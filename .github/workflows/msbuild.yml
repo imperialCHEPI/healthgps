@@ -13,21 +13,31 @@ env:
 
 jobs:
   build:
+    name: Run MSBuild
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+      id: checkout_code
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
+      id: setup_msbuild
 
     - name: Restore NuGet packages
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+      id: restore_packages
 
-    - name: Build
+    - name: Run MSBuild
       working-directory: ${{env.GITHUB_WORKSPACE}}
       
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      id: run_msbuild
+      
+    - name: Run Health-GPS
+      run: ${{env.SOLUTION_FILE_PATH}}\HealthGPS.Console.exe
+      id: run_healthgps
