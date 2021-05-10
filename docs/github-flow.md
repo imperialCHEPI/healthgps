@@ -4,13 +4,13 @@ Traditional Git-flow branching patterns are usually adopted by large software te
 
 The GitHub Flow branching structure assumes a single version in production with high-frequency integration onto a release-ready mainline, `main` branch, which should always be deployable. **Figure 1** shows the GitHub flow branching pattern, to work on something new, always start by creating a descriptively named branch off of `main` branch, and there is no difference between *hotfix* and a very small or large feature.
 
-![](images\GitFlow-repo.png)
+![](images/GitFlow-repo.png)
 
 *Figure 1 – Workflow using GitHub Flow Branching Policy*
 
 Developers always work with feature branching, never on the `main` branch. They push their feature branches regularly to the central repository, to support visibility, but there's no integration with mainline until the feature is complete. A feature branches can be a single line of code, or run for a couple of weeks, the process is intended to work the same way in either case. The GitHub pull-request mechanism must be used to integrate a new feature into the mainline with the option for pre-integration code review. **Figure 2** shows the suggested workflow for developing a single feature within the Health-GPS microsimulation project.
 
-![](images\GitFlow-feature.png)
+![](images/GitFlow-feature.png)
 
 *Figure 2 - GitHub Flow for a Single Feature*
 
