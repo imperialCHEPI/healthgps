@@ -386,3 +386,10 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+###############################################
+#    Visual Studio Ends Here
+###############################################
+
+# vcpkg installation folder
+vcpkg_installed/
