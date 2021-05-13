@@ -16,10 +16,5 @@ namespace HealthGPSTest
 			Assert::IsTrue(true);
 			Assert::IsFalse(hgps::getTimeNowStr().empty());
 		}
-
-		TEST_METHOD(InvalidLocalTime)
-		{
-			Assert::IsTrue(hgps::getTimeNowStr().empty());
-		}
 	};
 }
