@@ -1,4 +1,7 @@
+#include "boost/ut.hpp"
 #include "main.h"
+
+using namespace hgps;
 
 int main(int argc, char* argv[])
 {
