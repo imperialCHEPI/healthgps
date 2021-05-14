@@ -74,11 +74,11 @@ jobs:
       uses: papeloto/action-zip@v1
       with:
         files: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
-        dest: ${{ github.workspace }}\health_gps.zip
+        dest: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}\health_gps.zip
 
     - name: Upload artefacts
       id: upload_zip
       uses: actions/upload-artifact@v2
       with:
         name: health-gps
-        path: ${{ github.workspace }}\health_gps.zip
+        path: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}\health_gps.zip
