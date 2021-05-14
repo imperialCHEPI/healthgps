@@ -1,5 +1,5 @@
 #include "boost/ut.hpp"
-#include "main.h"
+#include "program.h"
 
 using namespace hgps;
 

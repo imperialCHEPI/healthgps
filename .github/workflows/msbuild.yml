@@ -1,7 +1,17 @@
 name: MSBuild
 
-on: [push]
+# Trigger the workflow on push or pull request to the main branch
+on: 
+  push:
+    branches:
+      - main
 
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+  
 env:
   # Path to the solution file relative to the root of the project.
   SOLUTION_FILE_PATH: .\source
@@ -13,28 +23,62 @@ env:
 
 jobs:
   build:
-    name: Run MSBuild
     runs-on: windows-latest
+    name: Run MSBuild and VSTest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Checkout code 
       id: checkout_code
+      uses: actions/checkout@v2
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Setup MSBuild and add to PATH
       id: setup_msbuild
+      uses: microsoft/setup-msbuild@v1.0.2
 
     - name: Restore NuGet packages
+      id: restore_nuget
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore ${{env.SOLUTION_FILE_PATH}}
-      id: restore_packages
-
-    - name: Run MSBuild
-      working-directory: ${{env.GITHUB_WORKSPACE}}
       
+    - name: Installing vcpkg (windows)
+      id: install_vcpkg
+      run: |
+        cd ..
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        git checkout --force 2021.04.30
+        .\bootstrap-vcpkg.bat -disableMetrics
+        .\vcpkg integrate install
+        
+    - name: Build
+      id: run_msbuild
+      working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}     
-      id: run_msbuild
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+      
+    - name: Setup VSTest and add to PATH
+      id: setup_vstest
+      uses: darenm/Setup-VSTest@v1
+      
+    - name: Run Test
+      id: run_vstest
+      working-directory: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
+      run: |
+        ls
+        .\HealthGPS.Console.exe
+        vstest.console.exe "HealthGPS.Tests.dll" /Settings:..\..\HealthGPS.Tests.runsettings
+        
+    - name: Zip output folder
+      id: zip_folder
+      uses: papeloto/action-zip@v1
+      with:
+        files: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
+        dest: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}\health_gps_bin.zip
 
+    - name: Upload artefacts
+      id: upload_zip
+      uses: actions/upload-artifact@v2
+      with:
+        name: health-gps
+        path: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}\health_gps_bin.zip
