@@ -11,11 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\boost\ut.hpp" />
-    <ClInclude Include="include\main.h" />
+    <ClInclude Include="include\program.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

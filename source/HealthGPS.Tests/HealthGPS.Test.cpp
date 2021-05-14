@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "..\HealthGPS.Console\include\main.h"
+#include "..\HealthGPS.Console\include\program.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
