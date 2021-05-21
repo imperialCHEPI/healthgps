@@ -6,13 +6,12 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1B1FECE1-A4B6-461D-982D-514E35857A71}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		HealthGPS.Tests.runsettings = HealthGPS.Tests.runsettings
 		vcpkg.json = vcpkg.json
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Console", "HealthGPS.Console\HealthGPS.Console.vcxproj", "{775CCE1D-5801-4180-8A99-AAF927E2E5FE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Tests", "HealthGPS.Tests\HealthGPS.Tests.vcxproj", "{F15A7CCE-4EF5-40AC-AB59-4C5551BAFF26}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Tests", "HealthGPS.Tests\HealthGPS.Tests.vcxproj", "{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +23,10 @@ Global
 		{775CCE1D-5801-4180-8A99-AAF927E2E5FE}.Debug|x64.Build.0 = Debug|x64
 		{775CCE1D-5801-4180-8A99-AAF927E2E5FE}.Release|x64.ActiveCfg = Release|x64
 		{775CCE1D-5801-4180-8A99-AAF927E2E5FE}.Release|x64.Build.0 = Release|x64
-		{F15A7CCE-4EF5-40AC-AB59-4C5551BAFF26}.Debug|x64.ActiveCfg = Debug|x64
-		{F15A7CCE-4EF5-40AC-AB59-4C5551BAFF26}.Debug|x64.Build.0 = Debug|x64
-		{F15A7CCE-4EF5-40AC-AB59-4C5551BAFF26}.Release|x64.ActiveCfg = Release|x64
-		{F15A7CCE-4EF5-40AC-AB59-4C5551BAFF26}.Release|x64.Build.0 = Release|x64
+		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Debug|x64.ActiveCfg = Debug|x64
+		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Debug|x64.Build.0 = Debug|x64
+		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Release|x64.ActiveCfg = Release|x64
+		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
