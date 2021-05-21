@@ -1,3 +1,5 @@
+#include <concepts>
+#include <random>
 #include "boost/ut.hpp"
 #include "program.h"
 
@@ -27,7 +29,8 @@ int main(int argc, char* argv[])
 	}
 
 	// TDD macro-free framework
-	boost::ut::expect(true);
+	auto value = rand_gen(std::mt19937{});
+	boost::ut::expect(value >= 0.0 && value < 1.0);
 
 	return EXIT_SUCCESS;
 }

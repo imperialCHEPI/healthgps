@@ -56,6 +56,26 @@ namespace hgps
 
 		return j2;
 	}
+
+	template<typename Gen>
+	concept random_number_engine = std::uniform_random_bit_generator<Gen>
+		&& requires (Gen rnd)
+	{
+		{rnd.seed()};
+		{rnd.seed(1U)};
+		{rnd.discard(1ULL)};
+	};
+
+	template<random_number_engine Gen>
+	auto rand_gen(Gen&& rnd, std::optional<unsigned int> seed = std::nullopt)
+	{
+		if (seed.has_value())
+		{
+			rnd.seed(seed.value());
+		}
+
+		return std::generate_canonical<double, 10>(rnd);
+	}
 }
 
 #endif //HEALTHGPS_CONSOLE_HPP_INCLUDED
