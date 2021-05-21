@@ -63,7 +63,7 @@ jobs:
       run: |
         ls
         .\HealthGPS.Console.exe
-        .\HealthGPS.Test.exe
+        .\HealthGPS.Tests.exe
                
     - name: Zip output folder
       id: zip_folder
