@@ -7,6 +7,15 @@
     <ClCompile Include="Console.Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core.Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthGPS.Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Datastore.Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -15,10 +24,19 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{593c5d91-d86d-4822-8a5c-9986c3af9a49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\boost">
+      <UniqueIdentifier>{d0615a27-dbfc-4db4-9e62-7e4886b764f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="boost\ut.hpp">
+      <Filter>Header Files\boost</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

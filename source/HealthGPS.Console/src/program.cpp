@@ -3,7 +3,7 @@
 #include "boost/ut.hpp"
 #include "program.h"
 
-using namespace hgps;
+using namespace hgps::host;
 
 int main(int argc, char* argv[])
 {

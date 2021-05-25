@@ -28,10 +28,14 @@
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemGroup>
+    <ClInclude Include="boost\ut.hpp" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.Test.cpp" />
+    <ClCompile Include="Core.Test.cpp" />
+    <ClCompile Include="Datastore.Test.cpp" />
+    <ClCompile Include="HealthGPS.Test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -43,6 +47,15 @@
   <ItemGroup>
     <ProjectReference Include="..\HealthGPS.Console\HealthGPS.Console.vcxproj">
       <Project>{775cce1d-5801-4180-8a99-aaf927e2e5fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">
+      <Project>{d2996854-5d40-4aa1-a924-7cd3420a6e16}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\HealthGPS.Datastore\HealthGPS.Datastore.vcxproj">
+      <Project>{8e37a1cd-09aa-46aa-b666-f0a3b2a95e23}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\HealthGPS\HealthGPS.vcxproj">
+      <Project>{f56fa497-de90-4798-8134-d872a73a8281}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemDefinitionGroup />
@@ -59,6 +72,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -73,6 +87,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

@@ -5,6 +5,8 @@
   "dependencies": [
     "fmt",
     "cxxopts",
-    "nlohmann-json"
+    "indicators",
+    "nlohmann-json",
+    "fast-cpp-csv-parser"
   ]
 }

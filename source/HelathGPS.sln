@@ -13,6 +13,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Console", "Health
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Tests", "HealthGPS.Tests\HealthGPS.Tests.vcxproj", "{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS", "HealthGPS\HealthGPS.vcxproj", "{F56FA497-DE90-4798-8134-D872A73A8281}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Datastore", "HealthGPS.Datastore\HealthGPS.Datastore.vcxproj", "{8E37A1CD-09AA-46AA-B666-F0A3B2A95E23}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Core", "HealthGPS.Core\HealthGPS.Core.vcxproj", "{D2996854-5D40-4AA1-A924-7CD3420A6E16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -27,6 +33,18 @@ Global
 		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Debug|x64.Build.0 = Debug|x64
 		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Release|x64.ActiveCfg = Release|x64
 		{D481CBF1-1D9A-41C9-9C07-7F2058AC5D9B}.Release|x64.Build.0 = Release|x64
+		{F56FA497-DE90-4798-8134-D872A73A8281}.Debug|x64.ActiveCfg = Debug|x64
+		{F56FA497-DE90-4798-8134-D872A73A8281}.Debug|x64.Build.0 = Debug|x64
+		{F56FA497-DE90-4798-8134-D872A73A8281}.Release|x64.ActiveCfg = Release|x64
+		{F56FA497-DE90-4798-8134-D872A73A8281}.Release|x64.Build.0 = Release|x64
+		{8E37A1CD-09AA-46AA-B666-F0A3B2A95E23}.Debug|x64.ActiveCfg = Debug|x64
+		{8E37A1CD-09AA-46AA-B666-F0A3B2A95E23}.Debug|x64.Build.0 = Debug|x64
+		{8E37A1CD-09AA-46AA-B666-F0A3B2A95E23}.Release|x64.ActiveCfg = Release|x64
+		{8E37A1CD-09AA-46AA-B666-F0A3B2A95E23}.Release|x64.Build.0 = Release|x64
+		{D2996854-5D40-4AA1-A924-7CD3420A6E16}.Debug|x64.ActiveCfg = Debug|x64
+		{D2996854-5D40-4AA1-A924-7CD3420A6E16}.Debug|x64.Build.0 = Debug|x64
+		{D2996854-5D40-4AA1-A924-7CD3420A6E16}.Release|x64.ActiveCfg = Release|x64
+		{D2996854-5D40-4AA1-A924-7CD3420A6E16}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
