@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 
 	// TDD macro-free framework
 	auto value = rand_gen(std::mt19937{});
-	boost::ut::expect(value >= 0.0 && value < 1.0);
+	boost::ut::expect(value >= 0);
 
 	return EXIT_SUCCESS;
 }
