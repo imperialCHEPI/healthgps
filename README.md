@@ -18,8 +18,9 @@ The code in this repository is licensed under the ***TODO*** License.
 | [indicators](https://github.com/p-ranav/indicators)                        | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)                          | MIT          |
 | [fast-cpp-csv-parser](https://github.com/ben-strasser/fast-cpp-csv-parser) | BSD 3-Clause |
+| *Experimental* ||
 | [arrow](https://github.com/apache/arrow)                                   | Apache-2.0   |
-
+| [Adevs](https://sourceforge.net/projects/adevs/)                           | BSD 3-Clause |
 ### Tools and Frameworks
 | Name  | License |
 |:---   |:---     |

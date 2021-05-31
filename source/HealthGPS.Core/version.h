@@ -17,6 +17,8 @@ namespace hgps {
 			Version() = delete;
 			Version(const Version&) = delete;
 			Version& operator=(const Version&) = delete;
+			Version(const Version&&) = delete;
+			Version& operator=(const Version&&) = delete;
 
 			static int GetMajor();
 			static int GetMinor();

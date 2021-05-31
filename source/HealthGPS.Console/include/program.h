@@ -4,10 +4,14 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
+#include <limits>
+#include <optional>
+#include <random>
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <cxxopts.hpp>
 #include <nlohmann/json.hpp>
+#include "../../HealthGPS/api.h"
 
 namespace hgps {
 	namespace host {
@@ -76,6 +80,62 @@ namespace hgps {
 			}
 
 			return rnd(); // std::generate_canonical<double, 10>(rnd);
+		};
+
+		/*
+		class RandomBitGenerator
+		{
+		public:
+			using result_type = unsigned int;
+			virtual result_type operator()() = 0;
+
+			static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
+			static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
+		};
+
+		class Random : public RandomBitGenerator
+		{
+		public:
+			Random() = delete;
+			Random(std::optional<unsigned int> seed = std::nullopt) : RandomBitGenerator()
+			{
+				if (seed.has_value())
+				{
+					rnd.seed(seed.value());
+				}
+				else
+				{
+					std::random_device rd;
+					rnd.seed(rd());
+				}
+			}
+
+			~Random() = default;
+
+			result_type operator()() override { return rnd(); }
+
+		private:
+			std::mt19937 rnd;
+		};
+		*/
+
+		void print_canonical(RandomBitGenerator& rnd, unsigned int n)
+		{
+			for (size_t i = 0; i < n; i++) {
+				fmt::print("{} ", std::generate_canonical<float, 5>(rnd));
+			}
+
+			fmt::print("\n\n");
+		}
+
+		void print_uniform_int_dist(RandomBitGenerator& rnd, unsigned int n, int max = 10)
+		{
+			std::uniform_int_distribution undist(0, max);
+			for (size_t i = 0; i < n; i++) {
+				fmt::print("{} ", undist(rnd));
+			}
+
+			fmt::print("\n\n");
 		}
 	}
 }

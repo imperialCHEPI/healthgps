@@ -13,17 +13,47 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\adevs">
+      <UniqueIdentifier>{43acd7c7-6bb8-4561-9254-03d0faa29c85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="visibility.h">
+    <ClInclude Include="interfaces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="options.h">
+    <ClInclude Include="mtrandom.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scenario.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="adevs\adevs.h">
+      <Filter>Header Files\adevs</Filter>
+    </ClInclude>
+    <ClInclude Include="adevs\adevs_base.h">
+      <Filter>Header Files\adevs</Filter>
+    </ClInclude>
+    <ClInclude Include="adevs\adevs_pdevs.h">
+      <Filter>Header Files\adevs</Filter>
+    </ClInclude>
+    <ClInclude Include="adevs\adevs_time.h">
+      <Filter>Header Files\adevs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="options.cpp">
+    <ClCompile Include="mtrandom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="simulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scenario.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

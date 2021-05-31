@@ -32,6 +32,9 @@ namespace hgps {
 			/// If false, column names will be read from the first CSV row after `skip_rows`.
 			bool autogenerate_column_names = false;
 
+			/// Gets the core library version 
+			static std::string GetApiVersion();
+
 			/// Create read options with default values
 			static ReadOptions Defaults();
 		};

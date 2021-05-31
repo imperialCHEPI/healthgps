@@ -8,7 +8,7 @@ TEST(TestHealthGPSCore, CurrentApiVersion)
 	using namespace hgps::core;
 
 	std::stringstream ss;
-	ss << API_MAJOR << "." << API_MINOR << "." << API_PATCH;	
+	ss << API_MAJOR << "." << API_MINOR << "." << API_PATCH;
 
 	EXPECT_EQ(API_MAJOR, Version::GetMajor());
 	EXPECT_EQ(API_MINOR, Version::GetMinor());
