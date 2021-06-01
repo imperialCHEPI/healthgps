@@ -178,7 +178,7 @@ class Model
 	private:
 		friend class Simulator<DataType,TimeType>;
 		TimeType priority;
-		unsigned heap_pos;
+		size_t heap_pos;
 		bool remove;
 		std::vector<DataType> *msgs, *defer;
 };
@@ -405,7 +405,7 @@ void Simulator<DataType,TimeType>::percolate_up(Model<DataType,TimeType>* model)
 {
 	assert(model->priority < adevs_inf<TimeType>());
 	assert(heap[model->heap_pos] == model);
-	unsigned index = model->heap_pos;
+	size_t index = model->heap_pos;
 	/* priority < heap_parent->priority stops percolating up
 	 * as soon as possible. */
 	while (heap[index/2] != NULL && model->priority < heap[index/2]->priority) 
@@ -423,7 +423,7 @@ template <typename DataType, typename TimeType>
 void Simulator<DataType,TimeType>::percolate_down(Model<DataType,TimeType>* model)
 {
 	assert(heap[model->heap_pos] == model);
-	unsigned child, index = model->heap_pos;
+	size_t child, index = model->heap_pos;
 	for (; index*2 < heap.size(); index = child) 
 	{
 		child = index*2;
@@ -459,7 +459,7 @@ void Simulator<DataType,TimeType>::percolate_away(Model<DataType,TimeType>* mode
 	heap.pop_back();
 	if (heap.size() > 1)
 	{
-		const unsigned parent = move->heap_pos/2;
+		const size_t parent = move->heap_pos/2;
 		if (heap[parent] != NULL &&
 				heap[move->heap_pos]->priority < heap[parent]->priority)
 			percolate_up(move);
