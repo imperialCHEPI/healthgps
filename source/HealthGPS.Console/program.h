@@ -11,7 +11,7 @@
 #include <fmt/color.h>
 #include <cxxopts.hpp>
 #include <nlohmann/json.hpp>
-#include "../../HealthGPS/api.h"
+#include "../HealthGPS/api.h"
 
 namespace hgps {
 	namespace host {

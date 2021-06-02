@@ -19,6 +19,12 @@ namespace hgps {
 		return engine_();
 	}
 
+	
+	double MTRandom32::next_double()
+	{
+		return std::generate_canonical<double, std::numeric_limits<double>::digits>(engine_);
+	}
+
 	void MTRandom32::seed(const unsigned int seed) {
 		engine_.seed(seed);
 	}

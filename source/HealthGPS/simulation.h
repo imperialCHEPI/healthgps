@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-#include "adevs/adevs.h"
+#include <adevs/adevs.h>
+
 #include "interfaces.h"
 #include "scenario.h"
 
@@ -11,7 +12,6 @@ namespace hgps {
 	{
 	public:
 		Simulation() = delete;
-		explicit Simulation(Scenario& scenario);
 		explicit Simulation(Scenario& scenario, RandomBitGenerator&& generator);
 		
 		adevs::Time init(adevs::SimEnv<int>* env);
@@ -22,7 +22,7 @@ namespace hgps {
 
 		void fini(adevs::Time clock);
 
-		double next_double() const;
+		double next_double();
 	private:
 		RandomBitGenerator& rnd_;
 		Scenario scenario_;

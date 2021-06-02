@@ -1,4 +1,5 @@
 #include "program.h"
+#include <fmt/chrono.h>
 
 #include "../../HealthGPS/adevs/adevs.h"
 
@@ -49,9 +50,7 @@ int main(int argc, char* argv[])
 	
 	/* Create the model */
 	hgps::Scenario inputs(2010, 2030);
-
-	//auto model = hgps::Simulation(inputs, hgps::MTRandom32());
-	auto model = hgps::Simulation(inputs);
+	auto model = hgps::Simulation(inputs, hgps::MTRandom32());
 
 	/* Create the simulation context */
 	adevs::Simulator<int> sim;
@@ -60,9 +59,16 @@ int main(int argc, char* argv[])
 	sim.add(&model);
 
 	/* Run until the next event is at infinity */
+	auto start = std::chrono::steady_clock::now();
 	while (sim.next_event_time() < adevs_inf<adevs::Time>()) {
 		sim.exec_next_event();
 	}
+
+	std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
+	fmt::print("\n");
+	fmt::print(fg(fmt::color::blue) | bg(fmt::color::light_yellow),
+		"Elapsed time : {}ms", elapsed.count());
+	fmt::print("\n");
 
 	return EXIT_SUCCESS;
 }

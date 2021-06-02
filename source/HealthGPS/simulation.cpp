@@ -1,4 +1,3 @@
-#include <limits>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -8,18 +7,6 @@
 
 
 namespace hgps {
-	/*
-	Simulation::Simulation(Scenario& scenario) 
-		: scenario_(scenario), rnd_(*(new MTRandom32{}))
-	{
-	}
-	*/
-
-	Simulation::Simulation(Scenario& scenario)
-		: Simulation(scenario, std::move(*(new MTRandom32{})))
-	{
-	}
-
 	Simulation::Simulation(Scenario& scenario, RandomBitGenerator&& generator)
 		: scenario_{ scenario }, rnd_{ generator }
 	{
@@ -72,8 +59,5 @@ namespace hgps {
 				  << ", clear up memory." << std::endl;
 	}
 
-	double Simulation::next_double() const
-	{
-		return std::generate_canonical<double, std::numeric_limits<double>::digits>(rnd_);
-	}
+	double Simulation::next_double() { return rnd_.next_double(); }
 }

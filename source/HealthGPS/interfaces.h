@@ -12,6 +12,8 @@ namespace hgps {
 
 		virtual unsigned int operator()() = 0;
 
+		virtual double next_double() = 0;
+
 		virtual void seed(unsigned int) = 0;
 
 		virtual void discard(unsigned long long skip) = 0;

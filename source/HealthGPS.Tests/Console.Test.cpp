@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "..\HealthGPS.Console\include\program.h"
+#include "..\HealthGPS.Console\program.h"
 
 TEST(TestConsole, LocalTimeNow)
 {
