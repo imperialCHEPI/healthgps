@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	if (!scenario.has_value()) {
 		fmt::print(fg(fmt::color::blue) | bg(fmt::color::alice_blue),
 			       "\nNo configuration file, running default scenario.\n");
-		hgps::Scenario inputs(2015, 2025);
+		scenario = hgps::Scenario(2015, 2025);
 	}
 
 	auto model = hgps::Simulation(scenario.value(), hgps::MTRandom32());
