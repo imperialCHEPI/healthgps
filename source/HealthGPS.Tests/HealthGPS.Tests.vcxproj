@@ -26,9 +26,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>$(SolutionDir)\external;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExternalIncludePath>$(SolutionDir)\external;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -38,7 +40,6 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Console.Test.cpp" />
     <ClCompile Include="Core.Test.cpp" />
     <ClCompile Include="Datastore.Test.cpp" />
     <ClCompile Include="HealthGPS.Test.cpp" />
@@ -51,9 +52,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HealthGPS.Console\HealthGPS.Console.vcxproj">
-      <Project>{775cce1d-5801-4180-8a99-aaf927e2e5fe}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">
       <Project>{d2996854-5d40-4aa1-a924-7cd3420a6e16}</Project>
     </ProjectReference>

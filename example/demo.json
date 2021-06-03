@@ -1,0 +1,21 @@
+{
+    "inputs": {
+        "file" :{},
+        "population":{},
+        "ses_mapping": {}
+    },
+    "modelling": {
+        "risk_factors":{},
+        "models":{
+            "static": {},
+            "dynamic":{}
+        }
+    },
+    "running": {
+        "seed":[123456789],
+        "start_time": 2010,
+        "stop_time": 2030,
+        "diseases": [],
+        "intervention":{}
+    }
+}

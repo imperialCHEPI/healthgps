@@ -59,12 +59,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(SolutionDir)\external;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(MSBuildProjectDirectory)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(SolutionDir)\external;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">

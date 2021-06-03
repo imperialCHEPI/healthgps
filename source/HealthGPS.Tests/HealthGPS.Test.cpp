@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "..\HealthGPS\api.h"
+#include "HealthGPS\api.h"
 
 TEST(TestHelathGPS, RandomBitGenerator)
 {

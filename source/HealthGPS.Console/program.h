@@ -1,5 +1,4 @@
-#ifndef HEALTHGPS_CONSOLE_HPP_INCLUDED
-#define HEALTHGPS_CONSOLE_HPP_INCLUDED
+#pragma once
 
 #include <chrono>
 #include <ctime>
@@ -7,11 +6,14 @@
 #include <limits>
 #include <optional>
 #include <random>
+#include <fstream>
+#include <filesystem>
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <cxxopts.hpp>
 #include <nlohmann/json.hpp>
-#include "../HealthGPS/api.h"
+
+#include "HealthGPS/api.h"
 
 namespace hgps {
 	namespace host {
@@ -60,6 +62,31 @@ namespace hgps {
 			};
 
 			return j2;
+		}
+
+		std::optional<Scenario> create_scenario(std::string file_name)
+		{
+			std::ifstream ifs(file_name, std::ifstream::in);
+			if (ifs)
+			{
+				auto config = json::parse(ifs);
+				auto start = config["running"]["start_time"].get<int>();
+				auto stop = config["running"]["stop_time"].get<int>();
+				auto seed = config["running"]["seed"].get<std::vector<unsigned int>>();
+				Scenario settings(start, stop);
+				if (seed.size() > 0) {
+					settings.custom_seed = seed[0];
+				}
+
+				return settings;
+			}
+			else
+			{
+				std::cout << std::format("File {} doesn't exist.", file_name) << std::endl;
+			}
+
+			ifs.close();
+			return std::nullopt;
 		}
 
 		template<typename Gen>
@@ -139,5 +166,3 @@ namespace hgps {
 		}
 	}
 }
-
-#endif //HEALTHGPS_CONSOLE_HPP_INCLUDED

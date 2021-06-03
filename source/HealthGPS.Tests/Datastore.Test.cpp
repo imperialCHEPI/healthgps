@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "..\HealthGPS.Datastore\options.h"
+#include "HealthGPS.Datastore\options.h"
 
 TEST(TestDatastore, DefaultOptions)
 {

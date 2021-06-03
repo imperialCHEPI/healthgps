@@ -1,7 +1,7 @@
 #include <sstream>
 #include "pch.h"
 
-#include "..\HealthGPS.Core\version.h"
+#include "HealthGPS.Core\version.h"
 
 TEST(TestHealthGPSCore, CurrentApiVersion)
 {
