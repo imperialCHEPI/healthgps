@@ -1,18 +1,32 @@
 #include "pch.h"
-#include "HealthGPS.Datastore\options.h"
+#include "HealthGPS.Datastore\api.h"
 
-TEST(TestDatastore, DefaultOptions)
+namespace fs = std::filesystem;
+
+TEST(TestDatastore, CreateFileRepository)
 {
 	using namespace hgps::data;
 
-	auto opt = ReadOptions();
-	EXPECT_EQ(ReadOptions::Defaults().block_size, opt.block_size);
+	auto full_path = fs::absolute("../../../data");
+
+	auto repo = FileRepository(full_path);
+
+	auto countries = repo.get_countries();
+
+	ASSERT_GT(countries.size(), 0);
 }
 
-TEST(TestDatastore, CoreAPIVersion)
+TEST(TestDatastore, CreateDataManager)
 {
 	using namespace hgps::data;
 
-	auto version = ReadOptions::GetApiVersion();
-	EXPECT_EQ("0.1.0", version);
+	auto full_path = fs::absolute("../../../data");
+
+	auto repo = FileRepository(full_path);
+
+	auto manager = DataManager(repo);
+
+	auto countries = manager.get_countries();
+
+	ASSERT_GT(countries.size(), 0);
 }

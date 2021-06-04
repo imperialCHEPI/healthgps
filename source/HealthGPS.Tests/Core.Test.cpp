@@ -1,7 +1,7 @@
 #include <sstream>
 #include "pch.h"
 
-#include "HealthGPS.Core\version.h"
+#include "HealthGPS.Core\api.h"
 
 TEST(TestHealthGPSCore, CurrentApiVersion)
 {
@@ -24,3 +24,19 @@ TEST(TestHealthGPSCore, CurrentApiVersion)
 	EXPECT_FALSE(Version::IsAtLeast(API_MAJOR, API_MINOR, API_PATCH + 1));
 }
 
+TEST(TestHealthGPSCore, CreateCountry)
+{
+	using namespace hgps::core;
+
+	auto id = "GB";
+	auto uk = "United Kingdom";
+
+
+	auto c = Country{
+		.code = id,
+		.name = uk
+	};
+
+	EXPECT_EQ(id, c.code);
+	EXPECT_EQ(uk, c.name);
+}

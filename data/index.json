@@ -1,1 +1,6 @@
-{}
+{
+    "country":{
+        "format":"csv",
+        "filename":"Countries.csv"
+    }
+}

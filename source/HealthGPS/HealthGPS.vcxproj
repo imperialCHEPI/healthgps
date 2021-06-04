@@ -46,10 +46,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <ExternalIncludePath>$(SolutionDir)\external;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <ExternalIncludePath>$(SolutionDir)\external;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -97,12 +99,12 @@
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="mtrandom.h" />
     <ClInclude Include="scenario.h" />
-    <ClInclude Include="simulation.h" />
+    <ClInclude Include="healthgps.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp" />
     <ClCompile Include="scenario.cpp" />
-    <ClCompile Include="simulation.cpp" />
+    <ClCompile Include="healthgps.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">

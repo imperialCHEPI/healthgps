@@ -38,7 +38,8 @@ namespace hgps {
 			cxxopts::Options options("C++20 Study", "Creates a modern C++ tool chain study.");
 			options.add_options()
 				("h,help", "Help about this application.")
-				("f,file", "File name", cxxopts::value<std::string>())
+				("f,file", "Configuration file full name.", cxxopts::value<std::string>())
+				("s,storage","Path to file data storage root folder.", cxxopts::value<std::string>())
 				("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"));
 
 			return options;
@@ -64,7 +65,7 @@ namespace hgps {
 			return j2;
 		}
 
-		std::optional<Scenario> create_scenario(std::string file_name)
+		Scenario create_scenario(std::filesystem::path file_name)
 		{
 			std::ifstream ifs(file_name, std::ifstream::in);
 			if (ifs)
@@ -78,15 +79,18 @@ namespace hgps {
 					settings.custom_seed = seed[0];
 				}
 
+				settings.country = config["inputs"]["population"]["country"].get<std::string>();
+
+				ifs.close();
 				return settings;
 			}
 			else
 			{
-				std::cout << std::format("File {} doesn't exist.", file_name) << std::endl;
+				std::cout << std::format("File {} doesn't exist.", file_name.string()) << std::endl;
 			}
 
 			ifs.close();
-			return std::nullopt;
+			return Scenario(2015, 2025);
 		}
 
 		template<typename Gen>

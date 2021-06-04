@@ -1,6 +1,7 @@
 #include "program.h"
 #include <fmt/chrono.h>
 #include <adevs/adevs.h>
+#include "HealthGPS.Datastore/api.h"
 
 using namespace hgps::host;
 
@@ -11,9 +12,9 @@ void run_experimental();
 int main(int argc, char* argv[])
 {
 	fmt::print(fg(fmt::color::yellow) | bg(fmt::color::blue) |
-		fmt::emphasis::bold, "\n# Hello Health-GPS Microsimulation World #\n\n");
+		fmt::emphasis::bold, "\n# Hello Health-GPS Microsimulation World #\n");
 
-	fmt::print("Today: {}\n\n", getTimeNowStr());
+	fmt::print("\nToday: {}\n\n", getTimeNowStr());
 
 	auto options = create_options();
 	auto result = options.parse(argc, argv);
@@ -23,36 +24,52 @@ int main(int argc, char* argv[])
 		return EXIT_SUCCESS;
 	}
 
-	std::optional<hgps::Scenario> scenario;
+	fs::path config_file {};
 	if (result.count("file"))
 	{
-		fs::path file_name = result["file"].as<std::string>();
-		std::string full_path{ file_name.string() };
-		if (file_name.is_relative()) {
-			full_path = std::filesystem::absolute(file_name).string();
-		}
-
-		scenario = create_scenario(full_path);
-		if (scenario.has_value()) {
-			fmt::print("Configuration file: {}\n", full_path);
+		config_file = result["file"].as<std::string>();
+		if (config_file.is_relative()) {
+			config_file = std::filesystem::absolute(config_file);
+			fmt::print("Configuration file.: {}\n", config_file.string());
 		}
 	}
-		
+
+	if (!fs::exists(config_file)) {
+		fmt::print(fg(fmt::color::red), "\n\nConfiguration file: {} not found.\n", config_file.string());
+		return EXIT_FAILURE;
+	}
+
+	fs::path storage_folder {};
+	if (result.count("storage"))
+	{
+		storage_folder = result["storage"].as<std::string>();
+		if (storage_folder.is_relative()) {
+			storage_folder = std::filesystem::absolute(storage_folder);
+			fmt::print("File storage folder: {}\n", storage_folder.string());
+		}
+	}
+
+	if (!fs::exists(storage_folder)) {
+		fmt::print(fg(fmt::color::red), "\n\nFile storage folder: {} not found.\n", storage_folder.string());
+		return EXIT_FAILURE;
+	}
+
 	/* Create the model */
-	if (!scenario.has_value()) {
-		fmt::print(fg(fmt::color::blue) | bg(fmt::color::alice_blue),
-			       "\nNo configuration file, running default scenario.\n");
-		scenario = hgps::Scenario(2015, 2025);
-	}
+	auto scenario = create_scenario(config_file);
+	auto repo = hgps::data::FileRepository{ storage_folder };
+	auto data_api = hgps::data::DataManager(repo);
+	
+	auto model = hgps::HealthGPS(scenario, hgps::MTRandom32());
 
-	auto model = hgps::Simulation(scenario.value(), hgps::MTRandom32());
-
-	fmt::print(fg(fmt::color::green) | bg(fmt::color::alice_blue),
-		"\nStarting simulation ...\n\n");
+	fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
 
 	auto start = std::chrono::steady_clock::now();
 	try
 	{
+		// Selected country
+		auto countries = data_api.get_countries();
+		fmt::print("There are {} countries in storage.\n\n", countries.size());
+
 		/* Create the simulation context */
 		adevs::Simulator<int> sim;
 
@@ -66,8 +83,7 @@ int main(int argc, char* argv[])
 
 		std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
 		fmt::print("\n");
-		fmt::print(fg(fmt::color::blue) | bg(fmt::color::light_yellow),
-			"Completed, elapsed time : {}ms", elapsed.count());
+		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", elapsed.count());
 	}
 	catch (const std::exception& ex)
 	{
@@ -75,7 +91,9 @@ int main(int argc, char* argv[])
 		fmt::print(fg(fmt::color::red), "\n\nFailed after {}ms with message {}.\n", elapsed.count(), ex.what());
 	}
 
-	fmt::print(fg(fmt::color::light_green), "\n\nGoodbye.\n");
+	fmt::print("\n\n");
+	fmt::print(fg(fmt::color::yellow) | bg(fmt::color::blue), "Goodbye");
+	fmt::print("\n\n");
 
 	return EXIT_SUCCESS;
 }

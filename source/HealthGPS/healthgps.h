@@ -8,11 +8,11 @@
 
 namespace hgps {
 
-	class Simulation : public adevs::Model<int>
+	class HealthGPS : public adevs::Model<int>
 	{
 	public:
-		Simulation() = delete;
-		explicit Simulation(Scenario& scenario, RandomBitGenerator&& generator);
+		HealthGPS() = delete;
+		explicit HealthGPS(Scenario& scenario, RandomBitGenerator&& generator);
 		
 		adevs::Time init(adevs::SimEnv<int>* env);
 

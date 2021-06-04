@@ -1,7 +1,9 @@
 {
     "inputs": {
         "file" :{},
-        "population":{},
+        "population":{
+            "country":"GB"
+        },
         "ses_mapping": {}
     },
     "modelling": {

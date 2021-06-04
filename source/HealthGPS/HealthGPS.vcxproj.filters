@@ -24,7 +24,7 @@
     <ClInclude Include="api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="simulation.h">
+    <ClInclude Include="healthgps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scenario.h">
@@ -35,7 +35,7 @@
     <ClCompile Include="mtrandom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="simulation.cpp">
+    <ClCompile Include="healthgps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="scenario.cpp">

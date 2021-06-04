@@ -15,15 +15,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="visibility.h">
+    <ClInclude Include="datamanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="options.h">
+    <ClInclude Include="api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filerepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="options.cpp">
+    <ClCompile Include="datamanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filerepository.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

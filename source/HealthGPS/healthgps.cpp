@@ -2,17 +2,17 @@
 #include <chrono>
 #include <thread>
 
-#include "simulation.h"
+#include "healthgps.h"
 #include "mtrandom.h"
 
 
 namespace hgps {
-	Simulation::Simulation(Scenario& scenario, RandomBitGenerator&& generator)
+	HealthGPS::HealthGPS(Scenario& scenario, RandomBitGenerator&& generator)
 		: scenario_{ scenario }, rnd_{ generator }
 	{
 	}
 
-	adevs::Time Simulation::init(adevs::SimEnv<int>* env)
+	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)
 	{
 		end_time_ = adevs::Time(scenario_.get_stop_time(), 0);
 		if (scenario_.custom_seed.has_value())
@@ -26,7 +26,7 @@ namespace hgps {
 		return env->now() + adevs::Time(scenario_.get_start_time(), 0);
 	}
 
-	adevs::Time Simulation::update(adevs::SimEnv<int>* env)
+	adevs::Time HealthGPS::update(adevs::SimEnv<int>* env)
 	{
 		std::uniform_int_distribution dist(100, 200);
 		auto sleep_time = dist(rnd_);
@@ -47,17 +47,17 @@ namespace hgps {
 		return adevs_inf<adevs::Time>();
 	}
 
-	adevs::Time Simulation::update(adevs::SimEnv<int>*, std::vector<int>&)
+	adevs::Time HealthGPS::update(adevs::SimEnv<int>*, std::vector<int>&)
 	{
 		// This method is never called because nobody sends messages.
 		return adevs_inf<adevs::Time>();
 	}
 
-	void Simulation::fini(adevs::Time clock)
+	void HealthGPS::fini(adevs::Time clock)
 	{
 		std::cout << "Finished @ " << clock.real << "," << clock.logical 
 				  << ", clear up memory." << std::endl;
 	}
 
-	double Simulation::next_double() { return rnd_.next_double(); }
+	double HealthGPS::next_double() { return rnd_.next_double(); }
 }
