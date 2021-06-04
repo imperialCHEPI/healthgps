@@ -97,11 +97,13 @@
   <ItemGroup>
     <ClInclude Include="api.h" />
     <ClInclude Include="interfaces.h" />
+    <ClInclude Include="modelrunner.h" />
     <ClInclude Include="mtrandom.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="modelrunner.cpp" />
     <ClCompile Include="mtrandom.cpp" />
     <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
