@@ -33,7 +33,9 @@ namespace hgps {
 
 		/// @brief Gets the entity unique identifier
 		/// @return The entity identifier
-		virtual unsigned int get_id() = 0;
+		virtual int get_id() const = 0;
+
+		virtual std::string to_string() const = 0;
 	};
 
 	/// @brief Simulation modules interface
@@ -44,22 +46,10 @@ namespace hgps {
 
 		/// @brief Gets the kind of module unique identifier
 		/// @return The module kind identifier
-		virtual std::string get_kind() = 0;
+		virtual std::string get_kind() const = 0;
 
 		virtual void execute(std::string_view command, std::vector<Entity>& entities) = 0;
 
 		virtual void execute(std::string_view command, Entity& entity) = 0;
-	};
-
-	/// @brief Simulation module builders interface
-	class ModuleBuilder
-	{
-	public:
-		virtual ~ModuleBuilder() = default;
-
-		/// @brief Create a new instance of the module
-		/// @param manager The data API to retrieve the modulo data 
-		/// @return The module instance
-		virtual std::unique_ptr<Module> Build(hgps::core::Datastore& manager) = 0;
 	};
 }

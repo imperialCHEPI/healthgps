@@ -1,7 +1,7 @@
 #pragma once
 
 #include <adevs/adevs.h>
-#include "HealthGPS.Core\datastore.h"
+#include "modulefactory.h"
 #include "scenario.h"
 
 namespace hgps {
@@ -9,7 +9,7 @@ namespace hgps {
 	class ModelRunner
 	{
 	public:
-		explicit ModelRunner(adevs::Model<int>& model, hgps::core::Datastore& manager);
+		explicit ModelRunner(adevs::Model<int>& model, ModuleFactory& factory);
 
 		ModelRunner() = delete;
 
@@ -17,6 +17,6 @@ namespace hgps {
 
 	private:
 		adevs::Model<int>& simulation_;
-		hgps::core::Datastore& datastore_;
+		ModuleFactory& factory_;
 	};
 }

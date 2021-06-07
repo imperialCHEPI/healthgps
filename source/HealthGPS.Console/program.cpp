@@ -28,8 +28,8 @@ int main(int argc, char* argv[])
 
 	// Create infrastructure
 	auto scenario = create_scenario(settings.config_file);
-	auto repo = hgps::data::FileRepository{ settings.storage_folder };
-	auto data_api = hgps::data::DataManager(repo);
+	auto data_api = hgps::data::DataManager(settings.storage_folder);
+	auto factory = hgps::ModuleFactory(data_api);
 
 	// Validate target country
 	auto countries = data_api.get_countries();
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 		auto model = hgps::HealthGPS(scenario, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = hgps::ModelRunner(model, data_api);
+		auto runner = hgps::ModelRunner(model, factory);
 		auto runtime = runner.run();
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}

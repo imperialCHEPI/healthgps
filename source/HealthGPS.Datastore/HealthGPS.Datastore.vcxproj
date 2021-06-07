@@ -100,12 +100,9 @@
   <ItemGroup>
     <ClInclude Include="api.h" />
     <ClInclude Include="datamanager.h" />
-    <ClInclude Include="filerepository.h" />
-    <ClInclude Include="repository.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="datamanager.cpp" />
-    <ClCompile Include="filerepository.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -96,8 +96,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="api.h" />
+    <ClInclude Include="countrymodule.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
+    <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />

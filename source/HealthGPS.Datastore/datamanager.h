@@ -1,7 +1,9 @@
 #pragma once
 
+#include <filesystem>
+#include <nlohmann/json.hpp>
+
 #include "HealthGPS.Core/api.h"
-#include "repository.h"
 
 namespace hgps {
 	namespace data {
@@ -11,15 +13,14 @@ namespace hgps {
 		class DataManager : public Datastore
 		{
 		public:
-			explicit DataManager(Repository& provider);
-			~DataManager();
-
 			DataManager() = delete;
+			explicit DataManager(const std::filesystem::path root_directory);
 
 			std::vector<Country> get_countries();
 
 		private:
-			Repository& source_;
+			const std::filesystem::path root_;
+			nlohmann::json index_;
 		};
 	} 
 }

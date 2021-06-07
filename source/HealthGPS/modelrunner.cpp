@@ -2,8 +2,8 @@
 #include "modelrunner.h"
 
 namespace hgps {
-	ModelRunner::ModelRunner(adevs::Model<int>& model, hgps::core::Datastore& manager)
-		: simulation_{model}, datastore_{manager}
+	ModelRunner::ModelRunner(adevs::Model<int>& model, ModuleFactory& factory)
+		: simulation_{ model }, factory_{ factory }
 	{
 	}
 
