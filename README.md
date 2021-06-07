@@ -17,9 +17,10 @@ The code in this repository is licensed under the ***TODO*** License.
 | [cxxopts](https://github.com/jarro2783/cxxopts)                            | MIT          |
 | [indicators](https://github.com/p-ranav/indicators)                        | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)                          | MIT          |
-| [fast-cpp-csv-parser](https://github.com/ben-strasser/fast-cpp-csv-parser) | BSD 3-Clause |
+| [rapidcsv](https://github.com/d99kris/rapidcsv)                            | BSD 3-Clause |
+| [Adevs](https://sourceforge.net/projects/adevs/)                           | BSD 3-Clause |
+| *Experimental* ||
 | [arrow](https://github.com/apache/arrow)                                   | Apache-2.0   |
-
 ### Tools and Frameworks
 | Name  | License |
 |:---   |:---     |

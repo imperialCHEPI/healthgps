@@ -15,10 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="visibility.h">
+    <ClInclude Include="version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="version.h">
+    <ClInclude Include="api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="datastore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="poco.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

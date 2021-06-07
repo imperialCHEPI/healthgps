@@ -62,7 +62,7 @@ jobs:
       working-directory: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
       run: |
         ls
-        .\HealthGPS.Console.exe
+        .\HealthGPS.Console.exe -f "..\..\..\example\demo.json" -s "..\..\..\data\"
         .\HealthGPS.Tests.exe
                
     - name: Zip output folder

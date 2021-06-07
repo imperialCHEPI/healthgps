@@ -1,0 +1,24 @@
+{
+    "inputs": {
+        "file" :{},
+        "population":{
+            "country":"GB"
+        },
+        "ses_mapping": {}
+    },
+    "modelling": {
+        "risk_factors":{},
+        "models":{
+            "static": {},
+            "dynamic":{}
+        }
+    },
+    "running": {
+        "seed":[123456789],
+        "start_time": 2010,
+        "stop_time": 2030,
+        "trial_runs": 1,
+        "diseases": [],
+        "intervention":{}
+    }
+}

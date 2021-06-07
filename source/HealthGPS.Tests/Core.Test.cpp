@@ -1,14 +1,14 @@
 #include <sstream>
 #include "pch.h"
 
-#include "..\HealthGPS.Core\version.h"
+#include "HealthGPS.Core\api.h"
 
 TEST(TestHealthGPSCore, CurrentApiVersion)
 {
 	using namespace hgps::core;
 
 	std::stringstream ss;
-	ss << API_MAJOR << "." << API_MINOR << "." << API_PATCH;	
+	ss << API_MAJOR << "." << API_MINOR << "." << API_PATCH;
 
 	EXPECT_EQ(API_MAJOR, Version::GetMajor());
 	EXPECT_EQ(API_MINOR, Version::GetMinor());
@@ -24,3 +24,19 @@ TEST(TestHealthGPSCore, CurrentApiVersion)
 	EXPECT_FALSE(Version::IsAtLeast(API_MAJOR, API_MINOR, API_PATCH + 1));
 }
 
+TEST(TestHealthGPSCore, CreateCountry)
+{
+	using namespace hgps::core;
+
+	auto id = "GB";
+	auto uk = "United Kingdom";
+
+
+	auto c = Country{
+		.code = id,
+		.name = uk
+	};
+
+	EXPECT_EQ(id, c.code);
+	EXPECT_EQ(uk, c.name);
+}

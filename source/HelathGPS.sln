@@ -5,6 +5,7 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1B1FECE1-A4B6-461D-982D-514E35857A71}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		vcpkg.json = vcpkg.json
 	EndProjectSection
@@ -18,6 +19,16 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Datastore", "HealthGPS.Datastore\HealthGPS.Datastore.vcxproj", "{8E37A1CD-09AA-46AA-B666-F0A3B2A95E23}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HealthGPS.Core", "HealthGPS.Core\HealthGPS.Core.vcxproj", "{D2996854-5D40-4AA1-A924-7CD3420A6E16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "external", "external", "{36493930-AECE-4E53-AA2E-35C337DED32D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adevs", "adevs", "{17709B40-0D3A-47C2-86B9-99BA080EB868}"
+	ProjectSection(SolutionItems) = preProject
+		external\adevs\adevs.h = external\adevs\adevs.h
+		external\adevs\adevs_base.h = external\adevs\adevs_base.h
+		external\adevs\adevs_pdevs.h = external\adevs\adevs_pdevs.h
+		external\adevs\adevs_time.h = external\adevs\adevs_time.h
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +59,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{36493930-AECE-4E53-AA2E-35C337DED32D} = {1B1FECE1-A4B6-461D-982D-514E35857A71}
+		{17709B40-0D3A-47C2-86B9-99BA080EB868} = {36493930-AECE-4E53-AA2E-35C337DED32D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {60C1B40B-40AB-4043-ADD8-832BDAED6B83}
