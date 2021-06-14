@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\table">
+      <UniqueIdentifier>{1341dec2-12ff-460c-b10a-5b1d64be36fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="datamanager.h">
@@ -21,10 +24,39 @@
     <ClInclude Include="api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="datatable.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="forward_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="visitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="column_numeric.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column_iterator.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column_builder.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="datamanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="datatable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="datatable.cd">
+      <Filter>Header Files\table</Filter>
+    </None>
   </ItemGroup>
 </Project>

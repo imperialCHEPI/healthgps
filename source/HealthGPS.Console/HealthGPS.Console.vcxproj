@@ -24,6 +24,13 @@
   <ItemGroup>
     <ClInclude Include="options.h" />
     <ClInclude Include="program.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="HealthGPS.Console.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="healthgps.ico" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

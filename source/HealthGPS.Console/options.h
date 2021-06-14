@@ -13,3 +13,16 @@ struct CommandOptions
 
 	bool verbose{};
 };
+
+struct Configuration
+{
+	std::string country;
+
+	std::optional<unsigned int> custom_seed;
+	
+	int start_time;
+
+	int stop_time;
+
+	int trial_runs;
+};
