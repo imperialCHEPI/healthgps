@@ -17,6 +17,8 @@ namespace hgps {
 
             virtual ~DataTableColumnVisitor() {};
 
+            virtual void visit(const StringDataTableColumn& column) = 0;
+
             virtual void visit(const FloatDataTableColumn& column) = 0;
 
             virtual void visit(const DoubleDataTableColumn& column) = 0;

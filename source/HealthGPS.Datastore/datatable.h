@@ -37,6 +37,8 @@ namespace hgps {
 
 			IteratorType end() const noexcept { return columns_.end(); }
 
+			std::string to_string() const;
+
 		private:
 			std::vector<std::string> names_{};
 			std::unordered_map < std::string, std::size_t> index_{};

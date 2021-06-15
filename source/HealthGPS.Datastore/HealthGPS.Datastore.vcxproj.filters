@@ -45,6 +45,9 @@
     <ClInclude Include="column_builder.h">
       <Filter>Header Files\table</Filter>
     </ClInclude>
+    <ClInclude Include="column_primitive.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="datamanager.cpp">

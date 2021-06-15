@@ -103,6 +103,7 @@
     <ClInclude Include="column_builder.h" />
     <ClInclude Include="column_iterator.h" />
     <ClInclude Include="column_numeric.h" />
+    <ClInclude Include="column_primitive.h" />
     <ClInclude Include="datamanager.h" />
     <ClInclude Include="datatable.h" />
     <ClInclude Include="forward_type.h" />

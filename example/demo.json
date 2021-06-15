@@ -8,7 +8,7 @@
                 "Year1": "integer",
                 "Gender": "integer",
                 "Age": "integer",
-                "AgeGroup":"integer",
+                "agegroup":"string",
                 "Age1": "integer",
                 "Age2": "integer",
                 "Age3": "integer",
@@ -28,6 +28,8 @@
             "delta_percent": 0
         },
         "ses_mapping": {
+            "gender": "Gender",
+            "age_group": "AgeGroup",
             "education": "Education",
             "income": "Income"
         }

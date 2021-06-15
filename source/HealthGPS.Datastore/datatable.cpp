@@ -54,5 +54,12 @@ namespace hgps {
 
 			return std::nullopt;
 		}
+
+		std::string DataTable::to_string() const
+		{
+			std::stringstream ss;
+			PrettyPrint(*this, 0, &ss));
+			return ss.str();
+		}
 	}
 }

@@ -22,9 +22,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="csvparser.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="program.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HealthGPS.Console.rc" />

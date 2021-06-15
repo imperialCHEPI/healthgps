@@ -1,7 +1,9 @@
 #include "program.h"
+#include "csvparser.h"
+#include "HealthGPS.Datastore/api.h"
+
 #include <fmt/chrono.h>
 #include <adevs/adevs.h>
-#include "HealthGPS.Datastore/api.h"
 
 using namespace hgps;
 namespace fs = std::filesystem;
@@ -28,6 +30,12 @@ int main(int argc, char* argv[])
 
 	// Parse configuration file 
 	auto config = load_configuration(settings);
+
+	auto input_table = hgps::data::DataTable();
+	if (!load_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
+	{
+		return EXIT_FAILURE;
+	}
 
 	// Create infrastructure
 	auto scenario = create_scenario(config);

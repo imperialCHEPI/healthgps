@@ -10,14 +10,14 @@ namespace hgps {
 	namespace data {
 
 		template<typename ColumnType>
-		class NumericDataTableColumnBuilder {
+		class PrimitiveDataTableColumnBuilder {
 
 		public:
 			using value_type = ColumnType::value_type;
 
-			NumericDataTableColumnBuilder() = delete;
+			PrimitiveDataTableColumnBuilder() = delete;
 
-			explicit NumericDataTableColumnBuilder(std::string name) : name_{ name }
+			explicit PrimitiveDataTableColumnBuilder(std::string name) : name_{ name }
 			{
 				if (name_.length() < 2 || !std::isalpha(name_.front())) {
 					throw std::invalid_argument(
@@ -80,8 +80,9 @@ namespace hgps {
 		};
 
 		// Builders
-		using FloatDataTableColumnBuilder = NumericDataTableColumnBuilder<FloatDataTableColumn>;
-		using DoubleDataTableColumnBuilder = NumericDataTableColumnBuilder<DoubleDataTableColumn>;
-		using IntegerDataTableColumnBuilder = NumericDataTableColumnBuilder<IntegerDataTableColumn>;
+		using StringDataTableColumnBuilder = PrimitiveDataTableColumnBuilder<StringDataTableColumn>;
+		using FloatDataTableColumnBuilder = PrimitiveDataTableColumnBuilder<FloatDataTableColumn>;
+		using DoubleDataTableColumnBuilder = PrimitiveDataTableColumnBuilder<DoubleDataTableColumn>;
+		using IntegerDataTableColumnBuilder = PrimitiveDataTableColumnBuilder<IntegerDataTableColumn>;
 	}
 }

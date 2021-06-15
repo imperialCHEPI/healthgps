@@ -48,7 +48,7 @@ TEST(TestHelathGPS, RandomBitGeneratorCopy)
 TEST(TestHelathGPS, SimulationInitialise)
 {
 	using namespace hgps;
-	Scenario inputs(2010, 2030);
+	Scenario inputs(2010, 2030, 1);
 
 	auto sim = HealthGPS(inputs, MTRandom32());
 	EXPECT_TRUE(sim.next_double() >= 0);

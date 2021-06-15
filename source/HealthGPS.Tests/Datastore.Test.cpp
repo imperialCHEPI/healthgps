@@ -20,9 +20,16 @@ TEST(TestDatastore, CreateTableColumn)
 {
 	using namespace hgps::data;
 
+	auto str_col = StringDataTableColumn("string", { "Cat", "Dog", "" }, { true, true, false });
 	auto flt_col = FloatDataTableColumn("float", { 5.7f, 15.37f, 0.0f, 20.75f }, { true, true, false, true});
 	auto dbl_col = DoubleDataTableColumn("double", { 7.13, 15.37, 20.75 }, {true, true, true });
 	auto int_col = IntegerDataTableColumn("integer", { 0, 15, 200 }, {false, true, true });
+
+	ASSERT_EQ(3, str_col.length());
+	ASSERT_EQ(1, str_col.null_count());
+	ASSERT_TRUE(str_col.is_null(2));
+	ASSERT_FALSE(str_col.is_null(0));
+	ASSERT_TRUE(str_col.is_null(7)); // outside bound
 
 	ASSERT_EQ(4, flt_col.length());
 	ASSERT_EQ(1, flt_col.null_count());
@@ -81,32 +88,46 @@ TEST(TestDatastore, TableColumnInterator)
 	ASSERT_EQ(10.0, sum);
 }
 
+TEST(TestDatastore, StringColumnTest)
+{
+	using namespace hgps::data;
+
+	auto dbl_col = DoubleDataTableColumn("double", { 1.5, 3.5, 2.0, 3.0 }, { true, true, true, true });
+
+	auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0);
+
+	ASSERT_EQ(4, dbl_col.length());
+	ASSERT_EQ(10.0, sum);
+}
 
 TEST(TestDatastore, CreateDataTable)
 {
 	using namespace hgps::data;
 
+	auto str_values = std::vector<std::string>{ "Cat", "Dog", "", "Cow", "Fox"};
 	auto flt_values = std::vector<float>{ 5.7f, 7.13f, 15.37f, 0.0f, 20.75f };
 	auto int_values = std::vector<int>{ 15, 78, 154, 0, 200 };
 
+	auto str_duilder = StringDataTableColumnBuilder{ "String" };
 	auto ftl_duilder = FloatDataTableColumnBuilder{ "Floats" };
 	auto dbl_duilder = DoubleDataTableColumnBuilder{ "Doubles" };
 	auto int_duilder = IntegerDataTableColumnBuilder{ "Integer" };
 
 	for (size_t i = 0; i < flt_values.size(); i++)
 	{
-		ftl_duilder.append(flt_values[i]);
-		dbl_duilder.append(flt_values[i] + 1.0);
-
-		int_duilder.append(int_values[i]);
+		str_values[i].empty() ? str_duilder.append_null() : str_duilder.append(str_values[i]);
+		flt_values[i] == float{} ? ftl_duilder.append_null() : ftl_duilder.append(flt_values[i]);
+		flt_values[i] == double{} ? dbl_duilder.append_null() : dbl_duilder.append(flt_values[i] + 1.0);
+		int_values[i] == int{} ? int_duilder.append_null() : int_duilder.append(int_values[i]);
 	}
 
 	auto table = DataTable();
+	table.add(str_duilder.build());
 	table.add(ftl_duilder.build());
 	table.add(dbl_duilder.build());
 	table.add(int_duilder.build());
 
-	ASSERT_EQ(3, table.count());
+	ASSERT_EQ(4, table.count());
 }
 
 TEST(TestDatastore, DataTableFailWithColumnLenMismath)

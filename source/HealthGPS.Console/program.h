@@ -13,6 +13,7 @@
 
 #include "HealthGPS/api.h"
 #include "options.h"
+#include "utility.h"
 
 namespace fs = std::filesystem;
 
@@ -27,12 +28,6 @@ std::string getTimeNowStr() {
 	std::strftime(&s[0], s.size(), "%c", &localtime);
 
 	return s;
-}
-
-bool iequals(const std::string& a, const std::string& b)
-{
-	return std::equal(a.begin(), a.end(), b.begin(), b.end(),
-		[](char a, char b) { return tolower(a) == tolower(b); });
 }
 
 cxxopts::Options create_options()

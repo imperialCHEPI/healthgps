@@ -18,6 +18,7 @@ namespace hgps {
 		template<Numerical TYPE>
 		class NumericDataTableColumn;
 
+		class StringDataTableColumn;
 		class FloatDataTableColumn;
 		class DoubleDataTableColumn;
 		class IntegerDataTableColumn;
