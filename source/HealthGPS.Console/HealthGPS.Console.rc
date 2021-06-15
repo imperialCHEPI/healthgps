@@ -93,6 +93,13 @@ END
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "healthgps.ico"
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// PNG
+//
+
+IDB_PNG1                PNG                     "C:\\Utilities\\VS2019 Image Library\\vswin2019\\ValidateModel\\ValidateModel_16x.png"
+
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 

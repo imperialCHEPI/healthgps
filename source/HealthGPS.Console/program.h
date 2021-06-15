@@ -10,12 +10,10 @@
 #include <fmt/core.h>
 #include <fmt/color.h>
 #include <cxxopts.hpp>
-#include <nlohmann/json.hpp>
 
 #include "HealthGPS/api.h"
 #include "options.h"
 
-using json = nlohmann::json;
 namespace fs = std::filesystem;
 
 std::string getTimeNowStr() {
@@ -108,37 +106,67 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 	return cmd;
 }
 
-hgps::Scenario create_scenario(std::filesystem::path file_name)
-{
-	std::ifstream ifs(file_name, std::ifstream::in);
+Configuration load_configuration(CommandOptions& options) {
+
+	Configuration config;
+	std::ifstream ifs(options.config_file, std::ifstream::in);
 	if (ifs)
 	{
-		auto config = json::parse(ifs);
-		auto start = config["running"]["start_time"].get<int>();
-		auto stop = config["running"]["stop_time"].get<int>();
-		auto seed = config["running"]["seed"].get<std::vector<unsigned int>>();
+		auto opt = json::parse(ifs);
 
-		hgps::Scenario settings(start, stop);
-		if (seed.size() > 0) {
-			settings.custom_seed = seed[0];
+		// input data file
+		config.file = opt["inputs"]["file"].get<FileInfo>();
+		fs::path full_path = config.file.name;
+		if (full_path.is_relative()) {
+			full_path = options.config_file.parent_path() / config.file.name;
+			if (fs::exists(full_path)) {
+				config.file.name = full_path.string();
+				fmt::print("Input data file....: {}\n", config.file.name);
+			}
 		}
 
-		settings.country = config["inputs"]["population"]["country"].get<std::string>();
+		if (!fs::exists(full_path)) {
+			fmt::print(fg(fmt::color::red),
+				"\n\nInput data file: {} not found.\n",
+				full_path.string());
+		}
 
-		ifs.close();
-		return settings;
+		// Population and SES mapping
+		config.population = opt["inputs"]["population"].get<Population>();
+		opt["inputs"].at("ses_mapping").get_to(config.ses_mapping);
+
+		// Run-time
+		opt["running"]["start_time"].get_to(config.start_time);
+		opt["running"]["stop_time"].get_to(config.stop_time);
+		opt["running"]["trial_runs"].get_to(config.trial_runs);
+		auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
+		if (seed.size() > 0) {
+			config.custom_seed = seed[0];
+		}
 	}
 	else
 	{
-		std::cout << std::format("File {} doesn't exist.", file_name.string()) << std::endl;
+		std::cout << std::format(
+			"File {} doesn't exist.",
+			options.config_file.string()) << std::endl;
 	}
 
 	ifs.close();
-
-	// default test scenario
-	return hgps::Scenario(2015, 2025);
+	return config;
 }
 
+hgps::Scenario create_scenario(Configuration& config)
+{
+	hgps::Scenario scenario(
+		config.start_time,
+		config.stop_time,
+		config.trial_runs);
+
+	scenario.country = config.population.country;
+	scenario.custom_seed = config.custom_seed;
+
+	return scenario;
+}
 
 std::optional<hgps::core::Country> find_country(const std::vector<hgps::core::Country>& v, std::string code)
 {

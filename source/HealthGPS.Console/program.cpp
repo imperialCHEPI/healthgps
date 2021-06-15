@@ -26,8 +26,11 @@ int main(int argc, char* argv[])
 		return settings.exit_code;
 	}
 
+	// Parse configuration file 
+	auto config = load_configuration(settings);
+
 	// Create infrastructure
-	auto scenario = create_scenario(settings.config_file);
+	auto scenario = create_scenario(config);
 	auto data_api = hgps::data::DataManager(settings.storage_folder);
 	auto factory = hgps::ModuleFactory(data_api);
 
