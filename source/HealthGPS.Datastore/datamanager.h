@@ -16,7 +16,9 @@ namespace hgps {
 			DataManager() = delete;
 			explicit DataManager(const std::filesystem::path root_directory);
 
-			std::vector<Country> get_countries();
+			std::vector<Country> get_countries() const override;
+
+			std::optional<Country> get_country(std::string code) const override;
 
 		private:
 			const std::filesystem::path root_;

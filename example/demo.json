@@ -22,7 +22,7 @@
             }
         },
         "population":{
-            "country":"GB",
+            "country_code":"GB",
             "identity": "Year1",
             "start_value": 2014,
             "delta_percent": 0

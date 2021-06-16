@@ -80,14 +80,14 @@ void from_json(const json& j, FileInfo& p) {
 // population
 void to_json(json& j, const Population& p) {
 	j = json{ 
-		{"country", p.country},
+		{"country_code", p.country},
 		{"identity", p.identity},
 		{"start_value", p.start_value},
 		{"delta_percent", p.delta_percent}};
 }
 
 void from_json(const json& j, Population& p) {
-	j.at("country").get_to(p.country);
+	j.at("country_code").get_to(p.country);
 	j.at("identity").get_to(p.identity);
 	j.at("start_value").get_to(p.start_value);
 	j.at("delta_percent").get_to(p.delta_percent);

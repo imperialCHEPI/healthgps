@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 
 	// Validate target country
 	auto countries = data_api.get_countries();
-	fmt::print("\nThere are {} countries in storage.\n", countries.size());
-	auto target = find_country(countries, scenario.country);
+	fmt::print("There are {} countries in storage.\n", countries.size());
+	auto target = data_api.get_country(scenario.country);
 	if (target.has_value())	{
 		fmt::print("Target country: {} - {}.\n", target.value().code, target.value().name);
 	}
