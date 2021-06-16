@@ -12,9 +12,6 @@ namespace hgps {
 		class DataTable;
 		class DataTableColumn;
 
-		template <typename ColumnType>
-		class DataTableColumnIterator;
-
 		template<Numerical TYPE>
 		class NumericDataTableColumn;
 

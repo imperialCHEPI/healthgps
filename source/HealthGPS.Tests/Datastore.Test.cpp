@@ -16,7 +16,7 @@ TEST(TestDatastore, CreateDataManager)
 	ASSERT_GT(countries.size(), 0);
 }
 
-TEST(TestDatastore, CreateTableColumn)
+TEST(TestDatastore, CreateTableColumnWithNulls)
 {
 	using namespace hgps::data;
 
@@ -56,6 +56,40 @@ TEST(TestDatastore, CreateTableColumn)
 	ASSERT_TRUE(int_col.is_valid(1));
 }
 
+TEST(TestDatastore, CreateTableColumnWithoutNulls)
+{
+	using namespace hgps::data;
+
+	auto str_col = StringDataTableColumn("string", { "Cat", "Dog", "Cow" });
+	auto flt_col = FloatDataTableColumn("float", { 7.13f, 15.37f, 0.0f, 20.75f });
+	auto dbl_col = DoubleDataTableColumn("double", { 7.13, 15.37, 20.75 });
+	auto int_col = IntegerDataTableColumn("integer", { 0, 15, 200 });
+
+	ASSERT_EQ(3, str_col.length());
+	ASSERT_EQ(0, str_col.null_count());
+	ASSERT_EQ("Dog", *str_col.value(1));
+	ASSERT_TRUE(str_col.is_valid(0));
+	ASSERT_FALSE(str_col.is_null(0));
+
+	ASSERT_EQ(4, flt_col.length());
+	ASSERT_EQ(0, flt_col.null_count());
+	ASSERT_EQ(15.37f, *flt_col.value(1));
+	ASSERT_TRUE(flt_col.is_valid(0));
+	ASSERT_FALSE(flt_col.is_null(0));
+
+	ASSERT_EQ(3, dbl_col.length());
+	ASSERT_EQ(0, dbl_col.null_count());
+	ASSERT_EQ(15.37, *dbl_col.value(1));
+	ASSERT_TRUE(dbl_col.is_valid(1));
+	ASSERT_FALSE(dbl_col.is_null(1));
+
+	ASSERT_EQ(3, int_col.length());
+	ASSERT_EQ(0, int_col.null_count());
+	ASSERT_EQ(15, *int_col.value(1));
+	ASSERT_TRUE(int_col.is_valid(0));
+	ASSERT_FALSE(int_col.is_null(0));
+}
+
 TEST(TestDatastore, CreateTableColumnFailWithLenMismatch)
 {
 	using namespace hgps::data;
@@ -83,28 +117,27 @@ TEST(TestDatastore, CreateTableColumnFailWithInvalidName)
 		std::invalid_argument);
 }
 
-TEST(TestDatastore, TableColumnInterator)
+TEST(TestDatastore, TableColumnIterator)
 {
 	using namespace hgps::data;
 
-	auto dbl_col = DoubleDataTableColumn("double", { 1.5, 3.5, 2.0, 3.0 }, { true, true, true, true });
+	auto dbl_col = DoubleDataTableColumn("double",
+		{ 1.5, 3.5, 2.0, 0.0, 3.0, 0.0, 5.0 },
+		{ true, true, true, false, true, false, true });
 
-	auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0);
+	double loop_sum = 0.0;
+	for (auto& item : dbl_col)
+	{
+		loop_sum += item.value_or(0.0);
+	}
 
-	ASSERT_EQ(4, dbl_col.length());
-	ASSERT_EQ(10.0, sum);
-}
+	auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0,
+		[](auto a, auto b) {return b.has_value() ? a + b.value() : a; });
 
-TEST(TestDatastore, StringColumnTest)
-{
-	using namespace hgps::data;
-
-	auto dbl_col = DoubleDataTableColumn("double", { 1.5, 3.5, 2.0, 3.0 }, { true, true, true, true });
-
-	auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0);
-
-	ASSERT_EQ(4, dbl_col.length());
-	ASSERT_EQ(10.0, sum);
+	ASSERT_EQ(7, dbl_col.length());
+	ASSERT_EQ(2, dbl_col.null_count());
+	ASSERT_EQ(15.0, sum);
+	ASSERT_EQ(loop_sum, sum);
 }
 
 TEST(TestDatastore, CreateDataTable)

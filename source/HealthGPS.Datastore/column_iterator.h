@@ -5,10 +5,23 @@
 namespace hgps {
 	namespace data {
 
-		template <typename ColumnType>
+		namespace detail {
+
+			template <typename ColumnType>
+			struct DefaultValueAccessor {
+				using ValueType = decltype(std::declval<ColumnType>().value(0));
+
+				ValueType operator()(const ColumnType& column, std::size_t index) {
+					return column.value(index);
+				}
+			};
+		}  // namespace detail
+
+		template <typename ColumnType, 
+			      typename ValueAccessor = detail::DefaultValueAccessor<ColumnType>>
 		class DataTableColumnIterator {
 		public:
-			using value_type = ColumnType::value_type;
+			using value_type = ValueAccessor::ValueType;
 			using difference_type = std::size_t;
 			using pointer = value_type*;
 			using reference = value_type&;

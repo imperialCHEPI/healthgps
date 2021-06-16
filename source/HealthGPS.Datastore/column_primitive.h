@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "column.h"
+#include "column_iterator.h"
 
 namespace hgps {
 	namespace data {
