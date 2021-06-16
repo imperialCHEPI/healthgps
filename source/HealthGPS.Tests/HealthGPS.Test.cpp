@@ -64,14 +64,14 @@ TEST(TestHelathGPS, ModuleFactoryRegistry)
 	auto manager = DataManager(full_path);
 
 	auto factory = ModuleFactory(manager);
-	factory.Register("country",
-		[](hgps::core::Datastore& manager) -> ModuleFactory::ModuleType {
+	factory.Register(ModuleType::Simulator,
+		[](hgps::core::Datastore& manager) -> ModuleFactory::ModuleInstance {
 			return build_country_module(manager);
 		});
 
 	auto p = Person(5);
 
-	auto country = factory.Create("country");
+	auto country = factory.Create(ModuleType::Simulator);
 	country->execute("print", p);
 	EXPECT_EQ(p.get_id(), 5);
 }

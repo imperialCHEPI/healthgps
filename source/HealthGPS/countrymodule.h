@@ -15,7 +15,9 @@ namespace hgps {
 		{
 		}
 
-		std::string get_kind() const override { return "country"; };
+		ModuleType type() const override { return ModuleType::Simulator; };
+
+		std::string name() const override { return "country"; }
 
 		virtual void execute(std::string_view command, std::vector<Entity>& entities) override {
 			for (auto& entity : entities) {
@@ -24,7 +26,7 @@ namespace hgps {
 		}
 
 		void execute(std::string_view command, Entity& entity) override {
-			std::cout << command << ": " << entity.to_string() << std::endl;
+			std::cout << command << ": " << entity.to_string() << " to " << name() << std::endl;
 		}
 
 	private:

@@ -9,32 +9,33 @@ namespace hgps {
 	class ModuleFactory
 	{
     public:
-        using ModuleType = std::unique_ptr<Module>;
-        using ConcreteBuilder = ModuleType(*)(hgps::core::Datastore&);
+        using ModuleInstance = std::unique_ptr<Module>;
+        using ConcreteBuilder = ModuleInstance(*)(hgps::core::Datastore&);
 
         ModuleFactory() = delete;
 
         explicit ModuleFactory(hgps::core::Datastore& manager) 
             :manager_{ manager } {}
 
-        void Register(std::string_view kind, ConcreteBuilder builder) {
-            builders_.emplace(kind, builder);
+        void Register(ModuleType type, ConcreteBuilder builder) {
+            builders_.emplace(type, builder);
         }
 
-        ModuleType Create(std::string_view kind) {
-            auto it = builders_.find(kind);
+        ModuleInstance Create(ModuleType type) {
+            auto it = builders_.find(type);
             if (it != builders_.end()) {
                 return it->second(manager_);
             }
             else
             {
-                throw std::invalid_argument{ "Trying to create a module of unknown kind: " + std::string(kind) };
+                throw std::invalid_argument{
+                    "Trying to create a module of unknown type: " + std::to_string((int)type) };
             }
         }
 
     private:
         hgps::core::Datastore& manager_;
-        std::unordered_map<std::string_view, ConcreteBuilder> builders_;
+        std::unordered_map<ModuleType, ConcreteBuilder> builders_;
 	};
 }
 
