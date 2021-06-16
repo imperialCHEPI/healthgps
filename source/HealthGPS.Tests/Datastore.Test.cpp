@@ -27,26 +27,33 @@ TEST(TestDatastore, CreateTableColumn)
 
 	ASSERT_EQ(3, str_col.length());
 	ASSERT_EQ(1, str_col.null_count());
+	ASSERT_EQ("Dog", *str_col.value(1));
 	ASSERT_TRUE(str_col.is_null(2));
+	ASSERT_FALSE(str_col.is_valid(2));
 	ASSERT_FALSE(str_col.is_null(0));
-	ASSERT_TRUE(str_col.is_null(7)); // outside bound
+	ASSERT_TRUE(str_col.is_valid(0));
 
 	ASSERT_EQ(4, flt_col.length());
 	ASSERT_EQ(1, flt_col.null_count());
+	ASSERT_EQ(15.37f, *flt_col.value(1));
 	ASSERT_TRUE(flt_col.is_null(2));
+	ASSERT_FALSE(flt_col.is_valid(2));
 	ASSERT_FALSE(flt_col.is_null(0));
-	ASSERT_TRUE(flt_col.is_null(7)); // outside bound
+	ASSERT_TRUE(flt_col.is_valid(0));
 
 	ASSERT_EQ(3, dbl_col.length());
 	ASSERT_EQ(0, dbl_col.null_count());
+	ASSERT_EQ(15.37, *dbl_col.value(1));
 	ASSERT_FALSE(dbl_col.is_null(1));
-	ASSERT_TRUE(dbl_col.is_null(7)); // outside bound
+	ASSERT_TRUE(dbl_col.is_valid(1));
 
 	ASSERT_EQ(3, int_col.length());
 	ASSERT_EQ(1, int_col.null_count());
+	ASSERT_EQ(15, *int_col.value(1));
 	ASSERT_TRUE(int_col.is_null(0));
+	ASSERT_FALSE(int_col.is_valid(0));
 	ASSERT_FALSE(int_col.is_null(1));
-	ASSERT_TRUE(int_col.is_null(7)); // outside bound
+	ASSERT_TRUE(int_col.is_valid(1));
 }
 
 TEST(TestDatastore, CreateTableColumnFailWithLenMismatch)
@@ -127,7 +134,8 @@ TEST(TestDatastore, CreateDataTable)
 	table.add(dbl_duilder.build());
 	table.add(int_duilder.build());
 
-	ASSERT_EQ(4, table.count());
+	ASSERT_EQ(4, table.num_columns());
+	ASSERT_EQ(5, table.num_rows());
 }
 
 TEST(TestDatastore, DataTableFailWithColumnLenMismath)

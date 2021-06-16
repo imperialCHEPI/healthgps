@@ -37,6 +37,8 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
+	std::cout << input_table.to_string();
+
 	// Create infrastructure
 	auto scenario = create_scenario(config);
 	auto data_api = hgps::data::DataManager(settings.storage_folder);

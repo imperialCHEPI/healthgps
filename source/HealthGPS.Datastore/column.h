@@ -20,7 +20,7 @@ namespace hgps {
 
             virtual ~DataTableColumn() {};
 
-            virtual const std::type_info& type() const noexcept = 0;
+            virtual const std::string type() const noexcept = 0;
 
             virtual const std::string name() const noexcept = 0;
 
@@ -29,6 +29,8 @@ namespace hgps {
             virtual const std::size_t length() const noexcept = 0;
 
             virtual const bool is_null(std::size_t index) const noexcept = 0;
+
+            virtual const bool is_valid(std::size_t index) const noexcept = 0;
 
             virtual void accept(DataTableColumnVisitor& visitor) const = 0;
         };

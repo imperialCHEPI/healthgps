@@ -26,7 +26,7 @@ struct FileInfo
 
 	std::string delimiter;
 
-	std::unordered_map<std::string,std::string> columns;
+	std::map<std::string,std::string> columns;
 };
 
 struct Population
@@ -46,7 +46,7 @@ struct Configuration
 
 	Population population;
 
-	std::unordered_map<std::string, std::string> ses_mapping;
+	std::map<std::string, std::string> ses_mapping;
 
 	std::optional<unsigned int> custom_seed;
 	

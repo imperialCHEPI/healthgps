@@ -23,7 +23,9 @@ namespace hgps {
 		public:
 			using IteratorType = std::vector<std::unique_ptr<DataTableColumn>>::const_iterator;
 
-			const std::size_t count() const noexcept;
+			const std::size_t num_columns() const noexcept;
+
+			const std::size_t num_rows() const noexcept;
 
 			const std::vector<std::string> names() const;
 
@@ -43,7 +45,7 @@ namespace hgps {
 			std::vector<std::string> names_{};
 			std::unordered_map < std::string, std::size_t> index_{};
 			std::vector<std::unique_ptr<DataTableColumn>> columns_{};
-			size_t row_count_ = 0;
+			size_t rows_count_ = 0;
 			std::mutex sync_mtx_{};
 		};
 	}

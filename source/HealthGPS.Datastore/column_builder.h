@@ -55,10 +55,17 @@ namespace hgps {
 				data_.shrink_to_fit();
 				null_bitmap_.shrink_to_fit();
 
-				return std::make_unique<ColumnType>(
-					std::move(name_),
-					std::move(data_),
-					std::move(null_bitmap_));
+				if (null_count_ > 0) {
+
+					// Contains null data, use null bitmap
+					return std::make_unique<ColumnType>(
+						std::move(name_),
+						std::move(data_),
+						std::move(null_bitmap_));
+				}
+
+				// Full vector, no need for null bitmap
+				return std::make_unique<ColumnType>(std::move(name_), std::move(data_));
 			}
 
 		private:

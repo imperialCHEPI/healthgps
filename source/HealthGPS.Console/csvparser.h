@@ -71,7 +71,7 @@ auto get_double_column(std::string name, std::vector<std::string>& data)
 
 bool load_csv(
 	const std::string& full_filename,
-	const std::unordered_map<std::string, std::string> columns,
+	const std::map<std::string, std::string> columns,
 	hd::DataTable& out_table,
 	const std::string delimiter = ",") {
 
@@ -82,10 +82,13 @@ bool load_csv(
 	// Validate columns and create file columns map
 	auto mismatch = 0;
 	auto headers = doc.GetColumnNames();
-	std::unordered_map<std::string, std::string> csv_cols;
+	std::map<std::string, std::string, case_insensitive::comparator> csv_cols;
 	for (auto& pair : columns)
 	{
-		auto is_match = [&pair](const auto& str) {return iequals(pair.first, str); };
+		auto is_match = [&pair](const auto& str) {
+			return case_insensitive::equals(pair.first, str);
+		};
+
 		if (auto it = std::find_if(headers.begin(), headers.end(), is_match); it != headers.end()) {
 			csv_cols[pair.first] = *it;
 		}
