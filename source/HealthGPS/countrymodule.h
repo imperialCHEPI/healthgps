@@ -10,8 +10,8 @@ namespace hgps {
 	{
 	public:
 		CountryModule() = delete;
-		explicit CountryModule(std::vector<hgps::core::Country> countries)
-			: countries_{ countries }
+		explicit CountryModule(std::vector<core::Country> countries, core::Country current)
+			: countries_{ countries }, current_{ current }
 		{
 		}
 
@@ -19,22 +19,23 @@ namespace hgps {
 
 		std::string name() const override { return "country"; }
 
-		virtual void execute(std::string_view command, std::vector<Entity>& entities) override {
+		virtual void execute(std::string_view command, RandomBitGenerator& generator, std::vector<Entity>& entities) override {
 			for (auto& entity : entities) {
-				execute(command, entity);
+				execute(command, generator, entity);
 			}
 		}
 
-		void execute(std::string_view command, Entity& entity) override {
-			std::cout << command << ": " << entity.to_string() << " to " << name() << std::endl;
+		void execute(std::string_view command, RandomBitGenerator& generator, Entity& entity) override {
+			std::cout << command << ": " << entity.to_string() << " from " <<
+				current_.name << " lucky #: " << generator() << std::endl;
 		}
 
 	private:
-
-		std::vector<hgps::core::Country> countries_;
+		core::Country current_;
+		std::vector<core::Country> countries_;
 	};
 
-	static std::unique_ptr<CountryModule> build_country_module(hgps::core::Datastore& manager) {
-		return std::make_unique<CountryModule>(manager.get_countries());
+	static std::unique_ptr<CountryModule> build_country_module(core::Datastore& manager, core::Country current) {
+		return std::make_unique<CountryModule>(manager.get_countries(), current);
 	}
 }

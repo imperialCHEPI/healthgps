@@ -62,16 +62,18 @@ TEST(TestHelathGPS, ModuleFactoryRegistry)
 	auto full_path = fs::absolute("../../../data");
 
 	auto manager = DataManager(full_path);
+	auto country = manager.get_country("GB");
 
 	auto factory = SimulationModuleFactory(manager);
 	factory.Register(SimulationModuleType::Simulator,
-		[](hgps::core::Datastore& manager) -> SimulationModuleFactory::ModuleType {
-			return build_country_module(manager);
+		[](core::Datastore& manager, core::Country& country) -> SimulationModuleFactory::ModuleType {
+			return build_country_module(manager, country);
 		});
 
 	auto p = Person(5);
 
-	auto country = factory.Create(SimulationModuleType::Simulator);
-	country->execute("print", p);
+	MTRandom32 rnd;
+	auto country_mod = factory.Create(SimulationModuleType::Simulator, country.value());
+	country_mod->execute("print", rnd, p);
 	EXPECT_EQ(p.id(), 5);
 }

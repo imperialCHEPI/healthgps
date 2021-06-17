@@ -5,11 +5,20 @@
 #include "healthgps.h"
 #include "mtrandom.h"
 
-
 namespace hgps {
 	HealthGPS::HealthGPS(Scenario& scenario, RandomBitGenerator&& generator)
-		: scenario_{ scenario }, rnd_{ generator }
+		: Simulation(std::move(generator)), scenario_{ scenario }
 	{
+	}
+
+	void HealthGPS::initialize() const
+	{
+		std::cout << "Microsimulation algorithm initialised." << std::endl;
+	}
+
+	void HealthGPS::terminate() const
+	{
+		std::cout << "Microsimulation algorithm terminate." << std::endl;
 	}
 
 	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)

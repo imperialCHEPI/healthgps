@@ -3,7 +3,6 @@
 #include "HealthGPS.Datastore/api.h"
 
 #include <fmt/chrono.h>
-#include <adevs/adevs.h>
 
 using namespace hgps;
 namespace fs = std::filesystem;
@@ -61,7 +60,7 @@ int main(int argc, char* argv[])
 		auto model = hgps::HealthGPS(scenario, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = hgps::ModelRunner(model, factory);
+		auto runner = hgps::ModelRunner(model, factory, 1);
 		auto runtime = runner.run();
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}

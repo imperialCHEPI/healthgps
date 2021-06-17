@@ -103,6 +103,7 @@
     <ClInclude Include="mtrandom.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
+    <ClInclude Include="simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="modelrunner.cpp" />

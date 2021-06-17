@@ -1,7 +1,7 @@
 #pragma once
 
-#include <adevs/adevs.h>
 #include "modulefactory.h"
+#include "simulation.h"
 #include "scenario.h"
 
 namespace hgps {
@@ -9,14 +9,15 @@ namespace hgps {
 	class ModelRunner
 	{
 	public:
-		explicit ModelRunner(adevs::Model<int>& model, SimulationModuleFactory& factory);
+		explicit ModelRunner(Simulation& model, SimulationModuleFactory& factory, const int trial_runs);
 
 		ModelRunner() = delete;
 
 		double run() const;
 
 	private:
-		adevs::Model<int>& simulation_;
+		const int trial_runs_;
+		Simulation& simulation_;
 		SimulationModuleFactory& factory_;
 	};
 }

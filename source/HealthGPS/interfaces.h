@@ -77,8 +77,14 @@ namespace hgps {
 		/// @return The human-readable module name
 		virtual std::string name() const = 0;
 
-		virtual void execute(std::string_view command, std::vector<Entity>& entities) = 0;
+		virtual void execute(
+			std::string_view command,
+			RandomBitGenerator& generator,
+			std::vector<Entity>& entities) = 0;
 
-		virtual void execute(std::string_view command, Entity& entity) = 0;
+		virtual void execute(
+			std::string_view command,
+			RandomBitGenerator& generator,
+			Entity& entity) = 0;
 	};
 }
