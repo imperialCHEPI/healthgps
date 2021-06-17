@@ -9,7 +9,7 @@ namespace hgps {
 	class ModelRunner
 	{
 	public:
-		explicit ModelRunner(adevs::Model<int>& model, ModuleFactory& factory);
+		explicit ModelRunner(adevs::Model<int>& model, SimulationModuleFactory& factory);
 
 		ModelRunner() = delete;
 
@@ -17,6 +17,6 @@ namespace hgps {
 
 	private:
 		adevs::Model<int>& simulation_;
-		ModuleFactory& factory_;
+		SimulationModuleFactory& factory_;
 	};
 }

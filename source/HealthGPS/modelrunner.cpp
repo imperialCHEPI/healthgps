@@ -2,7 +2,7 @@
 #include "modelrunner.h"
 
 namespace hgps {
-	ModelRunner::ModelRunner(adevs::Model<int>& model, ModuleFactory& factory)
+	ModelRunner::ModelRunner(adevs::Model<int>& model, SimulationModuleFactory& factory)
 		: simulation_{ model }, factory_{ factory }
 	{
 	}

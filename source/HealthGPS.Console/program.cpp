@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 	// Create infrastructure
 	auto scenario = create_scenario(config);
 	auto data_api = hgps::data::DataManager(settings.storage_folder);
-	auto factory = hgps::ModuleFactory(data_api);
+	auto factory = hgps::SimulationModuleFactory(data_api);
 
 	// Validate target country
 	auto countries = data_api.get_countries();

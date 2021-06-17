@@ -6,22 +6,22 @@
 
 namespace hgps {
 
-	class ModuleFactory
+	class SimulationModuleFactory
 	{
     public:
-        using ModuleInstance = std::unique_ptr<Module>;
-        using ConcreteBuilder = ModuleInstance(*)(hgps::core::Datastore&);
+        using ModuleType = std::unique_ptr<SimulationModule>;
+        using ConcreteBuilder = ModuleType(*)(hgps::core::Datastore&);
 
-        ModuleFactory() = delete;
+        SimulationModuleFactory() = delete;
 
-        explicit ModuleFactory(hgps::core::Datastore& manager) 
+        explicit SimulationModuleFactory(hgps::core::Datastore& manager) 
             :manager_{ manager } {}
 
-        void Register(ModuleType type, ConcreteBuilder builder) {
+        void Register(SimulationModuleType type, ConcreteBuilder builder) {
             builders_.emplace(type, builder);
         }
 
-        ModuleInstance Create(ModuleType type) {
+        ModuleType Create(SimulationModuleType type) {
             auto it = builders_.find(type);
             if (it != builders_.end()) {
                 return it->second(manager_);
@@ -35,7 +35,7 @@ namespace hgps {
 
     private:
         hgps::core::Datastore& manager_;
-        std::unordered_map<ModuleType, ConcreteBuilder> builders_;
+        std::unordered_map<SimulationModuleType, ConcreteBuilder> builders_;
 	};
 }
 

@@ -33,13 +33,13 @@ namespace hgps {
 
 		/// @brief Gets the entity unique identifier
 		/// @return The entity identifier
-		virtual int get_id() const = 0;
+		virtual int id() const = 0;
 
 		virtual std::string to_string() const = 0;
 	};
 
 	/// @brief Health GPS simulation modules types enumeration
-	enum class ModuleType : uint8_t
+	enum class SimulationModuleType : uint8_t
 	{
 		/// @brief Health GPS microsimulation algorithm
 		Simulator,
@@ -64,14 +64,14 @@ namespace hgps {
 	};
 
 	/// @brief Simulation modules interface
-	class Module
+	class SimulationModule
 	{
 	public:
-		virtual ~Module() = default;
+		virtual ~SimulationModule() = default;
 
 		/// @brief Gets the module type identifier
 		/// @return The module type identifier
-		virtual ModuleType type() const = 0;
+		virtual SimulationModuleType type() const = 0;
 
 		/// @brief Gets the module name
 		/// @return The human-readable module name

@@ -6,7 +6,7 @@
 
 namespace hgps {
 
-	class CountryModule : public Module
+	class CountryModule : public SimulationModule
 	{
 	public:
 		CountryModule() = delete;
@@ -15,7 +15,7 @@ namespace hgps {
 		{
 		}
 
-		ModuleType type() const override { return ModuleType::Simulator; };
+		SimulationModuleType type() const override { return SimulationModuleType::Simulator; };
 
 		std::string name() const override { return "country"; }
 

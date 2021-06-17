@@ -9,7 +9,7 @@ struct Person : public hgps::Entity {
 
 	Person(int id) : id_{id}{}
 
-	int get_id() const override { return id_; }
+	int id() const override { return id_; }
 
 	virtual std::string to_string() const override {
 		return std::format("Person # {}", id_);
@@ -63,15 +63,15 @@ TEST(TestHelathGPS, ModuleFactoryRegistry)
 
 	auto manager = DataManager(full_path);
 
-	auto factory = ModuleFactory(manager);
-	factory.Register(ModuleType::Simulator,
-		[](hgps::core::Datastore& manager) -> ModuleFactory::ModuleInstance {
+	auto factory = SimulationModuleFactory(manager);
+	factory.Register(SimulationModuleType::Simulator,
+		[](hgps::core::Datastore& manager) -> SimulationModuleFactory::ModuleType {
 			return build_country_module(manager);
 		});
 
 	auto p = Person(5);
 
-	auto country = factory.Create(ModuleType::Simulator);
+	auto country = factory.Create(SimulationModuleType::Simulator);
 	country->execute("print", p);
-	EXPECT_EQ(p.get_id(), 5);
+	EXPECT_EQ(p.id(), 5);
 }
