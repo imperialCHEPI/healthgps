@@ -11,12 +11,7 @@
 
 
 namespace hgps {
-	namespace data {
-
-		static std::string toLower(std::string s) {
-			std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-			return s;
-		}
+	namespace core {
 
 		class DataTable
 		{

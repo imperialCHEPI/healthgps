@@ -1,8 +1,9 @@
-#include "datatable.h"
 #include <stdexcept>
+#include "datatable.h"
+#include "string_util.h"
 
 namespace hgps {
-	namespace data {
+	namespace core {
 		const std::size_t DataTable::num_columns() const noexcept { return columns_.size(); }
 
 		const std::size_t DataTable::num_rows() const noexcept { return rows_count_; }
@@ -20,7 +21,7 @@ namespace hgps {
 					"Column lengths mismatch, new columns must have the same lengths of existing ones.");
 			}
 
-			auto column_key = toLower(column->name());
+			auto column_key = to_lower(column->name());
 			if (index_.contains(column_key)) {
 				throw std::invalid_argument("Duplicated column name is not allowed.");
 			}
@@ -43,7 +44,7 @@ namespace hgps {
 
 		const std::optional<std::reference_wrapper<DataTableColumn>> DataTable::column(std::string name)
 		{
-			auto lower_name = toLower(name);
+			auto lower_name = to_lower(name);
 			auto found = index_.find(lower_name);
 			if (found != index_.end()) {
 				// Reference to pointed object

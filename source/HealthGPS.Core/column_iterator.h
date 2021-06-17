@@ -3,7 +3,7 @@
 #include <iterator>
 
 namespace hgps {
-	namespace data {
+	namespace core {
 
 		namespace detail {
 
@@ -82,8 +82,8 @@ namespace hgps {
 namespace std {
 
 	template <typename ColumnType>
-	struct iterator_traits<::hgps::data::DataTableColumnIterator<ColumnType>> {
-		using IteratorType = ::hgps::data::DataTableColumnIterator<ColumnType>;
+	struct iterator_traits<::hgps::core::DataTableColumnIterator<ColumnType>> {
+		using IteratorType = ::hgps::core::DataTableColumnIterator<ColumnType>;
 		using difference_type = typename IteratorType::difference_type;
 		using value_type = typename IteratorType::value_type;
 		using pointer = typename IteratorType::pointer;

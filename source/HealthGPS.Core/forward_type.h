@@ -3,7 +3,7 @@
 
 // forward type declaration
 namespace hgps {
-	namespace data {
+	namespace core {
 
 		// C++20 concept for numeric columns types
 		template <typename T>

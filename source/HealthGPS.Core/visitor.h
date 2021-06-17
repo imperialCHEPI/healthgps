@@ -3,7 +3,7 @@
 #include "forward_type.h"
 
 namespace hgps {
-    namespace data {
+    namespace core {
 
         class DataTableColumnVisitor {
         public:

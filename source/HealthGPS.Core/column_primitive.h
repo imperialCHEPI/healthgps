@@ -7,7 +7,7 @@
 #include "column_iterator.h"
 
 namespace hgps {
-	namespace data {
+	namespace core {
 
 		template<typename TYPE>
 		class PrimitiveDataTableColumn : public DataTableColumn {

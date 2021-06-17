@@ -3,7 +3,7 @@
 #include "column_primitive.h"
 
 namespace hgps {
-    namespace data {
+    namespace core {
 
         class FloatDataTableColumn : public PrimitiveDataTableColumn<float> {
         public:

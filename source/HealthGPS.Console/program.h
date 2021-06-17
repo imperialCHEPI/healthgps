@@ -13,7 +13,6 @@
 
 #include "HealthGPS/api.h"
 #include "options.h"
-#include "utility.h"
 
 namespace fs = std::filesystem;
 
@@ -162,18 +161,3 @@ hgps::Scenario create_scenario(Configuration& config)
 
 	return scenario;
 }
-
-std::optional<hgps::core::Country> find_country(const std::vector<hgps::core::Country>& v, std::string code)
-{
-	auto is_target = [&code](const hgps::core::Country& obj) {
-		return case_insensitive::equals(obj.code, code);
-	};
-
-	if (auto it = std::find_if(v.begin(), v.end(), is_target); it != v.end())
-	{
-		return (*it);
-	}
-
-	return std::nullopt;
-}
-

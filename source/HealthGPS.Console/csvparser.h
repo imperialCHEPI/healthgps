@@ -1,17 +1,17 @@
 #pragma once
 
 #include <rapidcsv.h>
-#include "HealthGPS.Datastore/api.h"
-#include "utility.h"
+#include "HealthGPS.Core/api.h"
+#include "HealthGPS.Core/string_util.h"
 
-namespace hd = hgps::data;
+namespace hc = hgps::core;
 
 auto get_string_column(std::string name, std::vector<std::string>& data)
 {
-	auto builder = hd::StringDataTableColumnBuilder(name);
+	auto builder = hc::StringDataTableColumnBuilder(name);
 	for (auto& value : data) {
 		// trim string 
-		auto str = trim(value);
+		auto str = hc::trim(value);
 
 		if (str.length() > 0) {
 			builder.append(str);
@@ -26,7 +26,7 @@ auto get_string_column(std::string name, std::vector<std::string>& data)
 
 auto get_int_column(std::string name, std::vector<std::string>& data)
 {
-	auto builder = hd::IntegerDataTableColumnBuilder(name);
+	auto builder = hc::IntegerDataTableColumnBuilder(name);
 	for (auto& value : data) {
 		if (value.length() > 0) {
 			builder.append(std::stoi(value));
@@ -41,7 +41,7 @@ auto get_int_column(std::string name, std::vector<std::string>& data)
 
 auto get_float_column(std::string name, std::vector<std::string>& data)
 {
-	auto builder = hd::FloatDataTableColumnBuilder(name);
+	auto builder = hc::FloatDataTableColumnBuilder(name);
 	for (auto& value : data) {
 		if (value.length() > 0) {
 			builder.append(std::stof(value));
@@ -56,7 +56,7 @@ auto get_float_column(std::string name, std::vector<std::string>& data)
 
 auto get_double_column(std::string name, std::vector<std::string>& data)
 {
-	auto builder = hd::DoubleDataTableColumnBuilder(name);
+	auto builder = hc::DoubleDataTableColumnBuilder(name);
 	for (auto& value : data) {
 		if (value.length() > 0) {
 			builder.append(std::stod(value));
@@ -72,7 +72,7 @@ auto get_double_column(std::string name, std::vector<std::string>& data)
 bool load_csv(
 	const std::string& full_filename,
 	const std::map<std::string, std::string> columns,
-	hd::DataTable& out_table,
+	hc::DataTable& out_table,
 	const std::string delimiter = ",") {
 
 	using namespace rapidcsv;
@@ -82,11 +82,11 @@ bool load_csv(
 	// Validate columns and create file columns map
 	auto mismatch = 0;
 	auto headers = doc.GetColumnNames();
-	std::map<std::string, std::string, case_insensitive::comparator> csv_cols;
+	std::map<std::string, std::string, hc::case_insensitive::comparator> csv_cols;
 	for (auto& pair : columns)
 	{
 		auto is_match = [&pair](const auto& str) {
-			return case_insensitive::equals(pair.first, str);
+			return hc::case_insensitive::equals(pair.first, str);
 		};
 
 		if (auto it = std::find_if(headers.begin(), headers.end(), is_match); it != headers.end()) {
@@ -104,7 +104,7 @@ bool load_csv(
 
 	for (auto& pair : csv_cols)
 	{
-		auto col_type = to_lower(columns.at(pair.first));
+		auto col_type = hc::to_lower(columns.at(pair.first));
 
 		// Get raw data
 		auto data = doc.GetColumn<std::string>(pair.second);

@@ -7,7 +7,7 @@
 #include "column.h"
 
 namespace hgps {
-	namespace data {
+	namespace core {
 
 		template<typename ColumnType>
 		class PrimitiveDataTableColumnBuilder {

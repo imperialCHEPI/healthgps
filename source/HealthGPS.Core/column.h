@@ -6,7 +6,7 @@
 #include "visitor.h"
 
 namespace hgps {
-    namespace data {
+    namespace core {
 
         class DataTableColumn {
         public:

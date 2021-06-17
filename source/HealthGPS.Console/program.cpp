@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 	// Parse configuration file 
 	auto config = load_configuration(settings);
 
-	auto input_table = hgps::data::DataTable();
+	auto input_table = core::DataTable();
 	if (!load_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
 	{
 		return EXIT_FAILURE;
@@ -40,8 +40,8 @@ int main(int argc, char* argv[])
 
 	// Create infrastructure
 	auto scenario = create_scenario(config);
-	auto data_api = hgps::data::DataManager(settings.storage_folder);
-	auto factory = hgps::SimulationModuleFactory(data_api);
+	auto data_api = data::DataManager(settings.storage_folder);
+	auto factory = SimulationModuleFactory(data_api);
 
 	// Validate target country
 	auto countries = data_api.get_countries();
@@ -54,18 +54,16 @@ int main(int argc, char* argv[])
 		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", scenario.country);
 	}
 
-	try
-	{
+	try	{
 		// Create model
-		auto model = hgps::HealthGPS(scenario, hgps::MTRandom32());
+		auto model = HealthGPS(scenario, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = hgps::ModelRunner(model, factory, 1);
+		auto runner = ModelRunner(model, factory, 1);
 		auto runtime = runner.run();
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}
-	catch (const std::exception& ex)
-	{
+	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
 	}
 
