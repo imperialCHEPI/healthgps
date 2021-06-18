@@ -52,16 +52,17 @@ int main(int argc, char* argv[])
 	}
 
 	// Create model context
-	auto model_context = create_context(input_table, target.value(), config);
+	auto context = create_context(input_table, target.value(), config);
 
 	try	{
 
 		// Create model
-		auto model = HealthGPS(scenario, hgps::MTRandom32());
+		auto model = HealthGPS(context, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner(model, factory, config.trial_runs);
-		auto runtime = runner.run();
+		auto runner = ModelRunner(factory, context);
+
+		auto runtime = runner.run(model, config.trial_runs);
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}
 	catch (const std::exception& ex) {

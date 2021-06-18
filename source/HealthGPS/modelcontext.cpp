@@ -15,8 +15,16 @@ namespace hgps {
 		return input_data_;
 	}
 
-	RunInfo ModelContext::run_info() const noexcept	{
-		return run_info_;
+	unsigned int ModelContext::start_time() const noexcept {
+		return run_info_.start_time;
+	}
+
+	unsigned int ModelContext::stop_time() const noexcept {
+		return run_info_.stop_time;
+	}
+
+	std::optional<unsigned int> ModelContext::seed() const noexcept {
+		return run_info_.seed;
 	}
 
 	SESMapping ModelContext::ses_mapping() const noexcept {

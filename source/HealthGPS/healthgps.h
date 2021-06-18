@@ -11,7 +11,7 @@ namespace hgps {
 	{
 	public:
 		HealthGPS() = delete;
-		explicit HealthGPS(Scenario& scenario, RandomBitGenerator&& generator);
+		explicit HealthGPS(ModelContext& context, RandomBitGenerator&& generator);
 		
 		void initialize() const override;
 
@@ -27,6 +27,7 @@ namespace hgps {
 
 		double next_double();
 	private:
-		Scenario scenario_;
+
+		//Scenario& scenario_;
 	};
 }

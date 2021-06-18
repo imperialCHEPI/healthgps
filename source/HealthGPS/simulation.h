@@ -2,6 +2,7 @@
 
 #include <adevs/adevs.h>
 #include "interfaces.h"
+#include "modelcontext.h"
 
 namespace hgps {
 
@@ -9,20 +10,18 @@ namespace hgps {
 	{
 	public:
 		Simulation() = delete;
-		explicit Simulation(RandomBitGenerator&& generator)
-			: rnd_{generator}
+		explicit Simulation(ModelContext& context, RandomBitGenerator&& generator)
+			: context_{ context }, rnd_{ generator }
 		{}
 
 		virtual ~Simulation() = default;
-
-		int trial_number() const noexcept { return trial_number_; }
 
 		virtual void initialize() const = 0;
 
 		virtual void terminate() const = 0;
 
 	protected:
-		int trial_number_{};
+		ModelContext context_;
 		RandomBitGenerator& rnd_;
 		adevs::Time end_time_;
 	};

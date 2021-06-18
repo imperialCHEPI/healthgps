@@ -25,6 +25,8 @@ namespace hgps {
 				}
 			}
 
+			std::string name() const { return name_; }
+
 			std::size_t length() const { return data_.size(); }
 
 			std::size_t null_count() const { return null_count_; }
@@ -51,7 +53,7 @@ namespace hgps {
 				null_count_ = 0;
 			}
 
-			std::unique_ptr<ColumnType> build() {
+			[[nodiscard]] std::unique_ptr<ColumnType> build() {
 				data_.shrink_to_fit();
 				null_bitmap_.shrink_to_fit();
 

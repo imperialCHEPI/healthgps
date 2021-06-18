@@ -2,22 +2,22 @@
 #include "modelrunner.h"
 
 namespace hgps {
-	ModelRunner::ModelRunner(Simulation& model, SimulationModuleFactory& factory, const int trial_runs)
-		: simulation_{ model }, factory_{ factory }, trial_runs_{ trial_runs }
+
+	ModelRunner::ModelRunner(SimulationModuleFactory& factory, ModelContext& context)
+		: factory_{factory}, context_{context} {}
+
+	double ModelRunner::run(Simulation& model, const unsigned int trial_runs) const
 	{
-		if (trial_runs_ < 1) {
+		if (trial_runs < 1) {
 			throw std::invalid_argument("The number of trial runs must not be less than one.");
 		}
-	}
 
-	double ModelRunner::run() const
-	{
 		auto start = std::chrono::steady_clock::now();
 
 		/* Initialise simulation */
-		simulation_.initialize();
+		model.initialize();
 
-		for (size_t run = 1; run <= trial_runs_; run++)
+		for (size_t run = 1; run <= trial_runs; run++)
 		{
 			std::cout << std::format("Run # {} started...\n", run);
 
@@ -25,7 +25,7 @@ namespace hgps {
 			adevs::Simulator<int> sim;
 
 			/* Add the model to the engine */
-			sim.add(&simulation_);
+			sim.add(&model);
 
 			/* Run until the next event is at infinity */
 			while (sim.next_event_time() < adevs_inf<adevs::Time>()) {
@@ -36,7 +36,7 @@ namespace hgps {
 		}
 
 		/* Terminate simulation */
-		simulation_.terminate();
+		model.terminate();
 
 		std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
 		return elapsed.count();

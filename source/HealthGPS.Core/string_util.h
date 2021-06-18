@@ -18,9 +18,15 @@ namespace hgps {
 				bool operator() (const std::string& left, const std::string& right) const;
 			};
 
-			std::weak_ordering compare(const std::string& left, const std::string& right) const;
+			static std::weak_ordering compare(const std::string& left, const std::string& right);
 
 			static bool equals(const std::string_view& left, const std::string_view& right);
+
+			static bool contains(const std::string_view& text, const std::string_view& str);
+
+			static bool starts_with(const std::string_view& text, const std::string_view& str);
+
+			static bool ends_with(const std::string_view& text, const std::string_view& str);
 		};
 	}
 }

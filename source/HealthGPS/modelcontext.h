@@ -28,7 +28,11 @@ namespace hgps {
 
 		core::DataTable& data() const noexcept;
 
-		RunInfo run_info() const noexcept;
+		unsigned int start_time() const noexcept;
+
+		unsigned int stop_time() const noexcept;
+
+		std::optional<unsigned int> seed() const noexcept;
 
 		SESMapping ses_mapping() const noexcept;
 

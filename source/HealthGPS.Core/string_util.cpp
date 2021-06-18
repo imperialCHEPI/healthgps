@@ -30,7 +30,8 @@ namespace hgps {
         }
 
         std::weak_ordering case_insensitive::compare(
-            const std::string& left, const std::string& right) const {
+            const std::string& left, const std::string& right) {
+
             int cmp = to_lower(left).compare(to_lower(right));
             if (cmp < 0) {
                 return std::weak_ordering::less;
@@ -42,13 +43,56 @@ namespace hgps {
             return std::weak_ordering::equivalent;
         }
 
-        bool case_insensitive::equals(const std::string_view& left, const std::string_view& right) {
+        bool case_insensitive::equals(const std::string_view& left,
+            const std::string_view& right) {
+
             if (left.size() != right.size()) {
                 return false;
             }
 
             return std::equal(left.begin(), left.end(), right.begin(), right.end(),
-                [](char a, char b) { return tolower(a) == tolower(b); });
+                [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+        }
+
+        bool case_insensitive::contains(const std::string_view& text,
+            const std::string_view& str) {
+
+            if (str.length() > text.length()) {
+                return false;
+            }
+
+            auto it = std::search(text.begin(), text.end(), str.begin(), str.end(),
+                [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+
+            return it != text.end();
+        }
+
+        bool case_insensitive::starts_with(const std::string_view& text,
+            const std::string_view& str) {
+
+            if (str.length() > text.length()) {
+                return false;
+            }
+
+            auto it = std::search(text.begin(), text.begin() + str.length(),
+                str.begin(), str.end(),
+                [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+
+            return it == text.begin();
+        }
+
+        bool case_insensitive::ends_with(const std::string_view& text,
+            const std::string_view& str) {
+
+            if (str.length() > text.length()) {
+                return false;
+            }
+
+            auto it = std::search(text.rbegin(), text.rbegin() + str.length(),
+                str.rbegin(), str.rend(),
+                [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+
+            return it == text.rbegin();
         }
     }
 }

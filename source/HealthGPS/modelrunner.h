@@ -3,21 +3,20 @@
 #include "modulefactory.h"
 #include "simulation.h"
 #include "scenario.h"
+#include <HealthGPS/modelcontext.h>
 
 namespace hgps {
 
 	class ModelRunner
 	{
 	public:
-		explicit ModelRunner(Simulation& model, SimulationModuleFactory& factory, const int trial_runs);
-
 		ModelRunner() = delete;
+		explicit ModelRunner(SimulationModuleFactory& factory, ModelContext& context);
 
-		double run() const;
+		double run(Simulation& model, const unsigned int trial_runs) const;
 
 	private:
-		const int trial_runs_;
-		Simulation& simulation_;
-		SimulationModuleFactory& factory_;
+		ModelContext context_;
+		SimulationModuleFactory factory_;
 	};
 }

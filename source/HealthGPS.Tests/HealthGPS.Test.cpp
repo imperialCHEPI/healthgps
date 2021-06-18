@@ -45,12 +45,31 @@ TEST(TestHelathGPS, RandomBitGeneratorCopy)
 	EXPECT_NE(rnd(), copy());
 }
 
+
 TEST(TestHelathGPS, SimulationInitialise)
 {
 	using namespace hgps;
-	Scenario inputs(2010, 2030, 1);
 
-	auto sim = HealthGPS(inputs, MTRandom32());
+	auto count = 10U;
+	auto uk = core::Country{ .code = "GB", .name = "United Kingdom" };
+	auto builder = core::FloatDataTableColumnBuilder("Test");
+	for (size_t i = 0; i < count; i++)
+	{
+		if ((i % 2) == 0)
+			builder.append(i * 2.5f);
+		else
+			builder.append_null();
+	}
+
+	auto data = core::DataTable();
+	data.add(builder.build());
+	auto pop = Population(uk, builder.name(), 1, 0.1);
+	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
+	auto ses = SESMapping();
+	ses.entries.emplace("test", builder.name());
+	auto context = ModelContext(data, pop, info, ses);
+
+	auto sim = HealthGPS(context, MTRandom32());
 	EXPECT_TRUE(sim.next_double() >= 0);
 }
 

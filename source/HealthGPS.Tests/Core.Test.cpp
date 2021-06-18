@@ -3,6 +3,7 @@
 #include <numeric>
 
 #include "HealthGPS.Core\api.h"
+#include "HealthGPS.Core\string_util.h"
 
 TEST(TestHealthGPSCore, CurrentApiVersion)
 {
@@ -43,7 +44,7 @@ TEST(TestHealthGPSCore, CreateCountry)
 }
 
 
-TEST(TestDatastore, CreateTableColumnWithNulls)
+TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
 {
 	using namespace hgps::core;
 
@@ -83,7 +84,7 @@ TEST(TestDatastore, CreateTableColumnWithNulls)
 	ASSERT_TRUE(int_col.is_valid(1));
 }
 
-TEST(TestDatastore, CreateTableColumnWithoutNulls)
+TEST(TestHealthGPSCore, CreateTableColumnWithoutNulls)
 {
 	using namespace hgps::core;
 
@@ -117,7 +118,7 @@ TEST(TestDatastore, CreateTableColumnWithoutNulls)
 	ASSERT_FALSE(int_col.is_null(0));
 }
 
-TEST(TestDatastore, CreateTableColumnFailWithLenMismatch)
+TEST(TestHealthGPSCore, CreateTableColumnFailWithLenMismatch)
 {
 	using namespace hgps::core;
 
@@ -126,7 +127,7 @@ TEST(TestDatastore, CreateTableColumnFailWithLenMismatch)
 		std::invalid_argument);
 }
 
-TEST(TestDatastore, CreateTableColumnFailWithShortName)
+TEST(TestHealthGPSCore, CreateTableColumnFailWithShortName)
 {
 	using namespace hgps::core;
 
@@ -135,7 +136,7 @@ TEST(TestDatastore, CreateTableColumnFailWithShortName)
 		std::invalid_argument);
 }
 
-TEST(TestDatastore, CreateTableColumnFailWithInvalidName)
+TEST(TestHealthGPSCore, CreateTableColumnFailWithInvalidName)
 {
 	using namespace hgps::core;
 
@@ -144,7 +145,7 @@ TEST(TestDatastore, CreateTableColumnFailWithInvalidName)
 		std::invalid_argument);
 }
 
-TEST(TestDatastore, TableColumnIterator)
+TEST(TestHealthGPSCore, TableColumnIterator)
 {
 	using namespace hgps::core;
 
@@ -167,7 +168,7 @@ TEST(TestDatastore, TableColumnIterator)
 	ASSERT_EQ(loop_sum, sum);
 }
 
-TEST(TestDatastore, CreateDataTable)
+TEST(TestHealthGPSCore, CreateDataTable)
 {
 	using namespace hgps::core;
 
@@ -198,7 +199,7 @@ TEST(TestDatastore, CreateDataTable)
 	ASSERT_EQ(5, table.num_rows());
 }
 
-TEST(TestDatastore, DataTableFailWithColumnLenMismath)
+TEST(TestHealthGPSCore, DataTableFailWithColumnLenMismath)
 {
 	using namespace hgps::core;
 
@@ -219,7 +220,7 @@ TEST(TestDatastore, DataTableFailWithColumnLenMismath)
 		std::invalid_argument);
 }
 
-TEST(TestDatastore, DataTableFailDuplicateColumn)
+TEST(TestHealthGPSCore, DataTableFailDuplicateColumn)
 {
 	using namespace hgps::core;
 
@@ -238,4 +239,20 @@ TEST(TestDatastore, DataTableFailDuplicateColumn)
 			std::move(int_values),
 			std::vector<bool> {true, true, false, true})),
 		std::invalid_argument);
+}
+
+TEST(TestHealthGPSCore, CaseInsensitiveString)
+{
+	using namespace hgps::core;
+
+	auto source = "The quick brown fox jumps over the lazy dog";
+
+	ASSERT_TRUE(case_insensitive::equals("fox", "Fox"));
+	ASSERT_TRUE(case_insensitive::contains(source, "FOX"));
+	ASSERT_TRUE(case_insensitive::starts_with(source, "the"));
+	ASSERT_TRUE(case_insensitive::ends_with(source, "Dog"));
+
+	ASSERT_EQ(std::weak_ordering::less, case_insensitive::compare("Dog", "Fox"));
+	ASSERT_EQ(std::weak_ordering::equivalent, case_insensitive::compare("fox", "Fox"));
+	ASSERT_EQ(std::weak_ordering::greater, case_insensitive::compare("Dog", "Cat"));
 }
