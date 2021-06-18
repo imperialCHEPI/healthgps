@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <functional>
 
 namespace hgps {
 	namespace core {
@@ -14,8 +15,10 @@ namespace hgps {
 
 		struct case_insensitive {
 			struct comparator {
-				bool operator() (const std::string& s1, const std::string& s2) const;
+				bool operator() (const std::string& left, const std::string& right) const;
 			};
+
+			std::weak_ordering compare(const std::string& left, const std::string& right) const;
 
 			static bool equals(const std::string_view& left, const std::string_view& right);
 		};

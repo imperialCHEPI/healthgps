@@ -99,15 +99,19 @@
     <ClInclude Include="countrymodule.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
+    <ClInclude Include="modelcontext.h" />
     <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
+    <ClInclude Include="population.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
     <ClInclude Include="simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="modelrunner.cpp" />
+    <ClCompile Include="modelcontext.cpp" />
     <ClCompile Include="mtrandom.cpp" />
+    <ClCompile Include="population.cpp" />
     <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
   </ItemGroup>

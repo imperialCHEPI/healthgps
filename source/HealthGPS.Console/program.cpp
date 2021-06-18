@@ -4,9 +4,6 @@
 
 #include <fmt/chrono.h>
 
-using namespace hgps;
-namespace fs = std::filesystem;
-
 int main(int argc, char* argv[])
 {
 	// Parse command line arguments
@@ -29,7 +26,6 @@ int main(int argc, char* argv[])
 
 	// Parse configuration file 
 	auto config = load_configuration(settings);
-
 	auto input_table = core::DataTable();
 	if (!load_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
 	{
@@ -52,14 +48,19 @@ int main(int argc, char* argv[])
 	}
 	else {
 		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", scenario.country);
+		return EXIT_FAILURE;
 	}
 
+	// Create model context
+	auto model_context = create_context(input_table, target.value(), config);
+
 	try	{
+
 		// Create model
 		auto model = HealthGPS(scenario, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner(model, factory, 1);
+		auto runner = ModelRunner(model, factory, config.trial_runs);
 		auto runtime = runner.run();
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}

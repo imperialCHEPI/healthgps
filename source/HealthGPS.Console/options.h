@@ -29,7 +29,7 @@ struct FileInfo
 	std::map<std::string,std::string> columns;
 };
 
-struct Population
+struct DataInfo
 {
 	std::string country{};
 
@@ -44,17 +44,17 @@ struct Configuration
 {
 	FileInfo file;
 
-	Population population;
+	DataInfo data_info;
 
 	std::map<std::string, std::string> ses_mapping;
 
 	std::optional<unsigned int> custom_seed;
 	
-	int start_time{};
+	unsigned int start_time{};
 
-	int stop_time{};
+	unsigned int stop_time{};
 
-	int trial_runs{};
+	unsigned int trial_runs{};
 };
 
 //--------------------------------------------------------
@@ -78,7 +78,7 @@ void from_json(const json& j, FileInfo& p) {
 }
 
 // population
-void to_json(json& j, const Population& p) {
+void to_json(json& j, const DataInfo& p) {
 	j = json{ 
 		{"country_code", p.country},
 		{"identity", p.identity},
@@ -86,7 +86,7 @@ void to_json(json& j, const Population& p) {
 		{"delta_percent", p.delta_percent}};
 }
 
-void from_json(const json& j, Population& p) {
+void from_json(const json& j, DataInfo& p) {
 	j.at("country_code").get_to(p.country);
 	j.at("identity").get_to(p.identity);
 	j.at("start_value").get_to(p.start_value);

@@ -14,6 +14,7 @@
 #include "HealthGPS/api.h"
 #include "options.h"
 
+using namespace hgps;
 namespace fs = std::filesystem;
 
 std::string getTimeNowStr() {
@@ -126,7 +127,7 @@ Configuration load_configuration(CommandOptions& options) {
 		}
 
 		// Population and SES mapping
-		config.population = opt["inputs"]["population"].get<Population>();
+		config.data_info = opt["inputs"]["population"].get<DataInfo>();
 		opt["inputs"].at("ses_mapping").get_to(config.ses_mapping);
 
 		// Run-time
@@ -156,8 +157,26 @@ hgps::Scenario create_scenario(Configuration& config)
 		config.stop_time,
 		config.trial_runs);
 
-	scenario.country = config.population.country;
+	scenario.country = config.data_info.country;
 	scenario.custom_seed = config.custom_seed;
 
 	return scenario;
+}
+
+ModelContext create_context(core::DataTable& input_table, core::Country country, Configuration& config)
+{
+	// Create simulation context
+	auto population = Population(country, config.data_info.identity,
+		config.data_info.start_value, config.data_info.delta_percent);
+
+	auto run_info = RunInfo{
+		.start_time = config.start_time,
+		.stop_time = config.stop_time,
+		.seed = config.custom_seed
+	};
+
+	auto ses_mapping = SESMapping();
+	ses_mapping.entries.insert(config.ses_mapping.begin(), config.ses_mapping.end());
+
+	return ModelContext(input_table, population, run_info, ses_mapping);
 }

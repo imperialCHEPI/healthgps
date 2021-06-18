@@ -4,6 +4,7 @@
 #include "mtrandom.h"
 #include "healthgps.h"
 #include "scenario.h"
+#include "modelcontext.h"
 #include "modelrunner.h"
 #include "modulefactory.h"
 #include "countrymodule.h"
