@@ -9,6 +9,12 @@ namespace hgps {
 		template <typename T>
 		concept Numerical = std::is_arithmetic_v<T>;
 
+		enum class Gender : uint8_t {
+			unknown,
+			male,
+			female
+		};
+
 		class DataTable;
 		class DataTableColumn;
 

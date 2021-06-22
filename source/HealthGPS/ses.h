@@ -5,17 +5,15 @@
 
 namespace hgps {
 
-	enum class Gender : uint8_t{unknown, male, female };
-	
-	class SESDatum
+	class SESRecord
 	{
 	public:
-		SESDatum(Gender gender, core::IntegerInterval age_group, float education, float incoming, float weight)
+		SESRecord(core::Gender gender, core::IntegerInterval age_group, float education, float incoming, float weight)
 			: gender_{ gender }, age_group_{ age_group }, 
 			  education_level_{ education }, incoming_level_{ incoming },
 			  weight_{ weight } {}
 
-		const Gender& gender() const noexcept { return gender_; }
+		const core::Gender& gender() const noexcept { return gender_; }
 
 		const core::IntegerInterval& age_group() const noexcept { return age_group_; }
 
@@ -26,7 +24,7 @@ namespace hgps {
 		const float& weight() const noexcept { return weight_; }
 
 	private:
-		Gender gender_;
+		core::Gender gender_;
 		core::IntegerInterval age_group_;
 		float education_level_{};
 		float incoming_level_{};
@@ -37,13 +35,13 @@ namespace hgps {
 	{
 	public:
 		SESModule() = delete;
-		SESModule(std::vector<SESDatum>&& data, core::IntegerInterval age_range);
+		SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range);
 
 		SimulationModuleType type() const override;
 
 		std::string name() const override;
 
-		const std::vector<SESDatum>& data() const noexcept;
+		const std::vector<SESRecord>& data() const noexcept;
 
 		const int& max_education_level() const noexcept;
 
@@ -54,7 +52,7 @@ namespace hgps {
 		void execute(std::string_view command, RandomBitGenerator& generator, Entity& entity) override;
 
 	private:
-		std::vector<SESDatum> data_;
+		std::vector<SESRecord> data_;
 		core::IntegerInterval age_range_;
 		int max_education_level_{};
 		int max_income_level_{};
@@ -62,7 +60,7 @@ namespace hgps {
 		void calculate_max_levels();
 	};
 
-	Gender parse_gender(const std::any& value);
+	core::Gender parse_gender(const std::any& value);
 
 	core::IntegerInterval parse_age_group(const std::any& value);
 

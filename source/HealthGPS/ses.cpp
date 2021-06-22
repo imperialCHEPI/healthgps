@@ -3,7 +3,7 @@
 
 namespace hgps {
 
-	hgps::SESModule::SESModule(std::vector<SESDatum>&& data, core::IntegerInterval age_range)
+	hgps::SESModule::SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range)
 		: data_{ data }, age_range_{ age_range }
 	{
 		calculate_max_levels();
@@ -17,7 +17,7 @@ namespace hgps {
 		return "SES";
 	}
 
-	const std::vector<SESDatum>& hgps::SESModule::data() const noexcept {
+	const std::vector<SESRecord>& hgps::SESModule::data() const noexcept {
 		return data_;
 	}
 
@@ -53,25 +53,35 @@ namespace hgps {
 		}
 	}
 
-	Gender parse_gender(const std::any& value)
+	core::Gender parse_gender(const std::any& value)
 	{
 		if (!value.has_value()) {
-			return Gender::unknown;
+			return core::Gender::unknown;
 		}
 
 		if (const int* i = std::any_cast<int>(&value)) {
-			return *i == 1 ? Gender::male : Gender::female;
+			return *i == 1 ? core::Gender::male : core::Gender::female;
 		}
 		else if (const std::string* s = std::any_cast<std::string>(&value))
 		{
 			if (s->length() == 1) {
-				return core::case_insensitive::equals(*s, "m") ? Gender::male : Gender::female;
+				if (core::case_insensitive::equals(*s, "m")) {
+					return core::Gender::male;
+				}
+				else {
+					return core::Gender::female;
+				}
 			}
 
-			return core::case_insensitive::equals(*s, "male") ? Gender::male : Gender::female;
+			if (core::case_insensitive::equals(*s, "male")) {
+				return core::Gender::male;
+			}
+			else {
+				return core::Gender::female;
+			}
 		}
 
-		return Gender::unknown;
+		return core::Gender::unknown;
 	}
 
 	core::IntegerInterval parse_age_group(const std::any& value)
@@ -114,7 +124,7 @@ namespace hgps {
 		auto& edu_col = table.column(context.ses_mapping().entries["education"]);
 		auto& inc_col = table.column(context.ses_mapping().entries["income"]);
 
-		std::vector<SESDatum> data;
+		std::vector<SESRecord> data;
 		for (size_t row = 0; row < table.num_rows(); row++)
 		{
 			auto gender = parse_gender(gender_col->value(row));
@@ -123,7 +133,7 @@ namespace hgps {
 			float income = parse_float(inc_col->value(row));
 			auto weight = 1.0f;
 
-			data.emplace_back(SESDatum(gender, age_group, edu_value, income, weight));
+			data.emplace_back(SESRecord(gender, age_group, edu_value, income, weight));
 		}
 
 		return std::make_unique<SESModule>(std::move(data), context.population().age_range());
