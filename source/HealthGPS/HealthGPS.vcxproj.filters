@@ -60,6 +60,9 @@
     <ClInclude Include="population.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="ses.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -79,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="population.cpp">
       <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="ses.cpp">
+      <Filter>Source Files\modules</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

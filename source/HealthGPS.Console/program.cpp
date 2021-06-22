@@ -38,6 +38,10 @@ int main(int argc, char* argv[])
 	auto scenario = create_scenario(config);
 	auto data_api = data::DataManager(settings.storage_folder);
 	auto factory = SimulationModuleFactory(data_api);
+	factory.Register(SimulationModuleType::SES,
+		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
+			return build_ses_module(manager, context);
+		});
 
 	// Validate target country
 	auto countries = data_api.get_countries();
@@ -55,6 +59,7 @@ int main(int argc, char* argv[])
 	auto context = create_context(input_table, target.value(), config);
 
 	try	{
+		// auto ses_module = factory.Create(SimulationModuleType::SES, context);
 
 		// Create model
 		auto model = HealthGPS(context, hgps::MTRandom32());

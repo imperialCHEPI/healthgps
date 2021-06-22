@@ -1,14 +1,16 @@
 #pragma once
 
 #include <HealthGPS.Core/poco.h>
+#include <HealthGPS.Core/interval.h>
 
 namespace hgps {
 
 	class Population
 	{
 	public:
-		Population(core::Country country, std::string identy_column,
-			const int start_time, double dt_percent);
+		Population(const core::Country country, const std::string identy_col, 
+			const int start_time, const float dt_percent,
+			const std::string linkage_col, const core::IntegerInterval age_range);
 
 		core::Country country() const noexcept;
 
@@ -16,12 +18,18 @@ namespace hgps {
 
 		int start_time() const noexcept;
 
-		double delta_percent() const noexcept;
+		float delta_percent() const noexcept;
+
+		std::string linkage_column() const noexcept;
+
+		core::IntegerInterval age_range() const noexcept;
 
 	private:
-		const core::Country country_;
-		const std::string identity_column_;
-		const int start_time_{};
-		const double delta_percent_{};
+		core::Country country_;
+		std::string identity_column_;
+		int start_time_{};
+		float delta_percent_{};
+		std::string linkage_column_;
+		core::IntegerInterval age_range_;
 	};
 }

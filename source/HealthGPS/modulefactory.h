@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include "interfaces.h"
-#include <HealthGPS.Core/poco.h>
+#include "modelcontext.h"
 
 namespace hgps {
 
@@ -11,7 +11,7 @@ namespace hgps {
 	{
     public:
         using ModuleType = std::unique_ptr<SimulationModule>;
-        using ConcreteBuilder = ModuleType(*)(core::Datastore&, core::Country&);
+        using ConcreteBuilder = ModuleType(*)(core::Datastore&, ModelContext&);
 
         SimulationModuleFactory() = delete;
 
@@ -22,10 +22,10 @@ namespace hgps {
             builders_.emplace(type, builder);
         }
 
-        ModuleType Create(SimulationModuleType type, core::Country& country) {
+        ModuleType Create(SimulationModuleType type, ModelContext& context) {
             auto it = builders_.find(type);
             if (it != builders_.end()) {
-                return it->second(manager_, country);
+                return it->second(manager_, context);
             }
             else
             {

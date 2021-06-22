@@ -32,26 +32,24 @@ namespace hgps {
 			columns_.push_back(std::move(column));
 		}
 
-		const std::optional<std::reference_wrapper<DataTableColumn>> DataTable::column(std::size_t index)
+		const std::unique_ptr<DataTableColumn>& DataTable::column(std::size_t index)
 		{
 			if (index < num_columns()) {
-				// Reference to pointed object
-				return *columns_.at(index);
+				return columns_.at(index);
 			}
 
-			return std::nullopt;
+			throw std::invalid_argument("Column index outside the range.");
 		}
 
-		const std::optional<std::reference_wrapper<DataTableColumn>> DataTable::column(std::string name)
+		const std::unique_ptr<DataTableColumn>& DataTable::column(std::string name)
 		{
 			auto lower_name = to_lower(name);
 			auto found = index_.find(lower_name);
 			if (found != index_.end()) {
-				// Reference to pointed object
-				return *columns_.at(found->second);
+				return columns_.at(found->second);
 			}
 
-			return std::nullopt;
+			throw std::invalid_argument(std::format("Column name: {} not found.", name));
 		}
 
 		std::string DataTable::to_string() const

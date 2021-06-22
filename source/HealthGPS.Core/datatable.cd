@@ -1,73 +1,73 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
-  <Class Name="hgps::data::DataTable">
+  <Class Name="hgps::core::DataTable">
     <Position X="0.5" Y="0.5" Width="5.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAACAAAAAAAAAAAAgQAQQAEAAAABIAAAAAADAIQ=</HashCode>
       <FileName>datatable.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::DataTableColumn">
+  <Class Name="hgps::core::DataTableColumn">
     <Position X="6.5" Y="0.5" Width="3.25" />
     <TypeIdentifier>
       <HashCode>AAAAAACAAAAAQEAAAEAAQAAAACAFAAAAAAAgAAAACAA=</HashCode>
       <FileName>column.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::PrimitiveDataTableColumnBuilder&lt;ColumnType&gt;">
+  <Class Name="hgps::core::PrimitiveDataTableColumnBuilder&lt;ColumnType&gt;">
     <Position X="10" Y="0.5" Width="3.75" />
     <TypeIdentifier>
-      <HashCode>AAAEAIAEAAQAAAAAAEIQQAAAAAEAACIAQIkAAAAAIAA=</HashCode>
+      <HashCode>AAAEAIAEAAQAAAAAAEIQQAAAAAEEACIAQIkAAAAAIAA=</HashCode>
       <FileName>column_builder.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::DataTableColumnIterator&lt;ColumnType&gt;">
+  <Class Name="hgps::core::DataTableColumnIterator&lt;ColumnType, ValueAccessor&gt;">
     <Position X="0.5" Y="5.75" Width="3.75" />
     <TypeIdentifier>
       <HashCode>AAAAIAAAAAAAAAAAQAEAAQAAAAAAgAAAAAAgAAABAAA=</HashCode>
       <FileName>column_iterator.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::FloatDataTableColumn">
+  <Class Name="hgps::core::FloatDataTableColumn">
     <Position X="7.75" Y="8.75" Width="2.75" />
     <TypeIdentifier>
       <HashCode>AAAAAACAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>column_numeric.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::DoubleDataTableColumn">
+  <Class Name="hgps::core::DoubleDataTableColumn">
     <Position X="10.75" Y="8.75" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>column_numeric.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::IntegerDataTableColumn">
+  <Class Name="hgps::core::IntegerDataTableColumn">
     <Position X="4.5" Y="8.75" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAACAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>column_numeric.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::PrimitiveDataTableColumn&lt;TYPE&gt;">
+  <Class Name="hgps::core::PrimitiveDataTableColumn&lt;TYPE&gt;">
     <Position X="6.5" Y="3.75" Width="3.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAIACAAQAQAAAAEAAQAAQACAFACAAAAgAAAAAIIA=</HashCode>
+      <HashCode>AAAAAIACAAQAQAAAAEAAQAAQACAFACAAAAgAAAIAIIA=</HashCode>
       <FileName>column_primitive.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="hgps::data::StringDataTableColumn">
+  <Class Name="hgps::core::StringDataTableColumn">
     <Position X="10.75" Y="6" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAACAAAAAAABAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
       <FileName>column_primitive.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Struct Name="std::iterator_traits&lt;::hgps::data::DataTableColumnIterator&lt;ColumnType&gt;&gt;">
+  <Struct Name="std::iterator_traits&lt;_Ty&gt;">
     <Position X="0.5" Y="4.5" Width="5.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>column_iterator.h</FileName>
+      <FileName>C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30037\include\xutility</FileName>
     </TypeIdentifier>
   </Struct>
   <Font Name="Segoe UI" Size="9" />

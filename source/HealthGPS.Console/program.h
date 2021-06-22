@@ -166,8 +166,12 @@ hgps::Scenario create_scenario(Configuration& config)
 ModelContext create_context(core::DataTable& input_table, core::Country country, Configuration& config)
 {
 	// Create simulation context
+	auto age_range = core::IntegerInterval(
+		config.data_info.age_range.front(), config.data_info.age_range.back());
+
 	auto population = Population(country, config.data_info.identity,
-		config.data_info.start_value, config.data_info.delta_percent);
+		config.data_info.start_value, config.data_info.delta_percent,
+		config.data_info.data_linkage, age_range);
 
 	auto run_info = RunInfo{
 		.start_time = config.start_time,

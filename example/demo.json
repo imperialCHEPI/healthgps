@@ -8,7 +8,7 @@
                 "Year1": "integer",
                 "Gender": "integer",
                 "Age": "integer",
-                "agegroup":"string",
+                "AgeGroup":"string",
                 "Age1": "integer",
                 "Age2": "integer",
                 "Age3": "integer",
@@ -25,7 +25,9 @@
             "country_code":"GB",
             "identity": "Year1",
             "start_value": 2014,
-            "delta_percent": 0
+            "delta_percent": 0.001,
+            "data_linkage": "AgeGroup",
+            "age_range":[0, 110]
         },
         "ses_mapping": {
             "gender": "Gender",

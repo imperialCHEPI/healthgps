@@ -69,6 +69,9 @@
     <ClInclude Include="visitor.h">
       <Filter>Header Files\table</Filter>
     </ClInclude>
+    <ClInclude Include="interval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">
@@ -79,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="datatable.cpp">
       <Filter>Source Files\table</Filter>
+    </ClCompile>
+    <ClCompile Include="interval.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -24,6 +24,26 @@ namespace hgps {
             return result;
         }
 
+        std::vector<std::string_view> split_string(std::string_view value, std::string_view delims) {
+            std::vector<std::string_view> output;
+            size_t first = 0;
+
+            while (first < value.size()) {
+                const auto second = value.find_first_of(delims, first);
+                if (first != second) {
+                    output.emplace_back(value.substr(first, second - first));
+                }
+
+                if (second == std::string_view::npos) {
+                    break;
+                }
+
+                first = second + 1;
+            }
+
+            return output;
+        }
+
         bool case_insensitive::comparator::operator()(
             const std::string& left, const std::string& right) const {
             return to_lower(left) < to_lower(right);

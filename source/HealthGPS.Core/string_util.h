@@ -8,10 +8,11 @@ namespace hgps {
 		/// @brief Trim leading and trailing occurrences of white-space characters from string.
 		std::string trim(std::string value);
 
-		/// @brief 
 		std::string to_lower(std::string_view value);
 
 		std::string to_upper(std::string_view value);
+
+		std::vector<std::string_view> split_string(std::string_view value, std::string_view delims);
 
 		struct case_insensitive {
 			struct comparator {

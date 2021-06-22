@@ -105,6 +105,7 @@
     <ClInclude Include="population.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
+    <ClInclude Include="ses.h" />
     <ClInclude Include="simulation.h" />
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +115,7 @@
     <ClCompile Include="population.cpp" />
     <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
+    <ClCompile Include="ses.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">

@@ -43,7 +43,6 @@ TEST(TestHealthGPSCore, CreateCountry)
 	EXPECT_EQ(uk, c.name);
 }
 
-
 TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
 {
 	using namespace hgps::core;
@@ -55,7 +54,8 @@ TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
 
 	ASSERT_EQ(3, str_col.length());
 	ASSERT_EQ(1, str_col.null_count());
-	ASSERT_EQ("Dog", *str_col.value(1));
+	ASSERT_EQ("Dog", *str_col.value_safe(1));
+	ASSERT_EQ("Dog", str_col.value_unsafe(1));
 	ASSERT_TRUE(str_col.is_null(2));
 	ASSERT_FALSE(str_col.is_valid(2));
 	ASSERT_FALSE(str_col.is_null(0));
@@ -63,7 +63,8 @@ TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
 
 	ASSERT_EQ(4, flt_col.length());
 	ASSERT_EQ(1, flt_col.null_count());
-	ASSERT_EQ(15.37f, *flt_col.value(1));
+	ASSERT_EQ(15.37f, *flt_col.value_safe(1));
+	ASSERT_EQ(15.37f, flt_col.value_unsafe(1));
 	ASSERT_TRUE(flt_col.is_null(2));
 	ASSERT_FALSE(flt_col.is_valid(2));
 	ASSERT_FALSE(flt_col.is_null(0));
@@ -71,13 +72,15 @@ TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
 
 	ASSERT_EQ(3, dbl_col.length());
 	ASSERT_EQ(0, dbl_col.null_count());
-	ASSERT_EQ(15.37, *dbl_col.value(1));
+	ASSERT_EQ(15.37, *dbl_col.value_safe(1));
+	ASSERT_EQ(15.37, dbl_col.value_unsafe(1));
 	ASSERT_FALSE(dbl_col.is_null(1));
 	ASSERT_TRUE(dbl_col.is_valid(1));
 
 	ASSERT_EQ(3, int_col.length());
 	ASSERT_EQ(1, int_col.null_count());
-	ASSERT_EQ(15, *int_col.value(1));
+	ASSERT_EQ(15, *int_col.value_safe(1));
+	ASSERT_EQ(15, int_col.value_unsafe(1));
 	ASSERT_TRUE(int_col.is_null(0));
 	ASSERT_FALSE(int_col.is_valid(0));
 	ASSERT_FALSE(int_col.is_null(1));
@@ -95,25 +98,29 @@ TEST(TestHealthGPSCore, CreateTableColumnWithoutNulls)
 
 	ASSERT_EQ(3, str_col.length());
 	ASSERT_EQ(0, str_col.null_count());
-	ASSERT_EQ("Dog", *str_col.value(1));
+	ASSERT_EQ("Dog", *str_col.value_safe(1));
+	ASSERT_EQ("Dog", str_col.value_unsafe(1));
 	ASSERT_TRUE(str_col.is_valid(0));
 	ASSERT_FALSE(str_col.is_null(0));
 
 	ASSERT_EQ(4, flt_col.length());
 	ASSERT_EQ(0, flt_col.null_count());
-	ASSERT_EQ(15.37f, *flt_col.value(1));
+	ASSERT_EQ(15.37f, *flt_col.value_safe(1));
+	ASSERT_EQ(15.37f, flt_col.value_unsafe(1));
 	ASSERT_TRUE(flt_col.is_valid(0));
 	ASSERT_FALSE(flt_col.is_null(0));
 
 	ASSERT_EQ(3, dbl_col.length());
 	ASSERT_EQ(0, dbl_col.null_count());
-	ASSERT_EQ(15.37, *dbl_col.value(1));
+	ASSERT_EQ(15.37, *dbl_col.value_safe(1));
+	ASSERT_EQ(15.37, dbl_col.value_unsafe(1));
 	ASSERT_TRUE(dbl_col.is_valid(1));
 	ASSERT_FALSE(dbl_col.is_null(1));
 
 	ASSERT_EQ(3, int_col.length());
 	ASSERT_EQ(0, int_col.null_count());
-	ASSERT_EQ(15, *int_col.value(1));
+	ASSERT_EQ(15, *int_col.value_safe(1));
+	ASSERT_EQ(15, int_col.value_unsafe(1));
 	ASSERT_TRUE(int_col.is_valid(0));
 	ASSERT_FALSE(int_col.is_null(0));
 }
@@ -176,27 +183,39 @@ TEST(TestHealthGPSCore, CreateDataTable)
 	auto flt_values = std::vector<float>{ 5.7f, 7.13f, 15.37f, 0.0f, 20.75f };
 	auto int_values = std::vector<int>{ 15, 78, 154, 0, 200 };
 
-	auto str_duilder = StringDataTableColumnBuilder{ "String" };
-	auto ftl_duilder = FloatDataTableColumnBuilder{ "Floats" };
-	auto dbl_duilder = DoubleDataTableColumnBuilder{ "Doubles" };
-	auto int_duilder = IntegerDataTableColumnBuilder{ "Integer" };
+	auto str_builder = StringDataTableColumnBuilder{ "String" };
+	auto ftl_builder = FloatDataTableColumnBuilder{ "Floats" };
+	auto dbl_builder = DoubleDataTableColumnBuilder{ "Doubles" };
+	auto int_builder = IntegerDataTableColumnBuilder{ "Integer" };
 
 	for (size_t i = 0; i < flt_values.size(); i++)
 	{
-		str_values[i].empty() ? str_duilder.append_null() : str_duilder.append(str_values[i]);
-		flt_values[i] == float{} ? ftl_duilder.append_null() : ftl_duilder.append(flt_values[i]);
-		flt_values[i] == double{} ? dbl_duilder.append_null() : dbl_duilder.append(flt_values[i] + 1.0);
-		int_values[i] == int{} ? int_duilder.append_null() : int_duilder.append(int_values[i]);
+		str_values[i].empty() ? str_builder.append_null() : str_builder.append(str_values[i]);
+		flt_values[i] == float{} ? ftl_builder.append_null() : ftl_builder.append(flt_values[i]);
+		flt_values[i] == double{} ? dbl_builder.append_null() : dbl_builder.append(flt_values[i] + 1.0);
+		int_values[i] == int{} ? int_builder.append_null() : int_builder.append(int_values[i]);
 	}
 
 	auto table = DataTable();
-	table.add(str_duilder.build());
-	table.add(ftl_duilder.build());
-	table.add(dbl_duilder.build());
-	table.add(int_duilder.build());
+	table.add(str_builder.build());
+	table.add(ftl_builder.build());
+	table.add(dbl_builder.build());
+	table.add(int_builder.build());
+
+	// Casting to columns type
+	auto& col = table.column("Integer");
+	auto& int_col = static_cast<IntegerDataTableColumn&>(*col);
+
+	auto slow_value = std::any_cast<int>(col->value(1));
+	auto safe_value = int_col.value_safe(1);
+	auto fast_value = int_col.value_unsafe(1);
 
 	ASSERT_EQ(4, table.num_columns());
 	ASSERT_EQ(5, table.num_rows());
+	ASSERT_EQ(table.num_rows(), int_col.length());
+	ASSERT_EQ(78, slow_value);
+	ASSERT_EQ(slow_value, *safe_value);
+	ASSERT_EQ(slow_value, fast_value);
 }
 
 TEST(TestHealthGPSCore, DataTableFailWithColumnLenMismath)
@@ -255,4 +274,23 @@ TEST(TestHealthGPSCore, CaseInsensitiveString)
 	ASSERT_EQ(std::weak_ordering::less, case_insensitive::compare("Dog", "Fox"));
 	ASSERT_EQ(std::weak_ordering::equivalent, case_insensitive::compare("fox", "Fox"));
 	ASSERT_EQ(std::weak_ordering::greater, case_insensitive::compare("Dog", "Cat"));
+}
+
+TEST(TestHealthGPSCore, SplitDelimitedString) {
+	using namespace hgps::core;
+
+	auto source = "The quick brown fox jumps over the lazy dog";
+	auto parts = split_string(source, " ");
+
+	auto csv_source = "The,quick,brown,fox,jumps,over,the,lazy,dog";
+	auto csv_parts = split_string(csv_source, ",");
+	
+	
+	ASSERT_EQ(9, parts.size());
+	ASSERT_EQ("The", parts.front());
+	ASSERT_EQ("dog", parts.back());
+
+	ASSERT_EQ(parts.size(), csv_parts.size());
+	ASSERT_EQ(parts.front(), csv_parts.front());
+	ASSERT_EQ(parts.back(), csv_parts.back());
 }

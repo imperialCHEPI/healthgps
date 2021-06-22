@@ -9,10 +9,10 @@ namespace hgps {
 
 			template <typename ColumnType>
 			struct DefaultValueAccessor {
-				using ValueType = decltype(std::declval<ColumnType>().value(0));
+				using ValueType = decltype(std::declval<ColumnType>().value_safe(0));
 
 				ValueType operator()(const ColumnType& column, std::size_t index) {
-					return column.value(index);
+					return column.value_safe(index);
 				}
 			};
 		}  // namespace detail
@@ -23,7 +23,6 @@ namespace hgps {
 		public:
 			using value_type = ValueAccessor::ValueType;
 			using difference_type = std::size_t;
-			using pointer = value_type*;
 			using reference = value_type&;
 			using iterator_category = std::random_access_iterator_tag;
 
@@ -37,7 +36,7 @@ namespace hgps {
 
 			// Value access
 			value_type operator*() const {
-				return column_->is_null(index_) ? value_type{} : column_->value(index_).value();
+				return column_->is_null(index_) ? value_type{} : column_->value_safe(index_).value();
 			}
 
 			// Forward / backward
@@ -86,7 +85,6 @@ namespace std {
 		using IteratorType = ::hgps::core::DataTableColumnIterator<ColumnType>;
 		using difference_type = typename IteratorType::difference_type;
 		using value_type = typename IteratorType::value_type;
-		using pointer = typename IteratorType::pointer;
 		using reference = typename IteratorType::reference;
 		using iterator_category = typename IteratorType::iterator_category;
 	};

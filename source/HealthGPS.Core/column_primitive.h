@@ -76,12 +76,24 @@ namespace hgps {
 				return null_bitmap_.empty() || null_bitmap_[index];
 			}
 
-			const std::optional<value_type> value(const std::size_t index) const {
+			const std::any value(std::size_t index) const noexcept override {
+				if (is_valid(index)) {
+					return data_[index];
+				}
+
+				return std::any();
+			}
+
+			const std::optional<value_type> value_safe(const std::size_t index) const noexcept {
 				if (is_valid(index)) {
 					return data_[index];
 				}
 
 				return std::nullopt;
+			}
+
+			const value_type value_unsafe(const std::size_t index) const {
+					return data_[index];
 			}
 
 			IteratorType begin() const { return IteratorType(*this); }

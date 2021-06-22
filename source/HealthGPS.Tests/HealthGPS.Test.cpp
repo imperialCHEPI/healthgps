@@ -19,7 +19,7 @@ private:
 	int id_;
 };
 
-TEST(TestHelathGPS, RandomBitGenerator)
+TEST(TestHealthGPS, RandomBitGenerator)
 {
 	using namespace hgps;
 
@@ -29,7 +29,7 @@ TEST(TestHelathGPS, RandomBitGenerator)
 	EXPECT_TRUE(rnd() >= 0);
 }
 
-TEST(TestHelathGPS, RandomBitGeneratorCopy)
+TEST(TestHealthGPS, RandomBitGeneratorCopy)
 {
 	using namespace hgps;
 
@@ -46,7 +46,7 @@ TEST(TestHelathGPS, RandomBitGeneratorCopy)
 }
 
 
-TEST(TestHelathGPS, SimulationInitialise)
+TEST(TestHealthGPS, SimulationInitialise)
 {
 	using namespace hgps;
 
@@ -63,7 +63,8 @@ TEST(TestHelathGPS, SimulationInitialise)
 
 	auto data = core::DataTable();
 	data.add(builder.build());
-	auto pop = Population(uk, builder.name(), 1, 0.1);
+	auto age_range = core::IntegerInterval(0, 110);
+	auto pop = Population(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
@@ -73,26 +74,99 @@ TEST(TestHelathGPS, SimulationInitialise)
 	EXPECT_TRUE(sim.next_double() >= 0);
 }
 
-TEST(TestHelathGPS, ModuleFactoryRegistry)
+TEST(TestHealthGPS, ModuleFactoryRegistry)
 {
 	using namespace hgps;
 	using namespace hgps::data;
 
-	auto full_path = fs::absolute("../../../data");
+	auto count = 10U;
+	auto builder = core::FloatDataTableColumnBuilder("Test");
+	for (size_t i = 0; i < count; i++) {
+		if ((i % 2) == 0)
+			builder.append(i * 2.5f);
+		else
+			builder.append_null();
+	}
 
+	auto data = core::DataTable();
+	data.add(builder.build());
+
+	auto uk = core::Country{ .code = "GB", .name = "United Kingdom" };
+	auto age_range = core::IntegerInterval(0, 110);
+	auto pop = Population(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
+	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
+	auto ses = SESMapping();
+	ses.entries.emplace("test", builder.name());
+	auto context = ModelContext(data, pop, info, ses);
+
+	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
-	auto country = manager.get_country("GB");
 
 	auto factory = SimulationModuleFactory(manager);
 	factory.Register(SimulationModuleType::Simulator,
-		[](core::Datastore& manager, core::Country& country) -> SimulationModuleFactory::ModuleType {
-			return build_country_module(manager, country);
+		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
+			return build_country_module(manager, context);
 		});
 
 	auto p = Person(5);
 
 	MTRandom32 rnd;
-	auto country_mod = factory.Create(SimulationModuleType::Simulator, country.value());
+	auto country_mod = factory.Create(SimulationModuleType::Simulator, context);
 	country_mod->execute("print", rnd, p);
 	EXPECT_EQ(p.id(), 5);
+}
+
+TEST(TestHealthGPS, CreateSESModule)
+{
+	using namespace hgps;
+	using namespace hgps::data;
+	using namespace hgps::core;
+
+	auto gender_values = std::vector<int>{1, 0, 0, 1, 0 };
+	auto age_values = std::vector<std::string>{ "0-4", "5-9", "10-14", "15-19", "20-25" };
+	auto edu_values = std::vector<float>{ 6.0f, 10.0f, 2.0f, 9.0f, 12.0f };
+	auto inc_values = std::vector<double>{ 2.0, 10.0, 5.0, std::nan(""), 13.0};
+
+	auto gender_builder = IntegerDataTableColumnBuilder{ "Gender" };
+	auto age_builder = StringDataTableColumnBuilder{ "AgeGroup" };
+	auto edu_builder = FloatDataTableColumnBuilder{ "Education" };
+	auto inc_builder = DoubleDataTableColumnBuilder{ "Income" };
+
+	for (size_t i = 0; i < gender_values.size(); i++)
+	{
+		gender_builder.append(gender_values[i]);
+		age_builder.append(age_values[i]);
+		edu_builder.append(edu_values[i]);
+		if (std::isnan(inc_values[i]))
+			inc_builder.append_null();
+		else
+			inc_builder.append(inc_values[i]);
+	}
+
+	auto data = DataTable();
+	data.add(gender_builder.build());
+	data.add(age_builder.build());
+	data.add(edu_builder.build());
+	data.add(inc_builder.build());
+
+	auto uk = core::Country{ .code = "GB", .name = "United Kingdom" };
+	auto age_range = core::IntegerInterval(0, 110);
+	auto pop = Population(uk, "AgeGroup", 1, 0.1f, "AgeGroup", age_range);
+	auto info = RunInfo{ .start_time = 1, .stop_time = 10, .seed = std::nullopt };
+	auto ses = SESMapping();
+	ses.entries.emplace("gender", gender_builder.name());
+	ses.entries.emplace("age_group", age_builder.name());
+	ses.entries.emplace("education", edu_builder.name());
+	ses.entries.emplace("income", inc_builder.name());
+	auto context = ModelContext(data, pop, info, ses);
+
+	auto full_path = fs::absolute("../../../data");
+	auto manager = DataManager(full_path);
+
+	auto ses_module = build_ses_module(manager, context);
+	ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
+	ASSERT_EQ("SES", ses_module->name());
+	ASSERT_EQ(12, ses_module->max_education_level());
+	ASSERT_EQ(13, ses_module->max_incoming_level());
+	ASSERT_EQ(5, ses_module->data().size());
 }

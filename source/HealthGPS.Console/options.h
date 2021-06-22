@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include "HealthGPS.Core\api.h"
 
 using json = nlohmann::json;
 
@@ -37,7 +38,11 @@ struct DataInfo
 
 	int start_value{};
 
-	double delta_percent{};
+	float delta_percent{};
+
+	std::string data_linkage{};
+
+	std::vector<int> age_range;
 };
 
 struct Configuration
@@ -83,7 +88,9 @@ void to_json(json& j, const DataInfo& p) {
 		{"country_code", p.country},
 		{"identity", p.identity},
 		{"start_value", p.start_value},
-		{"delta_percent", p.delta_percent}};
+		{"delta_percent", p.delta_percent},
+		{"data_linkage", p.data_linkage},
+		{"age_range", p.age_range}};
 }
 
 void from_json(const json& j, DataInfo& p) {
@@ -91,4 +98,6 @@ void from_json(const json& j, DataInfo& p) {
 	j.at("identity").get_to(p.identity);
 	j.at("start_value").get_to(p.start_value);
 	j.at("delta_percent").get_to(p.delta_percent);
+	j.at("data_linkage").get_to(p.data_linkage);
+	j.at("age_range").get_to(p.age_range);
 }

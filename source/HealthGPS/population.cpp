@@ -4,10 +4,12 @@
 
 namespace hgps {
 
-	Population::Population(core::Country country, std::string identy_column,
-		const int start_time, double dt_percent) 
-		: country_{country}, identity_column_{identy_column},
-		start_time_{start_time}, delta_percent_{dt_percent}	{
+	Population::Population(const core::Country country, const std::string identy_col,
+		const int start_time, const float dt_percent, const std::string linkage_col, 
+		const core::IntegerInterval range)
+		: country_{country}, identity_column_{identy_col},
+		start_time_{ start_time }, delta_percent_{ dt_percent },
+		linkage_column_{linkage_col}, age_range_{ range } {
 
 		// TODO: Create a columns name wrapper
 		if (identity_column_.length() < 2 || !std::isalpha(identity_column_.front())) {
@@ -33,7 +35,16 @@ namespace hgps {
 		return start_time_;
 	}
 
-	double Population::delta_percent() const noexcept {
+	float Population::delta_percent() const noexcept {
 		return delta_percent_;
+	}
+
+	std::string Population::linkage_column() const noexcept
+	{
+		return std::string();
+	}
+
+	core::IntegerInterval Population::age_range() const noexcept {
+		return age_range_;
 	}
 }
