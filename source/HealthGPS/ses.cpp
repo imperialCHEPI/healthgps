@@ -29,6 +29,78 @@ namespace hgps {
 		return max_income_level_;
 	}
 
+	const std::map<core::IntegerInterval, std::vector<float>> SESModule::get_education_frequency(
+		std::optional<core::Gender> filter) const {
+
+		auto results = std::map<core::IntegerInterval, std::vector<float>>();
+		if (data_.size() < 1) {
+			return results;
+		}
+		
+		auto data_sz = max_education_level_ + 1;
+		for (auto& item : data_) {
+			if (!results.contains(item.age_group())) { 
+				results.emplace(item.age_group(), std::vector<float>(data_sz));
+				results.at(item.age_group()).reserve(data_sz);
+			}
+
+			if (item.education_level() >= 0 && 
+				(!filter.has_value() || item.gender() == filter.value())) {
+				results.at(item.age_group())[(int)item.education_level()] += item.weight();
+			}
+		}
+
+		// Fill gaps in data, assuming equal age group length.
+		auto length = results.begin()->first.length();
+		auto step_sz = length + 1;
+		for (auto i = age_range_.lower(); i < age_range_.upper(); i += step_sz) {
+			auto test_group = core::IntegerInterval(i, i + length);
+			if (!results.contains(test_group)) {
+				results.emplace(test_group, std::vector<float>(data_sz, 1.0f));
+			}
+		}
+
+		return results;
+	}
+
+	const std::map<core::IntegerInterval, core::FloatArray2D> SESModule::get_income_frenquency(
+		std::optional<core::Gender> filter) const {
+
+		auto results = std::map<core::IntegerInterval, core::FloatArray2D>();
+		if (data_.size() < 1) {
+			return results;
+		}
+
+		int num_rows = max_education_level_ + 1;
+		int num_cols = max_income_level_ + 1;
+		for (auto& r : data_)
+		{
+			if (isnan(r.incoming_level() + r.education_level())) {
+				continue;
+			}
+
+			if (!results.contains(r.age_group())) {
+				results.emplace(r.age_group(), core::FloatArray2D(num_rows, num_cols));
+			}
+
+			if (!filter.has_value() || r.gender() == filter.value()) {
+				results[r.age_group()]((int)r.education_level(), (int)r.incoming_level()) += r.weight();
+			}
+		}
+
+		// Fill gaps in data, assuming equal age group length.
+		auto length = results.begin()->first.length();
+		auto step_sz = length + 1;
+		for (auto i = age_range_.lower(); i < age_range_.upper(); i += step_sz) {
+			auto test_group = core::IntegerInterval(i, i + length);
+			if (!results.contains(test_group)) {
+				results.emplace(test_group, core::FloatArray2D(num_rows, num_cols, 1.0f));
+			}
+		}
+
+		return results;
+	}
+
 	void hgps::SESModule::execute(std::string_view command,
 		RandomBitGenerator& generator, std::vector<Entity>& entities) {
 	}

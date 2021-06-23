@@ -294,3 +294,59 @@ TEST(TestHealthGPSCore, SplitDelimitedString) {
 	ASSERT_EQ(parts.front(), csv_parts.front());
 	ASSERT_EQ(parts.back(), csv_parts.back());
 }
+
+TEST(TestHealthGPSCore, CreateArray2DStorage) {
+	using namespace hgps::core;
+
+	std::vector<int> n = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+	auto d3x2 = DoubleArray2D(3, 2);
+	auto d2x3v5 = DoubleArray2D(2, 3, 5);
+	auto i3x4v = IntegerArray2D(3, 4, n);
+
+	ASSERT_EQ(3, d3x2.num_rows());
+	ASSERT_EQ(2, d3x2.num_columns());
+	ASSERT_EQ(6, d3x2.count());
+
+	ASSERT_EQ(2, d2x3v5.num_rows());
+	ASSERT_EQ(3, d2x3v5.num_columns());
+	ASSERT_EQ(6, d2x3v5.count());
+
+	ASSERT_EQ(3, i3x4v.num_rows());
+	ASSERT_EQ(4, i3x4v.num_columns());
+	ASSERT_EQ(12, i3x4v.count());
+
+	for (size_t i = 0; i < 3; i++) {
+		for (size_t j = 0; j < 2; j++) {
+			ASSERT_EQ(0.0, d3x2(i, j));
+			ASSERT_EQ(5.0, d2x3v5(j, i));
+		}
+
+		for (size_t j = 0; j < 4; j++) {
+			ASSERT_EQ(n[i * 4 + j], i3x4v(i, j));
+		}
+	}
+}
+
+TEST(TestHealthGPSCore, AccessArray2DStorage) {
+	using namespace hgps::core;
+
+	std::vector<int> n = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+	auto i3x4v = IntegerArray2D(3, 4, n);
+
+	ASSERT_EQ(3, i3x4v.num_rows());
+	ASSERT_EQ(4, i3x4v.num_columns());
+	ASSERT_EQ(12, i3x4v.count());
+
+	for (size_t i = 0; i < 3; i++) {
+		for (size_t j = 0; j < 4; j++) {
+			// Read current
+			ASSERT_EQ(n[i * 4 + j], i3x4v(i, j));
+
+			// Update value
+			i3x4v(i, j) += 5;
+
+			// Read again
+			ASSERT_EQ(n[i * 4 + j]+5, i3x4v(i, j));
+		}
+	}
+}

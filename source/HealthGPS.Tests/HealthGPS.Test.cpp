@@ -150,7 +150,7 @@ TEST(TestHealthGPS, CreateSESModule)
 	data.add(inc_builder.build());
 
 	auto uk = core::Country{ .code = "GB", .name = "United Kingdom" };
-	auto age_range = core::IntegerInterval(0, 110);
+	auto age_range = core::IntegerInterval(0, 30);
 	auto pop = Population(uk, "AgeGroup", 1, 0.1f, "AgeGroup", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = 10, .seed = std::nullopt };
 	auto ses = SESMapping();
@@ -164,6 +164,9 @@ TEST(TestHealthGPS, CreateSESModule)
 	auto manager = DataManager(full_path);
 
 	auto ses_module = build_ses_module(manager, context);
+	auto pub_hist = ses_module->get_education_frequency(std::nullopt);
+	auto inc_hist = ses_module->get_income_frenquency(std::nullopt);
+
 	ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
 	ASSERT_EQ("SES", ses_module->name());
 	ASSERT_EQ(12, ses_module->max_education_level());

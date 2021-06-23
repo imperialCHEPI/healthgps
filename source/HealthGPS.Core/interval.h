@@ -12,9 +12,9 @@ namespace hgps {
 			Interval() = default;
 			explicit Interval(TYPE lower, TYPE upper) : lower_{ lower }, upper_{ upper }{}
 
-			const unsigned int& lower() const { return lower_; }
+			const unsigned int lower() const { return lower_; }
 
-			const unsigned int& upper() const { return upper_; }
+			const unsigned int upper() const { return upper_; }
 
 			unsigned int length() const { return upper_ - lower_; }
 

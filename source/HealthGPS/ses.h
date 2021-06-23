@@ -47,6 +47,10 @@ namespace hgps {
 
 		const int& max_incoming_level() const noexcept;
 
+		const std::map<core::IntegerInterval, std::vector<float>> get_education_frequency(std::optional<core::Gender> filter) const;
+
+		const std::map<core::IntegerInterval, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
+
 		void execute(std::string_view command, RandomBitGenerator& generator, std::vector<Entity>& entities) override;
 
 		void execute(std::string_view command, RandomBitGenerator& generator, Entity& entity) override;

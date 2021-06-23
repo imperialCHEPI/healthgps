@@ -88,6 +88,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="api.h" />
+    <ClInclude Include="array2d.h" />
     <ClInclude Include="column.h" />
     <ClInclude Include="column_builder.h" />
     <ClInclude Include="column_iterator.h" />
