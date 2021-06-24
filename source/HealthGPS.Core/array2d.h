@@ -32,19 +32,19 @@ namespace hgps {
 			Array2D(const size_t nrows, const size_t ncols, std::vector<TYPE>& values) 
 				: Array2D(nrows, ncols) {
 
-				if (values.size() > count()) {
+				if (values.size() > size()) {
 					throw std::invalid_argument(
-						std::format("Array size and values size mismatch: {} vs. given {}.", count(), values.size()));
+						std::format("Array size and values size mismatch: {} vs. given {}.", size(), values.size()));
 				}
 
 				std::copy(values.begin(), values.end(), data_.get());
 			}
 
-			size_t count() { return rows_ * columns_; }
+			size_t size() { return rows_ * columns_; }
 
-			size_t num_rows() { return rows_; }
+			size_t rows() { return rows_; }
 
-			size_t num_columns() { return columns_; }
+			size_t columns() { return columns_; }
 
 			TYPE& operator()(size_t row, size_t column) {
 				check_boundaries(row, column);
@@ -56,9 +56,13 @@ namespace hgps {
 				return data_[row * columns_ + column];
 			}
 
-			void fill(TYPE value) { std::fill_n(data_.get(), count(), value); }
+			void fill(TYPE value) { std::fill_n(data_.get(), size(), value); }
 
 			void clear() { fill(TYPE{}); }
+
+			std::vector<TYPE> to_vector() {
+				return std::vector<TYPE>(data_.get(), data_.get()+size());
+			}
 
 			std::string to_string() noexcept {
 				std::stringstream ss;
@@ -77,8 +81,8 @@ namespace hgps {
 			}
 
 		private:
-			size_t rows_;
-			size_t columns_;
+			size_t rows_{};
+			size_t columns_{};
 			std::unique_ptr<TYPE[]> data_;
 
 			void check_boundaries(size_t row, size_t column) {

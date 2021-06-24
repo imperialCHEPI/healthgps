@@ -303,17 +303,17 @@ TEST(TestHealthGPSCore, CreateArray2DStorage) {
 	auto d2x3v5 = DoubleArray2D(2, 3, 5);
 	auto i3x4v = IntegerArray2D(3, 4, n);
 
-	ASSERT_EQ(3, d3x2.num_rows());
-	ASSERT_EQ(2, d3x2.num_columns());
-	ASSERT_EQ(6, d3x2.count());
+	ASSERT_EQ(3, d3x2.rows());
+	ASSERT_EQ(2, d3x2.columns());
+	ASSERT_EQ(6, d3x2.size());
 
-	ASSERT_EQ(2, d2x3v5.num_rows());
-	ASSERT_EQ(3, d2x3v5.num_columns());
-	ASSERT_EQ(6, d2x3v5.count());
+	ASSERT_EQ(2, d2x3v5.rows());
+	ASSERT_EQ(3, d2x3v5.columns());
+	ASSERT_EQ(6, d2x3v5.size());
 
-	ASSERT_EQ(3, i3x4v.num_rows());
-	ASSERT_EQ(4, i3x4v.num_columns());
-	ASSERT_EQ(12, i3x4v.count());
+	ASSERT_EQ(3, i3x4v.rows());
+	ASSERT_EQ(4, i3x4v.columns());
+	ASSERT_EQ(12, i3x4v.size());
 
 	for (size_t i = 0; i < 3; i++) {
 		for (size_t j = 0; j < 2; j++) {
@@ -332,10 +332,13 @@ TEST(TestHealthGPSCore, AccessArray2DStorage) {
 
 	std::vector<int> n = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
 	auto i3x4v = IntegerArray2D(3, 4, n);
+	auto i3vec = i3x4v.to_vector();
 
-	ASSERT_EQ(3, i3x4v.num_rows());
-	ASSERT_EQ(4, i3x4v.num_columns());
-	ASSERT_EQ(12, i3x4v.count());
+	ASSERT_EQ(3, i3x4v.rows());
+	ASSERT_EQ(4, i3x4v.columns());
+	ASSERT_EQ(12, i3x4v.size());
+	ASSERT_EQ(n.size(), i3vec.size());
+	ASSERT_EQ(n, i3vec);
 
 	for (size_t i = 0; i < 3; i++) {
 		for (size_t j = 0; j < 4; j++) {
