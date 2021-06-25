@@ -6,7 +6,7 @@ Childhood obesity is one of the major public health challenges throughout the wo
 
 # License
 
-The code in this repository is licensed under the ***TODO*** License.
+The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) License.
 
 ## Third-party components licenses
 
