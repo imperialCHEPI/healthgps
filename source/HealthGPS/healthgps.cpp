@@ -6,16 +6,16 @@
 #include "mtrandom.h"
 
 namespace hgps {
-	HealthGPS::HealthGPS(ModelContext& context, RandomBitGenerator&& generator)
-		: Simulation(context, std::move(generator))
+	HealthGPS::HealthGPS(ModelInput& config, RandomBitGenerator&& generator)
+		: Simulation(config, std::move(generator))
 	{
 	}
 
 	void HealthGPS::initialize() const
 	{
 		// Reset random number generator
-		if (context_.seed().has_value()){
-			rnd_.seed(context_.seed().value());
+		if (config_.seed().has_value()){
+			rnd_.seed(config_.seed().value());
 		}
 
 		std::cout << "Microsimulation algorithm initialised." << std::endl;
@@ -28,12 +28,12 @@ namespace hgps {
 
 	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)
 	{
-		end_time_ = adevs::Time( context_.stop_time(), 0);
+		end_time_ = adevs::Time( config_.stop_time(), 0);
 
 		std::cout << "Started @ " << env->now().real << "," << env->now().logical
 			      << ", allocate memory for population." << std::endl;
 
-		return env->now() + adevs::Time(context_.start_time(), 0);
+		return env->now() + adevs::Time(config_.start_time(), 0);
 	}
 
 	adevs::Time HealthGPS::update(adevs::SimEnv<int>* env)

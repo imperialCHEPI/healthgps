@@ -2,7 +2,7 @@
 
 #include <adevs/adevs.h>
 #include "interfaces.h"
-#include "modelcontext.h"
+#include "modelinput.h"
 
 namespace hgps {
 
@@ -10,8 +10,8 @@ namespace hgps {
 	{
 	public:
 		Simulation() = delete;
-		explicit Simulation(ModelContext& context, RandomBitGenerator&& generator)
-			: context_{ context }, rnd_{ generator }
+		explicit Simulation(ModelInput& config, RandomBitGenerator&& generator)
+			: config_{ config }, rnd_{ generator }
 		{}
 
 		virtual ~Simulation() = default;
@@ -21,7 +21,7 @@ namespace hgps {
 		virtual void terminate() const = 0;
 
 	protected:
-		ModelContext context_;
+		ModelInput config_;
 		RandomBitGenerator& rnd_;
 		adevs::Time end_time_;
 	};

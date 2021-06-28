@@ -11,7 +11,7 @@ namespace hgps {
 	{
 	public:
 		HealthGPS() = delete;
-		explicit HealthGPS(ModelContext& context, RandomBitGenerator&& generator);
+		explicit HealthGPS(ModelInput& config, RandomBitGenerator&& generator);
 		
 		void initialize() const override;
 

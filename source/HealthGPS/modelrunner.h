@@ -3,7 +3,7 @@
 #include "modulefactory.h"
 #include "simulation.h"
 #include "scenario.h"
-#include <HealthGPS/modelcontext.h>
+#include <HealthGPS/modelinput.h>
 
 namespace hgps {
 
@@ -11,12 +11,12 @@ namespace hgps {
 	{
 	public:
 		ModelRunner() = delete;
-		explicit ModelRunner(SimulationModuleFactory& factory, ModelContext& context);
+		explicit ModelRunner(SimulationModuleFactory& factory, ModelInput& config);
 
 		double run(Simulation& model, const unsigned int trial_runs) const;
 
 	private:
-		ModelContext context_;
+		ModelInput config_;
 		SimulationModuleFactory factory_;
 	};
 }

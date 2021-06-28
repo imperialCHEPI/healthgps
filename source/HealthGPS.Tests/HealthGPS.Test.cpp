@@ -50,7 +50,7 @@ void create_test_datatable(hgps::core::DataTable& data) {
 	data.add(inc_builder.build());
 }
 
-hgps::ModelContext create_test_context(hgps::core::DataTable& data) {
+hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	using namespace hgps;
 	using namespace hgps::core;
 
@@ -65,7 +65,7 @@ hgps::ModelContext create_test_context(hgps::core::DataTable& data) {
 	ses.entries.emplace("education", "Education");
 	ses.entries.emplace("income", "Income");
 
-	return ModelContext(data, pop, info, ses);
+	return ModelInput(data, pop, info, ses);
 }
 
 TEST(TestHealthGPS, RandomBitGenerator)
@@ -117,9 +117,9 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
-	auto context = ModelContext(data, pop, info, ses);
+	auto config = ModelInput(data, pop, info, ses);
 
-	auto sim = HealthGPS(context, MTRandom32());
+	auto sim = HealthGPS(config, MTRandom32());
 	EXPECT_TRUE(sim.next_double() >= 0);
 }
 
@@ -146,21 +146,21 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
-	auto context = ModelContext(data, pop, info, ses);
+	auto config = ModelInput(data, pop, info, ses);
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
 	auto factory = SimulationModuleFactory(manager);
 	factory.Register(SimulationModuleType::Simulator,
-		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
-			return build_country_module(manager, context);
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_country_module(manager, config);
 		});
 
 	auto p = Person(5);
 
 	MTRandom32 rnd;
-	auto country_mod = factory.Create(SimulationModuleType::Simulator, context);
+	auto country_mod = factory.Create(SimulationModuleType::Simulator, config);
 	country_mod->execute("print", rnd, p);
 	EXPECT_EQ(p.id(), 5);
 }
@@ -173,12 +173,12 @@ TEST(TestHealthGPS, CreateSESModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto context = create_test_context(data);
+	auto config = create_test_configuration(data);
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
-	auto ses_module = build_ses_module(manager, context);
+	auto ses_module = build_ses_module(manager, config);
 	auto edu_hist = ses_module->get_education_frequency(std::nullopt);
 	auto edu_size = ses_module->max_education_level() + 1;
 	auto inc_hist = ses_module->get_income_frenquency(std::nullopt);
@@ -201,14 +201,14 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto context = create_test_context(data);
+	auto config = create_test_configuration(data);
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
-	auto pop_module = build_demographic_module(manager, context);
-	auto total_pop = pop_module->get_total_population(context.start_time());
-	auto pop_dist = pop_module->get_age_gender_distribution(context.start_time());
+	auto pop_module = build_demographic_module(manager, config);
+	auto total_pop = pop_module->get_total_population(config.start_time());
+	auto pop_dist = pop_module->get_age_gender_distribution(config.start_time());
 	auto sum_male = 0.0;
 	auto sum_female = 0.0;
 	for (auto& age : pop_dist) {

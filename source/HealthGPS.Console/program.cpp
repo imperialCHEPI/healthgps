@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
 	auto data_api = data::DataManager(settings.storage_folder);
 	auto factory = SimulationModuleFactory(data_api);
 	factory.Register(SimulationModuleType::SES,
-		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
-			return build_ses_module(manager, context);});
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_ses_module(manager, config);});
 	factory.Register(SimulationModuleType::Demographic,
-		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
-			return build_demographic_module(manager, context);});
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_demographic_module(manager, config);});
 
 	// Validate target country
 	auto countries = data_api.get_countries();
@@ -57,17 +57,15 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	// Create model context
-	auto context = create_context(input_table, target.value(), config);
+	// Create model configration
+	auto model_config = create_model_input(input_table, target.value(), config);
 
 	try	{
-		// auto ses_module = factory.Create(SimulationModuleType::SES, context);
-
 		// Create model
-		auto model = HealthGPS(context, hgps::MTRandom32());
+		auto model = HealthGPS(model_config, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner(factory, context);
+		auto runner = ModelRunner(factory, model_config);
 
 		auto runtime = runner.run(model, config.trial_runs);
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);

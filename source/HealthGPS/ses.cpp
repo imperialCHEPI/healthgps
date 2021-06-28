@@ -186,15 +186,15 @@ namespace hgps {
 		return std::nanf("");
 	}
 
-	std::unique_ptr<SESModule> hgps::build_ses_module(core::Datastore& manager, ModelContext& context) {
+	std::unique_ptr<SESModule> hgps::build_ses_module(core::Datastore& manager, ModelInput& config) {
 
 		// SES required data, assuming it has been validated.
-		auto& table = context.data();
+		auto& table = config.data();
 
-		auto& gender_col = table.column(context.ses_mapping().entries["gender"]);
-		auto& age_col = table.column(context.ses_mapping().entries["age_group"]);
-		auto& edu_col = table.column(context.ses_mapping().entries["education"]);
-		auto& inc_col = table.column(context.ses_mapping().entries["income"]);
+		auto& gender_col = table.column(config.ses_mapping().entries["gender"]);
+		auto& age_col = table.column(config.ses_mapping().entries["age_group"]);
+		auto& edu_col = table.column(config.ses_mapping().entries["education"]);
+		auto& inc_col = table.column(config.ses_mapping().entries["income"]);
 
 		std::vector<SESRecord> data;
 		for (size_t row = 0; row < table.num_rows(); row++)
@@ -208,6 +208,6 @@ namespace hgps {
 			data.emplace_back(SESRecord(gender, age_group, edu_value, income, weight));
 		}
 
-		return std::make_unique<SESModule>(std::move(data), context.population().age_range());
+		return std::make_unique<SESModule>(std::move(data), config.population().age_range());
 	}
 }

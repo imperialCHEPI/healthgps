@@ -64,12 +64,12 @@ namespace hgps {
 		RandomBitGenerator& generator, Entity& entity) {
 	}
 
-	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelContext& context) {
+	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelInput& config) {
 		// year => age [age, male, female]
 		auto data = std::map<int, std::map<int, AgeRecord>>();
 
-		auto pop = manager.get_population(context.population().country(), [&context](const unsigned int& value) { 
-			return value >= context.start_time() && value <= context.stop_time(); });
+		auto pop = manager.get_population(config.population().country(), [&config](const unsigned int& value) { 
+			return value >= config.start_time() && value <= config.stop_time(); });
 
 		for (auto& item : pop) {
 			data[item.year].emplace(item.age, AgeRecord(item.age, item.males, item.females));

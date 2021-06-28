@@ -54,7 +54,7 @@
     <ClInclude Include="simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="modelcontext.h">
+    <ClInclude Include="modelinput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="population.h">
@@ -80,7 +80,7 @@
     <ClCompile Include="modelrunner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="modelcontext.cpp">
+    <ClCompile Include="modelinput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="population.cpp">

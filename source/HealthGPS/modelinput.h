@@ -17,11 +17,11 @@ namespace hgps {
 		std::map<std::string, std::string, core::case_insensitive::comparator> entries;
 	};
 
-	class ModelContext
+	class ModelInput
 	{
 	public:
-		ModelContext() = delete;
-		ModelContext(core::DataTable& data, Population population,
+		ModelInput() = delete;
+		ModelInput(core::DataTable& data, Population population,
 			RunInfo info, SESMapping ses_mapping);
 
 		Population population() const noexcept;

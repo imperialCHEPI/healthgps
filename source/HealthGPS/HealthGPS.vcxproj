@@ -100,7 +100,7 @@
     <ClInclude Include="demographic.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
-    <ClInclude Include="modelcontext.h" />
+    <ClInclude Include="modelinput.h" />
     <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
     <ClInclude Include="population.h" />
@@ -112,7 +112,7 @@
   <ItemGroup>
     <ClCompile Include="demographic.cpp" />
     <ClCompile Include="modelrunner.cpp" />
-    <ClCompile Include="modelcontext.cpp" />
+    <ClCompile Include="modelinput.cpp" />
     <ClCompile Include="mtrandom.cpp" />
     <ClCompile Include="population.cpp" />
     <ClCompile Include="scenario.cpp" />

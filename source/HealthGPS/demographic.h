@@ -1,7 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
-#include "modelcontext.h"
+#include "modelinput.h"
 
 namespace hgps {
 
@@ -52,6 +52,6 @@ namespace hgps {
 		core::IntegerInterval age_range_{};
 	};
 
-	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelContext& context);
+	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelInput& config);
 }
 

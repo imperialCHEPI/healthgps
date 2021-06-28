@@ -163,9 +163,9 @@ hgps::Scenario create_scenario(Configuration& config)
 	return scenario;
 }
 
-ModelContext create_context(core::DataTable& input_table, core::Country country, Configuration& config)
+ModelInput create_model_input(core::DataTable& input_table, core::Country country, Configuration& config)
 {
-	// Create simulation context
+	// Create simulation configuration
 	auto age_range = core::IntegerInterval(
 		config.data_info.age_range.front(), config.data_info.age_range.back());
 
@@ -182,5 +182,5 @@ ModelContext create_context(core::DataTable& input_table, core::Country country,
 	auto ses_mapping = SESMapping();
 	ses_mapping.entries.insert(config.ses_mapping.begin(), config.ses_mapping.end());
 
-	return ModelContext(input_table, population, run_info, ses_mapping);
+	return ModelInput(input_table, population, run_info, ses_mapping);
 }
