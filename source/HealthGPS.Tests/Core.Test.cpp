@@ -30,17 +30,20 @@ TEST(TestHealthGPSCore, CreateCountry)
 {
 	using namespace hgps::core;
 
-	auto id = "GB";
+	unsigned short id = 826;
 	auto uk = "United Kingdom";
-
 
 	auto c = Country{
 		.code = id,
-		.name = uk
+		.name = uk,
+		.alpha2 = "GB",
+		.alpha3 = "GBR"
 	};
 
 	EXPECT_EQ(id, c.code);
 	EXPECT_EQ(uk, c.name);
+	EXPECT_EQ("GB", c.alpha2);
+	EXPECT_EQ("GBR", c.alpha3);
 }
 
 TEST(TestHealthGPSCore, CreateTableColumnWithNulls)

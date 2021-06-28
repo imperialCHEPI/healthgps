@@ -40,8 +40,10 @@ int main(int argc, char* argv[])
 	auto factory = SimulationModuleFactory(data_api);
 	factory.Register(SimulationModuleType::SES,
 		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
-			return build_ses_module(manager, context);
-		});
+			return build_ses_module(manager, context);});
+	factory.Register(SimulationModuleType::Demographic,
+		[](core::Datastore& manager, ModelContext& context) -> SimulationModuleFactory::ModuleType {
+			return build_demographic_module(manager, context);});
 
 	// Validate target country
 	auto countries = data_api.get_countries();

@@ -10,22 +10,23 @@ namespace hgps {
 		class Interval {
 		public:
 			Interval() = default;
-			explicit Interval(TYPE lower, TYPE upper) : lower_{ lower }, upper_{ upper }{}
 
-			const unsigned int lower() const { return lower_; }
+			explicit Interval(TYPE lower_value, TYPE upper_value) 
+				: lower_{ lower_value }, upper_{ upper_value }{}
 
-			const unsigned int upper() const { return upper_; }
+			TYPE lower() const { return lower_; }
 
-			unsigned int length() const { return upper_ - lower_; }
+			TYPE upper() const { return upper_; }
+
+			TYPE length() const { return upper_ - lower_; }
 
 			bool contains(TYPE value) { lower_ <= value && value <= upper_; }
 
-			bool contains(Interval<TYPE>& other) { is_inside(other.lower()) && is_inside(other.upper()); }
+			bool contains(Interval<TYPE>& other) { is_inside(other.lower_) && is_inside(other.upper_); }
 
 			std::string to_string() const noexcept { return std::format("{}-{}", lower_, upper_); }
 
 			auto operator<=>(const Interval<TYPE>&) const = default;
-
 		private:
 			TYPE lower_;
 			TYPE upper_;

@@ -97,6 +97,7 @@
   <ItemGroup>
     <ClInclude Include="api.h" />
     <ClInclude Include="countrymodule.h" />
+    <ClInclude Include="demographic.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
     <ClInclude Include="modelcontext.h" />
@@ -109,6 +110,7 @@
     <ClInclude Include="simulation.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="demographic.cpp" />
     <ClCompile Include="modelrunner.cpp" />
     <ClCompile Include="modelcontext.cpp" />
     <ClCompile Include="mtrandom.cpp" />

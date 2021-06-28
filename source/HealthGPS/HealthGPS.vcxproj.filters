@@ -63,6 +63,9 @@
     <ClInclude Include="ses.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
+    <ClInclude Include="demographic.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -84,6 +87,9 @@
       <Filter>Source Files\data</Filter>
     </ClCompile>
     <ClCompile Include="ses.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="demographic.cpp">
       <Filter>Source Files\modules</Filter>
     </ClCompile>
   </ItemGroup>

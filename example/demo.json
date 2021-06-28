@@ -4,11 +4,11 @@
             "name": "dataset.csv",
             "format": "csv",
             "delimiter": ",",
+            "encoding":"ASCII",
             "columns": {
                 "Year1": "integer",
                 "Gender": "integer",
                 "Age": "integer",
-                "AgeGroup":"string",
                 "Age1": "integer",
                 "Age2": "integer",
                 "Age3": "integer",
@@ -26,12 +26,12 @@
             "identity": "Year1",
             "start_value": 2014,
             "delta_percent": 0.001,
-            "data_linkage": "AgeGroup",
-            "age_range":[0, 110]
+            "data_linkage": "Age",
+            "age_range":[0, 100]
         },
         "ses_mapping": {
             "gender": "Gender",
-            "age_group": "AgeGroup",
+            "age": "Age",
             "education": "Education",
             "income": "Income"
         }

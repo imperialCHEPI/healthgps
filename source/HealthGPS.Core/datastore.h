@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <optional>
+#include "interval.h"
 #include "poco.h"
 
 namespace hgps {
@@ -14,7 +15,10 @@ namespace hgps {
 
 			virtual std::vector<Country> get_countries() const = 0;
 
-			virtual std::optional<Country> get_country(std::string code) const = 0;
+			virtual std::optional<Country> get_country(std::string alpha) const = 0;
+
+			virtual std::vector<PopulationItem> get_population(
+				Country country, const std::function<bool(const unsigned int&)> year_filter) const = 0;
 		};
 	}
 }
