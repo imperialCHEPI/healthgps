@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "simulation.h"
-#include "scenario.h"
+#include "modulefactory.h"
 
 namespace hgps {
 
@@ -11,7 +11,7 @@ namespace hgps {
 	{
 	public:
 		HealthGPS() = delete;
-		explicit HealthGPS(ModelInput& config, RandomBitGenerator&& generator);
+		explicit HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator);
 		
 		void initialize() const override;
 
@@ -26,8 +26,8 @@ namespace hgps {
 		void fini(adevs::Time clock);
 
 		double next_double();
-	private:
 
-		//Scenario& scenario_;
+	private:
+		SimulationModuleFactory& factory_;
 	};
 }

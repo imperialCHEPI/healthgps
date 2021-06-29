@@ -1,14 +1,14 @@
 #include "modelinput.h"
 
 namespace hgps {
-	ModelInput::ModelInput(core::DataTable& data, Population population,
+	ModelInput::ModelInput(core::DataTable& data, Settings settings,
 		RunInfo run_info, SESMapping ses_mapping)
-		: input_data_{data}, population_{population},
+		: input_data_{data}, settings_{settings},
 		  run_info_{run_info}, ses_mapping_{ses_mapping} {
 	}
 
-	Population ModelInput::population() const noexcept {
-		return population_;
+	Settings ModelInput::settings() const noexcept {
+		return settings_;
 	}
 
 	core::DataTable& ModelInput::data() const noexcept {

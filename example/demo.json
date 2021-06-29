@@ -21,7 +21,7 @@
                 "AlcoholConsumption": "double"
             }
         },
-        "population":{
+        "settings":{
             "country_code":"GB",
             "identity": "Year1",
             "start_value": 2014,

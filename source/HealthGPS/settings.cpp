@@ -1,10 +1,10 @@
 #include <stdexcept>
 
-#include "population.h"
+#include "settings.h"
 
 namespace hgps {
 
-	Population::Population(const core::Country country, const std::string identy_col,
+	Settings::Settings(const core::Country country, const std::string identy_col,
 		const int start_time, const float dt_percent, const std::string linkage_col, 
 		const core::IntegerInterval range)
 		: country_{country}, identity_column_{identy_col},
@@ -23,28 +23,28 @@ namespace hgps {
 		}
 	}
 
-	core::Country Population::country() const noexcept {
+	core::Country Settings::country() const noexcept {
 		return country_;
 	}
 
-	std::string Population::identity_column() const noexcept {
+	std::string Settings::identity_column() const noexcept {
 		return identity_column_;
 	}
 
-	int Population::start_time() const noexcept	{
+	int Settings::start_time() const noexcept	{
 		return start_time_;
 	}
 
-	float Population::delta_percent() const noexcept {
+	float Settings::delta_percent() const noexcept {
 		return delta_percent_;
 	}
 
-	std::string Population::linkage_column() const noexcept
+	std::string Settings::linkage_column() const noexcept
 	{
 		return std::string();
 	}
 
-	core::IntegerInterval Population::age_range() const noexcept {
+	core::IntegerInterval Settings::age_range() const noexcept {
 		return age_range_;
 	}
 }

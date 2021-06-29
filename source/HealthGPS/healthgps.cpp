@@ -6,10 +6,9 @@
 #include "mtrandom.h"
 
 namespace hgps {
-	HealthGPS::HealthGPS(ModelInput& config, RandomBitGenerator&& generator)
-		: Simulation(config, std::move(generator))
-	{
-	}
+	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator)
+		: Simulation(config, std::move(generator)), factory_{factory}
+	{}
 
 	void HealthGPS::initialize() const
 	{

@@ -68,7 +68,7 @@ namespace hgps {
 		// year => age [age, male, female]
 		auto data = std::map<int, std::map<int, AgeRecord>>();
 
-		auto pop = manager.get_population(config.population().country(), [&config](const unsigned int& value) { 
+		auto pop = manager.get_population(config.settings().country(), [&config](const unsigned int& value) { 
 			return value >= config.start_time() && value <= config.stop_time(); });
 
 		for (auto& item : pop) {

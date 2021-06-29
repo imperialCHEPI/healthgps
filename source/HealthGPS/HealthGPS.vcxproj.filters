@@ -57,7 +57,7 @@
     <ClInclude Include="modelinput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="population.h">
+    <ClInclude Include="settings.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
     <ClInclude Include="ses.h">
@@ -83,7 +83,7 @@
     <ClCompile Include="modelinput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="population.cpp">
+    <ClCompile Include="settings.cpp">
       <Filter>Source Files\data</Filter>
     </ClCompile>
     <ClCompile Include="ses.cpp">

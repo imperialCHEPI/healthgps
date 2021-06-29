@@ -94,11 +94,13 @@
     <ClInclude Include="column_iterator.h" />
     <ClInclude Include="column_numeric.h" />
     <ClInclude Include="column_primitive.h" />
+    <ClInclude Include="country.h" />
     <ClInclude Include="datatable.h" />
     <ClInclude Include="forward_type.h" />
     <ClInclude Include="interval.h" />
     <ClInclude Include="poco.h" />
     <ClInclude Include="datastore.h" />
+    <ClInclude Include="population_item.h" />
     <ClInclude Include="string_util.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="visitor.h" />

@@ -75,6 +75,12 @@
     <ClInclude Include="array2d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="country.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="population_item.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">

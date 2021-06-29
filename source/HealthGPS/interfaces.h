@@ -63,6 +63,18 @@ namespace hgps {
 		Analysis,
 	};
 
+	class RuntimeContext
+	{
+	public:
+		virtual ~RuntimeContext() = default;
+
+		virtual int time_now() const noexcept = 0;
+
+		virtual unsigned int next_int() noexcept = 0;
+
+		virtual double next_double() noexcept = 0;
+	};
+
 	/// @brief Simulation modules interface
 	class SimulationModule
 	{

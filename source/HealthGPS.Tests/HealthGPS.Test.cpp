@@ -57,7 +57,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 
 	auto age_range = core::IntegerInterval(0, 30);
-	auto pop = Population(uk, "AgeGroup", 1, 0.1f, "AgeGroup", age_range);
+	auto settings = Settings(uk, "AgeGroup", 1, 0.1f, "AgeGroup", age_range);
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("gender", "Gender");
@@ -65,7 +65,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	ses.entries.emplace("education", "Education");
 	ses.entries.emplace("income", "Income");
 
-	return ModelInput(data, pop, info, ses);
+	return ModelInput(data, settings, info, ses);
 }
 
 TEST(TestHealthGPS, RandomBitGenerator)
@@ -113,11 +113,11 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto data = core::DataTable();
 	data.add(builder.build());
 	auto age_range = core::IntegerInterval(0, 110);
-	auto pop = Population(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
+	auto settings = Settings(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
-	auto config = ModelInput(data, pop, info, ses);
+	auto config = ModelInput(data, settings, info, ses);
 
 	auto sim = HealthGPS(config, MTRandom32());
 	EXPECT_TRUE(sim.next_double() >= 0);
@@ -142,11 +142,11 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 	auto age_range = core::IntegerInterval(0, 110);
-	auto pop = Population(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
+	auto settings = Settings(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
-	auto config = ModelInput(data, pop, info, ses);
+	auto config = ModelInput(data, settings, info, ses);
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);

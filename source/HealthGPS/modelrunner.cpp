@@ -3,9 +3,6 @@
 
 namespace hgps {
 
-	ModelRunner::ModelRunner(SimulationModuleFactory& factory, ModelInput& config)
-		: factory_{factory}, config_{config} {}
-
 	double ModelRunner::run(Simulation& model, const unsigned int trial_runs) const
 	{
 		if (trial_runs < 1) {

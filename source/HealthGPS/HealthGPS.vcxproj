@@ -103,7 +103,7 @@
     <ClInclude Include="modelinput.h" />
     <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
-    <ClInclude Include="population.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
     <ClInclude Include="ses.h" />
@@ -114,7 +114,7 @@
     <ClCompile Include="modelrunner.cpp" />
     <ClCompile Include="modelinput.cpp" />
     <ClCompile Include="mtrandom.cpp" />
-    <ClCompile Include="population.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
     <ClCompile Include="ses.cpp" />

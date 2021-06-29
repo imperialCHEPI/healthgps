@@ -126,8 +126,8 @@ Configuration load_configuration(CommandOptions& options) {
 				full_path.string());
 		}
 
-		// Population and SES mapping
-		config.data_info = opt["inputs"]["population"].get<DataInfo>();
+		// Settings and SES mapping
+		config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
 		opt["inputs"].at("ses_mapping").get_to(config.ses_mapping);
 
 		// Run-time
@@ -157,7 +157,7 @@ hgps::Scenario create_scenario(Configuration& config)
 		config.stop_time,
 		config.trial_runs);
 
-	scenario.country = config.data_info.country;
+	scenario.country = config.settings.country;
 	scenario.custom_seed = config.custom_seed;
 
 	return scenario;
@@ -167,11 +167,11 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 {
 	// Create simulation configuration
 	auto age_range = core::IntegerInterval(
-		config.data_info.age_range.front(), config.data_info.age_range.back());
+		config.settings.age_range.front(), config.settings.age_range.back());
 
-	auto population = Population(country, config.data_info.identity,
-		config.data_info.start_value, config.data_info.delta_percent,
-		config.data_info.data_linkage, age_range);
+	auto settings = Settings(country, config.settings.identity,
+		config.settings.start_value, config.settings.delta_percent,
+		config.settings.data_linkage, age_range);
 
 	auto run_info = RunInfo{
 		.start_time = config.start_time,
@@ -182,5 +182,5 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto ses_mapping = SESMapping();
 	ses_mapping.entries.insert(config.ses_mapping.begin(), config.ses_mapping.end());
 
-	return ModelInput(input_table, population, run_info, ses_mapping);
+	return ModelInput(input_table, settings, run_info, ses_mapping);
 }

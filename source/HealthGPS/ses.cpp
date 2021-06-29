@@ -208,6 +208,6 @@ namespace hgps {
 			data.emplace_back(SESRecord(gender, age_group, edu_value, income, weight));
 		}
 
-		return std::make_unique<SESModule>(std::move(data), config.population().age_range());
+		return std::make_unique<SESModule>(std::move(data), config.settings().age_range());
 	}
 }

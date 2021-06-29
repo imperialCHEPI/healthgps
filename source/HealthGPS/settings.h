@@ -5,10 +5,10 @@
 
 namespace hgps {
 
-	class Population
+	class Settings
 	{
 	public:
-		Population(const core::Country country, const std::string identy_col, 
+		Settings(const core::Country country, const std::string identy_col, 
 			const int start_time, const float dt_percent,
 			const std::string linkage_col, const core::IntegerInterval age_range);
 

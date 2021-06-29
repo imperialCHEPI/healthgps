@@ -36,6 +36,6 @@ namespace hgps {
 	};
 
 	static std::unique_ptr<CountryModule> build_country_module(core::Datastore& manager, ModelInput& config) {
-		return std::make_unique<CountryModule>(manager.get_countries(), config.population().country());
+		return std::make_unique<CountryModule>(manager.get_countries(), config.settings().country());
 	}
 }
