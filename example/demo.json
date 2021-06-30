@@ -23,9 +23,8 @@
         },
         "settings":{
             "country_code":"GB",
-            "identity": "Year1",
-            "start_value": 2014,
-            "delta_percent": 0.001,
+            "reference_time": 2014,
+            "size_fraction": 0.001,
             "data_linkage": "Age",
             "age_range":[0, 100]
         },

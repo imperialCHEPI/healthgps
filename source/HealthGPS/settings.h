@@ -8,17 +8,14 @@ namespace hgps {
 	class Settings
 	{
 	public:
-		Settings(const core::Country country, const std::string identy_col, 
-			const int start_time, const float dt_percent,
-			const std::string linkage_col, const core::IntegerInterval age_range);
+		Settings(const core::Country country, const unsigned int reference_time, 
+			const float size_fraction, const std::string linkage_col, const core::IntegerInterval age_range);
 
 		core::Country country() const noexcept;
 
-		std::string identity_column() const noexcept;
+		unsigned int reference_time() const noexcept;
 
-		int start_time() const noexcept;
-
-		float delta_percent() const noexcept;
+		float size_fraction() const noexcept;
 
 		std::string linkage_column() const noexcept;
 
@@ -26,9 +23,8 @@ namespace hgps {
 
 	private:
 		core::Country country_;
-		std::string identity_column_;
-		int start_time_{};
-		float delta_percent_{};
+		unsigned int reference_time_{};
+		float size_fraction_{};
 		std::string linkage_column_;
 		core::IntegerInterval age_range_;
 	};

@@ -4,22 +4,15 @@
 
 namespace hgps {
 
-	Settings::Settings(const core::Country country, const std::string identy_col,
-		const int start_time, const float dt_percent, const std::string linkage_col, 
-		const core::IntegerInterval range)
-		: country_{country}, identity_column_{identy_col},
-		start_time_{ start_time }, delta_percent_{ dt_percent },
-		linkage_column_{linkage_col}, age_range_{ range } {
+	Settings::Settings(const core::Country country, const unsigned int reference_time,
+		const float size_fraction, const std::string linkage_col, const core::IntegerInterval age_range)
+		: country_{country}, reference_time_{ reference_time }, size_fraction_{ size_fraction },
+		linkage_column_{linkage_col}, age_range_{ age_range } {
 
-		// TODO: Create a columns name wrapper
-		if (identity_column_.length() < 2 || !std::isalpha(identity_column_.front())) {
+		// TODO: Create a fraction type wrapper
+		if (size_fraction <= 0.0 || size_fraction > 1.0) {
 			throw std::invalid_argument(
-				"Invalid column name: minimum length of two and start with alpha character.");
-		}
-
-		if (dt_percent < 0.0 || dt_percent > 1.0) {
-			throw std::invalid_argument(
-				"Invalid percentage value, must be between in range [0, 1].");
+				"Invalid population size fraction value, must be between in range (0, 1].");
 		}
 	}
 
@@ -27,16 +20,12 @@ namespace hgps {
 		return country_;
 	}
 
-	std::string Settings::identity_column() const noexcept {
-		return identity_column_;
+	unsigned int Settings::reference_time() const noexcept	{
+		return reference_time_;
 	}
 
-	int Settings::start_time() const noexcept	{
-		return start_time_;
-	}
-
-	float Settings::delta_percent() const noexcept {
-		return delta_percent_;
+	float Settings::size_fraction() const noexcept {
+		return size_fraction_;
 	}
 
 	std::string Settings::linkage_column() const noexcept

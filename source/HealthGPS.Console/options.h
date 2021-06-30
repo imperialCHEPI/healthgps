@@ -34,11 +34,10 @@ struct SettingsInfo
 {
 	std::string country{};
 
-	std::string identity{};
+	/// @brief The data reference time, probably should be the simulation start time.
+	int reference_time{};
 
-	int start_value{};
-
-	float delta_percent{};
+	float size_fraction{};
 
 	std::string data_linkage{};
 
@@ -86,18 +85,16 @@ void from_json(const json& j, FileInfo& p) {
 void to_json(json& j, const SettingsInfo& p) {
 	j = json{ 
 		{"country_code", p.country},
-		{"identity", p.identity},
-		{"start_value", p.start_value},
-		{"delta_percent", p.delta_percent},
+		{"reference_time", p.reference_time},
+		{"size_fraction", p.size_fraction},
 		{"data_linkage", p.data_linkage},
 		{"age_range", p.age_range}};
 }
 
 void from_json(const json& j, SettingsInfo& p) {
 	j.at("country_code").get_to(p.country);
-	j.at("identity").get_to(p.identity);
-	j.at("start_value").get_to(p.start_value);
-	j.at("delta_percent").get_to(p.delta_percent);
+	j.at("reference_time").get_to(p.reference_time);
+	j.at("size_fraction").get_to(p.size_fraction);
 	j.at("data_linkage").get_to(p.data_linkage);
 	j.at("age_range").get_to(p.age_range);
 }

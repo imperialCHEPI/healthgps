@@ -60,8 +60,10 @@ namespace hgps {
 		// year => age [age, male, female]
 		auto data = std::map<int, std::map<int, AgeRecord>>();
 
-		auto pop = manager.get_population(config.settings().country(), [&config](const unsigned int& value) { 
-			return value >= config.start_time() && value <= config.stop_time(); });
+		auto min_time = std::min(config.start_time(), config.settings().reference_time());
+
+		auto pop = manager.get_population(config.settings().country(), [&](const unsigned int& value) { 
+			return value >= min_time && value <= config.stop_time(); });
 
 		for (auto& item : pop) {
 			data[item.year].emplace(item.age, AgeRecord(item.age, item.males, item.females));

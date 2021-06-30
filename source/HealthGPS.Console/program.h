@@ -169,9 +169,8 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto age_range = core::IntegerInterval(
 		config.settings.age_range.front(), config.settings.age_range.back());
 
-	auto settings = Settings(country, config.settings.identity,
-		config.settings.start_value, config.settings.delta_percent,
-		config.settings.data_linkage, age_range);
+	auto settings = Settings(country, config.settings.reference_time, 
+		config.settings.size_fraction, config.settings.data_linkage, age_range);
 
 	auto run_info = RunInfo{
 		.start_time = config.start_time,
