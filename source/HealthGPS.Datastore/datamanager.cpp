@@ -102,7 +102,7 @@ namespace hgps {
 								.age = std::stoi(row[6]),		// AgeGrp
 								.males = std::stof(row[9]),		// PopMale
 								.females = std::stof(row[10]),	// PopFemale
-								.total = std::stof(row[11]),	// PopTotal
+								.total = std::stof(row[11])		// PopTotal
 							});
 					}
 

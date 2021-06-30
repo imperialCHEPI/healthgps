@@ -5,6 +5,8 @@
 #include "simulation.h"
 #include "modulefactory.h"
 #include "runtime_context.h"
+#include "demographic.h"
+#include "ses.h"
 
 namespace hgps {
 
@@ -29,5 +31,7 @@ namespace hgps {
 	private:
 		SimulationModuleFactory& factory_;
 		RuntimeContext context_;
+		std::unique_ptr<SESModule> ses_;
+		std::unique_ptr<DemographicModule> demographic_;
 	};
 }

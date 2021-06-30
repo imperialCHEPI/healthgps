@@ -20,7 +20,6 @@
         "file_name":"P{NUMBER}.csv",
         "age_limits":[0, 100],
         "time_limits":[1950, 2100],
-        "units": "thousands",
         "projections": 2020
     }
 }

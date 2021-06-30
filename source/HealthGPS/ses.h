@@ -8,14 +8,14 @@ namespace hgps {
 	class SESRecord
 	{
 	public:
-		SESRecord(core::Gender gender, core::IntegerInterval age_group, float education, float incoming, float weight)
-			: gender_{ gender }, age_group_{ age_group }, 
+		SESRecord(core::Gender gender, int age, float education, float incoming, float weight)
+			: gender_{ gender }, age_{ age }, 
 			  education_level_{ education }, incoming_level_{ incoming },
 			  weight_{ weight } {}
 
 		const core::Gender& gender() const noexcept { return gender_; }
 
-		const core::IntegerInterval& age_group() const noexcept { return age_group_; }
+		const int age() const noexcept { return age_; }
 
 		const float& education_level() const noexcept { return education_level_; }
 
@@ -25,7 +25,7 @@ namespace hgps {
 
 	private:
 		core::Gender gender_;
-		core::IntegerInterval age_group_;
+		int age_;
 		float education_level_{};
 		float incoming_level_{};
 		float weight_{};
@@ -47,9 +47,9 @@ namespace hgps {
 
 		const int& max_incoming_level() const noexcept;
 
-		const std::map<core::IntegerInterval, std::vector<float>> get_education_frequency(std::optional<core::Gender> filter) const;
+		const std::map<int, std::vector<float>> get_education_frequency(std::optional<core::Gender> filter) const;
 
-		const std::map<core::IntegerInterval, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
+		const std::map<int, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
 
 	private:
 		std::vector<SESRecord> data_;
@@ -62,7 +62,7 @@ namespace hgps {
 
 	core::Gender parse_gender(const std::any& value);
 
-	core::IntegerInterval parse_age_group(const std::any& value);
+	int parse_integer(const std::any& value);
 
 	float parse_float(const std::any& value);
 

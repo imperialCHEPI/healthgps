@@ -29,44 +29,41 @@ namespace hgps {
 		return max_income_level_;
 	}
 
-	const std::map<core::IntegerInterval, std::vector<float>> SESModule::get_education_frequency(
+	const std::map<int, std::vector<float>> SESModule::get_education_frequency(
 		std::optional<core::Gender> filter) const {
 
-		auto results = std::map<core::IntegerInterval, std::vector<float>>();
+		auto results = std::map<int, std::vector<float>>();
 		if (data_.size() < 1) {
 			return results;
 		}
 		
 		auto data_sz = max_education_level_ + 1;
 		for (auto& item : data_) {
-			if (!results.contains(item.age_group())) { 
-				results.emplace(item.age_group(), std::vector<float>(data_sz));
-				results.at(item.age_group()).reserve(data_sz);
+			if (!results.contains(item.age())) { 
+				results.emplace(item.age(), std::vector<float>(data_sz));
+				results.at(item.age()).reserve(data_sz);
 			}
 
 			if (item.education_level() >= 0 && 
 				(!filter.has_value() || item.gender() == filter.value())) {
-				results.at(item.age_group())[(int)item.education_level()] += item.weight();
+				results.at(item.age())[(int)item.education_level()] += item.weight();
 			}
 		}
 
-		// Fill gaps in data, assuming equal age group length.
-		auto length = results.begin()->first.length();
-		auto step_sz = length + 1;
-		for (auto i = age_range_.lower(); i < age_range_.upper(); i += step_sz) {
-			auto test_group = core::IntegerInterval(i, i + length);
-			if (!results.contains(test_group)) {
-				results.emplace(test_group, std::vector<float>(data_sz, 1.0f));
+		// Fill gaps in data
+		for (auto age = age_range_.lower(); age < age_range_.upper(); age++) {
+			if (!results.contains(age)) {
+				results.emplace(age, std::vector<float>(data_sz, 1.0f));
 			}
 		}
 
 		return results;
 	}
 
-	const std::map<core::IntegerInterval, core::FloatArray2D> SESModule::get_income_frenquency(
+	const std::map<int, core::FloatArray2D> SESModule::get_income_frenquency(
 		std::optional<core::Gender> filter) const {
 
-		auto results = std::map<core::IntegerInterval, core::FloatArray2D>();
+		auto results = std::map<int, core::FloatArray2D>();
 		if (data_.size() < 1) {
 			return results;
 		}
@@ -79,22 +76,19 @@ namespace hgps {
 				continue;
 			}
 
-			if (!results.contains(r.age_group())) {
-				results.emplace(r.age_group(), core::FloatArray2D(num_rows, num_cols));
+			if (!results.contains(r.age())) {
+				results.emplace(r.age(), core::FloatArray2D(num_rows, num_cols));
 			}
 
 			if (!filter.has_value() || r.gender() == filter.value()) {
-				results[r.age_group()]((int)r.education_level(), (int)r.incoming_level()) += r.weight();
+				results[r.age()]((int)r.education_level(), (int)r.incoming_level()) += r.weight();
 			}
 		}
 
-		// Fill gaps in data, assuming equal age group length.
-		auto length = results.begin()->first.length();
-		auto step_sz = length + 1;
-		for (auto i = age_range_.lower(); i < age_range_.upper(); i += step_sz) {
-			auto test_group = core::IntegerInterval(i, i + length);
-			if (!results.contains(test_group)) {
-				results.emplace(test_group, core::FloatArray2D(num_rows, num_cols, 1.0f));
+		// Fill gaps in data.
+		for (auto age = age_range_.lower(); age < age_range_.upper(); age++) {
+			if (!results.contains(age)) {
+				results.emplace(age, core::FloatArray2D(num_rows, num_cols, 1.0f));
 			}
 		}
 
@@ -148,13 +142,26 @@ namespace hgps {
 		return core::Gender::unknown;
 	}
 
-	core::IntegerInterval parse_age_group(const std::any& value)
-	{
-		if (auto* s = std::any_cast<std::string>(&value)) {
-			return  core::parse_integer_interval(*s);
+	int parse_integer(const std::any& value) {
+		if (value.has_value()) {
+			if (auto* i = std::any_cast<int>(&value)) {
+				return *i;
+			}
+			else if (auto* s = std::any_cast<short>(&value)) {
+				return *s;
+			}
+			else if (auto* f = std::any_cast<float>(&value)) {
+				return (int)*f;
+			}
+			else if (auto* d = std::any_cast<double>(&value)) {
+				return (int)*f;
+			}
+			else if (auto* s = std::any_cast<std::string>(&value)) {
+				return std::stoi(*s);
+			}
 		}
 
-		return core::IntegerInterval(0,0);
+		return -1;
 	}
 
 	float parse_float(const std::any& value)
@@ -184,7 +191,7 @@ namespace hgps {
 		auto& table = config.data();
 
 		auto& gender_col = table.column(config.ses_mapping().entries["gender"]);
-		auto& age_col = table.column(config.ses_mapping().entries["age_group"]);
+		auto& age_col = table.column(config.ses_mapping().entries["age"]);
 		auto& edu_col = table.column(config.ses_mapping().entries["education"]);
 		auto& inc_col = table.column(config.ses_mapping().entries["income"]);
 
@@ -192,12 +199,12 @@ namespace hgps {
 		for (size_t row = 0; row < table.num_rows(); row++)
 		{
 			auto gender = parse_gender(gender_col->value(row));
-			auto age_group = parse_age_group(age_col->value(row));
+			auto age = parse_integer(age_col->value(row));
 			auto edu_value = parse_float(edu_col->value(row));
 			float income = parse_float(inc_col->value(row));
 			auto weight = 1.0f;
 
-			data.emplace_back(SESRecord(gender, age_group, edu_value, income, weight));
+			data.emplace_back(SESRecord(gender, age, edu_value, income, weight));
 		}
 
 		return std::make_unique<SESModule>(std::move(data), config.settings().age_range());

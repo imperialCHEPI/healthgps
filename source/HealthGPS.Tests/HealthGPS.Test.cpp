@@ -10,12 +10,12 @@ void create_test_datatable(hgps::core::DataTable& data) {
 	using namespace hgps::core;
 
 	auto gender_values = std::vector<int>{ 1, 0, 0, 1, 0 };
-	auto age_values = std::vector<std::string>{ "0-4", "5-9", "10-14", "15-19", "20-25" };
+	auto age_values = std::vector<int>{ 4, 9, 14, 19, 25 };
 	auto edu_values = std::vector<float>{ 6.0f, 10.0f, 2.0f, 9.0f, 12.0f };
 	auto inc_values = std::vector<double>{ 2.0, 10.0, 5.0, std::nan(""), 13.0 };
 
 	auto gender_builder = IntegerDataTableColumnBuilder{ "Gender" };
-	auto age_builder = StringDataTableColumnBuilder{ "AgeGroup" };
+	auto age_builder = IntegerDataTableColumnBuilder{ "Age" };
 	auto edu_builder = FloatDataTableColumnBuilder{ "Education" };
 	auto inc_builder = DoubleDataTableColumnBuilder{ "Income" };
 
@@ -43,11 +43,11 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 
 	auto age_range = core::IntegerInterval(0, 30);
-	auto settings = Settings(uk, "AgeGroup", 1, 0.1f, "AgeGroup", age_range);
+	auto settings = Settings(uk, 1, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("gender", "Gender");
-	ses.entries.emplace("age_group", "AgeGroup");
+	ses.entries.emplace("age", "Age");
 	ses.entries.emplace("education", "Education");
 	ses.entries.emplace("income", "Income");
 
@@ -86,30 +86,21 @@ TEST(TestHealthGPS, SimulationInitialise)
 	using namespace hgps;
 	using namespace hgps::data;
 
-	auto count = 10U;
-	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2="GB", .alpha3="GBR"};
-	auto builder = core::FloatDataTableColumnBuilder("Test");
-	for (size_t i = 0; i < count; i++)
-	{
-		if ((i % 2) == 0)
-			builder.append(i * 2.5f);
-		else
-			builder.append_null();
-	}
+	DataTable data;
+	create_test_datatable(data);
 
-	auto data = core::DataTable();
-	data.add(builder.build());
-	auto age_range = core::IntegerInterval(0, 110);
-	auto settings = Settings(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
-	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
-	auto ses = SESMapping();
-	ses.entries.emplace("test", builder.name());
-	auto config = ModelInput(data, settings, info, ses);
+	auto config = create_test_configuration(data);
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
 	auto factory = SimulationModuleFactory(manager);
+	factory.Register(SimulationModuleType::SES,
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_ses_module(manager, config); });
+	factory.Register(SimulationModuleType::Demographic,
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_demographic_module(manager, config); });
 
 	auto sim = HealthGPS(factory, config, MTRandom32());
 }
@@ -132,8 +123,8 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	data.add(builder.build());
 
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
-	auto age_range = core::IntegerInterval(0, 110);
-	auto settings = Settings(uk, builder.name(), 1, 0.1f, "AgeGroup", age_range);
+	auto age_range = core::IntegerInterval(0, 100);
+	auto settings = Settings(uk, 1, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());

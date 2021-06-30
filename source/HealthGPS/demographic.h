@@ -27,10 +27,10 @@ namespace hgps {
 		const double female;
 	};
 
-	class Demographic final : public SimulationModule {
+	class DemographicModule final : public SimulationModule {
 	public:
-		Demographic() = delete;
-		Demographic(std::map<int, std::map<int, AgeRecord>>&& data);
+		DemographicModule() = delete;
+		DemographicModule(std::map<int, std::map<int, AgeRecord>>&& data);
 
 		SimulationModuleType type() const override;
 
@@ -48,6 +48,6 @@ namespace hgps {
 		core::IntegerInterval age_range_{};
 	};
 
-	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelInput& config);
+	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config);
 }
 

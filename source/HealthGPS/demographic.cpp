@@ -2,7 +2,7 @@
 #include <numeric>
 
 namespace hgps {
-	Demographic::Demographic(std::map<int, std::map<int, AgeRecord>>&& data)
+	DemographicModule::DemographicModule(std::map<int, std::map<int, AgeRecord>>&& data)
 		: data_{ data } {
 		if (!data_.empty()) {
 			auto first_entry = data_.begin();
@@ -15,15 +15,15 @@ namespace hgps {
 		}
 	}
 
-	SimulationModuleType Demographic::type() const {
+	SimulationModuleType DemographicModule::type() const {
 		return SimulationModuleType::Demographic;
 	}
 
-	std::string Demographic::name() const {
+	std::string DemographicModule::name() const {
 		return "Demographic";
 	}
 
-	size_t Demographic::get_total_population(int time_year) const noexcept {
+	size_t DemographicModule::get_total_population(int time_year) const noexcept {
 		auto total = 0.0f;
 		if (data_.contains(time_year)) {
 			auto year_data = data_.at(time_year);
@@ -35,7 +35,7 @@ namespace hgps {
 		return (size_t)total;
 	}
 
-	std::map<int, GenderPair> Demographic::get_age_gender_distribution(int time_year) const noexcept {
+	std::map<int, GenderPair> DemographicModule::get_age_gender_distribution(int time_year) const noexcept {
 
 		std::map<int, GenderPair> result;
 		if (!data_.contains(time_year)) {
@@ -56,7 +56,7 @@ namespace hgps {
 		return result;
 	}
 
-	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelInput& config) {
+	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config) {
 		// year => age [age, male, female]
 		auto data = std::map<int, std::map<int, AgeRecord>>();
 
@@ -69,6 +69,6 @@ namespace hgps {
 			data[item.year].emplace(item.age, AgeRecord(item.age, item.males, item.females));
 		}
 
-		return std::make_unique<Demographic>(std::move(data));
+		return std::make_unique<DemographicModule>(std::move(data));
 	}
 }

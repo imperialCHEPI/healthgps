@@ -8,6 +8,13 @@
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator)
 		: Simulation(config, std::move(generator)), factory_{ factory }, context_{ rnd_ } {
+
+		// Create required modules, should change to shared_ptr
+		auto ses_base = factory.Create(SimulationModuleType::SES, config_);
+		auto dem_base = factory.Create(SimulationModuleType::Demographic, config_);
+
+		ses_.reset(dynamic_cast<SESModule*>(ses_base.release()));
+		demographic_.reset(dynamic_cast<DemographicModule*>(dem_base.release()));
 	}
 
 	void HealthGPS::initialize()
@@ -30,11 +37,14 @@ namespace hgps {
 	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)
 	{
 		// Reset runt-me context;
+		auto ref_year = config_.settings().reference_time();
+		auto pop_year = demographic_->get_total_population(ref_year);
+		auto pop_size = (int)(config_.settings().size_fraction() * pop_year);
+		context_.reset_population(pop_size);
 		context_.set_current_time(config_.start_time());
-		context_.reset_population(100);
 
 		std::cout << "Started @ " << env->now().real << "," << env->now().logical
-			      << ", allocate memory for population." << std::endl;
+			      << ", population size: " << pop_size << std::endl;
 
 		return env->now() + adevs::Time(config_.start_time(), 0);
 	}
