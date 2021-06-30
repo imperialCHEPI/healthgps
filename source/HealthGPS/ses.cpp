@@ -101,14 +101,6 @@ namespace hgps {
 		return results;
 	}
 
-	void hgps::SESModule::execute(std::string_view command,
-		RandomBitGenerator& generator, std::vector<Entity>& entities) {
-	}
-
-	void hgps::SESModule::execute(std::string_view command,
-		RandomBitGenerator& generator, Entity& entity) {
-	}
-
 	void hgps::SESModule::calculate_max_levels() {
 
 		for (auto& datum : data_) {

@@ -56,14 +56,6 @@ namespace hgps {
 		return result;
 	}
 
-	void Demographic::execute(std::string_view command,
-		RandomBitGenerator& generator, std::vector<Entity>& entities) {
-	}
-
-	void Demographic::execute(std::string_view command,
-		RandomBitGenerator& generator, Entity& entity) {
-	}
-
 	std::unique_ptr<Demographic> build_demographic_module(core::Datastore& manager, ModelInput& config) {
 		// year => age [age, male, female]
 		auto data = std::map<int, std::map<int, AgeRecord>>();

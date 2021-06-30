@@ -51,10 +51,6 @@ namespace hgps {
 
 		const std::map<core::IntegerInterval, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
 
-		void execute(std::string_view command, RandomBitGenerator& generator, std::vector<Entity>& entities) override;
-
-		void execute(std::string_view command, RandomBitGenerator& generator, Entity& entity) override;
-
 	private:
 		std::vector<SESRecord> data_;
 		core::IntegerInterval age_range_;

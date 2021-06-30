@@ -17,17 +17,10 @@ namespace hgps {
 
 		SimulationModuleType type() const override { return SimulationModuleType::Simulator; };
 
-		std::string name() const override { return "country"; }
+		std::string name() const override { return "Country"; }
 
-		virtual void execute(std::string_view command, RandomBitGenerator& generator, std::vector<Entity>& entities) override {
-			for (auto& entity : entities) {
-				execute(command, generator, entity);
-			}
-		}
-
-		void execute(std::string_view command, RandomBitGenerator& generator, Entity& entity) override {
-			std::cout << command << ": " << entity.to_string() << " from " <<
-				current_.name << " lucky #: " << generator() << std::endl;
+		void execute(std::string command) {
+			std::cout << command << ": " << current_.name << std::endl;
 		}
 
 	private:

@@ -40,10 +40,6 @@ namespace hgps {
 
 		std::map<int, GenderPair> get_age_gender_distribution(int time_year) const noexcept;
 
-		void execute(std::string_view command, RandomBitGenerator& generator, std::vector<Entity>& entities) override;
-
-		void execute(std::string_view command, RandomBitGenerator& generator, Entity& entity) override;
-
 	private:
 		std::map<int, std::map<int, AgeRecord>> data_;
 

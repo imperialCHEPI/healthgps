@@ -66,6 +66,15 @@
     <ClInclude Include="demographic.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
+    <ClInclude Include="runtime_context.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="population.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="person.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -91,6 +100,15 @@
     </ClCompile>
     <ClCompile Include="demographic.cpp">
       <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime_context.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="population.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="person.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

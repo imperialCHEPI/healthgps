@@ -5,20 +5,6 @@
 
 namespace fs = std::filesystem;
 
-struct Person : public hgps::Entity {
-
-	Person(int id) : id_{id}{}
-
-	int id() const override { return id_; }
-
-	virtual std::string to_string() const override {
-		return std::format("Person # {}", id_);
-	}
-
-private:
-	int id_;
-};
-
 void create_test_datatable(hgps::core::DataTable& data) {
 	using namespace hgps;
 	using namespace hgps::core;
@@ -98,6 +84,7 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 TEST(TestHealthGPS, SimulationInitialise)
 {
 	using namespace hgps;
+	using namespace hgps::data;
 
 	auto count = 10U;
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2="GB", .alpha3="GBR"};
@@ -119,8 +106,12 @@ TEST(TestHealthGPS, SimulationInitialise)
 	ses.entries.emplace("test", builder.name());
 	auto config = ModelInput(data, settings, info, ses);
 
-	auto sim = HealthGPS(config, MTRandom32());
-	EXPECT_TRUE(sim.next_double() >= 0);
+	auto full_path = fs::absolute("../../../data");
+	auto manager = DataManager(full_path);
+
+	auto factory = SimulationModuleFactory(manager);
+
+	auto sim = HealthGPS(factory, config, MTRandom32());
 }
 
 TEST(TestHealthGPS, ModuleFactoryRegistry)
@@ -157,12 +148,12 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 			return build_country_module(manager, config);
 		});
 
-	auto p = Person(5);
+	auto base_module = factory.Create(SimulationModuleType::Simulator, config);
+	auto country_mod = static_cast<CountryModule*>(base_module.get());
+	country_mod->execute("print");
 
-	MTRandom32 rnd;
-	auto country_mod = factory.Create(SimulationModuleType::Simulator, config);
-	country_mod->execute("print", rnd, p);
-	EXPECT_EQ(p.id(), 5);
+	ASSERT_EQ(SimulationModuleType::Simulator, country_mod->type());
+	ASSERT_EQ("Country", country_mod->name());
 }
 
 TEST(TestHealthGPS, CreateSESModule)

@@ -4,6 +4,7 @@
 
 #include "simulation.h"
 #include "modulefactory.h"
+#include "runtime_context.h"
 
 namespace hgps {
 
@@ -13,9 +14,9 @@ namespace hgps {
 		HealthGPS() = delete;
 		explicit HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator);
 		
-		void initialize() const override;
+		void initialize() override;
 
-		void terminate() const override;
+		void terminate() override;
 
 		adevs::Time init(adevs::SimEnv<int>* env);
 
@@ -25,9 +26,8 @@ namespace hgps {
 
 		void fini(adevs::Time clock);
 
-		double next_double();
-
 	private:
 		SimulationModuleFactory& factory_;
+		RuntimeContext context_;
 	};
 }

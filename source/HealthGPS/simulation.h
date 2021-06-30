@@ -16,9 +16,9 @@ namespace hgps {
 
 		virtual ~Simulation() = default;
 
-		virtual void initialize() const = 0;
+		virtual void initialize() = 0;
 
-		virtual void terminate() const = 0;
+		virtual void terminate() = 0;
 
 	protected:
 		ModelInput config_;
