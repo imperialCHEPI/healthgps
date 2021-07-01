@@ -1,5 +1,6 @@
 #include "demographic.h"
 #include <numeric>
+#include <cassert>
 
 namespace hgps {
 	DemographicModule::DemographicModule(std::map<int, std::map<int, AgeRecord>>&& data)
@@ -23,7 +24,7 @@ namespace hgps {
 		return "Demographic";
 	}
 
-	size_t DemographicModule::get_total_population(int time_year) const noexcept {
+	size_t DemographicModule::get_total_population(const int time_year) const noexcept {
 		auto total = 0.0f;
 		if (data_.contains(time_year)) {
 			auto year_data = data_.at(time_year);
@@ -35,7 +36,7 @@ namespace hgps {
 		return (size_t)total;
 	}
 
-	std::map<int, GenderPair> DemographicModule::get_age_gender_distribution(int time_year) const noexcept {
+	std::map<int, GenderPair> DemographicModule::get_age_gender_distribution(const int time_year) const noexcept {
 
 		std::map<int, GenderPair> result;
 		if (!data_.contains(time_year)) {
@@ -54,6 +55,53 @@ namespace hgps {
 		}
 
 		return result;
+	}
+
+	void DemographicModule::initialise_population(RuntimeContext& context, const int time_year) {
+
+		auto age_gender_dist = get_age_gender_distribution(time_year);
+
+		auto index = 0;
+		int pop_size = static_cast<int>(context.population().size());
+		for (auto& entry : age_gender_dist) {
+			auto num_males = static_cast<int>(std::round(pop_size * entry.second.male));
+			auto num_females = static_cast<int>(std::round(pop_size * entry.second.female));
+			auto num_required = index + num_males + num_females;
+			if (num_required > pop_size) {
+				// Adjust size
+				auto pop_diff = pop_size - num_required;
+				num_males -= static_cast<int>(std::round(pop_diff * entry.second.male));
+				num_females -= static_cast<int>(std::round(pop_diff * entry.second.female));
+
+				pop_diff = pop_size - (index + num_males + num_females);
+				if (pop_diff > 0) {
+					if (entry.second.male > entry.second.female) {
+						num_males -= pop_diff;
+					}
+					else {
+						num_females -= pop_diff;
+					}
+				}
+
+				num_required = index + num_males + num_females;
+				pop_diff = pop_size - num_required;
+				assert(pop_diff <= 1);
+			}
+
+			// [index, index + num_males)
+			for (size_t i = 0; i < num_males; i++) {
+				context.population()[index].age = entry.first;
+				context.population()[index].gender = core::Gender::male;
+				index++;
+			}
+
+			// [index + num_males, num_required)
+			for (size_t i = 0; i < num_females; i++) {
+				context.population()[index].age = entry.first;
+				context.population()[index].gender = core::Gender::female;
+				index++;
+			}
+		}
 	}
 
 	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config) {

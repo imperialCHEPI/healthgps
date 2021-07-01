@@ -1,5 +1,7 @@
 #include "ses.h"
 #include <algorithm>
+#include <cassert>
+#include <numeric>
 
 namespace hgps {
 
@@ -51,7 +53,7 @@ namespace hgps {
 		}
 
 		// Fill gaps in data
-		for (auto age = age_range_.lower(); age < age_range_.upper(); age++) {
+		for (auto age = age_range_.lower(); age <= age_range_.upper(); age++) {
 			if (!results.contains(age)) {
 				results.emplace(age, std::vector<float>(data_sz, 1.0f));
 			}
@@ -86,13 +88,36 @@ namespace hgps {
 		}
 
 		// Fill gaps in data.
-		for (auto age = age_range_.lower(); age < age_range_.upper(); age++) {
+		for (auto age = age_range_.lower(); age <= age_range_.upper(); age++) {
 			if (!results.contains(age)) {
 				results.emplace(age, core::FloatArray2D(num_rows, num_cols, 1.0f));
 			}
 		}
 
 		return results;
+	}
+
+	void SESModule::initialise_population(RuntimeContext& context) {
+		
+		// Should this calculation be cached?
+		auto edu_male = get_education_frequency(core::Gender::male);
+		auto edu_female = get_education_frequency(core::Gender::female);
+
+		auto income_male = get_income_frenquency(core::Gender::male);
+		auto income_female = get_income_frenquency(core::Gender::female);
+
+		for (auto& entity : context.population()) {
+			assert(entity.gender != core::Gender::unknown);
+			// Note that order is important
+			if (entity.gender == core::Gender::male) {
+				entity.education = sample_education(context, edu_male.at(entity.age));
+				entity.income = sample_income(context, entity.education, income_male.at(entity.age));
+			}
+			else {
+				entity.education = sample_education(context, edu_female.at(entity.age));
+				entity.income = sample_income(context, entity.education, income_female.at(entity.age));
+			}
+		}
 	}
 
 	void hgps::SESModule::calculate_max_levels() {
@@ -109,6 +134,55 @@ namespace hgps {
 				max_education_level_ = (int)edu_level;
 			}
 		}
+	}
+
+	int SESModule::sample_education(RuntimeContext& context,
+		const std::vector<float>& edu_values) {
+
+		auto total_sum = std::accumulate(edu_values.begin(), edu_values.end(), 0.0);
+		auto prob_sample = context.next_double();
+
+		auto cdf_sum = 0.0;
+		auto pdf_prob = 0.0;
+		auto pdf_default = 1.0 / static_cast<double>(edu_values.size() - 1);
+		for (auto idx = 0; idx < edu_values.size(); idx++) {
+			pdf_prob = total_sum > 0.0 ? edu_values[idx] / total_sum : pdf_default;
+
+			cdf_sum += pdf_prob;
+			if (cdf_sum >= prob_sample) {
+				return idx;
+			}
+		}
+
+		return -1;
+	}
+
+	int SESModule::sample_income(RuntimeContext& context,
+		const int education, core::FloatArray2D& income_values) {
+
+		auto total_sum = 0.0;
+		for (size_t i = 0; i < income_values.columns(); i++) {
+			total_sum += income_values(education, i);
+		}
+
+		auto prob_sample = context.next_double();
+
+		auto cdf_sum = 0.0;
+		auto pdf_prob = 0.0;
+		auto pdf_default = 1.0 / static_cast<double>(income_values.columns() - 1);
+		for (auto col = 0; col < income_values.columns(); col++) {
+			pdf_prob = pdf_default;
+			if (total_sum > 0.0) {
+				pdf_prob = income_values(education, col) / total_sum;
+			}
+
+			cdf_sum += pdf_prob;
+			if (cdf_sum >= prob_sample) {
+				return col;
+			}
+		}
+
+		return -1;
 	}
 
 	core::Gender parse_gender(const std::any& value)
@@ -151,10 +225,10 @@ namespace hgps {
 				return *s;
 			}
 			else if (auto* f = std::any_cast<float>(&value)) {
-				return (int)*f;
+				return static_cast<int>(*f);
 			}
 			else if (auto* d = std::any_cast<double>(&value)) {
-				return (int)*f;
+				return static_cast<int>(*d);
 			}
 			else if (auto* s = std::any_cast<std::string>(&value)) {
 				return std::stoi(*s);
@@ -172,10 +246,10 @@ namespace hgps {
 				return *f;
 			}
 			else if (auto* d = std::any_cast<double>(&value)) {
-				return (float)*d; // down-cast
+				return static_cast<float>(*d); // down-cast
 			}
 			else if (auto* i = std::any_cast<int>(&value)) {
-				return (float)*i;
+				return static_cast<float>(*i);
 			}
 			else if (auto* s = std::any_cast<std::string>(&value)) {
 				return std::stof(*s);

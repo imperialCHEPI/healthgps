@@ -2,6 +2,7 @@
 
 #include "interfaces.h"
 #include "modelinput.h"
+#include "runtime_context.h"
 
 namespace hgps {
 
@@ -51,6 +52,8 @@ namespace hgps {
 
 		const std::map<int, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
 
+		void initialise_population(RuntimeContext& context);
+
 	private:
 		std::vector<SESRecord> data_;
 		core::IntegerInterval age_range_;
@@ -58,6 +61,9 @@ namespace hgps {
 		int max_income_level_{};
 
 		void calculate_max_levels();
+		
+		int sample_education(RuntimeContext& context, const std::vector<float>& edu_values);
+		int sample_income(RuntimeContext& context, const int education, core::FloatArray2D& income_values);
 	};
 
 	core::Gender parse_gender(const std::any& value);

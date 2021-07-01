@@ -2,6 +2,7 @@
 
 #include "interfaces.h"
 #include "modelinput.h"
+#include "runtime_context.h"
 
 namespace hgps {
 
@@ -36,9 +37,11 @@ namespace hgps {
 
 		std::string name() const override;
 
-		size_t get_total_population(int time_year) const noexcept;
+		size_t get_total_population(const int time_year) const noexcept;
 
-		std::map<int, GenderPair> get_age_gender_distribution(int time_year) const noexcept;
+		std::map<int, GenderPair> get_age_gender_distribution(const int time_year) const noexcept;
+
+		void initialise_population(RuntimeContext& context, const int time_year);
 
 	private:
 		std::map<int, std::map<int, AgeRecord>> data_;

@@ -9,7 +9,7 @@ namespace hgps {
         return time_now_;
     }
 
-    const Population& RuntimeContext::population() const noexcept {
+    Population& RuntimeContext::population() noexcept {
         return population_;
     }
 

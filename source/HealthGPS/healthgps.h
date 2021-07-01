@@ -33,5 +33,7 @@ namespace hgps {
 		RuntimeContext context_;
 		std::unique_ptr<SESModule> ses_;
 		std::unique_ptr<DemographicModule> demographic_;
+
+		void initialise_population(const int pop_size, const int ref_year);
 	};
 }

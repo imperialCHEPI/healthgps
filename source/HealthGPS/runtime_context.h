@@ -12,7 +12,7 @@ namespace hgps {
 
 		int time_now() const noexcept;
 
-		const Population& population() const noexcept;
+		Population& population() noexcept;
 
 		unsigned int next_int() noexcept;
 

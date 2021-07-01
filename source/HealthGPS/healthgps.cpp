@@ -1,6 +1,6 @@
 #include <iostream>
-#include <chrono>
-#include <thread>
+#include <algorithm>
+#include <numeric>
 
 #include "healthgps.h"
 #include "mtrandom.h"
@@ -20,7 +20,7 @@ namespace hgps {
 	void HealthGPS::initialize()
 	{
 		// Reset random number generator
-		if (config_.seed().has_value()){
+		if (config_.seed().has_value()) {
 			rnd_.seed(config_.seed().value());
 		}
 
@@ -36,17 +36,17 @@ namespace hgps {
 
 	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)
 	{
-		// Reset runt-me context;
 		auto ref_year = config_.settings().reference_time();
 		auto pop_year = demographic_->get_total_population(ref_year);
 		auto pop_size = (int)(config_.settings().size_fraction() * pop_year);
-		context_.reset_population(pop_size);
-		context_.set_current_time(config_.start_time());
 
-		std::cout << "Started @ " << env->now().real << "," << env->now().logical
-			      << ", population size: " << pop_size << std::endl;
+		initialise_population(pop_size, ref_year);
 
-		return env->now() + adevs::Time(config_.start_time(), 0);
+		auto world_time = config_.start_time();
+		context_.set_current_time(world_time);
+		std::cout << "Started @ " << context_.time_now() << " [" << env->now().real << ","
+			<< env->now().logical << "], population size: " << pop_size << std::endl;
+		return env->now() + adevs::Time(world_time, 0);
 	}
 
 	adevs::Time HealthGPS::update(adevs::SimEnv<int>* env)
@@ -59,20 +59,20 @@ namespace hgps {
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
-		if (env->now() < end_time_) 
+		if (env->now() < end_time_)
 		{
-			auto clock = env->now() + adevs::Time(1, 0);
-			context_.set_current_time(clock.real);
-			return clock;
+			auto world_time = env->now() + adevs::Time(1, 0);
+			context_.set_current_time(world_time.real);
+			return world_time;
 		}
 
-		/* We have reached the end. 
+		/* We have reached the end.
 		   Return an infinite time of next event and remove the model. */
 		env->remove(this);
 		return adevs_inf<adevs::Time>();
 	}
 
-	adevs::Time HealthGPS::update(adevs::SimEnv<int>*, std::vector<int>&) 
+	adevs::Time HealthGPS::update(adevs::SimEnv<int>*, std::vector<int>&)
 	{
 		// This method is never called because nobody sends messages.
 		return adevs_inf<adevs::Time>();
@@ -80,7 +80,19 @@ namespace hgps {
 
 	void HealthGPS::fini(adevs::Time clock)
 	{
-		std::cout << "Finished @ " << clock.real << "," << clock.logical 
-				  << ", clear up memory." << std::endl;
+		std::cout << "Finished @ " << context_.time_now() << " [" << clock.real << ","
+			<< clock.logical << "], clear up resources." << std::endl;
+	}
+
+	void HealthGPS::initialise_population(const int pop_size, const int ref_year)
+	{
+		// Note the order is very important
+		context_.reset_population(pop_size);
+
+		// Gender - Age, must be first
+		demographic_->initialise_population(context_, ref_year);
+
+		// Social economics status
+		ses_->initialise_population(context_);
 	}
 }
