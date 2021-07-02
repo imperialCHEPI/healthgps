@@ -25,6 +25,12 @@
     <Filter Include="Source Files\data">
       <UniqueIdentifier>{639d67b8-adc7-4178-bd9a-7761baa92f3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{700fcdec-c700-4de0-8f5c-4424d86cec3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{17cb0c4c-bb90-4578-ac07-564d38590841}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interfaces.h">
@@ -75,6 +81,9 @@
     <ClInclude Include="person.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="univariate_visitor.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -109,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="person.cpp">
       <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="univariate_visitor.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

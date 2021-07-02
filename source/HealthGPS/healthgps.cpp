@@ -4,6 +4,7 @@
 
 #include "healthgps.h"
 #include "mtrandom.h"
+#include "univariate_visitor.h"
 
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator)
@@ -94,5 +95,55 @@ namespace hgps {
 
 		// Social economics status
 		ses_->initialise_population(context_);
+
+		// Print out initial population statistics
+		// 
+		// TODO: Move to the analytics module
+		// 
+		auto visitor = UnivariateVisitor();
+		auto col_names = std::vector<std::string>{ "Gender", "Age", "Education", "Income" };
+		auto orig_summary = std::unordered_map<std::string, core::UnivariateSummary>();
+		auto sim8_summary = std::unordered_map<std::string, core::UnivariateSummary>();
+		for (auto& name : col_names) {
+			config_.data().column(name)->accept(visitor);
+			orig_summary.emplace(name, visitor.get_summary());
+			sim8_summary.emplace(name, core::UnivariateSummary(name));
+		}
+
+		for (auto& entity : context_.population()) {
+			sim8_summary["Gender"].append(entity.gender == core::Gender::male ? 1.0 : 0.0);
+			sim8_summary["Age"].append(entity.age);
+			sim8_summary["Education"].append(entity.education);
+			sim8_summary["Income"].append(entity.income);
+		}
+
+		std::size_t longestColumnName = 0;
+		for (auto& col : col_names) {
+			longestColumnName = std::max(longestColumnName, col.length());
+		}
+
+		auto pad = longestColumnName + 2;
+		auto width = pad + 66;
+		auto orig_pop = config_.data().num_rows();
+		auto sim8_pop = context_.population().size();
+
+		std::stringstream ss;
+		ss << std::format("\n Initial Virtual Population Summary:\n");
+		ss << std::format("|{:-<{}}|\n", '-', width);
+		ss << std::format("| {:{}} : {:>12} : {:>12} : {:>14} : {:>14} |\n", 
+			"Variable", pad, "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");
+		ss << std::format("|{:-<{}}|\n", '-', width);
+
+		ss << std::format("| {:{}} : {:12} : {:12} : {:14} : {:14} |\n",
+			"Population", pad, orig_pop, sim8_pop, orig_pop, sim8_pop);
+
+		for (auto& col : col_names) {
+			ss << std::format("| {:{}} : {:12.6f} : {:12.6f} : {:14.6f} : {:14.6f} |\n",
+				col, pad, orig_summary[col].average(), sim8_summary[col].average(),
+				orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());
+		}
+
+		ss << std::format("|{:_<{}}|\n\n", '_', width);
+		std::cout << ss.str();
 	}
 }

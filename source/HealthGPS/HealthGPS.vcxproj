@@ -111,6 +111,7 @@
     <ClInclude Include="healthgps.h" />
     <ClInclude Include="ses.h" />
     <ClInclude Include="simulation.h" />
+    <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="demographic.cpp" />
@@ -124,6 +125,7 @@
     <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
     <ClCompile Include="ses.cpp" />
+    <ClCompile Include="univariate_visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">
