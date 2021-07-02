@@ -1,10 +1,39 @@
 {
     "inputs": {
-        "file" :{},
-        "population":{
-            "country":"GB"
+        "file" :{
+            "name": "dataset.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding":"ASCII",
+            "columns": {
+                "Year1": "integer",
+                "Gender": "integer",
+                "Age": "integer",
+                "Age1": "integer",
+                "Age2": "integer",
+                "Age3": "integer",
+                "Education":"integer",
+                "Income": "integer",
+                "PhysicalActivityMET": "double",
+                "BMI": "double",
+                "FruitsVegetablesConsumption": "double",
+                "SmokingStatus": "integer",
+                "AlcoholConsumption": "double"
+            }
         },
-        "ses_mapping": {}
+        "settings":{
+            "country_code":"GB",
+            "reference_time": 2010,
+            "size_fraction": 0.0001,
+            "data_linkage": "Age",
+            "age_range":[0, 100]
+        },
+        "ses_mapping": {
+            "gender": "Gender",
+            "age": "Age",
+            "education": "Education",
+            "income": "Income"
+        }
     },
     "modelling": {
         "risk_factors":{},

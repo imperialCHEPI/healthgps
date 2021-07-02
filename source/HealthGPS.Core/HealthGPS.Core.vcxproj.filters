@@ -13,6 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\table">
+      <UniqueIdentifier>{6b8b1fe6-1703-4da9-bb31-cd475f16d07d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{0dd32cab-f39e-4e55-8989-4e0663ffda6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{40f7c38f-cbca-4ac5-96a6-62be67aed211}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\poco">
+      <UniqueIdentifier>{d3749106-2efd-4545-a4d5-aac189764b3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\table">
+      <UniqueIdentifier>{9f8d2134-66cc-43fe-b002-49868a856546}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version.h">
@@ -24,13 +39,72 @@
     <ClInclude Include="datastore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="poco.h">
+    <ClInclude Include="forward_type.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="string_util.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="column.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column_builder.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column_iterator.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column_numeric.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="column_primitive.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="datatable.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="poco.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="visitor.h">
+      <Filter>Header Files\table</Filter>
+    </ClInclude>
+    <ClInclude Include="interval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="array2d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="country.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="population_item.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="univariate_summary.h">
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="string_util.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="datatable.cpp">
+      <Filter>Source Files\table</Filter>
+    </ClCompile>
+    <ClCompile Include="interval.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="univariate_summary.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="datatable.cd">
+      <Filter>Header Files\table</Filter>
+    </None>
   </ItemGroup>
 </Project>

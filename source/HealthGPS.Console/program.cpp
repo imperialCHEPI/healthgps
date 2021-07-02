@@ -1,10 +1,8 @@
 #include "program.h"
-#include <fmt/chrono.h>
-#include <adevs/adevs.h>
+#include "csvparser.h"
 #include "HealthGPS.Datastore/api.h"
 
-using namespace hgps;
-namespace fs = std::filesystem;
+#include <fmt/chrono.h>
 
 int main(int argc, char* argv[])
 {
@@ -20,40 +18,57 @@ int main(int argc, char* argv[])
 
 	fmt::print("\nToday: {}\n\n", getTimeNowStr());
 
-	auto settings = parse_arguments(options, argc, argv);
-	if (!settings.success)
+	auto cmd_args = parse_arguments(options, argc, argv);
+	if (!cmd_args.success)
 	{
-		return settings.exit_code;
+		return cmd_args.exit_code;
 	}
 
+	// Parse configuration file 
+	auto config = load_configuration(cmd_args);
+	auto input_table = core::DataTable();
+	if (!load_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
+	{
+		return EXIT_FAILURE;
+	}
+
+	std::cout << input_table.to_string();
+
 	// Create infrastructure
-	auto scenario = create_scenario(settings.config_file);
-	auto data_api = hgps::data::DataManager(settings.storage_folder);
-	auto factory = hgps::ModuleFactory(data_api);
+	auto data_api = data::DataManager(cmd_args.storage_folder);
+	auto factory = SimulationModuleFactory(data_api);
+	factory.Register(SimulationModuleType::SES,
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_ses_module(manager, config);});
+	factory.Register(SimulationModuleType::Demographic,
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			return build_demographic_module(manager, config);});
 
 	// Validate target country
 	auto countries = data_api.get_countries();
-	fmt::print("\nThere are {} countries in storage.\n", countries.size());
-	auto target = find_country(countries, scenario.country);
+	fmt::print("There are {} countries in storage.\n", countries.size());
+	auto target = data_api.get_country(config.settings.country);
 	if (target.has_value())	{
 		fmt::print("Target country: {} - {}.\n", target.value().code, target.value().name);
 	}
 	else {
-		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", scenario.country);
+		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", config.settings.country);
+		return EXIT_FAILURE;
 	}
 
-	try
-	{
+	// Create model configration
+	auto model_config = create_model_input(input_table, target.value(), config);
+
+	try	{
 		// Create model
-		auto model = hgps::HealthGPS(scenario, hgps::MTRandom32());
+		auto model = HealthGPS(factory, model_config, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = hgps::ModelRunner(model, factory);
-		auto runtime = runner.run();
+		auto runner = ModelRunner();
+		auto runtime = runner.run(model, config.trial_runs);
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}
-	catch (const std::exception& ex)
-	{
+	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
 	}
 

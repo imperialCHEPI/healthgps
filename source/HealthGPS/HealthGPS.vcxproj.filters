@@ -16,6 +16,21 @@
     <Filter Include="Header Files\modules">
       <UniqueIdentifier>{9873397f-2cc1-4515-8594-b487e37f1686}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\modules">
+      <UniqueIdentifier>{450128e5-6c28-4e46-b3f4-35d34a808a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\data">
+      <UniqueIdentifier>{f6d27817-3e89-4b26-98ba-d0750a835d0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\data">
+      <UniqueIdentifier>{639d67b8-adc7-4178-bd9a-7761baa92f3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{700fcdec-c700-4de0-8f5c-4424d86cec3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{17cb0c4c-bb90-4578-ac07-564d38590841}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interfaces.h">
@@ -42,6 +57,33 @@
     <ClInclude Include="countrymodule.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
+    <ClInclude Include="simulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="modelinput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="ses.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="demographic.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime_context.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="population.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="person.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="univariate_visitor.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -55,6 +97,30 @@
     </ClCompile>
     <ClCompile Include="modelrunner.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="modelinput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="ses.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="demographic.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime_context.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="population.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="person.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="univariate_visitor.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

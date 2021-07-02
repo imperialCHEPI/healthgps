@@ -97,18 +97,35 @@
   <ItemGroup>
     <ClInclude Include="api.h" />
     <ClInclude Include="countrymodule.h" />
+    <ClInclude Include="demographic.h" />
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
+    <ClInclude Include="modelinput.h" />
     <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
+    <ClInclude Include="person.h" />
+    <ClInclude Include="population.h" />
+    <ClInclude Include="runtime_context.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
+    <ClInclude Include="ses.h" />
+    <ClInclude Include="simulation.h" />
+    <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="demographic.cpp" />
     <ClCompile Include="modelrunner.cpp" />
+    <ClCompile Include="modelinput.cpp" />
     <ClCompile Include="mtrandom.cpp" />
+    <ClCompile Include="person.cpp" />
+    <ClCompile Include="population.cpp" />
+    <ClCompile Include="runtime_context.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
+    <ClCompile Include="ses.cpp" />
+    <ClCompile Include="univariate_visitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">

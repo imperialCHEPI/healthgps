@@ -26,30 +26,43 @@ namespace hgps {
 		static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
 	};
 
-	/// @brief Simulation entity interface
-	struct Entity
+	/// @brief Health GPS simulation modules types enumeration
+	enum class SimulationModuleType : uint8_t
 	{
-		virtual ~Entity() = default;
+		/// @brief Health GPS microsimulation algorithm
+		Simulator,
+		
+		/// @brief Risk factor module
+		RiskFactor,
 
-		/// @brief Gets the entity unique identifier
-		/// @return The entity identifier
-		virtual int get_id() const = 0;
+		/// @brief Socio-economic status module
+		SES,
 
-		virtual std::string to_string() const = 0;
+		/// @brief Intervention module (non-baseline).
+		Intervention,
+
+		/// @brief Demographic module
+		Demographic,
+
+		/// @brief Disease module coordinator
+		Disease,
+
+		/// @brief Statistical analysis module, e.g. BoD module
+		Analysis,
 	};
 
 	/// @brief Simulation modules interface
-	class Module
+	class SimulationModule
 	{
 	public:
-		virtual ~Module() = default;
+		virtual ~SimulationModule() = default;
 
-		/// @brief Gets the kind of module unique identifier
-		/// @return The module kind identifier
-		virtual std::string get_kind() const = 0;
+		/// @brief Gets the module type identifier
+		/// @return The module type identifier
+		virtual SimulationModuleType type() const = 0;
 
-		virtual void execute(std::string_view command, std::vector<Entity>& entities) = 0;
-
-		virtual void execute(std::string_view command, Entity& entity) = 0;
+		/// @brief Gets the module name
+		/// @return The human-readable module name
+		virtual std::string name() const = 0;
 	};
 }

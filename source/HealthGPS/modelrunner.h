@@ -1,22 +1,15 @@
 #pragma once
 
-#include <adevs/adevs.h>
 #include "modulefactory.h"
+#include "simulation.h"
 #include "scenario.h"
+#include <HealthGPS/modelinput.h>
 
 namespace hgps {
 
 	class ModelRunner
 	{
 	public:
-		explicit ModelRunner(adevs::Model<int>& model, ModuleFactory& factory);
-
-		ModelRunner() = delete;
-
-		double run() const;
-
-	private:
-		adevs::Model<int>& simulation_;
-		ModuleFactory& factory_;
+		double run(Simulation& model, const unsigned int trial_runs) const;
 	};
 }

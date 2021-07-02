@@ -88,12 +88,33 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="api.h" />
+    <ClInclude Include="array2d.h" />
+    <ClInclude Include="column.h" />
+    <ClInclude Include="column_builder.h" />
+    <ClInclude Include="column_iterator.h" />
+    <ClInclude Include="column_numeric.h" />
+    <ClInclude Include="column_primitive.h" />
+    <ClInclude Include="country.h" />
+    <ClInclude Include="datatable.h" />
+    <ClInclude Include="forward_type.h" />
+    <ClInclude Include="interval.h" />
     <ClInclude Include="poco.h" />
     <ClInclude Include="datastore.h" />
+    <ClInclude Include="population_item.h" />
+    <ClInclude Include="string_util.h" />
+    <ClInclude Include="univariate_summary.h" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="visitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="datatable.cpp" />
+    <ClCompile Include="interval.cpp" />
+    <ClCompile Include="string_util.cpp" />
+    <ClCompile Include="univariate_summary.cpp" />
     <ClCompile Include="version.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="datatable.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,19 +1,25 @@
 #pragma once
 
 #include <vector>
-#include <adevs/adevs.h>
 
-#include "interfaces.h"
-#include "scenario.h"
+#include "simulation.h"
+#include "modulefactory.h"
+#include "runtime_context.h"
+#include "demographic.h"
+#include "ses.h"
 
 namespace hgps {
 
-	class HealthGPS : public adevs::Model<int>
+	class HealthGPS : public Simulation
 	{
 	public:
 		HealthGPS() = delete;
-		explicit HealthGPS(Scenario& scenario, RandomBitGenerator&& generator);
+		explicit HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator);
 		
+		void initialize() override;
+
+		void terminate() override;
+
 		adevs::Time init(adevs::SimEnv<int>* env);
 
 		adevs::Time update(adevs::SimEnv<int>* env);
@@ -22,10 +28,12 @@ namespace hgps {
 
 		void fini(adevs::Time clock);
 
-		double next_double();
 	private:
-		RandomBitGenerator& rnd_;
-		Scenario scenario_;
-		adevs::Time end_time_;
+		SimulationModuleFactory& factory_;
+		RuntimeContext context_;
+		std::unique_ptr<SESModule> ses_;
+		std::unique_ptr<DemographicModule> demographic_;
+
+		void initialise_population(const int pop_size, const int ref_year);
 	};
 }

@@ -1,33 +1,4 @@
-code,name
-AL,Albania
-AT,Austria
-BA,Bosnia and Herzegovina
-BE,Belgium
-BG,Bulgaria
-CH,Switzerland
-CY,Cyprus
-DE,Germany
-DK,Denmark
-EE,Estonia
-ES,Spain
-FI,Finland
-FR,France
-GB,United Kingdom
-GR,Greece
-HR,Croatia
-HU,Hungary
-IE,Ireland
-IS,Iceland
-IT,Italy
-LT,Lithuania
-LV,Latvia
-MK,Macedonia
-MT,Malta
-NL,Netherlands
-NO,Norway
-PL,Poland
-PT,Portugal
-RO,Romania
-RS,Serbia
-SE,Sweden
-SI,Slovenia
+Code,Name,Alpha-2,Alpha-3
+250,France,FR,FRA
+620,Portugal,PT,PRT
+826,United Kingdom of Great Britain and Northern Ireland (the),GB,GBR
