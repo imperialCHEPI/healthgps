@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.Test.cpp" />
+    <ClCompile Include="UnivariateSummary.Test.cpp" />
     <ClCompile Include="Datastore.Test.cpp" />
     <ClCompile Include="HealthGPS.Test.cpp" />
     <ClCompile Include="pch.cpp">

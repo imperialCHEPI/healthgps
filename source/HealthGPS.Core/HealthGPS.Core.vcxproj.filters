@@ -81,6 +81,9 @@
     <ClInclude Include="population_item.h">
       <Filter>Header Files\poco</Filter>
     </ClInclude>
+    <ClInclude Include="univariate_summary.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">
@@ -94,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="interval.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="univariate_summary.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

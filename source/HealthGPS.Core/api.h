@@ -9,6 +9,7 @@
 #include "column_iterator.h"
 #include "interval.h"
 #include "array2d.h"
+#include "univariate_summary.h"
 #include "poco.h"
 
 /// \brief Top-level namespace for Health GPS Core C++ API
