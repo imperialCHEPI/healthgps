@@ -23,9 +23,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csvparser.h" />
+    <ClInclude Include="jsonparser.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="program.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="riskmodel.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HealthGPS.Console.rc" />

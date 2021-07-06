@@ -34,6 +34,9 @@ int main(int argc, char* argv[])
 
 	std::cout << input_table.to_string();
 
+	// Load risk factors model definition
+	auto risk_models = load_risk_models(config.modelling);
+
 	// Create infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
 	auto factory = SimulationModuleFactory(data_api);
@@ -56,7 +59,7 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	// Create model configration
+	// Create model configuration
 	auto model_config = create_model_input(input_table, target.value(), config);
 
 	try	{

@@ -1,0 +1,127 @@
+#pragma once
+
+#include <nlohmann/json.hpp>
+
+#include "options.h"
+#include "riskmodel.h"
+
+using json = nlohmann::json;
+
+//--------------------------------------------------------
+// Risk Model JSON serialisation / de-serialisation
+//--------------------------------------------------------
+
+// Linear models
+void to_json(json& j, const Coefficient& p) {
+	j = json{
+		{"value", p.value},
+		{"stdError", p.std_error},
+		{"tValue", p.tvalue},
+		{"pValue", p.pvalue} };
+}
+
+void from_json(const json& j, Coefficient& p) {
+	j.at("value").get_to(p.value);
+	j.at("stdError").get_to(p.std_error);
+	j.at("tValue").get_to(p.tvalue);
+	j.at("pValue").get_to(p.pvalue);
+}
+
+void to_json(json& j, const LinearModel& p) {
+	j = json{
+		{"formula", p.formula},
+		{"coefficients", p.coefficients},
+		{"residuals", p.residuals},
+		{"fittedValues", p.fitted_values},
+		{"rSquared", p.rsquared} };
+}
+
+void from_json(const json& j, LinearModel& p) {
+	j.at("formula").get_to(p.formula);
+	j.at("coefficients").get_to(p.coefficients);
+	j.at("residuals").get_to(p.residuals);
+	j.at("fittedValues").get_to(p.fitted_values);
+	j.at("rSquared").get_to(p.rsquared);
+}
+
+// Hierarchical levels
+void to_json(json& j, const Array2Dto& p) {
+	j = json{
+		{"rows", p.rows},
+		{"cols", p.cols},
+		{"data", p.data} };
+}
+
+void from_json(const json& j, Array2Dto& p) {
+	j.at("rows").get_to(p.rows);
+	j.at("cols").get_to(p.cols);
+	j.at("data").get_to(p.data);
+}
+
+void to_json(json& j, const HierarchicalLevel& p) {
+	j = json{
+		{"s", p.s},
+		{"w", p.w},
+		{"m", p.m},
+		{"correlation", p.correlation},
+		{"variances", p.variances} };
+}
+
+void from_json(const json& j, HierarchicalLevel& p) {
+	j.at("s").get_to(p.s);
+	j.at("w").get_to(p.w);
+	j.at("m").get_to(p.m);
+	j.at("correlation").get_to(p.correlation);
+	j.at("variances").get_to(p.variances);
+}
+
+//--------------------------------------------------------
+// Options JSON serialisation / de-serialisation
+//--------------------------------------------------------
+
+// data file
+void to_json(json& j, const FileInfo& p) {
+	j = json{
+		{"name", p.name},
+		{"format", p.format},
+		{"delimiter", p.delimiter},
+		{"columns", p.columns} };
+}
+
+void from_json(const json& j, FileInfo& p) {
+	j.at("name").get_to(p.name);
+	j.at("format").get_to(p.format);
+	j.at("delimiter").get_to(p.delimiter);
+	j.at("columns").get_to(p.columns);
+}
+
+// Data Information
+void to_json(json& j, const SettingsInfo& p) {
+	j = json{
+		{"country_code", p.country},
+		{"reference_time", p.reference_time},
+		{"size_fraction", p.size_fraction},
+		{"data_linkage", p.data_linkage},
+		{"age_range", p.age_range} };
+}
+
+void from_json(const json& j, SettingsInfo& p) {
+	j.at("country_code").get_to(p.country);
+	j.at("reference_time").get_to(p.reference_time);
+	j.at("size_fraction").get_to(p.size_fraction);
+	j.at("data_linkage").get_to(p.data_linkage);
+	j.at("age_range").get_to(p.age_range);
+}
+
+// Risk Factor Modelling
+void to_json(json& j, const Modelling& p) {
+	j = json{
+		{"risk_factors", p.risk_factors},
+		{"models", p.models} };
+}
+
+void from_json(const json& j, Modelling& p) {
+	j.at("risk_factors").get_to(p.risk_factors);
+	j.at("models").get_to(p.models);
+}
+

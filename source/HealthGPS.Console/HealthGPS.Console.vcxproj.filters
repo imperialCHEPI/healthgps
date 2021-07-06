@@ -32,6 +32,12 @@
     <ClInclude Include="csvparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="jsonparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="riskmodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HealthGPS.Console.rc">

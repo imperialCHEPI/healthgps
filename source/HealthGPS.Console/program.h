@@ -12,7 +12,8 @@
 #include <cxxopts.hpp>
 
 #include "HealthGPS/api.h"
-#include "options.h"
+
+#include "jsonparser.h"
 
 using namespace hgps;
 namespace fs = std::filesystem;
@@ -62,7 +63,7 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 			cmd.config_file = result["file"].as<std::string>();
 			if (cmd.config_file.is_relative()) {
 				cmd.config_file = std::filesystem::absolute(cmd.config_file);
-				fmt::print("Configuration file.: {}\n", cmd.config_file.string());
+				fmt::print("Configuration file..: {}\n", cmd.config_file.string());
 			}
 		}
 
@@ -78,7 +79,7 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 			cmd.storage_folder = result["storage"].as<std::string>();
 			if (cmd.storage_folder.is_relative()) {
 				cmd.storage_folder = std::filesystem::absolute(cmd.storage_folder);
-				fmt::print("File storage folder: {}\n", cmd.storage_folder.string());
+				fmt::print("File storage folder.: {}\n", cmd.storage_folder.string());
 			}
 		}
 
@@ -116,19 +117,37 @@ Configuration load_configuration(CommandOptions& options) {
 			full_path = options.config_file.parent_path() / config.file.name;
 			if (fs::exists(full_path)) {
 				config.file.name = full_path.string();
-				fmt::print("Input data file....: {}\n", config.file.name);
+				fmt::print("Input data file.....: {}\n", config.file.name);
 			}
 		}
 
 		if (!fs::exists(full_path)) {
 			fmt::print(fg(fmt::color::red),
-				"\n\nInput data file: {} not found.\n",
+				"\nInput data file: {} not found.\n",
 				full_path.string());
 		}
 
 		// Settings and SES mapping
 		config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
 		opt["inputs"].at("ses_mapping").get_to(config.ses_mapping);
+
+		// Modelling information
+		config.modelling = opt["modelling"].get<Modelling>();
+		for (auto& model : config.modelling.models) {
+			full_path = model.second;
+			if (full_path.is_relative()) {
+				full_path = options.config_file.parent_path() / model.second;
+				if (fs::exists(full_path)) {
+					model.second = full_path.string();
+					fmt::print("Model: {:<7}, file: {}\n", model.first, model.second);
+				}
+			}
+
+			if (!fs::exists(full_path)) {
+				fmt::print(fg(fmt::color::red),
+					"Model: {:<7}, file: {} not found.\n", model.first, full_path.string());
+			}
+		}
 
 		// Run-time
 		opt["running"]["start_time"].get_to(config.start_time);
@@ -150,6 +169,52 @@ Configuration load_configuration(CommandOptions& options) {
 	return config;
 }
 
+std::unordered_map<std::string, HierarchicalModel> load_risk_models(Modelling info) {
+	std::unordered_map<std::string, HierarchicalModel> result;
+	for (auto& model : info.models) {
+		std::ifstream ifs(model.second, std::ifstream::in);
+		if (ifs) {
+			try {
+				auto opt = json::parse(ifs);
+				HierarchicalModel hmodel;
+				hmodel.models = opt["models"].get<std::unordered_map<std::string, LinearModel>>();
+				hmodel.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevel>>();
+				result.emplace(model.first, hmodel);
+			}
+			catch (const std::exception& ex) {
+				fmt::print(fg(fmt::color::red),
+					"Failed to parse model: {:<7}, file: {}. {}\n",
+					model.first, model.second, ex.what());
+			}
+		}
+		else {
+			fmt::print(fg(fmt::color::red),
+				"Model: {:<7}, file: {} not found.\n",
+				model.first, model.second);
+		}
+
+		ifs.close();
+	}
+
+	fmt::print(" Risk Factors: {}, models: {}\n", info.risk_factors.size(), result.size());
+	fmt::print("|{0:-^{1}}|\n", "", 43);
+	fmt::print("| {:<8} : {:>8} : {:>8} : {:>8} |\n", "Type", "Models", "Levels", "Factors");
+	fmt::print("|{0:-^{1}}|\n", "", 43);
+	for (auto& model : result) {
+		auto max_model = std::max_element(model.second.models.begin(), model.second.models.end(),
+			[](const auto& lhs, const auto& rhs) {
+				return lhs.second.coefficients.size() < rhs.second.coefficients.size();
+			});
+
+		fmt::print("| {:<8} : {:>8} : {:>8} : {:>8} |\n",
+			model.first, model.second.models.size(), model.second.levels.size(),
+			max_model->second.coefficients.size());
+	}
+
+	fmt::print("|{0:_^{1}}|\n\n", "", 43);
+	return result;
+}
+
 hgps::Scenario create_scenario(Configuration& config)
 {
 	hgps::Scenario scenario(
@@ -169,7 +234,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto age_range = core::IntegerInterval(
 		config.settings.age_range.front(), config.settings.age_range.back());
 
-	auto settings = Settings(country, config.settings.reference_time, 
+	auto settings = Settings(country, config.settings.reference_time,
 		config.settings.size_fraction, config.settings.data_linkage, age_range);
 
 	auto run_info = RunInfo{

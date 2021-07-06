@@ -6,10 +6,9 @@
             "delimiter": ",",
             "encoding":"ASCII",
             "columns": {
-                "Year1": "integer",
+                "Year": "integer",
                 "Gender": "integer",
                 "Age": "integer",
-                "Age1": "integer",
                 "Age2": "integer",
                 "Age3": "integer",
                 "Education":"integer",
@@ -36,10 +35,23 @@
         }
     },
     "modelling": {
-        "risk_factors":{},
+        "risk_factors": {
+            "Year": 0,
+            "Gender": 0,
+            "Age": 0,
+            "Age2": 0,
+            "Age3": 0,
+            "Education": 0,
+            "Income": 0,
+            "PhysicalActivityMET": 1,
+            "FruitsVegetablesConsumption": 1,
+            "SmokingStatus": 1,
+            "AlcoholConsumption": 1,
+            "BMI": 2
+        },
         "models":{
-            "static": {},
-            "dynamic":{}
+            "static": "HLM.Json",
+            "dynamic": "DHLM.Json"
         }
     },
     "running": {
