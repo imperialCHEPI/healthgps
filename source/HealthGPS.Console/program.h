@@ -225,7 +225,7 @@ std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(Mode
 	return modelsInfo;
 }
 
-RiskFactorModule build_risk_factor_module(ModellingInfo info) {
+std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 	MEASURE_FUNCTION();
 	auto modelsInfo = load_risk_model_info(info);
 
@@ -298,7 +298,7 @@ RiskFactorModule build_risk_factor_module(ModellingInfo info) {
 		}
 	}
 
-	return RiskFactorModule(std::move(linear_models));
+	return std::make_shared<RiskFactorModule>(std::move(linear_models));
 }
 
 hgps::Scenario create_scenario(Configuration& config)

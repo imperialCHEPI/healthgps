@@ -120,6 +120,7 @@
     <ClCompile Include="hierarchical_model.cpp" />
     <ClCompile Include="modelrunner.cpp" />
     <ClCompile Include="modelinput.cpp" />
+    <ClCompile Include="modulefactory.cpp" />
     <ClCompile Include="mtrandom.cpp" />
     <ClCompile Include="person.cpp" />
     <ClCompile Include="population.cpp" />

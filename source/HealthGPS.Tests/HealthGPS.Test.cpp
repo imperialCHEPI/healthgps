@@ -3,6 +3,8 @@
 #include "HealthGPS\api.h"
 #include "HealthGPS.Datastore\api.h"
 
+#include "RiskFactorData.h"
+
 namespace fs = std::filesystem;
 
 void create_test_datatable(hgps::core::DataTable& data) {
@@ -94,13 +96,21 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
+	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
+	risk_models.emplace(HierarchicalModelType::Static, create_static_test_model());
+	risk_models.emplace(HierarchicalModelType::Static, create_dynamic_test_model());
+
+	auto risk_module_ptr = std::make_shared<RiskFactorModule>(std::move(risk_models));
+
 	auto factory = SimulationModuleFactory(manager);
-	factory.Register(SimulationModuleType::SES,
+	factory.register_builder(SimulationModuleType::SES,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_ses_module(manager, config); });
-	factory.Register(SimulationModuleType::Demographic,
+	factory.register_builder(SimulationModuleType::Demographic,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_demographic_module(manager, config); });
+
+	factory.register_instance(SimulationModuleType::RiskFactor, risk_module_ptr);
 
 	auto sim = HealthGPS(factory, config, MTRandom32());
 }
@@ -134,12 +144,12 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto manager = DataManager(full_path);
 
 	auto factory = SimulationModuleFactory(manager);
-	factory.Register(SimulationModuleType::Simulator,
+	factory.register_builder(SimulationModuleType::Simulator,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_country_module(manager, config);
 		});
 
-	auto base_module = factory.Create(SimulationModuleType::Simulator, config);
+	auto base_module = factory.create(SimulationModuleType::Simulator, config);
 	auto country_mod = static_cast<CountryModule*>(base_module.get());
 	country_mod->execute("print");
 
@@ -203,4 +213,18 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	ASSERT_GT(total_pop, 0);
 	ASSERT_GT(pop_dist.size(), 0);
 	ASSERT_TRUE((sum_prob - 1.0) < 1e-4);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModule)
+{
+	using namespace hgps;
+
+	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
+	risk_models.emplace(HierarchicalModelType::Static, create_static_test_model());
+	risk_models.emplace(HierarchicalModelType::Static, create_dynamic_test_model());
+
+	auto risk_module = RiskFactorModule(std::move(risk_models));
+
+	ASSERT_EQ(SimulationModuleType::RiskFactor, risk_module.type());
+	ASSERT_EQ("RiskFactor", risk_module.name());
 }

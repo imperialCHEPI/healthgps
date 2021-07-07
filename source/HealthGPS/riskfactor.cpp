@@ -27,7 +27,10 @@ namespace hgps {
 	}
 
 	void RiskFactorModule::initialise_population(RuntimeContext& context) {
+		if (models_.contains(HierarchicalModelType::Static)) {
+			models_.at(HierarchicalModelType::Static).generate(context);
+		}
 
-		throw std::logic_error("Function not implemented.");
+		throw std::logic_error("RiskFactorModule has not static hierarchical model.");
 	}
 }

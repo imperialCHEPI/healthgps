@@ -11,11 +11,13 @@ namespace hgps {
 		: Simulation(config, std::move(generator)), factory_{ factory }, context_{ rnd_ } {
 
 		// Create required modules, should change to shared_ptr
-		auto ses_base = factory.Create(SimulationModuleType::SES, config_);
-		auto dem_base = factory.Create(SimulationModuleType::Demographic, config_);
+		auto ses_base = factory.create(SimulationModuleType::SES, config_);
+		auto dem_base = factory.create(SimulationModuleType::Demographic, config_);
+		auto risk_base = factory.create(SimulationModuleType::RiskFactor, config_);
 
-		ses_.reset(dynamic_cast<SESModule*>(ses_base.release()));
-		demographic_.reset(dynamic_cast<DemographicModule*>(dem_base.release()));
+		ses_ = std::dynamic_pointer_cast<SESModule>(ses_base);
+		demographic_ = std::dynamic_pointer_cast<DemographicModule>(dem_base);
+		risk_factor_ = std::dynamic_pointer_cast<RiskFactorModule>(risk_base);
 	}
 
 	void HealthGPS::initialize()
@@ -95,6 +97,9 @@ namespace hgps {
 
 		// Social economics status
 		ses_->initialise_population(context_);
+
+		// Generate risk factors
+		risk_factor_->initialise_population(context_);
 
 		// Print out initial population statistics
 		// 

@@ -7,6 +7,7 @@
 #include "runtime_context.h"
 #include "demographic.h"
 #include "ses.h"
+#include "riskfactor.h"
 
 namespace hgps {
 
@@ -31,8 +32,9 @@ namespace hgps {
 	private:
 		SimulationModuleFactory& factory_;
 		RuntimeContext context_;
-		std::unique_ptr<SESModule> ses_;
-		std::unique_ptr<DemographicModule> demographic_;
+		std::shared_ptr<SESModule> ses_;
+		std::shared_ptr<DemographicModule> demographic_;
+		std::shared_ptr<RiskFactorModule> risk_factor_;
 
 		void initialise_population(const int pop_size, const int ref_year);
 	};

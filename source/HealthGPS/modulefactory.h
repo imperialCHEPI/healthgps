@@ -10,33 +10,26 @@ namespace hgps {
 	class SimulationModuleFactory
 	{
     public:
-        using ModuleType = std::unique_ptr<SimulationModule>;
+        using ModuleType = std::shared_ptr<SimulationModule>;
         using ConcreteBuilder = ModuleType(*)(core::Datastore&, ModelInput&);
 
         SimulationModuleFactory() = delete;
+        SimulationModuleFactory(core::Datastore& manager);
 
-        explicit SimulationModuleFactory(core::Datastore& manager) 
-            :manager_{ manager } {}
+        std::size_t size() const noexcept;
 
-        void Register(SimulationModuleType type, ConcreteBuilder builder) {
-            builders_.emplace(type, builder);
-        }
+        bool countains(const SimulationModuleType type) const noexcept;
 
-        ModuleType Create(SimulationModuleType type, ModelInput& config) {
-            auto it = builders_.find(type);
-            if (it != builders_.end()) {
-                return it->second(manager_, config);
-            }
-            else
-            {
-                throw std::invalid_argument{
-                    "Trying to create a module of unknown type: " + std::to_string((int)type) };
-            }
-        }
+        void register_instance(const SimulationModuleType type, const ModuleType instance);
+
+        void register_builder(const SimulationModuleType type, const ConcreteBuilder builder);
+
+        ModuleType create(const SimulationModuleType type, ModelInput& config);
 
     private:
         hgps::core::Datastore& manager_;
         std::unordered_map<SimulationModuleType, ConcreteBuilder> builders_;
+        std::map<SimulationModuleType, std::weak_ptr<SimulationModule>> registry_;
 	};
 }
 

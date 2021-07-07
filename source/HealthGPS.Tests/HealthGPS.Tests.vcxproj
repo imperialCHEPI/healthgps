@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="boost\ut.hpp" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RiskFactorData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.Test.cpp" />

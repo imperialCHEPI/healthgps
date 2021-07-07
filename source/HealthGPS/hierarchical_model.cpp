@@ -16,7 +16,8 @@ namespace hgps {
 	}
 
 	void HierarchicalLinearModel::generate(RuntimeContext& context) {
-		throw std::logic_error("Function not implemented.");
+		throw std::logic_error(
+			"HierarchicalLinearModel.generate function not implemented.");
 	}
 
 	// ************ Dynamic Hierarchical Model ************
@@ -36,6 +37,7 @@ namespace hgps {
 	}
 
 	void DynamicHierarchicalLinearModel::generate(RuntimeContext& context) {
-		throw std::logic_error("Function not implemented.");
+		throw std::logic_error(
+			"DynamicHierarchicalLinearModel.generate function not implemented.");
 	}
 }

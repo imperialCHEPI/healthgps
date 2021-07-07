@@ -40,12 +40,13 @@ int main(int argc, char* argv[])
 	// Create infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
 	auto factory = SimulationModuleFactory(data_api);
-	factory.Register(SimulationModuleType::SES,
+	factory.register_builder(SimulationModuleType::SES,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_ses_module(manager, config);});
-	factory.Register(SimulationModuleType::Demographic,
+	factory.register_builder(SimulationModuleType::Demographic,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_demographic_module(manager, config);});
+	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
 
 	// Validate target country
 	auto countries = data_api.get_countries();
