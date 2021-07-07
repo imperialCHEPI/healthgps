@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 	std::cout << input_table.to_string();
 
 	// Load risk factors model definition
-	auto risk_models = load_risk_models(config.modelling);
+	auto risk_factor_module = build_risk_factor_module(config.modelling);
 
 	// Create infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
 	// Validate target country
 	auto countries = data_api.get_countries();
-	fmt::print("There are {} countries in storage.\n", countries.size());
+	fmt::print("\nThere are {} countries in storage.\n", countries.size());
 	auto target = data_api.get_country(config.settings.country);
 	if (target.has_value())	{
 		fmt::print("Target country: {} - {}.\n", target.value().code, target.value().name);

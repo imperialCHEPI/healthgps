@@ -12,7 +12,7 @@ using json = nlohmann::json;
 //--------------------------------------------------------
 
 // Linear models
-void to_json(json& j, const Coefficient& p) {
+void to_json(json& j, const CoefficientInfo& p) {
 	j = json{
 		{"value", p.value},
 		{"stdError", p.std_error},
@@ -20,14 +20,14 @@ void to_json(json& j, const Coefficient& p) {
 		{"pValue", p.pvalue} };
 }
 
-void from_json(const json& j, Coefficient& p) {
+void from_json(const json& j, CoefficientInfo& p) {
 	j.at("value").get_to(p.value);
 	j.at("stdError").get_to(p.std_error);
 	j.at("tValue").get_to(p.tvalue);
 	j.at("pValue").get_to(p.pvalue);
 }
 
-void to_json(json& j, const LinearModel& p) {
+void to_json(json& j, const LinearModelInfo& p) {
 	j = json{
 		{"formula", p.formula},
 		{"coefficients", p.coefficients},
@@ -36,7 +36,7 @@ void to_json(json& j, const LinearModel& p) {
 		{"rSquared", p.rsquared} };
 }
 
-void from_json(const json& j, LinearModel& p) {
+void from_json(const json& j, LinearModelInfo& p) {
 	j.at("formula").get_to(p.formula);
 	j.at("coefficients").get_to(p.coefficients);
 	j.at("residuals").get_to(p.residuals);
@@ -45,32 +45,32 @@ void from_json(const json& j, LinearModel& p) {
 }
 
 // Hierarchical levels
-void to_json(json& j, const Array2Dto& p) {
+void to_json(json& j, const Array2Info& p) {
 	j = json{
 		{"rows", p.rows},
 		{"cols", p.cols},
 		{"data", p.data} };
 }
 
-void from_json(const json& j, Array2Dto& p) {
+void from_json(const json& j, Array2Info& p) {
 	j.at("rows").get_to(p.rows);
 	j.at("cols").get_to(p.cols);
 	j.at("data").get_to(p.data);
 }
 
-void to_json(json& j, const HierarchicalLevel& p) {
+void to_json(json& j, const HierarchicalLevelInfo& p) {
 	j = json{
-		{"s", p.s},
-		{"w", p.w},
-		{"m", p.m},
+		{"m", p.transition},
+		{"w", p.inverse_transition},
+		{"s", p.residual_distribution},
 		{"correlation", p.correlation},
 		{"variances", p.variances} };
 }
 
-void from_json(const json& j, HierarchicalLevel& p) {
-	j.at("s").get_to(p.s);
-	j.at("w").get_to(p.w);
-	j.at("m").get_to(p.m);
+void from_json(const json& j, HierarchicalLevelInfo& p) {
+	j.at("m").get_to(p.transition);
+	j.at("w").get_to(p.inverse_transition);
+	j.at("s").get_to(p.residual_distribution);
 	j.at("correlation").get_to(p.correlation);
 	j.at("variances").get_to(p.variances);
 }
@@ -114,13 +114,13 @@ void from_json(const json& j, SettingsInfo& p) {
 }
 
 // Risk Factor Modelling
-void to_json(json& j, const Modelling& p) {
+void to_json(json& j, const ModellingInfo& p) {
 	j = json{
 		{"risk_factors", p.risk_factors},
 		{"models", p.models} };
 }
 
-void from_json(const json& j, Modelling& p) {
+void from_json(const json& j, ModellingInfo& p) {
 	j.at("risk_factors").get_to(p.risk_factors);
 	j.at("models").get_to(p.models);
 }

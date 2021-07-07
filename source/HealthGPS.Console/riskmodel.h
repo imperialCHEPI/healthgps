@@ -1,35 +1,35 @@
 #pragma once
 
-struct Coefficient {
+struct CoefficientInfo {
 	double value{};
 	double pvalue{};
 	double tvalue{};
 	double std_error{};
 };
 
-struct LinearModel {
+struct LinearModelInfo {
 	std::string formula;
-	std::unordered_map<std::string, Coefficient> coefficients;
+	std::unordered_map<std::string, CoefficientInfo> coefficients;
 	std::vector<double> fitted_values;
 	std::vector<double> residuals;
 	double rsquared{};
 };
 
-struct Array2Dto {
+struct Array2Info {
 	int rows{};
 	int cols{};
 	std::vector<double> data;
 };
 
-struct HierarchicalLevel {
-	Array2Dto s;
-	Array2Dto w;
-	Array2Dto m;
-	Array2Dto correlation;
+struct HierarchicalLevelInfo {
+	Array2Info residual_distribution;
+	Array2Info inverse_transition;
+	Array2Info transition;
+	Array2Info correlation;
 	std::vector<double> variances;
 };
 
-struct HierarchicalModel {
-	std::unordered_map<std::string, LinearModel> models;
-	std::unordered_map<std::string, HierarchicalLevel> levels;
+struct HierarchicalModelInfo {
+	std::unordered_map<std::string, LinearModelInfo> models;
+	std::unordered_map<std::string, HierarchicalLevelInfo> levels;
 };

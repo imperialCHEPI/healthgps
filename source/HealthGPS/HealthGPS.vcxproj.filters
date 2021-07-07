@@ -84,6 +84,12 @@
     <ClInclude Include="univariate_visitor.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="riskfactor.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -121,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="univariate_visitor.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="riskfactor.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="hierarchical_model.cpp">
+      <Filter>Source Files\modules</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

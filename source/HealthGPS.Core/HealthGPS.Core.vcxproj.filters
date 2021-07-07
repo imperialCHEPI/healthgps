@@ -84,6 +84,9 @@
     <ClInclude Include="univariate_summary.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="scoped_timer.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">

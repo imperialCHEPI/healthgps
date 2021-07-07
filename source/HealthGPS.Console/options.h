@@ -40,7 +40,7 @@ struct SettingsInfo
 	std::vector<int> age_range;
 };
 
-struct Modelling
+struct ModellingInfo
 {
 	std::unordered_map<std::string, int> risk_factors;
 
@@ -55,7 +55,7 @@ struct Configuration
 
 	std::map<std::string, std::string> ses_mapping;
 
-	Modelling modelling;
+	ModellingInfo modelling;
 
 	std::optional<unsigned int> custom_seed;
 	

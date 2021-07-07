@@ -51,6 +51,16 @@ namespace hgps {
 		Analysis,
 	};
 
+	/// @brief Health GPS risk factor module types enumeration
+	enum class HierarchicalModelType : uint8_t
+	{
+		/// @brief Static hierarchical model
+		Static,
+
+		/// @brief Dynamic hierarchical model
+		Dynamic,
+	};
+
 	/// @brief Simulation modules interface
 	class SimulationModule
 	{

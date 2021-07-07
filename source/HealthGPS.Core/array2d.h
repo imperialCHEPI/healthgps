@@ -21,7 +21,7 @@ namespace hgps {
 					throw std::invalid_argument("Invalid array constructor with 0 size");
 				}
 
-				data_ = std::make_unique<TYPE[]>(rows_ * columns_);
+				data_ = std::make_shared<TYPE[]>(rows_ * columns_);
 			}
 
 			Array2D(const size_t nrows, const size_t ncols, TYPE value)
@@ -83,7 +83,7 @@ namespace hgps {
 		private:
 			size_t rows_{};
 			size_t columns_{};
-			std::unique_ptr<TYPE[]> data_;
+			std::shared_ptr<TYPE[]> data_;
 
 			void check_boundaries(size_t row, size_t column) {
 				if ((row < 0) || (row >= rows_)) {

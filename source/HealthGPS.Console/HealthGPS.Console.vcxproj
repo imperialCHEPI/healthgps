@@ -35,6 +35,9 @@
   <ItemGroup>
     <Image Include="healthgps.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="HierarchicalModel.cd" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

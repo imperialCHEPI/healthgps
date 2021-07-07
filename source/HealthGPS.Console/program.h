@@ -12,11 +12,21 @@
 #include <cxxopts.hpp>
 
 #include "HealthGPS/api.h"
+#include "HealthGPS.Core/scoped_timer.h"
 
 #include "jsonparser.h"
 
 using namespace hgps;
 namespace fs = std::filesystem;
+
+#define USE_TIMER 1
+
+#if USE_TIMER
+#define MEASURE_FUNCTION()                                                     \
+  core::ScopedTimer timer { __func__ }
+#else
+#define MEASURE_FUNCTION()
+#endif
 
 std::string getTimeNowStr() {
 	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -31,8 +41,7 @@ std::string getTimeNowStr() {
 	return s;
 }
 
-cxxopts::Options create_options()
-{
+cxxopts::Options create_options() {
 	cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
 	options.add_options()
 		("h,help", "Help about this application.")
@@ -43,8 +52,8 @@ cxxopts::Options create_options()
 	return options;
 }
 
-CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[])
-{
+CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[]) {
+	MEASURE_FUNCTION();
 	CommandOptions cmd;
 	try
 	{
@@ -103,7 +112,7 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 }
 
 Configuration load_configuration(CommandOptions& options) {
-
+	MEASURE_FUNCTION();
 	Configuration config;
 	std::ifstream ifs(options.config_file, std::ifstream::in);
 	if (ifs)
@@ -132,7 +141,7 @@ Configuration load_configuration(CommandOptions& options) {
 		opt["inputs"].at("ses_mapping").get_to(config.ses_mapping);
 
 		// Modelling information
-		config.modelling = opt["modelling"].get<Modelling>();
+		config.modelling = opt["modelling"].get<ModellingInfo>();
 		for (auto& model : config.modelling.models) {
 			full_path = model.second;
 			if (full_path.is_relative()) {
@@ -169,17 +178,18 @@ Configuration load_configuration(CommandOptions& options) {
 	return config;
 }
 
-std::unordered_map<std::string, HierarchicalModel> load_risk_models(Modelling info) {
-	std::unordered_map<std::string, HierarchicalModel> result;
+std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(ModellingInfo info) {
+	MEASURE_FUNCTION();
+	std::unordered_map<std::string, HierarchicalModelInfo> modelsInfo;
 	for (auto& model : info.models) {
 		std::ifstream ifs(model.second, std::ifstream::in);
 		if (ifs) {
 			try {
 				auto opt = json::parse(ifs);
-				HierarchicalModel hmodel;
-				hmodel.models = opt["models"].get<std::unordered_map<std::string, LinearModel>>();
-				hmodel.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevel>>();
-				result.emplace(model.first, hmodel);
+				HierarchicalModelInfo hmodel;
+				hmodel.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
+				hmodel.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
+				modelsInfo.emplace(model.first, hmodel);
 			}
 			catch (const std::exception& ex) {
 				fmt::print(fg(fmt::color::red),
@@ -196,11 +206,11 @@ std::unordered_map<std::string, HierarchicalModel> load_risk_models(Modelling in
 		ifs.close();
 	}
 
-	fmt::print(" Risk Factors: {}, models: {}\n", info.risk_factors.size(), result.size());
+	fmt::print(" Risk Factors: {}, models: {}\n", info.risk_factors.size(), modelsInfo.size());
 	fmt::print("|{0:-^{1}}|\n", "", 43);
 	fmt::print("| {:<8} : {:>8} : {:>8} : {:>8} |\n", "Type", "Models", "Levels", "Factors");
 	fmt::print("|{0:-^{1}}|\n", "", 43);
-	for (auto& model : result) {
+	for (auto& model : modelsInfo) {
 		auto max_model = std::max_element(model.second.models.begin(), model.second.models.end(),
 			[](const auto& lhs, const auto& rhs) {
 				return lhs.second.coefficients.size() < rhs.second.coefficients.size();
@@ -212,7 +222,83 @@ std::unordered_map<std::string, HierarchicalModel> load_risk_models(Modelling in
 	}
 
 	fmt::print("|{0:_^{1}}|\n\n", "", 43);
-	return result;
+	return modelsInfo;
+}
+
+RiskFactorModule build_risk_factor_module(ModellingInfo info) {
+	MEASURE_FUNCTION();
+	auto modelsInfo = load_risk_model_info(info);
+
+	// Create hierarchical models
+	std::unordered_map<HierarchicalModelType, HierarchicalLinearModel> linear_models;
+	for (auto& entry : modelsInfo) {
+		HierarchicalModelType modelType;
+		if (core::case_insensitive::equals(entry.first, "static")) {
+			modelType = HierarchicalModelType::Static;
+		}
+		else if (core::case_insensitive::equals(entry.first, "dynamic")) {
+			modelType = HierarchicalModelType::Dynamic;
+		}
+		else {
+			fmt::print(fg(fmt::color::red),
+				"Unknown hierarchical model type: {}.\n", entry.first);
+			continue;
+		}
+
+		// TODO: independent work, can be done in parallel
+		std::unordered_map<std::string, LinearModel> models;
+		for (auto& item : entry.second.models) {
+			auto& at = item.second;
+			std::unordered_map<std::string, Coefficient> coeffs;
+			std::transform(at.coefficients.begin(), at.coefficients.end(),
+				std::inserter(coeffs, coeffs.end()), [](const auto& pair) {
+					return std::pair(pair.first, Coefficient{
+						.value = pair.second.value,
+						.pvalue = pair.second.pvalue,
+						.tvalue = pair.second.tvalue,
+						.std_error = pair.second.std_error
+						});
+				});
+
+			models.emplace(entry.first, LinearModel{
+				.coefficients = coeffs,
+				.fitted_values = at.fitted_values,
+				.residuals = at.fitted_values,
+				.rsquared = at.rsquared
+				});
+		}
+
+		std::map<int, HierarchicalLevel> levels;
+		for (auto& item : entry.second.levels) {
+			auto& at = item.second;
+			levels.emplace(std::stoi(item.first), HierarchicalLevel{
+				.transition = core::DoubleArray2D(
+					at.transition.rows, at.transition.cols, at.transition.data),
+
+				.inverse_transition = core::DoubleArray2D(at.inverse_transition.rows,
+					at.inverse_transition.cols, at.inverse_transition.data),
+
+				.residual_distribution = core::DoubleArray2D(at.residual_distribution.rows,
+					at.residual_distribution.cols, at.residual_distribution.data),
+
+				.correlation = core::DoubleArray2D(at.correlation.rows,
+					at.correlation.cols, at.correlation.data),
+
+				.variances = at.variances
+				});
+		}
+
+		if (modelType == HierarchicalModelType::Static) {
+			linear_models.emplace(modelType,
+				HierarchicalLinearModel(std::move(models), std::move(levels)));
+		}
+		else if (modelType == HierarchicalModelType::Dynamic) {
+			linear_models.emplace(modelType,
+				DynamicHierarchicalLinearModel(std::move(models), std::move(levels)));
+		}
+	}
+
+	return RiskFactorModule(std::move(linear_models));
 }
 
 hgps::Scenario create_scenario(Configuration& config)

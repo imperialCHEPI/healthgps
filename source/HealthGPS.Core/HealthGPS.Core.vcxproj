@@ -101,6 +101,7 @@
     <ClInclude Include="poco.h" />
     <ClInclude Include="datastore.h" />
     <ClInclude Include="population_item.h" />
+    <ClInclude Include="scoped_timer.h" />
     <ClInclude Include="string_util.h" />
     <ClInclude Include="univariate_summary.h" />
     <ClInclude Include="version.h" />
