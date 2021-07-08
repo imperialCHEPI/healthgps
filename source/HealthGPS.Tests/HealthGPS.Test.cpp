@@ -97,8 +97,8 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto manager = DataManager(full_path);
 
 	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
-	risk_models.emplace(HierarchicalModelType::Static, create_static_test_model());
-	risk_models.emplace(HierarchicalModelType::Static, create_dynamic_test_model());
+	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model());
+	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model());
 
 	auto risk_module_ptr = std::make_shared<RiskFactorModule>(std::move(risk_models));
 
@@ -219,12 +219,50 @@ TEST(TestHealthGPS, CreateRiskFactorModule)
 {
 	using namespace hgps;
 
+	// Test data code generation via JSON model definition.
+	/*
+	auto static_code = generate_test_code(
+		HierarchicalModelType::Static, "C:/HealthGPS/Test/HLM.Json");
+
+	auto dynamic_code = generate_test_code(
+		HierarchicalModelType::Dynamic, "C:/HealthGPS/Test/DHLM.Json");
+	*/
+
 	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
-	risk_models.emplace(HierarchicalModelType::Static, create_static_test_model());
-	risk_models.emplace(HierarchicalModelType::Static, create_dynamic_test_model());
+	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model());
+	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model());
 
 	auto risk_module = RiskFactorModule(std::move(risk_models));
 
 	ASSERT_EQ(SimulationModuleType::RiskFactor, risk_module.type());
 	ASSERT_EQ("RiskFactor", risk_module.name());
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
+{
+	using namespace hgps;
+
+	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
+	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model());
+
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
+{
+	using namespace hgps;
+
+	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
+	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model());
+
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModuleFailEmpty)
+{
+	using namespace hgps;
+
+	auto risk_models = std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>();
+
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
 }

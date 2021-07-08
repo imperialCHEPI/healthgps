@@ -4,7 +4,21 @@ namespace hgps {
 
 	RiskFactorModule::RiskFactorModule(
 		std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>&& models) 
-		: models_{models} {}
+		: models_{models} {
+
+		if (models.empty()) {
+			throw std::invalid_argument(
+				"Missing required hierarchical model of types = static and dynamic.");
+		}
+
+		if (!models.contains(HierarchicalModelType::Static)) {
+			throw std::invalid_argument("Missing required hierarchical model of type = static.");
+		}
+
+		if (!models.contains(HierarchicalModelType::Dynamic)) {
+			throw std::invalid_argument("Missing required hierarchical model of type = dynamic.");
+		}
+	}
 
 	SimulationModuleType RiskFactorModule::type() const {
 		return SimulationModuleType::RiskFactor;
