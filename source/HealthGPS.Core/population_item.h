@@ -15,11 +15,11 @@ namespace hgps {
 		};
 
 		inline bool operator< (PopulationItem const& lhs, PopulationItem const& rhs) {
-			return std::tie(lhs.year, lhs.year) < std::tie(rhs.age, rhs.age);
+			return std::tie(lhs.year, lhs.age) < std::tie(rhs.year, rhs.age);
 		}
 
 		inline bool operator> (PopulationItem const& lhs, PopulationItem const& rhs) {
-			return std::tie(lhs.year, lhs.year) > std::tie(rhs.age, rhs.age);
+			return std::tie(lhs.year, lhs.age) > std::tie(rhs.year, rhs.age);
 		}
 	}
 }

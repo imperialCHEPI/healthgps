@@ -314,7 +314,18 @@ hgps::Scenario create_scenario(Configuration& config)
 	return scenario;
 }
 
-ModelInput create_model_input(core::DataTable& input_table, core::Country country, Configuration& config)
+auto find_by_value(SESMapping ses, std::string value) {
+	for (auto& i : ses.entries) {
+		if (core::case_insensitive::equals(i.second, value)) {
+			return i.first;
+		}
+	}
+
+	return std::string{};
+}
+
+ModelInput create_model_input(core::DataTable& input_table, 
+	core::Country country, Configuration& config)
 {
 	// Create simulation configuration
 	auto age_range = core::IntegerInterval(
@@ -332,5 +343,12 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto ses_mapping = SESMapping();
 	ses_mapping.entries.insert(config.ses_mapping.begin(), config.ses_mapping.end());
 
-	return ModelInput(input_table, settings, run_info, ses_mapping);
+	auto mapping = std::vector<MappingEntry>();
+	for (auto& item : config.modelling.risk_factors){
+		mapping.emplace_back(MappingEntry(item.first, item.second,
+			find_by_value(ses_mapping, item.first)));
+	}
+
+	return ModelInput(input_table, settings, run_info, ses_mapping,
+		HierarchicalMapping(std::move(mapping)));
 }

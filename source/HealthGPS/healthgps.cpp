@@ -8,7 +8,8 @@
 
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator)
-		: Simulation(config, std::move(generator)), factory_{ factory }, context_{ rnd_ } {
+		: Simulation(config, std::move(generator)), factory_{ factory },
+		context_{ rnd_, config_.risk_mapping() } {
 
 		// Create required modules, should change to shared_ptr
 		auto ses_base = factory.create(SimulationModuleType::SES, config_);

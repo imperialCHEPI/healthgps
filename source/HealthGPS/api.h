@@ -7,6 +7,7 @@
 #include "modelinput.h"
 #include "modelrunner.h"
 #include "modulefactory.h"
+#include "mapping.h"
 #include "ses.h"
 #include "demographic.h"
 #include "riskfactor.h"

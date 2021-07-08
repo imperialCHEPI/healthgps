@@ -90,6 +90,9 @@
     <ClInclude Include="hierarchical_model.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
+    <ClInclude Include="mapping.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="modulefactory.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mapping.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

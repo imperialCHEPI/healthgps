@@ -53,7 +53,16 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	ses.entries.emplace("education", "Education");
 	ses.entries.emplace("income", "Income");
 
-	return ModelInput(data, settings, info, ses);
+	auto mapping = std::vector<MappingEntry>{
+		MappingEntry("Year", 0),
+		MappingEntry("Gender", 0, "gender"),
+		MappingEntry("Age", 0, "age"),
+		MappingEntry("SmokingStatus", 1),
+		MappingEntry("AlcoholConsumption", 1),
+		MappingEntry("BMI", 2)
+	};
+
+	return ModelInput(data, settings, info, ses, HierarchicalMapping(std::move(mapping)));
 }
 
 TEST(TestHealthGPS, RandomBitGenerator)
@@ -138,7 +147,13 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
-	auto config = ModelInput(data, settings, info, ses);
+	auto mapping = std::vector<MappingEntry>{
+		MappingEntry("Year", 0),
+		MappingEntry("Gender", 0, "gender"),
+		MappingEntry("Age", 0, "age"),
+	};
+
+	auto config = ModelInput(data, settings, info, ses, HierarchicalMapping(std::move(mapping)));
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "population.h"
+#include "mapping.h"
 
 namespace hgps {
 
@@ -8,11 +9,13 @@ namespace hgps {
 	{
 	public:
 		RuntimeContext() = delete;
-		RuntimeContext(RandomBitGenerator& generator);
+		RuntimeContext(RandomBitGenerator& generator, const HierarchicalMapping& mapping);
 
 		int time_now() const noexcept;
 
 		Population& population() noexcept;
+
+		const HierarchicalMapping& mapping() const noexcept;
 
 		unsigned int next_int() noexcept;
 
@@ -24,6 +27,7 @@ namespace hgps {
 
 	private:
 		RandomBitGenerator& generator_;
+		HierarchicalMapping mapping_;
 		Population population_;
 		int time_now_{};
 	};
