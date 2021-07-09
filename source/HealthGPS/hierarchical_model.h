@@ -21,6 +21,7 @@ namespace hgps {
 	};
 
 	struct HierarchicalLevel {
+		std::vector<std::string> variables;
 		core::DoubleArray2D transition;
 		core::DoubleArray2D inverse_transition;
 		core::DoubleArray2D residual_distribution;

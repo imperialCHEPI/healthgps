@@ -60,6 +60,7 @@ void from_json(const json& j, Array2Info& p) {
 
 void to_json(json& j, const HierarchicalLevelInfo& p) {
 	j = json{
+		{"variables", p.variables},
 		{"m", p.transition},
 		{"w", p.inverse_transition},
 		{"s", p.residual_distribution},
@@ -68,6 +69,7 @@ void to_json(json& j, const HierarchicalLevelInfo& p) {
 }
 
 void from_json(const json& j, HierarchicalLevelInfo& p) {
+	j.at("variables").get_to(p.variables);
 	j.at("m").get_to(p.transition);
 	j.at("w").get_to(p.inverse_transition);
 	j.at("s").get_to(p.residual_distribution);

@@ -272,6 +272,7 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		for (auto& item : entry.second.levels) {
 			auto& at = item.second;
 			levels.emplace(std::stoi(item.first), HierarchicalLevel{
+				.variables = at.variables,
 				.transition = core::DoubleArray2D(
 					at.transition.rows, at.transition.cols, at.transition.data),
 

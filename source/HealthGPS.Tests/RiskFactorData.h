@@ -5,12 +5,14 @@
 #include "HealthGPS/riskfactor.h"
 #include "HealthGPS.Console/jsonparser.h"
 
-std::string join_string(const std::vector<double>& v, std::string_view delimiter) {
+template <typename TYPE>
+std::string join_string(const std::vector<TYPE>& v, std::string_view delimiter, bool quoted = false) {
 	std::stringstream  s;
 	if (!v.empty()) {
-		s << v.front();
+		std::string_view q = quoted ? "\"" : "";
+		s << q << v.front() << q;
 		for (size_t i = 1; i < v.size(); ++i) {
-			s << delimiter << " " << v[i];
+			s << delimiter << " " << q << v[i] << q;
 		}
 	}
 
@@ -63,11 +65,13 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 				ss << std::format("corr_mat = {{{}}};\n", join_string(at.correlation.data, ","));
 
 				ss << std::format("levels.emplace({0}, HierarchicalLevel{{ \
-								  \n\t.transition = core::DoubleArray2D({1}, {1}, tmat_m), \
-					              \n\t.inverse_transition = core::DoubleArray2D({1}, {1}, itmat_w), \
-								  \n\t.residual_distribution = core::DoubleArray2D({2}, {1}, rmat_s), \
-								  \n\t.correlation = core::DoubleArray2D({1}, {1}, corr_mat),\n\t.variances = {{{3}}} }});\n",
-					item.first, at.transition.rows, at.residual_distribution.rows, join_string(at.variances, ","));
+								  \n\t.variables = {{{1}}}, \
+								  \n\t.transition = core::DoubleArray2D({2}, {2}, tmat_m), \
+					              \n\t.inverse_transition = core::DoubleArray2D({2}, {2}, itmat_w), \
+								  \n\t.residual_distribution = core::DoubleArray2D({3}, {2}, rmat_s), \
+								  \n\t.correlation = core::DoubleArray2D({2}, {2}, corr_mat),\n\t.variances = {{{4}}} }});\n",
+					item.first, join_string(at.variables, ",", true), at.transition.rows,
+					at.residual_distribution.rows, join_string(at.variances, ","));
 			}
 
 			if (model_type == hgps::HierarchicalModelType::Static) {
@@ -143,9 +147,11 @@ hgps::HierarchicalLinearModel get_static_test_model() {
 	/* 1 */
 	tmat_m = { -0.0035606, 3.19407, 0.308565, 0.0184036 };
 	itmat_w = { -0.0186717, 3.24059, 0.313059, 0.00361245 };
-	rmat_s = { 0.0249242, 0.415528, 0.786364, -0.748982, 1.73733, -0.811288, -1.40388, -2.15996, 0.00761843, 1.10788, -0.000606345, 0.00723274, 1.05208, -0.0142448 };
+	rmat_s = { 0.0249242, 0.415528, 0.786364, -0.748982, 1.73733, -0.811288, -1.40388,
+			  -2.15996, 0.00761843, 1.10788, -0.000606345, 0.00723274, 1.05208, -0.0142448 };
 	corr_mat = { 1, -0.0057769, -0.0057769, 1 };
 	levels.emplace(1, HierarchicalLevel{
+		.variables = {"SmokingStatus", "AlcoholConsumption"},
 		.transition = core::DoubleArray2D(2, 2, tmat_m),
 		.inverse_transition = core::DoubleArray2D(2, 2, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 2, rmat_s),
@@ -158,6 +164,7 @@ hgps::HierarchicalLinearModel get_static_test_model() {
 	rmat_s = { -1.15916e-16, -2.237, 0.303002, 0.817005, 0.971242, -0.303002, 0.448757 };
 	corr_mat = { 1 };
 	levels.emplace(2, HierarchicalLevel{
+		.variables = {"BMI"},
 		.transition = core::DoubleArray2D(1, 1, tmat_m),
 		.inverse_transition = core::DoubleArray2D(1, 1, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 1, rmat_s),
@@ -224,9 +231,11 @@ hgps::DynamicHierarchicalLinearModel get_dynamic_test_model() {
 	/* 1 */
 	tmat_m = { -0.111198, 2.86563, -0.203549, -0.132974 };
 	itmat_w = { -0.222334, -4.79136, 0.340336, -0.185925 };
-	rmat_s = { 0.778387, 0.94104, 0.21149, -0.731434, 1.29645, -0.989878, -1.50605, 1.42484, -1.64932, -0.452958, 0.194915, 0.681437, -0.971885, 0.772969 };
+	rmat_s = { 0.778387, 0.94104, 0.21149, -0.731434, 1.29645, -0.989878, -1.50605, 
+			   1.42484, -1.64932, -0.452958, 0.194915, 0.681437, -0.971885, 0.772969 };
 	corr_mat = { 1, -0.438228, -0.438228, 1 };
 	levels.emplace(1, HierarchicalLevel{
+		.variables = {"SmokingStatus", "AlcoholConsumption"},
 		.transition = core::DoubleArray2D(2, 2, tmat_m),
 		.inverse_transition = core::DoubleArray2D(2, 2, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 2, rmat_s),
@@ -239,6 +248,7 @@ hgps::DynamicHierarchicalLinearModel get_dynamic_test_model() {
 	rmat_s = { 7.89387e-17, -0.552753, -0.300238, 2.03918, 0.0477231, 0.300238, -1.53415 };
 	corr_mat = { 1 };
 	levels.emplace(2, HierarchicalLevel{
+		.variables = {"BMI"},
 		.transition = core::DoubleArray2D(1, 1, tmat_m),
 		.inverse_transition = core::DoubleArray2D(1, 1, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 1, rmat_s),
@@ -246,4 +256,6 @@ hgps::DynamicHierarchicalLinearModel get_dynamic_test_model() {
 		.variances = {1} });
 
 	return DynamicHierarchicalLinearModel(std::move(models), std::move(levels));
+
+
 }

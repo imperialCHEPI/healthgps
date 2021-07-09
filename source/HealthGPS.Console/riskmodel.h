@@ -22,6 +22,7 @@ struct Array2Info {
 };
 
 struct HierarchicalLevelInfo {
+	std::vector<std::string> variables;
 	Array2Info residual_distribution;
 	Array2Info inverse_transition;
 	Array2Info transition;
