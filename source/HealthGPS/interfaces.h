@@ -1,11 +1,17 @@
 #pragma once
 
+#include <map>
 #include <limits>
 #include <memory>
 
 #include "HealthGPS.Core\api.h"
 
 namespace hgps {
+
+	/// @brief Defines a map template with case insensitive string keys and type.
+	/// @tparam T The map value data type
+	template <typename T>
+	using case_insensitive_map = std::map<std::string, T, core::case_insensitive::comparator>;
 
 	/// @brief Random number generator algorithms interface
 	class RandomBitGenerator {

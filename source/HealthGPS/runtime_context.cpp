@@ -1,4 +1,5 @@
 #include "runtime_context.h"
+#include <random>
 
 namespace hgps {
     RuntimeContext::RuntimeContext(RandomBitGenerator& generator, const HierarchicalMapping& mapping)
@@ -17,8 +18,22 @@ namespace hgps {
         return mapping_;
     }
 
-    unsigned int RuntimeContext::next_int() noexcept {
-        return generator_();
+    int RuntimeContext::next_int() {
+        return next_int(0, std::numeric_limits<int>::max());
+    }
+
+    int RuntimeContext::next_int(int max_value) {
+        return next_int(0, max_value);
+    }
+
+    int RuntimeContext::next_int(int min_value, int max_value) {
+        if (min_value < 0 ||  max_value < min_value) {
+            throw std::invalid_argument(
+                "min_value must be non-negative, and less than or equal to max_value.");
+        }
+
+        std::uniform_int_distribution<int> distribution(min_value, max_value);
+        return distribution(generator_);
     }
 
     double RuntimeContext::next_double() noexcept {

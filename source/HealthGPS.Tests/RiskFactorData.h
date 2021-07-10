@@ -75,10 +75,12 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 			}
 
 			if (model_type == hgps::HierarchicalModelType::Static) {
-				ss << "\nreturn HierarchicalLinearModel(std::move(models), std::move(levels));\n";
+				ss << "std::vector<std::string> exclusions{{\"year\"}};\n";
+				ss << "\nreturn std::make_shared<HierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));\n";
 			}
 			else {
-				ss << "\nreturn DynamicHierarchicalLinearModel(std::move(models), std::move(levels));\n";
+				ss << "std::vector<std::string> exclusions{{}};\n";
+				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
 			}
 		}
 		catch (const std::exception& ex) {
@@ -93,7 +95,7 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 	return ss.str();
 }
 
-hgps::HierarchicalLinearModel get_static_test_model() {
+std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
 	/* Auto-generated code, do not change **** */
 
 	using namespace hgps;
@@ -171,10 +173,13 @@ hgps::HierarchicalLinearModel get_static_test_model() {
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	return HierarchicalLinearModel(std::move(models), std::move(levels));
+	std::vector<std::string> exclusions{ "Year" };
+
+	return std::make_shared<HierarchicalLinearModel>(
+		exclusions, std::move(models), std::move(levels));
 }
 
-hgps::DynamicHierarchicalLinearModel get_dynamic_test_model() {
+std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {
 	/* Auto-generated code, do not change **** */
 
 	using namespace hgps;
@@ -255,7 +260,7 @@ hgps::DynamicHierarchicalLinearModel get_dynamic_test_model() {
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	return DynamicHierarchicalLinearModel(std::move(models), std::move(levels));
-
-
+	std::vector<std::string> exclusions{};
+	return std::make_shared<DynamicHierarchicalLinearModel>(
+		exclusions, std::move(models), std::move(levels));
 }

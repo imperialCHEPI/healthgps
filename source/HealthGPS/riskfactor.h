@@ -7,7 +7,7 @@ namespace hgps {
 	class RiskFactorModule final : public SimulationModule {
 	public:
 		RiskFactorModule() = delete;
-		RiskFactorModule(std::unordered_map<HierarchicalModelType, HierarchicalLinearModel>&& models);
+		RiskFactorModule(std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>&& models);
 
 		SimulationModuleType type() const override;
 
@@ -15,13 +15,13 @@ namespace hgps {
 
 		std::size_t size() const noexcept;
 
-		HierarchicalLinearModel& operator[](HierarchicalModelType modelType);
+		std::shared_ptr<HierarchicalLinearModel> operator[](HierarchicalModelType modelType);
 
-		const HierarchicalLinearModel& operator[](HierarchicalModelType modelType) const;
+		const std::shared_ptr<HierarchicalLinearModel> operator[](HierarchicalModelType modelType) const;
 
 		void initialise_population(RuntimeContext& context);
 
 	private:
-		std::unordered_map<HierarchicalModelType, HierarchicalLinearModel> models_;
+		std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>> models_;
 	};
 }

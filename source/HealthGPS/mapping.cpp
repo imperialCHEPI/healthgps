@@ -20,6 +20,10 @@ namespace hgps {
 
 	bool MappingEntry::is_entity() const noexcept { return entity_name_.length() > 0; }
 
+	std::string MappingEntry::key() const noexcept {
+		return is_entity() ? entity_name_ : name_;
+	}
+
 	inline bool operator> (const MappingEntry& lhs, const MappingEntry& rhs) {
 		return lhs.level() > rhs.level() || 
 			 ((lhs.level() == rhs.level()) && lhs.name() > rhs.name());

@@ -17,7 +17,11 @@ namespace hgps {
 
 		const HierarchicalMapping& mapping() const noexcept;
 
-		unsigned int next_int() noexcept;
+		int next_int();
+
+		int next_int(int max_value);
+
+		int next_int(int min_value, int max_value);
 
 		double next_double() noexcept;
 

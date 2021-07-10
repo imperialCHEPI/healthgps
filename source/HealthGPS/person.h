@@ -1,6 +1,8 @@
 #pragma once
 
+#include <map>
 #include <atomic>
+
 #include "interfaces.h"
 
 namespace hgps {
@@ -23,13 +25,20 @@ namespace hgps {
 
 		unsigned int income{};
 
+		case_insensitive_map<double> risk_factors;
+
 		bool is_active() const noexcept;
+
+		double get_risk_factor_value(const std::string& key) const noexcept;
+
+		double gender_to_value() const noexcept;
 
 		static void reset_id();
 
 	private:
 		size_t id_;
 		static std::atomic<size_t> newUID;
+		static case_insensitive_map<std::function<double(const Person&)>> dispatcher;
 	};
 }
 

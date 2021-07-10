@@ -279,6 +279,52 @@ TEST(TestHealthGPSCore, CaseInsensitiveString)
 	ASSERT_EQ(std::weak_ordering::greater, case_insensitive::compare("Dog", "Cat"));
 }
 
+TEST(TestHealthGPSCore, CaseInsensitiveVectorIndexOf)
+{
+	using namespace hgps::core;
+
+	std::vector<std::string> source { 
+		"The", "quick", "brown", "fox", "jumps", "over", "a", "lazy", "dog" };
+
+	for (size_t i = 0; i < source.size(); i++) {
+		ASSERT_EQ(i, case_insensitive::index_of(source, source[i]));
+	}
+
+	for (size_t i = 0; i < source.size(); i++) {
+		ASSERT_EQ(i, case_insensitive::index_of(source, to_upper(source[i])));
+	}
+
+	EXPECT_EQ(0, case_insensitive::index_of(source, "the"));
+	EXPECT_EQ(2, case_insensitive::index_of(source, "brown"));
+	EXPECT_EQ(2, case_insensitive::index_of(source, "BROWN"));
+	EXPECT_EQ(8, case_insensitive::index_of(source, "dog"));
+	EXPECT_EQ(8, case_insensitive::index_of(source, "DoG"));
+	EXPECT_EQ(-1, case_insensitive::index_of(source, "Cat"));
+}
+
+TEST(TestHealthGPSCore, CaseInsensitiveVectorContains)
+{
+	using namespace hgps::core;
+
+	std::vector<std::string> source{
+		"The", "quick", "brown", "fox", "jumps", "over", "a", "lazy", "dog" };
+
+	for (size_t i = 0; i < source.size(); i++) {
+		ASSERT_TRUE(case_insensitive::contains(source, source[i]));
+	}
+
+	for (size_t i = 0; i < source.size(); i++) {
+		ASSERT_TRUE(case_insensitive::contains(source, to_upper(source[i])));
+	}
+
+	EXPECT_TRUE(case_insensitive::contains(source, "the"));
+	EXPECT_TRUE(case_insensitive::contains(source, "brown"));
+	EXPECT_TRUE(case_insensitive::contains(source, "BROWN"));
+	EXPECT_TRUE(case_insensitive::contains(source, "dog"));
+	EXPECT_TRUE(case_insensitive::contains(source, "DoG"));
+	EXPECT_FALSE(case_insensitive::contains(source, "Cat"));
+}
+
 TEST(TestHealthGPSCore, SplitDelimitedString) {
 	using namespace hgps::core;
 

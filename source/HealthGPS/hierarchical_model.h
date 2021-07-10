@@ -32,6 +32,7 @@ namespace hgps {
 	class HierarchicalLinearModel {
 	public:
 		HierarchicalLinearModel(
+			std::vector<std::string>& exclusions,
 			std::unordered_map<std::string, LinearModel>&& models,
 			std::map<int, HierarchicalLevel>&& levels);
 
@@ -45,7 +46,7 @@ namespace hgps {
 
 	protected:
 		HierarchicalLinearModel() = default;
-
+		std::vector<std::string> exclusions_;
 		std::unordered_map<std::string, LinearModel> models_;
 		std::map<int, HierarchicalLevel> levels_;
 	};
@@ -55,6 +56,7 @@ namespace hgps {
 		DynamicHierarchicalLinearModel() = delete;
 
 		DynamicHierarchicalLinearModel(
+			std::vector<std::string>& exclusions,
 			std::unordered_map<std::string, LinearModel>&& models,
 			std::map<int, HierarchicalLevel>&& levels);
 

@@ -227,40 +227,45 @@ std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(Mode
 
 std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 	MEASURE_FUNCTION();
-	auto modelsInfo = load_risk_model_info(info);
+	auto config_models_info = load_risk_model_info(info);
 
 	// Create hierarchical models
-	std::unordered_map<HierarchicalModelType, HierarchicalLinearModel> linear_models;
-	for (auto& entry : modelsInfo) {
-		HierarchicalModelType modelType;
-		if (core::case_insensitive::equals(entry.first, "static")) {
-			modelType = HierarchicalModelType::Static;
+	std::unordered_map<HierarchicalModelType, 
+		std::shared_ptr<HierarchicalLinearModel>> linear_models;
+	for (auto& config_model_type : config_models_info) {
+		HierarchicalModelType model_type;
+		if (core::case_insensitive::equals(config_model_type.first, "static")) {
+			model_type = HierarchicalModelType::Static;
 		}
-		else if (core::case_insensitive::equals(entry.first, "dynamic")) {
-			modelType = HierarchicalModelType::Dynamic;
+		else if (core::case_insensitive::equals(config_model_type.first, "dynamic")) {
+			model_type = HierarchicalModelType::Dynamic;
 		}
 		else {
 			fmt::print(fg(fmt::color::red),
-				"Unknown hierarchical model type: {}.\n", entry.first);
+				"Unknown hierarchical model type: {}.\n", config_model_type.first);
 			continue;
 		}
 
 		// TODO: independent work, can be done in parallel
+		std::unordered_set<std::string> model_factors;
 		std::unordered_map<std::string, LinearModel> models;
-		for (auto& item : entry.second.models) {
-			auto& at = item.second;
+		for (auto& model_item : config_model_type.second.models) {
+			auto& at = model_item.second;
+			model_factors.emplace(core::to_lower(model_item.first));
+
 			std::unordered_map<std::string, Coefficient> coeffs;
-			std::transform(at.coefficients.begin(), at.coefficients.end(),
-				std::inserter(coeffs, coeffs.end()), [](const auto& pair) {
-					return std::pair(pair.first, Coefficient{
+			for (auto& pair : at.coefficients) {
+				coeffs.emplace(pair.first, Coefficient{
 						.value = pair.second.value,
 						.pvalue = pair.second.pvalue,
 						.tvalue = pair.second.tvalue,
 						.std_error = pair.second.std_error
-						});
-				});
+					});
 
-			models.emplace(entry.first, LinearModel{
+				model_factors.emplace(core::to_lower(pair.first));
+			}
+
+			models.emplace(model_item.first, LinearModel{
 				.coefficients = coeffs,
 				.fitted_values = at.fitted_values,
 				.residuals = at.fitted_values,
@@ -269,9 +274,9 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		}
 
 		std::map<int, HierarchicalLevel> levels;
-		for (auto& item : entry.second.levels) {
-			auto& at = item.second;
-			levels.emplace(std::stoi(item.first), HierarchicalLevel{
+		for (auto& level_item : config_model_type.second.levels) {
+			auto& at = level_item.second;
+			levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
 				.variables = at.variables,
 				.transition = core::DoubleArray2D(
 					at.transition.rows, at.transition.cols, at.transition.data),
@@ -289,13 +294,22 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 				});
 		}
 
-		if (modelType == HierarchicalModelType::Static) {
-			linear_models.emplace(modelType,
-				HierarchicalLinearModel(std::move(models), std::move(levels)));
+		std::vector<std::string> exclusions;
+		for (auto& risk : info.risk_factors) {
+			if (!model_factors.contains(core::to_lower(risk.first))) {
+				exclusions.emplace_back(risk.first);
+			}
 		}
-		else if (modelType == HierarchicalModelType::Dynamic) {
-			linear_models.emplace(modelType,
-				DynamicHierarchicalLinearModel(std::move(models), std::move(levels)));
+
+		model_factors.clear();
+		exclusions.shrink_to_fit();
+		if (model_type == HierarchicalModelType::Static) {
+			linear_models.emplace(model_type, std::make_shared<HierarchicalLinearModel>(
+				exclusions, std::move(models), std::move(levels)));
+		}
+		else if (model_type == HierarchicalModelType::Dynamic) {
+			linear_models.emplace(model_type, std::make_shared<DynamicHierarchicalLinearModel>(
+				exclusions, std::move(models), std::move(levels)));
 		}
 	}
 
