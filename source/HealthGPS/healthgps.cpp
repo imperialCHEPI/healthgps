@@ -107,44 +107,43 @@ namespace hgps {
 		// TODO: Move to the analytics module
 		// 
 		auto visitor = UnivariateVisitor();
-		auto col_names = std::vector<std::string>{ "Gender", "Age", "Education", "Income" };
 		auto orig_summary = std::unordered_map<std::string, core::UnivariateSummary>();
 		auto sim8_summary = std::unordered_map<std::string, core::UnivariateSummary>();
-		for (auto& name : col_names) {
-			config_.data().column(name)->accept(visitor);
-			orig_summary.emplace(name, visitor.get_summary());
-			sim8_summary.emplace(name, core::UnivariateSummary(name));
+		for (auto& entry : context_.mapping()) {
+			config_.data().column(entry.name())->accept(visitor);
+			orig_summary.emplace(entry.name(), visitor.get_summary());
+			sim8_summary.emplace(entry.name(), core::UnivariateSummary(entry.name()));
 		}
 
 		for (auto& entity : context_.population()) {
-			sim8_summary["Gender"].append(entity.gender == core::Gender::male ? 1.0 : 0.0);
-			sim8_summary["Age"].append(entity.age);
-			sim8_summary["Education"].append(entity.education);
-			sim8_summary["Income"].append(entity.income);
+			for (auto& entry : context_.mapping()) {
+				sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
+			}
 		}
 
 		std::size_t longestColumnName = 0;
-		for (auto& col : col_names) {
-			longestColumnName = std::max(longestColumnName, col.length());
+		for (auto& entry : context_.mapping()) {
+			longestColumnName = std::max(longestColumnName, entry.name().length());
 		}
 
 		auto pad = longestColumnName + 2;
-		auto width = pad + 66;
+		auto width = pad + 70;
 		auto orig_pop = config_.data().num_rows();
 		auto sim8_pop = context_.population().size();
 
 		std::stringstream ss;
 		ss << std::format("\n Initial Virtual Population Summary:\n");
 		ss << std::format("|{:-<{}}|\n", '-', width);
-		ss << std::format("| {:{}} : {:>12} : {:>12} : {:>14} : {:>14} |\n", 
+		ss << std::format("| {:{}} : {:>14} : {:>14} : {:>14} : {:>14} |\n", 
 			"Variable", pad, "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");
 		ss << std::format("|{:-<{}}|\n", '-', width);
 
-		ss << std::format("| {:{}} : {:12} : {:12} : {:14} : {:14} |\n",
+		ss << std::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n",
 			"Population", pad, orig_pop, sim8_pop, orig_pop, sim8_pop);
 
-		for (auto& col : col_names) {
-			ss << std::format("| {:{}} : {:12.6f} : {:12.6f} : {:14.6f} : {:14.6f} |\n",
+		for (auto& entry : context_.mapping()) {
+			auto col = entry.name();
+			ss << std::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n",
 				col, pad, orig_summary[col].average(), sim8_summary[col].average(),
 				orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());
 		}
