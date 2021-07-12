@@ -13,10 +13,13 @@
     <ClCompile Include="Datastore.Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UnivariateSummary.Test.cpp">
+    <ClCompile Include="Core.UnivariateSummary.Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HierarchicalMapping.Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core.Array2DTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,7 +5,7 @@
 #include "HealthGPS.Core\api.h"
 #include "HealthGPS.Core\string_util.h"
 
-TEST(TestHealthGPSCore, CurrentApiVersion)
+TEST(TestCore, CurrentApiVersion)
 {
 	using namespace hgps::core;
 
@@ -26,7 +26,7 @@ TEST(TestHealthGPSCore, CurrentApiVersion)
 	EXPECT_FALSE(Version::IsAtLeast(API_MAJOR, API_MINOR, API_PATCH + 1));
 }
 
-TEST(TestHealthGPSCore, CreateCountry)
+TEST(TestCore, CreateCountry)
 {
 	using namespace hgps::core;
 
@@ -46,7 +46,7 @@ TEST(TestHealthGPSCore, CreateCountry)
 	EXPECT_EQ("GBR", c.alpha3);
 }
 
-TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
+TEST(TestCore, CreateTableColumnWithNulls)
 {
 	using namespace hgps::core;
 
@@ -90,7 +90,7 @@ TEST(TestHealthGPSCore, CreateTableColumnWithNulls)
 	ASSERT_TRUE(int_col.is_valid(1));
 }
 
-TEST(TestHealthGPSCore, CreateTableColumnWithoutNulls)
+TEST(TestCore, CreateTableColumnWithoutNulls)
 {
 	using namespace hgps::core;
 
@@ -128,7 +128,7 @@ TEST(TestHealthGPSCore, CreateTableColumnWithoutNulls)
 	ASSERT_FALSE(int_col.is_null(0));
 }
 
-TEST(TestHealthGPSCore, CreateTableColumnFailWithLenMismatch)
+TEST(TestCore, CreateTableColumnFailWithLenMismatch)
 {
 	using namespace hgps::core;
 
@@ -137,7 +137,7 @@ TEST(TestHealthGPSCore, CreateTableColumnFailWithLenMismatch)
 		std::invalid_argument);
 }
 
-TEST(TestHealthGPSCore, CreateTableColumnFailWithShortName)
+TEST(TestCore, CreateTableColumnFailWithShortName)
 {
 	using namespace hgps::core;
 
@@ -146,7 +146,7 @@ TEST(TestHealthGPSCore, CreateTableColumnFailWithShortName)
 		std::invalid_argument);
 }
 
-TEST(TestHealthGPSCore, CreateTableColumnFailWithInvalidName)
+TEST(TestCore, CreateTableColumnFailWithInvalidName)
 {
 	using namespace hgps::core;
 
@@ -155,7 +155,7 @@ TEST(TestHealthGPSCore, CreateTableColumnFailWithInvalidName)
 		std::invalid_argument);
 }
 
-TEST(TestHealthGPSCore, TableColumnIterator)
+TEST(TestCore, TableColumnIterator)
 {
 	using namespace hgps::core;
 
@@ -178,7 +178,7 @@ TEST(TestHealthGPSCore, TableColumnIterator)
 	ASSERT_EQ(loop_sum, sum);
 }
 
-TEST(TestHealthGPSCore, CreateDataTable)
+TEST(TestCore, CreateDataTable)
 {
 	using namespace hgps::core;
 
@@ -221,7 +221,7 @@ TEST(TestHealthGPSCore, CreateDataTable)
 	ASSERT_EQ(slow_value, fast_value);
 }
 
-TEST(TestHealthGPSCore, DataTableFailWithColumnLenMismath)
+TEST(TestCore, DataTableFailWithColumnLenMismath)
 {
 	using namespace hgps::core;
 
@@ -242,7 +242,7 @@ TEST(TestHealthGPSCore, DataTableFailWithColumnLenMismath)
 		std::invalid_argument);
 }
 
-TEST(TestHealthGPSCore, DataTableFailDuplicateColumn)
+TEST(TestCore, DataTableFailDuplicateColumn)
 {
 	using namespace hgps::core;
 
@@ -263,7 +263,7 @@ TEST(TestHealthGPSCore, DataTableFailDuplicateColumn)
 		std::invalid_argument);
 }
 
-TEST(TestHealthGPSCore, CaseInsensitiveString)
+TEST(TestCore, CaseInsensitiveString)
 {
 	using namespace hgps::core;
 
@@ -279,7 +279,7 @@ TEST(TestHealthGPSCore, CaseInsensitiveString)
 	ASSERT_EQ(std::weak_ordering::greater, case_insensitive::compare("Dog", "Cat"));
 }
 
-TEST(TestHealthGPSCore, CaseInsensitiveVectorIndexOf)
+TEST(TestCore, CaseInsensitiveVectorIndexOf)
 {
 	using namespace hgps::core;
 
@@ -302,7 +302,7 @@ TEST(TestHealthGPSCore, CaseInsensitiveVectorIndexOf)
 	EXPECT_EQ(-1, case_insensitive::index_of(source, "Cat"));
 }
 
-TEST(TestHealthGPSCore, CaseInsensitiveVectorContains)
+TEST(TestCore, CaseInsensitiveVectorContains)
 {
 	using namespace hgps::core;
 
@@ -325,7 +325,7 @@ TEST(TestHealthGPSCore, CaseInsensitiveVectorContains)
 	EXPECT_FALSE(case_insensitive::contains(source, "Cat"));
 }
 
-TEST(TestHealthGPSCore, SplitDelimitedString) {
+TEST(TestCore, SplitDelimitedString) {
 	using namespace hgps::core;
 
 	auto source = "The quick brown fox jumps over the lazy dog";
@@ -342,63 +342,4 @@ TEST(TestHealthGPSCore, SplitDelimitedString) {
 	ASSERT_EQ(parts.size(), csv_parts.size());
 	ASSERT_EQ(parts.front(), csv_parts.front());
 	ASSERT_EQ(parts.back(), csv_parts.back());
-}
-
-TEST(TestHealthGPSCore, CreateArray2DStorage) {
-	using namespace hgps::core;
-
-	std::vector<int> n = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
-	auto d3x2 = DoubleArray2D(3, 2);
-	auto d2x3v5 = DoubleArray2D(2, 3, 5);
-	auto i3x4v = IntegerArray2D(3, 4, n);
-
-	ASSERT_EQ(3, d3x2.rows());
-	ASSERT_EQ(2, d3x2.columns());
-	ASSERT_EQ(6, d3x2.size());
-
-	ASSERT_EQ(2, d2x3v5.rows());
-	ASSERT_EQ(3, d2x3v5.columns());
-	ASSERT_EQ(6, d2x3v5.size());
-
-	ASSERT_EQ(3, i3x4v.rows());
-	ASSERT_EQ(4, i3x4v.columns());
-	ASSERT_EQ(12, i3x4v.size());
-
-	for (size_t i = 0; i < 3; i++) {
-		for (size_t j = 0; j < 2; j++) {
-			ASSERT_EQ(0.0, d3x2(i, j));
-			ASSERT_EQ(5.0, d2x3v5(j, i));
-		}
-
-		for (size_t j = 0; j < 4; j++) {
-			ASSERT_EQ(n[i * 4 + j], i3x4v(i, j));
-		}
-	}
-}
-
-TEST(TestHealthGPSCore, AccessArray2DStorage) {
-	using namespace hgps::core;
-
-	std::vector<int> n = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
-	auto i3x4v = IntegerArray2D(3, 4, n);
-	auto i3vec = i3x4v.to_vector();
-
-	ASSERT_EQ(3, i3x4v.rows());
-	ASSERT_EQ(4, i3x4v.columns());
-	ASSERT_EQ(12, i3x4v.size());
-	ASSERT_EQ(n.size(), i3vec.size());
-	ASSERT_EQ(n, i3vec);
-
-	for (size_t i = 0; i < 3; i++) {
-		for (size_t j = 0; j < 4; j++) {
-			// Read current
-			ASSERT_EQ(n[i * 4 + j], i3x4v(i, j));
-
-			// Update value
-			i3x4v(i, j) += 5;
-
-			// Read again
-			ASSERT_EQ(n[i * 4 + j]+5, i3x4v(i, j));
-		}
-	}
 }

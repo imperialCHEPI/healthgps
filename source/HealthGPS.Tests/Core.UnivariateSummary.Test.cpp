@@ -3,62 +3,87 @@
 
 #include "HealthGPS.Core\univariate_summary.h"
 
-TEST(TestCore_UnivariateSummary, CreateEmpty)
+TEST(TestCore_UnivariateSummary, CreateEmptyWithoutName)
 {
 	using namespace hgps::core;
 
 	auto init_empty = UnivariateSummary();
-	auto init_name = UnivariateSummary("Test");
 
 	ASSERT_TRUE(init_empty.is_empty());
-	ASSERT_EQ("Untitled", init_empty.name());
-	ASSERT_TRUE(std::isnan(init_empty.min()));
-	ASSERT_TRUE(std::isnan(init_empty.max()));
-	ASSERT_EQ(0, init_empty.count_valid());
-	ASSERT_EQ(0, init_empty.count_null());
-	ASSERT_EQ(0, init_empty.count_total());
 
-	ASSERT_TRUE(init_name.is_empty());
-	ASSERT_EQ("Test", init_name.name());
-	ASSERT_TRUE(std::isnan(init_name.min()));
-	ASSERT_TRUE(std::isnan(init_name.max()));
-	ASSERT_EQ(0, init_name.count_valid());
-	ASSERT_EQ(0, init_name.count_null());
-	ASSERT_EQ(0, init_name.count_total());
+	EXPECT_EQ("Untitled", init_empty.name());
+	EXPECT_TRUE(std::isnan(init_empty.min()));
+	EXPECT_TRUE(std::isnan(init_empty.max()));
+	EXPECT_EQ(0, init_empty.count_valid());
+	EXPECT_EQ(0, init_empty.count_null());
+	EXPECT_EQ(0, init_empty.count_total());
 }
 
-TEST(TestCore_UnivariateSummary, CreateFull)
+TEST(TestCore_UnivariateSummary, CreateEmptyWithName)
+{
+	using namespace hgps::core;
+
+	auto init_name = UnivariateSummary("Test");
+
+	ASSERT_TRUE(init_name.is_empty());
+
+	EXPECT_EQ("Test", init_name.name());
+	EXPECT_TRUE(std::isnan(init_name.min()));
+	EXPECT_TRUE(std::isnan(init_name.max()));
+	EXPECT_EQ(0, init_name.count_valid());
+	EXPECT_EQ(0, init_name.count_null());
+	EXPECT_EQ(0, init_name.count_total());
+}
+
+TEST(TestCore_UnivariateSummary, CreateFullFromVectorWithoutName)
 {
 	using namespace hgps::core;
 	auto data = std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0 };
 
 	auto init_vector = UnivariateSummary(data);
-	auto init_full = UnivariateSummary("Test", data);
-	auto init_list = UnivariateSummary("Test", { 1.0, 2.0, 3.0, 4.0, 5.0 });
 
 	ASSERT_FALSE(init_vector.is_empty());
 	ASSERT_EQ("Untitled", init_vector.name());
-	ASSERT_FALSE(std::isnan(init_vector.min()));
-	ASSERT_FALSE(std::isnan(init_vector.max()));
 	ASSERT_EQ(data.size(), init_vector.count_valid());
 	ASSERT_EQ(0, init_vector.count_null());
 	ASSERT_EQ(data.size(), init_vector.count_total());
 
+	EXPECT_FALSE(std::isnan(init_vector.min()));
+	EXPECT_FALSE(std::isnan(init_vector.max()));
+}
+
+TEST(TestCore_UnivariateSummary, CreateFullFromVectorWithName)
+{
+	using namespace hgps::core;
+	auto data = std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0 };
+
+	auto init_full = UnivariateSummary("Test", data);
+
 	ASSERT_FALSE(init_full.is_empty());
 	ASSERT_EQ("Test", init_full.name());
-	ASSERT_FALSE(std::isnan(init_full.min()));
-	ASSERT_FALSE(std::isnan(init_full.max()));
 	ASSERT_EQ(data.size(), init_full.count_valid());
 	ASSERT_EQ(0, init_full.count_null());
 	ASSERT_EQ(data.size(), init_full.count_total());
 
+	EXPECT_FALSE(std::isnan(init_full.min()));
+	EXPECT_FALSE(std::isnan(init_full.max()));
+}
+
+TEST(TestCore_UnivariateSummary, CreateFullFromListWithName)
+{
+	using namespace hgps::core;
+	auto data = std::vector<double>{ 1.0, 2.0, 3.0, 4.0, 5.0 };
+
+	auto init_list = UnivariateSummary("Test", { 1.0, 2.0, 3.0, 4.0, 5.0 });
+
 	ASSERT_FALSE(init_list.is_empty());
 	ASSERT_EQ("Test", init_list.name());
-	ASSERT_FALSE(std::isnan(init_list.min()));
-	ASSERT_FALSE(std::isnan(init_list.max()));
 	ASSERT_EQ(data.size(), init_list.count_valid());
 	ASSERT_EQ(0, init_list.count_null());
 	ASSERT_EQ(data.size(), init_list.count_total());
+
+	EXPECT_FALSE(std::isnan(init_list.min()));
+	EXPECT_FALSE(std::isnan(init_list.max()));
 }
 
 TEST(TestCore_UnivariateSummary, CreateFullValues)
