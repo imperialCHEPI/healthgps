@@ -13,9 +13,11 @@ namespace hgps {
 
 		std::string name() const noexcept;
 
-		int level() const noexcept;
+		short level() const noexcept;
 
 		std::string entity_name() const noexcept;
+
+		std::string entity_key() const noexcept;
 
 		bool is_entity() const noexcept;
 
@@ -23,6 +25,7 @@ namespace hgps {
 
 	private:
 		std::string name_;
+		std::string name_key_;
 		short level_{};
 		std::string entity_name_;
 	};

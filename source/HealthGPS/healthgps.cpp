@@ -117,7 +117,7 @@ namespace hgps {
 
 		for (auto& entity : context_.population()) {
 			for (auto& entry : context_.mapping()) {
-				sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
+				sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.entity_key()));
 			}
 		}
 

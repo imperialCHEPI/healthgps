@@ -19,6 +19,22 @@ std::string join_string(const std::vector<TYPE>& v, std::string_view delimiter, 
 	return s.str();
 }
 
+std::string join_string_map(const std::vector<std::string>& v, std::string_view delimiter) {
+	std::stringstream  s;
+	if (!v.empty()) {
+		std::string_view q = "\"";
+		s << "{{" << q << v.front() << q << ",0}";
+		for (size_t i = 1; i < v.size(); ++i) {
+			s << delimiter << " {" << q << v[i] << q << delimiter << i << "}";
+		}
+
+		s << "}";
+	}
+
+	return s.str();
+}
+
+
 std::string generate_test_code(hgps::HierarchicalModelType model_type, std::string filename) {
 	std::stringstream ss;
 	HierarchicalModelInfo hmodel;
@@ -65,22 +81,22 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 				ss << std::format("corr_mat = {{{}}};\n", join_string(at.correlation.data, ","));
 
 				ss << std::format("levels.emplace({0}, HierarchicalLevel{{ \
-								  \n\t.variables = {{{1}}}, \
+								  \n\t.variables = {1}, \
 								  \n\t.transition = core::DoubleArray2D({2}, {2}, tmat_m), \
 					              \n\t.inverse_transition = core::DoubleArray2D({2}, {2}, itmat_w), \
 								  \n\t.residual_distribution = core::DoubleArray2D({3}, {2}, rmat_s), \
 								  \n\t.correlation = core::DoubleArray2D({2}, {2}, corr_mat),\n\t.variances = {{{4}}} }});\n",
-					item.first, join_string(at.variables, ",", true), at.transition.rows,
+					item.first, join_string_map(at.variables, ","), at.transition.rows,
 					at.residual_distribution.rows, join_string(at.variances, ","));
 			}
 
 			if (model_type == hgps::HierarchicalModelType::Static) {
-				ss << "std::vector<std::string> exclusions{{\"year\"}};\n";
+				ss << "\nstd::vector<std::string> exclusions{{\"year\"}};\n";
 				ss << "\nreturn std::make_shared<HierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));\n";
 			}
 			else {
 				ss << "std::vector<std::string> exclusions{{}};\n";
-				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
+				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));\n";
 			}
 		}
 		catch (const std::exception& ex) {
@@ -97,7 +113,7 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 
 std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
 	/* Auto-generated code, do not change **** */
-
+	
 	using namespace hgps;
 
 	/*---- LINEAR MODELS ---- */
@@ -147,13 +163,12 @@ std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
 	std::vector<double> corr_mat;
 
 	/* 1 */
-	tmat_m = { -0.0035606, 3.19407, 0.308565, 0.0184036 };
-	itmat_w = { -0.0186717, 3.24059, 0.313059, 0.00361245 };
-	rmat_s = { 0.0249242, 0.415528, 0.786364, -0.748982, 1.73733, -0.811288, -1.40388,
-			  -2.15996, 0.00761843, 1.10788, -0.000606345, 0.00723274, 1.05208, -0.0142448 };
+	tmat_m = { -0.0035606, 0.308565, 3.19407, 0.0184036 };
+	itmat_w = { -0.0186717, 0.313059, 3.24059, 0.00361245 };
+	rmat_s = { 0.0249242, -2.15996, 0.415528, 0.00761843, 0.786364, 1.10788, -0.748982, -0.000606345, 1.73733, 0.00723274, -0.811288, 1.05208, -1.40388, -0.0142448 };
 	corr_mat = { 1, -0.0057769, -0.0057769, 1 };
 	levels.emplace(1, HierarchicalLevel{
-		.variables = {"SmokingStatus", "AlcoholConsumption"},
+		.variables = {{"SmokingStatus",0}, {"AlcoholConsumption",1}},
 		.transition = core::DoubleArray2D(2, 2, tmat_m),
 		.inverse_transition = core::DoubleArray2D(2, 2, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 2, rmat_s),
@@ -166,22 +181,21 @@ std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
 	rmat_s = { -1.15916e-16, -2.237, 0.303002, 0.817005, 0.971242, -0.303002, 0.448757 };
 	corr_mat = { 1 };
 	levels.emplace(2, HierarchicalLevel{
-		.variables = {"BMI"},
+		.variables = {{"BMI",0}},
 		.transition = core::DoubleArray2D(1, 1, tmat_m),
 		.inverse_transition = core::DoubleArray2D(1, 1, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 1, rmat_s),
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	std::vector<std::string> exclusions{ "Year" };
+	std::vector<std::string> exclusions{ {"year"} };
 
-	return std::make_shared<HierarchicalLinearModel>(
-		exclusions, std::move(models), std::move(levels));
+	return std::make_shared<HierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));
 }
 
 std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {
 	/* Auto-generated code, do not change **** */
-
+	
 	using namespace hgps;
 
 	/*---- LINEAR MODELS ---- */
@@ -234,13 +248,12 @@ std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {
 	std::vector<double> corr_mat;
 
 	/* 1 */
-	tmat_m = { -0.111198, 2.86563, -0.203549, -0.132974 };
-	itmat_w = { -0.222334, -4.79136, 0.340336, -0.185925 };
-	rmat_s = { 0.778387, 0.94104, 0.21149, -0.731434, 1.29645, -0.989878, -1.50605, 
-			   1.42484, -1.64932, -0.452958, 0.194915, 0.681437, -0.971885, 0.772969 };
+	tmat_m = { -0.111198, -0.203549, 2.86563, -0.132974 };
+	itmat_w = { -0.222334, 0.340336, -4.79136, -0.185925 };
+	rmat_s = { 0.778387, 1.42484, 0.94104, -1.64932, 0.21149, -0.452958, -0.731434, 0.194915, 1.29645, 0.681437, -0.989878, -0.971885, -1.50605, 0.772969 };
 	corr_mat = { 1, -0.438228, -0.438228, 1 };
 	levels.emplace(1, HierarchicalLevel{
-		.variables = {"SmokingStatus", "AlcoholConsumption"},
+		.variables = {{"SmokingStatus",0}, {"AlcoholConsumption",1}},
 		.transition = core::DoubleArray2D(2, 2, tmat_m),
 		.inverse_transition = core::DoubleArray2D(2, 2, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 2, rmat_s),
@@ -253,14 +266,13 @@ std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {
 	rmat_s = { 7.89387e-17, -0.552753, -0.300238, 2.03918, 0.0477231, 0.300238, -1.53415 };
 	corr_mat = { 1 };
 	levels.emplace(2, HierarchicalLevel{
-		.variables = {"BMI"},
+		.variables = {{"BMI",0}},
 		.transition = core::DoubleArray2D(1, 1, tmat_m),
 		.inverse_transition = core::DoubleArray2D(1, 1, itmat_w),
 		.residual_distribution = core::DoubleArray2D(7, 1, rmat_s),
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
+	std::vector<std::string> exclusions{ {} };
 
-	std::vector<std::string> exclusions{};
-	return std::make_shared<DynamicHierarchicalLinearModel>(
-		exclusions, std::move(models), std::move(levels));
+	return std::make_shared<DynamicHierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));
 }

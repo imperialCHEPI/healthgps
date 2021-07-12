@@ -255,7 +255,7 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 
 			std::unordered_map<std::string, Coefficient> coeffs;
 			for (auto& pair : at.coefficients) {
-				coeffs.emplace(pair.first, Coefficient{
+				coeffs.emplace(core::to_lower(pair.first), Coefficient{
 						.value = pair.second.value,
 						.pvalue = pair.second.pvalue,
 						.tvalue = pair.second.tvalue,
@@ -265,7 +265,7 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 				model_factors.emplace(core::to_lower(pair.first));
 			}
 
-			models.emplace(model_item.first, LinearModel{
+			models.emplace(core::to_lower(model_item.first), LinearModel{
 				.coefficients = coeffs,
 				.fitted_values = at.fitted_values,
 				.residuals = at.fitted_values,
@@ -276,8 +276,13 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		std::map<int, HierarchicalLevel> levels;
 		for (auto& level_item : config_model_type.second.levels) {
 			auto& at = level_item.second;
+			std::unordered_map<std::string,int> col_names;
+			for (size_t i = 0; i < at.variables.size(); i++){
+				col_names.emplace(core::to_lower(at.variables[i]), i);
+			}
+
 			levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
-				.variables = at.variables,
+				.variables = col_names,
 				.transition = core::DoubleArray2D(
 					at.transition.rows, at.transition.cols, at.transition.data),
 
@@ -297,7 +302,7 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		std::vector<std::string> exclusions;
 		for (auto& risk : info.risk_factors) {
 			if (!model_factors.contains(core::to_lower(risk.first))) {
-				exclusions.emplace_back(risk.first);
+				exclusions.emplace_back(core::to_lower(risk.first));
 			}
 		}
 

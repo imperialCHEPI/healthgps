@@ -3,26 +3,30 @@
 #include <iterator>
 
 #include "mapping.h"
+#include "HealthGPS.Core/string_util.h"
 
 namespace hgps {
 
 	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name)
-		:name_{ name }, level_{ level }, entity_name_{ entity_name } {}
+		:name_{ name }, level_{ level }, entity_name_{ core::to_lower(entity_name) },
+		name_key_{core::to_lower(name)} {}
 
 	MappingEntry::MappingEntry(std::string name, short level)
-		: MappingEntry(name, level, "") {}
+		: MappingEntry(name, level, std::string{}) {}
 
 	std::string MappingEntry::name() const noexcept { return name_; }
 
-	int MappingEntry::level() const noexcept { return level_; }
+	short MappingEntry::level() const noexcept { return level_; }
 
 	std::string MappingEntry::entity_name() const noexcept { return entity_name_; }
 
+	std::string MappingEntry::entity_key() const noexcept {
+		return is_entity() ? entity_name_ : name_key_;
+	}
+
 	bool MappingEntry::is_entity() const noexcept { return entity_name_.length() > 0; }
 
-	std::string MappingEntry::key() const noexcept {
-		return is_entity() ? entity_name_ : name_;
-	}
+	std::string MappingEntry::key() const noexcept { return name_key_; }
 
 	inline bool operator> (const MappingEntry& lhs, const MappingEntry& rhs) {
 		return lhs.level() > rhs.level() || 

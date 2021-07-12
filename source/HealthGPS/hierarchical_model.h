@@ -21,7 +21,7 @@ namespace hgps {
 	};
 
 	struct HierarchicalLevel {
-		std::vector<std::string> variables;
+		std::unordered_map<std::string, int> variables;
 		core::DoubleArray2D transition;
 		core::DoubleArray2D inverse_transition;
 		core::DoubleArray2D residual_distribution;
@@ -42,13 +42,16 @@ namespace hgps {
 
 		virtual std::string name() const;
 
-		virtual void generate(RuntimeContext& context);
+		void generate(RuntimeContext& context);
 
 	protected:
 		HierarchicalLinearModel() = default;
 		std::vector<std::string> exclusions_;
 		std::unordered_map<std::string, LinearModel> models_;
 		std::map<int, HierarchicalLevel> levels_;
+
+		virtual void generate_for_entity(RuntimeContext& context, Person& entity, 
+			int level, std::vector<MappingEntry>& level_factors);
 	};
 
 	class DynamicHierarchicalLinearModel final : public HierarchicalLinearModel {
@@ -64,6 +67,7 @@ namespace hgps {
 
 		std::string name() const override;
 
-		void generate(RuntimeContext& context)  override;
+		void generate_for_entity(RuntimeContext& context, Person& entity, 
+			int level, std::vector<MappingEntry>& level_factors)  override;
 	};
 }

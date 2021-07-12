@@ -79,22 +79,26 @@ TEST(TestHealthGPS_Mapping, AccessByInterator)
 	auto mapping = HierarchicalMapping(std::move(entries));
 
 	for (auto& entry : mapping)	{
-		EXPECT_GE(entry.level(), 0);
+		ASSERT_GE(entry.level(), 0);
 		if (entry.entity_name().empty()) {
-			EXPECT_FALSE(entry.is_entity());
+			ASSERT_FALSE(entry.is_entity());
+			EXPECT_EQ(entry.key(), entry.entity_key());
 		}
 		else {
-			EXPECT_TRUE(entry.is_entity());
+			ASSERT_TRUE(entry.is_entity());
+			EXPECT_EQ(entry.entity_name(), entry.entity_key());
 		}
 	}
 
 	for (const auto& entry : mapping) {
-		EXPECT_GE(entry.level(), 0);
+		ASSERT_GE(entry.level(), 0);
 		if (entry.entity_name().empty()) {
-			EXPECT_FALSE(entry.is_entity());
+			ASSERT_FALSE(entry.is_entity());
+			EXPECT_EQ(entry.key(), entry.entity_key());
 		}
 		else {
-			EXPECT_TRUE(entry.is_entity());
+			ASSERT_TRUE(entry.is_entity());
+			EXPECT_EQ(entry.entity_name(), entry.entity_key());
 		}
 	}
 }
