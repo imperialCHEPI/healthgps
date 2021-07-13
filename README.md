@@ -1,3 +1,7 @@
+![windows](https://github.com/imperialCHEPI/healthgps/actions/workflows/msbuild.yml/badge.svg)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
+![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
+
 # Global Health Policy Simulation model (Health-GPS)
 
 Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
