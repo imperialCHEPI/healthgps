@@ -49,6 +49,7 @@
             "AlcoholConsumption": 1,
             "BMI": 2
         },
+        "dynamic_risk_factor":"Year",
         "models":{
             "static": "HLM.Json",
             "dynamic": "DHLM.Json"

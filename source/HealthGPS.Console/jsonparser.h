@@ -119,11 +119,13 @@ void from_json(const json& j, SettingsInfo& p) {
 void to_json(json& j, const ModellingInfo& p) {
 	j = json{
 		{"risk_factors", p.risk_factors},
+		{"dynamic_risk_factor", p.dynamic_risk_factor},
 		{"models", p.models} };
 }
 
 void from_json(const json& j, ModellingInfo& p) {
 	j.at("risk_factors").get_to(p.risk_factors);
+	j.at("dynamic_risk_factor").get_to(p.dynamic_risk_factor);
 	j.at("models").get_to(p.models);
 }
 

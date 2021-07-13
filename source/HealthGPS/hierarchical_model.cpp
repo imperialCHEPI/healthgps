@@ -3,11 +3,9 @@
 
 namespace hgps {
 	HierarchicalLinearModel::HierarchicalLinearModel(
-		std::vector<std::string>& exclusions,
 		std::unordered_map<std::string, LinearModel>&& models,
 		std::map<int, HierarchicalLevel>&& levels)
-		: models_{ models }, levels_{ levels },
-		exclusions_{ exclusions.begin(), exclusions.end() }
+		: models_{ models }, levels_{ levels }
 	{}
 
 	HierarchicalModelType HierarchicalLinearModel::type() const {
@@ -20,22 +18,6 @@ namespace hgps {
 
 	void HierarchicalLinearModel::generate(RuntimeContext& context)
 	{
-		// TODO: Cache this information on the model construction.
-		auto model_mapping = std::vector<MappingEntry>(
-			context.mapping().begin(), context.mapping().end());
-		if (!exclusions_.empty()) {
-			for (auto& entry : exclusions_) {
-				auto it = std::find_if(model_mapping.begin(), model_mapping.end(),
-					[&entry](const auto& x) {
-						return core::case_insensitive::equals(entry, x.name());
-					});
-
-				if (it != model_mapping.end()) {
-					model_mapping.erase(it);
-				}
-			}
-		}
-
 		std::vector<MappingEntry> level_factors;
 		std::unordered_map<int, std::vector<MappingEntry>> level_factors_cache;
 		for (auto& entity : context.population()) {
@@ -44,7 +26,7 @@ namespace hgps {
 					level_factors = level_factors_cache.at(level);
 				}
 				else {
-					level_factors = context.mapping().at_level(level);
+					level_factors = context.mapping().at_level_without_dynamic(level);
 					level_factors_cache.emplace(level, level_factors);
 				}
 
@@ -71,11 +53,6 @@ namespace hgps {
 		// The Stochastic Component of The Risk Factors
 		auto stoch_comp_factors = std::unordered_map<std::string, double>();
 		for (auto& item : level_factors) {
-			if (!exclusions_.empty() &&
-				std::find(exclusions_.begin(), exclusions_.end(), item.key()) != exclusions_.end()) {
-				continue;
-			}
-
 			auto sum = 0.0;
 			auto row_idx = level_info.variables.at(item.key());
 			for (int j = 0; j < level_factors.size(); j++) {
@@ -89,12 +66,10 @@ namespace hgps {
 		auto determ_risk_factors = std::unordered_map<std::string, double>();
 		determ_risk_factors.emplace("intercept", 1.0); // Need a better way.
 		for (auto& item : context.mapping()) {
-			if (item.level() >= level || (!exclusions_.empty() &&
-				std::find(exclusions_.begin(), exclusions_.end(), item.key()) != exclusions_.end())) {
-				continue;
+			if (item.level() < level) {
+				determ_risk_factors.emplace(item.key(),
+					entity.get_risk_factor_value(item.entity_key()));
 			}
-
-			determ_risk_factors.emplace(item.key(), entity.get_risk_factor_value(item.entity_key()));
 		}
 
 		// The Deterministic Components of Risk Factors
@@ -117,10 +92,9 @@ namespace hgps {
 	// ************ Dynamic Hierarchical Model ************
 
 	DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
-		std::vector<std::string>& exclusions,
 		std::unordered_map<std::string, LinearModel>&& models,
 		std::map<int, HierarchicalLevel>&& levels)
-		: HierarchicalLinearModel(exclusions, std::move(models), std::move(levels))
+		: HierarchicalLinearModel(std::move(models), std::move(levels))
 	{}
 
 	HierarchicalModelType DynamicHierarchicalLinearModel::type() const {

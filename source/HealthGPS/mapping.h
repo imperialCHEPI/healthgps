@@ -8,8 +8,9 @@ namespace hgps {
 	class MappingEntry {
 	public:
 		MappingEntry() = delete;
-		MappingEntry(std::string name, short level, std::string entity_name);
-		MappingEntry(std::string name, short level);
+		MappingEntry(std::string name, const short level, std::string entity_name, const bool dynamic_factor);
+		MappingEntry(std::string name, const short level, std::string entity_name);
+		MappingEntry(std::string name, const short level);
 
 		std::string name() const noexcept;
 
@@ -21,12 +22,15 @@ namespace hgps {
 
 		bool is_entity() const noexcept;
 
+		bool is_dynamic_factor() const noexcept;
+
 		std::string key() const noexcept;
 
 	private:
 		std::string name_;
 		std::string name_key_;
 		short level_{};
+		bool dynamic_factor_;
 		std::string entity_name_;
 	};
 
@@ -40,15 +44,17 @@ namespace hgps {
 
 		const std::vector<MappingEntry>& entries() const noexcept;
 
+		std::vector<MappingEntry> entries_without_dynamic() const noexcept;
+
 		std::size_t size() const noexcept;
 
 		int max_level() const noexcept;
 
+		MappingEntry at(const std::string name) const;
+
 		std::vector<MappingEntry> at_level(const int level) const noexcept;
 
-		MappingEntry& operator[](std::size_t index);
-
-		const MappingEntry& operator[](std::size_t index) const;
+		std::vector<MappingEntry> at_level_without_dynamic(const int level) const noexcept;
 
 		IteratorType begin() noexcept { return mapping_.begin(); }
 		IteratorType end() noexcept { return mapping_.end(); }

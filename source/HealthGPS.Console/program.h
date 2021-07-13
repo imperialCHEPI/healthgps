@@ -158,6 +158,13 @@ Configuration load_configuration(CommandOptions& options) {
 			}
 		}
 
+		if (!config.modelling.dynamic_risk_factor.empty() &&
+			!config.modelling.risk_factors.contains(config.modelling.dynamic_risk_factor)) {
+			fmt::print(fg(fmt::color::red), 
+				"\nInvalid configuration, dynamic risk factor: {} is not a risk factor.\n",
+				config.modelling.dynamic_risk_factor);
+		}
+
 		// Run-time
 		opt["running"]["start_time"].get_to(config.start_time);
 		opt["running"]["stop_time"].get_to(config.stop_time);
@@ -247,11 +254,9 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		}
 
 		// TODO: independent work, can be done in parallel
-		std::unordered_set<std::string> model_factors;
 		std::unordered_map<std::string, LinearModel> models;
 		for (auto& model_item : config_model_type.second.models) {
 			auto& at = model_item.second;
-			model_factors.emplace(core::to_lower(model_item.first));
 
 			std::unordered_map<std::string, Coefficient> coeffs;
 			for (auto& pair : at.coefficients) {
@@ -261,8 +266,6 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 						.tvalue = pair.second.tvalue,
 						.std_error = pair.second.std_error
 					});
-
-				model_factors.emplace(core::to_lower(pair.first));
 			}
 
 			models.emplace(core::to_lower(model_item.first), LinearModel{
@@ -277,7 +280,7 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		for (auto& level_item : config_model_type.second.levels) {
 			auto& at = level_item.second;
 			std::unordered_map<std::string,int> col_names;
-			for (size_t i = 0; i < at.variables.size(); i++){
+			for (int i = 0; i < at.variables.size(); i++){
 				col_names.emplace(core::to_lower(at.variables[i]), i);
 			}
 
@@ -299,22 +302,13 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 				});
 		}
 
-		std::vector<std::string> exclusions;
-		for (auto& risk : info.risk_factors) {
-			if (!model_factors.contains(core::to_lower(risk.first))) {
-				exclusions.emplace_back(core::to_lower(risk.first));
-			}
-		}
-
-		model_factors.clear();
-		exclusions.shrink_to_fit();
 		if (model_type == HierarchicalModelType::Static) {
-			linear_models.emplace(model_type, std::make_shared<HierarchicalLinearModel>(
-				exclusions, std::move(models), std::move(levels)));
+			linear_models.emplace(model_type,
+				std::make_shared<HierarchicalLinearModel>(std::move(models), std::move(levels)));
 		}
 		else if (model_type == HierarchicalModelType::Dynamic) {
-			linear_models.emplace(model_type, std::make_shared<DynamicHierarchicalLinearModel>(
-				exclusions, std::move(models), std::move(levels)));
+			linear_models.emplace(model_type,
+				std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels)));
 		}
 	}
 
@@ -365,8 +359,14 @@ ModelInput create_model_input(core::DataTable& input_table,
 
 	auto mapping = std::vector<MappingEntry>();
 	for (auto& item : config.modelling.risk_factors){
-		mapping.emplace_back(MappingEntry(item.first, item.second,
-			find_by_value(ses_mapping, item.first)));
+		if (core::case_insensitive::equals(item.first, config.modelling.dynamic_risk_factor)) {
+			mapping.emplace_back(MappingEntry(item.first, item.second,
+				find_by_value(ses_mapping, item.first), true));
+		}
+		else {
+			mapping.emplace_back(MappingEntry(item.first, item.second,
+				find_by_value(ses_mapping, item.first)));
+		}
 	}
 
 	return ModelInput(input_table, settings, run_info, ses_mapping,

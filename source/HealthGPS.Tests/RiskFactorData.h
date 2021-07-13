@@ -91,12 +91,10 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 			}
 
 			if (model_type == hgps::HierarchicalModelType::Static) {
-				ss << "\nstd::vector<std::string> exclusions{{\"year\"}};\n";
-				ss << "\nreturn std::make_shared<HierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));\n";
+				ss << "\nreturn std::make_shared<HierarchicalLinearModel>(std::move(models), std::move(levels));\n";
 			}
 			else {
-				ss << "std::vector<std::string> exclusions{{}};\n";
-				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));\n";
+				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
 			}
 		}
 		catch (const std::exception& ex) {
@@ -188,9 +186,7 @@ std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	std::vector<std::string> exclusions{ {"year"} };
-
-	return std::make_shared<HierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));
+	return std::make_shared<HierarchicalLinearModel>(std::move(models), std::move(levels));
 }
 
 std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {
@@ -272,7 +268,6 @@ std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {
 		.residual_distribution = core::DoubleArray2D(7, 1, rmat_s),
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
-	std::vector<std::string> exclusions{ {} };
 
-	return std::make_shared<DynamicHierarchicalLinearModel>(exclusions, std::move(models), std::move(levels));
+	return std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels));
 }

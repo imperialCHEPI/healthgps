@@ -44,6 +44,8 @@ struct ModellingInfo
 {
 	std::unordered_map<std::string, int> risk_factors;
 
+	std::string dynamic_risk_factor;
+
 	std::unordered_map<std::string, std::string> models;
 };
 
