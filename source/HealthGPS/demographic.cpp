@@ -69,12 +69,12 @@ namespace hgps {
 			auto num_required = index + num_males + num_females;
 			if (num_required > pop_size) {
 				// Adjust size
-				auto pop_diff = pop_size - num_required;
+				auto pop_diff = (num_required) - pop_size;
 				num_males -= static_cast<int>(std::round(pop_diff * entry.second.male));
 				num_females -= static_cast<int>(std::round(pop_diff * entry.second.female));
 
-				pop_diff = pop_size - (index + num_males + num_females);
-				if (pop_diff > 0) {
+				pop_diff = (index + num_males + num_females) - pop_size;
+				if (pop_diff >= 0) {
 					if (entry.second.male > entry.second.female) {
 						num_males -= pop_diff;
 					}
@@ -85,7 +85,7 @@ namespace hgps {
 
 				num_required = index + num_males + num_females;
 				pop_diff = pop_size - num_required;
-				assert(pop_diff <= 1);
+				assert(pop_diff == 0);
 			}
 
 			// [index, index + num_males)
