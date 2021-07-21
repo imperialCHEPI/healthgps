@@ -1,5 +1,7 @@
 #include "pch.h"
 #include <atomic>
+#include <map>
+
 #include "HealthGPS\api.h"
 #include "HealthGPS.Datastore\api.h"
 
@@ -374,24 +376,6 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	auto manager = DataManager(full_path);
 
 	auto inputs = create_test_configuration(data);
-
-	auto expected = std::vector<std::string>{ "asthma", "diabetes", "lowbackpain"};
-
-	auto uk = core::Country { .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
-
-	auto diseases = manager.get_diseases();
-	ASSERT_GT(diseases.size(), 0);
-
-	for (auto& item : diseases) {
-		auto info = manager.get_disease_info(item.code);
-		auto data = manager.get_disease(item, uk);
-
-		EXPECT_TRUE(info.has_value());
-		EXPECT_GT(data.items.size(), 0);
-		EXPECT_GT(data.measures.size(), 0);
-		EXPECT_EQ(item.code, data.info.code);
-		EXPECT_EQ(uk.code, data.country.code);
-	}
 
 	auto disease_module = build_disease_module(manager, inputs);
 	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());

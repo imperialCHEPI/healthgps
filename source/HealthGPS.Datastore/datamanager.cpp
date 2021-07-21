@@ -171,7 +171,7 @@ namespace hgps {
 					rapidcsv::Document doc(filename);
 
 					auto table = std::unordered_map<int,
-						std::unordered_map<core::Gender, std::unordered_map<int, double>>>();
+						std::unordered_map<core::Gender, std::map<int, double>>>();
 
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
@@ -186,7 +186,7 @@ namespace hgps {
 						}
 
 						if (!table[age].contains(gender)) {
-							table[age].emplace(gender, std::unordered_map<int, double>{});
+							table[age].emplace(gender, std::map<int, double>{});
 						}
 
 						table[age][gender][measure_id] = measure_value;

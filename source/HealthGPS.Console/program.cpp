@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 	auto diseases = get_diseases(data_api, config);
 	if (diseases.size() != config.diseases.size()) {
 		fmt::print(fg(fmt::color::light_salmon), "Invalid list of diseases in configuration.\n");
-		//return EXIT_FAILURE;
+		return EXIT_FAILURE;
 	}
 
 	// Create model configuration

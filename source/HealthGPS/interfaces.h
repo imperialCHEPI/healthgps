@@ -112,9 +112,9 @@ namespace hgps {
 	public:
 		virtual ~DiseaseModel() = default;
 
-		/// @brief Gets the disease model name
-		/// @return The human-readable model name
-		virtual std::string name() const noexcept = 0;
+		/// @brief Gets the disease model type identifier
+		/// @return The model type identifier
+		virtual std::string type() const noexcept = 0;
 
 		/// @brief Generates the disease state for the population.
 		/// @param The simulation run-time context

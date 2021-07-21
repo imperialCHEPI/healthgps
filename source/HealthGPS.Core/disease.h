@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include<vector>
+#include <map>
+
 #include "forward_type.h"
 
 namespace hgps {
@@ -25,14 +27,14 @@ namespace hgps {
 		{
 			int age;
 			Gender gender;
-			std::unordered_map<int, double> measures;
+			std::map<int, double> measures;
 		};
 
 		struct DiseaseEntity
 		{
 			Country country;
 			DiseaseInfo info;
-			std::unordered_map<std::string, int> measures;
+			std::map<std::string, int> measures;
 			std::vector<DiseaseItem> items;
 		};
 	}

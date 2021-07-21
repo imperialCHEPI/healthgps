@@ -105,6 +105,12 @@
     <ClInclude Include="hierarchical_model.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="disease_table.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="disease_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -160,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="hierarchical_model.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="disease_table.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
