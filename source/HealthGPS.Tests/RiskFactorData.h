@@ -91,7 +91,7 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 			}
 
 			if (model_type == hgps::HierarchicalModelType::Static) {
-				ss << "\nreturn std::make_shared<HierarchicalLinearModel>(std::move(models), std::move(levels));\n";
+				ss << "\nreturn std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
 			}
 			else {
 				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
@@ -109,7 +109,7 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 	return ss.str();
 }
 
-std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
+std::shared_ptr<hgps::StaticHierarchicalLinearModel> get_static_test_model() {
 	/* Auto-generated code, do not change **** */
 	
 	using namespace hgps;
@@ -186,7 +186,7 @@ std::shared_ptr<hgps::HierarchicalLinearModel> get_static_test_model() {
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	return std::make_shared<HierarchicalLinearModel>(std::move(models), std::move(levels));
+	return std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels));
 }
 
 std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model() {

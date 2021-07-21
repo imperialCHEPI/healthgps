@@ -1,25 +1,41 @@
 {
-    "country":{
-        "format":"csv",
+    "country": {
+        "format": "csv",
         "delimiter": ",",
-        "encoding":"UTF8",
+        "encoding": "UTF8",
         "source": "International Organization for Standardization",
         "url": "https://www.iso.org/iso-3166-country-codes.html",
-        "license":"N/A",
-        "path":"",
-        "file_name":"Countries.csv"
+        "license": "N/A",
+        "path": "",
+        "file_name": "Countries.csv"
     },
-    "population":{
-        "format":"csv",
+    "population": {
+        "format": "csv",
         "delimiter": ",",
-        "encoding":"UTF8",
-        "source":"UN Population Database",
-        "url":"https://population.un.org/wpp/",
-        "license":"Creative Commons license",
-        "path":"undb\\population",
-        "file_name":"P{NUMBER}.csv",
-        "age_limits":[0, 100],
-        "time_limits":[1950, 2100],
+        "encoding": "UTF8",
+        "source": "UN Population Database",
+        "url": "https://population.un.org/wpp/",
+        "license": "Creative Commons license",
+        "path": "undb\\population",
+        "file_name": "P{NUMBER}.csv",
+        "age_limits": [0, 100],
+        "time_limits": [1950, 2100],
         "projections": 2020
+    },
+    "diseases": {
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "source": "The Institute for Health Metrics and Evaluation",
+        "url": "http://www.healthdata.org/",
+        "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
+        "path": "diseases",
+        "file_name": "D{NUMBER}.csv",
+        "age_limits": [0, 100],
+        "types": {
+            "asthma": "Asthma",
+            "diabetes": "Diabetes mellitus",
+            "lowbackpain": "Low back pain"
+        }
     }
 }

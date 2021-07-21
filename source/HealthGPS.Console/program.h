@@ -173,6 +173,8 @@ Configuration load_configuration(CommandOptions& options) {
 		if (seed.size() > 0) {
 			config.custom_seed = seed[0];
 		}
+
+		opt["running"]["diseases"].get_to(config.diseases);
 	}
 	else
 	{
@@ -304,7 +306,7 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 
 		if (model_type == HierarchicalModelType::Static) {
 			linear_models.emplace(model_type,
-				std::make_shared<HierarchicalLinearModel>(std::move(models), std::move(levels)));
+				std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels)));
 		}
 		else if (model_type == HierarchicalModelType::Dynamic) {
 			linear_models.emplace(model_type,
@@ -314,6 +316,24 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 
 	return std::make_shared<RiskFactorModule>(std::move(linear_models));
 }
+
+std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configuration& config) {
+	std::vector<core::DiseaseInfo> result;
+	auto diseases = data_api.get_diseases();
+	fmt::print("\nThere are {} diseases in storage.\n", diseases.size());
+	for (auto& code : config.diseases) {
+		auto item = data_api.get_disease_info(core::to_lower(code));
+		if (item.has_value()){
+			result.emplace_back(item.value());
+		}
+		else {
+			fmt::print(fg(fmt::color::salmon), "Unknown disease code: {}.\n", code);
+		}
+	}
+
+	return result;
+}
+
 
 hgps::Scenario create_scenario(Configuration& config)
 {
@@ -338,8 +358,8 @@ auto find_by_value(SESMapping ses, std::string value) {
 	return std::string{};
 }
 
-ModelInput create_model_input(core::DataTable& input_table, 
-	core::Country country, Configuration& config)
+ModelInput create_model_input(core::DataTable& input_table, core::Country country,
+	Configuration& config, std::vector<core::DiseaseInfo> diseases)
 {
 	// Create simulation configuration
 	auto age_range = core::IntegerInterval(
@@ -370,5 +390,5 @@ ModelInput create_model_input(core::DataTable& input_table,
 	}
 
 	return ModelInput(input_table, settings, run_info, ses_mapping,
-		HierarchicalMapping(std::move(mapping)));
+		HierarchicalMapping(std::move(mapping)), diseases);
 }

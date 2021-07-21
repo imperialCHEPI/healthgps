@@ -1,17 +1,17 @@
 {
     "inputs": {
-        "file" :{
+        "file": {
             "name": "dataset.csv",
             "format": "csv",
             "delimiter": ",",
-            "encoding":"ASCII",
+            "encoding": "ASCII",
             "columns": {
                 "Year": "integer",
                 "Gender": "integer",
                 "Age": "integer",
                 "Age2": "integer",
                 "Age3": "integer",
-                "Education":"integer",
+                "Education": "integer",
                 "Income": "integer",
                 "PhysicalActivityMET": "double",
                 "BMI": "double",
@@ -20,12 +20,15 @@
                 "AlcoholConsumption": "double"
             }
         },
-        "settings":{
-            "country_code":"GB",
+        "settings": {
+            "country_code": "GB",
             "reference_time": 2010,
             "size_fraction": 0.0001,
             "data_linkage": "Age",
-            "age_range":[0, 100]
+            "age_range": [
+                0,
+                100
+            ]
         },
         "ses_mapping": {
             "gender": "Gender",
@@ -49,18 +52,24 @@
             "AlcoholConsumption": 1,
             "BMI": 2
         },
-        "dynamic_risk_factor":"Year",
-        "models":{
+        "dynamic_risk_factor": "Year",
+        "models": {
             "static": "HLM.Json",
             "dynamic": "DHLM.Json"
         }
     },
     "running": {
-        "seed":[123456789],
+        "seed": [
+            123456789
+        ],
         "start_time": 2010,
         "stop_time": 2030,
         "trial_runs": 1,
-        "diseases": [],
-        "intervention":{}
+      "diseases": [
+        "asthma",
+        "diabetes",
+        "lowbackpain"
+      ],
+        "intervention": {}
     }
 }

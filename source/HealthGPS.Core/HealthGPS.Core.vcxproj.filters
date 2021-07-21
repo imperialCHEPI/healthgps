@@ -87,6 +87,9 @@
     <ClInclude Include="scoped_timer.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="disease.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">

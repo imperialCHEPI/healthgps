@@ -98,6 +98,8 @@
     <ClInclude Include="api.h" />
     <ClInclude Include="countrymodule.h" />
     <ClInclude Include="demographic.h" />
+    <ClInclude Include="diabetes_model.h" />
+    <ClInclude Include="disease.h" />
     <ClInclude Include="mapping.h" />
     <ClInclude Include="hierarchical_model.h" />
     <ClInclude Include="interfaces.h" />
@@ -118,6 +120,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="demographic.cpp" />
+    <ClCompile Include="diabetes_model.cpp" />
+    <ClCompile Include="disease.cpp" />
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="hierarchical_model.cpp" />
     <ClCompile Include="modelrunner.cpp" />

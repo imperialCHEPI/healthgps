@@ -2,7 +2,7 @@
 #include <map>
 
 #include "interfaces.h"
-#include "runtime_context.h"
+#include "mapping.h"
 
 namespace hgps {
 
@@ -29,22 +29,20 @@ namespace hgps {
 		std::vector<double> variances;
 	};
 
-	class HierarchicalLinearModel {
+	class StaticHierarchicalLinearModel : public HierarchicalLinearModel {
 	public:
-		HierarchicalLinearModel(
+		StaticHierarchicalLinearModel() = delete;
+		StaticHierarchicalLinearModel(
 			std::unordered_map<std::string, LinearModel>&& models,
 			std::map<int, HierarchicalLevel>&& levels);
 
-		virtual ~HierarchicalLinearModel() = default;
+		virtual HierarchicalModelType type() const noexcept override;
 
-		virtual HierarchicalModelType type() const;
+		virtual std::string name() const noexcept override;
 
-		virtual std::string name() const;
-
-		void generate(RuntimeContext& context);
+		virtual void generate(RuntimeContext& context) override;
 
 	protected:
-		HierarchicalLinearModel() = default;
 		std::unordered_map<std::string, LinearModel> models_;
 		std::map<int, HierarchicalLevel> levels_;
 
@@ -52,7 +50,7 @@ namespace hgps {
 			int level, std::vector<MappingEntry>& level_factors);
 	};
 
-	class DynamicHierarchicalLinearModel final : public HierarchicalLinearModel {
+	class DynamicHierarchicalLinearModel final : public StaticHierarchicalLinearModel {
 	public:
 		DynamicHierarchicalLinearModel() = delete;
 
@@ -60,9 +58,9 @@ namespace hgps {
 			std::unordered_map<std::string, LinearModel>&& models,
 			std::map<int, HierarchicalLevel>&& levels);
 
-		HierarchicalModelType type() const override;
+		HierarchicalModelType type() const noexcept override;
 
-		std::string name() const override;
+		std::string name() const noexcept override;
 
 		void generate_for_entity(RuntimeContext& context, Person& entity, 
 			int level, std::vector<MappingEntry>& level_factors)  override;

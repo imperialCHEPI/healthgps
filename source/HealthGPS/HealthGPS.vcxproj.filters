@@ -31,6 +31,12 @@
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{17cb0c4c-bb90-4578-ac07-564d38590841}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\models">
+      <UniqueIdentifier>{575b2588-ccce-4c00-88fa-1bcf50f8fe6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\models">
+      <UniqueIdentifier>{3daa05b8-d92a-47a2-b7ea-b5930a691b6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interfaces.h">
@@ -87,11 +93,17 @@
     <ClInclude Include="riskfactor.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
-    <ClInclude Include="hierarchical_model.h">
-      <Filter>Header Files\modules</Filter>
-    </ClInclude>
     <ClInclude Include="mapping.h">
       <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="disease.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="diabetes_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model.h">
+      <Filter>Header Files\models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -134,14 +146,20 @@
     <ClCompile Include="riskfactor.cpp">
       <Filter>Source Files\modules</Filter>
     </ClCompile>
-    <ClCompile Include="hierarchical_model.cpp">
-      <Filter>Source Files\modules</Filter>
-    </ClCompile>
     <ClCompile Include="modulefactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mapping.cpp">
       <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="disease.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="diabetes_model.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="hierarchical_model.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

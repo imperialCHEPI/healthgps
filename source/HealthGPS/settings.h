@@ -9,7 +9,8 @@ namespace hgps {
 	{
 	public:
 		Settings(const core::Country country, const unsigned int reference_time, 
-			const float size_fraction, const std::string linkage_col, const core::IntegerInterval age_range);
+			const float size_fraction, const std::string linkage_col,
+			const core::IntegerInterval age_range);
 
 		core::Country country() const noexcept;
 

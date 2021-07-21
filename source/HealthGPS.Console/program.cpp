@@ -60,8 +60,15 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
+	// Validate diseases
+	auto diseases = get_diseases(data_api, config);
+	if (diseases.size() != config.diseases.size()) {
+		fmt::print(fg(fmt::color::light_salmon), "Invalid list of diseases in configuration.\n");
+		//return EXIT_FAILURE;
+	}
+
 	// Create model configuration
-	auto model_config = create_model_input(input_table, target.value(), config);
+	auto model_config = create_model_input(input_table, target.value(), config, diseases);
 
 	try	{
 		// Create model

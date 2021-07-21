@@ -19,6 +19,12 @@ namespace hgps {
 
 			virtual std::vector<PopulationItem> get_population(
 				Country country, const std::function<bool(const unsigned int&)> year_filter) const = 0;
+
+			virtual std::vector<DiseaseInfo> get_diseases() const = 0;
+
+			virtual std::optional<DiseaseInfo> get_disease_info(std::string code) const = 0;
+
+			virtual DiseaseEntity get_disease(DiseaseInfo info, Country country) const = 0;
 		};
 	}
 }

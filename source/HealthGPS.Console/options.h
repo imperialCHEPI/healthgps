@@ -59,6 +59,8 @@ struct Configuration
 
 	ModellingInfo modelling;
 
+	std::vector<std::string> diseases;
+
 	std::optional<unsigned int> custom_seed;
 	
 	unsigned int start_time{};

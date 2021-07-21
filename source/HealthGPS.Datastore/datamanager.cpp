@@ -112,5 +112,101 @@ namespace hgps {
 
 			return results;
 		}
+
+		std::vector<DiseaseInfo> DataManager::get_diseases() const
+		{
+			auto result = std::vector<DiseaseInfo>();
+			if (index_.contains("diseases")) {
+				auto types = index_["diseases"]["types"].get<std::map<std::string,std::string>>();
+				for (auto& item : types) {
+					result.emplace_back(DiseaseInfo{
+						.code = item.first,
+						.name = item.second
+						});
+				}
+
+				std::sort(result.begin(), result.end());
+			}
+
+			return result;
+		}
+
+		std::optional<DiseaseInfo> DataManager::get_disease_info(std::string code) const
+		{
+			if (index_.contains("diseases")) {
+				auto types = index_["diseases"]["types"].get<std::map<std::string, std::string>>();
+				auto disease_code = core::to_lower(code);
+				if (types.contains(disease_code)) {
+					return DiseaseInfo{
+						.code = disease_code,
+						.name = types.at(disease_code)
+						};
+				}
+			}
+
+			return std::optional<DiseaseInfo>();
+		}
+
+		DiseaseEntity DataManager::get_disease(DiseaseInfo info, Country country) const
+		{
+			DiseaseEntity result;
+			result.info = info;
+			result.country = country;
+
+			if (index_.contains("diseases")) {
+				auto filepath = index_["diseases"]["path"].get<std::string>();
+				auto filename = index_["diseases"]["file_name"].get<std::string>();
+
+				// Tokenized file names X{country.code}X.xxx
+				auto tk_start = filename.find_first_of("{");
+				if (tk_start != std::string::npos) {
+					auto tk_end = filename.find_first_of("}", tk_start + 1);
+					if (tk_end != std::string::npos) {
+						filename = filename.replace(tk_start, tk_end - tk_start + 1, std::to_string(country.code));
+					}
+				}
+
+				filename = (root_ / filepath / info.code / filename).string();
+				if (std::filesystem::exists(filename)) {
+					rapidcsv::Document doc(filename);
+
+					auto table = std::unordered_map<int,
+						std::unordered_map<core::Gender, std::unordered_map<int, double>>>();
+
+					for (size_t i = 0; i < doc.GetRowCount(); i++) {
+						auto row = doc.GetRow<std::string>(i);
+						auto age = std::stoi(row[6]);								// age
+						auto gender = static_cast<core::Gender>(std::stoi(row[8]));	// gender_id
+						auto measure_id = std::stoi(row[10]);						// measure_id
+						auto measure_key = core::to_lower(row[11]);					// measure
+						auto measure_value = std::stod(row[12]);					// mean
+
+						if (!result.measures.contains(measure_key)) {
+							result.measures.emplace(measure_key, measure_id);
+						}
+
+						if (!table[age].contains(gender)) {
+							table[age].emplace(gender, std::unordered_map<int, double>{});
+						}
+
+						table[age][gender][measure_id] = measure_value;
+					}
+
+					for (auto& pair : table) {
+						for (auto& child : pair.second) {
+							result.items.emplace_back(DiseaseItem{
+								.age = pair.first,
+								.gender = child.first,
+								.measures = child.second
+								});
+						}
+					}
+
+					result.items.shrink_to_fit();
+				}
+			}
+
+			return result;
+		}
 	}
 }

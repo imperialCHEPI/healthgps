@@ -1,0 +1,39 @@
+#pragma once
+
+#include <string>
+#include <unordered_map>
+#include "forward_type.h"
+
+namespace hgps {
+	namespace core {
+
+		struct DiseaseInfo
+		{
+			std::string code{};
+			std::string name{};
+		};
+
+		inline bool operator> (const DiseaseInfo& lhs, const DiseaseInfo& rhs) {
+			return lhs.name > rhs.name;
+		}
+
+		inline bool operator< (const DiseaseInfo& lhs, const DiseaseInfo& rhs) {
+			return lhs.name < rhs.name;
+		}
+
+		struct DiseaseItem
+		{
+			int age;
+			Gender gender;
+			std::unordered_map<int, double> measures;
+		};
+
+		struct DiseaseEntity
+		{
+			Country country;
+			DiseaseInfo info;
+			std::unordered_map<std::string, int> measures;
+			std::vector<DiseaseItem> items;
+		};
+	}
+}

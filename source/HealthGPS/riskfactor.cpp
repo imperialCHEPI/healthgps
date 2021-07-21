@@ -3,8 +3,8 @@
 namespace hgps {
 
 	RiskFactorModule::RiskFactorModule(
-		std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>&& models) 
-		: models_{models} {
+		std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>&& models)
+		: models_{ models } {
 
 		if (models.empty()) {
 			throw std::invalid_argument(

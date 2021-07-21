@@ -96,6 +96,7 @@
     <ClInclude Include="column_primitive.h" />
     <ClInclude Include="country.h" />
     <ClInclude Include="datatable.h" />
+    <ClInclude Include="disease.h" />
     <ClInclude Include="forward_type.h" />
     <ClInclude Include="interval.h" />
     <ClInclude Include="poco.h" />

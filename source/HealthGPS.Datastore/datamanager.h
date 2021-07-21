@@ -25,6 +25,12 @@ namespace hgps {
 			std::vector<PopulationItem> get_population(
 				Country country, const std::function<bool(const unsigned int&)> year_filter) const override;
 
+			std::vector<DiseaseInfo> get_diseases() const override;
+
+			std::optional<DiseaseInfo> get_disease_info(std::string code) const override;
+
+			DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
+
 		private:
 			const std::filesystem::path root_;
 			nlohmann::json index_;

@@ -11,6 +11,7 @@
 #include "ses.h"
 #include "demographic.h"
 #include "riskfactor.h"
+#include "disease.h"
 #include "countrymodule.h"
 
 /// \brief Top-level namespace for Health GPS C++ API
