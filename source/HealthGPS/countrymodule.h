@@ -15,9 +15,11 @@ namespace hgps {
 		{
 		}
 
-		SimulationModuleType type() const override { return SimulationModuleType::Simulator; };
+		SimulationModuleType type() const noexcept override {
+			return SimulationModuleType::Simulator;
+		};
 
-		std::string name() const override { return "Country"; }
+		std::string name() const noexcept override { return "Country"; }
 
 		void execute(std::string command) {
 			std::cout << command << ": " << current_.name << std::endl;

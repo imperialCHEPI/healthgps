@@ -26,11 +26,11 @@ namespace hgps {
 		}
 	}
 
-	SimulationModuleType RiskFactorModule::type() const {
+	SimulationModuleType RiskFactorModule::type() const noexcept {
 		return SimulationModuleType::RiskFactor;
 	}
 
-	std::string RiskFactorModule::name() const {
+	std::string RiskFactorModule::name() const noexcept {
 		return "RiskFactor";
 	}
 

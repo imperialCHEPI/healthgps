@@ -6,11 +6,11 @@ namespace hgps {
 	DiseaseModule::DiseaseModule(std::unordered_map<std::string, std::shared_ptr<DiseaseModel>>&& models)
 		: models_{models}	{}
 
-	SimulationModuleType DiseaseModule::type() const {
+	SimulationModuleType DiseaseModule::type() const noexcept {
 		return SimulationModuleType::Disease;
 	}
 
-	std::string DiseaseModule::name() const {
+	std::string DiseaseModule::name() const noexcept {
 		return "Disease";
 	}
 

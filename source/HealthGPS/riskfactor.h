@@ -9,9 +9,9 @@ namespace hgps {
 		RiskFactorModule() = delete;
 		RiskFactorModule(std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>&& models);
 
-		SimulationModuleType type() const override;
+		SimulationModuleType type() const noexcept override;
 
-		std::string name() const override;
+		std::string name() const noexcept override;
 
 		std::size_t size() const noexcept;
 

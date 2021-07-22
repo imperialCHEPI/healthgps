@@ -111,6 +111,9 @@
     <ClInclude Include="disease_model.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="simulation_module.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -169,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="disease_table.cpp">
       <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="countrymodule.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

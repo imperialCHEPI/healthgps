@@ -107,6 +107,7 @@
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
     <ClInclude Include="modelinput.h" />
+    <ClInclude Include="simulation_module.h" />
     <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
     <ClInclude Include="person.h" />

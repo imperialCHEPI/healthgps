@@ -16,7 +16,7 @@ TEST(TestHealthGPS_Disease, CreateDiseaseMeasure)
 	ASSERT_EQ(2.13, measure.at(2));
 }
 
-TEST(TestHealthGPS_Disease, AccessDiseaseMeasureOutsideBoundThrows)
+TEST(TestHealthGPS_Disease, AccessDiseaseMeasureOutOfBoundThrows)
 {
 	using namespace hgps;
 
@@ -116,7 +116,7 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTable)
 	ASSERT_EQ(age2_male[2], age2_male_y);
 }
 
-TEST(TestHealthGPS_Disease, AccessDiseaseTableOutsideBoundThrows)
+TEST(TestHealthGPS_Disease, AccessDiseaseTableOutOfBoundThrows)
 {
 	using namespace hgps;
 

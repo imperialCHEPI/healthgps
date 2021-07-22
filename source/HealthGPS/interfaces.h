@@ -81,11 +81,11 @@ namespace hgps {
 
 		/// @brief Gets the module type identifier
 		/// @return The module type identifier
-		virtual SimulationModuleType type() const = 0;
+		virtual SimulationModuleType type() const noexcept = 0;
 
 		/// @brief Gets the module name
 		/// @return The human-readable module name
-		virtual std::string name() const = 0;
+		virtual std::string name() const noexcept  = 0;
 	};
 
 	/// @brief Hierarchical linear model interface

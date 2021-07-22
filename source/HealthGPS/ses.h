@@ -38,9 +38,9 @@ namespace hgps {
 		SESModule() = delete;
 		SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range);
 
-		SimulationModuleType type() const override;
+		SimulationModuleType type() const noexcept override;
 
-		std::string name() const override;
+		std::string name() const noexcept override;
 
 		const std::vector<SESRecord>& data() const noexcept;
 

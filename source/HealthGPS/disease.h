@@ -11,9 +11,9 @@ namespace hgps {
 		DiseaseModule() = delete;
 		DiseaseModule(std::unordered_map<std::string, std::shared_ptr<DiseaseModel>>&& models);
 
-		SimulationModuleType type() const override;
+		SimulationModuleType type() const noexcept override;
 
-		std::string name() const override;
+		std::string name() const noexcept override;
 
 		std::size_t size() const noexcept;
 

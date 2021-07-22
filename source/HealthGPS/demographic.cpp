@@ -16,11 +16,11 @@ namespace hgps {
 		}
 	}
 
-	SimulationModuleType DemographicModule::type() const {
+	SimulationModuleType DemographicModule::type() const noexcept {
 		return SimulationModuleType::Demographic;
 	}
 
-	std::string DemographicModule::name() const {
+	std::string DemographicModule::name() const noexcept {
 		return "Demographic";
 	}
 

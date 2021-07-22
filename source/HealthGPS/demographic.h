@@ -33,9 +33,9 @@ namespace hgps {
 		DemographicModule() = delete;
 		DemographicModule(std::map<int, std::map<int, AgeRecord>>&& data);
 
-		SimulationModuleType type() const override;
+		SimulationModuleType type() const noexcept override;
 
-		std::string name() const override;
+		std::string name() const noexcept override;
 
 		size_t get_total_population(const int time_year) const noexcept;
 

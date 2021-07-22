@@ -6,14 +6,7 @@
 #include "scenario.h"
 #include "modelinput.h"
 #include "modelrunner.h"
-#include "modulefactory.h"
-#include "mapping.h"
-#include "ses.h"
-#include "demographic.h"
-#include "riskfactor.h"
-#include "disease.h"
-#include "disease_table.h"
-#include "countrymodule.h"
+#include "simulation_module.h"
 
 /// \brief Top-level namespace for Health GPS C++ API
 namespace hgps {}

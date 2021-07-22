@@ -11,11 +11,11 @@ namespace hgps {
 		calculate_max_levels();
 	}
 
-	SimulationModuleType hgps::SESModule::type() const {
+	SimulationModuleType hgps::SESModule::type() const noexcept {
 		return SimulationModuleType::SES;
 	}
 
-	std::string hgps::SESModule::name() const {
+	std::string hgps::SESModule::name() const noexcept {
 		return "SES";
 	}
 
