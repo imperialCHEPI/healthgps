@@ -17,7 +17,7 @@
         "url": "https://population.un.org/wpp/",
         "license": "Creative Commons license",
         "path": "undb\\population",
-        "file_name": "P{NUMBER}.csv",
+        "file_name": "P{COUNTRY_CODE}.csv",
         "age_limits": [0, 100],
         "time_limits": [1950, 2100],
         "projections": 2020
@@ -30,8 +30,20 @@
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "path": "diseases",
-        "file_name": "D{NUMBER}.csv",
+        "file_name": "D{COUNTRY_CODE}.csv",
         "age_limits": [0, 100],
+        "relative_risk":{
+            "path": "relative_risk",
+            "to_disease":{
+                "path":"disease",
+                "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
+                "default_value": 1.0
+            },
+            "to_risk_factor":{
+                "path":"risk_factor",
+                "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
+            }
+        },
         "types": {
             "asthma": "Asthma",
             "diabetes": "Diabetes mellitus",

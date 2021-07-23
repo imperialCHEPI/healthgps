@@ -19,6 +19,9 @@ namespace hgps {
 	private:
 		std::string identifier_;
 		DiseaseTable table_;
+		std::map<int, std::map<core::Gender, double>> relative_risk_;
+
+		double calculate_combined_relative_risk(Person& entity);
 	};
 }
 

@@ -68,6 +68,23 @@ TEST(TestHealthGPS_Mapping, AccessByInterator)
 			EXPECT_EQ(entry.entity_name(), entry.entity_key());
 		}
 	}
+}
+
+TEST(TestHealthGPS_Mapping, AccessByConstInterator)
+{
+	using namespace hgps;
+
+	auto entries = std::vector<MappingEntry>{
+		MappingEntry("Year", 0, "", true),
+		MappingEntry("Gender", 0, "gender"),
+		MappingEntry("Age", 0, "age"),
+		MappingEntry("SmokingStatus", 1),
+		MappingEntry("AlcoholConsumption", 1),
+		MappingEntry("BMI", 2)
+	};
+
+	auto exp_size = entries.size();
+	auto mapping = HierarchicalMapping(std::move(entries));
 
 	for (const auto& entry : mapping) {
 		ASSERT_GE(entry.level(), 0);
@@ -163,6 +180,8 @@ TEST(TestHealthGPS_Mapping, AccessSingleEntryThrowForUnknowKey)
 
 	auto mapping = HierarchicalMapping(std::move(entries));
 	ASSERT_THROW(mapping.at("Cat"),std::out_of_range);
+	ASSERT_THROW(mapping.at("Dog"), std::out_of_range);
+	ASSERT_THROW(mapping.at("Cow"), std::out_of_range);
 }
 
 TEST(TestHealthGPS_Mapping, AccessEntriesWithoutDynamicFactor)

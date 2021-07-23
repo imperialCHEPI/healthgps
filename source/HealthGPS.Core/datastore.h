@@ -25,6 +25,12 @@ namespace hgps {
 			virtual std::optional<DiseaseInfo> get_disease_info(std::string code) const = 0;
 
 			virtual DiseaseEntity get_disease(DiseaseInfo info, Country country) const = 0;
+
+			virtual RelativeRiskTable get_relative_risk_to_disease(
+				DiseaseInfo source, DiseaseInfo target) const = 0;
+
+			virtual RelativeRiskTable get_relative_risk_to_risk_factor(
+				DiseaseInfo source, Gender gender, std::string risk_factor) const = 0;
 		};
 	}
 }

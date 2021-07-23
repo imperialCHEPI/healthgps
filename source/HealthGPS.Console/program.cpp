@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 	{
 		return cmd_args.exit_code;
 	}
-
+	
 	// Parse configuration file 
 	auto config = load_configuration(cmd_args);
 	auto input_table = core::DataTable();
@@ -34,15 +34,15 @@ int main(int argc, char* argv[])
 
 	std::cout << input_table.to_string();
 
-	// Load risk factors model definition
+	// Create risk factors model instance
 	auto risk_factor_module = build_risk_factor_module(config.modelling);
 
-	// Create infrastructure
+	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
 	auto factory = get_default_simulation_module_factory(data_api);
 	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
 
-	// Validate target country
+	// Validate the configuration target country
 	auto countries = data_api.get_countries();
 	fmt::print("\nThere are {} countries in storage.\n", countries.size());
 	auto target = data_api.get_country(config.settings.country);
@@ -54,18 +54,18 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	// Validate diseases
+	// Validate the configuration diseases list
 	auto diseases = get_diseases(data_api, config);
 	if (diseases.size() != config.diseases.size()) {
 		fmt::print(fg(fmt::color::light_salmon), "Invalid list of diseases in configuration.\n");
 		return EXIT_FAILURE;
 	}
 
-	// Create model configuration
+	// Create the complete model configuration
 	auto model_config = create_model_input(input_table, target.value(), config, diseases);
 
 	try	{
-		// Create model
+		// Create main simulation model instance and run experiment
 		auto model = HealthGPS(factory, model_config, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
