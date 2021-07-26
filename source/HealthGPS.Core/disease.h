@@ -38,11 +38,11 @@ namespace hgps {
 			std::vector<DiseaseItem> items;
 		};
 
-		struct RelativeRiskTable
+		struct RelativeRiskEntity
 		{
 			bool is_default_value{};
 			std::vector<std::string> columns;
-			std::map<int, std::vector<float>> rows;
+			std::vector<std::vector<float>> rows;
 
 			bool empty() const noexcept { return rows.empty(); }
 		};

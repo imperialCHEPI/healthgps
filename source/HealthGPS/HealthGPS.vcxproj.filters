@@ -114,6 +114,15 @@
     <ClInclude Include="simulation_module.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
+    <ClInclude Include="relative_risk.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="monotonic_vector.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="converter.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -173,8 +182,11 @@
     <ClCompile Include="disease_table.cpp">
       <Filter>Source Files\data</Filter>
     </ClCompile>
-    <ClCompile Include="countrymodule.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="relative_risk.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="converter.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

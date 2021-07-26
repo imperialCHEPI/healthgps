@@ -31,17 +31,17 @@ namespace hgps {
 
 			DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
 
-			RelativeRiskTable get_relative_risk_to_disease(
+			RelativeRiskEntity get_relative_risk_to_disease(
 				DiseaseInfo source, DiseaseInfo target) const override;
 
-			RelativeRiskTable get_relative_risk_to_risk_factor(
+			RelativeRiskEntity get_relative_risk_to_risk_factor(
 				DiseaseInfo source, Gender gender, std::string risk_factor) const override;
 
 		private:
 			const std::filesystem::path root_;
 			nlohmann::json index_;
 
-			RelativeRiskTable generate_default_relative_risk_to_disease() const;
+			RelativeRiskEntity generate_default_relative_risk_to_disease() const;
 
 			std::string replace_string_tokens(std::string source, std::vector<std::string> tokens) const;
 		};

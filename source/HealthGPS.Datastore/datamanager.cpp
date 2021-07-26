@@ -196,7 +196,7 @@ namespace hgps {
 			return result;
 		}
 
-		RelativeRiskTable DataManager::get_relative_risk_to_disease(
+		RelativeRiskEntity DataManager::get_relative_risk_to_disease(
 			DiseaseInfo source, DiseaseInfo target) const
 		{
 			if (index_.contains("diseases")) {
@@ -214,7 +214,7 @@ namespace hgps {
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 
-					auto table = RelativeRiskTable();
+					auto table = RelativeRiskEntity();
 					table.is_default_value = false;
 					table.columns = doc.GetColumnNames();
 
@@ -222,13 +222,12 @@ namespace hgps {
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
 
-						auto age = std::stoi(row[0]);
-						auto age_row = std::vector<float>(row_size - 1);
-						for (size_t col = 1; col < row_size; col++) {
-							age_row[col - 1] = std::stof(row[col]);
+						auto row_data = std::vector<float>(row_size);
+						for (size_t col = 0; col < row_size; col++) {
+							row_data[col] = std::stof(row[col]);
 						}
 
-						table.rows.emplace(age, age_row);
+						table.rows.emplace_back(row_data);
 					}
 
 					return table;
@@ -237,13 +236,13 @@ namespace hgps {
 				return generate_default_relative_risk_to_disease();
 			}
 
-			return RelativeRiskTable();
+			return RelativeRiskEntity();
 		}
 
-		RelativeRiskTable DataManager::get_relative_risk_to_risk_factor(
+		RelativeRiskEntity DataManager::get_relative_risk_to_risk_factor(
 			DiseaseInfo source, Gender gender, std::string risk_factor) const
 		{
-			auto table = RelativeRiskTable();
+			auto table = RelativeRiskEntity();
 			if (!index_.contains("diseases")) {
 				return table;
 			}
@@ -260,50 +259,50 @@ namespace hgps {
 			// Tokenized file name {GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.xxx
 			auto tokens = { gender_name, source.code, risk_factor };
 			filename = replace_string_tokens(filename, tokens);
-
 			filename = (root_ / disease_folder / source.code / risk_folder / file_folder / filename).string();
 			if (!std::filesystem::exists(filename)) {
 				return table;
 			}
 
 			rapidcsv::Document doc(filename);
-
 			table.is_default_value = false;
 			table.columns = doc.GetColumnNames();
 			auto row_size = table.columns.size();
 			for (size_t i = 0; i < doc.GetRowCount(); i++) {
 				auto row = doc.GetRow<std::string>(i);
 
-				auto age = std::stoi(row[0]);
-				auto age_row = std::vector<float>(row_size - 1);
-				for (size_t col = 1; col < row_size; col++) {
-					age_row[col - 1] = std::stof(row[col]);
+				auto row_data = std::vector<float>(row_size);
+				for (size_t col = 0; col < row_size; col++) {
+					row_data[col] = std::stof(row[col]);
 				}
 
-				table.rows.emplace(age, age_row);
+				table.rows.emplace_back(row_data);
 			}
 
+			table.rows.shrink_to_fit();
+			table.columns.shrink_to_fit();
 			return table;
 		}
 
-		RelativeRiskTable DataManager::generate_default_relative_risk_to_disease() const
+		RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() const
 		{
 			if (index_.contains("diseases")) {
 				auto age_limits = index_["diseases"]["age_limits"].get<std::vector<int>>();
 				auto to_disease = index_["diseases"]["relative_risk"]["to_disease"];
 				auto default_value = to_disease["default_value"].get<float>();
 
-				auto table = RelativeRiskTable();
+				auto table = RelativeRiskEntity();
 				table.is_default_value = true;
 				table.columns = { "age","male","female" };
 				for (int age = age_limits[0]; age <= age_limits[1]; age++) {
-					table.rows.emplace(age, std::vector<float>(2, default_value));
+					table.rows.emplace_back(std::vector<float>{
+						static_cast<float>(age), default_value, default_value});
 				}
 
 				return table;
 			}
 
-			return RelativeRiskTable();
+			return RelativeRiskEntity();
 		}
 
 		std::string DataManager::replace_string_tokens(std::string source, std::vector<std::string> tokens) const

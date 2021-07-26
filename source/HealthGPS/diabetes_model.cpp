@@ -2,8 +2,9 @@
 #include "runtime_context.h"
 
 namespace hgps {
-	DiabetesModel::DiabetesModel(std::string identifier, DiseaseTable&& table)
-		: identifier_{ identifier }, table_{ table } {}
+
+	DiabetesModel::DiabetesModel(std::string identifier, DiseaseTable&& table, RelativeRisk&& risks)
+		: identifier_{ identifier }, table_{ table }, risks_{ risks } {}
 
 	std::string DiabetesModel::type() const noexcept { return identifier_; }
 

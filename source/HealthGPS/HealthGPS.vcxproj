@@ -96,6 +96,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="api.h" />
+    <ClInclude Include="converter.h" />
     <ClInclude Include="countrymodule.h" />
     <ClInclude Include="demographic.h" />
     <ClInclude Include="diabetes_model.h" />
@@ -107,6 +108,8 @@
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
     <ClInclude Include="modelinput.h" />
+    <ClInclude Include="monotonic_vector.h" />
+    <ClInclude Include="relative_risk.h" />
     <ClInclude Include="simulation_module.h" />
     <ClInclude Include="modulefactory.h" />
     <ClInclude Include="mtrandom.h" />
@@ -122,6 +125,7 @@
     <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="converter.cpp" />
     <ClCompile Include="demographic.cpp" />
     <ClCompile Include="diabetes_model.cpp" />
     <ClCompile Include="disease.cpp" />
@@ -134,6 +138,7 @@
     <ClCompile Include="mtrandom.cpp" />
     <ClCompile Include="person.cpp" />
     <ClCompile Include="population.cpp" />
+    <ClCompile Include="relative_risk.cpp" />
     <ClCompile Include="riskfactor.cpp" />
     <ClCompile Include="runtime_context.cpp" />
     <ClCompile Include="settings.cpp" />

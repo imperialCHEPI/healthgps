@@ -2,8 +2,8 @@
 
 #include "HealthGPS\disease.h"
 #include "HealthGPS\disease_table.h"
+#include "HealthGPS\relative_risk.h"
 #include "HealthGPS\diabetes_model.h"
-
 TEST(TestHealthGPS_Disease, CreateDiseaseMeasure)
 {
 	using namespace hgps;
@@ -141,4 +141,79 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTableOutOfBoundThrows)
 	// Values
 	ASSERT_THROW(table(0, core::Gender::male), std::out_of_range);
 	ASSERT_THROW(table(2, core::Gender::unknown), std::out_of_range);
+}
+
+TEST(TestHealthGPS_Disease, CreateMonotonicVector)
+{
+	using namespace hgps;
+
+	auto data = std::vector<int>{ 1, 3, 5, 7, 8, 9, 11, 13 };
+	std::vector<int> reverse(data.size());
+	std::reverse_copy(data.begin(), data.end(), reverse.begin());
+
+	auto increasing = MonotonicVector(data);
+	auto decreasing = MonotonicVector(reverse);
+
+	ASSERT_EQ(data.size(), increasing.size());
+	ASSERT_EQ(reverse.size(), decreasing.size());
+}
+
+TEST(TestHealthGPS_Disease, MonotonicVectorThrowsForDuplicate)
+{
+	using namespace hgps;
+
+	auto data = std::vector<int>{ 1, 3, 3, 7, 8, 9, 11, 13 };
+
+	ASSERT_THROW(auto test = MonotonicVector(data), std::invalid_argument);
+}
+
+TEST(TestHealthGPS_Disease, MonotonicVectorThrowsForUnodered)
+{
+	using namespace hgps;
+
+	auto data = std::vector<int>{ 1, 5, 3, 7, 8, 9, 11, 13 };
+
+	ASSERT_THROW(auto test = MonotonicVector(data), std::invalid_argument);
+}
+
+TEST(TestHealthGPS_Disease, AccessMonotonicVectorIndex)
+{
+	using namespace hgps;
+	auto data = std::vector<int>{ 1, 3, 5, 7, 8, 9, 11, 13 };
+	auto test = MonotonicVector(data);
+	for (size_t i = 0; i < data.size(); i++) {
+		ASSERT_EQ(data[i], test[i]);
+		ASSERT_EQ(data.at(i), test.at(i));
+	}
+}
+
+TEST(TestHealthGPS_Disease, AccessMonotonicVectorIterator)
+{
+	using namespace hgps;
+	auto data = std::vector<int>{ 1, 3, 5, 7, 8, 9, 11, 13 };
+	auto test = MonotonicVector(data);
+	const auto const_vec = MonotonicVector(data);
+
+	const auto [min, max] = std::minmax_element(data.begin(), data.end());
+	for (auto& v : test) {
+		ASSERT_GE(v, *min);
+		ASSERT_LE(v, *max);
+	}
+
+	for (const auto& v : const_vec) {
+		ASSERT_GE(v, *min);
+		ASSERT_LE(v, *max);
+	}
+}
+
+TEST(TestHealthGPS_Disease, AccessMonotonicVectorThrowsOutOfbound)
+{
+	using namespace hgps;
+
+	auto data = std::vector<int>{ 1, 3, 5, 7, 8, 9, 11, 13 };
+
+	auto test = MonotonicVector(data);
+
+	ASSERT_THROW(test[data.size()], std::out_of_range);
+	ASSERT_THROW(test.at(data.size()), std::out_of_range);
 }

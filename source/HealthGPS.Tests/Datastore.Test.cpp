@@ -93,6 +93,7 @@ TEST(TestDatastore, RetrieveDeseaseDefinition)
 
 TEST(TestDatastore, DiseaseRelativeRiskToDisease)
 {
+	using namespace hgps;
 	using namespace hgps::data;
 
 	auto manager = DataManager(store_full_path);
@@ -105,12 +106,12 @@ TEST(TestDatastore, DiseaseRelativeRiskToDisease)
 
 	ASSERT_EQ(3, table_self.columns.size());
 	ASSERT_GT(table_self.rows.size(), 0);
-	ASSERT_EQ(table_self.rows[0][0], table_self.rows[0][1]);
+	ASSERT_EQ(table_self.rows[0][1], table_self.rows[0][2]);
 	ASSERT_FALSE(table_self.is_default_value);
 
 	ASSERT_EQ(3, table_other.columns.size());
 	ASSERT_GT(table_other.rows.size(), 0);
-	ASSERT_NE(table_other.rows[0][0], table_other.rows[0][1]);
+	ASSERT_NE(table_other.rows[0][1], table_other.rows[0][2]);
 	ASSERT_FALSE(table_other.is_default_value);
 }
 
@@ -131,11 +132,11 @@ TEST(TestDatastore, DiseaseRelativeRiskToRiskFactor)
 
 	ASSERT_EQ(col_size, table_male.columns.size());
 	ASSERT_GT(table_male.rows.size(), 0);
-	ASSERT_NE(table_male.rows[0][0], table_male.rows[0][1]);
+	ASSERT_NE(table_male.rows[0][1], table_male.rows[0][2]);
 	ASSERT_FALSE(table_male.is_default_value);
 
 	ASSERT_EQ(col_size, table_feme.columns.size());
 	ASSERT_GT(table_feme.rows.size(), 0);
-	ASSERT_NE(table_feme.rows[0][0], table_feme.rows[0][1]);
+	ASSERT_NE(table_feme.rows[0][1], table_feme.rows[0][2]);
 	ASSERT_FALSE(table_feme.is_default_value);
 }

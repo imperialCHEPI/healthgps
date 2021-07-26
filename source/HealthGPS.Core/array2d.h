@@ -40,11 +40,11 @@ namespace hgps {
 				std::copy(values.begin(), values.end(), data_.get());
 			}
 
-			size_t size() { return rows_ * columns_; }
+			size_t size() const noexcept { return rows_ * columns_; }
 
-			size_t rows() { return rows_; }
+			size_t rows() const noexcept { return rows_; }
 
-			size_t columns() { return columns_; }
+			size_t columns() const noexcept { return columns_; }
 
 			TYPE& operator()(size_t row, size_t column) {
 				check_boundaries(row, column);
@@ -85,7 +85,7 @@ namespace hgps {
 			size_t columns_{};
 			std::shared_ptr<TYPE[]> data_;
 
-			void check_boundaries(size_t row, size_t column) {
+			void check_boundaries(size_t row, size_t column) const {
 				if ((row < 0) || (row >= rows_)) {
 					throw std::invalid_argument(std::format("Row {} is out of array bounds.", row));
 				}

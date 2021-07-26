@@ -1,10 +1,11 @@
 #include "disease.h"
 #include "disease_model.h"
+#include "converter.h"
 
 namespace hgps {
 
 	DiseaseModule::DiseaseModule(std::unordered_map<std::string, std::shared_ptr<DiseaseModel>>&& models)
-		: models_{models}	{}
+		: models_{ models } {}
 
 	SimulationModuleType DiseaseModule::type() const noexcept {
 		return SimulationModuleType::Disease;
@@ -35,11 +36,17 @@ namespace hgps {
 			"DisieaseModule.initialise_population function not yet implemented.");
 	}
 
-	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config) 
+	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config)
 	{
 		// Models must be registered prior to be created.
 		auto registry = get_default_disease_model_registry();
 		auto models = std::unordered_map<std::string, std::shared_ptr<DiseaseModel>>();
+
+		auto risk_factors = std::vector<MappingEntry>();
+		for (int level = 1; level <= config.risk_mapping().max_level(); level++) {
+			auto risks = config.risk_mapping().at_level(level);
+			risk_factors.insert(risk_factors.end(), risks.begin(), risks.end());
+		}
 
 		for (auto& info : config.diseases()) {
 			if (!registry.contains(info.code)) {
@@ -47,14 +54,18 @@ namespace hgps {
 			}
 
 			auto disease = manager.get_disease(info, config.settings().country());
-			auto measures = disease.measures;
-			auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>();
-			for (auto& v : disease.items) {
-				data[v.age][v.gender] = DiseaseMeasure(v.measures);
-			}
+			auto desease_table = detail::StoreConverter::to_disease_table(disease);
 
-			auto table = DiseaseTable(info.name, std::move(measures), std::move(data));
-			models.emplace(info.code, registry.at(info.code)(info.code, std::move(table)));
+			auto relative_risks = detail::create_relative_risk(detail::RelativeRiskInfo
+				{
+					.disease = info,
+					.manager = manager,
+					.inputs = config,
+					.risk_factors = risk_factors
+				});
+
+			models.emplace(info.code, registry.at(info.code)(info.code,
+				std::move(desease_table), std::move(relative_risks)));
 		}
 
 		return std::make_unique<DiseaseModule>(std::move(models));

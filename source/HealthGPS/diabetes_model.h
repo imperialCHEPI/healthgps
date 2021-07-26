@@ -1,12 +1,13 @@
 #pragma once
 #include "interfaces.h"
 #include "disease_table.h"
+#include "relative_risk.h"
 
 namespace hgps {
 	class DiabetesModel final : public DiseaseModel {
 	public:
 		DiabetesModel() = delete;
-		DiabetesModel(std::string identifier, DiseaseTable&& table);
+		DiabetesModel(std::string identifier, DiseaseTable&& table, RelativeRisk&& risks);
 
 		std::string type() const noexcept override;
 
@@ -19,7 +20,7 @@ namespace hgps {
 	private:
 		std::string identifier_;
 		DiseaseTable table_;
-		std::map<int, std::map<core::Gender, double>> relative_risk_;
+		RelativeRisk risks_;
 
 		double calculate_combined_relative_risk(Person& entity);
 	};
