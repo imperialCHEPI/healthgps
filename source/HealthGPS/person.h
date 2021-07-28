@@ -7,6 +7,22 @@
 
 namespace hgps {
 
+	/// @brief Disease status enumeration
+	enum class DiseaseStatus : uint8_t
+	{
+		/// @brief declared free from condition
+		Free,
+
+		/// @brief current with the condition
+		Active
+	};
+
+	struct Disease
+	{
+		DiseaseStatus status;
+		int start_time;
+	};
+
 	struct Person
 	{
 		Person();
@@ -25,9 +41,9 @@ namespace hgps {
 
 		unsigned int income{};
 
-		case_insensitive_map<double> risk_factors;
+		std::map<std::string, double> risk_factors;
 
-		std::map<std::string, int> diseases;
+		std::map<std::string, Disease> diseases;
 
 		bool is_active() const noexcept;
 

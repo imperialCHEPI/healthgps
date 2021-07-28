@@ -29,7 +29,7 @@ namespace hgps {
 
 			static DiseaseTable to_disease_table(const core::DiseaseEntity& entity);
 
-			static RelativeRiskTable to_relative_risk_table(const core::RelativeRiskEntity& entity);
+			static FloatAgeGenderTable to_relative_risk_table(const core::RelativeRiskEntity& entity);
 
 			static RelativeRiskLookup to_relative_risk_lookup(const core::RelativeRiskEntity& entity);
 		};

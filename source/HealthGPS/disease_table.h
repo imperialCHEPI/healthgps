@@ -14,9 +14,9 @@ namespace hgps {
 
 		std::size_t size() const noexcept;
 
-		double at(int measure_id) const;
+		const double& at(const int measure_id) const;
 
-		const double operator[](int measure_id) const;
+		const double& operator[](const int measure_id) const;
 
 	private:
 		std::map<int, double> measures_;
@@ -41,9 +41,9 @@ namespace hgps {
 
 		std::map<std::string, int> measures() const noexcept;
 
-		int at(std::string measure) const;
+		int at(const std::string measure) const;
 
-		const int operator[](std::string measure) const;
+		const int operator[](const std::string measure) const;
 
 		DiseaseMeasure& operator()(const int age, const core::Gender gender);
 

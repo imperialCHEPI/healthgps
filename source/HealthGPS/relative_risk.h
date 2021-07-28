@@ -1,41 +1,9 @@
 #pragma once
 #include <map>
-#include <vector>
-#include <concepts>
 
-#include "monotonic_vector.h"
-#include "HealthGPS.Core/array2d.h"
+#include "gender_table.h"
 
 namespace hgps {
-
-	class RelativeRiskTable {
-	public:
-		RelativeRiskTable() = delete;
-
-		RelativeRiskTable(
-			const MonotonicVector<int> rows, 
-			const std::vector<core::Gender>& cols,
-			core::FloatArray2D&& values);
-
-		std::size_t size() const noexcept;
-
-		std::size_t rows() const noexcept;
-
-		std::size_t columns() const noexcept;
-
-		float at(int age, core::Gender gender) const;
-
-		float operator()(int age, core::Gender gender);
-
-		const float operator()(int age, core::Gender gender) const;
-
-		bool contains(int age, core::Gender gender) const noexcept;
-
-	private:
-		core::FloatArray2D table_;
-		std::map<int, int> rows_index_;
-		std::map<core::Gender, int> cols_index_;
-	};
 
 	class RelativeRiskLookup {
 	public:
@@ -73,16 +41,16 @@ namespace hgps {
 	class RelativeRisk {
 	public:
 		RelativeRisk() = delete;
-		RelativeRisk(std::map<std::string, RelativeRiskTable>&& disease,
+		RelativeRisk(std::map<std::string, FloatAgeGenderTable>&& disease,
 			std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>&& risk_factor);
 
-		const std::map<std::string, RelativeRiskTable>& disease() const noexcept;
+		const std::map<std::string, FloatAgeGenderTable>& disease() const noexcept;
 
 		const std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>& risk_factor() const noexcept;
 
 	private:
-		std::map<std::string, RelativeRiskTable> disease_;
-		std::map<std::string, std::map<core::Gender,RelativeRiskLookup>> risk_factor_;
+		std::map<std::string, FloatAgeGenderTable> disease_;
+		std::map<std::string, std::map<core::Gender, RelativeRiskLookup>> risk_factor_;
 	};
 }
 

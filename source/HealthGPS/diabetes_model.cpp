@@ -25,7 +25,9 @@ namespace hgps {
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
 			auto hazard = context.next_double();
 			if (hazard < probability) {
-				entity.diseases[type()] = context.time_now();
+				entity.diseases[type()] = Disease{
+					.status = DiseaseStatus::Active,
+					.start_time = context.time_now() };
 			}
 		}
 	}
@@ -123,7 +125,7 @@ namespace hgps {
 		auto relative_risk_value = 1.0;
 		for (auto& disease : entity.diseases) {
 			// Only include existing diseases
-			if (time_now == 0 || disease.second < time_now) {
+			if (time_now == 0 || disease.second.start_time < time_now) {
 				double relative_disease_vale =
 					relative_risks_.disease().at(disease.first)(entity.age, entity.gender);
 

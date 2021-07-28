@@ -114,6 +114,7 @@ namespace hgps {
 		auto visitor = UnivariateVisitor();
 		auto orig_summary = std::unordered_map<std::string, core::UnivariateSummary>();
 		auto sim8_summary = std::unordered_map<std::string, core::UnivariateSummary>();
+		auto sim8_disease = std::map<std::string, int>();
 		for (auto& entry : context_.mapping()) {
 			config_.data().column(entry.name())->accept(visitor);
 			orig_summary.emplace(entry.name(), visitor.get_summary());
@@ -123,6 +124,10 @@ namespace hgps {
 		for (auto& entity : context_.population()) {
 			for (auto& entry : context_.mapping()) {
 				sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.entity_key()));
+			}
+
+			for (auto& disease : entity.diseases){
+				sim8_disease[disease.first]++;
 			}
 		}
 
@@ -151,6 +156,20 @@ namespace hgps {
 			ss << std::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n",
 				col, pad, orig_summary[col].average(), sim8_summary[col].average(),
 				orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());
+		}
+
+		ss << std::format("|{:_<{}}|\n\n", '_', width);
+
+		width = pad + 33;
+		ss << " Diseases:\n";
+		ss << std::format("|{:-<{}}|\n", '-', width);
+		ss << std::format("| {:{}} : {:>10} : {:>15} |\n",
+			"Name", pad, "Count", "Prevalence (%)");
+		ss << std::format("|{:-<{}}|\n", '-', width);
+		for (auto& disease : sim8_disease){
+			ss << std::format("| {:{}} : {:10} : {:15.3f} |\n",
+				disease.first, pad, disease.second, 
+				disease.second * 100.0 / context_.population().size());
 		}
 
 		ss << std::format("|{:_<{}}|\n\n", '_', width);

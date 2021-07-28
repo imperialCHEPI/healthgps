@@ -28,7 +28,7 @@ namespace hgps {
 			return DiseaseTable(entity.info.name, std::move(measures), std::move(data));
 		}
 
-		RelativeRiskTable StoreConverter::to_relative_risk_table(const core::RelativeRiskEntity& entity)
+		FloatAgeGenderTable StoreConverter::to_relative_risk_table(const core::RelativeRiskEntity& entity)
 		{
 			auto num_rows = entity.rows.size();
 			auto num_cols = entity.columns.size() - 1;
@@ -53,7 +53,7 @@ namespace hgps {
 				}
 			}
 
-			return RelativeRiskTable(MonotonicVector(rows), cols, std::move(data));
+			return FloatAgeGenderTable(MonotonicVector(rows), cols, std::move(data));
 		}
 
 		RelativeRiskLookup StoreConverter::to_relative_risk_lookup(const core::RelativeRiskEntity& entity)
@@ -80,7 +80,7 @@ namespace hgps {
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info)
 		{
-			auto relative_diseases = std::map<std::string, RelativeRiskTable>();
+			auto relative_diseases = std::map<std::string, FloatAgeGenderTable>();
 			for (auto& item : info.inputs.diseases()) {
 				auto table = info.manager.get_relative_risk_to_disease(info.disease, item);
 				if (!table.empty()) {

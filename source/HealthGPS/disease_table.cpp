@@ -14,11 +14,11 @@ namespace hgps {
 		return measures_.size();
 	}
 
-	double DiseaseMeasure::at(int measure_id) const {
+	const double& DiseaseMeasure::at(const int measure_id) const {
 		return measures_.at(measure_id);
 	}
 
-	const double DiseaseMeasure::operator[](int measure_id) const {
+	const double& DiseaseMeasure::operator[](const int measure_id) const {
 		return measures_.at(measure_id);
 	}
 
@@ -66,11 +66,11 @@ namespace hgps {
 		return measures_;
 	}
 
-	int DiseaseTable::at(std::string measure) const	{
+	int DiseaseTable::at(const std::string measure) const	{
 		return measures_.at(core::to_lower(measure)); 
 	}
 
-	const int DiseaseTable::operator[](std::string measure) const {
+	const int DiseaseTable::operator[](const std::string measure) const {
 		return measures_.at(core::to_lower(measure));
 	}
 
