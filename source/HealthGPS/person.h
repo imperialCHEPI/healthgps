@@ -27,11 +27,13 @@ namespace hgps {
 
 		case_insensitive_map<double> risk_factors;
 
+		std::map<std::string, int> diseases;
+
 		bool is_active() const noexcept;
 
 		double get_risk_factor_value(const std::string& key) const noexcept;
 
-		double gender_to_value() const noexcept;
+		float gender_to_value() const noexcept;
 
 		static void reset_id();
 

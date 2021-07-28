@@ -58,6 +58,10 @@ namespace hgps {
 		return data_.begin()->second.size();
 	}
 
+	bool DiseaseTable::contains(const int age) const noexcept {
+		return data_.contains(age);
+	}
+
 	std::map<std::string, int> DiseaseTable::measures() const noexcept {
 		return measures_;
 	}
@@ -70,11 +74,11 @@ namespace hgps {
 		return measures_.at(core::to_lower(measure));
 	}
 
-	DiseaseMeasure& DiseaseTable::operator()(int age, core::Gender gender) {
+	DiseaseMeasure& DiseaseTable::operator()(const int age, const core::Gender gender) {
 		return data_.at(age).at(gender);
 	}
 
-	const DiseaseMeasure& DiseaseTable::operator()(int age, core::Gender gender) const {
+	const DiseaseMeasure& DiseaseTable::operator()(const int age, const core::Gender gender) const {
 		return data_.at(age).at(gender);
 	}
 

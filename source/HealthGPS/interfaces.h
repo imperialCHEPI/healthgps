@@ -116,13 +116,13 @@ namespace hgps {
 		/// @return The model type identifier
 		virtual std::string type() const noexcept = 0;
 
-		/// @brief Generates the disease state for the population.
+		/// @brief Initialises the population disease status.
 		/// @param The simulation run-time context
-		virtual void generate(RuntimeContext& context) = 0;
+		virtual void initialise_disease_status(RuntimeContext& context) = 0;
 
-		/// @brief Adjust the average relative risks once diseases status were generated.
+		/// @brief Initialises the average relative risks once all diseases status were initialised.
 		/// @param The simulation run-time context
-		virtual void adjust_relative_risk(RuntimeContext& context) = 0;
+		virtual void initialise_average_relative_risk(RuntimeContext& context) = 0;
 
 		/// @brief Updates the disease cases remission and incidence in the population
 		/// @param The simulation run-time context

@@ -6,7 +6,7 @@ namespace hgps {
 		const MonotonicVector<int> rows,
 		const std::vector<core::Gender>& cols,
 		core::FloatArray2D&& values)
-		: rows_index_{}, cols_index_{}, table_{values}
+		: rows_index_{}, cols_index_{}, table_{ values }
 	{
 		if (rows.size() != values.rows() || cols.size() != values.columns()) {
 			throw std::invalid_argument("Lookup breakpoints and values size mismatch.");
@@ -84,16 +84,20 @@ namespace hgps {
 		return table_.columns();
 	}
 
+	bool RelativeRiskLookup::empty() const noexcept {
+		return rows_index_.empty() || cols_index_.empty();
+	}
+
 	float RelativeRiskLookup::at(const int age, const float value) const {
-		return table_(rows_index_.at(age), cols_index_.at(value));
+		return lookup_value(age, value);
 	}
 
 	float RelativeRiskLookup::operator()(const int age, const float value) {
-		return table_(rows_index_.at(age), cols_index_.at(value));
+		return lookup_value(age, value);
 	}
 
 	const float RelativeRiskLookup::operator()(const int age, const float value) const {
-		return table_(rows_index_.at(age), cols_index_.at(value));
+		return lookup_value(age, value);
 	}
 
 	bool RelativeRiskLookup::contains(const int age, const float value) const noexcept {
@@ -104,9 +108,38 @@ namespace hgps {
 		return false;
 	}
 
+	float RelativeRiskLookup::lookup_value(const int age, const float value) const noexcept {
+		if (empty()) {
+			return std::nanf("");
+		}
+
+		auto row_index = rows_index_.at(age);
+		if (value <= cols_index_.begin()->first) {
+			return table_(row_index, cols_index_.begin()->second);
+		}
+
+		if (value >= cols_index_.rbegin()->first) {
+			return table_(row_index, cols_index_.rbegin()->second);
+		}
+
+		if (cols_index_.contains(value)) {
+			return table_(row_index, cols_index_.at(value));
+		}
+
+		auto it = cols_index_.lower_bound(value);
+		auto it_prev = std::prev(it);
+		auto x1 = it_prev->first;
+		auto x2 = it->first;
+		auto y1 = table_(row_index, it_prev->second);
+		auto y2 = table_(row_index, it->second);
+
+		// Linear interpolation
+		return (y2 - y1) * (value - x1) / (x2 - x1) + y1;
+	}
+
 	/* -------------- Relative Risk implementation  ----------------*/
 
-	RelativeRisk::RelativeRisk(std::map<std::string, RelativeRiskTable>&& disease, 
+	RelativeRisk::RelativeRisk(std::map<std::string, RelativeRiskTable>&& disease,
 		std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>&& risk_factor)
 		:disease_{ disease }, risk_factor_{ risk_factor } {}
 
@@ -116,5 +149,5 @@ namespace hgps {
 
 	const std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>& RelativeRisk::risk_factor() const noexcept {
 		return risk_factor_;
-	}	
+	}
 }

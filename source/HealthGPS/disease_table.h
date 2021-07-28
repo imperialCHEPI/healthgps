@@ -37,15 +37,17 @@ namespace hgps {
 
 		std::size_t cols() const noexcept;
 
+		bool contains(const int age) const noexcept;
+
 		std::map<std::string, int> measures() const noexcept;
 
 		int at(std::string measure) const;
 
 		const int operator[](std::string measure) const;
 
-		DiseaseMeasure& operator()(int age, core::Gender gender);
+		DiseaseMeasure& operator()(const int age, const core::Gender gender);
 
-		const DiseaseMeasure& operator()(int age, core::Gender gender) const;
+		const DiseaseMeasure& operator()(const int age, const core::Gender gender) const;
 
 	private:
 		std::string name_;

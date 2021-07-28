@@ -2,8 +2,12 @@
 #include <random>
 
 namespace hgps {
-    RuntimeContext::RuntimeContext(RandomBitGenerator& generator, const HierarchicalMapping& mapping)
-        : generator_{ generator }, mapping_{ mapping }, time_now_{}, population_{ 0 }
+    RuntimeContext::RuntimeContext(
+        RandomBitGenerator& generator,
+        const HierarchicalMapping& mapping,
+        const core::IntegerInterval& age_range)
+        : generator_{ generator }, mapping_{ mapping }, age_range_{age_range},
+        time_now_{}, population_{ 0 }
     {}
 
     int RuntimeContext::time_now() const noexcept {
@@ -16,6 +20,10 @@ namespace hgps {
 
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
         return mapping_;
+    }
+
+    const core::IntegerInterval& RuntimeContext::age_range() const noexcept {
+        return age_range_;
     }
 
     int RuntimeContext::next_int() {

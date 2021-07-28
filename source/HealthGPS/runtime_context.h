@@ -9,13 +9,18 @@ namespace hgps {
 	{
 	public:
 		RuntimeContext() = delete;
-		RuntimeContext(RandomBitGenerator& generator, const HierarchicalMapping& mapping);
+		RuntimeContext(
+			RandomBitGenerator& generator,
+			const HierarchicalMapping& mapping,
+			const core::IntegerInterval& age_range);
 
 		int time_now() const noexcept;
 
 		Population& population() noexcept;
 
 		const HierarchicalMapping& mapping() const noexcept;
+
+		const core::IntegerInterval& age_range() const noexcept;
 
 		int next_int();
 
@@ -33,6 +38,7 @@ namespace hgps {
 		RandomBitGenerator& generator_;
 		HierarchicalMapping mapping_;
 		Population population_;
+		core::IntegerInterval age_range_;
 		int time_now_{};
 	};
 }

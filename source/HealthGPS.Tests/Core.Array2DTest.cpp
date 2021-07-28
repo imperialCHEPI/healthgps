@@ -45,6 +45,22 @@ TEST(TestCore_Array2D, CreateFullFromVector) {
 	ASSERT_EQ(12, i3x4v.size());
 }
 
+TEST(TestCore_Array2D, CreateWithZeroSizeThrows) {
+	using namespace hgps::core;
+
+	ASSERT_THROW(IntegerArray2D(0, 5), std::invalid_argument);
+	ASSERT_THROW(IntegerArray2D(5, 0), std::invalid_argument);
+}
+
+TEST(TestCore_Array2D, CreateWithSizeMismatchThrows) {
+	using namespace hgps::core;
+	auto rows = 3;
+	auto cols = 3;
+	std::vector<int> n = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+
+	ASSERT_THROW(IntegerArray2D(rows, cols, n), std::invalid_argument);
+}
+
 TEST(TestCore_Array2D, AccessViaColumnIndex) {
 	using namespace hgps::core;
 	auto rows = 3;
@@ -55,6 +71,24 @@ TEST(TestCore_Array2D, AccessViaColumnIndex) {
 	std::vector<int> row1 = { 8, 9, 7, 3 };
 	std::vector<int> row2 = { 5, 4, 2, 9 };
 	auto i3x4v = IntegerArray2D(rows, cols, data);
+
+	for (size_t i = 0; i < cols; i++) {
+		ASSERT_EQ(row0[i], i3x4v(0, i));
+		ASSERT_EQ(row1[i], i3x4v(1, i));
+		ASSERT_EQ(row2[i], i3x4v(2, i));
+	}
+}
+
+TEST(TestCore_Array2D, AccessViaConstColumnIndex) {
+	using namespace hgps::core;
+	auto rows = 3;
+	auto cols = 4;
+
+	std::vector<int> data = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+	std::vector<int> row0 = { 2, 1, 5, 7 };
+	std::vector<int> row1 = { 8, 9, 7, 3 };
+	std::vector<int> row2 = { 5, 4, 2, 9 };
+	const auto i3x4v = IntegerArray2D(rows, cols, data);
 
 	for (size_t i = 0; i < cols; i++) {
 		ASSERT_EQ(row0[i], i3x4v(0, i));
@@ -83,6 +117,26 @@ TEST(TestCore_Array2D, AccessViaRowIndex) {
 	}
 }
 
+TEST(TestCore_Array2D, AccessViaConstRowIndex) {
+	using namespace hgps::core;
+	auto rows = 3;
+	auto cols = 4;
+
+	std::vector<int> data = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+	std::vector<int> col0 = { 2, 8, 5 };
+	std::vector<int> col1 = { 1, 9, 4 };
+	std::vector<int> col2 = { 5, 7, 2 };
+	std::vector<int> col3 = { 7, 3, 9 };
+	const auto i3x4v = IntegerArray2D(rows, cols, data);
+
+	for (size_t i = 0; i < rows; i++) {
+		ASSERT_EQ(col0[i], i3x4v(i, 0));
+		ASSERT_EQ(col1[i], i3x4v(i, 1));
+		ASSERT_EQ(col2[i], i3x4v(i, 2));
+		ASSERT_EQ(col3[i], i3x4v(i, 3));
+	}
+}
+
 TEST(TestCore_Array2D, AccessViaRowColumnIndex) {
 	using namespace hgps::core;
 	auto rows = 3;
@@ -97,6 +151,20 @@ TEST(TestCore_Array2D, AccessViaRowColumnIndex) {
 			ASSERT_EQ(data[vector_idx], i3x4v(i, j));
 		}
 	}
+}
+
+TEST(TestCore_Array2D, AccessOutOfRangeThrows) {
+	using namespace hgps::core;
+	auto rows = 3;
+	auto cols = 4;
+
+	std::vector<int> data = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+	auto i3x4v = IntegerArray2D(rows, cols, data);
+
+	ASSERT_THROW(i3x4v(1, 5), std::out_of_range);
+	ASSERT_THROW(i3x4v(1, -1), std::out_of_range);
+	ASSERT_THROW(i3x4v(5, 2), std::out_of_range);
+	ASSERT_THROW(i3x4v(-1, 2), std::out_of_range);
 }
 
 TEST(TestCore_Array2D, ExportStorageToVector) {
@@ -149,6 +217,23 @@ TEST(TestCore_Array2D, UpdateStorageValue) {
 			// Read again
 			auto vector_idx = i * cols + j;
 			ASSERT_EQ(data[vector_idx] + 5, i3x4v(i, j));
+		}
+	}
+}
+
+TEST(TestCore_Array2D, ClearStorageValue) {
+	using namespace hgps::core;
+
+	auto rows = 3;
+	auto cols = 4;
+
+	std::vector<int> data = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
+	auto i3x4v = IntegerArray2D(rows, cols, data);
+
+	i3x4v.clear();
+	for (size_t i = 0; i < rows; i++) {
+		for (size_t j = 0; j < cols; j++) {
+			ASSERT_EQ(0, i3x4v(i, j));
 		}
 	}
 }

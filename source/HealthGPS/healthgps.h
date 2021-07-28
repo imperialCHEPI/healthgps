@@ -8,6 +8,7 @@
 #include "demographic.h"
 #include "ses.h"
 #include "riskfactor.h"
+#include "disease.h"
 
 namespace hgps {
 
@@ -35,6 +36,7 @@ namespace hgps {
 		std::shared_ptr<SESModule> ses_;
 		std::shared_ptr<DemographicModule> demographic_;
 		std::shared_ptr<RiskFactorModule> risk_factor_;
+		std::shared_ptr<DiseaseModule> disease_;
 
 		void initialise_population(const int pop_size, const int ref_year);
 	};

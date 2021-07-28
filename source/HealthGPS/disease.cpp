@@ -32,8 +32,14 @@ namespace hgps {
 	}
 
 	void DiseaseModule::initialise_population(RuntimeContext& context) {
-		throw std::logic_error(
-			"DisieaseModule.initialise_population function not yet implemented.");
+		for (auto& model : models_) {
+			model.second->initialise_disease_status(context);
+		}
+
+		// Recalculate relative risks once diseases status were generated
+		for (auto& model : models_) {
+			model.second->initialise_average_relative_risk(context);
+		}
 	}
 
 	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config)
@@ -65,7 +71,7 @@ namespace hgps {
 				});
 
 			models.emplace(info.code, registry.at(info.code)(info.code,
-				std::move(desease_table), std::move(relative_risks)));
+				std::move(desease_table), std::move(relative_risks), config.settings().age_range()));
 		}
 
 		return std::make_unique<DiseaseModule>(std::move(models));

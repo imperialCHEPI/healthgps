@@ -123,6 +123,9 @@
     <ClInclude Include="converter.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="gender_table.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

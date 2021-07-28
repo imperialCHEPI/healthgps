@@ -12,8 +12,9 @@ namespace hgps {
 		auto compare = [](TYPE a, TYPE b) { return a < b ? -1 : (a == b) ? 0 : 1; };
 
 		int previous = 0;
+		int offset = 1;
 		for (auto i = 0; i < values.size() - 1; ++i) {
-			int current = compare(values[i], values[i + 1]);
+			int current = compare(values[i], values[i + offset]);
 			if (current == 0) {
 				return false;
 			}

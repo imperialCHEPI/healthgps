@@ -52,6 +52,8 @@ namespace hgps {
 
 		std::size_t columns() const noexcept;
 
+		bool empty() const noexcept;
+
 		float at(const int age, const float value) const;
 
 		float operator()(const int age, const float value);
@@ -64,6 +66,8 @@ namespace hgps {
 		core::FloatArray2D table_;
 		std::map<int, int> rows_index_;
 		std::map<float, int> cols_index_;
+
+		float lookup_value(const int age, const float value) const noexcept;
 	};
 
 	class RelativeRisk {

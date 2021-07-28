@@ -115,8 +115,9 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	};
 
 	auto mapping = HierarchicalMapping(std::move(entries));
+	auto age_range = core::IntegerInterval(0, 100);
 
-	auto context = RuntimeContext(rnd, mapping);
+	auto context = RuntimeContext(rnd, mapping, age_range);
 	ASSERT_EQ(0, context.population().size());
 	ASSERT_EQ(0, context.time_now());
 }
@@ -135,8 +136,9 @@ TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
 	};
 
 	auto mapping = HierarchicalMapping(std::move(entries));
+	auto age_range = core::IntegerInterval(0, 100);
 
-	auto context = RuntimeContext(rnd, mapping);
+	auto context = RuntimeContext(rnd, mapping, age_range);
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
 
@@ -183,6 +185,9 @@ TEST(TestHealthGPS, SimulationInitialise)
 	factory.register_builder(SimulationModuleType::Demographic,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_demographic_module(manager, config); });
+	factory.register_builder(SimulationModuleType::Disease, 
+		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+		return build_disease_module(manager, config); });
 
 	factory.register_instance(SimulationModuleType::RiskFactor, risk_module_ptr);
 

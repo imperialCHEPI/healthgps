@@ -36,12 +36,12 @@ namespace hgps {
         return std::nan("");
     }
 
-    double Person::gender_to_value() const noexcept {
+    float Person::gender_to_value() const noexcept {
         if (gender == core::Gender::male) {
-            return 1.0;
+            return 1.0f;
         }
 
-        return 0.0;
+        return 0.0f;
     }
 
     void Person::reset_id() {

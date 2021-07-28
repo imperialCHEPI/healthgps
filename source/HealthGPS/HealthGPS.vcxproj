@@ -103,6 +103,7 @@
     <ClInclude Include="disease.h" />
     <ClInclude Include="disease_model.h" />
     <ClInclude Include="disease_table.h" />
+    <ClInclude Include="gender_table.h" />
     <ClInclude Include="mapping.h" />
     <ClInclude Include="hierarchical_model.h" />
     <ClInclude Include="interfaces.h" />

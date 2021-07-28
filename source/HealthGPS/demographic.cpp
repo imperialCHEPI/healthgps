@@ -7,7 +7,7 @@ namespace hgps {
 		: data_{ data } {
 		if (!data_.empty()) {
 			auto first_entry = data_.begin();
-			time_range_ = core::IntegerInterval(first_entry->first, (--data_.end())->first);
+			age_range_ = core::IntegerInterval(first_entry->first, (--data_.end())->first);
 			if (!first_entry->second.empty()) {
 				age_range_ = core::IntegerInterval(
 					first_entry->second.begin()->first,

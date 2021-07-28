@@ -9,16 +9,18 @@
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator)
 		: Simulation(config, std::move(generator)), factory_{ factory },
-		context_{ rnd_, config_.risk_mapping() } {
+		context_{ rnd_, config_.risk_mapping(), config_.settings().age_range() } {
 
 		// Create required modules, should change to shared_ptr
 		auto ses_base = factory.create(SimulationModuleType::SES, config_);
 		auto dem_base = factory.create(SimulationModuleType::Demographic, config_);
 		auto risk_base = factory.create(SimulationModuleType::RiskFactor, config_);
+		auto disease_base = factory.create(SimulationModuleType::Disease, config_);
 
 		ses_ = std::dynamic_pointer_cast<SESModule>(ses_base);
 		demographic_ = std::dynamic_pointer_cast<DemographicModule>(dem_base);
 		risk_factor_ = std::dynamic_pointer_cast<RiskFactorModule>(risk_base);
+		disease_ = std::dynamic_pointer_cast<DiseaseModule>(disease_base);
 	}
 
 	void HealthGPS::initialize()
@@ -42,7 +44,7 @@ namespace hgps {
 	{
 		auto ref_year = config_.settings().reference_time();
 		auto pop_year = demographic_->get_total_population(ref_year);
-		auto pop_size = (int)(config_.settings().size_fraction() * pop_year);
+		auto pop_size = static_cast<int>(config_.settings().size_fraction() * pop_year);
 
 		initialise_population(pop_size, ref_year);
 
@@ -101,6 +103,9 @@ namespace hgps {
 
 		// Generate risk factors
 		risk_factor_->initialise_population(context_);
+
+		// Initialise diseases
+		disease_->initialise_population(context_);
 
 		// Print out initial population statistics
 		// 

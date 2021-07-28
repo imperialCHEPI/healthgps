@@ -43,6 +43,7 @@
   <ItemGroup>
     <ClCompile Include="Core.Test.cpp" />
     <ClCompile Include="Core.Array2DTest.cpp" />
+    <ClCompile Include="AgeGenderTable.Test.cpp" />
     <ClCompile Include="HierarchicalMapping.Test.cpp" />
     <ClCompile Include="Core.UnivariateSummary.Test.cpp" />
     <ClCompile Include="Datastore.Test.cpp" />

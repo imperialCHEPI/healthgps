@@ -3,43 +3,134 @@
 
 namespace hgps {
 
-	DiabetesModel::DiabetesModel(std::string identifier, DiseaseTable&& table, RelativeRisk&& risks)
-		: identifier_{ identifier }, table_{ table }, risks_{ risks } {}
+	DiabetesModel::DiabetesModel(std::string identifier, DiseaseTable&& table, 
+		RelativeRisk&& risks, core::IntegerInterval age_range)
+		: identifier_{ identifier }, measures_table_{ table }, relative_risks_{ risks },
+		average_relative_risk_{create_age_gender_table<double>(age_range)}
+	{
+	}
 
 	std::string DiabetesModel::type() const noexcept { return identifier_; }
 
-	void DiabetesModel::generate(RuntimeContext& context) 
-	{
-		auto summary = std::map<int, std::map<core::Gender, std::pair<double, int>>>();
+	void DiabetesModel::initialise_disease_status(RuntimeContext& context) {
+		auto relative_risk_table = calculate_average_relative_risk(context);
+		for (auto& entity : context.population()) {
+			if (!entity.is_active() || !measures_table_.contains(entity.age)) {
+				continue;
+			}
+
+			auto relative_risk_value = calculate_relative_risk_for_risk_factors(entity);
+			auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
+			auto prevalence = measures_table_(entity.age, entity.gender).at(measures_table_.at("prevalence"));
+			auto probability = prevalence * relative_risk_value / average_relative_risk;
+			auto hazard = context.next_double();
+			if (hazard < probability) {
+				entity.diseases[type()] = context.time_now();
+			}
+		}
+	}
+
+	void DiabetesModel::initialise_average_relative_risk(RuntimeContext& context) {
+		auto age_range = context.age_range();
+		auto sum = create_age_gender_table<double>(age_range);
+		auto count = create_age_gender_table<double>(age_range);
 		for (auto& entity : context.population()) {
 			if (!entity.is_active()) {
 				continue;
 			}
 
-			auto combine_risk = calculate_combined_relative_risk(entity);
-			auto pair = summary[entity.age][entity.gender];
-			pair.first += combine_risk;
-			pair.second++;
+			auto combine_risk = calculate_combined_relative_risk(entity, context.time_now());
+			sum(entity.age, entity.gender) += combine_risk;
+			count(entity.age, entity.gender)++;
 		}
-	}
 
-	void DiabetesModel::adjust_relative_risk(RuntimeContext& context) {
-		throw std::logic_error("DiabetesModel.adjust_relative_risk function not yet implemented.");
+		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+			if (sum.contains(age)) {
+				auto male_count = count(age, core::Gender::male);
+				if (male_count != 0.0) {
+					average_relative_risk_(age, core::Gender::male) = sum(age, core::Gender::male) / male_count;
+				}
+
+				auto female_count = count(age, core::Gender::female);
+				if (female_count != 0.0) {
+					average_relative_risk_(age, core::Gender::female) = sum(age,core::Gender::female) / female_count;
+				}
+			}
+		}
 	}
 
 	void DiabetesModel::update(RuntimeContext& context) {
 		throw std::logic_error("DiabetesModel.update function not yet implemented.");
 	}
 
-	double DiabetesModel::calculate_combined_relative_risk(Person& entity)
+	DoubleAgeGenderTable DiabetesModel::calculate_average_relative_risk(RuntimeContext& context)
 	{
-		// The modelled risk factors
-		double combinedRelativeRisk = 1.0;
-		for (auto& factor : entity.risk_factors) {
-			auto factor_value = entity.get_risk_factor_value(factor.first);
-			combinedRelativeRisk *= factor_value;
+		auto age_range = context.age_range();
+		auto sum = create_age_gender_table<double>(age_range);
+		auto count = create_age_gender_table<double>(age_range);
+		for (auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			auto combine_risk = calculate_relative_risk_for_risk_factors(entity);
+			sum(entity.age, entity.gender) += combine_risk;
+			count(entity.age, entity.gender)++;
 		}
 
-		return 0.0;
+		auto result = create_age_gender_table<double>(age_range);
+		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+			if (sum.contains(age)) {
+				auto male_count = count(age, core::Gender::male);
+				if (male_count != 0.0) {
+					result(age, core::Gender::male) = sum(age, core::Gender::male) / male_count;
+				}
+
+				auto female_count = count(age, core::Gender::female);
+				if (female_count != 0.0) {
+					result(age, core::Gender::female) = sum(age, core::Gender::female) / female_count;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	double DiabetesModel::calculate_combined_relative_risk(Person& entity, const int time_now) {
+		auto combined_risk_value = 1.0;
+		combined_risk_value *= calculate_relative_risk_for_risk_factors(entity);
+		combined_risk_value *= calculate_relative_risk_for_diseases(entity, time_now);
+		return combined_risk_value;
+	}
+
+	double DiabetesModel::calculate_relative_risk_for_risk_factors(Person& entity) {
+		auto relative_risk_value = 1.0;
+		for (auto& factor : entity.risk_factors) {
+			if (!relative_risks_.risk_factor().contains(factor.first)) {
+				continue;
+			}
+
+			auto lut = relative_risks_.risk_factor().at(factor.first).at(entity.gender);
+			auto entity_factor_value = static_cast<float>(factor.second);
+			auto relative_factor_value = lut(entity.age, entity_factor_value);
+			relative_risk_value *= relative_factor_value;
+		}
+
+		return relative_risk_value;
+	}
+
+	double DiabetesModel::calculate_relative_risk_for_diseases(Person& entity, const int time_now) {
+		auto relative_risk_value = 1.0;
+		for (auto& disease : entity.diseases) {
+			// Only include existing diseases
+			if (time_now == 0 || disease.second < time_now) {
+				double relative_disease_vale =
+					relative_risks_.disease().at(disease.first)(entity.age, entity.gender);
+
+				relative_risk_value *= relative_disease_vale;
+			}
+		}
+
+		return relative_risk_value;
 	}
 }
