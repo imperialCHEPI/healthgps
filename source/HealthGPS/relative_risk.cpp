@@ -83,18 +83,4 @@ namespace hgps {
 		// Linear interpolation
 		return (y2 - y1) * (value - x1) / (x2 - x1) + y1;
 	}
-
-	/* -------------- Relative Risk implementation  ----------------*/
-
-	RelativeRisk::RelativeRisk(std::map<std::string, FloatAgeGenderTable>&& disease,
-		std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>&& risk_factor)
-		:disease_{ disease }, risk_factor_{ risk_factor } {}
-
-	const std::map<std::string, FloatAgeGenderTable>& RelativeRisk::disease() const noexcept {
-		return disease_;
-	}
-
-	const std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>& RelativeRisk::risk_factor() const noexcept {
-		return risk_factor_;
-	}
 }

@@ -126,6 +126,9 @@
     <ClInclude Include="gender_table.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="disease_definition.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

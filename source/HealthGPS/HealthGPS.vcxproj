@@ -101,6 +101,7 @@
     <ClInclude Include="demographic.h" />
     <ClInclude Include="diabetes_model.h" />
     <ClInclude Include="disease.h" />
+    <ClInclude Include="disease_definition.h" />
     <ClInclude Include="disease_model.h" />
     <ClInclude Include="disease_table.h" />
     <ClInclude Include="gender_table.h" />

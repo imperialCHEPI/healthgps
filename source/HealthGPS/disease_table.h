@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 
+#include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/forward_type.h"
 
 namespace hgps {
@@ -26,10 +27,10 @@ namespace hgps {
 	{
 	public:
 		DiseaseTable() = delete;
-		DiseaseTable(std::string name, std::map<std::string, int>&& measures, 
+		DiseaseTable(const core::DiseaseInfo info, std::map<std::string, int>&& measures,
 			std::map<int, std::map<core::Gender, DiseaseMeasure>>&& data);
 
-		std::string name() const noexcept;
+		const core::DiseaseInfo& info() const noexcept;
 
 		std::size_t size() const noexcept;
 
@@ -50,7 +51,7 @@ namespace hgps {
 		const DiseaseMeasure& operator()(const int age, const core::Gender gender) const;
 
 	private:
-		std::string name_;
+		core::DiseaseInfo info_;
 		std::map<std::string, int> measures_;
 		std::map<int, std::map<core::Gender, DiseaseMeasure>> data_;
 	};

@@ -3,25 +3,29 @@
 
 namespace hgps {
 
-	DiabetesModel::DiabetesModel(std::string identifier, DiseaseTable&& table, 
-		RelativeRisk&& risks, core::IntegerInterval age_range)
-		: identifier_{ identifier }, measures_table_{ table }, relative_risks_{ risks },
-		average_relative_risk_{create_age_gender_table<double>(age_range)}
+	DiabetesModel::DiabetesModel(DiseaseDefinition&& definition, core::IntegerInterval age_range)
+		: definition_{ definition }, average_relative_risk_{create_age_gender_table<double>(age_range)}
 	{
+		if (!core::case_insensitive::equals(definition.identifier().code, "diabetes")) {
+			throw std::invalid_argument(
+				std::format("Disease table data type mismatch: '{}' vs. 'diabetes'.",
+					definition.identifier().code));
+		}
 	}
 
-	std::string DiabetesModel::type() const noexcept { return identifier_; }
+	std::string DiabetesModel::type() const noexcept { return definition_.identifier().code; }
 
 	void DiabetesModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
+		auto prevalence_id = definition_.table().at("prevalence");
 		for (auto& entity : context.population()) {
-			if (!entity.is_active() || !measures_table_.contains(entity.age)) {
+			if (!entity.is_active() || !definition_.table().contains(entity.age)) {
 				continue;
 			}
 
 			auto relative_risk_value = calculate_relative_risk_for_risk_factors(entity);
 			auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
-			auto prevalence = measures_table_(entity.age, entity.gender).at(measures_table_.at("prevalence"));
+			auto prevalence = definition_.table()(entity.age, entity.gender).at(prevalence_id);
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
 			auto hazard = context.next_double();
 			if (hazard < probability) {
@@ -50,12 +54,14 @@ namespace hgps {
 			if (sum.contains(age)) {
 				auto male_count = count(age, core::Gender::male);
 				if (male_count != 0.0) {
-					average_relative_risk_(age, core::Gender::male) = sum(age, core::Gender::male) / male_count;
+					average_relative_risk_(age, core::Gender::male) =
+						sum(age, core::Gender::male) / male_count;
 				}
 
 				auto female_count = count(age, core::Gender::female);
 				if (female_count != 0.0) {
-					average_relative_risk_(age, core::Gender::female) = sum(age,core::Gender::female) / female_count;
+					average_relative_risk_(age, core::Gender::female) =
+						sum(age,core::Gender::female) / female_count;
 				}
 			}
 		}
@@ -108,11 +114,11 @@ namespace hgps {
 	double DiabetesModel::calculate_relative_risk_for_risk_factors(Person& entity) {
 		auto relative_risk_value = 1.0;
 		for (auto& factor : entity.risk_factors) {
-			if (!relative_risks_.risk_factor().contains(factor.first)) {
+			if (!definition_.relative_risk_factors().contains(factor.first)) {
 				continue;
 			}
 
-			auto lut = relative_risks_.risk_factor().at(factor.first).at(entity.gender);
+			auto lut = definition_.relative_risk_factors().at(factor.first).at(entity.gender);
 			auto entity_factor_value = static_cast<float>(factor.second);
 			auto relative_factor_value = lut(entity.age, entity_factor_value);
 			relative_risk_value *= relative_factor_value;
@@ -127,7 +133,7 @@ namespace hgps {
 			// Only include existing diseases
 			if (time_now == 0 || disease.second.start_time < time_now) {
 				double relative_disease_vale =
-					relative_risks_.disease().at(disease.first)(entity.age, entity.gender);
+					definition_.relative_risk_diseases().at(disease.first)(entity.age, entity.gender);
 
 				relative_risk_value *= relative_disease_vale;
 			}

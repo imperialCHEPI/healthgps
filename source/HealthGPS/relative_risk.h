@@ -2,8 +2,21 @@
 #include <map>
 
 #include "gender_table.h"
+#include "monotonic_vector.h"
+#include "HealthGPS.Core\array2d.h"
 
 namespace hgps {
+
+	class RelativeRiskLookup;
+	
+	using RelativeRiskTableMap = std::map<std::string, FloatAgeGenderTable>;
+	using RelativeRiskLookupMap = std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>;
+
+	struct RelativeRisk
+	{
+		RelativeRiskTableMap diseases;
+		RelativeRiskLookupMap risk_factors;
+	};
 
 	class RelativeRiskLookup {
 	public:
@@ -36,21 +49,6 @@ namespace hgps {
 		std::map<float, int> cols_index_;
 
 		float lookup_value(const int age, const float value) const noexcept;
-	};
-
-	class RelativeRisk {
-	public:
-		RelativeRisk() = delete;
-		RelativeRisk(std::map<std::string, FloatAgeGenderTable>&& disease,
-			std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>&& risk_factor);
-
-		const std::map<std::string, FloatAgeGenderTable>& disease() const noexcept;
-
-		const std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>& risk_factor() const noexcept;
-
-	private:
-		std::map<std::string, FloatAgeGenderTable> disease_;
-		std::map<std::string, std::map<core::Gender, RelativeRiskLookup>> risk_factor_;
 	};
 }
 

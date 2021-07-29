@@ -25,7 +25,7 @@ namespace hgps {
 				data[v.age][v.gender] = DiseaseMeasure(v.measures);
 			}
 
-			return DiseaseTable(entity.info.name, std::move(measures), std::move(data));
+			return DiseaseTable(entity.info, std::move(measures), std::move(data));
 		}
 
 		FloatAgeGenderTable StoreConverter::to_relative_risk_table(const core::RelativeRiskEntity& entity)
@@ -80,15 +80,14 @@ namespace hgps {
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info)
 		{
-			auto relative_diseases = std::map<std::string, FloatAgeGenderTable>();
+			RelativeRisk result;
 			for (auto& item : info.inputs.diseases()) {
 				auto table = info.manager.get_relative_risk_to_disease(info.disease, item);
 				if (!table.empty()) {
-					relative_diseases.emplace(item.code, StoreConverter::to_relative_risk_table(table));
+					result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(table));
 				}
 			}
 
-			auto relative_factors = std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>();
 			for (auto& factor : info.risk_factors) {
 				auto table_male = info.manager.get_relative_risk_to_risk_factor(
 					info.disease, core::Gender::male, factor.key());
@@ -96,17 +95,17 @@ namespace hgps {
 					info.disease, core::Gender::female, factor.key());
 
 				if (!table_male.empty()) {
-					relative_factors[factor.key()].emplace(
+					result.risk_factors[factor.key()].emplace(
 						core::Gender::male, StoreConverter::to_relative_risk_lookup(table_male));
 				}
 
 				if (!table_feme.empty()) {
-					relative_factors[factor.key()].emplace(
+					result.risk_factors[factor.key()].emplace(
 						core::Gender::female, StoreConverter::to_relative_risk_lookup(table_feme));
 				}
 			}
 
-			return RelativeRisk(std::move(relative_diseases), std::move(relative_factors));
+			return result;
 		}
 	}
 }

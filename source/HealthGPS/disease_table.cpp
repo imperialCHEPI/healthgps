@@ -25,9 +25,9 @@ namespace hgps {
 	/* --------------------   Disease Table Implementation ----------------- */
 
 
-	DiseaseTable::DiseaseTable(std::string name, std::map<std::string, int>&& measures,
+	DiseaseTable::DiseaseTable(core::DiseaseInfo info, std::map<std::string, int>&& measures,
 		std::map<int, std::map<core::Gender, DiseaseMeasure>>&& data)
-		: name_{ name }, measures_{ measures }, data_{ data } {
+		: info_{ info }, measures_{ measures }, data_{ data } {
 
 		if (data.empty()) {
 			return; // empty table
@@ -44,7 +44,7 @@ namespace hgps {
 		}
 	}
 
-	std::string DiseaseTable::name() const noexcept { return name_; }
+	const core::DiseaseInfo& DiseaseTable::info() const noexcept { return info_; }
 
 	std::size_t DiseaseTable::size() const noexcept { return rows() * cols(); }
 

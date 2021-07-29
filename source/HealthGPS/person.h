@@ -8,7 +8,7 @@
 namespace hgps {
 
 	/// @brief Disease status enumeration
-	enum class DiseaseStatus : uint8_t
+	enum struct DiseaseStatus : uint8_t
 	{
 		/// @brief declared free from condition
 		Free,

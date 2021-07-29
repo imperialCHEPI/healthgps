@@ -2,6 +2,7 @@
 #include "modelinput.h"
 #include "disease_table.h"
 #include "relative_risk.h"
+#include "gender_table.h"
 
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/DataStore.h"

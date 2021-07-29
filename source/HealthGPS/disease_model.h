@@ -5,13 +5,13 @@
 namespace hgps {
 	namespace detail {
 		using DiseaseModelBuilder = std::function<std::shared_ptr<DiseaseModel>(
-			const std::string, DiseaseTable&& data, RelativeRisk&& risks, core::IntegerInterval age_range)>;
+			DiseaseDefinition&& definition, const core::IntegerInterval age_range)>;
 	}
 
 	std::map<std::string, detail::DiseaseModelBuilder> get_default_disease_model_registry() {
 		auto registry = std::map<std::string, detail::DiseaseModelBuilder>{
-				{"diabetes", [](const std::string name, DiseaseTable&& data, RelativeRisk&& risks, core::IntegerInterval age_range) {
-					return std::make_shared<DiabetesModel>(name, std::move(data), std::move(risks), age_range); }}
+				{"diabetes", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
+					return std::make_shared<DiabetesModel>(std::move(definition), age_range); }}
 		};
 
 		return registry;

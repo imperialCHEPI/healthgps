@@ -70,8 +70,11 @@ namespace hgps {
 					.risk_factors = risk_factors
 				});
 
-			models.emplace(info.code, registry.at(info.code)(info.code,
-				std::move(desease_table), std::move(relative_risks), config.settings().age_range()));
+			auto definition = DiseaseDefinition(std::move(desease_table),
+				std::move(relative_risks.diseases), std::move(relative_risks.risk_factors));
+
+			models.emplace(info.code, registry.at(info.code)(
+				std::move(definition), config.settings().age_range()));
 		}
 
 		return std::make_unique<DiseaseModule>(std::move(models));
