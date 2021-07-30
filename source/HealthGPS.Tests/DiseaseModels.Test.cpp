@@ -43,8 +43,10 @@ TEST(TestHealthGPS_Disease, CreateDiseaseTable)
 			{core::Gender::female, DiseaseMeasure(std::map<int, double>{ {1, 7.13}, {2, 3.13}})}} }
 	};
 
-	auto table = DiseaseTable("Test", std::move(measures), std::move(data));
-	ASSERT_EQ("Test", table.name());
+	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+
+	auto table = DiseaseTable(info, std::move(measures), std::move(data));
+	ASSERT_EQ(info.code, table.info().code);
 	ASSERT_EQ(2, table.cols());
 	ASSERT_EQ(3, table.rows());
 	ASSERT_EQ(6, table.size());
@@ -57,9 +59,10 @@ TEST(TestHealthGPS_Disease, CreateDiseaseTableEmpty)
 
 	auto measures = std::map<std::string, int>();
 	auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>();
+	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
 
-	auto table = DiseaseTable("Test", std::move(measures), std::move(data));
-	ASSERT_EQ("Test", table.name());
+	auto table = DiseaseTable(info, std::move(measures), std::move(data));
+	ASSERT_EQ(info.code, table.info().code);
 	ASSERT_EQ(0, table.cols());
 	ASSERT_EQ(0, table.rows());
 	ASSERT_EQ(0, table.size());
@@ -82,7 +85,8 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTable)
 			{core::Gender::female, DiseaseMeasure(std::map<int, double>{ {1, 7.13}, {2, 3.13}})}} }
 	};
 
-	auto table = DiseaseTable("Test", std::move(measures), std::move(data));
+	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+	auto table = DiseaseTable(info, std::move(measures), std::move(data));
 
 	auto mapping = table.measures();
 
@@ -132,7 +136,8 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTableOutOfBoundThrows)
 			{core::Gender::female, DiseaseMeasure(std::map<int, double>{ {1, 7.13}, {2, 3.13}})}} }
 	};
 
-	auto table = DiseaseTable("Test", std::move(measures), std::move(data));
+	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+	auto table = DiseaseTable(info, std::move(measures), std::move(data));
 
 	// Measures
 	ASSERT_THROW(table["z"], std::out_of_range);

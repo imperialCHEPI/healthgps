@@ -7,17 +7,6 @@
 
 namespace hgps {
 
-	class RelativeRiskLookup;
-	
-	using RelativeRiskTableMap = std::map<std::string, FloatAgeGenderTable>;
-	using RelativeRiskLookupMap = std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>;
-
-	struct RelativeRisk
-	{
-		RelativeRiskTableMap diseases;
-		RelativeRiskLookupMap risk_factors;
-	};
-
 	class RelativeRiskLookup {
 	public:
 		RelativeRiskLookup() = delete;
@@ -49,6 +38,15 @@ namespace hgps {
 		std::map<float, int> cols_index_;
 
 		float lookup_value(const int age, const float value) const noexcept;
+	};
+
+	using RelativeRiskTableMap = std::map<std::string, FloatAgeGenderTable>;
+	using RelativeRiskLookupMap = std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>;
+
+	struct RelativeRisk
+	{
+		RelativeRiskTableMap diseases;
+		RelativeRiskLookupMap risk_factors;
 	};
 }
 
