@@ -3,6 +3,7 @@
 #include "disease_table.h"
 #include "relative_risk.h"
 #include "gender_table.h"
+#include "analysis_definition.h"
 
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/DataStore.h"
@@ -33,6 +34,9 @@ namespace hgps {
 			static FloatAgeGenderTable to_relative_risk_table(const core::RelativeRiskEntity& entity);
 
 			static RelativeRiskLookup to_relative_risk_lookup(const core::RelativeRiskEntity& entity);
+
+			static AnalysisDefinition to_analysis_definition(
+				const core::DiseaseAnalysisEntity& entity, const core::IntegerInterval& age_range);
 		};
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info);

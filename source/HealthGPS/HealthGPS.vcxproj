@@ -95,6 +95,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="analysis_definition.h" />
+    <ClInclude Include="analysis_module.h" />
     <ClInclude Include="api.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="countrymodule.h" />
@@ -127,6 +129,7 @@
     <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="analysis_module.cpp" />
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="demographic.cpp" />
     <ClCompile Include="diabetes_model.cpp" />

@@ -31,6 +31,8 @@ namespace hgps {
 
 			virtual RelativeRiskEntity get_relative_risk_to_risk_factor(
 				DiseaseInfo source, Gender gender, std::string risk_factor) const = 0;
+
+			virtual DiseaseAnalysisEntity get_disease_analysis(const Country country) const = 0;
 		};
 	}
 }

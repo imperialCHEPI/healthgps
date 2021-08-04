@@ -37,11 +37,19 @@ namespace hgps {
 			RelativeRiskEntity get_relative_risk_to_risk_factor(
 				DiseaseInfo source, Gender gender, std::string risk_factor) const override;
 
+			DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
+
 		private:
 			const std::filesystem::path root_;
 			nlohmann::json index_;
 
 			RelativeRiskEntity generate_default_relative_risk_to_disease() const;
+
+			std::map<int, std::map<Gender, double>> load_cost_of_diseases(
+				Country country, nlohmann::json node, std::filesystem::path parent_path) const;
+
+			std::vector<LifeExpectancyItem> load_life_expectancy(
+				Country country, nlohmann::json node, std::filesystem::path parent_path) const;
 
 			std::string replace_string_tokens(std::string source, std::vector<std::string> tokens) const;
 		};

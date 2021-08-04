@@ -107,5 +107,32 @@ namespace hgps {
 
 			return result;
 		}
+
+		AnalysisDefinition StoreConverter::to_analysis_definition(
+			const core::DiseaseAnalysisEntity& entity, const core::IntegerInterval& age_range)
+		{
+			auto cols = std::vector<core::Gender>{ core::Gender::male, core::Gender::female };
+			auto lex_rows = std::vector<int>(entity.life_expectancy.size());
+			auto lex_data = core::FloatArray2D(lex_rows.size(), cols.size());
+			for (int index = 0; index < entity.life_expectancy.size(); index++) {
+				const auto& item = entity.life_expectancy.at(index);
+				lex_rows[index] = item.time;
+				lex_data(index, 0) = item.male;
+				lex_data(index, 1) = item.female;
+			}
+
+			auto life_expectancy = GenderTable<int, float>(MonotonicVector(lex_rows), cols, std::move(lex_data));
+
+			auto min_time = entity.cost_of_diseases.begin()->first;
+			auto max_time = entity.cost_of_diseases.rbegin()->first;
+			auto cost_of_disease = create_age_gender_table<double>(core::IntegerInterval(min_time, max_time));
+			for (const auto& item : entity.cost_of_diseases) {
+				cost_of_disease(item.first, core::Gender::male) = item.second.at(core::Gender::male);
+				cost_of_disease(item.first, core::Gender::female) = item.second.at(core::Gender::female);
+			}
+
+			auto weights = std::map<std::string, float>(entity.disability_weights);
+			return AnalysisDefinition(std::move(life_expectancy), std::move(cost_of_disease), std::move(weights));
+		}
 	}
 }

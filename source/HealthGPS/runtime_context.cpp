@@ -7,11 +7,15 @@ namespace hgps {
         const HierarchicalMapping& mapping,
         const core::IntegerInterval& age_range)
         : generator_{ generator }, mapping_{ mapping }, age_range_{age_range},
-        time_now_{}, population_{ 0 }
+        time_now_{}, reference_time_{}, population_{ 0 }
     {}
 
     int RuntimeContext::time_now() const noexcept {
         return time_now_;
+    }
+
+    int RuntimeContext::reference_time() const noexcept {
+        return reference_time_;
     }
 
     Population& RuntimeContext::population() noexcept {
@@ -52,7 +56,8 @@ namespace hgps {
         time_now_ = time_now;
     }
 
-    void RuntimeContext::reset_population(const std::size_t pop_size) {
+    void RuntimeContext::reset_population(const std::size_t pop_size, const int reference_time) {
         population_ = Population{ pop_size };
+        reference_time_ = reference_time;
     }
 }

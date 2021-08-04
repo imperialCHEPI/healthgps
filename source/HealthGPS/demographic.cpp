@@ -56,8 +56,8 @@ namespace hgps {
 		return result;
 	}
 
-	void DemographicModule::initialise_population(RuntimeContext& context, const int time_year) {
-		auto age_gender_dist = get_age_gender_distribution(time_year);
+	void DemographicModule::initialise_population(RuntimeContext& context) {
+		auto age_gender_dist = get_age_gender_distribution(context.reference_time());
 		auto index = 0;
 		auto pop_size = static_cast<int>(context.population().size());
 		auto entry_count = 0;

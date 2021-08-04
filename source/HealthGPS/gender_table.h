@@ -99,7 +99,7 @@ namespace hgps {
 		std::iota(rows.begin(), rows.end(), age_range.lower());
 
 		auto cols = std::vector<core::Gender>{ core::Gender::male, core::Gender::female };
-		auto data = core::DoubleArray2D(rows.size(), cols.size());
+		auto data = core::Array2D<TYPE>(rows.size(), cols.size());
 		return AgeGenderTable<TYPE>(MonotonicVector(rows), cols, std::move(data));
 	}
 

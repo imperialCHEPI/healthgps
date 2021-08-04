@@ -284,6 +284,39 @@ namespace hgps {
 			return table;
 		}
 
+		DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) const
+		{
+			DiseaseAnalysisEntity entity;
+			if (!index_.contains("analysis")) {
+				return entity;
+			}
+
+			auto cost_node = index_["analysis"]["cost_of_disease"];
+			auto life_node = index_["analysis"]["life_expectancy"];
+			auto analysis_folder = index_["analysis"]["path"].get<std::string>();
+			auto disability_filename = index_["analysis"]["file_name"].get<std::string>();
+
+			auto local_root_path = (root_ / analysis_folder);
+			disability_filename = (local_root_path / disability_filename).string();
+			if (!std::filesystem::exists(disability_filename)) {
+				return entity;
+			}
+
+			rapidcsv::Document doc(disability_filename);
+			for (size_t i = 0; i < doc.GetRowCount(); i++) {
+				auto row = doc.GetRow<std::string>(i);
+				if (row.size() < 2) {
+					continue;
+				}
+
+				entity.disability_weights.emplace(row[0], std::stof(row[1]));
+			}
+
+			entity.cost_of_diseases = load_cost_of_diseases(country, cost_node, local_root_path.string());
+			entity.life_expectancy = load_life_expectancy(country, life_node, local_root_path.string());
+			return entity;
+		}
+
 		RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() const
 		{
 			if (index_.contains("diseases")) {
@@ -303,6 +336,69 @@ namespace hgps {
 			}
 
 			return RelativeRiskEntity();
+		}
+
+		std::map<int, std::map<Gender, double>> DataManager::load_cost_of_diseases(
+			Country country, nlohmann::json node, std::filesystem::path parent_path) const
+		{
+			std::map<int, std::map<Gender, double>> result;
+			auto cost_path = node["path"].get<std::string>();
+			auto filename = node["file_name"].get<std::string>();
+
+			// Tokenized file name BoD{COUNTRY_CODE}.xxx
+			auto tokens = std::vector<std::string> { std::to_string(country.code) };
+			filename = replace_string_tokens(filename, tokens);
+			filename = (parent_path / cost_path / filename).string();
+			if (!std::filesystem::exists(filename)) {
+				return result;
+			}
+
+			rapidcsv::Document doc(filename);
+			for (size_t i = 0; i < doc.GetRowCount(); i++) {
+				auto row = doc.GetRow<std::string>(i);
+				if (row.size() < 13) {
+					continue;
+				}
+
+				auto age = std::stoi(row[6]);
+				auto gender = static_cast<core::Gender>(std::stoi(row[8]));
+				result[age][gender] = std::stod(row[12]);
+			}
+
+			return result;
+		}
+
+		std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(
+			Country country, nlohmann::json node, std::filesystem::path parent_path) const
+		{
+			std::vector<LifeExpectancyItem> result;
+			auto life_path = node["path"].get<std::string>();
+			auto filename = node["file_name"].get<std::string>();
+
+			// Tokenized file name LEx{COUNTRY_CODE}.xxx
+			auto tokens = std::vector<std::string>{ std::to_string(country.code) };
+			filename = replace_string_tokens(filename, tokens);
+			filename = (parent_path / life_path / filename).string();
+			if (!std::filesystem::exists(filename)) {
+				return result;
+			}
+
+			rapidcsv::Document doc(filename);
+			for (size_t i = 0; i < doc.GetRowCount(); i++) {
+				auto row = doc.GetRow<std::string>(i);
+				if (row.size() < 10) {
+					continue;
+				}
+
+				result.push_back(LifeExpectancyItem{
+						.time = std::stoi(row[6]),
+						.both = std::stof(row[7]),
+						.male = std::stof(row[8]),
+						.female = std::stof(row[9])
+					});
+			}
+
+			return result;
 		}
 
 		std::string DataManager::replace_string_tokens(std::string source, std::vector<std::string> tokens) const

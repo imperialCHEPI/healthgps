@@ -140,3 +140,17 @@ TEST(TestDatastore, DiseaseRelativeRiskToRiskFactor)
 	ASSERT_NE(table_feme.rows[0][1], table_feme.rows[0][2]);
 	ASSERT_FALSE(table_feme.is_default_value);
 }
+
+TEST(TestDatastore, RetrieveAnalysisEntity)
+{
+	using namespace hgps::data;
+
+	auto manager = DataManager(store_full_path);
+	auto uk = manager.get_country("GB");
+	auto entity = manager.get_disease_analysis(uk.value());
+
+	ASSERT_FALSE(entity.empty());
+	ASSERT_GT(entity.disability_weights.size(), 0);
+	ASSERT_GT(entity.cost_of_diseases.size(), 0);
+	ASSERT_GT(entity.life_expectancy.size(), 0);
+}

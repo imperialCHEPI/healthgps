@@ -87,6 +87,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="analysis.h" />
     <ClInclude Include="api.h" />
     <ClInclude Include="array2d.h" />
     <ClInclude Include="column.h" />

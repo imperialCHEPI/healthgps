@@ -16,11 +16,13 @@ namespace hgps {
 		auto dem_base = factory.create(SimulationModuleType::Demographic, config_);
 		auto risk_base = factory.create(SimulationModuleType::RiskFactor, config_);
 		auto disease_base = factory.create(SimulationModuleType::Disease, config_);
+		auto analysis_base = factory.create(SimulationModuleType::Analysis, config_);
 
 		ses_ = std::static_pointer_cast<SESModule>(ses_base);
 		demographic_ = std::static_pointer_cast<DemographicModule>(dem_base);
 		risk_factor_ = std::static_pointer_cast<RiskFactorModule>(risk_base);
 		disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
+		analysis_ = std::static_pointer_cast<AnalysisModule>(analysis_base);
 	}
 
 	void HealthGPS::initialize()
@@ -93,10 +95,10 @@ namespace hgps {
 	void HealthGPS::initialise_population(const int pop_size, const int ref_year)
 	{
 		// Note the order is very important
-		context_.reset_population(pop_size);
+		context_.reset_population(pop_size, ref_year);
 
 		// Gender - Age, must be first
-		demographic_->initialise_population(context_, ref_year);
+		demographic_->initialise_population(context_);
 
 		// Social economics status
 		ses_->initialise_population(context_);
@@ -106,6 +108,9 @@ namespace hgps {
 
 		// Initialise diseases
 		disease_->initialise_population(context_);
+
+		// Initialise analysis
+		analysis_->initialise_population(context_);
 
 		// Print out initial population statistics
 		// 

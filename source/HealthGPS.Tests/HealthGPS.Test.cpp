@@ -386,3 +386,21 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
 	ASSERT_EQ("Disease", disease_module->name());
 }
+
+TEST(TestHealthGPS, CreateAnalysisModule)
+{
+	using namespace hgps;
+	using namespace hgps::data;
+
+	DataTable data;
+	create_test_datatable(data);
+
+	auto full_path = fs::absolute("../../../data");
+	auto manager = DataManager(full_path);
+
+	auto inputs = create_test_configuration(data);
+
+	auto analysis_module = build_analysis_module(manager, inputs);
+	ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
+	ASSERT_EQ("Analysis", analysis_module->name());
+}

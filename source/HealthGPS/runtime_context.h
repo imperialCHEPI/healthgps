@@ -16,6 +16,8 @@ namespace hgps {
 
 		int time_now() const noexcept;
 
+		int reference_time() const noexcept;
+
 		Population& population() noexcept;
 
 		const HierarchicalMapping& mapping() const noexcept;
@@ -32,13 +34,14 @@ namespace hgps {
 
 		void set_current_time(const int time_now) noexcept;
 
-		void reset_population(const std::size_t pop_size);
+		void reset_population(const std::size_t pop_size, const int reference_time);
 
 	private:
 		RandomBitGenerator& generator_;
 		HierarchicalMapping mapping_;
 		Population population_;
 		core::IntegerInterval age_range_;
+		int reference_time_{};
 		int time_now_{};
 	};
 }

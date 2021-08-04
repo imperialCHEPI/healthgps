@@ -26,12 +26,12 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "source": "The Institute for Health Metrics and Evaluation",
+        "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "path": "diseases",
         "file_name": "D{COUNTRY_CODE}.csv",
-        "age_limits": [0, 100],
+        "age_limits": [1, 100],
         "relative_risk":{
             "path": "relative_risk",
             "to_disease":{
@@ -48,6 +48,24 @@
             "asthma": "Asthma",
             "diabetes": "Diabetes mellitus",
             "lowbackpain": "Low back pain"
+        }
+    },
+    "analysis":{
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "source": "UN Population Database and IHME",
+        "path": "analysis",
+        "age_limits": [1, 100],
+        "time_limits": [1950, 2100],
+        "file_name": "disability_weights.csv",
+        "cost_of_disease": {
+            "path":"cost",
+            "file_name": "BoD{COUNTRY_CODE}.csv"
+        },
+        "life_expectancy":{
+            "path":"life_expectancy",
+            "file_name": "LEx{COUNTRY_CODE}.csv"
         }
     }
 }

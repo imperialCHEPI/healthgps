@@ -23,11 +23,11 @@ namespace hgps {
 		return models_.contains(code);
 	}
 
-	std::shared_ptr<DiseaseModel> DiseaseModule::operator[](std::string code) {
+	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string code) {
 		return models_.at(code);
 	}
 
-	const std::shared_ptr<DiseaseModel> DiseaseModule::operator[](std::string code) const {
+	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string code) const {
 		return models_.at(code);
 	}
 

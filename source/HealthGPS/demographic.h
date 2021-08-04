@@ -41,7 +41,7 @@ namespace hgps {
 
 		std::map<int, GenderPair> get_age_gender_distribution(const int time_year) const noexcept;
 
-		void initialise_population(RuntimeContext& context, const int time_year);
+		void initialise_population(RuntimeContext& context);
 
 	private:
 		std::map<int, std::map<int, AgeRecord>> data_;

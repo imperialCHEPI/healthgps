@@ -19,9 +19,9 @@ namespace hgps {
 
 		bool contains(std::string code) const noexcept;
 
-		std::shared_ptr<DiseaseModel> operator[](std::string code);
+		std::shared_ptr<DiseaseModel>& operator[](std::string code);
 
-		const std::shared_ptr<DiseaseModel> operator[](std::string code) const;
+		const std::shared_ptr<DiseaseModel>& operator[](std::string code) const;
 
 		void initialise_population(RuntimeContext& context);
 

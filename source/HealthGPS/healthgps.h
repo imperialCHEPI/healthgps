@@ -3,12 +3,8 @@
 #include <vector>
 
 #include "simulation.h"
-#include "modulefactory.h"
 #include "runtime_context.h"
-#include "demographic.h"
-#include "ses.h"
-#include "riskfactor.h"
-#include "disease.h"
+#include "simulation_module.h"
 
 namespace hgps {
 
@@ -37,6 +33,7 @@ namespace hgps {
 		std::shared_ptr<DemographicModule> demographic_;
 		std::shared_ptr<RiskFactorModule> risk_factor_;
 		std::shared_ptr<DiseaseModule> disease_;
+		std::shared_ptr<AnalysisModule> analysis_;
 
 		void initialise_population(const int pop_size, const int ref_year);
 	};
