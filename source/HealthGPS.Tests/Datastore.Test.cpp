@@ -73,6 +73,16 @@ TEST(TestDatastore, RetrieveDeseasesInfo)
 	ASSERT_GT(diseases.size(), 0);
 }
 
+TEST(TestDatastore, RetrieveDeseasesInfoHasNoValue)
+{
+	using namespace hgps::data;
+
+	auto manager = DataManager(store_full_path);
+
+	auto info = manager.get_disease_info("ghost369");
+	EXPECT_FALSE(info.has_value());
+}
+
 TEST(TestDatastore, RetrieveDeseaseDefinition)
 {
 	using namespace hgps::data;
@@ -84,11 +94,29 @@ TEST(TestDatastore, RetrieveDeseaseDefinition)
 	for (auto& item : diseases) {
 		auto entity = manager.get_disease(item, uk);
 
+		ASSERT_FALSE(entity.empty());
 		ASSERT_GT(entity.measures.size(), 0);
 		ASSERT_GT(entity.items.size(), 0);
 		EXPECT_EQ(item.code, entity.info.code);
 		EXPECT_EQ(uk.code, entity.country.code);
 	}
+}
+
+TEST(TestDatastore, RetrieveDeseaseDefinitionIsEmpty)
+{
+	using namespace hgps::data;
+
+	auto manager = DataManager(store_full_path);
+
+	auto uk = manager.get_country("GB").value();
+	auto info = DiseaseInfo{ .code = "ghost369", .name = "Look at the flowers." };
+	auto entity = manager.get_disease(info, uk);
+
+	ASSERT_TRUE(entity.empty());
+	ASSERT_EQ(0, entity.items.size());
+	ASSERT_EQ(0, entity.measures.size());
+	EXPECT_EQ(info.code, entity.info.code);
+	EXPECT_EQ(uk.code, entity.country.code);
 }
 
 TEST(TestDatastore, DiseaseRelativeRiskToDisease)
@@ -113,6 +141,23 @@ TEST(TestDatastore, DiseaseRelativeRiskToDisease)
 	ASSERT_GT(table_other.rows.size(), 0);
 	ASSERT_NE(table_other.rows[0][1], table_other.rows[0][2]);
 	ASSERT_FALSE(table_other.is_default_value);
+}
+
+TEST(TestDatastore, DefaultDiseaseRelativeRiskToDisease)
+{
+	using namespace hgps;
+	using namespace hgps::data;
+
+	auto manager = DataManager(store_full_path);
+	auto diabetes = manager.get_disease_info("diabetes").value();
+	auto ghost_disease = DiseaseInfo{ .code = "ghost369", .name = "Look at the flowers." };
+	auto default_table = manager.get_relative_risk_to_disease(diabetes, ghost_disease);
+
+	ASSERT_EQ(3, default_table.columns.size());
+	ASSERT_GT(default_table.rows.size(), 0);
+	ASSERT_EQ(1.0, default_table.rows[0][1]);
+	ASSERT_EQ(1.0, default_table.rows[0][2]);
+	ASSERT_TRUE(default_table.is_default_value);
 }
 
 TEST(TestDatastore, DiseaseRelativeRiskToRiskFactor)
@@ -153,4 +198,16 @@ TEST(TestDatastore, RetrieveAnalysisEntity)
 	ASSERT_GT(entity.disability_weights.size(), 0);
 	ASSERT_GT(entity.cost_of_diseases.size(), 0);
 	ASSERT_GT(entity.life_expectancy.size(), 0);
+}
+
+TEST(TestDatastore, RetrieveBirthIndicators)
+{
+	using namespace hgps::data;
+
+	auto manager = DataManager(store_full_path);
+	auto uk = manager.get_country("GB");
+	auto births = manager.get_birth_indicators(uk.value());
+
+	ASSERT_FALSE(births.empty());
+	ASSERT_GT(births.size(), 0);
 }

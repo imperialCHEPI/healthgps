@@ -286,6 +286,41 @@ namespace hgps {
 			return table;
 		}
 
+		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country) const
+		{
+			std::vector<BirthItem> result;
+			if (index_.contains("indicators")) {
+				auto indicators_folder = index_["indicators"]["path"].get<std::string>();
+				auto filename = index_["indicators"]["file_name"].get<std::string>();
+
+				// Tokenized file name Pi{COUNTRY_CODE}.xxx
+				auto tokens = std::vector<std::string>{ std::to_string(country.code) };
+				filename = replace_string_tokens(filename, tokens);
+				filename = (root_ / indicators_folder / filename).string();
+				if (!std::filesystem::exists(filename)) {
+					return result;
+				}
+
+				rapidcsv::Document doc(filename);
+				auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+					{ "TimeYear", "Births", "SRB" });
+				for (size_t i = 0; i < doc.GetRowCount(); i++) {
+					auto row = doc.GetRow<std::string>(i);
+					if (row.size() < 3) {
+						continue;
+					}
+
+					result.push_back(BirthItem{
+							.time = std::stoi(row[mapping["TimeYear"]]),
+							.number = std::stof(row[mapping["Births"]]),
+							.sex_ratio = std::stof(row[mapping["SRB"]])
+						});
+				}
+			}
+
+			return result;
+		}
+
 		DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) const
 		{
 			DiseaseAnalysisEntity entity;
@@ -389,7 +424,7 @@ namespace hgps {
 					{ "TimeYear", "LEx", "LExMale", "LExFemale"});
 				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
-					if (row.size() < 10) {
+					if (row.size() < 4) {
 						continue;
 					}
 

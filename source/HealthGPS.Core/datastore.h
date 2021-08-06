@@ -33,6 +33,8 @@ namespace hgps {
 				DiseaseInfo source, Gender gender, std::string risk_factor) const = 0;
 
 			virtual DiseaseAnalysisEntity get_disease_analysis(const Country country) const = 0;
+
+			virtual std::vector<BirthItem> get_birth_indicators(const Country country) const = 0;
 		};
 	}
 }

@@ -36,6 +36,10 @@ namespace hgps {
 			DiseaseInfo info;
 			std::map<std::string, int> measures;
 			std::vector<DiseaseItem> items;
+
+			bool empty() const noexcept {
+				return measures.empty() || items.empty();
+			}
 		};
 
 		struct RelativeRiskEntity

@@ -183,7 +183,6 @@ TEST(TestHealthGPS, SimulationInitialise)
 
 	ASSERT_NO_THROW(HealthGPS(factory, config, MTRandom32()));
 }
-
 TEST(TestHealthGPS, ModuleFactoryRegistry)
 {
 	using namespace hgps;

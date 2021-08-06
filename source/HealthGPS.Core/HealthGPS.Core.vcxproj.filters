@@ -93,6 +93,9 @@
     <ClInclude Include="analysis.h">
       <Filter>Header Files\poco</Filter>
     </ClInclude>
+    <ClInclude Include="indicator.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">

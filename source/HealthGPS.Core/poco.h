@@ -4,3 +4,4 @@
 #include "population_item.h"
 #include "disease.h"
 #include "analysis.h"
+#include "indicator.h"

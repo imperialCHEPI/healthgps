@@ -39,6 +39,8 @@ namespace hgps {
 
 			DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
 
+			std::vector<BirthItem> get_birth_indicators(const Country country) const override;
+
 		private:
 			const std::filesystem::path root_;
 			nlohmann::json index_;
