@@ -3,6 +3,7 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
+        "desciption": "ISO 3166-1 country codes.",
         "source": "International Organization for Standardization",
         "url": "https://www.iso.org/iso-3166-country-codes.html",
         "license": "N/A",
@@ -13,6 +14,7 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
+        "desciption": "Total population by sex, annually from 1950 to 2100.",
         "source": "UN Population Database",
         "url": "https://population.un.org/wpp/",
         "license": "Creative Commons license",
@@ -22,10 +24,38 @@
         "time_limits": [1950, 2100],
         "projections": 2020
     },
+    "mortality":{
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "desciption": "Number of deaths by sex in five-year age groups.",
+        "source": "UN Population Database",
+        "url": "https://population.un.org/wpp/",
+        "license": "Creative Commons license",
+        "path": "undb\\mortality",
+        "file_name": "M{COUNTRY_CODE}.csv",
+        "age_limits": [0, 100],
+        "time_limits": [1950, 2100],
+        "projections": 2020
+    },
+    "indicators": {
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "desciption":"Several indicators in 5-year periods, e.g. births, deaths and life expectancy.",
+        "source": "UN Population Database",
+        "url": "https://population.un.org/wpp/",
+        "license": "Creative Commons license",
+        "path": "undb\\indicators",
+        "file_name": "Pi{COUNTRY_CODE}.csv",
+        "time_limits": [1950, 2100],
+        "projections": 2020
+    },
     "diseases": {
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
+        "desciption":"Diseases indicators, measures and relative risk factors.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
@@ -54,7 +84,10 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "source": "UN Population Database and IHME",
+        "desciption":"Observed burden of disease measures and disability weigths.",
+        "source": "The Institute for Health Metrics and Evaluation - IHME",
+        "url": "http://www.healthdata.org/",
+        "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "path": "analysis",
         "age_limits": [1, 100],
         "time_limits": [1950, 2100],
@@ -62,10 +95,6 @@
         "cost_of_disease": {
             "path":"cost",
             "file_name": "BoD{COUNTRY_CODE}.csv"
-        },
-        "life_expectancy":{
-            "path":"life_expectancy",
-            "file_name": "LEx{COUNTRY_CODE}.csv"
         }
     }
 }

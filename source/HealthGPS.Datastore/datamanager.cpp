@@ -27,14 +27,16 @@ namespace hgps {
 				// TODO: use precondition contract
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
+					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+						{ "Code","Name","Alpha2","Alpha3" });
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
 						results.push_back(Country
 							{
-								.code = std::stoi(row[0]),
-								.name = row[1],
-								.alpha2 = row[2],
-								.alpha3 = row[3]
+								.code = std::stoi(row[mapping["Code"]]),
+								.name = row[mapping["Name"]],
+								.alpha2 = row[mapping["Alpha2"]],
+								.alpha3 = row[mapping["Alpha3"]]
 							});
 					}
 
@@ -292,7 +294,6 @@ namespace hgps {
 			}
 
 			auto cost_node = index_["analysis"]["cost_of_disease"];
-			auto life_node = index_["analysis"]["life_expectancy"];
 			auto analysis_folder = index_["analysis"]["path"].get<std::string>();
 			auto disability_filename = index_["analysis"]["file_name"].get<std::string>();
 
@@ -313,7 +314,7 @@ namespace hgps {
 			}
 
 			entity.cost_of_diseases = load_cost_of_diseases(country, cost_node, local_root_path.string());
-			entity.life_expectancy = load_life_expectancy(country, life_node, local_root_path.string());
+			entity.life_expectancy = load_life_expectancy(country);
 			return entity;
 		}
 
@@ -368,34 +369,37 @@ namespace hgps {
 			return result;
 		}
 
-		std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(
-			Country country, nlohmann::json node, std::filesystem::path parent_path) const
+		std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(const Country& country) const
 		{
 			std::vector<LifeExpectancyItem> result;
-			auto life_path = node["path"].get<std::string>();
-			auto filename = node["file_name"].get<std::string>();
+			if (index_.contains("indicators")) {
+				auto indicators_folder = index_["indicators"]["path"].get<std::string>();
+				auto filename = index_["indicators"]["file_name"].get<std::string>();
 
-			// Tokenized file name LEx{COUNTRY_CODE}.xxx
-			auto tokens = std::vector<std::string>{ std::to_string(country.code) };
-			filename = replace_string_tokens(filename, tokens);
-			filename = (parent_path / life_path / filename).string();
-			if (!std::filesystem::exists(filename)) {
-				return result;
-			}
-
-			rapidcsv::Document doc(filename);
-			for (size_t i = 0; i < doc.GetRowCount(); i++) {
-				auto row = doc.GetRow<std::string>(i);
-				if (row.size() < 10) {
-					continue;
+				// Tokenized file name Pi{COUNTRY_CODE}.xxx
+				auto tokens = std::vector<std::string>{ std::to_string(country.code) };
+				filename = replace_string_tokens(filename, tokens);
+				filename = (root_ / indicators_folder / filename).string();
+				if (!std::filesystem::exists(filename)) {
+					return result;
 				}
 
-				result.push_back(LifeExpectancyItem{
-						.time = std::stoi(row[6]),
-						.both = std::stof(row[7]),
-						.male = std::stof(row[8]),
-						.female = std::stof(row[9])
-					});
+				rapidcsv::Document doc(filename);
+				auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+					{ "TimeYear", "LEx", "LExMale", "LExFemale"});
+				for (size_t i = 0; i < doc.GetRowCount(); i++) {
+					auto row = doc.GetRow<std::string>(i);
+					if (row.size() < 10) {
+						continue;
+					}
+
+					result.push_back(LifeExpectancyItem{
+							.time = std::stoi(row[mapping["TimeYear"]]),
+							.both = std::stof(row[mapping["LEx"]]),
+							.male = std::stof(row[mapping["LExMale"]]),
+							.female = std::stof(row[mapping["LExFemale"]])
+						});
+				}
 			}
 
 			return result;
@@ -417,6 +421,23 @@ namespace hgps {
 			}
 
 			return output;
+		}
+
+		std::map<std::string, std::size_t> DataManager::create_fields_index_mapping(
+			const std::vector<std::string>& column_names,
+			const std::vector<std::string> fields) const
+		{
+			auto mapping = std::map<std::string, std::size_t>();
+			for (auto& field : fields) {
+				auto field_index = core::case_insensitive::index_of(column_names, field);
+				if (field_index < 0) {
+					throw std::out_of_range(std::format("Required field {} not found.", field));
+				}
+
+				mapping.emplace(field, field_index);
+			}
+
+			return mapping;
 		}
 	}
 }

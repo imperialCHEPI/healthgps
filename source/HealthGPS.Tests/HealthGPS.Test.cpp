@@ -178,17 +178,7 @@ TEST(TestHealthGPS, SimulationInitialise)
 
 	auto risk_module_ptr = std::make_shared<RiskFactorModule>(std::move(risk_models));
 
-	auto factory = SimulationModuleFactory(manager);
-	factory.register_builder(SimulationModuleType::SES,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-			return build_ses_module(manager, config); });
-	factory.register_builder(SimulationModuleType::Demographic,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-			return build_demographic_module(manager, config); });
-	factory.register_builder(SimulationModuleType::Disease, 
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-		return build_disease_module(manager, config); });
-
+	auto factory = get_default_simulation_module_factory(manager);
 	factory.register_instance(SimulationModuleType::RiskFactor, risk_module_ptr);
 
 	ASSERT_NO_THROW(HealthGPS(factory, config, MTRandom32()));
