@@ -90,7 +90,6 @@
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "path": "analysis",
         "age_limits": [1, 100],
-        "time_limits": [1950, 2100],
         "file_name": "disability_weights.csv",
         "cost_of_disease": {
             "path":"cost",

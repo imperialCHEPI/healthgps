@@ -3,15 +3,15 @@
 #include <cassert>
 
 namespace hgps {
-	DemographicModule::DemographicModule(std::map<int, std::map<int, AgeRecord>>&& data)
+	DemographicModule::DemographicModule(std::map<int, std::map<int, PopulationRecord>>&& data)
 		: data_{ data } {
 		if (!data_.empty()) {
 			auto first_entry = data_.begin();
-			age_range_ = core::IntegerInterval(first_entry->first, (--data_.end())->first);
+			age_range_ = core::IntegerInterval(first_entry->first, data_.rbegin()->first);
 			if (!first_entry->second.empty()) {
 				age_range_ = core::IntegerInterval(
 					first_entry->second.begin()->first,
-					(--first_entry->second.end())->first);
+					first_entry->second.rbegin()->first);
 			}
 		}
 	}
@@ -123,7 +123,7 @@ namespace hgps {
 
 	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config) {
 		// year => age [age, male, female]
-		auto data = std::map<int, std::map<int, AgeRecord>>();
+		auto data = std::map<int, std::map<int, PopulationRecord>>();
 
 		auto min_time = std::min(config.start_time(), config.settings().reference_time());
 
@@ -131,7 +131,7 @@ namespace hgps {
 			return value >= min_time && value <= config.stop_time(); });
 
 		for (auto& item : pop) {
-			data[item.year].emplace(item.age, AgeRecord(item.age, item.males, item.females));
+			data[item.year].emplace(item.age, PopulationRecord(item.age, item.males, item.females));
 		}
 
 		return std::make_unique<DemographicModule>(std::move(data));

@@ -6,8 +6,8 @@
 
 namespace hgps {
 
-	struct AgeRecord {
-		AgeRecord(int pop_age, float males, float females)
+	struct PopulationRecord {
+		PopulationRecord(int pop_age, float males, float females)
 			: age{ pop_age }, num_males{ males }, num_females{ females }
 		{}
 
@@ -31,7 +31,7 @@ namespace hgps {
 	class DemographicModule final : public SimulationModule {
 	public:
 		DemographicModule() = delete;
-		DemographicModule(std::map<int, std::map<int, AgeRecord>>&& data);
+		DemographicModule(std::map<int, std::map<int, PopulationRecord>>&& data);
 
 		SimulationModuleType type() const noexcept override;
 
@@ -44,7 +44,7 @@ namespace hgps {
 		void initialise_population(RuntimeContext& context);
 
 	private:
-		std::map<int, std::map<int, AgeRecord>> data_;
+		std::map<int, std::map<int, PopulationRecord>> data_;
 
 		// Data limits cache 
 		core::IntegerInterval time_range_{};
