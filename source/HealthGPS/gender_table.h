@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <numeric>
 
 #include "monotonic_vector.h"

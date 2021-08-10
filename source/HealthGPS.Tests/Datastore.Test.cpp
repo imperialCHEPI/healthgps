@@ -57,6 +57,30 @@ TEST(TestDatastore, CountryPopulation)
 	ASSERT_GT(uk_pop_max, uk_pop_flt.back().year);
 }
 
+TEST(TestDatastore, CountryMortality)
+{
+	using namespace hgps::data;
+
+	auto manager = DataManager(store_full_path);
+	auto uk = manager.get_country("GB");
+	auto uk_deaths = manager.get_mortality(uk.value());
+
+	// Filter out the ends of the years range
+	auto uk_deaths_min = uk_deaths.front().year;
+	auto uk_deaths_max = uk_deaths.back().year;
+	auto mid_year = std::midpoint(uk_deaths_min, uk_deaths_max);
+	auto uk_deaths_flt = manager.get_mortality(uk.value(), [&mid_year](const int& value)
+		{return value >= (mid_year - 1) && value <= (mid_year + 1); });
+
+	ASSERT_GT(uk_deaths.size(), 0);
+	ASSERT_GT(uk_deaths_flt.size(), 0);
+	ASSERT_GT(uk_deaths_max, uk_deaths_min);
+
+	ASSERT_GT(uk_deaths.size(), uk_deaths_flt.size());
+	ASSERT_LT(uk_deaths_min, uk_deaths_flt.front().year);
+	ASSERT_GT(uk_deaths_max, uk_deaths_flt.back().year);
+}
+
 TEST(TestDatastore, RetrieveDeseasesInfo)
 {
 	using namespace hgps::data;

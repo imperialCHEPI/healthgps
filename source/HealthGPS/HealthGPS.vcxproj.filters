@@ -135,6 +135,9 @@
     <ClInclude Include="analysis_definition.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="life_table.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="analysis_module.cpp">
       <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="life_table.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

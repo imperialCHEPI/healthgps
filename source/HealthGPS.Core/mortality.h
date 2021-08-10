@@ -1,10 +1,11 @@
 #pragma once
+
 #include <tuple>
 
 namespace hgps {
 	namespace core {
 
-		struct PopulationItem
+		struct MortalityItem
 		{
 			int location_id{};
 			int year{};
@@ -14,11 +15,11 @@ namespace hgps {
 			float total{};
 		};
 
-		inline bool operator< (PopulationItem const& lhs, PopulationItem const& rhs) {
+		inline bool operator< (MortalityItem const& lhs, MortalityItem const& rhs) {
 			return std::tie(lhs.year, lhs.age) < std::tie(rhs.year, rhs.age);
 		}
 
-		inline bool operator> (PopulationItem const& lhs, PopulationItem const& rhs) {
+		inline bool operator> (MortalityItem const& lhs, MortalityItem const& rhs) {
 			return std::tie(lhs.year, lhs.age) > std::tie(rhs.year, rhs.age);
 		}
 	}

@@ -96,6 +96,9 @@
     <ClInclude Include="indicator.h">
       <Filter>Header Files\poco</Filter>
     </ClInclude>
+    <ClInclude Include="mortality.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">

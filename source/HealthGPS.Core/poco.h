@@ -5,3 +5,4 @@
 #include "disease.h"
 #include "analysis.h"
 #include "indicator.h"
+#include "mortality.h"

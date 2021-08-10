@@ -107,6 +107,7 @@
     <ClInclude Include="disease_model.h" />
     <ClInclude Include="disease_table.h" />
     <ClInclude Include="gender_table.h" />
+    <ClInclude Include="life_table.h" />
     <ClInclude Include="mapping.h" />
     <ClInclude Include="hierarchical_model.h" />
     <ClInclude Include="interfaces.h" />
@@ -135,6 +136,7 @@
     <ClCompile Include="diabetes_model.cpp" />
     <ClCompile Include="disease.cpp" />
     <ClCompile Include="disease_table.cpp" />
+    <ClCompile Include="life_table.cpp" />
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="hierarchical_model.cpp" />
     <ClCompile Include="modelrunner.cpp" />

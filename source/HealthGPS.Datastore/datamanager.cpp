@@ -82,22 +82,70 @@ namespace hgps {
 				// LocID,Location,VarID,Variant,Time,MidPeriod,AgeGrp,AgeGrpStart,AgeGrpSpan,PopMale,PopFemale,PopTotal
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
+					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+						{ "LocID", "Time", "AgeGrp", "PopMale", "PopFemale", "PopTotal" });
 
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
-						auto time_year = std::stoi(row[4]);
+						auto time_year = std::stoi(row[mapping["Time"]]);
 						if (!year_filter(time_year)) {
 							continue;
 						}
 
 						results.push_back(PopulationItem
 							{
-								.code = std::stoi(row[0]),		// LocID
-								.year = time_year,				// Time
-								.age = std::stoi(row[6]),		// AgeGrp
-								.males = std::stof(row[9]),		// PopMale
-								.females = std::stof(row[10]),	// PopFemale
-								.total = std::stof(row[11])		// PopTotal
+								.location_id = std::stoi(row[mapping["LocID"]]),
+								.year = time_year,
+								.age = std::stoi(row[mapping["AgeGrp"]]),
+								.males = std::stof(row[mapping["PopMale"]]),
+								.females = std::stof(row[mapping["PopFemale"]]),
+								.total = std::stof(row[mapping["PopTotal"]])
+							});
+					}
+
+					std::sort(results.begin(), results.end());
+				}
+			}
+
+			return results;
+		}
+
+		std::vector<MortalityItem> DataManager::get_mortality(Country country) const {
+			return  DataManager::get_mortality(country, [](const unsigned int& value) {return true; });
+		}
+
+		std::vector<MortalityItem> DataManager::get_mortality(Country country,
+			const std::function<bool(const unsigned int&)> year_filter) const
+		{
+			auto results = std::vector<MortalityItem>();
+			if (index_.contains("mortality")) {
+				auto filepath = index_["mortality"]["path"].get<std::string>();
+				auto filename = index_["mortality"]["file_name"].get<std::string>();
+
+				// Tokenized file names X{country.code}X.xxx
+				filename = replace_string_tokens(filename, { std::to_string(country.code) });
+				filename = (root_ / filepath / filename).string();
+
+				// LocID,Location,Variant,Time,TimeYear,AgeGrp,Age,DeathsMale,DeathsFemale,DeathsTotal
+				if (std::filesystem::exists(filename)) {
+					rapidcsv::Document doc(filename);
+					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+						{ "LocID", "TimeYear", "Age", "DeathsMale", "DeathsFemale", "DeathsTotal" });
+					for (size_t i = 0; i < doc.GetRowCount(); i++) {
+						auto row = doc.GetRow<std::string>(i);
+						auto time_year = std::stoi(row[mapping["TimeYear"]]);
+						if (!year_filter(time_year)) {
+							continue;
+						}
+
+						results.push_back(MortalityItem
+							{
+								.location_id = std::stoi(row[mapping["LocID"]]),
+								.year = time_year,
+								.age = std::stoi(row[mapping["Age"]]),
+								.males = std::stof(row[mapping["DeathsMale"]]),
+								.females = std::stof(row[mapping["DeathsFemale"]]),
+								.total = std::stof(row[mapping["DeathsTotal"]])
 							});
 					}
 

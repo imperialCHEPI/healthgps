@@ -101,6 +101,7 @@
     <ClInclude Include="forward_type.h" />
     <ClInclude Include="indicator.h" />
     <ClInclude Include="interval.h" />
+    <ClInclude Include="mortality.h" />
     <ClInclude Include="poco.h" />
     <ClInclude Include="datastore.h" />
     <ClInclude Include="population_item.h" />
