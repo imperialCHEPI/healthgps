@@ -3,6 +3,8 @@
 #include "interfaces.h"
 #include "modelinput.h"
 #include "runtime_context.h"
+#include "gender_table.h"
+#include "life_table.h"
 
 namespace hgps {
 
@@ -31,7 +33,8 @@ namespace hgps {
 	class DemographicModule final : public SimulationModule {
 	public:
 		DemographicModule() = delete;
-		DemographicModule(std::map<int, std::map<int, PopulationRecord>>&& data);
+		DemographicModule(std::map<int, std::map<int, PopulationRecord>>&& pop_data,
+			LifeTable&& life_table);
 
 		SimulationModuleType type() const noexcept override;
 
@@ -41,14 +44,16 @@ namespace hgps {
 
 		std::map<int, GenderPair> get_age_gender_distribution(const int time_year) const noexcept;
 
+		GenderPair get_birth_rate(const int time_year) const noexcept;
+
 		void initialise_population(RuntimeContext& context);
 
 	private:
-		std::map<int, std::map<int, PopulationRecord>> data_;
+		std::map<int, std::map<int, PopulationRecord>> pop_data_;
+		LifeTable life_table_;
+		GenderTable<int, double> birth_rates_;
 
-		// Data limits cache 
-		core::IntegerInterval time_range_{};
-		core::IntegerInterval age_range_{};
+		void initialise_birth_rates();
 	};
 
 	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config);

@@ -89,6 +89,22 @@ namespace hgps {
 	};
 
 	template<core::Numerical TYPE>
+	GenderTable<int,TYPE> create_integer_gender_table(const core::IntegerInterval rows_range) {
+		if (rows_range.lower() < 0 || rows_range.lower() >= rows_range.upper()) {
+			throw std::invalid_argument(
+				"The 'range lower' value must be greater than zero and less than the 'range upper' value.");
+		}
+
+		int offset = 1;
+		auto rows = std::vector<int>(rows_range.length() + offset);
+		std::iota(rows.begin(), rows.end(), rows_range.lower());
+
+		auto cols = std::vector<core::Gender>{ core::Gender::male, core::Gender::female };
+		auto data = core::Array2D<TYPE>(rows.size(), cols.size());
+		return GenderTable<int, TYPE>(MonotonicVector(rows), cols, std::move(data));
+	}
+
+	template<core::Numerical TYPE>
 	AgeGenderTable<TYPE> create_age_gender_table(const core::IntegerInterval age_range) {
 		if (age_range.lower() < 0 || age_range.lower() >= age_range.upper()) {
 			throw std::invalid_argument(

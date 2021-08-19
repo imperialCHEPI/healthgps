@@ -230,8 +230,21 @@ TEST(TestDatastore, RetrieveBirthIndicators)
 
 	auto manager = DataManager(store_full_path);
 	auto uk = manager.get_country("GB");
-	auto births = manager.get_birth_indicators(uk.value());
+	auto uk_births = manager.get_birth_indicators(uk.value());
 
-	ASSERT_FALSE(births.empty());
-	ASSERT_GT(births.size(), 0);
+	// Filter out the ends of the years range
+	auto uk_births_min = uk_births.front().time;
+	auto uk_births_max = uk_births.back().time;
+	auto mid_year = std::midpoint(uk_births_min, uk_births_max);
+	auto uk_births_flt = manager.get_birth_indicators(uk.value(), [&mid_year](const int& value)
+		{return value >= (mid_year - 1) && value <= (mid_year + 1); });
+
+	ASSERT_FALSE(uk_births.empty());
+	ASSERT_GT(uk_births.size(), 0);
+	ASSERT_GT(uk_births_flt.size(), 0);
+	ASSERT_GT(uk_births_max, uk_births_min);
+
+	ASSERT_GT(uk_births.size(), uk_births_flt.size());
+	ASSERT_LT(uk_births_min, uk_births_flt.front().time);
+	ASSERT_GT(uk_births_max, uk_births_flt.back().time);
 }

@@ -44,7 +44,10 @@ namespace hgps {
 
 			DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
 
-			std::vector<BirthItem> get_birth_indicators(const Country country) const override;
+			std::vector<BirthItem> get_birth_indicators(const Country country) const;
+
+			std::vector<BirthItem> get_birth_indicators(const Country country,
+				const std::function<bool(const unsigned int&)> year_filter) const override;
 
 		private:
 			const std::filesystem::path root_;

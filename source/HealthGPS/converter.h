@@ -4,6 +4,7 @@
 #include "relative_risk.h"
 #include "gender_table.h"
 #include "analysis_definition.h"
+#include "life_table.h"
 
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/DataStore.h"
@@ -37,6 +38,8 @@ namespace hgps {
 
 			static AnalysisDefinition to_analysis_definition(
 				const core::DiseaseAnalysisEntity& entity, const core::IntegerInterval& age_range);
+
+			static LifeTable to_life_table(std::vector<core::BirthItem>& births, std::vector<core::MortalityItem>& deaths);
 		};
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info);

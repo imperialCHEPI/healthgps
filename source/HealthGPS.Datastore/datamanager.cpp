@@ -334,7 +334,12 @@ namespace hgps {
 			return table;
 		}
 
-		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country) const
+		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country) const {
+			return  DataManager::get_birth_indicators(country, [](const unsigned int& value) {return true; });
+		}
+
+		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country,
+			const std::function<bool(const unsigned int&)> year_filter) const
 		{
 			std::vector<BirthItem> result;
 			if (index_.contains("indicators")) {
@@ -354,12 +359,13 @@ namespace hgps {
 					{ "TimeYear", "Births", "SRB" });
 				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
-					if (row.size() < 3) {
+					auto time_year = std::stoi(row[mapping["TimeYear"]]);
+					if (!year_filter(time_year)) {
 						continue;
 					}
 
 					result.push_back(BirthItem{
-							.time = std::stoi(row[mapping["TimeYear"]]),
+							.time = time_year,
 							.number = std::stof(row[mapping["Births"]]),
 							.sex_ratio = std::stof(row[mapping["SRB"]])
 						});

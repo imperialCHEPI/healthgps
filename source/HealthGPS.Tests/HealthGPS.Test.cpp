@@ -47,7 +47,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 
 	auto age_range = core::IntegerInterval(0, 30);
-	auto settings = Settings(uk, 1, 0.1f, "Age", age_range);
+	auto settings = Settings(uk, 2011, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("gender", "Gender");
@@ -282,6 +282,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	auto pop_module = build_demographic_module(manager, config);
 	auto total_pop = pop_module->get_total_population(config.start_time());
 	auto pop_dist = pop_module->get_age_gender_distribution(config.start_time());
+	auto birth_rate = pop_module->get_birth_rate(config.start_time());
 	auto sum_male = 0.0;
 	auto sum_female = 0.0;
 	for (auto& age : pop_dist) {
@@ -293,6 +294,8 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	ASSERT_EQ("Demographic", pop_module->name());
 	ASSERT_GT(total_pop, 0);
 	ASSERT_GT(pop_dist.size(), 0);
+	ASSERT_GT(birth_rate.male, 0);
+	ASSERT_GT(birth_rate.female, 0);
 	ASSERT_TRUE((sum_prob - 1.0) < 1e-4);
 }
 

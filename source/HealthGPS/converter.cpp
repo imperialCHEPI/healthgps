@@ -134,5 +134,21 @@ namespace hgps {
 			auto weights = std::map<std::string, float>(entity.disability_weights);
 			return AnalysisDefinition(std::move(life_expectancy), std::move(cost_of_disease), std::move(weights));
 		}
+
+		LifeTable StoreConverter::to_life_table(std::vector<core::BirthItem>& births,
+			std::vector<core::MortalityItem>& deaths)
+		{
+			auto table_births = std::map<int, Birth>{};
+			for (auto& item : births) {
+				table_births.emplace(item.time, Birth{ item.number, item.sex_ratio });
+			}
+
+			auto table_deaths = std::map<int, std::map<int, Mortality>>{};
+			for (auto& item : deaths) {
+				table_deaths[item.year].emplace(item.age, Mortality(item.males, item.females));
+			}
+
+			return LifeTable(std::move(table_births), std::move(table_deaths));
+		}
 	}
 }

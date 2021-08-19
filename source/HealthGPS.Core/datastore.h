@@ -37,7 +37,8 @@ namespace hgps {
 
 			virtual DiseaseAnalysisEntity get_disease_analysis(const Country country) const = 0;
 
-			virtual std::vector<BirthItem> get_birth_indicators(const Country country) const = 0;
+			virtual std::vector<BirthItem> get_birth_indicators(
+				const Country country, const std::function<bool(const unsigned int&)> year_filter) const = 0;
 		};
 	}
 }
