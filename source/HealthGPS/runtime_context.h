@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "population.h"
 #include "mapping.h"
 
@@ -12,6 +13,7 @@ namespace hgps {
 		RuntimeContext(
 			RandomBitGenerator& generator,
 			const HierarchicalMapping& mapping,
+			const std::vector<core::DiseaseInfo>& diseases,
 			const core::IntegerInterval& age_range);
 
 		int time_now() const noexcept;
@@ -21,6 +23,8 @@ namespace hgps {
 		Population& population() noexcept;
 
 		const HierarchicalMapping& mapping() const noexcept;
+
+		const std::vector<core::DiseaseInfo>& diseases() const noexcept;
 
 		const core::IntegerInterval& age_range() const noexcept;
 
@@ -38,8 +42,9 @@ namespace hgps {
 
 	private:
 		RandomBitGenerator& generator_;
-		HierarchicalMapping mapping_;
 		Population population_;
+		HierarchicalMapping mapping_;
+		std::vector<core::DiseaseInfo> diseases_;
 		core::IntegerInterval age_range_;
 		int reference_time_{};
 		int time_now_{};

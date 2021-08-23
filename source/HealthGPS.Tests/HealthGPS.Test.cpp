@@ -114,10 +114,16 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	MappingEntry("BMI", 2)
 	};
 
+	auto diseases = std::vector<core::DiseaseInfo>{
+		core::DiseaseInfo{.code = "asthma", .name = "Asthma"},
+		core::DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
+		core::DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
+	};
+	
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto age_range = core::IntegerInterval(0, 100);
 
-	auto context = RuntimeContext(rnd, mapping, age_range);
+	auto context = RuntimeContext(rnd, mapping, diseases, age_range);
 	ASSERT_EQ(0, context.population().size());
 	ASSERT_EQ(0, context.time_now());
 }
@@ -135,10 +141,16 @@ TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
 	MappingEntry("BMI", 2)
 	};
 
+	auto diseases = std::vector<core::DiseaseInfo>{
+		core::DiseaseInfo{.code = "asthma", .name = "Asthma"},
+		core::DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
+		core::DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
+	};
+
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto age_range = core::IntegerInterval(0, 100);
 
-	auto context = RuntimeContext(rnd, mapping, age_range);
+	auto context = RuntimeContext(rnd, mapping, diseases, age_range);
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
 

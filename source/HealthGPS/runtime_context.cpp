@@ -5,9 +5,10 @@ namespace hgps {
     RuntimeContext::RuntimeContext(
         RandomBitGenerator& generator,
         const HierarchicalMapping& mapping,
+        const std::vector<core::DiseaseInfo>& diseases,
         const core::IntegerInterval& age_range)
-        : generator_{ generator }, mapping_{ mapping }, age_range_{age_range},
-        time_now_{}, reference_time_{}, population_{ 0 }
+        : generator_{ generator }, mapping_{ mapping }, diseases_{diseases},
+        age_range_{ age_range }, time_now_{}, reference_time_{}, population_{ 0 }
     {}
 
     int RuntimeContext::time_now() const noexcept {
@@ -24,6 +25,10 @@ namespace hgps {
 
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
         return mapping_;
+    }
+
+    const std::vector<core::DiseaseInfo>& RuntimeContext::diseases() const noexcept {
+        return diseases_;
     }
 
     const core::IntegerInterval& RuntimeContext::age_range() const noexcept {
