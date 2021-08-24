@@ -106,6 +106,10 @@
     <ClInclude Include="disease_definition.h" />
     <ClInclude Include="disease_model.h" />
     <ClInclude Include="disease_table.h" />
+    <ClInclude Include="event_aggregator.h" />
+    <ClInclude Include="event_bus.h" />
+    <ClInclude Include="event_message.h" />
+    <ClInclude Include="event_subscriber.h" />
     <ClInclude Include="gender_table.h" />
     <ClInclude Include="life_table.h" />
     <ClInclude Include="mapping.h" />
@@ -136,6 +140,8 @@
     <ClCompile Include="diabetes_model.cpp" />
     <ClCompile Include="disease.cpp" />
     <ClCompile Include="disease_table.cpp" />
+    <ClCompile Include="event_bus.cpp" />
+    <ClCompile Include="event_subscriber.cpp" />
     <ClCompile Include="life_table.cpp" />
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="hierarchical_model.cpp" />

@@ -37,6 +37,12 @@
     <Filter Include="Source Files\models">
       <UniqueIdentifier>{3daa05b8-d92a-47a2-b7ea-b5930a691b6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\events">
+      <UniqueIdentifier>{66678ac5-1f87-421f-82f4-82ecc25becf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\events">
+      <UniqueIdentifier>{91cfc951-d0b6-4347-a4d9-a727487e6ecd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interfaces.h">
@@ -138,6 +144,18 @@
     <ClInclude Include="life_table.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="event_aggregator.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="event_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="event_bus.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="event_subscriber.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -208,6 +226,12 @@
     </ClCompile>
     <ClCompile Include="life_table.cpp">
       <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="event_bus.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="event_subscriber.cpp">
+      <Filter>Source Files\events</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
