@@ -10,14 +10,10 @@ namespace hgps {
 		InfoEventMessage() = delete;
 		InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time) noexcept;
 		InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time, std::string msg) noexcept;
-
-		const std::string source{};
-
-		const unsigned int run_number{};
+		
+		const int model_time{};
 
 		const ModelAction model_action{};
-
-		const int model_time{};
 
 		const std::string message;
 

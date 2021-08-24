@@ -63,9 +63,6 @@
     <ClInclude Include="modelrunner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="modulefactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="countrymodule.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
@@ -162,6 +159,18 @@
     <ClInclude Include="runner_message.h">
       <Filter>Header Files\events</Filter>
     </ClInclude>
+    <ClInclude Include="modulefactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="result_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="model_result.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="error_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -243,6 +252,15 @@
       <Filter>Source Files\events</Filter>
     </ClCompile>
     <ClCompile Include="runner_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="result_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="model_result.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="error_message.cpp">
       <Filter>Source Files\events</Filter>
     </ClCompile>
   </ItemGroup>

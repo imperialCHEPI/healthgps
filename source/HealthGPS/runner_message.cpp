@@ -14,7 +14,7 @@ hgps::RunnerEventMessage::RunnerEventMessage(
 
 hgps::RunnerEventMessage::RunnerEventMessage(
     std::string sender, RunnerAction run_action, unsigned int run, double elapsed) noexcept
-    : source{sender}, action{ run_action }, run_number{ run }, elapsed_ms{elapsed} {}
+    : EventMessage{ sender, run }, action{ run_action }, elapsed_ms{elapsed} {}
 
 int hgps::RunnerEventMessage::id() const noexcept {
     return static_cast<int>(EventType::runner);
@@ -22,11 +22,11 @@ int hgps::RunnerEventMessage::id() const noexcept {
 
 std::string hgps::RunnerEventMessage::to_string() const {
     if (action == RunnerAction::start) {
-        return std::format("Source: {}, experiment starting ...", source);
+        return std::format("Source: {}, experiment started ...", source);
     }
 
     if (action == RunnerAction::run_begin) {
-        return std::format("Source: {}, run # {} begin ...", source, run_number);
+        return std::format("Source: {}, run # {} began ...", source, run_number);
     }
 
     if (action == RunnerAction::run_end) {

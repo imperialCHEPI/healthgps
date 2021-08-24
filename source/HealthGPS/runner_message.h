@@ -13,10 +13,6 @@ namespace hgps {
 		RunnerEventMessage(std::string sender, RunnerAction run_action, unsigned int run) noexcept;
 		RunnerEventMessage(std::string sender, RunnerAction run_action, unsigned int run, double elapsed) noexcept;
 
-		const std::string source;
-
-		const unsigned int run_number{};
-
 		const RunnerAction action{};
 
 		const double elapsed_ms{};
