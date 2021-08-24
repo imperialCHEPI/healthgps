@@ -3,6 +3,8 @@
 #include <map>
 
 #include "HealthGPS\api.h"
+#include "HealthGPS\event_bus.h"
+
 #include "HealthGPS.Datastore\api.h"
 
 #include "RiskFactorData.h"
@@ -105,7 +107,8 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 {
 	using namespace hgps;
 
-	MTRandom32 rnd(123456789);
+	auto bus = DefaultEventBus{};
+	auto rnd = MTRandom32(123456789);
 
 	auto entries = std::vector<MappingEntry>{
 	MappingEntry("Year", 0, "", true),
@@ -123,7 +126,7 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto age_range = core::IntegerInterval(0, 100);
 
-	auto context = RuntimeContext(rnd, mapping, diseases, age_range);
+	auto context = RuntimeContext(bus, rnd, mapping, diseases, age_range);
 	ASSERT_EQ(0, context.population().size());
 	ASSERT_EQ(0, context.time_now());
 }
@@ -132,7 +135,8 @@ TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
 {
 	using namespace hgps;
 
-	MTRandom32 rnd(123456789);
+	auto bus = DefaultEventBus{};
+	auto rnd = MTRandom32(123456789);
 
 	auto entries = std::vector<MappingEntry>{
 	MappingEntry("Year", 0, "", true),
@@ -150,7 +154,7 @@ TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto age_range = core::IntegerInterval(0, 100);
 
-	auto context = RuntimeContext(rnd, mapping, diseases, age_range);
+	auto context = RuntimeContext(bus, rnd, mapping, diseases, age_range);
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
 
@@ -193,7 +197,9 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto factory = get_default_simulation_module_factory(manager);
 	factory.register_instance(SimulationModuleType::RiskFactor, risk_module_ptr);
 
-	ASSERT_NO_THROW(HealthGPS(factory, config, MTRandom32()));
+	auto event_bus = DefaultEventBus();
+
+	ASSERT_NO_THROW(HealthGPS(factory, config, event_bus, MTRandom32()));
 }
 TEST(TestHealthGPS, ModuleFactoryRegistry)
 {

@@ -20,9 +20,10 @@ namespace hgps {
 
 		virtual void terminate() = 0;
 
+		virtual void set_current_run(const unsigned int run_number) noexcept = 0;
+
 	protected:
 		ModelInput config_;
 		RandomBitGenerator& rnd_;
-		adevs::Time end_time_;
 	};
 }

@@ -5,12 +5,14 @@
 #include "healthgps.h"
 #include "mtrandom.h"
 #include "univariate_visitor.h"
+#include "info_message.h"
 
 namespace hgps {
-	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config, RandomBitGenerator&& generator)
-		: Simulation(config, std::move(generator)), factory_{ factory },
-		context_{ rnd_, config_.risk_mapping(), config_.diseases(), config_.settings().age_range() } {
-
+	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config,
+		EventAggregator& bus, RandomBitGenerator&& generator)
+		: Simulation(config, std::move(generator)), 
+		context_{ bus, rnd_, config_.risk_mapping(), config_.diseases(), config_.settings().age_range() }
+	{
 		// Create required modules, should change to shared_ptr
 		auto ses_base = factory.create(SimulationModuleType::SES, config_);
 		auto dem_base = factory.create(SimulationModuleType::Demographic, config_);
@@ -42,6 +44,15 @@ namespace hgps {
 		std::cout << "Microsimulation algorithm terminate." << std::endl;
 	}
 
+	void HealthGPS::set_current_run(const unsigned int run_number) noexcept {
+		context_.set_current_run(run_number);
+	}
+
+	std::string HealthGPS::name() {
+		// TODO: replace with scenario type
+		return "baseline";
+	}
+
 	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)
 	{
 		auto ref_year = config_.settings().reference_time();
@@ -52,8 +63,12 @@ namespace hgps {
 
 		auto world_time = config_.start_time();
 		context_.set_current_time(world_time);
-		std::cout << "Started @ " << context_.time_now() << " [" << env->now().real << ","
-			<< env->now().logical << "], population size: " << pop_size << std::endl;
+
+		auto message = std::format("[{:4},{}] population size: {}",
+			env->now().real, env->now().logical, pop_size);
+		context_.publish(InfoEventMessage{ name(), ModelAction::start,
+			context_.current_run(), context_.time_now(), message });
+
 		return env->now() + adevs::Time(world_time, 0);
 	}
 
@@ -62,8 +77,10 @@ namespace hgps {
 		std::uniform_int_distribution dist(100, 200);
 		auto sleep_time = dist(rnd_);
 
-		std::cout << "Update population @ " << context_.time_now() << " [" << env->now().real << ", "
-			<< env->now().logical << "] dt = " << sleep_time << "ms" << std::endl;
+		auto message = std::format("[{:4},{}] sleep: {}ms",
+			env->now().real, env->now().logical, sleep_time);
+		context_.publish(InfoEventMessage{ name(), ModelAction::update,
+			context_.current_run(), context_.time_now(), message });
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
@@ -88,8 +105,9 @@ namespace hgps {
 
 	void HealthGPS::fini(adevs::Time clock)
 	{
-		std::cout << "Finished @ " << context_.time_now() << " [" << clock.real << ","
-			<< clock.logical << "], clear up resources." << std::endl;
+		auto message = std::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
+		context_.publish(InfoEventMessage{ name(), ModelAction::stop,
+			context_.current_run(), context_.time_now(), message });
 	}
 
 	void HealthGPS::initialise_population(const int pop_size, const int ref_year)

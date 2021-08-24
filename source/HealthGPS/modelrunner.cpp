@@ -1,7 +1,13 @@
 #include <chrono>
 #include "modelrunner.h"
+#include <HealthGPS/runner_message.h>
 
 namespace hgps {
+
+	using ElapsedTime = std::chrono::duration<double, std::milli>;
+
+	ModelRunner::ModelRunner(EventAggregator& bus) noexcept
+		: event_bus_{bus} {}
 
 	double ModelRunner::run(Simulation& model, const unsigned int trial_runs) const
 	{
@@ -10,18 +16,22 @@ namespace hgps {
 		}
 
 		auto start = std::chrono::steady_clock::now();
+		event_bus_.publish_async(RunnerEventMessage{ model.name(), RunnerAction::start});
 
 		/* Initialise simulation */
 		model.initialize();
 
-		for (size_t run = 1; run <= trial_runs; run++)
+		for (auto run = 1u; run <= trial_runs; run++)
 		{
-			std::cout << std::format("Run # {} started...\n", run);
+			auto run_start = std::chrono::steady_clock::now();
+			event_bus_.publish_async(RunnerEventMessage{
+				model.name(), RunnerAction::run_begin, run });
 
 			/* Create the simulation engine */
 			adevs::Simulator<int> sim;
 
-			/* Add the model to the engine */
+			/* Update model and add to engine */
+			model.set_current_run(run);
 			sim.add(&model);
 
 			/* Run until the next event is at infinity */
@@ -29,13 +39,19 @@ namespace hgps {
 				sim.exec_next_event();
 			}
 
-			std::cout << std::format("Run # {} finished...\n", run);
+			ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
+			event_bus_.publish_async(RunnerEventMessage{ 
+				model.name(), RunnerAction::run_end, run, elapsed.count() });
 		}
 
 		/* Terminate simulation */
 		model.terminate();
 
-		std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
-		return elapsed.count();
+		ElapsedTime elapsed = std::chrono::steady_clock::now() - start;
+		auto elapsed_ms = elapsed.count();
+
+		event_bus_.publish_async(RunnerEventMessage{ 
+			model.name(), RunnerAction::finish, elapsed_ms });
+		return elapsed_ms;
 	}
 }

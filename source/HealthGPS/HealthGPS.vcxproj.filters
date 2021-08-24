@@ -156,6 +156,12 @@
     <ClInclude Include="event_subscriber.h">
       <Filter>Header Files\events</Filter>
     </ClInclude>
+    <ClInclude Include="info_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="runner_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -231,6 +237,12 @@
       <Filter>Source Files\events</Filter>
     </ClCompile>
     <ClCompile Include="event_subscriber.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="info_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="runner_message.cpp">
       <Filter>Source Files\events</Filter>
     </ClCompile>
   </ItemGroup>

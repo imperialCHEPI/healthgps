@@ -1,6 +1,7 @@
 #include "program.h"
 #include "csvparser.h"
 #include "HealthGPS.Datastore/api.h"
+#include "HealthGPS/event_bus.h"
 
 #include <fmt/chrono.h>
 
@@ -64,12 +65,19 @@ int main(int argc, char* argv[])
 	// Create the complete model configuration
 	auto model_config = create_model_input(input_table, target.value(), config, diseases);
 
+	// Create event bus
+	auto event_bus = DefaultEventBus();
+
 	try	{
+
+		// Register event subscribers with scoped handlers
+		auto subscribers = register_event_subscribers(event_bus);
+
 		// Create main simulation model instance and run experiment
-		auto model = HealthGPS(factory, model_config, hgps::MTRandom32());
+		auto model = HealthGPS(factory, model_config, event_bus, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner();
+		auto runner = ModelRunner(event_bus);
 		auto runtime = runner.run(model, config.trial_runs);
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}

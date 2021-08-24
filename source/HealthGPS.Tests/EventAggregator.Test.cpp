@@ -1,6 +1,8 @@
 #include "pch.h"
 
 #include "HealthGPS\event_bus.h"
+#include "HealthGPS\info_message.h"
+#include "HealthGPS\runner_message.h"
 
 struct InfoMessage final : public hgps::EventMessage
 {
@@ -196,4 +198,33 @@ TEST(TestHealthGPS_EventBus, PublishToSubscribers)
 	ASSERT_EQ(expected, hub.count());
 	ASSERT_EQ(expected, handler.counter);
 	ASSERT_EQ(expected, counter);
+}
+
+TEST(TestHealthGPS_EventBus, PublishToFilteredSubscribers)
+{
+	using namespace hgps;
+	using namespace std::placeholders;
+
+	auto runner_count = 0;
+	auto expected = 2;
+
+	auto info_msg = InfoEventMessage{ "UnitTest", ModelAction::start, 1, 0 };
+	auto runner_msg = RunnerEventMessage{ "UnitTest", RunnerAction::start };
+
+	auto info_handler = TestHandler{};
+	auto info_callback = std::bind(&TestHandler::handler_event, &info_handler, _1);
+
+	auto hub = DefaultEventBus{};
+	auto fun_sub = hub.subscribe(EventType::info, info_callback);
+	auto lam_sub = hub.subscribe(EventType::runner, 
+		[&runner_count](const EventMessage& msg) {runner_count++; });
+
+	hub.publish(runner_msg);
+	hub.publish_async(info_msg);
+	hub.publish_async(info_msg);
+	hub.publish(runner_msg);
+
+	ASSERT_EQ(expected, hub.count());
+	ASSERT_EQ(expected, info_handler.counter);
+	ASSERT_EQ(expected, runner_count);
 }

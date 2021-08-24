@@ -1,11 +1,10 @@
 #pragma once
 
 #include <string>
-#include <format>
 
 namespace hgps {
 
-    enum class EventType { run_marker, info, result, error };
+    enum class EventType { runner, info, result, error };
 
     struct EventMessage
     {

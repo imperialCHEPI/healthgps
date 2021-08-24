@@ -27,15 +27,12 @@ namespace hgps {
 				subscribers_.at(begin_id->second)(message);
 			}
 			});
-
-		std::cout << "done: " << std::this_thread::get_id() << std::endl;
 	}
 
 	void DefaultEventBus::publish_async(const EventMessage& message)
 	{
 		auto futptr = std::make_shared<std::future<void>>();
 		*futptr = std::async(std::launch::async, &DefaultEventBus::publish, this, std::ref(message));
-		std::cout << "publish async ... " << std::this_thread::get_id() << std::endl;
 	}
 
 	bool DefaultEventBus::unsubscribe(const EventSubscriber& subscriber)

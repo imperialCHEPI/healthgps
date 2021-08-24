@@ -3,11 +3,12 @@
 
 namespace hgps {
     RuntimeContext::RuntimeContext(
+        EventAggregator& bus,
         RandomBitGenerator& generator,
         const HierarchicalMapping& mapping,
         const std::vector<core::DiseaseInfo>& diseases,
         const core::IntegerInterval& age_range)
-        : generator_{ generator }, mapping_{ mapping }, diseases_{diseases},
+        : event_bus_{ bus }, generator_ {generator}, mapping_{ mapping }, diseases_{ diseases },
         age_range_{ age_range }, time_now_{}, reference_time_{}, population_{ 0 }
     {}
 
@@ -17,6 +18,10 @@ namespace hgps {
 
     int RuntimeContext::reference_time() const noexcept {
         return reference_time_;
+    }
+
+    unsigned int RuntimeContext::current_run() const noexcept {
+        return current_run_;
     }
 
     Population& RuntimeContext::population() noexcept {
@@ -61,8 +66,20 @@ namespace hgps {
         time_now_ = time_now;
     }
 
+    void RuntimeContext::set_current_run(const unsigned int run_number) noexcept {
+        current_run_ = run_number;
+    }
+
     void RuntimeContext::reset_population(const std::size_t pop_size, const int reference_time) {
         population_ = Population{ pop_size };
         reference_time_ = reference_time;
+    }
+
+    void RuntimeContext::publish(const EventMessage& message) const noexcept {
+        event_bus_.publish(message);
+    }
+
+    void RuntimeContext::publish_async(const EventMessage& message) const noexcept {
+        event_bus_.publish_async(message);
     }
 }

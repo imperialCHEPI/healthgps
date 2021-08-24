@@ -1,5 +1,7 @@
 #pragma once
+#include <stdexcept>
 #include <functional>
+
 #include "event_message.h"
 
 namespace hgps {
