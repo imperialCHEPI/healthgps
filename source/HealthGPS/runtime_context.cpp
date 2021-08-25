@@ -40,6 +40,10 @@ namespace hgps {
         return age_range_;
     }
 
+    const std::string RuntimeContext::identifier() const noexcept {
+        return "baseline"; // TODO get from simulation scenario
+    }
+
     int RuntimeContext::next_int() {
         return next_int(0, std::numeric_limits<int>::max());
     }

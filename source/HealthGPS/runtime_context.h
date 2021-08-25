@@ -32,6 +32,8 @@ namespace hgps {
 
 		const core::IntegerInterval& age_range() const noexcept;
 
+		const std::string identifier() const noexcept;
+
 		int next_int();
 
 		int next_int(int max_value);

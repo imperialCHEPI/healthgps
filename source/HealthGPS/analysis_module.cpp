@@ -45,6 +45,8 @@ namespace hgps {
 			residual_disability_weight_(age, core::Gender::female) = 
 				calculate_residual_disability_weight(age, core::Gender::female, expected_sum, expected_count);
 		}
+
+		publish_result_message(context);
 	}
 
 	double AnalysisModule::calculate_residual_disability_weight(const int& age, const core::Gender gender,
@@ -66,6 +68,119 @@ namespace hgps {
 		}
 
 		return residual_value;
+	}
+
+	void AnalysisModule::publish_result_message(RuntimeContext& context) const {
+		auto result = calculate_historical_statistics(context);
+		auto message = ResultEventMessage(context.identifier(), context.current_run(), context.time_now(), result);
+		context.publish(message);
+	}
+
+	ModelResult AnalysisModule::calculate_historical_statistics(RuntimeContext& context) const {
+		auto risk_factors = std::map<std::string, std::map<core::Gender, double>>();
+		for (const auto& item : context.mapping()) {
+			if (item.level() > 0) {
+				risk_factors.emplace(item.key(), std::map<core::Gender, double>{});
+			}
+		}
+
+		auto prevalence = std::map<std::string, std::map<core::Gender, int>>();
+		for (const auto& item : context.diseases()) {
+			prevalence.emplace(item.code, std::map<core::Gender, int>{});
+		}
+
+		auto age_sum = std::map<core::Gender, int>{};
+		auto age_count = std::map<core::Gender, int>{};
+		for (const auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			age_sum[entity.gender] += entity.age;
+			age_count[entity.gender]++;
+			for (auto& item : risk_factors) {
+				item.second[entity.gender] += entity.get_risk_factor_value(item.first);
+			}
+
+			for (const auto& item : context.diseases()) {
+				if (entity.diseases.contains(item.code) && 
+					entity.diseases.at(item.code).status == DiseaseStatus::Active) {
+						prevalence.at(item.code)[entity.gender]++;
+				}
+			}
+		}
+
+		// calculate the averages avoiding division by zero
+		auto result = ModelResult{};
+		auto males_count = std::max(1, age_count[core::Gender::male]);
+		auto females_count = std::max(1, age_count[core::Gender::female]);
+		result.average_age.male = age_sum[core::Gender::male] * 1.0 / males_count;
+		result.average_age.female = age_sum[core::Gender::female] * 1.0 / females_count;
+		for (auto& item : risk_factors) {
+			result.risk_ractor_average.emplace(item.first, ResultByGender {
+					.male = item.second[core::Gender::male] / males_count,
+					.female = item.second[core::Gender::female] / females_count
+				});
+		}
+
+		for (const auto& item : context.diseases()) {
+			result.disease_prevalence.emplace(item.code, ResultByGender {
+					.male = prevalence.at(item.code)[core::Gender::male] * 100.0 / males_count,
+					.female = prevalence.at(item.code)[core::Gender::female] * 100.0 / females_count
+				});
+		}
+
+		result.indicators = calculate_dalys(context.population(), context.age_range().upper(), context.time_now());
+		return result;
+	}
+
+	double AnalysisModule::calculate_disability_weight(const Person& entity) const {
+		auto sum = 1.0;
+		for (auto& disease : entity.diseases) {
+			if (disease.second.status == DiseaseStatus::Active) {
+				if (definition_.disability_weights().contains(disease.first)) {
+					sum *= (1.0 - definition_.disability_weights().at(disease.first));
+				}
+			}
+		}
+
+		auto residual_dw = residual_disability_weight_.at(entity.age, entity.gender);
+		residual_dw = std::min(1.0, std::max(residual_dw, 0.0));
+		sum *= (1.0 - residual_dw);
+		return 1.0 - sum;
+	}
+
+	DALYsIndicator AnalysisModule::calculate_dalys(
+		const Population& population, const unsigned int& max_age, const int& death_year) const {
+		auto yll_sum = 0.0;
+		auto yld_sum = 0.0;
+		auto count = 0;
+		for (const auto& entity : population) {
+			if (entity.time_of_death == death_year) {
+				if (entity.age <= max_age) {
+					auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
+					auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
+
+					auto reference_age = std::max(male_reference_age, female_reference_age);
+					auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
+					yll_sum += lifeExpectancy;
+				}
+			}
+
+			if (entity.is_active()){
+				yld_sum += calculate_disability_weight(entity);
+				count++;
+			}
+		}
+
+		auto yll = yll_sum * 100000.0 / count;
+		auto yld = yld_sum * 100000.0 / count;
+		return DALYsIndicator
+		{
+			.years_of_life_lost = yll,
+			.years_lived_with_disability = yld,
+			.disablity_adjusted_life_years = yll + yld
+		};
 	}
 
 	std::unique_ptr<AnalysisModule> build_analysis_module(core::Datastore& manager, ModelInput& config)

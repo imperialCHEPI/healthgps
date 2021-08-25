@@ -59,10 +59,9 @@ namespace hgps {
 		auto pop_year = demographic_->get_total_population(ref_year);
 		auto pop_size = static_cast<int>(config_.settings().size_fraction() * pop_year);
 
-		initialise_population(pop_size, ref_year);
-
 		auto world_time = config_.start_time();
 		context_.set_current_time(world_time);
+		initialise_population(pop_size, ref_year);
 
 		auto message = std::format("[{:4},{}] population size: {}",
 			env->now().real, env->now().logical, pop_size);
@@ -137,7 +136,6 @@ namespace hgps {
 		auto visitor = UnivariateVisitor();
 		auto orig_summary = std::unordered_map<std::string, core::UnivariateSummary>();
 		auto sim8_summary = std::unordered_map<std::string, core::UnivariateSummary>();
-		auto sim8_disease = std::map<std::string, std::map<core::Gender, int>>();
 		for (auto& entry : context_.mapping()) {
 			config_.data().column(entry.name())->accept(visitor);
 			orig_summary.emplace(entry.name(), visitor.get_summary());
@@ -147,10 +145,6 @@ namespace hgps {
 		for (auto& entity : context_.population()) {
 			for (auto& entry : context_.mapping()) {
 				sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.entity_key()));
-			}
-
-			for (auto& disease : entity.diseases){
-				sim8_disease[disease.first][entity.gender]++;
 			}
 		}
 
@@ -179,34 +173,6 @@ namespace hgps {
 			ss << std::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n",
 				col, pad, orig_summary[col].average(), sim8_summary[col].average(),
 				orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());
-		}
-
-		ss << std::format("|{:_<{}}|\n\n", '_', width);
-		std::cout << ss.str();
-
-		// Print out diseases information,
-		ss.str(std::string());
-
-		longestColumnName = 0;
-		for (auto& entry : sim8_disease) {
-			longestColumnName = std::max(longestColumnName, entry.first.length());
-		}
-
-		pad = longestColumnName + 2;
-		width = pad + 59;
-		ss << " Diseases:\n";
-		ss << std::format("|{:-<{}}|\n", '-', width);
-		ss << std::format("| {:{}} : {:>10} : {:>15} : {:>10} : {:>10} |\n",
-			"Name", pad, "Count", "Prevalence (%)", "Male", "Female");
-		ss << std::format("|{:-<{}}|\n", '-', width);
-		for (auto& disease : sim8_disease){
-			auto male_count = sim8_disease[disease.first][core::Gender::male];
-			auto female_count = sim8_disease[disease.first][core::Gender::female];
-			auto total_count = male_count + female_count;
-			auto prevalence = total_count * 100.0 / context_.population().size();
-
-			ss << std::format("| {:{}} : {:10} : {:15.3} : {:10} : {:10} | \n",
-				disease.first, pad, total_count, prevalence, male_count, female_count);
 		}
 
 		ss << std::format("|{:_<{}}|\n\n", '_', width);
