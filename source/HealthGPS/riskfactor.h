@@ -19,7 +19,7 @@ namespace hgps {
 
 		const std::shared_ptr<HierarchicalLinearModel> operator[](HierarchicalModelType modelType) const;
 
-		void initialise_population(RuntimeContext& context);
+		void initialise_population(RuntimeContext& context) override;
 
 	private:
 		std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>> models_;

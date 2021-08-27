@@ -12,7 +12,7 @@ namespace hgps {
 	}
 
 	std::string ResultEventMessage::to_string() const {
-		return std::format("Source: {}, run # {}, time: {}\n{}",
+		return std::format("Source: {}, run # {}, time: {}, results:\n{}",
 			source, run_number, model_time, content.to_string());
 	}
 }

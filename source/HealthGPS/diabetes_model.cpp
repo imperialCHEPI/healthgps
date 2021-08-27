@@ -71,6 +71,15 @@ namespace hgps {
 		throw std::logic_error("DiabetesModel.update function not yet implemented.");
 	}
 
+	double DiabetesModel::get_excess_mortality(const int& age, const core::Gender& gender) const noexcept {
+		auto excess_mortality_id = definition_.table().at("mtexcess");
+		if (definition_.table().contains(age)) {
+			return definition_.table()(age, gender).at(excess_mortality_id);
+		}
+
+		return 0.0;
+	}
+
 	DoubleAgeGenderTable DiabetesModel::calculate_average_relative_risk(RuntimeContext& context)
 	{
 		auto age_range = context.age_range();

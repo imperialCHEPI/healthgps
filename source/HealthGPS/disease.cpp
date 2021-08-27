@@ -19,16 +19,16 @@ namespace hgps {
 		return models_.size();
 	}
 
-	bool DiseaseModule::contains(std::string code) const noexcept {
-		return models_.contains(code);
+	bool DiseaseModule::contains(std::string disease_code) const noexcept {
+		return models_.contains(disease_code);
 	}
 
-	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string code) {
-		return models_.at(code);
+	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string disease_code) {
+		return models_.at(disease_code);
 	}
 
-	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string code) const {
-		return models_.at(code);
+	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string disease_code) const {
+		return models_.at(disease_code);
 	}
 
 	void DiseaseModule::initialise_population(RuntimeContext& context) {
@@ -40,6 +40,15 @@ namespace hgps {
 		for (auto& model : models_) {
 			model.second->initialise_average_relative_risk(context);
 		}
+	}
+
+	double DiseaseModule::get_excess_mortality(const std::string disease_code,
+		const int& age, const core::Gender& gender) const noexcept {
+		if (!models_.contains(disease_code)) {
+			return 0.0;
+		}
+
+		return models_.at(disease_code)->get_excess_mortality(age, gender);
 	}
 
 	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config)

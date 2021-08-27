@@ -9,15 +9,15 @@
 namespace hgps {
 
 	struct PopulationRecord {
-		PopulationRecord(int pop_age, float males, float females)
-			: age{ pop_age }, num_males{ males }, num_females{ females }
+		PopulationRecord(int pop_age, float num_males, float num_females)
+			: age{ pop_age }, males{ num_males }, females{ num_females }
 		{}
 
 		const int age{};
-		const float num_males{};
-		const float num_females{};
+		const float males{};
+		const float females{};
 
-		const float total() const noexcept { return num_males + num_females; }
+		const float total() const noexcept { return males + females; }
 	};
 
 	struct GenderPair {
@@ -46,14 +46,20 @@ namespace hgps {
 
 		GenderPair get_birth_rate(const int time_year) const noexcept;
 
-		void initialise_population(RuntimeContext& context);
+		void initialise_population(RuntimeContext& context) override;
+
+		void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host);
 
 	private:
 		std::map<int, std::map<int, PopulationRecord>> pop_data_;
 		LifeTable life_table_;
 		GenderTable<int, double> birth_rates_;
+		GenderTable<int, double> residual_death_rates_;
 
 		void initialise_birth_rates();
+
+		GenderTable<int, double> create_death_rates_table(const int time_year);
+		double calculate_excess_mortality_product(const Person& entity, const DiseaseHostModule& disease_host) const;
 	};
 
 	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config);

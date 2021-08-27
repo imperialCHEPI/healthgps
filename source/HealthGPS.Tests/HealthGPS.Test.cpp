@@ -395,6 +395,11 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	auto disease_module = build_disease_module(manager, inputs);
 	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
 	ASSERT_EQ("Disease", disease_module->name());
+	ASSERT_GT(disease_module->size(), 0);
+	ASSERT_TRUE(disease_module->contains("diabetes"));
+	ASSERT_FALSE(disease_module->contains("moonshot"));
+	ASSERT_GT(disease_module->get_excess_mortality("diabetes", 50, core::Gender::male), 0);
+	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", 50, core::Gender::male));
 }
 
 TEST(TestHealthGPS, CreateAnalysisModule)

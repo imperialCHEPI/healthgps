@@ -17,7 +17,7 @@ namespace hgps {
 
 		std::string name() const noexcept override;
 
-		void initialise_population(RuntimeContext& context);
+		void initialise_population(RuntimeContext& context) override;
 
 	private:
 		AnalysisDefinition definition_;

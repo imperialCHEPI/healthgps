@@ -10,7 +10,7 @@
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config,
 		EventAggregator& bus, RandomBitGenerator&& generator)
-		: Simulation(config, std::move(generator)), 
+		: Simulation(config, std::move(generator)),
 		context_{ bus, rnd_, config_.risk_mapping(), config_.diseases(), config_.settings().age_range() }
 	{
 		// Create required modules, should change to shared_ptr
@@ -23,7 +23,7 @@ namespace hgps {
 		ses_ = std::static_pointer_cast<SESModule>(ses_base);
 		demographic_ = std::static_pointer_cast<DemographicModule>(dem_base);
 		risk_factor_ = std::static_pointer_cast<RiskFactorModule>(risk_base);
-		disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
+		disease_ = std::static_pointer_cast<DiseaseHostModule>(disease_base);
 		analysis_ = std::static_pointer_cast<AnalysisModule>(analysis_base);
 	}
 
@@ -35,12 +35,10 @@ namespace hgps {
 		}
 
 		end_time_ = adevs::Time(config_.stop_time(), 0);
-
 		std::cout << "Microsimulation algorithm initialised." << std::endl;
 	}
 
-	void HealthGPS::terminate()
-	{
+	void HealthGPS::terminate() {
 		std::cout << "Microsimulation algorithm terminate." << std::endl;
 	}
 
@@ -73,25 +71,35 @@ namespace hgps {
 
 	adevs::Time HealthGPS::update(adevs::SimEnv<int>* env)
 	{
-		std::uniform_int_distribution dist(100, 200);
-		auto sleep_time = dist(rnd_);
+		if (env->now() < end_time_) {
+			auto ref_year = config_.settings().reference_time();
+			auto pop_year = demographic_->get_total_population(ref_year);
+			auto initial_pop_size = static_cast<int>(config_.settings().size_fraction() * pop_year);
 
-		auto message = std::format("[{:4},{}] sleep: {}ms",
-			env->now().real, env->now().logical, sleep_time);
-		context_.publish(InfoEventMessage{ name(), ModelAction::update,
-			context_.current_run(), context_.time_now(), message });
+			// Update mortality data, mortality is forward looking 2009 is for 2008-2009
+			demographic_->update_residual_mortality(context_, *disease_);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
-
-		if (env->now() < end_time_)
-		{
+			// Now move world clock to time t + 1
 			auto world_time = env->now() + adevs::Time(1, 0);
-			context_.set_current_time(world_time.real);
+			auto time_year = world_time.real;
+			context_.set_current_time(time_year);
+
+			update_population(initial_pop_size);
+
+			std::uniform_int_distribution dist(100, 200);
+			auto sleep_time = dist(rnd_);
+			auto message = std::format("[{:4},{}] sleep: {}ms",
+				env->now().real, env->now().logical, sleep_time);
+			context_.publish(InfoEventMessage{ name(), ModelAction::update,
+				context_.current_run(), context_.time_now(), message });
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
+
+			// Schedule next event time 
 			return world_time;
 		}
 
-		/* We have reached the end.
-		   Return an infinite time of next event and remove the model. */
+		// We have reached the end, remove the model and return infinite time for next event.
 		env->remove(this);
 		return adevs_inf<adevs::Time>();
 	}
@@ -161,7 +169,7 @@ namespace hgps {
 		std::stringstream ss;
 		ss << std::format("\n Initial Virtual Population Summary:\n");
 		ss << std::format("|{:-<{}}|\n", '-', width);
-		ss << std::format("| {:{}} : {:>14} : {:>14} : {:>14} : {:>14} |\n", 
+		ss << std::format("| {:{}} : {:>14} : {:>14} : {:>14} : {:>14} |\n",
 			"Variable", pad, "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");
 		ss << std::format("|{:-<{}}|\n", '-', width);
 
@@ -177,5 +185,11 @@ namespace hgps {
 
 		ss << std::format("|{:_<{}}|\n\n", '_', width);
 		std::cout << ss.str();
+	}
+
+	void HealthGPS::update_population(const int initial_pop_size) {
+
+		//Update Basic Information
+		// apply_birth_and_death_events();
 	}
 }

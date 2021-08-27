@@ -37,10 +37,11 @@ namespace hgps {
 		std::shared_ptr<SESModule> ses_;
 		std::shared_ptr<DemographicModule> demographic_;
 		std::shared_ptr<RiskFactorModule> risk_factor_;
-		std::shared_ptr<DiseaseModule> disease_;
+		std::shared_ptr<DiseaseHostModule> disease_;
 		std::shared_ptr<AnalysisModule> analysis_;
 		adevs::Time end_time_;
 
 		void initialise_population(const int pop_size, const int ref_year);
+		void update_population(const int initial_pop_size);
 	};
 }

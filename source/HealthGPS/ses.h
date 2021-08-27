@@ -52,7 +52,7 @@ namespace hgps {
 
 		const std::map<int, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
 
-		void initialise_population(RuntimeContext& context);
+		void initialise_population(RuntimeContext& context) override;
 
 	private:
 		std::vector<SESRecord> data_;

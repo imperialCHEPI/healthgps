@@ -86,6 +86,32 @@ namespace hgps {
 		/// @brief Gets the module name
 		/// @return The human-readable module name
 		virtual std::string name() const noexcept  = 0;
+
+		/// @brief Initialises the virtual population
+		/// @param context The simulation shared runtime context instance
+		virtual void initialise_population(RuntimeContext& context) = 0;
+	};
+
+	/// @brief Generic disease module interface to host multiple diseases model
+	class DiseaseHostModule : public SimulationModule
+	{
+	public:
+		/// @brief Gets the number of diseases model hosted
+		/// @return Number of hosted diseases models 
+		virtual std::size_t size() const noexcept = 0;
+
+		/// @brief Indicates whether the host contains an disease identified by code.
+		/// @param disease_code The disease unique identification code 
+		/// @return true if the disease is found, otherwise false.
+		virtual bool contains(const std::string disease_code) const noexcept = 0;
+
+		/// @brief Gets the excess mortality associated with a disease for an individual
+		/// @param disease_code The disease unique identification code 
+		/// @param age The reference age associated with the mortality
+		/// @param gender The gender associated with the mortality
+		/// @return the excess mortality value, if found, otherwise zero.
+		virtual double get_excess_mortality(const std::string disease_code,
+			const int& age, const core::Gender& gender) const noexcept = 0;
 	};
 
 	/// @brief Hierarchical linear model interface
@@ -127,5 +153,11 @@ namespace hgps {
 		/// @brief Updates the disease cases remission and incidence in the population
 		/// @param The simulation run-time context
 		virtual void update(RuntimeContext& context) = 0;
+
+		/// @brief Gets the excess mortality associated with a disease for an individual
+		/// @param age The reference age associated with the mortality
+		/// @param gender The gender associated with the mortality
+		/// @return the excess mortality value, if found, otherwise zero.
+		virtual double get_excess_mortality(const int& age, const core::Gender& gender) const noexcept = 0;
 	};
 }

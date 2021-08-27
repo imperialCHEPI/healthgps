@@ -5,7 +5,7 @@
 #include "runtime_context.h"
 
 namespace hgps {
-	class DiseaseModule final : public SimulationModule {
+	class DiseaseModule final : public DiseaseHostModule {
 
 	public:
 		DiseaseModule() = delete;
@@ -17,13 +17,16 @@ namespace hgps {
 
 		std::size_t size() const noexcept;
 
-		bool contains(std::string code) const noexcept;
+		bool contains(std::string disease_code) const noexcept;
 
-		std::shared_ptr<DiseaseModel>& operator[](std::string code);
+		std::shared_ptr<DiseaseModel>& operator[](std::string disease_code);
 
-		const std::shared_ptr<DiseaseModel>& operator[](std::string code) const;
+		const std::shared_ptr<DiseaseModel>& operator[](std::string disease_code) const;
 
-		void initialise_population(RuntimeContext& context);
+		void initialise_population(RuntimeContext& context) override;
+
+		double get_excess_mortality(const std::string disease_code,
+			const int& age, const core::Gender& gender) const noexcept override;
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<DiseaseModel>> models_;

@@ -17,6 +17,8 @@ namespace hgps {
 
 		void update(RuntimeContext& context) override;
 
+		double get_excess_mortality(const int& age, const core::Gender& gender) const noexcept override;
+
 	private:
 		DiseaseDefinition definition_;
 		DoubleAgeGenderTable average_relative_risk_;
