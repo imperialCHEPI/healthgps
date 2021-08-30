@@ -136,6 +136,7 @@
     <ClInclude Include="healthgps.h" />
     <ClInclude Include="ses.h" />
     <ClInclude Include="simulation.h" />
+    <ClInclude Include="two_step_value.h" />
     <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>
   <ItemGroup>

@@ -150,8 +150,8 @@ namespace hgps {
 		return 1.0 - sum;
 	}
 
-	DALYsIndicator AnalysisModule::calculate_dalys(
-		const Population& population, const unsigned int& max_age, const int& death_year) const {
+	DALYsIndicator AnalysisModule::calculate_dalys(Population& population,
+		const unsigned int& max_age, const int& death_year) const {
 		auto yll_sum = 0.0;
 		auto yld_sum = 0.0;
 		auto count = 0;

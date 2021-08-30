@@ -42,9 +42,13 @@ namespace hgps {
 
 		size_t get_total_population(const int time_year) const noexcept;
 
+		double get_total_deaths(const int time_year) const noexcept;
+
 		std::map<int, GenderPair> get_age_gender_distribution(const int time_year) const noexcept;
 
 		GenderPair get_birth_rate(const int time_year) const noexcept;
+
+		double get_residual_death_rate(const int& age, core::Gender& gender) const noexcept;
 
 		void initialise_population(RuntimeContext& context) override;
 

@@ -55,7 +55,15 @@ namespace hgps {
 				{ return previous + element.second.total(); });
 		}
 
-		return (size_t)total;
+		return static_cast<size_t>(total);
+	}
+
+	double DemographicModule::get_total_deaths(const int time_year) const noexcept {
+		if (life_table_.contains_time(time_year)) {
+			return life_table_.get_total_deaths_at(time_year);
+		}
+
+		return 0.0;
 	}
 
 	std::map<int, GenderPair> DemographicModule::get_age_gender_distribution(const int time_year) const noexcept {
@@ -85,6 +93,14 @@ namespace hgps {
 		}
 
 		return GenderPair{ 0.0, 0.0 };
+	}
+
+	double DemographicModule::get_residual_death_rate(const int& age, core::Gender& gender) const noexcept {
+		if (residual_death_rates_.contains(age)) {
+			return residual_death_rates_.at(age, gender);
+		}
+
+		return 0.0;
 	}
 
 	void DemographicModule::initialise_population(RuntimeContext& context) {
@@ -217,11 +233,10 @@ namespace hgps {
 	double DemographicModule::calculate_excess_mortality_product(
 		const Person& entity, const DiseaseHostModule& disease_host) const {
 		auto product = 1.0;
-		auto excessMortality = 0.0;
 		for (const auto& item : entity.diseases) {
 			if (item.second.status == DiseaseStatus::Active) {
-				auto excessMortality = disease_host.get_excess_mortality(item.first, entity.age, entity.gender);
-				product *= 1.0 - excessMortality;
+				auto excess_mortality = disease_host.get_excess_mortality(item.first, entity.age, entity.gender);
+				product *= 1.0 - excess_mortality;
 			}
 		}
 

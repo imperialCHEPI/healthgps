@@ -43,5 +43,27 @@ namespace hgps {
 		};
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info);
+
+		template<std::floating_point TYPE>
+		static std::vector<TYPE> create_cdf(std::vector<TYPE>& frequency) {
+			auto sum = std::accumulate(std::cbegin(frequency), std::cend(frequency), 0.0f);
+			auto pdf = std::vector<float>(frequency.size());
+			if (sum > 0) {
+				std::transform(std::cbegin(frequency), std::cend(frequency),
+					pdf.begin(), [&sum](auto& v) {return v / sum; });
+			}
+			else {
+				auto prob = static_cast<TYPE>(1.0 / (pdf.size() - 1));
+				std::fill(pdf.begin(), pdf.end(), prob);
+			}
+
+			auto cdf = std::vector<float>(pdf.size());
+			cdf[0] = pdf[0];
+			for (size_t i = 1; i < pdf.size(); i++) {
+				cdf[i] = cdf[i - 1] + pdf[i];
+			}
+
+			return cdf;
+		}
 	}
 }

@@ -10,12 +10,16 @@ namespace hgps {
         {"age",[](const Person& p) { return static_cast<double>(p.age); } },
         {"age2",[](const Person& p) { return pow(p.age, 2); } },
         {"age3",[](const Person& p) { return pow(p.age, 3); } },
-        {"education",[](const Person& p) { return static_cast<double>(p.education); } },
-        {"income",[](const Person& p) { return static_cast<double>(p.income); } },
+        {"education",[](const Person& p) { return static_cast<double>(p.education.value()); } },
+        {"income",[](const Person& p) { return static_cast<double>(p.income.value()); } },
     };
     
     Person::Person() 
         : id_{++Person::newUID}
+    {}
+
+    Person::Person(const core::Gender birth_gender) noexcept 
+        : id_{ ++Person::newUID }, age{ 0 }, gender{ birth_gender }
     {}
 
     const std::size_t Person::id() const noexcept { return id_; }

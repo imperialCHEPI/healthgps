@@ -1,4 +1,5 @@
 #include "life_table.h"
+#include <numeric>
 
 namespace hgps {
 	LifeTable::LifeTable(std::map<int, Birth>&& births,
@@ -30,33 +31,40 @@ namespace hgps {
 		}
 	}
 
-	const Birth& LifeTable::get_births_at(const int year) const	{
-		if (!birth_table_.contains(year)) {
+	const Birth& LifeTable::get_births_at(const int time_year) const	{
+		if (!birth_table_.contains(time_year)) {
 			throw std::out_of_range(std::format("The year must not be outside of the data limits."));
 		}
 
-		return birth_table_.at(year);
+		return birth_table_.at(time_year);
 	}
 
-	const std::map<int, Mortality>& LifeTable::get_mortalities_at(const int year) const {
-		if (!death_table_.contains(year)) {
+	const std::map<int, Mortality>& LifeTable::get_mortalities_at(const int time_year) const {
+		if (!death_table_.contains(time_year)) {
 			throw std::out_of_range(std::format("The year must not be outside of the data limits."));
 		}
 
-		return death_table_.at(year);
+		return death_table_.at(time_year);
 	}
 
-	double LifeTable::get_total_deaths_at(const int year) const {
-		if (!death_table_.contains(year)) {
+	double LifeTable::get_total_deaths_at(const int time_year) const {
+		if (!death_table_.contains(time_year)) {
 			throw std::out_of_range(std::format("The year must not be outside of the data limits."));
 		}
 
-		auto result_sum = 0.0;
-		for (auto& value : get_mortalities_at(year)) {
-			result_sum += value.second.total();
-		}
+		auto year_data = get_mortalities_at(time_year);
+		auto total = std::accumulate(year_data.cbegin(), year_data.cend(), 0.0,
+			[](const float previous, const auto& element) { return previous + element.second.total(); });
 
-		return result_sum;
+		return total;
+	}
+
+	bool LifeTable::contains_age(const int age) const noexcept {
+		return age_range_.lower() <= age && age <= age_range_.upper();
+	}
+
+	bool LifeTable::contains_time(const int time_year) const noexcept {
+		return death_table_.contains(time_year);
 	}
 
 	const core::IntegerInterval& LifeTable::time_limits() const noexcept {

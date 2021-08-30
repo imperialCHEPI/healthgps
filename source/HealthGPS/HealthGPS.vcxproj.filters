@@ -171,6 +171,9 @@
     <ClInclude Include="error_message.h">
       <Filter>Header Files\events</Filter>
     </ClInclude>
+    <ClInclude Include="two_step_value.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

@@ -4,6 +4,7 @@
 #include <atomic>
 
 #include "interfaces.h"
+#include "two_step_value.h"
 
 namespace hgps {
 
@@ -26,6 +27,7 @@ namespace hgps {
 	struct Person
 	{
 		Person();
+		Person(const core::Gender gender) noexcept;
 
 		const size_t id() const noexcept;
 
@@ -37,9 +39,9 @@ namespace hgps {
 
 		unsigned int time_of_death{};
 
-		unsigned int education{};
+		TwoStepValue<unsigned int> education{};
 
-		unsigned int income{};
+		TwoStepValue<unsigned int> income{};
 
 		std::map<std::string, double> risk_factors;
 

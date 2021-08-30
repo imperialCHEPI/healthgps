@@ -16,4 +16,10 @@ namespace hgps {
     const Person& Population::operator[](std::size_t index) const {
         return people_[index];
     }
+
+    void Population::add_newborn_babies(const int number, core::Gender gender) noexcept {
+        for (size_t i = 0; i < number; i++) {
+            people_.push_back(Person{ gender });
+        }
+    }
 }

@@ -6,6 +6,7 @@
 #include "mtrandom.h"
 #include "univariate_visitor.h"
 #include "info_message.h"
+#include "converter.h"
 
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config,
@@ -189,7 +190,171 @@ namespace hgps {
 
 	void HealthGPS::update_population(const int initial_pop_size) {
 
-		//Update Basic Information
-		// apply_birth_and_death_events();
+		// update basic information
+		update_age_and_lifecycle_events();
+
+		// update SES status - move into SES module
+		update_socioeconomic_status();
+	}
+
+	void hgps::HealthGPS::update_age_and_lifecycle_events() {
+		auto initial_pop_size = std::count_if(context_.population().cbegin(),
+			context_.population().cend(), [](const auto& p) { return p.is_active(); });
+
+		auto expected_pop_size = demographic_->get_total_population(context_.time_now());
+		auto expected_num_deaths = demographic_->get_total_deaths(context_.time_now());
+		
+		// apply death events
+		auto number_of_deaths =	update_age_and_death_events();
+
+		// Update basic information (not included in death counts? -> fold in above);
+		auto max_age = static_cast<unsigned int>(context_.age_range().upper());
+		for (auto& entity : context_.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			entity.age = entity.age + 1;
+			if (entity.age >= max_age) {
+				entity.is_alive = false;
+				entity.time_of_death = context_.time_now();
+			}
+		}
+
+		// apply births events
+		auto last_year_births_rate = demographic_->get_birth_rate(context_.time_now() - 1);
+		auto number_of_boys = static_cast<int> (last_year_births_rate.male * initial_pop_size);
+		auto number_of_girls = static_cast<int>(last_year_births_rate.female * initial_pop_size);
+		context_.population().add_newborn_babies(number_of_boys, core::Gender::male);
+		context_.population().add_newborn_babies(number_of_girls, core::Gender::female);
+
+		// Calculate debug statistics, to be removed.
+		auto number_of_births = number_of_boys + number_of_girls;
+		auto expected_migration = (expected_pop_size / 100.0) - initial_pop_size - number_of_births + number_of_deaths;
+
+		auto middle_pop_size = std::count_if(context_.population().cbegin(),
+			context_.population().cend(), [](const auto& p) { return p.is_active(); });
+
+		double pop_size_diff = (expected_pop_size / 100.0) - middle_pop_size;
+		double simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
+		double expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
+		double percentage_diff = 100 * (simulated_death_rate / expected_death_rate - 1);
+	}
+
+	int HealthGPS::update_age_and_death_events() {
+		// Apply deaths events
+		auto max_age = static_cast<unsigned int>(context_.age_range().upper());
+		auto number_of_deaths = 0;
+		for (auto& entity : context_.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			if (entity.age >= max_age) {
+				entity.is_alive = false;
+				entity.time_of_death = context_.time_now();
+				number_of_deaths++;
+			}
+			else {
+
+				// calculate death probability based on the health status
+				auto death_rate = demographic_->get_residual_death_rate(entity.age, entity.gender);
+				auto product = 1.0 - death_rate;
+				for (const auto& item : entity.diseases) {
+					if (item.second.status == DiseaseStatus::Active) {
+						auto excess_mortality = disease_->get_excess_mortality(item.first, entity.age, entity.gender);
+						product *= 1.0 - excess_mortality;
+					}
+				}
+
+				auto death_probability = 1.0 - product;
+				auto hazard = context_.next_double();
+				if (hazard < death_probability) {
+					entity.is_alive = false;
+					entity.time_of_death = context_.time_now();
+					number_of_deaths++;
+				}
+			}
+		}
+
+		return number_of_deaths;
+	}
+
+	void HealthGPS::update_socioeconomic_status() {
+		// Education
+		auto male_education_table = ses_->get_education_frequency(core::Gender::male);
+		auto female_education_table = ses_->get_education_frequency(core::Gender::female);
+		auto education_levels = std::vector<int>(male_education_table.begin()->second.size());
+		std::iota(education_levels.begin(), education_levels.end(), 0);
+
+		// Income
+		auto male_income_table = ses_->get_income_frenquency(core::Gender::male);
+		auto female_income_table = ses_->get_income_frenquency(core::Gender::female);
+		auto number_of_levels = male_income_table.begin()->second.columns();
+		auto income_levels = std::vector<int>(number_of_levels);
+		std::iota(income_levels.begin(), income_levels.end(), 0);
+
+		auto education_freq = std::vector<float>{};
+		auto income_freq = std::vector<float>{};
+		for (auto& entity : context_.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			if (entity.gender == core::Gender::male) {
+				education_freq = male_education_table.at(entity.age);
+				income_freq = std::vector<float>(number_of_levels);
+				for (int level = 0; level < number_of_levels; level++) {
+					income_freq[level] = male_income_table.at(entity.age)(entity.education.value(), level);
+				}
+			}
+			else {
+				education_freq = female_education_table.at(entity.age);
+				income_freq = std::vector<float>(number_of_levels);
+				for (int col = 0; col < number_of_levels; col++) {
+					income_freq[col] = female_income_table.at(entity.age)(entity.education.value(), col);
+				}
+			}
+
+			update_education_level(entity, education_levels, education_freq);
+			update_income_level(entity, income_levels, income_freq);
+		}
+	}
+
+	void hgps::HealthGPS::update_education_level(Person& entity,
+		std::vector<int>& education_levels, std::vector<float>& education_freq) {
+		auto education_cdf = detail::create_cdf(education_freq);
+		auto random_education_level = context_.next_empirical_discrete(education_levels, education_cdf);
+
+		// Very important to retrieve the old education level when calculating
+		// the risk value from the previous year.
+		if (entity.education.value() == 0) {
+			entity.education.set_both_values(random_education_level);
+		}
+		else {
+			// To prevent education level getting maximal values ???
+			auto current_education_level = static_cast<int>(entity.education.value());
+			if (entity.age < 31 && current_education_level < random_education_level) {
+				entity.education = random_education_level;
+			}
+		}
+	}
+
+	void HealthGPS::update_income_level(Person& entity,
+		std::vector<int>& income_levels, std::vector<float>& income_freq) {
+
+		auto income_cdf = detail::create_cdf(income_freq);
+		auto random_income_Level = context_.next_empirical_discrete(income_levels, income_cdf);
+		if (entity.income.value() == 0) {
+			entity.income.set_both_values(random_income_Level);
+		}
+		else
+		{
+			// To prevent education level getting maximal values ???
+			auto current_income_level = static_cast<int>(entity.income.value());
+			if (entity.age < 31 && current_income_level < random_income_Level) {
+				entity.income = random_income_Level;
+			}
+		}
 	}
 }

@@ -32,11 +32,15 @@ namespace hgps {
 		LifeTable(std::map<int, Birth>&& births,
 				  std::map<int, std::map<int, Mortality>>&& deaths);
 
-		const Birth& get_births_at(const int year) const;
+		const Birth& get_births_at(const int time_year) const;
 
-		const std::map<int, Mortality>& get_mortalities_at(const int year) const;
+		const std::map<int, Mortality>& get_mortalities_at(const int time_year) const;
 
-		double get_total_deaths_at(const int year) const;
+		double get_total_deaths_at(const int time_year) const;
+
+		bool contains_age(const int age) const noexcept;
+
+		bool contains_time(const int time_year) const noexcept;
 
 		const core::IntegerInterval& time_limits() const noexcept;
 
