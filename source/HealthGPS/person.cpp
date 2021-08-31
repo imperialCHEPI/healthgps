@@ -4,7 +4,7 @@ namespace hgps {
 
     std::atomic<std::size_t> Person::newUID{0};
 
-    case_insensitive_map<std::function<double(const Person&)>> Person::dispatcher {
+    case_insensitive_map<std::function<double(const Person&)>> Person::current_dispatcher {
         {"intercept",[](const Person& p) { return 1.0; } },
         {"gender",[](const Person& p) { return p.gender_to_value(); } },
         {"age",[](const Person& p) { return static_cast<double>(p.age); } },
@@ -12,6 +12,16 @@ namespace hgps {
         {"age3",[](const Person& p) { return pow(p.age, 3); } },
         {"education",[](const Person& p) { return static_cast<double>(p.education.value()); } },
         {"income",[](const Person& p) { return static_cast<double>(p.income.value()); } },
+    };
+
+    case_insensitive_map<std::function<double(const Person&)>> Person::previous_dispatcher{
+        {"intercept",[](const Person& p) { return 1.0; } },
+        {"gender",[](const Person& p) { return p.gender_to_value(); } },
+        {"age",[](const Person& p) { return static_cast<double>(p.age - 1); } },
+        {"age2",[](const Person& p) { return pow(p.age - 1, 2); } },
+        {"age3",[](const Person& p) { return pow(p.age - 1, 3); } },
+        {"education",[](const Person& p) { return static_cast<double>(p.education.old_value()); } },
+        {"income",[](const Person& p) { return static_cast<double>(p.income.old_value()); } },
     };
     
     Person::Person() 
@@ -29,8 +39,20 @@ namespace hgps {
     }
 
     double Person::get_risk_factor_value(const std::string& key) const noexcept {
-        if (dispatcher.contains(key)) {
-            return dispatcher.at(key)(*this);
+        if (current_dispatcher.contains(key)) {
+            return current_dispatcher.at(key)(*this);
+        }
+
+        if (risk_factors.contains(key)) {
+            return risk_factors.at(key);
+        }
+
+        return std::nan("");
+    }
+
+    double Person::get_previous_risk_factor_value(const std::string& key) const noexcept {
+        if (previous_dispatcher.contains(key)) {
+            return previous_dispatcher.at(key)(*this);
         }
 
         if (risk_factors.contains(key)) {

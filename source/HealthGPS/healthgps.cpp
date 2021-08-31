@@ -8,6 +8,8 @@
 #include "info_message.h"
 #include "converter.h"
 
+#include "hierarchical_model.h"
+
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationModuleFactory& factory, ModelInput& config,
 		EventAggregator& bus, RandomBitGenerator&& generator)
@@ -73,6 +75,7 @@ namespace hgps {
 	adevs::Time HealthGPS::update(adevs::SimEnv<int>* env)
 	{
 		if (env->now() < end_time_) {
+			auto start = std::chrono::steady_clock::now();
 			auto ref_year = config_.settings().reference_time();
 			auto pop_year = demographic_->get_total_population(ref_year);
 			auto initial_pop_size = static_cast<int>(config_.settings().size_fraction() * pop_year);
@@ -87,14 +90,12 @@ namespace hgps {
 
 			update_population(initial_pop_size);
 
-			std::uniform_int_distribution dist(100, 200);
-			auto sleep_time = dist(rnd_);
-			auto message = std::format("[{:4},{}] sleep: {}ms",
-				env->now().real, env->now().logical, sleep_time);
+			std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
+
+			auto message = std::format("[{:4},{}] elapsed: {}ms",
+				env->now().real, env->now().logical, elapsed.count());
 			context_.publish(InfoEventMessage{ name(), ModelAction::update,
 				context_.current_run(), context_.time_now(), message });
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time));
 
 			// Schedule next event time 
 			return world_time;
@@ -195,6 +196,9 @@ namespace hgps {
 
 		// update SES status - move into SES module
 		update_socioeconomic_status();
+
+		// update risk factors - move into risk factor module
+		update_risk_factors();
 	}
 
 	void hgps::HealthGPS::update_age_and_lifecycle_events() {
@@ -356,5 +360,17 @@ namespace hgps {
 				entity.income = random_income_Level;
 			}
 		}
+	}
+
+	void HealthGPS::update_risk_factors() {
+		
+		// TODO: risk_factor_.update_population(context_)
+		auto dynamic_model = risk_factor_->operator[](HierarchicalModelType::Dynamic);
+
+		// Generate risk factors for newborns
+		dynamic_model->generate_risk_factors(context_);
+
+		// Update risk factors for population
+		dynamic_model->update_risk_factors(context_);
 	}
 }

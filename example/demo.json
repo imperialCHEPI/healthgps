@@ -38,6 +38,15 @@
         }
     },
     "modelling": {
+        "ses":{
+            "max_age":30,
+            "mapping":{
+                "gender": "Gender",
+                "age": "Age",
+                "education": "Education",
+                "income": "Income"
+            }
+        },
         "risk_factors": {
             "Year": 0,
             "Gender": 0,

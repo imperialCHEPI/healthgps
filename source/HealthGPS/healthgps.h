@@ -40,10 +40,13 @@ namespace hgps {
 		void update_population(const int initial_pop_size);
 		void update_age_and_lifecycle_events();
 		int update_age_and_death_events();
+
 		void update_socioeconomic_status();
 		void update_education_level(Person& entity,
 			std::vector<int>& education_levels, std::vector<float>& education_freq);
 		void update_income_level(Person& entity,
 			std::vector<int>& income_levels, std::vector<float>& income_freq);
+
+		void update_risk_factors();
 	};
 }

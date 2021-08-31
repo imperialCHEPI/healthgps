@@ -47,6 +47,6 @@ namespace hgps {
 	}
 
 	void RiskFactorModule::initialise_population(RuntimeContext& context) {
-		models_.at(HierarchicalModelType::Static)->generate(context);
+		models_.at(HierarchicalModelType::Static)->generate_risk_factors(context);
 	}
 }

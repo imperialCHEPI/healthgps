@@ -1,4 +1,4 @@
-#include "hierarchical_model.h"
+#include "hierarchical_model_static.h"
 #include "runtime_context.h"
 #include "HealthGPS.Core\string_util.h"
 
@@ -17,7 +17,7 @@ namespace hgps {
 		return "Static";
 	}
 
-	void StaticHierarchicalLinearModel::generate(RuntimeContext& context)
+	void StaticHierarchicalLinearModel::generate_risk_factors(RuntimeContext& context)
 	{
 		std::vector<MappingEntry> level_factors;
 		std::unordered_map<int, std::vector<MappingEntry>> level_factors_cache;
@@ -36,6 +36,10 @@ namespace hgps {
 		}
 	}
 
+	void StaticHierarchicalLinearModel::update_risk_factors(RuntimeContext& context) {
+		throw std::logic_error("StaticHierarchicalLinearModel.update not yet implemented.");
+	}
+
 	void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
 		Person& entity, int level, std::vector<MappingEntry>& level_factors)
 	{
@@ -45,12 +49,10 @@ namespace hgps {
 		auto residualRiskFactors = std::unordered_map<std::string, double>();
 		for (auto& item : level_factors) {
 			// next_int returns a value in range [0, maximum]
-			auto row_idx = context.next_int(
-				static_cast<int>(level_info.residual_distribution.rows() - 1));
+			auto row_idx = context.next_int(static_cast<int>(level_info.residual_distribution.rows() - 1));
 
 			auto col_idx = level_info.variables.at(item.key());
-			residualRiskFactors.emplace(item.key(), 
-				level_info.residual_distribution(row_idx, col_idx));
+			residualRiskFactors.emplace(item.key(), level_info.residual_distribution(row_idx, col_idx));
 		}
 
 		// The Stochastic Component of The Risk Factors
@@ -90,28 +92,5 @@ namespace hgps {
 			auto total_value = factor.second + stoch_comp_factors.at(factor.first);
 			entity.risk_factors[factor.first] = total_value;
 		}
-	}
-
-	// ************ Dynamic Hierarchical Model ************
-
-	DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
-		std::unordered_map<std::string, LinearModel>&& models,
-		std::map<int, HierarchicalLevel>&& levels)
-		: StaticHierarchicalLinearModel(std::move(models), std::move(levels))
-	{}
-
-	HierarchicalModelType DynamicHierarchicalLinearModel::type() const noexcept {
-		return HierarchicalModelType::Dynamic;
-	}
-
-	std::string DynamicHierarchicalLinearModel::name() const noexcept {
-		return "Dynamic";
-	}
-
-	void DynamicHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
-		Person& entity, int level, std::vector<MappingEntry>& level_factors) {
-
-		throw std::logic_error(
-			"DynamicHierarchicalLinearModel.generate_for_entity function not implemented.");
 	}
 }

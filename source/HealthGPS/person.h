@@ -51,6 +51,8 @@ namespace hgps {
 
 		double get_risk_factor_value(const std::string& key) const noexcept;
 
+		double get_previous_risk_factor_value(const std::string& key) const noexcept;
+
 		float gender_to_value() const noexcept;
 
 		static void reset_id();
@@ -58,7 +60,8 @@ namespace hgps {
 	private:
 		size_t id_;
 		static std::atomic<size_t> newUID;
-		static case_insensitive_map<std::function<double(const Person&)>> dispatcher;
+		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
+		static case_insensitive_map<std::function<double(const Person&)>> previous_dispatcher;
 	};
 }
 

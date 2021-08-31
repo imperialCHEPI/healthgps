@@ -53,7 +53,7 @@ namespace hgps {
 		}
 
 		auto year_data = get_mortalities_at(time_year);
-		auto total = std::accumulate(year_data.cbegin(), year_data.cend(), 0.0,
+		auto total = std::accumulate(year_data.cbegin(), year_data.cend(), 0.0f,
 			[](const float previous, const auto& element) { return previous + element.second.total(); });
 
 		return total;

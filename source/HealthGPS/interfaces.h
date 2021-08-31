@@ -127,9 +127,13 @@ namespace hgps {
 		/// @return The human-readable model name
 		virtual std::string name() const noexcept = 0;
 
-		/// @brief Generates the initial risk factors for a population
-		/// @param The simulation run-time context
-		virtual void generate(RuntimeContext& context) = 0;
+		/// @brief Generates the initial risk factors for a population and newborns
+		/// @param context The simulation run-time context
+		virtual void generate_risk_factors(RuntimeContext& context) = 0;
+
+		/// @brief Update risk factors for population
+		/// @param context The simulation run-time context
+		virtual void update_risk_factors(RuntimeContext& context) = 0;
 	};
 
 	/// @brief Diseases model interface
