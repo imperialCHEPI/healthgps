@@ -22,6 +22,10 @@ namespace hgps {
 	{
 		DiseaseStatus status;
 		int start_time;
+
+		Disease clone() const noexcept {
+			return Disease{ .status = status, .start_time = start_time };
+		}
 	};
 
 	struct Person
@@ -37,11 +41,13 @@ namespace hgps {
 
 		bool is_alive{ true };
 
+		bool has_emigrated{ false };
+
 		unsigned int time_of_death{};
 
-		TwoStepValue<unsigned int> education{};
+		TwoStepValue<int> education{};
 
-		TwoStepValue<unsigned int> income{};
+		TwoStepValue<int> income{};
 
 		std::map<std::string, double> risk_factors;
 

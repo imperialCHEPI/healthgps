@@ -110,12 +110,12 @@ namespace hgps {
 			assert(entity.gender != core::Gender::unknown);
 			// Note that order is important
 			if (entity.gender == core::Gender::male) {
-				entity.education = sample_education(context, edu_male.at(entity.age));
-				entity.income = sample_income(context, entity.education.value(), income_male.at(entity.age));
+				entity.education.set_both_values(sample_education(context, edu_male.at(entity.age)));
+				entity.income.set_both_values(sample_income(context, entity.education.value(), income_male.at(entity.age)));
 			}
 			else {
-				entity.education = sample_education(context, edu_female.at(entity.age));
-				entity.income = sample_income(context, entity.education.value(), income_female.at(entity.age));
+				entity.education.set_both_values(sample_education(context, edu_female.at(entity.age)));
+				entity.income.set_both_values(sample_income(context, entity.education.value(), income_female.at(entity.age)));
 			}
 		}
 	}

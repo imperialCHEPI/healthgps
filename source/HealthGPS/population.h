@@ -19,6 +19,8 @@ namespace hgps {
 
 		const Person& operator[](std::size_t index) const;
 
+		void add(Person&& person) noexcept;
+
 		void add_newborn_babies(const int number, core::Gender gender) noexcept;
 
 		IteratorType begin() noexcept { return people_.begin(); }

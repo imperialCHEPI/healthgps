@@ -44,6 +44,8 @@ namespace hgps {
 
 		double get_total_deaths(const int time_year) const noexcept;
 
+		const std::map<int, PopulationRecord>& get_population(const int time_year) const;
+
 		std::map<int, GenderPair> get_age_gender_distribution(const int time_year) const noexcept;
 
 		GenderPair get_birth_rate(const int time_year) const noexcept;

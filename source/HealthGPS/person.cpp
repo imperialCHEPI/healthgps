@@ -35,7 +35,7 @@ namespace hgps {
     const std::size_t Person::id() const noexcept { return id_; }
 
     bool Person::is_active() const noexcept {
-        return is_alive;
+        return is_alive && !has_emigrated;
     }
 
     double Person::get_risk_factor_value(const std::string& key) const noexcept {

@@ -17,6 +17,14 @@ namespace hgps {
     };
 
 	struct ModelResult {
+        int population_size{};
+
+        int number_alive{};
+
+        int number_dead{};
+
+        int number_emigrated{};
+
         ResultByGender average_age{};
 
         DALYsIndicator indicators{};

@@ -8,6 +8,9 @@ namespace hgps {
 		std::stringstream ss;
 
 		auto pad = std::max<std::size_t>(24, caluclate_min_padding()) + 2;
+		ss << std::format("Population.: {}, alive = {}, migrating = {}, dead = {}\n",
+			population_size, number_alive, number_emigrated, number_dead);
+
 		ss << std::format("Average Age: Male = {:.5f}, Female = {:.5f}\n", average_age.male, average_age.female);
 
 		ss << std::format("Indicators.: YLL= {:.5f}, YLD = {:.5f}, DALY = {:.5f}\n", indicators.years_of_life_lost,

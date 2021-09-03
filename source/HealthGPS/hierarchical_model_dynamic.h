@@ -27,8 +27,7 @@ namespace hgps {
 
 		void update_for_entity(RuntimeContext& context, Person& entity,
 			const int& level, const std::vector<MappingEntry>& level_factors,
-			std::map<std::string,double>& current_risk_factors,
-			std::map<std::string, double>& next_risk_factors);
+			std::map<std::string,double>& current_risk_factors);
 
 		std::map<std::string, double> get_next_risk_factors(
 			const HierarchicalMapping& mapping, Person& entity, int time_year) const;

@@ -199,6 +199,14 @@ namespace hgps {
 
 		// update risk factors - move into risk factor module
 		update_risk_factors();
+
+		// Calculate the net immigration by gender and age, update the population accordingly
+		update_net_immigration();
+
+		// Update diseases remission and new cases
+
+		// Publish results to data logger
+		analysis_->update_population(context_);
 	}
 
 	void hgps::HealthGPS::update_age_and_lifecycle_events() {
@@ -315,8 +323,8 @@ namespace hgps {
 			else {
 				education_freq = female_education_table.at(entity.age);
 				income_freq = std::vector<float>(number_of_levels);
-				for (int col = 0; col < number_of_levels; col++) {
-					income_freq[col] = female_income_table.at(entity.age)(entity.education.value(), col);
+				for (int level = 0; level < number_of_levels; level++) {
+					income_freq[level] = female_income_table.at(entity.age)(entity.education.value(), level);
 				}
 			}
 
@@ -336,10 +344,11 @@ namespace hgps {
 			entity.education.set_both_values(random_education_level);
 		}
 		else {
+			entity.education = entity.education.value();
+
 			// To prevent education level getting maximal values ???
-			auto current_education_level = static_cast<int>(entity.education.value());
-			if (entity.age < 31 && current_education_level < random_education_level) {
-				entity.education = random_education_level;
+			if (entity.age % 5 == 0 && entity.age < 31) {
+				entity.education = std::max(entity.education.value(), random_education_level);
 			}
 		}
 	}
@@ -352,12 +361,12 @@ namespace hgps {
 		if (entity.income.value() == 0) {
 			entity.income.set_both_values(random_income_Level);
 		}
-		else
-		{
-			// To prevent education level getting maximal values ???
-			auto current_income_level = static_cast<int>(entity.income.value());
-			if (entity.age < 31 && current_income_level < random_income_Level) {
-				entity.income = random_income_Level;
+		else {
+			entity.income = entity.income.value();
+
+			// To prevent education level getting maximal values?, < ? mine just collapsed
+			if (entity.age % 5 == 0 && entity.age < 31) {
+				entity.income = std::max(entity.income.value(), random_income_Level);
 			}
 		}
 	}
@@ -372,5 +381,155 @@ namespace hgps {
 
 		// Update risk factors for population
 		dynamic_model->update_risk_factors(context_);
+	}
+
+	void HealthGPS::update_net_immigration()	{
+		auto sim_start_time = config_.start_time();
+		auto total_initial_population = demographic_->get_total_population(sim_start_time);
+		auto start_population_size = static_cast<int>(config_.settings().size_fraction() * total_initial_population);
+
+		// GetExpectedMalePopulation
+		auto current_population_table = demographic_->get_population(context_.time_now());
+
+		auto expected_population = create_age_gender_table<int>(context_.age_range());
+		auto start_age = context_.age_range().lower();
+		auto end_age = context_.age_range().upper();
+		for (int age = start_age; age <= end_age; age++) {
+			auto age_info = current_population_table.at(age);
+			expected_population.at(age, core::Gender::male) = 
+				static_cast<int>(std::round(age_info.males * start_population_size / total_initial_population));
+
+			expected_population.at(age, core::Gender::female) =
+				static_cast<int>(std::round(age_info.females * start_population_size / total_initial_population));
+		}
+
+		// GetSimulatedMalePopulation
+		auto simulated_population = create_age_gender_table<int>(context_.age_range());
+		for (auto& entity : context_.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			simulated_population.at(entity.age, entity.gender)++;
+		}
+
+		auto net_immigration = create_age_gender_table<int>(context_.age_range());
+		auto male_count = 0;
+		auto female_count = 0;
+		auto net_diff = 0;
+		for (int age = start_age; age <= end_age; age++) {
+			net_diff = expected_population.at(age, core::Gender::male) - simulated_population.at(age, core::Gender::male);
+			net_immigration.at(age, core::Gender::male) = net_diff;
+			male_count += net_diff;
+
+			net_diff = expected_population.at(age, core::Gender::female) - simulated_population.at(age, core::Gender::female);
+			net_immigration.at(age, core::Gender::female) = net_diff;
+			female_count += net_diff;
+		}
+
+		// Debug only, remove on final version
+		auto total_immigration = male_count + female_count;
+
+		// Update population based on net immigration
+		for (int age = start_age; age <= end_age; age++) {
+
+			// Male
+			auto male_net_value = net_immigration.at(age, core::Gender::male);
+			if (male_net_value > 0) {
+				// Get list of similar individuals
+				auto similar_males = std::vector<std::reference_wrapper<const Person>>();
+				for (const auto& entity : context_.population()) {
+					if (!entity.is_active()) {
+						continue;
+					}
+
+					if (entity.age == age && entity.gender == core::Gender::male) {
+						similar_males.push_back(entity);
+					}
+				}
+
+				if (similar_males.size() > 0) {
+					for (size_t i = 0; i < male_net_value; i++) {
+						auto index = context_.next_int(static_cast<int>(similar_males.size()) - 1);
+						auto& source = similar_males.at(index).get();
+						context_.population().add(std::move(clone_entiry(source)));
+					}
+				}
+			}
+			else if (male_net_value < 0) {
+
+				for (auto& entity : context_.population()) {
+					if (!entity.is_active()) {
+						continue;
+					}
+
+					if (entity.age == age && entity.gender == core::Gender::male) {
+						entity.has_emigrated = true;
+						male_net_value++;
+						if (male_net_value == 0) {
+							break;
+						}
+					}
+				}
+			}
+
+			// Female
+			auto female_net_value = net_immigration.at(age, core::Gender::female);
+			if (female_net_value > 0) {
+				// Get list of similar individuals
+				auto similar_females = std::vector<std::reference_wrapper<const Person>>();
+				for (const auto& entity : context_.population()) {
+					if (!entity.is_active()) {
+						continue;
+					}
+
+					if (entity.age == age && entity.gender == core::Gender::female) {
+						similar_females.push_back(entity);
+					}
+				}
+
+				if (similar_females.size() > 0) {
+					for (size_t i = 0; i < female_net_value; i++) {
+						auto index = context_.next_int(static_cast<int>(similar_females.size()) - 1);
+						auto& source = similar_females.at(index).get();
+						context_.population().add(std::move(clone_entiry(source)));
+					}
+				}
+			}
+			else if (female_net_value < 0) {
+				for (auto& entity : context_.population()) {
+					if (!entity.is_active()) {
+						continue;
+					}
+
+					if (entity.age == age && entity.gender == core::Gender::female) {
+						entity.has_emigrated = true;
+						female_net_value++;
+						if (female_net_value == 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	Person HealthGPS::clone_entiry(const Person& source) const noexcept {
+		auto clone = Person{};
+		clone.age = source.age;
+		clone.gender = source.gender;
+		clone.education.set_both_values(source.education.value());
+		clone.income.set_both_values(source.income.value());
+		clone.is_alive = true;
+		clone.has_emigrated = false;
+		for (const auto& item : source.risk_factors) {
+			clone.risk_factors.emplace(item.first, item.second);
+		}
+
+		for (const auto& item : source.diseases) {
+			clone.diseases.emplace(item.first, item.second.clone());
+		}
+
+		return clone;
 	}
 }

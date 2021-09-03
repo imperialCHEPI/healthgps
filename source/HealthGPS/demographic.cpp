@@ -66,6 +66,10 @@ namespace hgps {
 		return 0.0;
 	}
 
+	const std::map<int, PopulationRecord>& DemographicModule::get_population(const int time_year) const {
+		return pop_data_.at(time_year);
+	}
+
 	std::map<int, GenderPair> DemographicModule::get_age_gender_distribution(const int time_year) const noexcept {
 		std::map<int, GenderPair> result;
 		if (!pop_data_.contains(time_year)) {

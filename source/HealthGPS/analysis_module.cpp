@@ -49,6 +49,10 @@ namespace hgps {
 		publish_result_message(context);
 	}
 
+	void AnalysisModule::update_population(RuntimeContext& context) const {
+		publish_result_message(context);
+	}
+
 	double AnalysisModule::calculate_residual_disability_weight(const int& age, const core::Gender gender,
 		const DoubleAgeGenderTable& expected_sum, const IntegerAgeGenderTable& expected_count)
 	{
@@ -91,15 +95,32 @@ namespace hgps {
 
 		auto age_sum = std::map<core::Gender, int>{};
 		auto age_count = std::map<core::Gender, int>{};
+		auto population_size = static_cast<int>(context.population().size());
+		auto population_alive = 0;
+		auto population_dead = 0;
+		auto population_migrated = 0;
 		for (const auto& entity : context.population()) {
 			if (!entity.is_active()) {
+				if (entity.is_alive) {
+					population_migrated++;
+				}
+				else {
+					population_dead++;
+				}
+
 				continue;
 			}
 
+			population_alive++;
 			age_sum[entity.gender] += entity.age;
 			age_count[entity.gender]++;
 			for (auto& item : risk_factors) {
-				item.second[entity.gender] += entity.get_risk_factor_value(item.first);
+				auto factor_value = entity.get_risk_factor_value(item.first);
+				if (std::isnan(factor_value)) {
+					factor_value = 0.0;
+				}
+
+				item.second[entity.gender] += factor_value;
 			}
 
 			for (const auto& item : context.diseases()) {
@@ -110,8 +131,12 @@ namespace hgps {
 			}
 		}
 
-		// calculate the averages avoiding division by zero
+		// Calculate the averages avoiding division by zero
 		auto result = ModelResult{};
+		result.population_size = population_size;
+		result.number_alive = population_alive;
+		result.number_dead = population_dead;
+		result.number_emigrated = population_migrated;
 		auto males_count = std::max(1, age_count[core::Gender::male]);
 		auto females_count = std::max(1, age_count[core::Gender::female]);
 		result.average_age.male = age_sum[core::Gender::male] * 1.0 / males_count;

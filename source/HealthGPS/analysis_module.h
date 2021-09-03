@@ -19,6 +19,8 @@ namespace hgps {
 
 		void initialise_population(RuntimeContext& context) override;
 
+		void update_population(RuntimeContext& context) const;
+
 	private:
 		AnalysisDefinition definition_;
 		DoubleAgeGenderTable residual_disability_weight_;

@@ -48,5 +48,7 @@ namespace hgps {
 			std::vector<int>& income_levels, std::vector<float>& income_freq);
 
 		void update_risk_factors();
+		void update_net_immigration();
+		Person clone_entiry(const Person& source) const noexcept;
 	};
 }
