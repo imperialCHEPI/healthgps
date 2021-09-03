@@ -238,7 +238,7 @@ namespace hgps {
 		const Person& entity, const DiseaseHostModule& disease_host) const {
 		auto product = 1.0;
 		for (const auto& item : entity.diseases) {
-			if (item.second.status == DiseaseStatus::Active) {
+			if (item.second.status == DiseaseStatus::active) {
 				auto excess_mortality = disease_host.get_excess_mortality(item.first, entity.age, entity.gender);
 				product *= 1.0 - excess_mortality;
 			}

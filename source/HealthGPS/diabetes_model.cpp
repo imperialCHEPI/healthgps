@@ -13,7 +13,9 @@ namespace hgps {
 		}
 	}
 
-	std::string DiabetesModel::type() const noexcept { return definition_.identifier().code; }
+	std::string DiabetesModel::disease_type() const noexcept {
+		return definition_.identifier().code;
+	}
 
 	void DiabetesModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
@@ -29,8 +31,8 @@ namespace hgps {
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
 			auto hazard = context.next_double();
 			if (hazard < probability) {
-				entity.diseases[type()] = Disease{
-					.status = DiseaseStatus::Active,
+				entity.diseases[disease_type()] = Disease{
+					.status = DiseaseStatus::active,
 					.start_time = context.time_now() };
 			}
 		}
@@ -67,8 +69,10 @@ namespace hgps {
 		}
 	}
 
-	void DiabetesModel::update(RuntimeContext& context) {
-		throw std::logic_error("DiabetesModel.update function not yet implemented.");
+	void DiabetesModel::update_disease_status(RuntimeContext& context) {
+		// Order is very important!
+		update_remission_cases(context);
+		update_incidence_cases(context);
 	}
 
 	double DiabetesModel::get_excess_mortality(const int& age, const core::Gender& gender) const noexcept {
@@ -80,8 +84,7 @@ namespace hgps {
 		return 0.0;
 	}
 
-	DoubleAgeGenderTable DiabetesModel::calculate_average_relative_risk(RuntimeContext& context)
-	{
+	DoubleAgeGenderTable DiabetesModel::calculate_average_relative_risk(RuntimeContext& context) {
 		auto age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
@@ -113,14 +116,14 @@ namespace hgps {
 		return result;
 	}
 
-	double DiabetesModel::calculate_combined_relative_risk(Person& entity, const int time_now) {
+	double DiabetesModel::calculate_combined_relative_risk(const Person& entity, const int& time_now) const {
 		auto combined_risk_value = 1.0;
 		combined_risk_value *= calculate_relative_risk_for_risk_factors(entity);
 		combined_risk_value *= calculate_relative_risk_for_diseases(entity, time_now);
 		return combined_risk_value;
 	}
 
-	double DiabetesModel::calculate_relative_risk_for_risk_factors(Person& entity) {
+	double DiabetesModel::calculate_relative_risk_for_risk_factors(const Person& entity) const {
 		auto relative_risk_value = 1.0;
 		for (auto& factor : entity.risk_factors) {
 			if (!definition_.relative_risk_factors().contains(factor.first)) {
@@ -136,7 +139,7 @@ namespace hgps {
 		return relative_risk_value;
 	}
 
-	double DiabetesModel::calculate_relative_risk_for_diseases(Person& entity, const int time_now) {
+	double DiabetesModel::calculate_relative_risk_for_diseases(const Person& entity, const int& time_now) const {
 		auto relative_risk_value = 1.0;
 		for (auto& disease : entity.diseases) {
 			// Only include existing diseases
@@ -149,5 +152,84 @@ namespace hgps {
 		}
 
 		return relative_risk_value;
+	}
+
+	void DiabetesModel::update_remission_cases(RuntimeContext& context) {
+		auto remission_count = 0;
+		auto prevalence_count = 0;
+		auto remission_id = definition_.table().at("remission");
+		for (auto& entity : context.population()) {
+			if (entity.age == 0 || !entity.is_active()) {
+				continue;
+			}
+
+			if (!entity.diseases.contains(disease_type()) ||
+				entity.diseases.at(disease_type()).status != DiseaseStatus::active) {
+				continue;
+			}
+
+			auto probability = definition_.table()(entity.age, entity.gender).at(remission_id);
+			auto hazard = context.next_double();
+			if (hazard < probability) {
+				entity.diseases.at(disease_type()).status = DiseaseStatus::free;
+				remission_count++;
+			}
+
+			prevalence_count++;
+		}
+
+		// Debug calculation
+		auto remission_percent = remission_count * 100.0 / prevalence_count;
+	}
+
+	void DiabetesModel::update_incidence_cases(RuntimeContext& context) {
+		auto incidence_count = 0;
+		auto prevalence_count = 0;
+		auto population_count = 0;
+		for (auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			if (entity.age == 0) {
+				if (entity.diseases.size() > 0) {
+					entity.diseases.clear(); // Should not have nay disease at birth!
+				}
+
+				continue;
+			}
+
+			population_count++;
+
+			// Already have disease
+			if (entity.diseases.contains(disease_type()) &&
+				entity.diseases.at(disease_type()).status == DiseaseStatus::active) {
+				prevalence_count++;
+				continue;
+			}
+
+			auto probability = calculate_incidence_probability(entity, context.time_now());
+			auto hazard = context.next_double();
+			if (hazard < probability) {
+				entity.diseases[disease_type()] = Disease{
+									.status = DiseaseStatus::active,
+									.start_time = context.time_now() };
+				incidence_count++;
+				prevalence_count++;
+			}
+		}
+
+		// Debug calculation
+		auto disease_incidence = incidence_count * 100.0 / population_count;
+		auto disease_prevalence = prevalence_count * 100.0 / population_count;
+	}
+
+	double DiabetesModel::calculate_incidence_probability(const Person& entity, const int& time_now) const {
+		auto incidence_id = definition_.table().at("incidence");
+		auto combined_relative_risk = calculate_combined_relative_risk(entity, time_now);
+		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
+		auto incidence = definition_.table()(entity.age, entity.gender).at(incidence_id);
+		auto probability = incidence * combined_relative_risk / average_relative_risk;
+		return probability;
 	}
 }

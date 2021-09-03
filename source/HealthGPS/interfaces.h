@@ -112,6 +112,10 @@ namespace hgps {
 		/// @return the excess mortality value, if found, otherwise zero.
 		virtual double get_excess_mortality(const std::string disease_code,
 			const int& age, const core::Gender& gender) const noexcept = 0;
+
+		/// @brief Updates the population diseases status: remission and incidence
+		/// @param context The simulation run-time context
+		virtual void update_population(RuntimeContext& context) = 0;
 	};
 
 	/// @brief Hierarchical linear model interface
@@ -142,9 +146,9 @@ namespace hgps {
 	public:
 		virtual ~DiseaseModel() = default;
 
-		/// @brief Gets the disease model type identifier
-		/// @return The model type identifier
-		virtual std::string type() const noexcept = 0;
+		/// @brief Gets the model disease type unique identifier
+		/// @return The disease type identifier
+		virtual std::string disease_type() const noexcept = 0;
 
 		/// @brief Initialises the population disease status.
 		/// @param The simulation run-time context
@@ -156,7 +160,7 @@ namespace hgps {
 
 		/// @brief Updates the disease cases remission and incidence in the population
 		/// @param The simulation run-time context
-		virtual void update(RuntimeContext& context) = 0;
+		virtual void update_disease_status(RuntimeContext& context) = 0;
 
 		/// @brief Gets the excess mortality associated with a disease for an individual
 		/// @param age The reference age associated with the mortality

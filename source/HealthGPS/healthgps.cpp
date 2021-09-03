@@ -203,7 +203,8 @@ namespace hgps {
 		// Calculate the net immigration by gender and age, update the population accordingly
 		update_net_immigration();
 
-		// Update diseases remission and new cases
+		// Update diseases status: remission and incidence
+		disease_->update_population(context_);
 
 		// Publish results to data logger
 		analysis_->update_population(context_);
@@ -273,7 +274,7 @@ namespace hgps {
 				auto death_rate = demographic_->get_residual_death_rate(entity.age, entity.gender);
 				auto product = 1.0 - death_rate;
 				for (const auto& item : entity.diseases) {
-					if (item.second.status == DiseaseStatus::Active) {
+					if (item.second.status == DiseaseStatus::active) {
 						auto excess_mortality = disease_->get_excess_mortality(item.first, entity.age, entity.gender);
 						product *= 1.0 - excess_mortality;
 					}

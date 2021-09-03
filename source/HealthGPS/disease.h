@@ -25,6 +25,8 @@ namespace hgps {
 
 		void initialise_population(RuntimeContext& context) override;
 
+		void update_population(RuntimeContext& context) override;
+
 		double get_excess_mortality(const std::string disease_code,
 			const int& age, const core::Gender& gender) const noexcept override;
 

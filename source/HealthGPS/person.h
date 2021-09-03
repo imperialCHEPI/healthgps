@@ -12,10 +12,10 @@ namespace hgps {
 	enum struct DiseaseStatus : uint8_t
 	{
 		/// @brief declared free from condition
-		Free,
+		free,
 
 		/// @brief current with the condition
-		Active
+		active
 	};
 
 	struct Disease

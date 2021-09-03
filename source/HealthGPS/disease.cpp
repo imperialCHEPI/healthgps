@@ -42,6 +42,12 @@ namespace hgps {
 		}
 	}
 
+	void DiseaseModule::update_population(RuntimeContext& context) {
+		for (auto& model : models_) {
+			model.second->update_disease_status(context);
+		}
+	}
+
 	double DiseaseModule::get_excess_mortality(const std::string disease_code,
 		const int& age, const core::Gender& gender) const noexcept {
 		if (!models_.contains(disease_code)) {

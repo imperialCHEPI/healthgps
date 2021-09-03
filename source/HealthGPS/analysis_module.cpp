@@ -28,7 +28,7 @@ namespace hgps {
 
 			auto sum = 1.0;
 			for (auto& disease : entity.diseases) {
-				if (disease.second.status == DiseaseStatus::Active &&
+				if (disease.second.status == DiseaseStatus::active &&
 					definition_.disability_weights().contains(disease.first)) {
 					sum *= (1.0 - definition_.disability_weights().at(disease.first));
 				}
@@ -125,7 +125,7 @@ namespace hgps {
 
 			for (const auto& item : context.diseases()) {
 				if (entity.diseases.contains(item.code) && 
-					entity.diseases.at(item.code).status == DiseaseStatus::Active) {
+					entity.diseases.at(item.code).status == DiseaseStatus::active) {
 						prevalence.at(item.code)[entity.gender]++;
 				}
 			}
@@ -162,7 +162,7 @@ namespace hgps {
 	double AnalysisModule::calculate_disability_weight(const Person& entity) const {
 		auto sum = 1.0;
 		for (auto& disease : entity.diseases) {
-			if (disease.second.status == DiseaseStatus::Active) {
+			if (disease.second.status == DiseaseStatus::active) {
 				if (definition_.disability_weights().contains(disease.first)) {
 					sum *= (1.0 - definition_.disability_weights().at(disease.first));
 				}
