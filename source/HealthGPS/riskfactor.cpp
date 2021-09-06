@@ -49,4 +49,14 @@ namespace hgps {
 	void RiskFactorModule::initialise_population(RuntimeContext& context) {
 		models_.at(HierarchicalModelType::Static)->generate_risk_factors(context);
 	}
+
+	void RiskFactorModule::update_population(RuntimeContext& context) {
+		auto dynamic_model = models_.at(HierarchicalModelType::Dynamic);
+
+		// Generate risk factors for newborns
+		dynamic_model->generate_risk_factors(context);
+
+		// Update risk factors for population
+		dynamic_model->update_risk_factors(context);
+	}
 }

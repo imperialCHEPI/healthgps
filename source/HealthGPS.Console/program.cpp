@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 		auto runner = ModelRunner(event_bus);
 		auto runtime = runner.run(model, config.trial_runs);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
+		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());

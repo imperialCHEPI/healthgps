@@ -36,19 +36,19 @@ namespace hgps {
 		std::shared_ptr<AnalysisModule> analysis_;
 		adevs::Time end_time_;
 
-		void initialise_population(const int pop_size, const int ref_year);
-		void update_population(const int initial_pop_size);
+		void initialise_population();
+		void update_population();
+		void print_initial_population_statistics();
+
 		void update_age_and_lifecycle_events();
 		int update_age_and_death_events();
-
-		void update_socioeconomic_status();
-		void update_education_level(Person& entity,
-			std::vector<int>& education_levels, std::vector<float>& education_freq);
-		void update_income_level(Person& entity,
-			std::vector<int>& income_levels, std::vector<float>& income_freq);
-
-		void update_risk_factors();
 		void update_net_immigration();
-		Person clone_entiry(const Person& source) const noexcept;
+
+		hgps::IntegerAgeGenderTable get_current_expected_population() const;
+		hgps::IntegerAgeGenderTable	get_current_simulated_population();
+		std::vector<std::reference_wrapper<const Person>> get_similar_entities(const int& age, const core::Gender& gender);
+		void apply_net_migration(int net_value, int& age, const core::Gender& gender);
+
+		Person partial_clone_entity(const Person& source) const noexcept;
 	};
 }

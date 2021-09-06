@@ -15,6 +15,10 @@ namespace hgps {
 
 		std::size_t size() const noexcept;
 
+		std::size_t initial_size() const noexcept;
+
+		std::size_t current_active_size() const noexcept;
+
 		Person& operator[](std::size_t index);
 
 		const Person& operator[](std::size_t index) const;
@@ -30,6 +34,7 @@ namespace hgps {
 		ConstIteratorType cend() const noexcept { return people_.cend(); }
 
 	private:
+		std::size_t initial_size_;
 		std::vector<Person> people_;
 	};
 }

@@ -21,6 +21,8 @@ namespace hgps {
 
 		void initialise_population(RuntimeContext& context) override;
 
+		void update_population(RuntimeContext& context);
+
 	private:
 		std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>> models_;
 	};
