@@ -22,7 +22,6 @@
         },
         "settings": {
             "country_code": "GB",
-            "reference_time": 2010,
             "size_fraction": 0.0001,
             "data_linkage": "Age",
             "age_range": [
@@ -65,6 +64,20 @@
         "models": {
             "static": "HLM.Json",
             "dynamic": "DHLM.Json"
+        },
+        "baseline_adjustment":{
+            "is_enabled":true,
+            "risk_factors":["Year","PhysicalActivityMET","FruitsVegetablesConsumption","SmokingStatus","AlcoholConsumption","BMI"],
+            "data_points":{
+                "male":[
+                    [2010, 3734, 2.97, 0.355, 6.73, 32.0],
+                    [2050, 4480.8, 3.267, 0.30175, 5.0475, 27.12]
+                ],
+                "female":[
+                    [2010, 3734, 2.97, 0.355, 6.73, 22.6],
+                    [2050, 4480.8, 3.267, 0.30175, 5.0475, 25.0]
+                ]
+            }
         }
     },
     "running": {
@@ -79,6 +92,9 @@
         "diabetes",
         "lowbackpain"
       ],
-        "intervention": {}
+      "intervention": {}
+    },
+    "results":{
+        "folder":"C:\\HealthGPS\\Result"
     }
 }

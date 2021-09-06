@@ -283,7 +283,7 @@ namespace hgps {
 	}
 
 	hgps::IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
-		auto sim_start_time = context_.reference_time();
+		auto sim_start_time = context_.start_time();
 		auto total_initial_population = demographic_->get_total_population(sim_start_time);
 		auto start_population_size = static_cast<int>(config_.settings().size_fraction() * total_initial_population);
 

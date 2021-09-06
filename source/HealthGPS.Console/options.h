@@ -30,9 +30,6 @@ struct SettingsInfo
 {
 	std::string country{};
 
-	/// @brief The data reference time, probably should be the simulation start time.
-	int reference_time{};
-
 	float size_fraction{};
 
 	std::string data_linkage{};

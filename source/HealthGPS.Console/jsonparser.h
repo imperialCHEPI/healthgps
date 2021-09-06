@@ -101,7 +101,6 @@ void from_json(const json& j, FileInfo& p) {
 void to_json(json& j, const SettingsInfo& p) {
 	j = json{
 		{"country_code", p.country},
-		{"reference_time", p.reference_time},
 		{"size_fraction", p.size_fraction},
 		{"data_linkage", p.data_linkage},
 		{"age_range", p.age_range} };
@@ -109,7 +108,6 @@ void to_json(json& j, const SettingsInfo& p) {
 
 void from_json(const json& j, SettingsInfo& p) {
 	j.at("country_code").get_to(p.country);
-	j.at("reference_time").get_to(p.reference_time);
 	j.at("size_fraction").get_to(p.size_fraction);
 	j.at("data_linkage").get_to(p.data_linkage);
 	j.at("age_range").get_to(p.age_range);

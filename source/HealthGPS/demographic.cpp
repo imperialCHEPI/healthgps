@@ -108,7 +108,7 @@ namespace hgps {
 	}
 
 	void DemographicModule::initialise_population(RuntimeContext& context) {
-		auto age_gender_dist = get_age_gender_distribution(context.reference_time());
+		auto age_gender_dist = get_age_gender_distribution(context.start_time());
 		auto index = 0;
 		auto pop_size = static_cast<int>(context.population().size());
 		auto entry_count = 0;
@@ -251,7 +251,7 @@ namespace hgps {
 		// year => age [age, male, female]
 		auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
 
-		auto min_time = std::min(config.start_time(), config.settings().reference_time());
+		auto min_time = config.start_time();
 		auto max_time = config.stop_time();
 		auto time_filter = [&min_time, &max_time](const unsigned int& value) {
 			return value >= min_time && value <= max_time;

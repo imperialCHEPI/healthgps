@@ -20,7 +20,7 @@ namespace hgps {
 
 		int time_now() const noexcept;
 
-		int reference_time() const noexcept;
+		int start_time() const noexcept;
 
 		unsigned int current_run() const noexcept;
 
@@ -44,7 +44,7 @@ namespace hgps {
 
 		void set_current_run(const unsigned int run_number) noexcept;
 
-		void reset_population(const std::size_t pop_size, const int reference_time);
+		void reset_population(const std::size_t initial_pop_size, const int model_start_time);
 
 		void publish(std::unique_ptr<EventMessage> message) const noexcept;
 
@@ -58,7 +58,7 @@ namespace hgps {
 		std::vector<core::DiseaseInfo> diseases_;
 		core::IntegerInterval age_range_;
 		unsigned int current_run_{};
-		int reference_time_{};
+		int model_start_time_{};
 		int time_now_{};
 	};
 }

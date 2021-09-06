@@ -9,15 +9,15 @@ namespace hgps {
         const std::vector<core::DiseaseInfo>& diseases,
         const core::IntegerInterval& age_range)
         : event_bus_{ bus }, generator_ {generator}, mapping_{ mapping }, diseases_{ diseases },
-        age_range_{ age_range }, time_now_{}, reference_time_{}, population_{ 0 }
+        age_range_{ age_range }, time_now_{}, model_start_time_{}, population_{ 0 }
     {}
 
     int RuntimeContext::time_now() const noexcept {
         return time_now_;
     }
 
-    int RuntimeContext::reference_time() const noexcept {
-        return reference_time_;
+    int RuntimeContext::start_time() const noexcept {
+        return model_start_time_;
     }
 
     unsigned int RuntimeContext::current_run() const noexcept {
@@ -90,9 +90,9 @@ namespace hgps {
         current_run_ = run_number;
     }
 
-    void RuntimeContext::reset_population(const std::size_t pop_size, const int reference_time) {
-        population_ = Population{ pop_size };
-        reference_time_ = reference_time;
+    void RuntimeContext::reset_population(const std::size_t initial_pop_size, const int model_start_time) {
+        population_ = Population{ initial_pop_size };
+        model_start_time_ = model_start_time;
     }
 
     void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
