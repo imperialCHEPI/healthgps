@@ -16,5 +16,7 @@ namespace hgps {
 		int id() const noexcept override;
 
 		std::string to_string() const  override;
+
+		void accept(EventMessageVisitor& visitor) const override;
 	};
 }

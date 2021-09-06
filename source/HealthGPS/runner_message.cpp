@@ -35,3 +35,7 @@ std::string hgps::RunnerEventMessage::to_string() const {
 
     return std::format("Source: {}, experiment finished in {}ms.", source, elapsed_ms);
 }
+
+void hgps::RunnerEventMessage::accept(EventMessageVisitor& visitor) const {
+    visitor.visit(*this);
+}

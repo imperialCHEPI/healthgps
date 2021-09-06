@@ -111,6 +111,7 @@
     <ClInclude Include="event_bus.h" />
     <ClInclude Include="event_message.h" />
     <ClInclude Include="event_subscriber.h" />
+    <ClInclude Include="event_visitor.h" />
     <ClInclude Include="gender_table.h" />
     <ClInclude Include="hierarchical_model_dynamic.h" />
     <ClInclude Include="hierarchical_model_static.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="healthgps.h" />
     <ClInclude Include="ses.h" />
     <ClInclude Include="simulation.h" />
+    <ClInclude Include="threadsafe_queue.h" />
     <ClInclude Include="two_step_value.h" />
     <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>

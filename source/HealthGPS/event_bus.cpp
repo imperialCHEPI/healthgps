@@ -5,7 +5,7 @@
 namespace hgps {
 
 	std::unique_ptr<EventSubscriber> DefaultEventBus::subscribe(EventType event_id,
-		std::function<void(const EventMessage& message)>&& function)
+		std::function<void(std::shared_ptr<EventMessage> message)>&& function)
 	{
 		auto handle_id = std::string{};
 		exclusive_access([&]() {
@@ -18,21 +18,23 @@ namespace hgps {
 		return std::make_unique<EventSubscriberHandler>(handle_id, this);
 	}
 
-	void DefaultEventBus::publish(const EventMessage& message)
+	void DefaultEventBus::publish(std::unique_ptr<EventMessage> message)
 	{
 		shared_access([&]() {
-			// only call the functions we need to
-			auto [begin_id, end_id] = registry_.equal_range(message.id());
-			for (; begin_id != end_id; ++begin_id) {
-				subscribers_.at(begin_id->second)(message);
+			std::shared_ptr<EventMessage> shared_message = std::move(message);
+
+			// Only call the functions we need for the event type
+			auto [begin_id, end_id] = registry_.equal_range(shared_message->id());
+			for (; begin_id != end_id; ++begin_id) { 
+				subscribers_.at(begin_id->second)(shared_message);
 			}
 			});
 	}
 
-	void DefaultEventBus::publish_async(const EventMessage& message)
+	void DefaultEventBus::publish_async(std::unique_ptr<EventMessage> message)
 	{
 		auto futptr = std::make_shared<std::future<void>>();
-		*futptr = std::async(std::launch::async, &DefaultEventBus::publish, this, std::ref(message));
+		*futptr = std::async(std::launch::async, &DefaultEventBus::publish, this, std::move(message));
 	}
 
 	bool DefaultEventBus::unsubscribe(const EventSubscriber& subscriber)

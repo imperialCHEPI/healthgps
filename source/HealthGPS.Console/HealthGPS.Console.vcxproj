@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="event_monitor.cpp" />
+    <ClCompile Include="result_file_writer.cpp" />
     <ClCompile Include="program.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -23,10 +25,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="csvparser.h" />
+    <ClInclude Include="event_monitor.h" />
+    <ClInclude Include="result_file_writer.h" />
     <ClInclude Include="jsonparser.h" />
     <ClInclude Include="options.h" />
     <ClInclude Include="program.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="result_writer.h" />
     <ClInclude Include="riskmodel.h" />
   </ItemGroup>
   <ItemGroup>

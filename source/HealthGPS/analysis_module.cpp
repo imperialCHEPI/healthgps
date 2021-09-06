@@ -76,8 +76,9 @@ namespace hgps {
 
 	void AnalysisModule::publish_result_message(RuntimeContext& context) const {
 		auto result = calculate_historical_statistics(context);
-		auto message = ResultEventMessage(context.identifier(), context.current_run(), context.time_now(), result);
-		context.publish(message);
+
+		context.publish(std::make_unique<ResultEventMessage>(
+			context.identifier(), context.current_run(), context.time_now(), result));
 	}
 
 	ModelResult AnalysisModule::calculate_historical_statistics(RuntimeContext& context) const {

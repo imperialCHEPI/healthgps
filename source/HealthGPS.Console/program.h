@@ -392,29 +392,3 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	return ModelInput(input_table, settings, run_info, ses_mapping,
 		HierarchicalMapping(std::move(mapping)), diseases);
 }
-
-void runner_event_handler(const hgps::EventMessage& message) {
-	fmt::print(fg(fmt::color::light_blue), "{}\n", message.to_string());
-}
-
-void info_event_handler(const hgps::EventMessage& message){
-	fmt::print(fg(fmt::color::white_smoke), "{}\n", message.to_string());
-}
-
-void error_event_handler(const hgps::EventMessage& message){
-	fmt::print(fg(fmt::color::red), "{}\n", message.to_string());
-}
-
-void result_event_handler(const hgps::EventMessage& message) {
-	fmt::print("{}\n", message.to_string());
-}
-
-std::vector<std::unique_ptr<EventSubscriber>> register_event_subscribers(EventAggregator& bus)
-{
-	auto subscribers = std::vector<std::unique_ptr<EventSubscriber>>{};
-	subscribers.emplace_back(bus.subscribe(hgps::EventType::runner, runner_event_handler));
-	subscribers.emplace_back(bus.subscribe(hgps::EventType::info, info_event_handler));
-	subscribers.emplace_back(bus.subscribe(hgps::EventType::result, result_event_handler));
-	subscribers.emplace_back(bus.subscribe(hgps::EventType::error, error_event_handler));
-	return subscribers;
-}

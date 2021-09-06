@@ -50,12 +50,12 @@ namespace hgps {
 
         [[nodiscard]]
         virtual std::unique_ptr<EventSubscriber> subscribe(EventType event_id,
-            std::function<void(const EventMessage& message)>&& handler) = 0;
+            std::function<void(std::shared_ptr<EventMessage> message)>&& handler) = 0;
 
         virtual bool unsubscribe(const EventSubscriber& subscriber) = 0;
 
-        virtual void publish(const EventMessage& message) = 0;
+        virtual void publish(std::unique_ptr<EventMessage> message) = 0;
 
-        virtual void publish_async(const EventMessage& message) = 0;
+        virtual void publish_async(std::unique_ptr<EventMessage> message) = 0;
     };
 }

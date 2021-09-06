@@ -66,8 +66,8 @@ namespace hgps {
 
 		auto message = std::format("[{:4},{}] population size: {}",
 			env->now().real, env->now().logical, pop_size);
-		context_.publish(InfoEventMessage{ name(), ModelAction::start,
-			context_.current_run(), context_.time_now(), message });
+		context_.publish(std::make_unique<InfoEventMessage>(
+			name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
 
 		return env->now() + adevs::Time(world_time, 0);
 	}
@@ -94,8 +94,8 @@ namespace hgps {
 
 			auto message = std::format("[{:4},{}] elapsed: {}ms",
 				env->now().real, env->now().logical, elapsed.count());
-			context_.publish(InfoEventMessage{ name(), ModelAction::update,
-				context_.current_run(), context_.time_now(), message });
+			context_.publish(std::make_unique<InfoEventMessage>(
+				name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
 			// Schedule next event time 
 			return world_time;
@@ -115,8 +115,8 @@ namespace hgps {
 	void HealthGPS::fini(adevs::Time clock)
 	{
 		auto message = std::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
-		context_.publish(InfoEventMessage{ name(), ModelAction::stop,
-			context_.current_run(), context_.time_now(), message });
+		context_.publish(std::make_unique<InfoEventMessage>(
+			name(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
 	}
 
 	void HealthGPS::initialise_population(const int pop_size, const int ref_year)

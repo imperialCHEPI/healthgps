@@ -95,11 +95,11 @@ namespace hgps {
         reference_time_ = reference_time;
     }
 
-    void RuntimeContext::publish(const EventMessage& message) const noexcept {
-        event_bus_.publish(message);
+    void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
+        event_bus_.publish(std::move(message));
     }
 
-    void RuntimeContext::publish_async(const EventMessage& message) const noexcept {
-        event_bus_.publish_async(message);
+    void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
+        event_bus_.publish_async(std::move(message));
     }
 }

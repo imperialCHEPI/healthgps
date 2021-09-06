@@ -15,4 +15,8 @@ namespace hgps {
 		auto formatting = std::string{ "Source: {}, run # {}, {}, time: {}, cause: {}" };
 		return std::format(formatting, source, run_number, model_time, message);
 	}
+
+	void ErrorEventMessage::accept(EventMessageVisitor& visitor) const {
+		visitor.visit(*this);
+	}
 }

@@ -22,6 +22,10 @@ namespace hgps {
 		return std::format(formatting, source, run_number,
 			detail::model_action_str(model_action), model_time, message);
 	}
+
+	void InfoEventMessage::accept(EventMessageVisitor& visitor) const {
+		visitor.visit(*this);
+	}
 }
 
 

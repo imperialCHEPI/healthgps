@@ -12,11 +12,11 @@ namespace hgps {
 	public:
         [[nodiscard]]
         std::unique_ptr<EventSubscriber> subscribe(EventType event_id,
-            std::function<void(const EventMessage& message)>&& function) override;
+            std::function<void(std::shared_ptr<EventMessage> message)>&& function) override;
 
-        void publish(const EventMessage& message) override;
+        void publish(std::unique_ptr<EventMessage> message) override;
 
-        void publish_async(const EventMessage& message) override;
+        void publish_async(std::unique_ptr<EventMessage> message) override;
 
         bool unsubscribe(const EventSubscriber& subscriber);
 
@@ -28,7 +28,7 @@ namespace hgps {
         using mutex_type = std::shared_mutex;
         mutable mutex_type subscribe_mutex_;
         std::unordered_multimap<int, std::string> registry_;
-        std::unordered_map<std::string, std::function<void(const EventMessage& message)>> subscribers_;
+        std::unordered_map<std::string, std::function<void(std::shared_ptr<EventMessage>)>> subscribers_;
 
         template<typename Callable>
         void shared_access(Callable&& callable) {

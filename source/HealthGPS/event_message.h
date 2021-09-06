@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "event_visitor.h"
 
 namespace hgps {
 
@@ -25,5 +26,7 @@ namespace hgps {
         virtual int id() const noexcept = 0;
 
         virtual std::string to_string() const = 0;
+
+        virtual void accept(EventMessageVisitor& visitor) const = 0;
     };
 }

@@ -183,6 +183,12 @@
     <ClInclude Include="hierarchical_model_types.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="threadsafe_queue.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="event_visitor.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

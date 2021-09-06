@@ -15,4 +15,7 @@ namespace hgps {
 		return std::format("Source: {}, run # {}, time: {}, results:\n{}",
 			source, run_number, model_time, content.to_string());
 	}
+	void ResultEventMessage::accept(EventMessageVisitor& visitor) const	{
+		visitor.visit(*this);
+	}
 }

@@ -3,6 +3,9 @@
 #include "HealthGPS.Datastore/api.h"
 #include "HealthGPS/event_bus.h"
 
+#include "event_monitor.h"
+#include "result_file_writer.h"
+
 #include <fmt/chrono.h>
 
 int main(int argc, char* argv[])
@@ -67,24 +70,24 @@ int main(int argc, char* argv[])
 
 	// Create event bus
 	auto event_bus = DefaultEventBus();
+	auto result_file_logger = ResultFileWriter();
+	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
-
-		// Register event subscribers with scoped handlers
-		auto subscribers = register_event_subscribers(event_bus);
-
 		// Create main simulation model instance and run experiment
 		auto model = HealthGPS(factory, model_config, event_bus, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
 		auto runner = ModelRunner(event_bus);
 		auto runtime = runner.run(model, config.trial_runs);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
 	}
 	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
 	}
-
+	
+	event_monitor.stop();
 	fmt::print("\n\n");
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye");
 	fmt::print("\n\n");

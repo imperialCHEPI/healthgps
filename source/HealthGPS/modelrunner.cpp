@@ -16,7 +16,7 @@ namespace hgps {
 		}
 
 		auto start = std::chrono::steady_clock::now();
-		event_bus_.publish_async(RunnerEventMessage{ model.name(), RunnerAction::start});
+		event_bus_.publish_async(std::make_unique<RunnerEventMessage>(model.name(), RunnerAction::start));
 
 		/* Initialise simulation */
 		model.initialize();
@@ -24,8 +24,8 @@ namespace hgps {
 		for (auto run = 1u; run <= trial_runs; run++)
 		{
 			auto run_start = std::chrono::steady_clock::now();
-			event_bus_.publish_async(RunnerEventMessage{
-				model.name(), RunnerAction::run_begin, run });
+			event_bus_.publish_async(std::make_unique<RunnerEventMessage>(
+				model.name(), RunnerAction::run_begin, run ));
 
 			/* Create the simulation engine */
 			adevs::Simulator<int> sim;
@@ -40,8 +40,8 @@ namespace hgps {
 			}
 
 			ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
-			event_bus_.publish_async(RunnerEventMessage{ 
-				model.name(), RunnerAction::run_end, run, elapsed.count() });
+			event_bus_.publish_async(std::make_unique<RunnerEventMessage>(
+				model.name(), RunnerAction::run_end, run, elapsed.count()));
 		}
 
 		/* Terminate simulation */
@@ -50,8 +50,8 @@ namespace hgps {
 		ElapsedTime elapsed = std::chrono::steady_clock::now() - start;
 		auto elapsed_ms = elapsed.count();
 
-		event_bus_.publish_async(RunnerEventMessage{ 
-			model.name(), RunnerAction::finish, elapsed_ms });
+		event_bus_.publish_async(std::make_unique<RunnerEventMessage>(
+			model.name(), RunnerAction::finish, elapsed_ms ));
 		return elapsed_ms;
 	}
 }

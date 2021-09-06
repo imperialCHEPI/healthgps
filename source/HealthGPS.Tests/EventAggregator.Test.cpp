@@ -7,7 +7,7 @@
 #include "HealthGPS\error_message.h"
 
 struct TestHandler {
-	void handler_event(const hgps::EventMessage& message) {
+	void handler_event(std::shared_ptr<hgps::EventMessage> message) {
 		counter++;
 	}
 
@@ -15,7 +15,7 @@ struct TestHandler {
 };
 
 static int global_counter = 0;
-static void free_handler_event(const hgps::EventMessage& message) {
+static void free_handler_event(std::shared_ptr<hgps::EventMessage> message) {
 	global_counter++;
 }
 
@@ -79,7 +79,8 @@ TEST(TestHealthGPS_EventBus, AddEventSubscribers)
 	auto hub = DefaultEventBus{};
 	auto free_sub = hub.subscribe(EventType::info, free_handler_event);
 	auto fun_sub = hub.subscribe(EventType::info, member_callback);
-	auto lam_sub = hub.subscribe(EventType::info, [&counter](const EventMessage& msg) {counter++; });
+	auto lam_sub = hub.subscribe(EventType::info,
+		[&counter](std::shared_ptr<hgps::EventMessage> msg) { counter++; });
 
 	ASSERT_EQ(expected, hub.count());
 
@@ -105,7 +106,8 @@ TEST(TestHealthGPS_EventBus, HandlerAutoUnsubscribe)
 	{
 		auto free_sub = hub.subscribe(EventType::info, free_handler_event);
 		auto fun_sub = hub.subscribe(EventType::info, member_callback);
-		auto lam_sub = hub.subscribe(EventType::info, [&counter](const EventMessage& msg) {counter++; });
+		auto lam_sub = hub.subscribe(EventType::info,
+			[&counter](std::shared_ptr<hgps::EventMessage> msg) { counter++; });
 
 		ASSERT_EQ(expected, hub.count());
 	}
@@ -131,7 +133,7 @@ TEST(TestHealthGPS_EventBus, ContainerAutoUnsubscribe)
 	subscribers.push_back(hub.subscribe(EventType::info, free_handler_event));
 	subscribers.push_back(hub.subscribe(EventType::info, member_callback));
 	subscribers.push_back(hub.subscribe(EventType::info,
-		[&counter](const EventMessage& msg) {counter++; }));
+		[&counter](std::shared_ptr<hgps::EventMessage> msg) {counter++; }));
 	
 	ASSERT_EQ(expected, hub.count());
 	ASSERT_EQ(expected, subscribers.size());
@@ -156,7 +158,8 @@ TEST(TestHealthGPS_EventBus, ClearUnsubscribes)
 	auto hub = DefaultEventBus{};
 	auto free_sub = hub.subscribe(EventType::info, free_handler_event);
 	auto fun_sub = hub.subscribe(EventType::info, member_callback);
-	auto lam_sub = hub.subscribe(EventType::info, [&counter](const EventMessage& msg) {counter++; });
+	auto lam_sub = hub.subscribe(EventType::info,
+		[&counter](std::shared_ptr<hgps::EventMessage> msg) {counter++; });
 
 	ASSERT_EQ(expected, hub.count());
 	hub.clear();
@@ -170,16 +173,14 @@ TEST(TestHealthGPS_EventBus, PublishToSubscribers)
 
 	auto counter = 0;
 	auto expected = 2;
-	auto message = InfoEventMessage{ "UnitTest", ModelAction::start, 1, 2010 };
-
 	auto handler = TestHandler{};
 	auto callback = std::bind(&TestHandler::handler_event, &handler, _1);
 
 	auto hub = DefaultEventBus{};
 	auto fun_sub = hub.subscribe(EventType::info, callback);
-	auto lam_sub = hub.subscribe(EventType::info, [&counter](const EventMessage& msg) {counter++; });
-	hub.publish(message);
-	hub.publish_async(message);
+	auto lam_sub = hub.subscribe(EventType::info, [&counter](std::shared_ptr<hgps::EventMessage> msg) {counter++; });
+	hub.publish(std::make_unique<InfoEventMessage>("UnitTest", ModelAction::start, 1, 2010));
+	hub.publish_async(std::make_unique<InfoEventMessage>("UnitTest", ModelAction::start, 2, 2010));
 
 	ASSERT_EQ(expected, hub.count());
 	ASSERT_EQ(expected, handler.counter);
@@ -197,32 +198,27 @@ TEST(TestHealthGPS_EventBus, PublishToFilteredSubscribers)
 	auto hub_expected = 4;
 	auto count_expected = 2;
 
-	auto info_msg = InfoEventMessage{ "UnitTest", ModelAction::start, 1, 0 };
-	auto runner_msg = RunnerEventMessage{ "UnitTest", RunnerAction::start };
-	auto result_msg = ResultEventMessage("UnitTest", 1, 2010, ModelResult{});
-	auto error_msg = ErrorEventMessage{ "UnitTest", 1, 2010, "fell from world's edge"};
-	
 	auto info_handler = TestHandler{};
 	auto info_callback = std::bind(&TestHandler::handler_event, &info_handler, _1);
 
 	auto hub = DefaultEventBus{};
 	auto info_sub = hub.subscribe(EventType::info, info_callback);
 	auto run_sub = hub.subscribe(EventType::runner, 
-		[&runner_count](const EventMessage& msg) {runner_count++; });
+		[&runner_count](std::shared_ptr<hgps::EventMessage> msg) {runner_count++; });
 	auto err_sub = hub.subscribe(EventType::error,
-		[&error_count](const EventMessage& msg) {error_count++; });
+		[&error_count](std::shared_ptr<hgps::EventMessage> msg) {error_count++; });
 	auto result_sub = hub.subscribe(EventType::result,
-		[&result_count](const EventMessage& msg) {result_count++; });
+		[&result_count](std::shared_ptr<hgps::EventMessage> msg) {result_count++; });
 
-	hub.publish(runner_msg);
-	hub.publish_async(info_msg);
-	hub.publish_async(result_msg);
-	hub.publish_async(error_msg);
+	hub.publish(std::make_unique<RunnerEventMessage>("UnitTest", RunnerAction::start));
+	hub.publish_async(std::make_unique<InfoEventMessage>("UnitTest", ModelAction::start, 1, 0));
+	hub.publish_async(std::make_unique<ResultEventMessage>("UnitTest", 1, 2010, ModelResult{}));
+	hub.publish_async(std::make_unique<ErrorEventMessage>("UnitTest", 1, 2010, "fell from world's edge"));
 
-	hub.publish_async(info_msg);
-	hub.publish_async(result_msg);
-	hub.publish_async(error_msg);
-	hub.publish(runner_msg);
+	hub.publish_async(std::make_unique<InfoEventMessage>("UnitTest", ModelAction::start, 2, 0));
+	hub.publish_async(std::make_unique<ResultEventMessage>("UnitTest", 2, 2030, ModelResult{}));
+	hub.publish_async(std::make_unique<ErrorEventMessage>("UnitTest", 2, 2030, "fell from world's edge"));
+	hub.publish(std::make_unique<RunnerEventMessage>("UnitTest", RunnerAction::finish));
 
 	ASSERT_EQ(hub_expected, hub.count());
 	ASSERT_EQ(count_expected, info_handler.counter);

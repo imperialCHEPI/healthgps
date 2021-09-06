@@ -46,9 +46,9 @@ namespace hgps {
 
 		void reset_population(const std::size_t pop_size, const int reference_time);
 
-		void publish(const EventMessage& message) const noexcept;
+		void publish(std::unique_ptr<EventMessage> message) const noexcept;
 
-		void publish_async(const EventMessage& message) const noexcept;
+		void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
 	private:
 		EventAggregator& event_bus_;
