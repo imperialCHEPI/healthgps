@@ -127,3 +127,11 @@ void from_json(const json& j, ModellingInfo& p) {
 	j.at("models").get_to(p.models);
 }
 
+// Result information
+void to_json(json& j, const ResultInfo& p) {
+	j = json{ {"folder", p.folder}};
+}
+
+void from_json(const json& j, ResultInfo& p) {
+	j.at("folder").get_to(p.folder);
+}

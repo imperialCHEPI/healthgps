@@ -46,6 +46,11 @@ struct ModellingInfo
 	std::unordered_map<std::string, std::string> models;
 };
 
+struct ResultInfo
+{
+	std::string folder{};
+};
+
 struct Configuration
 {
 	FileInfo file;
@@ -65,4 +70,6 @@ struct Configuration
 	unsigned int stop_time{};
 
 	unsigned int trial_runs{};
+
+	ResultInfo result;
 };

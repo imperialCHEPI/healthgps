@@ -8,7 +8,8 @@
 #include <fmt/color.h>
 
 EventMonitor::EventMonitor(hgps::EventAggregator& event_bus, ResultWriter& result_writer)
-	: result_writer_{ result_writer }, threads_{}, handlers_{}, info_queue_{}, results_queue_{}
+	: result_writer_{ result_writer }, threads_{}, handlers_{}, info_queue_{},
+	results_queue_{}, cancel_source_{}
 {
 	handlers_.emplace_back(event_bus.subscribe(hgps::EventType::runner,
 		std::bind(&EventMonitor::info_event_handler, this, std::placeholders::_1)));
@@ -22,35 +23,8 @@ EventMonitor::EventMonitor(hgps::EventAggregator& event_bus, ResultWriter& resul
 	handlers_.emplace_back(event_bus.subscribe(hgps::EventType::error,
 		std::bind(&EventMonitor::error_event_handler, this, std::placeholders::_1)));
 
-	threads_.emplace_back(std::jthread([&](std::stop_token stoken) {
-		fmt::print(fg(fmt::color::light_blue), "Info event thread started...\n");
-		while (!stoken.stop_requested()) {
-			auto m = info_queue_.pop();
-			if (m.has_value()) {
-				m.value()->accept(*this);
-			}
-			else {
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			}
-		}
-
-		fmt::print(fg(fmt::color::light_blue), "Info event thread exited.\n");
-	}));
-
-	threads_.emplace_back(std::jthread([&](std::stop_token stoken) {
-		fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
-		while (!stoken.stop_requested()) {
-			auto m = results_queue_.pop();
-			if (m.has_value()) {
-				m.value()->accept(*this);
-			}
-			else {
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			}
-		}
-
-		fmt::print(fg(fmt::color::gray), "Result event thread exited.\n");
-	}));
+	threads_.emplace_back(std::jthread(&EventMonitor::info_dispatch_thread, this, cancel_source_.get_token()));
+	threads_.emplace_back(std::jthread(&EventMonitor::result_dispatch_thread, this, cancel_source_.get_token()));
 }
 
 EventMonitor::~EventMonitor() noexcept {
@@ -62,10 +36,7 @@ EventMonitor::~EventMonitor() noexcept {
 }
 
 void EventMonitor::stop() noexcept {
-	for (auto& thread : threads_) {
-		thread.request_stop();
-	}
-
+	cancel_source_.request_stop();
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
@@ -96,4 +67,34 @@ void EventMonitor::error_event_handler(std::shared_ptr<hgps::EventMessage> messa
 
 void EventMonitor::result_event_handler(std::shared_ptr<hgps::EventMessage> message) {
 	results_queue_.push(message);
+}
+
+void EventMonitor::info_dispatch_thread(std::stop_token token) {
+	fmt::print(fg(fmt::color::light_blue), "Info event thread started...\n");
+	while (!token.stop_requested()) {
+		auto m = info_queue_.pop();
+		if (m.has_value()) {
+			m.value()->accept(*this);
+		}
+		else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	}
+
+	fmt::print(fg(fmt::color::light_blue), "Info event thread exited.\n");
+}
+
+void EventMonitor::result_dispatch_thread(std::stop_token token) {
+	fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
+	while (!token.stop_requested()) {
+		auto m = results_queue_.pop();
+		if (m.has_value()) {
+			m.value()->accept(*this);
+		}
+		else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	}
+
+	fmt::print(fg(fmt::color::gray), "Result event thread exited.\n");
 }

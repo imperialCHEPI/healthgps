@@ -25,9 +25,13 @@ private:
 	std::vector <std::unique_ptr<hgps::EventSubscriber>> handlers_;
 	hgps::ThreadsafeQueue < std::shared_ptr<hgps::EventMessage>> info_queue_;
 	hgps::ThreadsafeQueue < std::shared_ptr<hgps::EventMessage>> results_queue_;
+	std::stop_source cancel_source_;
 
 	void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
 	void error_event_handler(std::shared_ptr<hgps::EventMessage> message);
 	void result_event_handler(std::shared_ptr<hgps::EventMessage> message);
+
+	void info_dispatch_thread(std::stop_token token);
+	void result_dispatch_thread(std::stop_token token);
 };
 

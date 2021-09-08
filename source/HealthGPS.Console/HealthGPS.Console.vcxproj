@@ -26,6 +26,7 @@
   <ItemGroup>
     <ClInclude Include="csvparser.h" />
     <ClInclude Include="event_monitor.h" />
+    <ClInclude Include="model_info.h" />
     <ClInclude Include="result_file_writer.h" />
     <ClInclude Include="jsonparser.h" />
     <ClInclude Include="options.h" />

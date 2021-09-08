@@ -175,6 +175,9 @@ Configuration load_configuration(CommandOptions& options) {
 		}
 
 		opt["running"]["diseases"].get_to(config.diseases);
+
+		// Results
+		config.result = opt["results"].get<ResultInfo>();
 	}
 	else
 	{
@@ -391,4 +394,16 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 
 	return ModelInput(input_table, settings, run_info, ses_mapping,
 		HierarchicalMapping(std::move(mapping)), diseases);
+}
+
+std::string create_output_file_name(const ResultInfo& info) {
+	fs::path output_folder = info.folder;
+	if (!fs::exists(output_folder)) {
+		fs::create_directories(output_folder);
+	}
+	
+	auto log_file_name = std::format("HealthGPS_result_{:%F_%H-%M-%S}.json", std::chrono::system_clock::now());
+	log_file_name = (output_folder / log_file_name).string();
+	fmt::print(fg(fmt::color::yellow_green), "Results file: {}.\n", log_file_name);
+	return log_file_name;
 }

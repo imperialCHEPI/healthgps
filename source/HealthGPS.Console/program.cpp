@@ -68,9 +68,12 @@ int main(int argc, char* argv[])
 	// Create the complete model configuration
 	auto model_config = create_model_input(input_table, target.value(), config, diseases);
 
-	// Create event bus
+	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();
-	auto result_file_logger = ResultFileWriter();
+	auto result_file_logger = ResultFileWriter{ 
+		create_output_file_name(config.result),
+		ModelInfo{.name = "Health-GPS", .version = "0.1.1-alpha.5"}
+	};
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
