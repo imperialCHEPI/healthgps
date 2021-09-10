@@ -3,6 +3,7 @@
 #include <rapidcsv.h>
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS/gender_value.h"
+#include "HealthGPS/hierarchical_model_types.h"
 #include "HealthGPS.Core/string_util.h"
 
 namespace hc = hgps::core;
@@ -152,8 +153,8 @@ std::map<std::string, std::size_t> create_fields_index_mapping(
 	return mapping;
 }
 
-std::map<int, std::map<std::string,hgps::DoubleGenderValue>> load_baseline_csv(
-	const hc::IntegerInterval& time_range, const std::string& full_filename, const std::string delimiter = ",")
+hgps::BaselineAdjustmentTable load_baseline_csv(const hc::IntegerInterval& time_range,
+	const std::string& full_filename, const std::string delimiter = ",")
 {
 	using namespace hgps;
 	using namespace rapidcsv;
@@ -178,5 +179,5 @@ std::map<int, std::map<std::string,hgps::DoubleGenderValue>> load_baseline_csv(
 			});
 	}
 
-	return data;
+	return BaselineAdjustmentTable{ std::move(data) };
 }

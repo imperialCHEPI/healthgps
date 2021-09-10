@@ -187,7 +187,7 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
-	auto baseline_data = hgps::BaselineAdjustment{ BaselineAdjustmentTable{}};
+	auto baseline_data = hgps::BaselineAdjustment{};
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
 	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model(baseline_data));
 	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model(baseline_data));
@@ -331,7 +331,7 @@ TEST(TestHealthGPS, CreateRiskFactorModule)
 		HierarchicalModelType::Dynamic, "C:/HealthGPS/Test/DHLM.Json");
 	*/
 
-	auto baseline_data = hgps::BaselineAdjustment{ BaselineAdjustmentTable{} };
+	auto baseline_data = hgps::BaselineAdjustment{};
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
 	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model(baseline_data));
 	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model(baseline_data));
@@ -353,7 +353,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
 {
 	using namespace hgps;
 
-	auto baseline_data = hgps::BaselineAdjustment{ BaselineAdjustmentTable{} };
+	auto baseline_data = hgps::BaselineAdjustment{};
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
 	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model(baseline_data));
 
@@ -364,7 +364,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
 {
 	using namespace hgps;
 
-	auto baseline_data = hgps::BaselineAdjustment{ BaselineAdjustmentTable{} };
+	auto baseline_data = hgps::BaselineAdjustment{};
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
 	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model(baseline_data));
 

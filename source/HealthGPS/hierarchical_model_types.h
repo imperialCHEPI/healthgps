@@ -31,14 +31,23 @@ namespace hgps {
 		std::vector<double> variances;
 	};
 
-	struct BaselineAdjustment
-	{
-		BaselineAdjustment() = delete;
+	struct BaselineAdjustment {
+		BaselineAdjustment() = default;
 		BaselineAdjustment(BaselineAdjustmentTable&& baseline_averages)
-			: risk_factors_averages{ baseline_averages }, adjustments{} {}
+			: averages{ baseline_averages }, risk_factors{}, is_enabled{ true }
+		{
+			if (baseline_averages.empty()) {
+				throw std::invalid_argument(
+					"The baseline risk factor averages table must not be empty.");
+			}
 
-		const BaselineAdjustmentTable risk_factors_averages;
+			for (const auto& factor : averages.cbegin()->second) {
+				risk_factors.emplace_back(factor.first);
+			}
+		}
 
-		std::map<int, std::map<std::string, DoubleGenderValue>> adjustments;
+		const bool is_enabled{ false };
+		const BaselineAdjustmentTable averages{};
+		std::vector<std::string> risk_factors{};
 	};
 }

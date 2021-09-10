@@ -244,15 +244,15 @@ std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(Mode
 hgps::BaselineAdjustment load_baseline_adjustment(
 	const BaselineInfo& info, const unsigned int& start_time, const unsigned int& stop_time) {
 	MEASURE_FUNCTION();
-	auto data = std::map<int, std::map<std::string, DoubleGenderValue>>{};
 	if (!info.is_enabled) {
-		return Map2d<int, std::string, DoubleGenderValue>{std::move(data)};
+		return BaselineAdjustment{};
 	}
 
 	try {
 		auto time_range = hc::IntegerInterval{static_cast<int>(start_time), static_cast<int>(stop_time) };
 		if (core::case_insensitive::equals(info.format, "CSV")) {
-			data = load_baseline_csv(time_range, info.file_name, info.delimiter);
+			auto data = load_baseline_csv(time_range, info.file_name, info.delimiter);
+			return BaselineAdjustment{ std::move(data) };
 		}
 		else if (core::case_insensitive::equals(info.format, "JSON")) {
 			throw std::logic_error("JSON support not yet implemented.");
@@ -275,9 +275,8 @@ hgps::BaselineAdjustment load_baseline_adjustment(
 	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red),
 			"Failed to parse model file: {}. {}\n", info.file_name, ex.what());
+		throw;
 	}
-
-	return hgps::BaselineAdjustment{std::move(data)};
 }
 
 std::shared_ptr<RiskFactorModule> build_risk_factor_module(

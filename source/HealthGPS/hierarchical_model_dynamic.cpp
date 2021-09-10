@@ -69,26 +69,23 @@ namespace hgps {
 	}
 
 	void DynamicHierarchicalLinearModel::adjust_risk_factors_with_baseline(RuntimeContext& context) {
-		if (baseline_scenario_.risk_factors_averages.empty()) {
+		if (!baseline_scenario_.is_enabled) {
 			return;
 		}
 
 		auto time_year = context.time_now();
-		auto time_adjustments = std::map<std::string, DoubleGenderValue>{};
+		auto baseline_adjustments = std::map<std::string, DoubleGenderValue>{};
 
-		auto risk_factors = std::vector<std::string>{};
 		auto gender_sum = std::map<std::string, std::map<core::Gender, double>>{};
 		auto gender_count = std::map<std::string, std::map<core::Gender, int>>{};
-		for (const auto& factor : baseline_scenario_.risk_factors_averages.cbegin()->second) {
-			risk_factors.emplace_back(factor.first);
+		for (const auto& factor : baseline_scenario_.risk_factors) {
+			gender_sum[factor][core::Gender::male] = 0.0;
+			gender_sum[factor][core::Gender::female] = 0.0;
 
-			gender_sum[factor.first][core::Gender::male] = 0.0;
-			gender_sum[factor.first][core::Gender::female] = 0.0;
+			gender_count[factor][core::Gender::male] = 0;
+			gender_count[factor][core::Gender::female] = 0;
 
-			gender_count[factor.first][core::Gender::male] = 0;
-			gender_count[factor.first][core::Gender::female] = 0;
-
-			time_adjustments.emplace(factor.first, DoubleGenderValue{});
+			baseline_adjustments.emplace(factor, DoubleGenderValue{});
 		}
 
 		for (const auto& entity : context.population()) {
@@ -96,28 +93,29 @@ namespace hgps {
 				continue;
 			}
 
-			for (const auto& factor : risk_factors) {
+			for (const auto& factor : baseline_scenario_.risk_factors) {
 				gender_sum[factor][entity.gender] += entity.get_risk_factor_value(factor);
 				gender_count[factor][entity.gender]++;
 			}
 		}
 
 		auto risk_factor_count = 0;
-		for (const auto& factor : risk_factors) {
+		const auto& baseline_averages_at_time = baseline_scenario_.averages.row(time_year);
+		for (const auto& factor : baseline_scenario_.risk_factors) {
 			risk_factor_count = gender_count[factor][core::Gender::male];
 			if (risk_factor_count > 0) {
-				auto risk_factor_average = gender_sum[factor][core::Gender::male] / risk_factor_count;
-				auto baseline_value = baseline_scenario_.risk_factors_averages.at(time_year, factor).male;
-				auto adjustment = baseline_value - risk_factor_average;
-				time_adjustments.at(factor).male = adjustment;
+				auto factor_average = gender_sum[factor][core::Gender::male] / risk_factor_count;
+				auto baseline_value = baseline_averages_at_time.at(factor).male;
+				auto adjustment = baseline_value - factor_average;
+				baseline_adjustments.at(factor).male = adjustment;
 			}
 
 			risk_factor_count = gender_count[factor][core::Gender::female];
 			if (risk_factor_count > 0) {
 				auto risk_factor_average = gender_sum[factor][core::Gender::female] / risk_factor_count;
-				auto baseline_value = baseline_scenario_.risk_factors_averages.at(time_year, factor).female;
+				auto baseline_value = baseline_averages_at_time.at(factor).female;
 				auto adjustment = baseline_value - risk_factor_average;
-				time_adjustments.at(factor).female = adjustment;
+				baseline_adjustments.at(factor).female = adjustment;
 			}
 		}
 
@@ -126,9 +124,9 @@ namespace hgps {
 				continue;
 			}
 
-			for (const auto& factor : risk_factors) {
+			for (const auto& factor : baseline_scenario_.risk_factors) {
 				auto risk_factor_value = entity.get_risk_factor_value(factor);
-				auto adjustment = time_adjustments.at(factor);
+				auto adjustment = baseline_adjustments.at(factor);
 				if (entity.gender == core::Gender::male) {
 					entity.risk_factors.at(factor) = risk_factor_value + adjustment.male;
 				}
@@ -137,8 +135,6 @@ namespace hgps {
 				}
 			}
 		}
-
-		baseline_scenario_.adjustments.emplace(time_year, time_adjustments);
 	}
 
 	void DynamicHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
