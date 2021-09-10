@@ -113,18 +113,38 @@ void from_json(const json& j, SettingsInfo& p) {
 	j.at("age_range").get_to(p.age_range);
 }
 
+// Baseline scenario adjustments
+void to_json(json& j, const BaselineInfo& p) {
+	j = json{
+		{"is_enabled", p.is_enabled},
+		{"format", p.format},
+		{"delimiter", p.delimiter},
+		{"encoding", p.encoding},
+		{"file_name", p.file_name} };
+}
+
+void from_json(const json& j, BaselineInfo& p) {
+	j.at("is_enabled").get_to(p.is_enabled);
+	j.at("format").get_to(p.format);
+	j.at("delimiter").get_to(p.delimiter);
+	j.at("encoding").get_to(p.encoding);
+	j.at("file_name").get_to(p.file_name);
+}
+
 // Risk Factor Modelling
 void to_json(json& j, const ModellingInfo& p) {
 	j = json{
 		{"risk_factors", p.risk_factors},
 		{"dynamic_risk_factor", p.dynamic_risk_factor},
-		{"models", p.models} };
+		{"models", p.models},
+		{"baseline_adjustment", p.baseline_adjustment} };
 }
 
 void from_json(const json& j, ModellingInfo& p) {
 	j.at("risk_factors").get_to(p.risk_factors);
 	j.at("dynamic_risk_factor").get_to(p.dynamic_risk_factor);
 	j.at("models").get_to(p.models);
+	j.at("baseline_adjustment").get_to(p.baseline_adjustment);
 }
 
 // Result information

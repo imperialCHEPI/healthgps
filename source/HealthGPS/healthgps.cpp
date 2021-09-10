@@ -161,6 +161,10 @@ namespace hgps {
 		// Update diseases status: remission and incidence
 		disease_->update_population(context_);
 
+		// Why can't we update this in risk_factor_->update_population?
+		auto dynamic_model = risk_factor_->operator[](HierarchicalModelType::Dynamic);
+		dynamic_model->adjust_risk_factors_with_baseline(context_);
+
 		// Publish results to data logger
 		analysis_->update_population(context_);
 	}

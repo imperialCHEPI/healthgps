@@ -138,6 +138,10 @@ namespace hgps {
 		/// @brief Update risk factors for population
 		/// @param context The simulation run-time context
 		virtual void update_risk_factors(RuntimeContext& context) = 0;
+
+		/// @brief Adjust the risk factors using the baseline scenario
+		/// @param context The simulation run-time context
+		virtual void adjust_risk_factors_with_baseline(RuntimeContext& context) = 0;
 	};
 
 	/// @brief Diseases model interface

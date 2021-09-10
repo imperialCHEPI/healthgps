@@ -14,6 +14,7 @@
 #include "HealthGPS/api.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include "csvparser.h"
 #include "jsonparser.h"
 
 using namespace hgps;
@@ -158,9 +159,14 @@ Configuration load_configuration(CommandOptions& options) {
 			}
 		}
 
+		full_path = options.config_file.parent_path() / config.modelling.baseline_adjustment.file_name;
+		if (fs::exists(full_path)) {
+			config.modelling.baseline_adjustment.file_name = full_path.string();
+		}
+
 		if (!config.modelling.dynamic_risk_factor.empty() &&
 			!config.modelling.risk_factors.contains(config.modelling.dynamic_risk_factor)) {
-			fmt::print(fg(fmt::color::red), 
+			fmt::print(fg(fmt::color::red),
 				"\nInvalid configuration, dynamic risk factor: {} is not a risk factor.\n",
 				config.modelling.dynamic_risk_factor);
 		}
@@ -175,8 +181,6 @@ Configuration load_configuration(CommandOptions& options) {
 		}
 
 		opt["running"]["diseases"].get_to(config.diseases);
-
-		// Results
 		config.result = opt["results"].get<ResultInfo>();
 	}
 	else
@@ -237,12 +241,52 @@ std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(Mode
 	return modelsInfo;
 }
 
-std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
+hgps::BaselineAdjustment load_baseline_adjustment(
+	const BaselineInfo& info, const unsigned int& start_time, const unsigned int& stop_time) {
+	MEASURE_FUNCTION();
+	auto data = std::map<int, std::map<std::string, DoubleGenderValue>>{};
+	if (!info.is_enabled) {
+		return Map2d<int, std::string, DoubleGenderValue>{std::move(data)};
+	}
+
+	try {
+		auto time_range = hc::IntegerInterval{static_cast<int>(start_time), static_cast<int>(stop_time) };
+		if (core::case_insensitive::equals(info.format, "CSV")) {
+			data = load_baseline_csv(time_range, info.file_name, info.delimiter);
+		}
+		else if (core::case_insensitive::equals(info.format, "JSON")) {
+			throw std::logic_error("JSON support not yet implemented.");
+
+			std::ifstream ifs(info.file_name, std::ifstream::in);
+			if (ifs) {
+				// TODO: JSON Parser
+			}
+			else {
+				fmt::print(fg(fmt::color::red),
+					"Baseline adjustment file: {} not found.\n", info.file_name);
+			}
+
+			ifs.close();
+		}
+		else {
+			throw std::logic_error("Unsupported file format: " + info.format);
+		}
+	}
+	catch (const std::exception& ex) {
+		fmt::print(fg(fmt::color::red),
+			"Failed to parse model file: {}. {}\n", info.file_name, ex.what());
+	}
+
+	return hgps::BaselineAdjustment{std::move(data)};
+}
+
+std::shared_ptr<RiskFactorModule> build_risk_factor_module(
+	const ModellingInfo info, hgps::BaselineAdjustment& baseline_data) {
 	MEASURE_FUNCTION();
 	auto config_models_info = load_risk_model_info(info);
 
 	// Create hierarchical models
-	std::unordered_map<HierarchicalModelType, 
+	std::unordered_map<HierarchicalModelType,
 		std::shared_ptr<HierarchicalLinearModel>> linear_models;
 	for (auto& config_model_type : config_models_info) {
 		HierarchicalModelType model_type;
@@ -284,8 +328,8 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 		std::map<int, HierarchicalLevel> levels;
 		for (auto& level_item : config_model_type.second.levels) {
 			auto& at = level_item.second;
-			std::unordered_map<std::string,int> col_names;
-			for (int i = 0; i < at.variables.size(); i++){
+			std::unordered_map<std::string, int> col_names;
+			for (int i = 0; i < at.variables.size(); i++) {
 				col_names.emplace(core::to_lower(at.variables[i]), i);
 			}
 
@@ -309,11 +353,11 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(ModellingInfo info) {
 
 		if (model_type == HierarchicalModelType::Static) {
 			linear_models.emplace(model_type,
-				std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels)));
+				std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data));
 		}
 		else if (model_type == HierarchicalModelType::Dynamic) {
 			linear_models.emplace(model_type,
-				std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels)));
+				std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data));
 		}
 	}
 
@@ -326,7 +370,7 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	fmt::print("\nThere are {} diseases in storage.\n", diseases.size());
 	for (auto& code : config.diseases) {
 		auto item = data_api.get_disease_info(core::to_lower(code));
-		if (item.has_value()){
+		if (item.has_value()) {
 			result.emplace_back(item.value());
 		}
 		else {
@@ -336,7 +380,6 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 
 	return result;
 }
-
 
 hgps::Scenario create_scenario(Configuration& config)
 {
@@ -381,7 +424,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	ses_mapping.entries.insert(config.ses_mapping.begin(), config.ses_mapping.end());
 
 	auto mapping = std::vector<MappingEntry>();
-	for (auto& item : config.modelling.risk_factors){
+	for (auto& item : config.modelling.risk_factors) {
 		if (core::case_insensitive::equals(item.first, config.modelling.dynamic_risk_factor)) {
 			mapping.emplace_back(MappingEntry(item.first, item.second,
 				find_by_value(ses_mapping, item.first), true));
@@ -401,8 +444,11 @@ std::string create_output_file_name(const ResultInfo& info) {
 	if (!fs::exists(output_folder)) {
 		fs::create_directories(output_folder);
 	}
-	
-	auto log_file_name = std::format("HealthGPS_result_{:%F_%H-%M-%S}.json", std::chrono::system_clock::now());
+
+	auto tp = std::chrono::system_clock::now();
+	auto local_tp = std::chrono::zoned_time{ std::chrono::current_zone(), tp };
+
+	auto log_file_name = std::format("HealthGPS_result_{:%F_%H-%M-%S}.json", local_tp);
 	log_file_name = (output_folder / log_file_name).string();
 	fmt::print(fg(fmt::color::yellow_green), "Results file: {}.\n", log_file_name);
 	return log_file_name;

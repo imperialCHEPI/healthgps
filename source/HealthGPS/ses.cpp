@@ -244,7 +244,7 @@ namespace hgps {
 			entity.education = entity.education.value();
 
 			// To prevent education level getting maximal values ???
-			if (entity.age < 31) {
+			if (entity.age % 5 == 0 && entity.age < 31) {
 				entity.education = std::max(entity.education.value(), random_education_level);
 			}
 		}
@@ -261,8 +261,8 @@ namespace hgps {
 		else {
 			entity.income = entity.income.value();
 
-			// To prevent education level getting maximal values?, < ? mine just collapsed
-			if (entity.age < 31) {
+			// To prevent education level getting maximal values ???
+			if (entity.age % 5 == 0 && entity.age < 31) {
 				entity.income = std::max(entity.income.value(), random_income_Level);
 			}
 		}

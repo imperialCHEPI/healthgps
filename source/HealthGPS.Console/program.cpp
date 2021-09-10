@@ -1,5 +1,4 @@
 #include "program.h"
-#include "csvparser.h"
 #include "HealthGPS.Datastore/api.h"
 #include "HealthGPS/event_bus.h"
 
@@ -31,7 +30,7 @@ int main(int argc, char* argv[])
 	// Parse configuration file 
 	auto config = load_configuration(cmd_args);
 	auto input_table = core::DataTable();
-	if (!load_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
+	if (!load_datatable_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
 	{
 		return EXIT_FAILURE;
 	}
@@ -39,7 +38,9 @@ int main(int argc, char* argv[])
 	std::cout << input_table.to_string();
 
 	// Create risk factors model instance
-	auto risk_factor_module = build_risk_factor_module(config.modelling);
+	auto baseline_data = load_baseline_adjustment(
+		config.modelling.baseline_adjustment, config.start_time, config.stop_time);
+	auto risk_factor_module = build_risk_factor_module(config.modelling, baseline_data);
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);

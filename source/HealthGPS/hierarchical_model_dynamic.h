@@ -8,7 +8,8 @@ namespace hgps {
 		DynamicHierarchicalLinearModel() = delete;
 		DynamicHierarchicalLinearModel(
 			std::unordered_map<std::string, LinearModel>&& models,
-			std::map<int, HierarchicalLevel>&& levels);
+			std::map<int, HierarchicalLevel>&& levels,
+			BaselineAdjustment& baseline_scenario);
 
 		HierarchicalModelType type() const noexcept override;
 
@@ -18,9 +19,12 @@ namespace hgps {
 
 		void update_risk_factors(RuntimeContext& context) override;
 
+		void adjust_risk_factors_with_baseline(RuntimeContext& context) override;
+
 	private:
 		std::unordered_map<std::string, LinearModel> models_;
 		std::map<int, HierarchicalLevel> levels_;
+		BaselineAdjustment& baseline_scenario_;
 
 		void generate_for_entity(RuntimeContext& context, Person& entity,
 			int level, std::vector<MappingEntry>& level_factors);

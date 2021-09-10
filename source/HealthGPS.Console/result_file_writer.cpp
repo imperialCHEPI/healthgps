@@ -50,12 +50,14 @@ void ResultFileWriter::write(const hgps::ResultEventMessage& message) {
 
 void ResultFileWriter::write_json_begin() {
 	using json = nlohmann::ordered_json;
-	auto time_now = std::chrono::system_clock::now();
+
+	auto tp = std::chrono::system_clock::now();
+	auto local_tp = std::chrono::zoned_time{ std::chrono::current_zone(), tp };
 	json msg = {
 		{"experiment", {
 			{"model", info_.name},
 			{"version", info_.version},
-			{"time_of_day", std::format("{:%F %T}", std::chrono::system_clock::now())}
+			{"time_of_day", std::format("{:%F %T %Z}",local_tp)}
 		}},
 		{"result",{1,2}} };
 

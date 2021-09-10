@@ -2,6 +2,7 @@
 
 #include <rapidcsv.h>
 #include "HealthGPS.Core/api.h"
+#include "HealthGPS/gender_value.h"
 #include "HealthGPS.Core/string_util.h"
 
 namespace hc = hgps::core;
@@ -69,7 +70,7 @@ auto get_double_column(std::string name, std::vector<std::string>& data)
 	return builder;
 }
 
-bool load_csv(
+bool load_datatable_csv(
 	const std::string& full_filename,
 	const std::map<std::string, std::string> columns,
 	hc::DataTable& out_table,
@@ -133,4 +134,49 @@ bool load_csv(
 	}
 
 	return true;
+}
+
+std::map<std::string, std::size_t> create_fields_index_mapping(
+	const std::vector<std::string>& column_names, const std::vector<std::string> fields)
+{
+	auto mapping = std::map<std::string, std::size_t>();
+	for (auto& field : fields) {
+		auto field_index = hc::case_insensitive::index_of(column_names, field);
+		if (field_index < 0) {
+			throw std::out_of_range(std::format("Required field {} not found.", field));
+		}
+
+		mapping.emplace(field, field_index);
+	}
+
+	return mapping;
+}
+
+std::map<int, std::map<std::string,hgps::DoubleGenderValue>> load_baseline_csv(
+	const hc::IntegerInterval& time_range, const std::string& full_filename, const std::string delimiter = ",")
+{
+	using namespace hgps;
+	using namespace rapidcsv;
+
+	auto data = std::map<int, std::map<std::string, DoubleGenderValue>>{};
+
+	auto doc = Document{ full_filename, LabelParams{}, SeparatorParams(delimiter.front()) };
+	auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+		{ "Time", "RiskFactor", "Male", "Female" });
+
+	for (size_t i = 0; i < doc.GetRowCount(); i++) {
+		auto row = doc.GetRow<std::string>(i);
+		auto time = std::stoi(row[mapping["Time"]]);
+		if (time < time_range.lower() || time > time_range.upper()) {
+			continue;
+		}
+
+		auto factor = hc::to_lower(row[mapping["RiskFactor"]]);
+		data[time].emplace(factor, DoubleGenderValue{
+				std::stod(row[mapping["Male"]]),
+				std::stod(row[mapping["Female"]])
+			});
+	}
+
+	return data;
 }

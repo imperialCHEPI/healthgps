@@ -1,12 +1,13 @@
 #include "hierarchical_model_static.h"
 #include "runtime_context.h"
 #include "HealthGPS.Core\string_util.h"
+#include "gender_table.h"
 
 namespace hgps {
 	StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
 		std::unordered_map<std::string, LinearModel>&& models,
-		std::map<int, HierarchicalLevel>&& levels)
-		: models_{ models }, levels_{ levels }
+		std::map<int, HierarchicalLevel>&& levels, BaselineAdjustment& baseline_scenario)
+		: models_{ models }, levels_{ levels }, baseline_scenario_{ baseline_scenario }
 	{}
 
 	HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
@@ -37,7 +38,71 @@ namespace hgps {
 	}
 
 	void StaticHierarchicalLinearModel::update_risk_factors(RuntimeContext& context) {
-		throw std::logic_error("StaticHierarchicalLinearModel.update not yet implemented.");
+		throw std::logic_error("StaticHierarchicalLinearModel.update_risk_factors not yet implemented.");
+	}
+
+	void StaticHierarchicalLinearModel::adjust_risk_factors_with_baseline(RuntimeContext& context) {
+		if (baseline_scenario_.risk_factors_averages.empty()) {
+			return;
+		}
+
+		auto time_year = context.time_now();
+		auto time_adjustments = std::map<std::string, DoubleGenderValue>{};
+
+		auto risk_factors = std::vector<std::string>{};
+		auto gender_sum = std::map<std::string, std::map<core::Gender, double>>{};
+		auto gender_count = std::map<std::string, std::map<core::Gender, int>>{};
+		for (const auto& factor : baseline_scenario_.risk_factors_averages.cbegin()->second) {
+			risk_factors.emplace_back(factor.first);
+			
+			gender_sum[factor.first][core::Gender::male] = 0.0;
+			gender_sum[factor.first][core::Gender::female] = 0.0;
+
+			gender_count[factor.first][core::Gender::male] = 0;
+			gender_count[factor.first][core::Gender::female] = 0;
+
+			time_adjustments.emplace(factor.first, DoubleGenderValue{});
+		}
+
+		for (const auto& entity : context.population()) {
+			for (const auto& factor : risk_factors) {
+				gender_sum[factor][entity.gender] += entity.get_risk_factor_value(factor);
+				gender_count[factor][entity.gender]++;
+			}
+		}
+
+		for (const auto& factor : risk_factors) {
+			auto risk_factor_count = gender_count[factor][core::Gender::male];
+			if (risk_factor_count > 0) {
+				auto risk_factor_average = gender_sum[factor][core::Gender::male] / risk_factor_count;
+				auto baseline_value = baseline_scenario_.risk_factors_averages.at(time_year, factor).male;
+				auto adjustment = baseline_value - risk_factor_average;
+				time_adjustments.at(factor).male = adjustment;
+			}
+
+			risk_factor_count = gender_count[factor][core::Gender::female];
+			if (risk_factor_count > 0) {
+				auto risk_factor_average = gender_sum[factor][core::Gender::female] / risk_factor_count;
+				auto baseline_value = baseline_scenario_.risk_factors_averages.at(time_year, factor).female;
+				auto adjustment = baseline_value - risk_factor_average;
+				time_adjustments.at(factor).female = adjustment;
+			}
+		}
+
+		for (auto& entity : context.population()) {
+			for (const auto& factor : risk_factors) {
+				auto risk_factor_value = entity.get_risk_factor_value(factor);
+				auto adjustment = time_adjustments.at(factor);
+				if (entity.gender == core::Gender::male) {
+					entity.risk_factors.at(factor) = risk_factor_value + adjustment.male;
+				}
+				else {
+					entity.risk_factors.at(factor) = risk_factor_value + adjustment.female;
+				}
+			}
+		}
+
+		baseline_scenario_.adjustments.emplace(time_year, time_adjustments);
 	}
 
 	void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,

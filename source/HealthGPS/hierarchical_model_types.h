@@ -1,8 +1,12 @@
 #pragma once
 #include "interfaces.h"
 #include "mapping.h"
+#include "map2d.h"
+#include "gender_value.h"
 
 namespace hgps {
+
+	using BaselineAdjustmentTable = Map2d<int, std::string, DoubleGenderValue>;
 
 	struct Coefficient {
 		double value{};
@@ -25,5 +29,16 @@ namespace hgps {
 		core::DoubleArray2D residual_distribution;
 		core::DoubleArray2D correlation;
 		std::vector<double> variances;
+	};
+
+	struct BaselineAdjustment
+	{
+		BaselineAdjustment() = delete;
+		BaselineAdjustment(BaselineAdjustmentTable&& baseline_averages)
+			: risk_factors_averages{ baseline_averages }, adjustments{} {}
+
+		const BaselineAdjustmentTable risk_factors_averages;
+
+		std::map<int, std::map<std::string, DoubleGenderValue>> adjustments;
 	};
 }

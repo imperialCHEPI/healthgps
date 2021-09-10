@@ -113,10 +113,12 @@
     <ClInclude Include="event_subscriber.h" />
     <ClInclude Include="event_visitor.h" />
     <ClInclude Include="gender_table.h" />
+    <ClInclude Include="gender_value.h" />
     <ClInclude Include="hierarchical_model_dynamic.h" />
     <ClInclude Include="hierarchical_model_static.h" />
     <ClInclude Include="hierarchical_model_types.h" />
     <ClInclude Include="life_table.h" />
+    <ClInclude Include="map2d.h" />
     <ClInclude Include="mapping.h" />
     <ClInclude Include="hierarchical_model.h" />
     <ClInclude Include="interfaces.h" />

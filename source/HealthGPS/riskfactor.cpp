@@ -47,7 +47,11 @@ namespace hgps {
 	}
 
 	void RiskFactorModule::initialise_population(RuntimeContext& context) {
-		models_.at(HierarchicalModelType::Static)->generate_risk_factors(context);
+		auto static_model = models_.at(HierarchicalModelType::Static);
+		static_model->generate_risk_factors(context);
+
+		// This should be a internal function called by generate_risk_factors?
+		static_model->adjust_risk_factors_with_baseline(context);
 	}
 
 	void RiskFactorModule::update_population(RuntimeContext& context) {

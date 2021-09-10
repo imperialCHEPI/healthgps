@@ -10,8 +10,7 @@ namespace hgps {
 
 	struct PopulationRecord {
 		PopulationRecord(int pop_age, float num_males, float num_females)
-			: age{ pop_age }, males{ num_males }, females{ num_females }
-		{}
+			: age{ pop_age }, males{ num_males }, females{ num_females } {}
 
 		const int age{};
 		const float males{};
@@ -22,11 +21,9 @@ namespace hgps {
 
 	struct GenderPair {
 		GenderPair(double male_value, double female_value) 
-			: male{ male_value }, female{ female_value }
-		{}
+			: male{ male_value }, female{ female_value } {}
 
 		const double male;
-
 		const double female;
 	};
 

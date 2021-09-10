@@ -38,6 +38,7 @@
     },
     "modelling": {
         "ses":{
+            "update_interval": 5,
             "max_age":30,
             "mapping":{
                 "gender": "Gender",
@@ -67,17 +68,10 @@
         },
         "baseline_adjustment":{
             "is_enabled":true,
-            "risk_factors":["Year","PhysicalActivityMET","FruitsVegetablesConsumption","SmokingStatus","AlcoholConsumption","BMI"],
-            "data_points":{
-                "male":[
-                    [2010, 3734, 2.97, 0.355, 6.73, 32.0],
-                    [2050, 4480.8, 3.267, 0.30175, 5.0475, 27.12]
-                ],
-                "female":[
-                    [2010, 3734, 2.97, 0.355, 6.73, 22.6],
-                    [2050, 4480.8, 3.267, 0.30175, 5.0475, 25.0]
-                ]
-            }
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "file_name": "BaselineScenarioAdjustment.csv"
         }
     },
     "running": {

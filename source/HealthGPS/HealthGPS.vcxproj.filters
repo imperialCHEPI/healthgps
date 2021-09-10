@@ -189,6 +189,12 @@
     <ClInclude Include="event_visitor.h">
       <Filter>Header Files\events</Filter>
     </ClInclude>
+    <ClInclude Include="gender_value.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="map2d.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
