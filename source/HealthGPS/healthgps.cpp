@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <memory>
 
 #include "healthgps.h"
 #include "mtrandom.h"
@@ -58,9 +59,13 @@ namespace hgps {
 	{
 		auto start = std::chrono::steady_clock::now();
 		auto world_time = config_.start_time();
+		context_.metrics().clear();
 		context_.set_current_time(world_time);
+	
 		initialise_population();
-		std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
+
+		auto stop = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
 		auto message = std::format("[{:4},{}] population size: {}, elapsed: {}ms",
 			env->now().real, env->now().logical, context_.population().initial_size(), elapsed.count());
@@ -74,6 +79,7 @@ namespace hgps {
 	{
 		if (env->now() < end_time_) {
 			auto start = std::chrono::steady_clock::now();
+			context_.metrics().reset();
 
 			// Update mortality data, mortality is forward looking 2009 is for 2008-2009
 			demographic_->update_residual_mortality(context_, *disease_);
@@ -84,7 +90,9 @@ namespace hgps {
 			context_.set_current_time(time_year);
 
 			update_population();
-			std::chrono::duration<double, std::milli> elapsed = std::chrono::steady_clock::now() - start;
+
+			auto stop = std::chrono::steady_clock::now();
+			auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
 			auto message = std::format("[{:4},{}], elapsed: {}ms",
 				env->now().real, env->now().logical, elapsed.count());
@@ -174,22 +182,8 @@ namespace hgps {
 		auto expected_pop_size = demographic_->get_total_population(context_.time_now());
 		auto expected_num_deaths = demographic_->get_total_deaths(context_.time_now());
 
-		// apply death events
+		// apply death events and update basic information (age)
 		auto number_of_deaths = update_age_and_death_events();
-
-		// Update basic information (not included in death counts? -> fold in above);
-		auto max_age = static_cast<unsigned int>(context_.age_range().upper());
-		for (auto& entity : context_.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
-
-			entity.age = entity.age + 1;
-			if (entity.age >= max_age) {
-				entity.is_alive = false;
-				entity.time_of_death = context_.time_now();
-			}
-		}
 
 		// apply births events
 		auto last_year_births_rate = demographic_->get_birth_rate(context_.time_now() - 1);
@@ -201,14 +195,15 @@ namespace hgps {
 		// Calculate debug statistics, to be removed.
 		auto number_of_births = number_of_boys + number_of_girls;
 		auto expected_migration = (expected_pop_size / 100.0) - initial_pop_size - number_of_births + number_of_deaths;
+		auto middle_pop_size = context_.population().current_active_size();
+		auto pop_size_diff = (expected_pop_size / 100.0) - middle_pop_size;
 
-		auto middle_pop_size = std::count_if(context_.population().cbegin(),
-			context_.population().cend(), [](const auto& p) { return p.is_active(); });
-
-		double pop_size_diff = (expected_pop_size / 100.0) - middle_pop_size;
-		double simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
-		double expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
-		double percentage_diff = 100 * (simulated_death_rate / expected_death_rate - 1);
+		auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
+		auto expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
+		auto percent_difference = 100 * (simulated_death_rate / expected_death_rate - 1);
+		context_.metrics()["SimulatedDeathRate"] = simulated_death_rate;
+		context_.metrics()["ExpectedDeathRate"] = expected_death_rate;
+		context_.metrics()["DeathRateDeltaPercent"] = percent_difference;
 	}
 
 	int HealthGPS::update_age_and_death_events() {
@@ -242,6 +237,15 @@ namespace hgps {
 					entity.is_alive = false;
 					entity.time_of_death = context_.time_now();
 					number_of_deaths++;
+				}
+			}
+
+			// Update basic information
+			if (entity.is_active()) {
+				entity.age = entity.age + 1;
+				if (entity.age >= max_age) {
+					entity.is_alive = false;
+					entity.time_of_death = context_.time_now();
 				}
 			}
 		}

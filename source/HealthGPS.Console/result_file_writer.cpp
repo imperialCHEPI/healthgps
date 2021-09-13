@@ -108,5 +108,7 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage& mes
 		};
 	}
 
+	msg["metrics"] = message.content.metrics;
+
 	return msg.dump();
 }

@@ -28,6 +28,10 @@ namespace hgps {
         return population_;
     }
 
+    RuntimeMetric& RuntimeContext::metrics() noexcept {
+        return metrics_;
+    }
+
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
         return mapping_;
     }

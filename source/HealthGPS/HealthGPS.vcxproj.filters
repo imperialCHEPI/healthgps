@@ -195,6 +195,9 @@
     <ClInclude Include="map2d.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="runtime_metric.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="hierarchical_model_dynamic.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime_metric.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

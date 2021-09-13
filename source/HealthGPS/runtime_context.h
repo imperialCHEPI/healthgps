@@ -4,6 +4,7 @@
 #include "population.h"
 #include "mapping.h"
 #include "event_aggregator.h"
+#include "runtime_metric.h"
 
 namespace hgps {
 
@@ -25,6 +26,8 @@ namespace hgps {
 		unsigned int current_run() const noexcept;
 
 		Population& population() noexcept;
+
+		RuntimeMetric& metrics() noexcept;
 
 		const HierarchicalMapping& mapping() const noexcept;
 
@@ -57,6 +60,7 @@ namespace hgps {
 		HierarchicalMapping mapping_;
 		std::vector<core::DiseaseInfo> diseases_;
 		core::IntegerInterval age_range_;
+		RuntimeMetric metrics_{};
 		unsigned int current_run_{};
 		int model_start_time_{};
 		int time_now_{};

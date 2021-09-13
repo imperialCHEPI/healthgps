@@ -33,6 +33,8 @@ namespace hgps {
 
         std::map<std::string, ResultByGender> disease_prevalence{};
 
+        std::map<std::string, double> metrics{};
+
 		std::string to_string() const noexcept;
 
     private:

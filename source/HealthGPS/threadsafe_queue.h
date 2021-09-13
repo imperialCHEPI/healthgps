@@ -28,18 +28,26 @@ namespace hgps {
 				return {};
 			}
 
-			T tmp = queue_.front();
+			T tmp = std::move(queue_.front());
 			queue_.pop();
 			return tmp;
 		}
 
+		void push(T&& item) {
+			do_push(std::move(item));
+		}
+
 		void push(const T& item) {
-			std::unique_lock<std::mutex> lck(mutex_);
-			queue_.push(item);
+			do_push(item);
 		}
 
 	private:
 		std::queue<T> queue_;
 		mutable std::mutex mutex_;
+
+		void do_push(auto&& item) {
+			std::unique_lock<std::mutex> lck(mutex_);
+			queue_.push(std::forward<decltype(item)>(item));
+		}
 	};
 }

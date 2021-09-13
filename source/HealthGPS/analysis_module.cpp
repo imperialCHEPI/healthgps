@@ -143,7 +143,8 @@ namespace hgps {
 		result.average_age.male = age_sum[core::Gender::male] * 1.0 / males_count;
 		result.average_age.female = age_sum[core::Gender::female] * 1.0 / females_count;
 		for (auto& item : risk_factors) {
-			result.risk_ractor_average.emplace(item.first, ResultByGender {
+			auto user_name = context.mapping().at(item.first).name();
+			result.risk_ractor_average.emplace(user_name, ResultByGender {
 					.male = item.second[core::Gender::male] / males_count,
 					.female = item.second[core::Gender::female] / females_count
 				});
@@ -154,6 +155,10 @@ namespace hgps {
 					.male = prevalence.at(item.code)[core::Gender::male] * 100.0 / males_count,
 					.female = prevalence.at(item.code)[core::Gender::female] * 100.0 / females_count
 				});
+		}
+
+		for (const auto& item : context.metrics()) {
+			result.metrics.emplace(item.first, item.second);
 		}
 
 		result.indicators = calculate_dalys(context.population(), context.age_range().upper(), context.time_now());
