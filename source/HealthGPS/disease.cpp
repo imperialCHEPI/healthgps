@@ -1,5 +1,5 @@
 #include "disease.h"
-#include "disease_model.h"
+#include "disease_registry.h"
 #include "converter.h"
 
 namespace hgps {

@@ -83,8 +83,7 @@
         "trial_runs": 1,
       "diseases": [
         "asthma",
-        "diabetes",
-        "lowbackpain"
+        "diabetes"        
       ],
       "intervention": {}
     },

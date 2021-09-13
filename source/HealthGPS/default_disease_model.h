@@ -4,10 +4,10 @@
 #include "gender_table.h"
 
 namespace hgps {
-	class DiabetesModel final : public DiseaseModel {
+	class DefaultDiseaseModel final : public DiseaseModel {
 	public:
-		DiabetesModel() = delete;
-		DiabetesModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range);
+		DefaultDiseaseModel() = delete;
+		DefaultDiseaseModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range);
 
 		std::string disease_type() const noexcept override;
 

@@ -102,7 +102,7 @@
     <ClInclude Include="disease.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
-    <ClInclude Include="diabetes_model.h">
+    <ClInclude Include="default_disease_model.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="hierarchical_model.h">
@@ -111,7 +111,7 @@
     <ClInclude Include="disease_table.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
-    <ClInclude Include="disease_model.h">
+    <ClInclude Include="disease_registry.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
     <ClInclude Include="simulation_module.h">
@@ -248,7 +248,7 @@
     <ClCompile Include="disease.cpp">
       <Filter>Source Files\modules</Filter>
     </ClCompile>
-    <ClCompile Include="diabetes_model.cpp">
+    <ClCompile Include="default_disease_model.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="disease_table.cpp">

@@ -101,10 +101,10 @@
     <ClInclude Include="converter.h" />
     <ClInclude Include="countrymodule.h" />
     <ClInclude Include="demographic.h" />
-    <ClInclude Include="diabetes_model.h" />
+    <ClInclude Include="default_disease_model.h" />
     <ClInclude Include="disease.h" />
     <ClInclude Include="disease_definition.h" />
-    <ClInclude Include="disease_model.h" />
+    <ClInclude Include="disease_registry.h" />
     <ClInclude Include="disease_table.h" />
     <ClInclude Include="error_message.h" />
     <ClInclude Include="event_aggregator.h" />
@@ -151,7 +151,7 @@
     <ClCompile Include="analysis_module.cpp" />
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="demographic.cpp" />
-    <ClCompile Include="diabetes_model.cpp" />
+    <ClCompile Include="default_disease_model.cpp" />
     <ClCompile Include="disease.cpp" />
     <ClCompile Include="disease_table.cpp" />
     <ClCompile Include="error_message.cpp" />

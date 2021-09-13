@@ -1,23 +1,21 @@
-#include "diabetes_model.h"
+#include "default_disease_model.h"
 #include "runtime_context.h"
 
 namespace hgps {
 
-	DiabetesModel::DiabetesModel(DiseaseDefinition&& definition, core::IntegerInterval age_range)
+	DefaultDiseaseModel::DefaultDiseaseModel(DiseaseDefinition&& definition, core::IntegerInterval age_range)
 		: definition_{ definition }, average_relative_risk_{create_age_gender_table<double>(age_range)}
 	{
-		if (!core::case_insensitive::equals(definition.identifier().code, "diabetes")) {
-			throw std::invalid_argument(
-				std::format("Disease table data type mismatch: '{}' vs. 'diabetes'.",
-					definition.identifier().code));
+		if (definition.identifier().code.empty()) {
+			throw std::invalid_argument("Invalid disease definition with empty identifier.");
 		}
 	}
 
-	std::string DiabetesModel::disease_type() const noexcept {
+	std::string DefaultDiseaseModel::disease_type() const noexcept {
 		return definition_.identifier().code;
 	}
 
-	void DiabetesModel::initialise_disease_status(RuntimeContext& context) {
+	void DefaultDiseaseModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
 		auto prevalence_id = definition_.table().at("prevalence");
 		for (auto& entity : context.population()) {
@@ -38,7 +36,7 @@ namespace hgps {
 		}
 	}
 
-	void DiabetesModel::initialise_average_relative_risk(RuntimeContext& context) {
+	void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext& context) {
 		auto age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
@@ -69,13 +67,13 @@ namespace hgps {
 		}
 	}
 
-	void DiabetesModel::update_disease_status(RuntimeContext& context) {
+	void DefaultDiseaseModel::update_disease_status(RuntimeContext& context) {
 		// Order is very important!
 		update_remission_cases(context);
 		update_incidence_cases(context);
 	}
 
-	double DiabetesModel::get_excess_mortality(const int& age, const core::Gender& gender) const noexcept {
+	double DefaultDiseaseModel::get_excess_mortality(const int& age, const core::Gender& gender) const noexcept {
 		auto excess_mortality_id = definition_.table().at("mtexcess");
 		if (definition_.table().contains(age)) {
 			return definition_.table()(age, gender).at(excess_mortality_id);
@@ -84,7 +82,7 @@ namespace hgps {
 		return 0.0;
 	}
 
-	DoubleAgeGenderTable DiabetesModel::calculate_average_relative_risk(RuntimeContext& context) {
+	DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(RuntimeContext& context) {
 		auto age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
@@ -116,14 +114,14 @@ namespace hgps {
 		return result;
 	}
 
-	double DiabetesModel::calculate_combined_relative_risk(const Person& entity, const int& time_now) const {
+	double DefaultDiseaseModel::calculate_combined_relative_risk(const Person& entity, const int& time_now) const {
 		auto combined_risk_value = 1.0;
 		combined_risk_value *= calculate_relative_risk_for_risk_factors(entity);
 		combined_risk_value *= calculate_relative_risk_for_diseases(entity, time_now);
 		return combined_risk_value;
 	}
 
-	double DiabetesModel::calculate_relative_risk_for_risk_factors(const Person& entity) const {
+	double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Person& entity) const {
 		auto relative_risk_value = 1.0;
 		for (auto& factor : entity.risk_factors) {
 			if (!definition_.relative_risk_factors().contains(factor.first)) {
@@ -139,7 +137,7 @@ namespace hgps {
 		return relative_risk_value;
 	}
 
-	double DiabetesModel::calculate_relative_risk_for_diseases(const Person& entity, const int& time_now) const {
+	double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person& entity, const int& time_now) const {
 		auto relative_risk_value = 1.0;
 		for (auto& disease : entity.diseases) {
 			// Only include existing diseases
@@ -154,7 +152,7 @@ namespace hgps {
 		return relative_risk_value;
 	}
 
-	void DiabetesModel::update_remission_cases(RuntimeContext& context) {
+	void DefaultDiseaseModel::update_remission_cases(RuntimeContext& context) {
 		auto remission_count = 0;
 		auto prevalence_count = 0;
 		auto remission_id = definition_.table().at("remission");
@@ -182,7 +180,7 @@ namespace hgps {
 		auto remission_percent = remission_count * 100.0 / prevalence_count;
 	}
 
-	void DiabetesModel::update_incidence_cases(RuntimeContext& context) {
+	void DefaultDiseaseModel::update_incidence_cases(RuntimeContext& context) {
 		auto incidence_count = 0;
 		auto prevalence_count = 0;
 		auto population_count = 0;
@@ -224,7 +222,7 @@ namespace hgps {
 		auto disease_prevalence = prevalence_count * 100.0 / population_count;
 	}
 
-	double DiabetesModel::calculate_incidence_probability(const Person& entity, const int& time_now) const {
+	double DefaultDiseaseModel::calculate_incidence_probability(const Person& entity, const int& time_now) const {
 		auto incidence_id = definition_.table().at("incidence");
 		auto combined_relative_risk = calculate_combined_relative_risk(entity, time_now);
 		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
