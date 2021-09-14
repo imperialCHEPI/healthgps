@@ -7,6 +7,7 @@
     "cxxopts",
     "indicators",
     "nlohmann-json",
-    "rapidcsv"
+    "rapidcsv",
+    "crossguid"
   ]
 }

@@ -87,6 +87,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="analysis.h" />
     <ClInclude Include="api.h" />
     <ClInclude Include="array2d.h" />
     <ClInclude Include="column.h" />
@@ -96,11 +97,15 @@
     <ClInclude Include="column_primitive.h" />
     <ClInclude Include="country.h" />
     <ClInclude Include="datatable.h" />
+    <ClInclude Include="disease.h" />
     <ClInclude Include="forward_type.h" />
+    <ClInclude Include="indicator.h" />
     <ClInclude Include="interval.h" />
+    <ClInclude Include="mortality.h" />
     <ClInclude Include="poco.h" />
     <ClInclude Include="datastore.h" />
     <ClInclude Include="population_item.h" />
+    <ClInclude Include="scoped_timer.h" />
     <ClInclude Include="string_util.h" />
     <ClInclude Include="univariate_summary.h" />
     <ClInclude Include="version.h" />

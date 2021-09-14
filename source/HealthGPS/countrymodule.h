@@ -15,9 +15,16 @@ namespace hgps {
 		{
 		}
 
-		SimulationModuleType type() const override { return SimulationModuleType::Simulator; };
+		SimulationModuleType type() const noexcept override {
+			return SimulationModuleType::Simulator;
+		};
 
-		std::string name() const override { return "Country"; }
+		std::string name() const noexcept override { return "Country"; }
+
+		void initialise_population(RuntimeContext& context) override {
+			std::cout << "There are: " << countries_.size() << 
+				" countries, current: " << current_.name << std::endl;
+		}
 
 		void execute(std::string command) {
 			std::cout << command << ": " << current_.name << std::endl;

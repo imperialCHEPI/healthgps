@@ -84,6 +84,21 @@
     <ClInclude Include="univariate_summary.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="scoped_timer.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="disease.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="analysis.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="indicator.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
+    <ClInclude Include="mortality.h">
+      <Filter>Header Files\poco</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="version.cpp">

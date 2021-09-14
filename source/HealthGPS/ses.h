@@ -38,9 +38,9 @@ namespace hgps {
 		SESModule() = delete;
 		SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range);
 
-		SimulationModuleType type() const override;
+		SimulationModuleType type() const noexcept override;
 
-		std::string name() const override;
+		std::string name() const noexcept override;
 
 		const std::vector<SESRecord>& data() const noexcept;
 
@@ -52,7 +52,9 @@ namespace hgps {
 
 		const std::map<int, core::FloatArray2D> get_income_frenquency(std::optional<core::Gender> filter) const;
 
-		void initialise_population(RuntimeContext& context);
+		void initialise_population(RuntimeContext& context) override;
+
+		void update_population(RuntimeContext& context);
 
 	private:
 		std::vector<SESRecord> data_;
@@ -64,6 +66,11 @@ namespace hgps {
 		
 		int sample_education(RuntimeContext& context, const std::vector<float>& edu_values);
 		int sample_income(RuntimeContext& context, const int education, core::FloatArray2D& income_values);
+
+		void update_education_level(RuntimeContext& context, Person& entity,
+			std::vector<int>& education_levels, std::vector<float>& education_freq);
+		void update_income_level(RuntimeContext& context, Person& entity,
+			std::vector<int>& income_levels, std::vector<float>& income_freq);
 	};
 
 	core::Gender parse_gender(const std::any& value);

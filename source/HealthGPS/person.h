@@ -1,13 +1,37 @@
 #pragma once
 
+#include <map>
 #include <atomic>
+
 #include "interfaces.h"
+#include "two_step_value.h"
 
 namespace hgps {
+
+	/// @brief Disease status enumeration
+	enum struct DiseaseStatus : uint8_t
+	{
+		/// @brief declared free from condition
+		free,
+
+		/// @brief current with the condition
+		active
+	};
+
+	struct Disease
+	{
+		DiseaseStatus status;
+		int start_time;
+
+		Disease clone() const noexcept {
+			return Disease{ .status = status, .start_time = start_time };
+		}
+	};
 
 	struct Person
 	{
 		Person();
+		Person(const core::Gender gender) noexcept;
 
 		const size_t id() const noexcept;
 
@@ -17,19 +41,33 @@ namespace hgps {
 
 		bool is_alive{ true };
 
+		bool has_emigrated{ false };
+
 		unsigned int time_of_death{};
 
-		unsigned int education{};
+		TwoStepValue<int> education{};
 
-		unsigned int income{};
+		TwoStepValue<int> income{};
+
+		std::map<std::string, double> risk_factors;
+
+		std::map<std::string, Disease> diseases;
 
 		bool is_active() const noexcept;
+
+		double get_risk_factor_value(const std::string& key) const noexcept;
+
+		double get_previous_risk_factor_value(const std::string& key) const noexcept;
+
+		float gender_to_value() const noexcept;
 
 		static void reset_id();
 
 	private:
 		size_t id_;
 		static std::atomic<size_t> newUID;
+		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
+		static case_insensitive_map<std::function<double(const Person&)>> previous_dispatcher;
 	};
 }
 

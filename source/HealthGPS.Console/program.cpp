@@ -1,6 +1,9 @@
 #include "program.h"
-#include "csvparser.h"
 #include "HealthGPS.Datastore/api.h"
+#include "HealthGPS/event_bus.h"
+
+#include "event_monitor.h"
+#include "result_file_writer.h"
 
 #include <fmt/chrono.h>
 
@@ -23,30 +26,30 @@ int main(int argc, char* argv[])
 	{
 		return cmd_args.exit_code;
 	}
-
+	
 	// Parse configuration file 
 	auto config = load_configuration(cmd_args);
 	auto input_table = core::DataTable();
-	if (!load_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
+	if (!load_datatable_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
 	{
 		return EXIT_FAILURE;
 	}
 
 	std::cout << input_table.to_string();
 
-	// Create infrastructure
-	auto data_api = data::DataManager(cmd_args.storage_folder);
-	auto factory = SimulationModuleFactory(data_api);
-	factory.Register(SimulationModuleType::SES,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-			return build_ses_module(manager, config);});
-	factory.Register(SimulationModuleType::Demographic,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-			return build_demographic_module(manager, config);});
+	// Create risk factors model instance
+	auto baseline_data = load_baseline_adjustment(
+		config.modelling.baseline_adjustment, config.start_time, config.stop_time);
+	auto risk_factor_module = build_risk_factor_module(config.modelling, baseline_data);
 
-	// Validate target country
+	// Create back-end data store and modules factory infrastructure
+	auto data_api = data::DataManager(cmd_args.storage_folder);
+	auto factory = get_default_simulation_module_factory(data_api);
+	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
+
+	// Validate the configuration target country
 	auto countries = data_api.get_countries();
-	fmt::print("There are {} countries in storage.\n", countries.size());
+	fmt::print("\nThere are {} countries in storage.\n", countries.size());
 	auto target = data_api.get_country(config.settings.country);
 	if (target.has_value())	{
 		fmt::print("Target country: {} - {}.\n", target.value().code, target.value().name);
@@ -56,22 +59,39 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	// Create model configration
-	auto model_config = create_model_input(input_table, target.value(), config);
+	// Validate the configuration diseases list
+	auto diseases = get_diseases(data_api, config);
+	if (diseases.size() != config.diseases.size()) {
+		fmt::print(fg(fmt::color::light_salmon), "Invalid list of diseases in configuration.\n");
+		return EXIT_FAILURE;
+	}
+
+	// Create the complete model configuration
+	auto model_config = create_model_input(input_table, target.value(), config, diseases);
+
+	// Create event bus and monitor
+	auto event_bus = DefaultEventBus();
+	auto result_file_logger = ResultFileWriter{ 
+		create_output_file_name(config.result),
+		ModelInfo{.name = "Health-GPS", .version = "0.1.1-alpha.5"}
+	};
+	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
-		// Create model
-		auto model = HealthGPS(factory, model_config, hgps::MTRandom32());
+		// Create main simulation model instance and run experiment
+		auto model = HealthGPS(factory, model_config, event_bus, hgps::MTRandom32());
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner();
+		auto runner = ModelRunner(event_bus);
 		auto runtime = runner.run(model, config.trial_runs);
-		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms", runtime);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
 	}
-
+	
+	event_monitor.stop();
 	fmt::print("\n\n");
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye");
 	fmt::print("\n\n");

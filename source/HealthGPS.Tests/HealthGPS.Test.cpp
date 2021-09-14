@@ -1,7 +1,13 @@
 #include "pch.h"
 #include <atomic>
+#include <map>
+
 #include "HealthGPS\api.h"
+#include "HealthGPS\event_bus.h"
+
 #include "HealthGPS.Datastore\api.h"
+
+#include "RiskFactorData.h"
 
 namespace fs = std::filesystem;
 
@@ -43,7 +49,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 
 	auto age_range = core::IntegerInterval(0, 30);
-	auto settings = Settings(uk, 1, 0.1f, "Age", age_range);
+	auto settings = Settings(uk, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("gender", "Gender");
@@ -51,7 +57,24 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	ses.entries.emplace("education", "Education");
 	ses.entries.emplace("income", "Income");
 
-	return ModelInput(data, settings, info, ses);
+	auto entries = std::vector<MappingEntry>{
+		MappingEntry("Year", 0, "", true),
+		MappingEntry("Gender", 0, "gender"),
+		MappingEntry("Age", 0, "age"),
+		MappingEntry("SmokingStatus", 1),
+		MappingEntry("AlcoholConsumption", 1),
+		MappingEntry("BMI", 2)
+	};
+
+	auto mapping = HierarchicalMapping(std::move(entries));
+
+	auto diseases = std::vector<core::DiseaseInfo>{
+		DiseaseInfo{.code = "asthma", .name = "Asthma"},
+		DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
+		DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
+	};
+
+	return ModelInput(data, settings, info, ses, mapping, diseases);
 }
 
 TEST(TestHealthGPS, RandomBitGenerator)
@@ -80,6 +103,76 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 	EXPECT_NE(rnd(), copy());
 }
 
+TEST(TestHealthGPS, CreateRuntimeContext)
+{
+	using namespace hgps;
+
+	auto bus = DefaultEventBus{};
+	auto rnd = MTRandom32(123456789);
+
+	auto entries = std::vector<MappingEntry>{
+	MappingEntry("Year", 0, "", true),
+	MappingEntry("Age", 0, "age"),
+	MappingEntry("AlcoholConsumption", 1),
+	MappingEntry("BMI", 2)
+	};
+
+	auto diseases = std::vector<core::DiseaseInfo>{
+		core::DiseaseInfo{.code = "asthma", .name = "Asthma"},
+		core::DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
+		core::DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
+	};
+	
+	auto mapping = HierarchicalMapping(std::move(entries));
+	auto age_range = core::IntegerInterval(0, 100);
+
+	auto context = RuntimeContext(bus, rnd, mapping, diseases, age_range);
+	ASSERT_EQ(0, context.population().size());
+	ASSERT_EQ(0, context.time_now());
+}
+
+TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
+{
+	using namespace hgps;
+
+	auto bus = DefaultEventBus{};
+	auto rnd = MTRandom32(123456789);
+
+	auto entries = std::vector<MappingEntry>{
+	MappingEntry("Year", 0, "", true),
+	MappingEntry("Age", 0, "age"),
+	MappingEntry("SmokingStatus", 1),
+	MappingEntry("BMI", 2)
+	};
+
+	auto diseases = std::vector<core::DiseaseInfo>{
+		core::DiseaseInfo{.code = "asthma", .name = "Asthma"},
+		core::DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
+		core::DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
+	};
+
+	auto mapping = HierarchicalMapping(std::move(entries));
+	auto age_range = core::IntegerInterval(0, 100);
+
+	auto context = RuntimeContext(bus, rnd, mapping, diseases, age_range);
+	auto summary_one = core::UnivariateSummary();
+	auto summary_two = core::UnivariateSummary();
+
+	auto sample_min = 1;
+	auto sample_max = 10;
+	auto sample_size = 100;
+	for (size_t i = 0; i < sample_size; i++)
+	{
+		summary_one.append(context.next_int(sample_max));
+		summary_two.append(context.next_int(sample_min, sample_max));
+	}
+
+	ASSERT_EQ(0.0, summary_one.min());
+	ASSERT_EQ(sample_max, summary_one.max());
+
+	ASSERT_EQ(sample_min, summary_two.min());
+	ASSERT_EQ(sample_max, summary_two.max());
+}
 
 TEST(TestHealthGPS, SimulationInitialise)
 {
@@ -94,15 +187,19 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
-	auto factory = SimulationModuleFactory(manager);
-	factory.Register(SimulationModuleType::SES,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-			return build_ses_module(manager, config); });
-	factory.Register(SimulationModuleType::Demographic,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
-			return build_demographic_module(manager, config); });
+	auto baseline_data = hgps::BaselineAdjustment{};
+	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
+	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model(baseline_data));
+	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model(baseline_data));
 
-	auto sim = HealthGPS(factory, config, MTRandom32());
+	auto risk_module_ptr = std::make_shared<RiskFactorModule>(std::move(risk_models));
+
+	auto factory = get_default_simulation_module_factory(manager);
+	factory.register_instance(SimulationModuleType::RiskFactor, risk_module_ptr);
+
+	auto event_bus = DefaultEventBus();
+
+	ASSERT_NO_THROW(HealthGPS(factory, config, event_bus, MTRandom32()));
 }
 
 TEST(TestHealthGPS, ModuleFactoryRegistry)
@@ -124,22 +221,35 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 	auto age_range = core::IntegerInterval(0, 100);
-	auto settings = Settings(uk, 1, 0.1f, "Age", age_range);
+	auto settings = Settings(uk, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses = SESMapping();
 	ses.entries.emplace("test", builder.name());
-	auto config = ModelInput(data, settings, info, ses);
+
+	auto mapping = HierarchicalMapping(
+		std::vector<MappingEntry>{
+			MappingEntry("Year", 0),
+			MappingEntry("Gender", 0, "gender"),
+			MappingEntry("Age", 0, "age"),
+	});
+
+	auto diseases = std::vector<core::DiseaseInfo>{
+		DiseaseInfo{.code = "angina", .name = "Angina Pectoris"},
+		DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"}
+	};
+
+	auto config = ModelInput(data, settings, info, ses, mapping, diseases);
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
 
 	auto factory = SimulationModuleFactory(manager);
-	factory.Register(SimulationModuleType::Simulator,
+	factory.register_builder(SimulationModuleType::Simulator,
 		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_country_module(manager, config);
 		});
 
-	auto base_module = factory.Create(SimulationModuleType::Simulator, config);
+	auto base_module = factory.create(SimulationModuleType::Simulator, config);
 	auto country_mod = static_cast<CountryModule*>(base_module.get());
 	country_mod->execute("print");
 
@@ -151,7 +261,7 @@ TEST(TestHealthGPS, CreateSESModule)
 {
 	using namespace hgps;
 	using namespace hgps::data;
-	
+
 	DataTable data;
 	create_test_datatable(data);
 
@@ -191,6 +301,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	auto pop_module = build_demographic_module(manager, config);
 	auto total_pop = pop_module->get_total_population(config.start_time());
 	auto pop_dist = pop_module->get_age_gender_distribution(config.start_time());
+	auto birth_rate = pop_module->get_birth_rate(config.start_time());
 	auto sum_male = 0.0;
 	auto sum_female = 0.0;
 	for (auto& age : pop_dist) {
@@ -202,5 +313,111 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	ASSERT_EQ("Demographic", pop_module->name());
 	ASSERT_GT(total_pop, 0);
 	ASSERT_GT(pop_dist.size(), 0);
+	ASSERT_GT(birth_rate.male, 0);
+	ASSERT_GT(birth_rate.female, 0);
 	ASSERT_TRUE((sum_prob - 1.0) < 1e-4);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModule)
+{
+	using namespace hgps;
+
+	// Test data code generation via JSON model definition.
+	/*
+	auto static_code = generate_test_code(
+		HierarchicalModelType::Static, "C:/HealthGPS/Test/HLM.Json");
+
+	auto dynamic_code = generate_test_code(
+		HierarchicalModelType::Dynamic, "C:/HealthGPS/Test/DHLM.Json");
+	*/
+
+	auto baseline_data = hgps::BaselineAdjustment{};
+	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
+	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model(baseline_data));
+	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model(baseline_data));
+
+	auto dynamic_type = risk_models.at(HierarchicalModelType::Dynamic)->type();
+	auto dyname_name = risk_models.at(HierarchicalModelType::Dynamic)->name();
+
+	auto risk_module = RiskFactorModule(std::move(risk_models));
+
+	ASSERT_EQ(SimulationModuleType::RiskFactor, risk_module.type());
+	ASSERT_EQ("RiskFactor", risk_module.name());
+
+	// No slicing!!!
+	ASSERT_EQ(HierarchicalModelType::Dynamic, dynamic_type);
+	ASSERT_EQ("Dynamic", dyname_name);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
+{
+	using namespace hgps;
+
+	auto baseline_data = hgps::BaselineAdjustment{};
+	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
+	risk_models.emplace(HierarchicalModelType::Static, get_static_test_model(baseline_data));
+
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
+{
+	using namespace hgps;
+
+	auto baseline_data = hgps::BaselineAdjustment{};
+	auto risk_models = std::unordered_map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModel>>();
+	risk_models.emplace(HierarchicalModelType::Dynamic, get_dynamic_test_model(baseline_data));
+
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+}
+
+TEST(TestHealthGPS, CreateRiskFactorModuleFailEmpty)
+{
+	using namespace hgps;
+
+	auto risk_models = std::unordered_map<HierarchicalModelType,
+		std::shared_ptr<HierarchicalLinearModel>>();
+
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+}
+
+TEST(TestHealthGPS, CreateDiseaseModule)
+{
+	using namespace hgps;
+	using namespace hgps::data;
+
+	DataTable data;
+	create_test_datatable(data);
+
+	auto full_path = fs::absolute("../../../data");
+	auto manager = DataManager(full_path);
+
+	auto inputs = create_test_configuration(data);
+
+	auto disease_module = build_disease_module(manager, inputs);
+	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
+	ASSERT_EQ("Disease", disease_module->name());
+	ASSERT_GT(disease_module->size(), 0);
+	ASSERT_TRUE(disease_module->contains("diabetes"));
+	ASSERT_FALSE(disease_module->contains("moonshot"));
+	ASSERT_GT(disease_module->get_excess_mortality("diabetes", 50, core::Gender::male), 0);
+	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", 50, core::Gender::male));
+}
+
+TEST(TestHealthGPS, CreateAnalysisModule)
+{
+	using namespace hgps;
+	using namespace hgps::data;
+
+	DataTable data;
+	create_test_datatable(data);
+
+	auto full_path = fs::absolute("../../../data");
+	auto manager = DataManager(full_path);
+
+	auto inputs = create_test_configuration(data);
+
+	auto analysis_module = build_analysis_module(manager, inputs);
+	ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
+	ASSERT_EQ("Analysis", analysis_module->name());
 }

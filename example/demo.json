@@ -1,18 +1,17 @@
 {
     "inputs": {
-        "file" :{
+        "file": {
             "name": "dataset.csv",
             "format": "csv",
             "delimiter": ",",
-            "encoding":"ASCII",
+            "encoding": "ASCII",
             "columns": {
-                "Year1": "integer",
+                "Year": "integer",
                 "Gender": "integer",
                 "Age": "integer",
-                "Age1": "integer",
                 "Age2": "integer",
                 "Age3": "integer",
-                "Education":"integer",
+                "Education": "integer",
                 "Income": "integer",
                 "PhysicalActivityMET": "double",
                 "BMI": "double",
@@ -21,12 +20,14 @@
                 "AlcoholConsumption": "double"
             }
         },
-        "settings":{
-            "country_code":"GB",
-            "reference_time": 2010,
+        "settings": {
+            "country_code": "GB",
             "size_fraction": 0.0001,
             "data_linkage": "Age",
-            "age_range":[0, 100]
+            "age_range": [
+                0,
+                100
+            ]
         },
         "ses_mapping": {
             "gender": "Gender",
@@ -36,18 +37,57 @@
         }
     },
     "modelling": {
-        "risk_factors":{},
-        "models":{
-            "static": {},
-            "dynamic":{}
+        "ses":{
+            "update_interval": 5,
+            "max_age":30,
+            "mapping":{
+                "gender": "Gender",
+                "age": "Age",
+                "education": "Education",
+                "income": "Income"
+            }
+        },
+        "risk_factors": {
+            "Year": 0,
+            "Gender": 0,
+            "Age": 0,
+            "Age2": 0,
+            "Age3": 0,
+            "Education": 0,
+            "Income": 0,
+            "PhysicalActivityMET": 1,
+            "FruitsVegetablesConsumption": 1,
+            "SmokingStatus": 1,
+            "AlcoholConsumption": 1,
+            "BMI": 2
+        },
+        "dynamic_risk_factor": "Year",
+        "models": {
+            "static": "HLM.Json",
+            "dynamic": "DHLM.Json"
+        },
+        "baseline_adjustment":{
+            "is_enabled":true,
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "file_name": "BaselineScenarioAdjustment.csv"
         }
     },
     "running": {
-        "seed":[123456789],
+        "seed": [
+            123456789
+        ],
         "start_time": 2010,
         "stop_time": 2030,
         "trial_runs": 1,
-        "diseases": [],
-        "intervention":{}
+      "diseases": [
+        "asthma",
+        "diabetes"        
+      ],
+      "intervention": {}
+    },
+    "results":{
+        "folder":"C:\\HealthGPS\\Result"
     }
 }

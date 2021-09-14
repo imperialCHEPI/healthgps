@@ -18,6 +18,12 @@
     <ClCompile Include="program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="event_monitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="result_file_writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="program.h">
@@ -32,6 +38,24 @@
     <ClInclude Include="csvparser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="jsonparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="riskmodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="event_monitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="result_writer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="result_file_writer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HealthGPS.Console.rc">
@@ -42,5 +66,10 @@
     <Image Include="healthgps.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HierarchicalModel.cd">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

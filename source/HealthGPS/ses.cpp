@@ -3,6 +3,8 @@
 #include <cassert>
 #include <numeric>
 
+#include "converter.h"
+
 namespace hgps {
 
 	hgps::SESModule::SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range)
@@ -11,11 +13,11 @@ namespace hgps {
 		calculate_max_levels();
 	}
 
-	SimulationModuleType hgps::SESModule::type() const {
+	SimulationModuleType hgps::SESModule::type() const noexcept {
 		return SimulationModuleType::SES;
 	}
 
-	std::string hgps::SESModule::name() const {
+	std::string hgps::SESModule::name() const noexcept {
 		return "SES";
 	}
 
@@ -110,13 +112,55 @@ namespace hgps {
 			assert(entity.gender != core::Gender::unknown);
 			// Note that order is important
 			if (entity.gender == core::Gender::male) {
-				entity.education = sample_education(context, edu_male.at(entity.age));
-				entity.income = sample_income(context, entity.education, income_male.at(entity.age));
+				entity.education.set_both_values(sample_education(context, edu_male.at(entity.age)));
+				entity.income.set_both_values(sample_income(context, entity.education.value(), income_male.at(entity.age)));
 			}
 			else {
-				entity.education = sample_education(context, edu_female.at(entity.age));
-				entity.income = sample_income(context, entity.education, income_female.at(entity.age));
+				entity.education.set_both_values(sample_education(context, edu_female.at(entity.age)));
+				entity.income.set_both_values(sample_income(context, entity.education.value(), income_female.at(entity.age)));
 			}
+		}
+	}
+
+	void SESModule::update_population(RuntimeContext& context) {
+
+		// Education
+		auto male_education_table = get_education_frequency(core::Gender::male);
+		auto female_education_table = get_education_frequency(core::Gender::female);
+		auto education_levels = std::vector<int>(male_education_table.begin()->second.size());
+		std::iota(education_levels.begin(), education_levels.end(), 0);
+
+		// Income
+		auto male_income_table = get_income_frenquency(core::Gender::male);
+		auto female_income_table = get_income_frenquency(core::Gender::female);
+		auto number_of_levels = male_income_table.begin()->second.columns();
+		auto income_levels = std::vector<int>(number_of_levels);
+		std::iota(income_levels.begin(), income_levels.end(), 0);
+
+		auto education_freq = std::vector<float>{};
+		auto income_freq = std::vector<float>{};
+		for (auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			if (entity.gender == core::Gender::male) {
+				education_freq = male_education_table.at(entity.age);
+				income_freq = std::vector<float>(number_of_levels);
+				for (int level = 0; level < number_of_levels; level++) {
+					income_freq[level] = male_income_table.at(entity.age)(entity.education.value(), level);
+				}
+			}
+			else {
+				education_freq = female_education_table.at(entity.age);
+				income_freq = std::vector<float>(number_of_levels);
+				for (int level = 0; level < number_of_levels; level++) {
+					income_freq[level] = female_income_table.at(entity.age)(entity.education.value(), level);
+				}
+			}
+
+			update_education_level(context, entity, education_levels, education_freq);
+			update_income_level(context, entity, income_levels, income_freq);
 		}
 	}
 
@@ -183,6 +227,45 @@ namespace hgps {
 		}
 
 		return -1;
+	}
+
+	void SESModule::update_education_level(RuntimeContext& context, Person& entity,
+		std::vector<int>& education_levels, std::vector<float>& education_freq)
+	{
+		auto education_cdf = detail::create_cdf(education_freq);
+		auto random_education_level = context.next_empirical_discrete(education_levels, education_cdf);
+
+		// Very important to retrieve the old education level when calculating
+		// the risk value from the previous year.
+		if (entity.education.value() == 0) {
+			entity.education.set_both_values(random_education_level);
+		}
+		else {
+			entity.education = entity.education.value();
+
+			// To prevent education level getting maximal values ???
+			if (entity.age % 5 == 0 && entity.age < 31) {
+				entity.education = std::max(entity.education.value(), random_education_level);
+			}
+		}
+	}
+
+	void SESModule::update_income_level(RuntimeContext& context, Person& entity,
+		std::vector<int>& income_levels, std::vector<float>& income_freq)
+	{
+		auto income_cdf = detail::create_cdf(income_freq);
+		auto random_income_Level = context.next_empirical_discrete(income_levels, income_cdf);
+		if (entity.income.value() == 0) {
+			entity.income.set_both_values(random_income_Level);
+		}
+		else {
+			entity.income = entity.income.value();
+
+			// To prevent education level getting maximal values ???
+			if (entity.age % 5 == 0 && entity.age < 31) {
+				entity.income = std::max(entity.income.value(), random_income_Level);
+			}
+		}
 	}
 
 	core::Gender parse_gender(const std::any& value)

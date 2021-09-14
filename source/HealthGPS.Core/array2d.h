@@ -15,13 +15,13 @@ namespace hgps {
 		public:
 			Array2D() = default;
 			Array2D(const size_t nrows, const size_t ncols) 
-				: rows_{ nrows }, columns_{ ncols }
+				: rows_{ nrows }, columns_{ ncols }, data_(nrows * ncols)
 			{
 				if (nrows <= 0 || ncols <= 0) {
 					throw std::invalid_argument("Invalid array constructor with 0 size");
 				}
 
-				data_ = std::make_unique<TYPE[]>(rows_ * columns_);
+				data_.shrink_to_fit();
 			}
 
 			Array2D(const size_t nrows, const size_t ncols, TYPE value)
@@ -32,36 +32,36 @@ namespace hgps {
 			Array2D(const size_t nrows, const size_t ncols, std::vector<TYPE>& values) 
 				: Array2D(nrows, ncols) {
 
-				if (values.size() > size()) {
+				if (values.size() != size()) {
 					throw std::invalid_argument(
 						std::format("Array size and values size mismatch: {} vs. given {}.", size(), values.size()));
 				}
 
-				std::copy(values.begin(), values.end(), data_.get());
+				std::copy(values.begin(), values.end(), data_.begin());
 			}
 
-			size_t size() { return rows_ * columns_; }
+			size_t size() const noexcept { return rows_ * columns_; }
 
-			size_t rows() { return rows_; }
+			size_t rows() const noexcept { return rows_; }
 
-			size_t columns() { return columns_; }
+			size_t columns() const noexcept { return columns_; }
 
 			TYPE& operator()(size_t row, size_t column) {
 				check_boundaries(row, column);
 				return data_[row * columns_ + column]; 
 			}
 
-			TYPE operator()(size_t row, size_t column) const {
+			const TYPE& operator()(size_t row, size_t column) const {
 				check_boundaries(row, column);
 				return data_[row * columns_ + column];
 			}
 
-			void fill(TYPE value) { std::fill_n(data_.get(), size(), value); }
+			void fill(TYPE value) { std::fill(data_.begin(), data_.end(), value); }
 
 			void clear() { fill(TYPE{}); }
 
 			std::vector<TYPE> to_vector() {
-				return std::vector<TYPE>(data_.get(), data_.get()+size());
+				return std::vector<TYPE>(data_);
 			}
 
 			std::string to_string() noexcept {
@@ -83,15 +83,15 @@ namespace hgps {
 		private:
 			size_t rows_{};
 			size_t columns_{};
-			std::unique_ptr<TYPE[]> data_;
+			std::vector<TYPE> data_;
 
-			void check_boundaries(size_t row, size_t column) {
+			void check_boundaries(size_t row, size_t column) const {
 				if ((row < 0) || (row >= rows_)) {
-					throw std::invalid_argument(std::format("Row {} is out of array bounds.", row));
+					throw std::out_of_range(std::format("Row {} is out of array bounds.", row));
 				}
 				
 				if ((column < 0) || (column >= columns_)) {
-					throw std::invalid_argument(std::format("Column {} is out of array bounds.", column));
+					throw std::out_of_range(std::format("Column {} is out of array bounds.", column));
 				}
 			}
 		};

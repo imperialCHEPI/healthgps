@@ -38,16 +38,27 @@
   <ItemGroup>
     <ClInclude Include="boost\ut.hpp" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RiskFactorData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.Test.cpp" />
-    <ClCompile Include="UnivariateSummary.Test.cpp" />
+    <ClCompile Include="Core.Array2DTest.cpp" />
+    <ClCompile Include="AgeGenderTable.Test.cpp" />
+    <ClCompile Include="EventAggregator.Test.cpp" />
+    <ClCompile Include="HierarchicalMapping.Test.cpp" />
+    <ClCompile Include="Core.UnivariateSummary.Test.cpp" />
     <ClCompile Include="Datastore.Test.cpp" />
     <ClCompile Include="HealthGPS.Test.cpp" />
+    <ClCompile Include="LifeTable.Test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="DiseaseModels.Test.cpp" />
+    <ClCompile Include="Population.Test.cpp" />
+    <ClCompile Include="Map2d.Test.cpp" />
+    <ClCompile Include="RuntimeMetric.Test.cpp" />
+    <ClCompile Include="ThreadsafeQueue.Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

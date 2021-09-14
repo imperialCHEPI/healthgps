@@ -31,6 +31,18 @@
     <Filter Include="Header Files\util">
       <UniqueIdentifier>{17cb0c4c-bb90-4578-ac07-564d38590841}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\models">
+      <UniqueIdentifier>{575b2588-ccce-4c00-88fa-1bcf50f8fe6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\models">
+      <UniqueIdentifier>{3daa05b8-d92a-47a2-b7ea-b5930a691b6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\events">
+      <UniqueIdentifier>{66678ac5-1f87-421f-82f4-82ecc25becf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\events">
+      <UniqueIdentifier>{91cfc951-d0b6-4347-a4d9-a727487e6ecd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interfaces.h">
@@ -49,9 +61,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="modelrunner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="modulefactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="countrymodule.h">
@@ -83,6 +92,111 @@
     </ClInclude>
     <ClInclude Include="univariate_visitor.h">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="riskfactor.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="mapping.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="disease.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="default_disease_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="disease_table.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="disease_registry.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="simulation_module.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="relative_risk.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="monotonic_vector.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="converter.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="gender_table.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="disease_definition.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="analysis_module.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="analysis_definition.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="life_table.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="event_aggregator.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="event_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="event_bus.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="event_subscriber.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="info_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="runner_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="modulefactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="result_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="model_result.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="error_message.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="two_step_value.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model_static.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model_dynamic.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model_types.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="threadsafe_queue.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="event_visitor.h">
+      <Filter>Header Files\events</Filter>
+    </ClInclude>
+    <ClInclude Include="gender_value.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="map2d.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime_metric.h">
+      <Filter>Header Files\data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +235,66 @@
     </ClCompile>
     <ClCompile Include="univariate_visitor.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="riskfactor.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="modulefactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mapping.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="disease.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="default_disease_model.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="disease_table.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="relative_risk.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="converter.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="analysis_module.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="life_table.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="event_bus.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="event_subscriber.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="info_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="runner_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="result_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="model_result.cpp">
+      <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="error_message.cpp">
+      <Filter>Source Files\events</Filter>
+    </ClCompile>
+    <ClCompile Include="hierarchical_model_static.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="hierarchical_model_dynamic.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime_metric.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
