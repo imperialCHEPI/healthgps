@@ -2,7 +2,6 @@
 
 #include "interfaces.h"
 #include "modelinput.h"
-#include "runtime_context.h"
 
 namespace hgps {
 

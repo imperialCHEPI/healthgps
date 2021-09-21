@@ -3,6 +3,7 @@
 #include <cassert>
 #include <numeric>
 
+#include "runtime_context.h"
 #include "converter.h"
 
 namespace hgps {

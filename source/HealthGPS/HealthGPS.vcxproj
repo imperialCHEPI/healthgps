@@ -98,6 +98,8 @@
     <ClInclude Include="analysis_definition.h" />
     <ClInclude Include="analysis_module.h" />
     <ClInclude Include="api.h" />
+    <ClInclude Include="baseline_scenario.h" />
+    <ClInclude Include="channel.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="countrymodule.h" />
     <ClInclude Include="demographic.h" />
@@ -117,6 +119,7 @@
     <ClInclude Include="hierarchical_model_dynamic.h" />
     <ClInclude Include="hierarchical_model_static.h" />
     <ClInclude Include="hierarchical_model_types.h" />
+    <ClInclude Include="Intervention_scenario.h" />
     <ClInclude Include="life_table.h" />
     <ClInclude Include="map2d.h" />
     <ClInclude Include="mapping.h" />
@@ -126,6 +129,7 @@
     <ClInclude Include="modelinput.h" />
     <ClInclude Include="model_result.h" />
     <ClInclude Include="monotonic_vector.h" />
+    <ClInclude Include="policy_scenario.h" />
     <ClInclude Include="relative_risk.h" />
     <ClInclude Include="info_message.h" />
     <ClInclude Include="result_message.h" />
@@ -143,12 +147,14 @@
     <ClInclude Include="healthgps.h" />
     <ClInclude Include="ses.h" />
     <ClInclude Include="simulation.h" />
+    <ClInclude Include="sync_message.h" />
     <ClInclude Include="threadsafe_queue.h" />
     <ClInclude Include="two_step_value.h" />
     <ClInclude Include="univariate_visitor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="analysis_module.cpp" />
+    <ClCompile Include="baseline_scenario.cpp" />
     <ClCompile Include="converter.cpp" />
     <ClCompile Include="demographic.cpp" />
     <ClCompile Include="default_disease_model.cpp" />
@@ -158,6 +164,7 @@
     <ClCompile Include="event_bus.cpp" />
     <ClCompile Include="event_subscriber.cpp" />
     <ClCompile Include="hierarchical_model_dynamic.cpp" />
+    <ClCompile Include="Intervention_scenario.cpp" />
     <ClCompile Include="life_table.cpp" />
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="modelrunner.cpp" />
@@ -175,7 +182,6 @@
     <ClCompile Include="runtime_context.cpp" />
     <ClCompile Include="runtime_metric.cpp" />
     <ClCompile Include="settings.cpp" />
-    <ClCompile Include="scenario.cpp" />
     <ClCompile Include="healthgps.cpp" />
     <ClCompile Include="ses.cpp" />
     <ClCompile Include="hierarchical_model_static.cpp" />
@@ -185,6 +191,9 @@
     <ProjectReference Include="..\HealthGPS.Core\HealthGPS.Core.vcxproj">
       <Project>{d2996854-5d40-4aa1-a924-7cd3420a6e16}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scenarios.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

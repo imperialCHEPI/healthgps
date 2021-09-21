@@ -41,6 +41,7 @@
     <ClInclude Include="RiskFactorData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Channel.Test.cpp" />
     <ClCompile Include="Core.Test.cpp" />
     <ClCompile Include="Core.Array2DTest.cpp" />
     <ClCompile Include="AgeGenderTable.Test.cpp" />
@@ -58,6 +59,7 @@
     <ClCompile Include="Population.Test.cpp" />
     <ClCompile Include="Map2d.Test.cpp" />
     <ClCompile Include="RuntimeMetric.Test.cpp" />
+    <ClCompile Include="Scenario.Test.cpp" />
     <ClCompile Include="TestMain.cpp" />
     <ClCompile Include="ThreadsafeQueue.Test.cpp" />
   </ItemGroup>

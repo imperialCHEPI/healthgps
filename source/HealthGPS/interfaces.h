@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "HealthGPS.Core\api.h"
+#include "scenario.h"
 
 namespace hgps {
 

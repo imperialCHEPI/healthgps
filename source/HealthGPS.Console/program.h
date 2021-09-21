@@ -380,19 +380,6 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	return result;
 }
 
-hgps::Scenario create_scenario(Configuration& config)
-{
-	hgps::Scenario scenario(
-		config.start_time,
-		config.stop_time,
-		config.trial_runs);
-
-	scenario.country = config.settings.country;
-	scenario.custom_seed = config.custom_seed;
-
-	return scenario;
-}
-
 auto find_by_value(SESMapping ses, std::string value) {
 	for (auto& i : ses.entries) {
 		if (core::case_insensitive::equals(i.second, value)) {

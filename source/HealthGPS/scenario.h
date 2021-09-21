@@ -1,26 +1,37 @@
 #pragma once
 
-#include<optional>
+#include <string>
+#include <memory>
+
+#include "channel.h"
+#include "sync_message.h"
 
 namespace hgps {
 
-	class Scenario
+	/// @brief Scenario data synchronisation channel type
+	using SyncChannel = Channel<std::unique_ptr<SyncMessage>>;
+
+	/// @brief Health GPS policy scenario types enumeration
+	enum class ScenarioType : uint8_t
 	{
+		/// @brief Baseline scenario
+		baseline,
 
+		/// @brief Intervention scenario
+		intervention,
+	};
+
+	/// @brief Health GPS simulation scenario interface
+	class Scenario {
 	public:
-		Scenario() = delete;
-		explicit Scenario(int start_time, int stop_time, int trial_runs);
+		virtual ~Scenario() = default;
 
-		std::optional<unsigned int> custom_seed;
+		virtual ScenarioType type() const noexcept = 0;
 
-		std::string country;
+		virtual std::string name() const noexcept = 0;
 
-		int get_start_time();
-		int get_stop_time();
+		virtual SyncChannel& channel() = 0;
 
-	private:
-		int start_time_;
-		int stop_time_;
-		int trial_runs_;
+		virtual double apply(const int& time, const std::string& risk_factor_key, const double& value) = 0;
 	};
 }
