@@ -34,8 +34,8 @@ namespace hgps {
 		const std::string identifier() const noexcept;
 
 		int next_int();
-		int next_int(int max_value);
-		int next_int(int min_value, int max_value);
+		int next_int(const int& max_value);
+		int next_int(const int& min_value, const int& max_value);
 		double next_double() noexcept;
 		int next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf);
 

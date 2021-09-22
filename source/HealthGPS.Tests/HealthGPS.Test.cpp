@@ -103,6 +103,61 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 	EXPECT_NE(rnd(), copy());
 }
 
+TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
+{
+	using namespace hgps;
+
+	auto rnd = MTRandom32{ 123456789 };
+
+	auto summary_one = core::UnivariateSummary();
+	auto summary_two = core::UnivariateSummary();
+
+	auto sample_min = 1;
+	auto sample_max = 10;
+	auto sample_size = 100;
+	for (size_t i = 0; i < sample_size; i++)
+	{
+		summary_one.append(rnd.next_int(sample_max));
+		summary_two.append(rnd.next_int(sample_min, sample_max));
+	}
+
+	ASSERT_EQ(0.0, summary_one.min());
+	ASSERT_EQ(sample_max, summary_one.max());
+
+	ASSERT_EQ(sample_min, summary_two.min());
+	ASSERT_EQ(sample_max, summary_two.max());
+}
+
+TEST(TestHealthGPS, RandomBitGeneratorEmpiricalDiscrete)
+{
+	using namespace hgps;
+
+	auto rnd = MTRandom32{ 123456789 };
+
+	auto values = std::vector<int>{2, 3, 5, 7, 9};
+	auto freq_pdf = std::vector<float>{0.2f, 0.4f, 0.1f, 0.2f, 0.1f };
+	auto cdf = std::vector<float>(freq_pdf.size());
+
+	cdf[0] = freq_pdf[0];
+	for (auto i = 1; i < freq_pdf.size(); i++) {
+		cdf[i] = cdf[i - 1] + freq_pdf[i];
+	}
+
+	ASSERT_EQ(1.0, cdf.back());
+	for (auto i = 1; i < freq_pdf.size(); i++) {
+		ASSERT_LT(cdf[i - 1], cdf[i]);
+	}
+
+	auto summary = core::UnivariateSummary();
+	auto sample_size = 100;
+	for (size_t i = 0; i < sample_size; i++) {
+		summary.append(rnd.next_empirical_discrete(values, cdf));
+	}
+
+	ASSERT_EQ(2.0, summary.min());
+	ASSERT_EQ(9.0, summary.max());
+}
+
 TEST(TestHealthGPS, CreateRuntimeContext)
 {
 	using namespace hgps;
@@ -121,41 +176,6 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	auto context = RuntimeContext(bus, definition);
 	ASSERT_EQ(0, context.population().size());
 	ASSERT_EQ(0, context.time_now());
-}
-
-TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
-{
-	using namespace hgps;
-	using namespace hgps::data;
-
-	DataTable data;
-	create_test_datatable(data);
-
-	auto bus = DefaultEventBus{};
-	auto channel = SyncChannel{};
-	auto rnd = MTRandom32{ 123456789 };
-	auto scenario = BaselineScenario{ channel };
-	auto config = create_test_configuration(data);
-	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
-
-	auto context = RuntimeContext(bus, definition);
-	auto summary_one = core::UnivariateSummary();
-	auto summary_two = core::UnivariateSummary();
-
-	auto sample_min = 1;
-	auto sample_max = 10;
-	auto sample_size = 100;
-	for (size_t i = 0; i < sample_size; i++)
-	{
-		summary_one.append(context.next_int(sample_max));
-		summary_two.append(context.next_int(sample_min, sample_max));
-	}
-
-	ASSERT_EQ(0.0, summary_one.min());
-	ASSERT_EQ(sample_max, summary_one.max());
-
-	ASSERT_EQ(sample_min, summary_two.min());
-	ASSERT_EQ(sample_max, summary_two.max());
 }
 
 TEST(TestHealthGPS, SimulationInitialise)

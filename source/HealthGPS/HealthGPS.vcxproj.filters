@@ -222,6 +222,9 @@
     <ClInclude Include="simulation_definition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="randombit_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

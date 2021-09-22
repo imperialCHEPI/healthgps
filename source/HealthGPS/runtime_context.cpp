@@ -44,21 +44,15 @@ namespace hgps {
     }
 
     int RuntimeContext::next_int() {
-        return next_int(0, std::numeric_limits<int>::max());
+        return definition_.rnd().next_int();
     }
 
-    int RuntimeContext::next_int(int max_value) {
-        return next_int(0, max_value);
+    int RuntimeContext::next_int(const int& max_value) {
+        return definition_.rnd().next_int(max_value);
     }
 
-    int RuntimeContext::next_int(int min_value, int max_value) {
-        if (min_value < 0 ||  max_value < min_value) {
-            throw std::invalid_argument(
-                "min_value must be non-negative, and less than or equal to max_value.");
-        }
-
-        std::uniform_int_distribution<int> distribution(min_value, max_value);
-        return distribution(definition_.rnd());
+    int RuntimeContext::next_int(const int& min_value, const int& max_value) {
+        return definition_.rnd().next_int(min_value, max_value);
     }
 
     double RuntimeContext::next_double() noexcept {
@@ -66,19 +60,7 @@ namespace hgps {
     }
 
     int RuntimeContext::next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf) {
-        if (values.size() != cdf.size()) {
-            throw std::invalid_argument(
-                std::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
-        }
-
-        auto p = definition_.rnd().next_double();
-        for (size_t i = 0; i < cdf.size(); i++) {
-            if (p <= cdf[i]) {
-                return values[i];
-            }
-        }
-
-        return values.back();
+        return definition_.rnd().next_empirical_discrete(values, cdf);
     }
 
     void RuntimeContext::set_current_time(const int time_now) noexcept {
