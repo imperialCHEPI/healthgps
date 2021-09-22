@@ -247,7 +247,7 @@ namespace hgps {
 		return product;
 	}
 
-	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config) {
+	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, const ModelInput& config) {
 		// year => age [age, male, female]
 		auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
 

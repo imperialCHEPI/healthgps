@@ -2,8 +2,8 @@
 #include <atomic>
 #include <map>
 
-#include "HealthGPS\api.h"
-#include "HealthGPS\event_bus.h"
+#include "HealthGPS/api.h"
+#include "HealthGPS/event_bus.h"
 
 #include "HealthGPS.Datastore\api.h"
 
@@ -106,27 +106,19 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 TEST(TestHealthGPS, CreateRuntimeContext)
 {
 	using namespace hgps;
+	using namespace hgps::data;
+
+	DataTable data;
+	create_test_datatable(data);
 
 	auto bus = DefaultEventBus{};
-	auto rnd = MTRandom32(123456789);
+	auto channel = SyncChannel{};
+	auto rnd = MTRandom32{ 123456789 };
+	auto scenario = BaselineScenario{ channel };
+	auto config = create_test_configuration(data);
+	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
-	auto entries = std::vector<MappingEntry>{
-	MappingEntry("Year", 0, "", true),
-	MappingEntry("Age", 0, "age"),
-	MappingEntry("AlcoholConsumption", 1),
-	MappingEntry("BMI", 2)
-	};
-
-	auto diseases = std::vector<core::DiseaseInfo>{
-		core::DiseaseInfo{.code = "asthma", .name = "Asthma"},
-		core::DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
-		core::DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
-	};
-	
-	auto mapping = HierarchicalMapping(std::move(entries));
-	auto age_range = core::IntegerInterval(0, 100);
-
-	auto context = RuntimeContext(bus, rnd, mapping, diseases, age_range);
+	auto context = RuntimeContext(bus, definition);
 	ASSERT_EQ(0, context.population().size());
 	ASSERT_EQ(0, context.time_now());
 }
@@ -134,27 +126,19 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 TEST(TestHealthGPS, RuntimeContextNextIntRangeIsClosed)
 {
 	using namespace hgps;
+	using namespace hgps::data;
+
+	DataTable data;
+	create_test_datatable(data);
 
 	auto bus = DefaultEventBus{};
-	auto rnd = MTRandom32(123456789);
+	auto channel = SyncChannel{};
+	auto rnd = MTRandom32{ 123456789 };
+	auto scenario = BaselineScenario{ channel };
+	auto config = create_test_configuration(data);
+	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
-	auto entries = std::vector<MappingEntry>{
-	MappingEntry("Year", 0, "", true),
-	MappingEntry("Age", 0, "age"),
-	MappingEntry("SmokingStatus", 1),
-	MappingEntry("BMI", 2)
-	};
-
-	auto diseases = std::vector<core::DiseaseInfo>{
-		core::DiseaseInfo{.code = "asthma", .name = "Asthma"},
-		core::DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
-		core::DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
-	};
-
-	auto mapping = HierarchicalMapping(std::move(entries));
-	auto age_range = core::IntegerInterval(0, 100);
-
-	auto context = RuntimeContext(bus, rnd, mapping, diseases, age_range);
+	auto context = RuntimeContext(bus, definition);
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
 
@@ -182,7 +166,12 @@ TEST(TestHealthGPS, SimulationInitialise)
 	DataTable data;
 	create_test_datatable(data);
 
+	auto bus = DefaultEventBus{};
+	auto channel = SyncChannel{};
+	auto rnd = MTRandom32{ 123456789 };
+	auto scenario = BaselineScenario{ channel };
 	auto config = create_test_configuration(data);
+	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
 	auto full_path = fs::absolute("../../../data");
 	auto manager = DataManager(full_path);
@@ -197,9 +186,7 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto factory = get_default_simulation_module_factory(manager);
 	factory.register_instance(SimulationModuleType::RiskFactor, risk_module_ptr);
 
-	auto event_bus = DefaultEventBus();
-
-	ASSERT_NO_THROW(HealthGPS(factory, config, event_bus, MTRandom32()));
+	ASSERT_NO_THROW(HealthGPS(std::move(definition), factory, bus));
 }
 
 TEST(TestHealthGPS, ModuleFactoryRegistry)
@@ -245,7 +232,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto factory = SimulationModuleFactory(manager);
 	factory.register_builder(SimulationModuleType::Simulator,
-		[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+		[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_country_module(manager, config);
 		});
 

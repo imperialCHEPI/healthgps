@@ -18,19 +18,19 @@ namespace hgps {
 	{
 		auto factory = SimulationModuleFactory(manager);
 		factory.register_builder(SimulationModuleType::SES,
-			[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
 				return build_ses_module(manager, config); });
 
 		factory.register_builder(SimulationModuleType::Demographic,
-			[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
 				return build_demographic_module(manager, config); });
 
 		factory.register_builder(SimulationModuleType::Disease,
-			[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
 				return build_disease_module(manager, config); });
 
 		factory.register_builder(SimulationModuleType::Analysis,
-			[](core::Datastore& manager, ModelInput& config) -> SimulationModuleFactory::ModuleType {
+			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
 				return build_analysis_module(manager, config); });
 
 		return factory;

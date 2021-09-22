@@ -343,15 +343,15 @@ namespace hgps {
 		return std::nanf("");
 	}
 
-	std::unique_ptr<SESModule> hgps::build_ses_module(core::Datastore& manager, ModelInput& config) {
+	std::unique_ptr<SESModule> hgps::build_ses_module(core::Datastore& manager, const ModelInput& config) {
 
 		// SES required data, assuming it has been validated.
 		auto& table = config.data();
 
-		auto& gender_col = table.column(config.ses_mapping().entries["gender"]);
-		auto& age_col = table.column(config.ses_mapping().entries["age"]);
-		auto& edu_col = table.column(config.ses_mapping().entries["education"]);
-		auto& inc_col = table.column(config.ses_mapping().entries["income"]);
+		auto& gender_col = table.column(config.ses_mapping().entries.at("gender"));
+		auto& age_col = table.column(config.ses_mapping().entries.at("age"));
+		auto& edu_col = table.column(config.ses_mapping().entries.at("education"));
+		auto& inc_col = table.column(config.ses_mapping().entries.at("income"));
 
 		std::vector<SESRecord> data;
 		for (size_t row = 0; row < table.num_rows(); row++)

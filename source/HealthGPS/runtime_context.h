@@ -5,6 +5,7 @@
 #include "mapping.h"
 #include "event_aggregator.h"
 #include "runtime_metric.h"
+#include "simulation_definition.h"
 
 namespace hgps {
 
@@ -12,12 +13,7 @@ namespace hgps {
 	{
 	public:
 		RuntimeContext() = delete;
-		RuntimeContext(
-			EventAggregator& bus,
-			RandomBitGenerator& generator,
-			const HierarchicalMapping& mapping,
-			const std::vector<core::DiseaseInfo>& diseases,
-			const core::IntegerInterval& age_range);
+		RuntimeContext(EventAggregator& bus, SimulationDefinition& definition);
 
 		int time_now() const noexcept;
 
@@ -54,12 +50,9 @@ namespace hgps {
 		void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
 	private:
-		EventAggregator& event_bus_;
-		RandomBitGenerator& generator_;
 		Population population_;
-		HierarchicalMapping mapping_;
-		std::vector<core::DiseaseInfo> diseases_;
-		core::IntegerInterval age_range_;
+		EventAggregator& event_bus_;
+		SimulationDefinition& definition_;
 		RuntimeMetric metrics_{};
 		unsigned int current_run_{};
 		int model_start_time_{};

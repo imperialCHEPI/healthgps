@@ -78,6 +78,6 @@ namespace hgps {
 
 	float parse_float(const std::any& value);
 
-	std::unique_ptr<SESModule> build_ses_module(core::Datastore& manager, ModelInput& config);
+	std::unique_ptr<SESModule> build_ses_module(core::Datastore& manager, const ModelInput& config);
 }
 

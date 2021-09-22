@@ -2,14 +2,9 @@
 #include <random>
 
 namespace hgps {
-    RuntimeContext::RuntimeContext(
-        EventAggregator& bus,
-        RandomBitGenerator& generator,
-        const HierarchicalMapping& mapping,
-        const std::vector<core::DiseaseInfo>& diseases,
-        const core::IntegerInterval& age_range)
-        : event_bus_{ bus }, generator_ {generator}, mapping_{ mapping }, diseases_{ diseases },
-        age_range_{ age_range }, time_now_{}, model_start_time_{}, population_{ 0 }
+
+    RuntimeContext::RuntimeContext(EventAggregator& bus, SimulationDefinition& definition)
+        : event_bus_{ bus }, definition_{ definition }, population_{ 0 }
     {}
 
     int RuntimeContext::time_now() const noexcept {
@@ -33,19 +28,19 @@ namespace hgps {
     }
 
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
-        return mapping_;
+        return definition_.inputs().risk_mapping();
     }
 
     const std::vector<core::DiseaseInfo>& RuntimeContext::diseases() const noexcept {
-        return diseases_;
+        return definition_.inputs().diseases();
     }
 
     const core::IntegerInterval& RuntimeContext::age_range() const noexcept {
-        return age_range_;
+        return definition_.inputs().settings().age_range();
     }
 
     const std::string RuntimeContext::identifier() const noexcept {
-        return "baseline"; // TODO get from simulation scenario
+        return definition_.identifier();
     }
 
     int RuntimeContext::next_int() {
@@ -63,11 +58,11 @@ namespace hgps {
         }
 
         std::uniform_int_distribution<int> distribution(min_value, max_value);
-        return distribution(generator_);
+        return distribution(definition_.rnd());
     }
 
     double RuntimeContext::next_double() noexcept {
-        return generator_.next_double();
+        return definition_.rnd().next_double();
     }
 
     int RuntimeContext::next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf) {
@@ -76,7 +71,7 @@ namespace hgps {
                 std::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
         }
 
-        auto p = generator_.next_double();
+        auto p = definition_.rnd().next_double();
         for (size_t i = 0; i < cdf.size(); i++) {
             if (p <= cdf[i]) {
                 return values[i];

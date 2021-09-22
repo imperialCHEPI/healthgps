@@ -10,9 +10,9 @@
 namespace hgps {
 
 	struct RunInfo {
-		unsigned int start_time;
-		unsigned int stop_time;
-		std::optional<unsigned int> seed;
+		const unsigned int start_time;
+		const unsigned int stop_time;
+		const std::optional<unsigned int> seed;
 	};
 
 	struct SESMapping {
@@ -27,21 +27,21 @@ namespace hgps {
 			SESMapping ses_mapping, HierarchicalMapping risk_mapping, 
 			std::vector<core::DiseaseInfo> diseases);
 
-		Settings settings() const noexcept;
+		const Settings& settings() const noexcept;
 
-		core::DataTable& data() const noexcept;
+		const core::DataTable& data() const noexcept;
 
-		unsigned int start_time() const noexcept;
+		const unsigned int& start_time() const noexcept;
 
-		unsigned int stop_time() const noexcept;
+		const unsigned int& stop_time() const noexcept;
 
-		std::optional<unsigned int> seed() const noexcept;
+		const std::optional<unsigned int>& seed() const noexcept;
 
-		SESMapping ses_mapping() const noexcept;
+		const SESMapping& ses_mapping() const noexcept;
 
-		HierarchicalMapping risk_mapping() const noexcept;
+		const HierarchicalMapping& risk_mapping() const noexcept;
 
-		std::vector<core::DiseaseInfo> diseases() const noexcept;
+		const std::vector<core::DiseaseInfo>& diseases() const noexcept;
 
 	private:
 		core::DataTable& input_data_;

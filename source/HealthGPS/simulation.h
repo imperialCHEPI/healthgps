@@ -1,8 +1,7 @@
 #pragma once
 
 #include <adevs/adevs.h>
-#include "interfaces.h"
-#include "modelinput.h"
+#include "simulation_definition.h"
 
 namespace hgps {
 
@@ -10,9 +9,8 @@ namespace hgps {
 	{
 	public:
 		Simulation() = delete;
-		explicit Simulation(ModelInput& config, RandomBitGenerator&& generator)
-			: config_{ config }, rnd_{ generator }
-		{}
+		explicit Simulation(SimulationDefinition&& definition)
+			: definition_{std::move(definition)} {}
 
 		virtual ~Simulation() = default;
 
@@ -23,7 +21,6 @@ namespace hgps {
 		virtual void set_current_run(const unsigned int run_number) noexcept = 0;
 
 	protected:
-		ModelInput config_;
-		RandomBitGenerator& rnd_;
+		SimulationDefinition definition_;
 	};
 }

@@ -1,6 +1,8 @@
 #include "program.h"
 #include "HealthGPS.Datastore/api.h"
 #include "HealthGPS/event_bus.h"
+#include "HealthGPS/baseline_scenario.h"
+#include "HealthGPS/intervention_scenario.h"
 
 #include "event_monitor.h"
 #include "result_file_writer.h"
@@ -79,11 +81,14 @@ int main(int argc, char* argv[])
 
 	try	{
 		// Create main simulation model instance and run experiment
-		auto model = HealthGPS(factory, model_config, event_bus, hgps::MTRandom32());
+		auto channel = SyncChannel{};
+		auto baseline = HealthGPS{
+			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
+			factory, event_bus };
 
 		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
 		auto runner = ModelRunner(event_bus);
-		auto runtime = runner.run(model, config.trial_runs);
+		auto runtime = runner.run(baseline, config.trial_runs);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
 	}

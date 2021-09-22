@@ -14,11 +14,11 @@ namespace hgps {
 
 		struct RelativeRiskInfo
 		{
-			core::DiseaseInfo& disease;
+			const core::DiseaseInfo& disease;
 
 			core::Datastore& manager;
 
-			ModelInput& inputs;
+			const ModelInput& inputs;
 
 			std::vector<MappingEntry>& risk_factors;
 		};

@@ -16,20 +16,19 @@ namespace hgps {
 		}
 	}
 
-	core::Country Settings::country() const noexcept {
+	const core::Country& Settings::country() const noexcept {
 		return country_;
 	}
 
-	float Settings::size_fraction() const noexcept {
+	const float& Settings::size_fraction() const noexcept {
 		return size_fraction_;
 	}
 
-	std::string Settings::linkage_column() const noexcept
-	{
-		return std::string();
+	const std::string& Settings::linkage_column() const noexcept {
+		return linkage_column_;
 	}
 
-	core::IntegerInterval Settings::age_range() const noexcept {
+	const core::IntegerInterval& Settings::age_range() const noexcept {
 		return age_range_;
 	}
 }

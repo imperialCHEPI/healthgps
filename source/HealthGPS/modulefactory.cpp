@@ -7,6 +7,7 @@ namespace hgps {
 	std::size_t SimulationModuleFactory::size() const noexcept {
 		return builders_.size() + registry_.size();
 	}
+
 	bool SimulationModuleFactory::countains(const SimulationModuleType type) const noexcept {
 		return registry_.contains(type) || builders_.contains(type);
 	}
@@ -16,6 +17,7 @@ namespace hgps {
 
 		registry_[type] = instance;
 	}
+
 	void SimulationModuleFactory::register_builder(
 		const SimulationModuleType type, const ConcreteBuilder builder) {
 
@@ -23,7 +25,7 @@ namespace hgps {
 	}
 
 	SimulationModuleFactory::ModuleType SimulationModuleFactory::create(
-		const SimulationModuleType type, ModelInput& config) {
+		const SimulationModuleType type, const ModelInput& config) {
 
 		auto reg_it = registry_.find(type);
 		if (reg_it != registry_.end()) {

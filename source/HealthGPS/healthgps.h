@@ -13,8 +13,7 @@ namespace hgps {
 	{
 	public:
 		HealthGPS() = delete;
-		explicit HealthGPS(SimulationModuleFactory& factory, ModelInput& config,
-						   EventAggregator& bus, RandomBitGenerator&& generator);
+		explicit HealthGPS(SimulationDefinition&& definition, SimulationModuleFactory& factory, EventAggregator& bus);
 		
 		void initialize() override;
 		void terminate() override;

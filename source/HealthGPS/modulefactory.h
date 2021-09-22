@@ -11,7 +11,7 @@ namespace hgps {
 	{
     public:
         using ModuleType = std::shared_ptr<SimulationModule>;
-        using ConcreteBuilder = ModuleType(*)(core::Datastore&, ModelInput&);
+        using ConcreteBuilder = ModuleType(*)(core::Datastore&, const ModelInput&);
 
         SimulationModuleFactory() = delete;
         SimulationModuleFactory(core::Datastore& manager);
@@ -24,7 +24,7 @@ namespace hgps {
 
         void register_builder(const SimulationModuleType type, const ConcreteBuilder builder);
 
-        ModuleType create(const SimulationModuleType type, ModelInput& config);
+        ModuleType create(const SimulationModuleType type, const ModelInput& config);
 
     private:
         hgps::core::Datastore& manager_;

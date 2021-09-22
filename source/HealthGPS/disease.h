@@ -34,5 +34,5 @@ namespace hgps {
 		std::unordered_map<std::string, std::shared_ptr<DiseaseModel>> models_;
 	};
 
-	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config);
+	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, const ModelInput& config);
 }

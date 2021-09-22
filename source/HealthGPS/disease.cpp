@@ -57,7 +57,7 @@ namespace hgps {
 		return models_.at(disease_code)->get_excess_mortality(age, gender);
 	}
 
-	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config)
+	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, const ModelInput& config)
 	{
 		// Models must be registered prior to be created.
 		auto registry = get_default_disease_model_registry();

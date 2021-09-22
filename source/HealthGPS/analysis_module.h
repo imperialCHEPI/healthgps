@@ -35,5 +35,5 @@ namespace hgps {
 			const unsigned int& max_age, const int& death_year) const;
 	};
 
-	std::unique_ptr<AnalysisModule> build_analysis_module(core::Datastore& manager, ModelInput& config);
+	std::unique_ptr<AnalysisModule> build_analysis_module(core::Datastore& manager, const ModelInput& config);
 }

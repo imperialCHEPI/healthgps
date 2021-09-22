@@ -214,7 +214,7 @@ namespace hgps {
 		};
 	}
 
-	std::unique_ptr<AnalysisModule> build_analysis_module(core::Datastore& manager, ModelInput& config)
+	std::unique_ptr<AnalysisModule> build_analysis_module(core::Datastore& manager, const ModelInput& config)
 	{
 		auto analysis_entity = manager.get_disease_analysis(config.settings().country());
 		if (analysis_entity.empty()) {

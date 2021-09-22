@@ -219,6 +219,9 @@
     <ClInclude Include="Intervention_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
+    <ClInclude Include="simulation_definition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

@@ -65,6 +65,6 @@ namespace hgps {
 		double calculate_excess_mortality_product(const Person& entity, const DiseaseHostModule& disease_host) const;
 	};
 
-	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, ModelInput& config);
+	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, const ModelInput& config);
 }
 
