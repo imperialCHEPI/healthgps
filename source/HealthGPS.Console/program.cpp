@@ -75,27 +75,43 @@ int main(int argc, char* argv[])
 	auto event_bus = DefaultEventBus();
 	auto result_file_logger = ResultFileWriter{ 
 		create_output_file_name(config.result),
-		ModelInfo{.name = "Health-GPS", .version = "0.1.1-alpha.5"}
+		ModelInfo{.name = "Health-GPS", .version = "0.2.beta"}
 	};
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
-		// Create main simulation model instance and run experiment
 		auto channel = SyncChannel{};
+		auto runner = ModelRunner(event_bus);
+		auto runtime = 0.0;
+
+		// Create main simulation model instance and run experiment
 		auto baseline = HealthGPS{
 			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
 			factory, event_bus };
 
-		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner(event_bus);
-		auto runtime = runner.run(baseline, config.trial_runs);
+		if (config.intervention.is_enabled) {
+			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
+			auto intervention = HealthGPS{
+				SimulationDefinition{ model_config,std::move(policy_scenario), hgps::MTRandom32() },
+				factory, event_bus };
+
+			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
+
+			// TODO: Parallel execution
+			// runtime = runner.run(baseline, intervention, config.trial_runs);
+		}
+		else {
+			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
+			runtime = runner.run(baseline, config.trial_runs);
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
 	}
-	
+
 	event_monitor.stop();
 	fmt::print("\n\n");
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye");

@@ -175,12 +175,17 @@ Configuration load_configuration(CommandOptions& options) {
 		opt["running"]["start_time"].get_to(config.start_time);
 		opt["running"]["stop_time"].get_to(config.stop_time);
 		opt["running"]["trial_runs"].get_to(config.trial_runs);
+		opt["running"]["sync_timeout_ms"].get_to(config.timeout_ms);
 		auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
 		if (seed.size() > 0) {
 			config.custom_seed = seed[0];
 		}
 
 		opt["running"]["diseases"].get_to(config.diseases);
+		if (!opt["running"]["intervention"].empty()) {
+			config.intervention = opt["running"]["intervention"].get<PolicyScenarioInfo>();
+		}
+
 		config.result = opt["results"].get<ResultInfo>();
 	}
 	else
@@ -438,4 +443,24 @@ std::string create_output_file_name(const ResultInfo& info) {
 	log_file_name = (output_folder / log_file_name).string();
 	fmt::print(fg(fmt::color::yellow_green), "Results file: {}.\n", log_file_name);
 	return log_file_name;
+}
+
+hgps::InterventionScenario create_intervention_scenario(SyncChannel& channel, const PolicyScenarioInfo& info) {
+	using namespace hgps;
+	auto impact_type = PolicyImpactType::absolute;
+	if (core::case_insensitive::equals(info.impact_type, "relative")) {
+		impact_type = PolicyImpactType::relative;
+	}
+	else if (!core::case_insensitive::equals(info.impact_type, "absolute")) {
+		throw std::logic_error(std::format("Unknown policy impact type: {}", info.impact_type));
+	}
+
+	auto risk_impacts = std::vector<PolicyImpact>{};
+	for (auto& item : info.impacts) {
+		risk_impacts.emplace_back(PolicyImpact{ core::to_lower(item.first), item.second });
+	}
+
+	auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
+	auto definition = PolicyDefinition(impact_type, risk_impacts, period);
+	return InterventionScenario{ channel, std::move(definition) };
 }

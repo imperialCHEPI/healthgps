@@ -20,6 +20,8 @@ namespace hgps {
 
 		virtual void set_current_run(const unsigned int run_number) noexcept = 0;
 
+		ScenarioType type() noexcept { return definition_.scenario().type(); }
+
 	protected:
 		SimulationDefinition definition_;
 	};

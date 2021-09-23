@@ -6,7 +6,7 @@ namespace hgps {
 	InterventionScenario::InterventionScenario(SyncChannel& data_sync, PolicyDefinition&& definition)
 		: channel_{ data_sync }, factor_impact_{}, definition_{std::move(definition)}
 	{
-		for (auto& factor : definition.impacts) {
+		for (auto& factor : definition_.impacts) {
 			factor_impact_.emplace(core::to_lower(factor.risk_factor), factor);
 		}
 	}

@@ -14,7 +14,7 @@ namespace hgps {
 			: impact_type{ type_of_impact }, impacts{ risk_impacts }, active_period{ period }{}
 
 		const PolicyImpactType impact_type;
-		const std::vector<PolicyImpact>& impacts;
+		const std::vector<PolicyImpact> impacts;
 		const PolicyInterval active_period;
 	};
 

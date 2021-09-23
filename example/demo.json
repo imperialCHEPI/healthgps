@@ -37,10 +37,10 @@
         }
     },
     "modelling": {
-        "ses":{
+        "ses": {
             "update_interval": 5,
-            "max_age":30,
-            "mapping":{
+            "max_age": 30,
+            "mapping": {
                 "gender": "Gender",
                 "age": "Age",
                 "education": "Education",
@@ -66,8 +66,8 @@
             "static": "HLM.Json",
             "dynamic": "DHLM.Json"
         },
-        "baseline_adjustment":{
-            "is_enabled":true,
+        "baseline_adjustment": {
+            "is_enabled": true,
             "format": "csv",
             "delimiter": ",",
             "encoding": "UTF8",
@@ -81,13 +81,24 @@
         "start_time": 2010,
         "stop_time": 2030,
         "trial_runs": 1,
-      "diseases": [
-        "asthma",
-        "diabetes"        
-      ],
-      "intervention": {}
+        "sync_timeout_ms": 500,
+        "diseases": [
+            "asthma",
+            "diabetes"
+        ],
+        "intervention": {
+            "is_enabled": true,
+            "impact_type": "absolute",
+            "impacts": {
+                "BMI": -0.02
+            },
+            "active_period": {
+                "start_time": 2021,
+                "finish_time": null
+            }
+        }
     },
-    "results":{
-        "folder":"C:\\HealthGPS\\Result"
+    "results": {
+        "folder": "C:\\HealthGPS\\Result"
     }
 }

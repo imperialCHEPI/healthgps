@@ -147,6 +147,34 @@ void from_json(const json& j, ModellingInfo& p) {
 	j.at("baseline_adjustment").get_to(p.baseline_adjustment);
 }
 
+// Policy Scenario
+void to_json(json& j, const PolicyPeriodInfo& p) {
+	j = json{
+		{"start_time", p.start_time},
+		{"finish_time", p.to_finish_time_str()} };
+}
+
+void from_json(const json& j, PolicyPeriodInfo& p) {
+	j.at("start_time").get_to(p.start_time);
+	if (!j.at("finish_time").is_null() && !j.at("finish_time").empty()) {
+		p.finish_time = j.at("finish_time").get<unsigned int>();
+	}
+}
+
+void to_json(json& j, const PolicyScenarioInfo& p) {
+	j = json{
+	{"impact_type", p.impact_type},
+	{"impacts", p.impacts},
+	{"active_period", p.active_period }};
+}
+
+void from_json(const json& j, PolicyScenarioInfo& p) {
+	j.at("is_enabled").get_to(p.is_enabled);
+	j.at("impact_type").get_to(p.impact_type);
+	j.at("impacts").get_to(p.impacts);
+	j.at("active_period").get_to(p.active_period);
+}
+
 // Result information
 void to_json(json& j, const ResultInfo& p) {
 	j = json{ {"folder", p.folder}};
