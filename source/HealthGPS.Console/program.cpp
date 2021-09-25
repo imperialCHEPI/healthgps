@@ -8,6 +8,7 @@
 #include "result_file_writer.h"
 
 #include <fmt/chrono.h>
+#include <thread>
 
 int main(int argc, char* argv[])
 {
@@ -40,7 +41,7 @@ int main(int argc, char* argv[])
 	std::cout << input_table.to_string();
 
 	// Create risk factors model instance
-	auto baseline_data = load_baseline_adjustment(
+	auto baseline_data = load_baseline_adjustments(
 		config.modelling.baseline_adjustment, config.start_time, config.stop_time);
 	auto risk_factor_module = build_risk_factor_module(config.modelling, baseline_data);
 
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
 	auto data_api = data::DataManager(cmd_args.storage_folder);
 	auto factory = get_default_simulation_module_factory(data_api);
 	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
-
+	
 	// Validate the configuration target country
 	auto countries = data_api.get_countries();
 	fmt::print("\nThere are {} countries in storage.\n", countries.size());
@@ -85,31 +86,56 @@ int main(int argc, char* argv[])
 		auto runtime = 0.0;
 
 		// Create main simulation model instance and run experiment
+		std::atomic<bool> done(false);
 		auto baseline = HealthGPS{
 			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
 			factory, event_bus };
-
 		if (config.intervention.is_enabled) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
 			auto intervention = HealthGPS{
-				SimulationDefinition{ model_config,std::move(policy_scenario), hgps::MTRandom32() },
+				SimulationDefinition{ model_config, std::move(policy_scenario), hgps::MTRandom32() },
 				factory, event_bus };
 
+			
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
+			// TODO: Run parallel version with data sync
+			auto worker = std::jthread{ [&runtime, &runner, &baseline, &intervention, &config, &done] {
+				runtime = runner.run(baseline, intervention, config.trial_runs);
+				done.store(true);
+			} };
 
-			// TODO: Parallel execution
-			// runtime = runner.run(baseline, intervention, config.trial_runs);
+			/*
+			auto worker = std::jthread{ [&runtime, &runner, &intervention, &config, &done] {
+				runtime = runner.run(intervention, config.trial_runs);
+				done.store(true);
+			} };
+			*/
+
+			while (!done.load()) {
+				std::this_thread::sleep_for(std::chrono::microseconds(100));
+			}
+
+			worker.join();
 		}
 		else {
 			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
-			runtime = runner.run(baseline, config.trial_runs);
+			auto worker = std::jthread{ [&runtime, &runner, &baseline, &config, &done ] {
+				runtime = runner.run(baseline, config.trial_runs);
+				done.store(true);
+			} };
+
+			while (!done.load()) {
+				std::this_thread::sleep_for(std::chrono::microseconds(100));
+			}
+
+			worker.join();
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
-		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
+		fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n", ex.what());
 	}
 
 	event_monitor.stop();

@@ -25,6 +25,8 @@ namespace hgps {
 
 		RuntimeMetric& metrics() noexcept;
 
+		Scenario& scenario() noexcept;
+
 		const HierarchicalMapping& mapping() const noexcept;
 
 		const std::vector<core::DiseaseInfo>& diseases() const noexcept;

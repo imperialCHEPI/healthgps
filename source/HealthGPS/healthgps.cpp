@@ -68,7 +68,7 @@ namespace hgps {
 		auto message = std::format("[{:4},{}] population size: {}, elapsed: {}ms",
 			env->now().real, env->now().logical, context_.population().initial_size(), elapsed.count());
 		context_.publish(std::make_unique<InfoEventMessage>(
-			name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
+			identifier(), ModelAction::start, context_.current_run(), context_.time_now(), message));
 
 		return env->now() + adevs::Time(world_time, 0);
 	}
@@ -95,7 +95,7 @@ namespace hgps {
 			auto message = std::format("[{:4},{}], elapsed: {}ms",
 				env->now().real, env->now().logical, elapsed.count());
 			context_.publish(std::make_unique<InfoEventMessage>(
-				name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
+				identifier(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
 			// Schedule next event time 
 			return world_time;
@@ -116,7 +116,7 @@ namespace hgps {
 	{
 		auto message = std::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
 		context_.publish(std::make_unique<InfoEventMessage>(
-			name(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
+			identifier(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
 	}
 
 	void HealthGPS::initialise_population()
@@ -190,7 +190,7 @@ namespace hgps {
 		context_.population().add_newborn_babies(number_of_boys, core::Gender::male);
 		context_.population().add_newborn_babies(number_of_girls, core::Gender::female);
 
-		// Calculate debug statistics, to be removed.
+		// Calculate statistics.
 		auto number_of_births = number_of_boys + number_of_girls;
 		auto expected_migration = (expected_pop_size / 100.0) - initial_pop_size - number_of_births + number_of_deaths;
 		auto middle_pop_size = context_.population().current_active_size();
@@ -252,39 +252,21 @@ namespace hgps {
 	}
 
 	void HealthGPS::update_net_immigration() {
-		auto expected_population = get_current_expected_population();
-		auto simulated_population = get_current_simulated_population();
-
-		// Debug counters, remove on final version
-		auto male_count = 0;
-		auto female_count = 0;
-		auto net_diff = 0;
-
-		auto net_immigration = create_age_gender_table<int>(context_.age_range());
-		auto start_age = context_.age_range().lower();
-		auto end_age = context_.age_range().upper();
-		for (int age = start_age; age <= end_age; age++) {
-			net_diff = expected_population.at(age,
-				core::Gender::male) - simulated_population.at(age, core::Gender::male);
-			net_immigration.at(age, core::Gender::male) = net_diff;
-			male_count += net_diff;
-
-			net_diff = expected_population.at(age,
-				core::Gender::female) - simulated_population.at(age, core::Gender::female);
-			net_immigration.at(age, core::Gender::female) = net_diff;
-			female_count += net_diff;
-		}
-
-		// Debug only, remove on final version
-		auto total_immigration = male_count + female_count;
+		auto net_immigration = get_net_migration();
 
 		// Update population based on net immigration
+		auto start_age = context_.age_range().lower();
+		auto end_age = context_.age_range().upper();
 		for (int age = start_age; age <= end_age; age++) {
 			auto male_net_value = net_immigration.at(age, core::Gender::male);
 			apply_net_migration(male_net_value, age, core::Gender::male);
 
 			auto female_net_value = net_immigration.at(age, core::Gender::female);
 			apply_net_migration(female_net_value, age, core::Gender::female);
+		}
+
+		if (context_.scenario().type() == ScenarioType::baseline) {
+			// TODO: send net_migration message via the channel
 		}
 	}
 
@@ -368,6 +350,44 @@ namespace hgps {
 		}
 	}
 
+	hgps::IntegerAgeGenderTable HealthGPS::get_net_migration() {
+		if (context_.scenario().type() == ScenarioType::baseline) {
+			return create_net_migration();
+		}
+
+		// TODO: Receive net migration from channel
+		return create_net_migration();
+	}
+
+	hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
+		auto expected_population = get_current_expected_population();
+		auto simulated_population = get_current_simulated_population();
+
+		// Debug counters, remove on final version
+		auto male_count = 0;
+		auto female_count = 0;
+		auto net_diff = 0;
+
+		auto net_immigration = create_age_gender_table<int>(context_.age_range());
+		auto start_age = context_.age_range().lower();
+		auto end_age = context_.age_range().upper();
+		for (int age = start_age; age <= end_age; age++) {
+			net_diff = expected_population.at(age,
+				core::Gender::male) - simulated_population.at(age, core::Gender::male);
+			net_immigration.at(age, core::Gender::male) = net_diff;
+			male_count += net_diff;
+
+			net_diff = expected_population.at(age,
+				core::Gender::female) - simulated_population.at(age, core::Gender::female);
+			net_immigration.at(age, core::Gender::female) = net_diff;
+			female_count += net_diff;
+		}
+
+		// Update statistics
+		auto total_immigration = male_count + female_count;
+		return net_immigration;
+	}
+
 	Person HealthGPS::partial_clone_entity(const Person& source) const noexcept {
 		auto clone = Person{};
 		clone.age = source.age;
@@ -416,7 +436,7 @@ namespace hgps {
 		auto sim8_pop = context_.population().size();
 
 		std::stringstream ss;
-		ss << std::format("\n Initial Virtual Population Summary:\n");
+		ss << std::format("\n Initial Virtual Population Summary: {}\n", context_.identifier());
 		ss << std::format("|{:-<{}}|\n", '-', width);
 		ss << std::format("| {:{}} : {:>14} : {:>14} : {:>14} : {:>14} |\n",
 			"Variable", pad, "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");

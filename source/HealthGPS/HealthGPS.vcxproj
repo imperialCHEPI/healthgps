@@ -114,9 +114,11 @@
     <ClInclude Include="event_message.h" />
     <ClInclude Include="event_subscriber.h" />
     <ClInclude Include="event_visitor.h" />
+    <ClInclude Include="finally.h" />
     <ClInclude Include="gender_table.h" />
     <ClInclude Include="gender_value.h" />
     <ClInclude Include="hierarchical_model_dynamic.h" />
+    <ClInclude Include="hierarchical_model_registry.h" />
     <ClInclude Include="hierarchical_model_static.h" />
     <ClInclude Include="hierarchical_model_types.h" />
     <ClInclude Include="Intervention_scenario.h" />
@@ -127,6 +129,7 @@
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
     <ClInclude Include="modelinput.h" />
+    <ClInclude Include="model_data_provider.h" />
     <ClInclude Include="model_result.h" />
     <ClInclude Include="monotonic_vector.h" />
     <ClInclude Include="policy_scenario.h" />
@@ -171,6 +174,7 @@
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="modelrunner.cpp" />
     <ClCompile Include="modelinput.cpp" />
+    <ClCompile Include="model_data_provider.cpp" />
     <ClCompile Include="model_result.cpp" />
     <ClCompile Include="modulefactory.cpp" />
     <ClCompile Include="mtrandom.cpp" />

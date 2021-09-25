@@ -22,6 +22,8 @@ namespace hgps {
 
 		ScenarioType type() noexcept { return definition_.scenario().type(); }
 
+		std::string identifier() noexcept { return definition_.identifier(); }
+
 	protected:
 		SimulationDefinition definition_;
 	};

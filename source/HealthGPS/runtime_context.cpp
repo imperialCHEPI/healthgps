@@ -27,6 +27,10 @@ namespace hgps {
         return metrics_;
     }
 
+    Scenario& RuntimeContext::scenario() noexcept {
+        return definition_.scenario();
+    }
+
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
         return definition_.inputs().risk_mapping();
     }

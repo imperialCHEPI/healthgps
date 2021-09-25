@@ -62,6 +62,9 @@ namespace hgps {
 		void initialise_birth_rates();
 
 		GenderTable<int, double> create_death_rates_table(const int time_year);
+		GenderTable<int, double> calculate_residual_mortality(
+			RuntimeContext& context, const DiseaseHostModule& disease_host);
+
 		double calculate_excess_mortality_product(const Person& entity, const DiseaseHostModule& disease_host) const;
 	};
 

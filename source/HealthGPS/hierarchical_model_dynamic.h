@@ -37,6 +37,9 @@ namespace hgps {
 			const HierarchicalMapping& mapping, Person& entity, int time_year) const;
 		std::map<std::string, double> get_current_risk_factors(
 			const HierarchicalMapping& mapping, Person& entity, int time_year) const;
+
+		std::map<std::string, DoubleGenderValue> get_baseline_adjustments(RuntimeContext& context);
+		std::map<std::string, DoubleGenderValue> create_baseline_adjustments(RuntimeContext& context);
 	};
 }
 

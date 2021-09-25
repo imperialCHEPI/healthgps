@@ -87,10 +87,10 @@
             "diabetes"
         ],
         "intervention": {
-            "is_enabled": true,
+            "is_enabled": false,
             "impact_type": "absolute",
             "impacts": {
-                "BMI": -0.02
+                "BMI": -1.2
             },
             "active_period": {
                 "start_time": 2021,

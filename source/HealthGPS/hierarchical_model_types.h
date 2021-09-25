@@ -6,7 +6,9 @@
 
 namespace hgps {
 
+	struct HierarchicalLinearModelDefinition;
 	using BaselineAdjustmentTable = Map2d<int, std::string, DoubleGenderValue>;
+	using HLMDefinitionMap = std::map<HierarchicalModelType, HierarchicalLinearModelDefinition>;
 
 	struct Coefficient {
 		double value{};
@@ -49,5 +51,20 @@ namespace hgps {
 		const bool is_enabled{ false };
 		const BaselineAdjustmentTable averages{};
 		std::vector<std::string> risk_factors{};
+	};
+
+	struct HierarchicalLinearModelDefinition
+	{
+		HierarchicalLinearModelDefinition() = delete;
+		HierarchicalLinearModelDefinition(
+			std::unordered_map<std::string, LinearModel>&& linear_models,
+			std::map<int, HierarchicalLevel>&& model_levels,
+			BaselineAdjustment& baseline_adjustment)
+			: models{ std::move(linear_models) }, levels{ std::move(model_levels) },
+			baseline_scenario{ baseline_adjustment } {}
+
+		std::unordered_map<std::string, LinearModel> models;
+		std::map<int, HierarchicalLevel> levels;
+		BaselineAdjustment& baseline_scenario;
 	};
 }

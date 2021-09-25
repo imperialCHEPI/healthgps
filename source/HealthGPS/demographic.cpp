@@ -173,34 +173,15 @@ namespace hgps {
 	}
 
 	void DemographicModule::update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) {
-		auto excess_mortality_product = create_integer_gender_table<double>(life_table_.age_limits());
-		auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
-		for (const auto& entity : context.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
+		if (context.scenario().type() == ScenarioType::baseline) {
+			auto residual_mortality = calculate_residual_mortality(context, disease_host);
+			residual_death_rates_ = residual_mortality;
 
-			auto product = calculate_excess_mortality_product(entity, disease_host);
-			excess_mortality_product.at(entity.age, entity.gender) += product;
-			excess_mortality_count.at(entity.age, entity.gender)++;
+			// TODO: Send residual_mortality message via the channel
 		}
 
-		auto death_rates = create_death_rates_table(context.time_now());
-		residual_death_rates_ = create_integer_gender_table<double>(life_table_.age_limits());
-		auto start_age = life_table_.age_limits().lower();
-		auto end_age = life_table_.age_limits().upper();
-		for (int age = start_age; age <= end_age; age++) {
-			auto male_count = excess_mortality_count.at(age, core::Gender::male);
-			auto female_count = excess_mortality_count.at(age, core::Gender::female);
-			auto male_average_product = excess_mortality_product.at(age, core::Gender::male) / male_count;
-			auto female_average_product = excess_mortality_product.at(age, core::Gender::female) / female_count;
-
-			residual_death_rates_.at(age, core::Gender::male) =
-				1.0 - (1.0 - death_rates.at(age, core::Gender::male) / male_average_product);
-
-			residual_death_rates_.at(age, core::Gender::female) =
-				1.0 - (1.0 - death_rates.at(age, core::Gender::female) / female_average_product);
-		}
+		// TODO: Receive residual_mortality from channel
+		residual_death_rates_ = calculate_residual_mortality(context, disease_host);
 	}
 
 	void DemographicModule::initialise_birth_rates() {
@@ -232,6 +213,40 @@ namespace hgps {
 		}
 
 		return death_rates;
+	}
+
+	GenderTable<int, double> DemographicModule::calculate_residual_mortality(
+		RuntimeContext& context, const DiseaseHostModule& disease_host) {
+		auto excess_mortality_product = create_integer_gender_table<double>(life_table_.age_limits());
+		auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
+		for (const auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			auto product = calculate_excess_mortality_product(entity, disease_host);
+			excess_mortality_product.at(entity.age, entity.gender) += product;
+			excess_mortality_count.at(entity.age, entity.gender)++;
+		}
+
+		auto death_rates = create_death_rates_table(context.time_now());
+		auto residual_mortality = create_integer_gender_table<double>(life_table_.age_limits());
+		auto start_age = life_table_.age_limits().lower();
+		auto end_age = life_table_.age_limits().upper();
+		for (int age = start_age; age <= end_age; age++) {
+			auto male_count = excess_mortality_count.at(age, core::Gender::male);
+			auto female_count = excess_mortality_count.at(age, core::Gender::female);
+			auto male_average_product = excess_mortality_product.at(age, core::Gender::male) / male_count;
+			auto female_average_product = excess_mortality_product.at(age, core::Gender::female) / female_count;
+
+			residual_mortality.at(age, core::Gender::male) =
+				1.0 - (1.0 - death_rates.at(age, core::Gender::male) / male_average_product);
+
+			residual_mortality.at(age, core::Gender::female) =
+				1.0 - (1.0 - death_rates.at(age, core::Gender::female) / female_average_product);
+		}
+
+		return residual_mortality;
 	}
 
 	double DemographicModule::calculate_excess_mortality_product(
