@@ -6,17 +6,11 @@ namespace hgps {
 		:repository_{data_repository} {}
 
 	std::size_t SimulationModuleFactory::size() const noexcept {
-		return builders_.size() + registry_.size();
+		return builders_.size();
 	}
 
 	bool SimulationModuleFactory::countains(const SimulationModuleType type) const noexcept {
-		return registry_.contains(type) || builders_.contains(type);
-	}
-
-	void SimulationModuleFactory::register_instance(
-		const SimulationModuleType type, const ModuleType instance) {
-
-		registry_[type] = instance;
+		return builders_.contains(type);
 	}
 
 	void SimulationModuleFactory::register_builder(
@@ -28,20 +22,9 @@ namespace hgps {
 	SimulationModuleFactory::ModuleType SimulationModuleFactory::create(
 		const SimulationModuleType type, const ModelInput& config) {
 
-		auto reg_it = registry_.find(type);
-		if (reg_it != registry_.end()) {
-			if (auto ptr = reg_it->second.lock()) {
-				return ptr;
-			}
-
-			// Expired.
-			registry_.erase(reg_it);
-		}
-
 		auto it = builders_.find(type);
 		if (it != builders_.end()) {
-			auto builty_module = it->second(repository_.manager(), config);
-			registry_[type] = builty_module;
+			auto builty_module = it->second(repository_, config);
 			return builty_module;
 		}
 

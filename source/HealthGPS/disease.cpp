@@ -57,7 +57,7 @@ namespace hgps {
 		return models_.at(disease_code)->get_excess_mortality(age, gender);
 	}
 
-	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, const ModelInput& config)
+	std::unique_ptr<DiseaseModule> build_disease_module(Repository& repository, const ModelInput& config)
 	{
 		// Models must be registered prior to be created.
 		auto registry = get_default_disease_model_registry();
@@ -74,13 +74,13 @@ namespace hgps {
 				continue; // TODO: Throw argument exception.
 			}
 
-			auto disease = manager.get_disease(info, config.settings().country());
+			auto disease = repository.manager().get_disease(info, config.settings().country());
 			auto desease_table = detail::StoreConverter::to_disease_table(disease);
 
 			auto relative_risks = detail::create_relative_risk(detail::RelativeRiskInfo
 				{
 					.disease = info,
-					.manager = manager,
+					.manager = repository.manager(),
 					.inputs = config,
 					.risk_factors = risk_factors
 				});

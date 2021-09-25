@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
+#include "repository.h"
 #include "modelinput.h"
 
 namespace hgps {
@@ -78,6 +79,6 @@ namespace hgps {
 
 	float parse_float(const std::any& value);
 
-	std::unique_ptr<SESModule> build_ses_module(core::Datastore& manager, const ModelInput& config);
+	std::unique_ptr<SESModule> build_ses_module(Repository& repository, const ModelInput& config);
 }
 

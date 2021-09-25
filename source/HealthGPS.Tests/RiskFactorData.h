@@ -34,7 +34,6 @@ std::string join_string_map(const std::vector<std::string>& v, std::string_view 
 	return s.str();
 }
 
-
 std::string generate_test_code(hgps::HierarchicalModelType model_type, std::string filename) {
 	std::stringstream ss;
 	HierarchicalModelInfo hmodel;
@@ -90,12 +89,7 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 					at.residual_distribution.rows, join_string(at.variances, ","));
 			}
 
-			if (model_type == hgps::HierarchicalModelType::Static) {
-				ss << "\nreturn std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
-			}
-			else {
-				ss << "\nreturn std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels));\n";
-			}
+			ss << "\nreturn HierarchicalLinearModelDefinition{std::move(models), std::move(levels), baseline_data);\n";
 		}
 		catch (const std::exception& ex) {
 			std::cout << std::format("Failed to parse model file: {}. {}\n", filename, ex.what());
@@ -109,7 +103,7 @@ std::string generate_test_code(hgps::HierarchicalModelType model_type, std::stri
 	return ss.str();
 }
 
-std::shared_ptr<hgps::StaticHierarchicalLinearModel> get_static_test_model(hgps::BaselineAdjustment& baseline_data) {
+hgps::HierarchicalLinearModelDefinition get_static_test_model(hgps::BaselineAdjustment& baseline_data) {
 	/* Auto-generated code, do not change **** */
 	
 	using namespace hgps;
@@ -186,10 +180,10 @@ std::shared_ptr<hgps::StaticHierarchicalLinearModel> get_static_test_model(hgps:
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	return std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data);
+	return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), baseline_data };
 }
 
-std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model(hgps::BaselineAdjustment& baseline_data) {
+hgps::HierarchicalLinearModelDefinition get_dynamic_test_model(hgps::BaselineAdjustment& baseline_data) {
 	/* Auto-generated code, do not change **** */
 	
 	using namespace hgps;
@@ -269,5 +263,5 @@ std::shared_ptr<hgps::DynamicHierarchicalLinearModel> get_dynamic_test_model(hgp
 		.correlation = core::DoubleArray2D(1, 1, corr_mat),
 		.variances = {1} });
 
-	return std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data);
+	return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), baseline_data };
 }

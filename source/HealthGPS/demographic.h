@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
+#include "repository.h"
 #include "modelinput.h"
 #include "runtime_context.h"
 #include "gender_table.h"
@@ -68,6 +69,6 @@ namespace hgps {
 		double calculate_excess_mortality_product(const Person& entity, const DiseaseHostModule& disease_host) const;
 	};
 
-	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, const ModelInput& config);
+	std::unique_ptr<DemographicModule> build_demographic_module(Repository& repository, const ModelInput& config);
 }
 

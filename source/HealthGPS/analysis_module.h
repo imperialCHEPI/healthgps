@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
+#include "repository.h"
 #include "modelinput.h"
 #include "runtime_context.h"
 #include "analysis_definition.h"
@@ -35,5 +36,5 @@ namespace hgps {
 			const unsigned int& max_age, const int& death_year) const;
 	};
 
-	std::unique_ptr<AnalysisModule> build_analysis_module(core::Datastore& manager, const ModelInput& config);
+	std::unique_ptr<AnalysisModule> build_analysis_module(Repository& repository, const ModelInput& config);
 }

@@ -18,20 +18,24 @@ namespace hgps {
 	{
 		auto factory = SimulationModuleFactory(manager);
 		factory.register_builder(SimulationModuleType::SES,
-			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
-				return build_ses_module(manager, config); });
+			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
+				return build_ses_module(repository, config); });
 
 		factory.register_builder(SimulationModuleType::Demographic,
-			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
-				return build_demographic_module(manager, config); });
+			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
+				return build_demographic_module(repository, config); });
+
+		factory.register_builder(SimulationModuleType::RiskFactor,
+			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
+				return build_risk_factor_module(repository, config); });
 
 		factory.register_builder(SimulationModuleType::Disease,
-			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
-				return build_disease_module(manager, config); });
+			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
+				return build_disease_module(repository, config); });
 
 		factory.register_builder(SimulationModuleType::Analysis,
-			[](core::Datastore& manager, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
-				return build_analysis_module(manager, config); });
+			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
+				return build_analysis_module(repository, config); });
 
 		return factory;
 	}

@@ -343,7 +343,7 @@ namespace hgps {
 		return std::nanf("");
 	}
 
-	std::unique_ptr<SESModule> hgps::build_ses_module(core::Datastore& manager, const ModelInput& config) {
+	std::unique_ptr<SESModule> hgps::build_ses_module(Repository& repository, const ModelInput& config) {
 
 		// SES required data, assuming it has been validated.
 		auto& table = config.data();

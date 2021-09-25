@@ -262,7 +262,7 @@ namespace hgps {
 		return product;
 	}
 
-	std::unique_ptr<DemographicModule> build_demographic_module(core::Datastore& manager, const ModelInput& config) {
+	std::unique_ptr<DemographicModule> build_demographic_module(Repository& repository, const ModelInput& config) {
 		// year => age [age, male, female]
 		auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
 
@@ -272,13 +272,13 @@ namespace hgps {
 			return value >= min_time && value <= max_time;
 		};
 
-		auto pop = manager.get_population(config.settings().country(), time_filter);
+		auto pop = repository.manager().get_population(config.settings().country(), time_filter);
 		for (auto& item : pop) {
 			pop_data[item.year].emplace(item.age, PopulationRecord(item.age, item.males, item.females));
 		}
 
-		auto births = manager.get_birth_indicators(config.settings().country(), time_filter);
-		auto deaths = manager.get_mortality(config.settings().country(), time_filter);
+		auto births = repository.manager().get_birth_indicators(config.settings().country(), time_filter);
+		auto deaths = repository.manager().get_mortality(config.settings().country(), time_filter);
 		auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
 		return std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));

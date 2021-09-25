@@ -75,7 +75,7 @@
       <Filter>Header Files\boost</Filter>
     </ClInclude>
     <ClInclude Include="RiskFactorData.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

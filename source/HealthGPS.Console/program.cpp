@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", config.settings.country);
 		return EXIT_FAILURE;
 	}
-
+	
 	// Validate the configuration diseases list
 	auto diseases = get_diseases(data_api, config);
 	if (diseases.size() != config.diseases.size()) {
@@ -71,10 +71,6 @@ int main(int argc, char* argv[])
 
 	// Create the complete model configuration
 	auto model_config = create_model_input(input_table, target.value(), config, diseases);
-
-	// TODO: Delete and create risk factor module from factory!
-	std::shared_ptr<RiskFactorModule> risk_factor_module = build_risk_factor_module(data_repository, model_config);
-	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
 
 	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();
@@ -102,18 +98,10 @@ int main(int argc, char* argv[])
 
 			
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
-			// TODO: Run parallel version with data sync
 			auto worker = std::jthread{ [&runtime, &runner, &baseline, &intervention, &config, &done] {
 				runtime = runner.run(baseline, intervention, config.trial_runs);
 				done.store(true);
 			} };
-
-			/*
-			auto worker = std::jthread{ [&runtime, &runner, &intervention, &config, &done] {
-				runtime = runner.run(intervention, config.trial_runs);
-				done.store(true);
-			} };
-			*/
 
 			while (!done.load()) {
 				std::this_thread::sleep_for(std::chrono::microseconds(100));

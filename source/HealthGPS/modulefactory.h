@@ -12,7 +12,7 @@ namespace hgps {
 	{
     public:
         using ModuleType = std::shared_ptr<SimulationModule>;
-        using ConcreteBuilder = ModuleType(*)(core::Datastore&, const ModelInput&);
+        using ConcreteBuilder = ModuleType(*)(Repository&, const ModelInput&);
 
         SimulationModuleFactory() = delete;
         SimulationModuleFactory(Repository& data_repository);
@@ -21,8 +21,6 @@ namespace hgps {
 
         bool countains(const SimulationModuleType type) const noexcept;
 
-        void register_instance(const SimulationModuleType type, const ModuleType instance);
-
         void register_builder(const SimulationModuleType type, const ConcreteBuilder builder);
 
         ModuleType create(const SimulationModuleType type, const ModelInput& config);
@@ -30,6 +28,5 @@ namespace hgps {
     private:
         Repository& repository_;
         std::unordered_map<SimulationModuleType, ConcreteBuilder> builders_;
-        std::map<SimulationModuleType, std::weak_ptr<SimulationModule>> registry_;
 	};
 }
