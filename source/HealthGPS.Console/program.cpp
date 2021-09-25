@@ -40,16 +40,16 @@ int main(int argc, char* argv[])
 
 	std::cout << input_table.to_string();
 
-	// Create risk factors model instance
-	auto baseline_data = load_baseline_adjustments(
+	// Load baseline scenario adjustments
+	auto baseline_adjustments = load_baseline_adjustments(
 		config.modelling.baseline_adjustment, config.start_time, config.stop_time);
-	auto risk_factor_module = build_risk_factor_module(config.modelling, baseline_data);
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
-	auto factory = get_default_simulation_module_factory(data_api);
-	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
-	
+	auto data_repository = hgps::CachedRepository(data_api);
+	register_risk_factor_model_definitions(config.modelling, data_repository, baseline_adjustments);
+	auto factory = get_default_simulation_module_factory(data_repository);
+
 	// Validate the configuration target country
 	auto countries = data_api.get_countries();
 	fmt::print("\nThere are {} countries in storage.\n", countries.size());
@@ -71,6 +71,10 @@ int main(int argc, char* argv[])
 
 	// Create the complete model configuration
 	auto model_config = create_model_input(input_table, target.value(), config, diseases);
+
+	// TODO: Delete and create risk factor module from factory!
+	std::shared_ptr<RiskFactorModule> risk_factor_module = build_risk_factor_module(data_repository, model_config);
+	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
 
 	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();

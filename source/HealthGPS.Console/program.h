@@ -282,11 +282,10 @@ hgps::BaselineAdjustment load_baseline_adjustments(
 	}
 }
 
-hgps::HLMDefinitionMap build_risk_factors_definition(
-	const ModellingInfo info, hgps::BaselineAdjustment& baseline_data) {
+void register_risk_factor_model_definitions(const ModellingInfo info,
+	hgps::CachedRepository& repository, hgps::BaselineAdjustment& baseline_data) {
 	MEASURE_FUNCTION();
 	auto config_models_info = load_risk_model_info(info);
-	auto definitions = hgps::HLMDefinitionMap();
 
 	// Create hierarchical models
 	for (auto& config_model_type : config_models_info) {
@@ -352,95 +351,9 @@ hgps::HLMDefinitionMap build_risk_factors_definition(
 				});
 		}
 
-		definitions.emplace(model_type, HierarchicalLinearModelDefinition{
-			std::move(models), std::move(levels), baseline_data });
+		repository.register_linear_model_definition(model_type,
+			HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), baseline_data });
 	}
-
-	return definitions;
-}
-
-std::shared_ptr<RiskFactorModule> build_risk_factor_module(
-	const ModellingInfo info, hgps::BaselineAdjustment& baseline_data) {
-	MEASURE_FUNCTION();
-	auto config_models_info = load_risk_model_info(info);
-
-	// Create hierarchical models
-	std::unordered_map<HierarchicalModelType,
-		std::shared_ptr<HierarchicalLinearModel>> linear_models;
-	for (auto& config_model_type : config_models_info) {
-		HierarchicalModelType model_type;
-		if (core::case_insensitive::equals(config_model_type.first, "static")) {
-			model_type = HierarchicalModelType::Static;
-		}
-		else if (core::case_insensitive::equals(config_model_type.first, "dynamic")) {
-			model_type = HierarchicalModelType::Dynamic;
-		}
-		else {
-			fmt::print(fg(fmt::color::red),
-				"Unknown hierarchical model type: {}.\n", config_model_type.first);
-			continue;
-		}
-
-		// TODO: independent work, can be done in parallel
-		std::unordered_map<std::string, LinearModel> models;
-		for (auto& model_item : config_model_type.second.models) {
-			auto& at = model_item.second;
-
-			std::unordered_map<std::string, Coefficient> coeffs;
-			for (auto& pair : at.coefficients) {
-				coeffs.emplace(core::to_lower(pair.first), Coefficient{
-						.value = pair.second.value,
-						.pvalue = pair.second.pvalue,
-						.tvalue = pair.second.tvalue,
-						.std_error = pair.second.std_error
-					});
-			}
-
-			models.emplace(core::to_lower(model_item.first), LinearModel{
-				.coefficients = coeffs,
-				.fitted_values = at.fitted_values,
-				.residuals = at.fitted_values,
-				.rsquared = at.rsquared
-				});
-		}
-
-		std::map<int, HierarchicalLevel> levels;
-		for (auto& level_item : config_model_type.second.levels) {
-			auto& at = level_item.second;
-			std::unordered_map<std::string, int> col_names;
-			for (int i = 0; i < at.variables.size(); i++) {
-				col_names.emplace(core::to_lower(at.variables[i]), i);
-			}
-
-			levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
-				.variables = col_names,
-				.transition = core::DoubleArray2D(
-					at.transition.rows, at.transition.cols, at.transition.data),
-
-				.inverse_transition = core::DoubleArray2D(at.inverse_transition.rows,
-					at.inverse_transition.cols, at.inverse_transition.data),
-
-				.residual_distribution = core::DoubleArray2D(at.residual_distribution.rows,
-					at.residual_distribution.cols, at.residual_distribution.data),
-
-				.correlation = core::DoubleArray2D(at.correlation.rows,
-					at.correlation.cols, at.correlation.data),
-
-				.variances = at.variances
-				});
-		}
-
-		if (model_type == HierarchicalModelType::Static) {
-			linear_models.emplace(model_type,
-				std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data));
-		}
-		else if (model_type == HierarchicalModelType::Dynamic) {
-			linear_models.emplace(model_type,
-				std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data));
-		}
-	}
-
-	return std::make_shared<RiskFactorModule>(std::move(linear_models));
 }
 
 std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configuration& config) {

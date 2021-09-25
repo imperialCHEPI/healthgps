@@ -1,8 +1,9 @@
 #include "modulefactory.h"
 
 namespace hgps {
-	SimulationModuleFactory::SimulationModuleFactory(core::Datastore& manager)
-		:manager_{ manager } {}
+
+	SimulationModuleFactory::SimulationModuleFactory(Repository& data_repository)
+		:repository_{data_repository} {}
 
 	std::size_t SimulationModuleFactory::size() const noexcept {
 		return builders_.size() + registry_.size();
@@ -39,7 +40,7 @@ namespace hgps {
 
 		auto it = builders_.find(type);
 		if (it != builders_.end()) {
-			auto builty_module = it->second(manager_, config);
+			auto builty_module = it->second(repository_.manager(), config);
 			registry_[type] = builty_module;
 			return builty_module;
 		}

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "interfaces.h"
 #include "modelinput.h"
+#include "repository.h"
 
 namespace hgps {
 
@@ -14,7 +15,7 @@ namespace hgps {
         using ConcreteBuilder = ModuleType(*)(core::Datastore&, const ModelInput&);
 
         SimulationModuleFactory() = delete;
-        SimulationModuleFactory(core::Datastore& manager);
+        SimulationModuleFactory(Repository& data_repository);
 
         std::size_t size() const noexcept;
 
@@ -27,9 +28,8 @@ namespace hgps {
         ModuleType create(const SimulationModuleType type, const ModelInput& config);
 
     private:
-        hgps::core::Datastore& manager_;
+        Repository& repository_;
         std::unordered_map<SimulationModuleType, ConcreteBuilder> builders_;
         std::map<SimulationModuleType, std::weak_ptr<SimulationModule>> registry_;
 	};
 }
-

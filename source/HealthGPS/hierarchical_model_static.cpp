@@ -4,11 +4,8 @@
 #include "gender_table.h"
 
 namespace hgps {
-	StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
-		std::unordered_map<std::string, LinearModel>&& models,
-		std::map<int, HierarchicalLevel>&& levels, BaselineAdjustment& baseline_scenario)
-		: models_{ models }, levels_{ levels }, baseline_scenario_{ baseline_scenario }
-	{}
+	StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(HierarchicalLinearModelDefinition& definition) 
+		: definition_{definition}{}
 
 	HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
 		return HierarchicalModelType::Static;
@@ -42,7 +39,7 @@ namespace hgps {
 	}
 
 	void StaticHierarchicalLinearModel::adjust_risk_factors_with_baseline(RuntimeContext& context) {
-		if (!baseline_scenario_.is_enabled) {
+		if (!definition_.adjustments.is_enabled) {
 			return;
 		}
 
@@ -51,7 +48,7 @@ namespace hgps {
 
 		auto gender_sum = std::map<std::string, std::map<core::Gender, double>>{};
 		auto gender_count = std::map<std::string, std::map<core::Gender, int>>{};
-		for (const auto& factor : baseline_scenario_.risk_factors) {		
+		for (const auto& factor : definition_.adjustments.risk_factors) {
 			gender_sum[factor][core::Gender::male] = 0.0;
 			gender_sum[factor][core::Gender::female] = 0.0;
 
@@ -62,15 +59,15 @@ namespace hgps {
 		}
 
 		for (const auto& entity : context.population()) {
-			for (const auto& factor : baseline_scenario_.risk_factors) {
+			for (const auto& factor : definition_.adjustments.risk_factors) {
 				gender_sum[factor][entity.gender] += entity.get_risk_factor_value(factor);
 				gender_count[factor][entity.gender]++;
 			}
 		}
 
 		auto risk_factor_count = 0;
-		const auto& baseline_averages_at_time = baseline_scenario_.averages.row(time_year);
-		for (const auto& factor : baseline_scenario_.risk_factors) {
+		const auto& baseline_averages_at_time = definition_.adjustments.averages.row(time_year);
+		for (const auto& factor : definition_.adjustments.risk_factors) {
 			risk_factor_count = gender_count[factor][core::Gender::male];
 			if (risk_factor_count > 0) {
 				auto risk_factor_average = gender_sum[factor][core::Gender::male] / risk_factor_count;
@@ -89,7 +86,7 @@ namespace hgps {
 		}
 
 		for (auto& entity : context.population()) {
-			for (const auto& factor : baseline_scenario_.risk_factors) {
+			for (const auto& factor : definition_.adjustments.risk_factors) {
 				auto risk_factor_value = entity.get_risk_factor_value(factor);
 				auto adjustment = baseline_adjustments.at(factor);
 				if (entity.gender == core::Gender::male) {
@@ -105,7 +102,7 @@ namespace hgps {
 	void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
 		Person& entity, int level, std::vector<MappingEntry>& level_factors)
 	{
-		const auto level_info = levels_.at(level);
+		const auto level_info = definition_.levels.at(level);
 
 		// Residual Risk Factors Random Sampling
 		auto residual_risk_factors = std::map<std::string, double>();
@@ -141,7 +138,7 @@ namespace hgps {
 		auto determ_comp_factors = std::map<std::string, double>();
 		for (const auto& factor : level_factors) {
 			auto sum = 0.0;
-			for (const auto& coeff : models_.at(factor.key()).coefficients) {
+			for (const auto& coeff : definition_.models.at(factor.key()).coefficients) {
 				sum += coeff.second.value * determ_risk_factors[coeff.first];
 			}
 

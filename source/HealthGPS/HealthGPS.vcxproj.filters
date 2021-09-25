@@ -228,11 +228,11 @@
     <ClInclude Include="finally.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="hierarchical_model_registry.h">
       <Filter>Header Files\models</Filter>
-    </ClInclude>
-    <ClInclude Include="model_data_provider.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -335,7 +335,7 @@
     <ClCompile Include="Intervention_scenario.cpp">
       <Filter>Source Files\scenarios</Filter>
     </ClCompile>
-    <ClCompile Include="model_data_provider.cpp">
+    <ClCompile Include="repository.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

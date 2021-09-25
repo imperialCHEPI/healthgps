@@ -12,9 +12,9 @@
 namespace hgps {
 
 	/// @brief Create the default simulation modules factory for production usage. 
-	/// @param manager the data storage manger to be used to create the modules.
+	/// @param manager the data repository manger to be used to create the modules.
 	/// @return the default production instance of simulation modules factory.
-	static SimulationModuleFactory get_default_simulation_module_factory(core::Datastore& manager) 
+	static SimulationModuleFactory get_default_simulation_module_factory(Repository& manager) 
 	{
 		auto factory = SimulationModuleFactory(manager);
 		factory.register_builder(SimulationModuleType::SES,

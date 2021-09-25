@@ -59,12 +59,12 @@ namespace hgps {
 		HierarchicalLinearModelDefinition(
 			std::unordered_map<std::string, LinearModel>&& linear_models,
 			std::map<int, HierarchicalLevel>&& model_levels,
-			BaselineAdjustment& baseline_adjustment)
+			const BaselineAdjustment& baseline_adjustment)
 			: models{ std::move(linear_models) }, levels{ std::move(model_levels) },
-			baseline_scenario{ baseline_adjustment } {}
+			adjustments{ baseline_adjustment } {}
 
-		std::unordered_map<std::string, LinearModel> models;
-		std::map<int, HierarchicalLevel> levels;
-		BaselineAdjustment& baseline_scenario;
+		const std::unordered_map<std::string, LinearModel> models;
+		const std::map<int, HierarchicalLevel> levels;
+		const BaselineAdjustment& adjustments;
 	};
 }
