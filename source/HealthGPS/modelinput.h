@@ -12,6 +12,7 @@ namespace hgps {
 	struct RunInfo {
 		const unsigned int start_time;
 		const unsigned int stop_time;
+		const unsigned int sync_timeout_ms;
 		const std::optional<unsigned int> seed;
 	};
 
@@ -34,6 +35,8 @@ namespace hgps {
 		const unsigned int& start_time() const noexcept;
 
 		const unsigned int& stop_time() const noexcept;
+
+		const unsigned int& sync_timeout_ms() const noexcept;
 
 		const std::optional<unsigned int>& seed() const noexcept;
 

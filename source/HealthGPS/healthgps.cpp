@@ -10,6 +10,7 @@
 #include "converter.h"
 
 #include "hierarchical_model.h"
+#include "baseline_sync_message.h"
 
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationDefinition&& definition, SimulationModuleFactory& factory, EventAggregator& bus)
@@ -37,20 +38,20 @@ namespace hgps {
 		}
 
 		end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
-		std::cout << "Microsimulation algorithm initialised." << std::endl;
+		std::cout << "Microsimulation algorithm initialised: " << name() << std::endl;
 	}
 
 	void HealthGPS::terminate() {
-		std::cout << "Microsimulation algorithm terminate." << std::endl;
+		std::cout << "Microsimulation algorithm terminate: " << name() << std::endl;
 	}
 
-	void HealthGPS::set_current_run(const unsigned int run_number) noexcept {
+	void HealthGPS::setup_run(const unsigned int run_number) noexcept {
 		context_.set_current_run(run_number);
 	}
 
-	std::string HealthGPS::name() {
-		// TODO: replace with scenario type
-		return "baseline";
+	void HealthGPS::setup_run(const unsigned int run_number, const unsigned int run_seed) noexcept {
+		context_.set_current_run(run_number);
+		definition_.rnd().seed(run_seed);
 	}
 
 	adevs::Time HealthGPS::init(adevs::SimEnv<int>* env)
@@ -68,7 +69,7 @@ namespace hgps {
 		auto message = std::format("[{:4},{}] population size: {}, elapsed: {}ms",
 			env->now().real, env->now().logical, context_.population().initial_size(), elapsed.count());
 		context_.publish(std::make_unique<InfoEventMessage>(
-			identifier(), ModelAction::start, context_.current_run(), context_.time_now(), message));
+			name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
 
 		return env->now() + adevs::Time(world_time, 0);
 	}
@@ -95,7 +96,7 @@ namespace hgps {
 			auto message = std::format("[{:4},{}], elapsed: {}ms",
 				env->now().real, env->now().logical, elapsed.count());
 			context_.publish(std::make_unique<InfoEventMessage>(
-				identifier(), ModelAction::update, context_.current_run(), context_.time_now(), message));
+				name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
 			// Schedule next event time 
 			return world_time;
@@ -116,7 +117,7 @@ namespace hgps {
 	{
 		auto message = std::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
 		context_.publish(std::make_unique<InfoEventMessage>(
-			identifier(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
+			name(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
 	}
 
 	void HealthGPS::initialise_population()
@@ -266,7 +267,8 @@ namespace hgps {
 		}
 
 		if (context_.scenario().type() == ScenarioType::baseline) {
-			// TODO: send net_migration message via the channel
+			context_.scenario().channel().send(std::make_unique<NetImmigrationMessage>(
+				context_.current_run(), context_.time_now(), std::move(net_immigration)));
 		}
 	}
 
@@ -355,8 +357,22 @@ namespace hgps {
 			return create_net_migration();
 		}
 
-		// TODO: Receive net migration from channel
-		return create_net_migration();
+		// Receive message with timeout
+		auto message = context_.scenario().channel().try_receive(context_.sync_timeout_millis());
+		if (message.has_value()) {
+			auto& basePtr = message.value();
+			auto messagePrt = dynamic_cast<NetImmigrationMessage*>(basePtr.get());
+			if (messagePrt) {
+				return messagePrt->data();
+			}
+
+			throw std::runtime_error(
+				"Simulation out of sync, failed to receive a net immigration message");
+		}
+		else {
+			throw std::runtime_error(
+				"Simulation out of sync, receive net immigration message has timed out");
+		}
 	}
 
 	hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {

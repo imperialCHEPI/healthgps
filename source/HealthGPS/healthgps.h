@@ -17,14 +17,15 @@ namespace hgps {
 		
 		void initialize() override;
 		void terminate() override;
-		std::string name() override;
 
 		adevs::Time init(adevs::SimEnv<int>* env);
 		adevs::Time update(adevs::SimEnv<int>* env);
 		adevs::Time update(adevs::SimEnv<int>*, std::vector<int>&);
 		void fini(adevs::Time clock);
 
-		void set_current_run(const unsigned int run_number) noexcept override;
+		void setup_run(const unsigned int run_number) noexcept override;
+
+		void setup_run(const unsigned int run_number, const unsigned int seed) noexcept override;
 
 	private:
 		RuntimeContext context_;

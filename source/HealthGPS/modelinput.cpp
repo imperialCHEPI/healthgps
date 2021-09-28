@@ -24,6 +24,10 @@ namespace hgps {
 		return run_info_.stop_time;
 	}
 
+	const unsigned int& ModelInput::sync_timeout_ms() const noexcept {
+		return run_info_.sync_timeout_ms;
+	}
+
 	const std::optional<unsigned int>& ModelInput::seed() const noexcept {
 		return run_info_.seed;
 	}

@@ -173,7 +173,7 @@ Configuration load_configuration(CommandOptions& options) {
 		opt["running"]["start_time"].get_to(config.start_time);
 		opt["running"]["stop_time"].get_to(config.stop_time);
 		opt["running"]["trial_runs"].get_to(config.trial_runs);
-		opt["running"]["sync_timeout_ms"].get_to(config.timeout_ms);
+		opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
 		auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
 		if (seed.size() > 0) {
 			config.custom_seed = seed[0];
@@ -396,6 +396,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto run_info = RunInfo{
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
+		.sync_timeout_ms = config.sync_timeout_ms,
 		.seed = config.custom_seed
 	};
 

@@ -33,6 +33,26 @@ TEST(ChannelTest, SendAndReceive)
     ASSERT_EQ(7, out.value());
 }
 
+TEST(ChannelTest, ReceiveTimeout)
+{
+    using namespace hgps;
+
+    auto timeout = 10;
+    auto channel = Channel<int>{};
+    channel.send(3);
+
+    ASSERT_EQ(1, channel.size());
+    ASSERT_FALSE(channel.empty());
+    ASSERT_FALSE(channel.closed());
+
+    auto out = channel.try_receive(timeout);
+    ASSERT_TRUE(out.has_value());
+    ASSERT_EQ(3, out.value());
+
+    out = channel.try_receive(timeout);
+    ASSERT_FALSE(out.has_value());
+}
+
 TEST(ChannelTest, SendByMoveAndReceive)
 {
     using namespace hgps;
@@ -115,6 +135,45 @@ TEST(ChannelTest, ProducerConsummer)
 
     producer.join();
     consumer.join();
+
+    ASSERT_EQ(std::vector<int>({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }), result);
+    ASSERT_TRUE(channel.closed());
+}
+
+TEST(ChannelTest, ConsummerProducer)
+{
+    using namespace hgps;
+
+    auto channel = Channel<int>{ 10 };
+    std::vector<int> result;
+
+    auto consumer = std::thread{ [&channel, &result]() {
+        for (;;) {
+            while (channel.empty() && !channel.closed()) {
+                // busy wait
+            }
+
+            auto element = channel.try_receive();
+            if (element.has_value()) {
+                result.push_back(*element);
+            }
+            else {
+                break;
+            }
+        }
+    } };
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    auto producer = std::thread{ [&channel]() {
+        for (auto i = 0; i < 10; ++i) {
+            channel.send({i});
+        }
+
+        channel.close();
+    } };
+
+    consumer.join();
+    producer.join();
 
     ASSERT_EQ(std::vector<int>({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }), result);
     ASSERT_TRUE(channel.closed());

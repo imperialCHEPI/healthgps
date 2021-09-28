@@ -81,22 +81,22 @@
         "start_time": 2010,
         "stop_time": 2030,
         "trial_runs": 1,
-        "sync_timeout_ms": 500,
+        "sync_timeout_ms": 5000,
         "diseases": [
             "asthma",
             "diabetes"
         ],
-        "intervention": {
-            "is_enabled": false,
-            "impact_type": "absolute",
-            "impacts": {
-                "BMI": -1.2
-            },
-            "active_period": {
-                "start_time": 2021,
-                "finish_time": null
-            }
+      "intervention": {
+        "is_enabled": false,
+        "impact_type": "absolute",
+        "impacts": {
+          "BMI": -0.5
+        },
+        "active_period": {
+          "start_time": 2021,
+          "finish_time": null
         }
+      }
     },
     "results": {
         "folder": "C:\\HealthGPS\\Result"

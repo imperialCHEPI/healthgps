@@ -1,6 +1,7 @@
 #include "hierarchical_model_dynamic.h"
 #include "runtime_context.h"
 #include "HealthGPS.Core\string_util.h"
+#include "baseline_sync_message.h"
 
 namespace hgps {
 	DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
@@ -89,7 +90,8 @@ namespace hgps {
 		}
 
 		if (context.scenario().type() == ScenarioType::baseline) {
-			// TODO: Send baseline adjustments sync message
+			context.scenario().channel().send(std::make_unique<BaselineAdjustmentMessage>(
+				context.current_run(), context.time_now(), std::move(baseline_adjustments)));
 		}
 	}
 
@@ -268,9 +270,21 @@ namespace hgps {
 			return create_baseline_adjustments(context);
 		}
 
+		auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+		if (message.has_value()) {
+			auto& basePtr = message.value();
+			auto messagePrt = dynamic_cast<BaselineAdjustmentMessage*>(basePtr.get());
+			if (messagePrt) {
+				return messagePrt->data();
+			}
 
-		// TODO: Receive message from channel and return.
-		return create_baseline_adjustments(context);
+			throw std::runtime_error(
+				"Simulation out of sync, failed to receive a baseline adjustment message");
+		}
+		else {
+			throw std::runtime_error(
+				"Simulation out of sync, receive baseline adjustment message has timed out");
+		}
 	}
 
 	std::map<std::string, DoubleGenderValue> DynamicHierarchicalLinearModel::create_baseline_adjustments(RuntimeContext& context)

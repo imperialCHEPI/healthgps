@@ -26,10 +26,17 @@ namespace hgps {
 		bool send(const value_type& t) { return do_send(t); }
 		bool send(value_type&& t) { return do_send(std::move(t)); }
 
-		std::optional<value_type> try_receive() {
+		std::optional<value_type> try_receive(const int timeout_millis = 0) {
 			std::unique_lock<std::mutex> lock{ mtx_ };
 
-			cond_var_.wait(lock, [this] { return buffer_.size() > 0 || closed(); });
+			if (timeout_millis <= 0) {
+				cond_var_.wait(lock, [this] { return buffer_.size() > 0 || closed(); });
+			}
+			else {
+				cond_var_.wait_for(lock, std::chrono::milliseconds(timeout_millis),
+					[this] { return buffer_.size() > 0 || closed(); });
+			}
+
 			if (buffer_.empty()) {
 				return {};
 			}
@@ -38,7 +45,7 @@ namespace hgps {
 			buffer_.pop();
 
 			cond_var_.notify_one();
-			return std::make_optional(entry);
+			return entry;
 		}
 
 		[[nodiscard]]

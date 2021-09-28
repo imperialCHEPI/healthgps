@@ -234,6 +234,9 @@
     <ClInclude Include="hierarchical_model_registry.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="baseline_sync_message.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">

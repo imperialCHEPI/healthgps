@@ -99,6 +99,7 @@
     <ClInclude Include="analysis_module.h" />
     <ClInclude Include="api.h" />
     <ClInclude Include="baseline_scenario.h" />
+    <ClInclude Include="baseline_sync_message.h" />
     <ClInclude Include="channel.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="countrymodule.h" />

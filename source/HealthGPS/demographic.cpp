@@ -2,6 +2,7 @@
 #include <cassert>
 #include "demographic.h"
 #include "converter.h"
+#include "baseline_sync_message.h"
 
 namespace hgps {
 	DemographicModule::DemographicModule(
@@ -177,11 +178,27 @@ namespace hgps {
 			auto residual_mortality = calculate_residual_mortality(context, disease_host);
 			residual_death_rates_ = residual_mortality;
 
-			// TODO: Send residual_mortality message via the channel
+			context.scenario().channel().send(std::make_unique<ResidualMortalityMessage>(
+				context.current_run(), context.time_now(), std::move(residual_mortality)));
 		}
-
-		// TODO: Receive residual_mortality from channel
-		residual_death_rates_ = calculate_residual_mortality(context, disease_host);
+		else {
+			auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+			if (message.has_value()) {
+				auto& basePtr = message.value();
+				auto messagePrt = dynamic_cast<ResidualMortalityMessage*>(basePtr.get());
+				if (messagePrt) {
+					residual_death_rates_ = messagePrt->data();
+				}
+				else {
+					throw std::runtime_error(
+						"Simulation out of sync, failed to receive a residual mortality message");
+				}
+			}
+			else {
+				throw std::runtime_error(
+					"Simulation out of sync, receive residual mortality message has timed out");
+			}
+		}
 	}
 
 	void DemographicModule::initialise_birth_rates() {

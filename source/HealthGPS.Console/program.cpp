@@ -81,12 +81,17 @@ int main(int argc, char* argv[])
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
+		auto seed_generator = hgps::MTRandom32{};
+		if (model_config.seed().has_value()) {
+			seed_generator.seed(model_config.seed().value());
+		}
+
+		auto runner = ModelRunner(event_bus, std::move(seed_generator));
 		auto channel = SyncChannel{};
-		auto runner = ModelRunner(event_bus);
-		auto runtime = 0.0;
 
 		// Create main simulation model instance and run experiment
 		std::atomic<bool> done(false);
+		auto runtime = 0.0;
 		auto baseline = HealthGPS{
 			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
 			factory, event_bus };
@@ -111,6 +116,7 @@ int main(int argc, char* argv[])
 		}
 		else {
 			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
+			channel.close(); // Will not store any message
 			auto worker = std::jthread{ [&runtime, &runner, &baseline, &config, &done ] {
 				runtime = runner.run(baseline, config.trial_runs);
 				done.store(true);

@@ -21,6 +21,8 @@ namespace hgps {
 
 		unsigned int current_run() const noexcept;
 
+		int sync_timeout_millis() const noexcept;
+
 		Population& population() noexcept;
 
 		RuntimeMetric& metrics() noexcept;

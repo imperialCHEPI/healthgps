@@ -1,5 +1,4 @@
 #include "runtime_context.h"
-#include <random>
 
 namespace hgps {
 
@@ -17,6 +16,10 @@ namespace hgps {
 
     unsigned int RuntimeContext::current_run() const noexcept {
         return current_run_;
+    }
+
+    int RuntimeContext::sync_timeout_millis() const noexcept {
+        return definition_.inputs().sync_timeout_ms();
     }
 
     Population& RuntimeContext::population() noexcept {

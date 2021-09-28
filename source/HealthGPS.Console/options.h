@@ -83,7 +83,7 @@ struct Configuration
 	unsigned int start_time{};
 	unsigned int stop_time{};
 	unsigned int trial_runs{};
-	unsigned int timeout_ms{};
+	unsigned int sync_timeout_ms{};
 	PolicyScenarioInfo intervention;
 	ResultInfo result;
 };

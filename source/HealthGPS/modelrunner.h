@@ -10,7 +10,7 @@ namespace hgps {
 	{
 	public:
 		ModelRunner() = delete;
-		ModelRunner(EventAggregator& bus) noexcept;
+		ModelRunner(EventAggregator& bus, RandomBitGenerator&& generator) noexcept;
 
 		double run(Simulation& baseline, const unsigned int trial_runs);
 
@@ -23,8 +23,11 @@ namespace hgps {
 	private:
 		std::atomic<bool> running_;
 		EventAggregator& event_bus_;
+		RandomBitGenerator& rnd_;
 		std::stop_source source_;
+		std::string runner_id_{};
 
-		void run_model_thread(std::stop_token token, Simulation& model, const unsigned int run);
+		void run_model_thread(std::stop_token token, Simulation& model,
+			const unsigned int run, const std::optional<unsigned int> seed = std::nullopt);
 	};
 }

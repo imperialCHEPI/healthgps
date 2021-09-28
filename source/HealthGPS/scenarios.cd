@@ -15,9 +15,9 @@
     </TypeIdentifier>
   </Class>
   <Class Name="hgps::Channel&lt;T&gt;">
-    <Position X="9.75" Y="0.5" Width="3" />
+    <Position X="9.75" Y="0.5" Width="4" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAgAAAAYAAAAIIABAICAAAAABAAAIAgAgQAEAA=</HashCode>
+      <HashCode>AAAAAAAgEAAAYAAAAIIABAICAAAAABAAAIAgAgQAAAA=</HashCode>
       <FileName>channel.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -33,6 +33,20 @@
     <TypeIdentifier>
       <HashCode>AAAAEAABAQAAoAAAAAAAABAAAAAFBAAAAAgAAEAAAAA=</HashCode>
       <FileName>Intervention_scenario.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="hgps::SyncMessage">
+    <Position X="14.25" Y="0.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAEBAgAAAAAAAAAAAABAAAAAAAAAAAAAEAAgAAAgAAA=</HashCode>
+      <FileName>sync_message.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="hgps::SyncDataMessage&lt;PayloadType&gt;">
+    <Position X="14" Y="4.25" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAQ=</HashCode>
+      <FileName>sync_message.h</FileName>
     </TypeIdentifier>
   </Class>
   <Struct Name="hgps::PolicyImpact">
