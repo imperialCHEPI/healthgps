@@ -50,6 +50,28 @@ struct ResultInfo
 	std::string folder{};
 };
 
+struct PolicyPeriodInfo
+{
+	int start_time{};
+	std::optional<int> finish_time;
+
+	std::string to_finish_time_str() const {
+		if (finish_time.has_value()) {
+			return std::to_string(finish_time.value());
+		}
+
+		return "null";
+	}
+};
+
+struct PolicyScenarioInfo
+{
+	bool is_enabled {false};
+	std::string impact_type;
+	std::unordered_map<std::string, double> impacts;
+	PolicyPeriodInfo active_period;
+};
+
 struct Configuration
 {
 	FileInfo file;
@@ -61,5 +83,7 @@ struct Configuration
 	unsigned int start_time{};
 	unsigned int stop_time{};
 	unsigned int trial_runs{};
+	unsigned int sync_timeout_ms{};
+	PolicyScenarioInfo intervention;
 	ResultInfo result;
 };

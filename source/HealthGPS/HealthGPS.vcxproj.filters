@@ -43,6 +43,12 @@
     <Filter Include="Source Files\events">
       <UniqueIdentifier>{91cfc951-d0b6-4347-a4d9-a727487e6ecd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\scenarios">
+      <UniqueIdentifier>{ea09dcf5-86b7-4e78-b45b-14fb9cac1aae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\scenarios">
+      <UniqueIdentifier>{afdbb6cb-1c79-4fa7-8440-1743c1f1a7a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interfaces.h">
@@ -55,9 +61,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="healthgps.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scenario.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="modelrunner.h">
@@ -198,15 +201,48 @@
     <ClInclude Include="runtime_metric.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
+    <ClInclude Include="scenario.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="channel.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_message.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="policy_scenario.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="baseline_scenario.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="Intervention_scenario.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
+    <ClInclude Include="simulation_definition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="randombit_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="finally.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hierarchical_model_registry.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="baseline_sync_message.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="healthgps.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scenario.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="modelrunner.cpp">
@@ -296,5 +332,19 @@
     <ClCompile Include="runtime_metric.cpp">
       <Filter>Source Files\data</Filter>
     </ClCompile>
+    <ClCompile Include="baseline_scenario.cpp">
+      <Filter>Source Files\scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="Intervention_scenario.cpp">
+      <Filter>Source Files\scenarios</Filter>
+    </ClCompile>
+    <ClCompile Include="repository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="scenarios.cd">
+      <Filter>Header Files\scenarios</Filter>
+    </None>
   </ItemGroup>
 </Project>

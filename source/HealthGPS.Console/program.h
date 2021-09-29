@@ -3,9 +3,7 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
-#include <limits>
 #include <optional>
-#include <random>
 #include <fstream>
 #include <fmt/core.h>
 #include <fmt/color.h>
@@ -175,12 +173,17 @@ Configuration load_configuration(CommandOptions& options) {
 		opt["running"]["start_time"].get_to(config.start_time);
 		opt["running"]["stop_time"].get_to(config.stop_time);
 		opt["running"]["trial_runs"].get_to(config.trial_runs);
+		opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
 		auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
 		if (seed.size() > 0) {
 			config.custom_seed = seed[0];
 		}
 
 		opt["running"]["diseases"].get_to(config.diseases);
+		if (!opt["running"]["intervention"].empty()) {
+			config.intervention = opt["running"]["intervention"].get<PolicyScenarioInfo>();
+		}
+
 		config.result = opt["results"].get<ResultInfo>();
 	}
 	else
@@ -241,7 +244,7 @@ std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(Mode
 	return modelsInfo;
 }
 
-hgps::BaselineAdjustment load_baseline_adjustment(
+hgps::BaselineAdjustment load_baseline_adjustments(
 	const BaselineInfo& info, const unsigned int& start_time, const unsigned int& stop_time) {
 	MEASURE_FUNCTION();
 	if (!info.is_enabled) {
@@ -279,14 +282,12 @@ hgps::BaselineAdjustment load_baseline_adjustment(
 	}
 }
 
-std::shared_ptr<RiskFactorModule> build_risk_factor_module(
-	const ModellingInfo info, hgps::BaselineAdjustment& baseline_data) {
+void register_risk_factor_model_definitions(const ModellingInfo info,
+	hgps::CachedRepository& repository, hgps::BaselineAdjustment& baseline_data) {
 	MEASURE_FUNCTION();
 	auto config_models_info = load_risk_model_info(info);
 
 	// Create hierarchical models
-	std::unordered_map<HierarchicalModelType,
-		std::shared_ptr<HierarchicalLinearModel>> linear_models;
 	for (auto& config_model_type : config_models_info) {
 		HierarchicalModelType model_type;
 		if (core::case_insensitive::equals(config_model_type.first, "static")) {
@@ -350,17 +351,9 @@ std::shared_ptr<RiskFactorModule> build_risk_factor_module(
 				});
 		}
 
-		if (model_type == HierarchicalModelType::Static) {
-			linear_models.emplace(model_type,
-				std::make_shared<StaticHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data));
-		}
-		else if (model_type == HierarchicalModelType::Dynamic) {
-			linear_models.emplace(model_type,
-				std::make_shared<DynamicHierarchicalLinearModel>(std::move(models), std::move(levels), baseline_data));
-		}
+		repository.register_linear_model_definition(model_type,
+			HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), baseline_data });
 	}
-
-	return std::make_shared<RiskFactorModule>(std::move(linear_models));
 }
 
 std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configuration& config) {
@@ -378,19 +371,6 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	}
 
 	return result;
-}
-
-hgps::Scenario create_scenario(Configuration& config)
-{
-	hgps::Scenario scenario(
-		config.start_time,
-		config.stop_time,
-		config.trial_runs);
-
-	scenario.country = config.settings.country;
-	scenario.custom_seed = config.custom_seed;
-
-	return scenario;
 }
 
 auto find_by_value(SESMapping ses, std::string value) {
@@ -416,6 +396,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto run_info = RunInfo{
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
+		.sync_timeout_ms = config.sync_timeout_ms,
 		.seed = config.custom_seed
 	};
 
@@ -451,4 +432,24 @@ std::string create_output_file_name(const ResultInfo& info) {
 	log_file_name = (output_folder / log_file_name).string();
 	fmt::print(fg(fmt::color::yellow_green), "Results file: {}.\n", log_file_name);
 	return log_file_name;
+}
+
+hgps::InterventionScenario create_intervention_scenario(SyncChannel& channel, const PolicyScenarioInfo& info) {
+	using namespace hgps;
+	auto impact_type = PolicyImpactType::absolute;
+	if (core::case_insensitive::equals(info.impact_type, "relative")) {
+		impact_type = PolicyImpactType::relative;
+	}
+	else if (!core::case_insensitive::equals(info.impact_type, "absolute")) {
+		throw std::logic_error(std::format("Unknown policy impact type: {}", info.impact_type));
+	}
+
+	auto risk_impacts = std::vector<PolicyImpact>{};
+	for (auto& item : info.impacts) {
+		risk_impacts.emplace_back(PolicyImpact{ core::to_lower(item.first), item.second });
+	}
+
+	auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
+	auto definition = PolicyDefinition(impact_type, risk_impacts, period);
+	return InterventionScenario{ channel, std::move(definition) };
 }

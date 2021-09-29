@@ -1,10 +1,11 @@
 #pragma once
 
 #include <map>
-#include <limits>
 #include <memory>
 
 #include "HealthGPS.Core\api.h"
+#include "randombit_generator.h"
+#include "scenario.h"
 
 namespace hgps {
 
@@ -18,25 +19,6 @@ namespace hgps {
 
 	/// @brief Simulation run-time context for shared data and state.
 	class RuntimeContext;
-
-	/// @brief Random number generator algorithms interface
-	class RandomBitGenerator {
-	public:
-		using result_type = unsigned int;
-
-		virtual ~RandomBitGenerator() = default;
-
-		virtual unsigned int operator()() = 0;
-
-		virtual double next_double() = 0;
-
-		virtual void seed(unsigned int) = 0;
-
-		virtual void discard(unsigned long long skip) = 0;
-
-		static constexpr result_type min() { return std::numeric_limits<result_type>::min(); }
-		static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-	};
 
 	/// @brief Health GPS simulation modules types enumeration
 	enum class SimulationModuleType : uint8_t

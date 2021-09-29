@@ -13,19 +13,19 @@ namespace hgps {
 	{
 	public:
 		HealthGPS() = delete;
-		explicit HealthGPS(SimulationModuleFactory& factory, ModelInput& config,
-						   EventAggregator& bus, RandomBitGenerator&& generator);
+		explicit HealthGPS(SimulationDefinition&& definition, SimulationModuleFactory& factory, EventAggregator& bus);
 		
 		void initialize() override;
 		void terminate() override;
-		std::string name() override;
 
 		adevs::Time init(adevs::SimEnv<int>* env);
 		adevs::Time update(adevs::SimEnv<int>* env);
 		adevs::Time update(adevs::SimEnv<int>*, std::vector<int>&);
 		void fini(adevs::Time clock);
 
-		void set_current_run(const unsigned int run_number) noexcept override;
+		void setup_run(const unsigned int run_number) noexcept override;
+
+		void setup_run(const unsigned int run_number, const unsigned int seed) noexcept override;
 
 	private:
 		RuntimeContext context_;
@@ -48,6 +48,8 @@ namespace hgps {
 		hgps::IntegerAgeGenderTable	get_current_simulated_population();
 		std::vector<std::reference_wrapper<const Person>> get_similar_entities(const int& age, const core::Gender& gender);
 		void apply_net_migration(int net_value, int& age, const core::Gender& gender);
+		hgps::IntegerAgeGenderTable	get_net_migration();
+		hgps::IntegerAgeGenderTable	create_net_migration();
 
 		Person partial_clone_entity(const Person& source) const noexcept;
 	};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
+#include "repository.h"
 #include "modelinput.h"
 #include "runtime_context.h"
 
@@ -34,5 +35,5 @@ namespace hgps {
 		std::unordered_map<std::string, std::shared_ptr<DiseaseModel>> models_;
 	};
 
-	std::unique_ptr<DiseaseModule> build_disease_module(core::Datastore& manager, ModelInput& config);
+	std::unique_ptr<DiseaseModule> build_disease_module(Repository& repository, const ModelInput& config);
 }

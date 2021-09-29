@@ -3,7 +3,7 @@
 
 namespace hgps {
 
-	enum class RunnerAction	{start, run_begin, run_end, finish };
+	enum class RunnerAction	{start, run_begin, cancelled, run_end, finish };
 
 	struct RunnerEventMessage final : public EventMessage {
 

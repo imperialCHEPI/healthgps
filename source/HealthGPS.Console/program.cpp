@@ -1,11 +1,14 @@
 #include "program.h"
 #include "HealthGPS.Datastore/api.h"
 #include "HealthGPS/event_bus.h"
+#include "HealthGPS/baseline_scenario.h"
+#include "HealthGPS/intervention_scenario.h"
 
 #include "event_monitor.h"
 #include "result_file_writer.h"
 
 #include <fmt/chrono.h>
+#include <thread>
 
 int main(int argc, char* argv[])
 {
@@ -37,15 +40,15 @@ int main(int argc, char* argv[])
 
 	std::cout << input_table.to_string();
 
-	// Create risk factors model instance
-	auto baseline_data = load_baseline_adjustment(
+	// Load baseline scenario adjustments
+	auto baseline_adjustments = load_baseline_adjustments(
 		config.modelling.baseline_adjustment, config.start_time, config.stop_time);
-	auto risk_factor_module = build_risk_factor_module(config.modelling, baseline_data);
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
-	auto factory = get_default_simulation_module_factory(data_api);
-	factory.register_instance(SimulationModuleType::RiskFactor, risk_factor_module);
+	auto data_repository = hgps::CachedRepository(data_api);
+	register_risk_factor_model_definitions(config.modelling, data_repository, baseline_adjustments);
+	auto factory = get_default_simulation_module_factory(data_repository);
 
 	// Validate the configuration target country
 	auto countries = data_api.get_countries();
@@ -58,7 +61,7 @@ int main(int argc, char* argv[])
 		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", config.settings.country);
 		return EXIT_FAILURE;
 	}
-
+	
 	// Validate the configuration diseases list
 	auto diseases = get_diseases(data_api, config);
 	if (diseases.size() != config.diseases.size()) {
@@ -73,24 +76,66 @@ int main(int argc, char* argv[])
 	auto event_bus = DefaultEventBus();
 	auto result_file_logger = ResultFileWriter{ 
 		create_output_file_name(config.result),
-		ModelInfo{.name = "Health-GPS", .version = "0.1.1-alpha.5"}
+		ModelInfo{.name = "Health-GPS", .version = "0.2.beta"}
 	};
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
-		// Create main simulation model instance and run experiment
-		auto model = HealthGPS(factory, model_config, event_bus, hgps::MTRandom32());
+		auto seed_generator = hgps::MTRandom32{};
+		if (model_config.seed().has_value()) {
+			seed_generator.seed(model_config.seed().value());
+		}
 
-		fmt::print(fg(fmt::color::cyan), "\nStarting simulation ...\n\n");
-		auto runner = ModelRunner(event_bus);
-		auto runtime = runner.run(model, config.trial_runs);
+		auto runner = ModelRunner(event_bus, std::move(seed_generator));
+		auto channel = SyncChannel{};
+
+		// Create main simulation model instance and run experiment
+		std::atomic<bool> done(false);
+		auto runtime = 0.0;
+		auto baseline = HealthGPS{
+			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
+			factory, event_bus };
+		if (config.intervention.is_enabled) {
+			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
+			auto intervention = HealthGPS{
+				SimulationDefinition{ model_config, std::move(policy_scenario), hgps::MTRandom32() },
+				factory, event_bus };
+
+			
+			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
+			auto worker = std::jthread{ [&runtime, &runner, &baseline, &intervention, &config, &done] {
+				runtime = runner.run(baseline, intervention, config.trial_runs);
+				done.store(true);
+			} };
+
+			while (!done.load()) {
+				std::this_thread::sleep_for(std::chrono::microseconds(100));
+			}
+
+			worker.join();
+		}
+		else {
+			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
+			channel.close(); // Will not store any message
+			auto worker = std::jthread{ [&runtime, &runner, &baseline, &config, &done ] {
+				runtime = runner.run(baseline, config.trial_runs);
+				done.store(true);
+			} };
+
+			while (!done.load()) {
+				std::this_thread::sleep_for(std::chrono::microseconds(100));
+			}
+
+			worker.join();
+		}
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
-		fmt::print(fg(fmt::color::red), "\n\nFailed with message {}.\n", ex.what());
+		fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n", ex.what());
 	}
-	
+
 	event_monitor.stop();
 	fmt::print("\n\n");
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye");

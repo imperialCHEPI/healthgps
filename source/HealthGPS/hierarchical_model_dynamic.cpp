@@ -1,14 +1,12 @@
 #include "hierarchical_model_dynamic.h"
 #include "runtime_context.h"
 #include "HealthGPS.Core\string_util.h"
+#include "baseline_sync_message.h"
 
 namespace hgps {
-
 	DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
-		std::unordered_map<std::string, LinearModel>&& models,
-		std::map<int, HierarchicalLevel>&& levels, BaselineAdjustment& baseline_scenario)
-		: models_{ models }, levels_{ levels }, baseline_scenario_{ baseline_scenario }
-	{}
+		HierarchicalLinearModelDefinition& definition)
+		: definition_{ definition } {}
 
 	HierarchicalModelType DynamicHierarchicalLinearModel::type() const noexcept {
 		return HierarchicalModelType::Dynamic;
@@ -69,62 +67,17 @@ namespace hgps {
 	}
 
 	void DynamicHierarchicalLinearModel::adjust_risk_factors_with_baseline(RuntimeContext& context) {
-		if (!baseline_scenario_.is_enabled) {
+		if (!definition_.adjustments.is_enabled) {
 			return;
 		}
 
-		auto time_year = context.time_now();
-		auto baseline_adjustments = std::map<std::string, DoubleGenderValue>{};
-
-		auto gender_sum = std::map<std::string, std::map<core::Gender, double>>{};
-		auto gender_count = std::map<std::string, std::map<core::Gender, int>>{};
-		for (const auto& factor : baseline_scenario_.risk_factors) {
-			gender_sum[factor][core::Gender::male] = 0.0;
-			gender_sum[factor][core::Gender::female] = 0.0;
-
-			gender_count[factor][core::Gender::male] = 0;
-			gender_count[factor][core::Gender::female] = 0;
-
-			baseline_adjustments.emplace(factor, DoubleGenderValue{});
-		}
-
-		for (const auto& entity : context.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
-
-			for (const auto& factor : baseline_scenario_.risk_factors) {
-				gender_sum[factor][entity.gender] += entity.get_risk_factor_value(factor);
-				gender_count[factor][entity.gender]++;
-			}
-		}
-
-		auto risk_factor_count = 0;
-		const auto& baseline_averages_at_time = baseline_scenario_.averages.row(time_year);
-		for (const auto& factor : baseline_scenario_.risk_factors) {
-			risk_factor_count = gender_count[factor][core::Gender::male];
-			if (risk_factor_count > 0) {
-				auto factor_average = gender_sum[factor][core::Gender::male] / risk_factor_count;
-				auto baseline_value = baseline_averages_at_time.at(factor).male;
-				auto adjustment = baseline_value - factor_average;
-				baseline_adjustments.at(factor).male = adjustment;
-			}
-
-			risk_factor_count = gender_count[factor][core::Gender::female];
-			if (risk_factor_count > 0) {
-				auto risk_factor_average = gender_sum[factor][core::Gender::female] / risk_factor_count;
-				auto baseline_value = baseline_averages_at_time.at(factor).female;
-				auto adjustment = baseline_value - risk_factor_average;
-				baseline_adjustments.at(factor).female = adjustment;
-			}
-		}
-
+		auto baseline_adjustments = get_baseline_adjustments(context);
 		for (auto& entity : context.population()) {
 			if (!entity.is_active()) {
 				continue;
 			}
 
-			for (const auto& factor : baseline_scenario_.risk_factors) {
+			for (const auto& factor : definition_.adjustments.risk_factors) {
 				auto risk_factor_value = entity.get_risk_factor_value(factor);
 				auto adjustment = baseline_adjustments.at(factor);
 				if (entity.gender == core::Gender::male) {
@@ -135,12 +88,17 @@ namespace hgps {
 				}
 			}
 		}
+
+		if (context.scenario().type() == ScenarioType::baseline) {
+			context.scenario().channel().send(std::make_unique<BaselineAdjustmentMessage>(
+				context.current_run(), context.time_now(), std::move(baseline_adjustments)));
+		}
 	}
 
 	void DynamicHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
 		Person& entity, int level, std::vector<MappingEntry>& level_factors)
 	{
-		const auto level_info = levels_.at(level);
+		const auto& level_info = definition_.levels.at(level);
 
 		// Residual Risk Factors Random Sampling
 		auto residual_risk_factors = std::map<std::string, double>();
@@ -181,10 +139,12 @@ namespace hgps {
 		auto determ_comp_factors = std::map<std::string, double>();
 		for (const auto& factor : level_factors) {
 			auto sum = 0.0;
-			for (const auto& coeff : models_.at(factor.key()).coefficients) {
+			for (const auto& coeff : definition_.models.at(factor.key()).coefficients) {
 				sum += coeff.second.value * determ_risk_factors[coeff.first];
 			}
 
+			// Intervention @ at current time, moved here for consistency.
+			sum = context.scenario().apply(context.time_now(), factor.key(), sum);
 			determ_comp_factors.emplace(factor.key(), sum);
 		}
 
@@ -198,16 +158,18 @@ namespace hgps {
 		Person& entity, const int& level, const std::vector<MappingEntry>& level_factors,
 		std::map<std::string, double>& current_risk_factors)
 	{
-		auto level_info = levels_.at(level);
+		const auto& level_info = definition_.levels.at(level);
 
 		// Current deterministic components of risk factors
 		auto current_determ_comp_factors = std::unordered_map<std::string, double>();
 		for (const auto& factor : level_factors) {
 			auto sum = 0.0;
-			for (const auto& coeff : models_.at(factor.key()).coefficients) {
+			for (const auto& coeff : definition_.models.at(factor.key()).coefficients) {
 				sum += coeff.second.value * current_risk_factors.at(coeff.first);
 			}
 
+			// Intervention: "-1" as we want to retrieve data from last year
+			sum = context.scenario().apply(context.time_now() - 1, factor.key(), sum);
 			current_determ_comp_factors.emplace(factor.key(), sum);
 		}
 
@@ -255,10 +217,12 @@ namespace hgps {
 		auto next_determ_comp_factors = std::unordered_map<std::string, double>();
 		for (const auto& factor : level_factors) {
 			auto sum = 0.0;
-			for (const auto& coeff : models_.at(factor.key()).coefficients) {
+			for (const auto& coeff : definition_.models.at(factor.key()).coefficients) {
 				sum += coeff.second.value * next_risk_factors.at(coeff.first);
 			}
 
+			// Intervention @ at current time
+			sum = context.scenario().apply(context.time_now(), factor.key(), sum);
 			next_determ_comp_factors.emplace(factor.key(), sum);
 		}
 
@@ -299,5 +263,77 @@ namespace hgps {
 		}
 
 		return entity_risk_factors;
+	}
+
+	std::map<std::string, DoubleGenderValue> DynamicHierarchicalLinearModel::get_baseline_adjustments(RuntimeContext& context) {
+		if (context.scenario().type() == ScenarioType::baseline) {
+			return create_baseline_adjustments(context);
+		}
+
+		auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+		if (message.has_value()) {
+			auto& basePtr = message.value();
+			auto messagePrt = dynamic_cast<BaselineAdjustmentMessage*>(basePtr.get());
+			if (messagePrt) {
+				return messagePrt->data();
+			}
+
+			throw std::runtime_error(
+				"Simulation out of sync, failed to receive a baseline adjustment message");
+		}
+		else {
+			throw std::runtime_error(
+				"Simulation out of sync, receive baseline adjustment message has timed out");
+		}
+	}
+
+	std::map<std::string, DoubleGenderValue> DynamicHierarchicalLinearModel::create_baseline_adjustments(RuntimeContext& context)
+	{
+		auto baseline_adjustments = std::map<std::string, DoubleGenderValue>{};
+		auto time_year = context.time_now();
+		auto gender_sum = std::map<std::string, std::map<core::Gender, double>>{};
+		auto gender_count = std::map<std::string, std::map<core::Gender, int>>{};
+		for (const auto& factor : definition_.adjustments.risk_factors) {
+			gender_sum[factor][core::Gender::male] = 0.0;
+			gender_sum[factor][core::Gender::female] = 0.0;
+
+			gender_count[factor][core::Gender::male] = 0;
+			gender_count[factor][core::Gender::female] = 0;
+
+			baseline_adjustments.emplace(factor, DoubleGenderValue{});
+		}
+
+		for (const auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			for (const auto& factor : definition_.adjustments.risk_factors) {
+				gender_sum[factor][entity.gender] += entity.get_risk_factor_value(factor);
+				gender_count[factor][entity.gender]++;
+			}
+		}
+
+		auto risk_factor_count = 0;
+		const auto& baseline_averages_at_time = definition_.adjustments.averages.row(time_year);
+		for (const auto& factor : definition_.adjustments.risk_factors) {
+			risk_factor_count = gender_count[factor][core::Gender::male];
+			if (risk_factor_count > 0) {
+				auto factor_average = gender_sum[factor][core::Gender::male] / risk_factor_count;
+				auto baseline_value = baseline_averages_at_time.at(factor).male;
+				auto adjustment = baseline_value - factor_average;
+				baseline_adjustments.at(factor).male = adjustment;
+			}
+
+			risk_factor_count = gender_count[factor][core::Gender::female];
+			if (risk_factor_count > 0) {
+				auto risk_factor_average = gender_sum[factor][core::Gender::female] / risk_factor_count;
+				auto baseline_value = baseline_averages_at_time.at(factor).female;
+				auto adjustment = baseline_value - risk_factor_average;
+				baseline_adjustments.at(factor).female = adjustment;
+			}
+		}
+
+		return baseline_adjustments;
 	}
 }
