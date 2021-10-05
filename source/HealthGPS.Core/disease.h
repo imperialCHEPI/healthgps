@@ -11,6 +11,7 @@ namespace hgps {
 
 		struct DiseaseInfo
 		{
+			DiseaseGroup group{};
 			std::string code{};
 			std::string name{};
 		};
@@ -49,6 +50,14 @@ namespace hgps {
 			std::vector<std::vector<float>> rows;
 
 			bool empty() const noexcept { return rows.empty(); }
+		};
+
+		struct CancerParameterEntity
+		{
+			int time_year{};
+			std::vector<LookupGenderValue> distribution{};
+			std::vector<LookupGenderValue> survival_rate{};
+			std::vector<LookupGenderValue> death_weight{};
 		};
 	}
 }

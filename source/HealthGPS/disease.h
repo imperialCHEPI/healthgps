@@ -28,8 +28,8 @@ namespace hgps {
 
 		void update_population(RuntimeContext& context) override;
 
-		double get_excess_mortality(const std::string disease_code,
-			const int& age, const core::Gender& gender) const noexcept override;
+		double get_excess_mortality(
+			const std::string disease_code, const Person& entity) const noexcept override;
 
 	private:
 		std::unordered_map<std::string, std::shared_ptr<DiseaseModel>> models_;

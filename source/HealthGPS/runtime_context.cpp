@@ -70,6 +70,10 @@ namespace hgps {
         return definition_.rnd().next_empirical_discrete(values, cdf);
     }
 
+    int RuntimeContext::next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf) {
+        return definition_.rnd().next_empirical_discrete(values, cdf);
+    }
+
     void RuntimeContext::set_current_time(const int time_now) noexcept {
         time_now_ = time_now;
     }

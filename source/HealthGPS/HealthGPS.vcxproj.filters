@@ -237,6 +237,9 @@
     <ClInclude Include="baseline_sync_message.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
+    <ClInclude Include="default_cancer_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -340,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="repository.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="default_cancer_model.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

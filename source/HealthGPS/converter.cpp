@@ -1,7 +1,8 @@
 #include "converter.h"
 
 #include "HealthGPS.Core/string_util.h"
-
+#include "default_cancer_model.h"
+#include <fstream>
 namespace hgps {
 	namespace detail {
 		core::Gender StoreConverter::to_gender(std::string name)
@@ -26,6 +27,117 @@ namespace hgps {
 			}
 
 			return DiseaseTable(entity.info, std::move(measures), std::move(data));
+		}
+
+		DiseaseTable StoreConverter::to_disease_table(const core::DiseaseEntity& entity,
+			const DiseaseParameter& parameter, const core::IntegerInterval& age_range)
+		{
+			// TODO: Add missing to configuration
+			auto remission_id = 7;
+			auto mortality_id = 15;
+			auto smooth_times = 50;
+			auto measures = std::map<std::string, int>{ entity.measures };
+			measures.emplace("remission", remission_id);
+			measures.emplace("mtspecific", mortality_id);
+
+			// Create local editable disease table, populate missing measures
+			auto data = std::map<int, std::map<core::Gender, std::map<int, double>>>();
+			for (auto& v : entity.items) {
+				data[v.age][v.gender] = std::map<int, double>{ v.measures };
+
+				auto mortality = DefaultCancerModel::get_survival_rate(
+					parameter.survival_rate, v.gender, v.age, parameter.time_year);
+				data[v.age][v.gender].emplace(remission_id, 0.0);
+				data[v.age][v.gender].emplace(mortality_id, 1.0 - mortality);
+			}
+
+			// Smooth rates
+			for (auto& item : measures) {
+				if (item.first == "incidence") {
+					continue;
+				}
+
+				smooth_rates(smooth_times, data, item.second);
+			}
+
+			update_incidence(data, measures, age_range);
+			auto table = std::map<int, std::map<core::Gender, DiseaseMeasure>>();
+			for (auto& item : data) {
+				table[item.first][core::Gender::male] = DiseaseMeasure(item.second.at(core::Gender::male));
+				table[item.first][core::Gender::female] = DiseaseMeasure(item.second.at(core::Gender::female));
+			}
+
+			return DiseaseTable(entity.info, std::move(measures), std::move(table));
+		}
+
+		void update_incidence(std::map<int, std::map<hgps::core::Gender, std::map<int, double>>>& data,
+			const std::map<std::string, int>& measures, const hgps::core::IntegerInterval& age_range)
+		{
+			// Update incident, overwrite loaded data???
+			auto prevalence_id = measures.at("prevalence");
+			auto incidence_id = measures.at("incidence");
+			auto remission_id = measures.at("remission"); 
+			auto mortality_id = measures.at("mtspecific");
+			const auto start_age = age_range.lower() + 1;
+			for (auto age = start_age; age <= age_range.upper(); age++) {
+				auto p_male = age == start_age ? 0.0 : data[age - 1][core::Gender::male].at(prevalence_id);
+				auto& male_measure = data[age][core::Gender::male];
+				auto male_value = 1.0 - male_measure.at(remission_id) - male_measure.at(mortality_id);
+				male_value = (male_measure.at(prevalence_id) - male_value * p_male) / (1.0 - p_male);
+				male_measure.at(incidence_id) = std::max(std::min(male_value, 1.0), 0.0);
+
+				auto p_female = age == start_age ? 0.0 : data[age - 1][core::Gender::female].at(prevalence_id);
+				auto& female_measure = data[age][core::Gender::female];
+				auto female_value = 1.0 - female_measure.at(remission_id) - female_measure.at(mortality_id);
+				female_value = (female_measure.at(prevalence_id) - female_value * p_female) / (1.0 - p_female);
+				female_measure.at(incidence_id) = std::max(std::min(female_value, 1.0), 0.0);
+			}
+		}
+
+		void smooth_rates(const int& times, std::map<int,
+			std::map<hgps::core::Gender, std::map<int, double>>>& data, const int& measure_id)
+		{
+			if (data.size() < 2) {
+				return;
+			}
+
+			auto start_age = data.cbegin()->first;
+			auto count = data.size() + start_age;
+			auto count_minus_one = count - 1;
+			auto male_res = std::vector<double>(count);
+			auto female_res = std::vector<double>(count);
+			for (auto& item : data) {
+				male_res[item.first] = item.second.at(core::Gender::male).at(measure_id);
+				female_res[item.first] = item.second.at(core::Gender::female).at(measure_id);
+			}
+
+			const auto divisor = 3.0;
+			for (auto j = 0; j < times; j++) {
+				auto male_tmp = male_res;
+				auto female_tmp = female_res;
+
+				for (std::size_t i = 0; i < count; i++) {
+					if (i == 0) {
+						male_res[i] = (2.0 * male_tmp[i] + male_tmp[i + 1]) / divisor;
+						female_res[i] = (2.0 * female_tmp[i] + female_tmp[i + 1]) / divisor;
+					}
+					else if (i == count_minus_one){
+						male_res[i] = (male_tmp[i - 1] + male_tmp[i] * 2.0) / divisor;
+						female_res[i] = (female_tmp[i - 1] + female_tmp[i] * 2.0) / divisor;
+					}
+					else {
+						male_res[i] = (male_tmp[i - 1] + male_tmp[i] + male_tmp[i + 1]) / divisor;
+						female_res[i] = (female_tmp[i - 1] + female_tmp[i] + female_tmp[i + 1]) / divisor;
+					}
+				}
+			}
+
+			auto index = start_age;
+			for (auto& item : data) {
+				item.second.at(core::Gender::male).at(measure_id) = male_res[index];
+				item.second.at(core::Gender::female).at(measure_id) = female_res[index];
+				index++;
+			}
 		}
 
 		FloatAgeGenderTable StoreConverter::to_relative_risk_table(const core::RelativeRiskEntity& entity)
@@ -149,6 +261,28 @@ namespace hgps {
 			}
 
 			return LifeTable(std::move(table_births), std::move(table_deaths));
+		}
+		
+		DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParameterEntity entity)
+		{
+			auto distribution = ParameterLookup{};
+			for (auto& item : entity.distribution) {
+				distribution.emplace(item.value, DoubleGenderValue(item.male, item.female));
+			}
+
+			auto survival = ParameterLookup{};
+			for (auto& item : entity.survival_rate) {
+				survival.emplace(item.value, DoubleGenderValue(item.male, item.female));
+			}
+
+			// Make sure that the deaths table is zero based!
+			auto deaths = ParameterLookup{};
+			auto offset = entity.death_weight.front().value;
+			for (auto& item : entity.death_weight) {
+				deaths.emplace(item.value - offset, DoubleGenderValue(item.male, item.female));
+			}
+
+			return DiseaseParameter(entity.time_year, distribution, survival, deaths);
 		}
 	}
 }

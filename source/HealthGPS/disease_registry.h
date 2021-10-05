@@ -1,6 +1,7 @@
 #pragma once
 
 #include "default_disease_model.h"
+#include "default_cancer_model.h"
 
 namespace hgps {
 	namespace detail {
@@ -17,7 +18,10 @@ namespace hgps {
 				return std::make_shared<DefaultDiseaseModel>(std::move(definition), age_range); }},
 
 			{"lowbackpain", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
-				return std::make_shared<DefaultDiseaseModel>(std::move(definition), age_range); }}
+				return std::make_shared<DefaultDiseaseModel>(std::move(definition), age_range); }},
+
+			{"colorectum", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
+				return std::make_shared<DefaultCancerModel>(std::move(definition), age_range); }},
 		};
 
 		return registry;

@@ -87,13 +87,12 @@ namespace hgps {
 		/// @return true if the disease is found, otherwise false.
 		virtual bool contains(const std::string disease_code) const noexcept = 0;
 
-		/// @brief Gets the excess mortality associated with a disease for an individual
+		/// @brief Gets the mortality rate associated with a disease for an individual
 		/// @param disease_code The disease unique identification code 
-		/// @param age The reference age associated with the mortality
-		/// @param gender The gender associated with the mortality
-		/// @return the excess mortality value, if found, otherwise zero.
-		virtual double get_excess_mortality(const std::string disease_code,
-			const int& age, const core::Gender& gender) const noexcept = 0;
+		/// @param entity The entity associated with the mortality value
+		/// @return the mortality rate value, if found, otherwise zero.
+		virtual double get_excess_mortality(
+			const std::string disease_code, const Person& entity) const noexcept = 0;
 
 		/// @brief Updates the population diseases status: remission and incidence
 		/// @param context The simulation run-time context
@@ -132,6 +131,10 @@ namespace hgps {
 	public:
 		virtual ~DiseaseModel() = default;
 
+		/// @brief Gets the disease group
+		/// @return The disease group identifier
+		virtual core::DiseaseGroup group() const noexcept = 0;
+
 		/// @brief Gets the model disease type unique identifier
 		/// @return The disease type identifier
 		virtual std::string disease_type() const noexcept = 0;
@@ -149,9 +152,8 @@ namespace hgps {
 		virtual void update_disease_status(RuntimeContext& context) = 0;
 
 		/// @brief Gets the excess mortality associated with a disease for an individual
-		/// @param age The reference age associated with the mortality
-		/// @param gender The gender associated with the mortality
-		/// @return the excess mortality value, if found, otherwise zero.
-		virtual double get_excess_mortality(const int& age, const core::Gender& gender) const noexcept = 0;
+		/// @param entity The entity associated with the mortality rate
+		/// @return the mortality rate value, if found, otherwise zero.
+		virtual double get_excess_mortality(const Person& entity) const noexcept = 0;
 	};
 }

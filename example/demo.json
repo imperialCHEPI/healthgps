@@ -86,6 +86,9 @@
             "asthma",
             "diabetes"
         ],
+        "cancers": [
+            "colorectum"
+        ],
       "intervention": {
         "is_enabled": false,
         "impact_type": "absolute",

@@ -48,13 +48,13 @@ namespace hgps {
 		}
 	}
 
-	double DiseaseModule::get_excess_mortality(const std::string disease_code,
-		const int& age, const core::Gender& gender) const noexcept {
+	double DiseaseModule::get_excess_mortality(
+		const std::string disease_code, const Person& entity) const noexcept {
 		if (!models_.contains(disease_code)) {
 			return 0.0;
 		}
 
-		return models_.at(disease_code)->get_excess_mortality(age, gender);
+		return models_.at(disease_code)->get_excess_mortality(entity);
 	}
 
 	std::unique_ptr<DiseaseModule> build_disease_module(Repository& repository, const ModelInput& config)
@@ -74,19 +74,30 @@ namespace hgps {
 				continue; // TODO: Throw argument exception.
 			}
 
-			auto disease = repository.manager().get_disease(info, config.settings().country());
-			auto desease_table = detail::StoreConverter::to_disease_table(disease);
+			auto disease_entity = repository.manager().get_disease(info, config.settings().country());
+			auto relative_risks = detail::create_relative_risk(detail::RelativeRiskInfo {
+				.disease = info,
+				.manager = repository.manager(),
+				.inputs = config,
+				.risk_factors = risk_factors });
 
-			auto relative_risks = detail::create_relative_risk(detail::RelativeRiskInfo
-				{
-					.disease = info,
-					.manager = repository.manager(),
-					.inputs = config,
-					.risk_factors = risk_factors
-				});
+			if (info.group != core::DiseaseGroup::cancer) {
+				auto disease_table = detail::StoreConverter::to_disease_table(disease_entity);
+				auto definition = DiseaseDefinition(std::move(disease_table),
+					std::move(relative_risks.diseases), std::move(relative_risks.risk_factors));
 
-			auto definition = DiseaseDefinition(std::move(desease_table),
-				std::move(relative_risks.diseases), std::move(relative_risks.risk_factors));
+				models.emplace(info.code, registry.at(info.code)(
+					std::move(definition), config.settings().age_range()));
+				continue;
+			}
+
+			auto cancer_param = repository.manager().get_disease_parameter(info, config.settings().country());
+			auto parameter = detail::StoreConverter::to_disease_parameter(cancer_param);
+			auto disease_table = detail::StoreConverter::to_disease_table(
+				disease_entity, parameter, config.settings().age_range());
+
+			auto definition = DiseaseDefinition(std::move(disease_table), std::move(relative_risks.diseases),
+				std::move(relative_risks.risk_factors), std::move(parameter));
 
 			models.emplace(info.code, registry.at(info.code)(
 				std::move(definition), config.settings().age_range()));

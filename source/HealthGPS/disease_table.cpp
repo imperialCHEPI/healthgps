@@ -29,7 +29,10 @@ namespace hgps {
 		std::map<int, std::map<core::Gender, DiseaseMeasure>>&& data)
 		: info_{ info }, measures_{ measures }, data_{ data } {
 
-		if (data.empty()) {
+		if (info.code.empty()) {
+			throw std::invalid_argument("Invalid disease information with empty identifier");
+		}
+		else if (data.empty()) {
 			return; // empty table
 		}
 

@@ -39,6 +39,6 @@ namespace hgps {
 	private:
 		std::mutex mutex_;
 		core::Datastore& data_manager_;
-		HLMDefinitionMap model_definiton_;
+		std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
 	};
 }

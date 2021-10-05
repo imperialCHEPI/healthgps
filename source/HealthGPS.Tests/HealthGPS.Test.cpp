@@ -395,6 +395,9 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);
+	auto test_person = Person{};
+	test_person.age = 50;
+	test_person.gender = core::Gender::male;
 
 	auto disease_module = build_disease_module(repository, inputs);
 	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
@@ -402,8 +405,8 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	ASSERT_GT(disease_module->size(), 0);
 	ASSERT_TRUE(disease_module->contains("diabetes"));
 	ASSERT_FALSE(disease_module->contains("moonshot"));
-	ASSERT_GT(disease_module->get_excess_mortality("diabetes", 50, core::Gender::male), 0);
-	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", 50, core::Gender::male));
+	ASSERT_GT(disease_module->get_excess_mortality("diabetes", test_person), 0);
+	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", test_person));
 }
 
 TEST(TestHealthGPS, CreateAnalysisModule)

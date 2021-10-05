@@ -62,6 +62,7 @@
         "path": "diseases",
         "file_name": "D{COUNTRY_CODE}.csv",
         "age_limits": [1, 100],
+        "time_year": 2019,
         "relative_risk":{
             "path": "relative_risk",
             "to_disease":{
@@ -74,11 +75,20 @@
                 "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
             }
         },
-        "types": {
-            "asthma": "Asthma",
-            "diabetes": "Diabetes mellitus",
-            "lowbackpain": "Low back pain"
-        }
+        "parameters":{
+            "path":"P{COUNTRY_CODE}",
+            "files":{
+                "distribution": "distribution_over_five_years.csv",
+                "survival_rate": "survival_rates_parameters.csv",
+                "death_weight": "death_weights.csv"
+            }
+        },
+        "registry":[
+            {"group": "other", "id": "asthma", "name": "Asthma"},
+            {"group": "other", "id": "diabetes", "name": "Diabetes mellitus"},
+            {"group": "other", "id": "lowbackpain", "name": "Low back pain"},
+            {"group": "cancer", "id": "colorectum", "name": "Colorectum  cancer"}
+        ]
     },
     "analysis":{
         "format": "csv",
@@ -90,6 +100,7 @@
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "path": "analysis",
         "age_limits": [1, 100],
+        "time_year": 2019,
         "file_name": "disability_weights.csv",
         "cost_of_disease": {
             "path":"cost",

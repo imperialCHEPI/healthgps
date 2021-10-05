@@ -160,12 +160,19 @@ namespace hgps {
 		{
 			auto result = std::vector<DiseaseInfo>();
 			if (index_.contains("diseases")) {
-				auto types = index_["diseases"]["types"].get<std::map<std::string, std::string>>();
-				for (auto& item : types) {
-					result.emplace_back(DiseaseInfo{
-						.code = item.first,
-						.name = item.second
-						});
+				auto registry = index_["diseases"]["registry"];
+				for (auto& item : registry) {
+					auto info = DiseaseInfo{};
+					auto group_str = std::string{};
+					item["group"].get_to(group_str);
+					item["id"].get_to(info.code);
+					item["name"].get_to(info.name);
+					info.group = DiseaseGroup::other;
+					if (core::case_insensitive::equals(group_str, "cancer")) {
+						info.group = DiseaseGroup::cancer;
+					}
+
+					result.emplace_back(info);
 				}
 
 				std::sort(result.begin(), result.end());
@@ -177,13 +184,22 @@ namespace hgps {
 		std::optional<DiseaseInfo> DataManager::get_disease_info(std::string code) const
 		{
 			if (index_.contains("diseases")) {
-				auto types = index_["diseases"]["types"].get<std::map<std::string, std::string>>();
+				auto registry = index_["diseases"]["registry"];
 				auto disease_code = core::to_lower(code);
-				if (types.contains(disease_code)) {
-					return DiseaseInfo{
-						.code = disease_code,
-						.name = types.at(disease_code)
-					};
+				auto info = DiseaseInfo{};
+				for (auto& item : registry) {
+					item["id"].get_to(info.code);
+					if (info.code == disease_code) {
+						auto group_str = std::string{};
+						item["group"].get_to(group_str);
+						item["name"].get_to(info.name);
+						info.group = DiseaseGroup::other;
+						if (core::case_insensitive::equals(group_str, "cancer")) {
+							info.group = DiseaseGroup::cancer;
+						}
+
+						return info;
+					}
 				}
 			}
 
@@ -269,6 +285,7 @@ namespace hgps {
 					table.columns = doc.GetColumnNames();
 
 					auto row_size = table.columns.size();
+
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
 
@@ -331,6 +348,63 @@ namespace hgps {
 
 			table.rows.shrink_to_fit();
 			table.columns.shrink_to_fit();
+			return table;
+		}
+
+		CancerParameterEntity DataManager::get_disease_parameter(DiseaseInfo info, Country country) const
+		{
+			auto table = CancerParameterEntity();
+			if (!index_.contains("diseases")) {
+				return table;
+			}
+
+			// Creates full file name from store configuration
+			auto disease_folder = index_["diseases"]["path"].get<std::string>();
+			auto params_node = index_["diseases"]["parameters"];
+			auto params_folder = params_node["path"].get<std::string>();
+			auto params_files = params_node["files"];
+
+			// Tokenized path name P{COUNTRY_CODE}
+			auto tokens = std::vector<std::string>{std::to_string(country.code)};
+			params_folder = replace_string_tokens(params_folder, tokens);
+			auto files_folder = (root_ / disease_folder / info.code / params_folder);
+			if (!std::filesystem::exists(files_folder)) {
+				return table;
+			}
+
+			for (auto& file : params_files.items()) {
+				auto file_name = (files_folder / file.value().get<std::string>());
+				if (!std::filesystem::exists(file_name)) {
+					continue;
+				}
+
+				auto lookup = std::vector<LookupGenderValue>{};
+				rapidcsv::Document doc(file_name.string());
+				auto mapping = create_fields_index_mapping(doc.GetColumnNames(), { "Time", "Male", "Female"});
+				for (auto i = 0; i < doc.GetRowCount(); i++) {
+					auto row = doc.GetRow<std::string>(i);
+					lookup.emplace_back(LookupGenderValue{
+						.value = std::stoi(row[mapping["Time"]]),
+						.male = std::stod(row[mapping["Male"]]),
+						.female = std::stod(row[mapping["Female"]]),
+						});
+				}
+
+				if (file.key() == "distribution") {
+					table.distribution = lookup;
+				}
+				else if (file.key() == "survival_rate")	{
+					table.survival_rate = lookup;
+				}
+				else if (file.key() == "death_weight") {
+					table.death_weight = lookup;
+				}
+				else {
+					throw std::out_of_range(std::format("Unknown disease parameter file type: {}", file.key()));
+				}
+			}
+
+			index_["diseases"]["time_year"].get_to(table.time_year);
 			return table;
 		}
 

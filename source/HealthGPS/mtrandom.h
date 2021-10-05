@@ -27,6 +27,8 @@ namespace hgps {
 
 		int next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf) override;
 
+		int next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf) override;
+
 		static constexpr unsigned int min() { return std::mt19937::min(); }
 		static constexpr unsigned int max() { return std::mt19937::max(); }
 

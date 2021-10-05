@@ -4,6 +4,7 @@
 #include "relative_risk.h"
 #include "gender_table.h"
 #include "analysis_definition.h"
+#include "disease_definition.h"
 #include "life_table.h"
 
 #include "HealthGPS.Core/poco.h"
@@ -32,6 +33,9 @@ namespace hgps {
 
 			static DiseaseTable to_disease_table(const core::DiseaseEntity& entity);
 
+			static DiseaseTable to_disease_table(const core::DiseaseEntity& entity,
+				const DiseaseParameter& parameter, const core::IntegerInterval& age_range);
+
 			static FloatAgeGenderTable to_relative_risk_table(const core::RelativeRiskEntity& entity);
 
 			static RelativeRiskLookup to_relative_risk_lookup(const core::RelativeRiskEntity& entity);
@@ -40,9 +44,15 @@ namespace hgps {
 				const core::DiseaseAnalysisEntity& entity, const core::IntegerInterval& age_range);
 
 			static LifeTable to_life_table(std::vector<core::BirthItem>& births, std::vector<core::MortalityItem>& deaths);
+
+			static DiseaseParameter to_disease_parameter(const core::CancerParameterEntity entity);
 		};
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info);
+		void update_incidence(std::map<int, std::map<hgps::core::Gender, std::map<int, double>>>& data, 
+			const std::map<std::string, int>& measures, const hgps::core::IntegerInterval& age_range);
+		void smooth_rates(const int& times,
+			std::map<int, std::map<hgps::core::Gender, std::map<int, double>>>& data, const int& measure_id);
 
 		template<std::floating_point TYPE>
 		static std::vector<TYPE> create_cdf(std::vector<TYPE>& frequency) {

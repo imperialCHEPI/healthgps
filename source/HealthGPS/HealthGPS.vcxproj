@@ -103,6 +103,7 @@
     <ClInclude Include="channel.h" />
     <ClInclude Include="converter.h" />
     <ClInclude Include="countrymodule.h" />
+    <ClInclude Include="default_cancer_model.h" />
     <ClInclude Include="demographic.h" />
     <ClInclude Include="default_disease_model.h" />
     <ClInclude Include="disease.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="analysis_module.cpp" />
     <ClCompile Include="baseline_scenario.cpp" />
     <ClCompile Include="converter.cpp" />
+    <ClCompile Include="default_cancer_model.cpp" />
     <ClCompile Include="demographic.cpp" />
     <ClCompile Include="default_disease_model.cpp" />
     <ClCompile Include="disease.cpp" />

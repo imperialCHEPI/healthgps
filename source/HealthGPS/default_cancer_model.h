@@ -4,10 +4,11 @@
 #include "gender_table.h"
 
 namespace hgps {
-	class DefaultDiseaseModel final : public DiseaseModel {
+
+	class DefaultCancerModel final : public DiseaseModel {
 	public:
-		DefaultDiseaseModel() = delete;
-		DefaultDiseaseModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range);
+		DefaultCancerModel() = delete;
+		DefaultCancerModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range);
 
 		core::DiseaseGroup group() const noexcept override;
 
@@ -21,6 +22,10 @@ namespace hgps {
 
 		double get_excess_mortality(const Person& entity) const noexcept override;
 
+		// Need to find a better way, possible injecting the survival function!!!
+		static double get_survival_rate(const ParameterLookup& survival,
+			const core::Gender& gender, const int& age, const int& time_year);
+
 	private:
 		DiseaseDefinition definition_;
 		DoubleAgeGenderTable average_relative_risk_;
@@ -33,5 +38,6 @@ namespace hgps {
 
 		void update_remission_cases(RuntimeContext& context);
 		void update_incidence_cases(RuntimeContext& context);
+		int calculate_time_since_onset(RuntimeContext& context, const core::Gender& gender) const;
 	};
 }

@@ -179,7 +179,10 @@ Configuration load_configuration(CommandOptions& options) {
 			config.custom_seed = seed[0];
 		}
 
+		auto cancers = std::vector<std::string>{};
 		opt["running"]["diseases"].get_to(config.diseases);
+		opt["running"]["cancers"].get_to(cancers);
+		config.diseases.insert(config.diseases.end(), cancers.begin(), cancers.end());
 		if (!opt["running"]["intervention"].empty()) {
 			config.intervention = opt["running"]["intervention"].get<PolicyScenarioInfo>();
 		}
