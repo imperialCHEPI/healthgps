@@ -29,24 +29,18 @@
                 100
             ]
         },
-        "ses_mapping": {
-            "gender": "Gender",
-            "age": "Age",
-            "education": "Education",
-            "income": "Income"
-        }
-    },
-    "modelling": {
         "ses": {
             "update_interval": 5,
-            "max_age": 30,
+            "update_max_age": 30,
             "mapping": {
                 "gender": "Gender",
                 "age": "Age",
                 "education": "Education",
                 "income": "Income"
             }
-        },
+        }
+    },
+    "modelling": {
         "risk_factors": {
             "Year": 0,
             "Gender": 0,

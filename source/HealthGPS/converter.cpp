@@ -2,7 +2,7 @@
 
 #include "HealthGPS.Core/string_util.h"
 #include "default_cancer_model.h"
-#include <fstream>
+
 namespace hgps {
 	namespace detail {
 		core::Gender StoreConverter::to_gender(std::string name)
@@ -38,7 +38,7 @@ namespace hgps {
 			auto smooth_times = 50;
 			auto measures = std::map<std::string, int>{ entity.measures };
 			measures.emplace("remission", remission_id);
-			measures.emplace("mtspecific", mortality_id);
+			measures.emplace("mortality", mortality_id);
 
 			// Create local editable disease table, populate missing measures
 			auto data = std::map<int, std::map<core::Gender, std::map<int, double>>>();
@@ -77,7 +77,7 @@ namespace hgps {
 			auto prevalence_id = measures.at("prevalence");
 			auto incidence_id = measures.at("incidence");
 			auto remission_id = measures.at("remission"); 
-			auto mortality_id = measures.at("mtspecific");
+			auto mortality_id = measures.at("mortality");
 			const auto start_age = age_range.lower() + 1;
 			for (auto age = start_age; age <= age_range.upper(); age++) {
 				auto p_male = age == start_age ? 0.0 : data[age - 1][core::Gender::male].at(prevalence_id);

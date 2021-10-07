@@ -87,7 +87,7 @@ namespace hgps {
 			return 0.0;
 		}
 		
-		auto mortality_id = definition_.table().at("mtspecific");
+		auto mortality_id = definition_.table().at("mortality");
 		auto excess_mortality = definition_.table()(entity.age, entity.gender).at(mortality_id);
 		auto death_weight = definition_.parameters().death_weight.at(disease_info.time_since_onset);
 		if (entity.gender == core::Gender::male) {

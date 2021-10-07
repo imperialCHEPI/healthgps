@@ -137,7 +137,7 @@ Configuration load_configuration(CommandOptions& options) {
 
 		// Settings and SES mapping
 		config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
-		opt["inputs"].at("ses_mapping").get_to(config.ses_mapping);
+		config.ses = opt["inputs"]["ses"].get<SESInfo>();
 
 		// Modelling information
 		config.modelling = opt["modelling"].get<ModellingInfo>();
@@ -403,8 +403,12 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		.seed = config.custom_seed
 	};
 
-	auto ses_mapping = SESMapping();
-	ses_mapping.entries.insert(config.ses_mapping.begin(), config.ses_mapping.end());
+	auto ses_mapping = SESMapping
+	{
+		.update_interval = config.ses.update_interval,
+		.update_max_age = config.ses.update_max_age,
+		.entries = config.ses.mapping
+	};
 
 	auto mapping = std::vector<MappingEntry>();
 	for (auto& item : config.modelling.risk_factors) {

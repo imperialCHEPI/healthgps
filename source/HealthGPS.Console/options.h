@@ -28,6 +28,13 @@ struct SettingsInfo
 	std::vector<int> age_range;
 };
 
+struct SESInfo
+{
+	unsigned int update_interval{};
+	unsigned int update_max_age{};
+	std::map<std::string, std::string> mapping;
+};
+
 struct BaselineInfo
 {
 	bool is_enabled;
@@ -76,7 +83,7 @@ struct Configuration
 {
 	FileInfo file;
 	SettingsInfo settings;
-	std::map<std::string, std::string> ses_mapping;
+	SESInfo ses;
 	ModellingInfo modelling;
 	std::vector<std::string> diseases;
 	std::optional<unsigned int> custom_seed;

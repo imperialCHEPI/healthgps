@@ -79,7 +79,7 @@ namespace hgps {
 	}
 
 	double DefaultDiseaseModel::get_excess_mortality(const Person& entity) const noexcept {
-		auto excess_mortality_id = definition_.table().at("mtexcess");
+		auto excess_mortality_id = definition_.table().at("mortality");
 		if (definition_.table().contains(entity.age)) {
 			return definition_.table()(entity.age, entity.gender).at(excess_mortality_id);
 		}

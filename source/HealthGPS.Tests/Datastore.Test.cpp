@@ -168,11 +168,11 @@ TEST(TestDatastore, DiseaseRelativeRiskToDisease)
 
 	auto manager = DataManager(store_full_path);
 
-	auto backpain = manager.get_disease_info("lowbackpain").value();
+	auto asthma = manager.get_disease_info("asthma").value();
 	auto diabetes = manager.get_disease_info("diabetes").value();
 
 	auto table_self = manager.get_relative_risk_to_disease(diabetes, diabetes);
-	auto table_other = manager.get_relative_risk_to_disease(diabetes, backpain);
+	auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
 
 	ASSERT_EQ(3, table_self.columns.size());
 	ASSERT_GT(table_self.rows.size(), 0);
@@ -181,7 +181,7 @@ TEST(TestDatastore, DiseaseRelativeRiskToDisease)
 
 	ASSERT_EQ(3, table_other.columns.size());
 	ASSERT_GT(table_other.rows.size(), 0);
-	ASSERT_NE(table_other.rows[0][1], table_other.rows[0][2]);
+	ASSERT_EQ(table_other.rows[0][1], table_other.rows[0][2]);
 	ASSERT_FALSE(table_other.is_default_value);
 }
 
