@@ -283,7 +283,7 @@ TEST(TestDatastore, RetrieveCancerDefinition)
 
 		auto entity = manager.get_disease(item, uk);
 		ASSERT_FALSE(entity.empty());
-		ASSERT_EQ(entity.measures.size(), 2);
+		ASSERT_EQ(entity.measures.size(), 4);
 		ASSERT_GT(entity.items.size(), 0);
 		EXPECT_EQ(item.code, entity.info.code);
 		EXPECT_EQ(uk.code, entity.country.code);
@@ -307,7 +307,7 @@ TEST(TestDatastore, RetrieveCancerParameters)
 		cancer_count++;
 		auto entity = manager.get_disease_parameter(item, uk.value());
 		ASSERT_GT(entity.time_year, 0);
-		ASSERT_FALSE(entity.distribution.empty());
+		ASSERT_FALSE(entity.prevalence_distribution.empty());
 		ASSERT_FALSE(entity.survival_rate.empty());
 		ASSERT_FALSE(entity.death_weight.empty());
 	}

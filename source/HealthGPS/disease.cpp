@@ -75,6 +75,7 @@ namespace hgps {
 			}
 
 			auto disease_entity = repository.manager().get_disease(info, config.settings().country());
+			auto disease_table = detail::StoreConverter::to_disease_table(disease_entity);
 			auto relative_risks = detail::create_relative_risk(detail::RelativeRiskInfo {
 				.disease = info,
 				.manager = repository.manager(),
@@ -82,7 +83,6 @@ namespace hgps {
 				.risk_factors = risk_factors });
 
 			if (info.group != core::DiseaseGroup::cancer) {
-				auto disease_table = detail::StoreConverter::to_disease_table(disease_entity);
 				auto definition = DiseaseDefinition(std::move(disease_table),
 					std::move(relative_risks.diseases), std::move(relative_risks.risk_factors));
 
@@ -93,8 +93,6 @@ namespace hgps {
 
 			auto cancer_param = repository.manager().get_disease_parameter(info, config.settings().country());
 			auto parameter = detail::StoreConverter::to_disease_parameter(cancer_param);
-			auto disease_table = detail::StoreConverter::to_disease_table(
-				disease_entity, parameter, config.settings().age_range());
 
 			auto definition = DiseaseDefinition(std::move(disease_table), std::move(relative_risks.diseases),
 				std::move(relative_risks.risk_factors), std::move(parameter));

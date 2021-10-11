@@ -78,8 +78,8 @@
         "parameters":{
             "path":"P{COUNTRY_CODE}",
             "files":{
-                "distribution": "distribution_over_five_years.csv",
-                "survival_rate": "survival_rates_parameters.csv",
+                "distribution": "prevalence_distribution.csv",
+                "survival_rate": "survival_rate_parameters.csv",
                 "death_weight": "death_weights.csv"
             }
         },

@@ -33,9 +33,6 @@ namespace hgps {
 
 			static DiseaseTable to_disease_table(const core::DiseaseEntity& entity);
 
-			static DiseaseTable to_disease_table(const core::DiseaseEntity& entity,
-				const DiseaseParameter& parameter, const core::IntegerInterval& age_range);
-
 			static FloatAgeGenderTable to_relative_risk_table(const core::RelativeRiskEntity& entity);
 
 			static RelativeRiskLookup to_relative_risk_lookup(const core::RelativeRiskEntity& entity);
@@ -49,10 +46,6 @@ namespace hgps {
 		};
 
 		RelativeRisk create_relative_risk(RelativeRiskInfo info);
-		void update_incidence(std::map<int, std::map<hgps::core::Gender, std::map<int, double>>>& data, 
-			const std::map<std::string, int>& measures, const hgps::core::IntegerInterval& age_range);
-		void smooth_rates(const int& times,
-			std::map<int, std::map<hgps::core::Gender, std::map<int, double>>>& data, const int& measure_id);
 
 		template<std::floating_point TYPE>
 		static std::vector<TYPE> create_cdf(std::vector<TYPE>& frequency) {

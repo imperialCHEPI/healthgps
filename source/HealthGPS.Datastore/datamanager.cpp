@@ -391,7 +391,7 @@ namespace hgps {
 				}
 
 				if (file.key() == "distribution") {
-					table.distribution = lookup;
+					table.prevalence_distribution = lookup;
 				}
 				else if (file.key() == "survival_rate")	{
 					table.survival_rate = lookup;

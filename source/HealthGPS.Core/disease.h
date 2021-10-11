@@ -55,9 +55,9 @@ namespace hgps {
 		struct CancerParameterEntity
 		{
 			int time_year{};
-			std::vector<LookupGenderValue> distribution{};
-			std::vector<LookupGenderValue> survival_rate{};
 			std::vector<LookupGenderValue> death_weight{};
+			std::vector<LookupGenderValue> prevalence_distribution{};
+			std::vector<LookupGenderValue> survival_rate{};
 		};
 	}
 }
