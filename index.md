@@ -1,14 +1,27 @@
 ## Welcome to the Global Health Policy Simulation model (Health-GPS).
 
+| [Quick Start](#quick-start) | [User Guide](#user-guide) | [Developer Guide](#developer-guide) | [License](#license) | [Support](#support) |
+
 Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle chronic diseases and obesity in children. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
 
 Childhood obesity is one of the major public health challenges throughout the world and is rising at an alarming rate in most countries. In particular, the rates of increase in obesity prevalence in developing countries have been more than 30% higher than those in developed countries. Simulation models are especially useful for assessing the long-term impacts of the wide range of policies that will be needed to tackle the obesity epidemic.
 
+<a name="quick-start"></a>
+### Quick Start
+This is a test example only.
 
+<a name="user-guide"></a>
+### User Guide
+This is a test example only.
+
+<a name="developer-guide"></a>
+### Developer Guide
+This is a test example only.
+
+<a name="license"></a>
 ### License
-
 The code in this repository is licensed under the [BSD 3-Clause](https://github.com/imperialCHEPI/healthgps/blob/main/LICENSE.md) license.
 
-### Contact and Support
-
+<a name="support"></a>
+### Support
 Imperial College London Business School, [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/).
