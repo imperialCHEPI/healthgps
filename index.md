@@ -18,7 +18,7 @@ Childhood obesity is one of the major public health challenges throughout the wo
 
 All supported running options are provided to the model via a *configuration file* (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing this configuration file and running the model again.
 
-**NOTE:** *The development dataset provided in this example is limited to 2010-2030 time frame. It is provided for demonstration purpuse to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names.*
+**NOTE:** *The development datasets provided in this example are limited to 2010-2030 time frame. It is provided for demonstration purpuse to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names.*
 
 <a name="overview"></a>
 ### Overview
@@ -27,11 +27,11 @@ The *Health GPS microsimulation* is being developed by the [Centre for Health Ec
 
 <a name="user-guide"></a>
 ### User Guide
-This is a test example only.
+Coming soon.
 
 <a name="developer-guide"></a>
 ### Developer Guide
-This is a test example only.
+Coming soon.
 
 <a name="license"></a>
 ### License
