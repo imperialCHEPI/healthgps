@@ -22,7 +22,8 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 | [indicators](https://github.com/p-ranav/indicators)                        | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)                          | MIT          |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)                            | BSD 3-Clause |
-| [Adevs](https://sourceforge.net/projects/adevs/)                           | BSD 3-Clause |
+| [Adevs](https://sourceforge.net/projects/adevs)                            | BSD 3-Clause |
+| [crossguid](https://github.com/graeme-hill/crossguid)                      | MIT          |
 | *Experimental* ||
 | [arrow](https://github.com/apache/arrow)                                   | Apache-2.0   |
 ### Tools and Frameworks

@@ -32,11 +32,18 @@ namespace hgps {
 		float weight_{};
 	};
 
+	struct SESConstraint
+	{
+		const unsigned int update_interval;
+		const unsigned int update_max_age;
+		const core::IntegerInterval age_range;
+	};
+
 	class SESModule final : public SimulationModule
 	{
 	public:
 		SESModule() = delete;
-		SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range);
+		SESModule(std::vector<SESRecord>&& data, const SESConstraint constraints);
 
 		SimulationModuleType type() const noexcept override;
 
@@ -61,6 +68,8 @@ namespace hgps {
 		core::IntegerInterval age_range_;
 		int max_education_level_{};
 		int max_income_level_{};
+		unsigned int update_interval_{};
+		unsigned int update_max_age_{};
 
 		void calculate_max_levels();
 		

@@ -225,7 +225,7 @@ namespace hgps {
 				auto product = 1.0 - death_rate;
 				for (const auto& item : entity.diseases) {
 					if (item.second.status == DiseaseStatus::active) {
-						auto excess_mortality = disease_->get_excess_mortality(item.first, entity.age, entity.gender);
+						auto excess_mortality = disease_->get_excess_mortality(item.first, entity);
 						product *= 1.0 - excess_mortality;
 					}
 				}

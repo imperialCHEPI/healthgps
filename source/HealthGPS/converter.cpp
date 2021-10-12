@@ -1,6 +1,7 @@
 #include "converter.h"
 
 #include "HealthGPS.Core/string_util.h"
+#include "default_cancer_model.h"
 
 namespace hgps {
 	namespace detail {
@@ -149,6 +150,28 @@ namespace hgps {
 			}
 
 			return LifeTable(std::move(table_births), std::move(table_deaths));
+		}
+		
+		DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParameterEntity entity)
+		{
+			auto distribution = ParameterLookup{};
+			for (auto& item : entity.prevalence_distribution) {
+				distribution.emplace(item.value, DoubleGenderValue(item.male, item.female));
+			}
+
+			auto survival = ParameterLookup{};
+			for (auto& item : entity.survival_rate) {
+				survival.emplace(item.value, DoubleGenderValue(item.male, item.female));
+			}
+
+			// Make sure that the deaths table is zero based!
+			auto deaths = ParameterLookup{};
+			auto offset = entity.death_weight.front().value;
+			for (auto& item : entity.death_weight) {
+				deaths.emplace(item.value - offset, DoubleGenderValue(item.male, item.female));
+			}
+
+			return DiseaseParameter(entity.time_year, distribution, survival, deaths);
 		}
 	}
 }

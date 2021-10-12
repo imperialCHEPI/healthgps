@@ -51,11 +51,14 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto age_range = core::IntegerInterval(0, 30);
 	auto settings = Settings(uk, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
-	auto ses = SESMapping();
-	ses.entries.emplace("gender", "Gender");
-	ses.entries.emplace("age", "Age");
-	ses.entries.emplace("education", "Education");
-	ses.entries.emplace("income", "Income");
+	auto ses_mapping = std::map<std::string, std::string>{ {"gender", "Gender"},
+		{"age", "Age"}, {"education", "Education"}, {"income", "Income"} };
+	auto ses = SESMapping
+	{
+		.update_interval = 5,
+		.update_max_age = 30,
+		.entries = ses_mapping
+	};
 
 	auto entries = std::vector<MappingEntry>{
 		MappingEntry("Year", 0, "", true),
@@ -69,9 +72,9 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto mapping = HierarchicalMapping(std::move(entries));
 
 	auto diseases = std::vector<core::DiseaseInfo>{
-		DiseaseInfo{.code = "asthma", .name = "Asthma"},
-		DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"},
-		DiseaseInfo{.code = "lowbackpain", .name = "Low Back Pain"},
+		DiseaseInfo{.group = DiseaseGroup::other, .code = "asthma", .name = "Asthma"},
+		DiseaseInfo{.group = DiseaseGroup::other, .code = "diabetes", .name = "Diabetes Mellitus"},
+		DiseaseInfo{.group = DiseaseGroup::cancer, .code = "colorectum", .name = "Colorectal cancer"},
 	};
 
 	return ModelInput(data, settings, info, ses, mapping, diseases);
@@ -226,8 +229,12 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto age_range = core::IntegerInterval(0, 100);
 	auto settings = Settings(uk, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
-	auto ses = SESMapping();
-	ses.entries.emplace("test", builder.name());
+	auto ses_mapping = std::map<std::string, std::string>{ {"test", builder.name()} };
+	auto ses = SESMapping {
+		.update_interval = 5,
+		.update_max_age = 30,
+		.entries = ses_mapping
+	};
 
 	auto mapping = HierarchicalMapping(
 		std::vector<MappingEntry>{
@@ -237,8 +244,8 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	});
 
 	auto diseases = std::vector<core::DiseaseInfo>{
-		DiseaseInfo{.code = "angina", .name = "Angina Pectoris"},
-		DiseaseInfo{.code = "diabetes", .name = "Diabetes Mellitus"}
+		DiseaseInfo{.group = DiseaseGroup::other, .code = "angina", .name = "Angina Pectoris"},
+		DiseaseInfo{.group = DiseaseGroup::other, .code = "diabetes", .name = "Diabetes Mellitus"}
 	};
 
 	auto config = ModelInput(data, settings, info, ses, mapping, diseases);
@@ -395,6 +402,9 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);
+	auto test_person = Person{};
+	test_person.age = 50;
+	test_person.gender = core::Gender::male;
 
 	auto disease_module = build_disease_module(repository, inputs);
 	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
@@ -402,8 +412,8 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	ASSERT_GT(disease_module->size(), 0);
 	ASSERT_TRUE(disease_module->contains("diabetes"));
 	ASSERT_FALSE(disease_module->contains("moonshot"));
-	ASSERT_GT(disease_module->get_excess_mortality("diabetes", 50, core::Gender::male), 0);
-	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", 50, core::Gender::male));
+	ASSERT_GT(disease_module->get_excess_mortality("diabetes", test_person), 0);
+	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", test_person));
 }
 
 TEST(TestHealthGPS, CreateAnalysisModule)

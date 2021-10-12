@@ -64,4 +64,21 @@ namespace hgps {
 
 		return values.back();
 	}
+
+	int MTRandom32::next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf) {
+		if (values.size() != cdf.size()) {
+			throw std::invalid_argument(
+				std::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
+		}
+
+		auto p = next_double();
+		for (size_t i = 0; i < cdf.size(); i++) {
+			if (p <= cdf[i]) {
+				return values[i];
+			}
+		}
+
+		return values.back();
+	}
+
 }

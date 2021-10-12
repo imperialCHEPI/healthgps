@@ -8,8 +8,9 @@
 
 namespace hgps {
 
-	hgps::SESModule::SESModule(std::vector<SESRecord>&& data, core::IntegerInterval age_range)
-		: data_{ data }, age_range_{ age_range }
+	hgps::SESModule::SESModule(std::vector<SESRecord>&& data, const SESConstraint constraints)
+		: data_{ data }, age_range_{ constraints.age_range }, 
+		update_interval_{constraints.update_interval}, update_max_age_{constraints.update_max_age}
 	{
 		calculate_max_levels();
 	}
@@ -245,7 +246,7 @@ namespace hgps {
 			entity.education = entity.education.value();
 
 			// To prevent education level getting maximal values ???
-			if (entity.age % 5 == 0 && entity.age < 31) {
+			if (entity.age % update_interval_ == 0 && entity.age <= update_max_age_) {
 				entity.education = std::max(entity.education.value(), random_education_level);
 			}
 		}
@@ -263,7 +264,7 @@ namespace hgps {
 			entity.income = entity.income.value();
 
 			// To prevent education level getting maximal values ???
-			if (entity.age % 5 == 0 && entity.age < 31) {
+			if (entity.age % update_interval_ == 0 && entity.age <= update_max_age_) {
 				entity.income = std::max(entity.income.value(), random_income_Level);
 			}
 		}
@@ -365,6 +366,12 @@ namespace hgps {
 			data.emplace_back(SESRecord(gender, age, edu_value, income, weight));
 		}
 
-		return std::make_unique<SESModule>(std::move(data), config.settings().age_range());
+		auto constraints = SESConstraint{
+			.update_interval = config.ses_mapping().update_interval,
+			.update_max_age = config.ses_mapping().update_max_age,
+			.age_range = config.settings().age_range()
+		};
+
+		return std::make_unique<SESModule>(std::move(data), constraints);
 	}
 }

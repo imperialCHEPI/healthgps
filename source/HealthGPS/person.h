@@ -21,10 +21,11 @@ namespace hgps {
 	struct Disease
 	{
 		DiseaseStatus status;
-		int start_time;
+		int start_time{};
+		int time_since_onset{ -1 };
 
 		Disease clone() const noexcept {
-			return Disease{ .status = status, .start_time = start_time };
+			return Disease{ .status = status, .start_time = start_time, .time_since_onset = time_since_onset };
 		}
 	};
 

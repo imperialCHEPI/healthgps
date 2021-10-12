@@ -42,6 +42,7 @@ namespace hgps {
 		int next_int(const int& min_value, const int& max_value);
 		double next_double() noexcept;
 		int next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf);
+		int next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf);
 
 		void set_current_time(const int time_now) noexcept;
 

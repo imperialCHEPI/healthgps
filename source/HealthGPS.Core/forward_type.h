@@ -9,10 +9,24 @@ namespace hgps {
 		template <typename T>
 		concept Numerical = std::is_arithmetic_v<T>;
 
+		/// @brief enumerates the gender
 		enum class Gender : uint8_t {
 			unknown,
 			male,
 			female
+		};
+
+		/// @brief enumerates supported diseases types
+		enum class DiseaseGroup : uint8_t {
+			other,
+			cancer
+		};
+
+		/// @brief Lookup table entry for gender values
+		struct LookupGenderValue {
+			int value{};
+			double male{};
+			double female{};
 		};
 
 		class DataTable;

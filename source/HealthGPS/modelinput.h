@@ -17,7 +17,9 @@ namespace hgps {
 	};
 
 	struct SESMapping {
-		std::map<std::string, std::string, core::case_insensitive::comparator> entries;
+		const unsigned int update_interval;
+		const unsigned int update_max_age;
+		const std::map<std::string, std::string> entries;
 	};
 
 	class ModelInput

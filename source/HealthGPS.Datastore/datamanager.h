@@ -42,6 +42,8 @@ namespace hgps {
 			RelativeRiskEntity get_relative_risk_to_risk_factor(
 				DiseaseInfo source, Gender gender, std::string risk_factor) const override;
 
+			CancerParameterEntity get_disease_parameter(DiseaseInfo info, Country country) const override;
+
 			DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
 
 			std::vector<BirthItem> get_birth_indicators(const Country country) const;
