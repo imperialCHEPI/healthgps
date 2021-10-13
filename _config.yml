@@ -1,3 +1,5 @@
-theme: jekyll-theme-architect
+theme: jekyll-theme-minimal
+title: Health GPS
+description: Global Health Policy Simulation model
 logo: /images/logo.png
 show_downloads: true
