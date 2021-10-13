@@ -23,7 +23,7 @@ All supported running options are provided to the model via a *configuration fil
 <a name="overview"></a>
 ### Overview
 
-The *Health GPS microsimulation* is being developed by the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; part of the [STOP project](https://www.stopchildobesity.eu/). The architecture uses a modular approach to software design to provide the building blocks of the Health GPS application, which is implemented using objected-oriented programming in Modern `C++20`.
+The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the Health GPS application, which is implemented using object-oriented programming principles in `Modern C++20`.
 
 <a name="user-guide"></a>
 ### User Guide
