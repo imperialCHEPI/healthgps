@@ -8,11 +8,12 @@ Childhood obesity is one of the major public health challenges throughout the wo
 
 <a name="quick-start"></a>
 ### Quick Start
-1. **Health GPS** command line interface (CLI) runs on *Windows 10 (and newer)* devices.
-2. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries from the repository.
-3. Unzip the file contents into a local directory of your choice (xxx).
-4. Open a command terminal, e.g. PowerShell, and navigate to the directory used in step 2 (xxx).
-5. Run: `X:\xxx> .\HealthGPS.Console.exe -f ".\example\demo.json" -s ".\data"` where `-f` gives the *configuration file* fullname and
+The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* devices. You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version to be installed.
+
+1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries from the repository.
+2. Unzip the file contents into a local directory of your choice (xxx).
+3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
+4. Run: `X:\xxx> .\HealthGPS.Console.exe -f ".\example\demo.json" -s ".\data"` where `-f` gives the *configuration file* fullname and
 `-s` the path to the root folder of the *backend storage* respectivelly.
 5. The default output folder is `C:\HealthGPS\Result`, but this can be changed in the *configuration file* `(demo.json)`.
 
@@ -20,10 +21,14 @@ All supported running options are provided to the model via a *configuration fil
 
 **NOTE:** *The development datasets provided in this example are limited to 2010-2030 time frame. It is provided for demonstration purpuse to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names.*
 
+***Known Issue:*** Windows 10 support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the Windows 11 installation.
+
 <a name="overview"></a>
 ### Overview
 
-The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the Health GPS application, which is implemented using object-oriented programming principles in `Modern C++20`.
+*Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the `Health GPS application`, which is implemented using object-oriented principles in `Modern C++` programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20). The application contains four main components:
+
+![Health GPS Components](images/component_diagram.png)
 
 <a name="user-guide"></a>
 ### User Guide
