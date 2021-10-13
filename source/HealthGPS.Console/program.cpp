@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 	auto event_bus = DefaultEventBus();
 	auto result_file_logger = ResultFileWriter{ 
 		create_output_file_name(config.result),
-		ModelInfo{.name = "Health-GPS", .version = "0.2.beta"}
+		ModelInfo{.name = "Health-GPS", .version = "0.5.beta"}
 	};
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
