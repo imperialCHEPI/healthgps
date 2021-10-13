@@ -28,7 +28,7 @@ All supported running options are provided to the model via a *configuration fil
 
 *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks necessary to create the `Health GPS application`, which is implemented using object-oriented principles in `Modern C++` programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20). The software application contains four main components:
 
-|![Health GPS Components](images/component_diagram.png)|
+|![Health GPS Components](/assets/image/component_diagram.png)|
 |:--:|
 |*Health GPS Component Diagram*|
 
@@ -38,7 +38,13 @@ All supported running options are provided to the model via a *configuration fil
 - *Backend Data Storage* provides an interface (`Data API`) and persistence-agnostic data types (plain old class object - POCO) are required by the modules definition. This component provides a contract for all concrete implementations that actually store and retrieve the data.
 - *File-base Data Storage* implements the `Data API` interface to provide a file based storage for the modules data. This component can be replaced by a different storage type, e.g. database, without being noticed by the *Health GPS Model* component.
 
-These componets along with the phisical data storage are the minimum *package* to deploy and use the Health GPS microsimulation.  
+These componets along with the phisical data storage are the minimum *package* to deploy and use the Health GPS microsimulation. The *Health GPS Model* defines interfaces for modules and external communication, as shown below, to provide decoupling and flexibility during composition.
+
+|![Health GPS Modules](/assets/image/modules_diagram.png)|
+|:--:|
+|*Health GPS Modules Diagram*|
+
+A *modules factory* manages the registration and creation of the module instances required by the *Health GPS model*. A concrete implementation of the *backend data storage* interface is injected into the module factory to supply the required data during module creation. The simulation executive is reposible for managing the simulation clock and events scheduling, this functionality is provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. The simulation results are streamed asynchronous to the outside world via a concrete implementation of the *message bus* interface provided to the model by the *host application* during initialisation.
 
 <a name="user-guide"></a>
 ### User Guide
