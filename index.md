@@ -17,7 +17,7 @@ The **Health GPS** application provides a command line interface (CLI) and runs 
 5. The default output folder is `C:\HealthGPS\Result`, but this can be changed in the *configuration file* `(demo.json)`.
 
 For example, if you unzip the files into local directory `C:\HealthGPS\Release` during step 2, run:
-```console
+```cmd
 C:\HealthGPS\Release> .\HealthGPS.Console.exe -f ".\example\demo.json" -s ".\data"
 ```
 The following is the expected *Health GPS CLI* start screen (top lines only). 
@@ -66,15 +66,48 @@ As with any simulation model, it is the user's responsability to process and ana
 |:--:|
 |*Health GPS Execution Diagram*|
 
+The current model output format, JSON (JavaScript Object Notation), is an open standard file format designed for data interchange in human-readable text. It is language-independent, however all programming language and major data science tools supports JSON format because they have libraries and functions to read/write JSON structures. To read the model results in R, for example, you need the [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) package:
+```R
+require(jsonlite)
+data <- fromJSON(result_filename)
+View(data)
+```
+![Health GPS Results](/assets/image/model_results.png)
+
+---
+> **_UNDER DEVELOPMENT:_**  More content coming soon.
+---
+
+
 <a name="developer-guide"></a>
 ### Developer Guide
-The *Health GPS* software is implemented using *Modern C++* programming language, targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20) in [Microsft Visual Studio 2019](https://visualstudio.microsoft.com), therefore *Windows OS* only, however the code base is portable to other platforms when [compilers support](https://en.cppreference.com/w/cpp/compiler_support) for C++20 standard become avaialble. The development toolset users [vcpkg](https://github.com/microsoft/vcpkg) package managers for dependencies and the integrated [googletest](https://github.com/google/googletest) for unit testing.
+standard ANSI C++, using the C++ Standard Library
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [Microsft Visual Studio](https://visualstudio.microsoft.com) 2019, therefore *Windows OS* only, however the code base is portable and should be easily build on other platforms when [compilers](https://en.cppreference.com/w/cpp/compiler_support) supporting the C++20 standard become avaialble. The development toolset users [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
 
-Coming soon.
+To start working on the *Health GPS* code base, the development machine needs:
+1. Windows 10 or newer
+2. [Git](https://git-scm.com/downloads)
+3. [Microsft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer.
+4. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects.
+5. Internet connection
+
+Download the *Health GPS* source code to the local machine, we recommend somewhere like `C:\src` or `C:\source`, since otherwise you may run into path issues with the build systems.
+```cmd
+> git clone https://github.com/imperialCHEPI/healthgps
+```
+Finally, open the project solution in Visual Studio `...\healthgps\source\HelathGPS.sln` and hit build. The first build takes considerable longer than normal due to the initial work required by the package manager.
+
+---
+> **_UNDER DEVELOPMENT:_**  More content coming soon.
+---
+
+The current modelling of *intervention policies* require data synchonisation between the *baseline* and *intervention* scenarios at mutiple points, this requirement is a major constraint on the size of the virtual population and independent running of the model, resuting on pairs of simulations being evaluated at a time, see the *Execution Diagram* in previous section. The current solution is based on shared memory and works on a single machine, it creates an unidirectional channel to asynchronous send messages from the baseline scenario to the intervention scenario as shown below. At the receiving end, the channel is synchronous, blocking until the required message arrives or a pre-defined time expires, forcing the experiment to terminate.
 
 |![Health GPS DataSync](/assets/image/sync_diagram.png)|
 |:--:|
 |*Health GPS Scenario Data Synchronization*|
+
+An alternative to this design is to use a message broker, e.g. [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages over a network of computers running in pairs to scale-up the model virtual population size and throughput.
 
 <a name="license"></a>
 ### License
