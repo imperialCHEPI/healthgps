@@ -13,9 +13,15 @@ The **Health GPS** application provides a command line interface (CLI) and runs 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-4. Run: `X:\xxx> .\HealthGPS.Console.exe -f ".\example\demo.json" -s ".\data"` where `-f` gives the *configuration file* fullname and
-`-s` the path to the root folder of the *backend storage* respectivelly.
+4. Run `X:\xxx> .\HealthGPS.Console.exe -f ".\example\demo.json" -s ".\data"` whehe `-f` gives the *configuration file* fullname and `-s` the path to the root folder of the *backend storage* respectivelly.
 5. The default output folder is `C:\HealthGPS\Result`, but this can be changed in the *configuration file* `(demo.json)`.
+
+For example, if you unzip the files into local directory `C:\HealthGPS\Release` during step 2, run:
+```console
+C:\HealthGPS\Release> .\HealthGPS.Console.exe -f ".\example\demo.json" -s ".\data"
+```
+The following is the expected *Health GPS CLI* start screen (top lines only). 
+![Health GPS CLI](/assets/image/cli_startscreen.png)
 
 All supported running options are provided to the model via a *configuration file* (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing this configuration file and running the model again.
 
@@ -48,11 +54,27 @@ A *modules factory* manages the registration and creation of the module instance
 
 <a name="user-guide"></a>
 ### User Guide
-Coming soon.
+The *Health-GPS* microsimulation is a data driven modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated backend data storage to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowlege of the full workflows. A high-level representation of the `Health-GPS workflow` is shown below, it is crucial that users have a good appreciation for the general dataflow and processes to better design experiments and quantify the results.
+
+|![Health GPS Workflow](/assets/image/workflow_diagram.png)|
+|:--:|
+|*Health GPS Workflow Diagram*|
+
+As with any simulation model, it is the user's responsability to process and analyse input data, define models hierarchy and fit parameters to data. A configuration file (JSON) is used control the simulation running settings and map the *Health-GPS* expected parameters to the user input data and fitted values. Likewise, it is the user's responsability to and analyse and quantify the model results, which are saved to a chosen output folder in `JSON` format.
+
+|![Health GPS Execution](/assets/image/execution_diagram.png)|
+|:--:|
+|*Health GPS Execution Diagram*|
 
 <a name="developer-guide"></a>
 ### Developer Guide
+The *Health GPS* software is implemented using *Modern C++* programming language, targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20) in [Microsft Visual Studio 2019](https://visualstudio.microsoft.com), therefore *Windows OS* only, however the code base is portable to other platforms when [compilers support](https://en.cppreference.com/w/cpp/compiler_support) for C++20 standard become avaialble. The development toolset users [vcpkg](https://github.com/microsoft/vcpkg) package managers for dependencies and the integrated [googletest](https://github.com/google/googletest) for unit testing.
+
 Coming soon.
+
+|![Health GPS DataSync](/assets/image/sync_diagram.png)|
+|:--:|
+|*Health GPS Scenario Data Synchronization*|
 
 <a name="license"></a>
 ### License
