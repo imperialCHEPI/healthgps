@@ -66,9 +66,6 @@
     <ClInclude Include="modelrunner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="countrymodule.h">
-      <Filter>Header Files\modules</Filter>
-    </ClInclude>
     <ClInclude Include="simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -351,6 +348,10 @@
   <ItemGroup>
     <None Include="scenarios.cd">
       <Filter>Header Files\scenarios</Filter>
+    </None>
+    <None Include="Interfaces.cd" />
+    <None Include="ModuleDiagram.cd">
+      <Filter>Header Files\modules</Filter>
     </None>
   </ItemGroup>
 </Project>

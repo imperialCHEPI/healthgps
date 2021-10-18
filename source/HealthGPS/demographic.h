@@ -4,6 +4,7 @@
 #include "repository.h"
 #include "modelinput.h"
 #include "runtime_context.h"
+#include "gender_value.h"
 #include "gender_table.h"
 #include "life_table.h"
 
@@ -20,39 +21,25 @@ namespace hgps {
 		const float total() const noexcept { return males + females; }
 	};
 
-	struct GenderPair {
-		GenderPair(double male_value, double female_value) 
-			: male{ male_value }, female{ female_value } {}
-
-		const double male;
-		const double female;
-	};
-
-	class DemographicModule final : public SimulationModule {
+	class PopulationModule final : public DemographicModule {
 	public:
-		DemographicModule() = delete;
-		DemographicModule(std::map<int, std::map<int, PopulationRecord>>&& pop_data,
+		PopulationModule() = delete;
+		PopulationModule(std::map<int, std::map<int, PopulationRecord>>&& pop_data,
 			LifeTable&& life_table);
 
 		SimulationModuleType type() const noexcept override;
 
 		std::string name() const noexcept override;
 
-		size_t get_total_population(const int time_year) const noexcept;
+		std::size_t get_total_population_size(const int time_year) const noexcept override;
 
-		double get_total_deaths(const int time_year) const noexcept;
-
-		const std::map<int, PopulationRecord>& get_population(const int time_year) const;
-
-		std::map<int, GenderPair> get_age_gender_distribution(const int time_year) const noexcept;
-
-		GenderPair get_birth_rate(const int time_year) const noexcept;
-
-		double get_residual_death_rate(const int& age, core::Gender& gender) const noexcept;
+		const std::map<int, PopulationRecord>& get_population_distribution(const int time_year) const override;
 
 		void initialise_population(RuntimeContext& context) override;
 
-		void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host);
+		void update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) override;
+
+		void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) override;
 
 	private:
 		std::map<int, std::map<int, PopulationRecord>> pop_data_;
@@ -62,13 +49,19 @@ namespace hgps {
 
 		void initialise_birth_rates();
 
+		double get_total_deaths(const int time_year) const noexcept;
+		std::map<int, DoubleGenderValue> get_age_gender_distribution(const int time_year) const noexcept;
+		DoubleGenderValue get_birth_rate(const int time_year) const noexcept;
+		double get_residual_death_rate(const int& age, core::Gender& gender) const noexcept;
+
 		GenderTable<int, double> create_death_rates_table(const int time_year);
 		GenderTable<int, double> calculate_residual_mortality(
 			RuntimeContext& context, const DiseaseHostModule& disease_host);
 
 		double calculate_excess_mortality_product(const Person& entity, const DiseaseHostModule& disease_host) const;
+		int update_age_and_death_events(RuntimeContext& context, const DiseaseHostModule& disease_host);
 	};
 
-	std::unique_ptr<DemographicModule> build_demographic_module(Repository& repository, const ModelInput& config);
+	std::unique_ptr<PopulationModule> build_population_module(Repository& repository, const ModelInput& config);
 }
 

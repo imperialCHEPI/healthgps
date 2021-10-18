@@ -7,6 +7,7 @@
 
 #include "HealthGPS.Datastore\api.h"
 
+#include "CountryModule.h"
 #include "RiskFactorData.h"
 
 namespace fs = std::filesystem;
@@ -255,16 +256,16 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto repository = CachedRepository(manager);
 
 	auto factory = SimulationModuleFactory(repository);
-	factory.register_builder(SimulationModuleType::Simulator,
+	factory.register_builder(SimulationModuleType::Analysis,
 		[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
 			return build_country_module(repository, config);
 		});
 
-	auto base_module = factory.create(SimulationModuleType::Simulator, config);
+	auto base_module = factory.create(SimulationModuleType::Analysis, config);
 	auto country_mod = static_cast<CountryModule*>(base_module.get());
 	country_mod->execute("print");
 
-	ASSERT_EQ(SimulationModuleType::Simulator, country_mod->type());
+	ASSERT_EQ(SimulationModuleType::Analysis, country_mod->type());
 	ASSERT_EQ("Country", country_mod->name());
 }
 
@@ -311,24 +312,17 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	auto manager = DataManager(full_path);
 	auto repository = CachedRepository(manager);
 
-	auto pop_module = build_demographic_module(repository, config);
-	auto total_pop = pop_module->get_total_population(config.start_time());
-	auto pop_dist = pop_module->get_age_gender_distribution(config.start_time());
-	auto birth_rate = pop_module->get_birth_rate(config.start_time());
-	auto sum_male = 0.0;
-	auto sum_female = 0.0;
-	for (auto& age : pop_dist) {
-		sum_male += age.second.male;
-		sum_female += age.second.female;
+	auto pop_module = build_population_module(repository, config);
+	auto total_pop = pop_module->get_total_population_size(config.start_time());
+	auto pop_dist = pop_module->get_population_distribution(config.start_time());
+	auto sum_dist = 0.0f;
+	for (auto& pair : pop_dist)	{
+		sum_dist += pair.second.total();
 	}
-	auto sum_prob = sum_male + sum_female;
 	ASSERT_EQ(SimulationModuleType::Demographic, pop_module->type());
 	ASSERT_EQ("Demographic", pop_module->name());
 	ASSERT_GT(total_pop, 0);
-	ASSERT_GT(pop_dist.size(), 0);
-	ASSERT_GT(birth_rate.male, 0);
-	ASSERT_GT(birth_rate.female, 0);
-	ASSERT_TRUE((sum_prob - 1.0) < 1e-4);
+	ASSERT_EQ(total_pop, sum_dist);
 }
 
 TEST(TestHealthGPS, CreateRiskFactorModule)

@@ -29,19 +29,17 @@ namespace hgps {
 
 	private:
 		RuntimeContext context_;
-		std::shared_ptr<SESModule> ses_;
+		std::shared_ptr<UpdatableModule> ses_;
 		std::shared_ptr<DemographicModule> demographic_;
-		std::shared_ptr<RiskFactorModule> risk_factor_;
+		std::shared_ptr<RiskFactorHostModule> risk_factor_;
 		std::shared_ptr<DiseaseHostModule> disease_;
-		std::shared_ptr<AnalysisModule> analysis_;
+		std::shared_ptr<UpdatableModule> analysis_;
 		adevs::Time end_time_;
 
 		void initialise_population();
 		void update_population();
 		void print_initial_population_statistics();
 
-		void update_age_and_lifecycle_events();
-		int update_age_and_death_events();
 		void update_net_immigration();
 
 		hgps::IntegerAgeGenderTable get_current_expected_population() const;
