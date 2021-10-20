@@ -99,14 +99,13 @@ Finally, open the project solution in Visual Studio `...\healthgps\source\Helath
 ---
 > **_UNDER DEVELOPMENT:_**  More content coming soon.
 ---
-
-The current modelling of *intervention policies* require data synchonisation between the *baseline* and *intervention* scenarios at mutiple points, this requirement is a major constraint on the size of the virtual population and independent running of the model, resuting on pairs of simulations being evaluated at a time, see the *Execution Diagram* in previous section. The current solution is based on shared memory and works on a single machine, it creates an unidirectional channel to asynchronous send messages from the baseline scenario to the intervention scenario as shown below. At the receiving end, the channel is synchronous, blocking until the required message arrives or a pre-defined time expires, forcing the experiment to terminate.
+The current modelling of *intervention policies* requires data synchronisation between the *baseline* and *intervention* scenarios at multiple points, this requirement is a major constraint on the size of the virtual population and independent running of the model, resulting on pairs of simulations being evaluated at a time, see the *Execution Diagram* in previous section. The current solution is based on shared memory and works on a single machine, it creates a unidirectional channel to asynchronous send messages from the baseline scenario to the intervention scenario as shown below. At the receiving end, the channel is synchronous, blocking until the required message arrives or a pre-defined time expires, forcing the experiment to terminate.
 
 |![Health GPS DataSync](/assets/image/sync_diagram.png)|
 |:--:|
 |*Health GPS Scenario Data Synchronization*|
 
-An alternative to this design is to use a message broker, e.g. [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages over a network of computers running in pairs to scale-up the model virtual population size and throughput.
+An alternative to this design is to use a message broker, e.g., [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages over a network of computers running in pairs to scale-up the model virtual population size and throughput.
 
 <a name="license"></a>
 ### License
