@@ -9,7 +9,7 @@
 
 namespace hgps {
 
-	class AnalysisModule final : public SimulationModule {
+	class AnalysisModule final : public UpdatableModule {
 	public:
 		AnalysisModule() = delete;
 		AnalysisModule(AnalysisDefinition&& definition, const core::IntegerInterval age_range);
@@ -20,7 +20,7 @@ namespace hgps {
 
 		void initialise_population(RuntimeContext& context) override;
 
-		void update_population(RuntimeContext& context) const;
+		void update_population(RuntimeContext& context) override;
 
 	private:
 		AnalysisDefinition definition_;

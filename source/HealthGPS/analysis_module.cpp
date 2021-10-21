@@ -49,7 +49,7 @@ namespace hgps {
 		publish_result_message(context);
 	}
 
-	void AnalysisModule::update_population(RuntimeContext& context) const {
+	void AnalysisModule::update_population(RuntimeContext& context) {
 		publish_result_message(context);
 	}
 

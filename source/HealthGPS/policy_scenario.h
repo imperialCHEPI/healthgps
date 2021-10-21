@@ -4,9 +4,6 @@
 #include <vector>
 
 namespace hgps {
-	
-	struct PolicyImpact;
-	struct PolicyInterval;
 
 	/// @brief Health GPS policy impact types enumeration
 	enum class PolicyImpactType : uint8_t
@@ -17,6 +14,9 @@ namespace hgps {
 		/// @brief Relative impact
 		relative,
 	};
+
+	struct PolicyImpact;
+	struct PolicyInterval;
 
 	/// @brief Health GPS intervention policy scenario interface
 	class PolicyScenario : public Scenario {

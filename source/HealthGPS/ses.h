@@ -39,7 +39,7 @@ namespace hgps {
 		const core::IntegerInterval age_range;
 	};
 
-	class SESModule final : public SimulationModule
+	class SESModule final : public UpdatableModule
 	{
 	public:
 		SESModule() = delete;

@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
 
 # Global Health Policy Simulation model (Health-GPS)
-| [Quick Start](#quick-start) | [License](#license) | [Third-party Components](#third-party-components) |
+| [Quick Start](#quick-start) | [Development Tools](#development-tools) | [License](#license) | [Third-party Components](#third-party-components) |
 
 Health-GPS microsimulation is part of the [STOP project](https://www.stopchildobesity.eu/), and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle *chronic diseases* and *obesity in children*. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.
 
@@ -26,6 +26,22 @@ All supported running options are provided to the model via a *configuration fil
 **NOTE:** *The development datasets provided in this example are limited to 2010-2030 time frame. It is provided for demonstration purpuse to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
 
 ***Known Issue:*** Windows 10 support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the Windows 11 installation.
+
+# Development Tools
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019, therefore *Windows OS* only, however the code base is portable and should easily build on other platforms when [compilers](https://en.cppreference.com/w/cpp/compiler_support) supporting the C++20 standard become available. The development toolset users [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
+
+To start working on the *Health GPS* code base, the development machine needs:
+1. Windows 10 or newer
+2. [Git](https://git-scm.com/downloads)
+3. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer.
+4. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects.
+5. Internet connection
+
+Download the *Health GPS* source code to the local machine, we recommend somewhere like `C:\src` or `C:\source`, since otherwise you may run into path issues with the build systems.
+```cmd
+> git clone https://github.com/imperialCHEPI/healthgps
+```
+Finally, open the project solution in Visual Studio `...\healthgps\source\HelathGPS.sln` and hit build. The first build takes considerably longer than normal due to the initial work required by the package manager.
 
 # License
 

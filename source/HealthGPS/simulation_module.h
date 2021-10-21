@@ -7,7 +7,6 @@
 #include "disease.h"
 #include "disease_table.h"
 #include "analysis_module.h"
-#include "countrymodule.h"
 
 namespace hgps {
 
@@ -23,7 +22,7 @@ namespace hgps {
 
 		factory.register_builder(SimulationModuleType::Demographic,
 			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
-				return build_demographic_module(repository, config); });
+				return build_population_module(repository, config); });
 
 		factory.register_builder(SimulationModuleType::RiskFactor,
 			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {

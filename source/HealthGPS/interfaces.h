@@ -17,23 +17,20 @@ namespace hgps {
 	/// @brief Simulation entity data structure
 	struct Person;
 
+	/// @brief Population age record data structure
+	struct PopulationRecord;
+
 	/// @brief Simulation run-time context for shared data and state.
 	class RuntimeContext;
 
 	/// @brief Health GPS simulation modules types enumeration
 	enum class SimulationModuleType : uint8_t
-	{
-		/// @brief Health GPS microsimulation algorithm
-		Simulator,
-		
+	{	
 		/// @brief Risk factor module
 		RiskFactor,
 
 		/// @brief Socio-economic status module
 		SES,
-
-		/// @brief Intervention module (non-baseline).
-		Intervention,
 
 		/// @brief Demographic module
 		Demographic,
@@ -75,7 +72,16 @@ namespace hgps {
 	};
 
 	/// @brief Generic disease module interface to host multiple diseases model
-	class DiseaseHostModule : public SimulationModule
+	class UpdatableModule : public SimulationModule
+	{
+	public:
+		/// @brief Updates the virtual population status
+		/// @param context The simulation run-time context
+		virtual void update_population(RuntimeContext& context) = 0;
+	};
+
+	/// @brief Generic disease module interface to host multiple disease models
+	class DiseaseHostModule : public UpdatableModule
 	{
 	public:
 		/// @brief Gets the number of diseases model hosted
@@ -93,10 +99,49 @@ namespace hgps {
 		/// @return the mortality rate value, if found, otherwise zero.
 		virtual double get_excess_mortality(
 			const std::string disease_code, const Person& entity) const noexcept = 0;
+	};
 
-		/// @brief Updates the population diseases status: remission and incidence
+	/// @brief Generic risk factors module interface to host hierarchical models
+	class RiskFactorHostModule : public UpdatableModule
+	{
+	public:
+		/// @brief Gets the number of diseases model hosted
+		/// @return Number of hosted diseases models 
+		virtual std::size_t size() const noexcept = 0;
+
+		/// @brief Indicates whether the host contains a model of type.
+		/// @param modelType The hierarchical model type identifier 
+		/// @return true if the hierarchical model is found, otherwise false.
+		virtual bool contains(const HierarchicalModelType& modelType) const noexcept = 0;
+
+		/// @brief Adjust the risk factors using the baseline scenario
 		/// @param context The simulation run-time context
-		virtual void update_population(RuntimeContext& context) = 0;
+		virtual void adjust_risk_factors_with_baseline(RuntimeContext& context) = 0;
+	};
+
+	/// @brief Population prospects module interface
+	class DemographicModule : public SimulationModule
+	{
+	public:
+		/// @brief Gets the total population at a specific point in time
+		/// @param time_year The reference point in time (in year)
+		/// @return The respective total population size
+		virtual std::size_t get_total_population_size(const int time_year) const noexcept = 0;
+
+		/// @brief Gets the population age distribution at a specific point in time 
+		/// @param time_year The reference point in time (in year)
+		/// @return The respective population age distribution 
+		virtual const std::map<int, PopulationRecord>& get_population_distribution(const int time_year) const = 0;
+
+		/// @brief Updates the virtual population status
+		/// @param context The simulation run-time context
+		/// @param disease_host The diseases host module instance
+		virtual void update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) = 0;
+
+		/// @brief Updates the virtual population status
+		/// @param context The simulation run-time context
+		/// @param disease_host The diseases host module instance
+		virtual void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) = 0;
 	};
 
 	/// @brief Hierarchical linear model interface

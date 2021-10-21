@@ -6,7 +6,7 @@
 
 namespace hgps {
 
-	class RiskFactorModule final : public SimulationModule {
+	class RiskFactorModule final : public RiskFactorHostModule {
 	public:
 		RiskFactorModule() = delete;
 		RiskFactorModule(std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models);
@@ -23,7 +23,9 @@ namespace hgps {
 
 		void initialise_population(RuntimeContext& context) override;
 
-		void update_population(RuntimeContext& context);
+		void update_population(RuntimeContext& context) override;
+
+		void adjust_risk_factors_with_baseline(RuntimeContext& context) override;
 
 	private:
 		std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models_;

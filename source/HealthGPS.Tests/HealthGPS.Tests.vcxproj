@@ -37,6 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="boost\ut.hpp" />
+    <ClInclude Include="CountryModule.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RiskFactorData.h" />
   </ItemGroup>

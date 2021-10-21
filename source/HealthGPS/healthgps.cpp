@@ -23,11 +23,11 @@ namespace hgps {
 		auto disease_base = factory.create(SimulationModuleType::Disease, definition_.inputs());
 		auto analysis_base = factory.create(SimulationModuleType::Analysis, definition_.inputs());
 
-		ses_ = std::static_pointer_cast<SESModule>(ses_base);
+		ses_ = std::static_pointer_cast<UpdatableModule>(ses_base);
 		demographic_ = std::static_pointer_cast<DemographicModule>(dem_base);
-		risk_factor_ = std::static_pointer_cast<RiskFactorModule>(risk_base);
+		risk_factor_ = std::static_pointer_cast<RiskFactorHostModule>(risk_base);
 		disease_ = std::static_pointer_cast<DiseaseHostModule>(disease_base);
-		analysis_ = std::static_pointer_cast<AnalysisModule>(analysis_base);
+		analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
 	}
 
 	void HealthGPS::initialize()
@@ -126,7 +126,7 @@ namespace hgps {
 
 		// Create virtual population
 		auto model_start_year = definition_.inputs().start_time();
-		auto total_year_pop_size = demographic_->get_total_population(model_start_year);
+		auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
 		auto virtual_pop_size = static_cast<int>(definition_.inputs().settings().size_fraction() * total_year_pop_size);
 		context_.reset_population(virtual_pop_size, model_start_year);
 
@@ -153,7 +153,7 @@ namespace hgps {
 		/* Note: order is very important */
 
 		// update basic information: demographics + diseases
-		update_age_and_lifecycle_events();
+		demographic_->update_population(context_, *disease_);
 
 		// update population socio-economic status
 		ses_->update_population(context_);
@@ -162,94 +162,16 @@ namespace hgps {
 		risk_factor_->update_population(context_);
 
 		// Calculate the net immigration by gender and age, update the population accordingly
-		// TODO: move into demographics module?
 		update_net_immigration();
 
 		// Update diseases status: remission and incidence
 		disease_->update_population(context_);
 
-		// Why can't we update this in risk_factor_->update_population?
-		auto& dynamic_model = risk_factor_->at(HierarchicalModelType::Dynamic);
-		dynamic_model.adjust_risk_factors_with_baseline(context_);
+		// Update risk factors
+		risk_factor_->adjust_risk_factors_with_baseline(context_);
 
 		// Publish results to data logger
 		analysis_->update_population(context_);
-	}
-
-	void hgps::HealthGPS::update_age_and_lifecycle_events() {
-		auto initial_pop_size = context_.population().current_active_size();
-		auto expected_pop_size = demographic_->get_total_population(context_.time_now());
-		auto expected_num_deaths = demographic_->get_total_deaths(context_.time_now());
-
-		// apply death events and update basic information (age)
-		auto number_of_deaths = update_age_and_death_events();
-
-		// apply births events
-		auto last_year_births_rate = demographic_->get_birth_rate(context_.time_now() - 1);
-		auto number_of_boys = static_cast<int> (last_year_births_rate.male * initial_pop_size);
-		auto number_of_girls = static_cast<int>(last_year_births_rate.female * initial_pop_size);
-		context_.population().add_newborn_babies(number_of_boys, core::Gender::male);
-		context_.population().add_newborn_babies(number_of_girls, core::Gender::female);
-
-		// Calculate statistics.
-		auto number_of_births = number_of_boys + number_of_girls;
-		auto expected_migration = (expected_pop_size / 100.0) - initial_pop_size - number_of_births + number_of_deaths;
-		auto middle_pop_size = context_.population().current_active_size();
-		auto pop_size_diff = (expected_pop_size / 100.0) - middle_pop_size;
-
-		auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
-		auto expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
-		auto percent_difference = 100 * (simulated_death_rate / expected_death_rate - 1);
-		context_.metrics()["SimulatedDeathRate"] = simulated_death_rate;
-		context_.metrics()["ExpectedDeathRate"] = expected_death_rate;
-		context_.metrics()["DeathRateDeltaPercent"] = percent_difference;
-	}
-
-	int HealthGPS::update_age_and_death_events() {
-		auto max_age = static_cast<unsigned int>(context_.age_range().upper());
-		auto number_of_deaths = 0;
-		for (auto& entity : context_.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
-
-			if (entity.age >= max_age) {
-				entity.is_alive = false;
-				entity.time_of_death = context_.time_now();
-				number_of_deaths++;
-			}
-			else {
-
-				// calculate death probability based on the health status
-				auto death_rate = demographic_->get_residual_death_rate(entity.age, entity.gender);
-				auto product = 1.0 - death_rate;
-				for (const auto& item : entity.diseases) {
-					if (item.second.status == DiseaseStatus::active) {
-						auto excess_mortality = disease_->get_excess_mortality(item.first, entity);
-						product *= 1.0 - excess_mortality;
-					}
-				}
-
-				auto death_probability = 1.0 - product;
-				auto hazard = context_.next_double();
-				if (hazard < death_probability) {
-					entity.is_alive = false;
-					entity.time_of_death = context_.time_now();
-					number_of_deaths++;
-				}
-			}
-
-			// Update basic information
-			if (entity.is_active()) {
-				entity.age = entity.age + 1;
-				if (entity.age >= max_age) {
-					entity.is_alive = false;
-					entity.time_of_death = context_.time_now();
-				}
-			}
-		}
-
-		return number_of_deaths;
 	}
 
 	void HealthGPS::update_net_immigration() {
@@ -274,10 +196,10 @@ namespace hgps {
 
 	hgps::IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
 		auto sim_start_time = context_.start_time();
-		auto total_initial_population = demographic_->get_total_population(sim_start_time);
+		auto total_initial_population = demographic_->get_total_population_size(sim_start_time);
 		auto start_population_size = static_cast<int>(definition_.inputs().settings().size_fraction() * total_initial_population);
 
-		auto current_population_table = demographic_->get_population(context_.time_now());
+		auto current_population_table = demographic_->get_population_distribution(context_.time_now());
 		auto expected_population = create_age_gender_table<int>(context_.age_range());
 		auto start_age = context_.age_range().lower();
 		auto end_age = context_.age_range().upper();

@@ -5,7 +5,7 @@
 #include "baseline_sync_message.h"
 
 namespace hgps {
-	DemographicModule::DemographicModule(
+	PopulationModule::PopulationModule(
 		std::map<int, std::map<int, PopulationRecord>>&& pop_data, LifeTable&& life_table)
 		: pop_data_{ pop_data }, life_table_{ life_table }, birth_rates_{}, residual_death_rates_{} {
 		if (pop_data_.empty()) {
@@ -39,15 +39,15 @@ namespace hgps {
 		initialise_birth_rates();
 	}
 
-	SimulationModuleType DemographicModule::type() const noexcept {
+	SimulationModuleType PopulationModule::type() const noexcept {
 		return SimulationModuleType::Demographic;
 	}
 
-	std::string DemographicModule::name() const noexcept {
+	std::string PopulationModule::name() const noexcept {
 		return "Demographic";
 	}
 
-	size_t DemographicModule::get_total_population(const int time_year) const noexcept {
+	std::size_t PopulationModule::get_total_population_size(const int time_year) const noexcept {
 		auto total = 0.0f;
 		if (pop_data_.contains(time_year)) {
 			auto year_data = pop_data_.at(time_year);
@@ -56,10 +56,10 @@ namespace hgps {
 				{ return previous + element.second.total(); });
 		}
 
-		return static_cast<size_t>(total);
+		return static_cast<std::size_t>(total);
 	}
 
-	double DemographicModule::get_total_deaths(const int time_year) const noexcept {
+	double PopulationModule::get_total_deaths(const int time_year) const noexcept {
 		if (life_table_.contains_time(time_year)) {
 			return life_table_.get_total_deaths_at(time_year);
 		}
@@ -67,22 +67,22 @@ namespace hgps {
 		return 0.0;
 	}
 
-	const std::map<int, PopulationRecord>& DemographicModule::get_population(const int time_year) const {
+	const std::map<int, PopulationRecord>& PopulationModule::get_population_distribution(const int time_year) const {
 		return pop_data_.at(time_year);
 	}
 
-	std::map<int, GenderPair> DemographicModule::get_age_gender_distribution(const int time_year) const noexcept {
-		std::map<int, GenderPair> result;
+	std::map<int, DoubleGenderValue> PopulationModule::get_age_gender_distribution(const int time_year) const noexcept {
+		std::map<int, DoubleGenderValue> result;
 		if (!pop_data_.contains(time_year)) {
 			return result;
 		}
 
 		auto year_data = pop_data_.at(time_year);
 		if (!year_data.empty()) {
-			double total_ratio = 1.0 / get_total_population(time_year);
+			double total_ratio = 1.0 / get_total_population_size(time_year);
 
 			for (auto& age : year_data) {
-				result.emplace(age.first, GenderPair(
+				result.emplace(age.first, DoubleGenderValue(
 					age.second.males * total_ratio,
 					age.second.females * total_ratio));
 			}
@@ -91,16 +91,16 @@ namespace hgps {
 		return result;
 	}
 
-	GenderPair DemographicModule::get_birth_rate(const int time_year) const noexcept {
+	DoubleGenderValue PopulationModule::get_birth_rate(const int time_year) const noexcept {
 		if (birth_rates_.contains(time_year)) {
-			return GenderPair{ birth_rates_(time_year, core::Gender::male),
+			return DoubleGenderValue{ birth_rates_(time_year, core::Gender::male),
 							   birth_rates_(time_year, core::Gender::female) };
 		}
 
-		return GenderPair{ 0.0, 0.0 };
+		return DoubleGenderValue{ 0.0, 0.0 };
 	}
 
-	double DemographicModule::get_residual_death_rate(const int& age, core::Gender& gender) const noexcept {
+	double PopulationModule::get_residual_death_rate(const int& age, core::Gender& gender) const noexcept {
 		if (residual_death_rates_.contains(age)) {
 			return residual_death_rates_.at(age, gender);
 		}
@@ -108,7 +108,7 @@ namespace hgps {
 		return 0.0;
 	}
 
-	void DemographicModule::initialise_population(RuntimeContext& context) {
+	void PopulationModule::initialise_population(RuntimeContext& context) {
 		auto age_gender_dist = get_age_gender_distribution(context.start_time());
 		auto index = 0;
 		auto pop_size = static_cast<int>(context.population().size());
@@ -173,7 +173,36 @@ namespace hgps {
 		assert(index == pop_size);
 	}
 
-	void DemographicModule::update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) {
+	void PopulationModule::update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) {
+		auto initial_pop_size = context.population().current_active_size();
+		auto expected_pop_size = get_total_population_size(context.time_now());
+		auto expected_num_deaths = get_total_deaths(context.time_now());
+
+		// apply death events and update basic information (age)
+		auto number_of_deaths = update_age_and_death_events(context, disease_host);
+
+		// apply births events
+		auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
+		auto number_of_boys = static_cast<int> (last_year_births_rate.male * initial_pop_size);
+		auto number_of_girls = static_cast<int>(last_year_births_rate.female * initial_pop_size);
+		context.population().add_newborn_babies(number_of_boys, core::Gender::male);
+		context.population().add_newborn_babies(number_of_girls, core::Gender::female);
+
+		// Calculate statistics.
+		auto number_of_births = number_of_boys + number_of_girls;
+		auto expected_migration = (expected_pop_size / 100.0) - initial_pop_size - number_of_births + number_of_deaths;
+		auto middle_pop_size = context.population().current_active_size();
+		auto pop_size_diff = (expected_pop_size / 100.0) - middle_pop_size;
+
+		auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
+		auto expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
+		auto percent_difference = 100 * (simulated_death_rate / expected_death_rate - 1);
+		context.metrics()["SimulatedDeathRate"] = simulated_death_rate;
+		context.metrics()["ExpectedDeathRate"] = expected_death_rate;
+		context.metrics()["DeathRateDeltaPercent"] = percent_difference;
+	}
+
+	void PopulationModule::update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) {
 		if (context.scenario().type() == ScenarioType::baseline) {
 			auto residual_mortality = calculate_residual_mortality(context, disease_host);
 			residual_death_rates_ = residual_mortality;
@@ -201,14 +230,14 @@ namespace hgps {
 		}
 	}
 
-	void DemographicModule::initialise_birth_rates() {
+	void PopulationModule::initialise_birth_rates() {
 		birth_rates_ = create_integer_gender_table<double>(life_table_.time_limits());
 		auto start_time = life_table_.time_limits().lower();
 		auto end_time = life_table_.time_limits().upper();
 		for (int year = start_time; year <= end_time; year++)
 		{
 			auto births = life_table_.get_births_at(year);
-			auto population_size = get_total_population(year);
+			auto population_size = get_total_population_size(year);
 
 			double male_birth_rate = births.number * births.sex_ratio / (1.0f + births.sex_ratio) / population_size;
 			double female_birth_rate = births.number / (1.0f + births.sex_ratio) / population_size;
@@ -218,7 +247,7 @@ namespace hgps {
 		}
 	}
 
-	GenderTable<int, double> DemographicModule::create_death_rates_table(const int time_year) {
+	GenderTable<int, double> PopulationModule::create_death_rates_table(const int time_year) {
 		auto population = pop_data_.at(time_year);
 		auto mortality = life_table_.get_mortalities_at(time_year);
 		auto death_rates = create_integer_gender_table<double>(life_table_.age_limits());
@@ -232,7 +261,7 @@ namespace hgps {
 		return death_rates;
 	}
 
-	GenderTable<int, double> DemographicModule::calculate_residual_mortality(
+	GenderTable<int, double> PopulationModule::calculate_residual_mortality(
 		RuntimeContext& context, const DiseaseHostModule& disease_host) {
 		auto excess_mortality_product = create_integer_gender_table<double>(life_table_.age_limits());
 		auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
@@ -266,7 +295,7 @@ namespace hgps {
 		return residual_mortality;
 	}
 
-	double DemographicModule::calculate_excess_mortality_product(
+	double PopulationModule::calculate_excess_mortality_product(
 		const Person& entity, const DiseaseHostModule& disease_host) const {
 		auto product = 1.0;
 		for (const auto& item : entity.diseases) {
@@ -279,7 +308,54 @@ namespace hgps {
 		return product;
 	}
 
-	std::unique_ptr<DemographicModule> build_demographic_module(Repository& repository, const ModelInput& config) {
+	int PopulationModule::update_age_and_death_events(RuntimeContext& context, const DiseaseHostModule& disease_host) {
+		auto max_age = static_cast<unsigned int>(context.age_range().upper());
+		auto number_of_deaths = 0;
+		for (auto& entity : context.population()) {
+			if (!entity.is_active()) {
+				continue;
+			}
+
+			if (entity.age >= max_age) {
+				entity.is_alive = false;
+				entity.time_of_death = context.time_now();
+				number_of_deaths++;
+			}
+			else {
+
+				// calculate death probability based on the health status
+				auto death_rate = get_residual_death_rate(entity.age, entity.gender);
+				auto product = 1.0 - death_rate;
+				for (const auto& item : entity.diseases) {
+					if (item.second.status == DiseaseStatus::active) {
+						auto excess_mortality = disease_host.get_excess_mortality(item.first, entity);
+						product *= 1.0 - excess_mortality;
+					}
+				}
+
+				auto death_probability = 1.0 - product;
+				auto hazard = context.next_double();
+				if (hazard < death_probability) {
+					entity.is_alive = false;
+					entity.time_of_death = context.time_now();
+					number_of_deaths++;
+				}
+			}
+
+			// Update basic information
+			if (entity.is_active()) {
+				entity.age = entity.age + 1;
+				if (entity.age >= max_age) {
+					entity.is_alive = false;
+					entity.time_of_death = context.time_now();
+				}
+			}
+		}
+
+		return number_of_deaths;
+	}
+
+	std::unique_ptr<PopulationModule> build_population_module(Repository& repository, const ModelInput& config) {
 		// year => age [age, male, female]
 		auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
 
@@ -298,6 +374,6 @@ namespace hgps {
 		auto deaths = repository.manager().get_mortality(config.settings().country(), time_filter);
 		auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
-		return std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
+		return std::make_unique<PopulationModule>(std::move(pop_data), std::move(life_table));
 	}
 }

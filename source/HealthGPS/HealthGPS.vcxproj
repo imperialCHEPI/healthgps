@@ -102,7 +102,6 @@
     <ClInclude Include="baseline_sync_message.h" />
     <ClInclude Include="channel.h" />
     <ClInclude Include="converter.h" />
-    <ClInclude Include="countrymodule.h" />
     <ClInclude Include="default_cancer_model.h" />
     <ClInclude Include="demographic.h" />
     <ClInclude Include="default_disease_model.h" />
@@ -202,7 +201,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Interfaces.cd" />
+    <None Include="ModuleDiagram.cd" />
     <None Include="scenarios.cd" />
+    <None Include="Simulation.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
