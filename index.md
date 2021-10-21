@@ -80,7 +80,7 @@ View(data)
 
 <a name="developer-guide"></a>
 ### Developer Guide
-The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019, therefore *Windows OS* only, however the code base is portable and should be easily build on other platforms when [compilers](https://en.cppreference.com/w/cpp/compiler_support) supporting the C++20 standard become available. The development toolset users [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019, therefore *Windows OS* only, however the code base is portable and should easily build on other platforms when [compilers](https://en.cppreference.com/w/cpp/compiler_support) supporting the C++20 standard become available. The development toolset users [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
 
 To start working on the *Health GPS* code base, the development machine needs:
 1. Windows 10 or newer
