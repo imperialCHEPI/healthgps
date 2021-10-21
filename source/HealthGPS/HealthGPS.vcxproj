@@ -204,6 +204,7 @@
     <None Include="Interfaces.cd" />
     <None Include="ModuleDiagram.cd" />
     <None Include="scenarios.cd" />
+    <None Include="Simulation.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

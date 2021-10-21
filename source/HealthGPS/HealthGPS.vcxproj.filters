@@ -353,5 +353,6 @@
     <None Include="ModuleDiagram.cd">
       <Filter>Header Files\modules</Filter>
     </None>
+    <None Include="Simulation.cd" />
   </ItemGroup>
 </Project>

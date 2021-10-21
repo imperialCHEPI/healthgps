@@ -18,7 +18,7 @@ namespace hgps {
 		const PolicyInterval active_period;
 	};
 
-	class InterventionScenario : public PolicyScenario {
+	class InterventionScenario final : public PolicyScenario {
 	public:
 		InterventionScenario() = delete;
 		InterventionScenario(SyncChannel& data_sync, PolicyDefinition&& definition);

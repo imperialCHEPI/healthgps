@@ -32,9 +32,6 @@ namespace hgps {
 		/// @brief Socio-economic status module
 		SES,
 
-		/// @brief Intervention module (non-baseline).
-		Intervention,
-
 		/// @brief Demographic module
 		Demographic,
 
