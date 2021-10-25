@@ -237,6 +237,9 @@
     <ClInclude Include="default_cancer_model.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="random_algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -343,6 +346,9 @@
     </ClCompile>
     <ClCompile Include="default_cancer_model.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="random_algorithm.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

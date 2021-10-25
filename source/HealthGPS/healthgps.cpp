@@ -250,7 +250,7 @@ namespace hgps {
 			auto similar_entities = get_similar_entities(age, gender);
 			if (similar_entities.size() > 0) {
 				for (auto trial = 0; trial < net_value; trial++) {
-					auto index = context_.next_int(static_cast<int>(similar_entities.size()) - 1);
+					auto index = context_.random().next_int(static_cast<int>(similar_entities.size()) - 1);
 					auto& source = similar_entities.at(index).get();
 					context_.population().add(std::move(partial_clone_entity(source)));
 				}

@@ -130,6 +130,7 @@
     <ClInclude Include="interfaces.h" />
     <ClInclude Include="modelrunner.h" />
     <ClInclude Include="modelinput.h" />
+    <ClInclude Include="random_algorithm.h" />
     <ClInclude Include="repository.h" />
     <ClInclude Include="model_result.h" />
     <ClInclude Include="monotonic_vector.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="modelrunner.cpp" />
     <ClCompile Include="modelinput.cpp" />
+    <ClCompile Include="random_algorithm.cpp" />
     <ClCompile Include="repository.cpp" />
     <ClCompile Include="model_result.cpp" />
     <ClCompile Include="modulefactory.cpp" />

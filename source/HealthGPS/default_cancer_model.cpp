@@ -32,7 +32,7 @@ namespace hgps {
 			auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
 			auto prevalence = definition_.table()(entity.age, entity.gender).at(prevalence_id);
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				auto onset = calculate_time_since_onset(context, entity.gender);
 				entity.diseases[disease_type()] = Disease{
@@ -223,7 +223,7 @@ namespace hgps {
 			}
 
 			auto probability = calculate_incidence_probability(entity, context.time_now());
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases[disease_type()] = Disease{
 									.status = DiseaseStatus::active,
@@ -266,7 +266,7 @@ namespace hgps {
 			cumulative.emplace_back(sum);
 		}
 
-		return context.next_empirical_discrete(values, cumulative);
+		return context.random().next_empirical_discrete(values, cumulative);
 	}
 
 	double DefaultCancerModel::get_survival_rate(const ParameterLookup& survival,

@@ -186,7 +186,7 @@ namespace hgps {
 		const std::vector<float>& edu_values) {
 
 		auto total_sum = std::accumulate(edu_values.begin(), edu_values.end(), 0.0);
-		auto prob_sample = context.next_double();
+		auto prob_sample = context.random().next_double();
 
 		auto cdf_sum = 0.0;
 		auto pdf_prob = 0.0;
@@ -211,7 +211,7 @@ namespace hgps {
 			total_sum += income_values(education, i);
 		}
 
-		auto prob_sample = context.next_double();
+		auto prob_sample = context.random().next_double();
 
 		auto cdf_sum = 0.0;
 		auto pdf_prob = 0.0;
@@ -235,7 +235,7 @@ namespace hgps {
 		std::vector<int>& education_levels, std::vector<float>& education_freq)
 	{
 		auto education_cdf = detail::create_cdf(education_freq);
-		auto random_education_level = context.next_empirical_discrete(education_levels, education_cdf);
+		auto random_education_level = context.random().next_empirical_discrete(education_levels, education_cdf);
 
 		// Very important to retrieve the old education level when calculating
 		// the risk value from the previous year.
@@ -256,7 +256,7 @@ namespace hgps {
 		std::vector<int>& income_levels, std::vector<float>& income_freq)
 	{
 		auto income_cdf = detail::create_cdf(income_freq);
-		auto random_income_Level = context.next_empirical_discrete(income_levels, income_cdf);
+		auto random_income_Level = context.random().next_empirical_discrete(income_levels, income_cdf);
 		if (entity.income.value() == 0) {
 			entity.income.set_both_values(random_income_Level);
 		}

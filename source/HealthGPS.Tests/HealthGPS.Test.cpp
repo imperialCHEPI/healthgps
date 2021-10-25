@@ -4,8 +4,10 @@
 
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
+#include "HealthGPS/random_algorithm.h"
 
 #include "HealthGPS.Datastore\api.h"
+
 
 #include "CountryModule.h"
 #include "RiskFactorData.h"
@@ -107,11 +109,43 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 	EXPECT_NE(rnd(), copy());
 }
 
-TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
+TEST(TestHealthGPS, RandomAlgorithmStandalone)
 {
 	using namespace hgps;
 
-	auto rnd = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(MTRandom32(123456789));
+	auto value = rnd_gen.next_double();
+	ASSERT_GT(value, 0.0);
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		value = rnd_gen.next_double();
+		ASSERT_GT(value, 0.0);
+	}
+}
+
+TEST(TestHealthGPS, RandomAlgorithmInternal)
+{
+	using namespace hgps;
+
+	auto engine = MTRandom32(123456789);
+	auto rnd_gen = Random(engine);
+	auto value = rnd_gen.next_double();
+	ASSERT_GT(value, 0.0);
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		value = rnd_gen.next_double();
+		ASSERT_GT(value, 0.0);
+	}
+}
+
+TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
+{
+	using namespace hgps;
+
+	auto engine = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(engine);
 
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
@@ -121,8 +155,8 @@ TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
 	auto sample_size = 100;
 	for (size_t i = 0; i < sample_size; i++)
 	{
-		summary_one.append(rnd.next_int(sample_max));
-		summary_two.append(rnd.next_int(sample_min, sample_max));
+		summary_one.append(rnd_gen.next_int(sample_max));
+		summary_two.append(rnd_gen.next_int(sample_min, sample_max));
 	}
 
 	ASSERT_EQ(0.0, summary_one.min());
@@ -132,14 +166,41 @@ TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
 	ASSERT_EQ(sample_max, summary_two.max());
 }
 
-TEST(TestHealthGPS, RandomBitGeneratorEmpiricalDiscrete)
+TEST(TestHealthGPS, RandomNextNormal)
 {
 	using namespace hgps;
 
-	auto rnd = MTRandom32{ 123456789 };
+	auto engine = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(engine);
 
-	auto values = std::vector<int>{2, 3, 5, 7, 9};
-	auto freq_pdf = std::vector<float>{0.2f, 0.4f, 0.1f, 0.2f, 0.1f };
+	auto summary_one = core::UnivariateSummary();
+	auto summary_two = core::UnivariateSummary();
+
+	auto sample_mean = 1;
+	auto sample_stdev = 2.5;
+	auto sample_size = 100;
+	for (size_t i = 0; i < sample_size; i++)
+	{
+		summary_one.append(rnd_gen.next_normal());
+		summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
+	}
+
+	ASSERT_NEAR(summary_one.average(), 0.0, 0.1);
+	ASSERT_NEAR(summary_one.std_deviation(), 1.0, 0.1);
+
+	ASSERT_NEAR(summary_two.average(), sample_mean, 0.1);
+	ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, 0.1);
+}
+
+TEST(TestHealthGPS, RandomEmpiricalDiscrete)
+{
+	using namespace hgps;
+
+	auto engine = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(engine);
+
+	auto values = std::vector<int>{ 2, 3, 5, 7, 9 };
+	auto freq_pdf = std::vector<float>{ 0.2f, 0.4f, 0.1f, 0.2f, 0.1f };
 	auto cdf = std::vector<float>(freq_pdf.size());
 
 	cdf[0] = freq_pdf[0];
@@ -155,7 +216,7 @@ TEST(TestHealthGPS, RandomBitGeneratorEmpiricalDiscrete)
 	auto summary = core::UnivariateSummary();
 	auto sample_size = 100;
 	for (size_t i = 0; i < sample_size; i++) {
-		summary.append(rnd.next_empirical_discrete(values, cdf));
+		summary.append(rnd_gen.next_empirical_discrete(values, cdf));
 	}
 
 	ASSERT_EQ(2.0, summary.min());

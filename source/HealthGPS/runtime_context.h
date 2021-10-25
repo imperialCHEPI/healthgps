@@ -6,6 +6,7 @@
 #include "event_aggregator.h"
 #include "runtime_metric.h"
 #include "simulation_definition.h"
+#include "random_algorithm.h"
 
 namespace hgps {
 
@@ -29,6 +30,8 @@ namespace hgps {
 
 		Scenario& scenario() noexcept;
 
+		Random& random() noexcept;
+
 		const HierarchicalMapping& mapping() const noexcept;
 
 		const std::vector<core::DiseaseInfo>& diseases() const noexcept;
@@ -36,13 +39,6 @@ namespace hgps {
 		const core::IntegerInterval& age_range() const noexcept;
 
 		const std::string identifier() const noexcept;
-
-		int next_int();
-		int next_int(const int& max_value);
-		int next_int(const int& min_value, const int& max_value);
-		double next_double() noexcept;
-		int next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf);
-		int next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf);
 
 		void set_current_time(const int time_now) noexcept;
 
@@ -55,6 +51,7 @@ namespace hgps {
 		void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
 	private:
+		Random generator_;
 		Population population_;
 		EventAggregator& event_bus_;
 		SimulationDefinition& definition_;

@@ -103,7 +103,7 @@ namespace hgps {
 		// Residual Risk Factors Random Sampling
 		auto residual_risk_factors = std::map<std::string, double>();
 		for (const auto& factor : level_factors) {
-			auto row_idx = context.next_int(static_cast<int>(level_info.residual_distribution.rows() - 1));
+			auto row_idx = context.random().next_int(static_cast<int>(level_info.residual_distribution.rows() - 1));
 			auto col_idx = level_info.variables.at(factor.key());
 			residual_risk_factors.emplace(factor.key(), level_info.residual_distribution(row_idx, col_idx));
 		}

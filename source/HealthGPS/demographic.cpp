@@ -334,7 +334,7 @@ namespace hgps {
 				}
 
 				auto death_probability = 1.0 - product;
-				auto hazard = context.next_double();
+				auto hazard = context.random().next_double();
 				if (hazard < death_probability) {
 					entity.is_alive = false;
 					entity.time_of_death = context.time_now();

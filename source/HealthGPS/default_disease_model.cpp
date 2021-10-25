@@ -32,7 +32,7 @@ namespace hgps {
 			auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
 			auto prevalence = definition_.table()(entity.age, entity.gender).at(prevalence_id);
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases[disease_type()] = Disease{
 					.status = DiseaseStatus::active,
@@ -172,7 +172,7 @@ namespace hgps {
 			}
 
 			auto probability = definition_.table()(entity.age, entity.gender).at(remission_id);
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases.at(disease_type()).status = DiseaseStatus::free;
 				remission_count++;
@@ -212,7 +212,7 @@ namespace hgps {
 			}
 
 			auto probability = calculate_incidence_probability(entity, context.time_now());
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases[disease_type()] = Disease{
 									.status = DiseaseStatus::active,
