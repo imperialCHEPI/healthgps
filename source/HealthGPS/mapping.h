@@ -2,13 +2,32 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <stdexcept>
 
 namespace hgps {
+
+	struct FactorRange {
+		FactorRange() = default;
+		FactorRange(const double min_value, const double max_value)
+			: minimum {min_value}, maximum{max_value}, empty{false} {
+			if (min_value > max_value) {
+				throw std::invalid_argument("Factor range minimum must not be greater than maximum.");
+			}
+		}
+
+		bool empty{ true };
+		double minimum{};
+		double maximum{};
+	};
 
 	class MappingEntry {
 	public:
 		MappingEntry() = delete;
+		MappingEntry(std::string name, const short level, std::string entity_name,
+			FactorRange range, const bool dynamic_factor);
+
 		MappingEntry(std::string name, const short level, std::string entity_name, const bool dynamic_factor);
+		MappingEntry(std::string name, const short level, std::string entity_name, FactorRange range);
 		MappingEntry(std::string name, const short level, std::string entity_name);
 		MappingEntry(std::string name, const short level);
 
@@ -26,12 +45,17 @@ namespace hgps {
 
 		std::string key() const noexcept;
 
+		const FactorRange& range() const noexcept;
+
+		double get_bounded_value(const double& value) const noexcept;
+
 	private:
 		std::string name_;
 		std::string name_key_;
 		short level_{};
 		bool dynamic_factor_;
 		std::string entity_name_;
+		FactorRange range_;
 	};
 
 	class HierarchicalMapping {

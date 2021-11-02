@@ -115,6 +115,31 @@ namespace hgps {
 
 	void HealthGPS::fini(adevs::Time clock)
 	{
+		auto bmi_value = 0.0;
+		auto male_data = std::vector<double>{};
+		auto feme_data = std::vector<double>{};
+		auto male_info = core::UnivariateSummary("Male BMI");
+		auto feme_info = core::UnivariateSummary("Female BMI");
+		for (const auto& p : context_.population()) {
+			if (!p.is_active()) {
+				continue;
+			}
+
+			bmi_value = p.get_risk_factor_value("bmi");
+			if (p.gender == core::Gender::male) {
+				male_info.append(bmi_value);
+				male_data.push_back(bmi_value);
+			}
+			else {
+				feme_info.append(bmi_value);
+				feme_data.push_back(bmi_value);
+			}
+		}
+
+		auto male = male_info.to_string();
+		auto feme = feme_info.to_string();
+
+		// risk_factor_->update_population(context_);
 		auto message = std::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
 		context_.publish(std::make_unique<InfoEventMessage>(
 			name(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
@@ -168,7 +193,7 @@ namespace hgps {
 		disease_->update_population(context_);
 
 		// Update risk factors
-		risk_factor_->adjust_risk_factors_with_baseline(context_);
+		// risk_factor_->adjust_risk_factors_with_baseline(context_);
 
 		// Publish results to data logger
 		analysis_->update_population(context_);
@@ -330,6 +355,7 @@ namespace hgps {
 		auto clone = Person{};
 		clone.age = source.age;
 		clone.gender = source.gender;
+		clone.ses = source.ses;
 		clone.education.set_both_values(source.education.value());
 		clone.income.set_both_values(source.income.value());
 		clone.is_alive = true;
@@ -363,7 +389,8 @@ namespace hgps {
 			}
 		}
 
-		std::size_t longestColumnName = 0;
+		std::string population = "Population";
+		std::size_t longestColumnName = population.length();
 		for (const auto& entry : context_.mapping()) {
 			longestColumnName = std::max(longestColumnName, entry.name().length());
 		}
@@ -381,7 +408,7 @@ namespace hgps {
 		ss << std::format("|{:-<{}}|\n", '-', width);
 
 		ss << std::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n",
-			"Population", pad, orig_pop, sim8_pop, orig_pop, sim8_pop);
+			population, pad, orig_pop, sim8_pop, orig_pop, sim8_pop);
 
 		for (const auto& entry : context_.mapping()) {
 			auto col = entry.name();

@@ -8,15 +8,22 @@
 
 namespace hgps {
 	hgps::MappingEntry::MappingEntry(std::string name, const short level, 
-		std::string entity_name, const bool dynamic_factor) 
+		std::string entity_name, FactorRange range, const bool dynamic_factor)
 		: name_{ name }, level_{ level }, entity_name_{ core::to_lower(entity_name) },
-		dynamic_factor_{ dynamic_factor }, name_key_{ core::to_lower(name) } { }
+		range_{range}, dynamic_factor_{ dynamic_factor }, name_key_{ core::to_lower(name) } { }
+
+	MappingEntry::MappingEntry(std::string name, const short level,
+		std::string entity_name, const bool dynamic_factor)
+		: MappingEntry(name, level, entity_name, FactorRange{}, dynamic_factor) {}
+
+	MappingEntry::MappingEntry(std::string name, const short level, std::string entity_name, FactorRange range)
+		: MappingEntry(name, level, entity_name, range, false) {}
 
 	MappingEntry::MappingEntry(std::string name, const short level, std::string entity_name)
-		: MappingEntry(name, level, entity_name, false) {}
+		: MappingEntry(name, level, entity_name, FactorRange{}, false) {}
 
 	MappingEntry::MappingEntry(std::string name, const short level)
-		: MappingEntry(name, level, std::string{}, false) {}
+		: MappingEntry(name, level, std::string{}, FactorRange{}, false) {}
 
 	std::string MappingEntry::name() const noexcept { return name_; }
 
@@ -33,6 +40,18 @@ namespace hgps {
 	bool MappingEntry::is_dynamic_factor() const noexcept { return dynamic_factor_; }
 
 	std::string MappingEntry::key() const noexcept { return name_key_; }
+
+	const FactorRange& MappingEntry::range() const noexcept {
+		return range_;
+	}
+
+	double MappingEntry::get_bounded_value(const double& value) const noexcept {
+		if (range_.empty) {
+			return value;
+		}
+
+		return std::min(std::max(value, range_.minimum), range_.maximum);
+	}
 
 	inline bool operator> (const MappingEntry& lhs, const MappingEntry& rhs) {
 		return lhs.level() > rhs.level() || 

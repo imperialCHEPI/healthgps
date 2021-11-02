@@ -40,6 +40,8 @@ namespace hgps {
 
 		unsigned int age{};
 
+		double ses{};
+
 		bool is_alive{ true };
 
 		bool has_emigrated{ false };

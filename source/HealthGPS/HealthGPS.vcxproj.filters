@@ -240,6 +240,12 @@
     <ClInclude Include="random_algorithm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ses_noise_module.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="energy_balance_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -349,6 +355,12 @@
     </ClCompile>
     <ClCompile Include="random_algorithm.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ses_noise_module.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="energy_balance_model.cpp">
+      <Filter>Source Files\models</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

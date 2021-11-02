@@ -148,9 +148,9 @@ namespace hgps {
 			determ_comp_factors.emplace(factor.key(), sum);
 		}
 
-		for (const auto& factor : determ_comp_factors) {
-			auto total_value = factor.second + stoch_comp_factors.at(factor.first);
-			entity.risk_factors[factor.first] = total_value;
+		for (const auto& factor : level_factors) {
+			auto total_value = determ_comp_factors.at(factor.key()) + stoch_comp_factors.at(factor.key());
+			entity.risk_factors[factor.key()] = factor.get_bounded_value(total_value);
 		}
 	}
 
@@ -229,7 +229,7 @@ namespace hgps {
 		// Update individual
 		for (const auto& factor : level_factors) {
 			auto total_value = next_determ_comp_factors.at(factor.key()) + next_stoch_comp_factors.at(factor.key());
-			entity.risk_factors[factor.key()] = total_value;
+			entity.risk_factors[factor.key()] = factor.get_bounded_value(total_value);
 		}
 	}
 

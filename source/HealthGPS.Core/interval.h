@@ -20,11 +20,17 @@ namespace hgps {
 
 			TYPE length() const { return upper_ - lower_; }
 
-			bool contains(TYPE value) { lower_ <= value && value <= upper_; }
+			bool contains(TYPE value) const noexcept {
+				return lower_ <= value && value <= upper_;
+			}
 
-			bool contains(Interval<TYPE>& other) { is_inside(other.lower_) && is_inside(other.upper_); }
+			bool contains(Interval<TYPE>& other) const noexcept {
+				return is_inside(other.lower_) && is_inside(other.upper_); 
+			}
 
-			std::string to_string() const noexcept { return std::format("{}-{}", lower_, upper_); }
+			std::string to_string() const noexcept {
+				return std::format("{}-{}", lower_, upper_);
+			}
 
 			auto operator<=>(const Interval<TYPE>&) const = default;
 		private:

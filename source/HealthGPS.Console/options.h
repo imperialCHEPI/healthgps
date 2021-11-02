@@ -44,9 +44,17 @@ struct BaselineInfo
 	std::string file_name;
 };
 
+struct RiskFactorInfo
+{
+	std::string name;
+	short level;
+	std::string proxy;
+	std::vector<double> range;
+};
+
 struct ModellingInfo
 {
-	std::unordered_map<std::string, int> risk_factors;
+	std::vector<RiskFactorInfo> risk_factors;
 	std::string dynamic_risk_factor;
 	std::unordered_map<std::string, std::string> models;
 	BaselineInfo baseline_adjustment;
@@ -91,6 +99,7 @@ struct Configuration
 	unsigned int stop_time{};
 	unsigned int trial_runs{};
 	unsigned int sync_timeout_ms{};
+	unsigned int loop_max_trials{};
 	PolicyScenarioInfo intervention;
 	ResultInfo result;
 };

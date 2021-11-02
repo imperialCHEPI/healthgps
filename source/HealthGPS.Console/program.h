@@ -10,22 +10,12 @@
 #include <cxxopts.hpp>
 
 #include "HealthGPS/api.h"
-#include "HealthGPS.Core/scoped_timer.h"
 
 #include "csvparser.h"
 #include "jsonparser.h"
 
 using namespace hgps;
 namespace fs = std::filesystem;
-
-#define USE_TIMER 1
-
-#if USE_TIMER
-#define MEASURE_FUNCTION()                                                     \
-  core::ScopedTimer timer { __func__ }
-#else
-#define MEASURE_FUNCTION()
-#endif
 
 std::string getTimeNowStr() {
 	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -141,6 +131,7 @@ Configuration load_configuration(CommandOptions& options) {
 
 		// Modelling information
 		config.modelling = opt["modelling"].get<ModellingInfo>();
+
 		for (auto& model : config.modelling.models) {
 			full_path = model.second;
 			if (full_path.is_relative()) {
@@ -162,8 +153,9 @@ Configuration load_configuration(CommandOptions& options) {
 			config.modelling.baseline_adjustment.file_name = full_path.string();
 		}
 
-		if (!config.modelling.dynamic_risk_factor.empty() &&
-			!config.modelling.risk_factors.contains(config.modelling.dynamic_risk_factor)) {
+		if (!config.modelling.dynamic_risk_factor.empty()) {
+			// TODO: Search for dynamic factor
+			// !config.modelling.risk_factors.contains(config.modelling.dynamic_risk_factor))
 			fmt::print(fg(fmt::color::red),
 				"\nInvalid configuration, dynamic risk factor: {} is not a risk factor.\n",
 				config.modelling.dynamic_risk_factor);
@@ -174,6 +166,7 @@ Configuration load_configuration(CommandOptions& options) {
 		opt["running"]["stop_time"].get_to(config.stop_time);
 		opt["running"]["trial_runs"].get_to(config.trial_runs);
 		opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
+		opt["running"]["loop_max_trials"].get_to(config.loop_max_trials);
 		auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
 		if (seed.size() > 0) {
 			config.custom_seed = seed[0];
@@ -200,51 +193,157 @@ Configuration load_configuration(CommandOptions& options) {
 	return config;
 }
 
-std::unordered_map<std::string, HierarchicalModelInfo> load_risk_model_info(ModellingInfo info) {
+HierarchicalLinearModelDefinition load_static_risk_model_definition(
+	std::string model_filename, hgps::BaselineAdjustment& baseline_data) {
 	MEASURE_FUNCTION();
-	std::unordered_map<std::string, HierarchicalModelInfo> modelsInfo;
-	for (auto& model : info.models) {
-		std::ifstream ifs(model.second, std::ifstream::in);
-		if (ifs) {
-			try {
-				auto opt = json::parse(ifs);
-				HierarchicalModelInfo hmodel;
-				hmodel.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
-				hmodel.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
-				modelsInfo.emplace(model.first, hmodel);
+
+	std::map<int, HierarchicalLevel> levels;
+	std::unordered_map<std::string, LinearModel> models;
+	std::ifstream ifs(model_filename, std::ifstream::in);
+	if (ifs) {
+		try {
+			auto opt = json::parse(ifs);
+			HierarchicalModelInfo model_info;
+			model_info.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
+			model_info.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
+
+			for (auto& model_item : model_info.models) {
+				auto& at = model_item.second;
+
+				std::unordered_map<std::string, Coefficient> coeffs;
+				for (auto& pair : at.coefficients) {
+					coeffs.emplace(core::to_lower(pair.first), Coefficient{
+							.value = pair.second.value,
+							.pvalue = pair.second.pvalue,
+							.tvalue = pair.second.tvalue,
+							.std_error = pair.second.std_error
+						});
+				}
+
+				models.emplace(core::to_lower(model_item.first), LinearModel{
+					.coefficients = coeffs,
+					.residuals_standard_deviation = at.residuals_standard_deviation,
+					.rsquared = at.rsquared
+					});
 			}
-			catch (const std::exception& ex) {
-				fmt::print(fg(fmt::color::red),
-					"Failed to parse model: {:<7}, file: {}. {}\n",
-					model.first, model.second, ex.what());
-			}
+
+			for (auto& level_item : model_info.levels) {
+				auto& at = level_item.second;
+				std::unordered_map<std::string, int> col_names;
+				for (int i = 0; i < at.variables.size(); i++) {
+					col_names.emplace(core::to_lower(at.variables[i]), i);
+				}
+
+				levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
+					.variables = col_names,
+					.transition = core::DoubleArray2D(
+						at.transition.rows, at.transition.cols, at.transition.data),
+
+					.inverse_transition = core::DoubleArray2D(at.inverse_transition.rows,
+						at.inverse_transition.cols, at.inverse_transition.data),
+
+					.residual_distribution = core::DoubleArray2D(at.residual_distribution.rows,
+						at.residual_distribution.cols, at.residual_distribution.data),
+
+					.correlation = core::DoubleArray2D(at.correlation.rows,
+						at.correlation.cols, at.correlation.data),
+
+					.variances = at.variances
+					});
+			}		
 		}
-		else {
+		catch (const std::exception& ex) {
 			fmt::print(fg(fmt::color::red),
-				"Model: {:<7}, file: {} not found.\n",
-				model.first, model.second);
+				"Failed to parse model: {:<7}, file: {}. {}\n",
+				"static", model_filename, ex.what());
 		}
-
-		ifs.close();
+	}
+	else {
+		fmt::print(fg(fmt::color::red),
+			"Model: {:<7}, file: {} not found.\n", "static", model_filename);
 	}
 
-	fmt::print(" Risk Factors: {}, models: {}\n", info.risk_factors.size(), modelsInfo.size());
-	fmt::print("|{0:-^{1}}|\n", "", 43);
-	fmt::print("| {:<8} : {:>8} : {:>8} : {:>8} |\n", "Type", "Models", "Levels", "Factors");
-	fmt::print("|{0:-^{1}}|\n", "", 43);
-	for (auto& model : modelsInfo) {
-		auto max_model = std::max_element(model.second.models.begin(), model.second.models.end(),
-			[](const auto& lhs, const auto& rhs) {
-				return lhs.second.coefficients.size() < rhs.second.coefficients.size();
-			});
+	ifs.close();
+	return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), baseline_data };
+}
 
-		fmt::print("| {:<8} : {:>8} : {:>8} : {:>8} |\n",
-			model.first, model.second.models.size(), model.second.levels.size(),
-			max_model->second.coefficients.size());
+LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename) {
+	MEASURE_FUNCTION();
+
+	std::map<std::string, std::string> variables;
+	std::map<core::IntegerInterval, AgeGroupGenderEquation> equations;
+
+	std::ifstream ifs(model_filename, std::ifstream::in);
+	if (ifs) {
+		try {
+			auto opt = json::parse(ifs);
+			auto info = LiteHierarchicalModelInfo{};
+			info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
+			for (auto it : opt["Equations"].items()) {
+				auto age_key = it.key();
+				info.equations.emplace(age_key, std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
+
+				for (auto sit : it.value().items()) {
+					auto gender_key = sit.key();
+					auto gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
+					info.equations.at(age_key).emplace(gender_key, gender_funcs);
+				}
+			}
+
+			for (auto& item : info.variables) {
+				variables.emplace(core::to_lower(item.name), core::to_lower(item.factor));
+			}
+
+			for (auto& age_grp : info.equations) {
+				auto limits = core::split_string(age_grp.first, "-");
+				auto age_key = core::IntegerInterval(std::stoi(limits[0].data()), std::stoi(limits[1].data()));
+				auto age_equations = AgeGroupGenderEquation{ .age_group = age_key };
+				for (auto& gender : age_grp.second)	{
+					
+					if (core::case_insensitive::equals("male", gender.first)) {
+						for (auto& func : gender.second) {
+							auto function = FactorDynamicEquation{ .name = func.name };
+							function.residuals_standard_deviation = func.residuals_standard_deviation;
+							for (auto& coeff : func.coefficients) {
+								function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
+							}
+
+							age_equations.male.emplace(core::to_lower(func.name), function);
+						}
+					}
+					else if (core::case_insensitive::equals("female", gender.first)) {
+						for (auto& func : gender.second) {
+							auto function = FactorDynamicEquation{ .name = func.name };
+							function.residuals_standard_deviation = func.residuals_standard_deviation;
+							for (auto& coeff : func.coefficients) {
+								function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
+							}
+
+							age_equations.female.emplace(core::to_lower(func.name), function);
+						}
+					}
+					else {
+						fmt::print(fg(fmt::color::red),
+							"Unknown model gender type: {}.\n", gender.first);
+					}
+				}
+
+				equations.emplace(age_key, std::move(age_equations));
+			}
+		}
+		catch (const std::exception& ex) {
+			fmt::print(fg(fmt::color::red),
+				"Failed to parse model: {:<7}, file: {}. {}\n",
+				"static", model_filename, ex.what());
+		}
+	}
+	else {
+		fmt::print(fg(fmt::color::red),
+			"Model: {:<7}, file: {} not found.\n", "static", model_filename);
 	}
 
-	fmt::print("|{0:_^{1}}|\n\n", "", 43);
-	return modelsInfo;
+	ifs.close();
+	return LiteHierarchicalModelDefinition{ std::move(equations), std::move(variables) };
 }
 
 hgps::BaselineAdjustment load_baseline_adjustments(
@@ -288,74 +387,24 @@ hgps::BaselineAdjustment load_baseline_adjustments(
 void register_risk_factor_model_definitions(const ModellingInfo info,
 	hgps::CachedRepository& repository, hgps::BaselineAdjustment& baseline_data) {
 	MEASURE_FUNCTION();
-	auto config_models_info = load_risk_model_info(info);
-
-	// Create hierarchical models
-	for (auto& config_model_type : config_models_info) {
+	for (auto& model : info.models) {
 		HierarchicalModelType model_type;
-		if (core::case_insensitive::equals(config_model_type.first, "static")) {
+		if (core::case_insensitive::equals(model.first, "static")) {
 			model_type = HierarchicalModelType::Static;
+			auto model_definition = load_static_risk_model_definition(model.second, baseline_data);
+			repository.register_linear_model_definition(model_type, std::move(model_definition));
+			
 		}
-		else if (core::case_insensitive::equals(config_model_type.first, "dynamic")) {
+		else if (core::case_insensitive::equals(model.first, "dynamic")) {
 			model_type = HierarchicalModelType::Dynamic;
+			auto model_definition = load_dynamic_risk_model_info(model.second);
+			repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
 		}
 		else {
 			fmt::print(fg(fmt::color::red),
-				"Unknown hierarchical model type: {}.\n", config_model_type.first);
+				"Unknown hierarchical model type: {}.\n", model.first);
 			continue;
 		}
-
-		// TODO: independent work, can be done in parallel
-		std::unordered_map<std::string, LinearModel> models;
-		for (auto& model_item : config_model_type.second.models) {
-			auto& at = model_item.second;
-
-			std::unordered_map<std::string, Coefficient> coeffs;
-			for (auto& pair : at.coefficients) {
-				coeffs.emplace(core::to_lower(pair.first), Coefficient{
-						.value = pair.second.value,
-						.pvalue = pair.second.pvalue,
-						.tvalue = pair.second.tvalue,
-						.std_error = pair.second.std_error
-					});
-			}
-
-			models.emplace(core::to_lower(model_item.first), LinearModel{
-				.coefficients = coeffs,
-				.fitted_values = at.fitted_values,
-				.residuals = at.fitted_values,
-				.rsquared = at.rsquared
-				});
-		}
-
-		std::map<int, HierarchicalLevel> levels;
-		for (auto& level_item : config_model_type.second.levels) {
-			auto& at = level_item.second;
-			std::unordered_map<std::string, int> col_names;
-			for (int i = 0; i < at.variables.size(); i++) {
-				col_names.emplace(core::to_lower(at.variables[i]), i);
-			}
-
-			levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
-				.variables = col_names,
-				.transition = core::DoubleArray2D(
-					at.transition.rows, at.transition.cols, at.transition.data),
-
-				.inverse_transition = core::DoubleArray2D(at.inverse_transition.rows,
-					at.inverse_transition.cols, at.inverse_transition.data),
-
-				.residual_distribution = core::DoubleArray2D(at.residual_distribution.rows,
-					at.residual_distribution.cols, at.residual_distribution.data),
-
-				.correlation = core::DoubleArray2D(at.correlation.rows,
-					at.correlation.cols, at.correlation.data),
-
-				.variances = at.variances
-				});
-		}
-
-		repository.register_linear_model_definition(model_type,
-			HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), baseline_data });
 	}
 }
 
@@ -376,16 +425,6 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	return result;
 }
 
-auto find_by_value(SESMapping ses, std::string value) {
-	for (auto& i : ses.entries) {
-		if (core::case_insensitive::equals(i.second, value)) {
-			return i.first;
-		}
-	}
-
-	return std::string{};
-}
-
 ModelInput create_model_input(core::DataTable& input_table, core::Country country,
 	Configuration& config, std::vector<core::DiseaseInfo> diseases)
 {
@@ -400,6 +439,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
 		.sync_timeout_ms = config.sync_timeout_ms,
+		.loop_max_trials = config.loop_max_trials,
 		.seed = config.custom_seed
 	};
 
@@ -412,13 +452,21 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 
 	auto mapping = std::vector<MappingEntry>();
 	for (auto& item : config.modelling.risk_factors) {
-		if (core::case_insensitive::equals(item.first, config.modelling.dynamic_risk_factor)) {
-			mapping.emplace_back(MappingEntry(item.first, item.second,
-				find_by_value(ses_mapping, item.first), true));
+		if (core::case_insensitive::equals(item.name, config.modelling.dynamic_risk_factor)) {
+			if (item.range.empty()) {
+				mapping.emplace_back(MappingEntry(item.name, item.level, item.proxy, true));
+			}
+			else {
+				auto boundary = FactorRange{ item.range[0], item.range[1] };
+				mapping.emplace_back(MappingEntry(item.name, item.level, item.proxy, boundary, true));
+			}
+		}
+		else if (!item.range.empty()) {
+			auto boundary = FactorRange{ item.range[0], item.range[1] };
+			mapping.emplace_back(MappingEntry{ item.name, item.level, item.proxy, boundary });
 		}
 		else {
-			mapping.emplace_back(MappingEntry(item.first, item.second,
-				find_by_value(ses_mapping, item.first)));
+			mapping.emplace_back(MappingEntry{ item.name, item.level, item.proxy });
 		}
 	}
 

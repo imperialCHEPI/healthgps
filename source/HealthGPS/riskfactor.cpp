@@ -52,16 +52,16 @@ namespace hgps {
 		static_model->generate_risk_factors(context);
 
 		// This should be a internal function called by generate_risk_factors?
-		static_model->adjust_risk_factors_with_baseline(context);
+		// static_model->adjust_risk_factors_with_baseline(context);
 	}
 
 	void RiskFactorModule::update_population(RuntimeContext& context) {
-		auto& dynamic_model = models_.at(HierarchicalModelType::Dynamic);
-
 		// Generate risk factors for newborns
-		dynamic_model->generate_risk_factors(context);
+		auto& static_model = models_.at(HierarchicalModelType::Static);
+		static_model->update_risk_factors(context);
 
 		// Update risk factors for population
+		auto& dynamic_model = models_.at(HierarchicalModelType::Dynamic);
 		dynamic_model->update_risk_factors(context);
 	}
 
@@ -73,13 +73,29 @@ namespace hgps {
 
 	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, const ModelInput& config)
 	{
-		auto registry = get_default_hierarchical_model_registry();
-		auto models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
-		models.emplace(HierarchicalModelType::Static, registry.at(HierarchicalModelType::Static)(
-			repository.get_linear_model_definition(HierarchicalModelType::Static)));
+		// Both model types are required, and must be registered
+		auto full_registry = get_default_hierarchical_model_registry();
+		auto lite_registry = get_default_lite_hierarchical_model_registry();
 
-		models.emplace(HierarchicalModelType::Dynamic, registry.at(HierarchicalModelType::Dynamic)(
-			repository.get_linear_model_definition(HierarchicalModelType::Dynamic)));
+		auto models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
+		if (full_registry.contains(HierarchicalModelType::Static)) {
+			models.emplace(HierarchicalModelType::Static, full_registry.at(HierarchicalModelType::Static)(
+				repository.get_linear_model_definition(HierarchicalModelType::Static)));
+		}
+		else {
+			models.emplace(HierarchicalModelType::Static, lite_registry.at(HierarchicalModelType::Static)(
+				repository.get_lite_linear_model_definition(HierarchicalModelType::Static)));
+		}
+
+		// Creates dynamic, must be in one of the registries
+		if (full_registry.contains(HierarchicalModelType::Dynamic)) {
+			models.emplace(HierarchicalModelType::Dynamic, full_registry.at(HierarchicalModelType::Dynamic)(
+				repository.get_linear_model_definition(HierarchicalModelType::Dynamic)));
+		}
+		else {
+			models.emplace(HierarchicalModelType::Dynamic, lite_registry.at(HierarchicalModelType::Dynamic)(
+				repository.get_lite_linear_model_definition(HierarchicalModelType::Dynamic)));
+		}
 
 		return std::make_unique<RiskFactorModule>(std::move(models));
 	}

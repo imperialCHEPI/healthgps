@@ -31,16 +31,14 @@ void to_json(json& j, const LinearModelInfo& p) {
 	j = json{
 		{"formula", p.formula},
 		{"coefficients", p.coefficients},
-		{"residuals", p.residuals},
-		{"fittedValues", p.fitted_values},
+		{"residualsStandardDeviation", p.residuals_standard_deviation},
 		{"rSquared", p.rsquared} };
 }
 
 void from_json(const json& j, LinearModelInfo& p) {
 	j.at("formula").get_to(p.formula);
 	j.at("coefficients").get_to(p.coefficients);
-	j.at("residuals").get_to(p.residuals);
-	j.at("fittedValues").get_to(p.fitted_values);
+	j.at("residualsStandardDeviation").get_to(p.residuals_standard_deviation);
 	j.at("rSquared").get_to(p.rsquared);
 }
 
@@ -146,6 +144,34 @@ void from_json(const json& j, BaselineInfo& p) {
 }
 
 // Risk Factor Modelling
+void to_json(json& j, const RiskFactorInfo& p) {
+	j = json{
+		{"name", p.name},
+		{"level", p.level},
+		{"proxy", p.proxy},
+		{"range", p.range} };
+}
+
+void from_json(const json& j, RiskFactorInfo& p) {
+	j.at("name").get_to(p.name);
+	j.at("level").get_to(p.level);
+	j.at("proxy").get_to(p.proxy);
+	j.at("range").get_to(p.range);
+}
+
+void to_json(json& j, const VariableInfo& p) {
+	j = json{
+		{"Name", p.name},
+		{"Level", p.level},
+		{"Factor", p.factor} };
+}
+
+void from_json(const json& j, VariableInfo& p) {
+	j.at("Name").get_to(p.name);
+	j.at("Level").get_to(p.level);
+	j.at("Factor").get_to(p.factor);
+}
+
 void to_json(json& j, const ModellingInfo& p) {
 	j = json{
 		{"risk_factors", p.risk_factors},
@@ -159,6 +185,19 @@ void from_json(const json& j, ModellingInfo& p) {
 	j.at("dynamic_risk_factor").get_to(p.dynamic_risk_factor);
 	j.at("models").get_to(p.models);
 	j.at("baseline_adjustment").get_to(p.baseline_adjustment);
+}
+
+void to_json(json& j, const FactorDynamicEquationInfo& p) {
+	j = json{
+		{"Name", p.name},
+		{"Coefficients", p.coefficients},
+		{"ResidualsStandardDeviation", p.residuals_standard_deviation} };
+}
+
+void from_json(const json& j, FactorDynamicEquationInfo& p) {
+	j.at("Name").get_to(p.name);
+	j.at("Coefficients").get_to(p.coefficients);
+	j.at("ResidualsStandardDeviation").get_to(p.residuals_standard_deviation);
 }
 
 // Policy Scenario

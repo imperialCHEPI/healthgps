@@ -5,6 +5,16 @@
 #include "HealthGPS/gender_value.h"
 #include "HealthGPS/hierarchical_model_types.h"
 #include "HealthGPS.Core/string_util.h"
+#include "HealthGPS.Core/scoped_timer.h"
+
+#define USE_TIMER 1
+
+#if USE_TIMER
+#define MEASURE_FUNCTION()                                                     \
+  hgps::core::ScopedTimer timer { __func__ }
+#else
+#define MEASURE_FUNCTION()
+#endif
 
 namespace hc = hgps::core;
 
@@ -76,7 +86,8 @@ bool load_datatable_csv(
 	const std::map<std::string, std::string> columns,
 	hc::DataTable& out_table,
 	const std::string delimiter = ",") {
-
+	
+	MEASURE_FUNCTION();
 	using namespace rapidcsv;
 
 	Document doc(full_filename, LabelParams(0, 0), SeparatorParams(delimiter.front()));

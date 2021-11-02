@@ -10,8 +10,7 @@ struct CoefficientInfo {
 struct LinearModelInfo {
 	std::string formula;
 	std::unordered_map<std::string, CoefficientInfo> coefficients;
-	std::vector<double> fitted_values;
-	std::vector<double> residuals;
+	double residuals_standard_deviation;
 	double rsquared{};
 };
 
@@ -33,4 +32,25 @@ struct HierarchicalLevelInfo {
 struct HierarchicalModelInfo {
 	std::unordered_map<std::string, LinearModelInfo> models;
 	std::unordered_map<std::string, HierarchicalLevelInfo> levels;
+};
+
+/* Energy Balance Style Models */
+
+struct VariableInfo
+{
+	std::string name;
+	short level;
+	std::string factor;
+};
+
+struct FactorDynamicEquationInfo {
+	std::string name;
+	std::map<std::string, double> coefficients;
+	double residuals_standard_deviation;
+};
+
+
+struct LiteHierarchicalModelInfo {
+	std::vector<VariableInfo> variables;
+	std::map<std::string, std::map<std::string, std::vector<FactorDynamicEquationInfo>>> equations;
 };

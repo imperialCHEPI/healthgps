@@ -1,7 +1,7 @@
 #pragma once
 
 #include "modulefactory.h"
-#include "ses.h"
+#include "ses_noise_module.h"
 #include "demographic.h"
 #include "riskfactor.h"
 #include "disease.h"
@@ -18,7 +18,7 @@ namespace hgps {
 		auto factory = SimulationModuleFactory(manager);
 		factory.register_builder(SimulationModuleType::SES,
 			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {
-				return build_ses_module(repository, config); });
+				return build_ses_noise_module(repository, config); });
 
 		factory.register_builder(SimulationModuleType::Demographic,
 			[](Repository& repository, const ModelInput& config) -> SimulationModuleFactory::ModuleType {

@@ -32,6 +32,10 @@ namespace hgps {
 		return run_info_.seed;
 	}
 
+	const RunInfo& ModelInput::run() const noexcept {
+		return run_info_;
+	}
+
 	const SESMapping& ModelInput::ses_mapping() const noexcept {
 		return ses_mapping_;
 	}

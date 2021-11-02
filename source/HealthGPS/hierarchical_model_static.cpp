@@ -35,7 +35,26 @@ namespace hgps {
 	}
 
 	void StaticHierarchicalLinearModel::update_risk_factors(RuntimeContext& context) {
-		throw std::logic_error("StaticHierarchicalLinearModel.update_risk_factors not yet implemented.");
+		std::vector<MappingEntry> level_factors;
+		std::unordered_map<int, std::vector<MappingEntry>> level_factors_cache;
+		auto newborn_age = 0u;
+		for (auto& entity : context.population()) {
+			if (entity.age > newborn_age) {
+				continue;
+			}
+
+			for (auto level = 1; level <= context.mapping().max_level(); level++) {
+				if (level_factors_cache.contains(level)) {
+					level_factors = level_factors_cache.at(level);
+				}
+				else {
+					level_factors = context.mapping().at_level_without_dynamic(level);
+					level_factors_cache.emplace(level, level_factors);
+				}
+
+				generate_for_entity(context, entity, level, level_factors);
+			}
+		}
 	}
 
 	void StaticHierarchicalLinearModel::adjust_risk_factors_with_baseline(RuntimeContext& context) {
@@ -102,7 +121,7 @@ namespace hgps {
 	void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
 		Person& entity, int level, std::vector<MappingEntry>& level_factors)
 	{
-		const auto level_info = definition_.levels.at(level);
+		const auto& level_info = definition_.levels.at(level);
 
 		// Residual Risk Factors Random Sampling
 		auto residual_risk_factors = std::map<std::string, double>();
@@ -145,9 +164,9 @@ namespace hgps {
 			determ_comp_factors.emplace(factor.key(), sum);
 		}
 
-		for (const auto& factor : determ_comp_factors) {
-			auto total_value = factor.second + stoch_comp_factors.at(factor.first);
-			entity.risk_factors[factor.first] = total_value;
+		for (const auto& factor : level_factors) {
+			auto total_value = determ_comp_factors.at(factor.key()) + stoch_comp_factors.at(factor.key());
+			entity.risk_factors[factor.key()] = factor.get_bounded_value(total_value);
 		}
 	}
 }
