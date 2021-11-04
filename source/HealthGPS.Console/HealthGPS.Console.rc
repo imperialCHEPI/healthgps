@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,5,0,0
- PRODUCTVERSION 0,5,0,0
+ FILEVERSION 0,6,0,0
+ PRODUCTVERSION 0,6,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -69,12 +69,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Imperial College London"
             VALUE "FileDescription", "Health GPS Microsimulation for policy options"
-            VALUE "FileVersion", "0.5.0.0"
+            VALUE "FileVersion", "0.6.0.0"
             VALUE "InternalName", "HealthGPS.Console"
             VALUE "LegalCopyright", "Copyright (C) 2021"
             VALUE "OriginalFilename", "HealthGPS.Console"
             VALUE "ProductName", "HealthGPS"
-            VALUE "ProductVersion", "0.5.0.0"
+            VALUE "ProductVersion", "0.6.0.0"
         END
     END
     BLOCK "VarFileInfo"

@@ -1,0 +1,104 @@
+{
+    "inputs": {
+        "file": {
+            "name": "France.DataFile.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "ASCII",
+            "columns": {
+                "Year": "integer",
+                "Gender": "integer",
+                "Age": "integer",
+                "Age2": "integer",
+                "Age3": "integer",
+                "SES": "double",
+                "PA": "double",
+                "Protein": "double",
+                "Sodium": "double",
+                "Fat": "double",
+                "Energy": "double",
+                "BMI": "double"
+            }
+        },
+        "settings": {
+            "country_code": "FRA",
+            "size_fraction": 0.0001,
+            "data_linkage": "Age",
+            "age_range": [
+                0,
+                100
+            ]
+        },
+        "ses": {
+            "noise_function":"normal",
+            "noise_parameters":[0.0, 1.0],
+            "update_interval": 5,
+            "update_max_age": 30,
+            "mapping": {
+                "gender": "Gender",
+                "age": "Age",
+                "education": "Education",
+                "income": "Income"
+            }
+        }
+    },
+    "modelling": {
+        "risk_factors": [
+            { "name": "Gender", "level": 0, "proxy": "gender", "range": [ 0, 1 ] },
+            { "name": "Age",    "level": 0, "proxy": "age",    "range": [ 1, 87] },
+            { "name": "Age2",   "level": 0, "proxy": "",       "range": [ 1, 7569 ] },
+            { "name": "Age3",   "level": 0, "proxy": "",       "range": [ 1, 658503 ] },
+            { "name": "SES",    "level": 0, "proxy": "ses",    "range": [ -2.314484485, 2.310181 ] },
+            { "name": "Sodium", "level": 1, "proxy": "",       "range": [ 1.146601, 8.675425 ] },
+            { "name": "Protein","level": 1, "proxy": "",       "range": [ 42.09252483, 238.4145 ] },
+            { "name": "Fat",    "level": 1, "proxy": "",       "range": [ 44.78128, 381.666 ] },
+            { "name": "PA",     "level": 2, "proxy": "",       "range": [ 400, 9769.83669 ] },
+            { "name": "Energy", "level": 2, "proxy": "",       "range": [ 1315.532125, 7545.832301 ] },
+            { "name": "BMI",    "level": 3, "proxy": "",       "range": [ 13.53255, 45.26488 ] }
+        ],
+        "dynamic_risk_factor": "",
+        "models": {
+            "static": "France_HLM.Json",
+            "dynamic": "France.EBHLM.json"
+        },
+        "baseline_adjustment": {
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "file_names": {
+                "static_male":"France.Initial.Adjustment.Male.csv",
+                "static_female":"France.Initial.Adjustment.Female.csv",
+                "dynamic_male":"France.Update.Adjustment.Male.csv",
+                "dynamic_female":"France.Update.Adjustment.Female.csv"
+            }
+        }
+    },
+    "running": {
+        "seed": [
+            123456789
+        ],
+        "start_time": 2010,
+        "stop_time": 2030,
+        "trial_runs": 1,
+        "sync_timeout_ms": 5000,
+        "diseases": [
+            "asthma",
+            "diabetes"
+        ],
+        "cancers": [],
+      "intervention": {
+        "is_enabled": false,
+        "impact_type": "absolute",
+        "impacts": {
+          "BMI": -1.0
+        },
+        "active_period": {
+          "start_time": 2021,
+          "finish_time": 2021
+        }
+      }
+    },
+    "results": {
+        "folder": "C:\\HealthGPS\\Result"
+    }
+}

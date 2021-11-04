@@ -11,7 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="configuration.cpp" />
+    <ClCompile Include="csvparser.cpp" />
     <ClCompile Include="event_monitor.cpp" />
+    <ClCompile Include="model_parser.cpp" />
     <ClCompile Include="result_file_writer.cpp" />
     <ClCompile Include="program.cpp" />
   </ItemGroup>
@@ -27,10 +30,11 @@
     <ClInclude Include="csvparser.h" />
     <ClInclude Include="event_monitor.h" />
     <ClInclude Include="model_info.h" />
+    <ClInclude Include="model_parser.h" />
     <ClInclude Include="result_file_writer.h" />
     <ClInclude Include="jsonparser.h" />
     <ClInclude Include="options.h" />
-    <ClInclude Include="program.h" />
+    <ClInclude Include="configuration.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="result_writer.h" />
     <ClInclude Include="riskmodel.h" />
@@ -94,7 +98,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;USE_TIMER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>

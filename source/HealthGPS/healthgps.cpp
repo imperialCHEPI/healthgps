@@ -192,9 +192,6 @@ namespace hgps {
 		// Update diseases status: remission and incidence
 		disease_->update_population(context_);
 
-		// Update risk factors
-		// risk_factor_->adjust_risk_factors_with_baseline(context_);
-
 		// Publish results to data logger
 		analysis_->update_population(context_);
 	}

@@ -119,7 +119,6 @@
     <ClInclude Include="finally.h" />
     <ClInclude Include="gender_table.h" />
     <ClInclude Include="gender_value.h" />
-    <ClInclude Include="hierarchical_model_dynamic.h" />
     <ClInclude Include="hierarchical_model_registry.h" />
     <ClInclude Include="hierarchical_model_static.h" />
     <ClInclude Include="hierarchical_model_types.h" />
@@ -154,7 +153,6 @@
     <ClInclude Include="settings.h" />
     <ClInclude Include="scenario.h" />
     <ClInclude Include="healthgps.h" />
-    <ClInclude Include="ses.h" />
     <ClInclude Include="simulation.h" />
     <ClInclude Include="sync_message.h" />
     <ClInclude Include="threadsafe_queue.h" />
@@ -174,7 +172,6 @@
     <ClCompile Include="error_message.cpp" />
     <ClCompile Include="event_bus.cpp" />
     <ClCompile Include="event_subscriber.cpp" />
-    <ClCompile Include="hierarchical_model_dynamic.cpp" />
     <ClCompile Include="Intervention_scenario.cpp" />
     <ClCompile Include="life_table.cpp" />
     <ClCompile Include="mapping.cpp" />
@@ -197,7 +194,6 @@
     <ClCompile Include="ses_noise_module.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="healthgps.cpp" />
-    <ClCompile Include="ses.cpp" />
     <ClCompile Include="hierarchical_model_static.cpp" />
     <ClCompile Include="univariate_visitor.cpp" />
   </ItemGroup>

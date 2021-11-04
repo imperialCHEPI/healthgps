@@ -13,7 +13,6 @@ namespace hgps {
 		const unsigned int start_time;
 		const unsigned int stop_time;
 		const unsigned int sync_timeout_ms;
-		const unsigned int loop_max_trials;
 		const std::optional<unsigned int> seed;
 	};
 

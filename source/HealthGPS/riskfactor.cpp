@@ -65,12 +65,6 @@ namespace hgps {
 		dynamic_model->update_risk_factors(context);
 	}
 
-	void RiskFactorModule::adjust_risk_factors_with_baseline(RuntimeContext& context)
-	{
-		auto& dynamic_model = models_.at(HierarchicalModelType::Dynamic);
-		dynamic_model->adjust_risk_factors_with_baseline(context);
-	}
-
 	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, const ModelInput& config)
 	{
 		// Both model types are required, and must be registered

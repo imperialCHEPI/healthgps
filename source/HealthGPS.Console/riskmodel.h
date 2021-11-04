@@ -51,6 +51,7 @@ struct FactorDynamicEquationInfo {
 
 
 struct LiteHierarchicalModelInfo {
+	double percentage{};
 	std::vector<VariableInfo> variables;
 	std::map<std::string, std::map<std::string, std::vector<FactorDynamicEquationInfo>>> equations;
 };

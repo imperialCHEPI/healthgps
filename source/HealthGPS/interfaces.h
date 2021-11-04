@@ -113,10 +113,6 @@ namespace hgps {
 		/// @param modelType The hierarchical model type identifier 
 		/// @return true if the hierarchical model is found, otherwise false.
 		virtual bool contains(const HierarchicalModelType& modelType) const noexcept = 0;
-
-		/// @brief Adjust the risk factors using the baseline scenario
-		/// @param context The simulation run-time context
-		virtual void adjust_risk_factors_with_baseline(RuntimeContext& context) = 0;
 	};
 
 	/// @brief Population prospects module interface
@@ -164,10 +160,6 @@ namespace hgps {
 		/// @brief Update risk factors for population
 		/// @param context The simulation run-time context
 		virtual void update_risk_factors(RuntimeContext& context) = 0;
-
-		/// @brief Adjust the risk factors using the baseline scenario
-		/// @param context The simulation run-time context
-		virtual void adjust_risk_factors_with_baseline(RuntimeContext& context) = 0;
 	};
 
 	/// @brief Diseases model interface

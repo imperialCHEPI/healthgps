@@ -18,11 +18,8 @@ namespace hgps {
 
 		void update_risk_factors(RuntimeContext& context) override;
 
-		void adjust_risk_factors_with_baseline(RuntimeContext& context) override;
-
 	private:
 		LiteHierarchicalModelDefinition& definition_;
-		std::map<int, double> bmi_updates_{};
 
 		void update_risk_factors_exposure(RuntimeContext& context, Person& entity,
 			std::map<std::string, double>& current_risk_factors,
@@ -30,5 +27,7 @@ namespace hgps {
 
 		std::map<std::string, double> get_current_risk_factors(
 			const HierarchicalMapping& mapping, Person& entity, int time_year) const;
+
+		double sample_normal_with_boundary(Random& random, double mean, double standard_deviation, double boundary) const;
 	};
 }

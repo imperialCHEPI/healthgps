@@ -24,9 +24,18 @@
     <ClCompile Include="result_file_writer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="model_parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="csvparser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="program.h">
+    <ClInclude Include="configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="options.h">
@@ -54,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="model_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

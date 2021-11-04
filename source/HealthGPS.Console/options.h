@@ -37,11 +37,10 @@ struct SESInfo
 
 struct BaselineInfo
 {
-	bool is_enabled;
 	std::string format;
 	std::string delimiter;
 	std::string encoding;
-	std::string file_name;
+	std::map<std::string, std::string> file_names;
 };
 
 struct RiskFactorInfo
@@ -99,7 +98,6 @@ struct Configuration
 	unsigned int stop_time{};
 	unsigned int trial_runs{};
 	unsigned int sync_timeout_ms{};
-	unsigned int loop_max_trials{};
 	PolicyScenarioInfo intervention;
 	ResultInfo result;
 };

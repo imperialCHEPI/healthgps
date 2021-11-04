@@ -75,9 +75,6 @@
     <ClInclude Include="settings.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
-    <ClInclude Include="ses.h">
-      <Filter>Header Files\modules</Filter>
-    </ClInclude>
     <ClInclude Include="demographic.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
@@ -177,9 +174,6 @@
     <ClInclude Include="hierarchical_model_static.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="hierarchical_model_dynamic.h">
-      <Filter>Header Files\models</Filter>
-    </ClInclude>
     <ClInclude Include="hierarchical_model_types.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -263,9 +257,6 @@
     <ClCompile Include="settings.cpp">
       <Filter>Source Files\data</Filter>
     </ClCompile>
-    <ClCompile Include="ses.cpp">
-      <Filter>Source Files\modules</Filter>
-    </ClCompile>
     <ClCompile Include="demographic.cpp">
       <Filter>Source Files\modules</Filter>
     </ClCompile>
@@ -333,9 +324,6 @@
       <Filter>Source Files\events</Filter>
     </ClCompile>
     <ClCompile Include="hierarchical_model_static.cpp">
-      <Filter>Source Files\models</Filter>
-    </ClCompile>
-    <ClCompile Include="hierarchical_model_dynamic.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
     <ClCompile Include="runtime_metric.cpp">

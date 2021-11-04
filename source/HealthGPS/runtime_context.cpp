@@ -4,7 +4,7 @@ namespace hgps {
 
     RuntimeContext::RuntimeContext(EventAggregator& bus, SimulationDefinition& definition)
         : event_bus_{ bus }, definition_{ definition }, population_{ 0 },
-        generator_{definition.rnd(), definition.inputs().run().loop_max_trials}
+        generator_{definition.rnd()}
     {}
 
     int RuntimeContext::time_now() const noexcept {

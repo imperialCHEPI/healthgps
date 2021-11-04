@@ -47,8 +47,8 @@ namespace hgps {
 				throw std::out_of_range("Policy start time must not be negative.");
 			}
 
-			if (finish_at_time.has_value() && start_at_time >= finish_at_time.value()) {
-				throw std::out_of_range("Policy finish time must be greater than the start time.");
+			if (finish_at_time.has_value() && start_at_time > finish_at_time.value()) {
+				throw std::out_of_range("Policy finish time must be equal or greater than the start time.");
 			}
 		}
 
@@ -59,7 +59,11 @@ namespace hgps {
 				return false;
 			}
 
-			return time <= finish_time.value_or(time);
+			if (finish_time.has_value()) {
+				return time <= finish_time.value();
+			}
+
+			return time == start_time;
 		}
 	};
 }
