@@ -56,11 +56,10 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses_mapping = std::map<std::string, std::string>{ {"gender", "Gender"},
 		{"age", "Age"}, {"education", "Education"}, {"income", "Income"} };
-	auto ses = SESMapping
+	auto ses = SESDefinition
 	{
-		.update_interval = 5,
-		.update_max_age = 30,
-		.entries = ses_mapping
+		.fuction_name = "normal",
+		.parameters = std::vector<double>{0.0, 1.0}
 	};
 
 	auto entries = std::vector<MappingEntry>{
@@ -294,10 +293,10 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto settings = Settings(uk, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses_mapping = std::map<std::string, std::string>{ {"test", builder.name()} };
-	auto ses = SESMapping {
-		.update_interval = 5,
-		.update_max_age = 30,
-		.entries = ses_mapping
+	auto ses = SESDefinition
+	{
+		.fuction_name = "normal",
+		.parameters = std::vector<double>{0.0, 1.0}
 	};
 
 	auto mapping = HierarchicalMapping(

@@ -114,15 +114,13 @@ static void from_json(const json& j, SettingsInfo& p) {
 // SES Model Information
 static void to_json(json& j, const SESInfo& p) {
 	j = json{
-		{"update_interval", p.update_interval},
-		{"update_max_age", p.update_max_age},
-		{"mapping", p.mapping} };
+		{"function_name", p.function},
+		{"function_parameters", p.parameters} };
 }
 
 static void from_json(const json & j, SESInfo& p) {
-		j.at("update_interval").get_to(p.update_interval);
-		j.at("update_max_age").get_to(p.update_max_age);
-		j.at("mapping").get_to(p.mapping);
+		j.at("function_name").get_to(p.function);
+		j.at("function_parameters").get_to(p.parameters);
 	}
 
 // Baseline scenario adjustments

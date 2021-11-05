@@ -30,16 +30,8 @@
             ]
         },
         "ses": {
-            "noise_function":"normal",
-            "noise_parameters":[0.0, 1.0],
-            "update_interval": 5,
-            "update_max_age": 30,
-            "mapping": {
-                "gender": "Gender",
-                "age": "Age",
-                "education": "Education",
-                "income": "Income"
-            }
+            "function_name": "normal",
+            "function_parameters":[0.0, 1.0]
         }
     },
     "modelling": {

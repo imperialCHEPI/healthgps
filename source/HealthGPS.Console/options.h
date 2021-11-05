@@ -30,9 +30,8 @@ struct SettingsInfo
 
 struct SESInfo
 {
-	unsigned int update_interval{};
-	unsigned int update_max_age{};
-	std::map<std::string, std::string> mapping;
+	std::string function;
+	std::vector<double> parameters;
 };
 
 struct BaselineInfo

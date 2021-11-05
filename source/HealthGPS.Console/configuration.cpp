@@ -238,9 +238,9 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	return result;
 }
 
-ModelInput create_model_input(core::DataTable& input_table, core::Country country, Configuration& config, std::vector<core::DiseaseInfo> diseases)
+ModelInput create_model_input(core::DataTable& input_table, core::Country country,
+	Configuration& config, std::vector<core::DiseaseInfo> diseases) 
 {
-
 	// Create simulation configuration
 	auto age_range = core::IntegerInterval(
 		config.settings.age_range.front(), config.settings.age_range.back());
@@ -248,18 +248,16 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto settings = Settings(country, config.settings.size_fraction,
 		config.settings.data_linkage, age_range);
 
-	auto run_info = RunInfo{
+	auto run_info = RunInfo {
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
 		.sync_timeout_ms = config.sync_timeout_ms,
 		.seed = config.custom_seed
 	};
 
-	auto ses_mapping = SESMapping
-	{
-		.update_interval = config.ses.update_interval,
-		.update_max_age = config.ses.update_max_age,
-		.entries = config.ses.mapping
+	auto ses_mapping = SESDefinition {
+		.fuction_name = config.ses.function,
+		.parameters = config.ses.parameters
 	};
 
 	auto mapping = std::vector<MappingEntry>();

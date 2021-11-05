@@ -250,10 +250,10 @@ namespace hgps {
 		return simulated_population;
 	}
 
-	std::vector<std::reference_wrapper<const Person>> HealthGPS::get_similar_entities(
+	const std::vector<Person> HealthGPS::get_similar_entities(
 		const int& age, const core::Gender& gender)
 	{
-		auto similar_entities = std::vector<std::reference_wrapper<const Person>>();
+		auto similar_entities = std::vector<Person>();
 		for (const auto& entity : context_.population()) {
 			if (!entity.is_active()) {
 				continue;
@@ -264,6 +264,7 @@ namespace hgps {
 			}
 		}
 
+		similar_entities.shrink_to_fit();
 		return similar_entities;
 	}
 
@@ -273,7 +274,7 @@ namespace hgps {
 			if (similar_entities.size() > 0) {
 				for (auto trial = 0; trial < net_value; trial++) {
 					auto index = context_.random().next_int(static_cast<int>(similar_entities.size()) - 1);
-					auto& source = similar_entities.at(index).get();
+					const auto& source = similar_entities.at(index);
 					context_.population().add(std::move(partial_clone_entity(source)));
 				}
 			}

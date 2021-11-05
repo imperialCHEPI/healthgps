@@ -16,10 +16,9 @@ namespace hgps {
 		const std::optional<unsigned int> seed;
 	};
 
-	struct SESMapping {
-		const unsigned int update_interval;
-		const unsigned int update_max_age;
-		const std::map<std::string, std::string> entries;
+	struct SESDefinition {
+		const std::string fuction_name;
+		const std::vector<double> parameters;
 	};
 
 	class ModelInput
@@ -27,7 +26,7 @@ namespace hgps {
 	public:
 		ModelInput() = delete;
 		ModelInput(core::DataTable& data, Settings settings, RunInfo info, 
-			SESMapping ses_mapping, HierarchicalMapping risk_mapping, 
+			SESDefinition ses_info, HierarchicalMapping risk_mapping, 
 			std::vector<core::DiseaseInfo> diseases);
 
 		const Settings& settings() const noexcept;
@@ -44,7 +43,7 @@ namespace hgps {
 
 		const RunInfo& run() const noexcept;
 
-		const SESMapping& ses_mapping() const noexcept;
+		const SESDefinition& ses_definition() const noexcept;
 
 		const HierarchicalMapping& risk_mapping() const noexcept;
 
@@ -54,7 +53,7 @@ namespace hgps {
 		core::DataTable& input_data_;
 		Settings settings_;
 		RunInfo run_info_;
-		SESMapping ses_mapping_;
+		SESDefinition ses_definition_;
 		HierarchicalMapping risk_mapping_;
 		std::vector<core::DiseaseInfo> diseases_;
 	};
