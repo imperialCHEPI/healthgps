@@ -69,8 +69,13 @@ namespace hgps {
 			risk_factors.insert(risk_factors.end(), risks.begin(), risks.end());
 		}
 
+		auto all_diseases = repository.manager().get_diseases();
 		for (auto& info : config.diseases()) {
-			if (!registry.contains(info.code)) {
+			auto it = std::find_if(all_diseases.begin(), all_diseases.end(), [&info](const auto& obj) {
+				return obj.code == info.code;
+				});
+
+			if (!registry.contains(info.group) || it == all_diseases.end()) {
 				continue; // TODO: Throw argument exception.
 			}
 
@@ -86,7 +91,7 @@ namespace hgps {
 				auto definition = DiseaseDefinition(std::move(disease_table),
 					std::move(relative_risks.diseases), std::move(relative_risks.risk_factors));
 
-				models.emplace(info.code, registry.at(info.code)(
+				models.emplace(info.code, registry.at(info.group)(
 					std::move(definition), config.settings().age_range()));
 				continue;
 			}
@@ -97,7 +102,7 @@ namespace hgps {
 			auto definition = DiseaseDefinition(std::move(disease_table), std::move(relative_risks.diseases),
 				std::move(relative_risks.risk_factors), std::move(parameter));
 
-			models.emplace(info.code, registry.at(info.code)(
+			models.emplace(info.code, registry.at(info.group)(
 				std::move(definition), config.settings().age_range()));
 		}
 
