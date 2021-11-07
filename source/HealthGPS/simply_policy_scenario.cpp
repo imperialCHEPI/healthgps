@@ -1,9 +1,9 @@
-#include "Intervention_scenario.h"
+#include "simply_policy_scenario.h"
 #include "HealthGPS.Core/string_util.h"
 
 namespace hgps {
 
-	InterventionScenario::InterventionScenario(SyncChannel& data_sync, PolicyDefinition&& definition)
+	SimplePolicyScenario::SimplePolicyScenario(SyncChannel& data_sync, SimplePolicyDefinition&& definition)
 		: channel_{ data_sync }, factor_impact_{}, definition_{std::move(definition)}
 	{
 		for (auto& factor : definition_.impacts) {
@@ -11,31 +11,35 @@ namespace hgps {
 		}
 	}
 
-	ScenarioType InterventionScenario::type() const noexcept {
+	ScenarioType SimplePolicyScenario::type() const noexcept {
 		return ScenarioType::intervention;
 	}
 
-	std::string InterventionScenario::name() const noexcept {
+	std::string SimplePolicyScenario::name() const noexcept {
 		return "Intervention";
 	}
 
-	SyncChannel& InterventionScenario::channel() {
+	SyncChannel& SimplePolicyScenario::channel() {
 		return channel_;
 	}
 
-	const PolicyImpactType& InterventionScenario::impact_type() const noexcept {
+	void SimplePolicyScenario::clear() noexcept {
+	}
+
+	const PolicyImpactType& SimplePolicyScenario::impact_type() const noexcept {
 		return definition_.impact_type;
 	}
 
-	const PolicyInterval& InterventionScenario::active_period() const noexcept {
+	const PolicyInterval& SimplePolicyScenario::active_period() const noexcept {
 		return definition_.active_period;
 	}
 
-	const std::vector<PolicyImpact>& InterventionScenario::impacts() const noexcept {
+	const std::vector<PolicyImpact>& SimplePolicyScenario::impacts() const noexcept {
 		return definition_.impacts;
 	}
 
-	double InterventionScenario::apply(const int& time, const std::string& risk_factor_key, const double& value) {
+	double SimplePolicyScenario::apply(Person& entity, const int& time,
+		const std::string& risk_factor_key, const double& value) {
 		auto result = value;
 		if (definition_.active_period.contains(time) && factor_impact_.contains(risk_factor_key)) {
 			auto impact = factor_impact_.at(risk_factor_key).value;

@@ -201,13 +201,13 @@
     <ClInclude Include="sync_message.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
-    <ClInclude Include="policy_scenario.h">
+    <ClInclude Include="intervention_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
     <ClInclude Include="baseline_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
-    <ClInclude Include="Intervention_scenario.h">
+    <ClInclude Include="simply_policy_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
     <ClInclude Include="simulation_definition.h">
@@ -239,6 +239,9 @@
     </ClInclude>
     <ClInclude Include="energy_balance_model.h">
       <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="marketing_scenario.h">
+      <Filter>Header Files\scenarios</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -332,7 +335,7 @@
     <ClCompile Include="baseline_scenario.cpp">
       <Filter>Source Files\scenarios</Filter>
     </ClCompile>
-    <ClCompile Include="Intervention_scenario.cpp">
+    <ClCompile Include="simply_policy_scenario.cpp">
       <Filter>Source Files\scenarios</Filter>
     </ClCompile>
     <ClCompile Include="repository.cpp">
@@ -349,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="energy_balance_model.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="marketing_scenario.cpp">
+      <Filter>Source Files\scenarios</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

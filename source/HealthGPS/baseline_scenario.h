@@ -15,7 +15,10 @@ namespace hgps {
 
 		SyncChannel& channel() override;
 
-		double apply(const int& time, const std::string& risk_factor_key, const double& value) override;
+		void clear() noexcept override;
+
+		double apply(Person& entity, const int& time,
+			const std::string& risk_factor_key, const double& value) override;
 
 	private:
 		SyncChannel& channel_;

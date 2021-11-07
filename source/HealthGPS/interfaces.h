@@ -5,7 +5,6 @@
 
 #include "HealthGPS.Core\api.h"
 #include "randombit_generator.h"
-#include "scenario.h"
 
 namespace hgps {
 

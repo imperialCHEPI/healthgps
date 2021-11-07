@@ -1,6 +1,9 @@
 #include "configuration.h"
 #include "jsonparser.h"
 
+#include "HealthGPS/simply_policy_scenario.h"
+#include "HealthGPS/marketing_scenario.h"
+
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <chrono>
@@ -203,8 +206,20 @@ Configuration load_configuration(CommandOptions& options)
 		opt["running"]["diseases"].get_to(config.diseases);
 		opt["running"]["cancers"].get_to(cancers);
 		config.diseases.insert(config.diseases.end(), cancers.begin(), cancers.end());
-		if (!opt["running"]["intervention"].empty()) {
-			config.intervention = opt["running"]["intervention"].get<PolicyScenarioInfo>();
+
+		// Intervention Policy
+		auto interventions = opt["running"]["interventions"];
+		if (!interventions["active_type_id"].is_null() && !interventions["active_type_id"].empty()) {
+			auto active_type = interventions["active_type_id"].get<std::string>();
+			auto policy_types = interventions["types"];
+			for (auto it = policy_types.begin(); it != policy_types.end(); ++it) {
+				if (core::case_insensitive::equals(it.key(), active_type)) {
+					config.intervention = it.value().get<PolicyScenarioInfo>();
+					config.intervention.identifier = core::to_lower(it.key());
+					config.has_active_intervention = true;
+					break;
+				}
+			}
 		}
 
 		config.result = opt["results"].get<ResultInfo>();
@@ -296,29 +311,59 @@ std::string create_output_file_name(const ResultInfo& info)
 	auto tp = std::chrono::system_clock::now();
 	auto local_tp = std::chrono::zoned_time{ std::chrono::current_zone(), tp };
 
+	// filename token replacement
+	auto file_name = info.file_name;
+	std::size_t tk_end = 0;
+	auto tk_start = file_name.find_first_of("{", tk_end);
+	if (tk_start != std::string::npos) {
+		auto timestamp_tk = std::string{ "{:%F_%H-%M-%S}" };
+		tk_end = file_name.find_first_of("}", tk_start + 1);
+		if (tk_end != std::string::npos) {
+			file_name.replace(tk_start, tk_end - tk_start + 1, timestamp_tk);
+		}
+	}
+
 	auto log_file_name = std::format("HealthGPS_result_{:%F_%H-%M-%S}.json", local_tp);
+	if (tk_end > 0) {
+		log_file_name = std::format(file_name, local_tp);
+	}
+
 	log_file_name = (output_folder / log_file_name).string();
 	fmt::print(fg(fmt::color::yellow_green), "Results file: {}.\n", log_file_name);
 	return log_file_name;
 }
 
-hgps::InterventionScenario create_intervention_scenario(SyncChannel& channel, const PolicyScenarioInfo& info)
+std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
+	SyncChannel& channel, const PolicyScenarioInfo& info)
 {
 	using namespace hgps;
-	auto impact_type = PolicyImpactType::absolute;
-	if (core::case_insensitive::equals(info.impact_type, "relative")) {
-		impact_type = PolicyImpactType::relative;
-	}
-	else if (!core::case_insensitive::equals(info.impact_type, "absolute")) {
-		throw std::logic_error(std::format("Unknown policy impact type: {}", info.impact_type));
-	}
 
+	fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n", info.identifier);
+	auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
 	auto risk_impacts = std::vector<PolicyImpact>{};
 	for (auto& item : info.impacts) {
-		risk_impacts.emplace_back(PolicyImpact{ core::to_lower(item.first), item.second });
+		risk_impacts.emplace_back(PolicyImpact{
+			core::to_lower(item.risk_factor), item.impact_value, item.from_age, item.to_age });
 	}
 
-	auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
-	auto definition = PolicyDefinition(impact_type, risk_impacts, period);
-	return InterventionScenario{ channel, std::move(definition) };
+	if (info.identifier == "simple") {
+		auto impact_type = PolicyImpactType::absolute;
+		if (core::case_insensitive::equals(info.impact_type, "relative")) {
+			impact_type = PolicyImpactType::relative;
+		}
+		else if (!core::case_insensitive::equals(info.impact_type, "absolute")) {
+			throw std::logic_error(std::format("Unknown policy impact type: {}", info.impact_type));
+		}
+
+		auto definition = SimplePolicyDefinition(impact_type, risk_impacts, period);
+		return std::make_unique<SimplePolicyScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "marketing") {
+		auto definition = MarketingPolicyDefinition(period, risk_impacts);
+		return std::make_unique<MarketingPolicyScenario>(channel, std::move(definition));
+	}
+
+	throw std::invalid_argument(
+		std::format("Unknown intervention policy identifier: {}", info.identifier));
 }

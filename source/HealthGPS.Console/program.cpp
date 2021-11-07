@@ -96,15 +96,14 @@ int main(int argc, char* argv[])
 		std::atomic<bool> done(false);
 		auto runtime = 0.0;
 		auto baseline = HealthGPS{
-			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
+			SimulationDefinition{ model_config, std::make_unique<BaselineScenario>(channel), hgps::MTRandom32() },
 			factory, event_bus };
-		if (config.intervention.is_enabled) {
+		if (config.has_active_intervention) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
 			auto intervention = HealthGPS{
 				SimulationDefinition{ model_config, std::move(policy_scenario), hgps::MTRandom32() },
 				factory, event_bus };
 
-			
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
 			auto worker = std::jthread{ [&runtime, &runner, &baseline, &intervention, &config, &done] {
 				runtime = runner.run(baseline, intervention, config.trial_runs);

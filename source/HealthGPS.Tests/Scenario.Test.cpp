@@ -82,7 +82,7 @@ TEST(ScenarioTest, InterventionConstruction)
     auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
     auto period = PolicyInterval(2022);
     auto definition = PolicyDefinition{ impact_type, risk_factor, period };
-    auto scenario = InterventionScenario{ channel, std::move(definition) };
+    auto scenario = SimplePolicyScenario{ channel, std::move(definition) };
 
     ASSERT_EQ(ScenarioType::intervention, scenario.type());
     ASSERT_EQ("Intervention", scenario.name());
@@ -101,7 +101,7 @@ TEST(ScenarioTest, InterventionApplyAbsolute)
     auto impact_type = PolicyImpactType::absolute;
     auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
     auto period = PolicyInterval(2021, 2030);
-    auto scenario = InterventionScenario{ channel,
+    auto scenario = SimplePolicyScenario{ channel,
         PolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
@@ -120,7 +120,7 @@ TEST(ScenarioTest, InterventionApplyRelative)
     auto impact_type = PolicyImpactType::relative;
     auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
     auto period = PolicyInterval(2021, 2030);
-    auto scenario = InterventionScenario{ channel,
+    auto scenario = SimplePolicyScenario{ channel,
     PolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
@@ -139,7 +139,7 @@ TEST(ScenarioTest, InterventionApplyOutsidePeriod)
     auto impact_type = PolicyImpactType::absolute;
     auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
     auto period = PolicyInterval(2021, 2030);
-    auto scenario = InterventionScenario{ channel,
+    auto scenario = SimplePolicyScenario{ channel,
     PolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
@@ -158,7 +158,7 @@ TEST(ScenarioTest, InterventionApplyOpenPeriod)
     auto impact_type = PolicyImpactType::absolute;
     auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
     auto period = PolicyInterval(2021);
-    auto scenario = InterventionScenario{ channel,
+    auto scenario = SimplePolicyScenario{ channel,
     PolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
@@ -180,7 +180,7 @@ TEST(ScenarioTest, InterventionApplyMultiple)
     };
 
     auto period = PolicyInterval(2021, 2030);
-    auto scenario = InterventionScenario{ channel,
+    auto scenario = SimplePolicyScenario{ channel,
         PolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;

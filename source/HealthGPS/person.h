@@ -67,8 +67,8 @@ namespace hgps {
 		static void reset_id();
 
 	private:
-		size_t id_;
-		static std::atomic<size_t> newUID;
+		std::size_t id_;
+		static std::atomic<std::size_t> newUID;
 		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
 		static case_insensitive_map<std::function<double(const Person&)>> previous_dispatcher;
 	};

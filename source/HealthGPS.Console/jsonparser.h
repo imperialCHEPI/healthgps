@@ -207,7 +207,24 @@ static void to_json(json& j, const PolicyPeriodInfo& p) {
 static void from_json(const json& j, PolicyPeriodInfo& p) {
 	j.at("start_time").get_to(p.start_time);
 	if (!j.at("finish_time").is_null() && !j.at("finish_time").empty()) {
-		p.finish_time = j.at("finish_time").get<unsigned int>();
+		p.finish_time = j.at("finish_time").get<int>();
+	}
+}
+
+static void to_json(json& j, const PolicyImpactInfo& p) {
+	j = json{
+		{"risk_factor", p.risk_factor},
+		{"impact_value", p.impact_value },
+		{"from_age", p.from_age},
+		{"to_age", p.to_age_str()} };
+}
+
+static void from_json(const json& j, PolicyImpactInfo& p) {
+	j.at("risk_factor").get_to(p.risk_factor);
+	j.at("impact_value").get_to(p.impact_value);
+	j.at("from_age").get_to(p.from_age);
+	if (!j.at("to_age").is_null() && !j.at("to_age").empty()) {
+		p.to_age = j.at("to_age").get<int>();
 	}
 }
 
@@ -219,8 +236,10 @@ static void to_json(json& j, const PolicyScenarioInfo& p) {
 }
 
 static void from_json(const json& j, PolicyScenarioInfo& p) {
-	j.at("is_enabled").get_to(p.is_enabled);
-	j.at("impact_type").get_to(p.impact_type);
+	if (j.contains("impact_type")) {
+		j.at("impact_type").get_to(p.impact_type);
+	}
+
 	j.at("impacts").get_to(p.impacts);
 	j.at("active_period").get_to(p.active_period);
 }
@@ -228,8 +247,10 @@ static void from_json(const json& j, PolicyScenarioInfo& p) {
 // Result information
 static void to_json(json& j, const ResultInfo& p) {
 	j = json{ {"folder", p.folder}};
+	j = json{ {"file_name", p.file_name} };
 }
 
 static void from_json(const json& j, ResultInfo& p) {
 	j.at("folder").get_to(p.folder);
+	j.at("file_name").get_to(p.file_name);
 }

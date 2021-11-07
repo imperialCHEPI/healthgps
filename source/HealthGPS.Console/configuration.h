@@ -24,4 +24,5 @@ hgps::ModelInput create_model_input(hgps::core::DataTable& input_table, hgps::co
 
 std::string create_output_file_name(const ResultInfo& info);
 
-hgps::InterventionScenario create_intervention_scenario(hgps::SyncChannel& channel, const PolicyScenarioInfo& info);
+std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
+	hgps::SyncChannel& channel, const PolicyScenarioInfo& info);

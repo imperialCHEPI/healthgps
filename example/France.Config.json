@@ -78,19 +78,35 @@
             "diabetes"
         ],
         "cancers": [],
-      "intervention": {
-        "is_enabled": false,
-        "impact_type": "absolute",
-        "impacts": {
-          "BMI": -1.0
-        },
-        "active_period": {
-          "start_time": 2021,
-          "finish_time": 2021
+        "interventions": {
+            "active_type_id": "marketing",
+            "types": {
+                "simple": {
+                    "active_period": {
+                        "start_time": 2021,
+                        "finish_time": 2021
+                    },
+                    "impact_type": "absolute",
+                    "impacts": [
+                        { "risk_factor":"BMI", "impact_value": -1.0, "from_age":0, "to_age":null}
+                    ]
+                },
+                "marketing": {
+                    "active_period": {
+                        "start_time": 2021,
+                        "finish_time": null
+                    },
+                    "impacts": [
+                        { "risk_factor":"BMI", "impact_value": -0.12, "from_age": 5, "to_age": 12 },
+                        { "risk_factor":"BMI", "impact_value": -0.31, "from_age": 13, "to_age": 18 },
+                        { "risk_factor":"BMI", "impact_value": -0.155, "from_age": 19, "to_age": null }
+                    ]
+                }
+            }
         }
-      }
     },
     "results": {
-        "folder": "C:\\HealthGPS\\Result"
+        "folder": "C:\\HealthGPS\\Result",
+        "file_name": "HealthGPS_{TIMESTAMP}_result.json"
     }
 }

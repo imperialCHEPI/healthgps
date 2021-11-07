@@ -59,6 +59,7 @@ namespace hgps {
 		auto start = std::chrono::steady_clock::now();
 		auto world_time = definition_.inputs().start_time();
 		context_.metrics().clear();
+		context_.scenario().clear();
 		context_.set_current_time(world_time);
 	
 		initialise_population();
