@@ -1,4 +1,10 @@
 disease,weight
-asthma,0.043
-diabetes,0.1748
-lowbackpain,0.125857
+alzheimer,0.298333333
+angina,0.093333333
+asthma,0.061333333
+copd,0.217333333
+diabetes,0.160333333
+gout,0.438
+lowbackpain,0.187625
+osteoarthritisknee,0.089
+colorectum,0.426333333

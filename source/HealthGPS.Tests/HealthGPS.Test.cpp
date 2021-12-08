@@ -233,7 +233,7 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	auto bus = DefaultEventBus{};
 	auto channel = SyncChannel{};
 	auto rnd = MTRandom32{ 123456789 };
-	auto scenario = BaselineScenario{ channel };
+	auto scenario = std::make_unique<BaselineScenario>(channel);
 	auto config = create_test_configuration(data);
 	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
@@ -348,7 +348,7 @@ TEST(TestHealthGPS, CreateSESNoiseModule)
 	auto bus = DefaultEventBus{};
 	auto channel = SyncChannel{};
 	auto rnd = MTRandom32{ 123456789 };
-	auto scenario = BaselineScenario{ channel };
+	auto scenario = std::make_unique<BaselineScenario>(channel);
 	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 	auto context = RuntimeContext(bus, definition);
 

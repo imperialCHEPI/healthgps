@@ -1,7 +1,7 @@
 #include "pch.h"
 
 #include "HealthGPS/baseline_scenario.h"
-#include "HealthGPS/intervention_scenario.h"
+#include "HealthGPS/simple_policy_scenario.h"
 
 TEST(ScenarioTest, BaselineDefaultConstruction)
 {
@@ -18,13 +18,15 @@ TEST(ScenarioTest, BaselineDefaultConstruction)
 TEST(ScenarioTest, BaselineApplyLoopback)
 {
     using namespace hgps;
+    using namespace hgps::core;
 
     auto channel = SyncChannel{};
     auto scenario = BaselineScenario{ channel };
+    auto entity = Person(core::Gender::male);
 
     auto factor_values = std::vector<double>{ 13.66, 7.13, 3.14, 105.0, 365.5 };
     for (auto& value : factor_values) {
-        auto impact_value = scenario.apply(2010, "BMI", value);
+        auto impact_value = scenario.apply(entity, 2010, "BMI", value);
         ASSERT_EQ(value, impact_value);
     }
 }
@@ -38,7 +40,7 @@ TEST(ScenarioTest, PolicyPeriodOpenConstruction)
     ASSERT_FALSE(period.finish_time.has_value());
     ASSERT_FALSE(period.contains(2021));
     ASSERT_TRUE(period.contains(2022));
-    ASSERT_FALSE(period.contains(2030));
+    ASSERT_TRUE(period.contains(2030));
 }
 
 TEST(ScenarioTest, PolicyPeriodClosedConstruction)
@@ -79,9 +81,9 @@ TEST(ScenarioTest, InterventionConstruction)
 
     auto channel = SyncChannel{};
     auto impact_type = PolicyImpactType::absolute;
-    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
+    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02, 0 } };
     auto period = PolicyInterval(2022);
-    auto definition = PolicyDefinition{ impact_type, risk_factor, period };
+    auto definition = SimplePolicyDefinition{ impact_type, risk_factor, period };
     auto scenario = SimplePolicyScenario{ channel, std::move(definition) };
 
     ASSERT_EQ(ScenarioType::intervention, scenario.type());
@@ -98,15 +100,16 @@ TEST(ScenarioTest, InterventionApplyAbsolute)
     using namespace hgps;
 
     auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
     auto impact_type = PolicyImpactType::absolute;
-    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
+    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 ,0} };
     auto period = PolicyInterval(2021, 2030);
     auto scenario = SimplePolicyScenario{ channel,
-        PolicyDefinition{ impact_type, risk_factor, period } };
+        SimplePolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
-    auto impact = scenario.apply(2023, "bmi", value);
-    auto no_impact = scenario.apply(2023, "xyz", value);
+    auto impact = scenario.apply(entity, 2023, "bmi", value);
+    auto no_impact = scenario.apply(entity, 2023, "xyz", value);
     ASSERT_GT(impact, value);
     ASSERT_EQ(100.02, impact);
     ASSERT_EQ(value, no_impact);
@@ -117,15 +120,16 @@ TEST(ScenarioTest, InterventionApplyRelative)
     using namespace hgps;
 
     auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
     auto impact_type = PolicyImpactType::relative;
-    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
+    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02, 0 } };
     auto period = PolicyInterval(2021, 2030);
     auto scenario = SimplePolicyScenario{ channel,
-    PolicyDefinition{ impact_type, risk_factor, period } };
+    SimplePolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
-    auto impact = scenario.apply(2025, "bmi", value);
-    auto no_impact = scenario.apply(2025, "xyz", value);
+    auto impact = scenario.apply(entity, 2025, "bmi", value);
+    auto no_impact = scenario.apply(entity, 2025, "xyz", value);
     ASSERT_GT(impact, value);
     ASSERT_EQ(102.0, impact);
     ASSERT_EQ(value, no_impact);
@@ -136,18 +140,19 @@ TEST(ScenarioTest, InterventionApplyOutsidePeriod)
     using namespace hgps;
 
     auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
     auto impact_type = PolicyImpactType::absolute;
-    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
+    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02, 0} };
     auto period = PolicyInterval(2021, 2030);
     auto scenario = SimplePolicyScenario{ channel,
-    PolicyDefinition{ impact_type, risk_factor, period } };
+    SimplePolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
-    ASSERT_EQ(value, scenario.apply(2025, "xyz", value));
-    ASSERT_EQ(value, scenario.apply(2010, "bmi", value));
-    ASSERT_EQ(value, scenario.apply(2020, "bmi", value));
-    ASSERT_EQ(value, scenario.apply(2031, "bmi", value));
-    ASSERT_EQ(value, scenario.apply(2050, "bmi", value));
+    ASSERT_EQ(value, scenario.apply(entity, 2025, "xyz", value));
+    ASSERT_EQ(value, scenario.apply(entity, 2010, "bmi", value));
+    ASSERT_EQ(value, scenario.apply(entity, 2020, "bmi", value));
+    ASSERT_EQ(value, scenario.apply(entity, 2031, "bmi", value));
+    ASSERT_EQ(value, scenario.apply(entity, 2050, "bmi", value));
 }
 
 TEST(ScenarioTest, InterventionApplyOpenPeriod)
@@ -155,17 +160,18 @@ TEST(ScenarioTest, InterventionApplyOpenPeriod)
     using namespace hgps;
 
     auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
     auto impact_type = PolicyImpactType::absolute;
-    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02 } };
+    auto risk_factor = std::vector<PolicyImpact>{ PolicyImpact{"bmi", 0.02, 0 } };
     auto period = PolicyInterval(2021);
     auto scenario = SimplePolicyScenario{ channel,
-    PolicyDefinition{ impact_type, risk_factor, period } };
+    SimplePolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
     auto expected = 100.02;
-    ASSERT_EQ(value, scenario.apply(2020, "bmi", value));
-    ASSERT_EQ(expected, scenario.apply(2021, "bmi", value));
-    ASSERT_EQ(value, scenario.apply(2025, "bmi", value));
+    ASSERT_EQ(value, scenario.apply(entity, 2020, "bmi", value));
+    ASSERT_EQ(expected, scenario.apply(entity, 2021, "bmi", value));
+    ASSERT_EQ(expected, scenario.apply(entity, 2025, "bmi", value));
 }
 
 TEST(ScenarioTest, InterventionApplyMultiple)
@@ -173,20 +179,21 @@ TEST(ScenarioTest, InterventionApplyMultiple)
     using namespace hgps;
 
     auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
     auto impact_type = PolicyImpactType::absolute;
     auto risk_factor = std::vector<PolicyImpact>{
-        PolicyImpact{"bmi", 0.02 },
-        PolicyImpact{"alcohol", 0.015}
+        PolicyImpact{"bmi", 0.02, 0},
+        PolicyImpact{"alcohol", 0.015, 0}
     };
 
     auto period = PolicyInterval(2021, 2030);
     auto scenario = SimplePolicyScenario{ channel,
-        PolicyDefinition{ impact_type, risk_factor, period } };
+        SimplePolicyDefinition{ impact_type, risk_factor, period } };
 
     auto value = 100.0;
-    auto bmi_impact = scenario.apply(2023, "bmi", value);
-    auto beer_impact = scenario.apply(2023, "alcohol", value);
-    auto no_impact = scenario.apply(2023, "xyz", value);
+    auto bmi_impact = scenario.apply(entity, 2023, "bmi", value);
+    auto beer_impact = scenario.apply(entity, 2023, "alcohol", value);
+    auto no_impact = scenario.apply(entity, 2023, "xyz", value);
 
     ASSERT_GT(bmi_impact, value);
     ASSERT_GT(beer_impact, value);

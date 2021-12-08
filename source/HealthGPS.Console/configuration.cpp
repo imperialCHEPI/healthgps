@@ -1,7 +1,7 @@
 #include "configuration.h"
 #include "jsonparser.h"
 
-#include "HealthGPS/simply_policy_scenario.h"
+#include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
 
 #include "HealthGPS.Core/scoped_timer.h"
@@ -239,7 +239,9 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 {
 	std::vector<core::DiseaseInfo> result;
 	auto diseases = data_api.get_diseases();
-	fmt::print("\nThere are {} diseases in storage.\n", diseases.size());
+	fmt::print("\nThere are {} diseases in storage, {} selected.\n",
+		diseases.size(), config.diseases.size());
+
 	for (auto& code : config.diseases) {
 		auto item = data_api.get_disease_info(core::to_lower(code));
 		if (item.has_value()) {

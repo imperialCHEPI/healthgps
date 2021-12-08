@@ -122,7 +122,7 @@
     <ClInclude Include="hierarchical_model_registry.h" />
     <ClInclude Include="hierarchical_model_static.h" />
     <ClInclude Include="hierarchical_model_types.h" />
-    <ClInclude Include="simply_policy_scenario.h" />
+    <ClInclude Include="simple_policy_scenario.h" />
     <ClInclude Include="life_table.h" />
     <ClInclude Include="map2d.h" />
     <ClInclude Include="mapping.h" />
@@ -173,7 +173,7 @@
     <ClCompile Include="error_message.cpp" />
     <ClCompile Include="event_bus.cpp" />
     <ClCompile Include="event_subscriber.cpp" />
-    <ClCompile Include="simply_policy_scenario.cpp" />
+    <ClCompile Include="simple_policy_scenario.cpp" />
     <ClCompile Include="life_table.cpp" />
     <ClCompile Include="mapping.cpp" />
     <ClCompile Include="marketing_scenario.cpp" />

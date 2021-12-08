@@ -212,19 +212,22 @@ TEST(TestDatastore, DiseaseRelativeRiskToRiskFactor)
 	auto risk_factor = "bmi";
 	auto diabetes = manager.get_disease_info("diabetes").value();
 
-	auto col_size = 6;
+	auto col_size = 8;
 
 	auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, core::Gender::male, risk_factor);
 	auto table_feme = manager.get_relative_risk_to_risk_factor(diabetes, core::Gender::female, risk_factor);
 
 	ASSERT_EQ(col_size, table_male.columns.size());
 	ASSERT_GT(table_male.rows.size(), 0);
-	ASSERT_NE(table_male.rows[0][1], table_male.rows[0][2]);
+	ASSERT_EQ(table_male.rows[0][1], table_male.rows[0][2]);
+	ASSERT_NE(table_male.rows[0][1], table_male.rows[0][3]);
+
 	ASSERT_FALSE(table_male.is_default_value);
 
 	ASSERT_EQ(col_size, table_feme.columns.size());
 	ASSERT_GT(table_feme.rows.size(), 0);
-	ASSERT_NE(table_feme.rows[0][1], table_feme.rows[0][2]);
+	ASSERT_EQ(table_feme.rows[0][1], table_feme.rows[0][2]);
+	ASSERT_NE(table_feme.rows[0][1], table_feme.rows[0][3]);
 	ASSERT_FALSE(table_feme.is_default_value);
 }
 

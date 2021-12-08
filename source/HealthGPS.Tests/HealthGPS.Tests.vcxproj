@@ -59,6 +59,7 @@
     <ClCompile Include="DiseaseModels.Test.cpp" />
     <ClCompile Include="Population.Test.cpp" />
     <ClCompile Include="Map2d.Test.cpp" />
+    <ClCompile Include="RelativeRiskLookup.Test.cpp" />
     <ClCompile Include="RuntimeMetric.Test.cpp" />
     <ClCompile Include="Scenario.Test.cpp" />
     <ClCompile Include="TestMain.cpp" />

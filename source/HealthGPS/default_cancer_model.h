@@ -22,19 +22,15 @@ namespace hgps {
 
 		double get_excess_mortality(const Person& entity) const noexcept override;
 
-		// Need to find a better way, possible injecting the survival function!!!
-		static double get_survival_rate(const ParameterLookup& survival,
-			const core::Gender& gender, const int& age, const int& time_year);
-
 	private:
 		DiseaseDefinition definition_;
 		DoubleAgeGenderTable average_relative_risk_;
 
 		DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext& context);
-		double calculate_combined_relative_risk(const Person& entity, const int& time_now) const;
-		double calculate_relative_risk_for_diseases(const Person& entity, const int& time_now) const;
+		double calculate_combined_relative_risk(const Person& entity, const int& start_time, const int& time_now) const;
+		double calculate_relative_risk_for_diseases(const Person& entity, const int& start_time, const int& time_now) const;
 		double calculate_relative_risk_for_risk_factors(const Person& entity) const;
-		double calculate_incidence_probability(const Person& entity, const int& time_now) const;
+		double calculate_incidence_probability(const Person& entity, const int& start_time, const int& time_now) const;
 
 		void update_remission_cases(RuntimeContext& context);
 		void update_incidence_cases(RuntimeContext& context);
