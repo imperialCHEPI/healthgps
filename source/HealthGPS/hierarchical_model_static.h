@@ -17,8 +17,6 @@ namespace hgps {
 
 		void update_risk_factors(RuntimeContext& context) override;
 
-		void adjust_risk_factors_with_baseline(RuntimeContext& context) override;
-
 	private:
 		HierarchicalLinearModelDefinition& definition_;
 

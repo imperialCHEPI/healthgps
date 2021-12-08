@@ -75,9 +75,6 @@
     <ClInclude Include="settings.h">
       <Filter>Header Files\data</Filter>
     </ClInclude>
-    <ClInclude Include="ses.h">
-      <Filter>Header Files\modules</Filter>
-    </ClInclude>
     <ClInclude Include="demographic.h">
       <Filter>Header Files\modules</Filter>
     </ClInclude>
@@ -177,9 +174,6 @@
     <ClInclude Include="hierarchical_model_static.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
-    <ClInclude Include="hierarchical_model_dynamic.h">
-      <Filter>Header Files\models</Filter>
-    </ClInclude>
     <ClInclude Include="hierarchical_model_types.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
@@ -207,13 +201,13 @@
     <ClInclude Include="sync_message.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
-    <ClInclude Include="policy_scenario.h">
+    <ClInclude Include="intervention_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
     <ClInclude Include="baseline_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
-    <ClInclude Include="Intervention_scenario.h">
+    <ClInclude Include="simple_policy_scenario.h">
       <Filter>Header Files\scenarios</Filter>
     </ClInclude>
     <ClInclude Include="simulation_definition.h">
@@ -237,6 +231,18 @@
     <ClInclude Include="default_cancer_model.h">
       <Filter>Header Files\models</Filter>
     </ClInclude>
+    <ClInclude Include="random_algorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ses_noise_module.h">
+      <Filter>Header Files\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="energy_balance_model.h">
+      <Filter>Header Files\models</Filter>
+    </ClInclude>
+    <ClInclude Include="marketing_scenario.h">
+      <Filter>Header Files\scenarios</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mtrandom.cpp">
@@ -253,9 +259,6 @@
     </ClCompile>
     <ClCompile Include="settings.cpp">
       <Filter>Source Files\data</Filter>
-    </ClCompile>
-    <ClCompile Include="ses.cpp">
-      <Filter>Source Files\modules</Filter>
     </ClCompile>
     <ClCompile Include="demographic.cpp">
       <Filter>Source Files\modules</Filter>
@@ -326,16 +329,13 @@
     <ClCompile Include="hierarchical_model_static.cpp">
       <Filter>Source Files\models</Filter>
     </ClCompile>
-    <ClCompile Include="hierarchical_model_dynamic.cpp">
-      <Filter>Source Files\models</Filter>
-    </ClCompile>
     <ClCompile Include="runtime_metric.cpp">
       <Filter>Source Files\data</Filter>
     </ClCompile>
     <ClCompile Include="baseline_scenario.cpp">
       <Filter>Source Files\scenarios</Filter>
     </ClCompile>
-    <ClCompile Include="Intervention_scenario.cpp">
+    <ClCompile Include="simple_policy_scenario.cpp">
       <Filter>Source Files\scenarios</Filter>
     </ClCompile>
     <ClCompile Include="repository.cpp">
@@ -343,6 +343,18 @@
     </ClCompile>
     <ClCompile Include="default_cancer_model.cpp">
       <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="random_algorithm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ses_noise_module.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="energy_balance_model.cpp">
+      <Filter>Source Files\models</Filter>
+    </ClCompile>
+    <ClCompile Include="marketing_scenario.cpp">
+      <Filter>Source Files\scenarios</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

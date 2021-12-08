@@ -1,45 +1,80 @@
 #pragma once
 
-#include "policy_scenario.h"
-
-#include <map>
-#include <optional>
+#include "scenario.h"
+#include <vector>
 
 namespace hgps {
 
-	struct PolicyDefinition {
-		PolicyDefinition() = delete;
-		PolicyDefinition(const PolicyImpactType& type_of_impact, 
-			const std::vector<PolicyImpact>& risk_impacts, const PolicyInterval& period)
-			: impact_type{ type_of_impact }, impacts{ risk_impacts }, active_period{ period }{}
+	struct PolicyImpact;
+	struct PolicyInterval;
 
-		const PolicyImpactType impact_type;
-		const std::vector<PolicyImpact> impacts;
-		const PolicyInterval active_period;
+	/// @brief Health GPS intervention policy scenario interface
+	class InterventionScenario : public Scenario {
+	public:
+		virtual const PolicyInterval& active_period()  const noexcept = 0;
+
+		virtual const std::vector<PolicyImpact>& impacts() const noexcept = 0;
 	};
 
-	class InterventionScenario final : public PolicyScenario {
-	public:
-		InterventionScenario() = delete;
-		InterventionScenario(SyncChannel& data_sync, PolicyDefinition&& definition);
+	/// @brief Defines the policy impact on risk factors data structure
+	struct PolicyImpact {
+		PolicyImpact() = delete;
+		PolicyImpact(std::string risk_factor_key, double policy_impact, 
+			const unsigned int start_age, std::optional<unsigned int> end_age = std::nullopt)
+			: risk_factor{ risk_factor_key }, value{ policy_impact },
+			from_age{ start_age }, to_age{ end_age } {
 
-		ScenarioType type() const noexcept override;
+			if (start_age < 0) {
+				throw std::out_of_range("Impact start age must not be negative.");
+			}
 
-		std::string name() const noexcept override;
+			if (end_age.has_value() && start_age > end_age.value()) {
+				throw std::out_of_range("Impact end age must be equal or greater than the start age.");
+			}
+		}
 
-		SyncChannel& channel() override;
+		const std::string risk_factor{};
+		const double value{};
+		const unsigned int from_age{};
+		const std::optional<unsigned int> to_age{};
+		bool contains(const unsigned int& age) const noexcept {
+			if (age < from_age) {
+				return false;
+			}
 
-		double apply(const int& time, const std::string& risk_factor_key, const double& value) override;
+			if (to_age.has_value()) {
+				return age <= to_age.value();
+			}
 
-		const PolicyImpactType& impact_type() const noexcept override;
+			return true;
+		}
+	};
 
-		const PolicyInterval& active_period()  const noexcept override;
+	/// @brief Defines the policy active interval
+	struct PolicyInterval {
+		PolicyInterval(int start_at_time, std::optional<int> finish_at_time = std::nullopt)
+			: start_time{ start_at_time }, finish_time{ finish_at_time } {
+			if (start_at_time < 0) {
+				throw std::out_of_range("Policy start time must not be negative.");
+			}
 
-		const std::vector<PolicyImpact>& impacts() const noexcept override;
+			if (finish_at_time.has_value() && start_at_time > finish_at_time.value()) {
+				throw std::out_of_range("Policy finish time must be equal or greater than the start time.");
+			}
+		}
 
-	private:
-		SyncChannel& channel_;
-		PolicyDefinition definition_;
-		std::map<std::string, PolicyImpact> factor_impact_;
+		const int start_time{};
+		const std::optional<int> finish_time{};
+		bool contains(const int& time) const noexcept {
+			if (time < start_time) {
+				return false;
+			}
+
+			if (finish_time.has_value()) {
+				return time <= finish_time.value();
+			}
+
+			return true;
+		}
 	};
 }

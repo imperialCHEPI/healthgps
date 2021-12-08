@@ -17,7 +17,11 @@ namespace hgps {
         return channel_;
     }
 
-    double BaselineScenario::apply(const int& time, const std::string& risk_factor_key, const double& value) {
+    void BaselineScenario::clear() noexcept {
+    }
+
+    double BaselineScenario::apply(Person& entity, const int& time,
+        const std::string& risk_factor_key, const double& value) {
         return value;
     }
 }

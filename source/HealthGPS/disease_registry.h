@@ -9,18 +9,12 @@ namespace hgps {
 			DiseaseDefinition&& definition, const core::IntegerInterval age_range)>;
 	}
 
-	std::map<std::string, detail::DiseaseModelBuilder> get_default_disease_model_registry() {
-		auto registry = std::map<std::string, detail::DiseaseModelBuilder>{
-			{"asthma", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
+	std::map<core::DiseaseGroup, detail::DiseaseModelBuilder> get_default_disease_model_registry() {
+		auto registry = std::map<core::DiseaseGroup, detail::DiseaseModelBuilder>{
+			{core::DiseaseGroup::other, [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
 				return std::make_shared<DefaultDiseaseModel>(std::move(definition), age_range); }},
 
-			{"diabetes", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
-				return std::make_shared<DefaultDiseaseModel>(std::move(definition), age_range); }},
-
-			{"lowbackpain", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
-				return std::make_shared<DefaultDiseaseModel>(std::move(definition), age_range); }},
-
-			{"colorectum", [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
+			{core::DiseaseGroup::cancer, [](DiseaseDefinition&& definition, const core::IntegerInterval age_range) {
 				return std::make_shared<DefaultCancerModel>(std::move(definition), age_range); }},
 		};
 

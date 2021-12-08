@@ -25,8 +25,6 @@ namespace hgps {
 
 		void update_population(RuntimeContext& context) override;
 
-		void adjust_risk_factors_with_baseline(RuntimeContext& context) override;
-
 	private:
 		std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models_;
 	};

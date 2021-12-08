@@ -30,23 +30,29 @@ struct SettingsInfo
 
 struct SESInfo
 {
-	unsigned int update_interval{};
-	unsigned int update_max_age{};
-	std::map<std::string, std::string> mapping;
+	std::string function;
+	std::vector<double> parameters;
 };
 
 struct BaselineInfo
 {
-	bool is_enabled;
 	std::string format;
 	std::string delimiter;
 	std::string encoding;
-	std::string file_name;
+	std::map<std::string, std::string> file_names;
+};
+
+struct RiskFactorInfo
+{
+	std::string name;
+	short level;
+	std::string proxy;
+	std::vector<double> range;
 };
 
 struct ModellingInfo
 {
-	std::unordered_map<std::string, int> risk_factors;
+	std::vector<RiskFactorInfo> risk_factors;
 	std::string dynamic_risk_factor;
 	std::unordered_map<std::string, std::string> models;
 	BaselineInfo baseline_adjustment;
@@ -55,6 +61,7 @@ struct ModellingInfo
 struct ResultInfo
 {
 	std::string folder{};
+	std::string file_name{};
 };
 
 struct PolicyPeriodInfo
@@ -71,12 +78,27 @@ struct PolicyPeriodInfo
 	}
 };
 
+struct PolicyImpactInfo
+{
+	std::string risk_factor{};
+	double impact_value{};
+	unsigned int from_age{};
+	std::optional<unsigned int> to_age{};
+	std::string to_age_str() const {
+		if (to_age.has_value()) {
+			return std::to_string(to_age.value());
+		}
+
+		return "null";
+	}
+};
+
 struct PolicyScenarioInfo
 {
-	bool is_enabled {false};
-	std::string impact_type;
-	std::unordered_map<std::string, double> impacts;
+	std::string identifier{};
 	PolicyPeriodInfo active_period;
+	std::string impact_type{};
+	std::vector<PolicyImpactInfo> impacts;
 };
 
 struct Configuration
@@ -91,6 +113,7 @@ struct Configuration
 	unsigned int stop_time{};
 	unsigned int trial_runs{};
 	unsigned int sync_timeout_ms{};
+	bool has_active_intervention{false};
 	PolicyScenarioInfo intervention;
 	ResultInfo result;
 };

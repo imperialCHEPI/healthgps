@@ -5,6 +5,7 @@
 
 #include "channel.h"
 #include "sync_message.h"
+#include "person.h"
 
 namespace hgps {
 
@@ -32,6 +33,9 @@ namespace hgps {
 
 		virtual SyncChannel& channel() = 0;
 
-		virtual double apply(const int& time, const std::string& risk_factor_key, const double& value) = 0;
+		virtual void clear() noexcept = 0;
+
+		virtual double apply(Person& entity, const int& time,
+			const std::string& risk_factor_key, const double& value) = 0;
 	};
 }

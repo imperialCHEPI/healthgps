@@ -4,8 +4,10 @@
 
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
+#include "HealthGPS/random_algorithm.h"
 
 #include "HealthGPS.Datastore\api.h"
+
 
 #include "CountryModule.h"
 #include "RiskFactorData.h"
@@ -54,11 +56,10 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses_mapping = std::map<std::string, std::string>{ {"gender", "Gender"},
 		{"age", "Age"}, {"education", "Education"}, {"income", "Income"} };
-	auto ses = SESMapping
+	auto ses = SESDefinition
 	{
-		.update_interval = 5,
-		.update_max_age = 30,
-		.entries = ses_mapping
+		.fuction_name = "normal",
+		.parameters = std::vector<double>{0.0, 1.0}
 	};
 
 	auto entries = std::vector<MappingEntry>{
@@ -107,11 +108,43 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 	EXPECT_NE(rnd(), copy());
 }
 
-TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
+TEST(TestHealthGPS, RandomAlgorithmStandalone)
 {
 	using namespace hgps;
 
-	auto rnd = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(MTRandom32(123456789));
+	auto value = rnd_gen.next_double();
+	ASSERT_GT(value, 0.0);
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		value = rnd_gen.next_double();
+		ASSERT_GT(value, 0.0);
+	}
+}
+
+TEST(TestHealthGPS, RandomAlgorithmInternal)
+{
+	using namespace hgps;
+
+	auto engine = MTRandom32(123456789);
+	auto rnd_gen = Random(engine);
+	auto value = rnd_gen.next_double();
+	ASSERT_GT(value, 0.0);
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		value = rnd_gen.next_double();
+		ASSERT_GT(value, 0.0);
+	}
+}
+
+TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
+{
+	using namespace hgps;
+
+	auto engine = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(engine);
 
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
@@ -121,8 +154,8 @@ TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
 	auto sample_size = 100;
 	for (size_t i = 0; i < sample_size; i++)
 	{
-		summary_one.append(rnd.next_int(sample_max));
-		summary_two.append(rnd.next_int(sample_min, sample_max));
+		summary_one.append(rnd_gen.next_int(sample_max));
+		summary_two.append(rnd_gen.next_int(sample_min, sample_max));
 	}
 
 	ASSERT_EQ(0.0, summary_one.min());
@@ -132,14 +165,41 @@ TEST(TestHealthGPS, RandomBitGeneratorNextIntRangeIsClosed)
 	ASSERT_EQ(sample_max, summary_two.max());
 }
 
-TEST(TestHealthGPS, RandomBitGeneratorEmpiricalDiscrete)
+TEST(TestHealthGPS, RandomNextNormal)
 {
 	using namespace hgps;
 
-	auto rnd = MTRandom32{ 123456789 };
+	auto engine = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(engine);
 
-	auto values = std::vector<int>{2, 3, 5, 7, 9};
-	auto freq_pdf = std::vector<float>{0.2f, 0.4f, 0.1f, 0.2f, 0.1f };
+	auto summary_one = core::UnivariateSummary();
+	auto summary_two = core::UnivariateSummary();
+
+	auto sample_mean = 1;
+	auto sample_stdev = 2.5;
+	auto sample_size = 100;
+	for (size_t i = 0; i < sample_size; i++)
+	{
+		summary_one.append(rnd_gen.next_normal());
+		summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
+	}
+
+	ASSERT_NEAR(summary_one.average(), 0.0, 0.1);
+	ASSERT_NEAR(summary_one.std_deviation(), 1.0, 0.1);
+
+	ASSERT_NEAR(summary_two.average(), sample_mean, 0.1);
+	ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, 0.1);
+}
+
+TEST(TestHealthGPS, RandomEmpiricalDiscrete)
+{
+	using namespace hgps;
+
+	auto engine = MTRandom32{ 123456789 };
+	auto rnd_gen = Random(engine);
+
+	auto values = std::vector<int>{ 2, 3, 5, 7, 9 };
+	auto freq_pdf = std::vector<float>{ 0.2f, 0.4f, 0.1f, 0.2f, 0.1f };
 	auto cdf = std::vector<float>(freq_pdf.size());
 
 	cdf[0] = freq_pdf[0];
@@ -155,7 +215,7 @@ TEST(TestHealthGPS, RandomBitGeneratorEmpiricalDiscrete)
 	auto summary = core::UnivariateSummary();
 	auto sample_size = 100;
 	for (size_t i = 0; i < sample_size; i++) {
-		summary.append(rnd.next_empirical_discrete(values, cdf));
+		summary.append(rnd_gen.next_empirical_discrete(values, cdf));
 	}
 
 	ASSERT_EQ(2.0, summary.min());
@@ -173,7 +233,7 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	auto bus = DefaultEventBus{};
 	auto channel = SyncChannel{};
 	auto rnd = MTRandom32{ 123456789 };
-	auto scenario = BaselineScenario{ channel };
+	auto scenario = std::make_unique<BaselineScenario>(channel);
 	auto config = create_test_configuration(data);
 	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
@@ -182,6 +242,7 @@ TEST(TestHealthGPS, CreateRuntimeContext)
 	ASSERT_EQ(0, context.time_now());
 }
 
+/*
 TEST(TestHealthGPS, SimulationInitialise)
 {
 	using namespace hgps;
@@ -208,6 +269,7 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto factory = get_default_simulation_module_factory(repository);
 	ASSERT_NO_THROW(HealthGPS(std::move(definition), factory, bus));
 }
+*/
 
 TEST(TestHealthGPS, ModuleFactoryRegistry)
 {
@@ -231,10 +293,10 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	auto settings = Settings(uk, 0.1f, "Age", age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses_mapping = std::map<std::string, std::string>{ {"test", builder.name()} };
-	auto ses = SESMapping {
-		.update_interval = 5,
-		.update_max_age = 30,
-		.entries = ses_mapping
+	auto ses = SESDefinition
+	{
+		.fuction_name = "normal",
+		.parameters = std::vector<double>{0.0, 1.0}
 	};
 
 	auto mapping = HierarchicalMapping(
@@ -269,7 +331,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 	ASSERT_EQ("Country", country_mod->name());
 }
 
-TEST(TestHealthGPS, CreateSESModule)
+TEST(TestHealthGPS, CreateSESNoiseModule)
 {
 	using namespace hgps;
 	using namespace hgps::data;
@@ -283,19 +345,25 @@ TEST(TestHealthGPS, CreateSESModule)
 	auto manager = DataManager(full_path);
 	auto repository = CachedRepository(manager);
 
-	auto ses_module = build_ses_module(repository, config);
-	auto edu_hist = ses_module->get_education_frequency(std::nullopt);
-	auto edu_size = ses_module->max_education_level() + 1;
-	auto inc_hist = ses_module->get_income_frenquency(std::nullopt);
-	auto inc_size = edu_size * (ses_module->max_incoming_level() + 1);
+	auto bus = DefaultEventBus{};
+	auto channel = SyncChannel{};
+	auto rnd = MTRandom32{ 123456789 };
+	auto scenario = std::make_unique<BaselineScenario>(channel);
+	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
+	auto context = RuntimeContext(bus, definition);
+
+	context.reset_population(10, 2021);
+
+	auto ses_module = build_ses_noise_module(repository, config);
+	ses_module->initialise_population(context);
 
 	ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
 	ASSERT_EQ("SES", ses_module->name());
-	ASSERT_EQ(12, ses_module->max_education_level());
-	ASSERT_EQ(13, ses_module->max_incoming_level());
-	ASSERT_EQ(5, ses_module->data().size());
-	ASSERT_EQ(edu_size, edu_hist.begin()->second.size());
-	ASSERT_EQ(inc_size, inc_hist.begin()->second.size());
+
+	for (auto& entity : context.population())
+	{
+		ASSERT_NE(entity.ses, 0.0);
+	}
 }
 
 TEST(TestHealthGPS, CreateDemographicModule)
@@ -325,19 +393,18 @@ TEST(TestHealthGPS, CreateDemographicModule)
 	ASSERT_EQ(total_pop, sum_dist);
 }
 
+/*
 TEST(TestHealthGPS, CreateRiskFactorModule)
 {
 	using namespace hgps;
 	using namespace hgps::data;
 
 	// Test data code generation via JSON model definition.
-	/*
-	auto static_code = generate_test_code(
-		HierarchicalModelType::Static, "C:/HealthGPS/Test/HLM.Json");
+	//auto static_code = generate_test_code(
+	//	HierarchicalModelType::Static, "C:/HealthGPS/Test/HLM.Json");
 
-	auto dynamic_code = generate_test_code(
-		HierarchicalModelType::Dynamic, "C:/HealthGPS/Test/DHLM.Json");
-	*/
+	//auto dynamic_code = generate_test_code(
+	//	HierarchicalModelType::Dynamic, "C:/HealthGPS/Test/DHLM.Json");
 
 	auto baseline_data = hgps::BaselineAdjustment{};
 	auto static_definition = get_static_test_model(baseline_data);
@@ -352,13 +419,15 @@ TEST(TestHealthGPS, CreateRiskFactorModule)
 	ASSERT_EQ("RiskFactor", risk_module.name());
 }
 
+*/
+
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty)
 {
 	using namespace hgps;
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>();
 	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
 }
-
+/*
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
 {
 	using namespace hgps;
@@ -382,6 +451,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
 
 	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
 }
+*/
 
 TEST(TestHealthGPS, CreateDiseaseModule)
 {

@@ -10,14 +10,14 @@
   <Class Name="hgps::HierarchicalLinearModel">
     <Position X="0.5" Y="8.25" Width="4.75" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAAIAAAAAAAAIAQAAAFAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAIAQAAAFAAAAAAAAAAAAAAA=</HashCode>
       <FileName>interfaces.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="hgps::RuntimeContext" Collapsed="true">
-    <Position X="9.25" Y="1.75" Width="1.5" />
+    <Position X="9.25" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAAEhQAoAQIAAAQACAABAAAAAB4BAACxAAggAgBA=</HashCode>
+      <HashCode>AIAAAAEhQAgIQIAAAQACAABAAAAABoBAACwAAggAgBA=</HashCode>
       <FileName>runtime_context.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -45,7 +45,7 @@
   <Class Name="hgps::RiskFactorHostModule">
     <Position X="0.5" Y="5.25" Width="4.75" />
     <TypeIdentifier>
-      <HashCode>ABAAAAAAAAAAIAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>ABAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>interfaces.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -60,12 +60,12 @@
   <Struct Name="hgps::Person" Collapsed="true">
     <Position X="9.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAAAAAASAEAQIgQAAAAgAAIEAAAACAACwAAARAAIgA=</HashCode>
+      <HashCode>AIAAAAAASAEAQIgQAAQAgAAIEAAAACAACwAAARAAIgA=</HashCode>
       <FileName>person.h</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="hgps::PopulationRecord" Collapsed="true">
-    <Position X="7" Y="1.75" Width="2" />
+    <Position X="7" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAACAAAQAAAAAIAAAAAAAABAAAAAEAAAAAAAAA=</HashCode>
       <FileName>demographic.h</FileName>

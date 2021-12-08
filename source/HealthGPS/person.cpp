@@ -10,6 +10,7 @@ namespace hgps {
         {"age",[](const Person& p) { return static_cast<double>(p.age); } },
         {"age2",[](const Person& p) { return pow(p.age, 2); } },
         {"age3",[](const Person& p) { return pow(p.age, 3); } },
+        {"ses",[](const Person& p) { return p.ses; } },
         {"education",[](const Person& p) { return static_cast<double>(p.education.value()); } },
         {"income",[](const Person& p) { return static_cast<double>(p.income.value()); } },
     };
@@ -20,6 +21,7 @@ namespace hgps {
         {"age",[](const Person& p) { return static_cast<double>(p.age - 1); } },
         {"age2",[](const Person& p) { return pow(p.age - 1, 2); } },
         {"age3",[](const Person& p) { return pow(p.age - 1, 3); } },
+        {"ses",[](const Person& p) { return p.ses; } },
         {"education",[](const Person& p) { return static_cast<double>(p.education.old_value()); } },
         {"income",[](const Person& p) { return static_cast<double>(p.income.old_value()); } },
     };

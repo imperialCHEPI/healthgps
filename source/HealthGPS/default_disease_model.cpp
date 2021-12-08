@@ -32,7 +32,7 @@ namespace hgps {
 			auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
 			auto prevalence = definition_.table()(entity.age, entity.gender).at(prevalence_id);
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases[disease_type()] = Disease{
 					.status = DiseaseStatus::active,
@@ -50,7 +50,8 @@ namespace hgps {
 				continue;
 			}
 
-			auto combine_risk = calculate_combined_relative_risk(entity, context.time_now());
+			auto combine_risk = calculate_combined_relative_risk(
+				entity, context.start_time(), context.time_now());
 			sum(entity.age, entity.gender) += combine_risk;
 			count(entity.age, entity.gender)++;
 		}
@@ -119,10 +120,11 @@ namespace hgps {
 		return result;
 	}
 
-	double DefaultDiseaseModel::calculate_combined_relative_risk(const Person& entity, const int& time_now) const {
+	double DefaultDiseaseModel::calculate_combined_relative_risk(
+		const Person& entity, const int& start_time, const int& time_now) const {
 		auto combined_risk_value = 1.0;
 		combined_risk_value *= calculate_relative_risk_for_risk_factors(entity);
-		combined_risk_value *= calculate_relative_risk_for_diseases(entity, time_now);
+		combined_risk_value *= calculate_relative_risk_for_diseases(entity, start_time, time_now);
 		return combined_risk_value;
 	}
 
@@ -142,12 +144,14 @@ namespace hgps {
 		return relative_risk_value;
 	}
 
-	double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person& entity, const int& time_now) const {
+	double DefaultDiseaseModel::calculate_relative_risk_for_diseases(
+		const Person& entity, const int& start_time, const int& time_now) const {
 		auto relative_risk_value = 1.0;
 		for (auto& disease : entity.diseases) {
 			// Only include existing diseases
-			if (time_now == 0 || disease.second.start_time < time_now) {
-				double relative_disease_vale =
+			if (disease.second.status == DiseaseStatus::active && 
+			   (start_time == time_now || disease.second.start_time < time_now)) {
+				auto relative_disease_vale =
 					definition_.relative_risk_diseases().at(disease.first)(entity.age, entity.gender);
 
 				relative_risk_value *= relative_disease_vale;
@@ -172,7 +176,7 @@ namespace hgps {
 			}
 
 			auto probability = definition_.table()(entity.age, entity.gender).at(remission_id);
-			auto hazard = context.next_double();
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases.at(disease_type()).status = DiseaseStatus::free;
 				remission_count++;
@@ -211,8 +215,9 @@ namespace hgps {
 				continue;
 			}
 
-			auto probability = calculate_incidence_probability(entity, context.time_now());
-			auto hazard = context.next_double();
+			auto probability = calculate_incidence_probability(
+				entity, context.start_time(), context.time_now());
+			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases[disease_type()] = Disease{
 									.status = DiseaseStatus::active,
@@ -227,9 +232,10 @@ namespace hgps {
 		auto disease_prevalence = prevalence_count * 100.0 / population_count;
 	}
 
-	double DefaultDiseaseModel::calculate_incidence_probability(const Person& entity, const int& time_now) const {
+	double DefaultDiseaseModel::calculate_incidence_probability(
+		const Person& entity, const int& start_time, const int& time_now) const {
 		auto incidence_id = definition_.table().at("incidence");
-		auto combined_relative_risk = calculate_combined_relative_risk(entity, time_now);
+		auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
 		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
 		auto incidence = definition_.table()(entity.age, entity.gender).at(incidence_id);
 		auto probability = incidence * combined_relative_risk / average_relative_risk;

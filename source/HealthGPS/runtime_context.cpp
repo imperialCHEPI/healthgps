@@ -3,7 +3,8 @@
 namespace hgps {
 
     RuntimeContext::RuntimeContext(EventAggregator& bus, SimulationDefinition& definition)
-        : event_bus_{ bus }, definition_{ definition }, population_{ 0 }
+        : event_bus_{ bus }, definition_{ definition }, population_{ 0 },
+        generator_{definition.rnd()}
     {}
 
     int RuntimeContext::time_now() const noexcept {
@@ -34,6 +35,10 @@ namespace hgps {
         return definition_.scenario();
     }
 
+    Random& RuntimeContext::random() noexcept {
+        return generator_;
+    }
+
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
         return definition_.inputs().risk_mapping();
     }
@@ -48,30 +53,6 @@ namespace hgps {
 
     const std::string RuntimeContext::identifier() const noexcept {
         return definition_.identifier();
-    }
-
-    int RuntimeContext::next_int() {
-        return definition_.rnd().next_int();
-    }
-
-    int RuntimeContext::next_int(const int& max_value) {
-        return definition_.rnd().next_int(max_value);
-    }
-
-    int RuntimeContext::next_int(const int& min_value, const int& max_value) {
-        return definition_.rnd().next_int(min_value, max_value);
-    }
-
-    double RuntimeContext::next_double() noexcept {
-        return definition_.rnd().next_double();
-    }
-
-    int RuntimeContext::next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf) {
-        return definition_.rnd().next_empirical_discrete(values, cdf);
-    }
-
-    int RuntimeContext::next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf) {
-        return definition_.rnd().next_empirical_discrete(values, cdf);
     }
 
     void RuntimeContext::set_current_time(const int time_now) noexcept {

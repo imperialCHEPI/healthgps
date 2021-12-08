@@ -1,4 +1,8 @@
-#include "program.h"
+#include "configuration.h"
+#include "model_parser.h"
+#include "csvparser.h"
+
+#include "HealthGPS/api.h"
 #include "HealthGPS.Datastore/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/baseline_scenario.h"
@@ -7,11 +11,14 @@
 #include "event_monitor.h"
 #include "result_file_writer.h"
 
+#include <fmt/color.h>
 #include <fmt/chrono.h>
 #include <thread>
 
 int main(int argc, char* argv[])
 {
+	using namespace hgps;
+
 	// Parse command line arguments
 	auto options = create_options();
 	if (argc < 2) {
@@ -40,14 +47,10 @@ int main(int argc, char* argv[])
 
 	std::cout << input_table.to_string();
 
-	// Load baseline scenario adjustments
-	auto baseline_adjustments = load_baseline_adjustments(
-		config.modelling.baseline_adjustment, config.start_time, config.stop_time);
-
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
 	auto data_repository = hgps::CachedRepository(data_api);
-	register_risk_factor_model_definitions(config.modelling, data_repository, baseline_adjustments);
+	register_risk_factor_model_definitions(config.modelling, data_repository);
 	auto factory = get_default_simulation_module_factory(data_repository);
 
 	// Validate the configuration target country
@@ -76,7 +79,7 @@ int main(int argc, char* argv[])
 	auto event_bus = DefaultEventBus();
 	auto result_file_logger = ResultFileWriter{ 
 		create_output_file_name(config.result),
-		ModelInfo{.name = "Health-GPS", .version = "0.5.beta"}
+		ModelInfo{.name = "Health-GPS", .version = "1.0.0.0"}
 	};
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
@@ -93,15 +96,14 @@ int main(int argc, char* argv[])
 		std::atomic<bool> done(false);
 		auto runtime = 0.0;
 		auto baseline = HealthGPS{
-			SimulationDefinition{ model_config, BaselineScenario{channel}, hgps::MTRandom32() },
+			SimulationDefinition{ model_config, std::make_unique<BaselineScenario>(channel), hgps::MTRandom32() },
 			factory, event_bus };
-		if (config.intervention.is_enabled) {
+		if (config.has_active_intervention) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
 			auto intervention = HealthGPS{
 				SimulationDefinition{ model_config, std::move(policy_scenario), hgps::MTRandom32() },
 				factory, event_bus };
 
-			
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
 			auto worker = std::jthread{ [&runtime, &runner, &baseline, &intervention, &config, &done] {
 				runtime = runner.run(baseline, intervention, config.trial_runs);

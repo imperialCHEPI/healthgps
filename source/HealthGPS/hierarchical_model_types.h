@@ -6,7 +6,7 @@
 
 namespace hgps {
 
-	using BaselineAdjustmentTable = Map2d<int, std::string, DoubleGenderValue>;
+	using FactorAdjustmentTable = Map2d<core::Gender, std::string, std::vector<double>>;
 
 	struct Coefficient {
 		double value{};
@@ -17,8 +17,7 @@ namespace hgps {
 
 	struct LinearModel {
 		std::unordered_map<std::string, Coefficient> coefficients;
-		std::vector<double> fitted_values;
-		std::vector<double> residuals;
+		double residuals_standard_deviation;
 		double rsquared{};
 	};
 
@@ -32,23 +31,28 @@ namespace hgps {
 	};
 
 	struct BaselineAdjustment final {
-		BaselineAdjustment() = default;
-		BaselineAdjustment(BaselineAdjustmentTable&& baseline_averages)
-			: averages{ baseline_averages }, risk_factors{}, is_enabled{ true }
+		BaselineAdjustment() = delete;
+		BaselineAdjustment(FactorAdjustmentTable&& adjustment_table)
+			: values{ adjustment_table }
 		{
-			if (baseline_averages.empty()) {
+			if (adjustment_table.empty()) {
 				throw std::invalid_argument(
-					"The baseline risk factor averages table must not be empty.");
+					"The risk factors adjustment table must not be empty.");
+			}
+			else if (adjustment_table.rows() != 2) {
+				throw std::invalid_argument(
+					"The risk factors adjustment definition must contain two tables.");
 			}
 
-			for (const auto& factor : averages.cbegin()->second) {
-				risk_factors.emplace_back(factor.first);
+			if (!adjustment_table.contains(core::Gender::male)) {
+				throw std::invalid_argument("Missing the required adjustment table for male.");
+			}
+			else if (!adjustment_table.contains(core::Gender::female)) {
+				throw std::invalid_argument("Missing the required adjustment table for female.");
 			}
 		}
 
-		const bool is_enabled{ false };
-		const BaselineAdjustmentTable averages{};
-		std::vector<std::string> risk_factors{};
+		const FactorAdjustmentTable values{};
 	};
 
 	struct HierarchicalLinearModelDefinition final {
@@ -56,12 +60,66 @@ namespace hgps {
 		HierarchicalLinearModelDefinition(
 			std::unordered_map<std::string, LinearModel>&& linear_models,
 			std::map<int, HierarchicalLevel>&& model_levels,
-			const BaselineAdjustment& baseline_adjustment)
+			BaselineAdjustment&& baseline_adjustment)
 			: models{ std::move(linear_models) }, levels{ std::move(model_levels) },
-			adjustments{ baseline_adjustment } {}
+			adjustments{ std::move(baseline_adjustment) } {}
 
 		const std::unordered_map<std::string, LinearModel> models;
 		const std::map<int, HierarchicalLevel> levels;
-		const BaselineAdjustment& adjustments;
+		const BaselineAdjustment adjustments;
+	};
+
+	struct FactorDynamicEquation {
+		std::string name;
+		std::map<std::string, double> coefficients;
+		double residuals_standard_deviation;
+	};
+
+	struct AgeGroupGenderEquation {
+		core::IntegerInterval age_group;
+		std::map<std::string, FactorDynamicEquation> male;
+		std::map<std::string, FactorDynamicEquation> female;
+	};
+
+	class LiteHierarchicalModelDefinition final {
+	public:
+		LiteHierarchicalModelDefinition() = delete;
+		LiteHierarchicalModelDefinition(
+			std::map<core::IntegerInterval, AgeGroupGenderEquation>&& equations,
+			std::map<std::string, std::string>&& variables,
+			BaselineAdjustment&& baseline_adjustment,
+			const double boundary_percentage = 0.05)
+			: equations_{ std::move(equations) }, variables_{ std::move(variables) },
+			adjustments_{ baseline_adjustment }, boundary_percentage_{ boundary_percentage } {
+
+			if (equations_.empty()) {
+				throw std::invalid_argument("The model definition equations must not be empty.");
+			}
+		}
+
+		const std::map<std::string, std::string>& variables() const noexcept { return variables_; }
+
+		const AgeGroupGenderEquation& at(const int& age) const {
+			for (auto& entry : equations_) {
+				if (entry.first.contains(age)) {
+					return entry.second;
+				}
+			}
+
+			if (age < equations_.begin()->first.lower()) {
+				return equations_.begin()->second;
+			}
+
+			return equations_.rbegin()->second;
+		}
+
+		const BaselineAdjustment& adjustments() const { return adjustments_; }
+		const double& boundary_percentage() const { return boundary_percentage_; }
+
+	private:
+		double boundary_percentage_;
+		std::map<core::IntegerInterval, AgeGroupGenderEquation> equations_;
+		std::map<std::string, std::string> variables_;
+		BaselineAdjustment adjustments_;
 	};
 }

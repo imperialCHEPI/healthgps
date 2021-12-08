@@ -1,0 +1,106 @@
+{
+    "inputs": {
+        "file": {
+            "name": "France.DataFile.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "ASCII",
+            "columns": {
+                "Year": "integer",
+                "Gender": "integer",
+                "Age": "integer",
+                "Age2": "integer",
+                "Age3": "integer",
+                "SES": "double",
+                "PA": "double",
+                "Protein": "double",
+                "Sodium": "double",
+                "Fat": "double",
+                "Energy": "double",
+                "BMI": "double"
+            }
+        },
+        "settings": {
+            "country_code": "FRA",
+            "size_fraction": 0.0001,
+            "data_linkage": "Age",
+            "age_range": [ 0, 100 ]
+        },
+        "ses": {
+            "function_name":"normal",
+            "function_parameters":[0.0, 1.0]
+        }
+    },
+    "modelling": {
+        "risk_factors": [
+            {"name":"Gender",   "level":0, "proxy":"gender", "range":[0,1]},
+            {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
+            {"name":"Age2",     "level":0, "proxy":"",       "range":[1,7569]},
+            {"name":"Age3",     "level":0, "proxy":"",       "range":[1,658503]},
+            {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.314484485,2.310181]},
+            {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.146601,8.675425]},
+            {"name":"Protein",  "level":1, "proxy":"",       "range":[42.09252483,238.4145]},
+            {"name":"Fat",      "level":1, "proxy":"",       "range":[44.78128,381.666]},
+            {"name":"PA",       "level":2, "proxy":"",       "range":[400,9769.83669]},
+            {"name":"Energy",   "level":2, "proxy":"",       "range":[1315.532125,7545.832301]},
+            {"name":"BMI",      "level":3, "proxy":"",       "range":[13.53255,45.26488]}
+        ],
+        "dynamic_risk_factor": "",
+        "models": {
+            "static": "France.HLM.Json",
+            "dynamic": "France.EBHLM.json"
+        },
+        "baseline_adjustment": {
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "file_names": {
+                "static_male":"France.Initial.Adjustment.Male.csv",
+                "static_female":"France.Initial.Adjustment.Female.csv",
+                "dynamic_male":"France.Update.Adjustment.Male.csv",
+                "dynamic_female":"France.Update.Adjustment.Female.csv"
+            }
+        }
+    },
+    "running": {
+        "seed": [
+            123456789
+        ],
+        "start_time": 2010,
+        "stop_time": 2050,
+        "trial_runs": 1,
+        "sync_timeout_ms": 5000,
+        "diseases": [ "asthma", "diabetes", "lowbackpain"],
+        "cancers": [ "colorectum" ],
+        "interventions": {
+            "active_type_id": "",
+            "types": {
+                "simple": {
+                    "active_period": {
+                        "start_time": 2021,
+                        "finish_time": 2021
+                    },
+                    "impact_type": "absolute",
+                    "impacts": [
+                        { "risk_factor":"BMI", "impact_value": -1.0, "from_age":0, "to_age":null}
+                    ]
+                },
+                "marketing": {
+                    "active_period": {
+                        "start_time": 2021,
+                        "finish_time": 2050
+                    },
+                    "impacts": [
+                        { "risk_factor":"BMI", "impact_value": -0.12, "from_age": 5, "to_age": 12 },
+                        { "risk_factor":"BMI", "impact_value": -0.31, "from_age": 13, "to_age": 18 },
+                        { "risk_factor":"BMI", "impact_value": -0.155, "from_age": 19, "to_age": null }
+                    ]
+                }
+            }
+        }
+    },
+    "results": {
+        "folder": "C:\\HealthGPS\\Results",
+        "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
+    }
+}

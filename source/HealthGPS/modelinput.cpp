@@ -2,10 +2,10 @@
 
 namespace hgps {
 	ModelInput::ModelInput(core::DataTable& data, Settings settings, RunInfo run_info,
-		SESMapping ses_mapping, HierarchicalMapping risk_mapping, 
+		SESDefinition ses_info, HierarchicalMapping risk_mapping, 
 		std::vector<core::DiseaseInfo> diseases)
 		: input_data_{data}, settings_{settings},
-		run_info_{ run_info }, ses_mapping_{ ses_mapping },
+		run_info_{ run_info }, ses_definition_{ ses_info },
 		risk_mapping_{ risk_mapping }, diseases_{diseases} { }
 
 	const Settings& ModelInput::settings() const noexcept {
@@ -32,8 +32,12 @@ namespace hgps {
 		return run_info_.seed;
 	}
 
-	const SESMapping& ModelInput::ses_mapping() const noexcept {
-		return ses_mapping_;
+	const RunInfo& ModelInput::run() const noexcept {
+		return run_info_;
+	}
+
+	const SESDefinition& ModelInput::ses_definition() const noexcept {
+		return ses_definition_;
 	}
 
 	const HierarchicalMapping& ModelInput::risk_mapping() const noexcept {
