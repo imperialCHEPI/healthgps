@@ -113,6 +113,7 @@ namespace hgps {
 		auto index = 0;
 		auto pop_size = static_cast<int>(context.population().size());
 		auto entry_count = 0;
+		auto entry_total = static_cast<int>(age_gender_dist.size());
 		for (auto& entry : age_gender_dist) {
 			entry_count++;
 			auto num_males = static_cast<int>(std::round(pop_size * entry.second.male));
@@ -120,36 +121,37 @@ namespace hgps {
 			auto num_required = index + num_males + num_females;
 			auto pop_diff = pop_size - num_required;
 			// Final adjustment due to rounding errors
-			if (entry_count == age_gender_dist.size() && pop_diff != 0) {
-				if (pop_diff > 0) {
-					int half_diff = pop_diff / 2;
-					num_males += half_diff;
-					num_females += half_diff;
-					if (entry.second.male > entry.second.female) {
-						num_males += pop_diff - (half_diff * 2);
-					}
-					else {
-						num_females += pop_diff - (half_diff * 2);
+			if (entry_count == entry_total && pop_diff > 0) {
+				int half_diff = pop_diff / 2;
+				num_males += half_diff;
+				num_females += half_diff;
+				if (entry.second.male > entry.second.female) {
+					num_males += pop_diff - (half_diff * 2);
+				}
+				else {
+					num_females += pop_diff - (half_diff * 2);
+				}
+
+				pop_diff = pop_size - (index + num_males + num_females);
+				assert(pop_diff == 0);
+			}
+			else if (pop_diff < 0) {
+				pop_diff *= -1;
+				if (entry.second.male > entry.second.female) {
+					num_females -= pop_diff;
+					if (num_females < 0) {
+						num_males += num_females;
 					}
 				}
 				else {
-					pop_diff *= -1;
-					if (entry.second.male > entry.second.female) {
-						num_females -= pop_diff;
-						if (num_females < 0) {
-							num_males += num_females;
-						}
+					num_males -= pop_diff;
+					if (num_males < 0) {
+						num_females += num_males;
 					}
-					else {
-						num_males -= pop_diff;
-						if (num_males < 0) {
-							num_females += num_males;
-						}
-					}
-
-					num_males = std::max(0, num_males);
-					num_females = std::max(0, num_females);
 				}
+
+				num_males = std::max(0, num_males);
+				num_females = std::max(0, num_females);
 
 				pop_diff = pop_size - (index + num_males + num_females);
 				assert(pop_diff == 0);
