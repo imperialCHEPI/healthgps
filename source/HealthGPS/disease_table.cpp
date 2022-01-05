@@ -1,8 +1,8 @@
 #include "disease_table.h"
-#include <stdexcept>
-#include <format>
-
 #include "HealthGPS.Core/string_util.h"
+
+#include <stdexcept>
+#include <fmt/format.h>
 
 namespace hgps {
 	/* --------------------   Disease Measure Implementation ----------------- */
@@ -41,7 +41,7 @@ namespace hgps {
 		for (auto& age : data) {
 			if (age.second.size() != col_size) {
 				throw std::invalid_argument(
-					std::format("Number of columns mismatch at age: {} ({} vs {}).",
+					fmt::format("Number of columns mismatch at age: {} ({} vs {}).",
 						age.first, age.second.size(), col_size));
 			}
 		}

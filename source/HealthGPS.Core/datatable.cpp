@@ -1,6 +1,7 @@
-#include <stdexcept>
 #include "datatable.h"
 #include "string_util.h"
+#include <stdexcept>
+#include <fmt/format.h>
 
 namespace hgps {
 	namespace core {
@@ -49,7 +50,7 @@ namespace hgps {
 				return columns_.at(found->second);
 			}
 
-			throw std::invalid_argument(std::format("Column name: {} not found.", name));
+			throw std::invalid_argument(fmt::format("Column name: {} not found.", name));
 		}
 
 		std::string DataTable::to_string() const
@@ -63,19 +64,19 @@ namespace hgps {
 			auto pad = longestColumnName + 2;
 			auto width = pad + 28;
 
-			ss << std::format("\n Table size: {} x {}\n", num_columns(), num_rows());
-			ss << std::format("|{:-<{}}|\n", '-', width);
-			ss << std::format("| {:{}} : {:10} : {:>10} |\n", "Column Name", pad, "Data Type", "# Nulls");
-			ss << std::format("|{:-<{}}|\n", '-', width);
+			ss << fmt::format("\n Table size: {} x {}\n", num_columns(), num_rows());
+			ss << fmt::format("|{:-<{}}|\n", '-', width);
+			ss << fmt::format("| {:{}} : {:10} : {:>10} |\n", "Column Name", pad, "Data Type", "# Nulls");
+			ss << fmt::format("|{:-<{}}|\n", '-', width);
 			for (auto& col : columns_)
 			{
-				ss << std::format("| {:{}} : {:10} : {:10} |\n",
+				ss << fmt::format("| {:{}} : {:10} : {:10} |\n",
 					col->name(), pad,
 					col->type(),
 					col->null_count());
 			}
 
-			ss << std::format("|{:_<{}}|\n\n", '_', width);
+			ss << fmt::format("|{:_<{}}|\n\n", '_', width);
 
 			return ss.str();
 		}

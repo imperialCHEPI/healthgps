@@ -1,5 +1,6 @@
 #include "life_table.h"
 #include <numeric>
+#include <fmt/format.h>
 
 namespace hgps {
 	LifeTable::LifeTable(std::map<int, Birth>&& births,
@@ -33,7 +34,7 @@ namespace hgps {
 
 	const Birth& LifeTable::get_births_at(const int time_year) const	{
 		if (!birth_table_.contains(time_year)) {
-			throw std::out_of_range(std::format("The year must not be outside of the data limits."));
+			throw std::out_of_range(fmt::format("The year must not be outside of the data limits."));
 		}
 
 		return birth_table_.at(time_year);
@@ -41,7 +42,7 @@ namespace hgps {
 
 	const std::map<int, Mortality>& LifeTable::get_mortalities_at(const int time_year) const {
 		if (!death_table_.contains(time_year)) {
-			throw std::out_of_range(std::format("The year must not be outside of the data limits."));
+			throw std::out_of_range(fmt::format("The year must not be outside of the data limits."));
 		}
 
 		return death_table_.at(time_year);
@@ -49,7 +50,7 @@ namespace hgps {
 
 	double LifeTable::get_total_deaths_at(const int time_year) const {
 		if (!death_table_.contains(time_year)) {
-			throw std::out_of_range(std::format("The year must not be outside of the data limits."));
+			throw std::out_of_range(fmt::format("The year must not be outside of the data limits."));
 		}
 
 		auto year_data = get_mortalities_at(time_year);

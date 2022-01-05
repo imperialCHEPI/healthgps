@@ -1,8 +1,8 @@
-#include <cmath>
-#include <format>
-#include <sstream>
-
 #include "univariate_summary.h"
+
+#include <cmath>
+#include <sstream>
+#include <fmt/format.h>
 
 namespace hgps {
 	namespace core {
@@ -153,20 +153,20 @@ namespace hgps {
 		std::string UnivariateSummary::to_string() const noexcept {
 
 			std::stringstream ss;
-			ss << std::format("Name ..........= {}\n", name());
-			ss << std::format("Count total....= {}\n", count_total());
-			ss << std::format("Count valid....= {}\n", count_valid());
-			ss << std::format("Count null.....= {}\n", count_null());
-			ss << std::format("Sum ...........= {}\n", sum());
-			ss << std::format("Minimum .......= {}\n", min());
-			ss << std::format("Maximum .......= {}\n", max());
-			ss << std::format("Range .........= {}\n", range());
-			ss << std::format("Average .......= {}\n", average());
-			ss << std::format("Variance ......= {}\n", variance());
-			ss << std::format("Std. Deviation = {}\n", std_deviation());
-			ss << std::format("Std. Error.....= {}\n", std_error());
-			ss << std::format("Kurtosis ......= {}\n", kurtosis());
-			ss << std::format("Skewness ......= {}\n", skewness());
+			ss << fmt::format("Name ..........= {}\n", name());
+			ss << fmt::format("Count total....= {}\n", count_total());
+			ss << fmt::format("Count valid....= {}\n", count_valid());
+			ss << fmt::format("Count null.....= {}\n", count_null());
+			ss << fmt::format("Sum ...........= {}\n", sum());
+			ss << fmt::format("Minimum .......= {}\n", min());
+			ss << fmt::format("Maximum .......= {}\n", max());
+			ss << fmt::format("Range .........= {}\n", range());
+			ss << fmt::format("Average .......= {}\n", average());
+			ss << fmt::format("Variance ......= {}\n", variance());
+			ss << fmt::format("Std. Deviation = {}\n", std_deviation());
+			ss << fmt::format("Std. Error.....= {}\n", std_error());
+			ss << fmt::format("Kurtosis ......= {}\n", kurtosis());
+			ss << fmt::format("Skewness ......= {}\n", skewness());
 			return ss.str();
 		}
 	}

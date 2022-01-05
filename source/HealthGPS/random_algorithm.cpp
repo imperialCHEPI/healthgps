@@ -2,8 +2,8 @@
 
 #include <random>
 #include <numbers>
-#include <format>
 #include <stdexcept>
+#include <fmt/format.h>
 
 namespace hgps
 {
@@ -48,7 +48,7 @@ namespace hgps
 	{
 		if (values.size() != cdf.size()) {
 			throw std::invalid_argument(
-				std::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
+				fmt::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
 		}
 
 		auto p = next_double();
@@ -64,7 +64,7 @@ namespace hgps
 	int  Random::next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf) {
 		if (values.size() != cdf.size()) {
 			throw std::invalid_argument(
-				std::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
+				fmt::format("input vectors size mismatch: {} vs {}.", values.size(), cdf.size()));
 		}
 
 		auto p = next_double();

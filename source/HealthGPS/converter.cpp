@@ -2,6 +2,7 @@
 
 #include "HealthGPS.Core/string_util.h"
 #include "default_cancer_model.h"
+#include <fmt/format.h>
 
 namespace hgps {
 	namespace detail {
@@ -38,7 +39,7 @@ namespace hgps {
 				auto gender = to_gender(entity.columns[i]);
 				if (gender == core::Gender::unknown) {
 					throw std::out_of_range(
-						std::format("Invalid column gender type: {}", entity.columns[i]));
+						fmt::format("Invalid column gender type: {}", entity.columns[i]));
 				}
 
 				cols.emplace_back(gender);

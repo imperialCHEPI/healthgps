@@ -1,5 +1,5 @@
 #include "info_message.h"
-#include <format>
+#include <fmt/format.h>
 
 namespace hgps {
 
@@ -19,7 +19,7 @@ namespace hgps {
 		auto formatting = std::string{ "Source: {}, run # {}, {}, time: {}" };
 		formatting += message.empty() ? "{}" : " - {}";
 
-		return std::format(formatting, source, run_number,
+		return fmt::format(formatting, source, run_number,
 			detail::model_action_str(model_action), model_time, message);
 	}
 

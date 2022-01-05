@@ -1,10 +1,11 @@
 #pragma once
-#include <format>
+#include "forward_type.h"
+
 #include <memory>
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
-#include "forward_type.h"
+#include <fmt/format.h>
 
 namespace hgps {
 	namespace core {
@@ -34,7 +35,7 @@ namespace hgps {
 
 				if (values.size() != size()) {
 					throw std::invalid_argument(
-						std::format("Array size and values size mismatch: {} vs. given {}.", size(), values.size()));
+						fmt::format("Array size and values size mismatch: {} vs. given {}.", size(), values.size()));
 				}
 
 				std::copy(values.begin(), values.end(), data_.begin());
@@ -87,11 +88,11 @@ namespace hgps {
 
 			void check_boundaries(size_t row, size_t column) const {
 				if ((row < 0) || (row >= rows_)) {
-					throw std::out_of_range(std::format("Row {} is out of array bounds.", row));
+					throw std::out_of_range(fmt::format("Row {} is out of array bounds.", row));
 				}
 				
 				if ((column < 0) || (column >= columns_)) {
-					throw std::out_of_range(std::format("Column {} is out of array bounds.", column));
+					throw std::out_of_range(fmt::format("Column {} is out of array bounds.", column));
 				}
 			}
 		};

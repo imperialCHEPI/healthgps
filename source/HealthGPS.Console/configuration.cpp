@@ -13,6 +13,7 @@
 #include <fstream>
 #include <fmt/core.h>
 #include <fmt/color.h>
+#include <fmt/chrono.h>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                     \
@@ -226,7 +227,7 @@ Configuration load_configuration(CommandOptions& options)
 	}
 	else
 	{
-		std::cout << std::format(
+		std::cout << fmt::format(
 			"File {} doesn't exist.",
 			options.config_file.string()) << std::endl;
 	}
@@ -311,23 +312,22 @@ std::string create_output_file_name(const ResultInfo& info)
 	}
 
 	auto tp = std::chrono::system_clock::now();
-	auto local_tp = std::chrono::zoned_time{ std::chrono::current_zone(), tp };
 
 	// filename token replacement
 	auto file_name = info.file_name;
 	std::size_t tk_end = 0;
 	auto tk_start = file_name.find_first_of("{", tk_end);
 	if (tk_start != std::string::npos) {
-		auto timestamp_tk = std::string{ "{:%F_%H-%M-%S}" };
+		auto timestamp_tk = std::string{ "{0:%F_%H-%M-}{1:%S}" };
 		tk_end = file_name.find_first_of("}", tk_start + 1);
 		if (tk_end != std::string::npos) {
 			file_name.replace(tk_start, tk_end - tk_start + 1, timestamp_tk);
 		}
 	}
 
-	auto log_file_name = std::format("HealthGPS_result_{:%F_%H-%M-%S}.json", local_tp);
+	auto log_file_name = fmt::format("HealthGPS_result_{0:%F_%H-%M-}{1:%S}.json", tp, tp.time_since_epoch());
 	if (tk_end > 0) {
-		log_file_name = std::format(file_name, local_tp);
+		log_file_name = fmt::format(file_name, tp, tp.time_since_epoch());
 	}
 
 	log_file_name = (output_folder / log_file_name).string();
@@ -354,7 +354,7 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 			impact_type = PolicyImpactType::relative;
 		}
 		else if (!core::case_insensitive::equals(info.impact_type, "absolute")) {
-			throw std::logic_error(std::format("Unknown policy impact type: {}", info.impact_type));
+			throw std::logic_error(fmt::format("Unknown policy impact type: {}", info.impact_type));
 		}
 
 		auto definition = SimplePolicyDefinition(impact_type, risk_impacts, period);
@@ -367,5 +367,5 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	}
 
 	throw std::invalid_argument(
-		std::format("Unknown intervention policy identifier: {}", info.identifier));
+		fmt::format("Unknown intervention policy identifier: {}", info.identifier));
 }

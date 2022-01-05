@@ -9,7 +9,7 @@ namespace hgps {
 				return IntegerInterval(std::stoi(parts[0].data()), std::stoi(parts[1].data()));
 			}
 
-			throw std::invalid_argument(std::format("Input value:'{}' does not have the right format: xx-xx.", value));
+			throw std::invalid_argument(fmt::format("Input value:'{}' does not have the right format: xx-xx.", value));
 		}
 
 		FloatInterval parse_float_interval(const std::string_view& value, const std::string_view delims) {
@@ -18,7 +18,7 @@ namespace hgps {
 				return FloatInterval(std::stof(parts[0].data()), std::stof(parts[1].data()));
 			}
 
-			throw std::invalid_argument(std::format("Input value:'{}' does not have the right format: xx-xx.", value));
+			throw std::invalid_argument(fmt::format("Input value:'{}' does not have the right format: xx-xx.", value));
 		}
 
 		DoubleInterval parse_double_interval(const std::string_view& value, const std::string_view delims) {
@@ -27,7 +27,7 @@ namespace hgps {
 				return DoubleInterval(std::stod(parts[0].data()), std::stod(parts[1].data()));
 			}
 
-			throw std::invalid_argument(std::format("Input value:'{}' does not have the right format: xx-xx.", value));
+			throw std::invalid_argument(fmt::format("Input value:'{}' does not have the right format: xx-xx.", value));
 		}
 	}
 }

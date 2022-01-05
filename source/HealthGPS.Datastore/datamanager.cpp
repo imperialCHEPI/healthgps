@@ -400,7 +400,7 @@ namespace hgps {
 					table.death_weight = lookup;
 				}
 				else {
-					throw std::out_of_range(std::format("Unknown disease parameter file type: {}", file.key()));
+					throw std::out_of_range(fmt::format("Unknown disease parameter file type: {}", file.key()));
 				}
 			}
 
@@ -594,7 +594,7 @@ namespace hgps {
 			for (auto& field : fields) {
 				auto field_index = core::case_insensitive::index_of(column_names, field);
 				if (field_index < 0) {
-					throw std::out_of_range(std::format("Required field {} not found.", field));
+					throw std::out_of_range(fmt::format("Required field {} not found.", field));
 				}
 
 				mapping.emplace(field, field_index);
