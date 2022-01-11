@@ -1,5 +1,4 @@
 #pragma once
-#include <format>
 #include <fstream>
 
 #include "HealthGPS/riskfactor.h"

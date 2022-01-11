@@ -23,7 +23,7 @@ TEST(TestHealthGPS_Metrics, EmplaceMetrics)
 	metrics.emplace("b", 15.3);
 	metrics.emplace("c", 3.13);
 	for (const auto& m : metrics) {
-
+		ASSERT_GT(m.second, 0.0);
 	}
 
 	ASSERT_FALSE(metrics.empty());

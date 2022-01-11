@@ -21,7 +21,7 @@ public:
 
 	std::string name() const noexcept override { return "Country"; }
 
-	void initialise_population(hgps::RuntimeContext& context) override {
+	void initialise_population(hgps::RuntimeContext&) override {
 		std::cout << "There are: " << countries_.size() <<
 			" countries, current: " << current_.name << std::endl;
 	}

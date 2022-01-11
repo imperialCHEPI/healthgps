@@ -39,6 +39,7 @@
   <ItemGroup>
     <ClInclude Include="boost\ut.hpp" />
     <ClInclude Include="CountryModule.h" />
+    <ClInclude Include="data_config.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RiskFactorData.h" />
   </ItemGroup>
@@ -93,7 +94,7 @@
       <PreprocessorDefinitions>X64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>

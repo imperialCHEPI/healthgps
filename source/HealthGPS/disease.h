@@ -18,7 +18,7 @@ namespace hgps {
 
 		std::size_t size() const noexcept;
 
-		bool contains(std::string disease_code) const noexcept;
+		bool contains(std::string disease_code) const noexcept override;
 
 		std::shared_ptr<DiseaseModel>& operator[](std::string disease_code);
 

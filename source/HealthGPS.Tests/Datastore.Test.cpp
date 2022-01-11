@@ -1,9 +1,12 @@
 #include "pch.h"
+#include "data_config.h"
+
 #include "HealthGPS.Datastore\api.h"
 
 namespace fs = std::filesystem;
 
-static auto store_full_path = fs::absolute("../../../data");
+static auto store_full_path = default_datastore_path();
+
 TEST(TestDatastore, CreateDataManager)
 {
 	using namespace hgps::data;

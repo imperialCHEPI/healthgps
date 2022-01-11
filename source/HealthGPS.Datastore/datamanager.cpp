@@ -71,13 +71,14 @@ namespace hgps {
 			Country country, const std::function<bool(const unsigned int&)> year_filter) const {
 			auto results = std::vector<PopulationItem>();
 
-			if (index_.contains("population")) {
-				auto filepath = index_["population"]["path"].get<std::string>();
-				auto filename = index_["population"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filepath = index_["demographic"]["population"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["population"]["file_name"].get<std::string>();
 
 				// Tokenized file names X{country.code}X.xxx
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
-				filename = (root_ / filepath / filename).string();
+				filename = (root_ / nodepath / filepath / filename).string();
 
 				// LocID,Location,VarID,Variant,Time,MidPeriod,AgeGrp,AgeGrpStart,AgeGrpSpan,PopMale,PopFemale,PopTotal
 				if (std::filesystem::exists(filename)) {
@@ -118,13 +119,14 @@ namespace hgps {
 			const std::function<bool(const unsigned int&)> year_filter) const
 		{
 			auto results = std::vector<MortalityItem>();
-			if (index_.contains("mortality")) {
-				auto filepath = index_["mortality"]["path"].get<std::string>();
-				auto filename = index_["mortality"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filepath = index_["demographic"]["mortality"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["mortality"]["file_name"].get<std::string>();
 
 				// Tokenized file names X{country.code}X.xxx
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
-				filename = (root_ / filepath / filename).string();
+				filename = (root_ / nodepath / filepath / filename).string();
 
 				// LocID,Location,Variant,Time,TimeYear,AgeGrp,Age,DeathsMale,DeathsFemale,DeathsTotal
 				if (std::filesystem::exists(filename)) {
@@ -416,14 +418,15 @@ namespace hgps {
 			const std::function<bool(const unsigned int&)> year_filter) const
 		{
 			std::vector<BirthItem> result;
-			if (index_.contains("indicators")) {
-				auto indicators_folder = index_["indicators"]["path"].get<std::string>();
-				auto filename = index_["indicators"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filefolder = index_["demographic"]["indicators"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["indicators"]["file_name"].get<std::string>();
 
 				// Tokenized file name Pi{COUNTRY_CODE}.xxx
 				auto tokens = std::vector<std::string>{ std::to_string(country.code) };
 				filename = replace_string_tokens(filename, tokens);
-				filename = (root_ / indicators_folder / filename).string();
+				filename = (root_ / nodepath / filefolder / filename).string();
 				if (!std::filesystem::exists(filename)) {
 					return result;
 				}
@@ -535,14 +538,15 @@ namespace hgps {
 		std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(const Country& country) const
 		{
 			std::vector<LifeExpectancyItem> result;
-			if (index_.contains("indicators")) {
-				auto indicators_folder = index_["indicators"]["path"].get<std::string>();
-				auto filename = index_["indicators"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filefolder = index_["demographic"]["indicators"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["indicators"]["file_name"].get<std::string>();
 
 				// Tokenized file name Pi{COUNTRY_CODE}.xxx
 				auto tokens = std::vector<std::string>{ std::to_string(country.code) };
 				filename = replace_string_tokens(filename, tokens);
-				filename = (root_ / indicators_folder / filename).string();
+				filename = (root_ / nodepath / filefolder / filename).string();
 				if (!std::filesystem::exists(filename)) {
 					return result;
 				}

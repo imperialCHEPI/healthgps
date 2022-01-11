@@ -8,7 +8,7 @@ TEST(TestHealthGPS_Population, CreateDefaultPerson)
 
 	auto p = Person{};
 	ASSERT_GT(p.id(), 0);
-	ASSERT_EQ(0, p.age);
+	ASSERT_EQ(0u, p.age);
 	ASSERT_EQ(core::Gender::unknown, p.gender);
 	ASSERT_TRUE(p.is_alive);
 	ASSERT_FALSE(p.has_emigrated);

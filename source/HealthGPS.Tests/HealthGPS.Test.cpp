@@ -1,18 +1,20 @@
 #include "pch.h"
-#include <atomic>
-#include <map>
+#include "data_config.h"
 
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
-
 #include "HealthGPS.Datastore\api.h"
-
 
 #include "CountryModule.h"
 #include "RiskFactorData.h"
 
+#include <atomic>
+#include <map>
+
 namespace fs = std::filesystem;
+
+static auto store_full_path = default_datastore_path();
 
 void create_test_datatable(hgps::core::DataTable& data) {
 	using namespace hgps;
@@ -104,7 +106,9 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 		EXPECT_EQ(rnd(), copy());
 	}
 
-	auto discard = rnd();
+	// C++ intentional discard of [[nodiscard]] return value
+	static_cast<void>(rnd());
+
 	EXPECT_NE(rnd(), copy());
 }
 
@@ -258,8 +262,7 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto config = create_test_configuration(data);
 	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto baseline_data = hgps::BaselineAdjustment{};
@@ -313,8 +316,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto config = ModelInput(data, settings, info, ses, mapping, diseases);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto factory = SimulationModuleFactory(repository);
@@ -341,8 +343,7 @@ TEST(TestHealthGPS, CreateSESNoiseModule)
 
 	auto config = create_test_configuration(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto bus = DefaultEventBus{};
@@ -376,8 +377,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 
 	auto config = create_test_configuration(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto pop_module = build_population_module(repository, config);
@@ -445,7 +445,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
 	using namespace hgps;
 
 	auto baseline_data = hgps::BaselineAdjustment{};
-	auto static_definition = get_static_test_model(baseline_data);
+	auto static_definition = get_static_test_model(baseline_data());
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>();
 	risk_models.emplace(HierarchicalModelType::Static, std::make_unique<StaticHierarchicalLinearModel>(static_definition));
 
@@ -461,8 +461,7 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);
@@ -488,8 +487,7 @@ TEST(TestHealthGPS, CreateAnalysisModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);
