@@ -8,7 +8,7 @@
 #include "life_table.h"
 
 #include "HealthGPS.Core/poco.h"
-#include "HealthGPS.Core/DataStore.h"
+#include "HealthGPS.Core/datastore.h"
 
 namespace hgps {
 	namespace detail {
