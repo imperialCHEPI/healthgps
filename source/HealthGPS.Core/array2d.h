@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <sstream>
 #include <fmt/format.h>
 
 namespace hgps {

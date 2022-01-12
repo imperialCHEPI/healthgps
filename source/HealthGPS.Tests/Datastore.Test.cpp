@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "data_config.h"
 
-#include "HealthGPS.Datastore\api.h"
+#include "HealthGPS.Datastore/api.h"
 
 namespace fs = std::filesystem;
 
@@ -287,6 +287,7 @@ TEST(TestDatastore, RetrieveCancerDefinition)
 			continue;
 		}
 
+		cancer_count++;
 		auto entity = manager.get_disease(item, uk);
 		ASSERT_FALSE(entity.empty());
 		ASSERT_EQ(entity.measures.size(), 4);
@@ -294,6 +295,9 @@ TEST(TestDatastore, RetrieveCancerDefinition)
 		EXPECT_EQ(item.code, entity.info.code);
 		EXPECT_EQ(uk.code, entity.country.code);
 	}
+
+	ASSERT_GT(diseases.size(), 0);
+	ASSERT_GT(cancer_count, 0);
 }
 
 TEST(TestDatastore, RetrieveCancerParameters)

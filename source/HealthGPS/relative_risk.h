@@ -1,9 +1,8 @@
 #pragma once
-#include <map>
-
 #include "gender_table.h"
 #include "monotonic_vector.h"
-#include "HealthGPS.Core\array2d.h"
+#include "HealthGPS.Core/array2d.h"
+#include <map>
 
 namespace hgps {
 

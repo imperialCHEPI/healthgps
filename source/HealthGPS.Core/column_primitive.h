@@ -44,20 +44,20 @@ namespace hgps {
 				null_count_ = std::count(null_bitmap_.begin(), null_bitmap_.end(), false);
 			}
 
-			const std::string type() const noexcept override { return typeid(TYPE).name(); }
+			std::string type() const noexcept override { return typeid(TYPE).name(); }
 
-			const std::string name() const noexcept override { return name_; }
+			std::string name() const noexcept override { return name_; }
 
-			const std::size_t null_count() const noexcept override { return null_count_; }
+			std::size_t null_count() const noexcept override { return null_count_; }
 
-			const std::size_t length() const noexcept override { return data_.size(); }
+			std::size_t length() const noexcept override { return data_.size(); }
 
 			/// @brief Checks if value at column index is null
 			/// @param index of the columns to check
 			/// @return true if the value is null, otherwise false.
-			const bool is_null(std::size_t index) const noexcept override {
+			bool is_null(std::size_t index) const noexcept override {
 				// Bound checks hit performance!
-				if (index < 0 || index >= length()) {
+				if (index >= length()) {
 					return true;
 				}
 
@@ -67,9 +67,9 @@ namespace hgps {
 			/// @brief Checks if value at column index is null, does not bounds check
 			/// @param index of the columns to check
 			/// @return true if the value is null, otherwise false.
-			const bool is_valid(std::size_t index) const noexcept override {
+			bool is_valid(std::size_t index) const noexcept override {
 				// Bound checks hit performance!
-				if (index < 0 || index >= length()) {
+				if (index >= length()) {
 					return false;
 				}
 
@@ -101,7 +101,7 @@ namespace hgps {
 			IteratorType end() const { return IteratorType(*this, length()); }
 
 		private:
-			const std::string name_;
+			std::string name_;
 			std::vector<TYPE> data_;
 			std::vector<bool> null_bitmap_{};
 			std::size_t null_count_ = 0;
@@ -117,7 +117,7 @@ namespace hgps {
 				: PrimitiveDataTableColumn{ std::move(name), std::move(data), std::move(null_bitmap) }
 			{}
 
-			const std::string type() const noexcept override { return "string"; }
+			std::string type() const noexcept override { return "string"; }
 
 			void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
 		};

@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include <cstdint>
 
 // forward type declaration
 namespace hgps {

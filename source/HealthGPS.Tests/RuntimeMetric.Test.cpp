@@ -1,7 +1,6 @@
 #include "pch.h"
+#include "HealthGPS/runtime_metric.h"
 #include <thread>
-
-#include "HealthGPS\runtime_metric.h"
 
 TEST(TestHealthGPS_Metrics, CreateDefault)
 {

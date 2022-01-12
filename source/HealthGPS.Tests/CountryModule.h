@@ -1,10 +1,9 @@
 #pragma once
+#include "HealthGPS/api.h"
+#include "HealthGPS.Datastore/api.h"
 
 #include <iostream>
 #include <memory>
-
-#include "HealthGPS/api.h"
-#include "HealthGPS.Datastore\api.h"
 
 class CountryModule : public hgps::SimulationModule
 {

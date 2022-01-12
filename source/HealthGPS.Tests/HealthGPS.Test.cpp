@@ -4,13 +4,14 @@
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
-#include "HealthGPS.Datastore\api.h"
+#include "HealthGPS.Datastore/api.h"
 
 #include "CountryModule.h"
 #include "RiskFactorData.h"
 
 #include <atomic>
 #include <map>
+#include <optional>
 
 namespace fs = std::filesystem;
 
@@ -116,7 +117,8 @@ TEST(TestHealthGPS, RandomAlgorithmStandalone)
 {
 	using namespace hgps;
 
-	auto rnd_gen = Random(MTRandom32(123456789));
+	auto rnd = MTRandom32(123456789);
+	auto rnd_gen = Random(rnd);
 	auto value = rnd_gen.next_double();
 	ASSERT_GT(value, 0.0);
 
@@ -179,20 +181,21 @@ TEST(TestHealthGPS, RandomNextNormal)
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
 
-	auto sample_mean = 1;
+	auto sample_mean = 1.0;
 	auto sample_stdev = 2.5;
-	auto sample_size = 100;
+	auto sample_size = 500;
+	auto tolerance = 0.15;
 	for (size_t i = 0; i < sample_size; i++)
 	{
 		summary_one.append(rnd_gen.next_normal());
 		summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
 	}
 
-	ASSERT_NEAR(summary_one.average(), 0.0, 0.1);
-	ASSERT_NEAR(summary_one.std_deviation(), 1.0, 0.1);
+	ASSERT_NEAR(summary_one.average(), 0.0, tolerance);
+	ASSERT_NEAR(summary_one.std_deviation(), 1.0, tolerance);
 
-	ASSERT_NEAR(summary_two.average(), sample_mean, 0.1);
-	ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, 0.1);
+	ASSERT_NEAR(summary_two.average(), sample_mean, tolerance);
+	ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, tolerance);
 }
 
 TEST(TestHealthGPS, RandomEmpiricalDiscrete)

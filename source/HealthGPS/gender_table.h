@@ -3,9 +3,9 @@
 #include <numeric>
 
 #include "monotonic_vector.h"
-#include "HealthGPS.Core\forward_type.h"
-#include "HealthGPS.Core\array2d.h"
-#include "HealthGPS.Core\interval.h"
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/array2d.h"
+#include "HealthGPS.Core/interval.h"
 
 namespace hgps {
 	template<core::Numerical ROW, core::Numerical TYPE>

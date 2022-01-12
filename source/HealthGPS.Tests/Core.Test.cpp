@@ -1,9 +1,9 @@
 #include "pch.h"
+#include "HealthGPS.Core/api.h"
+#include "HealthGPS.Core/string_util.h"
+
 #include <sstream>
 #include <numeric>
-
-#include "HealthGPS.Core\api.h"
-#include "HealthGPS.Core\string_util.h"
 
 TEST(TestCore, CurrentApiVersion)
 {

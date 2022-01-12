@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "event_message.h"
+#include <memory>
 
 namespace hgps {
 

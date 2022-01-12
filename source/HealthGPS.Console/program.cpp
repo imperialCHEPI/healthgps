@@ -95,13 +95,17 @@ int main(int argc, char* argv[])
 		// Create main simulation model instance and run experiment
 		std::atomic<bool> done(false);
 		auto runtime = 0.0;
+
+		// GCC thread initialisation bug reverses derived to base-class, when declared in line
+		auto base_rnd = hgps::MTRandom32();
 		auto baseline = HealthGPS{
-			SimulationDefinition{ model_config, std::make_unique<BaselineScenario>(channel), hgps::MTRandom32() },
+			SimulationDefinition{ model_config, std::make_unique<BaselineScenario>(channel), std::move(base_rnd) },
 			factory, event_bus };
 		if (config.has_active_intervention) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
+			auto policy_rnd = hgps::MTRandom32();
 			auto intervention = HealthGPS{
-				SimulationDefinition{ model_config, std::move(policy_scenario), hgps::MTRandom32() },
+				SimulationDefinition{ model_config, std::move(policy_scenario), std::move(policy_rnd) },
 				factory, event_bus };
 
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");

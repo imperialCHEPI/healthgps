@@ -1,8 +1,8 @@
 #include "event_monitor.h"
 
-#include "HealthGPS\info_message.h"
-#include "HealthGPS\runner_message.h"
-#include "HealthGPS\error_message.h"
+#include "HealthGPS/info_message.h"
+#include "HealthGPS/runner_message.h"
+#include "HealthGPS/error_message.h"
 
 #include <fmt/core.h>
 #include <fmt/color.h>

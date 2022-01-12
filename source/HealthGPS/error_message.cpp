@@ -1,5 +1,5 @@
 #include "error_message.h"
-#include <fmt/format.h>
+#include <sstream>
 
 namespace hgps {
 
@@ -12,8 +12,10 @@ namespace hgps {
 	}
 
 	std::string ErrorEventMessage::to_string() const {
-		auto formatting = std::string{ "Source: {}, run # {}, {}, time: {}, cause: {}" };
-		return fmt::format(formatting, source, run_number, model_time, message);
+		std::stringstream ss;
+		ss << "Source: " << source << ", run # " << run_number;
+		ss << ", time: " << model_time << ", cause : " << message;
+		return ss.str();
 	}
 
 	void ErrorEventMessage::accept(EventMessageVisitor& visitor) const {

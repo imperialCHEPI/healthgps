@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS\mapping.h"
+#include "HealthGPS/mapping.h"
 
 TEST(TestHealthGPS_Mapping, CreateEmpty)
 {

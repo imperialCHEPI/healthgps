@@ -1,7 +1,7 @@
 #include "pch.h"
+#include "HealthGPS.Core/univariate_summary.h"
 #include <optional>
-
-#include "HealthGPS.Core\univariate_summary.h"
+#include <cmath>
 
 TEST(TestCore_UnivariateSummary, CreateEmptyWithoutName)
 {

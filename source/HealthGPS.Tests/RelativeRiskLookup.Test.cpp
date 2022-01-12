@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS\relative_risk.h"
+#include "HealthGPS/relative_risk.h"
 
 hgps::RelativeRiskLookup create_test_relative_risk_table() {
 	using namespace hgps;

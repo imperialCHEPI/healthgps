@@ -26,3 +26,5 @@ std::string create_output_file_name(const ResultInfo& info);
 
 std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	hgps::SyncChannel& channel, const PolicyScenarioInfo& info);
+
+std::string expand_environment_variables(const std::string& path);

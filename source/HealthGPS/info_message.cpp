@@ -16,11 +16,16 @@ namespace hgps {
 	}
 
 	std::string InfoEventMessage::to_string() const	{
-		auto formatting = std::string{ "Source: {}, run # {}, {}, time: {}" };
-		formatting += message.empty() ? "{}" : " - {}";
+		std::string result{};
+		if (message.empty()) {
+			result = fmt::format("Source: {}, run # {}, {}, time: {}",
+				source, run_number, detail::model_action_str(model_action), model_time);
+		}
 
-		return fmt::format(formatting, source, run_number,
-			detail::model_action_str(model_action), model_time, message);
+		result = fmt::format("Source: {}, run # {}, {}, time: {} - {}",
+			source, run_number, detail::model_action_str(model_action), model_time, message);
+
+		return result;
 	}
 
 	void InfoEventMessage::accept(EventMessageVisitor& visitor) const {

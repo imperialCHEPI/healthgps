@@ -64,7 +64,7 @@ namespace hgps {
 		}
 
 		std::vector<PopulationItem> DataManager::get_population(Country country) const {
-			return  DataManager::get_population(country, [](const unsigned int& value) {return true; });
+			return  DataManager::get_population(country, [](const unsigned int&) {return true; });
 		}
 
 		std::vector<PopulationItem> DataManager::get_population(
@@ -112,7 +112,7 @@ namespace hgps {
 		}
 
 		std::vector<MortalityItem> DataManager::get_mortality(Country country) const {
-			return  DataManager::get_mortality(country, [](const unsigned int& value) {return true; });
+			return  DataManager::get_mortality(country, [](const unsigned int&) {return true; });
 		}
 
 		std::vector<MortalityItem> DataManager::get_mortality(Country country,
@@ -383,7 +383,7 @@ namespace hgps {
 				auto lookup = std::vector<LookupGenderValue>{};
 				rapidcsv::Document doc(file_name.string());
 				auto mapping = create_fields_index_mapping(doc.GetColumnNames(), { "Time", "Male", "Female"});
-				for (auto i = 0; i < doc.GetRowCount(); i++) {
+				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
 					lookup.emplace_back(LookupGenderValue{
 						.value = std::stoi(row[mapping["Time"]]),
@@ -411,7 +411,7 @@ namespace hgps {
 		}
 
 		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country) const {
-			return  DataManager::get_birth_indicators(country, [](const unsigned int& value) {return true; });
+			return  DataManager::get_birth_indicators(country, [](const unsigned int&) {return true; });
 		}
 
 		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country,

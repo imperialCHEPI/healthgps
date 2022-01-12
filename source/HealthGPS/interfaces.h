@@ -1,10 +1,9 @@
 #pragma once
+#include "randombit_generator.h"
+#include "HealthGPS.Core/api.h"
 
 #include <map>
 #include <memory>
-
-#include "HealthGPS.Core\api.h"
-#include "randombit_generator.h"
 
 namespace hgps {
 

@@ -18,11 +18,11 @@ namespace hgps {
 		public:
 			using IteratorType = std::vector<std::unique_ptr<DataTableColumn>>::const_iterator;
 
-			const std::size_t num_columns() const noexcept;
+			std::size_t num_columns() const noexcept;
 
-			const std::size_t num_rows() const noexcept;
+			std::size_t num_rows() const noexcept;
 
-			const std::vector<std::string> names() const;
+			std::vector<std::string> names() const;
 
 			void add(std::unique_ptr<DataTableColumn> column);
 

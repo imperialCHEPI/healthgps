@@ -7,11 +7,9 @@
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <chrono>
-#include <ctime>
 #include <iostream>
 #include <optional>
 #include <fstream>
-#include <fmt/core.h>
 #include <fmt/color.h>
 #include <fmt/chrono.h>
 
@@ -26,16 +24,8 @@ using namespace hgps;
 
 std::string getTimeNowStr()
 {
-	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	std::string s(30, '\0');
-
-	struct tm localtime;
-
-	localtime_s(&localtime, &now);
-
-	std::strftime(&s[0], s.size(), "%c", &localtime);
-
-	return s;
+	auto tp = std::chrono::system_clock::now();
+	return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
 }
 
 cxxopts::Options create_options()
@@ -224,6 +214,7 @@ Configuration load_configuration(CommandOptions& options)
 		}
 
 		config.result = opt["results"].get<ResultInfo>();
+		config.result.folder = expand_environment_variables(config.result.folder);
 	}
 	else
 	{
@@ -306,28 +297,29 @@ std::string create_output_file_name(const ResultInfo& info)
 {
 	namespace fs = std::filesystem;
 
-	fs::path output_folder = info.folder;
-	if (!fs::exists(output_folder)) {
-		fs::create_directories(output_folder);
+	fs::path output_folder = expand_environment_variables(info.folder);
+	if (!fs::exists(output_folder) && !fs::create_directories(output_folder)) {
+		throw std::runtime_error(
+				fmt::format("Failed to create output folder: {}", output_folder.string()));
 	}
 
 	auto tp = std::chrono::system_clock::now();
+	auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", tp, tp.time_since_epoch());
 
 	// filename token replacement
 	auto file_name = info.file_name;
 	std::size_t tk_end = 0;
 	auto tk_start = file_name.find_first_of("{", tk_end);
 	if (tk_start != std::string::npos) {
-		auto timestamp_tk = std::string{ "{0:%F_%H-%M-}{1:%S}" };
 		tk_end = file_name.find_first_of("}", tk_start + 1);
 		if (tk_end != std::string::npos) {
 			file_name.replace(tk_start, tk_end - tk_start + 1, timestamp_tk);
 		}
 	}
 
-	auto log_file_name = fmt::format("HealthGPS_result_{0:%F_%H-%M-}{1:%S}.json", tp, tp.time_since_epoch());
+	auto log_file_name = fmt::format("HealthGPS_result_{}.json", timestamp_tk);
 	if (tk_end > 0) {
-		log_file_name = fmt::format(file_name, tp, tp.time_since_epoch());
+		log_file_name = file_name;
 	}
 
 	log_file_name = (output_folder / log_file_name).string();
@@ -368,4 +360,26 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 
 	throw std::invalid_argument(
 		fmt::format("Unknown intervention policy identifier: {}", info.identifier));
+}
+
+std::string expand_environment_variables(const std::string& path)
+{
+	if (path.find("${") == std::string::npos) {
+		return path;
+	}
+
+	std::string pre = path.substr(0, path.find("${"));
+	std::string post = path.substr(path.find("${") + 2);
+	if (post.find('}') == std::string::npos) {
+		return path;
+	}
+
+	std::string variable = post.substr(0, post.find('}'));
+	std::string value = "";
+
+	post = post.substr(post.find('}') + 1);
+	const char* v = getenv(variable.c_str());
+	if (v != NULL) value = std::string(v);
+
+	return expand_environment_variables(pre + value + post);
 }

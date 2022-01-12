@@ -3,6 +3,19 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# ------------ Custom User Options ----------------
+
+# CMake presets, build directories and binary files
+build/
+out/
+cmake-build-*/
+CMakeUserPresets.json
+
+# vcpkg installation folder
+vcpkg_installed/
+
+# ---------------- End Here --------------------
+
 # User-specific files
 *.rsuser
 *.suo
@@ -206,9 +219,6 @@ PublishScripts/
 *.nuget.props
 *.nuget.targets
 
-# Nuget personal access tokens and Credentials
-nuget.config
-
 # Microsoft Azure Build Output
 csx/
 *.build.csdef
@@ -297,6 +307,17 @@ node_modules/
 # Visual Studio 6 auto-generated workspace file (contains which files were open etc.)
 *.vbw
 
+# Visual Studio 6 auto-generated project file (contains which files were open etc.)
+*.vbp
+
+# Visual Studio 6 workspace and project file (working project files containing files to include in project)
+*.dsw
+*.dsp
+
+# Visual Studio 6 technical files 
+*.ncb
+*.aps
+
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
 **/*.DesktopClient/GeneratedArtifacts
@@ -353,6 +374,9 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
+# Visual Studio History (VSHistory) files
+.vshistory/
+
 # BeatPulse healthcheck temp database
 healthchecksdb
 
@@ -384,12 +408,4 @@ FodyWeavers.xsd
 *.msp
 
 # JetBrains Rider
-.idea/
 *.sln.iml
-
-###############################################
-#    Visual Studio Ends Here
-###############################################
-
-# vcpkg installation folder
-vcpkg_installed/

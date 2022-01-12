@@ -1,15 +1,17 @@
 #include "datatable.h"
 #include "string_util.h"
-#include <stdexcept>
 #include <fmt/format.h>
+
+#include <stdexcept>
+#include <sstream>
 
 namespace hgps {
 	namespace core {
-		const std::size_t DataTable::num_columns() const noexcept { return columns_.size(); }
+		std::size_t DataTable::num_columns() const noexcept { return columns_.size(); }
 
-		const std::size_t DataTable::num_rows() const noexcept { return rows_count_; }
+		std::size_t DataTable::num_rows() const noexcept { return rows_count_; }
 
-		const std::vector<std::string> DataTable::names() const { return names_; }
+		std::vector<std::string> DataTable::names() const { return names_; }
 
 		void DataTable::add(std::unique_ptr<DataTableColumn> column) {
 
