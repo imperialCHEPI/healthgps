@@ -3,7 +3,7 @@
 
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/scenario.h"
-#include "HealthGPS/Intervention_scenario.h"
+#include "HealthGPS/intervention_scenario.h"
 
 #include "HealthGPS.Core/api.h"
 
