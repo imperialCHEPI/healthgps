@@ -378,7 +378,7 @@ std::string expand_environment_variables(const std::string& path)
 	std::string value = "";
 
 	post = post.substr(post.find('}') + 1);
-	const char* v = getenv(variable.c_str());
+	const char* v = std::getenv(variable.c_str());
 	if (v != NULL) value = std::string(v);
 
 	return expand_environment_variables(pre + value + post);

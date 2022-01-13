@@ -88,12 +88,12 @@ namespace hgps {
 			std::vector<TYPE> data_;
 
 			void check_boundaries(size_t row, size_t column) const {
-				if ((row < 0) || (row >= rows_)) {
-					throw std::out_of_range(fmt::format("Row {} is out of array bounds.", row));
+				if (row >= rows_) {
+					throw std::out_of_range(fmt::format("Row {} is out of array bounds [0, {}).", row, rows_));
 				}
 				
-				if ((column < 0) || (column >= columns_)) {
-					throw std::out_of_range(fmt::format("Column {} is out of array bounds.", column));
+				if (column >= columns_) {
+					throw std::out_of_range(fmt::format("Column {} is out of array bounds [0, {}).", column, columns_));
 				}
 			}
 		};

@@ -14,9 +14,9 @@ TEST(TestCore_UnivariateSummary, CreateEmptyWithoutName)
 	EXPECT_EQ("Untitled", init_empty.name());
 	EXPECT_TRUE(std::isnan(init_empty.min()));
 	EXPECT_TRUE(std::isnan(init_empty.max()));
-	EXPECT_EQ(0, init_empty.count_valid());
-	EXPECT_EQ(0, init_empty.count_null());
-	EXPECT_EQ(0, init_empty.count_total());
+	EXPECT_EQ(0u, init_empty.count_valid());
+	EXPECT_EQ(0u, init_empty.count_null());
+	EXPECT_EQ(0u, init_empty.count_total());
 }
 
 TEST(TestCore_UnivariateSummary, CreateEmptyWithName)
@@ -30,9 +30,9 @@ TEST(TestCore_UnivariateSummary, CreateEmptyWithName)
 	EXPECT_EQ("Test", init_name.name());
 	EXPECT_TRUE(std::isnan(init_name.min()));
 	EXPECT_TRUE(std::isnan(init_name.max()));
-	EXPECT_EQ(0, init_name.count_valid());
-	EXPECT_EQ(0, init_name.count_null());
-	EXPECT_EQ(0, init_name.count_total());
+	EXPECT_EQ(0u, init_name.count_valid());
+	EXPECT_EQ(0u, init_name.count_null());
+	EXPECT_EQ(0u, init_name.count_total());
 }
 
 TEST(TestCore_UnivariateSummary, CreateFullFromVectorWithoutName)
@@ -45,7 +45,7 @@ TEST(TestCore_UnivariateSummary, CreateFullFromVectorWithoutName)
 	ASSERT_FALSE(init_vector.is_empty());
 	ASSERT_EQ("Untitled", init_vector.name());
 	ASSERT_EQ(data.size(), init_vector.count_valid());
-	ASSERT_EQ(0, init_vector.count_null());
+	ASSERT_EQ(0u, init_vector.count_null());
 	ASSERT_EQ(data.size(), init_vector.count_total());
 
 	EXPECT_FALSE(std::isnan(init_vector.min()));
@@ -62,7 +62,7 @@ TEST(TestCore_UnivariateSummary, CreateFullFromVectorWithName)
 	ASSERT_FALSE(init_full.is_empty());
 	ASSERT_EQ("Test", init_full.name());
 	ASSERT_EQ(data.size(), init_full.count_valid());
-	ASSERT_EQ(0, init_full.count_null());
+	ASSERT_EQ(0u, init_full.count_null());
 	ASSERT_EQ(data.size(), init_full.count_total());
 
 	EXPECT_FALSE(std::isnan(init_full.min()));
@@ -79,7 +79,7 @@ TEST(TestCore_UnivariateSummary, CreateFullFromListWithName)
 	ASSERT_FALSE(init_list.is_empty());
 	ASSERT_EQ("Test", init_list.name());
 	ASSERT_EQ(data.size(), init_list.count_valid());
-	ASSERT_EQ(0, init_list.count_null());
+	ASSERT_EQ(0u, init_list.count_null());
 	ASSERT_EQ(data.size(), init_list.count_total());
 
 	EXPECT_FALSE(std::isnan(init_list.min()));
@@ -101,7 +101,7 @@ TEST(TestCore_UnivariateSummary, CreateFullValues)
 
 	ASSERT_EQ("Test", summary.name());
 	ASSERT_FALSE(summary.is_empty());
-	ASSERT_EQ(0, summary.count_null());
+	ASSERT_EQ(0u, summary.count_null());
 	ASSERT_EQ(data.size(), summary.count_valid());
 	ASSERT_EQ(data.size(), summary.count_total());
 	ASSERT_DOUBLE_EQ(expected[0], summary.min());
@@ -134,7 +134,7 @@ TEST(TestCore_UnivariateSummary, AppendOneValues)
 
 	ASSERT_EQ("Test", summary.name());
 	ASSERT_FALSE(summary.is_empty());
-	ASSERT_EQ(0, summary.count_null());
+	ASSERT_EQ(0u, summary.count_null());
 	ASSERT_EQ(data.size(), summary.count_valid());
 	ASSERT_EQ(data.size(), summary.count_total());
 	ASSERT_DOUBLE_EQ(expected[0], summary.min());
@@ -165,7 +165,7 @@ TEST(TestCore_UnivariateSummary, AppendRangeValues)
 
 	ASSERT_EQ("Test", summary.name());
 	ASSERT_FALSE(summary.is_empty());
-	ASSERT_EQ(0, summary.count_null());
+	ASSERT_EQ(0u, summary.count_null());
 	ASSERT_EQ(data.size(), summary.count_valid());
 	ASSERT_EQ(data.size(), summary.count_total());
 	ASSERT_DOUBLE_EQ(expected[0], summary.min());
@@ -193,7 +193,7 @@ TEST(TestCore_UnivariateSummary, AppendNullValues)
 	auto tolerance = 1e-10;
 	auto summary = UnivariateSummary("Test", data);
 
-	auto null_count = 4;
+	auto null_count = 4u;
 	auto null_value = std::optional<double>();
 	summary.append_null();
 	summary.append_null(2);

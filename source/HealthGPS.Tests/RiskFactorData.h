@@ -57,7 +57,7 @@ std::string join_string_map(const std::vector<std::string>& v, std::string_view 
 //						std::to_string(entry.second.tvalue), std::to_string(entry.second.std_error));
 //				}
 //
-//				ss << std::format("models.emplace(\"{}\", LinearModel{{ \n\t.coefficients=coeffs, \
+//				ss << std::format("models.emplace(\"{}\", LinearModel{{ \n\t.coefficients=coeffs, '\'
 //							      \n\t.fitted_values={{{}}},\n\t.residuals={{{}}},\n\t.rsquared={} }});\n",
 //					item.first, join_string(at.fitted_values, ","), join_string(at.residuals, ","), std::to_string(at.rsquared));
 //
@@ -78,11 +78,11 @@ std::string join_string_map(const std::vector<std::string>& v, std::string_view 
 //				ss << std::format("rmat_s = {{{}}};\n", join_string(at.residual_distribution.data, ","));
 //				ss << std::format("corr_mat = {{{}}};\n", join_string(at.correlation.data, ","));
 //
-//				ss << std::format("levels.emplace({0}, HierarchicalLevel{{ \
-//								  \n\t.variables = {1}, \
-//								  \n\t.transition = core::DoubleArray2D({2}, {2}, tmat_m), \
-//					              \n\t.inverse_transition = core::DoubleArray2D({2}, {2}, itmat_w), \
-//								  \n\t.residual_distribution = core::DoubleArray2D({3}, {2}, rmat_s), \
+//				ss << std::format("levels.emplace({0}, HierarchicalLevel{{ '\'
+//								  \n\t.variables = {1}, '\'
+//								  \n\t.transition = core::DoubleArray2D({2}, {2}, tmat_m), '\'
+//					              \n\t.inverse_transition = core::DoubleArray2D({2}, {2}, itmat_w), '\'
+//								  \n\t.residual_distribution = core::DoubleArray2D({3}, {2}, rmat_s), '\'
 //								  \n\t.correlation = core::DoubleArray2D({2}, {2}, corr_mat),\n\t.variances = {{{4}}} }});\n",
 //					item.first, join_string_map(at.variables, ","), at.transition.rows,
 //					at.residual_distribution.rows, join_string(at.variances, ","));

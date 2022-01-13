@@ -60,19 +60,19 @@ TEST(ScenarioTest, PolicyPeriodClosedConstruction)
 TEST(ScenarioTest, PolicyPeriodNegativeStartThrows)
 {
     using namespace hgps;
-    ASSERT_THROW(auto period = PolicyInterval(-2022, 2021), std::out_of_range);
+    ASSERT_THROW(PolicyInterval(-2022, 2021), std::out_of_range);
 }
 
 TEST(ScenarioTest, PolicyPeriodInvertedThrows)
 {
     using namespace hgps;
-    ASSERT_THROW(auto period = PolicyInterval(2022, 2021), std::out_of_range);
+    ASSERT_THROW(PolicyInterval(2022, 2021), std::out_of_range);
 }
 
 TEST(ScenarioTest, PolicyPeriodInvertedPeriodThrows)
 {
     using namespace hgps;
-    ASSERT_THROW(auto period = PolicyInterval(2023, 2022), std::out_of_range);
+    ASSERT_THROW(PolicyInterval(2023, 2022), std::out_of_range);
 }
 
 TEST(ScenarioTest, InterventionConstruction)

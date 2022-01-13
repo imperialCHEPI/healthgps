@@ -25,9 +25,7 @@ namespace hgps {
 
 		float at(const int age, const float value) const;
 
-		float operator()(const int age, const float value);
-
-		const float operator()(const int age, const float value) const;
+		float operator()(const int age, const float value) const;
 
 		bool contains(const int age, const float value) const noexcept;
 

@@ -30,8 +30,8 @@ public:
 	}
 
 private:
-	hgps::core::Country current_;
 	std::vector<hgps::core::Country> countries_;
+	hgps::core::Country current_;
 };
 
 static std::unique_ptr<CountryModule> build_country_module(

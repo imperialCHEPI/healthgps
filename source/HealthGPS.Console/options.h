@@ -1,6 +1,11 @@
 #pragma once
 
+#include <string>
+#include <vector>
+#include <map>
+#include <unordered_map>
 #include <filesystem>
+#include <optional>
 
 struct CommandOptions
 {

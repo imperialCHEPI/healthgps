@@ -71,14 +71,14 @@ namespace hgps {
 
 	struct FactorDynamicEquation {
 		std::string name;
-		std::map<std::string, double> coefficients;
-		double residuals_standard_deviation;
+		std::map<std::string, double> coefficients{};
+		double residuals_standard_deviation{};
 	};
 
 	struct AgeGroupGenderEquation {
 		core::IntegerInterval age_group;
-		std::map<std::string, FactorDynamicEquation> male;
-		std::map<std::string, FactorDynamicEquation> female;
+		std::map<std::string, FactorDynamicEquation> male{};
+		std::map<std::string, FactorDynamicEquation> female{};
 	};
 
 	class LiteHierarchicalModelDefinition final {
@@ -117,9 +117,9 @@ namespace hgps {
 		const double& boundary_percentage() const { return boundary_percentage_; }
 
 	private:
-		double boundary_percentage_;
 		std::map<core::IntegerInterval, AgeGroupGenderEquation> equations_;
 		std::map<std::string, std::string> variables_;
 		BaselineAdjustment adjustments_;
+		double boundary_percentage_;
 	};
 }

@@ -73,7 +73,7 @@ namespace hgps {
 		return measures_.at(core::to_lower(measure)); 
 	}
 
-	const int DiseaseTable::operator[](const std::string measure) const {
+	int DiseaseTable::operator[](const std::string measure) const {
 		return measures_.at(core::to_lower(measure));
 	}
 

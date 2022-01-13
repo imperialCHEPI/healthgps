@@ -78,9 +78,10 @@ target_sources(HealthGPS
 		"settings.h"
 		"simple_policy_scenario.cpp"
 		"simple_policy_scenario.h"
+		"simulation_module.cpp"
+		"simulation_module.h"
 		"univariate_visitor.cpp"
 		"univariate_visitor.h"
-
 		"analysis_definition.h"
 		"api.h"
 		"baseline_sync_message.h"
@@ -105,11 +106,9 @@ target_sources(HealthGPS
 		"scenario.h"
 		"simulation.h"
 		"simulation_definition.h"
-		"simulation_module.h"
 		"sync_message.h"
 		"threadsafe_queue.h"
-		"two_step_value.h"	
-)
+		"two_step_value.h")
 
 set(ROOT_NAMESPACE hgps)
 

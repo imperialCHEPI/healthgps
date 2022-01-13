@@ -25,8 +25,8 @@ TEST(TestCore_Array2D, CreateEmptyWithDefaultValue) {
 	ASSERT_EQ(cols, d2x3v5.columns());
 	ASSERT_EQ(rows*cols, d2x3v5.size());
 
-	for (size_t i = 0; i < rows; i++) {
-		for (size_t j = 0; j < cols; j++) {
+	for (auto i = 0; i < rows; i++) {
+		for (auto j = 0; j < cols; j++) {
 			ASSERT_EQ(data, d2x3v5(i, j));
 		}
 	}
@@ -72,7 +72,7 @@ TEST(TestCore_Array2D, AccessViaColumnIndex) {
 	std::vector<int> row2 = { 5, 4, 2, 9 };
 	auto i3x4v = IntegerArray2D(rows, cols, data);
 
-	for (size_t i = 0; i < cols; i++) {
+	for (auto i = 0; i < cols; i++) {
 		ASSERT_EQ(row0[i], i3x4v(0, i));
 		ASSERT_EQ(row1[i], i3x4v(1, i));
 		ASSERT_EQ(row2[i], i3x4v(2, i));
@@ -90,7 +90,7 @@ TEST(TestCore_Array2D, AccessViaConstColumnIndex) {
 	std::vector<int> row2 = { 5, 4, 2, 9 };
 	const auto i3x4v = IntegerArray2D(rows, cols, data);
 
-	for (size_t i = 0; i < cols; i++) {
+	for (auto i = 0; i < cols; i++) {
 		ASSERT_EQ(row0[i], i3x4v(0, i));
 		ASSERT_EQ(row1[i], i3x4v(1, i));
 		ASSERT_EQ(row2[i], i3x4v(2, i));
@@ -109,7 +109,7 @@ TEST(TestCore_Array2D, AccessViaRowIndex) {
 	std::vector<int> col3 = { 7, 3, 9 };
 	auto i3x4v = IntegerArray2D(rows, cols, data);
 
-	for (size_t i = 0; i < rows; i++) {
+	for (auto i = 0; i < rows; i++) {
 		ASSERT_EQ(col0[i], i3x4v(i, 0));
 		ASSERT_EQ(col1[i], i3x4v(i, 1));
 		ASSERT_EQ(col2[i], i3x4v(i, 2));
@@ -129,7 +129,7 @@ TEST(TestCore_Array2D, AccessViaConstRowIndex) {
 	std::vector<int> col3 = { 7, 3, 9 };
 	const auto i3x4v = IntegerArray2D(rows, cols, data);
 
-	for (size_t i = 0; i < rows; i++) {
+	for (auto i = 0; i < rows; i++) {
 		ASSERT_EQ(col0[i], i3x4v(i, 0));
 		ASSERT_EQ(col1[i], i3x4v(i, 1));
 		ASSERT_EQ(col2[i], i3x4v(i, 2));
@@ -145,8 +145,8 @@ TEST(TestCore_Array2D, AccessViaRowColumnIndex) {
 	std::vector<int> data = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
 	auto i3x4v = IntegerArray2D(rows, cols, data);
 
-	for (size_t i = 0; i < rows; i++) {
-		for (size_t j = 0; j < cols; j++) {
+	for (auto i = 0; i < rows; i++) {
+		for (auto j = 0; j < cols; j++) {
 			auto vector_idx = i * cols + j;
 			ASSERT_EQ(data[vector_idx], i3x4v(i, j));
 		}
@@ -162,9 +162,9 @@ TEST(TestCore_Array2D, AccessOutOfRangeThrows) {
 	auto i3x4v = IntegerArray2D(rows, cols, data);
 
 	ASSERT_THROW(i3x4v(1, 5), std::out_of_range);
-	ASSERT_THROW(i3x4v(1, -1), std::out_of_range);
+	ASSERT_THROW(i3x4v(1, 10), std::out_of_range);
 	ASSERT_THROW(i3x4v(5, 2), std::out_of_range);
-	ASSERT_THROW(i3x4v(-1, 2), std::out_of_range);
+	ASSERT_THROW(i3x4v(10, 2), std::out_of_range);
 }
 
 TEST(TestCore_Array2D, ExportStorageToVector) {
@@ -206,8 +206,8 @@ TEST(TestCore_Array2D, UpdateStorageValue) {
 	std::vector<int> data = { 2, 1, 5, 7, 8, 9, 7, 3, 5, 4, 2, 9 };
 	auto i3x4v = IntegerArray2D(rows, cols, data);
 
-	for (size_t i = 0; i < rows; i++) {
-		for (size_t j = 0; j < cols; j++) {
+	for (auto i = 0; i < rows; i++) {
+		for (auto j = 0; j < cols; j++) {
 			// Read current
 			ASSERT_EQ(data[i * 4 + j], i3x4v(i, j));
 
@@ -231,8 +231,8 @@ TEST(TestCore_Array2D, ClearStorageValue) {
 	auto i3x4v = IntegerArray2D(rows, cols, data);
 
 	i3x4v.clear();
-	for (size_t i = 0; i < rows; i++) {
-		for (size_t j = 0; j < cols; j++) {
+	for (auto i = 0; i < rows; i++) {
+		for (auto j = 0; j < cols; j++) {
 			ASSERT_EQ(0, i3x4v(i, j));
 		}
 	}

@@ -31,6 +31,19 @@ namespace hgps {
 	void InfoEventMessage::accept(EventMessageVisitor& visitor) const {
 		visitor.visit(*this);
 	}
-}
 
+	namespace detail {
+
+		const std::string model_action_str(const ModelAction action)
+		{
+			switch (action)
+			{
+				case ModelAction::update: return "update";
+				case ModelAction::start:  return "start";
+				case ModelAction::stop:   return "stop";
+				default: 				  return "unknown";
+			}
+		}
+	}
+}
 

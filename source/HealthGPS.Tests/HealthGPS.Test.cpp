@@ -92,7 +92,7 @@ TEST(TestHealthGPS, RandomBitGenerator)
 	MTRandom32 rnd;
 	EXPECT_EQ(RandomBitGenerator::min(), MTRandom32::min());
 	EXPECT_EQ(RandomBitGenerator::max(), MTRandom32::max());
-	EXPECT_TRUE(rnd() >= 0);
+	EXPECT_TRUE(rnd() > 0u);
 }
 
 TEST(TestHealthGPS, RandomBitGeneratorCopy)
@@ -158,7 +158,7 @@ TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
 	auto sample_min = 1;
 	auto sample_max = 10;
 	auto sample_size = 100;
-	for (size_t i = 0; i < sample_size; i++)
+	for (auto i = 0; i < sample_size; i++)
 	{
 		summary_one.append(rnd_gen.next_int(sample_max));
 		summary_two.append(rnd_gen.next_int(sample_min, sample_max));
@@ -185,8 +185,7 @@ TEST(TestHealthGPS, RandomNextNormal)
 	auto sample_stdev = 2.5;
 	auto sample_size = 500;
 	auto tolerance = 0.15;
-	for (size_t i = 0; i < sample_size; i++)
-	{
+	for (auto i = 0; i < sample_size; i++) {
 		summary_one.append(rnd_gen.next_normal());
 		summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
 	}
@@ -210,18 +209,18 @@ TEST(TestHealthGPS, RandomEmpiricalDiscrete)
 	auto cdf = std::vector<float>(freq_pdf.size());
 
 	cdf[0] = freq_pdf[0];
-	for (auto i = 1; i < freq_pdf.size(); i++) {
+	for (std::size_t i = 1; i < freq_pdf.size(); i++) {
 		cdf[i] = cdf[i - 1] + freq_pdf[i];
 	}
 
 	ASSERT_EQ(1.0, cdf.back());
-	for (auto i = 1; i < freq_pdf.size(); i++) {
+	for (std::size_t i = 1; i < freq_pdf.size(); i++) {
 		ASSERT_LT(cdf[i - 1], cdf[i]);
 	}
 
 	auto summary = core::UnivariateSummary();
 	auto sample_size = 100;
-	for (size_t i = 0; i < sample_size; i++) {
+	for (auto i = 0; i < sample_size; i++) {
 		summary.append(rnd_gen.next_empirical_discrete(values, cdf));
 	}
 

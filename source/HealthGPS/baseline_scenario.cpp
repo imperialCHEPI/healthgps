@@ -20,8 +20,8 @@ namespace hgps {
     void BaselineScenario::clear() noexcept {
     }
 
-    double BaselineScenario::apply(Person& entity, const int& time,
-        const std::string& risk_factor_key, const double& value) {
+    double BaselineScenario::apply([[maybe_unused]] Person& entity, [[maybe_unused]] const int& time,
+        [[maybe_unused]] const std::string& risk_factor_key, [[maybe_unused]] const double& value) {
         return value;
     }
 }

@@ -4,17 +4,19 @@ namespace hgps {
 
 	RelativeRiskLookup::RelativeRiskLookup(
 		const MonotonicVector<int> rows, const MonotonicVector<float> cols, core::FloatArray2D&& values)
-		: rows_index_{}, cols_index_{}, table_{ values }
+		: table_{ values }, rows_index_{}, cols_index_{}
 	{
 		if (rows.size() != values.rows() || cols.size() != values.columns()) {
 			throw std::invalid_argument("Lookup breakpoints and values size mismatch.");
 		}
 
-		for (int index = 0; index < rows.size(); index++) {
+		auto rows_count = static_cast<int>(rows.size());
+		for (auto index = 0; index < rows_count; index++) {
 			rows_index_.emplace(rows[index], index);
 		}
 
-		for (int index = 0; index < cols.size(); index++) {
+		auto cols_count = static_cast<int>(cols.size());
+		for (auto index = 0; index < cols_count; index++) {
 			cols_index_.emplace(cols[index], index);
 		}
 	}
@@ -39,11 +41,7 @@ namespace hgps {
 		return lookup_value(age, value);
 	}
 
-	float RelativeRiskLookup::operator()(const int age, const float value) {
-		return lookup_value(age, value);
-	}
-
-	const float RelativeRiskLookup::operator()(const int age, const float value) const {
+	float RelativeRiskLookup::operator()(const int age, const float value) const {
 		return lookup_value(age, value);
 	}
 

@@ -65,7 +65,7 @@ namespace hgps {
 		dynamic_model->update_risk_factors(context);
 	}
 
-	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, const ModelInput& config)
+	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, [[maybe_unused]] const ModelInput& config)
 	{
 		// Both model types are required, and must be registered
 		auto full_registry = get_default_hierarchical_model_registry();

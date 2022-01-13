@@ -182,7 +182,7 @@ namespace hgps {
 	}
 
 	DALYsIndicator AnalysisModule::calculate_dalys(Population& population,
-		const unsigned int& max_age, const int& death_year) const {
+		const unsigned int& max_age, const unsigned int& death_year) const {
 		auto yll_sum = 0.0;
 		auto yld_sum = 0.0;
 		auto count = 0;
@@ -222,8 +222,7 @@ namespace hgps {
 				"Failed to create analysis module, invalid disease analysis definition.");
 		}
 
-		auto definition = detail::StoreConverter::to_analysis_definition(
-			analysis_entity, config.settings().age_range());
+		auto definition = detail::StoreConverter::to_analysis_definition(analysis_entity);
 
 		return std::make_unique<AnalysisModule>(std::move(definition), config.settings().age_range());
 	}

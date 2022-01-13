@@ -24,10 +24,6 @@ namespace hgps {
 			: risk_factor{ risk_factor_key }, value{ policy_impact },
 			from_age{ start_age }, to_age{ end_age } {
 
-			if (start_age < 0) {
-				throw std::out_of_range("Impact start age must not be negative.");
-			}
-
 			if (end_age.has_value() && start_age > end_age.value()) {
 				throw std::out_of_range("Impact end age must be equal or greater than the start age.");
 			}

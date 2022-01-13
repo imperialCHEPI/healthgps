@@ -31,10 +31,10 @@ namespace hgps {
     {}
 
     Person::Person(const core::Gender birth_gender) noexcept 
-        : id_{ ++Person::newUID }, age{ 0 }, gender{ birth_gender }
+        : gender{ birth_gender }, age{ 0 }, id_{ ++Person::newUID }
     {}
 
-    const std::size_t Person::id() const noexcept { return id_; }
+    std::size_t Person::id() const noexcept { return id_; }
 
     bool Person::is_active() const noexcept {
         return is_alive && !has_emigrated;

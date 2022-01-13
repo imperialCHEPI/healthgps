@@ -138,7 +138,7 @@ class Model
 		 * the data and the data it should receive.
 		 */
 		virtual std::pair<Model<DataType,TimeType>*,DataType>
-			relay(Model<DataType,TimeType> *src, DataType x) {
+			relay([[maybe_unused]] Model<DataType,TimeType> *src, DataType x) {
 				return std::pair<Model<DataType,TimeType>*,DataType>(this,x);
 		}
 		/** 

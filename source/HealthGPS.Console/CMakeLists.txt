@@ -20,13 +20,13 @@ target_sources(HealthGPS.Console
 		"program.cpp"
 		"result_file_writer.cpp"
 		"result_file_writer.h"
+		"jsonparser.cpp"
 		"jsonparser.h"
 		"model_info.h"
 		"options.h"
 		"resource.h"
 		"result_writer.h"
-		"riskmodel.h"
-)
+		"riskmodel.h")
 
 target_link_libraries(HealthGPS.Console
 	PRIVATE

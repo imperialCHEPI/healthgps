@@ -2,7 +2,7 @@
 
 namespace hgps {
     Population::Population(const std::size_t size) 
-        : people_(size), initial_size_{size}
+        : initial_size_{size}, people_(size)
     {}
 
     std::size_t Population::size() const noexcept {
@@ -33,7 +33,7 @@ namespace hgps {
     }
 
     void Population::add_newborn_babies(const int number, core::Gender gender) noexcept {
-        for (size_t i = 0; i < number; i++) {
+        for (auto i = 0; i < number; i++) {
             people_.push_back(Person{ gender });
         }
     }

@@ -10,10 +10,10 @@ namespace hgps {
 		InfoEventMessage() = delete;
 		InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time) noexcept;
 		InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time, std::string msg) noexcept;
-		
-		const int model_time{};
 
 		const ModelAction model_action{};
+
+		const int model_time{};
 
 		const std::string message;
 
@@ -26,16 +26,6 @@ namespace hgps {
 
 	namespace detail {
 		/// @brief Converts enumeration to string, not pretty but no support in C++
-		const static std::string model_action_str(const ModelAction action) {
-			switch (action)
-			{
-				case ModelAction::update: return "update";
-				case ModelAction::start:  return "start";
-				case ModelAction::stop:   return "stop";
-				default: 				  return "unknown";
-			}
-		}
+		const std::string model_action_str(const ModelAction action);
 	}
 }
-
-

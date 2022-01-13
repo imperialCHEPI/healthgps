@@ -33,7 +33,7 @@ namespace hgps {
 		ModelResult calculate_historical_statistics(RuntimeContext& context) const;
 		double calculate_disability_weight(const Person& entity) const;
 		DALYsIndicator calculate_dalys(Population& population,
-			const unsigned int& max_age, const int& death_year) const;
+			const unsigned int& max_age, const unsigned int& death_year) const;
 	};
 
 	std::unique_ptr<AnalysisModule> build_analysis_module(Repository& repository, const ModelInput& config);

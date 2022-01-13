@@ -11,7 +11,7 @@ namespace hgps {
 	using ElapsedTime = std::chrono::duration<double, std::milli>;
 
 	ModelRunner::ModelRunner(EventAggregator& bus, RandomBitGenerator&& generator) noexcept
-		: event_bus_{ bus }, rnd_{ generator }, running_{ false }, source_{} {}
+		: running_{ false }, event_bus_{ bus }, rnd_{ generator }, source_{} {}
 
 	double ModelRunner::run(Simulation& baseline, const unsigned int trial_runs)
 	{

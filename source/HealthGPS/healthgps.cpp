@@ -252,7 +252,7 @@ namespace hgps {
 	}
 
 	const std::vector<Person> HealthGPS::get_similar_entities(
-		const int& age, const core::Gender& gender)
+		const unsigned int& age, const core::Gender& gender)
 	{
 		auto similar_entities = std::vector<Person>();
 		for (const auto& entity : context_.population()) {
@@ -269,7 +269,7 @@ namespace hgps {
 		return similar_entities;
 	}
 
-	void HealthGPS::apply_net_migration(int net_value, int& age, const core::Gender& gender) {
+	void HealthGPS::apply_net_migration(const int net_value, const unsigned int& age, const core::Gender& gender) {
 		if (net_value > 0) {
 			auto similar_entities = get_similar_entities(age, gender);
 			if (similar_entities.size() > 0) {

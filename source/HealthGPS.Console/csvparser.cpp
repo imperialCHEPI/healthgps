@@ -178,13 +178,13 @@ std::map<std::string, std::vector<double>> load_baseline_csv(const std::string& 
 	}
 
 	std::transform(column_names.begin(), column_names.end(), column_names.begin(), core::to_lower);
-	for (auto col = 1; col < column_count; col++) {
+	for (size_t col = 1; col < column_count; col++) {
 		data.emplace(core::to_lower(column_names.at(col)), std::vector<double>{});
 	}
 
 	for (size_t i = 0; i < doc.GetRowCount(); i++) {
 		auto row = doc.GetRow<std::string>(i);
-		for (auto col = 1; col < row.size(); col++) {
+		for (size_t col = 1; col < row.size(); col++) {
 			data.at(column_names[col]).emplace_back(std::stod(row[col]));
 		}
 	}

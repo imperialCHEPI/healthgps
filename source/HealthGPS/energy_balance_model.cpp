@@ -16,7 +16,7 @@ namespace hgps {
 		return "Dynamic";
 	}
 
-	void EnergyBalanceHierarchicalModel::generate_risk_factors(RuntimeContext& context) {
+	void EnergyBalanceHierarchicalModel::generate_risk_factors([[maybe_unused]] RuntimeContext& context) {
 		throw std::logic_error("EnergyBalanceHierarchicalModel::generate_risk_factors not yet implemented.");
 	}
 
@@ -105,9 +105,8 @@ namespace hgps {
 		return entity_risk_factors;
 	}
 
-	double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(
-		Random& random, double mean, double standard_deviation, double boundary) const {
-		auto absolute_boundary = std::abs(boundary);
+	double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random& random, 
+		const double mean, const double standard_deviation, const double boundary) const {
 		auto candidate = random.next_normal(mean, standard_deviation);
 		auto percentage = definition_.boundary_percentage();
 		auto cap = percentage * boundary;
