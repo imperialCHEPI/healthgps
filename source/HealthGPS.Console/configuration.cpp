@@ -362,6 +362,7 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 		fmt::format("Unknown intervention policy identifier: {}", info.identifier));
 }
 
+#pragma warning(disable : 4996)
 std::string expand_environment_variables(const std::string& path)
 {
 	if (path.find("${") == std::string::npos) {
@@ -378,7 +379,7 @@ std::string expand_environment_variables(const std::string& path)
 	std::string value = "";
 
 	post = post.substr(post.find('}') + 1);
-	const char* v = std::getenv(variable.c_str());
+	const char* v = std::getenv(variable.c_str()); // C4996, but safe here.
 	if (v != NULL) value = std::string(v);
 
 	return expand_environment_variables(pre + value + post);

@@ -197,6 +197,7 @@
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="healthgps.cpp" />
     <ClCompile Include="hierarchical_model_static.cpp" />
+    <ClCompile Include="simulation_module.cpp" />
     <ClCompile Include="univariate_visitor.cpp" />
   </ItemGroup>
   <ItemGroup>

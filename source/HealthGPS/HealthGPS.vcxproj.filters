@@ -356,6 +356,9 @@
     <ClCompile Include="marketing_scenario.cpp">
       <Filter>Source Files\scenarios</Filter>
     </ClCompile>
+    <ClCompile Include="simulation_module.cpp">
+      <Filter>Source Files\modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="scenarios.cd">
