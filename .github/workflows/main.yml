@@ -37,6 +37,9 @@ jobs:
         with: 
           repository: 'microsoft/vcpkg'
           path: 'vcpkg'
+          
+      # Install Ninja
+      - uses: seanmiddleditch/gha-setup-ninja@master
       
       # Install CMake
       - uses: lukka/get-cmake@latest
