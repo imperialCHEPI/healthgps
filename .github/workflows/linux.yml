@@ -54,14 +54,14 @@ jobs:
     - name: Configure
       id: cmake_config
       working-directory: ${{github.workspace}}/source
-      run: cmake --preset="x64-debug"
+      run: cmake --preset="linux-debug"
     
     - name: Build
       id: cmake_build
       working-directory: ${{github.workspace}}/source
-      run: cmake --build --preset="default-build-windows"
+      run: cmake --build --preset="default-build-linux"
       
     - name: Test
       id: ctest_run
       working-directory: ${{github.workspace}}/source
-      run: ctest --preset="core-test-windows"
+      run: ctest --preset="core-test-linux"
