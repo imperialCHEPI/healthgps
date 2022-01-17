@@ -17,16 +17,15 @@ jobs:
     runs-on: windows-2022
     
     env:
-      VCPKG_ROOT: './vcpkg'
+      VCPKG_ROOT: '../vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
-      SOLUTION_PATH: ./source
       
     steps:
     - uses: actions/checkout@v2
 
     - name: Installing vcpkg
       id: install_vcpkg
-      working-directory: ${{github.workspace}}/source
+      #working-directory: ${{github.workspace}}/source
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
@@ -43,7 +42,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
      
     - name: Tool Check
-      working-directory: ${{github.workspace}}/source  
+      #working-directory: ${{github.workspace}}/source  
       run: |
         ls
         cmake --version
