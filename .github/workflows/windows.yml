@@ -8,10 +8,6 @@ on:
     
   workflow_dispatch:
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
-
 jobs:
   build:
     runs-on: windows-2022
@@ -23,9 +19,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Installing vcpkg
+    - name: Get vcpkg
       id: install_vcpkg
-      #working-directory: ${{github.workspace}}/source
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
@@ -33,31 +28,33 @@ jobs:
         .\bootstrap-vcpkg.bat -disableMetrics    
 
     - name: Get Ninja
+      id: install_ninja
       uses: seanmiddleditch/gha-setup-ninja@master
-    
-    - name: Get CMake
-      uses: lukka/get-cmake@latest
-    
+
     - name: Get MSVC Tools
+      id: install_MSVC
       uses: ilammy/msvc-dev-cmd@v1
      
     - name: Tool Check
-      #working-directory: ${{github.workspace}}/source  
+      id: toos_version
       run: |
         ls
         cmake --version
         ninja --version
         ./vcpkg/vcpkg --version
         cl
-        
+
     - name: Configure
+      id: cmake_config
       working-directory: ${{github.workspace}}/source
       run: cmake --preset="x64-debug"
     
     - name: Build
+      id: cmake_build
       working-directory: ${{github.workspace}}/source
       run: cmake --build --preset="default-build-windows"
       
     - name: Test
+      id: ctest_run
       working-directory: ${{github.workspace}}/source
       run: ctest --preset="core-test-windows"
