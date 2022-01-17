@@ -41,7 +41,8 @@ jobs:
         ls
         cmake --version
         ninja --version
-        cl --version
+        ./vcpkg --version
+        cl
         
     - name: Configure
       run: cmake -S ${{github.workspace}}/source --preset="x64-debug"
