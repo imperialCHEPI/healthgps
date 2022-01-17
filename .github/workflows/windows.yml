@@ -23,13 +23,15 @@ jobs:
       
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Get vcpkg
+
+    - name: Installing vcpkg
+      id: install_vcpkg
       working-directory: ${{github.workspace}}/source
-      uses: actions/checkout@v2
-      with:
-        repository: 'microsoft/vcpkg'
-        path: 'vcpkg'
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        git checkout --force 2021.05.12
+        .\bootstrap-vcpkg.bat -disableMetrics    
 
     - name: Get Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
@@ -39,11 +41,9 @@ jobs:
     
     - name: Get MSVC Tools
       uses: ilammy/msvc-dev-cmd@v1
-
-    - name: 'Setup vcpkg'
-      run: ./source/vcpkg/bootstrap-vcpkg.bat
-      
+     
     - name: Tool Check
+      working-directory: ${{github.workspace}}/source  
       run: |
         ls
         cmake --version
