@@ -24,8 +24,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - uses: actions/checkout@v2
-      with: 
+    - name: Get vcpkg
+      working-directory: ${{github.workspace}}/source
+      uses: actions/checkout@v2
+      with:
         repository: 'microsoft/vcpkg'
         path: 'vcpkg'
 
@@ -37,9 +39,9 @@ jobs:
     
     - name: Get MSVC Tools
       uses: ilammy/msvc-dev-cmd@v1
-      
+
     - name: 'Setup vcpkg'
-      run: ./vcpkg/bootstrap-vcpkg.bat
+      run: ./source/vcpkg/bootstrap-vcpkg.bat
       
     - name: Tool Check
       run: |
@@ -50,10 +52,13 @@ jobs:
         cl
         
     - name: Configure
-      run: cmake -S ${{github.workspace}}/source --preset="x64-debug"
+      working-directory: ${{github.workspace}}/source
+      run: cmake --preset="x64-debug"
     
     - name: Build
-      run: cmake -S ${{github.workspace}}/source --build --preset="default-build-windows"
+      working-directory: ${{github.workspace}}/source
+      run: cmake --build --preset="default-build-windows"
       
     - name: Test
-      run: ctest -S ${{github.workspace}}/source --preset="core-test-windows"
+      working-directory: ${{github.workspace}}/source
+      run: ctest --preset="core-test-windows"
