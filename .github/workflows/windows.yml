@@ -1,0 +1,54 @@
+name: Windows
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-2022
+    
+    env:
+      VCPKG_ROOT: './vcpkg'
+      BUILD_TYPE: 'Release'
+      VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      
+    steps:
+    - uses: actions/checkout@v2
+    
+    - uses: actions/checkout@v2
+      with: 
+        repository: 'microsoft/vcpkg'
+        path: 'vcpkg'
+        
+    - uses: seanmiddleditch/gha-setup-ninja@master
+    
+    - uses: ilammy/msvc-dev-cmd@v1
+
+    - name: 'Setup vcpkg'
+      run: ./vcpkg/bootstrap-vcpkg.bat
+      
+    - name: Tool Check
+      run: |
+        ls
+        cmake --version
+        ninja --version
+        cl --version
+        
+    - name: Configure
+      run: cmake -S ${{github.workspace}}/source --preset="x64-debug"
+    
+    - name: Build
+      run: cmake -S ${{github.workspace}}/source --build --preset="default-build-windows"
+      
+    - name: Test
+      run: ctest -S ${{github.workspace}}/source --preset="core-test-windows"
+      
