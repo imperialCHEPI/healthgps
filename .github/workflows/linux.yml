@@ -1,0 +1,67 @@
+name: Linux
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    
+    env:
+      VCPKG_ROOT: '../vcpkg'
+      VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up GCC
+      id: install_gcc
+      uses: egor-tensin/setup-gcc@v1
+      with:
+        version: latest
+        platform: x64
+
+    - name: Get vcpkg
+      id: install_vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        git checkout --force 2021.05.12
+        ./bootstrap-vcpkg.sh -disableMetrics    
+
+    - name: Get Ninja
+      id: install_ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Get MSVC Tools
+      id: install_MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+     
+    - name: Tool Check
+      id: toos_version
+      run: |
+        ls
+        cmake --version
+        ninja --version
+        ./vcpkg/vcpkg --version
+        cl
+
+    - name: Configure
+      id: cmake_config
+      working-directory: ${{github.workspace}}/source
+      run: cmake --preset="x64-debug"
+    
+    - name: Build
+      id: cmake_build
+      working-directory: ${{github.workspace}}/source
+      run: cmake --build --preset="default-build-windows"
+      
+    - name: Test
+      id: ctest_run
+      working-directory: ${{github.workspace}}/source
+      run: ctest --preset="core-test-windows"

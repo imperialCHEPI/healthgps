@@ -46,7 +46,7 @@ jobs:
         cd ..
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2021.04.30
+        git checkout --force 2021.05.12
         .\bootstrap-vcpkg.bat -disableMetrics
         .\vcpkg integrate install
         
@@ -62,14 +62,14 @@ jobs:
       working-directory: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
       run: |
         ls
-        .\HealthGPS.Console.exe -f "..\..\..\example\demo.json" -s "..\..\..\data\"
+        .\HealthGPS.Console.exe -f "..\..\..\example\France.Config.json" -s "..\..\..\data\"
         .\HealthGPS.Tests.exe
 
     - name: Zip output folder
       id: zip_folder
       working-directory: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
       run: 7z a health_gps_bin.zip *.*
-      
+
     - name: Upload artefacts
       id: upload_zip
       uses: actions/upload-artifact@v2
