@@ -17,8 +17,9 @@ jobs:
     runs-on: windows-2022
     
     env:
-      VCPKG_ROOT: '${{github.workspace}}/vcpkg'
+      VCPKG_ROOT: './vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      SOLUTION_PATH: ./source
       
     steps:
     - uses: actions/checkout@v2
@@ -27,11 +28,16 @@ jobs:
       with: 
         repository: 'microsoft/vcpkg'
         path: 'vcpkg'
-        
-    - uses: seanmiddleditch/gha-setup-ninja@master
-    
-    - uses: ilammy/msvc-dev-cmd@v1
 
+    - name: Get Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+    
+    - name: Get CMake
+      uses: lukka/get-cmake@latest
+    
+    - name: Get MSVC Tools
+      uses: ilammy/msvc-dev-cmd@v1
+      
     - name: 'Setup vcpkg'
       run: ./vcpkg/bootstrap-vcpkg.bat
       
