@@ -41,7 +41,7 @@ jobs:
         ls
         cmake --version
         ninja --version
-        ./vcpkg --version
+        ./vcpkg/vcpkg --version
         cl
         
     - name: Configure
