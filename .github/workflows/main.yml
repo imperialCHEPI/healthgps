@@ -33,10 +33,12 @@ jobs:
         with:
           submodules: 'true'
           
-      - uses: actions/checkout@v2
-        with: 
-          repository: 'microsoft/vcpkg'
-          path: 'vcpkg'
+      # Setup vcpkg
+      - uses: lukka/run-vcpkg@v6
+        with:
+          # Location of the vcpkg as submodule of the repository.
+          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+          setupOnly: true
           
       # Install Ninja
       - uses: seanmiddleditch/gha-setup-ninja@master
