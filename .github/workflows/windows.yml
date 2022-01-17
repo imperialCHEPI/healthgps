@@ -27,9 +27,9 @@ jobs:
     - name: Get vcpkg
       working-directory: ${{github.workspace}}/source
       uses: actions/checkout@v2
-      with:
-        repository: 'microsoft/vcpkg'
-        path: 'vcpkg'
+        with:
+          repository: 'microsoft/vcpkg'
+          path: 'vcpkg'
 
     - name: Get Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
