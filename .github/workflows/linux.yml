@@ -49,7 +49,7 @@ jobs:
         cmake --version
         ninja --version
         ./vcpkg/vcpkg --version
-        cl
+        g++ --version
 
     - name: Configure
       id: cmake_config
