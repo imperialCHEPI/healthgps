@@ -1,0 +1,93 @@
+# Build and test the CMake project with vcpkg and CMakePresets.json on Windows and Linux
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+  workflow_dispatch:
+  
+jobs:
+  build:
+    
+    # Setup cross-platform build on Windows and Linux
+    strategy:
+      matrix:
+        os: ['windows-2022', 'ubuntu-20.04']
+        include:
+          - os: 'windows-2022'
+            triplet: 'x64-windows'
+            mono: ''
+          - os: 'ubuntu-20.04'
+            triplet: 'x64-linux'
+            mono: 'mono'
+            
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}  
+    
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+          
+      - uses: actions/checkout@v2
+        with: 
+          repository: 'microsoft/vcpkg'
+          path: 'vcpkg'
+      
+      # Install CMake
+      - uses: lukka/get-cmake@latest
+     
+      # Update apt
+      - name: 'Update apt' 
+        shell: 'bash'
+        run: 'sudo apt-get update'
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+      
+      # Install GCC 11
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 11
+          platform: x64
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+       
+      # Configure and build on Windows with Ninja and cl
+      - uses: ilammy/msvc-dev-cmd@v1  
+        with:
+          arch: 'x64'
+          
+      - name: 'Configure and build on Windows'
+        run: |
+          cmake --preset=x64-debug
+          cmake --build --preset default-build-windows
+        env:
+            VCPKG_ROOT: './vcpkg'
+            VCPKG_BINARY_SOURCES: 'clear;nuget,WillBuikGithub,readwrite'
+        if: ${{ matrix.os == 'windows-2022' }}
+      
+      # Configure and build on Linux with Ninja and gcc
+      - name: 'Configure and build on Linux'
+        run: |
+          cmake --preset=linux-debug 
+          cmake --build --preset default-build-linux
+        env:
+            VCPKG_ROOT: './vcpkg'
+            VCPKG_BINARY_SOURCES: 'clear;nuget,WillBuikGithub,readwrite'
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+
+      # Run CTest on Windows
+      - name: 'Run CTest on Windows'
+        shell: 'bash'
+        run: 'ctest --preset core-test-windows'
+        if: ${{ matrix.os == 'windows-2020' }}
+
+      # Run CTest on Linux
+      - name: 'Run CTest on Linux'
+        shell: 'bash'
+        run: 'ctest --preset core-test-linux'
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        
