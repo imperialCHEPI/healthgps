@@ -20,7 +20,7 @@ jobs:
       DEBUG_BUILD_PRESET: 'debug-build-windows'
       DEBUG_TEST_PRESET: 'core-test-windows'
       RELEASE_PRESET: 'x64-release'
-      RELEASE_BUILD_PRESET: '"release-build-windows'
+      RELEASE_BUILD_PRESET: 'release-build-windows'
 
     steps:
     - uses: actions/checkout@v2
