@@ -57,7 +57,7 @@ jobs:
         g++ --version
 
     - name: Build debug HealthGPS
-      id: cmake_build
+      id: cmake_debug
       working-directory: ${{github.workspace}}/source
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
       
@@ -67,7 +67,7 @@ jobs:
       run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
     - name: Build release HealthGPS
-      id: cmake_build
+      id: cmake_release
       working-directory: ${{github.workspace}}/source
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
