@@ -47,7 +47,7 @@
         ],
         "dynamic_risk_factor": "",
         "models": {
-            "static": "France.HLM.Json",
+            "static": "France.HLM.json",
             "dynamic": "France.EBHLM.json"
         },
         "baseline_adjustment": {
@@ -100,7 +100,7 @@
         }
     },
     "results": {
-        "folder": "C:\\HealthGPS\\Results",
+        "folder": "C:\\healthgps\\results",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
 }
