@@ -74,4 +74,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: health-gps-archive
-        path: artifact/health_gps_win64.zip      
+        path: artifact/health_gps_win64.zip
+

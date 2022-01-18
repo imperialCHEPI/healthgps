@@ -68,11 +68,13 @@ jobs:
     - name: Zip output folder
       id: zip_folder
       working-directory: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}
-      run: 7z a -tzip health_gps_win64.zip *.*
+      run: |
+        mkdir ${{github.workspace}}/artifact
+        7z a -tzip ${{github.workspace}}/artifact/health_gps_win64.zip *.dll *.exe
 
     - name: Upload artefacts
       id: upload_zip
       uses: actions/upload-artifact@v2
       with:
         name: health-gps-archive
-        path: ${{env.SOLUTION_FILE_PATH}}\x64\${{env.BUILD_CONFIGURATION}}\health_gps_win64.zip
+        path: artifact/health_gps_win64.zip
