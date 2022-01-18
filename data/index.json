@@ -8,7 +8,7 @@
         "url": "https://www.iso.org/iso-3166-country-codes.html",
         "license": "N/A",
         "path": "",
-        "file_name": "Countries.csv"
+        "file_name": "countries.csv"
     },
     "demographic": {
         "format": "csv",
