@@ -11,14 +11,16 @@ on:
 jobs:
   build:
     runs-on: windows-2022
+    name: Run CMake Windows Workflow
     
     env:
       VCPKG_ROOT: '../vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
-      CONFIG_PRESET: 'x64-debug'
-      BUILD_PRESET: 'default-build-windows'
-      TEST_PRESET: 'core-test-windows'
-      
+      RELEASE_PRESET: 'x64-release'
+      RELEASE_BUILD_PRESET: '"release-build-windows'
+      DEBUG_BUILD_PRESET: 'debug-build-windows'
+      DEBUG_TEST_PRESET: 'core-test-windows'
+
     steps:
     - uses: actions/checkout@v2
 
@@ -47,24 +49,24 @@ jobs:
         ./vcpkg/vcpkg --version
         cl
 
-    - name: Configure
-      id: cmake_config
-      working-directory: ${{github.workspace}}/source
-      run: cmake --preset=${{env.CONFIG_PRESET}}
-    
-    - name: Build
+    - name: Build debug HealthGPS
       id: cmake_build
       working-directory: ${{github.workspace}}/source
-      run: cmake --build --preset=${{env.BUILD_PRESET}}
+      run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
       
-    - name: Test
+    - name: Test debug HealthGPS
       id: ctest_run
       working-directory: ${{github.workspace}}/source
-      run: ctest --preset=${{env.TEST_PRESET}}
+      run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
+
+    - name: Build release HealthGPS
+      id: cmake_build
+      working-directory: ${{github.workspace}}/source
+      run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Zip output folder
       id: zip_folder
-      working-directory: ${{github.workspace}}/source/out/build/${{env.CONFIG_PRESET}}/HealthGPS.Console/
+      working-directory: ${{github.workspace}}/source/out/build/${{env.RELEASE_PRESET}}/HealthGPS.Console/
       run: |
         mkdir ${{github.workspace}}/artifact
         7z a -tzip ${{github.workspace}}/artifact/health_gps_win64.zip *.dll *.exe

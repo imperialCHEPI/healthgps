@@ -69,16 +69,28 @@
   ],
   "buildPresets": [
     {
-      "name": "default-build-linux",
+      "name": "debug-build-linux",
       "displayName": "Default",
       "configurePreset": "linux-debug",
-      "description": "Vanilla build"
+      "description": "Linux debug build"
     },
     {
-      "name": "default-build-windows",
+      "name": "debug-build-windows",
       "displayName": "Default",
       "configurePreset": "x64-debug",
       "description": "Vanilla build"
+    },
+    {
+      "name": "release-build-linux",
+      "displayName": "Release",
+      "configurePreset": "linux-release",
+      "description": "Linux release build"
+    },
+    {
+      "name": "release-build-windows",
+      "displayName": "Release",
+      "configurePreset": "x64-release",
+      "description": "Windows release build"
     }
   ],
   "testPresets": [

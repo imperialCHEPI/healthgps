@@ -11,13 +11,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
+    name: Run CMake Linux Workflow
     
     env:
       VCPKG_ROOT: '../vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
-      CONFIG_PRESET: 'linux-debug'
-      BUILD_PRESET: 'default-build-linux'
-      TEST_PRESET: 'core-test-linux'
+      RELEASE_PRESET: 'linux-release'
+      RELEASE_BUILD_PRESET: 'release-build-linux'
+      DEBUG_BUILD_PRESET: 'debug-build-linux'
+      DEBUG_TEST_PRESET: 'core-test-linux'
       
     steps:
     - uses: actions/checkout@v2
@@ -54,24 +56,24 @@ jobs:
         ./vcpkg/vcpkg --version
         g++ --version
 
-    - name: Configure
-      id: cmake_config
-      working-directory: ${{github.workspace}}/source
-      run: cmake --preset=${{env.CONFIG_PRESET}}
-    
-    - name: Build
+    - name: Build debug HealthGPS
       id: cmake_build
       working-directory: ${{github.workspace}}/source
-      run: cmake --build --preset=${{env.BUILD_PRESET}}
+      run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
       
-    - name: Test
+    - name: Test debug HealthGPS
       id: ctest_run
       working-directory: ${{github.workspace}}/source
-      run: ctest --preset=${{env.TEST_PRESET}}
+      run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
+
+    - name: Build release HealthGPS
+      id: cmake_build
+      working-directory: ${{github.workspace}}/source
+      run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Zip output folder
       id: zip_folder
-      working-directory: ${{github.workspace}}/source/out/build/${{env.CONFIG_PRESET}}/HealthGPS.Console/
+      working-directory: ${{github.workspace}}/source/out/build/${{env.RELEASE_PRESET}}/HealthGPS.Console/
       run: |
         mkdir ${{github.workspace}}/artifact
         7z a -tzip ${{github.workspace}}/artifact/health_gps_linux.zip HealthGPS.Console
