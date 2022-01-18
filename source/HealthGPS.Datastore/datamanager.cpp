@@ -330,7 +330,6 @@ namespace hgps {
 			filename = replace_string_tokens(filename, tokens);
 			filename = (root_ / disease_folder / source.code / risk_folder / file_folder / filename).string();
 			if (!std::filesystem::exists(filename)) {
-				std::cout << "Relative risk file not found: " << filename << "\n";
 				return table;
 			}
 
