@@ -16,10 +16,11 @@ jobs:
     env:
       VCPKG_ROOT: '../vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
-      RELEASE_PRESET: 'linux-release'
-      RELEASE_BUILD_PRESET: 'release-build-linux'
+      DEBUG_PRESET: 'linux-debug'
       DEBUG_BUILD_PRESET: 'debug-build-linux'
       DEBUG_TEST_PRESET: 'core-test-linux'
+      RELEASE_PRESET: 'linux-release'
+      RELEASE_BUILD_PRESET: 'release-build-linux'
       
     steps:
     - uses: actions/checkout@v2
@@ -56,8 +57,13 @@ jobs:
         ./vcpkg/vcpkg --version
         g++ --version
 
+    - name: Configure debug HealthGPS
+      id: cmake_config_debug
+      working-directory: ${{github.workspace}}/source
+      run: cmake --preset=${{env.DEBUG_PRESET}}        
+
     - name: Build debug HealthGPS
-      id: cmake_debug
+      id: cmake_build_debug
       working-directory: ${{github.workspace}}/source
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
       
@@ -66,8 +72,13 @@ jobs:
       working-directory: ${{github.workspace}}/source
       run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
+    - name: Configure release HealthGPS
+      id: cmake_config_release
+      working-directory: ${{github.workspace}}/source
+      run: cmake --preset=${{env.RELEASE_PRESET}}
+
     - name: Build release HealthGPS
-      id: cmake_release
+      id: cmake_build_release
       working-directory: ${{github.workspace}}/source
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
