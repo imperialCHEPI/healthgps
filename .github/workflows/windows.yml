@@ -15,6 +15,9 @@ jobs:
     env:
       VCPKG_ROOT: '../vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      CONFIG_PRESET: 'x64-debug'
+      BUILD_PRESET: 'default-build-windows'
+      TEST_PRESET: 'core-test-windows'
       
     steps:
     - uses: actions/checkout@v2
@@ -47,14 +50,28 @@ jobs:
     - name: Configure
       id: cmake_config
       working-directory: ${{github.workspace}}/source
-      run: cmake --preset="x64-debug"
+      run: cmake --preset=${{env.CONFIG_PRESET}}
     
     - name: Build
       id: cmake_build
       working-directory: ${{github.workspace}}/source
-      run: cmake --build --preset="default-build-windows"
+      run: cmake --build --preset=${{env.BUILD_PRESET}}
       
     - name: Test
       id: ctest_run
       working-directory: ${{github.workspace}}/source
-      run: ctest --preset="core-test-windows"
+      run: ctest --preset=${{env.TEST_PRESET}}
+
+    - name: Zip output folder
+      id: zip_folder
+      working-directory: ${{github.workspace}}/source/out/build/${{env.CONFIG_PRESET}}/HealthGPS.Console/
+      run: |
+        mkdir ${{github.workspace}}/artifact
+        7z a -tzip ${{github.workspace}}/artifact/health_gps_win64.zip *.dll *.exe
+
+    - name: Upload artefacts
+      id: upload_zip
+      uses: actions/upload-artifact@v2
+      with:
+        name: health-gps-archive
+        path: artifact/health_gps_win64.zip      
