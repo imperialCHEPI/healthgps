@@ -1,4 +1,6 @@
-![windows](https://github.com/imperialCHEPI/healthgps/actions/workflows/msbuild.yml/badge.svg)
+![MSBuild](https://github.com/imperialCHEPI/healthgps/actions/workflows/msbuild.yml/badge.svg)
+![windows](https://github.com/imperialCHEPI/healthgps/actions/workflows/windows.yml/badge.svg)
+![Linux](https://github.com/imperialCHEPI/healthgps/actions/workflows/linux.yml/badge.svg)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
 
