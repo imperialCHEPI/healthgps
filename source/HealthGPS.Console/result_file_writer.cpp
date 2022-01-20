@@ -9,8 +9,8 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path file_name, const 
 	: info_{ info } 
 {
 	stream_.open(file_name, std::ofstream::out | std::ofstream::app);
-	if (stream_.fail()) {
-		throw std::iostream::failure(fmt::format("Cannot open file: {}", file_name.string()));
+	if (stream_.fail() || !stream_.is_open()) {
+		throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
 	}
 
 	write_json_begin();

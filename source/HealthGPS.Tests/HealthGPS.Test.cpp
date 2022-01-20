@@ -154,14 +154,16 @@ TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
 
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
+	auto summary_three = core::UnivariateSummary();
 
 	auto sample_min = 1;
-	auto sample_max = 10;
+	auto sample_max = 20;
 	auto sample_size = 100;
 	for (auto i = 0; i < sample_size; i++)
 	{
 		summary_one.append(rnd_gen.next_int(sample_max));
 		summary_two.append(rnd_gen.next_int(sample_min, sample_max));
+		summary_three.append(rnd_gen.next_int());
 	}
 
 	ASSERT_EQ(0.0, summary_one.min());
@@ -169,6 +171,9 @@ TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
 
 	ASSERT_EQ(sample_min, summary_two.min());
 	ASSERT_EQ(sample_max, summary_two.max());
+
+	ASSERT_GE(summary_three.min(), 0);
+	ASSERT_GT(summary_three.max(), sample_max);
 }
 
 TEST(TestHealthGPS, RandomNextNormal)

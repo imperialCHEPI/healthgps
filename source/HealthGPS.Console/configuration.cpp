@@ -215,6 +215,12 @@ Configuration load_configuration(CommandOptions& options)
 
 		config.result = opt["results"].get<ResultInfo>();
 		config.result.folder = expand_environment_variables(config.result.folder);
+		if (!fs::exists(config.result.folder)) {
+			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.result.folder);
+			if (!fs::create_directories(config.result.folder)) {
+				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.result.folder));
+			}
+		}
 	}
 	else
 	{
@@ -298,11 +304,6 @@ std::string create_output_file_name(const ResultInfo& info)
 	namespace fs = std::filesystem;
 
 	fs::path output_folder = expand_environment_variables(info.folder);
-	if (!fs::exists(output_folder) && !fs::create_directories(output_folder)) {
-		throw std::runtime_error(
-				fmt::format("Failed to create output folder: {}", output_folder.string()));
-	}
-
 	auto tp = std::chrono::system_clock::now();
 	auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", tp, tp.time_since_epoch());
 

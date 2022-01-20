@@ -1,9 +1,9 @@
 #pragma once
 
+#include "HealthGPS.Core/api.h"
+
 #include <filesystem>
 #include <nlohmann/json.hpp>
-
-#include "HealthGPS.Core/api.h"
 
 namespace hgps {
 	namespace data {
@@ -66,6 +66,8 @@ namespace hgps {
 
 			std::map<std::string, std::size_t> create_fields_index_mapping(
 				const std::vector<std::string>& column_names, const std::vector<std::string> fields) const;
+
+			void notify_warning(const std::string_view message) const;
 		};
 	} 
 }

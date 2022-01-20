@@ -63,7 +63,7 @@ namespace hgps {
 				longestColumnName = std::max(longestColumnName, col->name().length());
 			}
 
-			auto pad = longestColumnName + 2;
+			auto pad = longestColumnName + 4;
 			auto width = pad + 28;
 
 			ss << fmt::format("\n Table size: {} x {}\n", num_columns(), num_rows());

@@ -89,14 +89,14 @@ namespace hgps {
 		/// @brief Indicates whether the host contains an disease identified by code.
 		/// @param disease_code The disease unique identification code 
 		/// @return true if the disease is found, otherwise false.
-		virtual bool contains(const std::string disease_code) const noexcept = 0;
+		virtual bool contains(const std::string& disease_code) const noexcept = 0;
 
 		/// @brief Gets the mortality rate associated with a disease for an individual
 		/// @param disease_code The disease unique identification code 
 		/// @param entity The entity associated with the mortality value
 		/// @return the mortality rate value, if found, otherwise zero.
 		virtual double get_excess_mortality(
-			const std::string disease_code, const Person& entity) const noexcept = 0;
+			const std::string& disease_code, const Person& entity) const noexcept = 0;
 	};
 
 	/// @brief Generic risk factors module interface to host hierarchical models

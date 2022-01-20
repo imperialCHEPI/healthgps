@@ -1,18 +1,23 @@
-#include <fstream>
-#include <rapidcsv.h>
-
 #include "datamanager.h"
 #include "HealthGPS.Core/string_util.h"
+
+#include <fstream>
+#include <rapidcsv.h>
+#include <fmt/color.h>
 
 namespace hgps {
 	namespace data {
 		DataManager::DataManager(const std::filesystem::path root_directory)
 			: root_{ root_directory }
 		{
-			// TODO: use precondition contract
-			std::ifstream ifs(root_ / "index.json", std::ifstream::in);
+			auto full_filename = root_ / "index.json";
+			auto ifs = std::ifstream{ full_filename, std::ifstream::in };
 			if (ifs) {
 				index_ = nlohmann::json::parse(ifs);
+			}
+			else {
+				throw std::invalid_argument(
+					fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
 			}
 		}
 
@@ -42,6 +47,12 @@ namespace hgps {
 
 					std::sort(results.begin(), results.end());
 				}
+				else {
+					notify_warning(fmt::format("countries file: '{}' not found.", filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'country' entry.");
 			}
 
 			return results;
@@ -106,6 +117,12 @@ namespace hgps {
 
 					std::sort(results.begin(), results.end());
 				}
+				else {
+					notify_warning(fmt::format("{} population file: '{}' not found.", country.name, filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'demographic' entry.");
 			}
 
 			return results;
@@ -153,6 +170,12 @@ namespace hgps {
 
 					std::sort(results.begin(), results.end());
 				}
+				else {
+					notify_warning(fmt::format("{} mortality file: '{}' not found.", country.name, filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'demographic' entry.");
 			}
 
 			return results;
@@ -179,6 +202,9 @@ namespace hgps {
 
 				std::sort(result.begin(), result.end());
 			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
+			}
 
 			return result;
 		}
@@ -203,6 +229,9 @@ namespace hgps {
 						return info;
 					}
 				}
+			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
 			}
 
 			return std::optional<DiseaseInfo>();
@@ -259,6 +288,12 @@ namespace hgps {
 
 					result.items.shrink_to_fit();
 				}
+				else {
+					notify_warning(fmt::format("{}, {} file: '{}' not found.", country.name, info.name, filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
 			}
 
 			return result;
@@ -301,8 +336,15 @@ namespace hgps {
 
 					return table;
 				}
+				else {
+					notify_warning(fmt::format(
+						"{} to {} relative risk file not found, using default.", source.code, target.code));
+				}
 
 				return generate_default_relative_risk_to_disease();
+			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
 			}
 
 			return RelativeRiskEntity();
@@ -313,6 +355,7 @@ namespace hgps {
 		{
 			auto table = RelativeRiskEntity();
 			if (!index_.contains("diseases")) {
+				notify_warning("index has no 'diseases' entry.");
 				return table;
 			}
 
@@ -330,6 +373,8 @@ namespace hgps {
 			filename = replace_string_tokens(filename, tokens);
 			filename = (root_ / disease_folder / source.code / risk_folder / file_folder / filename).string();
 			if (!std::filesystem::exists(filename)) {
+				notify_warning(fmt::format(
+					"{} to {} relative risk file not found, disabled.", source.code, risk_factor));
 				return table;
 			}
 
@@ -357,6 +402,7 @@ namespace hgps {
 		{
 			auto table = CancerParameterEntity();
 			if (!index_.contains("diseases")) {
+				notify_warning("index has no 'diseases' entry.");
 				return table;
 			}
 
@@ -371,12 +417,16 @@ namespace hgps {
 			params_folder = replace_string_tokens(params_folder, tokens);
 			auto files_folder = (root_ / disease_folder / info.code / params_folder);
 			if (!std::filesystem::exists(files_folder)) {
+				notify_warning(fmt::format(
+					"{}, {} parameters folder: '{}' not found.", info.code, country.name, files_folder.string()));
 				return table;
 			}
 
 			for (auto& file : params_files.items()) {
 				auto file_name = (files_folder / file.value().get<std::string>());
 				if (!std::filesystem::exists(file_name)) {
+					notify_warning(fmt::format(
+						"{}, {} parameters file: '{}' not found.", info.code, country.name, file_name.string()));
 					continue;
 				}
 
@@ -428,6 +478,8 @@ namespace hgps {
 				filename = replace_string_tokens(filename, tokens);
 				filename = (root_ / nodepath / filefolder / filename).string();
 				if (!std::filesystem::exists(filename)) {
+					notify_warning(fmt::format(
+						"{}, demographic indicators file: '{}' not found.", country.name, filename));
 					return result;
 				}
 
@@ -448,6 +500,9 @@ namespace hgps {
 						});
 				}
 			}
+			else {
+				notify_warning("index has no 'demographic' entry.");
+			}
 
 			return result;
 		}
@@ -456,6 +511,7 @@ namespace hgps {
 		{
 			DiseaseAnalysisEntity entity;
 			if (!index_.contains("analysis")) {
+				notify_warning("index has no 'analysis' entry.");
 				return entity;
 			}
 
@@ -466,6 +522,7 @@ namespace hgps {
 			auto local_root_path = (root_ / analysis_folder);
 			disability_filename = (local_root_path / disability_filename).string();
 			if (!std::filesystem::exists(disability_filename)) {
+				notify_warning(fmt::format("disease disability weights file: '{}' not found.", disability_filename));
 				return entity;
 			}
 
@@ -501,6 +558,9 @@ namespace hgps {
 
 				return table;
 			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
+			}
 
 			return RelativeRiskEntity();
 		}
@@ -517,6 +577,7 @@ namespace hgps {
 			filename = replace_string_tokens(filename, tokens);
 			filename = (parent_path / cost_path / filename).string();
 			if (!std::filesystem::exists(filename)) {
+				notify_warning(fmt::format("{} cost of disease file: '{}' not found.", country.name, filename));
 				return result;
 			}
 
@@ -548,6 +609,8 @@ namespace hgps {
 				filename = replace_string_tokens(filename, tokens);
 				filename = (root_ / nodepath / filefolder / filename).string();
 				if (!std::filesystem::exists(filename)) {
+					notify_warning(fmt::format(
+						"{}, demographic indicators file: '{}' not found.", country.name, filename));
 					return result;
 				}
 
@@ -605,6 +668,11 @@ namespace hgps {
 			}
 
 			return mapping;
+		}
+
+		void DataManager::notify_warning(const std::string_view message) const
+		{
+			fmt::print(fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
 		}
 	}
 }

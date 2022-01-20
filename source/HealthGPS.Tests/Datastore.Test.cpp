@@ -11,11 +11,19 @@ TEST(TestDatastore, CreateDataManager)
 {
 	using namespace hgps::data;
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager{ store_full_path };
 
 	auto countries = manager.get_countries();
 
 	ASSERT_GT(countries.size(), 0);
+}
+
+TEST(TestDatastore, CreateDataManagerFailWithWrongPath)
+{
+	using namespace hgps::data;
+	ASSERT_THROW(DataManager{ "C:\\x\\y" }, std::invalid_argument);
+	ASSERT_THROW(DataManager{ "C:/x/y" }, std::invalid_argument);
+	ASSERT_THROW(DataManager{ "/home/x/y/z" }, std::invalid_argument);
 }
 
 TEST(TestDatastore, CountryIsCaseInsensitive)
