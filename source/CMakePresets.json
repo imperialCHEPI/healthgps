@@ -18,9 +18,9 @@
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_COMPILER": "g++-11",
+        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_TOOLCHAIN_FILE": {
-          "value": "~/vcpkg/scripts/buildsystems/vcpkg.cmake",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
           "type": "FILEPATH"
         }
       },
