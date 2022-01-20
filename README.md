@@ -47,11 +47,12 @@ The *Health GPS* software is written in modern, standard ANSI C++, targeting the
 To start working on the *Health GPS* code base, the suggested development machine needs:
 1. Windows 10 or newer, [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/) enabled and Linux distribution of choice installed.
 2. [Git](https://git-scm.com/downloads) 2.3 or newer.
-3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html). 
-4. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer with CMake presets integration.
-5. [GCC](https://gcc.gnu.org/) 11.1 or newer installed for Linux environment.
-6. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
-7. Internet connection.
+3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
+4. [Ninja](https://ninja-build.org/) 1.10 or newer.
+5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer with CMake presets integration.
+6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment.
+7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
+8. Internet connection.
 
 Download the *Health GPS* source code to the local machine, we recommend somewhere like `C:\src` or `C:\source`, since otherwise you may run into path issues with the build systems.
 ```cmd
