@@ -61,6 +61,25 @@ Finally, open the '...\healthgps\source\' folder in Visual Studio and hit build.
 
 **NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
 
+### CMake (Windows)
+
+```cmd
+cmake --list-presets=all
+cmake --preset='x64-release'
+cmake --build --preset='release-build-windows'
+```
+
+The `HealthGPS` binary will now be inside the `./out/build/[preset]/HealthGPS.Console` directory.
+
+To run the unit tests:
+```cmd
+cmake --preset='x64-debug'
+cmake --build --preset='debug-build-windows'
+ctest --preset='core-test-windows'
+```
+
+A similar process can be followed to build and test the *HealthGPS* model on ***Linux OS*** using the respective *presets* provided in the project.
+
 # License
 
 The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) license.
