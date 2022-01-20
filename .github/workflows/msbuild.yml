@@ -71,7 +71,7 @@ jobs:
       run: |
         mkdir ${{github.workspace}}/artifact
         7z a -tzip ${{github.workspace}}/artifact/health_gps_win64.zip *.dll *.exe
-
+        
     - name: Upload artefacts
       id: upload_zip
       uses: actions/upload-artifact@v2

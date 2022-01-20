@@ -21,7 +21,7 @@ jobs:
       DEBUG_TEST_PRESET: 'core-test-linux'
       RELEASE_PRESET: 'linux-release'
       RELEASE_BUILD_PRESET: 'release-build-linux'
-      
+     
     steps:
     - uses: actions/checkout@v2
 
@@ -95,3 +95,4 @@ jobs:
       with:
         name: health-gps-archive
         path: artifact/health_gps_linux.zip
+        
