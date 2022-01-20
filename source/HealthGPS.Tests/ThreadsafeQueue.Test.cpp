@@ -1,7 +1,6 @@
 #include "pch.h"
+#include "HealthGPS/threadsafe_queue.h"
 #include <thread>
-
-#include "HealthGPS\threadsafe_queue.h"
 
 TEST(TestHealthGPS_Queue, CreateDefaultQueue)
 {

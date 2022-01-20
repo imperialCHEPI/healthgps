@@ -4,13 +4,14 @@
 
 #include <chrono>
 #include <thread>
+#include <fmt/format.h>
 
 namespace hgps {
 
 	using ElapsedTime = std::chrono::duration<double, std::milli>;
 
 	ModelRunner::ModelRunner(EventAggregator& bus, RandomBitGenerator&& generator) noexcept
-		: event_bus_{ bus }, rnd_{ generator }, running_{ false }, source_{} {}
+		: running_{ false }, event_bus_{ bus }, rnd_{ generator }, source_{} {}
 
 	double ModelRunner::run(Simulation& baseline, const unsigned int trial_runs)
 	{
@@ -19,7 +20,7 @@ namespace hgps {
 		}
 		else if (baseline.type() != ScenarioType::baseline) {
 			throw std::invalid_argument(
-				std::format("Simulation: '{}' can not be evaluated alone", baseline.name()));
+				fmt::format("Simulation: '{}' can not be evaluated alone", baseline.name()));
 		}
 
 		if (running_.load()) {
@@ -67,11 +68,11 @@ namespace hgps {
 		}
 		else if (baseline.type() != ScenarioType::baseline) {
 			throw std::invalid_argument(
-				std::format("Baseline simulation: {} type mismatch.", baseline.name()));
+				fmt::format("Baseline simulation: {} type mismatch.", baseline.name()));
 		}
 		else if (intervention.type() != ScenarioType::intervention) {
 			throw std::invalid_argument(
-				std::format("Intervention simulation: {} type mismatch.", intervention.name()));
+				fmt::format("Intervention simulation: {} type mismatch.", intervention.name()));
 		}
 
 		if (running_.load()) {
@@ -133,7 +134,7 @@ namespace hgps {
 	{
 		auto run_start = std::chrono::steady_clock::now();
 		event_bus_.publish_async(std::make_unique<RunnerEventMessage>(
-			std::format("{} - {}", runner_id_, model.name()), RunnerAction::run_begin, run));
+			fmt::format("{} - {}", runner_id_, model.name()), RunnerAction::run_begin, run));
 
 		/* Create the simulation engine */
 		adevs::Simulator<int> sim;
@@ -155,6 +156,6 @@ namespace hgps {
 
 		ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
 		event_bus_.publish_async(std::make_unique<RunnerEventMessage>(
-			std::format("{} - {}", runner_id_, model.name()), RunnerAction::run_end, run, elapsed.count()));
+			fmt::format("{} - {}", runner_id_, model.name()), RunnerAction::run_end, run, elapsed.count()));
 	}
 }

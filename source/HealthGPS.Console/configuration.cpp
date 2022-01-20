@@ -7,12 +7,11 @@
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <chrono>
-#include <ctime>
 #include <iostream>
 #include <optional>
 #include <fstream>
-#include <fmt/core.h>
 #include <fmt/color.h>
+#include <fmt/chrono.h>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                     \
@@ -25,16 +24,8 @@ using namespace hgps;
 
 std::string getTimeNowStr()
 {
-	std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	std::string s(30, '\0');
-
-	struct tm localtime;
-
-	localtime_s(&localtime, &now);
-
-	std::strftime(&s[0], s.size(), "%c", &localtime);
-
-	return s;
+	auto tp = std::chrono::system_clock::now();
+	return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
 }
 
 cxxopts::Options create_options()
@@ -223,10 +214,17 @@ Configuration load_configuration(CommandOptions& options)
 		}
 
 		config.result = opt["results"].get<ResultInfo>();
+		config.result.folder = expand_environment_variables(config.result.folder);
+		if (!fs::exists(config.result.folder)) {
+			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.result.folder);
+			if (!fs::create_directories(config.result.folder)) {
+				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.result.folder));
+			}
+		}
 	}
 	else
 	{
-		std::cout << std::format(
+		std::cout << fmt::format(
 			"File {} doesn't exist.",
 			options.config_file.string()) << std::endl;
 	}
@@ -305,29 +303,24 @@ std::string create_output_file_name(const ResultInfo& info)
 {
 	namespace fs = std::filesystem;
 
-	fs::path output_folder = info.folder;
-	if (!fs::exists(output_folder)) {
-		fs::create_directories(output_folder);
-	}
-
+	fs::path output_folder = expand_environment_variables(info.folder);
 	auto tp = std::chrono::system_clock::now();
-	auto local_tp = std::chrono::zoned_time{ std::chrono::current_zone(), tp };
+	auto timestamp_tk = fmt::format("{0:%F_%H-%M-}{1:%S}", tp, tp.time_since_epoch());
 
 	// filename token replacement
 	auto file_name = info.file_name;
 	std::size_t tk_end = 0;
 	auto tk_start = file_name.find_first_of("{", tk_end);
 	if (tk_start != std::string::npos) {
-		auto timestamp_tk = std::string{ "{:%F_%H-%M-%S}" };
 		tk_end = file_name.find_first_of("}", tk_start + 1);
 		if (tk_end != std::string::npos) {
 			file_name.replace(tk_start, tk_end - tk_start + 1, timestamp_tk);
 		}
 	}
 
-	auto log_file_name = std::format("HealthGPS_result_{:%F_%H-%M-%S}.json", local_tp);
+	auto log_file_name = fmt::format("HealthGPS_result_{}.json", timestamp_tk);
 	if (tk_end > 0) {
-		log_file_name = std::format(file_name, local_tp);
+		log_file_name = file_name;
 	}
 
 	log_file_name = (output_folder / log_file_name).string();
@@ -354,7 +347,7 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 			impact_type = PolicyImpactType::relative;
 		}
 		else if (!core::case_insensitive::equals(info.impact_type, "absolute")) {
-			throw std::logic_error(std::format("Unknown policy impact type: {}", info.impact_type));
+			throw std::logic_error(fmt::format("Unknown policy impact type: {}", info.impact_type));
 		}
 
 		auto definition = SimplePolicyDefinition(impact_type, risk_impacts, period);
@@ -367,5 +360,28 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	}
 
 	throw std::invalid_argument(
-		std::format("Unknown intervention policy identifier: {}", info.identifier));
+		fmt::format("Unknown intervention policy identifier: {}", info.identifier));
+}
+
+#pragma warning(disable : 4996)
+std::string expand_environment_variables(const std::string& path)
+{
+	if (path.find("${") == std::string::npos) {
+		return path;
+	}
+
+	std::string pre = path.substr(0, path.find("${"));
+	std::string post = path.substr(path.find("${") + 2);
+	if (post.find('}') == std::string::npos) {
+		return path;
+	}
+
+	std::string variable = post.substr(0, post.find('}'));
+	std::string value = "";
+
+	post = post.substr(post.find('}') + 1);
+	const char* v = std::getenv(variable.c_str()); // C4996, but safe here.
+	if (v != NULL) value = std::string(v);
+
+	return expand_environment_variables(pre + value + post);
 }

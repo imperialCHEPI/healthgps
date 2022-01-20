@@ -1,9 +1,11 @@
 #pragma once
 
 #include "event_subscriber.h"
-#include <functional>
+#include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
+#include <functional>
+#include <memory>
 
 namespace hgps {
 

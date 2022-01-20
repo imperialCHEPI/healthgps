@@ -9,8 +9,9 @@
 namespace hgps {
 	hgps::MappingEntry::MappingEntry(std::string name, const short level, 
 		std::string entity_name, FactorRange range, const bool dynamic_factor)
-		: name_{ name }, level_{ level }, entity_name_{ core::to_lower(entity_name) },
-		range_{range}, dynamic_factor_{ dynamic_factor }, name_key_{ core::to_lower(name) } { }
+		: name_{ name }, name_key_{ core::to_lower(name) }, level_{ level }, 
+		entity_name_{ core::to_lower(entity_name) }, range_{range},
+		dynamic_factor_{ dynamic_factor } { }
 
 	MappingEntry::MappingEntry(std::string name, const short level,
 		std::string entity_name, const bool dynamic_factor)

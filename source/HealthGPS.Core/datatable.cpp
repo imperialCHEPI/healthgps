@@ -1,14 +1,17 @@
-#include <stdexcept>
 #include "datatable.h"
 #include "string_util.h"
+#include <fmt/format.h>
+
+#include <stdexcept>
+#include <sstream>
 
 namespace hgps {
 	namespace core {
-		const std::size_t DataTable::num_columns() const noexcept { return columns_.size(); }
+		std::size_t DataTable::num_columns() const noexcept { return columns_.size(); }
 
-		const std::size_t DataTable::num_rows() const noexcept { return rows_count_; }
+		std::size_t DataTable::num_rows() const noexcept { return rows_count_; }
 
-		const std::vector<std::string> DataTable::names() const { return names_; }
+		std::vector<std::string> DataTable::names() const { return names_; }
 
 		void DataTable::add(std::unique_ptr<DataTableColumn> column) {
 
@@ -49,7 +52,7 @@ namespace hgps {
 				return columns_.at(found->second);
 			}
 
-			throw std::invalid_argument(std::format("Column name: {} not found.", name));
+			throw std::invalid_argument(fmt::format("Column name: {} not found.", name));
 		}
 
 		std::string DataTable::to_string() const
@@ -60,22 +63,22 @@ namespace hgps {
 				longestColumnName = std::max(longestColumnName, col->name().length());
 			}
 
-			auto pad = longestColumnName + 2;
+			auto pad = longestColumnName + 4;
 			auto width = pad + 28;
 
-			ss << std::format("\n Table size: {} x {}\n", num_columns(), num_rows());
-			ss << std::format("|{:-<{}}|\n", '-', width);
-			ss << std::format("| {:{}} : {:10} : {:>10} |\n", "Column Name", pad, "Data Type", "# Nulls");
-			ss << std::format("|{:-<{}}|\n", '-', width);
+			ss << fmt::format("\n Table size: {} x {}\n", num_columns(), num_rows());
+			ss << fmt::format("|{:-<{}}|\n", '-', width);
+			ss << fmt::format("| {:{}} : {:10} : {:>10} |\n", "Column Name", pad, "Data Type", "# Nulls");
+			ss << fmt::format("|{:-<{}}|\n", '-', width);
 			for (auto& col : columns_)
 			{
-				ss << std::format("| {:{}} : {:10} : {:10} |\n",
+				ss << fmt::format("| {:{}} : {:10} : {:10} |\n",
 					col->name(), pad,
 					col->type(),
 					col->null_count());
 			}
 
-			ss << std::format("|{:_<{}}|\n\n", '_', width);
+			ss << fmt::format("|{:_<{}}|\n\n", '_', width);
 
 			return ss.str();
 		}

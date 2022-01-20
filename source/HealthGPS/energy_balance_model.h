@@ -28,6 +28,7 @@ namespace hgps {
 		std::map<std::string, double> get_current_risk_factors(
 			const HierarchicalMapping& mapping, Person& entity, int time_year) const;
 
-		double sample_normal_with_boundary(Random& random, double mean, double standard_deviation, double boundary) const;
+		double sample_normal_with_boundary(Random& random, const double mean,
+			const double standard_deviation, const double boundary) const;
 	};
 }

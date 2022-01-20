@@ -100,7 +100,7 @@
         }
     },
     "results": {
-        "folder": "C:\\healthgps\\results",
+        "folder": "${HOME}/healthgps/results",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
 }

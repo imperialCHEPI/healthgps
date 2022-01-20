@@ -44,8 +44,8 @@ namespace hgps {
 
 		hgps::IntegerAgeGenderTable get_current_expected_population() const;
 		hgps::IntegerAgeGenderTable	get_current_simulated_population();
-		const std::vector<Person> get_similar_entities(const int& age, const core::Gender& gender);
-		void apply_net_migration(int net_value, int& age, const core::Gender& gender);
+		const std::vector<Person> get_similar_entities(const unsigned int& age, const core::Gender& gender);
+		void apply_net_migration(const int net_value, const unsigned int& age, const core::Gender& gender);
 		hgps::IntegerAgeGenderTable	get_net_migration();
 		hgps::IntegerAgeGenderTable	create_net_migration();
 

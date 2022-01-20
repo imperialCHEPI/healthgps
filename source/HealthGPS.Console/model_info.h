@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string>
-#include <format>
+#include <fmt/format.h>
 
 struct ModelInfo
 {
 	std::string name;
 	std::string version;
 	std::string to_string() const noexcept {
-		return std::format("{} v{}", name, version);
+		return fmt::format("{} v{}", name, version);
 	}
 };

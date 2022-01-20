@@ -2,6 +2,8 @@
 #include "runtime_context.h"
 #include "HealthGPS.Core/string_util.h"
 
+#include <fmt/format.h>
+
 namespace hgps {
 	SESNoiseModule::SESNoiseModule()
 		: SESNoiseModule(std::vector<double>{0.0, 1.0}) {}
@@ -14,12 +16,12 @@ namespace hgps {
 	{
 		if (!core::case_insensitive::equals("normal", function)) {
 			throw std::invalid_argument(
-				std::format("Noise generation function: {} is not supported", function));
+				fmt::format("Noise generation function: {} is not supported", function));
 		}
 
 		if (parameters.size() != 2) {
 			throw std::invalid_argument(
-				std::format("Number of parameters mismatch: expected 2, received {}", parameters.size()));
+				fmt::format("Number of parameters mismatch: expected 2, received {}", parameters.size()));
 		}
 	}
 
@@ -48,7 +50,7 @@ namespace hgps {
 		}
 	}
 
-	std::unique_ptr<SESNoiseModule> build_ses_noise_module(Repository& repository, const ModelInput& config)
+	std::unique_ptr<SESNoiseModule> build_ses_noise_module([[maybe_unused]] Repository& repository, const ModelInput& config)
 	{
 		const auto& ses = config.ses_definition();
 		return std::make_unique<SESNoiseModule>(ses.fuction_name, ses.parameters);

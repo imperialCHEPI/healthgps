@@ -10,46 +10,33 @@
         "path": "",
         "file_name": "countries.csv"
     },
-    "population": {
+    "demographic": {
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "desciption": "Total population by sex, annually from 1950 to 2100.",
-        "source": "UN Population Database",
+        "desciption": "United Nations (UN) population estimates and projections.",
+        "source": "UN Database - World Population Prospects 2019",
         "url": "https://population.un.org/wpp/",
         "license": "Creative Commons license",
-        "path": "undb\\population",
-        "file_name": "P{COUNTRY_CODE}.csv",
+        "path": "undb",
         "age_limits": [0, 100],
         "time_limits": [1950, 2100],
-        "projections": 2020
-    },
-    "mortality":{
-        "format": "csv",
-        "delimiter": ",",
-        "encoding": "UTF8",
-        "desciption": "Number of deaths by sex in five-year age groups.",
-        "source": "UN Population Database",
-        "url": "https://population.un.org/wpp/",
-        "license": "Creative Commons license",
-        "path": "undb\\mortality",
-        "file_name": "M{COUNTRY_CODE}.csv",
-        "age_limits": [0, 100],
-        "time_limits": [1950, 2100],
-        "projections": 2020
-    },
-    "indicators": {
-        "format": "csv",
-        "delimiter": ",",
-        "encoding": "UTF8",
-        "desciption":"Several indicators in 5-year periods, e.g. births, deaths and life expectancy.",
-        "source": "UN Population Database",
-        "url": "https://population.un.org/wpp/",
-        "license": "Creative Commons license",
-        "path": "undb\\indicators",
-        "file_name": "Pi{COUNTRY_CODE}.csv",
-        "time_limits": [1950, 2100],
-        "projections": 2020
+        "projections": 2020,
+        "population": {
+            "desciption": "Total population by sex, annually from 1950 to 2100.",
+            "path": "population",
+            "file_name": "P{COUNTRY_CODE}.csv"
+        },
+        "mortality": {
+            "desciption": "Number of deaths by sex in five-year age groups.",
+            "path": "mortality",
+            "file_name": "M{COUNTRY_CODE}.csv"
+        },
+        "indicators": {
+            "desciption": "Several indicators in 5-year periods, e.g. births, deaths and life expectancy.",
+            "path": "indicators",
+            "file_name": "Pi{COUNTRY_CODE}.csv"
+        }
     },
     "diseases": {
         "format": "csv",

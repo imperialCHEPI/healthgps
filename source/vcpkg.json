@@ -8,6 +8,7 @@
     "indicators",
     "nlohmann-json",
     "rapidcsv",
-    "crossguid"
+    "crossguid",
+    "gtest"
   ]
 }

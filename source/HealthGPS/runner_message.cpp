@@ -1,5 +1,5 @@
 #include "runner_message.h"
-#include <format>
+#include <fmt/format.h>
 
 hgps::RunnerEventMessage::RunnerEventMessage(std::string sender, RunnerAction run_action) noexcept
     : RunnerEventMessage(sender, run_action, 0u, 0.0) {}
@@ -22,18 +22,18 @@ int hgps::RunnerEventMessage::id() const noexcept {
 
 std::string hgps::RunnerEventMessage::to_string() const {
     if (action == RunnerAction::start) {
-        return std::format("Source: {}, experiment started ...", source);
+        return fmt::format("Source: {}, experiment started ...", source);
     }
 
     if (action == RunnerAction::run_begin) {
-        return std::format("Source: {}, run # {} began ...", source, run_number);
+        return fmt::format("Source: {}, run # {} began ...", source, run_number);
     }
 
     if (action == RunnerAction::run_end) {
-        return std::format("Source: {}, run # {} ended in {}ms.", source, run_number, elapsed_ms);
+        return fmt::format("Source: {}, run # {} ended in {}ms.", source, run_number, elapsed_ms);
     }
 
-    return std::format("Source: {}, experiment finished in {}ms.", source, elapsed_ms);
+    return fmt::format("Source: {}, experiment finished in {}ms.", source, elapsed_ms);
 }
 
 void hgps::RunnerEventMessage::accept(EventMessageVisitor& visitor) const {

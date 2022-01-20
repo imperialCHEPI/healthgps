@@ -3,9 +3,9 @@
 #include <numeric>
 
 #include "monotonic_vector.h"
-#include "HealthGPS.Core\forward_type.h"
-#include "HealthGPS.Core\array2d.h"
-#include "HealthGPS.Core\interval.h"
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/array2d.h"
+#include "HealthGPS.Core/interval.h"
 
 namespace hgps {
 	template<core::Numerical ROW, core::Numerical TYPE>
@@ -14,17 +14,19 @@ namespace hgps {
 		GenderTable() = default;
 		GenderTable(const MonotonicVector<ROW>& rows,
 			const std::vector<core::Gender>& cols, const core::Array2D<TYPE>&& values)
-			:rows_index_{}, cols_index_{}, table_{ values }
+			: table_{ values }, rows_index_{}, cols_index_{}
 		{
 			if (rows.size() != values.rows() || cols.size() != values.columns()) {
 				throw std::invalid_argument("Lookup breakpoints and values size mismatch.");
 			}
 
-			for (int index = 0; index < rows.size(); index++) {
+			auto rows_count = static_cast<int>(rows.size());
+			for (auto index = 0; index < rows_count; index++) {
 				rows_index_.emplace(rows[index], index);
 			}
 
-			for (int index = 0; index < cols.size(); index++) {
+			auto cols_count = static_cast<int>(cols.size());
+			for (auto index = 0; index < cols_count; index++) {
 				cols_index_.emplace(cols[index], index);
 			}
 		}

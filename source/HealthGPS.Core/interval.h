@@ -1,7 +1,7 @@
 #pragma once
-#include <format>
 #include "forward_type.h"
 #include "string_util.h"
+#include <fmt/format.h>
 
 namespace hgps {
 	namespace core {
@@ -29,7 +29,7 @@ namespace hgps {
 			}
 
 			std::string to_string() const noexcept {
-				return std::format("{}-{}", lower_, upper_);
+				return fmt::format("{}-{}", lower_, upper_);
 			}
 
 			auto operator<=>(const Interval<TYPE>&) const = default;

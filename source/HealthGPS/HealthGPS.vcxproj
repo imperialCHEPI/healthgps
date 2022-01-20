@@ -14,7 +14,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{f56fa497-de90-4798-8134-d872a73a8281}</ProjectGuid>
-    <RootNamespace>HealthGPS</RootNamespace>
+    <RootNamespace>hgps</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -64,7 +64,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
     </ClCompile>
     <Link>
@@ -197,6 +197,7 @@
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="healthgps.cpp" />
     <ClCompile Include="hierarchical_model_static.cpp" />
+    <ClCompile Include="simulation_module.cpp" />
     <ClCompile Include="univariate_visitor.cpp" />
   </ItemGroup>
   <ItemGroup>

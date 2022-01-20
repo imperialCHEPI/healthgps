@@ -2,6 +2,7 @@
 
 #include "HealthGPS.Core/string_util.h"
 #include "default_cancer_model.h"
+#include <fmt/format.h>
 
 namespace hgps {
 	namespace detail {
@@ -38,7 +39,7 @@ namespace hgps {
 				auto gender = to_gender(entity.columns[i]);
 				if (gender == core::Gender::unknown) {
 					throw std::out_of_range(
-						std::format("Invalid column gender type: {}", entity.columns[i]));
+						fmt::format("Invalid column gender type: {}", entity.columns[i]));
 				}
 
 				cols.emplace_back(gender);
@@ -109,13 +110,12 @@ namespace hgps {
 			return result;
 		}
 
-		AnalysisDefinition StoreConverter::to_analysis_definition(
-			const core::DiseaseAnalysisEntity& entity, const core::IntegerInterval& age_range)
+		AnalysisDefinition StoreConverter::to_analysis_definition(const core::DiseaseAnalysisEntity& entity)
 		{
 			auto cols = std::vector<core::Gender>{ core::Gender::male, core::Gender::female };
 			auto lex_rows = std::vector<int>(entity.life_expectancy.size());
 			auto lex_data = core::FloatArray2D(lex_rows.size(), cols.size());
-			for (int index = 0; index < entity.life_expectancy.size(); index++) {
+			for (size_t index = 0; index < entity.life_expectancy.size(); index++) {
 				const auto& item = entity.life_expectancy.at(index);
 				lex_rows[index] = item.time;
 				lex_data(index, 0) = item.male;

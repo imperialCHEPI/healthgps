@@ -1,6 +1,6 @@
 #pragma once
 
-#include "HealthGPS\result_message.h"
+#include "HealthGPS/result_message.h"
 
 class ResultWriter {
 public:

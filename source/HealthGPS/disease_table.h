@@ -44,7 +44,7 @@ namespace hgps {
 
 		int at(const std::string measure) const;
 
-		const int operator[](const std::string measure) const;
+		int operator[](const std::string measure) const;
 
 		DiseaseMeasure& operator()(const int age, const core::Gender gender);
 

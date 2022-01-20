@@ -18,7 +18,7 @@ namespace hgps {
 		const float males{};
 		const float females{};
 
-		const float total() const noexcept { return males + females; }
+		float total() const noexcept { return males + females; }
 	};
 
 	class PopulationModule final : public DemographicModule {

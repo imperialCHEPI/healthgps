@@ -34,7 +34,7 @@ namespace hgps {
 		Person();
 		Person(const core::Gender gender) noexcept;
 
-		const size_t id() const noexcept;
+		std::size_t id() const noexcept;
 
 		core::Gender gender{ core::Gender::unknown };
 
@@ -67,7 +67,7 @@ namespace hgps {
 		static void reset_id();
 
 	private:
-		std::size_t id_;
+		std::size_t id_{};
 		static std::atomic<std::size_t> newUID;
 		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
 		static case_insensitive_map<std::function<double(const Person&)>> previous_dispatcher;

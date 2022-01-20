@@ -1,4 +1,8 @@
 #pragma once
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <map>
 
 struct CoefficientInfo {
 	double value{};

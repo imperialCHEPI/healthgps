@@ -51,10 +51,10 @@ namespace hgps {
 		void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
 	private:
-		Random generator_;
-		Population population_;
 		EventAggregator& event_bus_;
 		SimulationDefinition& definition_;
+		Population population_;
+		Random generator_;
 		RuntimeMetric metrics_{};
 		unsigned int current_run_{};
 		int model_start_time_{};

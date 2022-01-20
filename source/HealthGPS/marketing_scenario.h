@@ -10,8 +10,8 @@ namespace hgps {
 		MarketingPolicyDefinition(const PolicyInterval& period, const std::vector<PolicyImpact>& sorted_impacts)
 			: active_period{ period }, impacts{ sorted_impacts } {}
 
-		const std::vector<PolicyImpact> impacts;
 		const PolicyInterval active_period;
+		const std::vector<PolicyImpact> impacts;
 	};
 
 	class MarketingPolicyScenario : public InterventionScenario {

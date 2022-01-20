@@ -1,16 +1,16 @@
-#include <iostream>
-#include <algorithm>
-#include <numeric>
-#include <memory>
-
 #include "healthgps.h"
 #include "mtrandom.h"
 #include "univariate_visitor.h"
 #include "info_message.h"
 #include "converter.h"
-
 #include "hierarchical_model.h"
 #include "baseline_sync_message.h"
+
+#include <iostream>
+#include <algorithm>
+#include <numeric>
+#include <memory>
+#include <fmt/format.h>
 
 namespace hgps {
 	HealthGPS::HealthGPS(SimulationDefinition&& definition, SimulationModuleFactory& factory, EventAggregator& bus)
@@ -67,7 +67,7 @@ namespace hgps {
 		auto stop = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
-		auto message = std::format("[{:4},{}] population size: {}, elapsed: {}ms",
+		auto message = fmt::format("[{:4},{}] population size: {}, elapsed: {}ms",
 			env->now().real, env->now().logical, context_.population().initial_size(), elapsed.count());
 		context_.publish(std::make_unique<InfoEventMessage>(
 			name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
@@ -94,7 +94,7 @@ namespace hgps {
 			auto stop = std::chrono::steady_clock::now();
 			auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
-			auto message = std::format("[{:4},{}], elapsed: {}ms",
+			auto message = fmt::format("[{:4},{}], elapsed: {}ms",
 				env->now().real, env->now().logical, elapsed.count());
 			context_.publish(std::make_unique<InfoEventMessage>(
 				name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
@@ -141,7 +141,7 @@ namespace hgps {
 		auto feme = feme_info.to_string();
 
 		// risk_factor_->update_population(context_);
-		auto message = std::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
+		auto message = fmt::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
 		context_.publish(std::make_unique<InfoEventMessage>(
 			name(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
 	}
@@ -252,7 +252,7 @@ namespace hgps {
 	}
 
 	const std::vector<Person> HealthGPS::get_similar_entities(
-		const int& age, const core::Gender& gender)
+		const unsigned int& age, const core::Gender& gender)
 	{
 		auto similar_entities = std::vector<Person>();
 		for (const auto& entity : context_.population()) {
@@ -269,7 +269,7 @@ namespace hgps {
 		return similar_entities;
 	}
 
-	void HealthGPS::apply_net_migration(int net_value, int& age, const core::Gender& gender) {
+	void HealthGPS::apply_net_migration(const int net_value, const unsigned int& age, const core::Gender& gender) {
 		if (net_value > 0) {
 			auto similar_entities = get_similar_entities(age, gender);
 			if (similar_entities.size() > 0) {
@@ -400,23 +400,23 @@ namespace hgps {
 		auto sim8_pop = context_.population().size();
 
 		std::stringstream ss;
-		ss << std::format("\n Initial Virtual Population Summary: {}\n", context_.identifier());
-		ss << std::format("|{:-<{}}|\n", '-', width);
-		ss << std::format("| {:{}} : {:>14} : {:>14} : {:>14} : {:>14} |\n",
+		ss << fmt::format("\n Initial Virtual Population Summary: {}\n", context_.identifier());
+		ss << fmt::format("|{:-<{}}|\n", '-', width);
+		ss << fmt::format("| {:{}} : {:>14} : {:>14} : {:>14} : {:>14} |\n",
 			"Variable", pad, "Mean (Real)", "Mean (Sim)", "StdDev (Real)", "StdDev (Sim)");
-		ss << std::format("|{:-<{}}|\n", '-', width);
+		ss << fmt::format("|{:-<{}}|\n", '-', width);
 
-		ss << std::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n",
+		ss << fmt::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n",
 			population, pad, orig_pop, sim8_pop, orig_pop, sim8_pop);
 
 		for (const auto& entry : context_.mapping()) {
 			auto col = entry.name();
-			ss << std::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n",
+			ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n",
 				col, pad, orig_summary[col].average(), sim8_summary[col].average(),
 				orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());
 		}
 
-		ss << std::format("|{:_<{}}|\n\n", '_', width);
+		ss << fmt::format("|{:_<{}}|\n\n", '_', width);
 		std::cout << ss.str();
 	}
 }

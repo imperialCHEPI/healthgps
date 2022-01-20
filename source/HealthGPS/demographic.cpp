@@ -158,14 +158,14 @@ namespace hgps {
 			}
 
 			// [index, index + num_males)
-			for (size_t i = 0; i < num_males; i++) {
+			for (auto i = 0; i < num_males; i++) {
 				context.population()[index].age = entry.first;
 				context.population()[index].gender = core::Gender::male;
 				index++;
 			}
 
 			// [index + num_males, num_required)
-			for (size_t i = 0; i < num_females; i++) {
+			for (auto i = 0; i < num_females; i++) {
 				context.population()[index].age = entry.first;
 				context.population()[index].gender = core::Gender::female;
 				index++;

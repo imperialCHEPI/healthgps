@@ -14,13 +14,17 @@ namespace hgps {
 
         std::string to_lower(std::string_view value) noexcept {
             std::string result = std::string(value);
-            std::transform(value.begin(), value.end(), result.begin(), ::tolower);
+            std::transform(value.begin(), value.end(), result.begin(),
+                [](char c) { return static_cast<char>(std::tolower(c)); });
+
             return result;
         }
 
         std::string to_upper(std::string_view value) noexcept {
             std::string result = std::string(value);
-            std::transform(value.begin(), value.end(), result.begin(), ::toupper);
+            std::transform(value.begin(), value.end(), result.begin(),
+                [](char c) { return static_cast<char>(std::toupper(c)); });
+
             return result;
         }
 
@@ -125,7 +129,7 @@ namespace hgps {
                 });
         }
 
-        std::size_t case_insensitive::index_of(const std::vector<std::string>& source,
+        int case_insensitive::index_of(const std::vector<std::string>& source,
             const std::string& element) noexcept {
 
             auto it = std::find_if(source.begin(), source.end(), 
@@ -134,7 +138,7 @@ namespace hgps {
                 });
 
             if (it != source.end()) {
-                return std::distance(source.begin(), it);
+                return static_cast<int>(std::distance(source.begin(), it));
             }
 
             return -1;

@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS\mapping.h"
+#include "HealthGPS/mapping.h"
 
 TEST(TestHealthGPS_Mapping, CreateEmpty)
 {
@@ -57,6 +57,7 @@ TEST(TestHealthGPS_Mapping, AccessByInterator)
 	auto exp_size = entries.size();
 	auto mapping = HierarchicalMapping(std::move(entries));
 
+	ASSERT_EQ(exp_size, mapping.size());
 	for (auto& entry : mapping)	{
 		ASSERT_GE(entry.level(), 0);
 		if (entry.entity_name().empty()) {
@@ -86,6 +87,7 @@ TEST(TestHealthGPS_Mapping, AccessByConstInterator)
 	auto exp_size = entries.size();
 	auto mapping = HierarchicalMapping(std::move(entries));
 
+	ASSERT_EQ(exp_size, mapping.size());
 	for (const auto& entry : mapping) {
 		ASSERT_GE(entry.level(), 0);
 		if (entry.entity_name().empty()) {

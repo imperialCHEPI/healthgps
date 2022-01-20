@@ -2,14 +2,15 @@
 
 #include <fmt/core.h>
 #include <fmt/color.h>
+#include <fmt/chrono.h>
 #include <nlohmann/json.hpp>
 
 ResultFileWriter::ResultFileWriter(const std::filesystem::path file_name, const ModelInfo info)
 	: info_{ info } 
 {
 	stream_.open(file_name, std::ofstream::out | std::ofstream::app);
-	if (stream_.fail()) {
-		throw std::iostream::failure(std::format("Cannot open file: {}", file_name.string()));
+	if (stream_.fail() || !stream_.is_open()) {
+		throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
 	}
 
 	write_json_begin();
@@ -52,12 +53,11 @@ void ResultFileWriter::write_json_begin() {
 	using json = nlohmann::ordered_json;
 
 	auto tp = std::chrono::system_clock::now();
-	auto local_tp = std::chrono::zoned_time{ std::chrono::current_zone(), tp };
 	json msg = {
 		{"experiment", {
 			{"model", info_.name},
 			{"version", info_.version},
-			{"time_of_day", std::format("{:%F %T %Z}",local_tp)}
+			{"time_of_day", fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch())}
 		}},
 		{"result",{1,2}} };
 

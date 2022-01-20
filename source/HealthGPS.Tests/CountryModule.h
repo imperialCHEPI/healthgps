@@ -1,10 +1,9 @@
 #pragma once
+#include "HealthGPS/api.h"
+#include "HealthGPS.Datastore/api.h"
 
 #include <iostream>
 #include <memory>
-
-#include "HealthGPS/api.h"
-#include "HealthGPS.Datastore\api.h"
 
 class CountryModule : public hgps::SimulationModule
 {
@@ -21,7 +20,7 @@ public:
 
 	std::string name() const noexcept override { return "Country"; }
 
-	void initialise_population(hgps::RuntimeContext& context) override {
+	void initialise_population(hgps::RuntimeContext&) override {
 		std::cout << "There are: " << countries_.size() <<
 			" countries, current: " << current_.name << std::endl;
 	}
@@ -31,8 +30,8 @@ public:
 	}
 
 private:
-	hgps::core::Country current_;
 	std::vector<hgps::core::Country> countries_;
+	hgps::core::Country current_;
 };
 
 static std::unique_ptr<CountryModule> build_country_module(

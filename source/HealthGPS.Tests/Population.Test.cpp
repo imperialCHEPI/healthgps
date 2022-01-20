@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS\api.h"
+#include "HealthGPS/api.h"
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson)
 {
@@ -8,12 +8,12 @@ TEST(TestHealthGPS_Population, CreateDefaultPerson)
 
 	auto p = Person{};
 	ASSERT_GT(p.id(), 0);
-	ASSERT_EQ(0, p.age);
+	ASSERT_EQ(0u, p.age);
 	ASSERT_EQ(core::Gender::unknown, p.gender);
 	ASSERT_TRUE(p.is_alive);
 	ASSERT_FALSE(p.has_emigrated);
 	ASSERT_TRUE(p.is_active());
-	ASSERT_EQ(0, p.time_of_death);
+	ASSERT_EQ(0u, p.time_of_death);
 	ASSERT_EQ(0, p.education.value());
 	ASSERT_EQ(0, p.education.old_value());
 	ASSERT_EQ(0, p.income.value());

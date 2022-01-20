@@ -18,7 +18,7 @@ namespace hgps {
 			count--;
 		}
 
-		for (auto i = 0; i < count; ++i) {
+		for (std::size_t i = 0; i < count; ++i) {
 			int current = compare(values[i], values[i + offset]);
 			if (current == 0) {
 				return false;

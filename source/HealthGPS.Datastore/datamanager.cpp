@@ -1,18 +1,23 @@
-#include <fstream>
-#include <rapidcsv.h>
-
 #include "datamanager.h"
 #include "HealthGPS.Core/string_util.h"
+
+#include <fstream>
+#include <rapidcsv.h>
+#include <fmt/color.h>
 
 namespace hgps {
 	namespace data {
 		DataManager::DataManager(const std::filesystem::path root_directory)
 			: root_{ root_directory }
 		{
-			// TODO: use precondition contract
-			std::ifstream ifs(root_ / "index.json", std::ifstream::in);
+			auto full_filename = root_ / "index.json";
+			auto ifs = std::ifstream{ full_filename, std::ifstream::in };
 			if (ifs) {
 				index_ = nlohmann::json::parse(ifs);
+			}
+			else {
+				throw std::invalid_argument(
+					fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
 			}
 		}
 
@@ -42,6 +47,12 @@ namespace hgps {
 
 					std::sort(results.begin(), results.end());
 				}
+				else {
+					notify_warning(fmt::format("countries file: '{}' not found.", filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'country' entry.");
 			}
 
 			return results;
@@ -64,20 +75,21 @@ namespace hgps {
 		}
 
 		std::vector<PopulationItem> DataManager::get_population(Country country) const {
-			return  DataManager::get_population(country, [](const unsigned int& value) {return true; });
+			return  DataManager::get_population(country, [](const unsigned int&) {return true; });
 		}
 
 		std::vector<PopulationItem> DataManager::get_population(
 			Country country, const std::function<bool(const unsigned int&)> year_filter) const {
 			auto results = std::vector<PopulationItem>();
 
-			if (index_.contains("population")) {
-				auto filepath = index_["population"]["path"].get<std::string>();
-				auto filename = index_["population"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filepath = index_["demographic"]["population"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["population"]["file_name"].get<std::string>();
 
 				// Tokenized file names X{country.code}X.xxx
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
-				filename = (root_ / filepath / filename).string();
+				filename = (root_ / nodepath / filepath / filename).string();
 
 				// LocID,Location,VarID,Variant,Time,MidPeriod,AgeGrp,AgeGrpStart,AgeGrpSpan,PopMale,PopFemale,PopTotal
 				if (std::filesystem::exists(filename)) {
@@ -105,26 +117,33 @@ namespace hgps {
 
 					std::sort(results.begin(), results.end());
 				}
+				else {
+					notify_warning(fmt::format("{} population file: '{}' not found.", country.name, filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'demographic' entry.");
 			}
 
 			return results;
 		}
 
 		std::vector<MortalityItem> DataManager::get_mortality(Country country) const {
-			return  DataManager::get_mortality(country, [](const unsigned int& value) {return true; });
+			return  DataManager::get_mortality(country, [](const unsigned int&) {return true; });
 		}
 
 		std::vector<MortalityItem> DataManager::get_mortality(Country country,
 			const std::function<bool(const unsigned int&)> year_filter) const
 		{
 			auto results = std::vector<MortalityItem>();
-			if (index_.contains("mortality")) {
-				auto filepath = index_["mortality"]["path"].get<std::string>();
-				auto filename = index_["mortality"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filepath = index_["demographic"]["mortality"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["mortality"]["file_name"].get<std::string>();
 
 				// Tokenized file names X{country.code}X.xxx
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
-				filename = (root_ / filepath / filename).string();
+				filename = (root_ / nodepath / filepath / filename).string();
 
 				// LocID,Location,Variant,Time,TimeYear,AgeGrp,Age,DeathsMale,DeathsFemale,DeathsTotal
 				if (std::filesystem::exists(filename)) {
@@ -151,6 +170,12 @@ namespace hgps {
 
 					std::sort(results.begin(), results.end());
 				}
+				else {
+					notify_warning(fmt::format("{} mortality file: '{}' not found.", country.name, filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'demographic' entry.");
 			}
 
 			return results;
@@ -177,6 +202,9 @@ namespace hgps {
 
 				std::sort(result.begin(), result.end());
 			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
+			}
 
 			return result;
 		}
@@ -201,6 +229,9 @@ namespace hgps {
 						return info;
 					}
 				}
+			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
 			}
 
 			return std::optional<DiseaseInfo>();
@@ -257,6 +288,12 @@ namespace hgps {
 
 					result.items.shrink_to_fit();
 				}
+				else {
+					notify_warning(fmt::format("{}, {} file: '{}' not found.", country.name, info.name, filename));
+				}
+			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
 			}
 
 			return result;
@@ -299,8 +336,15 @@ namespace hgps {
 
 					return table;
 				}
+				else {
+					notify_warning(fmt::format(
+						"{} to {} relative risk file not found, using default.", source.code, target.code));
+				}
 
 				return generate_default_relative_risk_to_disease();
+			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
 			}
 
 			return RelativeRiskEntity();
@@ -311,6 +355,7 @@ namespace hgps {
 		{
 			auto table = RelativeRiskEntity();
 			if (!index_.contains("diseases")) {
+				notify_warning("index has no 'diseases' entry.");
 				return table;
 			}
 
@@ -328,6 +373,8 @@ namespace hgps {
 			filename = replace_string_tokens(filename, tokens);
 			filename = (root_ / disease_folder / source.code / risk_folder / file_folder / filename).string();
 			if (!std::filesystem::exists(filename)) {
+				notify_warning(fmt::format(
+					"{} to {} relative risk file not found, disabled.", source.code, risk_factor));
 				return table;
 			}
 
@@ -355,6 +402,7 @@ namespace hgps {
 		{
 			auto table = CancerParameterEntity();
 			if (!index_.contains("diseases")) {
+				notify_warning("index has no 'diseases' entry.");
 				return table;
 			}
 
@@ -369,19 +417,23 @@ namespace hgps {
 			params_folder = replace_string_tokens(params_folder, tokens);
 			auto files_folder = (root_ / disease_folder / info.code / params_folder);
 			if (!std::filesystem::exists(files_folder)) {
+				notify_warning(fmt::format(
+					"{}, {} parameters folder: '{}' not found.", info.code, country.name, files_folder.string()));
 				return table;
 			}
 
 			for (auto& file : params_files.items()) {
 				auto file_name = (files_folder / file.value().get<std::string>());
 				if (!std::filesystem::exists(file_name)) {
+					notify_warning(fmt::format(
+						"{}, {} parameters file: '{}' not found.", info.code, country.name, file_name.string()));
 					continue;
 				}
 
 				auto lookup = std::vector<LookupGenderValue>{};
 				rapidcsv::Document doc(file_name.string());
 				auto mapping = create_fields_index_mapping(doc.GetColumnNames(), { "Time", "Male", "Female"});
-				for (auto i = 0; i < doc.GetRowCount(); i++) {
+				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
 					lookup.emplace_back(LookupGenderValue{
 						.value = std::stoi(row[mapping["Time"]]),
@@ -400,7 +452,7 @@ namespace hgps {
 					table.death_weight = lookup;
 				}
 				else {
-					throw std::out_of_range(std::format("Unknown disease parameter file type: {}", file.key()));
+					throw std::out_of_range(fmt::format("Unknown disease parameter file type: {}", file.key()));
 				}
 			}
 
@@ -409,22 +461,25 @@ namespace hgps {
 		}
 
 		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country) const {
-			return  DataManager::get_birth_indicators(country, [](const unsigned int& value) {return true; });
+			return  DataManager::get_birth_indicators(country, [](const unsigned int&) {return true; });
 		}
 
 		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country,
 			const std::function<bool(const unsigned int&)> year_filter) const
 		{
 			std::vector<BirthItem> result;
-			if (index_.contains("indicators")) {
-				auto indicators_folder = index_["indicators"]["path"].get<std::string>();
-				auto filename = index_["indicators"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filefolder = index_["demographic"]["indicators"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["indicators"]["file_name"].get<std::string>();
 
 				// Tokenized file name Pi{COUNTRY_CODE}.xxx
 				auto tokens = std::vector<std::string>{ std::to_string(country.code) };
 				filename = replace_string_tokens(filename, tokens);
-				filename = (root_ / indicators_folder / filename).string();
+				filename = (root_ / nodepath / filefolder / filename).string();
 				if (!std::filesystem::exists(filename)) {
+					notify_warning(fmt::format(
+						"{}, demographic indicators file: '{}' not found.", country.name, filename));
 					return result;
 				}
 
@@ -445,6 +500,9 @@ namespace hgps {
 						});
 				}
 			}
+			else {
+				notify_warning("index has no 'demographic' entry.");
+			}
 
 			return result;
 		}
@@ -453,6 +511,7 @@ namespace hgps {
 		{
 			DiseaseAnalysisEntity entity;
 			if (!index_.contains("analysis")) {
+				notify_warning("index has no 'analysis' entry.");
 				return entity;
 			}
 
@@ -463,6 +522,7 @@ namespace hgps {
 			auto local_root_path = (root_ / analysis_folder);
 			disability_filename = (local_root_path / disability_filename).string();
 			if (!std::filesystem::exists(disability_filename)) {
+				notify_warning(fmt::format("disease disability weights file: '{}' not found.", disability_filename));
 				return entity;
 			}
 
@@ -498,6 +558,9 @@ namespace hgps {
 
 				return table;
 			}
+			else {
+				notify_warning("index has no 'diseases' entry.");
+			}
 
 			return RelativeRiskEntity();
 		}
@@ -514,6 +577,7 @@ namespace hgps {
 			filename = replace_string_tokens(filename, tokens);
 			filename = (parent_path / cost_path / filename).string();
 			if (!std::filesystem::exists(filename)) {
+				notify_warning(fmt::format("{} cost of disease file: '{}' not found.", country.name, filename));
 				return result;
 			}
 
@@ -535,15 +599,18 @@ namespace hgps {
 		std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(const Country& country) const
 		{
 			std::vector<LifeExpectancyItem> result;
-			if (index_.contains("indicators")) {
-				auto indicators_folder = index_["indicators"]["path"].get<std::string>();
-				auto filename = index_["indicators"]["file_name"].get<std::string>();
+			if (index_.contains("demographic")) {
+				auto nodepath = index_["demographic"]["path"].get<std::string>();
+				auto filefolder = index_["demographic"]["indicators"]["path"].get<std::string>();
+				auto filename = index_["demographic"]["indicators"]["file_name"].get<std::string>();
 
 				// Tokenized file name Pi{COUNTRY_CODE}.xxx
 				auto tokens = std::vector<std::string>{ std::to_string(country.code) };
 				filename = replace_string_tokens(filename, tokens);
-				filename = (root_ / indicators_folder / filename).string();
+				filename = (root_ / nodepath / filefolder / filename).string();
 				if (!std::filesystem::exists(filename)) {
+					notify_warning(fmt::format(
+						"{}, demographic indicators file: '{}' not found.", country.name, filename));
 					return result;
 				}
 
@@ -594,13 +661,18 @@ namespace hgps {
 			for (auto& field : fields) {
 				auto field_index = core::case_insensitive::index_of(column_names, field);
 				if (field_index < 0) {
-					throw std::out_of_range(std::format("Required field {} not found.", field));
+					throw std::out_of_range(fmt::format("Required field {} not found.", field));
 				}
 
 				mapping.emplace(field, field_index);
 			}
 
 			return mapping;
+		}
+
+		void DataManager::notify_warning(const std::string_view message) const
+		{
+			fmt::print(fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
 		}
 	}
 }

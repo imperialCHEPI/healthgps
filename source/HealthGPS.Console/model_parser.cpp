@@ -90,7 +90,8 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string 
 			for (auto& level_item : model_info.levels) {
 				auto& at = level_item.second;
 				std::unordered_map<std::string, int> col_names;
-				for (int i = 0; i < at.variables.size(); i++) {
+				auto variables_count = static_cast<int>(at.variables.size());
+				for (auto i = 0; i < variables_count; i++) {
 					col_names.emplace(core::to_lower(at.variables[i]), i);
 				}
 

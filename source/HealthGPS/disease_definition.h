@@ -3,7 +3,7 @@
 #include "disease_table.h"
 #include "relative_risk.h"
 #include "gender_value.h"
-#include "HealthGPS.Core\poco.h"
+#include "HealthGPS.Core/poco.h"
 
 namespace hgps {
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <queue>
 #include <mutex>
+#include <optional>
 
 namespace hgps {
 	template<typename T>

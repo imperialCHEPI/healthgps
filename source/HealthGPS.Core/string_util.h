@@ -31,7 +31,7 @@ namespace hgps {
 
 			static bool ends_with(const std::string_view& text, const std::string_view& str)  noexcept;
 
-			static std::size_t index_of(const std::vector<std::string>& source, const std::string& element) noexcept;
+			static int index_of(const std::vector<std::string>& source, const std::string& element) noexcept;
 		};
 	}
 }

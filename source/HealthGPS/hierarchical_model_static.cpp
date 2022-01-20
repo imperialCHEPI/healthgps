@@ -1,7 +1,8 @@
 #include "hierarchical_model_static.h"
 #include "runtime_context.h"
-#include "HealthGPS.Core\string_util.h"
 #include "gender_table.h"
+
+#include "HealthGPS.Core/string_util.h"
 
 namespace hgps {
 	StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(HierarchicalLinearModelDefinition& definition)

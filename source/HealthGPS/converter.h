@@ -8,7 +8,7 @@
 #include "life_table.h"
 
 #include "HealthGPS.Core/poco.h"
-#include "HealthGPS.Core/DataStore.h"
+#include "HealthGPS.Core/datastore.h"
 
 namespace hgps {
 	namespace detail {
@@ -37,8 +37,7 @@ namespace hgps {
 
 			static RelativeRiskLookup to_relative_risk_lookup(const core::RelativeRiskEntity& entity);
 
-			static AnalysisDefinition to_analysis_definition(
-				const core::DiseaseAnalysisEntity& entity, const core::IntegerInterval& age_range);
+			static AnalysisDefinition to_analysis_definition(const core::DiseaseAnalysisEntity& entity);
 
 			static LifeTable to_life_table(std::vector<core::BirthItem>& births, std::vector<core::MortalityItem>& deaths);
 

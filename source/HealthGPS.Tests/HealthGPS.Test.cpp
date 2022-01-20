@@ -1,18 +1,21 @@
 #include "pch.h"
-#include <atomic>
-#include <map>
+#include "data_config.h"
 
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
-
-#include "HealthGPS.Datastore\api.h"
-
+#include "HealthGPS.Datastore/api.h"
 
 #include "CountryModule.h"
 #include "RiskFactorData.h"
 
+#include <atomic>
+#include <map>
+#include <optional>
+
 namespace fs = std::filesystem;
+
+static auto store_full_path = default_datastore_path();
 
 void create_test_datatable(hgps::core::DataTable& data) {
 	using namespace hgps;
@@ -89,7 +92,7 @@ TEST(TestHealthGPS, RandomBitGenerator)
 	MTRandom32 rnd;
 	EXPECT_EQ(RandomBitGenerator::min(), MTRandom32::min());
 	EXPECT_EQ(RandomBitGenerator::max(), MTRandom32::max());
-	EXPECT_TRUE(rnd() >= 0);
+	EXPECT_TRUE(rnd() > 0u);
 }
 
 TEST(TestHealthGPS, RandomBitGeneratorCopy)
@@ -104,7 +107,9 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy)
 		EXPECT_EQ(rnd(), copy());
 	}
 
-	auto discard = rnd();
+	// C++ intentional discard of [[nodiscard]] return value
+	static_cast<void>(rnd());
+
 	EXPECT_NE(rnd(), copy());
 }
 
@@ -112,7 +117,8 @@ TEST(TestHealthGPS, RandomAlgorithmStandalone)
 {
 	using namespace hgps;
 
-	auto rnd_gen = Random(MTRandom32(123456789));
+	auto rnd = MTRandom32(123456789);
+	auto rnd_gen = Random(rnd);
 	auto value = rnd_gen.next_double();
 	ASSERT_GT(value, 0.0);
 
@@ -148,14 +154,16 @@ TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
 
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
+	auto summary_three = core::UnivariateSummary();
 
 	auto sample_min = 1;
-	auto sample_max = 10;
+	auto sample_max = 20;
 	auto sample_size = 100;
-	for (size_t i = 0; i < sample_size; i++)
+	for (auto i = 0; i < sample_size; i++)
 	{
 		summary_one.append(rnd_gen.next_int(sample_max));
 		summary_two.append(rnd_gen.next_int(sample_min, sample_max));
+		summary_three.append(rnd_gen.next_int());
 	}
 
 	ASSERT_EQ(0.0, summary_one.min());
@@ -163,6 +171,9 @@ TEST(TestHealthGPS, RandomNextIntRangeIsClosed)
 
 	ASSERT_EQ(sample_min, summary_two.min());
 	ASSERT_EQ(sample_max, summary_two.max());
+
+	ASSERT_GE(summary_three.min(), 0);
+	ASSERT_GT(summary_three.max(), sample_max);
 }
 
 TEST(TestHealthGPS, RandomNextNormal)
@@ -175,20 +186,20 @@ TEST(TestHealthGPS, RandomNextNormal)
 	auto summary_one = core::UnivariateSummary();
 	auto summary_two = core::UnivariateSummary();
 
-	auto sample_mean = 1;
+	auto sample_mean = 1.0;
 	auto sample_stdev = 2.5;
-	auto sample_size = 100;
-	for (size_t i = 0; i < sample_size; i++)
-	{
+	auto sample_size = 500;
+	auto tolerance = 0.15;
+	for (auto i = 0; i < sample_size; i++) {
 		summary_one.append(rnd_gen.next_normal());
 		summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
 	}
 
-	ASSERT_NEAR(summary_one.average(), 0.0, 0.1);
-	ASSERT_NEAR(summary_one.std_deviation(), 1.0, 0.1);
+	ASSERT_NEAR(summary_one.average(), 0.0, tolerance);
+	ASSERT_NEAR(summary_one.std_deviation(), 1.0, tolerance);
 
-	ASSERT_NEAR(summary_two.average(), sample_mean, 0.1);
-	ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, 0.1);
+	ASSERT_NEAR(summary_two.average(), sample_mean, tolerance);
+	ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, tolerance);
 }
 
 TEST(TestHealthGPS, RandomEmpiricalDiscrete)
@@ -203,18 +214,18 @@ TEST(TestHealthGPS, RandomEmpiricalDiscrete)
 	auto cdf = std::vector<float>(freq_pdf.size());
 
 	cdf[0] = freq_pdf[0];
-	for (auto i = 1; i < freq_pdf.size(); i++) {
+	for (std::size_t i = 1; i < freq_pdf.size(); i++) {
 		cdf[i] = cdf[i - 1] + freq_pdf[i];
 	}
 
 	ASSERT_EQ(1.0, cdf.back());
-	for (auto i = 1; i < freq_pdf.size(); i++) {
+	for (std::size_t i = 1; i < freq_pdf.size(); i++) {
 		ASSERT_LT(cdf[i - 1], cdf[i]);
 	}
 
 	auto summary = core::UnivariateSummary();
 	auto sample_size = 100;
-	for (size_t i = 0; i < sample_size; i++) {
+	for (auto i = 0; i < sample_size; i++) {
 		summary.append(rnd_gen.next_empirical_discrete(values, cdf));
 	}
 
@@ -258,8 +269,7 @@ TEST(TestHealthGPS, SimulationInitialise)
 	auto config = create_test_configuration(data);
 	auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto baseline_data = hgps::BaselineAdjustment{};
@@ -313,8 +323,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto config = ModelInput(data, settings, info, ses, mapping, diseases);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto factory = SimulationModuleFactory(repository);
@@ -341,8 +350,7 @@ TEST(TestHealthGPS, CreateSESNoiseModule)
 
 	auto config = create_test_configuration(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto bus = DefaultEventBus{};
@@ -376,8 +384,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 
 	auto config = create_test_configuration(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto pop_module = build_population_module(repository, config);
@@ -445,7 +452,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
 	using namespace hgps;
 
 	auto baseline_data = hgps::BaselineAdjustment{};
-	auto static_definition = get_static_test_model(baseline_data);
+	auto static_definition = get_static_test_model(baseline_data());
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>();
 	risk_models.emplace(HierarchicalModelType::Static, std::make_unique<StaticHierarchicalLinearModel>(static_definition));
 
@@ -461,8 +468,7 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);
@@ -488,8 +494,7 @@ TEST(TestHealthGPS, CreateAnalysisModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto full_path = fs::absolute("../../../data");
-	auto manager = DataManager(full_path);
+	auto manager = DataManager(store_full_path);
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);

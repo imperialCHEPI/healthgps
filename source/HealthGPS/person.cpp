@@ -5,7 +5,7 @@ namespace hgps {
     std::atomic<std::size_t> Person::newUID{0};
 
     case_insensitive_map<std::function<double(const Person&)>> Person::current_dispatcher {
-        {"intercept",[](const Person& p) { return 1.0; } },
+        {"intercept",[](const Person&) { return 1.0; } },
         {"gender",[](const Person& p) { return p.gender_to_value(); } },
         {"age",[](const Person& p) { return static_cast<double>(p.age); } },
         {"age2",[](const Person& p) { return pow(p.age, 2); } },
@@ -16,7 +16,7 @@ namespace hgps {
     };
 
     case_insensitive_map<std::function<double(const Person&)>> Person::previous_dispatcher{
-        {"intercept",[](const Person& p) { return 1.0; } },
+        {"intercept",[](const Person&) { return 1.0; } },
         {"gender",[](const Person& p) { return p.gender_to_value(); } },
         {"age",[](const Person& p) { return static_cast<double>(p.age - 1); } },
         {"age2",[](const Person& p) { return pow(p.age - 1, 2); } },
@@ -31,10 +31,10 @@ namespace hgps {
     {}
 
     Person::Person(const core::Gender birth_gender) noexcept 
-        : id_{ ++Person::newUID }, age{ 0 }, gender{ birth_gender }
+        : gender{ birth_gender }, age{ 0 }, id_{ ++Person::newUID }
     {}
 
-    const std::size_t Person::id() const noexcept { return id_; }
+    std::size_t Person::id() const noexcept { return id_; }
 
     bool Person::is_active() const noexcept {
         return is_alive && !has_emigrated;

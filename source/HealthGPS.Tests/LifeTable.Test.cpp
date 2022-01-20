@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS\life_table.h"
+#include "HealthGPS/life_table.h"
 
 TEST(TestHealthGPS_LifeTable, CreateEmpty)
 {

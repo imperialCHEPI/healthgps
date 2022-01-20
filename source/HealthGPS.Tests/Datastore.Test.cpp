@@ -1,18 +1,29 @@
 #include "pch.h"
-#include "HealthGPS.Datastore\api.h"
+#include "data_config.h"
+
+#include "HealthGPS.Datastore/api.h"
 
 namespace fs = std::filesystem;
 
-static auto store_full_path = fs::absolute("../../../data");
+static auto store_full_path = default_datastore_path();
+
 TEST(TestDatastore, CreateDataManager)
 {
 	using namespace hgps::data;
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager{ store_full_path };
 
 	auto countries = manager.get_countries();
 
 	ASSERT_GT(countries.size(), 0);
+}
+
+TEST(TestDatastore, CreateDataManagerFailWithWrongPath)
+{
+	using namespace hgps::data;
+	ASSERT_THROW(DataManager{ "C:\\x\\y" }, std::invalid_argument);
+	ASSERT_THROW(DataManager{ "C:/x/y" }, std::invalid_argument);
+	ASSERT_THROW(DataManager{ "/home/x/y/z" }, std::invalid_argument);
 }
 
 TEST(TestDatastore, CountryIsCaseInsensitive)
@@ -284,6 +295,7 @@ TEST(TestDatastore, RetrieveCancerDefinition)
 			continue;
 		}
 
+		cancer_count++;
 		auto entity = manager.get_disease(item, uk);
 		ASSERT_FALSE(entity.empty());
 		ASSERT_EQ(entity.measures.size(), 4);
@@ -291,6 +303,9 @@ TEST(TestDatastore, RetrieveCancerDefinition)
 		EXPECT_EQ(item.code, entity.info.code);
 		EXPECT_EQ(uk.code, entity.country.code);
 	}
+
+	ASSERT_GT(diseases.size(), 0);
+	ASSERT_GT(cancer_count, 0);
 }
 
 TEST(TestDatastore, RetrieveCancerParameters)

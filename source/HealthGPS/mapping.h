@@ -9,7 +9,7 @@ namespace hgps {
 	struct FactorRange {
 		FactorRange() = default;
 		FactorRange(const double min_value, const double max_value)
-			: minimum {min_value}, maximum{max_value}, empty{false} {
+			: empty{ false }, minimum {min_value}, maximum{max_value} {
 			if (min_value > max_value) {
 				throw std::invalid_argument("Factor range minimum must not be greater than maximum.");
 			}
@@ -53,9 +53,9 @@ namespace hgps {
 		std::string name_;
 		std::string name_key_;
 		short level_{};
-		bool dynamic_factor_;
 		std::string entity_name_;
 		FactorRange range_;
+		bool dynamic_factor_;
 	};
 
 	class HierarchicalMapping {

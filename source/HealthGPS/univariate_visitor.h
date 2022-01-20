@@ -15,7 +15,7 @@ namespace hgps {
 
 		void visit(const core::StringDataTableColumn& column) override {
 			throw std::invalid_argument(
-				"Attempting to calculate statistical summary of strings.");
+				"Statistical summary is not available for column type string: " + column.name());
 		}
 
 		void visit(const core::FloatDataTableColumn& column) override {

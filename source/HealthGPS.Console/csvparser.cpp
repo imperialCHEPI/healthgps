@@ -6,6 +6,8 @@
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include <fmt/format.h>
+
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                     \
   hgps::core::ScopedTimer timer { __func__ }
@@ -127,12 +129,12 @@ bool load_datatable_csv(const std::string& full_filename, const std::map<std::st
 				out_table.add(get_string_column(pair.first, data).build());
 			}
 			else {
-				std::cout << std::format("Invalid data type: {} in column: {}\n", col_type, pair.first);
+				std::cout << fmt::format("Invalid data type: {} in column: {}\n", col_type, pair.first);
 			}
 		}
 		catch (const std::exception& ex)
 		{
-			std::cout << std::format("Error passing column: {}, cause: {}\n", pair.first, ex.what());
+			std::cout << fmt::format("Error passing column: {}, cause: {}\n", pair.first, ex.what());
 		}
 	}
 
@@ -146,7 +148,7 @@ std::map<std::string, std::size_t> create_fields_index_mapping(
 	for (auto& field : fields) {
 		auto field_index = hc::case_insensitive::index_of(column_names, field);
 		if (field_index < 0) {
-			throw std::out_of_range(std::format("Required field {} not found.", field));
+			throw std::out_of_range(fmt::format("Required field {} not found.", field));
 		}
 
 		mapping.emplace(field, field_index);
@@ -166,23 +168,23 @@ std::map<std::string, std::vector<double>> load_baseline_csv(const std::string& 
 	auto column_names = doc.GetColumnNames();
 	auto column_count = column_names.size();
 	if (column_count < 2) {
-		throw std::invalid_argument(std::format(
+		throw std::invalid_argument(fmt::format(
 			"Invalid number of columns: {} in adjustment file: {}", column_names.size(), full_filename));
 	}
 
 	if (!core::case_insensitive::equals("age", column_names.at(0))) {
-		throw std::invalid_argument(std::format(
+		throw std::invalid_argument(fmt::format(
 			"Invalid adjustment file format, first column must be age: {}", full_filename));
 	}
 
 	std::transform(column_names.begin(), column_names.end(), column_names.begin(), core::to_lower);
-	for (auto col = 1; col < column_count; col++) {
+	for (size_t col = 1; col < column_count; col++) {
 		data.emplace(core::to_lower(column_names.at(col)), std::vector<double>{});
 	}
 
 	for (size_t i = 0; i < doc.GetRowCount(); i++) {
 		auto row = doc.GetRow<std::string>(i);
-		for (auto col = 1; col < row.size(); col++) {
+		for (size_t col = 1; col < row.size(); col++) {
 			data.at(column_names[col]).emplace_back(std::stod(row[col]));
 		}
 	}

@@ -4,7 +4,7 @@
 
 namespace hgps {
 
-	DiseaseModule::DiseaseModule(std::unordered_map<std::string, std::shared_ptr<DiseaseModel>>&& models)
+	DiseaseModule::DiseaseModule(std::map<std::string, std::shared_ptr<DiseaseModel>>&& models)
 		: models_{ models } {}
 
 	SimulationModuleType DiseaseModule::type() const noexcept {
@@ -19,15 +19,15 @@ namespace hgps {
 		return models_.size();
 	}
 
-	bool DiseaseModule::contains(std::string disease_code) const noexcept {
+	bool DiseaseModule::contains(const std::string& disease_code) const noexcept {
 		return models_.contains(disease_code);
 	}
 
-	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string disease_code) {
+	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const std::string& disease_code) {
 		return models_.at(disease_code);
 	}
 
-	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](std::string disease_code) const {
+	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const std::string& disease_code) const {
 		return models_.at(disease_code);
 	}
 
@@ -49,7 +49,7 @@ namespace hgps {
 	}
 
 	double DiseaseModule::get_excess_mortality(
-		const std::string disease_code, const Person& entity) const noexcept {
+		const std::string& disease_code, const Person& entity) const noexcept {
 		if (!models_.contains(disease_code)) {
 			return 0.0;
 		}
@@ -61,7 +61,7 @@ namespace hgps {
 	{
 		// Models must be registered prior to be created.
 		auto registry = get_default_disease_model_registry();
-		auto models = std::unordered_map<std::string, std::shared_ptr<DiseaseModel>>();
+		auto models = std::map<std::string, std::shared_ptr<DiseaseModel>>();
 
 		auto risk_factors = std::vector<MappingEntry>();
 		for (int level = 1; level <= config.risk_mapping().max_level(); level++) {

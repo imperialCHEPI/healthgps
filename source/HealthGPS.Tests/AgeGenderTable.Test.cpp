@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS\gender_table.h"
+#include "HealthGPS/gender_table.h"
 
 TEST(TestHealthGPS_AgeGenderTable, CreateEmpty)
 {

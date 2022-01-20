@@ -22,7 +22,7 @@ namespace hgps
 
 		double next_normal();
 
-		double next_normal(double mean, double standard_deviation);
+		double next_normal(const double& mean, const double& standard_deviation);
 
 		int next_empirical_discrete(const std::vector<int>& values, const std::vector<float>& cdf);
 
@@ -30,5 +30,9 @@ namespace hgps
 
 	private:
 		RandomBitGenerator& engine_;
+
+		int next_int_internal(const int& min_value, const int& max_value);
+		double next_uniform_internal(const double& min_value, const double& max_value);
+		double next_normal_internal(const double& mean, const double& standard_deviation);
 	};
 }

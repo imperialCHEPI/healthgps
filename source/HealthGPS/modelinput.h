@@ -10,10 +10,10 @@
 namespace hgps {
 
 	struct RunInfo {
-		const unsigned int start_time;
-		const unsigned int stop_time;
-		const unsigned int sync_timeout_ms;
-		const std::optional<unsigned int> seed;
+		const unsigned int start_time{};
+		const unsigned int stop_time{};
+		const unsigned int sync_timeout_ms{};
+		const std::optional<unsigned int> seed{};
 	};
 
 	struct SESDefinition {

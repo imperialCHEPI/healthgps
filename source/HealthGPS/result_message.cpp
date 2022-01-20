@@ -1,5 +1,5 @@
 #include "result_message.h"
-#include <format>
+#include <fmt/format.h>
 
 namespace hgps {
 
@@ -12,7 +12,7 @@ namespace hgps {
 	}
 
 	std::string ResultEventMessage::to_string() const {
-		return std::format("Source: {}, run # {}, time: {}, results:\n{}",
+		return fmt::format("Source: {}, run # {}, time: {}, results:\n{}",
 			source, run_number, model_time, content.to_string());
 	}
 	void ResultEventMessage::accept(EventMessageVisitor& visitor) const	{

@@ -1,5 +1,5 @@
 #include "info_message.h"
-#include <format>
+#include <fmt/format.h>
 
 namespace hgps {
 
@@ -16,16 +16,34 @@ namespace hgps {
 	}
 
 	std::string InfoEventMessage::to_string() const	{
-		auto formatting = std::string{ "Source: {}, run # {}, {}, time: {}" };
-		formatting += message.empty() ? "{}" : " - {}";
+		std::string result{};
+		if (message.empty()) {
+			result = fmt::format("Source: {}, run # {}, {}, time: {}",
+				source, run_number, detail::model_action_str(model_action), model_time);
+		}
 
-		return std::format(formatting, source, run_number,
-			detail::model_action_str(model_action), model_time, message);
+		result = fmt::format("Source: {}, run # {}, {}, time: {} - {}",
+			source, run_number, detail::model_action_str(model_action), model_time, message);
+
+		return result;
 	}
 
 	void InfoEventMessage::accept(EventMessageVisitor& visitor) const {
 		visitor.visit(*this);
 	}
-}
 
+	namespace detail {
+
+		const std::string model_action_str(const ModelAction action)
+		{
+			switch (action)
+			{
+				case ModelAction::update: return "update";
+				case ModelAction::start:  return "start";
+				case ModelAction::stop:   return "stop";
+				default: 				  return "unknown";
+			}
+		}
+	}
+}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <atomic>
 #include <fstream>
 #include <filesystem>
 
