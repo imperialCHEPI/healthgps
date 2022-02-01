@@ -1,15 +1,19 @@
 #pragma once
+#include <type_traits>
+
 namespace hgps {
 
-	template<typename T>
+	template<typename T> requires std::is_arithmetic_v<T>
 	struct GenderValue {
 		GenderValue() = default;
-		GenderValue(T male_value, T female_value)
-			: male{ male_value }, female{ female_value }
+		GenderValue(T males_value, T females_value)
+			: males{ males_value }, females{ females_value }
 		{}
 
-		T male;
-		T female;
+		T males;
+		T females;
+
+		T total() const noexcept { return males + females; }
 	};
 
 	using IntegerGenderValue = GenderValue<int>;

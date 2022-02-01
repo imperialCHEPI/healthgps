@@ -57,8 +57,8 @@ TEST(TestHealthGPS_Map2d, CreateWithUserType)
 	ASSERT_EQ(8, m.size());
 	ASSERT_TRUE(m.contains(2021));
 	ASSERT_TRUE(m.contains(2021, 2));
-	ASSERT_EQ(2, m.at(2021, 1).male);
-	ASSERT_EQ(4, m.at(2021, 1).female);
+	ASSERT_EQ(2, m.at(2021, 1).males);
+	ASSERT_EQ(4, m.at(2021, 1).females);
 }
 
 TEST(TestHealthGPS_Map2d, IterateOverRows)
@@ -96,10 +96,10 @@ TEST(TestHealthGPS_Map2d, AccessSingleRows)
 
 	ASSERT_FALSE(r.empty());
 	ASSERT_EQ(2, r.size());
-	ASSERT_EQ(3, r.at(1).male);
-	ASSERT_EQ(6, r.at(1).female);
-	ASSERT_EQ(7, r.at(2).male);
-	ASSERT_EQ(21, r.at(2).female);
+	ASSERT_EQ(3, r.at(1).males);
+	ASSERT_EQ(6, r.at(1).females);
+	ASSERT_EQ(7, r.at(2).males);
+	ASSERT_EQ(21, r.at(2).females);
 }
 
 TEST(TestHealthGPS_Map2d, AccessSingleCell)
@@ -114,8 +114,8 @@ TEST(TestHealthGPS_Map2d, AccessSingleCell)
 	};
 
 	auto m = TimeAgeMap2d(std::move(data));
-	ASSERT_EQ(5, m.at(2019, 1).male);
-	ASSERT_EQ(6, m.at(2022, 1).female);
-	ASSERT_EQ(9, m.at(2020, 2).male);
-	ASSERT_EQ(21, m.at(2022, 2).female);
+	ASSERT_EQ(5, m.at(2019, 1).males);
+	ASSERT_EQ(6, m.at(2022, 1).females);
+	ASSERT_EQ(9, m.at(2020, 2).males);
+	ASSERT_EQ(21, m.at(2022, 2).females);
 }

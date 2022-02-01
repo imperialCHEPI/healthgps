@@ -92,10 +92,10 @@ namespace hgps {
 		auto excess_mortality = definition_.table()(entity.age, entity.gender).at(mortality_id);
 		auto death_weight = definition_.parameters().death_weight.at(disease_info.time_since_onset);
 		if (entity.gender == core::Gender::male) {
-			return excess_mortality * death_weight.male;
+			return excess_mortality * death_weight.males;
 		}
 
-		return excess_mortality * death_weight.female;
+		return excess_mortality * death_weight.females;
 	}
 
 	DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(RuntimeContext& context) {
@@ -262,9 +262,9 @@ namespace hgps {
 		auto cumulative = std::vector<double>{};
 		auto sum = 0.0;
 		for (auto& item : pdf) {
-			auto p = item.second.male;
+			auto p = item.second.males;
 			if (gender != core::Gender::male) {
-				p = item.second.female;
+				p = item.second.females;
 			}
 
 			sum += p;

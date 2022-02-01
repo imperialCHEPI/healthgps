@@ -118,8 +118,8 @@ namespace hgps {
 		auto entry_total = static_cast<int>(age_gender_dist.size());
 		for (auto& entry : age_gender_dist) {
 			entry_count++;
-			auto num_males = static_cast<int>(std::round(pop_size * entry.second.male));
-			auto num_females = static_cast<int>(std::round(pop_size * entry.second.female));
+			auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
+			auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
 			auto num_required = index + num_males + num_females;
 			auto pop_diff = pop_size - num_required;
 			// Final adjustment due to rounding errors
@@ -127,7 +127,7 @@ namespace hgps {
 				int half_diff = pop_diff / 2;
 				num_males += half_diff;
 				num_females += half_diff;
-				if (entry.second.male > entry.second.female) {
+				if (entry.second.males > entry.second.females) {
 					num_males += pop_diff - (half_diff * 2);
 				}
 				else {
@@ -139,7 +139,7 @@ namespace hgps {
 			}
 			else if (pop_diff < 0) {
 				pop_diff *= -1;
-				if (entry.second.male > entry.second.female) {
+				if (entry.second.males > entry.second.females) {
 					num_females -= pop_diff;
 					if (num_females < 0) {
 						num_males += num_females;
@@ -187,8 +187,8 @@ namespace hgps {
 
 		// apply births events
 		auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
-		auto number_of_boys = static_cast<int> (last_year_births_rate.male * initial_pop_size);
-		auto number_of_girls = static_cast<int>(last_year_births_rate.female * initial_pop_size);
+		auto number_of_boys = static_cast<int> (last_year_births_rate.males * initial_pop_size);
+		auto number_of_girls = static_cast<int>(last_year_births_rate.females * initial_pop_size);
 		context.population().add_newborn_babies(number_of_boys, core::Gender::male);
 		context.population().add_newborn_babies(number_of_girls, core::Gender::female);
 
