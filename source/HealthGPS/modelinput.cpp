@@ -1,12 +1,12 @@
 #include "modelinput.h"
 
 namespace hgps {
-	ModelInput::ModelInput(core::DataTable& data, Settings settings, RunInfo run_info,
-		SESDefinition ses_info, HierarchicalMapping risk_mapping, 
-		std::vector<core::DiseaseInfo> diseases)
-		: input_data_{data}, settings_{settings},
-		run_info_{ run_info }, ses_definition_{ ses_info },
-		risk_mapping_{ risk_mapping }, diseases_{diseases} { }
+
+	ModelInput::ModelInput(core::DataTable& data, const Settings& settings, const RunInfo& run_info,
+		const SESDefinition& ses_info, const HierarchicalMapping& risk_mapping,
+		const std::vector<core::DiseaseInfo>& diseases)
+		: input_data_{ data }, settings_{ settings }, run_info_{ run_info },
+		ses_definition_{ ses_info }, risk_mapping_{ risk_mapping }, diseases_{ diseases } { }
 
 	const Settings& ModelInput::settings() const noexcept {
 		return settings_;

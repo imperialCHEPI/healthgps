@@ -35,7 +35,7 @@ namespace hgps {
 
 		virtual void clear() noexcept = 0;
 
-		virtual double apply(Person& entity, const int& time,
-			const std::string& risk_factor_key, const double& value) = 0;
+		virtual double apply(Person& entity, const int time,
+			const std::string risk_factor_key, const double value) = 0;
 	};
 }

@@ -1,12 +1,14 @@
 #pragma once
 
-#include <vector>
 #include "population.h"
 #include "mapping.h"
 #include "event_aggregator.h"
 #include "runtime_metric.h"
 #include "simulation_definition.h"
 #include "random_algorithm.h"
+
+#include <vector>
+#include <functional>
 
 namespace hgps {
 
@@ -51,8 +53,8 @@ namespace hgps {
 		void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
 	private:
-		EventAggregator& event_bus_;
-		SimulationDefinition& definition_;
+		std::reference_wrapper<EventAggregator> event_bus_;
+		std::reference_wrapper<SimulationDefinition> definition_;
 		Population population_;
 		Random generator_;
 		RuntimeMetric metrics_{};

@@ -2,6 +2,7 @@
 #include "interfaces.h"
 #include "hierarchical_model_types.h"
 #include <mutex>
+#include <functional>
 
 namespace hgps {
 
@@ -48,7 +49,7 @@ namespace hgps {
 
 	private:
 		std::mutex mutex_;
-		core::Datastore& data_manager_;
+		std::reference_wrapper<core::Datastore> data_manager_;
 		std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
 	};

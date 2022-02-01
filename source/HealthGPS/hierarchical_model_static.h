@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hierarchical_model_types.h"
+#include <functional>
 
 namespace hgps {
 
@@ -18,7 +19,7 @@ namespace hgps {
 		void update_risk_factors(RuntimeContext& context) override;
 
 	private:
-		HierarchicalLinearModelDefinition& definition_;
+		std::reference_wrapper<HierarchicalLinearModelDefinition> definition_;
 
 		void generate_for_entity(RuntimeContext& context, Person& entity,
 			int level, std::vector<MappingEntry>& level_factors);

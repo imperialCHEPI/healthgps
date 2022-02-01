@@ -19,7 +19,7 @@ namespace hgps {
 		void update_risk_factors(RuntimeContext& context) override;
 
 	private:
-		LiteHierarchicalModelDefinition& definition_;
+		std::reference_wrapper<LiteHierarchicalModelDefinition> definition_;
 
 		void update_risk_factors_exposure(RuntimeContext& context, Person& entity,
 			std::map<std::string, double>& current_risk_factors,

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <stdexcept>
-#include <unordered_map>
 #include "interfaces.h"
 #include "modelinput.h"
 #include "repository.h"
+#include <functional>
+#include <unordered_map>
 
 namespace hgps {
 
@@ -26,7 +26,7 @@ namespace hgps {
         ModuleType create(const SimulationModuleType type, const ModelInput& config);
 
     private:
-        Repository& repository_;
+        std::reference_wrapper<Repository> repository_;
         std::unordered_map<SimulationModuleType, ConcreteBuilder> builders_;
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "randombit_generator.h"
+#include <functional>
 
 namespace hgps
 {
@@ -10,7 +11,6 @@ namespace hgps
 	public:
 		Random() = delete;
 		Random(RandomBitGenerator& generator);
-		Random(RandomBitGenerator&& generator);
 
 		int next_int();
 
@@ -29,8 +29,7 @@ namespace hgps
 		int next_empirical_discrete(const std::vector<int>& values, const std::vector<double>& cdf);
 
 	private:
-		RandomBitGenerator& engine_;
-
+		std::reference_wrapper<RandomBitGenerator> engine_;
 		int next_int_internal(const int& min_value, const int& max_value);
 		double next_uniform_internal(const double& min_value, const double& max_value);
 		double next_normal_internal(const double& mean, const double& standard_deviation);
