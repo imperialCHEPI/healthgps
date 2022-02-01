@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scenario.h"
+#include <functional>
 
 namespace hgps {
 
@@ -17,11 +18,11 @@ namespace hgps {
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int& time,
-			const std::string& risk_factor_key, const double& value) override;
+		double apply(Person& entity, const int time,
+			const std::string risk_factor_key, const double value) override;
 
 	private:
-		SyncChannel& channel_;
+		std::reference_wrapper<SyncChannel> channel_;
 	};
 }
 

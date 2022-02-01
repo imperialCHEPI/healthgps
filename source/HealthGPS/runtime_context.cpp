@@ -20,7 +20,7 @@ namespace hgps {
     }
 
     int RuntimeContext::sync_timeout_millis() const noexcept {
-        return definition_.inputs().sync_timeout_ms();
+        return definition_.get().inputs().sync_timeout_ms();
     }
 
     Population& RuntimeContext::population() noexcept {
@@ -32,7 +32,7 @@ namespace hgps {
     }
 
     Scenario& RuntimeContext::scenario() noexcept {
-        return definition_.scenario();
+        return definition_.get().scenario();
     }
 
     Random& RuntimeContext::random() noexcept {
@@ -40,19 +40,19 @@ namespace hgps {
     }
 
     const HierarchicalMapping& RuntimeContext::mapping() const noexcept {
-        return definition_.inputs().risk_mapping();
+        return definition_.get().inputs().risk_mapping();
     }
 
     const std::vector<core::DiseaseInfo>& RuntimeContext::diseases() const noexcept {
-        return definition_.inputs().diseases();
+        return definition_.get().inputs().diseases();
     }
 
     const core::IntegerInterval& RuntimeContext::age_range() const noexcept {
-        return definition_.inputs().settings().age_range();
+        return definition_.get().inputs().settings().age_range();
     }
 
     const std::string RuntimeContext::identifier() const noexcept {
-        return definition_.identifier();
+        return definition_.get().identifier();
     }
 
     void RuntimeContext::set_current_time(const int time_now) noexcept {
@@ -69,10 +69,10 @@ namespace hgps {
     }
 
     void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
-        event_bus_.publish(std::move(message));
+        event_bus_.get().publish(std::move(message));
     }
 
     void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
-        event_bus_.publish_async(std::move(message));
+        event_bus_.get().publish_async(std::move(message));
     }
 }

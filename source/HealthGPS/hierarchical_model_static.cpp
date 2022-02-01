@@ -61,7 +61,7 @@ namespace hgps {
 	void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext& context,
 		Person& entity, int level, std::vector<MappingEntry>& level_factors)
 	{
-		const auto& level_info = definition_.levels.at(level);
+		const auto& level_info = definition_.get().levels.at(level);
 
 		// Residual Risk Factors Random Sampling
 		auto residual_risk_factors = std::map<std::string, double>();
@@ -97,14 +97,14 @@ namespace hgps {
 		auto determ_comp_factors = std::map<std::string, double>();
 		for (const auto& factor : level_factors) {
 			auto sum = 0.0;
-			for (const auto& coeff : definition_.models.at(factor.key()).coefficients) {
+			for (const auto& coeff : definition_.get().models.at(factor.key()).coefficients) {
 				sum += coeff.second.value * determ_risk_factors[coeff.first];
 			}
 
 			determ_comp_factors.emplace(factor.key(), sum);
 		}
 
-		auto adjustments = definition_.adjustments.values.row(entity.gender);
+		auto adjustments = definition_.get().adjustments.values.row(entity.gender);
 		for (const auto& factor : level_factors) {
 			auto total_value = determ_comp_factors.at(factor.key()) + stoch_comp_factors.at(factor.key());
 			total_value += adjustments.at(factor.key()).at(entity.age);

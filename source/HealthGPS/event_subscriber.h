@@ -6,7 +6,7 @@ namespace hgps {
 	class EventSubscriberHandler final: public EventSubscriber {
     public:
         EventSubscriberHandler() = delete;
-        EventSubscriberHandler(const EventHandlerIdentifier id, EventAggregator* hub);
+        EventSubscriberHandler(EventHandlerIdentifier id, EventAggregator* hub);
         EventSubscriberHandler(const EventSubscriberHandler& other) = delete;
         EventSubscriberHandler& operator=(const EventSubscriberHandler& other) = delete;
         EventSubscriberHandler(EventSubscriberHandler&& other) = delete;

@@ -84,9 +84,9 @@ int main(int argc, char* argv[])
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
 	try	{
-		auto seed_generator = hgps::MTRandom32{};
+		auto seed_generator = std::make_unique<hgps::MTRandom32>();
 		if (model_config.seed().has_value()) {
-			seed_generator.seed(model_config.seed().value());
+			seed_generator->seed(model_config.seed().value());
 		}
 
 		auto runner = ModelRunner(event_bus, std::move(seed_generator));
@@ -97,13 +97,14 @@ int main(int argc, char* argv[])
 		auto runtime = 0.0;
 
 		// GCC thread initialisation bug reverses derived to base-class, when declared in line
-		auto base_rnd = hgps::MTRandom32();
+		auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
+		auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
 		auto baseline = HealthGPS{
-			SimulationDefinition{ model_config, std::make_unique<BaselineScenario>(channel), std::move(base_rnd) },
+			SimulationDefinition{ model_config, std::move(baseline_scenario) , std::move(baseline_rnd) },
 			factory, event_bus };
 		if (config.has_active_intervention) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
-			auto policy_rnd = hgps::MTRandom32();
+			auto policy_rnd = std::make_unique<hgps::MTRandom32>();
 			auto intervention = HealthGPS{
 				SimulationDefinition{ model_config, std::move(policy_scenario), std::move(policy_rnd) },
 				factory, event_bus };

@@ -5,7 +5,8 @@
 namespace hgps {
 	AnalysisModule::AnalysisModule(
 		AnalysisDefinition&& definition, const core::IntegerInterval age_range)
-		: definition_{ definition }, residual_disability_weight_{ create_age_gender_table<double>(age_range) }
+		: definition_{ std::move(definition) }
+		, residual_disability_weight_{ create_age_gender_table<double>(age_range) }
 	{}
 
 	SimulationModuleType AnalysisModule::type() const noexcept {

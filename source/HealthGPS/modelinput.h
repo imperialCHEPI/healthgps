@@ -25,9 +25,9 @@ namespace hgps {
 	{
 	public:
 		ModelInput() = delete;
-		ModelInput(core::DataTable& data, Settings settings, RunInfo info, 
-			SESDefinition ses_info, HierarchicalMapping risk_mapping, 
-			std::vector<core::DiseaseInfo> diseases);
+		ModelInput(core::DataTable& data, const Settings& settings, const RunInfo& run_info, 
+			const SESDefinition& ses_info, const HierarchicalMapping& risk_mapping, 
+			const std::vector<core::DiseaseInfo>& diseases);
 
 		const Settings& settings() const noexcept;
 
@@ -50,7 +50,7 @@ namespace hgps {
 		const std::vector<core::DiseaseInfo>& diseases() const noexcept;
 
 	private:
-		core::DataTable& input_data_;
+		std::reference_wrapper<core::DataTable> input_data_;
 		Settings settings_;
 		RunInfo run_info_;
 		SESDefinition ses_definition_;

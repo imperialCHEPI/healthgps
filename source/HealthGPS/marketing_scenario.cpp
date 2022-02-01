@@ -3,7 +3,7 @@
 namespace hgps {
     MarketingPolicyScenario::MarketingPolicyScenario(
         SyncChannel& data_sync, MarketingPolicyDefinition&& definition)
-        : channel_{ data_sync }, definition_{ definition },
+        : channel_{ data_sync }, definition_{ std::move(definition) },
         factor_impact_{}, interventions_book_{} {
 
         if (definition_.impacts.size() != 3) {
@@ -33,15 +33,17 @@ namespace hgps {
     std::string MarketingPolicyScenario::name() const noexcept {
         return "Intervention";
     }
+
     SyncChannel& MarketingPolicyScenario::channel() {
         return channel_;
     }
+
     void MarketingPolicyScenario::clear() noexcept {
         interventions_book_.clear();
     }
 
-    double MarketingPolicyScenario::apply(Person& entity, const int& time,
-        const std::string& risk_factor_key, const double& value) {
+    double MarketingPolicyScenario::apply(Person& entity, const int time,
+        const std::string risk_factor_key, const double value) {
         if (!factor_impact_.contains(risk_factor_key) ||
             !definition_.active_period.contains(time)) {
             return value;

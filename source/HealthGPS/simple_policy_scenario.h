@@ -4,6 +4,7 @@
 
 #include <map>
 #include <optional>
+#include <functional>
 
 namespace hgps {
 
@@ -41,8 +42,8 @@ namespace hgps {
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int& time, 
-			const std::string& risk_factor_key, const double& value) override;
+		double apply(Person& entity, const int time, 
+			const std::string risk_factor_key, const double value) override;
 
 		const PolicyImpactType& impact_type() const noexcept;
 
@@ -51,7 +52,7 @@ namespace hgps {
 		const std::vector<PolicyImpact>& impacts() const noexcept override;
 
 	private:
-		SyncChannel& channel_;
+		std::reference_wrapper<SyncChannel> channel_;
 		SimplePolicyDefinition definition_;
 		std::map<std::string, PolicyImpact> factor_impact_;
 	};

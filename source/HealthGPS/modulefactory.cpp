@@ -1,4 +1,5 @@
 #include "modulefactory.h"
+#include <stdexcept>
 
 namespace hgps {
 
@@ -24,7 +25,7 @@ namespace hgps {
 
 		auto it = builders_.find(type);
 		if (it != builders_.end()) {
-			auto builty_module = it->second(repository_, config);
+			auto builty_module = it->second(repository_.get(), config);
 			return builty_module;
 		}
 

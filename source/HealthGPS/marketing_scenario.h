@@ -1,6 +1,8 @@
 #pragma once
 #include "intervention_scenario.h"
+
 #include <set>
+#include <functional>
 
 namespace hgps {
 
@@ -27,15 +29,15 @@ namespace hgps {
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int& time,
-			const std::string& risk_factor_key, const double& value) override;
+		double apply(Person& entity, const int time,
+			const std::string risk_factor_key, const double value) override;
 
 		const PolicyInterval& active_period()  const noexcept override;
 
 		const std::vector<PolicyImpact>& impacts() const noexcept override;
 
 	private:
-		SyncChannel& channel_;
+		std::reference_wrapper<SyncChannel> channel_;
 		MarketingPolicyDefinition definition_;
 		std::set<std::string> factor_impact_;
 		std::unordered_map<std::size_t, int> interventions_book_{};

@@ -2,7 +2,7 @@
 
 namespace hgps {
 	EventSubscriberHandler::EventSubscriberHandler(
-		const EventHandlerIdentifier id, EventAggregator* hub)
+		EventHandlerIdentifier id, EventAggregator* hub)
 		: identifier_{id}, event_hub_{hub} {
 
 		if (hub == nullptr) {

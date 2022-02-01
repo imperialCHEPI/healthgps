@@ -11,7 +11,7 @@ namespace hgps {
 	{
 	public:
 		DiseaseMeasure() = default;
-		DiseaseMeasure(std::map<int, double> measures);
+		DiseaseMeasure(const std::map<int, double>& measures);
 
 		std::size_t size() const noexcept;
 
@@ -27,7 +27,7 @@ namespace hgps {
 	{
 	public:
 		DiseaseTable() = delete;
-		DiseaseTable(const core::DiseaseInfo info, std::map<std::string, int>&& measures,
+		DiseaseTable(const core::DiseaseInfo& info, std::map<std::string, int>&& measures,
 			std::map<int, std::map<core::Gender, DiseaseMeasure>>&& data);
 
 		const core::DiseaseInfo& info() const noexcept;

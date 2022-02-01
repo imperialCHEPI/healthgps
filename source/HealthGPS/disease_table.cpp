@@ -7,7 +7,7 @@
 namespace hgps {
 	/* --------------------   Disease Measure Implementation ----------------- */
 
-	DiseaseMeasure::DiseaseMeasure(std::map<int, double> measures)
+	DiseaseMeasure::DiseaseMeasure(const std::map<int, double>& measures)
 		: measures_{ measures } {}
 
 	std::size_t DiseaseMeasure::size() const noexcept {
@@ -25,9 +25,9 @@ namespace hgps {
 	/* --------------------   Disease Table Implementation ----------------- */
 
 
-	DiseaseTable::DiseaseTable(core::DiseaseInfo info, std::map<std::string, int>&& measures,
+	DiseaseTable::DiseaseTable(const core::DiseaseInfo& info, std::map<std::string, int>&& measures,
 		std::map<int, std::map<core::Gender, DiseaseMeasure>>&& data)
-		: info_{ info }, measures_{ measures }, data_{ data } {
+		: info_{ info }, measures_{ std::move(measures) }, data_{ std::move(data) } {
 
 		if (info.code.empty()) {
 			throw std::invalid_argument("Invalid disease information with empty identifier");

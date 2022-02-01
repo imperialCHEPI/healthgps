@@ -5,7 +5,7 @@
 namespace hgps {
 
 	DefaultDiseaseModel::DefaultDiseaseModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range)
-		: definition_{ definition }, average_relative_risk_{ create_age_gender_table<double>(age_range) }
+		: definition_{ std::move(definition) }, average_relative_risk_{ create_age_gender_table<double>(age_range) }
 	{
 		if (definition_.identifier().group == core::DiseaseGroup::cancer) {
 			throw std::invalid_argument("Disease definition group mismatch, must not be 'cancer'.");

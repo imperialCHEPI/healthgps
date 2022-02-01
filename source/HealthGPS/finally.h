@@ -10,6 +10,7 @@ namespace hgps {
         Finally(Func&& func) 
             : functor_(std::forward<Func>(func)) 
         {}
+
         Finally(const Finally&) = delete;
         Finally(Finally&&) = delete;
         Finally& operator =(const Finally&) = delete;

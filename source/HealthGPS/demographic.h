@@ -52,7 +52,7 @@ namespace hgps {
 		double get_total_deaths(const int time_year) const noexcept;
 		std::map<int, DoubleGenderValue> get_age_gender_distribution(const int time_year) const noexcept;
 		DoubleGenderValue get_birth_rate(const int time_year) const noexcept;
-		double get_residual_death_rate(const int& age, core::Gender& gender) const noexcept;
+		double get_residual_death_rate(const int age, const core::Gender gender) const noexcept;
 
 		GenderTable<int, double> create_death_rates_table(const int time_year);
 		GenderTable<int, double> calculate_residual_mortality(

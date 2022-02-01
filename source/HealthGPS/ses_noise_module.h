@@ -10,8 +10,8 @@ namespace hgps {
 	{
 	public:
 		SESNoiseModule();
-		SESNoiseModule(std::vector<double> parameters);
-		SESNoiseModule(std::string function, std::vector<double> parameters);
+		SESNoiseModule(const std::vector<double>& parameters);
+		SESNoiseModule(std::string function, const std::vector<double>& parameters);
 
 		SimulationModuleType type() const noexcept override;
 

@@ -8,10 +8,10 @@ namespace hgps {
 	SESNoiseModule::SESNoiseModule()
 		: SESNoiseModule(std::vector<double>{0.0, 1.0}) {}
 
-	SESNoiseModule::SESNoiseModule(std::vector<double> parameters)
+	SESNoiseModule::SESNoiseModule(const std::vector<double>& parameters)
 		: SESNoiseModule("normal", parameters) {}
 
-	SESNoiseModule::SESNoiseModule(std::string function, std::vector<double> parameters)
+	SESNoiseModule::SESNoiseModule(std::string function, const std::vector<double>& parameters)
 		: function_{ function }, parameters_{ parameters }
 	{
 		if (!core::case_insensitive::equals("normal", function)) {

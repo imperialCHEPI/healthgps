@@ -33,21 +33,21 @@ namespace hgps {
 	struct BaselineAdjustment final {
 		BaselineAdjustment() = delete;
 		BaselineAdjustment(FactorAdjustmentTable&& adjustment_table)
-			: values{ adjustment_table }
+			: values{ std::move(adjustment_table) }
 		{
-			if (adjustment_table.empty()) {
+			if (values.empty()) {
 				throw std::invalid_argument(
 					"The risk factors adjustment table must not be empty.");
 			}
-			else if (adjustment_table.rows() != 2) {
+			else if (values.rows() != 2) {
 				throw std::invalid_argument(
 					"The risk factors adjustment definition must contain two tables.");
 			}
 
-			if (!adjustment_table.contains(core::Gender::male)) {
+			if (!values.contains(core::Gender::male)) {
 				throw std::invalid_argument("Missing the required adjustment table for male.");
 			}
-			else if (!adjustment_table.contains(core::Gender::female)) {
+			else if (!values.contains(core::Gender::female)) {
 				throw std::invalid_argument("Missing the required adjustment table for female.");
 			}
 		}
@@ -90,7 +90,7 @@ namespace hgps {
 			BaselineAdjustment&& baseline_adjustment,
 			const double boundary_percentage = 0.05)
 			: equations_{ std::move(equations) }, variables_{ std::move(variables) },
-			adjustments_{ baseline_adjustment }, boundary_percentage_{ boundary_percentage } {
+			adjustments_{ std::move(baseline_adjustment) }, boundary_percentage_{ boundary_percentage } {
 
 			if (equations_.empty()) {
 				throw std::invalid_argument("The model definition equations must not be empty.");

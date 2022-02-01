@@ -377,7 +377,7 @@ namespace hgps {
 		auto orig_summary = std::unordered_map<std::string, core::UnivariateSummary>();
 		auto sim8_summary = std::unordered_map<std::string, core::UnivariateSummary>();
 		for (const auto& entry : context_.mapping()) {
-			definition_.inputs().data().column(entry.name())->accept(visitor);
+			definition_.inputs().data().column(entry.name()).accept(visitor);
 			orig_summary.emplace(entry.name(), visitor.get_summary());
 			sim8_summary.emplace(entry.name(), core::UnivariateSummary(entry.name()));
 		}

@@ -1,28 +1,20 @@
 #pragma once
-#include <map>
-
+#include "gender_value.h"
 #include "HealthGPS.Core/interval.h"
+
+#include <map>
 
 namespace hgps {
 
-	struct Mortality {
-		Mortality(float males, float females)
-			: males{ males }, females{ females }
-		{}
-
-		const float males{};
-		const float females{};
-
-		float total() const noexcept { return males + females; }
-	};
+	using Mortality = GenderValue<float>;
 
 	struct Birth {
 		Birth(float number_of_births, float bisth_sex_ratio)
 			: number{ number_of_births }, sex_ratio{ bisth_sex_ratio }
 		{}
 
-		const float number{};
-		const float sex_ratio{};
+		float number{};
+		float sex_ratio{};
 	};
 
 	class LifeTable

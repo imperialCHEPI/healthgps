@@ -9,8 +9,8 @@ namespace hgps {
 	public:
 		AnalysisDefinition(GenderTable<int, float>&& life_expectancy,
 			DoubleAgeGenderTable&& observed_YLD, std::map<std::string, float>&& disability_weights)
-			: life_expectancy_{ life_expectancy }, observed_YLD_{ observed_YLD }, 
-			disability_weights_{ disability_weights }
+			: life_expectancy_{ std::move(life_expectancy) }, observed_YLD_{ std::move(observed_YLD) }, 
+			disability_weights_{ std::move(disability_weights) }
 		{}
 
 		const GenderTable<int, float>& life_expectancy() const noexcept {

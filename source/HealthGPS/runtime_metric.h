@@ -12,19 +12,17 @@ namespace hgps {
 
 		std::size_t size() const noexcept;
 
-		double& operator[](const std::string& metric_key);
+		double& operator[](const std::string metric_key);
 
-		double& operator[](std::string&& metric_key);
+		double& at(const std::string metric_key);
 
-		double& at(const std::string& metric_key);
+		const double& at(const std::string metric_key) const;
 
-		const double& at(const std::string& metric_key) const;
-
-		bool contains(const std::string& metric_key) const noexcept;
+		bool contains(const std::string metric_key) const noexcept;
 
 		bool emplace(const std::string metric_key, const double value);
 
-		bool erase(const std::string& metric_key);
+		bool erase(const std::string metric_key);
 
 		void clear() noexcept;
 

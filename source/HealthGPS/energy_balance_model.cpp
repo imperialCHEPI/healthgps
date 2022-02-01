@@ -38,7 +38,7 @@ namespace hgps {
 				current_risk_factors.at("age") = model_age;
 			}
 
-			auto equations = definition_.at(model_age);
+			auto equations = definition_.get().at(model_age);
 			if (entity.gender == core::Gender::male) {
 				update_risk_factors_exposure(context, entity, current_risk_factors, equations.male);
 			}
@@ -57,7 +57,7 @@ namespace hgps {
 		}
 
 		auto delta_comp_factors = std::unordered_map<std::string, double>();
-		auto adjustments = definition_.adjustments().values.row(entity.gender);
+		auto adjustments = definition_.get().adjustments().values.row(entity.gender);
 		for (auto level = 1; level <= context.mapping().max_level(); level++) {
 			auto level_factors = context.mapping().at_level(level);
 			for (const auto& factor : level_factors) {
@@ -70,7 +70,7 @@ namespace hgps {
 						delta_factor += coeff.second * current_risk_factors.at(coeff.first);
 					}
 					else {
-						auto factor_key = definition_.variables().at(coeff.first);
+						auto factor_key = definition_.get().variables().at(coeff.first);
 						delta_factor += coeff.second * delta_comp_factors.at(factor_key);
 					}
 				}
@@ -108,7 +108,7 @@ namespace hgps {
 	double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random& random, 
 		const double mean, const double standard_deviation, const double boundary) const {
 		auto candidate = random.next_normal(mean, standard_deviation);
-		auto percentage = definition_.boundary_percentage();
+		auto percentage = definition_.get().boundary_percentage();
 		auto cap = percentage * boundary;
 		return std::min(std::max(candidate, -cap), +cap);
 	}

@@ -10,9 +10,6 @@ namespace hgps
 	Random::Random(RandomBitGenerator& generator)
 		: engine_{ generator } {}
 
-	Random::Random(RandomBitGenerator&& generator)
-		: engine_{ generator } {}
-
 	int Random::next_int() {
 		return next_int(0, std::numeric_limits<int>::max()-1);
 	}
@@ -28,13 +25,13 @@ namespace hgps
 		}
 
 		//std::uniform_int_distribution<int> distribution(min_value, max_value);
-		//return distribution(engine_);
+		//return distribution(engine_.get());
 
 		return next_int_internal(min_value, max_value);
 	}
 
 	double Random::next_double() noexcept {
-		return engine_.next_double();
+		return engine_.get().next_double();
 	}
 
 	double Random::next_normal() {

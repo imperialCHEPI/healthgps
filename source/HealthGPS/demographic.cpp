@@ -1,13 +1,15 @@
-#include <numeric>
-#include <cassert>
 #include "demographic.h"
 #include "converter.h"
 #include "baseline_sync_message.h"
+#include <numeric>
+#include <cassert>
 
 namespace hgps {
 	PopulationModule::PopulationModule(
 		std::map<int, std::map<int, PopulationRecord>>&& pop_data, LifeTable&& life_table)
-		: pop_data_{ pop_data }, life_table_{ life_table }, birth_rates_{}, residual_death_rates_{} {
+		: pop_data_{ std::move(pop_data) }, life_table_{ std::move(life_table) }, 
+		birth_rates_{}, residual_death_rates_{}
+	{
 		if (pop_data_.empty()) {
 			if (!life_table_.empty()) {
 				throw std::invalid_argument("empty population and life table content mismatch.");
@@ -28,11 +30,11 @@ namespace hgps {
 				first_entry->second.rbegin()->first);
 		}
 
-		if (time_range != life_table.time_limits()) {
+		if (time_range != life_table_.time_limits()) {
 			throw std::invalid_argument("Population and life table time limits mismatch.");
 		}
 
-		if (age_range != life_table.age_limits()) {
+		if (age_range != life_table_.age_limits()) {
 			throw std::invalid_argument("Population and life table age limits mismatch.");
 		}
 
@@ -100,7 +102,7 @@ namespace hgps {
 		return DoubleGenderValue{ 0.0, 0.0 };
 	}
 
-	double PopulationModule::get_residual_death_rate(const int& age, core::Gender& gender) const noexcept {
+	double PopulationModule::get_residual_death_rate(const int age, const core::Gender gender) const noexcept {
 		if (residual_death_rates_.contains(age)) {
 			return residual_death_rates_.at(age, gender);
 		}
@@ -116,8 +118,8 @@ namespace hgps {
 		auto entry_total = static_cast<int>(age_gender_dist.size());
 		for (auto& entry : age_gender_dist) {
 			entry_count++;
-			auto num_males = static_cast<int>(std::round(pop_size * entry.second.male));
-			auto num_females = static_cast<int>(std::round(pop_size * entry.second.female));
+			auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
+			auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
 			auto num_required = index + num_males + num_females;
 			auto pop_diff = pop_size - num_required;
 			// Final adjustment due to rounding errors
@@ -125,7 +127,7 @@ namespace hgps {
 				int half_diff = pop_diff / 2;
 				num_males += half_diff;
 				num_females += half_diff;
-				if (entry.second.male > entry.second.female) {
+				if (entry.second.males > entry.second.females) {
 					num_males += pop_diff - (half_diff * 2);
 				}
 				else {
@@ -137,7 +139,7 @@ namespace hgps {
 			}
 			else if (pop_diff < 0) {
 				pop_diff *= -1;
-				if (entry.second.male > entry.second.female) {
+				if (entry.second.males > entry.second.females) {
 					num_females -= pop_diff;
 					if (num_females < 0) {
 						num_males += num_females;
@@ -185,8 +187,8 @@ namespace hgps {
 
 		// apply births events
 		auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
-		auto number_of_boys = static_cast<int> (last_year_births_rate.male * initial_pop_size);
-		auto number_of_girls = static_cast<int>(last_year_births_rate.female * initial_pop_size);
+		auto number_of_boys = static_cast<int> (last_year_births_rate.males * initial_pop_size);
+		auto number_of_girls = static_cast<int>(last_year_births_rate.females * initial_pop_size);
 		context.population().add_newborn_babies(number_of_boys, core::Gender::male);
 		context.population().add_newborn_babies(number_of_girls, core::Gender::female);
 

@@ -8,7 +8,7 @@ namespace hgps {
 
 	struct FactorRange {
 		FactorRange() = default;
-		FactorRange(const double min_value, const double max_value)
+		FactorRange(double min_value, double max_value)
 			: empty{ false }, minimum {min_value}, maximum{max_value} {
 			if (min_value > max_value) {
 				throw std::invalid_argument("Factor range minimum must not be greater than maximum.");
@@ -23,8 +23,8 @@ namespace hgps {
 	class MappingEntry {
 	public:
 		MappingEntry() = delete;
-		MappingEntry(std::string name, const short level, std::string entity_name,
-			FactorRange range, const bool dynamic_factor);
+		MappingEntry(std::string name, short level, std::string entity_name,
+			FactorRange range, bool dynamic_factor);
 
 		MappingEntry(std::string name, const short level, std::string entity_name, const bool dynamic_factor);
 		MappingEntry(std::string name, const short level, std::string entity_name, FactorRange range);

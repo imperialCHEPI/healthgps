@@ -3,8 +3,8 @@
 namespace hgps {
 
 	RelativeRiskLookup::RelativeRiskLookup(
-		const MonotonicVector<int> rows, const MonotonicVector<float> cols, core::FloatArray2D&& values)
-		: table_{ values }, rows_index_{}, cols_index_{}
+		const MonotonicVector<int>& rows, const MonotonicVector<float>& cols, core::FloatArray2D&& values)
+		: table_{ std::move(values) }, rows_index_{}, cols_index_{}
 	{
 		if (rows.size() != values.rows() || cols.size() != values.columns()) {
 			throw std::invalid_argument("Lookup breakpoints and values size mismatch.");

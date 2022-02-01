@@ -5,7 +5,7 @@
 namespace hgps {
 
 	DiseaseModule::DiseaseModule(std::map<std::string, std::shared_ptr<DiseaseModel>>&& models)
-		: models_{ models } {}
+		: models_{ std::move(models) } {}
 
 	SimulationModuleType DiseaseModule::type() const noexcept {
 		return SimulationModuleType::Disease;
