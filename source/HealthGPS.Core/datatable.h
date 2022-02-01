@@ -26,9 +26,9 @@ namespace hgps {
 
 			void add(std::unique_ptr<DataTableColumn> column);
 
-			const std::unique_ptr<DataTableColumn>& column(std::size_t index) const;
+			const DataTableColumn& column(std::size_t index) const;
 
-			const std::unique_ptr<DataTableColumn>& column(std::string name) const;
+			const DataTableColumn& column(std::string name) const;
 
 			IteratorType begin() const noexcept { return columns_.begin(); }
 

@@ -9,7 +9,7 @@ namespace hgps {
 		, time_range_{}, age_range_{}
 	{
 		if (birth_table_.empty()) {
-			if (!deaths.empty()) {
+			if (!death_table_.empty()) {
 				throw std::invalid_argument("empty births and deaths content mismatch");
 			}
 

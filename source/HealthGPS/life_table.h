@@ -10,8 +10,8 @@ namespace hgps {
 			: males{ males }, females{ females }
 		{}
 
-		const float males{};
-		const float females{};
+		float males{};
+		float females{};
 
 		float total() const noexcept { return males + females; }
 	};
@@ -21,8 +21,8 @@ namespace hgps {
 			: number{ number_of_births }, sex_ratio{ bisth_sex_ratio }
 		{}
 
-		const float number{};
-		const float sex_ratio{};
+		float number{};
+		float sex_ratio{};
 	};
 
 	class LifeTable

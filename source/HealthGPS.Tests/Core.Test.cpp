@@ -207,9 +207,9 @@ TEST(TestCore, CreateDataTable)
 
 	// Casting to columns type
 	auto& col = table.column("Integer");
-	auto& int_col = static_cast<IntegerDataTableColumn&>(*col);
+	auto& int_col = static_cast<const IntegerDataTableColumn&>(col);
 
-	auto slow_value = std::any_cast<int>(col->value(1));
+	auto slow_value = std::any_cast<int>(col.value(1));
 	auto safe_value = int_col.value_safe(1);
 	auto fast_value = int_col.value_unsafe(1);
 
