@@ -359,6 +359,9 @@
     <ClCompile Include="simulation_module.cpp">
       <Filter>Source Files\modules</Filter>
     </ClCompile>
+    <ClCompile Include="simulation_definition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="scenarios.cd">
