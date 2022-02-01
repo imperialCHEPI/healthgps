@@ -6,7 +6,7 @@
 
 namespace hgps {
 	namespace detail {
-		core::Gender StoreConverter::to_gender(std::string name)
+		core::Gender StoreConverter::to_gender(const std::string name)
 		{
 			if (core::case_insensitive::equals(name, "male")) {
 				return core::Gender::male;
@@ -80,7 +80,7 @@ namespace hgps {
 			return RelativeRiskLookup(MonotonicVector(rows), MonotonicVector(cols), std::move(data));
 		}
 
-		RelativeRisk create_relative_risk(RelativeRiskInfo info)
+		RelativeRisk create_relative_risk(const RelativeRiskInfo& info)
 		{
 			RelativeRisk result;
 			for (auto& item : info.inputs.diseases()) {
@@ -136,8 +136,8 @@ namespace hgps {
 			return AnalysisDefinition(std::move(life_expectancy), std::move(cost_of_disease), std::move(weights));
 		}
 
-		LifeTable StoreConverter::to_life_table(std::vector<core::BirthItem>& births,
-			std::vector<core::MortalityItem>& deaths)
+		LifeTable StoreConverter::to_life_table(const std::vector<core::BirthItem>& births,
+			const std::vector<core::MortalityItem>& deaths)
 		{
 			auto table_births = std::map<int, Birth>{};
 			for (auto& item : births) {
@@ -152,7 +152,7 @@ namespace hgps {
 			return LifeTable(std::move(table_births), std::move(table_deaths));
 		}
 		
-		DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParameterEntity entity)
+		DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParameterEntity& entity)
 		{
 			auto distribution = ParameterLookup{};
 			for (auto& item : entity.prevalence_distribution) {

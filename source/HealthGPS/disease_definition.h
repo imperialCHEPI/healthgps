@@ -11,8 +11,8 @@ namespace hgps {
 
 	struct DiseaseParameter final {
 		DiseaseParameter() = default;
-		DiseaseParameter(const int data_time, ParameterLookup& prevalence,
-			ParameterLookup& survival, ParameterLookup& deaths)
+		DiseaseParameter(const int data_time, const ParameterLookup& prevalence,
+			const ParameterLookup& survival, const ParameterLookup& deaths)
 			: time_year{ data_time }, prevalence_distribution{ prevalence },
 			survival_rate{ survival }, death_weight{ deaths },
 			max_time_since_onset{ prevalence.rbegin()->first + 1 } {}
@@ -34,7 +34,7 @@ namespace hgps {
 		DiseaseDefinition(DiseaseTable&& measures_table, RelativeRiskTableMap&& diseases,
 			RelativeRiskLookupMap&& risk_factors, DiseaseParameter&& parameter)
 			: measures_table_{ std::move(measures_table) }, relative_risk_diseases_{ std::move(diseases) },
-			relative_risk_factors_{ std::move(risk_factors) }, parameters_{parameter} {}
+			relative_risk_factors_{ std::move(risk_factors) }, parameters_{std::move(parameter)} {}
 
 		const core::DiseaseInfo& identifier() const noexcept {
 			return measures_table_.info();

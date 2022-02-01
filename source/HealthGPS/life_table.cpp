@@ -5,26 +5,27 @@
 namespace hgps {
 	LifeTable::LifeTable(std::map<int, Birth>&& births,
 		std::map<int, std::map<int, Mortality>>&& deaths)
-		: birth_table_{ births }, death_table_{ deaths }, time_range_{}, age_range_{}
+		: birth_table_{ std::move(births) }, death_table_{ std::move(deaths) }
+		, time_range_{}, age_range_{}
 	{
-		if (births.empty()) {
+		if (birth_table_.empty()) {
 			if (!deaths.empty()) {
-				throw std::invalid_argument("empty births and deaths content mismatch.");
+				throw std::invalid_argument("empty births and deaths content mismatch");
 			}
 
 			return;
 		}
-		else if (deaths.empty()) {
-			throw std::invalid_argument("births and empty deaths content mismatch.");
+		else if (death_table_.empty()) {
+			throw std::invalid_argument("births and empty deaths content mismatch");
 		}
 
-		if (births.begin()->first != deaths.begin()->first ||
-			births.rbegin()->first != deaths.rbegin()->first) {
+		if (birth_table_.begin()->first != death_table_.begin()->first ||
+			birth_table_.rbegin()->first != death_table_.rbegin()->first) {
 			throw std::invalid_argument("births and deaths time range mismatch.");
 		}
 
-		auto time_entry = deaths.begin();
-		time_range_ = core::IntegerInterval(time_entry->first, deaths.rbegin()->first);
+		auto time_entry = death_table_.begin();
+		time_range_ = core::IntegerInterval(time_entry->first, death_table_.rbegin()->first);
 		if (!time_entry->second.empty()) {
 			age_range_ = core::IntegerInterval(
 				time_entry->second.begin()->first,

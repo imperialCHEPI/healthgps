@@ -78,6 +78,8 @@ target_sources(HealthGPS
 		"settings.h"
 		"simple_policy_scenario.cpp"
 		"simple_policy_scenario.h"
+		"simulation_definition.cpp"
+		"simulation_definition.h"
 		"simulation_module.cpp"
 		"simulation_module.h"
 		"univariate_visitor.cpp"
@@ -105,7 +107,6 @@ target_sources(HealthGPS
 		"randombit_generator.h"
 		"scenario.h"
 		"simulation.h"
-		"simulation_definition.h"
 		"sync_message.h"
 		"threadsafe_queue.h"
 		"two_step_value.h")

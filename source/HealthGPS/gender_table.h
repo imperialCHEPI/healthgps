@@ -13,8 +13,8 @@ namespace hgps {
 	public:
 		GenderTable() = default;
 		GenderTable(const MonotonicVector<ROW>& rows,
-			const std::vector<core::Gender>& cols, const core::Array2D<TYPE>&& values)
-			: table_{ values }, rows_index_{}, cols_index_{}
+			const std::vector<core::Gender>& cols, core::Array2D<TYPE>&& values)
+			: table_{ std::move(values) }, rows_index_{}, cols_index_{}
 		{
 			if (rows.size() != values.rows() || cols.size() != values.columns()) {
 				throw std::invalid_argument("Lookup breakpoints and values size mismatch.");
@@ -86,12 +86,12 @@ namespace hgps {
 	public:
 		AgeGenderTable() = default;
 		AgeGenderTable(const MonotonicVector<int>& rows,
-			const std::vector<core::Gender>& cols, const core::Array2D<TYPE>&& values)
+			const std::vector<core::Gender>& cols, core::Array2D<TYPE>&& values)
 			: GenderTable<int, TYPE>(rows, cols, std::move(values)) {}
 	};
 
 	template<core::Numerical TYPE>
-	GenderTable<int,TYPE> create_integer_gender_table(const core::IntegerInterval rows_range) {
+	GenderTable<int,TYPE> create_integer_gender_table(core::IntegerInterval rows_range) {
 		if (rows_range.lower() < 0 || rows_range.lower() >= rows_range.upper()) {
 			throw std::invalid_argument(
 				"The 'range lower' value must be greater than zero and less than the 'range upper' value.");
@@ -107,7 +107,7 @@ namespace hgps {
 	}
 
 	template<core::Numerical TYPE>
-	AgeGenderTable<TYPE> create_age_gender_table(const core::IntegerInterval age_range) {
+	AgeGenderTable<TYPE> create_age_gender_table(core::IntegerInterval age_range) {
 		if (age_range.lower() < 0 || age_range.lower() >= age_range.upper()) {
 			throw std::invalid_argument(
 				"The 'age lower' value must be greater than zero and less than the 'age upper' value.");

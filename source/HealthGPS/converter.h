@@ -29,7 +29,7 @@ namespace hgps {
 		public:
 			StoreConverter() = delete;
 
-			static core::Gender to_gender(std::string name);
+			static core::Gender to_gender(const std::string name);
 
 			static DiseaseTable to_disease_table(const core::DiseaseEntity& entity);
 
@@ -39,12 +39,13 @@ namespace hgps {
 
 			static AnalysisDefinition to_analysis_definition(const core::DiseaseAnalysisEntity& entity);
 
-			static LifeTable to_life_table(std::vector<core::BirthItem>& births, std::vector<core::MortalityItem>& deaths);
+			static LifeTable to_life_table(const std::vector<core::BirthItem>& births,
+				const std::vector<core::MortalityItem>& deaths);
 
-			static DiseaseParameter to_disease_parameter(const core::CancerParameterEntity entity);
+			static DiseaseParameter to_disease_parameter(const core::CancerParameterEntity& entity);
 		};
 
-		RelativeRisk create_relative_risk(RelativeRiskInfo info);
+		RelativeRisk create_relative_risk(const RelativeRiskInfo& info);
 
 		template<std::floating_point TYPE>
 		static std::vector<TYPE> create_cdf(std::vector<TYPE>& frequency) {

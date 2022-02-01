@@ -11,7 +11,7 @@ namespace hgps {
 
 		Map2d() = default;
 		Map2d(std::map<TROW, std::map<TCOL, TCell>>&& data) noexcept
-			: table_{ data } {}
+			: table_{ std::move(data) } {}
 
 		bool empty() const noexcept {
 			return table_.empty();

@@ -1,13 +1,15 @@
-#include <numeric>
-#include <cassert>
 #include "demographic.h"
 #include "converter.h"
 #include "baseline_sync_message.h"
+#include <numeric>
+#include <cassert>
 
 namespace hgps {
 	PopulationModule::PopulationModule(
 		std::map<int, std::map<int, PopulationRecord>>&& pop_data, LifeTable&& life_table)
-		: pop_data_{ pop_data }, life_table_{ life_table }, birth_rates_{}, residual_death_rates_{} {
+		: pop_data_{ std::move(pop_data) }, life_table_{ std::move(life_table) }, 
+		birth_rates_{}, residual_death_rates_{}
+	{
 		if (pop_data_.empty()) {
 			if (!life_table_.empty()) {
 				throw std::invalid_argument("empty population and life table content mismatch.");
@@ -28,11 +30,11 @@ namespace hgps {
 				first_entry->second.rbegin()->first);
 		}
 
-		if (time_range != life_table.time_limits()) {
+		if (time_range != life_table_.time_limits()) {
 			throw std::invalid_argument("Population and life table time limits mismatch.");
 		}
 
-		if (age_range != life_table.age_limits()) {
+		if (age_range != life_table_.age_limits()) {
 			throw std::invalid_argument("Population and life table age limits mismatch.");
 		}
 
@@ -100,7 +102,7 @@ namespace hgps {
 		return DoubleGenderValue{ 0.0, 0.0 };
 	}
 
-	double PopulationModule::get_residual_death_rate(const int& age, core::Gender& gender) const noexcept {
+	double PopulationModule::get_residual_death_rate(const int age, const core::Gender gender) const noexcept {
 		if (residual_death_rates_.contains(age)) {
 			return residual_death_rates_.at(age, gender);
 		}

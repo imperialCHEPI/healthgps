@@ -11,8 +11,8 @@ namespace hgps {
 		RelativeRiskLookup() = delete;
 
 		RelativeRiskLookup(
-			MonotonicVector<int> rows,
-			MonotonicVector<float> cols,
+			const MonotonicVector<int>& rows,
+			const MonotonicVector<float>& cols,
 			core::FloatArray2D&& values);
 
 		std::size_t size() const noexcept;
