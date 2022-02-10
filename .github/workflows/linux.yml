@@ -43,11 +43,7 @@ jobs:
     - name: Get Ninja
       id: install_ninja
       uses: seanmiddleditch/gha-setup-ninja@master
-
-    - name: Get MSVC Tools
-      id: install_MSVC
-      uses: ilammy/msvc-dev-cmd@v1
-     
+      
     - name: Tool Check
       id: toos_version
       run: |
