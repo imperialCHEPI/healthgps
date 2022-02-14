@@ -2,6 +2,7 @@
 ---
 
 @import "{{ site.theme }}";
+@import "github.css";
 
 .wrapper {
   width:1200px;
@@ -15,23 +16,4 @@ section {
   width:900px;
   float:right;
   padding-bottom:50px;
-}
-
-body {
-  font-family: Helvetica, arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background-color: white;
-  padding: 30px;
-  color: #333;
-}
-
-body > *:first-child {
-  margin-top: 0 !important;
-}
-
-body > *:last-child {
-  margin-bottom: 0 !important;
 }
