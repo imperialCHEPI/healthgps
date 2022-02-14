@@ -6,7 +6,7 @@
 
 The Health GPS software architecture adopts a modular design approach to provide the building blocks necessary to compose the microsimulation, which is written in modern, standard ANSI [C++20](https://en.cppreference.com/w/cpp/20) and using object-oriented principles for software development. The software application is open source, cross-platform,  and comprises of four main components:
 
-|![Health GPS Components](/assets/image/component_diagram.svg)|
+|![Health GPS Components](/assets/image/component_diagram.png)|
 |:--:|
 |*Health GPS Microsimulation Components*|
 

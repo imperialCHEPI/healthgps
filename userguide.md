@@ -3,7 +3,7 @@
 | [Home](index) | [Quick Start](getstarted) | [Software Architecture](architecture) | [Data Model](datamodel) | [Development](development) | User Guide | [License](index#license) |
 
 # User Guide
-The *Health-GPS* microsimulation is a data driven modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated backend data storage to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full workflows. A high-level representation of the `Health-GPS workflow` is shown below, it is crucial that users have a good appreciation for the general dataflow and processes to better design experiments and quantify the results.
+The *Health-GPS* microsimulation is a data driven modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated backend data storage to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full workflows. A high-level representation of the *Health-GPS workflow* is shown below, it is crucial that users have a good appreciation for the general dataflow and processes to better design experiments and quantify the results.
 
 |![Health GPS Workflow](/assets/image/workflow_diagram.png)|
 |:--:|
