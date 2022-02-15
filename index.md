@@ -1,6 +1,6 @@
 ## Welcome to the Global Health Policy Simulation model (Health GPS).
 
-| Home |[Quick Start](getstarted) | [Software Architecture](architecture) | [Data Model](datamodel) | [Development](development) | [User Guide](userguide) |
+| Home | [Quick Start](getstarted) | [User Guide](userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | [Developer Guide](development) |
 
 # Introduction
 **Health GPS** is a modular and flexible microsimulation framework developed in collaboration between the Centre for Health Economics & Policy Innovation ([CHEPI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/)), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). *Health GPS* allow researchers to test the effectiveness of a variety of health policies and interventions designed for tackling childhood obesity in European Countries.
