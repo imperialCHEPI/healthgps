@@ -1,4 +1,5 @@
-## Global Health Policy Simulation model (Health GPS).
+## Global Health Policy Simulation model
+
 | [Home](index) | [Quick Start](getstarted) | User Guide | [Software Architecture](architecture) | [Data Model](datamodel) | [Developer Guide](development) |
 
 
