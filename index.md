@@ -11,7 +11,7 @@ Childhood obesity is one of the major public health challenges throughout the wo
 
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a baseline simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, and health care expenditure which could then be used to complement qualitative policy evaluation tools.
 
-## Energy Balanace Model (EBM)
+## Energy Balance Model (EBM)
 
 National dietary surveys from various European countries are analysed with a view to build a comprehensive model of childhood obesity. The model estimates yearly changes in physical activity, diet, energy balance, and Body Mass Index (BMI) using statistical models calibrated using dietary and anthropometric surveys. These dynamics include measures of physical activity expressed in metabolic equivalents (METs) and macronutrients intakes measures including grams of fat, carbohydrates, protein, fibre, salt, and sugar. The general concept for an EBM is shown below (top diagram), and a possible Health GPS translation provided for illustration purpose.
 
@@ -25,7 +25,7 @@ The calibration of the equations is carried out outside of the model by gender f
 The overall approach adopted to evaluate the impacts and cost-effectiveness of intervention policies to reduce childhood obesity using the policy simulation tool is based upon *“what-if”* analyses to quantify the causal relations between variables, in simple terms, scenarios can be classified as:
 * *Baseline scenarios*: elaborated to define the trends in observed childhood obesity we measure outcomes against (e.g., population, calories intake, diseases prevalence trends).
 
-* *Intervention scenarios*: policies designed to change the observed trends in childhood obesity during a specific timeframe (e.g., food labelling, healthy eating promotion, BMI reduction).
+* *Intervention scenarios*: policies designed to change the observed trends in childhood obesity during a specific time frame (e.g., food labelling, healthy eating promotion, BMI reduction).
 
 The choice of baseline scenario is critical for analyses as it serves as a reference for comparison and can influence outcomes. Having defined the baseline scenario, the simulation assesses the impacts of different intervention policies by projecting populations, risk factors, diseases, and life trajectories into the future comparing pairs of no-intervention and intervention scenarios.
 

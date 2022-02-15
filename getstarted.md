@@ -6,7 +6,7 @@
 
 The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a *configuration file* (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
-Althoutg the model source code is portable, binaries must be generated for each platforms using respective tools and libraries. The Health GPS repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS) with very specific runtime requirements.
+Although the model source code is portable, binaries must be generated for each platforms using respective tools and libraries. The Health GPS repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS) with very specific runtime requirements.
 
 ## Windows
 You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version or newer to be installed.
@@ -14,8 +14,8 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-4. Run: `X:\xxx> .\HealthGPS.Console -f ".\example\France.Config.json" -s ".\data"` where `-f` gives the *configuration file* fullname and
-`-s` the path to the root folder of the *backend storage* respectivelly.
+4. Run: `X:\xxx> .\HealthGPS.Console -f ".\example\France.Config.json" -s ".\data"` where `-f` gives the *configuration file* full-name and
+`-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `C:\healthgps\results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ## Linux
@@ -24,11 +24,10 @@ You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Navigate to the directory used in step 2 (xxx).
-4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f ./example/France.Config.json -s ./data` where `-f` gives the *configuration file* fullname and
-`-s` the path to the root folder of the *backend storage* respectivelly.
+4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f ./example/France.Config.json -s ./data` where `-f` gives the *configuration file* full-name and `-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
-**NOTE:** *The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpuse to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
+**NOTE:** *The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpose to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
 
 ***Known Issue:*** `Windows 10` support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the `Windows 11` installation.
 

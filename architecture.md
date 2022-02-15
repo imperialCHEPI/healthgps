@@ -33,7 +33,7 @@ The Health GPS framework adopts a modular design to specify the building blocks 
 - ***Analysis Module** – collects statistical indicators about the simulated population, calculates diseases prevalence, risk factors exposure, and standardised metrics such as YLL, YLD, DALY, and publish the results to the outside world asynchronously via messaging.
 - ***Policy Scenario*** – defines the alternative scenario used to update risk factors distributions based on the intervention’s population targets and parameters. Interventions are designed specifically to study a particular scenario and may require new data formats and additional module in code.
 - ***Health GPS*** - the core of the microsimulation engine. It holds all the other modules instances and state machine to run a full simulation, dictating the calling order of each module during initialisation and multiple update steps to completion, and notify progress via messaging.
-- ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSOM format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
+- ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
 
 The *simulation engine* clock and events scheduling is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. The simulation results are streamed asynchronous to the outside world via the *message bus* instance provided to the model by the *host application* during initialisation.
 
@@ -110,7 +110,7 @@ The *simulation engine* requests the required modules instance to be created by 
 
 The order of execution of each module and provision of parameters for each call is the responsibility of the simulation engine algorithm. Users can optionally provide a fixed seed to initialise the random number generator for reproducibility, the same generator instance is used throughout the simulation and depending on the run mode: baseline only vs. with intervention, the seed is reset for each run. The simulation engine consists of two main steps, *initialise*, and *update* the virtual population.
 
-Creating and initialising the virtual population is the first step of a simulation run, below is the sequence diagram showning the events and order of activation of the different modules by the Health GPS algorithm.
+Creating and initialising the virtual population is the first step of a simulation run, below is the sequence diagram showing the events and order of activation of the different modules by the Health GPS algorithm.
 
 |![Health GPS Initialise Population](/assets/image/initialise_sequence.png)|
 |:--:|
@@ -126,13 +126,13 @@ The update population algorithm is the heart of the Health GPS microsimulation, 
 
 # Policy Scenarios
 
-Each simulation instance must have a single policy scenario associated as part of the experiment, the scenarios common interface definition is shown below. There are wwo types of scenarios are supported: ***Baseline*** to define the trends in the observed population to measure outcomes against; and ***Intervention*** for policies designed to change the observed trends during a specific timeframe.
+Each simulation instance must have a single policy scenario associated as part of the experiment, the scenarios common interface definition is shown below. There are wwo types of scenarios are supported: ***Baseline*** to define the trends in the observed population to measure outcomes against; and ***Intervention*** for policies designed to change the observed trends during a specific time frame.
 
 |![Health GPS Policy Scenarios Interface](/assets/image/scenarios_interface.png)|
 |:--:|
 |*Policy Scenario Common Interface*|
 
-Policy scenario is not a typical module, their implementation consists of a single function that is invoked with the information required for it to act: the individual, current time, the risk factor key, and risk factor value. The baseline scenario implementation simply loopback the *risk factor value* without making any change, independent of arguments, while the intervention scenarios definition might consist of external data, complex rules, and specific timeframe to act upon invocation.
+Policy scenario is not a typical module, their implementation consists of a single function that is invoked with the information required for it to act: the individual, current time, the risk factor key, and risk factor value. The baseline scenario implementation simply loopback the *risk factor value* without making any change, independent of arguments, while the intervention scenarios definition might consist of external data, complex rules, and specific time frame to act upon invocation.
 
 The current modelling of intervention scenario requires data synchronisation between the *baseline* and *intervention* scenarios at multiple points, resulting on pairs of simulations being evaluated at a time, instead of independently. The figure below illustrates the present solution, based on shared memory to work on a single machine, it creates a unidirectional channel to send messages, asynchronous, from baseline to intervention scenarios. At the receiving end, the channel is synchronous, blocking until the message arrives or a pre-defined time expires, forcing the experiment to terminate.
 
@@ -146,7 +146,7 @@ An alternative to this design is to use a message broker, e.g., [RabbitMQ](https
 
 The *executive* is responsible for managing the simulation clock and events scheduling is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. The DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, as well as hybrids with continuous components in a straightforward manner ([Zeigle and Muzy](https://www.sciencedirect.com/science/article/pii/S2405896317310601)). *Health GPS* describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater clarity and flexibility.
 
-To run the simulation under the requirements described above, a purposed build class has been designed as shown below, to create the simulation running environment, instruct the *simulation executive* to evaluate the scenarios for the user’s pre-defined number of runs, generate seeds and support for cancelation.
+To run the simulation under the requirements described above, a purposed build class has been designed as shown below, to create the simulation running environment, instruct the *simulation executive* to evaluate the scenarios for the user’s pre-defined number of runs, generate seeds and support for cancellation.
 
 |![Health GPS Runner Class Diagram](/assets/image/model_runner.png)|
 |:--:|
@@ -158,4 +158,4 @@ The *model runner* provides two modes of evaluating a simulation experiment, bot
 |:--:|
 |*Model Runner Activity Diagram*|
 
-The experiment's scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The model runner and simulation engine communicate with the outside world via messages, indicating the start and finish of the experiment, notifying run progress, handling cancelation, and publishing results at each simulated time step. An external event monitor can be used to process messages, display progress on screen, stream over the internet, summarise results and/or log to file.
+The experiment's scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The model runner and simulation engine communicate with the outside world via messages, indicating the start and finish of the experiment, notifying run progress, handling cancellation, and publishing results at each simulated time step. An external event monitor can be used to process messages, display progress on screen, stream over the internet, summarise results and/or log to file.

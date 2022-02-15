@@ -52,11 +52,11 @@ cmake --preset='linux-debug'
 cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
-All available options for CMake prestes are defined in the *CMakePresets.json* file, which also declare many of the options previously provided to CMake via command line arguments. The use of presets provides consistent builds scripts across development and CI/CD environments using source control for reproduciability.
+All available options for CMake *prestes* are defined in the `CMakePresets.json` file, which also declare many of the options previously provided to CMake via command line arguments. The use of presets provides consistent builds scripts across development and CI/CD environments using source control for reproducibility.
 
 ## Third-party components
 
-The project dependencieas are included using [vcpkg](https://github.com/microsoft/vcpkg) package manager, and declared in the *vcpkg.json* manifest file. The package manager is integreted with CMake and automatically invoked by the ```find_package``` command during build.
+The project dependencies are included using [vcpkg](https://github.com/microsoft/vcpkg) package manager, and declared in the *vcpkg.json* manifest file. The package manager is integrated with CMake and automatically invoked by the ```find_package``` command during build.
 
 | Name  | License |
 |:---   |:---     |
