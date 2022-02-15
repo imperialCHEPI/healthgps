@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model (Health GPS).
 
-| [Home](index) | [Quick Start](getstarted) | Software Architecture | [Data Model](datamodel) | [Implementation](implementation) | [Development Tools](development) | [License](index#license) |
+| [Home](index) | [Quick Start](getstarted) | Software Architecture | [Data Model](datamodel) | [Implementation](implementation) | [Development Tools](development) |
 
 # Software Architecture
 

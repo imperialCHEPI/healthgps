@@ -1,6 +1,6 @@
 ## Welcome to the Global Health Policy Simulation model (Health GPS).
 
-| Home |[Quick Start](getstarted) | [Software Architecture](architecture) | [Data Model](datamodel) | [Development](development) | [User Guide](userguide) | [License](index#license) |
+| Home |[Quick Start](getstarted) | [Software Architecture](architecture) | [Data Model](datamodel) | [Development](development) | [User Guide](userguide) |
 
 # Introduction
 **Health GPS** is a modular and flexible microsimulation framework developed in collaboration between the Centre for Health Economics & Policy Innovation ([CHEPI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/)), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). *Health GPS* allow researchers to test the effectiveness of a variety of health policies and interventions designed for tackling childhood obesity in European Countries.
@@ -32,10 +32,3 @@ The choice of baseline scenario is critical for analyses as it serves as a refer
 The first run evaluates the no-intervention, *“baseline scenario”* where demographics, risk factors, and diseases are projected based solely on estimates from historical data. The second run evaluates the *“intervention scenario”* where a specific policy is applied to the same population with the aim of modifying the underlying trends and risk factor distribution. 
 
 Finally, detailed analysis can be carried out, externally, to compare the two simulated scenarios results in terms of population demographics and burden of diseases to estimate the cost-effectiveness and impacts of the targeted intervention in tackling childhood obesity.
-
-<a name="license"></a>
-# License
-The code in this repository is licensed under the [BSD 3-Clause](https://github.com/imperialCHEPI/healthgps/blob/main/LICENSE.md) license.
-
-## Contact and Support
-Imperial College London Business School, Centre for Health Economics & Policy Innovation ([CHEPI](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/)).
