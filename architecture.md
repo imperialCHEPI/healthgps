@@ -158,4 +158,6 @@ The *model runner* provides two modes of evaluating a simulation experiment, bot
 |:--:|
 |*Model Runner Activity Diagram*|
 
-The experiment's scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The model runner and simulation engine communicate with the outside world via messages, indicating the start and finish of the experiment, notifying run progress, handling cancellation, and publishing results at each simulated time step. An external event monitor can be used to process messages, display progress on screen, stream over the internet, summarise results and/or log to file.
+The experiment's scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The model runner and simulation engine communicate with the outside world via messages, indicating the start and finish of the experiment, notifying run progress, handling cancellation, and publishing results at each simulated time step. An event monitor can be used to process messages, display progress on screen, stream over the internet, summarise results and/or log to file.
+
+See the [Data Model](datamodel) and [Developer Guide](development) for detailed information on the backend data storage and *interfaces* concrete implementation.
