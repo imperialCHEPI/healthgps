@@ -12,10 +12,30 @@ The *Health-GPS* microsimulation is a data driven modelling framework, combining
 
 As with any simulation model, it is the user's responsibility to process and analyse input data, define the model’s hierarchy, and fit parameters to data. A configuration file (JSON) is used control the simulation running settings and map the *Health-GPS* expected parameters to the user input data and fitted values. Likewise, it is the user's responsibility to and analyse and quantify the model results, which are saved to a chosen output folder in `JSON` format.
 
-|![Health GPS Execution](/assets/image/execution_diagram.png)|
+|![Health GPS Execution](/assets/image/model_runner_activity.png)|
 |:--:|
 |*Health GPS Execution Diagram*|
 
 ---
 > **_UNDER DEVELOPMENT:_**  More content coming soon.
 ---
+
+This is a permalink example:
+[healthgps/source/HealthGPS.Console/program.cpp](
+https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Console/program.cpp#L75-L146)
+
+```cpp
+	auto model_config = create_model_input(input_table, target.value(), config, diseases);
+
+	// Create event bus and monitor
+	auto event_bus = DefaultEventBus();
+	auto result_file_logger = ResultFileWriter{ 
+		create_output_file_name(config.result),
+		ModelInfo{.name = "Health-GPS", .version = "1.0.0.0"}
+	};
+	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
+
+    ...
+```
+
+

@@ -4,7 +4,7 @@
 
 # Software Architecture
 
-The Health GPS software architecture adopts a modular design approach to provide the building blocks necessary to compose the microsimulation, which is written in modern, standard ANSI [C++20](https://en.cppreference.com/w/cpp/20) and using object-oriented principles for software development. The software application is open source, cross-platform,  and comprises of four main components:
+The Health GPS software architecture adopts a modular design approach to provide the building blocks necessary to compose the microsimulation, which is written in modern, standard ANSI [C++20][cpp20] and using object-oriented principles for software development. The software application is open source, cross-platform,  and comprises of four main components:
 
 |![Health GPS Components](/assets/image/component_diagram.png)|
 |:--:|
@@ -35,7 +35,7 @@ The Health GPS framework adopts a modular design to specify the building blocks 
 - ***Health GPS*** - the core of the microsimulation engine. It holds all the other modules instances and state machine to run a full simulation, dictating the calling order of each module during initialisation and multiple update steps to completion, and notify progress via messaging.
 - ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
 
-The *simulation engine* clock and events scheduling is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. The simulation results are streamed asynchronous to the outside world via the *message bus* instance provided to the model by the *host application* during initialisation.
+The *simulation engine* clock and events scheduling is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. The simulation results are streamed asynchronous to the outside world via the *message bus* instance provided to the model by the *host application* during initialisation.
 
 The software architecture defines interfaces for modules, sub-models, and external communication; these abstractions provide decoupling, reuse, and flexibility for composing the microsimulation to answer different research questions. All modules share a common interface, as shown below, to enable dynamic registration of different modules version using a *factory pattern*, which also makes available the underline data infrastructure and user inputs for module instance creation.
 
@@ -102,7 +102,7 @@ Helper methods are provided for easy access, for instance the `is_active` method
 
 # Simulation Engine
 
-The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health GPS engine is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, as well as hybrids with continuous components in a straightforward manner ([Zeigle and Muzy](https://www.sciencedirect.com/science/article/pii/S2405896317310601)). Health GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
+The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health GPS engine is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS][adevs] library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, as well as hybrids with continuous components in a straightforward manner ([Zeigle and Muzy][devs]). Health GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
 
 The DEVS model has been abstracted behind the `Simulation` base class, which defines the Health GPS simulation engine shown below, it adds extensions to support this specific workflow, and stores the `SimulationDefinition` data structure containing the minimum information required to create a simulation. The pseudorandom number generator functionality required by the model is defined by the `RandomBitGenerator` interface, algorithms for generating sequence of numbers can be implemented and easily used by the simulation engine at runtime.
 
@@ -170,7 +170,7 @@ An alternative to this design is to use a message broker, e.g., [RabbitMQ](https
 
 # Simulation Executive
 
-The *simulation executive* creates the simulation running environment, instructs the *simulation engine* to evaluate the experiment scenarios for a pre-defined number of runs, manage master seeds generation, notify progress, and handle experiment for cancellation. The `ModelRunner` class shown below, implements the Health GPS executive.
+The *simulation executive* creates the simulation running environment, instructs the *simulation engine* to evaluate the experiment scenarios for a pre-defined number of runs, manage master seeds generation, notify progress, and handle experiment for cancellation. The `ModelRunner` class shown below, implements the *Health GPS simulation executive*.
 
 |![Health GPS Runner Class Diagram](/assets/image/model_runner.png)|
 |:--:|
@@ -180,10 +180,25 @@ Two modes of evaluating a simulation experiment as provided by the simulation ex
 
 |![Health GPS Simulation Runner](/assets/image/model_runner_activity.png)|
 |:--:|
-|*Model Runner Activity Diagram*|
+|*Health GPS Simulation Executive Activity Diagram*|
 
-Experiment scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. Like the simulation engine, the simulation executive communicates with the outside world via messages, ideally sharing the same message bus instance, indicating the start and finish of the experiment, notifying error and cancellation.
+Experiment scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The [ADEVS][adevs] executive, `Simulator`, is use inside each thread loop to execute the respective experiment scenario. The simulation executive communicates with the outside world via messages, ideally sharing the same message bus instance with the simulation engine, indicating the start and finish of the experiment, notifying error and cancellation.
 
-An event monitor should be used to receive and process the simulation messages, display on screen, stream over the internet, summarise results and/or log to file.
+The *message bus* mechanism decouples the sender from the receiver, typically one or more event monitors are used to subscriber for messages, receive, queue, and process the messages queue on its own pace and thread, common activities are display on screen, stream over the internet, summarise results and/or log to file.
 
-See the [Data Model](datamodel) and [Developer Guide](development) for detailed information on the backend data storage and *interfaces* concrete implementation.
+# Deployment
+
+The various components of the Health GPS ecosystem can be deployed to multiple computing platforms. The four components are packaged together into the *host application* executable, which is purpose built for each target platforms as shown below. The backend *data storage* is platform independent, but must be available, accessible, and properly configured for the application to work correctly at runtime.
+
+|![Health GPS Deployment](/assets/image/deployment_package.png)|
+|:--:|
+|*Health GPS Deployment Package*|
+
+The version of the *libraries* required by the application at runtime depends on the compiler being used to build Health GPS executable. The source code is portable for compilers supporting C++20 standard, however the resulting binaries are platform *dependent* and must be built, tested, and deployed accordingly for the model to work as expected.
+
+> See [Data Model](datamodel) and [Developer Guide](development) for detailed information on the backend data storage and the various *interfaces* implementation respectively.
+
+[comment]: # (References)
+[cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
+[adevs]:https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
+[devs]:https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
