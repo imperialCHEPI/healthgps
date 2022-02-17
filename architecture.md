@@ -102,14 +102,37 @@ Helper methods are provided for easy access, for instance the `is_active` method
 
 # Simulation Engine
 
-The *simulation engine* requests the required modules instance to be created by the factory by type during the engine instance construction and owns the module instances during its lifespan. Below is the simulation engine lifecycle workflow, which is controlled externally by the simulation executive, with full control over the simulation time step advancements and duration of each run.
+The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health GPS engine is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, as well as hybrids with continuous components in a straightforward manner ([Zeigle and Muzy](https://www.sciencedirect.com/science/article/pii/S2405896317310601)). Health GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
 
-|![Health GPS Simulation Engine](/assets/image/simulation_engine.png)|
+The DEVS model has been abstracted behind the `Simulation` base class, which defines the Health GPS simulation engine shown below, it adds extensions to support this specific workflow, and stores the `SimulationDefinition` data structure containing the minimum information required to create a simulation. The pseudorandom number generator functionality required by the model is defined by the `RandomBitGenerator` interface, algorithms for generating sequence of numbers can be implemented and easily used by the simulation engine at runtime.
+
+|![Health GPS Engine Interface](/assets/image/simulation_engine_interface.png)|
+|:--:|
+|*Health GPS Simulation Engine Interface*|
+
+The default implementation of the `Simulation` interface, the *simulation engine*, is provided by the `HealthGPS` class shown below. The *simulation engine* requests the module factory to create all the required modules type instances during construction. The engine owns the module instances created by the factory and has full control over the duration of each run and time step advancements during its lifespan. The `RuntimeContext` data structure is created by the *Health GPS engine* during construction to store the virtual population, and share common infrastructure, runtime information, and model settings with modules via calls to the public interface.
+
+|![Health GPS Engine](/assets/image/healthgps_engine.png)|
+|:--:|
+|*Health GPS Simulation Engine*|
+
+The engine enables communication with the outside world to update on progress, report errors, and publish simulation results via messaging, the `EventAggregator` and `EventSubscriber` interfaces define the required functionality that a concrete Message Bus implementation must provide as shown below. Four types of messages are current defined, however new messages can easily be added by extending the `EventMessage` interface, a single message is broadcasted to one or more subscribers. 
+
+|![Health GPS Engine](/assets/image/message_bus_interface.png)|
+|:--:|
+|*Health GPS Message Bus Interface*|
+
+A concrete *message bus* instance is provided to the *Health GPS engine* during construction and exposed by the `RuntimeContext` via the *publish* method to streamline usage. Messages can be sent *synchronous* or *asynchronous*, depending on specific requirements, for example, *error* messages need immediate attention before continuing, usually synchronous; while notification messages are typically queued before processing, may be asynchronous.
+
+The *simulation engine* internal workflow shown below, highlights the main algorithms executed during the Health GPS engine instance lifecycle, experiment scenario evaluation, and a single simulation run respectively. The number of simulation replications or runs required by an experiment is controlled externally by the *simulation executive*, which uses the same engine instance to complete multiple runs of the same scenario.
+
+|![Health GPS Engine Workflow](/assets/image/simulation_engine.png)|
 |:--:|
 |*Health GPS Simulation Engine Workflow*|
 
-The order of execution of each module and provision of parameters for each call is the responsibility of the simulation engine algorithm. Users can optionally provide a fixed seed to initialise the random number generator for reproducibility, the same generator instance is used throughout the simulation and depending on the run mode: baseline only vs. with intervention, the seed is reset for each run. The simulation engine consists of two main steps, *initialise*, and *update* the virtual population.
+The order of execution of each module and provision of parameters for each call is the responsibility of the simulation engine algorithm. The same random number generator instance is used throughout the simulation, the generator is initialised during the *Initialise* step, users can optionally provide a fixed seed to initialise the generator for reproducibility. This initialisation is sufficient for experiment with only *baseline* scenario, however experiments with *baseline* and *intervention* scenarios being evaluated together, the random number generator is reset before each run by the simulation executive to ensure reproducibility. The simulation engine consists of two main algorithms to *initialise* and *update* the virtual population over time respectively.
 
+## Initialise Population
 Creating and initialising the virtual population is the first step of a simulation run, below is the sequence diagram showing the events and order of activation of the different modules by the Health GPS algorithm.
 
 |![Health GPS Initialise Population](/assets/image/initialise_sequence.png)|
@@ -118,11 +141,14 @@ Creating and initialising the virtual population is the first step of a simulati
 
 The algorithm sets the simulation world clock, in years, to the user’s defined start time, and uses the simulation module interface to request each module to initialise the relevant properties of the virtual population individuals.
 
+## Update Population
 The update population algorithm is the heart of the Health GPS microsimulation, the sequence of events and order of activation for different modules during each time step update of the simulation is shown below. The algorithm moves the simulation clock, in years, forwards until the user’s defined end time is reached, at which point the algorithm terminates, finishing the run.
 
 |![Health GPS Update Population](/assets/image/update_sequence.png)|
 |:--:|
 |*Update Population Algorithm (Sequence Diagram #2)*|
+
+The empty squares in the Scenario timeline highlight data synchronisation points between the baseline and intervention scenarios, see next section for details.
 
 # Policy Scenarios
 
@@ -144,20 +170,20 @@ An alternative to this design is to use a message broker, e.g., [RabbitMQ](https
 
 # Simulation Executive
 
-The *executive* is responsible for managing the simulation clock and events scheduling is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS](https://web.ornl.gov/~nutarojj/adevs) library. The DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, as well as hybrids with continuous components in a straightforward manner ([Zeigle and Muzy](https://www.sciencedirect.com/science/article/pii/S2405896317310601)). *Health GPS* describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater clarity and flexibility.
-
-To run the simulation under the requirements described above, a purposed build class has been designed as shown below, to create the simulation running environment, instruct the *simulation executive* to evaluate the scenarios for the user’s pre-defined number of runs, generate seeds and support for cancellation.
+The *simulation executive* creates the simulation running environment, instructs the *simulation engine* to evaluate the experiment scenarios for a pre-defined number of runs, manage master seeds generation, notify progress, and handle experiment for cancellation. The `ModelRunner` class shown below, implements the Health GPS executive.
 
 |![Health GPS Runner Class Diagram](/assets/image/model_runner.png)|
 |:--:|
-|*Model Runner Class Diagram*|
+|*Simulation Executive Class Diagram*|
 
-The *model runner* provides two modes of evaluating a simulation experiment, both using the run function, which can take overloaded parameters. Below is an illustration of the two execution paths, the first simulates the *baseline* scenario only, and the second simulates both *baseline* and *intervention* scenarios as a pair with data synchronisation as described above.
+Two modes of evaluating a simulation experiment as provided by the simulation executive, using the *run* function with overloaded parameters. The two  paths of execution are illustration below, the first simulates *no-intervention*, baseline scenario only experiments, while the second simulates *intervention* experiments with baseline and intervention scenarios evaluated as a pair, and data synchronisation as described above.
 
 |![Health GPS Simulation Runner](/assets/image/model_runner_activity.png)|
 |:--:|
 |*Model Runner Activity Diagram*|
 
-The experiment's scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The model runner and simulation engine communicate with the outside world via messages, indicating the start and finish of the experiment, notifying run progress, handling cancellation, and publishing results at each simulated time step. An event monitor can be used to process messages, display progress on screen, stream over the internet, summarise results and/or log to file.
+Experiment scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. Like the simulation engine, the simulation executive communicates with the outside world via messages, ideally sharing the same message bus instance, indicating the start and finish of the experiment, notifying error and cancellation.
+
+An event monitor should be used to receive and process the simulation messages, display on screen, stream over the internet, summarise results and/or log to file.
 
 See the [Data Model](datamodel) and [Developer Guide](development) for detailed information on the backend data storage and *interfaces* concrete implementation.

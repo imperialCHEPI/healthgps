@@ -10,7 +10,7 @@ Health GPS creates a *virtual population* representative of a distinct country's
 The model uses proprietary equations to account for a variety of complex interactions such as risk factor-disease interactions and disease-disease interactions. Modellers are then able to evaluate health-related policies by changing some of the parameters and comparing the outputs with a *baseline* simulation. The model produces detailed quantitative outputs covering demographics, risk factors, diseases, mortality, global health estimates and health care expenditure, which could then be used to complement qualitative policy evaluation tools.
 
 ### General Workflow
-The Health GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
+The Health GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country, and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
 
 |![Health GPS Workflow](/assets/image/general_workflow.png)|
 |:--:|
@@ -20,20 +20,20 @@ The simulation creates the virtual population, simulates the synthetic individua
 
 ## Demographics
 
-The population historical trends and projections are used to define the baseline scenario for the model. The model requires historical and projected populations by *year*, *age* and *gender* for each country of interest, covering the entire duration of the experiment. All data processing, units conversion, gap filling, smoothing, etc, must be carried out outside to produce the complete datasets required. The following demographic measures are required by the model:
+The population historical trends and projections are used to define the baseline scenario for the model. The model requires historical and projected populations by *year*, *age* and *gender* for each country of interest, covering the entire duration of the experiment. All data processing, units' conversion, gap filling, smoothing, etc, must be carried out outside to produce the complete datasets required. The following demographic measures are required by the model:
 
 * *Population size*
 * *Birth rates*
 * *Death rates*
 * *Residual Mortality* - deaths from non-modelled causes.
 
-Births, deaths, and immigration are the only drivers of changes in demographics in a population. While births and deaths modelling is data driven, finding accurate data about immigration is more challenging. *Net migration*, the net flow of migrants between two consecutive years, is estimated as the difference by age and gender between the simulated population and the expected population from the country's input data.
+Births, deaths, and immigration are the only drivers of changes in demographics in a population. While the births and deaths modelling are data driven, finding accurate data about immigration is more challenging. *Net migration*, the net flow of migrants between two consecutive years, is estimated as the difference by age and gender between the simulated population and the expected population from the country's input data.
 
 ### Socio-Economic Status (SES)
-SES plays an important role in the levels of risk factors observed within the population. The levels of income and education can influences the nature of diet, and physical activity. Health GPS models SES as a proxy value, combining education, income and other factors to represent specific groups within the population. Each individual SES value is attributed at birth by sampling from a *standard normal distribution* and stays constant over time.
+SES plays an important role in the levels of risk factors observed within the population. The levels of income and education can influence the nature of diet, and physical activity. Health GPS models SES as a proxy value, combining education, income, and other factors to represent specific groups within the population. Each individual SES value is attributed at birth by sampling from a *standard normal distribution* and stays constant over time.
 ## Risk Factors
 
-The population cultural and social behaviours are represented by *risk factors*, defined as any attributes that can influence the likelihood of acquiring a disease. Individual choices such as smoking, alcohol consumption, physical activity, and diet, can lead to long-term consequences such as hypertension, obesity and diabetes. Furthermore, certain diseases can be risk factors for other diseases or certain types of cancers.
+The population cultural and social behaviours are represented by *risk factors*, defined as any attributes that can influence the likelihood of acquiring a disease. Individual choices such as smoking, alcohol consumption, physical activity, and diet, can lead to long-term consequences such as hypertension, obesity, and diabetes. Furthermore, certain diseases can be risk factors for other diseases or certain types of cancers.
 
 The dynamics of risk factors modelling is a major challenge for health policy modellers, there are divergent opinions on the types and directions of causality between risk factors and diseases. *Health GPS* defines a dynamic hierarchical risk factor model structure, modellers can configure the hierarchy outside for different problems, fit parameters to data and provide to fully built model as part of the experiment configuration.
 
@@ -49,9 +49,9 @@ The calibration of the equations is carried out outside of the model by gender f
 
 ## Diseases
 
-Individuals may acquire new diseases for many reasons, including genetics, environment and lifestyles. The associations between risk factors and the incidence of certain types of diseases is a major subject being widely study. Health GPS accounts for the associations between risk factors and diseases by using equations to translate exposures to risk factors into probabilities that are used to simulate the incidence of diseases in the population.
+Individuals may acquire new diseases for many reasons, including genetics, environment, and lifestyles. The associations between risk factors and the incidence of certain types of diseases is a major subject being widely study. Health GPS accounts for the associations between risk factors and diseases by using equations to translate exposures to risk factors into probabilities that are used to simulate the incidence of diseases in the population.
 
-The association between risk factor and disease stays constant throughout the simulation, however any changes in the distribution of a risk factor, will still translate to more/fewer disease cases through relative risk equations. Any change in the prevalence of a disease is therefore solely caused by changes in risk factors distributions alongside the ageing effect on the simulated population. Health GPS supports two types of diseases: general *noncommunicable* diseases, and types of *cancer* respectively.
+The association between risk factor and disease stays constant throughout the simulation, however any changes in the distribution of a risk factor, will still translate to more/fewer disease cases through relative risk equations. Any change in the prevalence of a disease is therefore solely caused by changes in risk factors distributions alongside the ageing effect on the simulated population. Health GPS supports two groups of diseases: general *noncommunicable* diseases, and types of *cancer* respectively.
 
 ## Policy Evaluation
 The overall approach adopted to evaluate the impacts and cost-effectiveness of intervention policies to reduce childhood obesity using the policy simulation tool is based upon *“what-if”* analyses to quantify the causal relations between variables, scenarios can be classified as:
