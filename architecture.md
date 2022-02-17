@@ -33,7 +33,7 @@ The Health GPS framework adopts a modular design to specify the building blocks 
 - ***Analysis Module** – collects statistical indicators about the simulated population, calculates diseases prevalence, risk factors exposure, and standardised metrics such as YLL, YLD, DALY, and publish the results to the outside world asynchronously via messaging.
 - ***Policy Scenario*** – defines the alternative scenario used to update risk factors distributions based on the intervention’s population targets and parameters. Interventions are designed specifically to study a particular scenario and may require new data formats and additional module in code.
 - ***Health GPS*** - the core of the microsimulation engine. It holds all the other modules instances and state machine to run a full simulation, dictating the calling order of each module during initialisation and multiple update steps to completion, and notify progress via messaging.
-- ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ](https://www.rabbitmq.com), or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
+- ***Output*** – the collection of results published by the simulation (Analysis Module) at the end of each time step and written to a file in disk, JSON format, by the Host Application to be analysed by the user externally to draw conclusions about the simulated experiment. An alternative to writing the results to a file in disk, is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute the messages and enable parallel analysis of results while the simulation is running by an external application.
 
 The *simulation engine* clock and events scheduling is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. The simulation results are streamed asynchronous to the outside world via the *message bus* instance provided to the model by the *host application* during initialisation.
 
@@ -102,7 +102,7 @@ Helper methods are provided for easy access, for instance the `is_active` method
 
 # Simulation Engine
 
-The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health GPS engine is based on the *Discrete Event System Specification* (DEVS) and provided by the [ADEVS][adevs] library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, as well as hybrids with continuous components in a straightforward manner ([Zeigle and Muzy][devs]). Health GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
+The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health GPS engine is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, agent-based systems as well as hybrids with continuous components in a straightforward manner. Health GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
 
 The DEVS model has been abstracted behind the `Simulation` base class, which defines the Health GPS simulation engine shown below, it adds extensions to support this specific workflow, and stores the `SimulationDefinition` data structure containing the minimum information required to create a simulation. The pseudorandom number generator functionality required by the model is defined by the `RandomBitGenerator` interface, algorithms for generating sequence of numbers can be implemented and easily used by the simulation engine at runtime.
 
@@ -166,7 +166,7 @@ The current modelling of intervention scenario requires data synchronisation bet
 |:--:|
 |*Policy Scenario’s Data Synchronisation Mechanism*|
 
-An alternative to this design is to use a message broker, e.g., [RabbitMQ](https://www.rabbitmq.com) , or a distributed event streaming platform such as [Apache Kafka](https://kafka.apache.org) to distribute random generator seeds and messages over a network of computers running in pairs to scale-up the model’s virtual population size and throughput. This solution would allow for a single baseline scenario data to be shared by multiple intervention scenarios, marked reducing the requirement for simulation pair coupling.
+An alternative to this design is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute random generator seeds and messages over a network of computers running in pairs to scale-up the model’s virtual population size and throughput. This solution would allow for a single baseline scenario data to be shared by multiple intervention scenarios, marked reducing the requirement for simulation pair coupling.
 
 # Simulation Executive
 
@@ -182,7 +182,7 @@ Two modes of evaluating a simulation experiment as provided by the simulation ex
 |:--:|
 |*Health GPS Simulation Executive Activity Diagram*|
 
-Experiment scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The [ADEVS][adevs] executive, `Simulator`, is use inside each thread loop to execute the respective experiment scenario. The simulation executive communicates with the outside world via messages, ideally sharing the same message bus instance with the simulation engine, indicating the start and finish of the experiment, notifying error and cancellation.
+Experiment scenarios are evaluated in parallel using multiple threads, however the need to exchange data between scenarios creates an indirect synchronisation with a small overhead. The [ADEVS][adevs] executive, [Simulator][adevsim] class, is use inside each thread loop to execute the respective experiment scenario. The simulation executive communicates with the outside world via messages, ideally sharing the same message bus instance with the simulation engine, indicating the start and finish of the experiment, notifying error and cancellation.
 
 The *message bus* mechanism decouples the sender from the receiver, typically one or more event monitors are used to subscriber for messages, receive, queue, and process the messages queue on its own pace and thread, common activities are display on screen, stream over the internet, summarise results and/or log to file.
 
@@ -200,5 +200,8 @@ The version of the *libraries* required by the application at runtime depends on
 
 [comment]: # (References)
 [cpp20]:https://en.cppreference.com/w/cpp/20 "C++ 20 standard features and compiler support"
+[kafka]:https://kafka.apache.org "Distributed event streaming platform"
+[broker]:https://www.rabbitmq.com "Message-broker with Advanced Message Queuing Protocol"
 [adevs]:https://web.ornl.gov/~nutarojj/adevs "A Discrete EVent System simulator library"
 [devs]:https://doi.org/10.1016/j.ifacol.2017.08.672 "From Discrete Event Simulation to Discrete Event Specified Systems (DEVS)"
+[adevsim]:https://github.com/imperialCHEPI/healthgps/blob/main/source/external/adevs/adevs_base.h#L193 "healthgps/blob/main/source/external/adevs/adevs_base.h"
