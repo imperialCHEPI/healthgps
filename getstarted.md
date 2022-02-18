@@ -4,7 +4,7 @@
 
 # Quick Start
 
-The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a *configuration file* (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
+The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
 Although the model source code is portable, binaries must be generated for each platforms using respective tools and libraries. The Health GPS repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS) with very specific runtime requirements.
 
@@ -93,3 +93,6 @@ show(p)
 |*Experiment BMI projection example*|
 
 In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
+
+[comment]: # (References)
+[configjson]:https://github.com/imperialCHEPI/healthgps/blob/main/example/France.Config.json "Configuration file example"
