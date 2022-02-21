@@ -26,12 +26,12 @@ The data model defines normalised enumerations, *yellow*, to provide *stable ide
 | Field name | Data Type | Constraint | Description             |
 | :---       | :---      | :---       | :---                    |
 | **XyzID**  | Integer   | PK         | Model unique identifier |
-| Code       | Text      | UK         | User stable identifier  |
+| Code       | Text      | UQ         | User stable identifier  |
 | ShortName  | Text      |            | User facing display name|
 | Description| Text      |            | Optional documentation  |
 
 
-The unique constraint (UK) may include multiple fields within the entity definition, *ShortName* fields are the user facing name for the *code* identifier and must always be provided. It is very **important** to be consistent when populating the enumerations *code* field to provide users and applications stable lookups, the following list is a suggested guide:
+The unique constraint (UQ) may include multiple fields within the entity definition, *ShortName* fields are the user facing name for the *code* identifier and must always be provided. It is very **important** to be consistent when populating the enumerations *code* field to provide users and applications stable lookups, the following list is a suggested guide:
 
 * start with a letter 
 * use only letters, numbers, and/or the underscore character, no spaces
@@ -40,21 +40,21 @@ The unique constraint (UK) may include multiple fields within the entity definit
 
 The same recommendation applies to *folders* and *file* names definitions in cross-platform applications, operating system like *Linux* are case-sensitive by default, adopt a consistent naming convention that works everywhere. Following are the enumerations defined by the Health GPS model:
 
-## Gender
+### Gender
 
 | GenderID | Code   | ShortName | Description      |
 | :---     | :---   | :---      | :---             |
 | 1        | male   | Male      |                  |
 | 2        | female | Female    |                  |
 
-## Disease Group
+### Disease Group
 
 | GroupID  | Code   | ShortName | Description|
 | :---     | :---   | :---      | :---       |
 | 0        | other  | Other     | General noncommunicable diseases|
 | 1        | cancer | Cancer    | Cancer type diseases|
 
-## Disease Measure Type
+### Disease Measure Type
 
 | MeasureID | Code   | ShortName | Description|
 | :---      | :---   | :---      | :---       |
@@ -63,7 +63,7 @@ The same recommendation applies to *folders* and *file* names definitions in cro
 | 7         | remission  | Remission| | |
 | 15        | mortality  | Mortality  | |
 
-## BoD Measure Type
+### BoD Measure Type
 
 | MeasureID | Code   | ShortName | Description|
 | :---      | :---   | :---      | :---       |
@@ -71,7 +71,7 @@ The same recommendation applies to *folders* and *file* names definitions in cro
 | 3         | yld  | YLD  | Years lived with disability |
 | 4         | yll  | YLL  | Years of life lost|
 
-## Cancer Parameter Type
+### Cancer Parameter Type
 
 | ParameterID | Code         | ShortName  | Description              |
 | :---        | :---         | :---       | :---                     |
@@ -82,7 +82,7 @@ The same recommendation applies to *folders* and *file* names definitions in cro
 ## Registries
 The *DiseaseType* and *RiskFactorType* are *dynamic enumerations*, providing a consistent *Registry* for available *diseases* and relative *risk factors* respectively. These enumerations are populated on demand, when defining a new diseases within the Health GPS ecosystem. Following are the examples of dynamic enumerations defined in the Health GPS model:
 
-## Disease Type
+### Disease Type
 
 | DiseaseID | Code        | GroupID | ShortName         | Description              |
 | :---      | :---        | :---:   | :---              | :---                     |
@@ -91,7 +91,7 @@ The *DiseaseType* and *RiskFactorType* are *dynamic enumerations*, providing a c
 | Auto      | lowbackpain | 0       | Low back pain     | |
 | Auto      | colorectum  | 1       | Colorectal  cancer| |
 
-## Risk Factor Type
+### Risk Factor Type
 
 | ParameterID | Code | ShortName | Description     |
 | :---      | :---   | :---      | :---            |
@@ -108,20 +108,130 @@ All entities in the model have a *time* and/or *age* dimension associated with t
 | AtTime    | Integer   | The time in years       |
 | WithAge   | Integer   | The age at time in years|
 
-Entities with a single measure associated with gender, e.g. Population, store the values for each enumeration as column, while entities with higher dimensionality, e.g. disease, represent *Gender* and *Measure* independent dimensions.
+Entities with a single measure associated with gender, e.g. Population, store the values for each enumeration as column, while entities with higher dimensionality, e.g. disease, represent *Gender* and *Measure* independent dimensions. All data stored in the model should have a consistent unit, with all units conversion performed outside prior to data ingestion.
 
 ## Demographics
+Country specific demographics data containing historic estimates and projections are modelled using one entity per measure, representing a two dimensional series, *time x age*, with expanded *gender* enumeration columns. The following entities provide the demographics module data, all fields are required for a row definition:
+
+### Population
+
+Stores the number of *males* and *females* measure for a location at each *time* and *age* combination.
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| LocationID | Integer   | UQ         | Location unique identifier |
+| AtTime     | Integer   | UQ         | The measure time in years |
+| WithAge    | Integer   | UQ         | The measure age in years |
+| PopMale    | Real      |            | Number of males in population |
+| PopFemale  | Real      |            | Number of female in population |
+
+### Mortality
+Stores the number for *males* and *females* deaths for a location at each *time* and *age* combination.
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| LocationID | Integer   | UQ         | Location unique identifier |
+| AtTime     | Integer   | UQ         | The measure time in years |
+| WithAge    | Integer   | UQ         | The measure age in years |
+| DeathMale  | Real      |            | Number of males deaths in population |
+| DeathFemale| Real      |            | Number of female deaths in population |
+
+### Indicators
+Stores general population indicators number for a location at each *time* entry.
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| LocationID | Integer   | UQ         | Location unique identifier |
+| AtTime     | Integer   | UQ         | Time reference of the indicator values |
+| Births     | Real      |            | Number of births, both sexes combined |
+| SRB        | Real      |            | Sex ratio at birth (male births per female births)|
+| LEx        | Real      |            | Life expectancy at birth for both sexes combined in years|
+| LExMale    | Real      |            | Male life expectancy at birth (years)|
+| LExFemale  | Real      |            | Female life expectancy at birth (years) |
 
 ## Diseases
+Country and disease specific data 
+
+Country and disease specific measure estimates are modelled using a multi-dimensional entity, representing a two dimensional series, *time x age*, for gender and measure type combinations. The following entities provide the diseases module data, all fields are required for a row definition:
+
+### Disease
+Diseases can be dynamic defined in the Health GPS framework using data only. The *disease* entity models the common measures used to defined all diseases.
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| LocationID | Integer   | UQ         | Location unique identifier |
+| DiseaseID  | Integer   | UQ         | Disease type unique identifier |
+| MeasureID  | Integer   | UQ         | Measure type unique identifier |
+| GenderID   | Integer   | UQ         | Gender type unique identifier |
+| AtTime     | Integer   | UQ         | Time reference of the measure values|
+| WithAge    | Integer   | UQ         | Age reference of the measure values |
+| Mean       | Real      |            | The measure mean value |
+
+### Cancer Parameter
+In addition to the common measures above, *cancers* definition require extra parameters, which are modelled using a multi-dimensional entity.
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| LocationID | Integer   | UQ         | Location unique identifier |
+| DiseaseID  | Integer   | UQ         | Disease type unique identifier |
+| ParameterID| Integer   | UQ         | Parameter type unique identifier |
+| AtTime     | Integer   | UQ         | Time reference of the measure values|
+| ValueMale  | Real      |            | The parameter value for males |
+| ValueFemale| Real      |            | The parameter value for females |
 
 ### Relative Risks
 
+#### Disease Risk to Disease (DiseaseRiskDisease)
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| DiseaseID  | Integer   | UQ         | Disease type unique identifier |
+| ToDiseaseID| Integer   | UQ         | Relative to disease type unique identifier |
+| WithAge    | Integer   | UQ         | Age reference of the risk values|
+| RiskMale   | Real      |            | The relative risk value for males |
+| RiskFemale | Real      |            | The relative risk value for females |
+
+#### Disease Risk to Risk Factor (DiseaseRiskFactor)
+
+| Field name   | Data Type | Constraint | Description |
+| :---         | :---      | :---       | :--- |
+| **ID**       | Integer   | PK         | Model unique identifier |
+| DiseaseID    | Integer   | UQ         | Disease type unique identifier |
+| RiskFactorID | Integer   | UQ         | Relative to risk factor unique identifier |
+| WithAge      | Integer   | UQ         | Age reference of the risk value|
+| WithFactor   | Real      | UQ         | Factor reference of the risk value|
+| RiskValue    | Real      |            | The relative risk value|
+
 ## Analysis
+
+### Disability Weight
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| DiseaseID  | Integer   | PK         | Disease type unique identifier |
+| Weight     | Real      |            | The disease weight value |
+
+### Global Burden of Disease (DiseaseBurden)
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Model unique identifier |
+| LocationID | Integer   | UQ         | Location unique identifier |
+| MeasureID  | Integer   | UQ         | BoD measure type unique identifier |
+| GenderID   | Integer   | UQ         | Gender type unique identifier |
+| AtTime     | Integer   | UQ         | Time reference of the measure values|
+| WithAge    | Integer   | UQ         | Age reference of the measure values |
+| Mean       | Real      |            | The measure mean value |
 
 ---
 > **_UNDER DEVELOPMENT:_**  More content coming soon.
 ---
-
 
 [comment]: # (References)
 [dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health GPS Data API definition."
