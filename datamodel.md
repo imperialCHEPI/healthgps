@@ -12,25 +12,32 @@ The data model is storage agnostic, the [Data API][dataapi] abstraction interfac
 |:--:|
 |*Backend Data API Interface*|
 
-The data model defines the minimum dataset required by the model, the backend storage can hold more data to support external analysis for example. The backend minimum dataset diagram is shown below, identify required entities, relationships, and fields with respective data types. The dataset is indexed by country, green, entities representing demographics are gray, diseases are blue, analysis are red, and enumeration types are yellow respectively. Primary key fields are shown in **bold**, the ***ID*** fields are auto-generated row identifiers for internal data integrity enforcement.
+The data model defines the minimum dataset required by the model, the backend storage can hold more data to support external analysis for example. The backend dataset diagram is shown below, it identifies the required entities, relationships, and fields with respective data types. The dataset is indexed by country, *green*, entities representing demographics are *gray*, diseases are *red*, analysis are *blue*, and enumeration types are *yellow* respectively. Primary key (PK) fields are shown in **bold**, the ***ID*** fields are auto-generated row identifiers for internal use and data integrity enforcement.
 
 |![Health GPS Data Model](/assets/image/data_model.png)|
 |:--:|
 |*Data Model Entity-Relation Diagram*|
 
-The *country* index table is based on the [ISO 3166-1][iso3166] standard. All external data sources must provide some kind of *location identifier*, most likely with different values, but must enable mapping with the data storage index definition to be reconcile.
+The *country* index entity is based on the [ISO 3166-1][iso3166] standard. All external data sources must provide some kind of *location identifier*, most likely with different values, but must enable mapping with the data storage index definition to be reconcile.
 
 # Enumerations
-To provide *stable identifier* to commonly used concepts, the data model provides normalised enumerations tables, yellow, which must be populated and possible mapped to external data source before data entry. It is very **important** to be consistent when populating the enumerations *code* field to provide a stable lookups, suggested guide:
+The data model defines normalised enumerations, *yellow*, to provide *stable identifier* for the commonly used concepts, such as gender, and consistent dimensional data lookups. Enumerations are defined by four fields as shown below, must populated before any data entry, provide also mapping with external data sources during the reconcile process.
 
-* Start with a letter 
-* Use only letters, numbers, and/or the underscore character, no spaces
-* Be consistent with casing, prefer lower case, avoid mixing
-* Keep it short, but meaningful and recognisable 
+| Field name | Data Type | Constraint | Description             |
+| :---       | :---      | :---       |---                      |
+| **XyzID**  | Integer   | PK         | Model unique identifier |
+| Code       | Text      | UK         | User stable identifier  |
+| ShortName  | Text      |            | User facing display name|
+| Description| Text      |            | Optional documentation  |
 
-The same recommendation applies to folders and file names definitions in cross-platform applications, operating system like linux are by default case-sensitive, adopting a consistent naming convention works everywhere.
+The unique constraint (UK) may include multiple fields within the entity definition, *ShortName* fields are the user facing name for the *code* identifier and must always be provided. It is very **important** to be consistent when populating the enumerations *code* field to provide users and applications stable lookups, the following list is a suggested guide:
 
-The *ShortName* field is intended to provide a user facing display name for the *code* identifier, and the *Description* field allows optional documentation. Following are example enumerations defined in Health GPS model:
+* start with a letter 
+* use only letters, numbers, and/or the underscore character, no spaces
+* be consistent with casing, prefer lower case, avoid mixing
+* keep it short, but meaningful and recognisable
+
+The same recommendation applies to *folders* and *file* names definitions in cross-platform applications, operating system like *Linux* are case-sensitive by default, adopt a consistent naming convention that works everywhere. Following are the enumerations defined by the Health GPS model:
 
 ## Gender
 
@@ -68,7 +75,39 @@ The *ShortName* field is intended to provide a user facing display name for the 
 | 1         | prevalence | Prevalence | Prevalence distribution |
 | 2         | survivalrate | Survival | Survival rate parameters |
 
-Entities *DiseaseType* and *RiskFactorType* provide a central **Registry** for available *diseases* and related *risk factors* respectively. The risk factor *code* must be consistent and exact match the external risk factor models definition.
+## ***Registries***
+The *DiseaseType* and *RiskFactorType* are *dynamic enumerations*, providing a consistent *Registry* for available *diseases* and relative *risk factors* respectively. These enumerations are populated on demand, when defining a new diseases within the Health GPS ecosystem. Following are the examples of dynamic enumerations defined in the Health GPS model:
+
+## Disease Type
+| DiseaseID | Code        | GroupID | ShortName | Description|
+| :---      | :---        | :---:   | :---      |---         |
+| Auto      | asthma      | 0       | Asthma    | |
+| Auto      | diabetes    | 0       | Diabetes| Diabetes mellitus type 2 |
+| Auto      | lowbackpain | 0       | Low back pain|  |
+| Auto      | colorectum  | 1       | Colorectal  cancer|  |
+
+## Risk Factor Type
+| ParameterID | Code | ShortName | Description     |
+| :---      | :---   | :---      |---              |
+| Auto      | bmi    | BMI       | Body Mass Index |
+
+>The risk factor *code* must be consistent, and exact match the risk factor naming convention used in the external models definition. Only risk factors with relative effects on diseases data should be registered to minimise the constraint on external modelling.
+
+# Data Entities
+
+All entities in the model have a *time* and/or *age* dimension associated with the *measures* being stored. The following notation is used to represent these two dimensions across the data model:
+
+| Field Name| Data Type | Description             |
+| :---      | :---      | :---                    |
+| AtTime    | Integer   | The time in years       |
+| WithAge   | Integer   | The age at time in years|
+
+Entities with a single measure associated with gender, e.g. Population, store the values for each enumeration as column, while entities with higher dimensionality, e.g. disease, represent *Gender* and *Measure* independent dimensions.
+
+---
+> **_UNDER DEVELOPMENT:_**  More content coming soon.
+---
+
 
 [comment]: # (References)
 [dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health GPS Data API definition."

@@ -17,9 +17,6 @@ As with any simulation model, it is the user's responsibility to process and ana
 
 The *file data storage* provides a reusable, reference dataset in the model's [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data sources. The [index.json][datastore] file defines the storage structure, file names, diseases definition, metadata to identify the data sources and respective limits for consistency validation.
 
-
-
-
 ---
 > **_UNDER DEVELOPMENT:_**  More content coming soon.
 ---
