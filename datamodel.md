@@ -24,11 +24,12 @@ The *country* index entity is based on the [ISO 3166-1][iso3166] standard. All e
 The data model defines normalised enumerations, *yellow*, to provide *stable identifier* for the commonly used concepts, such as gender, and consistent dimensional data lookups. Enumerations are defined by four fields as shown below, must populated before any data entry, provide also mapping with external data sources during the reconcile process.
 
 | Field name | Data Type | Constraint | Description             |
-| :---       | :---      | :---       |---                      |
+| :---       | :---      | :---       | :---                    |
 | **XyzID**  | Integer   | PK         | Model unique identifier |
 | Code       | Text      | UK         | User stable identifier  |
 | ShortName  | Text      |            | User facing display name|
 | Description| Text      |            | Optional documentation  |
+||
 
 The unique constraint (UK) may include multiple fields within the entity definition, *ShortName* fields are the user facing name for the *code* identifier and must always be provided. It is very **important** to be consistent when populating the enumerations *code* field to provide users and applications stable lookups, the following list is a suggested guide:
 
@@ -42,54 +43,60 @@ The same recommendation applies to *folders* and *file* names definitions in cro
 ## Gender
 
 | GenderID | Code   | ShortName | Description      |
-| :---     | :---   | :---      |---               |
+| :---     | :---   | :---      | :---             |
 | 1        | male   | Male      |                  |
 | 2        | female | Female    |                  |
+||
 
 ## Disease Group
 
 | GroupID  | Code   | ShortName | Description|
-| :---     | :---   | :---      |---         |
+| :---     | :---   | :---      | :---       |
 | 0        | other  | Other     | General noncommunicable diseases|
 | 1        | cancer | Cancer    | Cancer type diseases|
+||
 
 ## Disease Measure Type
 | MeasureID | Code   | ShortName | Description|
-| :---      | :---   | :---      |---         |
+| :---      | :---   | :---      | :---       |
 | 5         | prevalence | Prevalence | |
 | 6         | incidence  | Incidence  | |
 | 7         | remission  | Remission| | |
 | 15        | mortality  | Mortality  | |
+||
 
 ## BoD Measure Type
 | MeasureID | Code   | ShortName | Description|
-| :---      | :---   | :---      |---         |
+| :---      | :---   | :---      | :---       |
 | 2         | daly | DALY | Disability adjusted life years |
 | 3         | yld  | YLD  | Years lived with disability |
 | 4         | yll  | YLL  | Years of life lost|
+||
 
 ## Cancer Parameter Type
-| ParameterID | Code   | ShortName | Description|
-| :---      | :---   | :---      |---         |
-| 0         | deathweight | Deaths | Death weight |
-| 1         | prevalence | Prevalence | Prevalence distribution |
-| 2         | survivalrate | Survival | Survival rate parameters |
+| ParameterID | Code         | ShortName  | Description              |
+| :---        | :---         | :---       | :---                     |
+| 0           | deathweight  | Deaths     | Death weight             |
+| 1           | prevalence   | Prevalence | Prevalence distribution  |
+| 2           | survivalrate | Survival   | Survival rate parameters |
+||
 
 ## ***Registries***
 The *DiseaseType* and *RiskFactorType* are *dynamic enumerations*, providing a consistent *Registry* for available *diseases* and relative *risk factors* respectively. These enumerations are populated on demand, when defining a new diseases within the Health GPS ecosystem. Following are the examples of dynamic enumerations defined in the Health GPS model:
 
 ## Disease Type
-| DiseaseID | Code        | GroupID | ShortName | Description|
-| :---      | :---        | :---:   | :---      |---         |
-| Auto      | asthma      | 0       | Asthma    | |
-| Auto      | diabetes    | 0       | Diabetes| Diabetes mellitus type 2 |
-| Auto      | lowbackpain | 0       | Low back pain|  |
-| Auto      | colorectum  | 1       | Colorectal  cancer|  |
-
+| DiseaseID | Code        | GroupID | ShortName         | Description              |
+| :---      | :---        | :---:   | :---              | :---                     |
+| Auto      | asthma      | 0       | Asthma            | |
+| Auto      | diabetes    | 0       | Diabetes          | Diabetes mellitus type 2 |
+| Auto      | lowbackpain | 0       | Low back pain     | |
+| Auto      | colorectum  | 1       | Colorectal  cancer| |
+||
 ## Risk Factor Type
 | ParameterID | Code | ShortName | Description     |
-| :---      | :---   | :---      |---              |
+| :---      | :---   | :---      | :---            |
 | Auto      | bmi    | BMI       | Body Mass Index |
+||
 
 >The risk factor *code* must be consistent, and exact match the risk factor naming convention used in the external models definition. Only risk factors with relative effects on diseases data should be registered to minimise the constraint on external modelling.
 
@@ -101,6 +108,7 @@ All entities in the model have a *time* and/or *age* dimension associated with t
 | :---      | :---      | :---                    |
 | AtTime    | Integer   | The time in years       |
 | WithAge   | Integer   | The age at time in years|
+||
 
 Entities with a single measure associated with gender, e.g. Population, store the values for each enumeration as column, while entities with higher dimensionality, e.g. disease, represent *Gender* and *Measure* independent dimensions.
 
