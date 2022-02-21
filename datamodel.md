@@ -8,7 +8,7 @@ The backend *data model* defines an abstract model to organises data entities an
 
 The data model is storage agnostic, the [Data API][dataapi] abstraction interface shown below, provides a contract for the minimum dataset, easy access, strong typing, and decoupling from the backend storage implementation. 
 
-|![Health GPS Data API](/assets/image/data_api.png "Health GPS Data API")|
+|![Health GPS Data API](/assets/image/data_api.png)|
 |:--:|
 |*Backend Data API Interface*|
 
