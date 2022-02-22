@@ -226,9 +226,9 @@ Stores disease specific disability weight estimates, which representing the magn
 | DiseaseID  | Integer   | PK         | Disease type unique identifier |
 | Weight     | Real      |            | The disease weight value |
 
-### Global Burden of Disease (DiseaseBurden)
+### Burden of Disease
 
-The burden of diseases (BoD) measures is modelled using a two-dimensional entity, *time* x *age*, to represent the measure values for each *gender* enumeration entry.
+The burden of diseases (BoD) measure is modelled using a two-dimensional entity, *time* x *age*, to represent the measure values for each *gender* enumeration entry.
 
 | Field name | Data Type | Constraint | Description |
 | :---       | :---      | :---       | :--- |
@@ -240,8 +240,9 @@ The burden of diseases (BoD) measures is modelled using a two-dimensional entity
 | WithAge    | Integer   | UQ         | Age reference of the measure values |
 | Mean       | Real      |            | The measure mean value |
 
-# Note:
->Although the design presented in this document makes heavy use of relational-database notations, the data model is storage and implementation agnostic. The Health GPS ecosystem supports different implementations via instance injection during construction. See [Development Guide](development) for a *file-based* storage implementation detail.
+The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations, however the backend data model is storage and implementation agnostic, the Health GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
+
+>See [Development Guide](development) for a *file-based* backend storage implementation detail.
 
 [comment]: # (References)
 [dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health GPS Data API definition."
