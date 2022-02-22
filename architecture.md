@@ -49,7 +49,13 @@ The *simulation module type* enumeration is used by the microsimulation engine t
 |:--:|
 |*Module Factory Class Diagram with Concrete Builder Function example*|
 
-The *module builder* functions have access to both the model inputs and backend data storage (Repository) when requested to create the respective simulation module instance. The *Repository* interface provides read-only data structure specific design to parameterise each module, it uses the backend data storage interface to retrieve the required raw data, reshape and combine to creates the module required definition. A cached repository implementation of the repository interface is provided to share the module read-only definitions between baseline and intervention scenarios.
+The *module builder* functions have access to both the model inputs and backend data storage (Repository) when requested to create the respective simulation module instance. The *Repository* interface shown below, provides read-only access to external datasets loaded via configuration to parameterise the risk factor module, and exposes the *backend data storage* interface. Factory registered module builders can retrieve the required raw data, reshape, and combine to create the respective module parameters definition and instance.
+
+|![Health GPS Repository](/assets/image/repository_interface.png)|
+|:--:|
+|*Data Repository Interface Diagram*|
+
+This minimalistic design exposes the available datasets to the factory module builder functions, ultimately responsible for creating fully working module instances when requested. The requirement to evaluate *baseline* and *intervention* scenarios together as discussed later, provides an opportunity to extend the design to support caching of read-only modules parametrisation to share between the two scenarios. This optimisation would minimise backend I/O and memory usage, at the expense of introduced coupling between the repository and modules parameter.
 
 To take the virtual population through time, the simulation modules have different requirements, and consequently the simulation module interface has been extended with new properties and operations to satisfy the different modules as shown below.
 
