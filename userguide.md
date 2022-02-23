@@ -116,7 +116,7 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "files": {
+        "files_name": {
             "static_male":"france_initial_adjustment_male.csv",
             "static_female":"france_initial_adjustment_female.csv",
             "dynamic_male":"france_update_adjustment_male.csv",
@@ -127,9 +127,7 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
 ...
 ```
 
-The ***experiment*** section defines simulation *runtime* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment.
-
-Unlike diseases, *interventions* definition usually require specific data and rules coding. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
+The ***experiment*** section defines simulation *runtime* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
 
 ```json
 ...
@@ -170,7 +168,9 @@ Unlike diseases, *interventions* definition usually require specific data and ru
 ...
 ```
 
-Finally, the ***output*** section ...
+Unlike the diseases *data driven* definition, *interventions* can have specific data requirements, rules for selecting the target population to intervening, intervention period transition, etc, consequently the definition usually require supporting code implementation. Health GPS provides an *interface* abstraction for implementing new interventions and easily use at runtime, however the implementation must also handle the required input data.
+
+Finally, ***output*** section repeated below, defines the results output *folder and file name*. The configuration parser can handle *folder* name with *environment variables* such as `HOME` on Linux shown above, however care must be taken when running the model cross-platform with same configuration file. Likewise, *file name* can have a `TIMESTAMP` *token*, to enable multiple experiments to write results to the same folder on disk without file name crashing.
 
 ```json
 ...
@@ -192,6 +192,96 @@ Finally, the ***output*** section ...
 The *file data storage* provides a reusable, reference dataset in the model's [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data sources. The [index.json][datastore] file defines the storage structure, file names, diseases definition, metadata to identify the data sources and respective limits for consistency validation.
 
 ## Results
+
+The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation.
+
+```json
+{
+    "experiment": {
+        "model": "Health-GPS",
+        "version": "1.0.0.0",
+        "time_of_day": "2022-02-01 11:51:43.129 GMT Standard Time",
+        "intervention": "marketing"
+    },
+    "result": [
+        {
+            "id": 2,
+            "source": "baseline",
+            "run": 1,
+            "time": 2010,
+            ...
+        },
+        {
+            "id": 2,
+            "source": "intervention",
+            "run": 1,
+            "time": 2010,
+            ...
+        },
+        ...
+    ]
+}
+```
+The content of each message is implementation dependent, JSON (JavaScript Object Notation), an open standard file format designed for data interchange in human-readable text, can represent complex data structures. It is language-independent; however, all programming language and major data science tools supports JSON format because they have libraries and functions to read/write JSON structures. To read the model results in [R](https://www.r-project.org/), for example, you need the [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) package:
+```R
+require(jsonlite)
+data <- fromJSON(result_filename)
+View(data)
+```
+The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
+
+|![Health GPS Results](/assets/image/model_results.png)|
+|:--:|
+|*Health GPS results in R data frame example*|
+
+The results file contains the output of all simulations in the experiment, *baseline*, and *intervention* scenarios over one or more runs. The user should not assume data order during analysis of experiments with intervention scenarios, the results are published by both simulations running in parallel *asynchronously* via messages, the order in which the messages arrive at the destination queue, before being written to file is not guaranteed. A robust method to tabulate the results shown above, is to always group the data by: ```data.result(source, run, time)```, to ensure that the analysis algorithms work for both types of simulation experiments. For example, using the results data above in R, the following script will tabulate and plot the experiment's BMI projection.
+
+```R
+require(dplyr)
+require(ggplot2)
+
+# create groups frame
+groups <- data.frame(data$result$source, data$result$run, data$result$time)
+colnames(groups) <- c("scenario", "run", "time")
+
+# create dataset
+risk_factor <- "BMI"
+sim_data <- cbind(groups, data$result$risk_factors_average[[risk_factor]])
+
+# pivot data
+info <- sim_data %>% group_by(scenario, time) %>% 
+  summarise(runs = n(),
+            avg_male = mean(male, na.rm = TRUE),
+            sd_male = sd(male, na.rm = TRUE),
+            avg_female = mean(female, na.rm = TRUE),
+            sd_female = sd(female, na.rm = TRUE),
+            .groups = "keep")
+
+# reshape data
+df <- data.frame(scenario = info$scenario, time = info$time, runs = info$runs,
+      bmi = c(info$avg_male, info$avg_female),
+      sd = c(info$sd_male, info$sd_female),
+      se = c(info$sd_male / sqrt(info$runs), info$sd_female) / sqrt(info$runs),
+      gender = c(rep('male', nrow(info)), rep('female', nrow(info))))
+
+# Plot BMI projection
+p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
+  geom_line(size=0.6, aes(linetype=scenario, color=gender)) + theme_light() +
+  scale_linetype_manual(values=c("baseline"="solid","intervention"="longdash")) +
+  scale_color_manual(values=c("male"="blue","female"="red")) +
+  scale_x_continuous(breaks = pretty(df$time, n = 10)) +
+  scale_y_continuous(breaks = pretty(df$bmi, n = 10)) +
+  ggtitle(paste(risk_factor, " projection under two scenarios")) +
+  xlab("Year") + ylab("Average")
+
+show(p)
+```
+
+|![Experiment BMI Projection](/assets/image/bmi_projection.png)|
+|:--:|
+|*Experiment BMI projection example*|
+
+In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
 ---
 > **_UNDER DEVELOPMENT:_**  More content coming soon.
