@@ -240,7 +240,7 @@ The burden of diseases (BoD) measure is modelled using a two-dimensional entity,
 | WithAge    | Integer   | UQ         | Age reference of the measure values |
 | Mean       | Real      |            | The measure mean value |
 
-The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations, however the backend data model is storage and implementation agnostic, the Health GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
+The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations; however, the backend data model is storage and implementation agnostic, the Health GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
 
 >See [Development Guide](development) for a *file-based* backend storage implementation detail.
 
