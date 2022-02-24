@@ -2,8 +2,11 @@
 
 | [Home](index) | [Quick Start](getstarted) | User Guide | [Software Architecture](architecture) | [Data Model](datamodel) | [Developer Guide](development) |
 
-
 # User Guide
+
+---
+> **_UNDER DEVELOPMENT:_** New content is coming soon.
+---
 
 The **Health GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
@@ -15,7 +18,7 @@ As with any simulation model, the workflow starts with data, it is the user's re
 
 > See [Quick Start](getstarted) to get started using the microsimulation with a working example.
 
-## Configuration
+# Configuration
 
 The high-level structure of the [configuration][configjson] file used to create the model inputs, in `JSON` format, is shown below. The structure defines the schema version, the user's dataset file, target country with respective virtual population settings, external models' definition with respective fitted parameters, simulation experiment options including diseases selection, and intervention scenario, and finally the results output location.
 
@@ -38,7 +41,7 @@ The high-level structure of the [configuration][configjson] file used to create 
         "baseline_adjustments": {}
     },
     "experiment": {
-        "seed": [123456789], // optional for reproducibility
+        "seed": [123456789],
         "start_time": 2010,
         "stop_time": 2050,
         "trial_runs": 1,
@@ -56,6 +59,7 @@ The high-level structure of the [configuration][configjson] file used to create 
 }
 ```
 
+## Inputs
 The ***inputs*** section sets the target country information, the *file* sub-section provides details of data used to fit the model, including file name, format, and variable data type mapping with the model internal types: *string, integer, float, double*. The user's data is required only to provide a visual validation of the initial virtual population created by the model, this feature should be made optional in the future, the following example illustrates the data file definition:
 
 ```json
@@ -85,6 +89,7 @@ The ***inputs*** section sets the target country information, the *file* sub-sec
 ...
 ```
 
+## Modelling
 The ***modelling*** section, defines the *SES* model, and the *risk factor* model with factors identifiers, hierarchy level, data range and mapping with the model's virtual individual properties (proxy). The *risk_factor_models* sub-section provides the fitted parameters file, `JSON` format, for each hierarchical *model type*, the *dynamic risk factor*, if exists, can be identified by the respective property. Finally, the *baseline adjustments* sub-section provides the *adjustment files* for each hierarchical *model type* and *gender*.
 
 ```json
@@ -126,7 +131,9 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
 }
 ...
 ```
+The *risk factor model* and *baseline adjustment* files have their own schemas and formats requirements, these files structure are defined separately below, after all the *configuration file* sections.
 
+## Experiment
 The ***experiment*** section defines simulation *runtime* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
 
 ```json
@@ -170,6 +177,8 @@ The ***experiment*** section defines simulation *runtime* period, *start/stop ti
 
 Unlike the diseases *data driven* definition, *interventions* can have specific data requirements, rules for selecting the target population to intervening, intervention period transition, etc, consequently the definition usually require supporting code implementation. Health GPS provides an *interface* abstraction for implementing new interventions and easily use at runtime, however the implementation must also handle the required input data.
 
+## Output
+
 Finally, ***output*** section repeated below, defines the results output *folder and file name*. The configuration parser can handle *folder* name with *environment variables* such as `HOME` on Linux shown above, however care must be taken when running the model cross-platform with same configuration file. Likewise, *file name* can have a `TIMESTAMP` *token*, to enable multiple experiments to write results to the same folder on disk without file name crashing.
 
 ```json
@@ -181,17 +190,138 @@ Finally, ***output*** section repeated below, defines the results output *folder
 ...
 ```
 
-### Hierarchical Models
+## Risk Factor Models
 
-#### Static Schema
+### Static
 
-#### Dynamic Schema
+### Dynamic
 
+## Baseline Adjustments
 
-## Backend Storage
-The *file data storage* provides a reusable, reference dataset in the model's [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data sources. The [index.json][datastore] file defines the storage structure, file names, diseases definition, metadata to identify the data sources and respective limits for consistency validation.
+# Backend Storage
+Health GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
-## Results
+|![File-based Datastore](/assets/image/file_based_storage.png)|
+|:--:|
+|*File-based Backend Datastore example*|
+
+The *index file* defines data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The high-level structure of the file-based storage index file, in `JSON` format, is shown below.
+
+```json
+{
+    "country": {
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "description": "ISO 3166-1 country codes.",
+        "source": "International Organization for Standardization",
+        "url": "https://www.iso.org/iso-3166-country-codes.html",
+        "license": "N/A",
+        "path": "",
+        "file_name": "countries.csv"
+    },
+    "demographic": {},
+    "diseases": {
+        "relative_risk":{ },
+        "parameters":{ },
+        "registry":[ ]
+    },
+    "analysis":{ }
+}
+```
+
+The ***country*** data file lives at the *root* of the folder structure as shown above, therefore the *path* is left empty, and respective *file name* provided. The *metadata* is used only for documentation purpose, the current *Data API* contract has no support for surfacing metadata, but this can be added in the future versions, if necessary. The metadata content will be removed from the following sections for brevity and clarity.
+
+> The *path* and *file_name* properties are required and relative to the *parent* folder.
+
+## Demographic
+
+```json
+...
+"demographic": {
+    ...
+    "path": "undb",
+    "age_limits": [0, 100],
+    "time_limits": [1950, 2100],
+    "projections": 2020,
+    "population": {
+        "description": "Total population by sex, annually from 1950 to 2100.",
+        "path": "population",
+        "file_name": "P{COUNTRY_CODE}.csv"
+    },
+    "mortality": {
+        "description": "Number of deaths by age and gender.",
+        "path": "mortality",
+        "file_name": "M{COUNTRY_CODE}.csv"
+    },
+    "indicators": {
+        "description": "Several indicators, e.g. births, deaths and life expectancy.",
+        "path": "indicators",
+        "file_name": "Pi{COUNTRY_CODE}.csv"
+    }
+}
+...
+```
+
+## Diseases
+
+```json
+...
+"diseases": {
+    ...
+    "path": "diseases",
+    "file_name": "D{COUNTRY_CODE}.csv",
+    "age_limits": [1, 100],
+    "time_year": 2019,
+    "relative_risk":{
+        "path": "relative_risk",
+        "to_disease":{
+            "path":"disease",
+            "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
+            "default_value": 1.0
+        },
+        "to_risk_factor":{
+            "path":"risk_factor",
+            "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
+        }
+    },
+    "parameters":{
+        "path":"P{COUNTRY_CODE}",
+        "files":{
+            "distribution": "prevalence_distribution.csv",
+            "survival_rate": "survival_rate_parameters.csv",
+            "death_weight": "death_weights.csv"
+        }
+    },
+    "registry":[
+        {"group": "other", "id": "asthma", "name": "Asthma"},
+        {"group": "other", "id": "diabetes", "name": "Diabetes mellitus"},
+        {"group": "other",  "id": "lowbackpain", "name": "Low back pain"},
+        {"group": "cancer", "id": "colorectum", "name": "Colorectum  cancer"}
+    ]
+}
+...
+```
+
+## Analysis
+
+```json
+...
+"analysis":{
+    ...
+    "path": "analysis",
+    "age_limits": [1, 100],
+    "time_year": 2019,
+    "file_name": "disability_weights.csv",
+    "cost_of_disease": {
+        "path":"cost",
+        "file_name": "BoD{COUNTRY_CODE}.csv"
+    }
+}
+...
+```
+
+# Results
 
 The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation.
 
@@ -282,28 +412,6 @@ show(p)
 |*Experiment BMI projection example*|
 
 In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
-
----
-> **_UNDER DEVELOPMENT:_**  More content coming soon.
----
-
-This is a permalink example:
-[healthgps/source/HealthGPS.Console/program.cpp](
-https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Console/program.cpp#L75-L146)
-
-```cpp
-	auto model_config = create_model_input(input_table, target.value(), config, diseases);
-
-	// Create event bus and monitor
-	auto event_bus = DefaultEventBus();
-	auto result_file_logger = ResultFileWriter{ 
-		create_output_file_name(config.result),
-		ModelInfo{.name = "Health-GPS", .version = "1.0.0.0"}
-	};
-	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
-
-    ...
-```
 
 [comment]: # (References)
 [configjson]:https://github.com/imperialCHEPI/healthgps/blob/main/example/France.Config.json "Configuration file example"
