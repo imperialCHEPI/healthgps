@@ -18,7 +18,7 @@ As with any simulation model, the workflow starts with data, it is the user's re
 
 > See [Quick Start](getstarted) to get started using the microsimulation with a working example.
 
-# Configuration
+# 1.0 Configuration
 
 The high-level structure of the [configuration][configjson] file used to create the model inputs, in `JSON` format, is shown below. The structure defines the schema version, the user's dataset file, target country with respective virtual population settings, external models' definition with respective fitted parameters, simulation experiment options including diseases selection, and intervention scenario, and finally the results output location.
 
@@ -59,7 +59,7 @@ The high-level structure of the [configuration][configjson] file used to create 
 }
 ```
 
-## Inputs
+## 1.1 Inputs
 The ***inputs*** section sets the target country information, the *file* sub-section provides details of data used to fit the model, including file name, format, and variable data type mapping with the model internal types: *string, integer, float, double*. The user's data is required only to provide a visual validation of the initial virtual population created by the model, this feature should be made optional in the future, the following example illustrates the data file definition:
 
 ```json
@@ -89,7 +89,7 @@ The ***inputs*** section sets the target country information, the *file* sub-sec
 ...
 ```
 
-## Modelling
+## 1.2 Modelling
 The ***modelling*** section, defines the *SES* model, and the *risk factor* model with factors identifiers, hierarchy level, data range and mapping with the model's virtual individual properties (proxy). The *risk_factor_models* sub-section provides the fitted parameters file, `JSON` format, for each hierarchical *model type*, the *dynamic risk factor*, if exists, can be identified by the respective property. Finally, the *baseline adjustments* sub-section provides the *adjustment files* for each hierarchical *model type* and *gender*.
 
 ```json
@@ -133,7 +133,7 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
 ```
 The *risk factor model* and *baseline adjustment* files have their own schemas and formats requirements, these files structure are defined separately below, after all the *configuration file* sections.
 
-## Experiment
+## 1.3 Experiment
 The ***experiment*** section defines simulation *runtime* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
 
 ```json
@@ -177,7 +177,7 @@ The ***experiment*** section defines simulation *runtime* period, *start/stop ti
 
 Unlike the diseases *data driven* definition, *interventions* can have specific data requirements, rules for selecting the target population to intervening, intervention period transition, etc, consequently the definition usually require supporting code implementation. Health GPS provides an *interface* abstraction for implementing new interventions and easily use at runtime, however the implementation must also handle the required input data.
 
-## Output
+## 1.4 Output
 
 Finally, ***output*** section repeated below, defines the results output *folder and file name*. The configuration parser can handle *folder* name with *environment variables* such as `HOME` on Linux shown above, however care must be taken when running the model cross-platform with same configuration file. Likewise, *file name* can have a `TIMESTAMP` *token*, to enable multiple experiments to write results to the same folder on disk without file name crashing.
 
@@ -190,22 +190,24 @@ Finally, ***output*** section repeated below, defines the results output *folder
 ...
 ```
 
-## Risk Factor Models
+## 1.5 Risk Factor Models
 
-### Static
+### 1.5.1 Static
 
-### Dynamic
+### 1.5.2 Dynamic
 
-## Baseline Adjustments
+### 1.5.3 Baseline Adjustments
 
-# Backend Storage
+# 2.0 Backend Storage
 Health GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
 |![File-based Datastore](/assets/image/file_based_storage.png)|
 |:--:|
 |*File-based Backend Datastore example*|
 
-The *index file* defines data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The high-level structure of the file-based storage index file, in `JSON` format, is shown below.
+The *index file* defines data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The data is indexed and stored by country files taking advantage of the model's workflow, this minimises data reading time and enables the storage to scale with many countries.
+
+The data model defines many data hierarchies, which have been flatten for file-based storage, *file names* are defined for consistency, avoid naming clashes, and ultimately to store processed data for machines consumption, not necessarily for humans. The high-level structure of the file-based storage index file, in `JSON` format, is shown below.
 
 ```json
 {
@@ -230,11 +232,13 @@ The *index file* defines data groups, physical storage folders relative to the r
 }
 ```
 
-The ***country*** data file lives at the *root* of the folder structure as shown above, therefore the *path* is left empty, and respective *file name* provided. The *metadata* is used only for documentation purpose, the current *Data API* contract has no support for surfacing metadata, but this can be added in the future versions, if necessary. The metadata content will be removed from the following sections for brevity and clarity.
+The ***country*** data file lives at the *root* of the folder structure as shown above, therefore the *path* is left empty, and respective *file name* provided. The *metadata* is used only for documentation purpose, current *Data API* contracts have no support for surfacing metadata, therefore the metadata contents will be removed from the following sections for brevity and clarity.
 
-> The *path* and *file_name* properties are required and relative to the *parent* folder.
+> The *path* and *file_name* properties are required and must be defined, all *paths* are relative to the *parent* folder.
 
-## Demographic
+## 2.1 Demographic
+
+Defines the storage for country specific data containing historic estimates and projections for various demographics measures by *time, age* and *gender*. The datasets limits for *age* and *time* variables are stored for validation, the *projections* property marks the starting point, in time, for projected values. The data is stored by country file, the COUNTRY_CODE token is subtitled with a given country's identifier to identify the respective country's data file as shown below.
 
 ```json
 ...
@@ -263,7 +267,7 @@ The ***country*** data file lives at the *root* of the folder structure as shown
 ...
 ```
 
-## Diseases
+## 2.2 Diseases
 
 ```json
 ...
@@ -303,7 +307,7 @@ The ***country*** data file lives at the *root* of the folder structure as shown
 ...
 ```
 
-## Analysis
+## 2.3 Analysis
 
 ```json
 ...
@@ -321,7 +325,35 @@ The ***country*** data file lives at the *root* of the folder structure as shown
 ...
 ```
 
-# Results
+# 4.0 Running
+
+Health GPS has been designed to be portable, producing stable, and comparable results cross-platform. Only minor and insignificant rounding errors should be noticeable, these errors are attributed to the C++ application binary interface (ABI), which is not guaranteed to compatible between two binary programs cross-platform, or even on same platform when using different versions of the C++ standard library.
+
+The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health GPS application on each platform using the include example model and reference dataset.
+## Windows
+You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version or newer to be installed.
+
+1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
+2. Unzip the file contents into a local directory of your choice (xxx).
+3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
+4. Run: `X:\xxx> .\HealthGPS.Console -f ".\example\France.Config.json" -s ".\data"` where `-f` gives the *configuration file* full-name and
+`-s` the path to the root folder of the *backend storage* respectively.
+5. The default output folder is `C:\healthgps\results`, but this can be changed in the *configuration file* `(France.Config.json)`.
+
+## Linux
+You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires the `GCC 11.1` or newer version to be installed.
+
+1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
+2. Unzip the file contents into a local directory of your choice (xxx).
+3. Navigate to the directory used in step 2 (xxx).
+4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f ./example/France.Config.json -s ./data` where `-f` gives the *configuration file* full-name and `-s` the path to the root folder of the *backend storage* respectively.
+5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
+
+> See [Quick Start](getstarted) for details on the example dataset and known issues.
+
+The included model and dataset provide a complete example of the files and procedures described in this document. Users should use this example to a starting point when creating a production environment.
+
+# 4.1 Results
 
 The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation.
 
