@@ -27,7 +27,7 @@ You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/
 4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f ./example/France.Config.json -s ./data` where `-f` gives the *configuration file* full-name and `-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
-**NOTE:** *The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpose to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
+**NOTE:** *The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpose to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the [index.json][datastore] file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
 
 ***Known Issue:*** `Windows 10` support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the `Windows 11` installation.
 
@@ -96,3 +96,5 @@ In a similar manner, the resulting dataset `df`, can be re-created and expanded 
 
 [comment]: # (References)
 [configjson]:https://github.com/imperialCHEPI/healthgps/blob/main/example/France.Config.json "Configuration file example"
+
+[datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"

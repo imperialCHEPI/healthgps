@@ -236,13 +236,18 @@ The ***country*** data file lives at the *root* of the folder structure as shown
 
 > The *path* and *file_name* properties are required and must be defined, all *paths* are relative to the *parent* folder.
 
+The file store definition make use of *tokenisation* to represent dynamic contents in *folders* and *files* name. *Tokens* are substituted by their respective values in the file storage contents, for example, tokens {COUNTRY_CODE} and {GENDER} represent a *country unique identifier* and the *gender value* respectively. At runtime, tokens maps back to the storage's *folders* and *files* name when replaced by the Data API calls parameters, dynamically reconstructing *paths* and *files* name.
+
 ## 2.1 Demographic
 
-Defines the storage for country specific data containing historic estimates and projections for various demographics measures by *time, age* and *gender*. The datasets limits for *age* and *time* variables are stored for validation, the *projections* property marks the starting point, in time, for projected values. The data is stored by country file, the COUNTRY_CODE token is subtitled with a given country's identifier to identify the respective country's data file as shown below.
+Defines the file storage for country specific data containing historic estimates and projections for various demographics measures by *time, age* and *gender*. The datasets limits for *age* and *time* variables are stored for validation, the *projections* property marks the starting point, in time, for projected values. Data files are stored in separated folders for *population*, *mortality* and demographic *indicators* respectively as shown below, *file names* must include the *country's unique identifier* in place of the COUNTRY_CODE token. 
 
 ```json
 ...
 "demographic": {
+    "format": "csv",
+    "delimiter": ",",
+    "encoding": "UTF8",    
     ...
     "path": "undb",
     "age_limits": [0, 100],
@@ -268,33 +273,42 @@ Defines the storage for country specific data containing historic estimates and 
 ```
 
 ## 2.2 Diseases
+Defines the file storage for country specific data containing cross-sectional estimates by *age* and *gender* for various diseases measures, disease relative risk to other diseases, risk factor relative risk to diseases, and cancer parameters. Each ***disease*** is defined in a separate folder named using the *disease identifier* in place of the {DISEASE_TYPE} token, estimates for disease incidence, prevalence, mortality and remission are stored in a single file per country, *files name* must include the *country's unique identifier* in place of the COUNTRY_CODE token as shown below. Cancer ***parameters*** are stored with same files name per country.
+
+The ***relative risk*** data is stored in a sub-folder, with *disease* to *disease* interaction files defined in one folder and *risk factor* relative risk to *diseases* in another folder. The ***disease*** relative risk to *diseases* folder should contain data files for diseases with real interaction, when no file exists, the *default value* is used automatically. Similarly, the ***risk factor*** relative risk folder should only have files for *risk factors* with direct effect on the disease. In summary, only files with real *relative risk* values should be included.
 
 ```json
 ...
 "diseases": {
+    "format": "csv",
+    "delimiter": ",",
+    "encoding": "UTF8",    
     ...
     "path": "diseases",
-    "file_name": "D{COUNTRY_CODE}.csv",
     "age_limits": [1, 100],
     "time_year": 2019,
-    "relative_risk":{
-        "path": "relative_risk",
-        "to_disease":{
-            "path":"disease",
-            "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
-            "default_value": 1.0
+    "disease": {
+        "path": "{DISEASE_TYPE}",
+        "file_name": "D{COUNTRY_CODE}.csv",
+        "relative_risk":{
+            "path": "relative_risk",
+            "to_disease":{
+                "path":"disease",
+                "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
+                "default_value": 1.0
+            },
+            "to_risk_factor":{
+                "path":"risk_factor",
+                "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
+            }
         },
-        "to_risk_factor":{
-            "path":"risk_factor",
-            "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
-        }
-    },
-    "parameters":{
-        "path":"P{COUNTRY_CODE}",
-        "files":{
-            "distribution": "prevalence_distribution.csv",
-            "survival_rate": "survival_rate_parameters.csv",
-            "death_weight": "death_weights.csv"
+        "parameters":{
+            "path":"P{COUNTRY_CODE}",
+            "files":{
+                "distribution": "prevalence_distribution.csv",
+                "survival_rate": "survival_rate_parameters.csv",
+                "death_weight": "death_weights.csv"
+            }
         }
     },
     "registry":[
@@ -307,7 +321,19 @@ Defines the storage for country specific data containing historic estimates and 
 ...
 ```
 
+The ***registry*** contains the dynamic list of *disease types* supported by the model. Diseases must belong to one pre-defined *group*, the *id* property is the *disease unique identifier*, and must have a display *name*. 
+
+To add a new disease to the storage:
+
+1. Register the *disease* with a unique identifier, *id*
+2. Create a folder named *id* inside the *diseases* folder
+3. Populate the *disease* folder with the *disease* definition files
+
+The disease *id* value now can be used in the *configuration file* to select *diseases* to include in a given simulation experiment.
+
 ## 2.3 Analysis
+
+Defines the file storage for disease cost analysis for country specific data containing cross-sectional estimates by *age* for *burden of disease* measures. The datasets limit for the *age* variable is stored for validation, the *time_year* property identifies the cross-sectional data point for documentation purpose. The *disability weights* file provides global values for the disease analysis for all countries.
 
 ```json
 ...
@@ -351,7 +377,7 @@ You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/
 
 > See [Quick Start](getstarted) for details on the example dataset and known issues.
 
-The included model and dataset provide a complete example of the files and procedures described in this document. Users should use this example to a starting point when creating a production environment.
+The included model and dataset provide an complete exemplar of the files and procedures described in this document. Users should use this exemplar as a starting point when creating production environments to aid the design and testing of intervention policies. 
 
 # 4.1 Results
 
@@ -443,7 +469,7 @@ show(p)
 |:--:|
 |*Experiment BMI projection example*|
 
-In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
+In a similar manner, the resulting dataset *`df`*, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
 [comment]: # (References)
 [configjson]:https://github.com/imperialCHEPI/healthgps/blob/main/example/France.Config.json "Configuration file example"
