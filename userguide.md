@@ -192,11 +192,28 @@ Finally, ***output*** section repeated below, defines the results output *folder
 
 ## 1.5 Risk Factor Models
 
+> **_TODO:_** New content is coming soon.
+
 ### 1.5.1 Static
-
+> **_TODO:_** New content is coming soon.
 ### 1.5.2 Dynamic
-
+> **_TODO:_** New content is coming soon.
 ### 1.5.3 Baseline Adjustments
+Adjustment to the *risk factor model* values can be defined by *age* for each *model type* and *gender*. Separated files are provided, in comma separated format (CSV), for each combination of *model type* and *gender*, each *adjustment file* contents must cove the *age range* required by the configuration settings. The structure and contents of a *baseline adjustment* file is illustrated below.
+
+```csv
+Age,Sodium,Protein,Fat,PA,Energy,BMI
+0,0.682,21.186,31.285,-158.128,169.349,2.922
+1,0.544,17.733,26.261,-119.174,152.908,2.263
+...
+50,-0.105,-5.150,-7.019,57.353,-92.973,-0.564
+51,-0.092,-4.780,-6.429,49.482,-88.769,-0.509
+...
+99,-0.593,-35.578,-66.544,-561.144,-141.747,-8.306
+100,-0.658,-40.064,-74.064,-602.356,-145.923,-9.331
+```
+
+The values in the adjustment files are *added* to the *model values*, therefore a zero-adjustment value can be used to disable *baseline adjustments* for a specific *risk factor*.
 
 # 2.0 Backend Storage
 Health GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
