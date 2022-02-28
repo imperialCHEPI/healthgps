@@ -60,6 +60,7 @@ The high-level structure of the [configuration][configjson] file used to create 
 ```
 
 ## 1.1 Inputs
+
 The ***inputs*** section sets the target country information, the *file* sub-section provides details of data used to fit the model, including file name, format, and variable data type mapping with the model internal types: *string, integer, float, double*. The user's data is required only to provide a visual validation of the initial virtual population created by the model, this feature should be made optional in the future, the following example illustrates the data file definition:
 
 ```json
@@ -90,6 +91,7 @@ The ***inputs*** section sets the target country information, the *file* sub-sec
 ```
 
 ## 1.2 Modelling
+
 The ***modelling*** section, defines the *SES* model, and the *risk factor* model with factors identifiers, hierarchy level, data range and mapping with the model's virtual individual properties (proxy). The *risk_factor_models* sub-section provides the fitted parameters file, `JSON` format, for each hierarchical *model type*, the *dynamic risk factor*, if exists, can be identified by the respective property. Finally, the *baseline adjustments* sub-section provides the *adjustment files* for each hierarchical *model type* and *gender*.
 
 ```json
@@ -134,6 +136,7 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
 The *risk factor model* and *baseline adjustment* files have their own schemas and formats requirements, these files structure are defined separately below, after all the *configuration file* sections.
 
 ## 1.3 Experiment
+
 The ***experiment*** section defines simulation *runtime* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
 
 ```json
@@ -195,10 +198,15 @@ Finally, ***output*** section repeated below, defines the results output *folder
 > **_TODO:_** New content is coming soon.
 
 ### 1.5.1 Static
+
 > **_TODO:_** New content is coming soon.
+
 ### 1.5.2 Dynamic
+
 > **_TODO:_** New content is coming soon.
+
 ### 1.5.3 Baseline Adjustments
+
 Adjustment to the *risk factor model* values can be defined by *age* for each *model type* and *gender*. Separated files are provided, in comma separated format (CSV), for each combination of *model type* and *gender*, each *adjustment file* contents must cove the *age range* required by the configuration settings. The structure and contents of a *baseline adjustment* file is illustrated below.
 
 ```csv
@@ -216,6 +224,7 @@ Age,Sodium,Protein,Fat,PA,Energy,BMI
 The values in the adjustment files are *added* to the *model values*, therefore a zero-adjustment value can be used to disable *baseline adjustments* for a specific *risk factor*.
 
 # 2.0 Backend Storage
+
 Health GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
 |![File-based Datastore](/assets/image/file_based_storage.png)|
@@ -290,6 +299,7 @@ Defines the file storage for country specific data containing historic estimates
 ```
 
 ## 2.2 Diseases
+
 Defines the file storage for country specific data containing cross-sectional estimates by *age* and *gender* for various diseases measures, disease relative risk to other diseases, risk factor relative risk to diseases, and cancer parameters. Each ***disease*** is defined in a separate folder named using the *disease identifier* in place of the {DISEASE_TYPE} token, estimates for disease incidence, prevalence, mortality and remission are stored in a single file per country, *files name* must include the *country's unique identifier* in place of the COUNTRY_CODE token as shown below. Cancer ***parameters*** are stored with same files name per country.
 
 The ***relative risk*** data is stored in a sub-folder, with *disease* to *disease* interaction files defined in one folder and *risk factor* relative risk to *diseases* in another folder. The ***disease*** relative risk to *diseases* folder should contain data files for diseases with real interaction, when no file exists, the *default value* is used automatically. Similarly, the ***risk factor*** relative risk folder should only have files for *risk factors* with direct effect on the disease. In summary, only files with real *relative risk* values should be included.
@@ -373,7 +383,9 @@ Defines the file storage for disease cost analysis for country specific data con
 Health GPS has been designed to be portable, producing stable, and comparable results cross-platform. Only minor and insignificant rounding errors should be noticeable, these errors are attributed to the C++ application binary interface (ABI), which is not guaranteed to compatible between two binary programs cross-platform, or even on same platform when using different versions of the C++ standard library.
 
 The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health GPS application on each platform using the include example model and reference dataset.
+
 ## Windows
+
 You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version or newer to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
@@ -384,6 +396,7 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 5. The default output folder is `C:\healthgps\results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ## Linux
+
 You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires the `GCC 11.1` or newer version to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
