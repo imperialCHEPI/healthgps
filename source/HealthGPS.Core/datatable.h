@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <optional>
+#include <ostream>
 
 #include "column.h"
 
@@ -46,3 +47,4 @@ namespace hgps {
 	}
 }
 
+std::ostream& operator<<(std::ostream& stream, const hgps::core::DataTable& table);

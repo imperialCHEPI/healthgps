@@ -355,8 +355,6 @@ namespace hgps {
 		clone.age = source.age;
 		clone.gender = source.gender;
 		clone.ses = source.ses;
-		clone.education.set_both_values(source.education.value());
-		clone.income.set_both_values(source.income.value());
 		clone.is_alive = true;
 		clone.has_emigrated = false;
 		for (const auto& item : source.risk_factors) {

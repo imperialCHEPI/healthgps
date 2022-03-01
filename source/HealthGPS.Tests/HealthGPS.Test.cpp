@@ -55,7 +55,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 
 	auto age_range = core::IntegerInterval(0, 30);
-	auto settings = Settings(uk, 0.1f, "Age", age_range);
+	auto settings = Settings{ uk, 0.1f, age_range };
 	auto info = RunInfo{ .start_time = 2018, .stop_time = 2025, .seed = std::nullopt };
 	auto ses_mapping = std::map<std::string, std::string>{ {"gender", "Gender"},
 		{"age", "Age"}, {"education", "Education"}, {"income", "Income"} };
@@ -300,7 +300,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto uk = core::Country{ .code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR" };
 	auto age_range = core::IntegerInterval(0, 100);
-	auto settings = Settings(uk, 0.1f, "Age", age_range);
+	auto settings = Settings(uk, 0.1f, age_range);
 	auto info = RunInfo{ .start_time = 1, .stop_time = count, .seed = std::nullopt };
 	auto ses_mapping = std::map<std::string, std::string>{ {"test", builder.name()} };
 	auto ses = SESDefinition

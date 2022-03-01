@@ -32,20 +32,26 @@ int main(int argc, char* argv[])
 	fmt::print("\nToday: {}\n\n", getTimeNowStr());
 
 	auto cmd_args = parse_arguments(options, argc, argv);
-	if (!cmd_args.success)
-	{
+	if (!cmd_args.success) {
 		return cmd_args.exit_code;
 	}
+
+	// Parse configuration file
+	Configuration config;
+	try {
+		config = load_configuration(cmd_args);
+	}
+	catch (const std::exception& ex) {
+		fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
+		return EXIT_FAILURE;
+	}
 	
-	// Parse configuration file 
-	auto config = load_configuration(cmd_args);
 	auto input_table = core::DataTable();
-	if (!load_datatable_csv(config.file.name, config.file.columns, input_table, config.file.delimiter))
-	{
+	if (!load_datatable_csv(config.file.name, config.file.columns, input_table, config.file.delimiter)) {
 		return EXIT_FAILURE;
 	}
 
-	std::cout << input_table.to_string();
+	std::cout << input_table;
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder);
@@ -57,14 +63,14 @@ int main(int argc, char* argv[])
 	auto countries = data_api.get_countries();
 	fmt::print("\nThere are {} countries in storage.\n", countries.size());
 	auto target = data_api.get_country(config.settings.country);
-	if (target.has_value())	{
+	if (target.has_value()) {
 		fmt::print("Target country: {} - {}.\n", target.value().code, target.value().name);
-	}
+	} 
 	else {
 		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", config.settings.country);
 		return EXIT_FAILURE;
 	}
-	
+
 	// Validate the configuration diseases list
 	auto diseases = get_diseases(data_api, config);
 	if (diseases.size() != config.diseases.size()) {
@@ -77,13 +83,16 @@ int main(int argc, char* argv[])
 
 	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();
-	auto result_file_logger = ResultFileWriter{ 
+	auto result_file_logger = ResultFileWriter{
 		create_output_file_name(config.result),
-		ModelInfo{.name = "Health-GPS", .version = "1.0.0.0"}
+		ExperimentInfo{
+			.model = "Health GPS",
+			.version = "1.0.0.0",
+			.intervention = config.intervention.identifier}
 	};
 	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
 
-	try	{
+	try {
 		auto seed_generator = std::make_unique<hgps::MTRandom32>();
 		if (model_config.seed().has_value()) {
 			seed_generator->seed(model_config.seed().value());
@@ -124,7 +133,7 @@ int main(int argc, char* argv[])
 		else {
 			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
 			channel.close(); // Will not store any message
-			auto worker = std::jthread{ [&runtime, &runner, &baseline, &config, &done ] {
+			auto worker = std::jthread{ [&runtime, &runner, &baseline, &config, &done] {
 				runtime = runner.run(baseline, config.trial_runs);
 				done.store(true);
 			} };

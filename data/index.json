@@ -1,9 +1,10 @@
 {
+    "version": 1,
     "country": {
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "desciption": "ISO 3166-1 country codes.",
+        "description": "ISO 3166-1 country codes.",
         "source": "International Organization for Standardization",
         "url": "https://www.iso.org/iso-3166-country-codes.html",
         "license": "N/A",
@@ -14,7 +15,7 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "desciption": "United Nations (UN) population estimates and projections.",
+        "description": "United Nations (UN) population estimates and projections.",
         "source": "UN Database - World Population Prospects 2019",
         "url": "https://population.un.org/wpp/",
         "license": "Creative Commons license",
@@ -23,17 +24,17 @@
         "time_limits": [1950, 2100],
         "projections": 2020,
         "population": {
-            "desciption": "Total population by sex, annually from 1950 to 2100.",
+            "description": "Total population by sex, annually from 1950 to 2100.",
             "path": "population",
             "file_name": "P{COUNTRY_CODE}.csv"
         },
         "mortality": {
-            "desciption": "Number of deaths by sex in five-year age groups.",
+            "description": "Number of deaths by sex in five-year age groups.",
             "path": "mortality",
             "file_name": "M{COUNTRY_CODE}.csv"
         },
         "indicators": {
-            "desciption": "Several indicators in 5-year periods, e.g. births, deaths and life expectancy.",
+            "description": "Several indicators in 5-year periods, e.g. births, deaths and life expectancy.",
             "path": "indicators",
             "file_name": "Pi{COUNTRY_CODE}.csv"
         }
@@ -42,46 +43,49 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "desciption":"Diseases indicators, measures and relative risk factors.",
+        "description":"Diseases indicators, measures and relative risk factors.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
         "path": "diseases",
-        "file_name": "D{COUNTRY_CODE}.csv",
         "age_limits": [1, 100],
         "time_year": 2019,
-        "relative_risk":{
-            "path": "relative_risk",
-            "to_disease":{
-                "path":"disease",
-                "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
-                "default_value": 1.0
+        "disease": {
+            "path": "{DISEASE_TYPE}",
+            "file_name": "D{COUNTRY_CODE}.csv",
+            "relative_risk":{
+                "path": "relative_risk",
+                "to_disease":{
+                    "path":"disease",
+                    "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
+                    "default_value": 1.0
+                },
+                "to_risk_factor":{
+                    "path":"risk_factor",
+                    "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
+                }
             },
-            "to_risk_factor":{
-                "path":"risk_factor",
-                "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
-            }
-        },
-        "parameters":{
-            "path":"P{COUNTRY_CODE}",
-            "files":{
-                "distribution": "prevalence_distribution.csv",
-                "survival_rate": "survival_rate_parameters.csv",
-                "death_weight": "death_weights.csv"
+            "parameters":{
+                "path":"P{COUNTRY_CODE}",
+                "files":{
+                    "distribution": "prevalence_distribution.csv",
+                    "survival_rate": "survival_rate_parameters.csv",
+                    "death_weight": "death_weights.csv"
+                }
             }
         },
         "registry":[
             {"group": "other", "id": "asthma", "name": "Asthma"},
             {"group": "other", "id": "diabetes", "name": "Diabetes mellitus"},
             {"group": "other",  "id": "lowbackpain", "name": "Low back pain"},
-            {"group": "cancer", "id": "colorectum", "name": "Colorectum  cancer"}
+            {"group": "cancer", "id": "colorectum", "name": "Colorectal  cancer"}
         ]
     },
     "analysis":{
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "desciption":"Observed burden of disease measures and disability weigths.",
+        "description":"Observed burden of disease measures and disability weigths.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",

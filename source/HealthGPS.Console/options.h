@@ -29,7 +29,6 @@ struct SettingsInfo
 {
 	std::string country{};
 	float size_fraction{};
-	std::string data_linkage{};
 	std::vector<int> age_range;
 };
 
@@ -59,7 +58,7 @@ struct ModellingInfo
 {
 	std::vector<RiskFactorInfo> risk_factors;
 	std::string dynamic_risk_factor;
-	std::unordered_map<std::string, std::string> models;
+	std::unordered_map<std::string, std::string> risk_factor_models;
 	BaselineInfo baseline_adjustment;
 };
 

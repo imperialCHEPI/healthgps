@@ -1,12 +1,28 @@
 #pragma once
 
 #include <string>
+#include <cstdint>
 #include "event_visitor.h"
 
 namespace hgps {
 
-    enum class EventType { runner, info, result, error };
+    /// @brief Event Message type enumeration  
+    enum struct EventType : uint8_t 
+    {
+        /// @brief Simulation executive message
+        runner,
 
+        /// @brief General notification and progress message 
+        info,
+
+        /// @brief Simulation result message
+        result,
+
+        /// @brief General error reporting message
+        error
+    };
+
+    /// @brief Event message interface
     struct EventMessage
     {
         EventMessage() = delete;

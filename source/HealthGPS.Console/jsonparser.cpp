@@ -93,14 +93,12 @@ void to_json(json& j, const SettingsInfo& p) {
 	j = json{
 		{"country_code", p.country},
 		{"size_fraction", p.size_fraction},
-		{"data_linkage", p.data_linkage},
 		{"age_range", p.age_range} };
 }
 
 void from_json(const json& j, SettingsInfo& p) {
 	j.at("country_code").get_to(p.country);
 	j.at("size_fraction").get_to(p.size_fraction);
-	j.at("data_linkage").get_to(p.data_linkage);
 	j.at("age_range").get_to(p.age_range);
 }
 
@@ -167,15 +165,15 @@ void to_json(json& j, const ModellingInfo& p) {
 	j = json{
 		{"risk_factors", p.risk_factors},
 		{"dynamic_risk_factor", p.dynamic_risk_factor},
-		{"models", p.models},
-		{"baseline_adjustment", p.baseline_adjustment} };
+		{"risk_factor_models", p.risk_factor_models},
+		{"baseline_adjustments", p.baseline_adjustment} };
 }
 
 void from_json(const json& j, ModellingInfo& p) {
 	j.at("risk_factors").get_to(p.risk_factors);
 	j.at("dynamic_risk_factor").get_to(p.dynamic_risk_factor);
-	j.at("models").get_to(p.models);
-	j.at("baseline_adjustment").get_to(p.baseline_adjustment);
+	j.at("risk_factor_models").get_to(p.risk_factor_models);
+	j.at("baseline_adjustments").get_to(p.baseline_adjustment);
 }
 
 void to_json(json& j, const FactorDynamicEquationInfo& p) {

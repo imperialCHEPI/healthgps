@@ -4,10 +4,9 @@
 
 namespace hgps {
 
-	Settings::Settings(const core::Country country, const float size_fraction, 
-		const std::string linkage_col, const core::IntegerInterval age_range)
-		: country_{country}, size_fraction_{ size_fraction },
-		linkage_column_{linkage_col}, age_range_{ age_range } {
+	Settings::Settings(const core::Country& country, const float size_fraction,
+		const core::IntegerInterval& age_range)
+		: country_{country}, size_fraction_{ size_fraction }, age_range_{ age_range } {
 
 		// TODO: Create a fraction type wrapper
 		if (size_fraction <= 0.0 || size_fraction > 1.0) {
@@ -22,10 +21,6 @@ namespace hgps {
 
 	const float& Settings::size_fraction() const noexcept {
 		return size_fraction_;
-	}
-
-	const std::string& Settings::linkage_column() const noexcept {
-		return linkage_column_;
 	}
 
 	const core::IntegerInterval& Settings::age_range() const noexcept {

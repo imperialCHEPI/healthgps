@@ -7,23 +7,9 @@
 
 namespace hgps {
 
-	/// @brief Defines a map template with case insensitive string keys and type.
-	/// @tparam T The map value data type
-	template <typename T>
-	using case_insensitive_map = std::map<std::string, T, core::case_insensitive::comparator>;
-
-	/// @brief Simulation entity data structure
-	struct Person;
-
-	/// @brief Population age record data structure
-	struct PopulationRecord;
-
-	/// @brief Simulation run-time context for shared data and state.
-	class RuntimeContext;
-
 	/// @brief Health GPS simulation modules types enumeration
 	enum class SimulationModuleType : uint8_t
-	{	
+	{
 		/// @brief Risk factor module
 		RiskFactor,
 
@@ -49,6 +35,20 @@ namespace hgps {
 		/// @brief Dynamic hierarchical model
 		Dynamic,
 	};
+
+	/// @brief Defines a map template with case insensitive string keys and type.
+	/// @tparam T The map value data type
+	template <typename T>
+	using case_insensitive_map = std::map<std::string, T, core::case_insensitive::comparator>;
+
+	/// @brief Simulation entity data structure
+	struct Person;
+
+	/// @brief Population age record data structure
+	struct PopulationRecord;
+
+	/// @brief Simulation run-time context for shared data and state.
+	class RuntimeContext;
 
 	/// @brief Simulation modules interface
 	class SimulationModule
