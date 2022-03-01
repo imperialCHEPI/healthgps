@@ -24,7 +24,7 @@ The high-level structure of the [configuration][configjson] file used to create 
 
 ```json
 {
-    "version": 2,
+    "version": 1,
     "inputs": {
         "file": {},
         "settings": {
@@ -123,7 +123,7 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "files_name": {
+        "file_names": {
             "static_male":"france_initial_adjustment_male.csv",
             "static_female":"france_initial_adjustment_female.csv",
             "dynamic_male":"france_update_adjustment_male.csv",
@@ -231,12 +231,13 @@ Health GPS by default uses a *file-based backend storage*, which implements the 
 |:--:|
 |*File-based Backend Datastore example*|
 
-The *index file* defines data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The data is indexed and stored by country files taking advantage of the model's workflow, this minimises data reading time and enables the storage to scale with many countries.
+The *index file* defines schema version, data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The data is indexed and stored by country files taking advantage of the model's workflow, this minimises data reading time and enables the storage to scale with many countries.
 
 The data model defines many data hierarchies, which have been flatten for file-based storage, *file names* are defined for consistency, avoid naming clashes, and ultimately to store processed data for machines consumption, not necessarily for humans. The high-level structure of the file-based storage index file, in `JSON` format, is shown below.
 
 ```json
 {
+    "version": 1,
     "country": {
         "format": "csv",
         "delimiter": ",",
@@ -416,10 +417,10 @@ The model results file structure is composed of two parts: *experiment metadata*
 ```json
 {
     "experiment": {
-        "model": "Health-GPS",
+        "model": "Health GPS",
         "version": "1.0.0.0",
-        "time_of_day": "2022-02-01 11:51:43.129 GMT Standard Time",
-        "intervention": "marketing"
+        "intervention": "marketing",
+        "time_of_day": "2022-02-01 11:51:43.129 GMT Standard Time"
     },
     "result": [
         {

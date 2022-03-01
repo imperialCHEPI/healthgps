@@ -9,6 +9,7 @@ The **Health GPS** application provides a *Command Line Interface* (CLI) and run
 Although the model source code is portable, binaries must be generated for each platforms using respective tools and libraries. The Health GPS repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS) with very specific runtime requirements.
 
 ## Windows
+
 You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version or newer to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
@@ -19,6 +20,7 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 5. The default output folder is `C:\healthgps\results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ## Linux
+
 You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires the `GCC 11.1` or newer version to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
