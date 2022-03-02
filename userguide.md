@@ -4,10 +4,6 @@
 
 # User Guide
 
----
-> **_UNDER DEVELOPMENT:_** New content is coming soon.
----
-
 The **Health GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
 |![Health GPS Workflow](/assets/image/workflow_diagram.png)|
@@ -195,19 +191,157 @@ Finally, ***output*** section repeated below, defines the results output *folder
 
 ## 1.5 Risk Factor Models
 
-> **_TODO:_** New content is coming soon.
+Health GPS requires *two types* of risk factor models to be externally created by the user, fitted to data, and provided via configuration: *static* and *dynamic* respective. The *first type* is used to *initialise* the virtual population with the current risk factor trends, the *second type* is used to *update* the population attributes, accounting for the dynamics of the risk factors as time progresses in the simulation and individual's age.
+
+The *risk factor* models definition adopts a semi-parametric approach based on a regression models with sampling from the residuals to conserve the original data distributions. Each risk factor model file contains the various fitted regression models' coefficients, residuals, and other related values, that must be provided in a consistent format independent of the fitting tool.
 
 ### 1.5.1 Static
 
-> **_TODO:_** New content is coming soon.
+Initialise the virtual population, created by the model, with risk factor trends like the real population in terms of statistical distributions of the modelled variables. In addition to the regression fitted values, the *static* model includes transition matrix, inverse transition matrix, and independent residuals for sampling to conserve the correlations.
+
+The structure of a *static* model file is shown below, the size of the fitted residuals, arrays/matrices, are data size dependent, therefore this model type does not scale well with datasets size, *N*, and can potentially result in excessive memory usage.
+
+```json
+{
+    "models": {
+        "Sodium": {
+            "formula": "...",
+            "coefficients": {
+                "Intercept": {
+                    "value": 2.0303445114896066,
+                    "stdError": 0.023969233176537191,
+                    "tValue": 84.706277273694923,
+                    "pValue": 0
+                },
+                "Gender": {..},
+                "Age": {...},
+                "Age2": {...},
+                "Age3": {...},
+                "SES": {...}
+            },
+            "residuals": [N],
+            "fittedValues": [N],
+            "residualsStandardDeviation": 1.4648008146487799,
+            "rSquared": 0.13385827201094316
+        },
+        "Protein": {...},
+        "Fat": {...},
+        "PA": {...},
+        "Energy": {...},
+        "BMI": {...}
+    },
+    "levels": {
+        "1": {
+            "variables": ["Sodium", "Protein", "Fat"],
+            "s": {
+                "rows": N,
+                "cols": 3,
+                "data": [rows*cols]
+            },
+            "w": {
+                "rows": 3,
+                "cols": 3,
+                "data": [rows*cols]
+            },
+            "m": {
+                "rows": 3,
+                "cols": 3,
+                "data": [rows*cols]
+            },
+            "variances": [
+                0.6027296236467885,
+                0.30583191687945821,
+                0.091438459473747832
+            ],
+            "correlation": {
+                "rows": 3,
+                "cols": 3,
+                "data": [rows*cols]
+            }
+        },
+        "2": {
+            "variables": ["PA", "Energy"],
+            ...
+        },
+        "3": {
+            "variables": ["BMI"],
+            ...,
+            "correlation": {
+                "rows": 1,
+                "cols": 1,
+                "data": [1.0]
+            }
+        },
+    }
+}
+```
+The file structure has been defined for completeness, not all values are used by the current model, for example, the coefficients goodness of fit (GoF) values, however, these values are negligible when compared with the large arrays and matrices of size N. The *levels* matrices calculated using Independent Component Analysis (ICA). are stored using *row-major* order, *m* is the transition matrix, *w* the inverse transition matrix, and *s* the independent residuals distribution for variables at each *level*.
 
 ### 1.5.2 Dynamic
 
-> **_TODO:_** New content is coming soon.
+Having initialised the virtual population risk factors, the *dynamic model* projects individuals' risk factors over time using *delta* changes to current values. The structure of a *dynamic* model file is shown below, only the factors variable range, regression coefficients and residuals standard deviation are required, this model type definition is *lite* and can scale to any size datasets.
+
+The first two properties document the model's target *country*, and the *percentage value* used to calculate the *risk factors* variables range *quartile* from the respective dataset variables.
+
+```json
+{
+    "Country": {"Code":250,"Name":"France","Alpha2":"FR","Alpha3":"FRA"},
+    "BoundaryPercentage": 0.05,
+    "RiskFactors": [
+        {"Name":"Gender", "Level":0, "Proxy":"gender", "Range":[0,1]},
+        {"Name":"Age","   "Level":0, "Proxy":"age",    "Range":[1,87]},
+        ...
+    ],
+    "Variables": [
+        {"Name":"dPA",     "Level":3, "Factor":"pa"},
+        {"Name":"dEnergy", "Level":3, "Factor":"energy"},
+        {"Name":"dProtein","Level":2, "Factor":"protein"},
+        {"Name":"dSodium", "Level":2, "Factor":"sodium"},
+        {"Name":"dFat",    "Level":2, "Factor":"fat"}
+    ],
+    "Equations": {
+        "0-19": {
+            "Female": [
+                {
+                    "Name": "BMI",
+                    "Coefficients": {
+                        "Intercept": -0.227646964586474,
+                        "SES": -0.0201431467562394,
+                        "Age": 0.0877002551156606,
+                        "dPA": -4.63919783505021E-05,
+                        "dEnergy": 0.00244125012762089
+                    },
+                    "ResidualsStandardDeviation": 1.2335501015137833
+                },
+                ...
+            ],
+            "Male": [
+                ...,
+                {
+                    "Name": "Sodium",
+                    "Coefficients": {
+                        "Intercept": 0.0634502820168143,
+                        "SES": 0.00549710735696626,
+                        "Age": 0.0100775034506456
+                    },
+                    "ResidualsStandardDeviation": 0.2825432918724497
+                }
+            ]
+        },
+        "20-100": {
+            "Female": [...],
+            "Male": [...],
+        }
+    }
+}
+```
+The ***risk factors*** section above is not used to create dynamic model types, it is calculated from data and must be copied into the *configuration file* to be used during sampling at runtime. The order of the risk factors definition in the file is not important, the model is assembled dynamically using the *level* value in the risk factors hierarchy. ***Variables*** are internal *delta* terms in the regression equations associated with specific *factors* at each hierarchical *level*.
+
+The ***equations*** section contains the model's definition by *age group* and *gender*. The number of *age group* models is dynamic, the only constraint is that age groups must cover the *age range* required in the *configuration file* without any internal overlap.
 
 ### 1.5.3 Baseline Adjustments
 
-Adjustment to the *risk factor model* values can be defined by *age* for each *model type* and *gender*. Separated files are provided, in comma separated format (CSV), for each combination of *model type* and *gender*, each *adjustment file* contents must cove the *age range* required by the configuration settings. The structure and contents of a *baseline adjustment* file is illustrated below.
+To manage unknown trends in risk factors affecting the choices of baseline scenario, users can define *adjustments* values to keep the distributions of risk factors by *gender* and *age* constant over time. Separated files are defined, in comma separated format (CSV), for each combination of *model type* and *gender*, the *adjustment files* content must cove the *age range* required by the configuration settings. The structure and contents of an *adjustment* file is illustrated below.
 
 ```csv
 Age,Sodium,Protein,Fat,PA,Energy,BMI
@@ -221,7 +355,7 @@ Age,Sodium,Protein,Fat,PA,Energy,BMI
 100,-0.658,-40.064,-74.064,-602.356,-145.923,-9.331
 ```
 
-The values in the adjustment files are *added* to the *model values*, therefore a zero-adjustment value can be used to disable *baseline adjustments* for a specific *risk factor*.
+The values in the adjustment files are *added* to the *model values*, therefore a zero-adjustment value can be used to disable *baseline adjustments* for a specific *risk factor* variable.
 
 # 2.0 Backend Storage
 
