@@ -98,17 +98,17 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
         "function_parameters":[0.0, 1.0]
     },
     "risk_factors": [
-        {"name":"Gender",   "level":0, "proxy":"gender", "range":[0,1]},
-        {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
-        {"name":"Age2",     "level":0, "proxy":"",       "range":[1,7569]},
-        {"name":"Age3",     "level":0, "proxy":"",       "range":[1,658503]},
-        {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.314484485,2.310181]},
-        {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.146601,8.675425]},
-        {"name":"Protein",  "level":1, "proxy":"",       "range":[42.09252483,238.4145]},
-        {"name":"Fat",      "level":1, "proxy":"",       "range":[44.78128,381.666]},
-        {"name":"PA",       "level":2, "proxy":"",       "range":[400,9769.83669]},
-        {"name":"Energy",   "level":2, "proxy":"",       "range":[1315.532125,7545.832301]},
-        {"name":"BMI",      "level":3, "proxy":"",       "range":[13.53255,45.26488]}
+        {"name":"Gender",   "level":0, "proxy":"gender", "range":[0, 1]},
+        {"name":"Age",      "level":0, "proxy":"age",    "range":[1, 87]},
+        {"name":"Age2",     "level":0, "proxy":"",       "range":[1, 7569]},
+        {"name":"Age3",     "level":0, "proxy":"",       "range":[1, 658503]},
+        {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.314, 2.310]},
+        {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.146, 8.675]},
+        {"name":"Protein",  "level":1, "proxy":"",       "range":[42.093, 238.414]},
+        {"name":"Fat",      "level":1, "proxy":"",       "range":[44.781, 381.666]},
+        {"name":"PA",       "level":2, "proxy":"",       "range":[400.0, 9769.837]},
+        {"name":"Energy",   "level":2, "proxy":"",       "range":[1315.532, 7545.832]},
+        {"name":"BMI",      "level":3, "proxy":"",       "range":[13.532, 45.265]}
     ],
     "dynamic_risk_factor": "",
     "risk_factor_models": {
@@ -281,7 +281,7 @@ The file structure has been defined for completeness, not all values are used by
 
 Having initialised the virtual population risk factors, the *dynamic model* projects individuals' risk factors over time using *delta* changes to current values. The structure of a *dynamic* model file is shown below, only the factors variable range, regression coefficients and residuals standard deviation are required, this model type definition is *lite* and can scale to any size datasets.
 
-The first two properties document the model's target *country*, and the *percentage value* used to calculate the *risk factors* variables range *quartile* from the respective dataset variables.
+The first two properties document the model's target *country*, and the *percentage value* used to calculate the *risk factors* variables range *quartile* from the respective dataset variables. The *risk factors* section defines the model hierarchy and must be copied into the *configuration file*, the factors range are calculated from data are used as constraints during updates at runtime. 
 
 ```json
 {
@@ -343,7 +343,7 @@ The first two properties document the model's target *country*, and the *percent
     }
 }
 ```
-The ***risk factors*** section above is not used to create dynamic model types, it is calculated from data and must be copied into the *configuration file* to be used during sampling at runtime. The order of the risk factors definition in the file is not important, the model is assembled dynamically using the *level* value in the risk factors hierarchy. ***Variables*** are internal *delta* terms in the regression equations associated with specific *factors* at each hierarchical *level*.
+***Variables*** are internal *delta* terms in the regression equations associated with specific *factors* at each hierarchical *level*. The order of the risk factors definition in the file is not important, the model is assembled dynamically using the *level* value in the risk factors hierarchy.
 
 The ***equations*** section contains the model's definition by *age group* and *gender*. The number of *age group* models is dynamic, the only constraint is that age groups must cover the *age range* required in the *configuration file* without any internal overlap.
 
