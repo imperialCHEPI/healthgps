@@ -288,9 +288,17 @@ The first two properties document the model's target *country*, and the *percent
     "Country": {"Code":250,"Name":"France","Alpha2":"FR","Alpha3":"FRA"},
     "BoundaryPercentage": 0.05,
     "RiskFactors": [
-        {"Name":"Gender", "Level":0, "Proxy":"gender", "Range":[0,1]},
-        {"Name":"Age",    "Level":0, "Proxy":"age",    "Range":[1,87]},
-        ...
+        {"Name":"Gender", "Level":0, "Proxy":"gender", "Range":[0, 1]},
+        {"Name":"Age",    "Level":0, "Proxy":"age",    "Range":[1, 87]},
+        {"Name":"Age2",   "Level":0, "Proxy":"",       "Range":[1, 7569]},
+        {"Name":"Age3",   "Level":0, "Proxy":"",       "Range":[1, 658503]},
+        {"Name":"SES",    "Level":0, "Proxy":"ses",    "Range":[-2.314, 2.310]},
+        {"Name":"Sodium", "Level":1, "Proxy":"",       "Range":[1.146, 8.675]},
+        {"Name":"Protein","Level":1, "Proxy":"",       "Range":[42.092, 238.414]},
+        {"Name":"Fat",    "Level":1, "Proxy":"",       "Range":[44.781, 381.666]},
+        {"Name":"PA",     "Level":2, "Proxy":"",       "Range":[400.0, 9769.837]},
+        {"Name":"Energy", "Level":2, "Proxy":"",       "Range":[1315.532, 7545.832]}
+        {"Name":"BMI",    "Level":3, "Proxy":"",       "Range":[13.532, 45.265]}
     ],
     "Variables": [
         {"Name":"dPA",     "Level":3, "Factor":"pa"},
