@@ -289,7 +289,7 @@ The first two properties document the model's target *country*, and the *percent
     "BoundaryPercentage": 0.05,
     "RiskFactors": [
         {"Name":"Gender", "Level":0, "Proxy":"gender", "Range":[0,1]},
-        {"Name":"Age","   "Level":0, "Proxy":"age",    "Range":[1,87]},
+        {"Name":"Age",    "Level":0, "Proxy":"age",    "Range":[1,87]},
         ...
     ],
     "Variables": [
