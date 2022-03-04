@@ -18,6 +18,12 @@ The Health GPS workflow is summarised below, datasets from many disconnected sou
 
 The simulation creates the virtual population, simulates the synthetic individuals over time, collects population statistics and publish to the outside world at the end of each simulated time step. It is the user's responsibility to analyse and quantify the model results, which are saved to a chosen output folder in JSON format.
 
+Health GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules and sub-model are required as shown below.
+
+|![Health GPS Concept](/assets/image/model_concept_diagram.png)|
+|:--:|
+|*Health GPS Concept Diagram*|
+
 ## Demographics
 
 The population historical trends and projections are used to define the baseline scenario for the model. The model requires historical and projected populations by *year*, *age* and *gender* for each country of interest, covering the entire duration of the experiment. All data processing, units' conversion, gap filling, smoothing, etc, must be carried out outside to produce the complete datasets required. The following demographic measures are required by the model:
@@ -64,3 +70,13 @@ The choice of baseline scenario is critical for analyses as it serves as a refer
 The first run evaluates the no-intervention, *“baseline scenario”* where demographics, risk factors, and diseases are projected based solely on estimates from historical data. The second run evaluates the *“intervention scenario”* where a specific policy is applied to the same population with the aim of modifying the underlying trends and risk factor distribution. 
 
 Finally, detailed analysis can be carried out, externally, to compare the two simulated scenarios results in terms of population demographics and burden of diseases to estimate the cost-effectiveness and impacts of the targeted intervention in tackling childhood obesity.
+
+## Simulation Workflow
+
+The microsimulation consists of two main algorithms to *initialise* and *project* the virtual population over time respectively. Creating and *initialising* the virtual population is the first step of a simulation run, while the algorithm *projecting* the population over time is the core of the microsimulation as shown below. 
+
+|![Health GPS Concept](/assets/image/model_workflow_diagram.png)|
+|:--:|
+|*Health GPS Workflow Diagram*|
+
+The initialisation sets the simulation world clock, in years, to the user’s defined start time, and requests the simulation modules to initialise the relevant properties of the virtual population individuals. The projection moves the simulation clock, in years, forwards until the user’s defined end time is reached, at which point the algorithm terminates.

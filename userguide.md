@@ -281,7 +281,7 @@ The file structure has been defined for completeness, not all values are used by
 
 Having initialised the virtual population risk factors, the *dynamic model* projects individuals' risk factors over time using *delta* changes to current values. The structure of a *dynamic* model file is shown below, only the factors variable range, regression coefficients and residuals standard deviation are required, this model type definition is *lite* and can scale to any size datasets.
 
-The first two properties document the model's target *country*, and the *percentage value* used to calculate the *risk factors* variables range *quartile* from the respective dataset variables. The *risk factors* section defines the model hierarchy and must be copied into the *configuration file*, the factors range are calculated from data are used as constraints during updates at runtime. 
+The first two properties document the model's target *country*, and the *percentage value* used to calculate the *risk factors* variables range *quartile* from the respective dataset variables. The *risk factors* section defines the model hierarchy and must be copied into the *configuration file*, the factors range are used to constrain updates to the respective factors value at runtime.
 
 ```json
 {
