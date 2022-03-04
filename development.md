@@ -71,7 +71,105 @@ The project dependencies are included using [vcpkg](https://github.com/microsoft
 
 # Implementation
 
----
-> **_UNDER DEVELOPMENT:_**  More content coming soon.
----
+The software application provides a Command Line Interface (CLI) for the user to inform the configuration to run and backend storage location. The experiment options are provided to the model via a configuration file (JSON format), including population size, intervention scenarios and number of runs.
+
+ The console terminal application aims to provide the users of with a wider range of cross-platform options to run the microsimulation, including hardware ranging from desktops to high performance computers. However, the microsimulation software program can equality be a graphical user interface (GUI) or web page program.
+
+## Composing a Microsimulation
+To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and ModelRunner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
+
+|![Composing Health GPS](/assets/image/compose_simulation.png)|
+|:--:|
+|*Composing a Health GPS Microsimulation*|
+
+The simulation executive requires a RandomBitGenerator interface implementation for master seed generation and an implementation of the EventAggregator interface, in this example the DefaultEventBus class, which should be shared by the engines and executive to provide a centralised source of communication. The simulation engine must have its own random number generator instance as part of the simulation definition, the Mersenne Twister pseudorandom number generator algorithms is the default implementation, however other algorithms can easily be used. 
+
+EventMonitor class has been created to receive all messages from the microsimulation, notifications and error messages are displayed on the application terminal, and result messages are queued to be processed by an implementation of the ResultWriter interface, ResultFileWriter class in this example, which writes the results to a file in JSON format.
+
+The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance, and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure used to create all the simulation definitions.
+
+```cpp
+// Create factory with backend data store and modules implementation
+auto factory = get_default_simulation_module_factory(...);
+
+// Create the complete model input from configuration
+auto model_input = create_model_input(...);
+
+// Create event bus and monitor
+auto event_bus = DefaultEventBus();
+auto json_file_logger = ResultFileWriter{
+    create_output_file_name(config.output),
+    ExperimentInfo{.model = "Health GPS", .version = "1.0.0.0",
+        .intervention = config.intervention.identifier}
+};
+auto event_monitor = EventMonitor{ event_bus, json_file_logger };
+
+try {
+    // Create simulation executive
+    auto seed_generator = std::make_unique<hgps::MTRandom32>();
+    if (model_input.seed().has_value()) {
+        seed_generator->seed(model_input.seed().value());
+    }
+    auto executive = ModelRunner(event_bus, std::move(seed_generator));
+    
+    // Create baseline scenario with data sync channel
+    auto channel = SyncChannel{};
+    auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
+    
+    // Create simulation engine for baseline scenario
+    auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
+    auto baseline = HealthGPS{
+        SimulationDefinition{
+            model_input, std::move(baseline_scenario),
+            std::move(baseline_rnd)},
+        factory, event_bus };
+
+    std::atomic<bool> done(false);
+    auto runtime = 0.0;
+    if (config.has_active_intervention) {
+        // Create intervention scenario
+        auto policy_scenario = create_intervention_scenario(channel, config.intervention);
+
+        // Create simulation engine for intervention scenario
+        auto policy_rnd = std::make_unique<hgps::MTRandom32>();
+        auto intervention = HealthGPS{
+            SimulationDefinition{
+                model_input, std::move(policy_scenario),
+                std::move(policy_rnd)},
+            factory, event_bus };
+
+        // Create worker thread to run the two scenarios side by side
+        auto worker = std::jthread{ [&runtime, &executive, &baseline, &intervention, &config, &done] {
+            runtime = executive.run(baseline, intervention, config.trial_runs);
+            done.store(true);
+        } };
+
+        // Waits for it to finish, cancellation can be enabled here
+        while (!done.load()) {
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+        }
+        worker.join();
+    }
+    else {
+        // Create worker thread to run only the baseline scenario
+        channel.close(); // Will not store any message
+        auto worker = std::jthread{[&runtime, &executive, &baseline, &config, &done] {
+            runtime = executive.run(baseline, config.trial_runs);
+            done.store(true);
+        } };
+        
+        // Waits for it to finish, cancellation can be enabled here
+        while (!done.load()) {
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+        }
+        worker.join();
+    }
+}
+catch (const std::exception& ex) {
+    fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n", ex.what());
+}
+
+// Stop listening for new messages.
+event_monitor.stop();
+```
 
