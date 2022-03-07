@@ -218,12 +218,12 @@ Configuration load_configuration(CommandOptions& options)
 			}
 		}
 
-		config.result = opt["output"].get<ResultInfo>();
-		config.result.folder = expand_environment_variables(config.result.folder);
-		if (!fs::exists(config.result.folder)) {
-			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.result.folder);
-			if (!fs::create_directories(config.result.folder)) {
-				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.result.folder));
+		config.output = opt["output"].get<OutputInfo>();
+		config.output.folder = expand_environment_variables(config.output.folder);
+		if (!fs::exists(config.output.folder)) {
+			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.output.folder);
+			if (!fs::create_directories(config.output.folder)) {
+				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.output.folder));
 			}
 		}
 	}
@@ -303,7 +303,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		HierarchicalMapping(std::move(mapping)), diseases);
 }
 
-std::string create_output_file_name(const ResultInfo& info)
+std::string create_output_file_name(const OutputInfo& info)
 {
 	namespace fs = std::filesystem;
 

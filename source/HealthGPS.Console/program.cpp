@@ -78,27 +78,27 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	// Create the complete model configuration
-	auto model_config = create_model_input(input_table, target.value(), config, diseases);
+	// Create the complete model input from configuration
+	auto model_input = create_model_input(input_table, target.value(), config, diseases);
 
 	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();
-	auto result_file_logger = ResultFileWriter{
-		create_output_file_name(config.result),
+	auto json_file_logger = ResultFileWriter{
+		create_output_file_name(config.output),
 		ExperimentInfo{
 			.model = "Health GPS",
 			.version = "1.0.0.0",
 			.intervention = config.intervention.identifier}
 	};
-	auto event_monitor = EventMonitor{ event_bus, result_file_logger };
+	auto event_monitor = EventMonitor{ event_bus, json_file_logger };
 
 	try {
 		auto seed_generator = std::make_unique<hgps::MTRandom32>();
-		if (model_config.seed().has_value()) {
-			seed_generator->seed(model_config.seed().value());
+		if (model_input.seed().has_value()) {
+			seed_generator->seed(model_input.seed().value());
 		}
 
-		auto runner = ModelRunner(event_bus, std::move(seed_generator));
+		auto executive = ModelRunner(event_bus, std::move(seed_generator));
 		auto channel = SyncChannel{};
 
 		// Create main simulation model instance and run experiment
@@ -109,18 +109,18 @@ int main(int argc, char* argv[])
 		auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
 		auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
 		auto baseline = HealthGPS{
-			SimulationDefinition{ model_config, std::move(baseline_scenario) , std::move(baseline_rnd) },
+			SimulationDefinition{ model_input, std::move(baseline_scenario) , std::move(baseline_rnd) },
 			factory, event_bus };
 		if (config.has_active_intervention) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
 			auto policy_rnd = std::make_unique<hgps::MTRandom32>();
 			auto intervention = HealthGPS{
-				SimulationDefinition{ model_config, std::move(policy_scenario), std::move(policy_rnd) },
+				SimulationDefinition{ model_input, std::move(policy_scenario), std::move(policy_rnd) },
 				factory, event_bus };
 
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
-			auto worker = std::jthread{ [&runtime, &runner, &baseline, &intervention, &config, &done] {
-				runtime = runner.run(baseline, intervention, config.trial_runs);
+			auto worker = std::jthread{ [&runtime, &executive, &baseline, &intervention, &config, &done] {
+				runtime = executive.run(baseline, intervention, config.trial_runs);
 				done.store(true);
 			} };
 
@@ -133,8 +133,8 @@ int main(int argc, char* argv[])
 		else {
 			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
 			channel.close(); // Will not store any message
-			auto worker = std::jthread{ [&runtime, &runner, &baseline, &config, &done] {
-				runtime = runner.run(baseline, config.trial_runs);
+			auto worker = std::jthread{ [&runtime, &executive, &baseline, &config, &done] {
+				runtime = executive.run(baseline, config.trial_runs);
 				done.store(true);
 			} };
 

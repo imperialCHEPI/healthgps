@@ -237,12 +237,12 @@ void from_json(const json& j, PolicyScenarioInfo& p) {
 }
 
 // Result information
-void to_json(json& j, const ResultInfo& p) {
+void to_json(json& j, const OutputInfo& p) {
 	j = json{ {"folder", p.folder} };
 	j = json{ {"file_name", p.file_name} };
 }
 
-void from_json(const json& j, ResultInfo& p) {
+void from_json(const json& j, OutputInfo& p) {
 	j.at("folder").get_to(p.folder);
 	j.at("file_name").get_to(p.file_name);
 }

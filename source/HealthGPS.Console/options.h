@@ -62,7 +62,7 @@ struct ModellingInfo
 	BaselineInfo baseline_adjustment;
 };
 
-struct ResultInfo
+struct OutputInfo
 {
 	std::string folder{};
 	std::string file_name{};
@@ -119,5 +119,5 @@ struct Configuration
 	unsigned int sync_timeout_ms{};
 	bool has_active_intervention{false};
 	PolicyScenarioInfo intervention;
-	ResultInfo result;
+	OutputInfo output;
 };
