@@ -86,7 +86,7 @@ The simulation executive requires a RandomBitGenerator interface implementation 
 
 EventMonitor class has been created to receive all messages from the microsimulation, notifications and error messages are displayed on the application terminal, and result messages are queued to be processed by an implementation of the ResultWriter interface, ResultFileWriter class in this example, which writes the results to a file in JSON format.
 
-The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance, and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure used to create all the simulation definitions.
+The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance, and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure shared with all the simulation engines. An implementation of *scenario* interface must be provided for each simulation definition, the *BaselineScenario* class is a generic type, while the intervention scenarios are defined to test specific policies.
 
 ```cpp
 // Create factory with backend data store and modules implementation
@@ -173,3 +173,19 @@ catch (const std::exception& ex) {
 event_monitor.stop();
 ```
 
+The simulation executive can run experiments for baseline scenario only, or baseline and intervention scenarios combination as shown above. The results message is a polymorphic type carrying a customisable data payload, table below shows the default implementation outputs.
+
+| Property     | Overall | Male  | Female | Description             |
+| :---         | :---:   | :---: | :---:  |:---                     |
+| Id           | √       | -     | -      | The message type identifier (results type)
+| Source       | √       | -     | -      | The results experiment identification |
+| Run number   | √       | -     | -      | The results rum number identification |
+| Model time   | √       | -     | -      | The results model time identification |
+| Average Age  | -       | √     | √      | Average age of the population alive |
+| Prevalence   | -       | √     | √      | Prevalence for each disease in the population |
+| Risk factors | -       | √     | √      | Average risk factor values in the population |
+| Indicators (DALYs) | √ | - | - | YLL, YLD and DALY values per 10000 people |
+| Population Counts | √ | - | - |  Total size, number alive, dead and emigrants |
+| Metrics | √ | - | - | Custom key/value metrics for algorithms |
+
+These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
