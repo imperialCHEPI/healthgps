@@ -189,3 +189,40 @@ The simulation executive can run experiments for baseline scenario only, or base
 | Metrics | √ | - | - | Custom key/value metrics for algorithms |
 
 These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
+
+The following code snippet illustrates the dynamic registration of module builder functions with the simulation module factory by using the default module factory function used above. A similar mechanism can be used to register dummy or mock module versions, with deterministic behaviour for testing purpose.
+
+```cpp
+SimulationModuleFactory get_default_simulation_module_factory(Repository& manager)
+{
+    auto factory = SimulationModuleFactory(manager);
+    factory.register_builder(SimulationModuleType::SES,
+        [](Repository& repository, const ModelInput& config) ->
+        SimulationModuleFactory::ModuleType {
+            return build_ses_noise_module(repository, config); });
+
+    factory.register_builder(SimulationModuleType::Demographic,
+        [](Repository& repository, const ModelInput& config) -> 
+        SimulationModuleFactory::ModuleType {
+            return build_population_module(repository, config); });
+
+    factory.register_builder(SimulationModuleType::RiskFactor,
+        [](Repository& repository, const ModelInput& config) ->
+        SimulationModuleFactory::ModuleType {
+            return build_risk_factor_module(repository, config); });
+
+    factory.register_builder(SimulationModuleType::Disease,
+        [](Repository& repository, const ModelInput& config) -> 
+        SimulationModuleFactory::ModuleType {
+            return build_disease_module(repository, config); });
+
+    factory.register_builder(SimulationModuleType::Analysis,
+        [](Repository& repository, const ModelInput& config) -> 
+        SimulationModuleFactory::ModuleType {
+            return build_analysis_module(repository, config); });
+
+    return factory;
+}
+```
+
+The factory must provide builder functions for all module types, however, the user can disable a particular module behaviour by registering an implementation that makes no change to virtual population properties when invoked by the simulation engine.
