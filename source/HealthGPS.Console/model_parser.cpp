@@ -220,7 +220,7 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 void register_risk_factor_model_definitions(const ModellingInfo info, hgps::CachedRepository& repository)
 {
 	MEASURE_FUNCTION();
-	for (auto& model : info.models) {
+	for (auto& model : info.risk_factor_models) {
 		HierarchicalModelType model_type;
 		if (core::case_insensitive::equals(model.first, "static")) {
 			model_type = HierarchicalModelType::Static;

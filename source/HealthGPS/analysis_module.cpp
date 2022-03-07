@@ -18,7 +18,7 @@ namespace hgps {
 	}
 
 	void AnalysisModule::initialise_population(RuntimeContext& context) {
-		auto age_range = context.age_range();
+		auto& age_range = context.age_range();
 		auto expected_sum = create_age_gender_table<double>(age_range);
 		auto expected_count = create_age_gender_table<int>(age_range);
 
@@ -28,7 +28,7 @@ namespace hgps {
 			}
 
 			auto sum = 1.0;
-			for (auto& disease : entity.diseases) {
+			for (const auto& disease : entity.diseases) {
 				if (disease.second.status == DiseaseStatus::active &&
 					definition_.disability_weights().contains(disease.first)) {
 					sum *= (1.0 - definition_.disability_weights().at(disease.first));
@@ -168,7 +168,7 @@ namespace hgps {
 
 	double AnalysisModule::calculate_disability_weight(const Person& entity) const {
 		auto sum = 1.0;
-		for (auto& disease : entity.diseases) {
+		for (const auto& disease : entity.diseases) {
 			if (disease.second.status == DiseaseStatus::active) {
 				if (definition_.disability_weights().contains(disease.first)) {
 					sum *= (1.0 - definition_.disability_weights().at(disease.first));

@@ -14,6 +14,14 @@ namespace hgps {
 			auto ifs = std::ifstream{ full_filename, std::ifstream::in };
 			if (ifs) {
 				index_ = nlohmann::json::parse(ifs);
+				if (!index_.contains("version")) {
+					throw std::runtime_error("File-based store, invalid definition missing schema version");
+				}
+
+				auto version = index_["version"].get<int>();
+				if (version != 1) {
+					throw std::runtime_error("File-based store, index schema version mismatch, supported = 1");
+				}
 			}
 			else {
 				throw std::invalid_argument(
@@ -29,7 +37,6 @@ namespace hgps {
 				auto filename = index_["country"]["file_name"].get<std::string>();
 				filename = (root_ / filepath / filename).string();
 
-				// TODO: use precondition contract
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
@@ -60,7 +67,6 @@ namespace hgps {
 
 		std::optional<Country> DataManager::get_country(std::string alpha) const
 		{
-			// TODO: use caching or create a parser with filter
 			auto v = get_countries();
 			auto is_target = [&alpha](const hgps::core::Country& obj) {
 				return core::case_insensitive::equals(obj.alpha2, alpha) ||
@@ -185,7 +191,7 @@ namespace hgps {
 		{
 			auto result = std::vector<DiseaseInfo>();
 			if (index_.contains("diseases")) {
-				auto registry = index_["diseases"]["registry"];
+				auto& registry = index_["diseases"]["registry"];
 				for (auto& item : registry) {
 					auto info = DiseaseInfo{};
 					auto group_str = std::string{};
@@ -212,7 +218,7 @@ namespace hgps {
 		std::optional<DiseaseInfo> DataManager::get_disease_info(std::string code) const
 		{
 			if (index_.contains("diseases")) {
-				auto registry = index_["diseases"]["registry"];
+				auto& registry = index_["diseases"]["registry"];
 				auto disease_code = core::to_lower(code);
 				auto info = DiseaseInfo{};
 				for (auto& item : registry) {
@@ -244,26 +250,32 @@ namespace hgps {
 			result.country = country;
 
 			if (index_.contains("diseases")) {
-				auto filepath = index_["diseases"]["path"].get<std::string>();
-				auto filename = index_["diseases"]["file_name"].get<std::string>();
+				auto diseases_path = index_["diseases"]["path"].get<std::string>();
+				auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
+				auto filename = index_["diseases"]["disease"]["file_name"].get<std::string>();
+
+				// Tokenized folder name X{info.code}X
+				disease_folder = replace_string_tokens(disease_folder, { info.code });
 
 				// Tokenized file names X{country.code}X.xxx
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
 
-				filename = (root_ / filepath / info.code / filename).string();
+				filename = (root_ / diseases_path / disease_folder / filename).string();
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 
 					auto table = std::unordered_map<int,
 						std::unordered_map<core::Gender, std::map<int, double>>>();
 
+					auto mapping = create_fields_index_mapping(doc.GetColumnNames(), 
+						{ "age", "gender_id", "measure_id", "measure", "mean"});
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
-						auto age = std::stoi(row[6]);
-						auto gender = static_cast<core::Gender>(std::stoi(row[8]));
-						auto measure_id = std::stoi(row[10]);
-						auto measure_name = core::to_lower(row[11]);
-						auto measure_value = std::stod(row[12]);
+						auto age = std::stoi(row[mapping["age"]]);
+						auto gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]]));
+						auto measure_id = std::stoi(row[mapping["measure_id"]]);
+						auto measure_name = core::to_lower(row[mapping["measure"]]);
+						auto measure_value = std::stod(row[mapping["mean"]]);
 
 						if (!result.measures.contains(measure_name)) {
 							result.measures.emplace(measure_name, measure_id);
@@ -303,17 +315,22 @@ namespace hgps {
 			DiseaseInfo source, DiseaseInfo target) const
 		{
 			if (index_.contains("diseases")) {
-				auto disease_folder = index_["diseases"]["path"].get<std::string>();
-				auto risk_node = index_["diseases"]["relative_risk"];
+				auto diseases_path = index_["diseases"]["path"].get<std::string>();
+				auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
+				auto& risk_node = index_["diseases"]["disease"]["relative_risk"];
+
 				auto risk_folder = risk_node["path"].get<std::string>();
 				auto file_folder = risk_node["to_disease"]["path"].get<std::string>();
 				auto filename = risk_node["to_disease"]["file_name"].get<std::string>();
+
+				// Tokenized folder name X{info.code}X
+				disease_folder = replace_string_tokens(disease_folder, { source.code });
 
 				// Tokenized file name{ DISEASE_TYPE }_{ DISEASE_TYPE }.xxx
 				auto tokens = { source.code, target.code };
 				filename = replace_string_tokens(filename, tokens);
 
-				filename = (root_ / disease_folder / source.code / risk_folder / file_folder / filename).string();
+				filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 
@@ -360,18 +377,22 @@ namespace hgps {
 			}
 
 			// Creates full file name from store configuration
-			auto disease_folder = index_["diseases"]["path"].get<std::string>();
-			auto risk_node = index_["diseases"]["relative_risk"];
+			auto diseases_path = index_["diseases"]["path"].get<std::string>();
+			auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
+			auto& risk_node = index_["diseases"]["disease"]["relative_risk"];
+
 			auto risk_folder = risk_node["path"].get<std::string>();
 			auto file_folder = risk_node["to_risk_factor"]["path"].get<std::string>();
 			auto filename = risk_node["to_risk_factor"]["file_name"].get<std::string>();
 
-			std::string gender_name = gender == Gender::male ? "male" : "female";
+			// Tokenized folder name X{info.code}X
+			disease_folder = replace_string_tokens(disease_folder, { source.code });
 
 			// Tokenized file name {GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.xxx
+			std::string gender_name = gender == Gender::male ? "male" : "female";
 			auto tokens = { gender_name, source.code, risk_factor };
 			filename = replace_string_tokens(filename, tokens);
-			filename = (root_ / disease_folder / source.code / risk_folder / file_folder / filename).string();
+			filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
 			if (!std::filesystem::exists(filename)) {
 				notify_warning(fmt::format(
 					"{} to {} relative risk file not found, disabled.", source.code, risk_factor));
@@ -407,15 +428,20 @@ namespace hgps {
 			}
 
 			// Creates full file name from store configuration
-			auto disease_folder = index_["diseases"]["path"].get<std::string>();
-			auto params_node = index_["diseases"]["parameters"];
+			auto disease_path = index_["diseases"]["path"].get<std::string>();
+			auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
+
+			auto& params_node = index_["diseases"]["disease"]["parameters"];
 			auto params_folder = params_node["path"].get<std::string>();
-			auto params_files = params_node["files"];
+			auto& params_files = params_node["files"];
+
+			// Tokenized folder name X{info.code}X
+			disease_folder = replace_string_tokens(disease_folder, { info.code });
 
 			// Tokenized path name P{COUNTRY_CODE}
 			auto tokens = std::vector<std::string>{std::to_string(country.code)};
 			params_folder = replace_string_tokens(params_folder, tokens);
-			auto files_folder = (root_ / disease_folder / info.code / params_folder);
+			auto files_folder = (root_ / disease_path / disease_folder / params_folder);
 			if (!std::filesystem::exists(files_folder)) {
 				notify_warning(fmt::format(
 					"{}, {} parameters folder: '{}' not found.", info.code, country.name, files_folder.string()));
@@ -515,9 +541,9 @@ namespace hgps {
 				return entity;
 			}
 
-			auto cost_node = index_["analysis"]["cost_of_disease"];
 			auto analysis_folder = index_["analysis"]["path"].get<std::string>();
 			auto disability_filename = index_["analysis"]["file_name"].get<std::string>();
+			auto& cost_node = index_["analysis"]["cost_of_disease"];
 
 			auto local_root_path = (root_ / analysis_folder);
 			disability_filename = (local_root_path / disability_filename).string();
@@ -545,7 +571,7 @@ namespace hgps {
 		{
 			if (index_.contains("diseases")) {
 				auto age_limits = index_["diseases"]["age_limits"].get<std::vector<int>>();
-				auto to_disease = index_["diseases"]["relative_risk"]["to_disease"];
+				auto& to_disease = index_["diseases"]["disease"]["relative_risk"]["to_disease"];
 				auto default_value = to_disease["default_value"].get<float>();
 
 				auto table = RelativeRiskEntity();

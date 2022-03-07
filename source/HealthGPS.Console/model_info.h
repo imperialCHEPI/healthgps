@@ -3,11 +3,12 @@
 #include <string>
 #include <fmt/format.h>
 
-struct ModelInfo
+struct ExperimentInfo
 {
-	std::string name;
+	std::string model;
 	std::string version;
+	std::string intervention;
 	std::string to_string() const noexcept {
-		return fmt::format("{} v{}", name, version);
+		return fmt::format("{} v{} - {}", model, version, intervention);
 	}
 };

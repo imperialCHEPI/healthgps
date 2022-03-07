@@ -5,7 +5,7 @@
 #include <fmt/chrono.h>
 #include <nlohmann/json.hpp>
 
-ResultFileWriter::ResultFileWriter(const std::filesystem::path file_name, const ModelInfo info)
+ResultFileWriter::ResultFileWriter(const std::filesystem::path file_name, const ExperimentInfo info)
 	: info_{ info } 
 {
 	stream_.open(file_name, std::ofstream::out | std::ofstream::app);
@@ -55,8 +55,9 @@ void ResultFileWriter::write_json_begin() {
 	auto tp = std::chrono::system_clock::now();
 	json msg = {
 		{"experiment", {
-			{"model", info_.name},
+			{"model", info_.model},
 			{"version", info_.version},
+		    {"intervention", info_.intervention},
 			{"time_of_day", fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch())}
 		}},
 		{"result",{1,2}} };

@@ -84,3 +84,9 @@ namespace hgps {
 		}
 	}
 }
+
+std::ostream& operator<<(std::ostream& stream, const hgps::core::DataTable& table)
+{
+	stream << table.to_string();
+	return stream;
+}

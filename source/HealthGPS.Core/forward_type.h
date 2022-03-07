@@ -6,10 +6,6 @@
 namespace hgps {
 	namespace core {
 
-		// C++20 concept for numeric columns types
-		template <typename T>
-		concept Numerical = std::is_arithmetic_v<T>;
-
 		/// @brief enumerates the gender
 		enum class Gender : uint8_t {
 			unknown,
@@ -22,6 +18,10 @@ namespace hgps {
 			other,
 			cancer
 		};
+
+		// C++20 concept for numeric columns types
+		template <typename T>
+		concept Numerical = std::is_arithmetic_v<T>;
 
 		/// @brief Lookup table entry for gender values
 		struct LookupGenderValue {

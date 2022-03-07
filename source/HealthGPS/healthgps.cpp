@@ -116,30 +116,6 @@ namespace hgps {
 
 	void HealthGPS::fini(adevs::Time clock)
 	{
-		auto bmi_value = 0.0;
-		auto male_data = std::vector<double>{};
-		auto feme_data = std::vector<double>{};
-		auto male_info = core::UnivariateSummary("Male BMI");
-		auto feme_info = core::UnivariateSummary("Female BMI");
-		for (const auto& p : context_.population()) {
-			if (!p.is_active()) {
-				continue;
-			}
-
-			bmi_value = p.get_risk_factor_value("bmi");
-			if (p.gender == core::Gender::male) {
-				male_info.append(bmi_value);
-				male_data.push_back(bmi_value);
-			}
-			else {
-				feme_info.append(bmi_value);
-				feme_data.push_back(bmi_value);
-			}
-		}
-
-		auto male = male_info.to_string();
-		auto feme = feme_info.to_string();
-
 		// risk_factor_->update_population(context_);
 		auto message = fmt::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
 		context_.publish(std::make_unique<InfoEventMessage>(
@@ -355,8 +331,6 @@ namespace hgps {
 		clone.age = source.age;
 		clone.gender = source.gender;
 		clone.ses = source.ses;
-		clone.education.set_both_values(source.education.value());
-		clone.income.set_both_values(source.income.value());
 		clone.is_alive = true;
 		clone.has_emigrated = false;
 		for (const auto& item : source.risk_factors) {

@@ -92,13 +92,13 @@ namespace hgps {
 	std::map<std::string, double> EnergyBalanceHierarchicalModel::get_current_risk_factors(
 		const HierarchicalMapping& mapping, Person& entity, int time_year) const {
 		auto entity_risk_factors = std::map<std::string, double>();
-		entity_risk_factors.emplace("intercept", entity.get_previous_risk_factor_value("intercept"));
+		entity_risk_factors.emplace("intercept", entity.get_risk_factor_value("intercept"));
 		for (const auto& factor : mapping) {
 			if (factor.is_dynamic_factor()) {
 				entity_risk_factors.emplace(factor.key(), time_year - 1);
 			}
 			else {
-				entity_risk_factors.emplace(factor.key(), entity.get_previous_risk_factor_value(factor.key()));
+				entity_risk_factors.emplace(factor.key(), entity.get_risk_factor_value(factor.key()));
 			}
 		}
 

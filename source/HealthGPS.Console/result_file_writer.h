@@ -10,7 +10,7 @@
 class ResultFileWriter final : public ResultWriter {
 public:
 	ResultFileWriter() = delete;
-	ResultFileWriter(const std::filesystem::path file_name, const ModelInfo info);
+	ResultFileWriter(const std::filesystem::path file_name, const ExperimentInfo info);
 	ResultFileWriter(const ResultFileWriter&) = delete;
 	ResultFileWriter& operator= (const ResultFileWriter&) = delete;
 	ResultFileWriter(ResultFileWriter&& other) noexcept;
@@ -24,7 +24,7 @@ private:
 	std::ofstream stream_;
 	std::mutex lock_mutex_;
 	std::atomic<bool> first_row_{ true };
-	ModelInfo info_;
+	ExperimentInfo info_;
 
 	void write_json_begin();
 	void write_json_end();

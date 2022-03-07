@@ -113,6 +113,14 @@ Configuration load_configuration(CommandOptions& options)
 	if (ifs)
 	{
 		auto opt = json::parse(ifs);
+		if (!opt.contains("version")) {
+			throw std::runtime_error("Invalid definition, file must have a schema version");
+		}
+
+		auto version = opt["version"].get<int>();
+		if (version != 1) {
+			throw std::runtime_error("definition schema version mismatch, supported = 1");
+		}
 
 		// input data file
 		config.file = opt["inputs"]["file"].get<FileInfo>();
@@ -133,12 +141,12 @@ Configuration load_configuration(CommandOptions& options)
 
 		// Settings and SES mapping
 		config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
-		config.ses = opt["inputs"]["ses"].get<SESInfo>();
+		config.ses = opt["modelling"]["ses_model"].get<SESInfo>();
 
 		// Modelling information
 		config.modelling = opt["modelling"].get<ModellingInfo>();
 
-		for (auto& model : config.modelling.models) {
+		for (auto& model : config.modelling.risk_factor_models) {
 			full_path = model.second;
 			if (full_path.is_relative()) {
 				full_path = options.config_file.parent_path() / model.second;
@@ -193,16 +201,13 @@ Configuration load_configuration(CommandOptions& options)
 			config.custom_seed = seed[0];
 		}
 
-		auto cancers = std::vector<std::string>{};
 		opt["running"]["diseases"].get_to(config.diseases);
-		opt["running"]["cancers"].get_to(cancers);
-		config.diseases.insert(config.diseases.end(), cancers.begin(), cancers.end());
 
 		// Intervention Policy
-		auto interventions = opt["running"]["interventions"];
-		if (!interventions["active_type_id"].is_null() && !interventions["active_type_id"].empty()) {
+		auto& interventions = opt["running"]["interventions"];
+		if (!interventions["active_type_id"].is_null()) {
 			auto active_type = interventions["active_type_id"].get<std::string>();
-			auto policy_types = interventions["types"];
+			auto& policy_types = interventions["types"];
 			for (auto it = policy_types.begin(); it != policy_types.end(); ++it) {
 				if (core::case_insensitive::equals(it.key(), active_type)) {
 					config.intervention = it.value().get<PolicyScenarioInfo>();
@@ -213,12 +218,12 @@ Configuration load_configuration(CommandOptions& options)
 			}
 		}
 
-		config.result = opt["results"].get<ResultInfo>();
-		config.result.folder = expand_environment_variables(config.result.folder);
-		if (!fs::exists(config.result.folder)) {
-			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.result.folder);
-			if (!fs::create_directories(config.result.folder)) {
-				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.result.folder));
+		config.output = opt["output"].get<OutputInfo>();
+		config.output.folder = expand_environment_variables(config.output.folder);
+		if (!fs::exists(config.output.folder)) {
+			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.output.folder);
+			if (!fs::create_directories(config.output.folder)) {
+				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.output.folder));
 			}
 		}
 	}
@@ -260,8 +265,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto age_range = core::IntegerInterval(
 		config.settings.age_range.front(), config.settings.age_range.back());
 
-	auto settings = Settings(country, config.settings.size_fraction,
-		config.settings.data_linkage, age_range);
+	auto settings = Settings(country, config.settings.size_fraction, age_range);
 
 	auto run_info = RunInfo {
 		.start_time = config.start_time,
@@ -299,7 +303,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		HierarchicalMapping(std::move(mapping)), diseases);
 }
 
-std::string create_output_file_name(const ResultInfo& info)
+std::string create_output_file_name(const OutputInfo& info)
 {
 	namespace fs = std::filesystem;
 
@@ -363,7 +367,9 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 		fmt::format("Unknown intervention policy identifier: {}", info.identifier));
 }
 
+#ifdef _WIN32 
 #pragma warning(disable : 4996)
+#endif
 std::string expand_environment_variables(const std::string& path)
 {
 	if (path.find("${") == std::string::npos) {

@@ -48,10 +48,6 @@ namespace hgps {
 
 		unsigned int time_of_death{};
 
-		TwoStepValue<int> education{};
-
-		TwoStepValue<int> income{};
-
 		std::map<std::string, double> risk_factors;
 
 		std::map<std::string, Disease> diseases;
@@ -59,8 +55,6 @@ namespace hgps {
 		bool is_active() const noexcept;
 
 		double get_risk_factor_value(const std::string& key) const noexcept;
-
-		double get_previous_risk_factor_value(const std::string& key) const noexcept;
 
 		float gender_to_value() const noexcept;
 
@@ -70,7 +64,6 @@ namespace hgps {
 		std::size_t id_{};
 		static std::atomic<std::size_t> newUID;
 		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
-		static case_insensitive_map<std::function<double(const Person&)>> previous_dispatcher;
 	};
 }
 

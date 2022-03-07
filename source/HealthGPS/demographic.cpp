@@ -240,7 +240,7 @@ namespace hgps {
 		auto end_time = life_table_.time_limits().upper();
 		for (int year = start_time; year <= end_time; year++)
 		{
-			auto births = life_table_.get_births_at(year);
+			auto& births = life_table_.get_births_at(year);
 			auto population_size = get_total_population_size(year);
 
 			double male_birth_rate = births.number * births.sex_ratio / (1.0f + births.sex_ratio) / population_size;
@@ -252,8 +252,8 @@ namespace hgps {
 	}
 
 	GenderTable<int, double> PopulationModule::create_death_rates_table(const int time_year) {
-		auto population = pop_data_.at(time_year);
-		auto mortality = life_table_.get_mortalities_at(time_year);
+		auto& population = pop_data_.at(time_year);
+		auto& mortality = life_table_.get_mortalities_at(time_year);
 		auto death_rates = create_integer_gender_table<double>(life_table_.age_limits());
 		auto start_age = life_table_.age_limits().lower();
 		auto end_age = life_table_.age_limits().upper();

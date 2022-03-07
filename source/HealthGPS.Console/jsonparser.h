@@ -68,5 +68,5 @@ void to_json(json& j, const PolicyScenarioInfo& p);
 void from_json(const json& j, PolicyScenarioInfo& p);
 
 // Result information
-void to_json(json& j, const ResultInfo& p);
-void from_json(const json& j, ResultInfo& p);
+void to_json(json& j, const OutputInfo& p);
+void from_json(const json& j, OutputInfo& p);

@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "inputs": {
         "file": {
             "name": "France.DataFile.csv",
@@ -24,14 +25,14 @@
             "country_code": "FRA",
             "size_fraction": 0.0001,
             "data_linkage": "Age",
-            "age_range": [ 0, 100 ]
-        },
-        "ses": {
-            "function_name":"normal",
-            "function_parameters":[0.0, 1.0]
+            "age_range": [0, 100]
         }
     },
     "modelling": {
+        "ses_model": {
+            "function_name": "normal",
+            "function_parameters": [0.0, 1.0]
+        },
         "risk_factors": [
             {"name":"Gender",   "level":0, "proxy":"gender", "range":[0,1]},
             {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
@@ -46,34 +47,31 @@
             {"name":"BMI",      "level":3, "proxy":"",       "range":[13.53255,45.26488]}
         ],
         "dynamic_risk_factor": "",
-        "models": {
+        "risk_factor_models": {
             "static": "France.HLM.json",
             "dynamic": "France.EBHLM.json"
         },
-        "baseline_adjustment": {
+        "baseline_adjustments": {
             "format": "csv",
             "delimiter": ",",
             "encoding": "UTF8",
             "file_names": {
-                "static_male":"France.Initial.Adjustment.Male.csv",
-                "static_female":"France.Initial.Adjustment.Female.csv",
-                "dynamic_male":"France.Update.Adjustment.Male.csv",
-                "dynamic_female":"France.Update.Adjustment.Female.csv"
+                "static_male": "France.Initial.Adjustment.Male.csv",
+                "static_female": "France.Initial.Adjustment.Female.csv",
+                "dynamic_male": "France.Update.Adjustment.Male.csv",
+                "dynamic_female": "France.Update.Adjustment.Female.csv"
             }
         }
     },
     "running": {
-        "seed": [
-            123456789
-        ],
+        "seed": [123456789],
         "start_time": 2010,
         "stop_time": 2050,
         "trial_runs": 1,
         "sync_timeout_ms": 5000,
-        "diseases": [ "asthma", "diabetes", "lowbackpain"],
-        "cancers": [ "colorectum" ],
+        "diseases": ["asthma","diabetes","lowbackpain", "colorectum"],
         "interventions": {
-            "active_type_id": "",
+            "active_type_id": null,
             "types": {
                 "simple": {
                     "active_period": {
@@ -82,7 +80,7 @@
                     },
                     "impact_type": "absolute",
                     "impacts": [
-                        { "risk_factor":"BMI", "impact_value": -1.0, "from_age":0, "to_age":null}
+                        {"risk_factor":"BMI", "impact_value":-1.0, "from_age":0, "to_age":null}
                     ]
                 },
                 "marketing": {
@@ -91,15 +89,15 @@
                         "finish_time": 2050
                     },
                     "impacts": [
-                        { "risk_factor":"BMI", "impact_value": -0.12, "from_age": 5, "to_age": 12 },
-                        { "risk_factor":"BMI", "impact_value": -0.31, "from_age": 13, "to_age": 18 },
-                        { "risk_factor":"BMI", "impact_value": -0.155, "from_age": 19, "to_age": null }
+                        {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
+                        {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
+                        {"risk_factor":"BMI", "impact_value":-0.155,"from_age":19, "to_age":null}
                     ]
                 }
             }
         }
     },
-    "results": {
+    "output": {
         "folder": "${HOME}/healthgps/results",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
