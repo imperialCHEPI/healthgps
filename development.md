@@ -225,4 +225,4 @@ SimulationModuleFactory get_default_simulation_module_factory(Repository& manage
 }
 ```
 
-The factory must provide builder functions for all module types, however, the user can disable a particular module behaviour by registering an implementation that makes no change to virtual population properties when invoked by the simulation engine.
+The factory must provide builder functions for all the required *module types* in order to successfully create an instance of the HealthGPS simulation engine, however, the user can disable a particular module behaviour by registering an implementation that makes no change to the virtual population properties when invoked by the simulation engine at runtime.
