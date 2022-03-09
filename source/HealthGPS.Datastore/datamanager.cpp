@@ -7,8 +7,8 @@
 
 namespace hgps {
 	namespace data {
-		DataManager::DataManager(const std::filesystem::path root_directory)
-			: root_{ root_directory }
+		DataManager::DataManager(const std::filesystem::path root_directory, VerboseMode verbosity)
+			: root_{ root_directory }, verbosity_{ verbosity }
 		{
 			auto full_filename = root_ / "index.json";
 			auto ifs = std::ifstream{ full_filename, std::ifstream::in };
@@ -698,6 +698,10 @@ namespace hgps {
 
 		void DataManager::notify_warning(const std::string_view message) const
 		{
+			if (verbosity_ == VerboseMode::none) {
+				return;
+			}
+
 			fmt::print(fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
 		}
 	}

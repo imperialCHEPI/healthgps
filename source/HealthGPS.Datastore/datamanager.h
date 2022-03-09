@@ -14,7 +14,7 @@ namespace hgps {
 		{
 		public:
 			DataManager() = delete;
-			explicit DataManager(const std::filesystem::path root_directory);
+			explicit DataManager(const std::filesystem::path root_directory, VerboseMode verbosity = VerboseMode::none);
 
 			std::vector<Country> get_countries() const override;
 
@@ -52,7 +52,8 @@ namespace hgps {
 				const std::function<bool(const unsigned int&)> year_filter) const override;
 
 		private:
-			const std::filesystem::path root_;
+			std::filesystem::path root_;
+			VerboseMode verbosity_;
 			nlohmann::json index_;
 
 			RelativeRiskEntity generate_default_relative_risk_to_disease() const;

@@ -10,15 +10,16 @@
 namespace hgps {
 
 	struct RunInfo {
-		const unsigned int start_time{};
-		const unsigned int stop_time{};
-		const unsigned int sync_timeout_ms{};
-		const std::optional<unsigned int> seed{};
+		unsigned int start_time{};
+		unsigned int stop_time{};
+		unsigned int sync_timeout_ms{};
+		std::optional<unsigned int> seed{};
+		core::VerboseMode verbosity{};
 	};
 
 	struct SESDefinition {
-		const std::string fuction_name;
-		const std::vector<double> parameters;
+		std::string fuction_name;
+		std::vector<double> parameters;
 	};
 
 	class ModelInput

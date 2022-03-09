@@ -1,5 +1,7 @@
 #pragma once
 
+#include "HealthGPS.Core/forward_type.h"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -120,4 +122,5 @@ struct Configuration
 	bool has_active_intervention{false};
 	PolicyScenarioInfo intervention;
 	OutputInfo output;
+	hgps::core::VerboseMode verbosity{};
 };

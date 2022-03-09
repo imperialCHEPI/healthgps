@@ -5,8 +5,8 @@
 namespace hgps {
 	namespace core {
 
-		constexpr auto API_MAJOR = 0;
-		constexpr auto API_MINOR = 1;
+		constexpr auto API_MAJOR = 1;
+		constexpr auto API_MINOR = 0;
 		constexpr auto API_PATCH = 0;
 
 		class Version

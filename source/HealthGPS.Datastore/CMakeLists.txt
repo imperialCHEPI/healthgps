@@ -6,9 +6,8 @@ target_compile_features(HealthGPS.Datastore PUBLIC cxx_std_${CMAKE_CXX_STANDARD}
 target_sources(HealthGPS.Datastore
 	PRIVATE
 		"datamanager.cpp"
-		"datamanager.h"
-		"api.h"
-)
+		"datamanager.h"		
+		"api.h")
 
 set(ROOT_NAMESPACE hgps::data)
 

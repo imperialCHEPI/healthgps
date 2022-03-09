@@ -6,6 +6,16 @@
 namespace hgps {
 	namespace core {
 
+		/// @brief Data manager verbosity mode enumeration
+		enum class VerboseMode : uint8_t
+		{
+			/// @brief only report errors
+			none,
+
+			/// @brief Print more information about actions, including warning
+			verbose
+		};
+
 		/// @brief enumerates the gender
 		enum class Gender : uint8_t {
 			unknown,

@@ -1,5 +1,6 @@
 #include "configuration.h"
 #include "jsonparser.h"
+#include "version.h"
 
 #include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
@@ -32,10 +33,12 @@ cxxopts::Options create_options()
 {
 	cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
 	options.add_options()
-		("h,help", "Help about this application.")
 		("f,file", "Configuration file full name.", cxxopts::value<std::string>())
 		("s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())
-		("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"));
+		("j,jobid", "The batch execution job identifier.", cxxopts::value<int>()->default_value("0"))
+		("verbose", "Print more information about progress", cxxopts::value<bool>()->default_value("false"))
+		("help", "Help about this application.")
+		("version", "Print the application version number.");
 
 	return options;
 }
@@ -51,12 +54,25 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 	{
 		cmd.success = true;
 		cmd.exit_code = EXIT_SUCCESS;
+		cmd.verbose = false;
 		auto result = options.parse(argc, argv);
 		if (result.count("help"))
 		{
 			std::cout << options.help() << std::endl;
 			cmd.success = false;
 			return cmd;
+		}
+
+		if (result.count("version"))
+		{
+			fmt::print("Version {}\n\n", PROJECT_VERSION);
+			cmd.success = false;
+			return cmd;
+		}
+
+		cmd.verbose = result["verbose"].as<bool>();
+		if (cmd.verbose) {
+			fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
 		}
 
 		if (result.count("file"))
@@ -70,7 +86,7 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 
 		if (!fs::exists(cmd.config_file)) {
 			fmt::print(fg(fmt::color::red),
-				"\n\nConfiguration file: {} not found.\n",
+				"\nConfiguration file: {} not found.\n",
 				cmd.config_file.string());
 			cmd.exit_code = EXIT_FAILURE;
 		}
@@ -86,7 +102,7 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 
 		if (!fs::exists(cmd.storage_folder)) {
 			fmt::print(fg(fmt::color::red),
-				"\n\nFile storage folder: {} not found.\n",
+				"\nFile storage folder: {} not found.\n",
 				cmd.storage_folder.string());
 			cmd.exit_code = EXIT_FAILURE;
 		}
@@ -226,6 +242,12 @@ Configuration load_configuration(CommandOptions& options)
 				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.output.folder));
 			}
 		}
+
+		// verbosity
+		config.verbosity = core::VerboseMode::none;
+		if (options.verbose) {
+			config.verbosity = core::VerboseMode::verbose;
+		}
 	}
 	else
 	{
@@ -271,7 +293,8 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
 		.sync_timeout_ms = config.sync_timeout_ms,
-		.seed = config.custom_seed
+		.seed = config.custom_seed,
+		.verbosity = config.verbosity
 	};
 
 	auto ses_mapping = SESDefinition {
