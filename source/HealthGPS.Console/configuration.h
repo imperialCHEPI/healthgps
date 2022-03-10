@@ -22,7 +22,7 @@ std::vector<hgps::core::DiseaseInfo> get_diseases(hgps::core::Datastore& data_ap
 hgps::ModelInput create_model_input(hgps::core::DataTable& input_table, hgps::core::Country country,
 	Configuration& config, std::vector<hgps::core::DiseaseInfo> diseases);
 
-std::string create_output_file_name(const OutputInfo& info);
+std::string create_output_file_name(const OutputInfo& info, int job_id);
 
 std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	hgps::SyncChannel& channel, const PolicyScenarioInfo& info);

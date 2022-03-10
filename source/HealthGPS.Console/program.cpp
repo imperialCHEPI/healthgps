@@ -84,10 +84,10 @@ int main(int argc, char* argv[])
 	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();
 	auto json_file_logger = ResultFileWriter{
-		create_output_file_name(config.output),
+		create_output_file_name(config.output, config.job_id),
 		ExperimentInfo{
-			.model = "Health GPS",
-			.version = "1.0.0.0",
+			.model = config.app_name,
+			.version = config.app_version,
 			.intervention = config.intervention.identifier}
 	};
 	auto event_monitor = EventMonitor{ event_bus, json_file_logger };

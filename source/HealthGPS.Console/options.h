@@ -16,6 +16,7 @@ struct CommandOptions
 	std::filesystem::path config_file{};
 	std::filesystem::path storage_folder{};
 	bool verbose{};
+	int job_id{};
 };
 
 struct FileInfo
@@ -123,4 +124,7 @@ struct Configuration
 	PolicyScenarioInfo intervention;
 	OutputInfo output;
 	hgps::core::VerboseMode verbosity{};
+	int job_id{};
+	std::string app_name;
+	std::string app_version;
 };

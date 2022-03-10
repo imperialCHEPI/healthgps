@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(HealthGPS
         VERSION 1.0.0.2
         DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
+        HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
         LANGUAGES CXX)
 
 include(cmake/PreventInSourceBuilds.cmake)
@@ -34,3 +35,6 @@ if (BUILD_TESTING)
     enable_testing()
     add_subdirectory (HealthGPS.Tests)
 endif()
+
+# set the startup project for the "play" button in MSVC
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT HealthGPS.Console)

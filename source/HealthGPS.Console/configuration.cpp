@@ -35,7 +35,7 @@ cxxopts::Options create_options()
 	options.add_options()
 		("f,file", "Configuration file full name.", cxxopts::value<std::string>())
 		("s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())
-		("j,jobid", "The batch execution job identifier.", cxxopts::value<int>()->default_value("0"))
+		("j,jobid", "The batch execution job identifier.", cxxopts::value<int>())
 		("verbose", "Print more information about progress", cxxopts::value<bool>()->default_value("false"))
 		("help", "Help about this application.")
 		("version", "Print the application version number.");
@@ -107,6 +107,16 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 			cmd.exit_code = EXIT_FAILURE;
 		}
 
+		if (result.count("jobid")) {
+			cmd.job_id = result["jobid"].as<int>();
+			if (cmd.job_id < 1) {
+				fmt::print(fg(fmt::color::red),
+					"\nJob identifier value outside range: (0 < x) given: {}.\n",
+					std::to_string(cmd.job_id));
+				cmd.exit_code = EXIT_FAILURE;
+			}
+		}
+
 		cmd.success = cmd.exit_code == EXIT_SUCCESS;
 	}
 	catch (const cxxopts::OptionException& ex) {
@@ -137,6 +147,10 @@ Configuration load_configuration(CommandOptions& options)
 		if (version != 1) {
 			throw std::runtime_error("definition schema version mismatch, supported = 1");
 		}
+
+		// application version
+		config.app_name = PROJECT_NAME;
+		config.app_version = PROJECT_VERSION;
 
 		// input data file
 		config.file = opt["inputs"]["file"].get<FileInfo>();
@@ -234,6 +248,7 @@ Configuration load_configuration(CommandOptions& options)
 			}
 		}
 
+		config.job_id = options.job_id;
 		config.output = opt["output"].get<OutputInfo>();
 		config.output.folder = expand_environment_variables(config.output.folder);
 		if (!fs::exists(config.output.folder)) {
@@ -289,11 +304,16 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 
 	auto settings = Settings(country, config.settings.size_fraction, age_range);
 
+	auto job_custom_seed = config.custom_seed;
+	if (job_custom_seed.has_value() && config.job_id > 0) {
+		job_custom_seed.value() += static_cast<unsigned int>(config.job_id);
+	}
+
 	auto run_info = RunInfo {
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
 		.sync_timeout_ms = config.sync_timeout_ms,
-		.seed = config.custom_seed,
+		.seed = job_custom_seed,
 		.verbosity = config.verbosity
 	};
 
@@ -326,7 +346,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		HierarchicalMapping(std::move(mapping)), diseases);
 }
 
-std::string create_output_file_name(const OutputInfo& info)
+std::string create_output_file_name(const OutputInfo& info, int job_id)
 {
 	namespace fs = std::filesystem;
 
@@ -341,6 +361,11 @@ std::string create_output_file_name(const OutputInfo& info)
 	if (tk_start != std::string::npos) {
 		tk_end = file_name.find_first_of("}", tk_start + 1);
 		if (tk_end != std::string::npos) {
+			auto token_str = file_name.substr(tk_start, tk_end - tk_start + 1);
+			if (!core::case_insensitive::equals(token_str,"{TIMESTAMP}")) {
+				throw std::logic_error(fmt::format("Unknown output file token: {}", token_str));
+			}
+
 			file_name.replace(tk_start, tk_end - tk_start + 1, timestamp_tk);
 		}
 	}
@@ -348,6 +373,16 @@ std::string create_output_file_name(const OutputInfo& info)
 	auto log_file_name = fmt::format("HealthGPS_result_{}.json", timestamp_tk);
 	if (tk_end > 0) {
 		log_file_name = file_name;
+	}
+
+	if (job_id > 0) {
+		tk_start = log_file_name.find_last_of(".");
+		if (tk_start != std::string::npos) {
+			log_file_name.replace(tk_start, size_t{ 1 }, fmt::format("_{}.", std::to_string(job_id)));
+		}
+		else {
+			log_file_name.append(fmt::format("_{}.json", std::to_string(job_id)));
+		}
 	}
 
 	log_file_name = (output_folder / log_file_name).string();
