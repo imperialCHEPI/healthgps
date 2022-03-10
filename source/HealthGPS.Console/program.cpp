@@ -14,6 +14,7 @@
 #include <fmt/color.h>
 #include <fmt/chrono.h>
 #include <thread>
+#include <future>
 
 int main(int argc, char* argv[])
 {
@@ -46,12 +47,10 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 	
+	// load datatable assynchronous 
 	auto input_table = core::DataTable();
-	if (!load_datatable_csv(config.file.name, config.file.columns, input_table, config.file.delimiter)) {
-		return EXIT_FAILURE;
-	}
-
-	std::cout << input_table;
+	auto table_future = std::async(std::launch::async, load_datatable_csv, std::ref(config.file.name),
+		std::ref(config.file.columns), std::ref(input_table), config.file.delimiter);
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder, config.verbosity);
@@ -77,6 +76,13 @@ int main(int argc, char* argv[])
 		fmt::print(fg(fmt::color::light_salmon), "Invalid list of diseases in configuration.\n");
 		return EXIT_FAILURE;
 	}
+
+	// wait for datatable to complete
+	if (!table_future.get()) {
+		return EXIT_FAILURE;
+	}
+
+	std::cout << input_table;
 
 	// Create the complete model input from configuration
 	auto model_input = create_model_input(input_table, target.value(), config, diseases);

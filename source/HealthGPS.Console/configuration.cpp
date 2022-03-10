@@ -386,7 +386,7 @@ std::string create_output_file_name(const OutputInfo& info, int job_id)
 	}
 
 	log_file_name = (output_folder / log_file_name).string();
-	fmt::print(fg(fmt::color::yellow_green), "Results file: {}.\n", log_file_name);
+	fmt::print(fg(fmt::color::yellow_green), "Output file: {}.\n", log_file_name);
 	return log_file_name;
 }
 
