@@ -13,6 +13,9 @@ project(HealthGPS
 
 include(cmake/PreventInSourceBuilds.cmake)
 
+# Adding the tests:
+option(ENABLE_TESTING "Enable the tests" ON)
+
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -23,18 +26,4 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-variable) # -Werror
 endif()
 
-include(CTest)
-
-# Include sub-projects.
-add_subdirectory (HealthGPS.Core)
-add_subdirectory (HealthGPS.Datastore)
-add_subdirectory (HealthGPS)
-add_subdirectory (HealthGPS.Console)
-
-if (BUILD_TESTING)
-    enable_testing()
-    add_subdirectory (HealthGPS.Tests)
-endif()
-
-# set the startup project for the "play" button in MSVC
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT HealthGPS.Console)
+add_subdirectory (src)

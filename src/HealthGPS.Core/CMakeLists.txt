@@ -39,6 +39,3 @@ target_sources(HealthGPS.Core
 target_link_libraries(HealthGPS.Core PRIVATE fmt::fmt)
 
 set(ROOT_NAMESPACE hgps::core)
-
-# PUBLIC needed to make heathers and library available to other project
-target_include_directories(HealthGPS.Core PUBLIC ${PROJECT_SOURCE_DIR})

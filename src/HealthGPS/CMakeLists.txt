@@ -2,7 +2,6 @@ find_package(fmt CONFIG REQUIRED)
 find_package(crossguid CONFIG REQUIRED)
 
 add_library(HealthGPS STATIC "")
-target_include_directories(HealthGPS PUBLIC ${PROJECT_SOURCE_DIR}/external)
 target_compile_features(HealthGPS PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 target_sources(HealthGPS
@@ -119,5 +118,3 @@ target_link_libraries(HealthGPS
 		fmt::fmt
 		crossguid)
 
-# PUBLIC needed to make heathers and library available to other project
-target_include_directories(HealthGPS PUBLIC ${PROJECT_SOURCE_DIR})

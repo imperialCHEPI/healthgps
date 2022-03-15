@@ -16,5 +16,3 @@ target_link_libraries(HealthGPS.Datastore
 		HealthGPS.Core
 		fmt::fmt)
 
-# PUBLIC needed to make heathers and library available to other project
-target_include_directories(HealthGPS.Datastore PUBLIC ${PROJECT_SOURCE_DIR})
