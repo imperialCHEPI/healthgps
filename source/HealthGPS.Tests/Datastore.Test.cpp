@@ -7,18 +7,22 @@ namespace fs = std::filesystem;
 
 static auto store_full_path = default_datastore_path();
 
-TEST(TestDatastore, CreateDataManager)
+// The fixture for testing class Foo.
+class DatastoreTest : public ::testing::Test {
+protected:
+	DatastoreTest() : manager{ store_full_path } {
+	}
+
+	hgps::data::DataManager manager;
+};
+
+TEST_F(DatastoreTest, CreateDataManager)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager{ store_full_path };
-
 	auto countries = manager.get_countries();
-
 	ASSERT_GT(countries.size(), 0);
 }
 
-TEST(TestDatastore, CreateDataManagerFailWithWrongPath)
+TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath)
 {
 	using namespace hgps::data;
 	ASSERT_THROW(DataManager{ "C:\\x\\y" }, std::invalid_argument);
@@ -26,12 +30,8 @@ TEST(TestDatastore, CreateDataManagerFailWithWrongPath)
 	ASSERT_THROW(DataManager{ "/home/x/y/z" }, std::invalid_argument);
 }
 
-TEST(TestDatastore, CountryIsCaseInsensitive)
+TEST_F(DatastoreTest, CountryIsCaseInsensitive)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
-
 	auto countries = manager.get_countries();
 	auto gb2_lower = manager.get_country("gb");
 	auto gb2_upper = manager.get_country("GB");
@@ -45,11 +45,8 @@ TEST(TestDatastore, CountryIsCaseInsensitive)
 	ASSERT_TRUE(gb3_upper.has_value());
 }
 
-TEST(TestDatastore, CountryPopulation)
+TEST_F(DatastoreTest, CountryPopulation)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
 	auto uk = manager.get_country("GB");
 	auto uk_pop = manager.get_population(uk.value());
 
@@ -68,11 +65,8 @@ TEST(TestDatastore, CountryPopulation)
 	ASSERT_GT(uk_pop_max, uk_pop_flt.back().year);
 }
 
-TEST(TestDatastore, CountryMortality)
+TEST_F(DatastoreTest, CountryMortality)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
 	auto uk = manager.get_country("GB");
 	auto uk_deaths = manager.get_mortality(uk.value());
 
@@ -92,12 +86,8 @@ TEST(TestDatastore, CountryMortality)
 	ASSERT_GT(uk_deaths_max, uk_deaths_flt.back().year);
 }
 
-TEST(TestDatastore, RetrieveDeseasesInfo)
+TEST_F(DatastoreTest, RetrieveDeseasesInfo)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
-
 	auto diseases = manager.get_diseases();
 	for (auto& item : diseases) {
 		auto info = manager.get_disease_info(item.code);
@@ -108,11 +98,9 @@ TEST(TestDatastore, RetrieveDeseasesInfo)
 	ASSERT_GT(diseases.size(), 0);
 }
 
-TEST(TestDatastore, RetrieveDeseasesTypeInInfo)
+TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
+	using namespace hgps::core;
 
 	auto diseases = manager.get_diseases();
 	auto cancer_count = 0;
@@ -126,22 +114,14 @@ TEST(TestDatastore, RetrieveDeseasesTypeInInfo)
 	ASSERT_GT(cancer_count, 0);
 }
 
-TEST(TestDatastore, RetrieveDeseasesInfoHasNoValue)
+TEST_F(DatastoreTest, RetrieveDeseasesInfoHasNoValue)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
-
 	auto info = manager.get_disease_info("ghost369");
 	EXPECT_FALSE(info.has_value());
 }
 
-TEST(TestDatastore, RetrieveDeseaseDefinition)
+TEST_F(DatastoreTest, RetrieveDeseaseDefinition)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
-
 	auto uk = manager.get_country("GB").value();
 	auto diseases = manager.get_diseases();
 	for (auto& item : diseases) {
@@ -155,11 +135,9 @@ TEST(TestDatastore, RetrieveDeseaseDefinition)
 	}
 }
 
-TEST(TestDatastore, RetrieveDeseaseDefinitionIsEmpty)
+TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
+	using namespace hgps::core;
 
 	auto uk = manager.get_country("GB").value();
 	auto info = DiseaseInfo{ .group = DiseaseGroup::other, .code = "ghost369", .name = "Look at the flowers." };
@@ -172,13 +150,8 @@ TEST(TestDatastore, RetrieveDeseaseDefinitionIsEmpty)
 	EXPECT_EQ(uk.code, entity.country.code);
 }
 
-TEST(TestDatastore, DiseaseRelativeRiskToDisease)
+TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease)
 {
-	using namespace hgps;
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
-
 	auto asthma = manager.get_disease_info("asthma").value();
 	auto diabetes = manager.get_disease_info("diabetes").value();
 
@@ -196,12 +169,10 @@ TEST(TestDatastore, DiseaseRelativeRiskToDisease)
 	ASSERT_FALSE(table_other.is_default_value);
 }
 
-TEST(TestDatastore, DefaultDiseaseRelativeRiskToDisease)
+TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease)
 {
-	using namespace hgps;
-	using namespace hgps::data;
+	using namespace hgps::core;
 
-	auto manager = DataManager(store_full_path);
 	auto diabetes = manager.get_disease_info("diabetes").value();
 	auto ghost_disease = DiseaseInfo{ .group = DiseaseGroup::other, .code = "ghost369", .name = "Look at the flowers." };
 	auto default_table = manager.get_relative_risk_to_disease(diabetes, ghost_disease);
@@ -213,20 +184,17 @@ TEST(TestDatastore, DefaultDiseaseRelativeRiskToDisease)
 	ASSERT_TRUE(default_table.is_default_value);
 }
 
-TEST(TestDatastore, DiseaseRelativeRiskToRiskFactor)
+TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor)
 {
-	using namespace hgps;
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
+	using namespace hgps::core;
 
 	auto risk_factor = "bmi";
 	auto diabetes = manager.get_disease_info("diabetes").value();
 
 	auto col_size = 8;
 
-	auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, core::Gender::male, risk_factor);
-	auto table_feme = manager.get_relative_risk_to_risk_factor(diabetes, core::Gender::female, risk_factor);
+	auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
+	auto table_feme = manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
 
 	ASSERT_EQ(col_size, table_male.columns.size());
 	ASSERT_GT(table_male.rows.size(), 0);
@@ -242,11 +210,8 @@ TEST(TestDatastore, DiseaseRelativeRiskToRiskFactor)
 	ASSERT_FALSE(table_feme.is_default_value);
 }
 
-TEST(TestDatastore, RetrieveAnalysisEntity)
+TEST_F(DatastoreTest, RetrieveAnalysisEntity)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
 	auto uk = manager.get_country("GB");
 	auto entity = manager.get_disease_analysis(uk.value());
 
@@ -256,11 +221,8 @@ TEST(TestDatastore, RetrieveAnalysisEntity)
 	ASSERT_GT(entity.life_expectancy.size(), 0);
 }
 
-TEST(TestDatastore, RetrieveBirthIndicators)
+TEST_F(DatastoreTest, RetrieveBirthIndicators)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
 	auto uk = manager.get_country("GB");
 	auto uk_births = manager.get_birth_indicators(uk.value());
 
@@ -281,11 +243,9 @@ TEST(TestDatastore, RetrieveBirthIndicators)
 	ASSERT_GT(uk_births_max, uk_births_flt.back().time);
 }
 
-TEST(TestDatastore, RetrieveCancerDefinition)
+TEST_F(DatastoreTest, RetrieveCancerDefinition)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
+	using namespace hgps::core;
 
 	auto uk = manager.get_country("GB").value();
 	auto diseases = manager.get_diseases();
@@ -308,11 +268,9 @@ TEST(TestDatastore, RetrieveCancerDefinition)
 	ASSERT_GT(cancer_count, 0);
 }
 
-TEST(TestDatastore, RetrieveCancerParameters)
+TEST_F(DatastoreTest, RetrieveCancerParameters)
 {
-	using namespace hgps::data;
-
-	auto manager = DataManager(store_full_path);
+	using namespace hgps::core;
 
 	auto uk = manager.get_country("GB");
 	auto diseases = manager.get_diseases();
