@@ -1,5 +1,7 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
+
+include(CTest)
 include(GoogleTest)
 
 add_executable(HealthGPS.Tests "")

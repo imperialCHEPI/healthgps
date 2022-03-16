@@ -80,7 +80,7 @@ jobs:
 
     - name: Zip output folder
       id: zip_folder
-      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/HealthGPS.Console/
+      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
       run: |
         mkdir ${{github.workspace}}/artifact
         7z a -tzip ${{github.workspace}}/artifact/health_gps_linux.zip HealthGPS.Console
