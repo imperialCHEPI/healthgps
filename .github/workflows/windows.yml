@@ -30,7 +30,7 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2021.05.12
+        git checkout --force 2022.03.10
         .\bootstrap-vcpkg.bat -disableMetrics    
 
     - name: Get Ninja
@@ -52,32 +52,32 @@ jobs:
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
-      working-directory: ${{github.workspace}}/source
+      working-directory: ${{github.workspace}}
       run: cmake --preset=${{env.DEBUG_PRESET}}
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
-      working-directory: ${{github.workspace}}/source
+      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
       
     - name: Test debug HealthGPS
       id: ctest_run
-      working-directory: ${{github.workspace}}/source
+      working-directory: ${{github.workspace}}
       run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
     - name: Configure release HealthGPS
       id: cmake_config_release
-      working-directory: ${{github.workspace}}/source
+      working-directory: ${{github.workspace}}
       run: cmake --preset=${{env.RELEASE_PRESET}}
 
     - name: Build release HealthGPS
       id: cmake_build_release
-      working-directory: ${{github.workspace}}/source
+      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Zip output folder
       id: zip_folder
-      working-directory: ${{github.workspace}}/source/out/build/${{env.RELEASE_PRESET}}/HealthGPS.Console/
+      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/HealthGPS.Console/
       run: |
         mkdir ${{github.workspace}}/artifact
         7z a -tzip ${{github.workspace}}/artifact/health_gps_win64.zip *.dll *.exe
