@@ -11,7 +11,7 @@ Health-GPS microsimulation is part of the [STOP project](https://www.stopchildob
 
 Childhood obesity is one of the major public health challenges throughout the world and is rising at an alarming rate in most countries. In particular, the rates of increase in obesity prevalence in developing countries have been more than 30% higher than those in developed countries. Simulation models are especially useful for assessing the long-term impacts of the wide range of policies that will be needed to tackle the obesity epidemic.
 
-The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the `Health GPS application`, which is implemented using object-oriented principles in `Modern C++` programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20).
+The *Health GPS microsimulation* is being developed in collaboration between the [Centre for Health Economics & Policy Innovation (CHEPI)](https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/), Imperial College London; and [INRAE](https://www.inrae.fr), France; as part of the [STOP project](https://www.stopchildobesity.eu/). The software architecture uses a modular design approach to provide the building blocks of the *Health GPS application*, which is implemented using object-oriented principles in *Modern C++* programming language targeting the [C++20 standard](https://en.cppreference.com/w/cpp/20).
 
 # Quick Start
 
@@ -24,22 +24,22 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
 4. Run: `X:\xxx> .\HealthGPS.Console.exe -f ".\example\France.Config.json" -s ".\data"` where `-f` gives the *configuration file* fullname and
-`-s` the path to the root folder of the *backend storage* respectivelly.
+`-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `C:\HealthGPS\Results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ### Linux OS
-You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires the `GCC 11.1` or newer version to be installed.
+You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires `GCC 11.1` or newer version to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Navigate to the directory used in step 2 (xxx).
 4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f ./example/France.Config.json -s ./data` where `-f` gives the *configuration file* fullname and
-`-s` the path to the root folder of the *backend storage* respectivelly.
+`-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
-**NOTE:** *The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpuse to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
+>**NOTE:** The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpose to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
 
-***Known Issue:*** Windows 10 support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the Windows 11 installation.
+>***Known Issue:*** Windows 10 support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the Windows 11 installation.
 
 # Development Tools
 The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
@@ -54,32 +54,45 @@ To start working on the *Health GPS* code base, the suggested development machin
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
 8. Internet connection.
 
-Download the *Health GPS* source code to the local machine, we recommend somewhere like `C:\src` or `C:\source`, since otherwise you may run into path issues with the build systems.
+Download the *Health GPS* source code to the local machine, we recommend somewhere like root `/src` or `/source`, since otherwise you may run into path issues with the build systems.
 ```cmd
 > git clone https://github.com/imperialCHEPI/healthgps
 ```
-Finally, open the '...\healthgps\source\' folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager. Alternatively, there is also support for visual studio projects by opening the solution file `...\healthgps\source\HelathGPS.sln`, but this option will be removed in future version.
+Finally, open the `.../healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
-**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
+>**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
 
-### CMake (Windows)
+### CMake Build
 
 ```cmd
 cmake --list-presets=all
+
+# Windows
 cmake --preset='x64-release'
 cmake --build --preset='release-build-windows'
+
+# Linux
+cmake --preset='linux-release'
+cmake --build --preset='release-build-linux'
 ```
 
-The `HealthGPS` binary will now be inside the `./out/build/[preset]/HealthGPS.Console` directory.
+The `HealthGPS` binaries will now be inside the `./out/build/[preset]/src/HealthGPS.Console` directory.
 
 To run the unit tests:
 ```cmd
+# Windows
 cmake --preset='x64-debug'
 cmake --build --preset='debug-build-windows'
 ctest --preset='core-test-windows'
+
+# Linux
+cmake --preset='linux-debug'
+cmake --build --preset='debug-build-linux'
+ctest --preset='core-test-linux'
 ```
 
-A similar process can be followed to build and test the *HealthGPS* model on ***Linux OS*** using the respective *presets* provided in the project.
+All available options are defined using CMake *prestes* in the `CMakePresets.json` file, which also declare *build presets* to be used via the CMake command line arguments.
+
 
 # License
 
