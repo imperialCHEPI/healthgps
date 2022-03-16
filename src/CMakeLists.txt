@@ -1,5 +1,3 @@
-#include(CTest)
-
 # Include sub-projects.
 add_subdirectory (HealthGPS.Core)
 add_subdirectory (HealthGPS.Datastore)

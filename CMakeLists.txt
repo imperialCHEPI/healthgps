@@ -13,9 +13,6 @@ project(HealthGPS
 
 include(cmake/PreventInSourceBuilds.cmake)
 
-# Adding the tests:
-option(ENABLE_TESTING "Enable the tests" ON)
-
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -25,5 +22,7 @@ if(MSVC)
 else()
     add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-variable) # -Werror
 endif()
+
+include(CTest)
 
 add_subdirectory (src)
