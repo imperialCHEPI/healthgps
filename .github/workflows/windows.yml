@@ -14,7 +14,7 @@ jobs:
     name: Run CMake Windows Workflow
     
     env:
-      VCPKG_ROOT: '../vcpkg'
+      VCPKG_ROOT: 'vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
       DEBUG_PRESET: 'x64-debug'
       DEBUG_BUILD_PRESET: 'debug-build-windows'

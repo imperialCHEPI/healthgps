@@ -14,7 +14,7 @@ jobs:
     name: Run CMake Linux Workflow
     
     env:
-      VCPKG_ROOT: '../vcpkg'
+      VCPKG_ROOT: 'vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
       DEBUG_PRESET: 'linux-debug'
       DEBUG_BUILD_PRESET: 'debug-build-linux'
