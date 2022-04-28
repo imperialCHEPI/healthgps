@@ -154,14 +154,15 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease)
 {
 	auto asthma = manager.get_disease_info("asthma").value();
 	auto diabetes = manager.get_disease_info("diabetes").value();
-
+	
 	auto table_self = manager.get_relative_risk_to_disease(diabetes, diabetes);
 	auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
 
+	// diabetes to diabetes files-based default values
 	ASSERT_EQ(3, table_self.columns.size());
 	ASSERT_GT(table_self.rows.size(), 0);
 	ASSERT_EQ(table_self.rows[0][1], table_self.rows[0][2]);
-	ASSERT_FALSE(table_self.is_default_value);
+	ASSERT_TRUE(table_self.is_default_value);
 
 	ASSERT_EQ(3, table_other.columns.size());
 	ASSERT_GT(table_other.rows.size(), 0);

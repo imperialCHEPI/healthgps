@@ -1,8 +1,11 @@
 #pragma once
 #include "interfaces.h"
 #include "hierarchical_model_types.h"
+#include "modelinput.h"
+#include "disease_definition.h"
 #include <mutex>
 #include <functional>
+#include <optional>
 
 namespace hgps {
 
@@ -22,6 +25,13 @@ namespace hgps {
 
 		virtual LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
 			const HierarchicalModelType& model_type) = 0;
+
+		virtual const std::vector<core::DiseaseInfo>& get_diseases() = 0;
+
+		virtual std::optional<core::DiseaseInfo> get_disease_info(std::string code) = 0;
+
+		virtual DiseaseDefinition& get_disease_definition(
+			const core::DiseaseInfo& info, const ModelInput& config) = 0;
 	};
 
 	class CachedRepository final: public Repository {
@@ -43,6 +53,13 @@ namespace hgps {
 		LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
 			const HierarchicalModelType& model_type) override;
 
+		const std::vector<core::DiseaseInfo>& get_diseases() override;
+
+		std::optional<core::DiseaseInfo> get_disease_info(std::string code) override;
+
+		DiseaseDefinition& get_disease_definition(
+			const core::DiseaseInfo& info, const ModelInput& config) override;
+
 		core::Datastore& manager() noexcept override;
 
 		void clear_cache() noexcept;
@@ -52,5 +69,9 @@ namespace hgps {
 		std::reference_wrapper<core::Datastore> data_manager_;
 		std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
+		std::vector<core::DiseaseInfo> diseases_info_;
+		std::map<std::string, DiseaseDefinition> diseases_;
+
+		void load_disease_definition(const core::DiseaseInfo& info, const ModelInput& config);
 	};
 }

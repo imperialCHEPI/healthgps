@@ -1,5 +1,6 @@
 #include "datamanager.h"
 #include "HealthGPS.Core/string_util.h"
+#include "HealthGPS.Core/math_util.h"
 
 #include <fstream>
 #include <rapidcsv.h>
@@ -318,6 +319,7 @@ namespace hgps {
 				auto diseases_path = index_["diseases"]["path"].get<std::string>();
 				auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
 				auto& risk_node = index_["diseases"]["disease"]["relative_risk"];
+				auto default_value = risk_node["to_disease"]["default_value"].get<float>();
 
 				auto risk_folder = risk_node["path"].get<std::string>();
 				auto file_folder = risk_node["to_disease"]["path"].get<std::string>();
@@ -339,7 +341,7 @@ namespace hgps {
 					table.columns = doc.GetColumnNames();
 
 					auto row_size = table.columns.size();
-
+					auto non_default_count = std::size_t{ 0 };
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
 
@@ -347,8 +349,17 @@ namespace hgps {
 						for (size_t col = 0; col < row_size; col++) {
 							row_data[col] = std::stof(row[col]);
 						}
+						
+						non_default_count += std::count_if(std::next(row_data.cbegin()), row_data.cend(),
+							[&default_value](auto& v) { return !MathHelper::equal(v, default_value); });
 
 						table.rows.emplace_back(row_data);
+					}
+
+					if (non_default_count < 1) {
+						table.is_default_value = true;
+						notify_warning(fmt::format(
+							"{} to {} relative risk file has only default values.", source.code, target.code));
 					}
 
 					return table;

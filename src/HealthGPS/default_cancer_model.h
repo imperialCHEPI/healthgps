@@ -8,7 +8,7 @@ namespace hgps {
 	class DefaultCancerModel final : public DiseaseModel {
 	public:
 		DefaultCancerModel() = delete;
-		DefaultCancerModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range);
+		DefaultCancerModel(DiseaseDefinition& definition, const core::IntegerInterval age_range);
 
 		core::DiseaseGroup group() const noexcept override;
 
@@ -23,7 +23,7 @@ namespace hgps {
 		double get_excess_mortality(const Person& entity) const noexcept override;
 
 	private:
-		DiseaseDefinition definition_;
+		std::reference_wrapper<DiseaseDefinition> definition_;
 		DoubleAgeGenderTable average_relative_risk_;
 
 		DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext& context);

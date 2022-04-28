@@ -4,33 +4,33 @@
 
 namespace hgps {
 
-	DefaultCancerModel::DefaultCancerModel(DiseaseDefinition&& definition, const core::IntegerInterval age_range)
-		: definition_{ std::move(definition) }, average_relative_risk_{ create_age_gender_table<double>(age_range) }
+	DefaultCancerModel::DefaultCancerModel(DiseaseDefinition& definition, const core::IntegerInterval age_range)
+		: definition_{ definition }, average_relative_risk_{ create_age_gender_table<double>(age_range) }
 	{
-		if (definition_.identifier().group != core::DiseaseGroup::cancer) {
+		if (definition_.get().identifier().group != core::DiseaseGroup::cancer) {
 			throw std::invalid_argument("Disease definition group mismatch, must be 'cancer'.");
 		}
 	}
 
 	core::DiseaseGroup DefaultCancerModel::group() const noexcept {
-		return definition_.identifier().group;
+		return definition_.get().identifier().group;
 	}
 
 	std::string DefaultCancerModel::disease_type() const noexcept {
-		return definition_.identifier().code;
+		return definition_.get().identifier().code;
 	}
 
 	void DefaultCancerModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
-		auto prevalence_id = definition_.table().at("prevalence");
+		auto prevalence_id = definition_.get().table().at("prevalence");
 		for (auto& entity : context.population()) {
-			if (!entity.is_active() || !definition_.table().contains(entity.age)) {
+			if (!entity.is_active() || !definition_.get().table().contains(entity.age)) {
 				continue;
 			}
 
 			auto relative_risk_value = calculate_relative_risk_for_risk_factors(entity);
 			auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
-			auto prevalence = definition_.table()(entity.age, entity.gender).at(prevalence_id);
+			auto prevalence = definition_.get().table()(entity.age, entity.gender).at(prevalence_id);
 			auto probability = prevalence * relative_risk_value / average_relative_risk;
 			auto hazard = context.random().next_double();
 			if (hazard < probability) {
@@ -83,14 +83,14 @@ namespace hgps {
 
 	double DefaultCancerModel::get_excess_mortality(const Person& entity) const noexcept {
 		auto disease_info = entity.diseases.at(disease_type());
-		auto max_onset = definition_.parameters().max_time_since_onset;
+		auto max_onset = definition_.get().parameters().max_time_since_onset;
 		if (disease_info.time_since_onset < 0 || disease_info.time_since_onset >= max_onset) {
 			return 0.0;
 		}
 		
-		auto mortality_id = definition_.table().at("mortality");
-		auto excess_mortality = definition_.table()(entity.age, entity.gender).at(mortality_id);
-		auto death_weight = definition_.parameters().death_weight.at(disease_info.time_since_onset);
+		auto mortality_id = definition_.get().table().at("mortality");
+		auto excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
+		auto death_weight = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
 		if (entity.gender == core::Gender::male) {
 			return excess_mortality * death_weight.males;
 		}
@@ -140,12 +140,13 @@ namespace hgps {
 
 	double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person& entity) const {
 		auto relative_risk_value = 1.0;
+		auto& relative_factors = definition_.get().relative_risk_factors();
 		for (auto& factor : entity.risk_factors) {
-			if (!definition_.relative_risk_factors().contains(factor.first)) {
+			if (!relative_factors.contains(factor.first)) {
 				continue;
 			}
 
-			auto lut = definition_.relative_risk_factors().at(factor.first).at(entity.gender);
+			auto& lut = relative_factors.at(factor.first).at(entity.gender);
 			auto entity_factor_value = static_cast<float>(factor.second);
 			auto relative_factor_value = lut(entity.age, entity_factor_value);
 			relative_risk_value *= relative_factor_value;
@@ -157,12 +158,16 @@ namespace hgps {
 	double DefaultCancerModel::calculate_relative_risk_for_diseases(
 		const Person& entity, const int& start_time, const int& time_now) const {
 		auto relative_risk_value = 1.0;
+		auto& lut = definition_.get().relative_risk_diseases();
 		for (auto& disease : entity.diseases) {
+			if (!lut.contains(disease.first)) {
+				continue;
+			}
+
 			// Only include existing diseases
 			if (disease.second.status == DiseaseStatus::active &&
 				(start_time == time_now || disease.second.start_time < time_now)) {
-				auto relative_disease_vale =
-					definition_.relative_risk_diseases().at(disease.first)(entity.age, entity.gender);
+				auto relative_disease_vale = lut.at(disease.first)(entity.age, entity.gender);
 
 				relative_risk_value *= relative_disease_vale;
 			}
@@ -174,7 +179,7 @@ namespace hgps {
 	void DefaultCancerModel::update_remission_cases(RuntimeContext& context) {
 		auto remission_count = 0;
 		auto prevalence_count = 0;
-		auto max_onset = definition_.parameters().max_time_since_onset;
+		auto max_onset = definition_.get().parameters().max_time_since_onset;
 		for (auto& entity : context.population()) {
 			if (entity.age == 0 || !entity.is_active()) {
 				continue;
@@ -246,10 +251,10 @@ namespace hgps {
 
 	double DefaultCancerModel::calculate_incidence_probability(
 		const Person& entity, const int& start_time, const int& time_now) const {
-		auto incidence_id = definition_.table().at("incidence");
+		auto incidence_id = definition_.get().table().at("incidence");
 		auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
 		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
-		auto incidence = definition_.table()(entity.age, entity.gender).at(incidence_id);
+		auto incidence = definition_.get().table()(entity.age, entity.gender).at(incidence_id);
 		auto probability = incidence * combined_relative_risk / average_relative_risk;
 		return probability;
 	}
@@ -257,7 +262,7 @@ namespace hgps {
 	int DefaultCancerModel::calculate_time_since_onset(
 		RuntimeContext& context, const core::Gender& gender) const {
 
-		auto& pdf = definition_.parameters().prevalence_distribution;
+		auto& pdf = definition_.get().parameters().prevalence_distribution;
 		auto values = std::vector<int>{};
 		auto cumulative = std::vector<double>{};
 		auto sum = 0.0;

@@ -48,7 +48,7 @@ namespace hgps {
 			auto rows = std::vector<int>(num_rows);
 			auto data = core::FloatArray2D(num_rows, num_cols);
 			for (size_t i = 0; i < num_rows; i++) {
-				auto row = entity.rows[i];
+				auto& row = entity.rows[i];
 				rows[i] = static_cast<int>(row[0]);
 				for (size_t j = 1; j < row.size(); j++) {
 					data(i, j - 1) = row[j];
@@ -85,7 +85,7 @@ namespace hgps {
 			RelativeRisk result;
 			for (auto& item : info.inputs.diseases()) {
 				auto table = info.manager.get_relative_risk_to_disease(info.disease, item);
-				if (!table.empty()) {
+				if (!table.empty() && !table.is_default_value) {
 					result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(table));
 				}
 			}
