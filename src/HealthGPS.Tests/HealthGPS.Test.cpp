@@ -389,7 +389,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 
 	auto pop_module = build_population_module(repository, config);
 	auto total_pop = pop_module->get_total_population_size(config.start_time());
-	auto pop_dist = pop_module->get_population_distribution(config.start_time());
+	auto& pop_dist = pop_module->get_population_distribution(config.start_time());
 	auto sum_dist = 0.0f;
 	for (auto& pair : pop_dist)	{
 		sum_dist += pair.second.total();
@@ -499,7 +499,7 @@ TEST(TestHealthGPS, CreateAnalysisModule)
 
 	auto inputs = create_test_configuration(data);
 
-	auto analysis_module = build_analysis_module(repository, inputs);
+	auto analysis_module = build_analysis_module(repository,inputs);
 	ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
 	ASSERT_EQ("Analysis", analysis_module->name());
 }

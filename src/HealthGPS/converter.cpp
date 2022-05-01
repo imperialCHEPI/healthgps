@@ -173,5 +173,18 @@ namespace hgps {
 
 			return DiseaseParameter(entity.time_year, distribution, survival, deaths);
 		}
+
+		LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataRow>& dataset)
+		{
+			auto lms_dataset = LmsDataset{};
+			for (auto& row : dataset) {
+				lms_dataset[row.age][row.gender] = LmsRecord {
+					.lambda = row.lambda,
+					.mu = row.mu,
+					.sigma = row.sigma };
+			}
+
+			return LmsDefinition{ std::move(lms_dataset) };
+		}
 	}
 }

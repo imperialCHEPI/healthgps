@@ -63,6 +63,8 @@ namespace hgps {
 
 			std::vector<LifeExpectancyItem> load_life_expectancy(const Country& country) const;
 
+			std::vector<LmsDataRow> load_lms_parameters(std::filesystem::path filename) const;
+
 			std::string replace_string_tokens(std::string source, std::vector<std::string> tokens) const;
 
 			std::map<std::string, std::size_t> create_fields_index_mapping(

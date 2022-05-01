@@ -1,11 +1,13 @@
 
 #include "analysis_module.h"
+#include "weight_model.h"
+#include "lms_model.h"
 #include "converter.h"
 
 namespace hgps {
 	AnalysisModule::AnalysisModule(
-		AnalysisDefinition&& definition, const core::IntegerInterval age_range)
-		: definition_{ std::move(definition) }
+		AnalysisDefinition&& definition, WeightModel&& classifier, const core::IntegerInterval age_range)
+		: definition_{ std::move(definition) }, weight_classifier_{std::move(classifier)}
 		, residual_disability_weight_{ create_age_gender_table<double>(age_range) }
 	{}
 
@@ -224,7 +226,10 @@ namespace hgps {
 		}
 
 		auto definition = detail::StoreConverter::to_analysis_definition(analysis_entity);
+		auto lms_definition = detail::StoreConverter::to_lms_definition(analysis_entity.lms_parameters);
+		auto classifier = WeightModel{ LmsModel{ std::move(lms_definition) } };
 
-		return std::make_unique<AnalysisModule>(std::move(definition), config.settings().age_range());
+		return std::make_unique<AnalysisModule>(
+			std::move(definition), std::move(classifier), config.settings().age_range());
 	}
 }

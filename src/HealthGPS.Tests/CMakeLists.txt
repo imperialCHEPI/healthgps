@@ -32,6 +32,7 @@ target_sources(HealthGPS.Tests
         "Scenario.Test.cpp"
         "TestMain.cpp"
         "ThreadsafeQueue.Test.cpp"
+        "WeightModel.Test.cpp"
         "CountryModule.h"
         "RiskFactorData.h")
 

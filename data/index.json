@@ -92,7 +92,8 @@
         "path": "analysis",
         "age_limits": [1, 100],
         "time_year": 2019,
-        "file_name": "disability_weights.csv",
+        "disability_file_name": "disability_weights.csv",
+        "lms_file_name":"lms_parameters.csv",
         "cost_of_disease": {
             "path":"cost",
             "file_name": "BoD{COUNTRY_CODE}.csv"

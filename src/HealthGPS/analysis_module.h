@@ -6,13 +6,14 @@
 #include "runtime_context.h"
 #include "analysis_definition.h"
 #include "result_message.h"
+#include "weight_model.h"
 
 namespace hgps {
 
 	class AnalysisModule final : public UpdatableModule {
 	public:
 		AnalysisModule() = delete;
-		AnalysisModule(AnalysisDefinition&& definition, const core::IntegerInterval age_range);
+		AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier, const core::IntegerInterval age_range);
 
 		SimulationModuleType type() const noexcept override;
 
@@ -24,6 +25,7 @@ namespace hgps {
 
 	private:
 		AnalysisDefinition definition_;
+		WeightModel weight_classifier_;
 		DoubleAgeGenderTable residual_disability_weight_;
 
 		double calculate_residual_disability_weight(const int& age, const core::Gender gender,

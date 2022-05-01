@@ -37,6 +37,9 @@ target_sources(HealthGPS
 		"info_message.h"
 		"life_table.cpp"
 		"life_table.h"
+		"lms_model.cpp"
+		"lms_model.h"
+		"lms_definition.h"
 		"mapping.cpp"
 		"mapping.h"
 		"marketing_scenario.cpp"
@@ -108,7 +111,10 @@ target_sources(HealthGPS
 		"simulation.h"
 		"sync_message.h"
 		"threadsafe_queue.h"
-		"two_step_value.h")
+		"two_step_value.h"
+		"weight_category.h"
+		"weight_model.cpp"
+		"weight_model.h")
 
 set(ROOT_NAMESPACE hgps)
 
