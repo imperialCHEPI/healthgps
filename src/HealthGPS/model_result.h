@@ -37,6 +37,8 @@ namespace hgps {
 
 		std::string to_string() const noexcept;
 
+        int number_of_recyclable() const noexcept;
+
     private:
         std::size_t caluclate_min_padding() const noexcept;
 	};

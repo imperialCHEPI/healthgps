@@ -99,6 +99,7 @@ namespace hgps {
 
 		auto age_sum = std::map<core::Gender, int>{};
 		auto age_count = std::map<core::Gender, int>{};
+		auto analysis_time = static_cast<unsigned int>(context.time_now());
 		auto population_size = static_cast<int>(context.population().size());
 		auto population_alive = 0;
 		auto population_dead = 0;
@@ -106,9 +107,11 @@ namespace hgps {
 		for (const auto& entity : context.population()) {
 			if (!entity.is_active()) {
 				if (entity.is_alive()) {
-					population_migrated++;
+					if (entity.time_of_migration() == analysis_time) {
+						population_migrated++;
+					}
 				}
-				else {
+				else if (entity.time_of_death() == analysis_time) {
 					population_dead++;
 				}
 
@@ -164,7 +167,7 @@ namespace hgps {
 			result.metrics.emplace(item.first, item.second);
 		}
 
-		result.indicators = calculate_dalys(context.population(), context.age_range().upper(), context.time_now());
+		result.indicators = calculate_dalys(context.population(), context.age_range().upper(), analysis_time);
 		return result;
 	}
 

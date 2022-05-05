@@ -29,6 +29,10 @@ namespace hgps {
 		return ss.str();
 	}
 
+	int ModelResult::number_of_recyclable() const noexcept {
+		return population_size - (number_alive + number_dead + number_emigrated);
+	}
+
 	std::size_t ModelResult::caluclate_min_padding() const noexcept {
 		std::size_t longestName = 0;
 		for (const auto& entry : risk_ractor_average) {

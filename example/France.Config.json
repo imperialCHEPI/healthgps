@@ -69,7 +69,7 @@
         "stop_time": 2050,
         "trial_runs": 1,
         "sync_timeout_ms": 5000,
-        "diseases": ["asthma","diabetes","lowbackpain", "colorectum"],
+        "diseases": ["asthma","diabetes","lowbackpain", "colorectalcancer"],
         "interventions": {
             "active_type_id": null,
             "types": {

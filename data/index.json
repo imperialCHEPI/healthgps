@@ -78,7 +78,7 @@
             {"group": "other", "id": "asthma", "name": "Asthma"},
             {"group": "other", "id": "diabetes", "name": "Diabetes mellitus"},
             {"group": "other",  "id": "lowbackpain", "name": "Low back pain"},
-            {"group": "cancer", "id": "colorectum", "name": "Colorectal  cancer"}
+            {"group": "cancer", "id": "colorectalcancer", "name": "Colorectal  cancer"}
         ]
     },
     "analysis":{
