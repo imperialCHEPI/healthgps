@@ -252,7 +252,7 @@ namespace hgps {
 				for (auto trial = 0; trial < net_value; trial++) {
 					auto index = context_.random().next_int(static_cast<int>(similar_entities.size()) - 1);
 					const auto& source = similar_entities.at(index);
-					context_.population().add(std::move(partial_clone_entity(source)));
+					context_.population().add(std::move(partial_clone_entity(source)), context_.time_now());
 				}
 			}
 		}
@@ -264,7 +264,7 @@ namespace hgps {
 				}
 
 				if (entity.age == age && entity.gender == gender) {
-					entity.has_emigrated = true;
+					entity.emigrate(context_.time_now());
 					net_value_counter++;
 					if (net_value_counter == 0) {
 						break;
@@ -331,8 +331,6 @@ namespace hgps {
 		clone.age = source.age;
 		clone.gender = source.gender;
 		clone.ses = source.ses;
-		clone.is_alive = true;
-		clone.has_emigrated = false;
 		for (const auto& item : source.risk_factors) {
 			clone.risk_factors.emplace(item.first, item.second);
 		}

@@ -105,7 +105,7 @@ namespace hgps {
 		auto population_migrated = 0;
 		for (const auto& entity : context.population()) {
 			if (!entity.is_active()) {
-				if (entity.is_alive) {
+				if (entity.is_alive()) {
 					population_migrated++;
 				}
 				else {
@@ -190,7 +190,7 @@ namespace hgps {
 		auto yld_sum = 0.0;
 		auto count = 0;
 		for (const auto& entity : population) {
-			if (entity.time_of_death == death_year) {
+			if (entity.time_of_death() == death_year) {
 				if (entity.age <= max_age) {
 					auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
 					auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);

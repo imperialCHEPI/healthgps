@@ -10,10 +10,11 @@ TEST(TestHealthGPS_Population, CreateDefaultPerson)
 	ASSERT_GT(p.id(), 0);
 	ASSERT_EQ(0u, p.age);
 	ASSERT_EQ(core::Gender::unknown, p.gender);
-	ASSERT_TRUE(p.is_alive);
-	ASSERT_FALSE(p.has_emigrated);
+	ASSERT_TRUE(p.is_alive());
+	ASSERT_FALSE(p.has_emigrated());
 	ASSERT_TRUE(p.is_active());
-	ASSERT_EQ(0u, p.time_of_death);
+	ASSERT_EQ(0u, p.time_of_death());
+	ASSERT_EQ(0u, p.time_of_migration());
 	ASSERT_EQ(0, p.ses);
 	ASSERT_EQ(0, p.risk_factors.size());
 	ASSERT_EQ(0, p.diseases.size());
@@ -41,13 +42,59 @@ TEST(TestHealthGPS_Population, PersonStateIsActive)
 	auto p3 = Person{};
 	auto p4 = p2;
 
-	p2.is_alive = false;
-	p3.has_emigrated = true;
+	p2.die(2022);
+	p3.emigrate(2022);
 
 	ASSERT_TRUE(p1.is_active());
 	ASSERT_FALSE(p2.is_active());
 	ASSERT_FALSE(p3.is_active());
 	ASSERT_TRUE(p4.is_active());
+}
+
+TEST(TestHealthGPS_Population, PersonStateDeath)
+{
+	using namespace hgps;
+
+	auto p = Person{};
+	ASSERT_TRUE(p.is_alive());
+	ASSERT_TRUE(p.is_active());
+	ASSERT_FALSE(p.has_emigrated());
+	ASSERT_EQ(0, p.time_of_death());
+	ASSERT_EQ(0, p.time_of_migration());
+
+	auto time_now = 2022;
+	p.die(time_now);
+
+	ASSERT_FALSE(p.is_alive());
+	ASSERT_FALSE(p.is_active());
+	ASSERT_FALSE(p.has_emigrated());
+	ASSERT_EQ(time_now, p.time_of_death());
+	ASSERT_EQ(0, p.time_of_migration());
+	ASSERT_THROW(p.die(time_now), std::logic_error);
+	ASSERT_THROW(p.emigrate(time_now), std::logic_error);
+}
+
+TEST(TestHealthGPS_Population, PersonStateEmigrated)
+{
+	using namespace hgps;
+
+	auto p = Person{};
+	ASSERT_TRUE(p.is_alive());
+	ASSERT_TRUE(p.is_active());
+	ASSERT_FALSE(p.has_emigrated());
+	ASSERT_EQ(0, p.time_of_death());
+	ASSERT_EQ(0, p.time_of_migration());
+
+	auto time_now = 2022;
+	p.emigrate(time_now);
+
+	ASSERT_TRUE(p.is_alive());
+	ASSERT_FALSE(p.is_active());
+	ASSERT_TRUE(p.has_emigrated());
+	ASSERT_EQ(0, p.time_of_death());
+	ASSERT_EQ(time_now, p.time_of_migration());
+	ASSERT_THROW(p.die(time_now), std::logic_error);
+	ASSERT_THROW(p.emigrate(time_now), std::logic_error);
 }
 
 TEST(TestHealthGPS_Population, CreateDefaultTwoStepValue)
@@ -130,4 +177,62 @@ TEST(TestHealthGPS_Population, CloneDiseaseType)
 	ASSERT_EQ(source.status, clone.status);
 	ASSERT_EQ(source.start_time, clone.start_time);
 	ASSERT_NE(std::addressof(source), std::addressof(clone));
+}
+
+TEST(TestHealthGPS_Population, AddSingleNewEntity)
+{
+	using namespace hgps;
+	
+	constexpr auto init_size = 10;
+
+	auto p = Population{ init_size };
+	ASSERT_EQ(p.initial_size(), p.current_active_size());
+
+	auto time_now = 2022;
+	auto start_size = p.size();
+	p.add(Person{ core::Gender::male }, time_now);
+	ASSERT_GT(p.size(), start_size);
+
+	p[start_size].die(time_now);
+	ASSERT_FALSE(p[start_size].is_active());
+
+	time_now++;
+	auto current_size = p.size();
+	p.add(Person{ core::Gender::female }, time_now);
+	ASSERT_EQ(p.size(), current_size);
+	ASSERT_TRUE(p[start_size].is_active());
+}
+
+TEST(TestHealthGPS_Population, AddMultipleNewEntities)
+{
+	using namespace hgps;
+
+	constexpr auto init_size = 10;
+	constexpr auto alocate_size = 3;
+	constexpr auto replace_size = 2;
+	constexpr auto expected_size = init_size + alocate_size;
+
+	static_assert(replace_size < alocate_size);
+
+	auto p = Population{ init_size };
+	ASSERT_EQ(p.initial_size(), p.current_active_size());
+
+	auto time_now = 2022;
+	auto start_size = p.size();
+	auto midpoint = start_size / 2;
+	p.add_newborn_babies(alocate_size, core::Gender::male, time_now);
+	ASSERT_GT(p.size(), start_size);
+
+	p[midpoint].emigrate(time_now);
+	p[start_size].die(time_now);
+	ASSERT_FALSE(p[midpoint].is_active());
+	ASSERT_FALSE(p[start_size].is_active());
+
+	time_now++;
+	auto current_size = p.size();
+	p.add_newborn_babies(replace_size, core::Gender::female, time_now);
+	ASSERT_EQ(current_size, p.size());
+	ASSERT_EQ(expected_size, p.size());
+	ASSERT_TRUE(p[midpoint].is_active());
+	ASSERT_TRUE(p[start_size].is_active());
 }

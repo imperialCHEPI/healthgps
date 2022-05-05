@@ -189,8 +189,8 @@ namespace hgps {
 		auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
 		auto number_of_boys = static_cast<int> (last_year_births_rate.males * initial_pop_size);
 		auto number_of_girls = static_cast<int>(last_year_births_rate.females * initial_pop_size);
-		context.population().add_newborn_babies(number_of_boys, core::Gender::male);
-		context.population().add_newborn_babies(number_of_girls, core::Gender::female);
+		context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
+		context.population().add_newborn_babies(number_of_girls, core::Gender::female, context.time_now());
 
 		// Calculate statistics.
 		auto number_of_births = number_of_boys + number_of_girls;
@@ -321,8 +321,7 @@ namespace hgps {
 			}
 
 			if (entity.age >= max_age) {
-				entity.is_alive = false;
-				entity.time_of_death = context.time_now();
+				entity.die(context.time_now());
 				number_of_deaths++;
 			}
 			else {
@@ -340,8 +339,7 @@ namespace hgps {
 				auto death_probability = 1.0 - product;
 				auto hazard = context.random().next_double();
 				if (hazard < death_probability) {
-					entity.is_alive = false;
-					entity.time_of_death = context.time_now();
+					entity.die(context.time_now());
 					number_of_deaths++;
 				}
 			}
@@ -350,8 +348,7 @@ namespace hgps {
 			if (entity.is_active()) {
 				entity.age = entity.age + 1;
 				if (entity.age >= max_age) {
-					entity.is_alive = false;
-					entity.time_of_death = context.time_now();
+					entity.die(context.time_now());
 				}
 			}
 		}
