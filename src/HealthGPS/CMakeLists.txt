@@ -29,6 +29,8 @@ target_sources(HealthGPS
 		"event_bus.cpp"
 		"event_bus.h"
 		"event_subscriber.cpp"
+		"fiscal_scenario.cpp"
+		"fiscal_scenario.h"
 		"healthgps.cpp"
 		"healthgps.h"
 		"hierarchical_model_static.cpp"

@@ -4,6 +4,7 @@
 
 #include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
+#include "HealthGPS/fiscal_scenario.h"
 
 #include "HealthGPS.Core/scoped_timer.h"
 
@@ -419,6 +420,12 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	if (info.identifier == "marketing") {
 		auto definition = MarketingPolicyDefinition(period, risk_impacts);
 		return std::make_unique<MarketingPolicyScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "fiscal") {
+		auto impact_type = parse_fiscal_impact_type(info.impact_type);
+		auto definition = FiscalPolicyDefinition(impact_type, period, risk_impacts);
+		return std::make_unique<FiscalPolicyScenario>(channel, std::move(definition));
 	}
 
 	throw std::invalid_argument(

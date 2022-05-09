@@ -71,12 +71,12 @@
         "sync_timeout_ms": 5000,
         "diseases": ["asthma","diabetes","lowbackpain", "colorectalcancer"],
         "interventions": {
-            "active_type_id": null,
+            "active_type_id": "fiscal",
             "types": {
                 "simple": {
                     "active_period": {
-                        "start_time": 2021,
-                        "finish_time": 2021
+                        "start_time": 2022,
+                        "finish_time": 2022
                     },
                     "impact_type": "absolute",
                     "impacts": [
@@ -85,13 +85,25 @@
                 },
                 "marketing": {
                     "active_period": {
-                        "start_time": 2021,
+                        "start_time": 2022,
                         "finish_time": 2050
                     },
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
                         {"risk_factor":"BMI", "impact_value":-0.155,"from_age":19, "to_age":null}
+                    ]
+                },
+                "fiscal": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "impact_type": "medium",
+                    "impacts": [
+                        {"risk_factor":"Energy", "impact_value":-0.01282, "from_age":5,  "to_age":9},
+                        {"risk_factor":"Energy", "impact_value":-0.01814, "from_age":10, "to_age":17},
+                        {"risk_factor":"Energy", "impact_value":-0.00125,"from_age":18, "to_age":null}
                     ]
                 }
             }
