@@ -17,9 +17,8 @@ protected:
 	RepositoryTest() 
 		: manager_{ store_full_path }, repository{ manager_ } {}
 
-	hgps::CachedRepository repository;
-private:
 	hgps::data::DataManager manager_;
+	hgps::CachedRepository repository;
 };
 
 TEST_F(RepositoryTest, CreateRepository)
@@ -38,7 +37,7 @@ TEST_F(RepositoryTest, DiseaseInfoIsCached)
 	auto duration_cold = (stop - start);
 
 	auto number_of_trials = 13;
-	for (size_t i = 0; i < number_of_trials; i++) {
+	for (auto i = 0; i < number_of_trials; i++) {
 		start = steady_clock::now();
 		auto& diseases_hot = repository.get_diseases();
 		stop = steady_clock::now();

@@ -43,14 +43,14 @@ namespace hgps {
         auto remaining = number;
         if (recycle.size() > 0) {
             auto replacebles = std::min(number, recycle.size());
-            for (auto index = 0; index < replacebles; index++)
+            for (auto index = std::size_t{ 0 }; index < replacebles; index++)
             {
                 people_.at(recycle.at(index)) = Person{ gender };
                 remaining--;
             }
         }
 
-        for (auto i = 0; i < remaining; i++) {
+        for (auto i = std::size_t{ 0 }; i < remaining; i++) {
             people_.emplace_back(Person{ gender });
         }
     }

@@ -79,7 +79,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto diseases = std::vector<core::DiseaseInfo>{
 		DiseaseInfo{.group = DiseaseGroup::other, .code = "asthma", .name = "Asthma"},
 		DiseaseInfo{.group = DiseaseGroup::other, .code = "diabetes", .name = "Diabetes Mellitus"},
-		DiseaseInfo{.group = DiseaseGroup::cancer, .code = "colorectum", .name = "Colorectal cancer"},
+		DiseaseInfo{.group = DiseaseGroup::cancer, .code = "colorectalcancer", .name = "Colorectal cancer"},
 	};
 
 	return ModelInput(data, settings, info, ses, mapping, diseases);
