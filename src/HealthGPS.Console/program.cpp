@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
 				SimulationDefinition{ model_input, std::move(policy_scenario), std::move(policy_rnd) },
 				factory, event_bus };
 
-			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation ...\n\n");
+			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n\n", config.trial_runs);
 			auto worker = std::jthread{ [&runtime, &executive, &baseline, &intervention, &config, &done] {
 				runtime = executive.run(baseline, intervention, config.trial_runs);
 				done.store(true);
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 			worker.join();
 		}
 		else {
-			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation ...\n\n");
+			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
 			channel.close(); // Will not store any message
 			auto worker = std::jthread{ [&runtime, &executive, &baseline, &config, &done] {
 				runtime = executive.run(baseline, config.trial_runs);
