@@ -56,10 +56,11 @@ TEST_F(WeightModelTest, ClassifyAdultWeight)
 {
 	using namespace hgps;
 	using namespace hgps::core;
+	auto adult_age = 20;
 	auto genders = std::array<Gender,2>{ Gender::male, Gender::female };
 	auto bmi_values = std::array<double, 8>{15.0, 18.4, 18.5, 24.9, 25.0, 29.9, 30.0, 40.0};
 	auto expected = std::array<WeightCategory, 8>{
-		WeightCategory::underweight, WeightCategory::underweight,
+		WeightCategory::normal, WeightCategory::normal,
 		WeightCategory::normal, WeightCategory::normal,
 		WeightCategory::overweight, WeightCategory::overweight,
 		WeightCategory::obese, WeightCategory::obese};
@@ -67,7 +68,7 @@ TEST_F(WeightModelTest, ClassifyAdultWeight)
 	auto classifier = WeightModel{ create_lms_model(manager) };
 	for (auto& item : genders) {
 		for (auto idx = 0;  auto & bmi : bmi_values) {
-			auto entity = create_test_entity(item, 20, bmi);
+			auto entity = create_test_entity(item, adult_age, bmi);
 			auto category = classifier.classify_weight(entity);
 			ASSERT_EQ(expected[idx], category);
 			idx++;
@@ -79,14 +80,14 @@ TEST_F(WeightModelTest, ClassifyChildWeight)
 {
 	using namespace hgps;
 	using namespace hgps::core;
-	auto genders = std::array<Gender, 2>{ Gender::male, Gender::female };
 	auto child_age = 5;
+	auto genders = std::array<Gender, 2>{ Gender::male, Gender::female };
 	auto bmi_values = std::array<double, 8>{12.0, 13.0, 14.0, 15.0, 17.0, 18.0, 25.0, 30.0};
 	auto expected = std::array<WeightCategory, 8>{
-		WeightCategory::underweight, WeightCategory::underweight,
-			WeightCategory::normal, WeightCategory::normal,
-			WeightCategory::overweight, WeightCategory::overweight,
-			WeightCategory::obese, WeightCategory::obese};
+		WeightCategory::normal, WeightCategory::normal,
+		WeightCategory::normal, WeightCategory::normal,
+		WeightCategory::overweight, WeightCategory::overweight,
+		WeightCategory::obese, WeightCategory::obese};
 
 	auto classifier = WeightModel{ create_lms_model(manager) };
 	for (auto& item : genders) {

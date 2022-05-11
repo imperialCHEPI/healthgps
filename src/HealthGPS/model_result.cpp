@@ -4,6 +4,9 @@
 
 namespace hgps {
 
+	ModelResult::ModelResult(const unsigned int sample_size) 
+		: time_series{sample_size} {}
+
 	std::string ModelResult::to_string() const noexcept {
 		std::stringstream ss;
 

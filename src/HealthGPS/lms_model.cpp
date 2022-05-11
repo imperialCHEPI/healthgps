@@ -31,10 +31,7 @@ namespace hgps {
 				zscore = (std::pow(bmi / params.mu, params.lambda) - 1.0) / (params.lambda * params.sigma);
 			}
 
-			if (zscore < -2.0) {
-				return WeightCategory::underweight;
-			}
-			else if (zscore > 2.0) {
+			if (zscore > 2.0) {
 				return WeightCategory::obese;
 			}
 			else if (zscore > 1.0) {
@@ -42,10 +39,7 @@ namespace hgps {
 			}
 		}
 		else {
-			if (bmi < 18.5) {
-				return WeightCategory::underweight;
-			}
-			else if (bmi >= 30.0) {
+			if (bmi >= 30.0) {
 				return WeightCategory::obese;
 			}
 			else if (bmi >= 25.0) {

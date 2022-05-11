@@ -17,18 +17,20 @@ public:
 	ResultFileWriter& operator=(ResultFileWriter&& other) noexcept;
 
 	~ResultFileWriter();
-
-	void write(const hgps::ResultEventMessage& message);
+	void write(const hgps::ResultEventMessage& message) override;
 
 private:
 	std::ofstream stream_;
+	std::ofstream csvstream_;
 	std::mutex lock_mutex_;
 	std::atomic<bool> first_row_{ true };
 	ExperimentInfo info_;
 
-	void write_json_begin();
+	void write_json_begin(const std::filesystem::path output);
 	void write_json_end();
 
 	std::string to_json_string(const hgps::ResultEventMessage& message) const;
+	void write_csv_channels(const hgps::ResultEventMessage& message);
+	void write_csv_header(const hgps::ResultEventMessage& message);
 };
 

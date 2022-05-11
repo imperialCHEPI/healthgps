@@ -5,8 +5,6 @@ namespace hgps {
 	{
 		switch (value)
 		{
-		case WeightCategory::underweight:
-			return "underweight";
 		case WeightCategory::normal:
 			return "normal";
 		case WeightCategory::overweight:

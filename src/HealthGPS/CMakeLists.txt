@@ -116,7 +116,9 @@ target_sources(HealthGPS
 		"two_step_value.h"
 		"weight_category.h"
 		"weight_model.cpp"
-		"weight_model.h")
+		"weight_model.h"
+		"data_series.cpp"
+		"data_series.h" )
 
 set(ROOT_NAMESPACE hgps)
 

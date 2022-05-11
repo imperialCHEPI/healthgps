@@ -213,11 +213,11 @@ TEST(TestHealthGPS_EventBus, PublishToFilteredSubscribers)
 
 	hub.publish(std::make_unique<RunnerEventMessage>("UnitTest", RunnerAction::start));
 	hub.publish_async(std::make_unique<InfoEventMessage>("UnitTest", ModelAction::start, 1, 0));
-	hub.publish_async(std::make_unique<ResultEventMessage>("UnitTest", 1, 2010, ModelResult{}));
+	hub.publish_async(std::make_unique<ResultEventMessage>("UnitTest", 1, 2010, ModelResult{101}));
 	hub.publish_async(std::make_unique<ErrorEventMessage>("UnitTest", 1, 2010, "fell from world's edge"));
 
 	hub.publish_async(std::make_unique<InfoEventMessage>("UnitTest", ModelAction::start, 2, 0));
-	hub.publish_async(std::make_unique<ResultEventMessage>("UnitTest", 2, 2030, ModelResult{}));
+	hub.publish_async(std::make_unique<ResultEventMessage>("UnitTest", 2, 2030, ModelResult{101}));
 	hub.publish_async(std::make_unique<ErrorEventMessage>("UnitTest", 2, 2030, "fell from world's edge"));
 	hub.publish(std::make_unique<RunnerEventMessage>("UnitTest", RunnerAction::finish));
 

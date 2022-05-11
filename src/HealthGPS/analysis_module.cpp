@@ -4,11 +4,14 @@
 #include "lms_model.h"
 #include "converter.h"
 
+#include <cmath>
+
 namespace hgps {
 	AnalysisModule::AnalysisModule(
 		AnalysisDefinition&& definition, WeightModel&& classifier, const core::IntegerInterval age_range)
 		: definition_{ std::move(definition) }, weight_classifier_{std::move(classifier)}
-		, residual_disability_weight_{ create_age_gender_table<double>(age_range) }
+		, residual_disability_weight_{ create_age_gender_table<double>(age_range)}
+		, channels_{}
 	{}
 
 	SimulationModuleType AnalysisModule::type() const noexcept {
@@ -49,6 +52,8 @@ namespace hgps {
 				calculate_residual_disability_weight(age, core::Gender::female, expected_sum, expected_count);
 		}
 
+		initialise_output_channels(context);
+
 		publish_result_message(context);
 	}
 
@@ -79,6 +84,8 @@ namespace hgps {
 
 	void AnalysisModule::publish_result_message(RuntimeContext& context) const {
 		auto result = calculate_historical_statistics(context);
+
+		calculate_population_statistics(context, result.time_series);
 
 		context.publish(std::make_unique<ResultEventMessage>(
 			context.identifier(), context.current_run(), context.time_now(), result));
@@ -139,7 +146,8 @@ namespace hgps {
 		}
 
 		// Calculate the averages avoiding division by zero
-		auto result = ModelResult{};
+		auto sample_size = context.age_range().upper() + 1u;
+		auto result = ModelResult{ sample_size };
 		result.population_size = population_size;
 		result.number_alive = population_alive;
 		result.number_dead = population_dead;
@@ -218,6 +226,137 @@ namespace hgps {
 			.years_lived_with_disability = yld,
 			.disablity_adjusted_life_years = yll + yld
 		};
+	}
+
+	void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext& context, DataSeries& series) const
+	{
+		using namespace core;
+
+		auto min_age = context.age_range().lower();
+		auto max_age = context.age_range().upper();
+		if (series.size() > 0) {
+			throw std::logic_error("This should be a new object!");
+		}
+
+		series.add_channels(channels_);
+
+		auto daly_units = 100'000.0;
+		auto current_time = static_cast<unsigned int>(context.time_now());
+		for (const auto & entity : context.population()) {
+			auto age = entity.age;
+			auto gender = entity.gender;
+
+			if (!entity.is_active()) {
+				if (!entity.is_alive() && entity.time_of_death() == current_time) {
+					series(gender, "deaths").at(age)++;
+					auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
+					series(gender,"yll").at(age) += std::max(expcted_life - age, 0.0f) * daly_units;
+				}
+
+				if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
+					series(gender, "migrations").at(age)++;
+				}
+
+				continue;
+			}
+
+			series(gender, "count").at(age)++;
+			for (auto& factor : context.mapping().entries()) {
+				series(gender,factor.key()).at(age) += entity.get_risk_factor_value(factor.key());
+			}
+
+			for (auto& item : entity.diseases) {
+				if (item.second.status == DiseaseStatus::active) {
+					series(gender, item.first).at(age)++;
+				}
+			}
+
+			auto dw = calculate_disability_weight(entity);
+			series(gender,"disability_weight").at(age) += dw;
+			series(gender,"yld").at(age) += (dw * daly_units);
+
+			classify_weight(series, entity);
+		}
+
+		// Calculate DALY
+		for (auto idx = min_age; idx <= max_age; idx++) {
+			series(Gender::male, "daly").at(idx) = series(Gender::male, "yll").at(idx) + series(Gender::male, "yld").at(idx);
+			series(Gender::female, "daly").at(idx) = series(Gender::female, "yll").at(idx) + series(Gender::female, "yld").at(idx);
+		}
+
+		// Calculate in-place averages
+		for (auto index = min_age; index <= max_age; index++) {
+			for (auto& chan : series.channels()) {
+				if (chan == "count") {
+					continue;
+				}
+
+				auto real_count = series(Gender::male, "count").at(index);
+				if (real_count > 0.0) {
+					series(Gender::male, chan).at(index) = series(Gender::male, chan).at(index) / real_count;
+				}
+				else {
+					series(Gender::male, chan).at(index) = 0.0;
+				}
+
+				real_count = series(Gender::female, "count").at(index);
+				if (real_count > 0.0) {
+					series(Gender::female,chan).at(index) = series(Gender::female, chan).at(index) / real_count;
+				}
+				else {
+					series(Gender::female, chan).at(index) = 0.0;
+				}
+			}
+		}
+	}
+
+	void AnalysisModule::classify_weight(hgps::DataSeries& series, const hgps::Person& entity) const
+	{
+		auto weight_class = weight_classifier_.classify_weight(entity);
+		switch (weight_class)
+		{
+		case hgps::WeightCategory::normal:
+			series(entity.gender, "normal_weight").at(entity.age)++;
+			break;
+		case hgps::WeightCategory::overweight:
+			series(entity.gender, "over_weight").at(entity.age)++;
+			series(entity.gender, "above_weight").at(entity.age)++;
+			break;
+		case hgps::WeightCategory::obese:
+			series(entity.gender, "obese_weight").at(entity.age)++;
+			series(entity.gender, "above_weight").at(entity.age)++;
+			break;
+		default:
+			throw std::logic_error("Unknow weight classification category.");
+			break;
+		}
+	}
+
+	void AnalysisModule::initialise_output_channels(RuntimeContext& context)
+	{
+		if (!channels_.empty()) {
+			return;
+		}
+
+		channels_.push_back("count");
+		for (auto& factor : context.mapping().entries_without_dynamic()) {
+			channels_.emplace_back(factor.key());
+		}
+
+		for (auto& disease : context.diseases()) {
+			channels_.emplace_back(disease.code);
+		}
+
+		channels_.emplace_back("disability_weight");
+		channels_.emplace_back("deaths");
+		channels_.emplace_back("migrations");
+		channels_.emplace_back("normal_weight");
+		channels_.emplace_back("over_weight");
+		channels_.emplace_back("obese_weight");
+		channels_.emplace_back("above_weight");
+		channels_.emplace_back("yll");
+		channels_.emplace_back("yld");
+		channels_.emplace_back("daly");
 	}
 
 	std::unique_ptr<AnalysisModule> build_analysis_module(Repository& repository, const ModelInput& config)
