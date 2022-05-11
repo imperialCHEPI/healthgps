@@ -544,6 +544,43 @@ namespace hgps {
 			return result;
 		}
 
+		std::vector<LmsDataRow> DataManager::get_lms_parameters() const
+		{
+			auto parameters = std::vector<LmsDataRow>{};
+			if (!index_.contains("analysis")) {
+				notify_warning("index has no 'analysis' entry.");
+				return parameters;
+			}
+
+			auto analysis_folder = index_["analysis"]["path"].get<std::string>();
+			auto lms_filename = index_["analysis"]["lms_file_name"].get<std::string>();
+			auto full_filename = (root_ / analysis_folder / lms_filename);
+			if (!std::filesystem::exists(full_filename)) {
+				notify_warning(fmt::format("LMS parameters file: '{}' not found.", full_filename.string()));
+				return parameters;
+			}
+
+			rapidcsv::Document doc(full_filename.string());
+			auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
+				{ "age","gender_id","lambda","mu","sigma" });
+			for (size_t i = 0; i < doc.GetRowCount(); i++) {
+				auto row = doc.GetRow<std::string>(i);
+				if (row.size() < 6) {
+					continue;
+				}
+
+				parameters.emplace_back(LmsDataRow{
+					.age = std::stoi(row[mapping["age"]]),
+					.gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]])),
+					.lambda = std::stod(row[mapping["lambda"]]),
+					.mu = std::stod(row[mapping["mu"]]),
+					.sigma = std::stod(row[mapping["sigma"]])
+					});
+			}
+
+			return parameters;
+		}
+
 		DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) const
 		{
 			DiseaseAnalysisEntity entity;
@@ -554,7 +591,6 @@ namespace hgps {
 
 			auto analysis_folder = index_["analysis"]["path"].get<std::string>();
 			auto disability_filename = index_["analysis"]["disability_file_name"].get<std::string>();
-			auto lms_filename = index_["analysis"]["lms_file_name"].get<std::string>();
 			auto& cost_node = index_["analysis"]["cost_of_disease"];
 
 			auto local_root_path = (root_ / analysis_folder);
@@ -576,7 +612,6 @@ namespace hgps {
 
 			entity.cost_of_diseases = load_cost_of_diseases(country, cost_node, local_root_path.string());
 			entity.life_expectancy = load_life_expectancy(country);
-			entity.lms_parameters = load_lms_parameters((local_root_path / lms_filename).string());
 			return entity;
 		}
 
@@ -672,35 +707,6 @@ namespace hgps {
 			}
 
 			return result;
-		}
-
-		std::vector<LmsDataRow> DataManager::load_lms_parameters(std::filesystem::path filename) const
-		{
-			auto parameters = std::vector<LmsDataRow>{};
-			if (!std::filesystem::exists(filename)) {
-				notify_warning(fmt::format("LMS parameters file: '{}' not found.", filename.string()));
-				return parameters;
-			}
-
-			rapidcsv::Document doc(filename.string());
-			auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-				{"age","gender_id","lambda","mu","sigma"});
-			for (size_t i = 0; i < doc.GetRowCount(); i++) {
-				auto row = doc.GetRow<std::string>(i);
-				if (row.size() < 6) {
-					continue;
-				}
-
-				parameters.emplace_back(LmsDataRow{
-					.age = std::stoi(row[mapping["age"]]),
-					.gender = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]])),
-					.lambda = std::stod(row[mapping["lambda"]]),
-					.mu = std::stod(row[mapping["mu"]]),
-					.sigma = std::stod(row[mapping["sigma"]])
-					});
-			}
-
-			return parameters;
 		}
 
 		std::string DataManager::replace_string_tokens(std::string source, std::vector<std::string> tokens) const

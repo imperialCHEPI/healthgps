@@ -292,3 +292,20 @@ TEST_F(DatastoreTest, RetrieveCancerParameters)
 	ASSERT_GT(diseases.size(), 0);
 	ASSERT_GT(cancer_count, 0);
 }
+
+TEST_F(DatastoreTest, RetrieveLmsParameters)
+{
+	using namespace hgps::core;
+
+	auto lms = manager.get_lms_parameters();
+	auto male_count = std::count_if(lms.begin(), lms.end(), [](auto& row) {
+		return row.gender == Gender::male; });
+
+	auto feme_count = std::count_if(lms.begin(), lms.end(), [](auto& row) {
+		return row.gender == Gender::female; });
+
+	ASSERT_FALSE(lms.empty());
+	ASSERT_GT(male_count, 0);
+	ASSERT_LT(male_count, lms.size());
+	ASSERT_EQ(male_count, feme_count);
+}

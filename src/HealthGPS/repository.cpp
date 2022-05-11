@@ -88,6 +88,16 @@ namespace hgps {
 		}
 	}
 
+	LmsDefinition& CachedRepository::get_lms_definition() {
+		std::unique_lock<std::mutex> lock(mutex_);
+		if (lms_parameters_.empty()) {
+			auto lms_poco = data_manager_.get().get_lms_parameters();
+			lms_parameters_ = detail::StoreConverter::to_lms_definition(lms_poco);
+		}
+
+		return lms_parameters_;
+	}
+
 	core::Datastore& CachedRepository::manager() noexcept {
 		return data_manager_;
 	}

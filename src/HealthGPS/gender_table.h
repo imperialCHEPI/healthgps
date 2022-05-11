@@ -91,7 +91,7 @@ namespace hgps {
 	};
 
 	template<core::Numerical TYPE>
-	GenderTable<int,TYPE> create_integer_gender_table(core::IntegerInterval rows_range) {
+	GenderTable<int,TYPE> create_integer_gender_table(const core::IntegerInterval& rows_range) {
 		if (rows_range.lower() < 0 || rows_range.lower() >= rows_range.upper()) {
 			throw std::invalid_argument(
 				"The 'range lower' value must be greater than zero and less than the 'range upper' value.");
@@ -107,7 +107,7 @@ namespace hgps {
 	}
 
 	template<core::Numerical TYPE>
-	AgeGenderTable<TYPE> create_age_gender_table(core::IntegerInterval age_range) {
+	AgeGenderTable<TYPE> create_age_gender_table(const core::IntegerInterval& age_range) {
 		if (age_range.lower() < 0 || age_range.lower() >= age_range.upper()) {
 			throw std::invalid_argument(
 				"The 'age lower' value must be greater than zero and less than the 'age upper' value.");

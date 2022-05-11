@@ -15,7 +15,7 @@ namespace hgps {
     class LmsDefinition
     {
     public:
-        LmsDefinition() = delete;
+        LmsDefinition() = default;
         LmsDefinition(LmsDataset&& dataset) 
             : table_{ std::move(dataset) }{
 
@@ -24,6 +24,7 @@ namespace hgps {
             }
         }
 
+        bool empty() const noexcept { return table_.empty(); }
         std::size_t size() const noexcept { return table_.size(); }
         unsigned int min_age() const noexcept { return table_.cbegin()->first; }
         unsigned int max_age() const noexcept { return table_.rbegin()->first; }
@@ -41,6 +42,6 @@ namespace hgps {
         }
 
     private:
-        LmsDataset table_;
+        LmsDataset table_{};
     };
 }

@@ -9,8 +9,8 @@
 namespace hgps {
 	AnalysisModule::AnalysisModule(
 		AnalysisDefinition&& definition, WeightModel&& classifier, const core::IntegerInterval age_range)
-		: definition_{ std::move(definition) }, weight_classifier_{std::move(classifier)}
-		, residual_disability_weight_{ create_age_gender_table<double>(age_range)}
+		: definition_{ std::move(definition) }, weight_classifier_{ std::move(classifier) }
+		, residual_disability_weight_{ create_age_gender_table<double>(age_range) }
 		, channels_{}
 	{}
 
@@ -45,10 +45,10 @@ namespace hgps {
 		}
 
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-			residual_disability_weight_(age, core::Gender::male) = 
+			residual_disability_weight_(age, core::Gender::male) =
 				calculate_residual_disability_weight(age, core::Gender::male, expected_sum, expected_count);
 
-			residual_disability_weight_(age, core::Gender::female) = 
+			residual_disability_weight_(age, core::Gender::female) =
 				calculate_residual_disability_weight(age, core::Gender::female, expected_sum, expected_count);
 		}
 
@@ -138,9 +138,9 @@ namespace hgps {
 			}
 
 			for (const auto& item : context.diseases()) {
-				if (entity.diseases.contains(item.code) && 
+				if (entity.diseases.contains(item.code) &&
 					entity.diseases.at(item.code).status == DiseaseStatus::active) {
-						prevalence.at(item.code)[entity.gender]++;
+					prevalence.at(item.code)[entity.gender]++;
 				}
 			}
 		}
@@ -158,14 +158,14 @@ namespace hgps {
 		result.average_age.female = age_sum[core::Gender::female] * 1.0 / females_count;
 		for (auto& item : risk_factors) {
 			auto user_name = context.mapping().at(item.first).name();
-			result.risk_ractor_average.emplace(user_name, ResultByGender {
+			result.risk_ractor_average.emplace(user_name, ResultByGender{
 					.male = item.second[core::Gender::male] / males_count,
 					.female = item.second[core::Gender::female] / females_count
 				});
 		}
 
 		for (const auto& item : context.diseases()) {
-			result.disease_prevalence.emplace(item.code, ResultByGender {
+			result.disease_prevalence.emplace(item.code, ResultByGender{
 					.male = prevalence.at(item.code)[core::Gender::male] * 100.0 / males_count,
 					.female = prevalence.at(item.code)[core::Gender::female] * 100.0 / females_count
 				});
@@ -212,7 +212,7 @@ namespace hgps {
 				}
 			}
 
-			if (entity.is_active()){
+			if (entity.is_active()) {
 				yld_sum += calculate_disability_weight(entity);
 				count++;
 			}
@@ -242,7 +242,7 @@ namespace hgps {
 
 		auto daly_units = 100'000.0;
 		auto current_time = static_cast<unsigned int>(context.time_now());
-		for (const auto & entity : context.population()) {
+		for (const auto& entity : context.population()) {
 			auto age = entity.age;
 			auto gender = entity.gender;
 
@@ -250,7 +250,7 @@ namespace hgps {
 				if (!entity.is_alive() && entity.time_of_death() == current_time) {
 					series(gender, "deaths").at(age)++;
 					auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-					series(gender,"yll").at(age) += std::max(expcted_life - age, 0.0f) * daly_units;
+					series(gender, "yll").at(age) += std::max(expcted_life - age, 0.0f) * daly_units;
 				}
 
 				if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
@@ -262,7 +262,7 @@ namespace hgps {
 
 			series(gender, "count").at(age)++;
 			for (auto& factor : context.mapping().entries()) {
-				series(gender,factor.key()).at(age) += entity.get_risk_factor_value(factor.key());
+				series(gender, factor.key()).at(age) += entity.get_risk_factor_value(factor.key());
 			}
 
 			for (auto& item : entity.diseases) {
@@ -272,8 +272,8 @@ namespace hgps {
 			}
 
 			auto dw = calculate_disability_weight(entity);
-			series(gender,"disability_weight").at(age) += dw;
-			series(gender,"yld").at(age) += (dw * daly_units);
+			series(gender, "disability_weight").at(age) += dw;
+			series(gender, "yld").at(age) += (dw * daly_units);
 
 			classify_weight(series, entity);
 		}
@@ -301,7 +301,7 @@ namespace hgps {
 
 				real_count = series(Gender::female, "count").at(index);
 				if (real_count > 0.0) {
-					series(Gender::female,chan).at(index) = series(Gender::female, chan).at(index) / real_count;
+					series(Gender::female, chan).at(index) = series(Gender::female, chan).at(index) / real_count;
 				}
 				else {
 					series(Gender::female, chan).at(index) = 0.0;
@@ -362,14 +362,14 @@ namespace hgps {
 	std::unique_ptr<AnalysisModule> build_analysis_module(Repository& repository, const ModelInput& config)
 	{
 		auto analysis_entity = repository.manager().get_disease_analysis(config.settings().country());
-		if (analysis_entity.empty()) {
+		auto& lms_definition = repository.get_lms_definition();
+		if (analysis_entity.empty() || lms_definition.empty()) {
 			throw std::logic_error(
 				"Failed to create analysis module, invalid disease analysis definition.");
 		}
 
 		auto definition = detail::StoreConverter::to_analysis_definition(analysis_entity);
-		auto lms_definition = detail::StoreConverter::to_lms_definition(analysis_entity.lms_parameters);
-		auto classifier = WeightModel{ LmsModel{ std::move(lms_definition) } };
+		auto classifier = WeightModel{ LmsModel{ lms_definition } };
 
 		return std::make_unique<AnalysisModule>(
 			std::move(definition), std::move(classifier), config.settings().age_range());

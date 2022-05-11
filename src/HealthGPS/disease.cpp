@@ -1,5 +1,7 @@
 #include "disease.h"
 #include "disease_registry.h"
+#include "weight_model.h"
+#include "lms_model.h"
 
 namespace hgps {
 
@@ -68,9 +70,12 @@ namespace hgps {
 				throw std::runtime_error("Unknown disease definition: " + info.code);
 			}
 
-			auto& shared_definition = repository.get_disease_definition(info, config);
+			auto& disease_definition = repository.get_disease_definition(info, config);
+			auto& lms_definition = repository.get_lms_definition();
+			auto classifier = WeightModel{ LmsModel{ lms_definition } };
+
 			models.emplace(info.code, registry.at(info.group)(
-				shared_definition, config.settings().age_range()));
+				disease_definition, std::move(classifier), config.settings().age_range()));
 		}
 
 		return std::make_unique<DiseaseModule>(std::move(models));

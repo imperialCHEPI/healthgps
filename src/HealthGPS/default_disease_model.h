@@ -2,12 +2,14 @@
 #include "interfaces.h"
 #include "disease_definition.h"
 #include "gender_table.h"
+#include "weight_model.h"
 
 namespace hgps {
 	class DefaultDiseaseModel final : public DiseaseModel {
 	public:
 		DefaultDiseaseModel() = delete;
-		DefaultDiseaseModel(DiseaseDefinition& definition, core::IntegerInterval age_range);
+		DefaultDiseaseModel(DiseaseDefinition& definition,
+			WeightModel&& classifier, const core::IntegerInterval& age_range);
 
 		core::DiseaseGroup group() const noexcept override;
 
@@ -23,6 +25,7 @@ namespace hgps {
 
 	private:
 		std::reference_wrapper<DiseaseDefinition> definition_;
+		WeightModel weight_classifier_;
 		DoubleAgeGenderTable average_relative_risk_;
 
 		DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext& context);

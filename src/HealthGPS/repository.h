@@ -3,6 +3,7 @@
 #include "hierarchical_model_types.h"
 #include "modelinput.h"
 #include "disease_definition.h"
+#include "lms_definition.h"
 #include <mutex>
 #include <functional>
 #include <optional>
@@ -32,6 +33,8 @@ namespace hgps {
 
 		virtual DiseaseDefinition& get_disease_definition(
 			const core::DiseaseInfo& info, const ModelInput& config) = 0;
+
+		virtual LmsDefinition& get_lms_definition() = 0;
 	};
 
 	class CachedRepository final: public Repository {
@@ -60,6 +63,8 @@ namespace hgps {
 		DiseaseDefinition& get_disease_definition(
 			const core::DiseaseInfo& info, const ModelInput& config) override;
 
+		LmsDefinition& get_lms_definition() override;
+
 		core::Datastore& manager() noexcept override;
 
 		void clear_cache() noexcept;
@@ -71,6 +76,7 @@ namespace hgps {
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
 		std::vector<core::DiseaseInfo> diseases_info_;
 		std::map<std::string, DiseaseDefinition> diseases_;
+		LmsDefinition lms_parameters_;
 
 		void load_disease_definition(const core::DiseaseInfo& info, const ModelInput& config);
 	};

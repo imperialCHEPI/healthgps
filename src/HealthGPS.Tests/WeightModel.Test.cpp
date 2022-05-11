@@ -13,12 +13,14 @@ namespace fs = std::filesystem;
 
 static auto store_full_path = default_datastore_path();
 
+hgps::LmsDefinition lms_parameters;
+
 hgps::LmsModel create_lms_model(hgps::data::DataManager& manager) {
 	using namespace hgps;
 
-	auto uk = manager.get_country("GB");
-	auto defintion = manager.get_disease_analysis(uk.value());
-	return LmsModel{ detail::StoreConverter::to_lms_definition(defintion.lms_parameters) };
+	auto parameters = manager.get_lms_parameters();
+	lms_parameters = detail::StoreConverter::to_lms_definition(parameters);
+	return LmsModel{ lms_parameters };
 }
 
 hgps::Person create_test_entity(
@@ -95,6 +97,44 @@ TEST_F(WeightModelTest, ClassifyChildWeight)
 			auto entity = create_test_entity(item, child_age, bmi);
 			auto category = classifier.classify_weight(entity);
 			ASSERT_EQ(expected[idx], category);
+			idx++;
+		}
+	}
+}
+
+TEST_F(WeightModelTest, AdjustAdultBmi)
+{
+	using namespace hgps;
+	using namespace hgps::core;
+	auto adult_age = 20;
+	auto genders = std::array<Gender, 2>{ Gender::male, Gender::female };
+	auto bmi_values = std::array<double, 8>{15.0, 18.4, 18.5, 24.9, 25.0, 29.9, 30.0, 40.0};
+	auto classifier = WeightModel{ create_lms_model(manager) };
+	for (auto& item : genders) {
+		for (auto idx = 0; auto & bmi : bmi_values) {
+			auto entity = create_test_entity(item, adult_age, bmi);
+			auto equivalent = classifier.adjust_risk_factor_value(entity, "bmi", bmi);
+			ASSERT_EQ(bmi, equivalent);
+			idx++;
+		}
+	}
+}
+
+TEST_F(WeightModelTest, AdjustChildBmi)
+{
+	using namespace hgps;
+	using namespace hgps::core;
+	auto child_age = 5;
+	auto genders = std::array<Gender, 2>{ Gender::male, Gender::female };
+	auto bmi_values = std::array<double, 8>{12.0, 13.0, 14.0, 15.0, 17.0, 18.0, 25.0, 30.0};
+	auto expected = std::array<double, 8>{22.5, 22.5, 22.5, 22.5, 27.5, 27.5, 35.0, 35.0};
+
+	auto classifier = WeightModel{ create_lms_model(manager) };
+	for (auto& item : genders) {
+		for (auto idx = 0; auto & bmi : bmi_values) {
+			auto entity = create_test_entity(item, child_age, bmi);
+			auto equivalent = classifier.adjust_risk_factor_value(entity, "bmi", bmi);
+			ASSERT_EQ(expected[idx], equivalent);
 			idx++;
 		}
 	}

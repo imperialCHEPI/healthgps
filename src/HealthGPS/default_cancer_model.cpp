@@ -4,8 +4,11 @@
 
 namespace hgps {
 
-	DefaultCancerModel::DefaultCancerModel(DiseaseDefinition& definition, const core::IntegerInterval age_range)
-		: definition_{ definition }, average_relative_risk_{ create_age_gender_table<double>(age_range) }
+	DefaultCancerModel::DefaultCancerModel(DiseaseDefinition& definition,
+		WeightModel&& classifier, const core::IntegerInterval& age_range)
+		: definition_{ definition }
+		, weight_classifier_{ std::move(classifier) }
+		, average_relative_risk_{ create_age_gender_table<double>(age_range) }
 	{
 		if (definition_.get().identifier().group != core::DiseaseGroup::cancer) {
 			throw std::invalid_argument("Disease definition group mismatch, must be 'cancer'.");
@@ -147,8 +150,9 @@ namespace hgps {
 			}
 
 			auto& lut = relative_factors.at(factor.first).at(entity.gender);
-			auto entity_factor_value = static_cast<float>(factor.second);
-			auto relative_factor_value = lut(entity.age, entity_factor_value);
+			auto factor_value = weight_classifier_.adjust_risk_factor_value(entity, factor.first, factor.second);
+			auto lookup_value = static_cast<float>(factor_value);
+			auto relative_factor_value = lut(entity.age, lookup_value);
 			relative_risk_value *= relative_factor_value;
 		}
 

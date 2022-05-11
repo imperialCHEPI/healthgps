@@ -51,6 +51,8 @@ namespace hgps {
 			std::vector<BirthItem> get_birth_indicators(const Country country,
 				const std::function<bool(const unsigned int&)> year_filter) const override;
 
+			std::vector<LmsDataRow> get_lms_parameters() const override;
+
 		private:
 			std::filesystem::path root_;
 			VerboseMode verbosity_;
@@ -62,8 +64,6 @@ namespace hgps {
 				Country country, nlohmann::json node, std::filesystem::path parent_path) const;
 
 			std::vector<LifeExpectancyItem> load_life_expectancy(const Country& country) const;
-
-			std::vector<LmsDataRow> load_lms_parameters(std::filesystem::path filename) const;
 
 			std::string replace_string_tokens(std::string source, std::vector<std::string> tokens) const;
 

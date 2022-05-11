@@ -32,13 +32,20 @@ namespace hgps {
             return pimpl_->classify_weight(person);
         }
 
+        double adjust_risk_factor_value(const Person& entity,
+            std::string risk_factor_key, double value) const {
+            return pimpl_->adjust_risk_factor_value(entity, risk_factor_key, value);
+        }
+
     private:
         struct Concept
         {
             virtual ~Concept() {}
             virtual std::unique_ptr<Concept> clone() const = 0;
             virtual unsigned int child_cutoff_age() const noexcept = 0;
-            virtual WeightCategory classify_weight(const Person& person) const = 0;
+            virtual WeightCategory classify_weight(const Person& entity) const = 0;
+            virtual double adjust_risk_factor_value(const Person& entity,
+                std::string risk_factor_key, double value) const = 0;
         };
 
         template<typename T>
@@ -54,8 +61,13 @@ namespace hgps {
                 return object_.child_cutoff_age();
             }
 
-            WeightCategory classify_weight(const Person& person) const override {
-                return object_.classify_weight(person);
+            WeightCategory classify_weight(const Person& entity) const override {
+                return object_.classify_weight(entity);
+            }
+
+            double adjust_risk_factor_value(const Person& entity,
+                std::string risk_factor_key, double value) const override {
+                return object_.adjust_risk_factor_value(entity, risk_factor_key, value);
             }
 
             T object_;
