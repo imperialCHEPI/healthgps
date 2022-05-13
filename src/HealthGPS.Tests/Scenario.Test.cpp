@@ -222,11 +222,11 @@ TEST(ScenarioTest, FiscalPolicyDefinitionCreate)
 {
     using namespace hgps;
 
-    auto low_policy = create_fiscal_policy_definition(FiscalImpactType::low);
-    auto medium_policy = create_fiscal_policy_definition(FiscalImpactType::medium);
+    auto low_policy = create_fiscal_policy_definition(FiscalImpactType::pessimist);
+    auto medium_policy = create_fiscal_policy_definition(FiscalImpactType::optimist);
 
-    ASSERT_EQ(FiscalImpactType::low, low_policy.impact_type);
-    ASSERT_EQ(FiscalImpactType::medium, medium_policy.impact_type);
+    ASSERT_EQ(FiscalImpactType::pessimist, low_policy.impact_type);
+    ASSERT_EQ(FiscalImpactType::optimist, medium_policy.impact_type);
 }
 
 TEST(ScenarioTest, FiscalPolicyLowImpactNone)
@@ -243,7 +243,7 @@ TEST(ScenarioTest, FiscalPolicyLowImpactNone)
     auto expected = delta_value;
 
     entity.risk_factors.emplace(factor_key, factor_value);
-    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::low) };
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::pessimist) };
 
     auto policy_delta = policy.apply(entity, 2022, factor_key, delta_value);
     ASSERT_EQ(ScenarioType::intervention, policy.type());
@@ -264,7 +264,7 @@ TEST(ScenarioTest, FiscalPolicyLowImpactClear)
     auto expected = std::vector{10.0, 9.0, 8.0, 9.8 };
 
     entity.risk_factors.emplace(factor_key, factor_value);
-    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::low) };
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::pessimist) };
 
     ASSERT_EQ(ScenarioType::intervention, policy.type());
     for (size_t i = 0; i < ages.size(); i++) {
@@ -289,7 +289,7 @@ TEST(ScenarioTest, FiscalPolicyLowImpactWalk)
     auto expected = std::vector{ 10.0, 9.0, 9.0, 11.8 };
 
     entity.risk_factors.emplace(factor_key, factor_value);
-    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::low) };
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::pessimist) };
 
     ASSERT_EQ(ScenarioType::intervention, policy.type());
     for (size_t i = 0; i < ages.size(); i++) {
@@ -313,7 +313,7 @@ TEST(ScenarioTest, FiscalPolicyMediumImpactClear)
     auto expected = std::vector{ 10.0, 9.0, 8.0, 9.8 };
 
     entity.risk_factors.emplace(factor_key, factor_value);
-    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::medium) };
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::optimist) };
 
     ASSERT_EQ(ScenarioType::intervention, policy.type());
     for (size_t i = 0; i < ages.size(); i++) {
@@ -338,7 +338,7 @@ TEST(ScenarioTest, FiscalPolicyMediumImpactWalk)
     auto expected = std::vector{ 10.0, 9.0, 9.0, 10.0 };
 
     entity.risk_factors.emplace(factor_key, factor_value);
-    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::medium) };
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::optimist) };
 
     ASSERT_EQ(ScenarioType::intervention, policy.type());
     for (size_t i = 0; i < ages.size(); i++) {

@@ -18,42 +18,6 @@
 
 using namespace hgps;
 
-BaselineAdjustment create_baseline_adjustments(const BaselineInfo& info, HierarchicalModelType model_type)
-{
-	MEASURE_FUNCTION();
-	auto male_filename = std::string{};
-	auto female_filename = std::string{};
-	if (model_type == HierarchicalModelType::Static) {
-		male_filename = info.file_names.at("static_male");
-		female_filename = info.file_names.at("static_female");
-	}
-	else if (model_type == HierarchicalModelType::Dynamic) {
-		male_filename = info.file_names.at("dynamic_male");
-		female_filename = info.file_names.at("dynamic_female");
-	}
-	else {
-		fmt::print(fg(fmt::color::red), "Unknown hierarchical model type in adjustment definition.\n");
-	}
-
-	try {
-
-		if (core::case_insensitive::equals(info.format, "CSV")) {
-			auto data = std::map<core::Gender, std::map<std::string, std::vector<double>>>{};
-			data.emplace(core::Gender::male, load_baseline_csv(male_filename, info.delimiter));
-			data.emplace(core::Gender::female, load_baseline_csv(female_filename, info.delimiter));
-			return BaselineAdjustment{ FactorAdjustmentTable{ std::move(data) } };
-		}
-		else {
-			throw std::logic_error("Unsupported file format: " + info.format);
-		}
-	}
-	catch (const std::exception& ex) {
-		fmt::print(fg(fmt::color::red),
-			"Failed to parse adjustment file: {} or {}. {}\n", male_filename, female_filename, ex.what());
-		throw;
-	}
-}
-
 hgps::BaselineAdjustment load_baseline_adjustments(const BaselineInfo& info)
 {
 	MEASURE_FUNCTION();
@@ -79,7 +43,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const BaselineInfo& info)
 	}
 }
 
-HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string model_filename, hgps::BaselineAdjustment&& baseline_data)
+HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string model_filename)
 {
 	MEASURE_FUNCTION();
 	std::map<int, HierarchicalLevel> levels;
@@ -150,10 +114,10 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string 
 	}
 
 	ifs.close();
-	return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels), std::move(baseline_data) };
+	return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels) };
 }
 
-LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename, hgps::BaselineAdjustment&& baseline_data)
+LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename)
 {
 	MEASURE_FUNCTION();
 	auto percentage = 0.05;
@@ -239,24 +203,23 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 
 	ifs.close();
 	return LiteHierarchicalModelDefinition{
-		std::move(equations), std::move(variables), std::move(baseline_data), percentage };
+		std::move(equations), std::move(variables), percentage };
 }
 
-void register_risk_factor_model_definitions(const ModellingInfo& info, hgps::CachedRepository& repository)
+void register_risk_factor_model_definitions(const ModellingInfo& info, 
+	const SettingsInfo& settings, hgps::CachedRepository& repository)
 {
 	MEASURE_FUNCTION();
 	for (auto& model : info.risk_factor_models) {
 		HierarchicalModelType model_type;
 		if (core::case_insensitive::equals(model.first, "static")) {
 			model_type = HierarchicalModelType::Static;
-			auto adjustments = create_baseline_adjustments(info.baseline_adjustment, model_type);
-			auto model_definition = load_static_risk_model_definition(model.second, std::move(adjustments));
+			auto model_definition = load_static_risk_model_definition(model.second);
 			repository.register_linear_model_definition(model_type, std::move(model_definition));
 		}
 		else if (core::case_insensitive::equals(model.first, "dynamic")) {
 			model_type = HierarchicalModelType::Dynamic;
-			auto adjustments = create_baseline_adjustments(info.baseline_adjustment, model_type);
-			auto model_definition = load_dynamic_risk_model_info(model.second, std::move(adjustments));
+			auto model_definition = load_dynamic_risk_model_info(model.second);
 			repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
 		}
 		else {
@@ -266,5 +229,17 @@ void register_risk_factor_model_definitions(const ModellingInfo& info, hgps::Cac
 	}
 
 	auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
+	auto age_range = core::IntegerInterval(settings.age_range.front(), settings.age_range.back());
+	auto max_age = static_cast<std::size_t>(age_range.upper());
+	for (auto& table : adjustment.values) {
+		for (auto& item : table.second) {
+			if (item.second.size() <= max_age) {
+				fmt::print(fg(fmt::color::red), "Baseline adjustment files data must cover age range: [{}].\n",
+					age_range.to_string());
+				throw std::invalid_argument("Baseline adjustment file must cover the required age range.");
+			}
+		}
+	}
+
 	repository.register_baseline_adjustment_definition(std::move(adjustment));
 }

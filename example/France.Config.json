@@ -55,10 +55,6 @@
             "delimiter": ",",
             "encoding": "UTF8",
             "file_names": {
-                "static_male": "France.Initial.Adjustment.Male.csv",
-                "static_female": "France.Initial.Adjustment.Female.csv",
-                "dynamic_male": "France.Update.Adjustment.Male.csv",
-                "dynamic_female": "France.Update.Adjustment.Female.csv",
                 "factorsmean_male":"France.FactorsMean.Male.csv",
                 "factorsmean_female":"France.FactorsMean.Female.csv"
             }

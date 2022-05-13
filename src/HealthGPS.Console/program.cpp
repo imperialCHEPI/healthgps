@@ -54,8 +54,8 @@ int main(int argc, char* argv[])
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder, config.verbosity);
-	auto data_repository = hgps::CachedRepository(data_api);
-	register_risk_factor_model_definitions(config.modelling, data_repository);
+	auto data_repository = hgps::CachedRepository{ data_api };
+	register_risk_factor_model_definitions(config.modelling, config.settings, data_repository);
 	auto factory = get_default_simulation_module_factory(data_repository);
 
 	// Validate the configuration target country

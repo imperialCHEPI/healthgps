@@ -1,6 +1,7 @@
 #pragma once
 #include "interfaces.h"
 #include "hierarchical_model_types.h"
+#include "riskfactor_adjustment_types.h"
 #include "modelinput.h"
 #include "disease_definition.h"
 #include "lms_definition.h"
@@ -54,6 +55,8 @@ namespace hgps {
 
 		bool register_baseline_adjustment_definition(BaselineAdjustment&& definition);
 
+		core::Datastore& manager() noexcept override;
+
 		HierarchicalLinearModelDefinition& get_linear_model_definition(
 			const HierarchicalModelType& model_type) override;
 
@@ -70,8 +73,6 @@ namespace hgps {
 			const core::DiseaseInfo& info, const ModelInput& config) override;
 
 		LmsDefinition& get_lms_definition() override;
-
-		core::Datastore& manager() noexcept override;
 
 		void clear_cache() noexcept;
 

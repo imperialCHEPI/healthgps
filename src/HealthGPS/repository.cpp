@@ -39,6 +39,10 @@ namespace hgps {
 		return true;
 	}
 
+	core::Datastore& CachedRepository::manager() noexcept {
+		return data_manager_;
+	}
+
 	HierarchicalLinearModelDefinition& CachedRepository::get_linear_model_definition(
 		const HierarchicalModelType& model_type) {
 
@@ -109,10 +113,6 @@ namespace hgps {
 		}
 
 		return lms_parameters_;
-	}
-
-	core::Datastore& CachedRepository::manager() noexcept {
-		return data_manager_;
 	}
 
 	void CachedRepository::clear_cache() noexcept {
