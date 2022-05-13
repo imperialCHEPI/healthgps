@@ -140,6 +140,7 @@ namespace hgps {
 
 		// Generate risk factors
 		risk_factor_->initialise_population(context_);
+		risk_factor_->apply_baseline_adjustments(context_);
 
 		// Initialise diseases
 		disease_->initialise_population(context_);
@@ -165,6 +166,9 @@ namespace hgps {
 
 		// Calculate the net immigration by gender and age, update the population accordingly
 		update_net_immigration();
+
+		// apply risk factors baseline adjustment to population
+		risk_factor_->apply_baseline_adjustments(context_);
 
 		// Update diseases status: remission and incidence
 		disease_->update_population(context_);

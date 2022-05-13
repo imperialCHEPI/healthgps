@@ -1,12 +1,10 @@
 #pragma once
 #include "interfaces.h"
 #include "mapping.h"
-#include "map2d.h"
 #include "gender_value.h"
+#include "riskfactor_adjustment_types.h"
 
 namespace hgps {
-
-	using FactorAdjustmentTable = Map2d<core::Gender, std::string, std::vector<double>>;
 
 	struct Coefficient {
 		double value{};
@@ -28,31 +26,6 @@ namespace hgps {
 		core::DoubleArray2D residual_distribution;
 		core::DoubleArray2D correlation;
 		std::vector<double> variances;
-	};
-
-	struct BaselineAdjustment final {
-		BaselineAdjustment() = delete;
-		BaselineAdjustment(FactorAdjustmentTable&& adjustment_table)
-			: values{ std::move(adjustment_table) }
-		{
-			if (values.empty()) {
-				throw std::invalid_argument(
-					"The risk factors adjustment table must not be empty.");
-			}
-			else if (values.rows() != 2) {
-				throw std::invalid_argument(
-					"The risk factors adjustment definition must contain two tables.");
-			}
-
-			if (!values.contains(core::Gender::male)) {
-				throw std::invalid_argument("Missing the required adjustment table for male.");
-			}
-			else if (!values.contains(core::Gender::female)) {
-				throw std::invalid_argument("Missing the required adjustment table for female.");
-			}
-		}
-
-		const FactorAdjustmentTable values{};
 	};
 
 	struct HierarchicalLinearModelDefinition final {

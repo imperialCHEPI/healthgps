@@ -54,6 +54,31 @@ BaselineAdjustment create_baseline_adjustments(const BaselineInfo& info, Hierarc
 	}
 }
 
+hgps::BaselineAdjustment load_baseline_adjustments(const BaselineInfo& info)
+{
+	MEASURE_FUNCTION();
+	auto& male_filename = info.file_names.at("factorsmean_male");
+	auto& female_filename = info.file_names.at("factorsmean_female");
+
+	try {
+
+		if (core::case_insensitive::equals(info.format, "CSV")) {
+			auto data = std::map<core::Gender, std::map<std::string, std::vector<double>>>{};
+			data.emplace(core::Gender::male, load_baseline_csv(male_filename, info.delimiter));
+			data.emplace(core::Gender::female, load_baseline_csv(female_filename, info.delimiter));
+			return BaselineAdjustment{ FactorAdjustmentTable{ std::move(data) } };
+		}
+		else {
+			throw std::logic_error("Unsupported file format: " + info.format);
+		}
+	}
+	catch (const std::exception& ex) {
+		fmt::print(fg(fmt::color::red),
+			"Failed to parse adjustment file: {} or {}. {}\n", male_filename, female_filename, ex.what());
+		throw;
+	}
+}
+
 HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string model_filename, hgps::BaselineAdjustment&& baseline_data)
 {
 	MEASURE_FUNCTION();
@@ -149,11 +174,11 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 			}
 
 			info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
-			for (auto it : opt["Equations"].items()) {
-				auto age_key = it.key();
+			for (auto& it : opt["Equations"].items()) {
+				auto& age_key = it.key();
 				info.equations.emplace(age_key, std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
 
-				for (auto sit : it.value().items()) {
+				for (auto& sit : it.value().items()) {
 					auto gender_key = sit.key();
 					auto gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
 					info.equations.at(age_key).emplace(gender_key, gender_funcs);
@@ -217,7 +242,7 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 		std::move(equations), std::move(variables), std::move(baseline_data), percentage };
 }
 
-void register_risk_factor_model_definitions(const ModellingInfo info, hgps::CachedRepository& repository)
+void register_risk_factor_model_definitions(const ModellingInfo& info, hgps::CachedRepository& repository)
 {
 	MEASURE_FUNCTION();
 	for (auto& model : info.risk_factor_models) {
@@ -239,4 +264,7 @@ void register_risk_factor_model_definitions(const ModellingInfo info, hgps::Cach
 			continue;
 		}
 	}
+
+	auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
+	repository.register_baseline_adjustment_definition(std::move(adjustment));
 }

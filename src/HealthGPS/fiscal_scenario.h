@@ -12,10 +12,10 @@ namespace hgps {
 	enum class FiscalImpactType : uint8_t
 	{
 		/// @brief variable impact overtime    - option 1
-		low,
+		pessimist,
 
 		/// @brief incremental impact overtime - option 2
-		medium
+		optimist
 	};
 
 	struct FiscalPolicyDefinition

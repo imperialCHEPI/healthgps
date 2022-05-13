@@ -57,14 +57,15 @@ namespace hgps {
 		}
 
 		auto delta_comp_factors = std::unordered_map<std::string, double>();
-		auto& adjustments = definition_.get().adjustments().values.row(entity.gender);
+		//auto& adjustments = definition_.get().adjustments().values.row(entity.gender);
 		for (auto level = 1; level <= context.mapping().max_level(); level++) {
 			auto level_factors = context.mapping().at_level(level);
 			for (const auto& factor : level_factors) {
 				auto& factor_equation = equations.at(factor.key());
 
 				auto original_value = entity.get_risk_factor_value(factor.key());
-				auto delta_factor = adjustments.at(factor.key()).at(local_age);
+				//auto delta_factor = adjustments.at(factor.key()).at(local_age);
+				auto delta_factor = 0.0;
 				for (const auto& coeff : factor_equation.coefficients) {
 					if (current_risk_factors.contains(coeff.first)) {
 						delta_factor += coeff.second * current_risk_factors.at(coeff.first);

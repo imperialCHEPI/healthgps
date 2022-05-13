@@ -7,8 +7,9 @@
 namespace hgps {
 
 	CachedRepository::CachedRepository(core::Datastore& manager)
-		: mutex_{}, data_manager_{ manager },
-		model_definiton_{}, lite_model_definiton_{}, diseases_info_{}, diseases_{} {}
+		: mutex_{}, data_manager_{ manager }
+		, model_definiton_{}, lite_model_definiton_{}, baseline_adjustments_{}
+		, diseases_info_{}, diseases_{}, lms_parameters_{}{}
 
 	bool CachedRepository::register_linear_model_definition(
 		const HierarchicalModelType& model_type, HierarchicalLinearModelDefinition&& definition) {
@@ -32,6 +33,12 @@ namespace hgps {
 		return success.second;
 	}
 
+	bool CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment&& definition) {
+		std::unique_lock<std::mutex> lock(mutex_);
+		baseline_adjustments_ = std::move(definition);
+		return true;
+	}
+
 	HierarchicalLinearModelDefinition& CachedRepository::get_linear_model_definition(
 		const HierarchicalModelType& model_type) {
 
@@ -44,6 +51,12 @@ namespace hgps {
 
 		std::scoped_lock<std::mutex> lock(mutex_);
 		return lite_model_definiton_.at(model_type);
+	}
+
+	BaselineAdjustment& CachedRepository::get_baseline_adjustment_definition()
+	{
+		std::scoped_lock<std::mutex> lock(mutex_);
+		return baseline_adjustments_;
 	}
 
 	const std::vector<core::DiseaseInfo>& CachedRepository::get_diseases() {

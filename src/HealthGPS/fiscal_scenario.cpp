@@ -99,12 +99,12 @@ namespace hgps {
 
 			// adolescent to adult transition - IF not needed
 			if (teen_effect.contains(interventions_book_.at(entity.id()))) {
-				if (definition_.impact_type == FiscalImpactType::low) {
+				if (definition_.impact_type == FiscalImpactType::pessimist) {
 					interventions_book_.at(entity.id()) = age;
 					 auto effect = adult_effect.value - teen_effect.value;
 					 return value + (factor_value * effect);
 				}
-				else if (definition_.impact_type == FiscalImpactType::medium) {
+				else if (definition_.impact_type == FiscalImpactType::optimist) {
 					return value;
 				}
 				else {
@@ -127,11 +127,11 @@ namespace hgps {
 	}
 
 	FiscalImpactType parse_fiscal_impact_type(std::string impact_type) {
-		if (core::case_insensitive::equals(impact_type, "low")) {
-			return FiscalImpactType::low;
+		if (core::case_insensitive::equals(impact_type, "pessimist")) {
+			return FiscalImpactType::pessimist;
 		}
-		else if (core::case_insensitive::equals(impact_type, "medium")) {
-			return FiscalImpactType::medium;
+		else if (core::case_insensitive::equals(impact_type, "optimist")) {
+			return FiscalImpactType::optimist;
 		}
 
 		throw std::logic_error("Unknown fiscal policy impact type: " + impact_type);

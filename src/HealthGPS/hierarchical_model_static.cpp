@@ -104,10 +104,10 @@ namespace hgps {
 			determ_comp_factors.emplace(factor.key(), sum);
 		}
 
-		auto& adjustments = definition_.get().adjustments.values.row(entity.gender);
+		//auto& adjustments = definition_.get().adjustments.values.row(entity.gender);
 		for (const auto& factor : level_factors) {
 			auto total_value = determ_comp_factors.at(factor.key()) + stoch_comp_factors.at(factor.key());
-			total_value += adjustments.at(factor.key()).at(entity.age);
+			//total_value += adjustments.at(factor.key()).at(entity.age);
 			entity.risk_factors[factor.key()] = factor.get_bounded_value(total_value);
 		}
 	}

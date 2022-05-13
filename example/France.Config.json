@@ -58,7 +58,9 @@
                 "static_male": "France.Initial.Adjustment.Male.csv",
                 "static_female": "France.Initial.Adjustment.Female.csv",
                 "dynamic_male": "France.Update.Adjustment.Male.csv",
-                "dynamic_female": "France.Update.Adjustment.Female.csv"
+                "dynamic_female": "France.Update.Adjustment.Female.csv",
+                "factorsmean_male":"France.FactorsMean.Male.csv",
+                "factorsmean_female":"France.FactorsMean.Female.csv"
             }
         }
     },
@@ -98,7 +100,7 @@
                         "start_time": 2022,
                         "finish_time": 2050
                     },
-                    "impact_type": "medium",
+                    "impact_type": "optimist",
                     "impacts": [
                         {"risk_factor":"Energy", "impact_value":-0.01282, "from_age":5,  "to_age":9},
                         {"risk_factor":"Energy", "impact_value":-0.01814, "from_age":10, "to_age":17},

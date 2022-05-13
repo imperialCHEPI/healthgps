@@ -432,7 +432,8 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty)
 {
 	using namespace hgps;
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>();
-	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+	auto adjustments = BaselineAdjustment{};
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models), RiskfactorAdjustmentModel{adjustments}), std::invalid_argument);
 }
 /*
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)

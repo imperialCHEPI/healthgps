@@ -12,6 +12,8 @@ target_sources(HealthGPS
 		"baseline_scenario.h"
 		"converter.cpp"
 		"converter.h"
+		"data_series.cpp"
+		"data_series.h"
 		"default_cancer_model.cpp"
 		"default_cancer_model.h"
 		"default_disease_model.cpp"
@@ -70,6 +72,9 @@ target_sources(HealthGPS
 		"result_message.h"
 		"riskfactor.cpp"
 		"riskfactor.h"
+		"riskfactor_adjustment.cpp"
+		"riskfactor_adjustment.h"
+		"riskfactor_adjustment_types.h"
 		"runner_message.cpp"
 		"runner_message.h"
 		"runtime_context.cpp"
@@ -116,9 +121,7 @@ target_sources(HealthGPS
 		"two_step_value.h"
 		"weight_category.h"
 		"weight_model.cpp"
-		"weight_model.h"
-		"data_series.cpp"
-		"data_series.h" )
+		"weight_model.h")
 
 set(ROOT_NAMESPACE hgps)
 

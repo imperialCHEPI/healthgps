@@ -27,6 +27,8 @@ namespace hgps {
 		virtual LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
 			const HierarchicalModelType& model_type) = 0;
 
+		virtual BaselineAdjustment& get_baseline_adjustment_definition() = 0;
+
 		virtual const std::vector<core::DiseaseInfo>& get_diseases() = 0;
 
 		virtual std::optional<core::DiseaseInfo> get_disease_info(std::string code) = 0;
@@ -50,11 +52,15 @@ namespace hgps {
 			const HierarchicalModelType& model_type,
 			LiteHierarchicalModelDefinition&& definition);
 
+		bool register_baseline_adjustment_definition(BaselineAdjustment&& definition);
+
 		HierarchicalLinearModelDefinition& get_linear_model_definition(
 			const HierarchicalModelType& model_type) override;
 
 		LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
 			const HierarchicalModelType& model_type) override;
+
+		BaselineAdjustment& get_baseline_adjustment_definition() override;
 
 		const std::vector<core::DiseaseInfo>& get_diseases() override;
 
@@ -74,6 +80,7 @@ namespace hgps {
 		std::reference_wrapper<core::Datastore> data_manager_;
 		std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
+		BaselineAdjustment baseline_adjustments_;
 		std::vector<core::DiseaseInfo> diseases_info_;
 		std::map<std::string, DiseaseDefinition> diseases_;
 		LmsDefinition lms_parameters_;
