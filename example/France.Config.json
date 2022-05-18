@@ -41,7 +41,7 @@
             {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.127384,8.656519]},
             {"name":"Protein",  "level":1, "proxy":"",       "range":[43.50682,238.4145]},
             {"name":"Fat",      "level":1, "proxy":"",       "range":[45.04756,382.664098658922]},
-            {"name":"PA",       "level":2, "proxy":"",       "range":[400,9765.512]},
+            {"name":"PA",       "level":2, "proxy":"",       "range":[22.22314,9765.512]},
             {"name":"Energy",   "level":2, "proxy":"",       "range":[1326.14051277588,7522.496]},
             {"name":"BMI",      "level":3, "proxy":"",       "range":[13.88,39.48983]}
         ],

@@ -51,11 +51,6 @@ namespace hgps {
 	void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(RuntimeContext& context, Person& entity,
 		std::map<std::string, double>& current_risk_factors, std::map<std::string, FactorDynamicEquation>& equations)
 	{
-		auto local_age = entity.age;
-		if (current_risk_factors.contains("age")) {
-			local_age = static_cast<unsigned int>(current_risk_factors.at("age"));
-		}
-
 		auto delta_comp_factors = std::unordered_map<std::string, double>();
 		for (auto level = 1; level <= context.mapping().max_level(); level++) {
 			auto level_factors = context.mapping().at_level(level);
