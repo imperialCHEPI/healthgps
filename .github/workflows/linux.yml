@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Run CMake Linux Workflow
     
     env:
@@ -25,19 +25,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up GCC
-      id: install_gcc
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 11
-        platform: x64
-
     - name: Get vcpkg
       id: install_vcpkg
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2022.04.12
+        git checkout --force 2022.05.10
         ./bootstrap-vcpkg.sh -disableMetrics    
 
     - name: Get Ninja
