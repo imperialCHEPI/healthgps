@@ -4,8 +4,9 @@
 namespace hgps {
 
 	RiskFactorModule::RiskFactorModule(
-		std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models)
-		: models_{ std::move(models) } {
+		std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models,
+		RiskfactorAdjustmentModel&& adjustments)
+		: models_{ std::move(models) }, adjustment_{ std::move(adjustments) } {
 
 		if (models_.empty()) {
 			throw std::invalid_argument(
@@ -65,6 +66,11 @@ namespace hgps {
 		dynamic_model->update_risk_factors(context);
 	}
 
+	void RiskFactorModule::apply_baseline_adjustments(RuntimeContext& context)
+	{
+		adjustment_.Apply(context);
+	}
+
 	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, [[maybe_unused]] const ModelInput& config)
 	{
 		// Both model types are required, and must be registered
@@ -91,6 +97,7 @@ namespace hgps {
 				repository.get_lite_linear_model_definition(HierarchicalModelType::Dynamic)));
 		}
 
-		return std::make_unique<RiskFactorModule>(std::move(models));
+		auto adjustment_model = RiskfactorAdjustmentModel{ repository.get_baseline_adjustment_definition()};
+		return std::make_unique<RiskFactorModule>(std::move(models), std::move(adjustment_model));
 	}
 }

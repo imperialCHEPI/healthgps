@@ -50,7 +50,7 @@ namespace hgps {
         }
 
         auto age = entity.age;
-        auto child_effect = definition_.impacts.at(0);
+        auto& child_effect = definition_.impacts.at(0);
         if (age < child_effect.from_age) {
             return value;
         }
@@ -66,7 +66,7 @@ namespace hgps {
         }
 
         // adolescents
-        auto teen_effect = definition_.impacts.at(1);
+        auto& teen_effect = definition_.impacts.at(1);
         if (teen_effect.contains(age)) {
             // never exposed to the intervention
             if (!interventions_book_.contains(entity.id())) {
@@ -82,7 +82,7 @@ namespace hgps {
             }
         }
 
-        auto adult_effect = definition_.impacts.at(2);
+        auto& adult_effect = definition_.impacts.at(2);
         if (age >= adult_effect.from_age) {
             // never exposed to the intervention
             if (!interventions_book_.contains(entity.id())) {

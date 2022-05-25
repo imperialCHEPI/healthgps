@@ -2,6 +2,20 @@
 
 #include "HealthGPS/baseline_scenario.h"
 #include "HealthGPS/simple_policy_scenario.h"
+#include "HealthGPS/fiscal_scenario.h"
+
+hgps::FiscalPolicyDefinition create_fiscal_policy_definition(hgps::FiscalImpactType impact_type)
+{
+    using namespace hgps;
+    auto period = PolicyInterval(2022, 2030);
+    auto impacts = std::vector<PolicyImpact>{
+        PolicyImpact{"energy", -0.01, 5, 9},
+        PolicyImpact{"energy", -0.02, 10, 17},
+        PolicyImpact{"energy", -0.002, 18}
+    };
+
+    return FiscalPolicyDefinition{ impact_type, period, impacts };
+}
 
 TEST(ScenarioTest, BaselineDefaultConstruction)
 {
@@ -201,4 +215,135 @@ TEST(ScenarioTest, InterventionApplyMultiple)
     ASSERT_EQ(100.02, bmi_impact);
     ASSERT_EQ(100.015, beer_impact);
     ASSERT_EQ(value, no_impact);
+}
+
+
+TEST(ScenarioTest, FiscalPolicyDefinitionCreate)
+{
+    using namespace hgps;
+
+    auto low_policy = create_fiscal_policy_definition(FiscalImpactType::pessimist);
+    auto medium_policy = create_fiscal_policy_definition(FiscalImpactType::optimist);
+
+    ASSERT_EQ(FiscalImpactType::pessimist, low_policy.impact_type);
+    ASSERT_EQ(FiscalImpactType::optimist, medium_policy.impact_type);
+}
+
+TEST(ScenarioTest, FiscalPolicyLowImpactNone)
+{
+    using namespace hgps;
+
+    auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
+    entity.age = 3;
+
+    auto factor_key = "energy";
+    auto factor_value = 100.0;
+    auto delta_value = 10.0;
+    auto expected = delta_value;
+
+    entity.risk_factors.emplace(factor_key, factor_value);
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::pessimist) };
+
+    auto policy_delta = policy.apply(entity, 2022, factor_key, delta_value);
+    ASSERT_EQ(ScenarioType::intervention, policy.type());
+    ASSERT_EQ(expected, policy_delta);
+}
+
+TEST(ScenarioTest, FiscalPolicyLowImpactClear)
+{
+    using namespace hgps;
+
+    auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
+
+    auto factor_key = "energy";
+    auto factor_value = 100.0;
+    auto delta_value = 10.0;
+    auto ages = std::vector{ 3, 8, 13, 20 };
+    auto expected = std::vector{10.0, 9.0, 8.0, 9.8 };
+
+    entity.risk_factors.emplace(factor_key, factor_value);
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::pessimist) };
+
+    ASSERT_EQ(ScenarioType::intervention, policy.type());
+    for (size_t i = 0; i < ages.size(); i++) {
+        entity.age = ages.at(i);
+        auto policy_delta = policy.apply(entity, 2022, factor_key, delta_value);
+        ASSERT_EQ(expected.at(i), policy_delta);
+        policy.clear();
+    }
+}
+
+TEST(ScenarioTest, FiscalPolicyLowImpactWalk)
+{
+    using namespace hgps;
+
+    auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
+
+    auto factor_key = "energy";
+    auto factor_value = 100.0;
+    auto delta_value = 10.0;
+    auto ages = std::vector{ 3, 8, 13, 20 };
+    auto expected = std::vector{ 10.0, 9.0, 9.0, 11.8 };
+
+    entity.risk_factors.emplace(factor_key, factor_value);
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::pessimist) };
+
+    ASSERT_EQ(ScenarioType::intervention, policy.type());
+    for (size_t i = 0; i < ages.size(); i++) {
+        entity.age = ages.at(i);
+        auto policy_delta = policy.apply(entity, 2022, factor_key, delta_value);
+        ASSERT_EQ(expected.at(i), policy_delta);
+    }
+}
+
+TEST(ScenarioTest, FiscalPolicyMediumImpactClear)
+{
+    using namespace hgps;
+
+    auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
+
+    auto factor_key = "energy";
+    auto factor_value = 100.0;
+    auto delta_value = 10.0;
+    auto ages = std::vector{ 3, 8, 13, 20 };
+    auto expected = std::vector{ 10.0, 9.0, 8.0, 9.8 };
+
+    entity.risk_factors.emplace(factor_key, factor_value);
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::optimist) };
+
+    ASSERT_EQ(ScenarioType::intervention, policy.type());
+    for (size_t i = 0; i < ages.size(); i++) {
+        entity.age = ages.at(i);
+        auto policy_delta = policy.apply(entity, 2022, factor_key, delta_value);
+        ASSERT_EQ(expected.at(i), policy_delta);
+        policy.clear();
+    }
+}
+
+TEST(ScenarioTest, FiscalPolicyMediumImpactWalk)
+{
+    using namespace hgps;
+
+    auto channel = SyncChannel{};
+    auto entity = Person(core::Gender::male);
+
+    auto factor_key = "energy";
+    auto factor_value = 100.0;
+    auto delta_value = 10.0;
+    auto ages = std::vector{ 3, 8, 13, 20 };
+    auto expected = std::vector{ 10.0, 9.0, 9.0, 10.0 };
+
+    entity.risk_factors.emplace(factor_key, factor_value);
+    auto policy = FiscalPolicyScenario{ channel, create_fiscal_policy_definition(FiscalImpactType::optimist) };
+
+    ASSERT_EQ(ScenarioType::intervention, policy.type());
+    for (size_t i = 0; i < ages.size(); i++) {
+        entity.age = ages.at(i);
+        auto policy_delta = policy.apply(entity, 2022, factor_key, delta_value);
+        ASSERT_EQ(expected.at(i), policy_delta);
+    }
 }

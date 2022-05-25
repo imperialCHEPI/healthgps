@@ -1,12 +1,9 @@
 #pragma once
 #include "interfaces.h"
 #include "mapping.h"
-#include "map2d.h"
 #include "gender_value.h"
 
 namespace hgps {
-
-	using FactorAdjustmentTable = Map2d<core::Gender, std::string, std::vector<double>>;
 
 	struct Coefficient {
 		double value{};
@@ -30,43 +27,25 @@ namespace hgps {
 		std::vector<double> variances;
 	};
 
-	struct BaselineAdjustment final {
-		BaselineAdjustment() = delete;
-		BaselineAdjustment(FactorAdjustmentTable&& adjustment_table)
-			: values{ std::move(adjustment_table) }
-		{
-			if (values.empty()) {
-				throw std::invalid_argument(
-					"The risk factors adjustment table must not be empty.");
-			}
-			else if (values.rows() != 2) {
-				throw std::invalid_argument(
-					"The risk factors adjustment definition must contain two tables.");
-			}
-
-			if (!values.contains(core::Gender::male)) {
-				throw std::invalid_argument("Missing the required adjustment table for male.");
-			}
-			else if (!values.contains(core::Gender::female)) {
-				throw std::invalid_argument("Missing the required adjustment table for female.");
-			}
-		}
-
-		const FactorAdjustmentTable values{};
-	};
-
-	struct HierarchicalLinearModelDefinition final {
+	class HierarchicalLinearModelDefinition final {
+	public:
 		HierarchicalLinearModelDefinition() = delete;
 		HierarchicalLinearModelDefinition(
 			std::unordered_map<std::string, LinearModel>&& linear_models,
-			std::map<int, HierarchicalLevel>&& model_levels,
-			BaselineAdjustment&& baseline_adjustment)
-			: models{ std::move(linear_models) }, levels{ std::move(model_levels) },
-			adjustments{ std::move(baseline_adjustment) } {}
+			std::map<int, HierarchicalLevel>&& model_levels)
+			: models_{ std::move(linear_models) }, levels_{ std::move(model_levels) }{}
 
-		const std::unordered_map<std::string, LinearModel> models;
-		const std::map<int, HierarchicalLevel> levels;
-		const BaselineAdjustment adjustments;
+		const std::unordered_map<std::string, LinearModel>& models() const noexcept {
+			return models_;
+		}
+
+		const std::map<int, HierarchicalLevel>& levels() const noexcept {
+			return levels_;
+		}
+
+	private:
+		std::unordered_map<std::string, LinearModel> models_;
+		std::map<int, HierarchicalLevel> levels_;
 	};
 
 	struct FactorDynamicEquation {
@@ -86,18 +65,18 @@ namespace hgps {
 		LiteHierarchicalModelDefinition() = delete;
 		LiteHierarchicalModelDefinition(
 			std::map<core::IntegerInterval, AgeGroupGenderEquation>&& equations,
-			std::map<std::string, std::string>&& variables,
-			BaselineAdjustment&& baseline_adjustment,
-			const double boundary_percentage = 0.05)
-			: equations_{ std::move(equations) }, variables_{ std::move(variables) },
-			adjustments_{ std::move(baseline_adjustment) }, boundary_percentage_{ boundary_percentage } {
+			std::map<std::string, std::string>&& variables, const double boundary_percentage = 0.05)
+			: equations_{ std::move(equations) }, variables_{ std::move(variables) }
+			, boundary_percentage_{ boundary_percentage } {
 
 			if (equations_.empty()) {
 				throw std::invalid_argument("The model definition equations must not be empty.");
 			}
 		}
 
-		const std::map<std::string, std::string>& variables() const noexcept { return variables_; }
+		const std::map<std::string, std::string>& variables() const noexcept {
+			return variables_;
+		}
 
 		const AgeGroupGenderEquation& at(const int& age) const {
 			for (auto& entry : equations_) {
@@ -113,13 +92,13 @@ namespace hgps {
 			return equations_.rbegin()->second;
 		}
 
-		const BaselineAdjustment& adjustments() const { return adjustments_; }
-		const double& boundary_percentage() const { return boundary_percentage_; }
+		const double& boundary_percentage() const {
+			return boundary_percentage_;
+		}
 
 	private:
 		std::map<core::IntegerInterval, AgeGroupGenderEquation> equations_;
 		std::map<std::string, std::string> variables_;
-		BaselineAdjustment adjustments_;
 		double boundary_percentage_;
 	};
 }

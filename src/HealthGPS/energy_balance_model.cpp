@@ -51,36 +51,28 @@ namespace hgps {
 	void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(RuntimeContext& context, Person& entity,
 		std::map<std::string, double>& current_risk_factors, std::map<std::string, FactorDynamicEquation>& equations)
 	{
-		auto local_age = entity.age;
-		if (current_risk_factors.contains("age")) {
-			local_age = static_cast<unsigned int>(current_risk_factors.at("age"));
-		}
-
 		auto delta_comp_factors = std::unordered_map<std::string, double>();
-		auto adjustments = definition_.get().adjustments().values.row(entity.gender);
 		for (auto level = 1; level <= context.mapping().max_level(); level++) {
 			auto level_factors = context.mapping().at_level(level);
 			for (const auto& factor : level_factors) {
-				auto factor_equation = equations.at(factor.key());
+				auto& factor_equation = equations.at(factor.key());
 
 				auto original_value = entity.get_risk_factor_value(factor.key());
-				auto delta_factor = adjustments.at(factor.key()).at(local_age);
+				auto delta_factor = 0.0;
 				for (const auto& coeff : factor_equation.coefficients) {
 					if (current_risk_factors.contains(coeff.first)) {
 						delta_factor += coeff.second * current_risk_factors.at(coeff.first);
 					}
 					else {
-						auto factor_key = definition_.get().variables().at(coeff.first);
+						auto& factor_key = definition_.get().variables().at(coeff.first);
 						delta_factor += coeff.second * delta_comp_factors.at(factor_key);
 					}
 				}
 
 				// Intervention: "-1" as we want to retrieve data from last year
 				delta_factor = context.scenario().apply(entity, context.time_now() - 1, factor.key(), delta_factor);
-
-				auto boundary = original_value + delta_factor;
 				auto factor_stdev = factor_equation.residuals_standard_deviation;
-				delta_factor += sample_normal_with_boundary(context.random(), 0.0, factor_stdev, boundary);
+				delta_factor += sample_normal_with_boundary(context.random(), 0.0, factor_stdev, original_value);
 				delta_comp_factors.emplace(factor.key(), delta_factor);
 
 				auto updated_value = entity.risk_factors.at(factor.key()) + delta_factor;

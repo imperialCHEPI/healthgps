@@ -24,7 +24,6 @@
         "settings": {
             "country_code": "FRA",
             "size_fraction": 0.0001,
-            "data_linkage": "Age",
             "age_range": [0, 100]
         }
     },
@@ -38,13 +37,13 @@
             {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
             {"name":"Age2",     "level":0, "proxy":"",       "range":[1,7569]},
             {"name":"Age3",     "level":0, "proxy":"",       "range":[1,658503]},
-            {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.314484485,2.310181]},
-            {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.146601,8.675425]},
-            {"name":"Protein",  "level":1, "proxy":"",       "range":[42.09252483,238.4145]},
-            {"name":"Fat",      "level":1, "proxy":"",       "range":[44.78128,381.666]},
-            {"name":"PA",       "level":2, "proxy":"",       "range":[400,9769.83669]},
-            {"name":"Energy",   "level":2, "proxy":"",       "range":[1315.532125,7545.832301]},
-            {"name":"BMI",      "level":3, "proxy":"",       "range":[13.53255,45.26488]}
+            {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.316299,2.296689]},
+            {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.127384,8.656519]},
+            {"name":"Protein",  "level":1, "proxy":"",       "range":[43.50682,238.4145]},
+            {"name":"Fat",      "level":1, "proxy":"",       "range":[45.04756,382.664098658922]},
+            {"name":"PA",       "level":2, "proxy":"",       "range":[22.22314,9765.512]},
+            {"name":"Energy",   "level":2, "proxy":"",       "range":[1326.14051277588,7522.496]},
+            {"name":"BMI",      "level":3, "proxy":"",       "range":[13.88,39.48983]}
         ],
         "dynamic_risk_factor": "",
         "risk_factor_models": {
@@ -56,10 +55,8 @@
             "delimiter": ",",
             "encoding": "UTF8",
             "file_names": {
-                "static_male": "France.Initial.Adjustment.Male.csv",
-                "static_female": "France.Initial.Adjustment.Female.csv",
-                "dynamic_male": "France.Update.Adjustment.Male.csv",
-                "dynamic_female": "France.Update.Adjustment.Female.csv"
+                "factorsmean_male":"France.FactorsMean.Male.csv",
+                "factorsmean_female":"France.FactorsMean.Female.csv"
             }
         }
     },
@@ -69,14 +66,14 @@
         "stop_time": 2050,
         "trial_runs": 1,
         "sync_timeout_ms": 5000,
-        "diseases": ["asthma","diabetes","lowbackpain", "colorectum"],
+        "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
         "interventions": {
             "active_type_id": null,
             "types": {
                 "simple": {
                     "active_period": {
-                        "start_time": 2021,
-                        "finish_time": 2021
+                        "start_time": 2022,
+                        "finish_time": 2022
                     },
                     "impact_type": "absolute",
                     "impacts": [
@@ -85,13 +82,25 @@
                 },
                 "marketing": {
                     "active_period": {
-                        "start_time": 2021,
+                        "start_time": 2022,
                         "finish_time": 2050
                     },
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
                         {"risk_factor":"BMI", "impact_value":-0.155,"from_age":19, "to_age":null}
+                    ]
+                },
+                "fiscal": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "impact_type": "optimist",
+                    "impacts": [
+                        {"risk_factor":"Energy", "impact_value":-0.01282, "from_age":5,  "to_age":9},
+                        {"risk_factor":"Energy", "impact_value":-0.01814, "from_age":10, "to_age":17},
+                        {"risk_factor":"Energy", "impact_value":-0.00125,"from_age":18, "to_age":null}
                     ]
                 }
             }

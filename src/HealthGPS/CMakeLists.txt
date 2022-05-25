@@ -12,6 +12,8 @@ target_sources(HealthGPS
 		"baseline_scenario.h"
 		"converter.cpp"
 		"converter.h"
+		"data_series.cpp"
+		"data_series.h"
 		"default_cancer_model.cpp"
 		"default_cancer_model.h"
 		"default_disease_model.cpp"
@@ -29,6 +31,8 @@ target_sources(HealthGPS
 		"event_bus.cpp"
 		"event_bus.h"
 		"event_subscriber.cpp"
+		"fiscal_scenario.cpp"
+		"fiscal_scenario.h"
 		"healthgps.cpp"
 		"healthgps.h"
 		"hierarchical_model_static.cpp"
@@ -37,6 +41,9 @@ target_sources(HealthGPS
 		"info_message.h"
 		"life_table.cpp"
 		"life_table.h"
+		"lms_model.cpp"
+		"lms_model.h"
+		"lms_definition.h"
 		"mapping.cpp"
 		"mapping.h"
 		"marketing_scenario.cpp"
@@ -65,6 +72,9 @@ target_sources(HealthGPS
 		"result_message.h"
 		"riskfactor.cpp"
 		"riskfactor.h"
+		"riskfactor_adjustment.cpp"
+		"riskfactor_adjustment.h"
+		"riskfactor_adjustment_types.h"
 		"runner_message.cpp"
 		"runner_message.h"
 		"runtime_context.cpp"
@@ -108,7 +118,10 @@ target_sources(HealthGPS
 		"simulation.h"
 		"sync_message.h"
 		"threadsafe_queue.h"
-		"two_step_value.h")
+		"two_step_value.h"
+		"weight_category.h"
+		"weight_model.cpp"
+		"weight_model.h")
 
 set(ROOT_NAMESPACE hgps)
 

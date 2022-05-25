@@ -79,7 +79,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 	auto diseases = std::vector<core::DiseaseInfo>{
 		DiseaseInfo{.group = DiseaseGroup::other, .code = "asthma", .name = "Asthma"},
 		DiseaseInfo{.group = DiseaseGroup::other, .code = "diabetes", .name = "Diabetes Mellitus"},
-		DiseaseInfo{.group = DiseaseGroup::cancer, .code = "colorectum", .name = "Colorectal cancer"},
+		DiseaseInfo{.group = DiseaseGroup::cancer, .code = "colorectalcancer", .name = "Colorectal cancer"},
 	};
 
 	return ModelInput(data, settings, info, ses, mapping, diseases);
@@ -389,7 +389,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 
 	auto pop_module = build_population_module(repository, config);
 	auto total_pop = pop_module->get_total_population_size(config.start_time());
-	auto pop_dist = pop_module->get_population_distribution(config.start_time());
+	auto& pop_dist = pop_module->get_population_distribution(config.start_time());
 	auto sum_dist = 0.0f;
 	for (auto& pair : pop_dist)	{
 		sum_dist += pair.second.total();
@@ -432,7 +432,8 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty)
 {
 	using namespace hgps;
 	auto risk_models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>();
-	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+	auto adjustments = BaselineAdjustment{};
+	ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models), RiskfactorAdjustmentModel{adjustments}), std::invalid_argument);
 }
 /*
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
@@ -499,7 +500,7 @@ TEST(TestHealthGPS, CreateAnalysisModule)
 
 	auto inputs = create_test_configuration(data);
 
-	auto analysis_module = build_analysis_module(repository, inputs);
+	auto analysis_module = build_analysis_module(repository,inputs);
 	ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
 	ASSERT_EQ("Analysis", analysis_module->name());
 }

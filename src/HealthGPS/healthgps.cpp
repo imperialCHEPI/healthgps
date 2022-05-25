@@ -81,9 +81,6 @@ namespace hgps {
 			auto start = std::chrono::steady_clock::now();
 			context_.metrics().reset();
 
-			// Update mortality data, mortality is forward looking 2009 is for 2008-2009
-			demographic_->update_residual_mortality(context_, *disease_);
-
 			// Now move world clock to time t + 1
 			auto world_time = env->now() + adevs::Time(1, 0);
 			auto time_year = world_time.real;
@@ -140,6 +137,7 @@ namespace hgps {
 
 		// Generate risk factors
 		risk_factor_->initialise_population(context_);
+		risk_factor_->apply_baseline_adjustments(context_);
 
 		// Initialise diseases
 		disease_->initialise_population(context_);
@@ -165,6 +163,9 @@ namespace hgps {
 
 		// Calculate the net immigration by gender and age, update the population accordingly
 		update_net_immigration();
+
+		// apply risk factors baseline adjustment to population
+		risk_factor_->apply_baseline_adjustments(context_);
 
 		// Update diseases status: remission and incidence
 		disease_->update_population(context_);
@@ -252,7 +253,7 @@ namespace hgps {
 				for (auto trial = 0; trial < net_value; trial++) {
 					auto index = context_.random().next_int(static_cast<int>(similar_entities.size()) - 1);
 					const auto& source = similar_entities.at(index);
-					context_.population().add(std::move(partial_clone_entity(source)));
+					context_.population().add(std::move(partial_clone_entity(source)), context_.time_now());
 				}
 			}
 		}
@@ -264,7 +265,7 @@ namespace hgps {
 				}
 
 				if (entity.age == age && entity.gender == gender) {
-					entity.has_emigrated = true;
+					entity.emigrate(context_.time_now());
 					net_value_counter++;
 					if (net_value_counter == 0) {
 						break;
@@ -300,30 +301,22 @@ namespace hgps {
 	hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
 		auto expected_population = get_current_expected_population();
 		auto simulated_population = get_current_simulated_population();
-
-		// Debug counters, remove on final version
-		auto male_count = 0;
-		auto female_count = 0;
-		auto net_diff = 0;
-
-		auto net_immigration = create_age_gender_table<int>(context_.age_range());
+		auto net_emigration = create_age_gender_table<int>(context_.age_range());
 		auto start_age = context_.age_range().lower();
 		auto end_age = context_.age_range().upper();
+		auto net_value = 0;
 		for (int age = start_age; age <= end_age; age++) {
-			net_diff = expected_population.at(age,
-				core::Gender::male) - simulated_population.at(age, core::Gender::male);
-			net_immigration.at(age, core::Gender::male) = net_diff;
-			male_count += net_diff;
+			net_value = expected_population.at(age, core::Gender::male) -
+					    simulated_population.at(age, core::Gender::male);
+			net_emigration.at(age, core::Gender::male) = net_value;
 
-			net_diff = expected_population.at(age,
-				core::Gender::female) - simulated_population.at(age, core::Gender::female);
-			net_immigration.at(age, core::Gender::female) = net_diff;
-			female_count += net_diff;
+			net_value = expected_population.at(age, core::Gender::female) -
+					    simulated_population.at(age, core::Gender::female);
+			net_emigration.at(age, core::Gender::female) = net_value;
 		}
 
 		// Update statistics
-		auto total_immigration = male_count + female_count;
-		return net_immigration;
+		return net_emigration;
 	}
 
 	Person HealthGPS::partial_clone_entity(const Person& source) const noexcept {
@@ -331,8 +324,6 @@ namespace hgps {
 		clone.age = source.age;
 		clone.gender = source.gender;
 		clone.ses = source.ses;
-		clone.is_alive = true;
-		clone.has_emigrated = false;
 		for (const auto& item : source.risk_factors) {
 			clone.risk_factors.emplace(item.first, item.second);
 		}

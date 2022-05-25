@@ -1,7 +1,9 @@
 #pragma once
+#include "data_series.h"
 
 #include <string>
 #include <map>
+#include <vector>
 
 namespace hgps {
 
@@ -17,6 +19,9 @@ namespace hgps {
     };
 
 	struct ModelResult {
+        ModelResult() = delete;
+        ModelResult(const unsigned int sample_size);
+
         int population_size{};
 
         int number_alive{};
@@ -35,7 +40,11 @@ namespace hgps {
 
         std::map<std::string, double> metrics{};
 
+        DataSeries series;
+
 		std::string to_string() const noexcept;
+
+        int number_of_recyclable() const noexcept;
 
     private:
         std::size_t caluclate_min_padding() const noexcept;

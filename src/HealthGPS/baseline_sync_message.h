@@ -1,6 +1,7 @@
 #pragma once
 #include "sync_message.h"
 #include "gender_table.h"
+#include "riskfactor_adjustment_types.h"
 
 namespace hgps {
 
@@ -8,5 +9,5 @@ namespace hgps {
 
 	using NetImmigrationMessage = SyncDataMessage<IntegerAgeGenderTable>;
 
-	using BaselineAdjustmentMessage = SyncDataMessage<std::map<std::string, DoubleGenderValue>>;
+	using BaselineAdjustmentMessage = SyncDataMessage<FactorAdjustmentTable>;
 }

@@ -75,10 +75,12 @@
             }
         },
         "registry":[
+            {"group": "other", "id": "alzheimer","name":"Alzheimer"},
             {"group": "other", "id": "asthma", "name": "Asthma"},
             {"group": "other", "id": "diabetes", "name": "Diabetes mellitus"},
-            {"group": "other",  "id": "lowbackpain", "name": "Low back pain"},
-            {"group": "cancer", "id": "colorectum", "name": "Colorectal  cancer"}
+            {"group": "other", "id": "lowbackpain", "name": "Low back pain"},
+            {"group": "other", "id": "osteoarthritisknee","name": "Osteoarthritis Of The Knee"},
+            {"group": "cancer","id": "colorectalcancer", "name": "Colorectal  cancer"}
         ]
     },
     "analysis":{
@@ -92,7 +94,8 @@
         "path": "analysis",
         "age_limits": [1, 100],
         "time_year": 2019,
-        "file_name": "disability_weights.csv",
+        "disability_file_name": "disability_weights.csv",
+        "lms_file_name":"lms_parameters.csv",
         "cost_of_disease": {
             "path":"cost",
             "file_name": "BoD{COUNTRY_CODE}.csv"

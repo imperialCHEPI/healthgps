@@ -51,6 +51,8 @@ namespace hgps {
 			std::vector<BirthItem> get_birth_indicators(const Country country,
 				const std::function<bool(const unsigned int&)> year_filter) const override;
 
+			std::vector<LmsDataRow> get_lms_parameters() const override;
+
 		private:
 			std::filesystem::path root_;
 			VerboseMode verbosity_;

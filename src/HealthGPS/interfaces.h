@@ -111,6 +111,10 @@ namespace hgps {
 		/// @param modelType The hierarchical model type identifier 
 		/// @return true if the hierarchical model is found, otherwise false.
 		virtual bool contains(const HierarchicalModelType& modelType) const noexcept = 0;
+
+		/// @brief Apply baseline risk factor adjustments to population
+		/// @param context The simulation run-time context
+		virtual void apply_baseline_adjustments(RuntimeContext& context) = 0;
 	};
 
 	/// @brief Population prospects module interface
@@ -131,11 +135,6 @@ namespace hgps {
 		/// @param context The simulation run-time context
 		/// @param disease_host The diseases host module instance
 		virtual void update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) = 0;
-
-		/// @brief Updates the virtual population status
-		/// @param context The simulation run-time context
-		/// @param disease_host The diseases host module instance
-		virtual void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) = 0;
 	};
 
 	/// @brief Hierarchical linear model interface

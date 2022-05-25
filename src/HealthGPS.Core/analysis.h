@@ -9,10 +9,19 @@ namespace hgps {
 
 		struct LifeExpectancyItem
 		{
-			int time;
-			float both;
-			float male;
-			float female;
+			int time{};
+			float both{};
+			float male{};
+			float female{};
+		};
+
+		struct LmsDataRow
+		{
+			int age{};
+			Gender gender{};
+			double lambda{};
+			double mu{};
+			double sigma{};
 		};
 
 		struct DiseaseAnalysisEntity

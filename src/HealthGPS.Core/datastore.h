@@ -42,6 +42,9 @@ namespace hgps {
 
 			virtual std::vector<BirthItem> get_birth_indicators(
 				const Country country, const std::function<bool(const unsigned int&)> year_filter) const = 0;
+
+			virtual std::vector<LmsDataRow> get_lms_parameters() const = 0;
+
 		};
 	}
 }

@@ -3,6 +3,7 @@
 #include "baseline_sync_message.h"
 #include <numeric>
 #include <cassert>
+#include <algorithm>
 
 namespace hgps {
 	PopulationModule::PopulationModule(
@@ -52,7 +53,7 @@ namespace hgps {
 	std::size_t PopulationModule::get_total_population_size(const int time_year) const noexcept {
 		auto total = 0.0f;
 		if (pop_data_.contains(time_year)) {
-			auto year_data = pop_data_.at(time_year);
+			auto& year_data = pop_data_.at(time_year);
 			total = std::accumulate(year_data.begin(), year_data.end(), 0.0f,
 				[](const float previous, const auto& element)
 				{ return previous + element.second.total(); });
@@ -178,6 +179,8 @@ namespace hgps {
 	}
 
 	void PopulationModule::update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) {
+		update_residual_mortality(context, disease_host);
+
 		auto initial_pop_size = context.population().current_active_size();
 		auto expected_pop_size = get_total_population_size(context.time_now());
 		auto expected_num_deaths = get_total_deaths(context.time_now());
@@ -189,8 +192,8 @@ namespace hgps {
 		auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
 		auto number_of_boys = static_cast<int> (last_year_births_rate.males * initial_pop_size);
 		auto number_of_girls = static_cast<int>(last_year_births_rate.females * initial_pop_size);
-		context.population().add_newborn_babies(number_of_boys, core::Gender::male);
-		context.population().add_newborn_babies(number_of_girls, core::Gender::female);
+		context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
+		context.population().add_newborn_babies(number_of_girls, core::Gender::female, context.time_now());
 
 		// Calculate statistics.
 		auto number_of_births = number_of_boys + number_of_girls;
@@ -258,8 +261,10 @@ namespace hgps {
 		auto start_age = life_table_.age_limits().lower();
 		auto end_age = life_table_.age_limits().upper();
 		for (int age = start_age; age <= end_age; age++) {
-			death_rates.at(age, core::Gender::male) = mortality.at(age).males / population.at(age).males;
-			death_rates.at(age, core::Gender::female) = mortality.at(age).females / population.at(age).females;
+			auto male_rate = std::min(mortality.at(age).males / population.at(age).males, 1.0f);
+			auto feme_rate = std::min(mortality.at(age).females / population.at(age).females, 1.0f);
+			death_rates.at(age, core::Gender::male) = male_rate;
+			death_rates.at(age, core::Gender::female) = feme_rate;
 		}
 
 		return death_rates;
@@ -283,17 +288,24 @@ namespace hgps {
 		auto residual_mortality = create_integer_gender_table<double>(life_table_.age_limits());
 		auto start_age = life_table_.age_limits().lower();
 		auto end_age = life_table_.age_limits().upper();
+		auto default_average = 1.0;
 		for (int age = start_age; age <= end_age; age++) {
+			auto male_average_product = default_average;
+			auto female_average_product = default_average;
 			auto male_count = excess_mortality_count.at(age, core::Gender::male);
 			auto female_count = excess_mortality_count.at(age, core::Gender::female);
-			auto male_average_product = excess_mortality_product.at(age, core::Gender::male) / male_count;
-			auto female_average_product = excess_mortality_product.at(age, core::Gender::female) / female_count;
+			if (male_count > 0) {
+				male_average_product = excess_mortality_product.at(age, core::Gender::male) / male_count;
+			}
+			
+			if (female_count > 0) {
+				female_average_product = excess_mortality_product.at(age, core::Gender::female) / female_count;
+			}
 
-			residual_mortality.at(age, core::Gender::male) =
-				1.0 - (1.0 - death_rates.at(age, core::Gender::male) / male_average_product);
-
-			residual_mortality.at(age, core::Gender::female) =
-				1.0 - (1.0 - death_rates.at(age, core::Gender::female) / female_average_product);
+			auto male_mortality = 1.0 - (1.0 - death_rates.at(age, core::Gender::male)) / male_average_product;
+			auto feme_mortality = 1.0 - (1.0 - death_rates.at(age, core::Gender::female)) / female_average_product;
+			residual_mortality.at(age, core::Gender::male) = std::max(std::min(male_mortality, 1.0), 0.0);
+			residual_mortality.at(age, core::Gender::female) = std::max(std::min(feme_mortality, 1.0), 0.0);
 		}
 
 		return residual_mortality;
@@ -305,11 +317,11 @@ namespace hgps {
 		for (const auto& item : entity.diseases) {
 			if (item.second.status == DiseaseStatus::active) {
 				auto excess_mortality = disease_host.get_excess_mortality(item.first, entity);
-				product *= 1.0 - excess_mortality;
+				product *= (1.0 - excess_mortality);
 			}
 		}
 
-		return product;
+		return std::max(std::min(product, 1.0), 0.0);
 	}
 
 	int PopulationModule::update_age_and_death_events(RuntimeContext& context, const DiseaseHostModule& disease_host) {
@@ -321,27 +333,25 @@ namespace hgps {
 			}
 
 			if (entity.age >= max_age) {
-				entity.is_alive = false;
-				entity.time_of_death = context.time_now();
+				entity.die(context.time_now());
 				number_of_deaths++;
 			}
 			else {
 
 				// calculate death probability based on the health status
-				auto death_rate = get_residual_death_rate(entity.age, entity.gender);
-				auto product = 1.0 - death_rate;
+				auto residual_death_rate = get_residual_death_rate(entity.age, entity.gender);
+				auto product = 1.0 - residual_death_rate;
 				for (const auto& item : entity.diseases) {
 					if (item.second.status == DiseaseStatus::active) {
 						auto excess_mortality = disease_host.get_excess_mortality(item.first, entity);
-						product *= 1.0 - excess_mortality;
+						product *= (1.0 - excess_mortality);
 					}
 				}
 
 				auto death_probability = 1.0 - product;
 				auto hazard = context.random().next_double();
 				if (hazard < death_probability) {
-					entity.is_alive = false;
-					entity.time_of_death = context.time_now();
+					entity.die(context.time_now());
 					number_of_deaths++;
 				}
 			}
@@ -350,8 +360,7 @@ namespace hgps {
 			if (entity.is_active()) {
 				entity.age = entity.age + 1;
 				if (entity.age >= max_age) {
-					entity.is_alive = false;
-					entity.time_of_death = context.time_now();
+					entity.die(context.time_now());
 				}
 			}
 		}

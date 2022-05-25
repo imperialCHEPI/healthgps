@@ -42,15 +42,17 @@ namespace hgps {
 
 		double ses{};
 
-		bool is_alive{ true };
-
-		bool has_emigrated{ false };
-
-		unsigned int time_of_death{};
-
 		std::map<std::string, double> risk_factors;
 
 		std::map<std::string, Disease> diseases;
+
+		bool is_alive() const noexcept;
+
+		bool has_emigrated() const noexcept;
+
+		unsigned int time_of_death() const noexcept;
+
+		unsigned int time_of_migration() const noexcept;
 
 		bool is_active() const noexcept;
 
@@ -58,10 +60,19 @@ namespace hgps {
 
 		float gender_to_value() const noexcept;
 
+		void emigrate(const unsigned int time);
+
+		void die(const unsigned int time);
+
 		static void reset_id();
 
 	private:
 		std::size_t id_{};
+		bool is_alive_{ true };
+		bool has_emigrated_{ false };
+		unsigned int time_of_death_{};
+		unsigned int time_of_migration_{};
+
 		static std::atomic<std::size_t> newUID;
 		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
 	};

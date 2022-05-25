@@ -9,9 +9,9 @@ namespace hgps {
 		ResultEventMessage() = delete;
 		ResultEventMessage(std::string sender, unsigned int run, int time, ModelResult result);
 
-		const int model_time{};
+		int model_time{};
 
-		const ModelResult content{};
+		ModelResult content;
 
 		int id() const noexcept override;
 

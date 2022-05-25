@@ -4,6 +4,9 @@
 
 namespace hgps {
 
+	ModelResult::ModelResult(const unsigned int sample_size) 
+		: series{sample_size} {}
+
 	std::string ModelResult::to_string() const noexcept {
 		std::stringstream ss;
 
@@ -27,6 +30,10 @@ namespace hgps {
 		}
 
 		return ss.str();
+	}
+
+	int ModelResult::number_of_recyclable() const noexcept {
+		return population_size - (number_alive + number_dead + number_emigrated);
 	}
 
 	std::size_t ModelResult::caluclate_min_padding() const noexcept {

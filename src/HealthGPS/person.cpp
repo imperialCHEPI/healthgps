@@ -23,8 +23,24 @@ namespace hgps {
 
     std::size_t Person::id() const noexcept { return id_; }
 
+    bool Person::is_alive() const noexcept {
+        return is_alive_;
+    }
+
+    bool Person::has_emigrated() const noexcept {
+        return has_emigrated_;
+    }
+
+    unsigned int Person::time_of_death() const noexcept {
+        return time_of_death_;
+    }
+
+    unsigned int Person::time_of_migration() const noexcept {
+        return time_of_migration_;
+    }
+
     bool Person::is_active() const noexcept {
-        return is_alive && !has_emigrated;
+        return is_alive_ && !has_emigrated_;
     }
 
     double Person::get_risk_factor_value(const std::string& key) const noexcept {
@@ -45,6 +61,24 @@ namespace hgps {
         }
 
         return 0.0f;
+    }
+
+    void Person::emigrate(const unsigned int time) {
+        if (!is_active()) {
+            throw std::logic_error("Entity must be active prior to emigrate.");
+        }
+
+        has_emigrated_ = true;
+        time_of_migration_ = time;
+    }
+
+    void Person::die(const unsigned int time) {
+        if (!is_active()) {
+            throw std::logic_error("Entity must be active prior to death.");
+        }
+
+        is_alive_ = false;
+        time_of_death_ = time;
     }
 
     void Person::reset_id() {

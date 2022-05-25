@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     name: Run CMake Linux Workflow
-    
+
     env:
       VCPKG_ROOT: 'vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
@@ -21,7 +21,7 @@ jobs:
       DEBUG_TEST_PRESET: 'core-test-linux'
       RELEASE_PRESET: 'linux-release'
       RELEASE_BUILD_PRESET: 'release-build-linux'
-     
+
     steps:
     - uses: actions/checkout@v2
 
@@ -37,13 +37,13 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2022.03.10
+        git checkout --force 2022.05.10
         ./bootstrap-vcpkg.sh -disableMetrics    
 
     - name: Get Ninja
       id: install_ninja
       uses: seanmiddleditch/gha-setup-ninja@master
-      
+
     - name: Tool Check
       id: toos_version
       run: |
@@ -62,7 +62,7 @@ jobs:
       id: cmake_build_debug
       working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
-      
+
     - name: Test debug HealthGPS
       id: ctest_run
       working-directory: ${{github.workspace}}
@@ -91,4 +91,3 @@ jobs:
       with:
         name: health-gps-archive
         path: artifact/health_gps_linux.zip
-        

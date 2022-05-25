@@ -13,6 +13,8 @@ target_sources(HealthGPS.Core
 		"string_util.h"
 		"univariate_summary.cpp"
 		"univariate_summary.h"
+		"math_util.cpp"
+		"math_util.h"
 		"version.cpp"
 		"version.h"
 
@@ -33,8 +35,7 @@ target_sources(HealthGPS.Core
 		"poco.h"
 		"population_item.h"
 		"scoped_timer.h"
-		"visitor.h"
-)
+		"visitor.h")
 
 target_link_libraries(HealthGPS.Core PRIVATE fmt::fmt)
 

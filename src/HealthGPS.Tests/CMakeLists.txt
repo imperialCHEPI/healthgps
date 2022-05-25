@@ -17,7 +17,9 @@ target_sources(HealthGPS.Tests
         "Core.Array2DTest.cpp"
         "Core.Test.cpp"
         "Core.UnivariateSummary.Test.cpp"
+        "Core.MathHelper.Test.cpp"
         "Datastore.Test.cpp"
+        "Repository.Test.cpp"
         "DiseaseModels.Test.cpp"
         "EventAggregator.Test.cpp"
         "HealthGPS.Test.cpp"
@@ -30,6 +32,7 @@ target_sources(HealthGPS.Tests
         "Scenario.Test.cpp"
         "TestMain.cpp"
         "ThreadsafeQueue.Test.cpp"
+        "WeightModel.Test.cpp"
         "CountryModule.h"
         "RiskFactorData.h")
 

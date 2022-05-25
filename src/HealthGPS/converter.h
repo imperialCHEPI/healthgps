@@ -6,6 +6,7 @@
 #include "analysis_definition.h"
 #include "disease_definition.h"
 #include "life_table.h"
+#include "lms_definition.h"
 
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/datastore.h"
@@ -43,6 +44,8 @@ namespace hgps {
 				const std::vector<core::MortalityItem>& deaths);
 
 			static DiseaseParameter to_disease_parameter(const core::CancerParameterEntity& entity);
+
+			static LmsDefinition to_lms_definition(const std::vector<core::LmsDataRow>& dataset);
 		};
 
 		RelativeRisk create_relative_risk(const RelativeRiskInfo& info);
