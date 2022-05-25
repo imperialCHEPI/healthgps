@@ -226,6 +226,19 @@ Stores disease specific disability weight estimates, which representing the magn
 | DiseaseID  | Integer   | PK         | Disease type unique identifier |
 | Weight     | Real      |            | The disease weight value |
 
+### LMS Parameters
+
+Stores the Lambda-Mu-Sigma (LMS) model parameters, which is used to convert BMI risk factor values to z-scores for children.
+
+| Field name | Data Type | Constraint | Description |
+| :---       | :---      | :---       | :--- |
+| **ID**     | Integer   | PK         | Parameter unique identifier |
+| GenderID   | Integer   | UQ         | Gender type unique  |
+| WithAge    | Integer   | UQ         | Age reference of the parameter |
+| Lambda     | Real      |            | The lambda parameter value |
+| Mu         | Real      |            | The mu parameter value |
+| Sigma      | Real      |            | The sigma parameter value |
+
 ### Burden of Disease
 
 The burden of diseases (BoD) measure is modelled using a two-dimensional entity, *time* x *age*, to represent the measure values for each *gender* enumeration entry.

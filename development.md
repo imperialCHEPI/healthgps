@@ -16,13 +16,14 @@ To start working on the *Health GPS* code base, the suggested development machin
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
 8. Internet connection.
 
-Download the *Health GPS* source code to the local machine, we recommend somewhere like `C:\src` or `C:\source`, since otherwise you may run into path issues with the build systems.
+Download the *Health GPS* source code to the local machine, we recommend somewhere like root `src` or `source`, since otherwise you may run into path issues with the build systems.
 ```cmd
 > git clone https://github.com/imperialCHEPI/healthgps
 ```
-Finally, open the *'.../healthgps/source'* folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager. Alternatively, there is also support for visual studio projects by opening the solution file `.../healthgps/source/HelathGPS.sln`, but this option will be removed in future version.
 
-**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
+Finally, open the `.../healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
+
+>**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
 
 ### CMake Build
 
@@ -38,7 +39,7 @@ cmake --preset='linux-release'
 cmake --build --preset='release-build-linux'
 ```
 
-The `HealthGPS` binary will now be inside the `./out/build/[preset]/HealthGPS.Console` directory.
+The `HealthGPS` binary will now be inside the `./out/build/[preset]/src/HealthGPS.Console` directory.
 
 To run the unit tests:
 ```cmd
@@ -52,11 +53,11 @@ cmake --preset='linux-debug'
 cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
-All available options for CMake *prestes* are defined in the `CMakePresets.json` file, which also declare many of the options previously provided to CMake via command line arguments. The use of presets provides consistent builds scripts across development and CI/CD environments using source control for reproducibility.
+All available options are defined using CMake *prestes* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to CMake via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
 
 ## Third-party components
 
-The project dependencies are included using [vcpkg](https://github.com/microsoft/vcpkg) package manager, and declared in the *vcpkg.json* manifest file. The package manager is integrated with CMake and automatically invoked by the ```find_package``` command during build.
+The project dependencies are included using [vcpkg](https://github.com/microsoft/vcpkg) package manager, and declared in the *vcpkg.json* manifest file. The package manager is integrated with CMake and automatically invoked by the `find_package` command during build.
 
 | Name  | License |
 |:---   |:---     |
@@ -177,16 +178,17 @@ The simulation executive can run experiments for baseline scenario only, or base
 
 | Property     | Overall | Male  | Female | Description             |
 | :---         | :---:   | :---: | :---:  |:---                     |
-| Id           | √       | -     | -      | The message type identifier (results type)
-| Source       | √       | -     | -      | The results experiment identification |
-| Run number   | √       | -     | -      | The results rum number identification |
-| Model time   | √       | -     | -      | The results model time identification |
-| Average Age  | -       | √     | √      | Average age of the population alive |
-| Prevalence   | -       | √     | √      | Prevalence for each disease in the population |
-| Risk factors | -       | √     | √      | Average risk factor values in the population |
-| Indicators (DALYs) | √ | - | - | YLL, YLD and DALY values per 10000 people |
-| Population Counts | √ | - | - |  Total size, number alive, dead and emigrants |
-| Metrics | √ | - | - | Custom key/value metrics for algorithms |
+| Id           | ✓       | -     | -      | The message type identifier (results type)
+| Source       | ✓       | -     | -      | The results experiment identification |
+| Run number   | ✓       | -     | -      | The results rum number identification |
+| Model time   | ✓       | -     | -      | The results model time identification |
+| Average Age  | -       | ✓     | ✓      | Average age of the population alive |
+| Prevalence   | -       | ✓     | ✓      | Prevalence for each disease in the population |
+| Risk factors | -       | ✓     | ✓      | Average risk factor values in the population |
+| Indicators (DALYs) | ✓ | - | - | YLL, YLD and DALY values per 10000 people |
+| Population Counts | ✓ | - | - |  Total size, number alive, dead and emigrants |
+| Metrics | ✓ | - | - | Custom key/value metrics for algorithms |
+| Series | - | ✓ | ✓ | Detailed time series by time, age and gender |
 
 These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
 
