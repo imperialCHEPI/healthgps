@@ -47,7 +47,7 @@ namespace hgps {
 	}
 
 	void DefaultCancerModel::initialise_average_relative_risk(RuntimeContext& context) {
-		auto age_range = context.age_range();
+		auto& age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
 		for (auto& entity : context.population()) {
@@ -61,20 +61,24 @@ namespace hgps {
 			count(entity.age, entity.gender)++;
 		}
 
+		auto default_average = 1.0;
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+			auto male_average = default_average;
+			auto female_average = default_average;
 			if (sum.contains(age)) {
 				auto male_count = count(age, core::Gender::male);
-				if (male_count != 0.0) {
-					average_relative_risk_(age, core::Gender::male) =
-						sum(age, core::Gender::male) / male_count;
+				if (male_count > 0.0) {
+					male_average = sum(age, core::Gender::male) / male_count;
 				}
 
 				auto female_count = count(age, core::Gender::female);
-				if (female_count != 0.0) {
-					average_relative_risk_(age, core::Gender::female) =
-						sum(age, core::Gender::female) / female_count;
+				if (female_count > 0.0) {
+					female_average = sum(age, core::Gender::female) / female_count;
 				}
 			}
+
+			average_relative_risk_(age, core::Gender::male) = male_average;
+			average_relative_risk_(age, core::Gender::female) = female_average;
 		}
 	}
 
@@ -85,7 +89,7 @@ namespace hgps {
 	}
 
 	double DefaultCancerModel::get_excess_mortality(const Person& entity) const noexcept {
-		auto disease_info = entity.diseases.at(disease_type());
+		auto& disease_info = entity.diseases.at(disease_type());
 		auto max_onset = definition_.get().parameters().max_time_since_onset;
 		if (disease_info.time_since_onset < 0 || disease_info.time_since_onset >= max_onset) {
 			return 0.0;
@@ -93,7 +97,7 @@ namespace hgps {
 		
 		auto mortality_id = definition_.get().table().at("mortality");
 		auto excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
-		auto death_weight = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
+		auto& death_weight = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
 		if (entity.gender == core::Gender::male) {
 			return excess_mortality * death_weight.males;
 		}
@@ -102,7 +106,7 @@ namespace hgps {
 	}
 
 	DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(RuntimeContext& context) {
-		auto age_range = context.age_range();
+		auto& age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
 		for (auto& entity : context.population()) {
@@ -115,19 +119,25 @@ namespace hgps {
 			count(entity.age, entity.gender)++;
 		}
 
+		auto default_average = 1.0;
 		auto result = create_age_gender_table<double>(age_range);
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+			auto male_average = default_average;
+			auto female_average = default_average;
 			if (sum.contains(age)) {
 				auto male_count = count(age, core::Gender::male);
-				if (male_count != 0.0) {
-					result(age, core::Gender::male) = sum(age, core::Gender::male) / male_count;
+				if (male_count > 0.0) {
+					male_average = sum(age, core::Gender::male) / male_count;
 				}
 
 				auto female_count = count(age, core::Gender::female);
-				if (female_count != 0.0) {
-					result(age, core::Gender::female) = sum(age, core::Gender::female) / female_count;
+				if (female_count > 0.0) {
+					female_average = sum(age, core::Gender::female) / female_count;
 				}
 			}
+
+			result(age, core::Gender::male) = male_average;
+			result(age, core::Gender::female) = female_average;
 		}
 
 		return result;

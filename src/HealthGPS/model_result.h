@@ -40,7 +40,7 @@ namespace hgps {
 
         std::map<std::string, double> metrics{};
 
-        DataSeries time_series;
+        DataSeries series;
 
 		std::string to_string() const noexcept;
 

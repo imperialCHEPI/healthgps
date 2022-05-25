@@ -14,9 +14,9 @@ namespace hgps {
 		PopulationRecord(int pop_age, float num_males, float num_females)
 			: age{ pop_age }, males{ num_males }, females{ num_females } {}
 
-		const int age{};
-		const float males{};
-		const float females{};
+		int age{};
+		float males{};
+		float females{};
 
 		float total() const noexcept { return males + females; }
 	};
@@ -39,8 +39,6 @@ namespace hgps {
 
 		void update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) override;
 
-		void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host) override;
-
 	private:
 		std::map<int, std::map<int, PopulationRecord>> pop_data_;
 		LifeTable life_table_;
@@ -58,6 +56,7 @@ namespace hgps {
 		GenderTable<int, double> calculate_residual_mortality(
 			RuntimeContext& context, const DiseaseHostModule& disease_host);
 
+		void update_residual_mortality(RuntimeContext& context, const DiseaseHostModule& disease_host);
 		double calculate_excess_mortality_product(const Person& entity, const DiseaseHostModule& disease_host) const;
 		int update_age_and_death_events(RuntimeContext& context, const DiseaseHostModule& disease_host);
 	};

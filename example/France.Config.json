@@ -68,7 +68,7 @@
         "sync_timeout_ms": 5000,
       "diseases": ["asthma","diabetes","lowbackpain", "colorectalcancer"],
         "interventions": {
-            "active_type_id": "fiscal",
+            "active_type_id": null,
             "types": {
                 "simple": {
                     "active_period": {

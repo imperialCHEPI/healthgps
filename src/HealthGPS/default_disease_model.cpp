@@ -45,7 +45,7 @@ namespace hgps {
 	}
 
 	void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext& context) {
-		auto age_range = context.age_range();
+		auto& age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
 		for (auto& entity : context.population()) {
@@ -59,20 +59,24 @@ namespace hgps {
 			count(entity.age, entity.gender)++;
 		}
 
+		auto default_average = 1.0;
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+			auto male_average = default_average;
+			auto female_average = default_average;
 			if (sum.contains(age)) {
 				auto male_count = count(age, core::Gender::male);
-				if (male_count != 0.0) {
-					average_relative_risk_(age, core::Gender::male) =
-						sum(age, core::Gender::male) / male_count;
+				if (male_count > 0.0) {
+					male_average = sum(age, core::Gender::male) / male_count;
 				}
 
 				auto female_count = count(age, core::Gender::female);
-				if (female_count != 0.0) {
-					average_relative_risk_(age, core::Gender::female) =
-						sum(age, core::Gender::female) / female_count;
+				if (female_count > 0.0) {
+					female_average = sum(age, core::Gender::female) / female_count;
 				}
 			}
+
+			average_relative_risk_(age, core::Gender::male) = male_average;
+			average_relative_risk_(age, core::Gender::female) = female_average;
 		}
 	}
 
@@ -92,7 +96,7 @@ namespace hgps {
 	}
 
 	DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(RuntimeContext& context) {
-		auto age_range = context.age_range();
+		auto& age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
 		for (auto& entity : context.population()) {
@@ -105,19 +109,25 @@ namespace hgps {
 			count(entity.age, entity.gender)++;
 		}
 
+		auto default_average = 1.0;
 		auto result = create_age_gender_table<double>(age_range);
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+			auto male_average = default_average;
+			auto female_average = default_average;
 			if (sum.contains(age)) {
 				auto male_count = count(age, core::Gender::male);
-				if (male_count != 0.0) {
-					result(age, core::Gender::male) = sum(age, core::Gender::male) / male_count;
+				if (male_count > 0.0) {
+					male_average = sum(age, core::Gender::male) / male_count;
 				}
 
 				auto female_count = count(age, core::Gender::female);
-				if (female_count != 0.0) {
-					result(age, core::Gender::female) = sum(age, core::Gender::female) / female_count;
+				if (female_count > 0.0) {
+					female_average = sum(age, core::Gender::female) / female_count;
 				}
 			}
+
+			result(age, core::Gender::male) = male_average;
+			result(age, core::Gender::female) = female_average;
 		}
 
 		return result;

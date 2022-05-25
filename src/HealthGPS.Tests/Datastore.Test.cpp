@@ -47,6 +47,7 @@ TEST_F(DatastoreTest, CountryIsCaseInsensitive)
 
 TEST_F(DatastoreTest, CountryPopulation)
 {
+	using namespace hgps::core;
 	auto uk = manager.get_country("GB");
 	auto uk_pop = manager.get_population(uk.value());
 
@@ -63,10 +64,33 @@ TEST_F(DatastoreTest, CountryPopulation)
 	ASSERT_GT(uk_pop.size(), uk_pop_flt.size());
 	ASSERT_LT(uk_pop_min, uk_pop_flt.front().year);
 	ASSERT_GT(uk_pop_max, uk_pop_flt.back().year);
+
+	auto table_pop = std::map<int, std::map<int, PopulationItem>>{};
+	for (auto& item : uk_pop) {
+		if (!table_pop.contains(item.year)) {
+			table_pop.emplace(item.year, std::map<int, PopulationItem>{});
+		}
+
+		table_pop.at(item.year).emplace(item.age, PopulationItem{ .males = item.males, .females = item.females });
+	}
+
+	auto max_age = 100;
+	for (auto year = uk_pop_min; year <= uk_pop_max; year++) {
+		ASSERT_TRUE(table_pop.contains(year));
+
+		auto& year_pop = table_pop.at(year);
+		for (auto age = 0; age <= max_age; age++) {
+			ASSERT_TRUE(year_pop.contains(age));
+			auto& item = year_pop.at(age);
+			ASSERT_GT(item.males, 0.0f);
+			ASSERT_GT(item.females, 0.0f);
+		}
+	}
 }
 
 TEST_F(DatastoreTest, CountryMortality)
 {
+	using namespace hgps::core;
 	auto uk = manager.get_country("GB");
 	auto uk_deaths = manager.get_mortality(uk.value());
 
@@ -84,6 +108,28 @@ TEST_F(DatastoreTest, CountryMortality)
 	ASSERT_GT(uk_deaths.size(), uk_deaths_flt.size());
 	ASSERT_LT(uk_deaths_min, uk_deaths_flt.front().year);
 	ASSERT_GT(uk_deaths_max, uk_deaths_flt.back().year);
+
+	auto table_deaths = std::map<int, std::map<int, MortalityItem>>{};
+	for (auto& item : uk_deaths) {
+		if (!table_deaths.contains(item.year)) {
+			table_deaths.emplace(item.year, std::map<int, MortalityItem>{});
+		}
+
+		table_deaths.at(item.year).emplace(item.age, MortalityItem{.males = item.males, .females = item.females});
+	}
+
+	auto max_age = 100;
+	for (auto year = uk_deaths_min; year <= uk_deaths_max; year++) {
+		ASSERT_TRUE(table_deaths.contains(year));
+
+		auto& year_deaths = table_deaths.at(year);
+		for (auto age = 0; age <= max_age; age++) {
+			ASSERT_TRUE(year_deaths.contains(age));
+			auto& item = year_deaths.at(age);
+			ASSERT_GT(item.males, 0.0f);
+			ASSERT_GT(item.females, 0.0f);
+		}
+	}
 }
 
 TEST_F(DatastoreTest, RetrieveDeseasesInfo)

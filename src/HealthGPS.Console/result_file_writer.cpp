@@ -147,7 +147,7 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage& mes
 void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage& message)
 {
 	csvstream_ << "source,run,time,gender_name,index_id";
-	for (auto& chan : message.content.time_series.channels()) {
+	for (auto& chan : message.content.series.channels()) {
 		csvstream_ << "," << chan;
 	}
 
@@ -160,7 +160,7 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage& messag
 	using namespace hgps::core;
 
 	auto sep = ",";
-	auto& series = message.content.time_series;
+	auto& series = message.content.series;
 	std::stringstream mss;
 	std::stringstream fss;
 	for (auto& index : series.index_channel()) {
