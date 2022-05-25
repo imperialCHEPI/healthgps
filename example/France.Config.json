@@ -66,7 +66,7 @@
         "stop_time": 2050,
         "trial_runs": 1,
         "sync_timeout_ms": 5000,
-      "diseases": ["asthma","diabetes","lowbackpain", "colorectalcancer"],
+        "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
         "interventions": {
             "active_type_id": null,
             "types": {
