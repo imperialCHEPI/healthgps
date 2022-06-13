@@ -63,7 +63,8 @@ int main(int argc, char* argv[])
 	fmt::print("\nThere are {} countries in storage.\n", countries.size());
 	auto target = data_api.get_country(config.settings.country);
 	if (target.has_value()) {
-		fmt::print("Target country: {} - {}.\n", target.value().code, target.value().name);
+		fmt::print("Target country: {} - {}, population: {:0.3g}%.\n", 
+			target.value().code, target.value().name, config.settings.size_fraction*100.0f);
 	} 
 	else {
 		fmt::print(fg(fmt::color::light_salmon), "Target country: {} not found.\n", config.settings.country);
@@ -94,7 +95,9 @@ int main(int argc, char* argv[])
 		ExperimentInfo{
 			.model = config.app_name,
 			.version = config.app_version,
-			.intervention = config.intervention.identifier}
+			.intervention = config.intervention.identifier,
+			.job_id = config.job_id,
+			.seed = model_input.seed().value_or(0u)}
 	};
 	auto event_monitor = EventMonitor{ event_bus, json_file_logger };
 
@@ -117,6 +120,8 @@ int main(int argc, char* argv[])
 		auto baseline = HealthGPS{
 			SimulationDefinition{ model_input, std::move(baseline_scenario) , std::move(baseline_rnd) },
 			factory, event_bus };
+
+		fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n\n", config.trial_runs);
 		if (config.has_active_intervention) {
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
 			auto policy_rnd = std::make_unique<hgps::MTRandom32>();
@@ -124,7 +129,6 @@ int main(int argc, char* argv[])
 				SimulationDefinition{ model_input, std::move(policy_scenario), std::move(policy_rnd) },
 				factory, event_bus };
 
-			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n\n", config.trial_runs);
 			auto worker = std::jthread{ [&runtime, &executive, &baseline, &intervention, &config, &done] {
 				runtime = executive.run(baseline, intervention, config.trial_runs);
 				done.store(true);

@@ -293,8 +293,9 @@ namespace hgps {
 				"Simulation out of sync, failed to receive a net immigration message");
 		}
 		else {
-			throw std::runtime_error(
-				"Simulation out of sync, receive net immigration message has timed out");
+			throw std::runtime_error(fmt::format(
+				"Simulation out of sync, receive net immigration message has timed out after {} ms.",
+				context_.sync_timeout_millis()));
 		}
 	}
 

@@ -113,12 +113,11 @@ namespace hgps {
 		auto population_migrated = 0;
 		for (const auto& entity : context.population()) {
 			if (!entity.is_active()) {
-				if (entity.is_alive()) {
-					if (entity.time_of_migration() == analysis_time) {
-						population_migrated++;
-					}
+				if (entity.has_emigrated() && entity.time_of_migration() == analysis_time) {
+					population_migrated++;
 				}
-				else if (entity.time_of_death() == analysis_time) {
+
+				if (!entity.is_alive() && entity.time_of_death() == analysis_time) {
 					population_dead++;
 				}
 
@@ -137,10 +136,9 @@ namespace hgps {
 				item.second[entity.gender] += factor_value;
 			}
 
-			for (const auto& item : context.diseases()) {
-				if (entity.diseases.contains(item.code) &&
-					entity.diseases.at(item.code).status == DiseaseStatus::active) {
-					prevalence.at(item.code)[entity.gender]++;
+			for (const auto& item : entity.diseases) {
+				if (item.second.status == DiseaseStatus::active) {
+					prevalence.at(item.first)[entity.gender]++;
 				}
 			}
 		}
@@ -218,8 +216,8 @@ namespace hgps {
 			}
 		}
 
-		auto yll = yll_sum * 100000.0 / count;
-		auto yld = yld_sum * 100000.0 / count;
+		auto yll = yll_sum * DALY_UNITS / count;
+		auto yld = yld_sum * DALY_UNITS / count;
 		return DALYsIndicator
 		{
 			.years_of_life_lost = yll,
@@ -240,7 +238,6 @@ namespace hgps {
 
 		series.add_channels(channels_);
 
-		auto daly_units = 100'000.0;
 		auto current_time = static_cast<unsigned int>(context.time_now());
 		for (const auto& entity : context.population()) {
 			auto age = entity.age;
@@ -250,7 +247,7 @@ namespace hgps {
 				if (!entity.is_alive() && entity.time_of_death() == current_time) {
 					series(gender, "deaths").at(age)++;
 					auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-					series(gender, "yll").at(age) += std::max(expcted_life - age, 0.0f) * daly_units;
+					series(gender, "yll").at(age) += std::max(expcted_life - age, 0.0f) * DALY_UNITS;
 				}
 
 				if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
@@ -273,7 +270,7 @@ namespace hgps {
 
 			auto dw = calculate_disability_weight(entity);
 			series(gender, "disability_weight").at(age) += dw;
-			series(gender, "yld").at(age) += (dw * daly_units);
+			series(gender, "yld").at(age) += (dw * DALY_UNITS);
 
 			classify_weight(series, entity);
 		}

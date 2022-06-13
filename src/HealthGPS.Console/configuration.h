@@ -28,3 +28,5 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	hgps::SyncChannel& channel, const PolicyScenarioInfo& info);
 
 std::string expand_environment_variables(const std::string& path);
+
+std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed);

@@ -5,6 +5,7 @@
 #include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
 #include "HealthGPS/fiscal_scenario.h"
+#include "HealthGPS/mtrandom.h"
 
 #include "HealthGPS.Core/scoped_timer.h"
 
@@ -304,12 +305,7 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		config.settings.age_range.front(), config.settings.age_range.back());
 
 	auto settings = Settings(country, config.settings.size_fraction, age_range);
-
-	auto job_custom_seed = config.custom_seed;
-	if (job_custom_seed.has_value() && config.job_id > 0) {
-		job_custom_seed.value() += static_cast<unsigned int>(config.job_id);
-	}
-
+	auto job_custom_seed = create_job_seed(config.job_id, config.custom_seed);
 	auto run_info = RunInfo {
 		.start_time = config.start_time,
 		.stop_time = config.stop_time,
@@ -455,4 +451,17 @@ std::string expand_environment_variables(const std::string& path)
 	if (v != NULL) value = std::string(v);
 
 	return expand_environment_variables(pre + value + post);
+}
+
+std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed)
+{
+	if (job_id > 0 && user_seed.has_value()) {
+		auto seed = user_seed.value();
+		auto rnd = hgps::MTRandom32{ seed };
+		auto shift = static_cast<unsigned int>(std::pow(job_id, 2.0));
+		rnd.discard(shift);
+		return rnd();
+	}
+
+	return user_seed;
 }
