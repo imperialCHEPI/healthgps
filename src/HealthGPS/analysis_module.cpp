@@ -5,6 +5,8 @@
 #include "converter.h"
 
 #include <cmath>
+#include <future>
+#include <functional>
 
 namespace hgps {
 	AnalysisModule::AnalysisModule(
@@ -83,15 +85,21 @@ namespace hgps {
 	}
 
 	void AnalysisModule::publish_result_message(RuntimeContext& context) const {
-		auto result = calculate_historical_statistics(context);
+		auto sample_size = context.age_range().upper() + 1u;
+		auto result = ModelResult{ sample_size };
 
+		auto handle = std::async(std::launch::async,
+			&hgps::AnalysisModule::calculate_historical_statistics, this, std::ref(context), std::ref(result));
+
+		// calculate_historical_statistics(context, result);
 		calculate_population_statistics(context, result.series);
+		handle.get();
 
 		context.publish(std::make_unique<ResultEventMessage>(
 			context.identifier(), context.current_run(), context.time_now(), result));
 	}
 
-	ModelResult AnalysisModule::calculate_historical_statistics(RuntimeContext& context) const {
+	void AnalysisModule::calculate_historical_statistics(RuntimeContext& context, ModelResult& result) const {
 		auto risk_factors = std::map<std::string, std::map<core::Gender, double>>();
 		for (const auto& item : context.mapping()) {
 			if (item.level() > 0) {
@@ -144,8 +152,6 @@ namespace hgps {
 		}
 
 		// Calculate the averages avoiding division by zero
-		auto sample_size = context.age_range().upper() + 1u;
-		auto result = ModelResult{ sample_size };
 		result.population_size = population_size;
 		result.number_alive = population_alive;
 		result.number_dead = population_dead;
@@ -174,7 +180,6 @@ namespace hgps {
 		}
 
 		result.indicators = calculate_dalys(context.population(), context.age_range().upper(), analysis_time);
-		return result;
 	}
 
 	double AnalysisModule::calculate_disability_weight(const Person& entity) const {
@@ -199,15 +204,13 @@ namespace hgps {
 		auto yld_sum = 0.0;
 		auto count = 0;
 		for (const auto& entity : population) {
-			if (entity.time_of_death() == death_year) {
-				if (entity.age <= max_age) {
-					auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
-					auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
+			if (entity.time_of_death() == death_year && entity.age <= max_age) {
+				auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
+				auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
 
-					auto reference_age = std::max(male_reference_age, female_reference_age);
-					auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
-					yll_sum += lifeExpectancy;
-				}
+				auto reference_age = std::max(male_reference_age, female_reference_age);
+				auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
+				yll_sum += lifeExpectancy;
 			}
 
 			if (entity.is_active()) {

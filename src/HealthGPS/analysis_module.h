@@ -33,7 +33,7 @@ namespace hgps {
 			const DoubleAgeGenderTable& expected_sum, const IntegerAgeGenderTable& expected_count);
 
 		void publish_result_message(RuntimeContext& context) const;
-		ModelResult calculate_historical_statistics(RuntimeContext& context) const;
+		void calculate_historical_statistics(RuntimeContext& context, ModelResult& result) const;
 		double calculate_disability_weight(const Person& entity) const;
 		DALYsIndicator calculate_dalys(Population& population,
 			const unsigned int& max_age, const unsigned int& death_year) const;
