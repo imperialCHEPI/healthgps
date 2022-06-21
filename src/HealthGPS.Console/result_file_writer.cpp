@@ -142,6 +142,13 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage& mes
 		};
 	}
 
+	for (const auto& item : message.content.comorbidity) {
+		msg["comorbidity"][std::to_string(item.first)] = {
+			{"male", item.second.male},
+			{"female", item.second.female}
+		};
+	}
+
 	msg["metrics"] = message.content.metrics;
 	return msg.dump();
 }

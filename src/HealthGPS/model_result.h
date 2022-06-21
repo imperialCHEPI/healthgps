@@ -38,6 +38,8 @@ namespace hgps {
 
         std::map<std::string, ResultByGender> disease_prevalence{};
 
+        std::map<int, ResultByGender> comorbidity{};
+
         std::map<std::string, double> metrics{};
 
         DataSeries series;

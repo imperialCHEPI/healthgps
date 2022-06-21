@@ -35,8 +35,7 @@ namespace hgps {
 		void publish_result_message(RuntimeContext& context) const;
 		void calculate_historical_statistics(RuntimeContext& context, ModelResult& result) const;
 		double calculate_disability_weight(const Person& entity) const;
-		DALYsIndicator calculate_dalys(Population& population,
-			const unsigned int& max_age, const unsigned int& death_year) const;
+		DALYsIndicator calculate_dalys(Population& population, unsigned int max_age, unsigned int death_year) const;
 
 		void calculate_population_statistics(RuntimeContext& context, DataSeries& series) const;
 		void classify_weight(hgps::DataSeries& series, const hgps::Person& entity) const;

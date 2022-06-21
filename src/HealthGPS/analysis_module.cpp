@@ -112,9 +112,15 @@ namespace hgps {
 			prevalence.emplace(item.code, std::map<core::Gender, int>{});
 		}
 
+		std::map<int, ResultByGender> comorbidity{};
 		auto age_sum = std::map<core::Gender, int>{};
 		auto age_count = std::map<core::Gender, int>{};
+		auto age_upper_bound = context.age_range().upper();
 		auto analysis_time = static_cast<unsigned int>(context.time_now());
+
+		auto daly_handle = std::async(std::launch::async,
+			&hgps::AnalysisModule::calculate_dalys, this, std::ref(context.population()), age_upper_bound, analysis_time);
+
 		auto population_size = static_cast<int>(context.population().size());
 		auto population_alive = 0;
 		auto population_dead = 0;
@@ -144,9 +150,20 @@ namespace hgps {
 				item.second[entity.gender] += factor_value;
 			}
 
+			auto comorbidity_number = 0;
 			for (const auto& item : entity.diseases) {
 				if (item.second.status == DiseaseStatus::active) {
+					comorbidity_number++;
 					prevalence.at(item.first)[entity.gender]++;
+				}
+			}
+
+			if (comorbidity_number > 0) {
+				if (entity.gender == core::Gender::male) {
+					comorbidity[comorbidity_number].male++;
+				}
+				else {
+					comorbidity[comorbidity_number].female++;
 				}
 			}
 		}
@@ -179,7 +196,14 @@ namespace hgps {
 			result.metrics.emplace(item.first, item.second);
 		}
 
-		result.indicators = calculate_dalys(context.population(), context.age_range().upper(), analysis_time);
+		for (const auto& item : comorbidity) {
+			result.comorbidity.emplace(item.first, ResultByGender{
+					.male = item.second.male * 100.0 / males_count,
+					.female = item.second.female * 100.0 / males_count
+				});
+		}
+
+		result.indicators = daly_handle.get();
 	}
 
 	double AnalysisModule::calculate_disability_weight(const Person& entity) const {
@@ -199,7 +223,7 @@ namespace hgps {
 	}
 
 	DALYsIndicator AnalysisModule::calculate_dalys(Population& population,
-		const unsigned int& max_age, const unsigned int& death_year) const {
+		unsigned int max_age, unsigned int death_year) const {
 		auto yll_sum = 0.0;
 		auto yld_sum = 0.0;
 		auto count = 0;
