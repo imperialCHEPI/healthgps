@@ -84,6 +84,8 @@ void ResultFileWriter::write_json_begin(const std::filesystem::path output) {
 			{"model", info_.model},
 			{"version", info_.version},
 		    {"intervention", info_.intervention},
+			{"job_id", info_.job_id},
+			{"custom_seed", info_.seed},
 			{"time_of_day", fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch())},
 			{"output_filename", output.filename().string()}
 		}},
@@ -137,6 +139,13 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage& mes
 		msg["disease_prevalence"][disease.first] = { 
 			{"male", disease.second.male},
 			{"female", disease.second.female}
+		};
+	}
+
+	for (const auto& item : message.content.comorbidity) {
+		msg["comorbidities"][std::to_string(item.first)] = {
+			{"male", item.second.male},
+			{"female", item.second.female}
 		};
 	}
 

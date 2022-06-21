@@ -5,6 +5,9 @@
 #include "gender_table.h"
 
 namespace hgps {
+
+	static constexpr double DALY_UNITS = 100'000.0;
+
 	class AnalysisDefinition {
 	public:
 		AnalysisDefinition(GenderTable<int, float>&& life_expectancy,
@@ -29,5 +32,6 @@ namespace hgps {
 		GenderTable<int, float> life_expectancy_;
 		DoubleAgeGenderTable observed_YLD_;
 		std::map<std::string, float> disability_weights_;
+		unsigned int comorbidities_;
 	};
 }
