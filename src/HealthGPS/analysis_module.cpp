@@ -9,11 +9,11 @@
 #include <functional>
 
 namespace hgps {
-	AnalysisModule::AnalysisModule(
-		AnalysisDefinition&& definition, WeightModel&& classifier, const core::IntegerInterval age_range)
+	AnalysisModule::AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
+		const core::IntegerInterval age_range, unsigned int comorbidities)
 		: definition_{ std::move(definition) }, weight_classifier_{ std::move(classifier) }
 		, residual_disability_weight_{ create_age_gender_table<double>(age_range) }
-		, channels_{}
+		, channels_{}, comorbidities_{ comorbidities }
 	{}
 
 	SimulationModuleType AnalysisModule::type() const noexcept {
@@ -112,7 +112,12 @@ namespace hgps {
 			prevalence.emplace(item.code, std::map<core::Gender, int>{});
 		}
 
-		std::map<int, ResultByGender> comorbidity{};
+		auto comorbidity = std::map<unsigned int, ResultByGender>{};
+		for (auto i = 1u; i <= comorbidities_; i++)
+		{
+			comorbidity.emplace(i, ResultByGender{});
+		}
+
 		auto age_sum = std::map<core::Gender, int>{};
 		auto age_count = std::map<core::Gender, int>{};
 		auto age_upper_bound = context.age_range().upper();
@@ -150,7 +155,7 @@ namespace hgps {
 				item.second[entity.gender] += factor_value;
 			}
 
-			auto comorbidity_number = 0;
+			auto comorbidity_number = 0u;
 			for (const auto& item : entity.diseases) {
 				if (item.second.status == DiseaseStatus::active) {
 					comorbidity_number++;
@@ -159,6 +164,10 @@ namespace hgps {
 			}
 
 			if (comorbidity_number > 0) {
+				if (comorbidity_number > comorbidities_) {
+					comorbidity_number = comorbidities_;
+				}
+
 				if (entity.gender == core::Gender::male) {
 					comorbidity[comorbidity_number].male++;
 				}
@@ -395,7 +404,7 @@ namespace hgps {
 		auto definition = detail::StoreConverter::to_analysis_definition(analysis_entity);
 		auto classifier = WeightModel{ LmsModel{ lms_definition } };
 
-		return std::make_unique<AnalysisModule>(
-			std::move(definition), std::move(classifier), config.settings().age_range());
+		return std::make_unique<AnalysisModule>(std::move(definition), std::move(classifier),
+			config.settings().age_range(), config.run().comorbidities);
 	}
 }

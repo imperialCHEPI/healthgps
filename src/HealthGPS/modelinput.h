@@ -15,6 +15,7 @@ namespace hgps {
 		unsigned int sync_timeout_ms{};
 		std::optional<unsigned int> seed{};
 		core::VerboseMode verbosity{};
+		unsigned int comorbidities{};
 	};
 
 	struct SESDefinition {

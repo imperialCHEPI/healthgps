@@ -238,11 +238,14 @@ void from_json(const json& j, PolicyScenarioInfo& p) {
 
 // Result information
 void to_json(json& j, const OutputInfo& p) {
-	j = json{ {"folder", p.folder} };
-	j = json{ {"file_name", p.file_name} };
+	j = json{
+		{"folder", p.folder},
+		{"file_name", p.file_name},
+		{"comorbidities", p.comorbidities} };
 }
 
 void from_json(const json& j, OutputInfo& p) {
 	j.at("folder").get_to(p.folder);
 	j.at("file_name").get_to(p.file_name);
+	j.at("comorbidities").get_to(p.comorbidities);
 }

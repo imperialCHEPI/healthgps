@@ -304,6 +304,14 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	auto age_range = core::IntegerInterval(
 		config.settings.age_range.front(), config.settings.age_range.back());
 
+	auto comorbidities = config.output.comorbidities;
+	auto diseases_number = static_cast<unsigned int>(diseases.size());
+	if (comorbidities > diseases_number) {
+		comorbidities = diseases_number;
+		fmt::print(fg(fmt::color::salmon), "Comorbidities value: {}, set to # of diseases: {}.\n",
+			config.output.comorbidities, comorbidities);
+	}
+
 	auto settings = Settings(country, config.settings.size_fraction, age_range);
 	auto job_custom_seed = create_job_seed(config.job_id, config.custom_seed);
 	auto run_info = RunInfo {
@@ -311,7 +319,8 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 		.stop_time = config.stop_time,
 		.sync_timeout_ms = config.sync_timeout_ms,
 		.seed = job_custom_seed,
-		.verbosity = config.verbosity
+		.verbosity = config.verbosity,
+		.comorbidities = comorbidities,
 	};
 
 	auto ses_mapping = SESDefinition {

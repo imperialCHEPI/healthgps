@@ -13,7 +13,8 @@ namespace hgps {
 	class AnalysisModule final : public UpdatableModule {
 	public:
 		AnalysisModule() = delete;
-		AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier, const core::IntegerInterval age_range);
+		AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
+					   const core::IntegerInterval age_range, unsigned int comorbidities);
 
 		SimulationModuleType type() const noexcept override;
 
@@ -28,6 +29,7 @@ namespace hgps {
 		WeightModel weight_classifier_;
 		DoubleAgeGenderTable residual_disability_weight_;
 		std::vector<std::string> channels_;
+		unsigned int comorbidities_;
 
 		double calculate_residual_disability_weight(const int& age, const core::Gender gender,
 			const DoubleAgeGenderTable& expected_sum, const IntegerAgeGenderTable& expected_count);

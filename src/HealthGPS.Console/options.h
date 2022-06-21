@@ -67,6 +67,7 @@ struct ModellingInfo
 
 struct OutputInfo
 {
+	unsigned int comorbidities{};
 	std::string folder{};
 	std::string file_name{};
 };

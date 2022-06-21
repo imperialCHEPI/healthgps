@@ -107,6 +107,7 @@
         }
     },
     "output": {
+        "comorbidities": 5,
         "folder": "${HOME}/healthgps/results",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
