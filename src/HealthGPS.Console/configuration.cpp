@@ -401,7 +401,7 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 {
 	using namespace hgps;
 
-	fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n", info.identifier);
+	fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
 	auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
 	auto risk_impacts = std::vector<PolicyImpact>{};
 	for (auto& item : info.impacts) {

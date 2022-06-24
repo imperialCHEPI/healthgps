@@ -1,4 +1,5 @@
 #include "population.h"
+#include <execution>
 
 namespace hgps {
     Population::Population(const std::size_t size) 
@@ -14,7 +15,7 @@ namespace hgps {
     }
 
     std::size_t Population::current_active_size() const noexcept {
-        auto active_pop_size = std::count_if(people_.cbegin(),people_.cend(),
+        auto active_pop_size = std::count_if(std::execution::par, people_.cbegin(),people_.cend(),
             [](const auto& p) { return p.is_active(); });
 
         return active_pop_size;
