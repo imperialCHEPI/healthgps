@@ -113,7 +113,7 @@ namespace hgps {
 		}
 
 		auto comorbidity = std::map<unsigned int, ResultByGender>{};
-		for (auto i = 1u; i <= comorbidities_; i++)
+		for (auto i = 0u; i <= comorbidities_; i++)
 		{
 			comorbidity.emplace(i, ResultByGender{});
 		}
@@ -163,17 +163,15 @@ namespace hgps {
 				}
 			}
 
-			if (comorbidity_number > 0) {
-				if (comorbidity_number > comorbidities_) {
-					comorbidity_number = comorbidities_;
-				}
+			if (comorbidity_number > comorbidities_) {
+				comorbidity_number = comorbidities_;
+			}
 
-				if (entity.gender == core::Gender::male) {
-					comorbidity[comorbidity_number].male++;
-				}
-				else {
-					comorbidity[comorbidity_number].female++;
-				}
+			if (entity.gender == core::Gender::male) {
+				comorbidity[comorbidity_number].male++;
+			}
+			else {
+				comorbidity[comorbidity_number].female++;
 			}
 		}
 
@@ -208,7 +206,7 @@ namespace hgps {
 		for (const auto& item : comorbidity) {
 			result.comorbidity.emplace(item.first, ResultByGender{
 					.male = item.second.male * 100.0 / males_count,
-					.female = item.second.female * 100.0 / males_count
+					.female = item.second.female * 100.0 / females_count
 				});
 		}
 

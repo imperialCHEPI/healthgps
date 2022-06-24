@@ -115,14 +115,15 @@ int main(int argc, char* argv[])
 		auto runtime = 0.0;
 
 		// GCC thread initialisation bug reverses derived to base-class, when declared in line
+		fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
 		auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
 		auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
 		auto baseline = HealthGPS{
 			SimulationDefinition{ model_input, std::move(baseline_scenario) , std::move(baseline_rnd) },
 			factory, event_bus };
 
-		fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n\n", config.trial_runs);
 		if (config.has_active_intervention) {
+			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n", config.trial_runs);
 			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
 			auto policy_rnd = std::make_unique<hgps::MTRandom32>();
 			auto intervention = HealthGPS{
@@ -141,7 +142,6 @@ int main(int argc, char* argv[])
 			worker.join();
 		}
 		else {
-			fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
 			channel.close(); // Will not store any message
 			auto worker = std::jthread{ [&runtime, &executive, &baseline, &config, &done] {
 				runtime = executive.run(baseline, config.trial_runs);
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		fmt::print(fg(fmt::color::light_green), "Completed, elapsed time : {}ms\n\n", runtime);
+		fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
 		fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n", ex.what());
@@ -164,8 +164,8 @@ int main(int argc, char* argv[])
 
 	event_monitor.stop();
 	fmt::print("\n\n");
-	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye");
-	fmt::print("\n\n");
+	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
+	fmt::print(" {}.\n\n", getTimeNowStr());
 
 	return EXIT_SUCCESS;
 }
