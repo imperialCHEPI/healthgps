@@ -338,7 +338,7 @@ namespace hgps {
 			}
 			else {
 
-				// calculate death probability based on the health status
+				// Calculate death probability based on the health status
 				auto residual_death_rate = get_residual_death_rate(entity.age, entity.gender);
 				auto product = 1.0 - residual_death_rate;
 				for (const auto& item : entity.diseases) {
@@ -356,12 +356,8 @@ namespace hgps {
 				}
 			}
 
-			// Update basic information
 			if (entity.is_active()) {
 				entity.age = entity.age + 1;
-				if (entity.age >= max_age) {
-					entity.die(context.time_now());
-				}
 			}
 		}
 
