@@ -24,6 +24,16 @@ Health GPS is a flexible and modular framework, written in modern C++, designed 
 |:--:|
 |*Health GPS Concept Diagram*|
 
+### Dynamics
+
+The framework defines multi-dimensional interactions on demographic, risk factors and diseases as shown below. The model dynamics capture the effects of the various interacting modules overtime to stablish the population *baseline* projection and quantify the impact of *interventions* on risk factors, *the different between the two scenarios*.  
+
+|![Health GPS Dynamics](/assets/image/model_dynamics_diagram.png)|
+|:--:|
+|*Health GPS Dynamics Diagram*|
+
+A brief overview of each module is provided next, the framework has been designed for composition, and allows experimenting with different module implementations at run-time.
+
 ## Demographics
 
 The population historical trends and projections are used to define the baseline scenario for the model. The model requires historical and projected populations by *year*, *age* and *gender* for each country of interest, covering the entire duration of the experiment. All data processing, units' conversion, gap filling, smoothing, etc, must be carried out outside to produce the complete datasets required. The following demographic measures are required by the model:
