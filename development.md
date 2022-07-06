@@ -100,8 +100,12 @@ auto model_input = create_model_input(...);
 auto event_bus = DefaultEventBus();
 auto json_file_logger = ResultFileWriter{
     create_output_file_name(config.output),
-    ExperimentInfo{.model = "Health GPS", .version = "1.0.0.0",
-        .intervention = config.intervention.identifier}
+    ExperimentInfo{
+        .model = config.app_name, 
+        .version = config.app_version, 
+        .intervention = config.intervention.identifier, 
+        .job_id = config.job_id, 
+        .seed = model_input.seed().value_or(0u)}
 };
 auto event_monitor = EventMonitor{ event_bus, json_file_logger };
 
@@ -120,8 +124,8 @@ try {
     // Create simulation engine for baseline scenario
     auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
     auto baseline = HealthGPS{
-        SimulationDefinition{
-            model_input, std::move(baseline_scenario),
+        SimulationDefinition{ model_input,
+            std::move(baseline_scenario), 
             std::move(baseline_rnd)},
         factory, event_bus };
 
@@ -134,8 +138,8 @@ try {
         // Create simulation engine for intervention scenario
         auto policy_rnd = std::make_unique<hgps::MTRandom32>();
         auto intervention = HealthGPS{
-            SimulationDefinition{
-                model_input, std::move(policy_scenario),
+            SimulationDefinition{ model_input,
+                std::move(policy_scenario),
                 std::move(policy_rnd)},
             factory, event_bus };
 
@@ -185,8 +189,9 @@ The simulation executive can run experiments for baseline scenario only, or base
 | Average Age  | -       | ✓     | ✓      | Average age of the population alive |
 | Prevalence   | -       | ✓     | ✓      | Prevalence for each disease in the population |
 | Risk factors | -       | ✓     | ✓      | Average risk factor values in the population |
-| Indicators (DALYs) | ✓ | - | - | YLL, YLD and DALY values per 10000 people |
+| Indicators (DALYs) | ✓ | - | - | YLL, YLD and DALY values per 100'000 people |
 | Population Counts | ✓ | - | - |  Total size, number alive, dead and emigrants |
+|Comorbidities | -       | ✓     | ✓      | Percentage of people with 0 to N+ diseases |
 | Metrics | ✓ | - | - | Custom key/value metrics for algorithms |
 | Series | - | ✓ | ✓ | Detailed time series by time, age and gender |
 

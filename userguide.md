@@ -42,13 +42,14 @@ The high-level structure of the [configuration][configjson] file used to create 
         "stop_time": 2050,
         "trial_runs": 1,
         "sync_timeout_ms": 5000,
-        "diseases": [ "asthma", "diabetes", "lowbackpain", "colorectum"],
+        "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
         "interventions": {
             "active_type_id": "",
             "types": {}
         }
     },
     "output": {
+        "comorbidities": 4,
         "folder": "${HOME}/healthgps/results",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
@@ -112,18 +113,16 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
     ],
     "dynamic_risk_factor": "",
     "risk_factor_models": {
-        "static": "france_HLM.json",
-        "dynamic": "france_EBHLM.json"
+        "static": "France_HLM.json",
+        "dynamic": "France_EBHLM.json"
     },
     "baseline_adjustments": {
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
         "file_names": {
-            "static_male":"france_initial_adjustment_male.csv",
-            "static_female":"france_initial_adjustment_female.csv",
-            "dynamic_male":"france_update_adjustment_male.csv",
-            "dynamic_female":"france_update_adjustment_female.csv"
+            "factors_mean_male":"France.FactorsMean.Male.csv",
+            "factors_mean_female":"France.FactorsMean.Female.csv"
         }
     }
 }
@@ -143,7 +142,7 @@ The ***experiment*** section defines simulation *runtime* period, *start/stop ti
     "stop_time": 2050,
     "trial_runs": 1,
     "sync_timeout_ms": 5000,
-    "diseases": [ "asthma", "diabetes", "lowbackpain", "colorectum"],
+    "diseases": ["alzheimer", "asthma", "colorectalcancer", "diabetes", "lowbackpain", "osteoarthritisknee"],
     "interventions": {
         "active_type_id": "marketing",
         "types": {
@@ -178,16 +177,18 @@ Unlike the diseases *data driven* definition, *interventions* can have specific 
 
 ## 1.4 Output
 
-Finally, ***output*** section repeated below, defines the results output *folder and file name*. The configuration parser can handle *folder* name with *environment variables* such as `HOME` on Linux shown above, however care must be taken when running the model cross-platform with same configuration file. Likewise, *file name* can have a `TIMESTAMP` *token*, to enable multiple experiments to write results to the same folder on disk without file name crashing.
+Finally, ***output*** section repeated below, defines  the maximum number of *comorbidities* to include in the results, and the output *folder and file name*. The configuration parser can handle *folder* name with *environment variables* such as `HOME` on Linux shown below, however care must be taken when running the model cross-platform with same configuration file. Likewise, *file name* can have a `TIMESTAMP` *token*, to enable multiple experiments to write results to the same folder on disk without file name crashing.
 
 ```json
 ...
 "output": {
+    "comorbidities": 4,
     "folder": "${HOME}/healthgps/results",
     "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
 }
 ...
 ```
+The file name can have a *job_id*, passed as a CLI parameter, added to the end when running the simulation in batch mode, e.g., HPC cluster array. This feature enables the batch output files to be collated together to produce the complete results dataset for analysis.
 
 ## 1.5 Risk Factor Models
 
@@ -512,7 +513,8 @@ Defines the file storage for disease cost analysis for country specific data con
     "path": "analysis",
     "age_limits": [1, 100],
     "time_year": 2019,
-    "file_name": "disability_weights.csv",
+    "disability_file_name": "disability_weights.csv",
+    "lms_file_name":"lms_parameters.csv",
     "cost_of_disease": {
         "path":"cost",
         "file_name": "BoD{COUNTRY_CODE}.csv"
@@ -559,10 +561,13 @@ The model results file structure is composed of two parts: *experiment metadata*
 ```json
 {
     "experiment": {
-        "model": "Health GPS",
-        "version": "1.0.0.0",
+        "model": "HealthGPS",
+        "version": "1.1.3.0",
         "intervention": "marketing",
-        "time_of_day": "2022-02-01 11:51:43.129 GMT Standard Time"
+        "job_id": 0,
+        "custom_seed": 123456789,
+        "time_of_day": "2022-07-04 17:50:37.5678259 GMT Summer Time",
+        "output_filename": "HealthGPS_Result_{TIME_STAMP}.csv"
     },
     "result": [
         {
