@@ -536,7 +536,7 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-4. Run: `X:\xxx> .\HealthGPS.Console -f ".\example\France.Config.json" -s ".\data"` where `-f` gives the *configuration file* full-name and
+4. Run: `X:\xxx> .\HealthGPS.Console -f "example\France.Config.json" -s "data"` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `C:\healthgps\results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
@@ -547,7 +547,7 @@ You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
 3. Navigate to the directory used in step 2 (xxx).
-4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f ./example/France.Config.json -s ./data` where `-f` gives the *configuration file* full-name and `-s` the path to the root folder of the *backend storage* respectively.
+4. Run: `user@machine:~/xxx$ ./HealthGPS.Console -f example/France.Config.json -s data` where `-f` gives the *configuration file* full-name and `-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 > See [Quick Start](getstarted) for details on the example dataset and known issues.

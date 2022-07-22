@@ -233,3 +233,46 @@ SimulationModuleFactory get_default_simulation_module_factory(Repository& manage
 ```
 
 The factory must provide builder functions for all the required *module types* in order to successfully create an instance of the HealthGPS simulation engine, however, the user can disable a particular module behaviour by registering an implementation that makes no change to the virtual population properties when invoked by the simulation engine at runtime.
+
+## Reproducibility
+
+Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
+
+|![Experiment reproducibility](/assets/image/batch_mode_seed.png)|
+|:--:|
+|*Experiment reproducibility algorithm (seed management)*|
+
+When running the simulation as a single experiment, the solution is trivial, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. The following script, ***example.pbs*** in *Portable Batch System* (PBS) language, illustrate the mechanism by scheduling 50 simulation batches using *Health GPS* on a *HPC computer* to evaluate the *same experiment* in parallel. The custom seed is used to create predictable master seeds for each batch, resulting in a total of `50 x number of runs in each batch` repeatable simulation runs. The number of runs in each batch must be configured to complete in less than 8 hours in this example.
+
+```bash
+#PBS -l walltime=8:00:00
+#PBS -l select=1:ncpus=8:mem=96gb:ompthreads=16
+#PBS -J 1-50
+
+module load gcc/11.2.0
+
+cd $PBS_O_WORKDIR
+
+user@machine:~/xxx$ ./HealthGPS.Console -f example/France.Config.json -s data -j $PBS_ARRAY_INDEX$
+```
+To submit the job, using PBS, use the following command on a HPC login node:
+```
+user@machine:~/xxx$ qsub example.pbs
+```
+Each simulation batch results file have the HPC *arrays index number* appended to the filename, enabling a full reconstruction of the experiment results for analysis. This mechanism enables new simulation runs to be added to an existing experiment's results dataset to improved convergence without repeating simulations by incrementing the job range in the schedule script. For example, to added 25 simulation batches to the same experiment's results, change the script as follows, submit the job again, and process the the results as before:
+
+``` bash
+...
+#PBS -J 51-75
+...
+```
+
+To repeat the full experiment, keep track of the configuration file, Health GPS executable version, backend storage state, and HPC job range used, for example, the following change to the script repeat the full experiment above and produce \`exact\` the same results:
+
+``` bash
+...
+#PBS -J 1-75
+...
+```
+
+Please note that HPC machine configuration can also influence the results due to floating-point calculation, Health GPS will use shared libraries installed in the system such as C++ standard library, however the difference should be negligible within the machine numerical precision.
