@@ -2,6 +2,7 @@
 #include "disease_registry.h"
 #include "weight_model.h"
 #include "lms_model.h"
+#include <execution>
 
 namespace hgps {
 
@@ -64,19 +65,24 @@ namespace hgps {
 		auto registry = get_default_disease_model_registry();
 		auto models = std::map<std::string, std::shared_ptr<DiseaseModel>>();
 
-		for (auto& info : config.diseases()) {
-			auto other = repository.get_disease_info(info.code);
-			if (!registry.contains(info.group) || !other.has_value()) {
-				throw std::runtime_error("Unknown disease definition: " + info.code);
-			}
+		auto& diseases = config.diseases();
+		std::mutex m;
+		std::for_each(std::execution::par, std::begin(diseases), std::end(diseases),
+			[&](auto& info) {
+				auto other = repository.get_disease_info(info.code);
+				if (!registry.contains(info.group) || !other.has_value()) {
+					throw std::runtime_error("Unknown disease definition: " + info.code);
+				}
 
-			auto& disease_definition = repository.get_disease_definition(info, config);
-			auto& lms_definition = repository.get_lms_definition();
-			auto classifier = WeightModel{ LmsModel{ lms_definition } };
+				auto& disease_definition = repository.get_disease_definition(info, config);
+				auto& lms_definition = repository.get_lms_definition();
+				auto classifier = WeightModel{ LmsModel{ lms_definition } };
 
-			models.emplace(info.code, registry.at(info.group)(
-				disease_definition, std::move(classifier), config.settings().age_range()));
-		}
+				// Sync region
+				std::scoped_lock lock(m);
+				models.emplace(info.code, registry.at(info.group)(
+					disease_definition, std::move(classifier), config.settings().age_range()));
+			});
 
 		return std::make_unique<DiseaseModule>(std::move(models));
 	}
