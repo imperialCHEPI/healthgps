@@ -12,7 +12,7 @@ The model uses proprietary equations to account for a variety of complex interac
 ### General Workflow
 The Health GPS workflow is summarised below, datasets from many disconnected sources are used to define the various modules and components of the framework. Commonly used datasets are processed, aggregated, indexed by country, and stored in the backend *datastore*, while research specific datasets are analysed externally to build the *risk factors* and *socio-economic status* modules, design and parameterise *intervention* to be tested.
 
-|![Health GPS Workflow](/assets/image/general_workflow.png)|
+|![Health GPS Workflow](/assets/image/general_workflow.svg)|
 |:--:|
 |*Health GPS General Workflow Diagram*|
 
@@ -20,7 +20,7 @@ The simulation creates the virtual population, simulates the synthetic individua
 
 Health GPS is a flexible and modular framework, written in modern C++, designed using object-oriented principles to provide the building blocks necessary to compose the overall microsimulation, several data sources, modules and sub-model are required as shown below.
 
-|![Health GPS Concept](/assets/image/model_concept_diagram.png)|
+|![Health GPS Concept](/assets/image/model_concept_diagram.svg)|
 |:--:|
 |*Health GPS Concept Diagram*|
 
@@ -28,7 +28,7 @@ Health GPS is a flexible and modular framework, written in modern C++, designed 
 
 The framework defines multi-dimensional interactions on *demographics*, *risk factors*, *diseases* and *intervention* modules as shown below. The model dynamics capture the effects of the various interacting modules overtime to stablish the population *baseline* projection and quantify the impact of *interventions* on risk factors, *the different between the two scenarios*, with the burden of diseases (BoD) *analysis module*.
 
-|![Health GPS Dynamics](/assets/image/model_dynamics_diagram.png)|
+|![Health GPS Dynamics](/assets/image/model_dynamics_diagram.svg)|
 |:--:|
 |*Health GPS Dynamics Diagram*|
 
@@ -57,7 +57,7 @@ The dynamics of risk factors modelling is a major challenge for health policy mo
 
 To represent childhood obesity, national dietary surveys from various European countries are analysed to build the risk factor model. Estimates of yearly changes in physical activity, diet, energy balance, and Body Mass Index (BMI) are created using dietary and anthropometric surveys. These include measures of physical activity expressed in metabolic equivalents (METs) and macronutrients intakes measures including grams of fat, carbohydrates, protein, fibre, salt, and sugar. The general concept for an EBM is shown below (top diagram), and a possible *Health GPS* translation is provided for illustration purpose.
 
-|![Health GPS Components](/assets/image/energy_balance_model.png)|
+|![Health GPS Components](/assets/image/energy_balance_model.svg)|
 |:--:|
 |*Energy balance model structure example*|
 
@@ -85,7 +85,7 @@ Finally, detailed analysis can be carried out, externally, to compare the two si
 
 The microsimulation consists of two main algorithms to *initialise* and *project* the virtual population over time respectively. Creating and *initialising* the virtual population is the first step of a simulation run, while the algorithm *projecting* the population over time is the core of the microsimulation as shown below. 
 
-|![Health GPS Concept](/assets/image/model_workflow_diagram.png)|
+|![Health GPS Concept](/assets/image/model_workflow_diagram.svg)|
 |:--:|
 |*Health GPS Workflow Diagram*|
 
