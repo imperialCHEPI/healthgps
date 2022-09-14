@@ -15,8 +15,6 @@
 
 namespace fs = std::filesystem;
 
-static auto store_full_path = default_datastore_path();
-
 void create_test_datatable(hgps::core::DataTable& data) {
 	using namespace hgps;
 	using namespace hgps::core;
@@ -323,7 +321,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto config = ModelInput(data, settings, info, ses, mapping, diseases);
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager(test_datastore_path);
 	auto repository = CachedRepository(manager);
 
 	auto factory = SimulationModuleFactory(repository);
@@ -350,7 +348,7 @@ TEST(TestHealthGPS, CreateSESNoiseModule)
 
 	auto config = create_test_configuration(data);
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager(test_datastore_path);
 	auto repository = CachedRepository(manager);
 
 	auto bus = DefaultEventBus{};
@@ -384,7 +382,7 @@ TEST(TestHealthGPS, CreateDemographicModule)
 
 	auto config = create_test_configuration(data);
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager(test_datastore_path);
 	auto repository = CachedRepository(manager);
 
 	auto pop_module = build_population_module(repository, config);
@@ -469,7 +467,7 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager(test_datastore_path);
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);
@@ -495,7 +493,7 @@ TEST(TestHealthGPS, CreateAnalysisModule)
 	DataTable data;
 	create_test_datatable(data);
 
-	auto manager = DataManager(store_full_path);
+	auto manager = DataManager(test_datastore_path);
 	auto repository = CachedRepository(manager);
 
 	auto inputs = create_test_configuration(data);

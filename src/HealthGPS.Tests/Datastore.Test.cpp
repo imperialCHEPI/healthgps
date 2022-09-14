@@ -5,12 +5,10 @@
 
 namespace fs = std::filesystem;
 
-static auto store_full_path = default_datastore_path();
-
 // The fixture for testing class Foo.
 class DatastoreTest : public ::testing::Test {
 protected:
-	DatastoreTest() : manager{ store_full_path } {
+	DatastoreTest() : manager{ test_datastore_path } {
 	}
 
 	hgps::data::DataManager manager;

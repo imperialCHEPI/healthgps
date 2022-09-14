@@ -11,8 +11,6 @@
 
 namespace fs = std::filesystem;
 
-static auto store_full_path = default_datastore_path();
-
 hgps::LmsDefinition lms_parameters;
 
 hgps::LmsModel create_lms_model(hgps::data::DataManager& manager) {
@@ -39,7 +37,7 @@ hgps::Person create_test_entity(
 class WeightModelTest : public ::testing::Test {
 protected:
 	WeightModelTest()
-		: manager{ store_full_path } {}
+		: manager{ test_datastore_path } {}
 
 	hgps::data::DataManager manager;
 };
