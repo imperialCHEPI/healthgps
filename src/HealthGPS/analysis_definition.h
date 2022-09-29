@@ -24,7 +24,7 @@ namespace hgps {
 			return observed_YLD_;
 		}
 
-		const std::map<std::string, float> disability_weights() const noexcept {
+		const std::map<std::string, float>& disability_weights() const noexcept {
 			return disability_weights_;
 		}
 

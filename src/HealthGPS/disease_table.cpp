@@ -65,15 +65,15 @@ namespace hgps {
 		return data_.contains(age);
 	}
 
-	std::map<std::string, int> DiseaseTable::measures() const noexcept {
+	const std::map<std::string, int>& DiseaseTable::measures() const noexcept {
 		return measures_;
 	}
 
-	int DiseaseTable::at(const std::string measure) const	{
+	int DiseaseTable::at(const std::string& measure) const	{
 		return measures_.at(core::to_lower(measure)); 
 	}
 
-	int DiseaseTable::operator[](const std::string measure) const {
+	int DiseaseTable::operator[](const std::string& measure) const {
 		return measures_.at(core::to_lower(measure));
 	}
 

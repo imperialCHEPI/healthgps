@@ -31,19 +31,19 @@ namespace hgps {
 		MappingEntry(std::string name, const short level, std::string entity_name);
 		MappingEntry(std::string name, const short level);
 
-		std::string name() const noexcept;
+		const std::string& name() const noexcept;
 
 		short level() const noexcept;
 
-		std::string entity_name() const noexcept;
+		const std::string& entity_name() const noexcept;
 
-		std::string entity_key() const noexcept;
+		const std::string& entity_key() const noexcept;
 
 		bool is_entity() const noexcept;
 
 		bool is_dynamic_factor() const noexcept;
 
-		std::string key() const noexcept;
+		const std::string& key() const noexcept;
 
 		const FactorRange& range() const noexcept;
 

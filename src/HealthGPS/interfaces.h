@@ -171,7 +171,7 @@ namespace hgps {
 
 		/// @brief Gets the model disease type unique identifier
 		/// @return The disease type identifier
-		virtual std::string disease_type() const noexcept = 0;
+		virtual const std::string& disease_type() const noexcept = 0;
 
 		/// @brief Initialises the population disease status.
 		/// @param The simulation run-time context

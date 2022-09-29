@@ -25,7 +25,7 @@
 
 using namespace hgps;
 
-std::string getTimeNowStr()
+std::string get_time_now_str()
 {
 	auto tp = std::chrono::system_clock::now();
 	return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
@@ -45,6 +45,13 @@ cxxopts::Options create_options()
 	return options;
 }
 
+void print_app_title()
+{
+	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
+		"\n# Health-GPS Microsimulation for Policy Options #\n");
+
+	fmt::print("\nToday: {}\n\n", get_time_now_str());
+}
 
 CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[])
 {

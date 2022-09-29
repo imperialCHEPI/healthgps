@@ -19,7 +19,7 @@ namespace hgps {
 		return definition_.get().identifier().group;
 	}
 
-	std::string DefaultDiseaseModel::disease_type() const noexcept {
+	const std::string& DefaultDiseaseModel::disease_type() const noexcept {
 		return definition_.get().identifier().code;
 	}
 

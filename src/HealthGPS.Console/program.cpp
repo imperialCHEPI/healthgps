@@ -12,7 +12,7 @@
 #include "result_file_writer.h"
 
 #include <fmt/color.h>
-#include <fmt/chrono.h>
+
 #include <thread>
 #include <future>
 
@@ -27,11 +27,7 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
-		"\n# Health-GPS Microsimulation for Policy Options #\n");
-
-	fmt::print("\nToday: {}\n\n", getTimeNowStr());
-
+	print_app_title();
 	auto cmd_args = parse_arguments(options, argc, argv);
 	if (!cmd_args.success) {
 		return cmd_args.exit_code;
@@ -47,7 +43,7 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 	
-	// load datatable assynchronous 
+	// load datatable asynchronous 
 	auto input_table = core::DataTable();
 	auto table_future = std::async(std::launch::async, load_datatable_csv, std::ref(config.file.name),
 		std::ref(config.file.columns), std::ref(input_table), config.file.delimiter);
@@ -165,7 +161,7 @@ int main(int argc, char* argv[])
 	event_monitor.stop();
 	fmt::print("\n\n");
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
-	fmt::print(" {}.\n\n", getTimeNowStr());
+	fmt::print(" {}.\n\n", get_time_now_str());
 
 	return EXIT_SUCCESS;
 }

@@ -325,6 +325,23 @@ TEST(TestCore, CaseInsensitiveVectorContains)
 	EXPECT_FALSE(case_insensitive::contains(source, "Cat"));
 }
 
+TEST(TestCore, CaseInsensitiveMap)
+{
+	using namespace hgps::core;
+
+	std::map<std::string, int, case_insensitive::comparator> data
+	{
+		{"cat", 1},
+		{"Dog", 2},
+		{"ODD", 3},
+	};
+
+	EXPECT_TRUE(data.contains("CAT"));
+	EXPECT_TRUE(data.contains("dog"));
+	EXPECT_TRUE(data.contains("odd"));
+	EXPECT_FALSE(data.contains("Rat"));
+}
+
 TEST(TestCore, SplitDelimitedString) {
 	using namespace hgps::core;
 
