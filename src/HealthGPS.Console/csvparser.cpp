@@ -78,8 +78,8 @@ hc::DoubleDataTableColumnBuilder get_double_column(std::string name, std::vector
 	return builder;
 }
 
-bool load_datatable_csv(const std::string& full_filename, const std::map<std::string, std::string>& columns,
-	hc::DataTable& out_table, std::string delimiter)
+bool load_datatable_csv(hc::DataTable& out_table, std::string full_filename,
+	std::map<std::string, std::string> columns, std::string delimiter)
 {
 	MEASURE_FUNCTION();
 	using namespace rapidcsv;

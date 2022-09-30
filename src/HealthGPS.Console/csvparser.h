@@ -12,8 +12,8 @@ hc::FloatDataTableColumnBuilder get_float_column(std::string name, std::vector<s
 
 hc::DoubleDataTableColumnBuilder get_double_column(std::string name, std::vector<std::string>& data);
 
-bool load_datatable_csv(const std::string& full_filename, const std::map<std::string,std::string>& columns,
-	hc::DataTable& out_table, std::string delimiter = ",");
+bool load_datatable_csv(hc::DataTable& out_table, std::string full_filename,
+	std::map<std::string,std::string> columns, std::string delimiter = ",");
 
 std::map<std::string, std::size_t> create_fields_index_mapping(
 	const std::vector<std::string>& column_names, const std::vector<std::string> fields);

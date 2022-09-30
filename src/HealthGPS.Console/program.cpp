@@ -45,13 +45,13 @@ int main(int argc, char* argv[])
 	
 	// load datatable asynchronous 
 	auto input_table = core::DataTable();
-	auto table_future = std::async(std::launch::async, load_datatable_csv, std::ref(config.file.name),
-		std::ref(config.file.columns), std::ref(input_table), config.file.delimiter);
+	auto table_future = std::async(std::launch::async, load_datatable_csv, 
+		std::ref(input_table), config.file.name, config.file.columns, config.file.delimiter);
 
 	// Create back-end data store and modules factory infrastructure
 	auto data_api = data::DataManager(cmd_args.storage_folder, config.verbosity);
 	auto data_repository = hgps::CachedRepository{ data_api };
-	register_risk_factor_model_definitions(config.modelling, config.settings, data_repository);
+	register_risk_factor_model_definitions(data_repository, config.modelling, config.settings);
 	auto factory = get_default_simulation_module_factory(data_repository);
 
 	// Validate the configuration target country
