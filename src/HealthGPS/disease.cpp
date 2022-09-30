@@ -13,8 +13,8 @@ namespace hgps {
 		return SimulationModuleType::Disease;
 	}
 
-	std::string DiseaseModule::name() const noexcept {
-		return "Disease";
+	const std::string& DiseaseModule::name() const noexcept {
+		return name_;
 	}
 
 	std::size_t DiseaseModule::size() const noexcept {

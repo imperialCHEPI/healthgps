@@ -29,8 +29,8 @@ namespace hgps {
 		return SimulationModuleType::SES;
 	}
 
-	std::string SESNoiseModule::name() const noexcept {
-		return "SES";
+	const std::string& SESNoiseModule::name() const noexcept {
+		return name_;
 	}
 
 	void SESNoiseModule::initialise_population(RuntimeContext& context) {

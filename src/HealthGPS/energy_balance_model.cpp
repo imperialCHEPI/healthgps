@@ -12,8 +12,8 @@ namespace hgps {
 		return HierarchicalModelType::Dynamic;
 	}
 
-	std::string EnergyBalanceHierarchicalModel::name() const noexcept {
-		return "Dynamic";
+	const std::string& EnergyBalanceHierarchicalModel::name() const noexcept {
+		return name_;
 	}
 
 	void EnergyBalanceHierarchicalModel::generate_risk_factors([[maybe_unused]] RuntimeContext& context) {

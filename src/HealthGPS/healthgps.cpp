@@ -45,11 +45,11 @@ namespace hgps {
 		std::cout << "Microsimulation algorithm terminate: " << name() << std::endl;
 	}
 
-	void HealthGPS::setup_run(const unsigned int run_number) noexcept {
+	void HealthGPS::setup_run(unsigned int run_number) noexcept {
 		context_.set_current_run(run_number);
 	}
 
-	void HealthGPS::setup_run(const unsigned int run_number, const unsigned int run_seed) noexcept {
+	void HealthGPS::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
 		context_.set_current_run(run_number);
 		definition_.rnd().seed(run_seed);
 	}

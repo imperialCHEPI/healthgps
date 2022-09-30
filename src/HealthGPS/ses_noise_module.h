@@ -15,7 +15,7 @@ namespace hgps {
 
 		SimulationModuleType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		void initialise_population(RuntimeContext& context) override;
 
@@ -24,6 +24,7 @@ namespace hgps {
 	private:
 		std::string function_;
 		std::vector<double> parameters_;
+		std::string name_{ "SES" };
 	};
 
 	std::unique_ptr<SESNoiseModule> build_ses_noise_module(Repository& repository, const ModelInput& config);

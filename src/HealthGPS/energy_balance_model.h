@@ -12,7 +12,7 @@ namespace hgps {
 
 		HierarchicalModelType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		void generate_risk_factors(RuntimeContext& context) override;
 
@@ -20,6 +20,7 @@ namespace hgps {
 
 	private:
 		std::reference_wrapper<LiteHierarchicalModelDefinition> definition_;
+		std::string name_{ "Dynamic" };
 
 		void update_risk_factors_exposure(RuntimeContext& context, Person& entity,
 			std::map<std::string, double>& current_risk_factors,

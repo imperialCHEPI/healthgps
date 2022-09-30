@@ -18,7 +18,7 @@ namespace hgps {
 
 		SimulationModuleType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		void initialise_population(RuntimeContext& context) override;
 
@@ -30,6 +30,7 @@ namespace hgps {
 		DoubleAgeGenderTable residual_disability_weight_;
 		std::vector<std::string> channels_;
 		unsigned int comorbidities_;
+		std::string name_{ "Analysis" };
 
 		double calculate_residual_disability_weight(const int& age, const core::Gender gender,
 			const DoubleAgeGenderTable& expected_sum, const IntegerAgeGenderTable& expected_count);

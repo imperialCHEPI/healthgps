@@ -46,11 +46,11 @@ namespace hgps {
 		return SimulationModuleType::Demographic;
 	}
 
-	std::string PopulationModule::name() const noexcept {
-		return "Demographic";
+	const std::string& PopulationModule::name() const noexcept {
+		return name_;
 	}
 
-	std::size_t PopulationModule::get_total_population_size(const int time_year) const noexcept {
+	std::size_t PopulationModule::get_total_population_size(int time_year) const noexcept {
 		auto total = 0.0f;
 		if (pop_data_.contains(time_year)) {
 			auto& year_data = pop_data_.at(time_year);
@@ -62,7 +62,7 @@ namespace hgps {
 		return static_cast<std::size_t>(total);
 	}
 
-	double PopulationModule::get_total_deaths(const int time_year) const noexcept {
+	double PopulationModule::get_total_deaths(int time_year) const noexcept {
 		if (life_table_.contains_time(time_year)) {
 			return life_table_.get_total_deaths_at(time_year);
 		}
@@ -70,17 +70,17 @@ namespace hgps {
 		return 0.0;
 	}
 
-	const std::map<int, PopulationRecord>& PopulationModule::get_population_distribution(const int time_year) const {
+	const std::map<int, PopulationRecord>& PopulationModule::get_population_distribution(int time_year) const {
 		return pop_data_.at(time_year);
 	}
 
-	std::map<int, DoubleGenderValue> PopulationModule::get_age_gender_distribution(const int time_year) const noexcept {
+	std::map<int, DoubleGenderValue> PopulationModule::get_age_gender_distribution(int time_year) const noexcept {
 		std::map<int, DoubleGenderValue> result;
 		if (!pop_data_.contains(time_year)) {
 			return result;
 		}
 
-		auto year_data = pop_data_.at(time_year);
+		auto& year_data = pop_data_.at(time_year);
 		if (!year_data.empty()) {
 			double total_ratio = 1.0 / get_total_population_size(time_year);
 
@@ -94,7 +94,7 @@ namespace hgps {
 		return result;
 	}
 
-	DoubleGenderValue PopulationModule::get_birth_rate(const int time_year) const noexcept {
+	DoubleGenderValue PopulationModule::get_birth_rate(int time_year) const noexcept {
 		if (birth_rates_.contains(time_year)) {
 			return DoubleGenderValue{ birth_rates_(time_year, core::Gender::male),
 							   birth_rates_(time_year, core::Gender::female) };
@@ -103,7 +103,7 @@ namespace hgps {
 		return DoubleGenderValue{ 0.0, 0.0 };
 	}
 
-	double PopulationModule::get_residual_death_rate(const int age, const core::Gender gender) const noexcept {
+	double PopulationModule::get_residual_death_rate(int age, core::Gender gender) const noexcept {
 		if (residual_death_rates_.contains(age)) {
 			return residual_death_rates_.at(age, gender);
 		}
@@ -241,8 +241,7 @@ namespace hgps {
 		birth_rates_ = create_integer_gender_table<double>(life_table_.time_limits());
 		auto start_time = life_table_.time_limits().lower();
 		auto end_time = life_table_.time_limits().upper();
-		for (int year = start_time; year <= end_time; year++)
-		{
+		for (int year = start_time; year <= end_time; year++) {
 			auto& births = life_table_.get_births_at(year);
 			auto population_size = get_total_population_size(year);
 
@@ -254,7 +253,7 @@ namespace hgps {
 		}
 	}
 
-	GenderTable<int, double> PopulationModule::create_death_rates_table(const int time_year) {
+	GenderTable<int, double> PopulationModule::create_death_rates_table(int time_year) {
 		auto& population = pop_data_.at(time_year);
 		auto& mortality = life_table_.get_mortalities_at(time_year);
 		auto death_rates = create_integer_gender_table<double>(life_table_.age_limits());

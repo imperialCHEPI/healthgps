@@ -20,8 +20,8 @@ namespace hgps {
 		return SimulationModuleType::Analysis;
 	}
 
-	std::string AnalysisModule::name() const noexcept {
-		return "Analysis";
+	const std::string& AnalysisModule::name() const noexcept {
+		return name_;
 	}
 
 	void AnalysisModule::initialise_population(RuntimeContext& context) {
