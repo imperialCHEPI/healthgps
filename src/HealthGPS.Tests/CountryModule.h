@@ -18,7 +18,7 @@ public:
 		return hgps::SimulationModuleType::Analysis;
 	};
 
-	std::string name() const noexcept override { return "Country"; }
+	const std::string& name() const noexcept override { return name_ ; }
 
 	void initialise_population(hgps::RuntimeContext&) override {
 		std::cout << "There are: " << countries_.size() <<
@@ -32,6 +32,7 @@ public:
 private:
 	std::vector<hgps::core::Country> countries_;
 	hgps::core::Country current_;
+	std::string name_{ "Country" };
 };
 
 static std::unique_ptr<CountryModule> build_country_module(

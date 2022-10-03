@@ -20,7 +20,7 @@ namespace hgps {
 
 		RandomBitGenerator& rnd() noexcept;
 
-		std::string identifier() const noexcept;
+		const std::string& identifier() const noexcept;
 
 	private:
 		std::reference_wrapper<ModelInput> inputs_;

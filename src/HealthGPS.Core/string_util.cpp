@@ -52,7 +52,7 @@ namespace hgps {
         bool case_insensitive::comparator::operator()(
             const std::string_view& left, const std::string_view& right) const {
             return std::lexicographical_compare(left.cbegin(), left.cend(), right.cbegin(), right.cend(),
-                [](const char a, const char b) { return std::tolower(a) < std::tolower(b); });
+                [](char a, char b) { return std::tolower(a) < std::tolower(b); });
         }
 
         std::weak_ordering case_insensitive::compare(

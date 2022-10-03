@@ -199,7 +199,7 @@ namespace hgps {
 		auto total_initial_population = demographic_->get_total_population_size(sim_start_time);
 		auto start_population_size = static_cast<int>(definition_.inputs().settings().size_fraction() * total_initial_population);
 
-		auto current_population_table = demographic_->get_population_distribution(context_.time_now());
+		auto& current_population_table = demographic_->get_population_distribution(context_.time_now());
 		auto expected_population = create_age_gender_table<int>(context_.age_range());
 		auto start_age = context_.age_range().lower();
 		auto end_age = context_.age_range().upper();
