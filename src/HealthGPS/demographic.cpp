@@ -1,9 +1,12 @@
 #include "demographic.h"
 #include "converter.h"
 #include "baseline_sync_message.h"
+#include "HealthGPS.Core/thread_util.h"
 #include <numeric>
 #include <cassert>
 #include <algorithm>
+#include <execution>
+#include <mutex>
 
 namespace hgps {
 	PopulationModule::PopulationModule(
@@ -115,17 +118,15 @@ namespace hgps {
 		auto age_gender_dist = get_age_gender_distribution(context.start_time());
 		auto index = 0;
 		auto pop_size = static_cast<int>(context.population().size());
-		auto entry_count = 0;
 		auto entry_total = static_cast<int>(age_gender_dist.size());
-		for (auto& entry : age_gender_dist) {
-			entry_count++;
+		for (auto entry_count = 1; auto& entry : age_gender_dist) {
 			auto num_males = static_cast<int>(std::round(pop_size * entry.second.males));
 			auto num_females = static_cast<int>(std::round(pop_size * entry.second.females));
 			auto num_required = index + num_males + num_females;
 			auto pop_diff = pop_size - num_required;
 			// Final adjustment due to rounding errors
 			if (entry_count == entry_total && pop_diff > 0) {
-				int half_diff = pop_diff / 2;
+				auto half_diff = pop_diff / 2;
 				num_males += half_diff;
 				num_females += half_diff;
 				if (entry.second.males > entry.second.females) {
@@ -173,19 +174,23 @@ namespace hgps {
 				context.population()[index].gender = core::Gender::female;
 				index++;
 			}
+
+			entry_count++;
 		}
 
 		assert(index == pop_size);
 	}
 
-	void PopulationModule::update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) {
-		update_residual_mortality(context, disease_host);
+	void PopulationModule::update_population(RuntimeContext& context, const DiseaseHostModule& disease_host) {	
+		auto residual_future = core::run_async(&PopulationModule::update_residual_mortality, this,
+			std::ref(context), std::ref(disease_host));
 
 		auto initial_pop_size = context.population().current_active_size();
 		auto expected_pop_size = get_total_population_size(context.time_now());
 		auto expected_num_deaths = get_total_deaths(context.time_now());
 
 		// apply death events and update basic information (age)
+		residual_future.get();
 		auto number_of_deaths = update_age_and_death_events(context, disease_host);
 
 		// apply births events
@@ -196,11 +201,6 @@ namespace hgps {
 		context.population().add_newborn_babies(number_of_girls, core::Gender::female, context.time_now());
 
 		// Calculate statistics.
-		auto number_of_births = number_of_boys + number_of_girls;
-		auto expected_migration = (expected_pop_size / 100.0) - initial_pop_size - number_of_births + number_of_deaths;
-		auto middle_pop_size = context.population().current_active_size();
-		auto pop_size_diff = (expected_pop_size / 100.0) - middle_pop_size;
-
 		auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
 		auto expected_death_rate = expected_num_deaths * 1000.0 / expected_pop_size;
 		auto percent_difference = 100 * (simulated_death_rate / expected_death_rate - 1);
@@ -273,15 +273,19 @@ namespace hgps {
 		RuntimeContext& context, const DiseaseHostModule& disease_host) {
 		auto excess_mortality_product = create_integer_gender_table<double>(life_table_.age_limits());
 		auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
-		for (const auto& entity : context.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
+		auto& pop = context.population();
+		auto sum_mutex = std::mutex{};
+		std::for_each(std::execution::par, pop.cbegin(), pop.cend(), [&](const auto& entity)
+			{
+				if (!entity.is_active()) {
+					return;
+				}
 
-			auto product = calculate_excess_mortality_product(entity, disease_host);
-			excess_mortality_product.at(entity.age, entity.gender) += product;
-			excess_mortality_count.at(entity.age, entity.gender)++;
-		}
+				auto product = calculate_excess_mortality_product(entity, disease_host);
+				auto lock = std::unique_lock{ sum_mutex };
+				excess_mortality_product.at(entity.age, entity.gender) += product;
+				excess_mortality_count.at(entity.age, entity.gender)++;
+			});
 
 		auto death_rates = create_death_rates_table(context.time_now());
 		auto residual_mortality = create_integer_gender_table<double>(life_table_.age_limits());

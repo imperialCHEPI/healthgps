@@ -48,9 +48,9 @@ cxxopts::Options create_options()
 void print_app_title()
 {
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
-		"\n# Health-GPS Microsimulation for Policy Options #\n");
+		"\n# Health-GPS Microsimulation for Policy Options #\n\n");
 
-	fmt::print("\nToday: {}\n\n", get_time_now_str());
+	fmt::print("Today: {}\n\n", get_time_now_str());
 }
 
 CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[])

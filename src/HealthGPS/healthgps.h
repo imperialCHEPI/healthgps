@@ -48,6 +48,7 @@ namespace hgps {
 		void apply_net_migration(const int net_value, const unsigned int& age, const core::Gender& gender);
 		hgps::IntegerAgeGenderTable	get_net_migration();
 		hgps::IntegerAgeGenderTable	create_net_migration();
+		std::map<std::string, core::UnivariateSummary> create_input_data_summary() const;
 
 		Person partial_clone_entity(const Person& source) const noexcept;
 	};

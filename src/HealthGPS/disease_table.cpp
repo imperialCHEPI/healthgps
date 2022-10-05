@@ -1,5 +1,4 @@
 #include "disease_table.h"
-#include "HealthGPS.Core/string_util.h"
 
 #include <stdexcept>
 #include <fmt/format.h>
@@ -69,12 +68,12 @@ namespace hgps {
 		return measures_;
 	}
 
-	int DiseaseTable::at(const std::string& measure) const	{
-		return measures_.at(core::to_lower(measure)); 
+	const int& DiseaseTable::at(const std::string& measure) const	{
+		return measures_.at(measure); 
 	}
 
-	int DiseaseTable::operator[](const std::string& measure) const {
-		return measures_.at(core::to_lower(measure));
+	const int& DiseaseTable::operator[](const std::string& measure) const {
+		return measures_.at(measure);
 	}
 
 	DiseaseMeasure& DiseaseTable::operator()(const int age, const core::Gender gender) {

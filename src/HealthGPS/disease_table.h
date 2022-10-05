@@ -7,6 +7,14 @@
 
 namespace hgps {
 
+	struct MeasureKey final
+	{
+		static inline const std::string prevalence{ "prevalence" };
+		static inline const std::string mortality{ "mortality" };
+		static inline const std::string remission{ "remission" };
+		static inline const std::string incidence{ "incidence" };
+	};
+
 	class DiseaseMeasure
 	{
 	public:
@@ -42,9 +50,9 @@ namespace hgps {
 
 		const std::map<std::string, int>& measures() const noexcept;
 
-		int at(const std::string& measure) const;
+		const int& at(const std::string& measure) const;
 
-		int operator[](const std::string& measure) const;
+		const int& operator[](const std::string& measure) const;
 
 		DiseaseMeasure& operator()(const int age, const core::Gender gender);
 

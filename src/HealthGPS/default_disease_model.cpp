@@ -25,7 +25,7 @@ namespace hgps {
 
 	void DefaultDiseaseModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
-		auto prevalence_id = definition_.get().table().at("prevalence");
+		auto& prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 		for (auto& entity : context.population()) {
 			if (!entity.is_active() || !definition_.get().table().contains(entity.age)) {
 				continue;
@@ -87,9 +87,9 @@ namespace hgps {
 	}
 
 	double DefaultDiseaseModel::get_excess_mortality(const Person& entity) const noexcept {
-		auto excess_mortality_id = definition_.get().table().at("mortality");
+		auto& mortality_id = definition_.get().table().at(MeasureKey::mortality);
 		if (definition_.get().table().contains(entity.age)) {
-			return definition_.get().table()(entity.age, entity.gender).at(excess_mortality_id);
+			return definition_.get().table()(entity.age, entity.gender).at(mortality_id);
 		}
 
 		return 0.0;
@@ -180,9 +180,7 @@ namespace hgps {
 	}
 
 	void DefaultDiseaseModel::update_remission_cases(RuntimeContext& context) {
-		auto remission_count = 0;
-		auto prevalence_count = 0;
-		auto remission_id = definition_.get().table().at("remission");
+		auto& remission_id = definition_.get().table().at(MeasureKey::remission);
 		for (auto& entity : context.population()) {
 			if (entity.age == 0 || !entity.is_active()) {
 				continue;
@@ -197,20 +195,11 @@ namespace hgps {
 			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases.at(disease_type()).status = DiseaseStatus::free;
-				remission_count++;
 			}
-
-			prevalence_count++;
 		}
-
-		// Debug calculation
-		auto remission_percent = remission_count * 100.0 / prevalence_count;
 	}
 
 	void DefaultDiseaseModel::update_incidence_cases(RuntimeContext& context) {
-		auto incidence_count = 0;
-		auto prevalence_count = 0;
-		auto population_count = 0;
 		for (auto& entity : context.population()) {
 			if (!entity.is_active()) {
 				continue;
@@ -224,12 +213,9 @@ namespace hgps {
 				continue;
 			}
 
-			population_count++;
-
 			// Already have disease
 			if (entity.diseases.contains(disease_type()) &&
 				entity.diseases.at(disease_type()).status == DiseaseStatus::active) {
-				prevalence_count++;
 				continue;
 			}
 
@@ -240,19 +226,13 @@ namespace hgps {
 				entity.diseases[disease_type()] = Disease{
 									.status = DiseaseStatus::active,
 									.start_time = context.time_now() };
-				incidence_count++;
-				prevalence_count++;
 			}
 		}
-
-		// Debug calculation
-		auto disease_incidence = incidence_count * 100.0 / population_count;
-		auto disease_prevalence = prevalence_count * 100.0 / population_count;
 	}
 
 	double DefaultDiseaseModel::calculate_incidence_probability(
 		const Person& entity, const int& start_time, const int& time_now) const {
-		auto incidence_id = definition_.get().table().at("incidence");
+		auto& incidence_id = definition_.get().table().at(MeasureKey::incidence);
 		auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
 		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
 		auto incidence = definition_.get().table()(entity.age, entity.gender).at(incidence_id);

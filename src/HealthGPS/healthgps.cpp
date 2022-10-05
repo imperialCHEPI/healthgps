@@ -5,11 +5,14 @@
 #include "converter.h"
 #include "hierarchical_model.h"
 #include "baseline_sync_message.h"
+#include "HealthGPS.Core/thread_util.h"
 
 #include <iostream>
 #include <algorithm>
 #include <numeric>
 #include <memory>
+#include <execution>
+#include <mutex>
 #include <fmt/format.h>
 
 namespace hgps {
@@ -204,7 +207,7 @@ namespace hgps {
 		auto start_age = context_.age_range().lower();
 		auto end_age = context_.age_range().upper();
 		for (int age = start_age; age <= end_age; age++) {
-			auto age_info = current_population_table.at(age);
+			auto& age_info = current_population_table.at(age);
 			expected_population.at(age, core::Gender::male) =
 				static_cast<int>(std::round(age_info.males * start_population_size / total_initial_population));
 
@@ -217,13 +220,17 @@ namespace hgps {
 
 	hgps::IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
 		auto simulated_population = create_age_gender_table<int>(context_.age_range());
-		for (const auto& entity : context_.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
+		auto& pop = context_.population();
+		auto count_mutex = std::mutex{};
+		std::for_each(std::execution::par, pop.cbegin(), pop.cend(), [&](const auto& entity)
+			{
+				if (!entity.is_active()) {
+					return;
+				}
 
-			simulated_population.at(entity.age, entity.gender)++;
-		}
+				auto lock = std::unique_lock{ count_mutex };
+				simulated_population.at(entity.age, entity.gender)++;
+			});
 
 		return simulated_population;
 	}
@@ -233,13 +240,13 @@ namespace hgps {
 	{
 		auto similar_entities = std::vector<Person>();
 		for (const auto& entity : context_.population()) {
-			if (!entity.is_active()) {
+				if (!entity.is_active()) {
 				continue;
-			}
+				}
 
-			if (entity.age == age && entity.gender == gender) {
-				similar_entities.push_back(entity);
-			}
+				if (entity.age == age && entity.gender == gender) {
+					similar_entities.push_back(entity);
+				}
 		}
 
 		similar_entities.shrink_to_fit();
@@ -300,11 +307,12 @@ namespace hgps {
 	}
 
 	hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
-		auto expected_population = get_current_expected_population();
+		auto expected_future = core::run_async(&HealthGPS::get_current_expected_population, this);
 		auto simulated_population = get_current_simulated_population();
 		auto net_emigration = create_age_gender_table<int>(context_.age_range());
 		auto start_age = context_.age_range().lower();
 		auto end_age = context_.age_range().upper();
+		auto expected_population = expected_future.get();
 		auto net_value = 0;
 		for (int age = start_age; age <= end_age; age++) {
 			net_value = expected_population.at(age, core::Gender::male) -
@@ -336,28 +344,40 @@ namespace hgps {
 		return clone;
 	}
 
+	std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summary() const
+	{
+		auto visitor = UnivariateVisitor();
+		auto summary = std::map<std::string, core::UnivariateSummary>();
+		auto& input_data = definition_.inputs().data();
+		for (const auto& entry : context_.mapping()) {
+			input_data.column(entry.name()).accept(visitor);
+			summary.emplace(entry.name(), visitor.get_summary());
+		}
+
+		return summary;
+	}
+
 	void hgps::HealthGPS::print_initial_population_statistics()
 	{
-		// TODO: Move to the analytics module
-		auto visitor = UnivariateVisitor();
-		auto orig_summary = std::unordered_map<std::string, core::UnivariateSummary>();
-		auto sim8_summary = std::unordered_map<std::string, core::UnivariateSummary>();
+		if (context_.current_run() > 1 &&
+			definition_.inputs().run().verbosity == core::VerboseMode::none)
+		{
+			return;
+		}
+
+		auto original_future = core::run_async(&HealthGPS::create_input_data_summary, this);
+		std::string population = "Population";
+		std::size_t longestColumnName = population.length();
+		auto sim8_summary = std::map<std::string, core::UnivariateSummary>();
 		for (const auto& entry : context_.mapping()) {
-			definition_.inputs().data().column(entry.name()).accept(visitor);
-			orig_summary.emplace(entry.name(), visitor.get_summary());
+			longestColumnName = std::max(longestColumnName, entry.name().length());
 			sim8_summary.emplace(entry.name(), core::UnivariateSummary(entry.name()));
 		}
 
-		for (auto& entity : context_.population()) {
-			for (auto& entry : context_.mapping()) {
+		for (const auto& entity : context_.population()) {
+			for (const auto& entry : context_.mapping()) {
 				sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.entity_key()));
 			}
-		}
-
-		std::string population = "Population";
-		std::size_t longestColumnName = population.length();
-		for (const auto& entry : context_.mapping()) {
-			longestColumnName = std::max(longestColumnName, entry.name().length());
 		}
 
 		auto pad = longestColumnName + 2;
@@ -375,8 +395,9 @@ namespace hgps {
 		ss << fmt::format("| {:{}} : {:14} : {:14} : {:14} : {:14} |\n",
 			population, pad, orig_pop, sim8_pop, orig_pop, sim8_pop);
 
+		auto orig_summary = original_future.get();
 		for (const auto& entry : context_.mapping()) {
-			auto col = entry.name();
+			auto& col = entry.name();
 			ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n",
 				col, pad, orig_summary[col].average(), sim8_summary[col].average(),
 				orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());

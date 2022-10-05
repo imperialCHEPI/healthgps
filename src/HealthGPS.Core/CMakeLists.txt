@@ -35,6 +35,7 @@ target_sources(HealthGPS.Core
 		"poco.h"
 		"population_item.h"
 		"scoped_timer.h"
+		"thread_util.h"
 		"visitor.h")
 
 target_link_libraries(HealthGPS.Core PRIVATE fmt::fmt)

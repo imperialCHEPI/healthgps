@@ -25,7 +25,7 @@ namespace hgps {
 
 	void DefaultCancerModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
-		auto prevalence_id = definition_.get().table().at("prevalence");
+		auto& prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 		for (auto& entity : context.population()) {
 			if (!entity.is_active() || !definition_.get().table().contains(entity.age)) {
 				continue;
@@ -95,8 +95,8 @@ namespace hgps {
 			return 0.0;
 		}
 		
-		auto mortality_id = definition_.get().table().at("mortality");
-		auto excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
+		auto& mortality_id = definition_.get().table().at(MeasureKey::mortality);
+		auto& excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
 		auto& death_weight = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
 		if (entity.gender == core::Gender::male) {
 			return excess_mortality * death_weight.males;
@@ -191,8 +191,6 @@ namespace hgps {
 	}
 
 	void DefaultCancerModel::update_remission_cases(RuntimeContext& context) {
-		auto remission_count = 0;
-		auto prevalence_count = 0;
 		auto max_onset = definition_.get().parameters().max_time_since_onset;
 		for (auto& entity : context.population()) {
 			if (entity.age == 0 || !entity.is_active()) {
@@ -209,20 +207,11 @@ namespace hgps {
 			if (entity.diseases.at(disease_type()).time_since_onset >= max_onset) {
 				entity.diseases.at(disease_type()).status = DiseaseStatus::free;
 				entity.diseases.at(disease_type()).time_since_onset = -1;
-				remission_count++;
 			}
-
-			prevalence_count++;
 		}
-
-		// Debug calculation
-		auto remission_percent = remission_count * 100.0 / prevalence_count;
 	}
 
 	void DefaultCancerModel::update_incidence_cases(RuntimeContext& context) {
-		auto incidence_count = 0;
-		auto prevalence_count = 0;
-		auto population_count = 0;
 		for (auto& entity : context.population()) {
 			if (!entity.is_active()) {
 				continue;
@@ -236,12 +225,9 @@ namespace hgps {
 				continue;
 			}
 
-			population_count++;
-
 			// Already have disease
 			if (entity.diseases.contains(disease_type()) &&
 				entity.diseases.at(disease_type()).status == DiseaseStatus::active) {
-				prevalence_count++;
 				continue;
 			}
 
@@ -253,19 +239,13 @@ namespace hgps {
 									.status = DiseaseStatus::active,
 									.start_time = context.time_now(),
 									.time_since_onset = 0 };
-				incidence_count++;
-				prevalence_count++;
 			}
 		}
-
-		// Debug calculation
-		auto disease_incidence = incidence_count * 100.0 / population_count;
-		auto disease_prevalence = prevalence_count * 100.0 / population_count;
 	}
 
 	double DefaultCancerModel::calculate_incidence_probability(
 		const Person& entity, const int& start_time, const int& time_now) const {
-		auto incidence_id = definition_.get().table().at("incidence");
+		auto& incidence_id = definition_.get().table().at(MeasureKey::incidence);
 		auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
 		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
 		auto incidence = definition_.get().table()(entity.age, entity.gender).at(incidence_id);
