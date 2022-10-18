@@ -26,10 +26,10 @@ namespace hgps {
 		MappingEntry(std::string name, short level, std::string entity_name,
 			FactorRange range, bool dynamic_factor);
 
-		MappingEntry(std::string name, const short level, std::string entity_name, const bool dynamic_factor);
-		MappingEntry(std::string name, const short level, std::string entity_name, FactorRange range);
-		MappingEntry(std::string name, const short level, std::string entity_name);
-		MappingEntry(std::string name, const short level);
+		MappingEntry(std::string name, short level, std::string entity_name, bool dynamic_factor);
+		MappingEntry(std::string name, short level, std::string entity_name, FactorRange range);
+		MappingEntry(std::string name, short level, std::string entity_name);
+		MappingEntry(std::string name, short level);
 
 		const std::string& name() const noexcept;
 

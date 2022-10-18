@@ -2,10 +2,8 @@
 #include "converter.h"
 #include "baseline_sync_message.h"
 #include "HealthGPS.Core/thread_util.h"
-#include <numeric>
 #include <cassert>
 #include <algorithm>
-#include <execution>
 #include <mutex>
 
 namespace hgps {
@@ -275,7 +273,7 @@ namespace hgps {
 		auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
 		auto& pop = context.population();
 		auto sum_mutex = std::mutex{};
-		std::for_each(std::execution::par, pop.cbegin(), pop.cend(), [&](const auto& entity)
+		std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto& entity)
 			{
 				if (!entity.is_active()) {
 					return;

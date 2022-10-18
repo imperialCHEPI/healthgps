@@ -1,6 +1,6 @@
 #pragma once
 #include <benchmark/benchmark.h>
-#include "../HealthGPS.Core/string_util.h"
+#include "HealthGPS.Core/string_util.h"
 #include <string>
 #include <algorithm>
 

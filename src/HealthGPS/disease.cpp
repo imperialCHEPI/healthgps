@@ -2,7 +2,7 @@
 #include "disease_registry.h"
 #include "weight_model.h"
 #include "lms_model.h"
-#include <execution>
+#include "HealthGPS.Core/thread_util.h"
 
 namespace hgps {
 
@@ -67,7 +67,7 @@ namespace hgps {
 
 		auto& diseases = config.diseases();
 		std::mutex m;
-		std::for_each(std::execution::par, std::begin(diseases), std::end(diseases),
+		std::for_each(core::execution_policy, std::begin(diseases), std::end(diseases),
 			[&](auto& info) {
 				auto other = repository.get_disease_info(info.code);
 				if (!registry.contains(info.group) || !other.has_value()) {

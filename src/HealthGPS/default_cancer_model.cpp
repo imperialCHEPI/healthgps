@@ -25,7 +25,7 @@ namespace hgps {
 
 	void DefaultCancerModel::initialise_disease_status(RuntimeContext& context) {
 		auto relative_risk_table = calculate_average_relative_risk(context);
-		auto& prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
+		auto prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 		for (auto& entity : context.population()) {
 			if (!entity.is_active() || !definition_.get().table().contains(entity.age)) {
 				continue;
@@ -95,8 +95,8 @@ namespace hgps {
 			return 0.0;
 		}
 		
-		auto& mortality_id = definition_.get().table().at(MeasureKey::mortality);
-		auto& excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
+		auto mortality_id = definition_.get().table().at(MeasureKey::mortality);
+		auto excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
 		auto& death_weight = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
 		if (entity.gender == core::Gender::male) {
 			return excess_mortality * death_weight.males;
@@ -245,7 +245,7 @@ namespace hgps {
 
 	double DefaultCancerModel::calculate_incidence_probability(
 		const Person& entity, const int& start_time, const int& time_now) const {
-		auto& incidence_id = definition_.get().table().at(MeasureKey::incidence);
+		auto incidence_id = definition_.get().table().at(MeasureKey::incidence);
 		auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
 		auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
 		auto incidence = definition_.get().table()(entity.age, entity.gender).at(incidence_id);

@@ -21,8 +21,6 @@ namespace hgps {
 	}
 
 	void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext& context) {
-		std::vector<MappingEntry> level_factors;
-		std::unordered_map<int, std::vector<MappingEntry>> level_factors_cache;
 		for (auto& entity : context.population()) {
 			// Ignore if inactive, newborn risk factors must be generated, not updated!
 			if (!entity.is_active() || entity.age == 0) {
@@ -38,7 +36,7 @@ namespace hgps {
 				current_risk_factors.at("age") = model_age;
 			}
 
-			auto equations = definition_.get().at(model_age);
+			auto& equations = definition_.get().at(model_age);
 			if (entity.gender == core::Gender::male) {
 				update_risk_factors_exposure(context, entity, current_risk_factors, equations.male);
 			}
@@ -49,7 +47,8 @@ namespace hgps {
 	}
 
 	void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(RuntimeContext& context, Person& entity,
-		std::map<std::string, double>& current_risk_factors, std::map<std::string, FactorDynamicEquation>& equations)
+		const std::map<std::string, double>& current_risk_factors,
+		const std::map<std::string, FactorDynamicEquation>& equations)
 	{
 		auto delta_comp_factors = std::unordered_map<std::string, double>();
 		for (auto level = 1; level <= context.mapping().max_level(); level++) {
@@ -97,8 +96,8 @@ namespace hgps {
 		return entity_risk_factors;
 	}
 
-	double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random& random, 
-		const double mean, const double standard_deviation, const double boundary) const {
+	double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random& random,
+		double mean, double standard_deviation, double boundary) const {
 		auto candidate = random.next_normal(mean, standard_deviation);
 		auto percentage = definition_.get().boundary_percentage();
 		auto cap = percentage * boundary;

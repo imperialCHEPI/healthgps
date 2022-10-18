@@ -13,17 +13,17 @@ namespace hgps {
 		, entity_name_{ core::to_lower(entity_name) }, range_{range}
 		, dynamic_factor_{ dynamic_factor } { }
 
-	MappingEntry::MappingEntry(std::string name, const short level,
-		std::string entity_name, const bool dynamic_factor)
+	MappingEntry::MappingEntry(std::string name, short level,
+		std::string entity_name, bool dynamic_factor)
 		: MappingEntry(name, level, entity_name, FactorRange{}, dynamic_factor) {}
 
-	MappingEntry::MappingEntry(std::string name, const short level, std::string entity_name, FactorRange range)
+	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name, FactorRange range)
 		: MappingEntry(name, level, entity_name, range, false) {}
 
-	MappingEntry::MappingEntry(std::string name, const short level, std::string entity_name)
+	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name)
 		: MappingEntry(name, level, entity_name, FactorRange{}, false) {}
 
-	MappingEntry::MappingEntry(std::string name, const short level)
+	MappingEntry::MappingEntry(std::string name, short level)
 		: MappingEntry(name, level, std::string{}, FactorRange{}, false) {}
 
 	const std::string&  MappingEntry::name() const noexcept { return name_; }

@@ -222,7 +222,7 @@ namespace hgps {
 		auto simulated_population = create_age_gender_table<int>(context_.age_range());
 		auto& pop = context_.population();
 		auto count_mutex = std::mutex{};
-		std::for_each(std::execution::par, pop.cbegin(), pop.cend(), [&](const auto& entity)
+		std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto& entity)
 			{
 				if (!entity.is_active()) {
 					return;
@@ -235,31 +235,21 @@ namespace hgps {
 		return simulated_population;
 	}
 
-	const std::vector<Person> HealthGPS::get_similar_entities(
-		const unsigned int& age, const core::Gender& gender)
-	{
-		auto similar_entities = std::vector<Person>();
-		for (const auto& entity : context_.population()) {
-				if (!entity.is_active()) {
-				continue;
-				}
-
-				if (entity.age == age && entity.gender == gender) {
-					similar_entities.push_back(entity);
-				}
-		}
-
-		similar_entities.shrink_to_fit();
-		return similar_entities;
-	}
-
-	void HealthGPS::apply_net_migration(const int net_value, const unsigned int& age, const core::Gender& gender) {
+	void HealthGPS::apply_net_migration(int net_value, const unsigned int& age, const core::Gender& gender) {
 		if (net_value > 0) {
-			auto similar_entities = get_similar_entities(age, gender);
-			if (similar_entities.size() > 0) {
+			auto& pop = context_.population();
+			auto similar_indeces = core::find_index_of_all(core::execution_policy, pop, [&](const Person& entity)
+				{
+					return entity.is_active() && entity.age == age && entity.gender == gender;
+				});
+
+			if (similar_indeces.size() > 0) {
+				// Needed for repeatability in random selection
+				std::sort(similar_indeces.begin(), similar_indeces.end());
+
 				for (auto trial = 0; trial < net_value; trial++) {
-					auto index = context_.random().next_int(static_cast<int>(similar_entities.size()) - 1);
-					const auto& source = similar_entities.at(index);
+					auto index = context_.random().next_int(static_cast<int>(similar_indeces.size()) - 1);
+					const auto& source = pop.at(similar_indeces.at(index));
 					context_.population().add(std::move(partial_clone_entity(source)), context_.time_now());
 				}
 			}

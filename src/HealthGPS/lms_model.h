@@ -14,7 +14,7 @@ namespace hgps {
         LmsModel(LmsDefinition& definition);
         unsigned int child_cutoff_age() const noexcept;
         WeightCategory classify_weight(const Person& entity) const;
-        double adjust_risk_factor_value(const Person& entity, std::string risk_factor_key, double value) const;
+        double adjust_risk_factor_value(const Person& entity, const std::string& risk_factor_key, double value) const;
 
     private:
         std::reference_wrapper<LmsDefinition> definition_;

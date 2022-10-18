@@ -472,10 +472,9 @@ std::string expand_environment_variables(const std::string& path)
 std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed)
 {
 	if (job_id > 0 && user_seed.has_value()) {
-		auto seed = user_seed.value();
-		auto rnd = hgps::MTRandom32{ seed };
-		auto shift = static_cast<unsigned int>(std::pow(job_id, 2.0));
-		rnd.discard(shift);
+		auto rnd = hgps::MTRandom32{ user_seed.value() };
+		auto jump_size = static_cast<unsigned long>(1.618 * job_id * std::pow(2, 16));
+		rnd.discard(jump_size);
 		return rnd();
 	}
 
