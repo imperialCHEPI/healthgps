@@ -3,12 +3,16 @@
 #include "weight_model.h"
 #include "lms_model.h"
 #include "converter.h"
+#include "HealthGPS.Core/thread_util.h"
 
 #include <cmath>
 #include <future>
 #include <functional>
 
 namespace hgps {
+
+	constexpr double DALY_UNITS = 100'000.0;
+
 	AnalysisModule::AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
 		const core::IntegerInterval age_range, unsigned int comorbidities)
 		: definition_{ std::move(definition) }, weight_classifier_{ std::move(classifier) }
@@ -28,23 +32,26 @@ namespace hgps {
 		auto& age_range = context.age_range();
 		auto expected_sum = create_age_gender_table<double>(age_range);
 		auto expected_count = create_age_gender_table<int>(age_range);
-
-		for (const auto& entity : context.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
-
-			auto sum = 1.0;
-			for (const auto& disease : entity.diseases) {
-				if (disease.second.status == DiseaseStatus::active &&
-					definition_.disability_weights().contains(disease.first)) {
-					sum *= (1.0 - definition_.disability_weights().at(disease.first));
+		auto& pop = context.population();
+		auto sum_mutex = std::mutex{};
+		std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto& entity)
+			{
+				if (!entity.is_active()) {
+					return;
 				}
-			}
 
-			expected_sum(entity.age, entity.gender) += sum;
-			expected_count(entity.age, entity.gender)++;
-		}
+				auto sum = 1.0;
+				for (const auto& disease : entity.diseases) {
+					if (disease.second.status == DiseaseStatus::active &&
+						definition_.disability_weights().contains(disease.first)) {
+						sum *= (1.0 - definition_.disability_weights().at(disease.first));
+					}
+				}
+
+				auto lock = std::unique_lock{ sum_mutex };
+				expected_sum(entity.age, entity.gender) += sum;
+				expected_count(entity.age, entity.gender)++;
+			});
 
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
 			residual_disability_weight_(age, core::Gender::male) =
@@ -87,9 +94,8 @@ namespace hgps {
 	void AnalysisModule::publish_result_message(RuntimeContext& context) const {
 		auto sample_size = context.age_range().upper() + 1u;
 		auto result = ModelResult{ sample_size };
-
-		auto handle = std::async(std::launch::async,
-			&hgps::AnalysisModule::calculate_historical_statistics, this, std::ref(context), std::ref(result));
+		auto handle = core::run_async(&hgps::AnalysisModule::calculate_historical_statistics,
+			this, std::ref(context), std::ref(result));
 
 		// calculate_historical_statistics(context, result);
 		calculate_population_statistics(context, result.series);
@@ -123,8 +129,8 @@ namespace hgps {
 		auto age_upper_bound = context.age_range().upper();
 		auto analysis_time = static_cast<unsigned int>(context.time_now());
 
-		auto daly_handle = std::async(std::launch::async,
-			&hgps::AnalysisModule::calculate_dalys, this, std::ref(context.population()), age_upper_bound, analysis_time);
+		auto daly_handle = core::run_async(&hgps::AnalysisModule::calculate_dalys,
+			this, std::ref(context.population()), age_upper_bound, analysis_time);
 
 		auto population_size = static_cast<int>(context.population().size());
 		auto population_alive = 0;
@@ -235,20 +241,20 @@ namespace hgps {
 		auto yld_sum = 0.0;
 		auto count = 0;
 		for (const auto& entity : population) {
-			if (entity.time_of_death() == death_year && entity.age <= max_age) {
-				auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
-				auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
+				if (entity.time_of_death() == death_year && entity.age <= max_age) {
+					auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
+					auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
 
-				auto reference_age = std::max(male_reference_age, female_reference_age);
+					auto reference_age = std::max(male_reference_age, female_reference_age);
 				auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
 				yll_sum += lifeExpectancy;
-			}
+				}
 
-			if (entity.is_active()) {
+				if (entity.is_active()) {
 				yld_sum += calculate_disability_weight(entity);
 				count++;
 			}
-		}
+				}
 
 		auto yll = yll_sum * DALY_UNITS / count;
 		auto yld = yld_sum * DALY_UNITS / count;
