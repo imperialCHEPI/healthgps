@@ -20,5 +20,3 @@ target_link_libraries(HealthGPS.Benchmarks
         fmt::fmt
         cxxopts::cxxopts
         benchmark::benchmark)
-
-gtest_discover_tests(HealthGPS.Benchmarks)
