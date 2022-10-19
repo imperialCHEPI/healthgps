@@ -7,14 +7,12 @@
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/baseline_scenario.h"
 #include "HealthGPS/intervention_scenario.h"
+#include "HealthGPS.Core/thread_util.h"
 
 #include "event_monitor.h"
 #include "result_file_writer.h"
 
 #include <fmt/color.h>
-
-#include <thread>
-#include <future>
 
 int main(int argc, char* argv[])
 {
@@ -45,7 +43,7 @@ int main(int argc, char* argv[])
 	
 	// load datatable asynchronous 
 	auto input_table = core::DataTable();
-	auto table_future = std::async(std::launch::async, load_datatable_csv, 
+	auto table_future = core::run_async(load_datatable_csv,
 		std::ref(input_table), config.file.name, config.file.columns, config.file.delimiter);
 
 	// Create back-end data store and modules factory infrastructure

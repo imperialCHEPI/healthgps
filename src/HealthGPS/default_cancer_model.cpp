@@ -1,6 +1,7 @@
 #include "default_cancer_model.h"
 #include "runtime_context.h"
 #include "person.h"
+#include "HealthGPS.Core/thread_util.h"
 
 namespace hgps {
 
@@ -50,16 +51,20 @@ namespace hgps {
 		auto& age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
-		for (auto& entity : context.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
+		auto& pop = context.population();
+		auto sum_mutex = std::mutex{};
+		std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto& entity)
+			{
+				if (!entity.is_active()) {
+					return;
+				}
 
-			auto combine_risk = calculate_combined_relative_risk(
-				entity, context.start_time(), context.time_now());
-			sum(entity.age, entity.gender) += combine_risk;
-			count(entity.age, entity.gender)++;
-		}
+				auto combine_risk = calculate_combined_relative_risk(
+					entity, context.start_time(), context.time_now());
+				auto lock = std::unique_lock{ sum_mutex };
+				sum(entity.age, entity.gender) += combine_risk;
+				count(entity.age, entity.gender)++;
+			});
 
 		auto default_average = 1.0;
 		for (int age = age_range.lower(); age <= age_range.upper(); age++) {
@@ -109,15 +114,19 @@ namespace hgps {
 		auto& age_range = context.age_range();
 		auto sum = create_age_gender_table<double>(age_range);
 		auto count = create_age_gender_table<double>(age_range);
-		for (auto& entity : context.population()) {
-			if (!entity.is_active()) {
-				continue;
-			}
+		auto& pop = context.population();
+		auto sum_mutex = std::mutex{};
+		std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto& entity)
+			{
+				if (!entity.is_active()) {
+					return;
+				}
 
-			auto combine_risk = calculate_relative_risk_for_risk_factors(entity);
-			sum(entity.age, entity.gender) += combine_risk;
-			count(entity.age, entity.gender)++;
-		}
+				auto combine_risk = calculate_relative_risk_for_risk_factors(entity);
+				auto lock = std::unique_lock{ sum_mutex };
+				sum(entity.age, entity.gender) += combine_risk;
+				count(entity.age, entity.gender)++;
+			});
 
 		auto default_average = 1.0;
 		auto result = create_age_gender_table<double>(age_range);
@@ -192,23 +201,26 @@ namespace hgps {
 
 	void DefaultCancerModel::update_remission_cases(RuntimeContext& context) {
 		auto max_onset = definition_.get().parameters().max_time_since_onset;
-		for (auto& entity : context.population()) {
-			if (entity.age == 0 || !entity.is_active()) {
-				continue;
-			}
+		auto& pop = context.population();
+		std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto& entity)
+			{
+				if (entity.age == 0 || !entity.is_active()) {
+					return;
+				}
 
-			if (!entity.diseases.contains(disease_type()) ||
-				entity.diseases.at(disease_type()).status != DiseaseStatus::active) {
-				continue;
-			}
+				if (!entity.diseases.contains(disease_type()) ||
+					entity.diseases.at(disease_type()).status != DiseaseStatus::active) {
+					return;
+				}
 
-			// Increment duration by one year
-			entity.diseases.at(disease_type()).time_since_onset++;
-			if (entity.diseases.at(disease_type()).time_since_onset >= max_onset) {
-				entity.diseases.at(disease_type()).status = DiseaseStatus::free;
-				entity.diseases.at(disease_type()).time_since_onset = -1;
-			}
-		}
+				// Increment duration by one year
+				auto& disease = entity.diseases.at(disease_type());
+				disease.time_since_onset++;
+				if (disease.time_since_onset >= max_onset) {
+					disease.status = DiseaseStatus::free;
+					disease.time_since_onset = -1;
+				}
+			});
 	}
 
 	void DefaultCancerModel::update_incidence_cases(RuntimeContext& context) {
@@ -231,8 +243,7 @@ namespace hgps {
 				continue;
 			}
 
-			auto probability = calculate_incidence_probability(
-				entity, context.start_time(), context.time_now());
+			auto probability = calculate_incidence_probability(entity, context.start_time(), context.time_now());
 			auto hazard = context.random().next_double();
 			if (hazard < probability) {
 				entity.diseases[disease_type()] = Disease{

@@ -9,10 +9,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include <numeric>
 #include <memory>
-#include <execution>
-#include <mutex>
 #include <fmt/format.h>
 
 namespace hgps {

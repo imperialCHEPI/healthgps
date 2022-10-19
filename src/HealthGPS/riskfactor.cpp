@@ -4,7 +4,7 @@
 namespace hgps {
 
 	RiskFactorModule::RiskFactorModule(
-		std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models,
+		std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models,
 		RiskfactorAdjustmentModel&& adjustments)
 		: models_{ std::move(models) }, adjustment_{ std::move(adjustments) } {
 
@@ -51,9 +51,6 @@ namespace hgps {
 	void RiskFactorModule::initialise_population(RuntimeContext& context) {
 		auto& static_model = models_.at(HierarchicalModelType::Static);
 		static_model->generate_risk_factors(context);
-
-		// This should be a internal function called by generate_risk_factors?
-		// static_model->adjust_risk_factors_with_baseline(context);
 	}
 
 	void RiskFactorModule::update_population(RuntimeContext& context) {
@@ -77,7 +74,7 @@ namespace hgps {
 		auto full_registry = get_default_hierarchical_model_registry();
 		auto lite_registry = get_default_lite_hierarchical_model_registry();
 
-		auto models = std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
+		auto models = std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
 		if (full_registry.contains(HierarchicalModelType::Static)) {
 			models.emplace(HierarchicalModelType::Static, full_registry.at(HierarchicalModelType::Static)(
 				repository.get_linear_model_definition(HierarchicalModelType::Static)));
