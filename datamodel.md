@@ -4,17 +4,17 @@
 
 # Data Model
 
-The backend *data model* defines an abstract model to organises data entities and how they relate to one another in a standardised schema and format to be used within the Health GPS systems. The backend storage provides a reference dataset that reconcile various disparate data sources required by the model, fill gaps, adjust units, etc, for easy use. The standardised format allows the reference dataset to be easily expanded to accommodate new and non-traditional data sources.
+The backend *data model* defines an abstract model to organises data entities and how they relate to one another in a standardised schema and format to be used within the Health-GPS systems. The backend storage provides a reference dataset that reconcile various disparate data sources required by the model, fill gaps, adjust units, etc, for easy use. The standardised format allows the reference dataset to be easily expanded to accommodate new and non-traditional data sources.
 
 The data model is storage agnostic, the [Data API][dataapi] abstraction interface shown below, provides a contract for the minimum dataset, easy access, strong typing, and decoupling from the backend storage implementation. 
 
-|![Health GPS Data API](/assets/image/data_api.png)|
+|![Health-GPS Data API](/assets/image/data_api.png)|
 |:--:|
 |*Backend Data API Interface*|
 
 The data model defines the minimum dataset required by the model, the backend storage can hold more data to support external analysis for example. The backend dataset diagram is shown below, it identifies the required entities, relationships, and fields with respective data types. The dataset is indexed by country, *green*, entities representing demographics are *gray*, diseases are *red*, analysis are *blue*, and enumeration types are *yellow* respectively. Primary key (PK) fields are shown in **bold**, the ***ID*** fields are auto-generated row identifiers for internal use and data integrity enforcement.
 
-|![Health GPS Data Model](/assets/image/data_model.png)|
+|![Health-GPS Data Model](/assets/image/data_model.png)|
 |:--:|
 |*Data Model Entity–Relationship Diagram*|
 
@@ -38,7 +38,7 @@ The unique constraint (UQ) may include multiple fields within the entity definit
 * be consistent with casing, prefer lower case, avoid mixing
 * keep it short, but meaningful and recognisable
 
-The same recommendation applies to *folders* and *file names* definitions in cross-platform applications, operating system like *Linux* is case-sensitive by default, adopt a consistent naming convention that works everywhere. Following are enumerations defined by the Health GPS model:
+The same recommendation applies to *folders* and *file names* definitions in cross-platform applications, operating system like *Linux* is case-sensitive by default, adopt a consistent naming convention that works everywhere. Following are enumerations defined by the Health-GPS model:
 
 ### Gender
 
@@ -80,7 +80,7 @@ The same recommendation applies to *folders* and *file names* definitions in cro
 | 2           | survivalrate | Survival   | Survival rate parameters |
 
 ## Registries
-The *DiseaseType* and *RiskFactorType* are *dynamic enumerations*, providing a consistent *Registry* for available *diseases* and relative *risk factors* respectively. These enumerations are populated on demand, when defining new diseases within the Health GPS ecosystem. Following are the examples of dynamic enumerations defined in the Health GPS model:
+The *DiseaseType* and *RiskFactorType* are *dynamic enumerations*, providing a consistent *Registry* for available *diseases* and relative *risk factors* respectively. These enumerations are populated on demand, when defining new diseases within the Health-GPS ecosystem. Following are the examples of dynamic enumerations defined in the Health-GPS model:
 
 ### Disease Type
 
@@ -156,7 +156,7 @@ Stores general population indicators number for a location at each *time* entry.
 Countries disease specific estimates are modelled using a multi-dimensional entity to represent a two dimensional series, *time x age*, for *gender* and *measure type* combinations. The following entities provide the *diseases model* required data, all fields are required for a row definition.
 
 ### Disease
-Diseases can be dynamic defined within the *Health GPS framework* using data only. The *disease* entity models the common measures required to define all diseases.
+Diseases can be dynamic defined within the *Health-GPS framework* using data only. The *disease* entity models the common measures required to define all diseases.
 
 | Field name | Data Type | Constraint | Description |
 | :---       | :---      | :---       | :--- |
@@ -253,11 +253,11 @@ The burden of diseases (BoD) measure is modelled using a two-dimensional entity,
 | WithAge    | Integer   | UQ         | Age reference of the measure values |
 | Mean       | Real      |            | The measure mean value |
 
-The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations; however, the backend data model is storage and implementation agnostic, the Health GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
+The ***data model*** definition is now *complete*. The design makes heavy use of relational-database notations; however, the backend data model is storage and implementation agnostic, the Health-GPS ecosystem seamlessly supports different [Data API][dataapi] implementations via instance injection during construction.
 
 >See [Development Guide](development) for a *file-based* backend storage implementation detail.
 
 [comment]: # (References)
-[dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health GPS Data API definition."
+[dataapi]: https://github.com/imperialCHEPI/healthgps/blob/main/source/HealthGPS.Core/datastore.h "Health-GPS Data API definition."
 
 [iso3166]: https://www.iso.org/iso-3166-country-codes.html "ISO 3166 Country Codes"

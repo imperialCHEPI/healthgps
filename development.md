@@ -4,9 +4,9 @@
 
 # Developer Guide
 
-The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
+The *Health-GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
 
-To start working on the *Health GPS* code base, the suggested development machine needs:
+To start working on the *Health-GPS* code base, the suggested development machine needs:
 1. Windows 10 or newer, [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/) enabled and Linux distribution of choice installed.
 2. [Git](https://git-scm.com/downloads) 2.3 or newer.
 3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
@@ -16,7 +16,7 @@ To start working on the *Health GPS* code base, the suggested development machin
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
 8. Internet connection.
 
-Download the *Health GPS* source code to the local machine, we recommend somewhere like root `src` or `source`, since otherwise you may run into path issues with the build systems.
+Download the *Health-GPS* source code to the local machine, we recommend somewhere like root `src` or `source`, since otherwise you may run into path issues with the build systems.
 ```cmd
 > git clone https://github.com/imperialCHEPI/healthgps
 ```
@@ -79,15 +79,15 @@ The software application provides a Command Line Interface (CLI) for the user to
 ## Composing a Microsimulation
 To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and ModelRunner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
 
-|![Composing Health GPS](/assets/image/compose_simulation.png)|
+|![Composing Health-GPS](/assets/image/compose_simulation.svg)|
 |:--:|
-|*Composing a Health GPS Microsimulation*|
+|*Composing a Health-GPS Microsimulation*|
 
 The simulation executive requires a RandomBitGenerator interface implementation for master seed generation and an implementation of the EventAggregator interface, in this example the DefaultEventBus class, which should be shared by the engines and executive to provide a centralised source of communication. The simulation engine must have its own random number generator instance as part of the simulation definition, the Mersenne Twister pseudorandom number generator algorithms is the default implementation, however other algorithms can easily be used. 
 
 EventMonitor class has been created to receive all messages from the microsimulation, notifications and error messages are displayed on the application terminal, and result messages are queued to be processed by an implementation of the ResultWriter interface, ResultFileWriter class in this example, which writes the results to a file in JSON format.
 
-The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance, and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure shared with all the simulation engines. An implementation of *scenario* interface must be provided for each simulation definition, the *BaselineScenario* class is a generic type, while the intervention scenarios are defined to test specific policies.
+The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure shared with all the simulation engines. An implementation of *scenario* interface must be provided for each simulation definition, the *BaselineScenario* class is a generic type, while the intervention scenarios are defined to test specific policies.
 
 ```cpp
 // Create factory with backend data store and modules implementation
@@ -193,7 +193,7 @@ The simulation executive can run experiments for baseline scenario only, or base
 | Population Counts | ✓ | - | - |  Total size, number alive, dead and emigrants |
 |Comorbidities | -       | ✓     | ✓      | Percentage of people with 0 to N+ diseases |
 | Metrics | ✓ | - | - | Custom key/value metrics for algorithms |
-| Series | - | ✓ | ✓ | Detailed time series by time, age and gender |
+| Series | - | ✓ | ✓ | Detailed time series by time, age, and gender |
 
 These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
 
@@ -232,17 +232,17 @@ SimulationModuleFactory get_default_simulation_module_factory(Repository& manage
 }
 ```
 
-The factory must provide builder functions for all the required *module types* in order to successfully create an instance of the HealthGPS simulation engine, however, the user can disable a particular module behaviour by registering an implementation that makes no change to the virtual population properties when invoked by the simulation engine at runtime.
+The factory must provide builder functions for all the required *module types* to successfully create an instance of the *HealthGPS* simulation engine, however, the user can disable a particular module behaviour by registering an implementation that makes no change to the virtual population properties when invoked by the simulation engine at runtime.
 
 ## Reproducibility
 
-Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
+Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health-GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health-GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
 
-|![Experiment reproducibility](/assets/image/batch_mode_seed.png)|
+|![Experiment reproducibility](/assets/image/batch_mode_seed.svg)|
 |:--:|
 |*Experiment reproducibility algorithm (seed management)*|
 
-When running the simulation as a single experiment, the solution is trivial, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. The following script, ***example.pbs*** in *Portable Batch System* (PBS) language, illustrate the mechanism by scheduling 50 simulation batches using *Health GPS* on a *HPC computer* to evaluate the *same experiment* in parallel. The custom seed is used to create predictable master seeds for each batch, resulting in a total of `50 x number of runs in each batch` repeatable simulation runs. The number of runs in each batch must be configured to complete in less than 8 hours in this example.
+When running the simulation as a single experiment, the solution is trivial, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. The following script, ***example.pbs*** in *Portable Batch System* (PBS) language, illustrate the mechanism by scheduling 50 simulation batches using *Health-GPS* on a *HPC computer* to evaluate the *same experiment* in parallel. The custom seed is used to create predictable master seeds for each batch, resulting in a total of `50 x number of runs in each batch` repeatable simulation runs. The number of runs in each batch must be configured to complete in less than 8 hours in this example.
 
 ```bash
 #PBS -l walltime=8:00:00
@@ -259,7 +259,7 @@ To submit the job, using PBS, use the following command on a HPC login node:
 ```
 user@machine:~/xxx$ qsub example.pbs
 ```
-Each simulation batch results file have the HPC *arrays index number* appended to the filename, enabling a full reconstruction of the experiment results for analysis. This mechanism enables new simulation runs to be added to an existing experiment's results dataset to improved convergence without repeating simulations by incrementing the job range in the schedule script. For example, to added 25 simulation batches to the same experiment's results, change the script as follows, submit the job again, and process the the results as before:
+Each simulation batch results file has the HPC *arrays index number* appended to the filename, enabling a full reconstruction of the experiment results for analysis. This mechanism enables new simulation runs to be added to an existing experiment's results dataset to improved convergence without repeating simulations by incrementing the job range in the schedule script. For example, to added 25 simulation batches to the same experiment's results, change the script as follows, submit the job again, and process the results as before:
 
 ``` bash
 ...
@@ -267,7 +267,7 @@ Each simulation batch results file have the HPC *arrays index number* appended t
 ...
 ```
 
-To repeat the full experiment, keep track of the configuration file, Health GPS executable version, backend storage state, and HPC job range used, for example, the following change to the script repeat the full experiment above and produce \`exact\` the same results:
+To repeat the full experiment, keep track of the configuration file, Health-GPS executable version, backend storage state, and HPC job range used, for example, the following change to the script repeat the full experiment above and produce \`exact\` the same results:
 
 ``` bash
 ...
@@ -275,4 +275,4 @@ To repeat the full experiment, keep track of the configuration file, Health GPS 
 ...
 ```
 
-Please note that HPC machine configuration can also influence the results due to floating-point calculation, Health GPS will use shared libraries installed in the system such as C++ standard library, however the difference should be negligible within the machine numerical precision.
+Please note that HPC machine configuration can also influence the results due to floating-point calculation, Health-GPS will use shared libraries installed in the system such as C++ standard library, however the difference should be negligible within the machine numerical precision.

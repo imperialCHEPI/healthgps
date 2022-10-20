@@ -4,9 +4,9 @@
 
 # Quick Start
 
-The **Health GPS** application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
+The **Health-GPS** application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
-Although the model source code is portable, binaries must be generated for each platforms using respective tools and libraries. The Health GPS repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS) with very specific runtime requirements.
+Although the model source code is portable, binaries must be generated for each platforms using respective tools and libraries. The Health-GPS repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS) with very specific runtime requirements.
 
 ## Windows
 
@@ -43,9 +43,9 @@ View(data)
 ```
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
 
-|![Health GPS Results](/assets/image/model_results.png)|
+|![Health-GPS Results](/assets/image/model_results.png)|
 |:--:|
-|*Health GPS results in R data frame example*|
+|*Health-GPS results in R data frame example*|
 
 The results file contains the output of all simulations in the experiment, *baseline*, and *intervention* scenarios over one or more runs. The user should not assume data order during analysis of experiments with intervention scenarios, the results are published by both simulations running in parallel *asynchronously* via messages, the order in which the messages arrive at the destination queue, before being written to file is not guaranteed. A robust method to tabulate the results shown above, is to always group the data by: ```data.result(source, run, time)```, to ensure that the analysis algorithms work for both types of simulation experiments. For example, using the results data above in R, the following script will tabulate and plot the experiment's BMI projection.
 
@@ -90,7 +90,7 @@ p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
 show(p)
 ```
 
-|![Experiment BMI Projection](/assets/image/bmi_projection.png)|
+|![Experiment BMI Projection](/assets/image/bmi_projection.svg)|
 |:--:|
 |*Experiment BMI projection example*|
 

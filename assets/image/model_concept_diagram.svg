@@ -4,6 +4,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
 		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="9.49513in" height="3.03155in"
 		viewBox="0 0 683.65 218.272" xml:space="preserve" color-interpolation-filters="sRGB" class="st22">
+	<title>Health-GPS Concept Diagrams</title>
 	<v:documentProperties v:langID="1033" v:metric="true" v:viewMarkup="false"/>
 
 	<style type="text/css">
@@ -201,7 +202,7 @@
 		</g>
 		<g id="shape1-46" v:mID="1" v:groupContext="shape" transform="translate(102.627,-92.4835)">
 			<title>Rectangle</title>
-			<desc>Health GPS Microsimulation</desc>
+			<desc>Health-GPS Microsimulation</desc>
 			<v:userDefs>
 				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
 				<v:ud v:nameU="visMasterStencil" v:prompt="" v:val="VT4(Basic_M.vssx)"/>
@@ -209,7 +210,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="235.111" cy="194.582" width="470.23" height="47.3791"/>
 			<rect x="0" y="170.893" width="470.222" height="47.3791" class="st11"/>
-			<text x="98" y="199.98" class="st12" v:langID="2057"><v:paragraph v:horizAlign="1"/><v:tabList/>Health GPS Microsimulation</text>		</g>
+			<text x="98" y="199.98" class="st12" v:langID="2057"><v:paragraph v:horizAlign="1"/><v:tabList/>Health-GPS Microsimulation</text>		</g>
 		<g id="shape95-49" v:mID="95" v:groupContext="shape" transform="translate(103.446,-41.3772)">
 			<title>Rectangle.95</title>
 			<v:userDefs>

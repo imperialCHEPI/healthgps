@@ -4,11 +4,11 @@
 
 # User Guide
 
-The **Health GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
+The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
-|![Health GPS Workflow](/assets/image/workflow_diagram.png)|
+|![Health-GPS Workflow](/assets/image/workflow_diagram.svg)|
 |:--:|
-|*Health GPS Workflow Diagram*|
+|*Health-GPS Workflow Diagram*|
 
 As with any simulation model, the workflow starts with data, it is the user's responsibility to process and analyse the input data, define the model’s hierarchy, fit parameters to data, and design intervention. A *configuration* file is used to provide the user's datasets, model parameters, and control the simulation experiment runtime. The model is invoked via a *Command Line Interface* (CLI), which validates the configuration contents, loads associated files to create the model inputs, assembles the microsimulation with the required modules, evaluates the experiment, and writes the results to a chosen output *file* and *folder*. Likewise, it is the user's responsibility to analyse and quantify the model results and draw conclusions on the cost-effectiveness of the intervention.
 
@@ -173,7 +173,7 @@ The ***experiment*** section defines simulation *runtime* period, *start/stop ti
 ...
 ```
 
-Unlike the diseases *data driven* definition, *interventions* can have specific data requirements, rules for selecting the target population to intervening, intervention period transition, etc, consequently the definition usually require supporting code implementation. Health GPS provides an *interface* abstraction for implementing new interventions and easily use at runtime, however the implementation must also handle the required input data.
+Unlike the diseases *data driven* definition, *interventions* can have specific data requirements, rules for selecting the target population to intervening, intervention period transition, etc, consequently the definition usually require supporting code implementation. Health-GPS provides an *interface* abstraction for implementing new interventions and easily use at runtime, however the implementation must also handle the required input data.
 
 ## 1.4 Output
 
@@ -192,7 +192,7 @@ The file name can have a *job_id*, passed as a CLI parameter, added to the end w
 
 ## 1.5 Risk Factor Models
 
-Health GPS requires *two types* of risk factor models to be externally created by the user, fitted to data, and provided via configuration: *static* and *dynamic* respective. The *first type* is used to *initialise* the virtual population with the current risk factor trends, the *second type* is used to *update* the population attributes, accounting for the dynamics of the risk factors as time progresses in the simulation and individual's age.
+Health-GPS requires *two types* of risk factor models to be externally created by the user, fitted to data, and provided via configuration: *static* and *dynamic* respective. The *first type* is used to *initialise* the virtual population with the current risk factor trends, the *second type* is used to *update* the population attributes, accounting for the dynamics of the risk factors as time progresses in the simulation and individual's age.
 
 The *risk factor* models definition adopts a semi-parametric approach based on a regression models with sampling from the residuals to conserve the original data distributions. Each risk factor model file contains the various fitted regression models' coefficients, residuals, and other related values, that must be provided in a consistent format independent of the fitting tool.
 
@@ -368,7 +368,7 @@ The values in the adjustment files are *added* to the *model values*, therefore 
 
 # 2.0 Backend Storage
 
-Health GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
+Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
 |![File-based Datastore](/assets/image/file_based_storage.png)|
 |:--:|
@@ -525,9 +525,9 @@ Defines the file storage for disease cost analysis for country specific data con
 
 # 4.0 Running
 
-Health GPS has been designed to be portable, producing stable, and comparable results cross-platform. Only minor and insignificant rounding errors should be noticeable, these errors are attributed to the C++ application binary interface (ABI), which is not guaranteed to compatible between two binary programs cross-platform, or even on same platform when using different versions of the C++ standard library.
+Health-GPS has been designed to be portable, producing stable, and comparable results cross-platform. Only minor and insignificant rounding errors should be noticeable, these errors are attributed to the C++ application binary interface (ABI), which is not guaranteed to compatible between two binary programs cross-platform, or even on same platform when using different versions of the C++ standard library.
 
-The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health GPS application on each platform using the include example model and reference dataset.
+The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health-GPS application on each platform using the include example model and reference dataset.
 
 ## Windows
 
@@ -596,9 +596,9 @@ View(data)
 ```
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
 
-|![Health GPS Results](/assets/image/model_results.png)|
+|![Health-GPS Results](/assets/image/model_results.png)|
 |:--:|
-|*Health GPS results in R data frame example*|
+|*Health-GPS results in R data frame example*|
 
 The results file contains the output of all simulations in the experiment, *baseline*, and *intervention* scenarios over one or more runs. The user should not assume data order during analysis of experiments with intervention scenarios, the results are published by both simulations running in parallel *asynchronously* via messages, the order in which the messages arrive at the destination queue, before being written to file is not guaranteed. A robust method to tabulate the results shown above, is to always group the data by: ```data.result(source, run, time)```, to ensure that the analysis algorithms work for both types of simulation experiments. For example, using the results data above in R, the following script will tabulate and plot the experiment's BMI projection.
 
@@ -643,7 +643,7 @@ p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
 show(p)
 ```
 
-|![Experiment BMI Projection](/assets/image/bmi_projection.png)|
+|![Experiment BMI Projection](/assets/image/bmi_projection.svg)|
 |:--:|
 |*Experiment BMI projection example*|
 
