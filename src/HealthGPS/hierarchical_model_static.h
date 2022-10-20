@@ -12,7 +12,7 @@ namespace hgps {
 
 		HierarchicalModelType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		void generate_risk_factors(RuntimeContext& context) override;
 
@@ -20,6 +20,7 @@ namespace hgps {
 
 	private:
 		std::reference_wrapper<HierarchicalLinearModelDefinition> definition_;
+		std::string name_{ "Static" };
 
 		void generate_for_entity(RuntimeContext& context, Person& entity,
 			int level, std::vector<MappingEntry>& level_factors);

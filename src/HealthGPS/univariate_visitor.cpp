@@ -13,14 +13,14 @@ namespace hgps {
 	void UnivariateVisitor::visit(const core::FloatDataTableColumn& column)	{
 		summary_ = core::UnivariateSummary(column.name());
 		if (column.null_count() > 0) {
-			for (auto& v : column) {
+			for (const auto& v : column) {
 				summary_.append(v);
 			}
 
 			return;
 		}
 
-		for (auto& v : column) {
+		for (const auto& v : column) {
 			summary_.append(v.value());
 		}
 	}
@@ -28,14 +28,14 @@ namespace hgps {
 	void UnivariateVisitor::visit(const core::DoubleDataTableColumn& column) {
 		summary_ = core::UnivariateSummary(column.name());
 		if (column.null_count() > 0) {
-			for (auto& v : column) {
+			for (const auto& v : column) {
 				summary_.append(v);
 			}
 
 			return;
 		}
 
-		for (auto& v : column) {
+		for (const auto& v : column) {
 			summary_.append(v.value());
 		}
 	}
@@ -43,14 +43,14 @@ namespace hgps {
 	void UnivariateVisitor::visit(const core::IntegerDataTableColumn& column) {
 		summary_ = core::UnivariateSummary(column.name());
 		if (column.null_count() > 0) {
-			for (auto& v : column) {
+			for (const auto& v : column) {
 				summary_.append(v);
 			}
 
 			return;
 		}
 
-		for (auto& v : column) {
+		for (const auto& v : column) {
 			summary_.append(v.value());
 		}
 	}

@@ -9,6 +9,7 @@
     "nlohmann-json",
     "rapidcsv",
     "crossguid",
-    "gtest"
+    "gtest",
+    "benchmark"
   ]
 }

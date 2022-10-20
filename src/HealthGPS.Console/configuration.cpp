@@ -25,7 +25,7 @@
 
 using namespace hgps;
 
-std::string getTimeNowStr()
+std::string get_time_now_str()
 {
 	auto tp = std::chrono::system_clock::now();
 	return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
@@ -45,6 +45,13 @@ cxxopts::Options create_options()
 	return options;
 }
 
+void print_app_title()
+{
+	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
+		"\n# Health-GPS Microsimulation for Policy Options #\n\n");
+
+	fmt::print("Today: {}\n\n", get_time_now_str());
+}
 
 CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[])
 {
@@ -465,10 +472,9 @@ std::string expand_environment_variables(const std::string& path)
 std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed)
 {
 	if (job_id > 0 && user_seed.has_value()) {
-		auto seed = user_seed.value();
-		auto rnd = hgps::MTRandom32{ seed };
-		auto shift = static_cast<unsigned int>(std::pow(job_id, 2.0));
-		rnd.discard(shift);
+		auto rnd = hgps::MTRandom32{ user_seed.value() };
+		auto jump_size = static_cast<unsigned long>(1.618 * job_id * std::pow(2, 16));
+		rnd.discard(jump_size);
 		return rnd();
 	}
 

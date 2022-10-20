@@ -13,26 +13,26 @@ namespace hgps {
 		, entity_name_{ core::to_lower(entity_name) }, range_{range}
 		, dynamic_factor_{ dynamic_factor } { }
 
-	MappingEntry::MappingEntry(std::string name, const short level,
-		std::string entity_name, const bool dynamic_factor)
+	MappingEntry::MappingEntry(std::string name, short level,
+		std::string entity_name, bool dynamic_factor)
 		: MappingEntry(name, level, entity_name, FactorRange{}, dynamic_factor) {}
 
-	MappingEntry::MappingEntry(std::string name, const short level, std::string entity_name, FactorRange range)
+	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name, FactorRange range)
 		: MappingEntry(name, level, entity_name, range, false) {}
 
-	MappingEntry::MappingEntry(std::string name, const short level, std::string entity_name)
+	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name)
 		: MappingEntry(name, level, entity_name, FactorRange{}, false) {}
 
-	MappingEntry::MappingEntry(std::string name, const short level)
+	MappingEntry::MappingEntry(std::string name, short level)
 		: MappingEntry(name, level, std::string{}, FactorRange{}, false) {}
 
-	std::string MappingEntry::name() const noexcept { return name_; }
+	const std::string&  MappingEntry::name() const noexcept { return name_; }
 
 	short MappingEntry::level() const noexcept { return level_; }
 
-	std::string MappingEntry::entity_name() const noexcept { return entity_name_; }
+	const std::string& MappingEntry::entity_name() const noexcept { return entity_name_; }
 
-	std::string MappingEntry::entity_key() const noexcept {
+	const std::string& MappingEntry::entity_key() const noexcept {
 		return is_entity() ? entity_name_ : name_key_;
 	}
 
@@ -40,7 +40,7 @@ namespace hgps {
 
 	bool MappingEntry::is_dynamic_factor() const noexcept { return dynamic_factor_; }
 
-	std::string MappingEntry::key() const noexcept { return name_key_; }
+	const std::string& MappingEntry::key() const noexcept { return name_key_; }
 
 	const FactorRange& MappingEntry::range() const noexcept {
 		return range_;
@@ -78,11 +78,11 @@ namespace hgps {
 	}
 
 	std::vector<MappingEntry> HierarchicalMapping::entries_without_dynamic() const noexcept {
-		std::vector<MappingEntry> out;
-		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(out),
+		std::vector<MappingEntry> result;
+		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(result),
 			[](const auto& elem) {return !elem.is_dynamic_factor(); });
 
-		return out;
+		return result;
 	}
 
 	std::size_t HierarchicalMapping::size() const noexcept { 

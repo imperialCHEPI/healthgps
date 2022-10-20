@@ -1,4 +1,5 @@
 find_package(fmt CONFIG REQUIRED)
+find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
 include(CTest)
@@ -12,6 +13,7 @@ target_sources(HealthGPS.Tests
         "pch.cpp"
         "pch.h"
         "data_config.h"
+        "data_config.cpp"
         "AgeGenderTable.Test.cpp"
         "Channel.Test.cpp"
         "Core.Array2DTest.cpp"
@@ -44,6 +46,7 @@ target_link_libraries(HealthGPS.Tests
         HealthGPS.Datastore
         HealthGPS
         fmt::fmt
+        cxxopts::cxxopts
         GTest::gtest)
 
 gtest_discover_tests(HealthGPS.Tests)

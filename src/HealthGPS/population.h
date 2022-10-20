@@ -1,7 +1,8 @@
 #pragma once
+#include "person.h"
+
 #include <vector>
 
-#include "person.h"
 namespace hgps {
 
 	class Population
@@ -22,6 +23,10 @@ namespace hgps {
 		Person& operator[](std::size_t index);
 
 		const Person& operator[](std::size_t index) const;
+
+		Person& at(std::size_t index);
+
+		const Person& at(std::size_t index) const;
 
 		void add(Person&& person, unsigned int time) noexcept;
 

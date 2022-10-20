@@ -14,7 +14,7 @@ namespace hgps {
 
 		SimulationModuleType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		std::size_t size() const noexcept;
 
@@ -33,6 +33,7 @@ namespace hgps {
 
 	private:
 		std::map<std::string, std::shared_ptr<DiseaseModel>> models_;
+		std::string name_{ "Disease" };
 	};
 
 	std::unique_ptr<DiseaseModule> build_disease_module(Repository& repository, const ModelInput& config);

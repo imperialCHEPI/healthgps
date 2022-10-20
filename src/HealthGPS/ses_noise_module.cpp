@@ -1,6 +1,7 @@
 #include "ses_noise_module.h"
 #include "runtime_context.h"
 #include "HealthGPS.Core/string_util.h"
+#include "HealthGPS.Core/thread_util.h"
 
 #include <fmt/format.h>
 
@@ -29,8 +30,8 @@ namespace hgps {
 		return SimulationModuleType::SES;
 	}
 
-	std::string SESNoiseModule::name() const noexcept {
-		return "SES";
+	const std::string& SESNoiseModule::name() const noexcept {
+		return name_;
 	}
 
 	void SESNoiseModule::initialise_population(RuntimeContext& context) {
@@ -41,16 +42,21 @@ namespace hgps {
 
 	void SESNoiseModule::update_population(RuntimeContext& context) {
 		auto newborn_age = 0u;
-		for (auto& entity : context.population()) {
-			if (entity.age > newborn_age) {
-				continue;
-			}
+		auto& pop = context.population();
+		auto indeces = core::find_index_of_all(core::execution_policy, pop, [&](const Person& entity)
+			{
+				return entity.age == newborn_age;
+			});
 
-			entity.ses = context.random().next_normal(parameters_[0], parameters_[1]);
+		std::sort(indeces.begin(), indeces.end());
+		for (auto& index : indeces)
+		{
+			pop[index].ses = context.random().next_normal(parameters_[0], parameters_[1]);
 		}
 	}
 
-	std::unique_ptr<SESNoiseModule> build_ses_noise_module([[maybe_unused]] Repository& repository, const ModelInput& config)
+	std::unique_ptr<SESNoiseModule> build_ses_noise_module(
+		[[maybe_unused]] Repository& repository, const ModelInput& config)
 	{
 		const auto& ses = config.ses_definition();
 		return std::make_unique<SESNoiseModule>(ses.fuction_name, ses.parameters);

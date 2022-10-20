@@ -9,13 +9,11 @@
 
 namespace fs = std::filesystem;
 
-static auto store_full_path = default_datastore_path();
-
 // The fixture for testing class Foo.
 class RepositoryTest : public ::testing::Test {
 protected:
 	RepositoryTest() 
-		: manager_{ store_full_path }, repository{ manager_ } {}
+		: manager_{ test_datastore_path }, repository{ manager_ } {}
 
 	hgps::data::DataManager manager_;
 	hgps::CachedRepository repository;

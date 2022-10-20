@@ -11,5 +11,5 @@ hgps::HierarchicalLinearModelDefinition load_static_risk_model_definition(std::s
 
 hgps::LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename);
 
-void register_risk_factor_model_definitions(const ModellingInfo& info,
-	const SettingsInfo& settings, hgps::CachedRepository& repository);
+void register_risk_factor_model_definitions(hgps::CachedRepository& repository,
+	const ModellingInfo& info, const SettingsInfo& settings);

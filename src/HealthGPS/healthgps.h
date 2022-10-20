@@ -23,9 +23,9 @@ namespace hgps {
 		adevs::Time update(adevs::SimEnv<int>*, std::vector<int>&);
 		void fini(adevs::Time clock);
 
-		void setup_run(const unsigned int run_number) noexcept override;
+		void setup_run(unsigned int run_number) noexcept override;
 
-		void setup_run(const unsigned int run_number, const unsigned int seed) noexcept override;
+		void setup_run(unsigned int run_number, unsigned int seed) noexcept override;
 
 	private:
 		RuntimeContext context_;
@@ -44,10 +44,10 @@ namespace hgps {
 
 		hgps::IntegerAgeGenderTable get_current_expected_population() const;
 		hgps::IntegerAgeGenderTable	get_current_simulated_population();
-		const std::vector<Person> get_similar_entities(const unsigned int& age, const core::Gender& gender);
-		void apply_net_migration(const int net_value, const unsigned int& age, const core::Gender& gender);
+		void apply_net_migration(int net_value, const unsigned int& age, const core::Gender& gender);
 		hgps::IntegerAgeGenderTable	get_net_migration();
 		hgps::IntegerAgeGenderTable	create_net_migration();
+		std::map<std::string, core::UnivariateSummary> create_input_data_summary() const;
 
 		Person partial_clone_entity(const Person& source) const noexcept;
 	};

@@ -4,7 +4,7 @@ namespace hgps {
 
     std::atomic<std::size_t> Person::newUID{0};
 
-    case_insensitive_map<std::function<double(const Person&)>> Person::current_dispatcher {
+    std::map<std::string,std::function<double(const Person&)>> Person::current_dispatcher {
         {"intercept",[](const Person&) { return 1.0; } },
         {"gender",[](const Person& p) { return p.gender_to_value(); } },
         {"age",[](const Person& p) { return static_cast<double>(p.age); } },

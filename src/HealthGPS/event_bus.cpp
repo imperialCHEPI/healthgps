@@ -1,6 +1,6 @@
 #include "event_bus.h"
+#include "HealthGPS.Core/thread_util.h"
 #include <crossguid/guid.hpp>
-#include <future>
 
 namespace hgps {
 
@@ -34,7 +34,7 @@ namespace hgps {
 	void DefaultEventBus::publish_async(std::unique_ptr<EventMessage> message)
 	{
 		auto futptr = std::make_shared<std::future<void>>();
-		*futptr = std::async(std::launch::async, &DefaultEventBus::publish, this, std::move(message));
+		*futptr = core::run_async(&DefaultEventBus::publish, this, std::move(message));
 	}
 
 	bool DefaultEventBus::unsubscribe(const EventSubscriber& subscriber)

@@ -6,8 +6,6 @@
 
 namespace hgps {
 
-	static constexpr double DALY_UNITS = 100'000.0;
-
 	class AnalysisDefinition {
 	public:
 		AnalysisDefinition(GenderTable<int, float>&& life_expectancy,
@@ -24,7 +22,7 @@ namespace hgps {
 			return observed_YLD_;
 		}
 
-		const std::map<std::string, float> disability_weights() const noexcept {
+		const std::map<std::string, float>& disability_weights() const noexcept {
 			return disability_weights_;
 		}
 

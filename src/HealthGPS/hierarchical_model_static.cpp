@@ -12,8 +12,8 @@ namespace hgps {
 		return HierarchicalModelType::Static;
 	}
 
-	std::string StaticHierarchicalLinearModel::name() const noexcept {
-		return "Static";
+	const std::string& StaticHierarchicalLinearModel::name() const noexcept {
+		return name_;
 	}
 
 	void StaticHierarchicalLinearModel::generate_risk_factors(RuntimeContext& context)

@@ -8,6 +8,9 @@ if (BUILD_TESTING)
 	enable_testing()
 	message(STATUS "Building Tests ...")
 	add_subdirectory (HealthGPS.Tests)
+
+	message(STATUS "Building Benchmarks ...")
+	add_subdirectory (HealthGPS.Benchmarks)
 endif()
 
 # PUBLIC needed to make heathers and library available to other project

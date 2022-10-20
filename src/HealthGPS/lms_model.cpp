@@ -23,7 +23,8 @@ namespace hgps {
 		return classify_weight_bmi(entity, bmi);
 	}
 
-	double hgps::LmsModel::adjust_risk_factor_value(const Person& entity, std::string risk_factor_key, double value) const
+	double hgps::LmsModel::adjust_risk_factor_value(
+		const Person& entity, const std::string& risk_factor_key, double value) const
 	{
 		if (risk_factor_key != bmi_key_) {
 			return value;

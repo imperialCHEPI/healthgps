@@ -18,7 +18,7 @@ namespace hgps {
 		return *rnd_;
 	}
 
-	std::string SimulationDefinition::identifier() const noexcept {
+	const std::string& SimulationDefinition::identifier() const noexcept {
 		return identifier_;
 	}
 }

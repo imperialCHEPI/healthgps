@@ -37,8 +37,8 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2022.05.10
-        ./bootstrap-vcpkg.sh -disableMetrics    
+        git checkout --force 2022.09.27
+        ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: Get Ninja
       id: install_ninja

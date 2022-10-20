@@ -10,12 +10,12 @@ namespace hgps {
 	class RiskFactorModule final : public RiskFactorHostModule {
 	public:
 		RiskFactorModule() = delete;
-		RiskFactorModule(std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models,
+		RiskFactorModule(std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>&& models,
 			RiskfactorAdjustmentModel&& adjustments);
 
 		SimulationModuleType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		std::size_t size() const noexcept;
 
@@ -30,8 +30,9 @@ namespace hgps {
 		void apply_baseline_adjustments(RuntimeContext& context) override;
 
 	private:
-		std::unordered_map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models_;
+		std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models_;
 		RiskfactorAdjustmentModel adjustment_;
+		std::string name_{ "RiskFactor" };
 	};
 
 	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, const ModelInput& config);

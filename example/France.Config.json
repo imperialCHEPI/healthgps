@@ -88,7 +88,7 @@
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
-                        {"risk_factor":"BMI", "impact_value":-0.155,"from_age":19, "to_age":null}
+                        {"risk_factor":"BMI", "impact_value":-0.16,"from_age":19, "to_age":null}
                     ]
                 },
                 "fiscal": {
@@ -98,9 +98,9 @@
                     },
                     "impact_type": "optimist",
                     "impacts": [
-                        {"risk_factor":"Energy", "impact_value":-0.01282, "from_age":5,  "to_age":9},
-                        {"risk_factor":"Energy", "impact_value":-0.01814, "from_age":10, "to_age":17},
-                        {"risk_factor":"Energy", "impact_value":-0.00125,"from_age":18, "to_age":null}
+                        {"risk_factor":"Energy", "impact_value":-0.01742, "from_age":5,  "to_age":9},
+                        {"risk_factor":"Energy", "impact_value":-0.01812, "from_age":10, "to_age":17},
+                        {"risk_factor":"Energy", "impact_value":-0.00563, "from_age":18, "to_age":null}
                     ]
                 }
             }

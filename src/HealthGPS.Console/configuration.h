@@ -9,9 +9,11 @@
 
 #include "options.h"
 
-std::string getTimeNowStr();
+std::string get_time_now_str();
 
 cxxopts::Options create_options();
+
+void print_app_title();
 
 CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[]);
 

@@ -74,7 +74,7 @@ namespace hgps {
 		unsigned int time_of_migration_{};
 
 		static std::atomic<std::size_t> newUID;
-		static case_insensitive_map<std::function<double(const Person&)>> current_dispatcher;
+		static std::map<std::string, std::function<double(const Person&)>> current_dispatcher;
 	};
 }
 

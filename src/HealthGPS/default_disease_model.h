@@ -13,7 +13,7 @@ namespace hgps {
 
 		core::DiseaseGroup group() const noexcept override;
 
-		std::string disease_type() const noexcept override;
+		const std::string& disease_type() const noexcept override;
 
 		void initialise_disease_status(RuntimeContext& context) override;
 

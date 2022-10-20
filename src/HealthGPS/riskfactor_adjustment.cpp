@@ -1,5 +1,6 @@
 #include "riskfactor_adjustment.h"
 #include "baseline_sync_message.h"
+#include "HealthGPS.Core/thread_util.h"
 
 #include <cmath>
 #include <memory>
@@ -11,19 +12,21 @@ namespace hgps {
 
 	void RiskfactorAdjustmentModel::Apply(RuntimeContext& context)
     {
+        auto& pop = context.population();
         auto coefficients = get_adjustment_coefficients(context);
-        for (auto& entity : context.population()) {
-            if (!entity.is_active()) {
-                continue;
-            }
+        std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto& entity)
+            {
+                if (!entity.is_active()) {
+                    return;
+                }
 
-            auto& table = coefficients.row(entity.gender);
-            for (auto& factor : table) {
-                auto current_value = entity.get_risk_factor_value(factor.first);
-                auto adjustment = factor.second.at(entity.age);
-                entity.risk_factors.at(factor.first) = current_value + adjustment;
-            }
-        }
+                auto& table = coefficients.row(entity.gender);
+                for (auto& factor : table) {
+                    auto current_value = entity.get_risk_factor_value(factor.first);
+                    auto adjustment = factor.second.at(entity.age);
+                    entity.risk_factors.at(factor.first) = current_value + adjustment;
+                }
+            });
 
         if (context.scenario().type() == ScenarioType::baseline) {
             context.scenario().channel().send(std::make_unique<BaselineAdjustmentMessage>(

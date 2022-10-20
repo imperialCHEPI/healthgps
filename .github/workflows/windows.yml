@@ -30,7 +30,7 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2022.05.10
+        git checkout --force 2022.09.27
         .\bootstrap-vcpkg.bat -disableMetrics    
 
     - name: Get Ninja

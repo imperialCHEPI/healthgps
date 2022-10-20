@@ -62,7 +62,7 @@ namespace hgps {
 
 		/// @brief Gets the module name
 		/// @return The human-readable module name
-		virtual std::string name() const noexcept  = 0;
+		virtual const std::string& name() const noexcept  = 0;
 
 		/// @brief Initialises the virtual population
 		/// @param context The simulation shared runtime context instance
@@ -124,12 +124,12 @@ namespace hgps {
 		/// @brief Gets the total population at a specific point in time
 		/// @param time_year The reference point in time (in year)
 		/// @return The respective total population size
-		virtual std::size_t get_total_population_size(const int time_year) const noexcept = 0;
+		virtual std::size_t get_total_population_size(int time_year) const noexcept = 0;
 
 		/// @brief Gets the population age distribution at a specific point in time 
 		/// @param time_year The reference point in time (in year)
 		/// @return The respective population age distribution 
-		virtual const std::map<int, PopulationRecord>& get_population_distribution(const int time_year) const = 0;
+		virtual const std::map<int, PopulationRecord>& get_population_distribution(int time_year) const = 0;
 
 		/// @brief Updates the virtual population status
 		/// @param context The simulation run-time context
@@ -148,7 +148,7 @@ namespace hgps {
 
 		/// @brief Gets the model name
 		/// @return The human-readable model name
-		virtual std::string name() const noexcept = 0;
+		virtual const std::string& name() const noexcept = 0;
 
 		/// @brief Generates the initial risk factors for a population and newborns
 		/// @param context The simulation run-time context
@@ -171,7 +171,7 @@ namespace hgps {
 
 		/// @brief Gets the model disease type unique identifier
 		/// @return The disease type identifier
-		virtual std::string disease_type() const noexcept = 0;
+		virtual const std::string& disease_type() const noexcept = 0;
 
 		/// @brief Initialises the population disease status.
 		/// @param The simulation run-time context
