@@ -5,12 +5,9 @@
 #include "HealthGPS/api.h"
 #include "HealthGPS.Datastore/api.h"
 #include "HealthGPS/event_bus.h"
-#include "HealthGPS/baseline_scenario.h"
-#include "HealthGPS/intervention_scenario.h"
 #include "HealthGPS.Core/thread_util.h"
 
 #include "event_monitor.h"
-#include "result_file_writer.h"
 
 #include <fmt/color.h>
 
@@ -84,15 +81,7 @@ int main(int argc, char* argv[])
 
 	// Create event bus and monitor
 	auto event_bus = DefaultEventBus();
-	auto json_file_logger = ResultFileWriter{
-		create_output_file_name(config.output, config.job_id),
-		ExperimentInfo{
-			.model = config.app_name,
-			.version = config.app_version,
-			.intervention = config.intervention.identifier,
-			.job_id = config.job_id,
-			.seed = model_input.seed().value_or(0u)}
-	};
+	auto json_file_logger = create_results_file_logger(config, model_input);
 	auto event_monitor = EventMonitor{ event_bus, json_file_logger };
 
 	try {
@@ -110,22 +99,14 @@ int main(int argc, char* argv[])
 
 		// GCC thread initialisation bug reverses derived to base-class, when declared in line
 		fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
-		auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
-		auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
-		auto baseline = HealthGPS{
-			SimulationDefinition{ model_input, std::move(baseline_scenario) , std::move(baseline_rnd) },
-			factory, event_bus };
+		auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input, config.intervention);
 
 		if (config.has_active_intervention) {
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n", config.trial_runs);
-			auto policy_scenario = create_intervention_scenario(channel, config.intervention);
-			auto policy_rnd = std::make_unique<hgps::MTRandom32>();
-			auto intervention = HealthGPS{
-				SimulationDefinition{ model_input, std::move(policy_scenario), std::move(policy_rnd) },
-				factory, event_bus };
+			auto policy_sim = create_intervention_simulation(channel, factory, event_bus, model_input, config.intervention);
 
-			auto worker = std::jthread{ [&runtime, &executive, &baseline, &intervention, &config, &done] {
-				runtime = executive.run(baseline, intervention, config.trial_runs);
+			auto worker = std::jthread{ [&runtime, &executive, &baseline_sim, &policy_sim, &config, &done] {
+				runtime = executive.run(baseline_sim, policy_sim, config.trial_runs);
 				done.store(true);
 			} };
 
@@ -137,8 +118,8 @@ int main(int argc, char* argv[])
 		}
 		else {
 			channel.close(); // Will not store any message
-			auto worker = std::jthread{ [&runtime, &executive, &baseline, &config, &done] {
-				runtime = executive.run(baseline, config.trial_runs);
+			auto worker = std::jthread{ [&runtime, &executive, &baseline_sim, &config, &done] {
+				runtime = executive.run(baseline_sim, config.trial_runs);
 				done.store(true);
 			} };
 
@@ -153,7 +134,7 @@ int main(int argc, char* argv[])
 		fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
 	}
 	catch (const std::exception& ex) {
-		fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n", ex.what());
+		fmt::print(fg(fmt::color::red), "\n\nFailed with message - {}.\n\n", ex.what());
 	}
 
 	event_monitor.stop();

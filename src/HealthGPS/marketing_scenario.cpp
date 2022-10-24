@@ -42,8 +42,8 @@ namespace hgps {
         interventions_book_.clear();
     }
 
-    double MarketingPolicyScenario::apply(Person& entity, const int time,
-        const std::string risk_factor_key, const double value) {
+    double MarketingPolicyScenario::apply([[maybe_unused]] Random& generator, Person& entity,
+        int time, const std::string& risk_factor_key, double value) {
         if (!factor_impact_.contains(risk_factor_key) ||
             !definition_.active_period.contains(time)) {
             return value;

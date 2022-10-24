@@ -43,8 +43,8 @@ namespace hgps {
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int time,
-			const std::string risk_factor_key, const double value) override;
+		double apply(Random& generator, Person& entity, int time,
+			const std::string& risk_factor_key, double value) override;
 
 		const PolicyInterval& active_period()  const noexcept override;
 

@@ -107,6 +107,7 @@ struct PolicyScenarioInfo
 	PolicyPeriodInfo active_period;
 	std::string impact_type{};
 	std::vector<PolicyImpactInfo> impacts;
+	std::vector<double> dynamics;
 };
 
 struct Configuration

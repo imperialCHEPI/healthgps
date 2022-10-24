@@ -2,8 +2,10 @@
 #include "jsonparser.h"
 #include "version.h"
 
+#include "HealthGPS/baseline_scenario.h"
 #include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
+#include "HealthGPS/marketing_dynamic_scenario.h"
 #include "HealthGPS/fiscal_scenario.h"
 #include "HealthGPS/mtrandom.h"
 
@@ -153,8 +155,8 @@ Configuration load_configuration(CommandOptions& options)
 		}
 
 		auto version = opt["version"].get<int>();
-		if (version != 1) {
-			throw std::runtime_error("definition schema version mismatch, supported = 1");
+		if (version != 1 && version != 2) {
+			throw std::runtime_error(fmt::format("configuration schema version: {} mismatch, supported: 1 and 2", version));
 		}
 
 		// application version
@@ -254,6 +256,10 @@ Configuration load_configuration(CommandOptions& options)
 					config.has_active_intervention = true;
 					break;
 				}
+			}
+
+			if (!core::case_insensitive::equals(config.intervention.identifier, active_type)) {
+				throw std::runtime_error(fmt::format("Unknown active intervention type identifier: {}", active_type));
 			}
 		}
 
@@ -403,6 +409,50 @@ std::string create_output_file_name(const OutputInfo& info, int job_id)
 	return log_file_name;
 }
 
+ResultFileWriter create_results_file_logger(const Configuration& config, const hgps::ModelInput& input)
+{
+	return ResultFileWriter{
+		create_output_file_name(config.output, config.job_id),
+		ExperimentInfo{
+			.model = config.app_name,
+			.version = config.app_version,
+			.intervention = config.intervention.identifier,
+			.job_id = config.job_id,
+			.seed = input.seed().value_or(0u)}
+	};
+}
+
+std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel& channel, const PolicyScenarioInfo& info)
+{
+	if (!info.identifier.empty()) {
+		// TODO: Baseline scenario with population labelling
+	}
+
+	return std::make_unique<BaselineScenario>(channel);
+}
+
+hgps::HealthGPS create_baseline_simulation(hgps::SyncChannel& channel, hgps::SimulationModuleFactory& factory,
+	hgps::EventAggregator& event_bus, hgps::ModelInput& input, const PolicyScenarioInfo& info)
+{
+	auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
+	auto baseline_scenario = create_baseline_scenario(channel, info);
+	return HealthGPS {
+		SimulationDefinition{ input, std::move(baseline_scenario) , std::move(baseline_rnd) },
+		factory,
+		event_bus };
+}
+
+hgps::HealthGPS create_intervention_simulation(hgps::SyncChannel& channel, hgps::SimulationModuleFactory& factory,
+	hgps::EventAggregator& event_bus, hgps::ModelInput& input, const PolicyScenarioInfo& info)
+{
+	auto policy_scenario = create_intervention_scenario(channel, info);
+	auto policy_rnd = std::make_unique<hgps::MTRandom32>();
+	return HealthGPS {
+		SimulationDefinition{ input, std::move(policy_scenario), std::move(policy_rnd) },
+		factory,
+		event_bus };
+}
+
 std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	SyncChannel& channel, const PolicyScenarioInfo& info)
 {
@@ -432,6 +482,12 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	if (info.identifier == "marketing") {
 		auto definition = MarketingPolicyDefinition(period, risk_impacts);
 		return std::make_unique<MarketingPolicyScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "dynamic_marketing") {
+		auto dynamic = PolicyDynamic{ info.dynamics };
+		auto definition = MarketingDynamicDefinition{ period, risk_impacts, dynamic };
+		return std::make_unique<MarketingDynamicScenario>(channel, std::move(definition));
 	}
 
 	if (info.identifier == "fiscal") {

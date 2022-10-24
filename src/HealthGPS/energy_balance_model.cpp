@@ -69,7 +69,8 @@ namespace hgps {
 				}
 
 				// Intervention: "-1" as we want to retrieve data from last year
-				delta_factor = context.scenario().apply(entity, context.time_now() - 1, factor.key(), delta_factor);
+				delta_factor = context.scenario().apply(context.random(), entity,
+					context.time_now() - 1, factor.key(), delta_factor);
 				auto factor_stdev = factor_equation.residuals_standard_deviation;
 				delta_factor += sample_normal_with_boundary(context.random(), 0.0, factor_stdev, original_value);
 				delta_comp_factors.emplace(factor.key(), delta_factor);

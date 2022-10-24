@@ -6,6 +6,7 @@
 #include "channel.h"
 #include "sync_message.h"
 #include "person.h"
+#include "random_algorithm.h"
 
 namespace hgps {
 
@@ -35,7 +36,7 @@ namespace hgps {
 
 		virtual void clear() noexcept = 0;
 
-		virtual double apply(Person& entity, const int time,
-			const std::string risk_factor_key, const double value) = 0;
+		virtual double apply(Random& generator, Person& entity, int time,
+			const std::string& risk_factor_key, double value) = 0;
 	};
 }

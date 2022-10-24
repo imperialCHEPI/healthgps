@@ -224,12 +224,17 @@ void to_json(json& j, const PolicyScenarioInfo& p) {
 	j = json{
 	{"impact_type", p.impact_type},
 	{"impacts", p.impacts},
+	{"dynamics", p.dynamics},
 	{"active_period", p.active_period } };
 }
 
 void from_json(const json& j, PolicyScenarioInfo& p) {
 	if (j.contains("impact_type")) {
 		j.at("impact_type").get_to(p.impact_type);
+	}
+
+	if (j.contains("dynamics")) {
+		j.at("dynamics").get_to(p.dynamics);
 	}
 
 	j.at("impacts").get_to(p.impacts);

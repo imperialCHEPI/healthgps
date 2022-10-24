@@ -46,6 +46,8 @@ target_sources(HealthGPS
 		"lms_definition.h"
 		"mapping.cpp"
 		"mapping.h"
+		"marketing_dynamic_scenario.cpp"
+		"marketing_dynamic_scenario.h"
 		"marketing_scenario.cpp"
 		"marketing_scenario.h"
 		"model_result.cpp"

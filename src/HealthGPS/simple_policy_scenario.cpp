@@ -38,8 +38,8 @@ namespace hgps {
 		return definition_.impacts;
 	}
 
-	double SimplePolicyScenario::apply([[maybe_unused]] Person& entity, const int time,
-		const std::string risk_factor_key, const double value) {
+	double SimplePolicyScenario::apply([[maybe_unused]] Random& generator, [[maybe_unused]] Person& entity,
+		int time, const std::string& risk_factor_key, double value) {
 		auto result = value;
 		if (definition_.active_period.contains(time) && factor_impact_.contains(risk_factor_key)) {
 			auto impact = factor_impact_.at(risk_factor_key).value;
