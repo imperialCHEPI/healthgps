@@ -130,7 +130,7 @@ namespace hgps {
 		}
 
 		auto risk_factors = std::vector<MappingEntry>();
-		for (int level = 1; level <= config.risk_mapping().max_level(); level++) {
+		for (auto level = 1; level <= config.risk_mapping().max_level(); level++) {
 			auto risks = config.risk_mapping().at_level(level);
 			risk_factors.insert(risk_factors.end(), risks.begin(), risks.end());
 		}

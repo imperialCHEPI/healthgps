@@ -74,17 +74,20 @@ namespace hgps {
 
 		int max_level() const noexcept;
 
-		MappingEntry at(const std::string name) const;
+		MappingEntry at(const std::string& name) const;
 
-		std::vector<MappingEntry> at_level(const int level) const noexcept;
+		std::vector<MappingEntry> at_level(int level) const noexcept;
 
-		std::vector<MappingEntry> at_level_without_dynamic(const int level) const noexcept;
+		std::vector<MappingEntry> at_level_without_dynamic(int level) const noexcept;
 
 		IteratorType begin() noexcept { return mapping_.begin(); }
 		IteratorType end() noexcept { return mapping_.end(); }
 
 		ConstIteratorType begin() const noexcept { return mapping_.begin(); }
 		ConstIteratorType end() const noexcept { return mapping_.end(); }
+
+		ConstIteratorType cbegin() const noexcept { return mapping_.cbegin(); }
+		ConstIteratorType cend() const noexcept { return mapping_.cend(); }
 
 	private:
 		std::vector<MappingEntry> mapping_;

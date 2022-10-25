@@ -35,6 +35,9 @@ namespace hgps {
 		IteratorType begin() noexcept { return people_.begin(); }
 		IteratorType end() noexcept { return people_.end(); }
 
+		ConstIteratorType begin() const noexcept { return people_.begin(); }
+		ConstIteratorType end() const noexcept { return people_.end(); }
+
 		ConstIteratorType cbegin() const noexcept { return people_.cbegin(); }
 		ConstIteratorType cend() const noexcept { return people_.cend(); }
 

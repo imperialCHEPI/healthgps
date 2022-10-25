@@ -6,7 +6,9 @@
 namespace hgps::core {
 	struct Identifier final
 	{
-		Identifier(std::string value);
+		Identifier() = default;
+
+		explicit Identifier(std::string value);
 
 		bool is_empty() const noexcept;
 
@@ -25,7 +27,6 @@ namespace hgps::core {
 	private:
 		std::string value_{};
 
-		Identifier() = default;
 		void validate_identifeir() const;
 	};
 }

@@ -3,14 +3,20 @@
 #include "HealthGPS.Core/identifier.h"
 
 #include <unordered_map>
+#include<sstream>
 
 TEST(TestCore_Identity, CreateEmpty)
 {
 	using namespace hgps::core;
 	auto empty = Identifier::empty();
+	auto other = Identifier{};
 
 	ASSERT_TRUE(empty.is_empty());
+	ASSERT_TRUE(other.is_empty());
+
 	ASSERT_EQ(0, empty.size());
+	ASSERT_EQ(0, other.size());
+	ASSERT_EQ(other, empty);
 }
 
 TEST(TestCore_Identity, CreateValid)
@@ -37,6 +43,7 @@ TEST(TestCore_Identity, Equality)
 	ASSERT_EQ(dodo, dodo_lower);
 	ASSERT_EQ(dodo, dodo_upper);
 	ASSERT_EQ(dodo_lower, dodo_upper);
+	ASSERT_EQ(dodo.hash(), dodo_upper.hash());
 
 	ASSERT_TRUE(dodo == dodo_lower);
 	ASSERT_TRUE(dodo_lower == dodo_upper);
@@ -110,4 +117,17 @@ TEST(TestCore_Identity, CreateUnorderedMapKey)
 	ASSERT_TRUE(animals.contains(dog));
 	ASSERT_TRUE(animals.contains(cow));
 	ASSERT_FALSE(animals.contains(tmp));
+}
+
+TEST(TestCore_Identity, ConvertToStrem)
+{
+	using namespace hgps::core;
+
+	auto dodo = Identifier{ "Dodo_and_Duck" };
+
+	std::stringstream stream;
+
+	stream << dodo;
+	auto dodo_str = stream.str();
+	ASSERT_EQ(dodo.to_string(), dodo_str);
 }

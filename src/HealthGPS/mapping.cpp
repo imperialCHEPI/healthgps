@@ -97,9 +97,10 @@ namespace hgps {
 		return mapping_.back().level();
 	}
 
-	MappingEntry HierarchicalMapping::at(const std::string name) const {
+	MappingEntry HierarchicalMapping::at(const std::string& name) const {
+		auto other_key = core::to_lower(name);
 		auto it = std::find_if(mapping_.begin(), mapping_.end(),
-			[&name](const auto& item) {return item.key() == core::to_lower(name); });
+			[&other_key](const auto& item) { return item.key() == other_key; });
 		if (it != mapping_.end()) {
 			return *it;
 		}
@@ -108,21 +109,21 @@ namespace hgps {
 			"The mapping container does not have an element with the specified key.");
 	}
 
-	std::vector<MappingEntry> HierarchicalMapping::at_level(const int level) const noexcept {
-		std::vector<MappingEntry> out;
-		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(out),
+	std::vector<MappingEntry> HierarchicalMapping::at_level(int level) const noexcept {
+		std::vector<MappingEntry> result;
+		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(result),
 			[&level](const auto& elem) {return elem.level() == level; });
 
-		return out;
+		return result;
 	}
 
-	std::vector<MappingEntry> HierarchicalMapping::at_level_without_dynamic(const int level) const noexcept {
-		std::vector<MappingEntry> out;
-		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(out),
+	std::vector<MappingEntry> HierarchicalMapping::at_level_without_dynamic(int level) const noexcept {
+		std::vector<MappingEntry> result;
+		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(result),
 			[&level](const auto& elem) {
 				return elem.level() == level && !elem.is_dynamic_factor();
 			});
 
-		return out;
+		return result;
 	}
 }
