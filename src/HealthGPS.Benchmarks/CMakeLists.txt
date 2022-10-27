@@ -8,7 +8,8 @@ target_compile_features(HealthGPS.Tests PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 target_sources(HealthGPS.Benchmarks
     PRIVATE
     "BenchMain.cpp"
- "string_benchs.h")
+    "string_benchs.h"
+    "identifier_benchs.h")
 
 set(ROOT_NAMESPACE hgps::bench)
 

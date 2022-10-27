@@ -158,13 +158,12 @@ std::map<std::string, std::size_t> create_fields_index_mapping(
 	return mapping;
 }
 
-std::map<std::string, std::vector<double>> load_baseline_csv(const std::string& full_filename, const std::string delimiter)
+std::map<hc::Identifier, std::vector<double>> load_baseline_csv(const std::string& full_filename, const std::string delimiter)
 {
 	using namespace hgps;
 	using namespace rapidcsv;
 
 	auto data = std::map<std::string, std::vector<double>>{};
-
 	auto doc = Document{ full_filename, LabelParams{}, SeparatorParams(delimiter.front()) };
 	auto column_names = doc.GetColumnNames();
 	auto column_count = column_names.size();
@@ -194,5 +193,10 @@ std::map<std::string, std::vector<double>> load_baseline_csv(const std::string& 
 		col.second.shrink_to_fit();
 	}
 
-	return data;
+	auto result = std::map<hc::Identifier, std::vector<double>>{};
+	for (const auto& col: data) {
+		result.emplace(core::Identifier{ col.first }, col.second);
+	}
+
+	return result;
 }

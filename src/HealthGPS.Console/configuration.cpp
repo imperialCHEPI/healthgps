@@ -297,8 +297,9 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	fmt::print("\nThere are {} diseases in storage, {} selected.\n",
 		diseases.size(), config.diseases.size());
 
-	for (auto& code : config.diseases) {
-		auto item = data_api.get_disease_info(core::to_lower(code));
+	for (const auto& code : config.diseases) {
+		auto code_key = core::Identifier{ code };
+		auto item = data_api.get_disease_info(code_key);
 		if (item.has_value()) {
 			result.emplace_back(item.value());
 		}
@@ -345,19 +346,19 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	for (auto& item : config.modelling.risk_factors) {
 		if (core::case_insensitive::equals(item.name, config.modelling.dynamic_risk_factor)) {
 			if (item.range.empty()) {
-				mapping.emplace_back(MappingEntry(item.name, item.level, item.proxy, true));
+				mapping.emplace_back(MappingEntry(item.name, item.level, core::Identifier{ item.proxy }, true));
 			}
 			else {
 				auto boundary = FactorRange{ item.range[0], item.range[1] };
-				mapping.emplace_back(MappingEntry(item.name, item.level, item.proxy, boundary, true));
+				mapping.emplace_back(MappingEntry(item.name, item.level, core::Identifier{ item.proxy }, boundary, true));
 			}
 		}
 		else if (!item.range.empty()) {
 			auto boundary = FactorRange{ item.range[0], item.range[1] };
-			mapping.emplace_back(MappingEntry{ item.name, item.level, item.proxy, boundary });
+			mapping.emplace_back(MappingEntry{ item.name, item.level, core::Identifier{item.proxy}, boundary });
 		}
 		else {
-			mapping.emplace_back(MappingEntry{ item.name, item.level, item.proxy });
+			mapping.emplace_back(MappingEntry{ item.name, item.level, core::Identifier{item.proxy} });
 		}
 	}
 
@@ -463,7 +464,7 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	auto risk_impacts = std::vector<PolicyImpact>{};
 	for (auto& item : info.impacts) {
 		risk_impacts.emplace_back(PolicyImpact{
-			core::to_lower(item.risk_factor), item.impact_value, item.from_age, item.to_age });
+			core::Identifier{item.risk_factor}, item.impact_value, item.from_age, item.to_age });
 	}
 
 	if (info.identifier == "simple") {

@@ -11,7 +11,7 @@
 
 namespace hgps {
 
-	constexpr double DALY_UNITS = 100'000.0;
+	inline constexpr double DALY_UNITS = 100'000.0;
 
 	AnalysisModule::AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
 		const core::IntegerInterval age_range, unsigned int comorbidities)
@@ -106,14 +106,14 @@ namespace hgps {
 	}
 
 	void AnalysisModule::calculate_historical_statistics(RuntimeContext& context, ModelResult& result) const {
-		auto risk_factors = std::map<std::string, std::map<core::Gender, double>>();
+		auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
 		for (const auto& item : context.mapping()) {
 			if (item.level() > 0) {
 				risk_factors.emplace(item.key(), std::map<core::Gender, double>{});
 			}
 		}
 
-		auto prevalence = std::map<std::string, std::map<core::Gender, int>>();
+		auto prevalence = std::map<core::Identifier, std::map<core::Gender, int>>();
 		for (const auto& item : context.diseases()) {
 			prevalence.emplace(item.code, std::map<core::Gender, int>{});
 		}
@@ -199,7 +199,7 @@ namespace hgps {
 		}
 
 		for (const auto& item : context.diseases()) {
-			result.disease_prevalence.emplace(item.code, ResultByGender{
+			result.disease_prevalence.emplace(item.code.to_string(), ResultByGender{
 					.male = prevalence.at(item.code)[core::Gender::male] * 100.0 / males_count,
 					.female = prevalence.at(item.code)[core::Gender::female] * 100.0 / females_count
 				});
@@ -246,15 +246,15 @@ namespace hgps {
 					auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
 
 					auto reference_age = std::max(male_reference_age, female_reference_age);
-				auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
-				yll_sum += lifeExpectancy;
+					auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
+					yll_sum += lifeExpectancy;
 				}
 
 				if (entity.is_active()) {
-				yld_sum += calculate_disability_weight(entity);
-				count++;
-			}
+					yld_sum += calculate_disability_weight(entity);
+					count++;
 				}
+		}
 
 		auto yll = yll_sum * DALY_UNITS / count;
 		auto yld = yld_sum * DALY_UNITS / count;
@@ -299,12 +299,12 @@ namespace hgps {
 
 			series(gender, "count").at(age)++;
 			for (auto& factor : context.mapping().entries()) {
-				series(gender, factor.key()).at(age) += entity.get_risk_factor_value(factor.key());
+				series(gender, factor.key().to_string()).at(age) += entity.get_risk_factor_value(factor.key());
 			}
 
 			for (auto& item : entity.diseases) {
 				if (item.second.status == DiseaseStatus::active) {
-					series(gender, item.first).at(age)++;
+					series(gender, item.first.to_string()).at(age)++;
 				}
 			}
 
@@ -377,11 +377,11 @@ namespace hgps {
 
 		channels_.push_back("count");
 		for (auto& factor : context.mapping().entries_without_dynamic()) {
-			channels_.emplace_back(factor.key());
+			channels_.emplace_back(factor.key().to_string());
 		}
 
 		for (auto& disease : context.diseases()) {
-			channels_.emplace_back(disease.code);
+			channels_.emplace_back(disease.code.to_string());
 		}
 
 		channels_.emplace_back("disability_weight");

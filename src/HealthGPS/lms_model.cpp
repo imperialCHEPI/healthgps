@@ -8,7 +8,7 @@ namespace hgps {
 
 		auto& local = definition_.get();
 		if (local.min_age() > child_cutoff_age_ || local.max_age() < child_cutoff_age_) {
-			throw std::invalid_argument(fmt::format("Child cutoff age outside the LMS valid range: [{}, {}]",
+			throw std::invalid_argument(fmt::format("Child cut-off age outside the LMS valid range: [{}, {}]",
 				local.min_age(), local.max_age()));
 		}
 	}
@@ -24,9 +24,9 @@ namespace hgps {
 	}
 
 	double hgps::LmsModel::adjust_risk_factor_value(
-		const Person& entity, const std::string& risk_factor_key, double value) const
+		const Person& entity, const core::Identifier& factor_key, double value) const
 	{
-		if (risk_factor_key != bmi_key_) {
+		if (factor_key != bmi_key_) {
 			return value;
 		}
 

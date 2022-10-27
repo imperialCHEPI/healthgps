@@ -5,6 +5,7 @@
 #include <map>
 
 #include "forward_type.h"
+#include "identifier.h"
 
 namespace hgps {
 	namespace core {
@@ -12,7 +13,7 @@ namespace hgps {
 		struct DiseaseInfo
 		{
 			DiseaseGroup group{};
-			std::string code{};
+			Identifier code{};
 			std::string name{};
 		};
 

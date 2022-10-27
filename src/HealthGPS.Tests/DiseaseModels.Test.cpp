@@ -4,6 +4,7 @@
 #include "HealthGPS/disease_table.h"
 #include "HealthGPS/relative_risk.h"
 #include "HealthGPS/default_disease_model.h"
+
 TEST(TestHealthGPS_Disease, CreateDiseaseMeasure)
 {
 	using namespace hgps;
@@ -43,7 +44,7 @@ TEST(TestHealthGPS_Disease, CreateDiseaseTable)
 			{core::Gender::female, DiseaseMeasure(std::map<int, double>{ {1, 7.13}, {2, 3.13}})}} }
 	};
 
-	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+	auto info = core::DiseaseInfo{ .code = core::Identifier{"Test"}, .name = "Test disease." };
 
 	auto table = DiseaseTable(info, std::move(measures), std::move(data));
 	ASSERT_EQ(info.code, table.info().code);
@@ -59,7 +60,7 @@ TEST(TestHealthGPS_Disease, CreateDiseaseTableEmpty)
 
 	auto measures = std::map<std::string, int>();
 	auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>();
-	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+	auto info = core::DiseaseInfo{ .code = core::Identifier{"Test"}, .name = "Test disease." };
 
 	auto table = DiseaseTable(info, std::move(measures), std::move(data));
 	ASSERT_EQ(info.code, table.info().code);
@@ -85,7 +86,7 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTable)
 			{core::Gender::female, DiseaseMeasure(std::map<int, double>{ {1, 7.13}, {2, 3.13}})}} }
 	};
 
-	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+	auto info = core::DiseaseInfo{ .code = core::Identifier{"Test"}, .name = "Test disease." };
 	auto table = DiseaseTable(info, std::move(measures), std::move(data));
 
 	auto mapping = table.measures();
@@ -136,7 +137,7 @@ TEST(TestHealthGPS_Disease, AccessDiseaseTableOutOfBoundThrows)
 			{core::Gender::female, DiseaseMeasure(std::map<int, double>{ {1, 7.13}, {2, 3.13}})}} }
 	};
 
-	auto info = core::DiseaseInfo{ .code = "Test", .name = "Test disease." };
+	auto info = core::DiseaseInfo{ .code = core::Identifier{"Test"}, .name = "Test disease." };
 	auto table = DiseaseTable(info, std::move(measures), std::move(data));
 
 	// Measures

@@ -132,7 +132,11 @@ namespace hgps {
 				cost_of_disease(item.first, core::Gender::female) = item.second.at(core::Gender::female);
 			}
 
-			auto weights = std::map<std::string, float>(entity.disability_weights);
+			auto weights = std::map<core::Identifier, float>{};
+			for (const auto& item : entity.disability_weights) {
+				weights.emplace(core::Identifier{ item.first }, item.second);
+			}
+
 			return AnalysisDefinition(std::move(life_expectancy), std::move(cost_of_disease), std::move(weights));
 		}
 

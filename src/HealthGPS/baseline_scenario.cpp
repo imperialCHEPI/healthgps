@@ -21,7 +21,7 @@ namespace hgps {
     }
 
     double BaselineScenario::apply([[maybe_unused]] Random& generator, [[maybe_unused]] Person& entity,
-        [[maybe_unused]] int time,[[maybe_unused]] const std::string& risk_factor_key,
+        [[maybe_unused]] int time,[[maybe_unused]] const core::Identifier& risk_factor_key,
         [[maybe_unused]] double value) {
         return value;
     }

@@ -10,6 +10,7 @@
 #include "interval.h"
 #include "array2d.h"
 #include "univariate_summary.h"
+#include "identifier.h"
 #include "poco.h"
 
 /// \brief Top-level namespace for Health GPS Core C++ API

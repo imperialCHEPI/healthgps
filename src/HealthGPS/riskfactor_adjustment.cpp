@@ -62,12 +62,12 @@ namespace hgps {
     {
         auto& age_range = context.age_range();
         auto max_age = age_range.upper() + 1;
-        auto coefficients = std::map<core::Gender, std::map<std::string, std::vector<double>>>{};
+        auto coefficients = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
 
         auto simulated_means = calculate_simulated_mean(context.population(), age_range);
         auto& baseline_means = adjustments_.get().values;
         for (auto& gender : simulated_means) {
-            coefficients.emplace(gender.first, std::map<std::string, std::vector<double>>{});
+            coefficients.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
             for (auto& factor : gender.second) {
                 coefficients.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
                 for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
@@ -85,10 +85,10 @@ namespace hgps {
     FactorAdjustmentTable RiskfactorAdjustmentModel::calculate_simulated_mean(
         Population& population, const core::IntegerInterval& age_range) const {
         auto max_age = age_range.upper() + 1;
-        auto moments = std::map<core::Gender, std::map<std::string, std::vector<FirstMoment>>>{};
+        auto moments = std::map<core::Gender, std::map<core::Identifier, std::vector<FirstMoment>>>{};
 
-        moments.emplace(core::Gender::male, std::map<std::string, std::vector<FirstMoment>>{});
-        moments.emplace(core::Gender::female, std::map<std::string, std::vector<FirstMoment>>{});
+        moments.emplace(core::Gender::male, std::map<core::Identifier, std::vector<FirstMoment>>{});
+        moments.emplace(core::Gender::female, std::map<core::Identifier, std::vector<FirstMoment>>{});
         for (const auto& entity : population) {
             if (!entity.is_active()) {
                 continue;
@@ -104,9 +104,9 @@ namespace hgps {
             }
         }
 
-        auto means = std::map<core::Gender, std::map<std::string, std::vector<double>>>{};
+        auto means = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
         for (auto& gender : moments) {
-            means.emplace(gender.first, std::map<std::string, std::vector<double>>{});
+            means.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
             for (auto& factor : gender.second) {
                 means.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
                 for (auto age = age_range.lower(); age <= age_range.upper(); age++) {

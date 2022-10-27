@@ -73,7 +73,7 @@ namespace hgps {
 	}
 
 	std::optional<core::DiseaseInfo> CachedRepository::get_disease_info(std::string code) {
-		auto code_key = core::to_lower(code);
+		auto code_key = core::Identifier{ code };
 		auto& all_diseases = get_diseases();
 		auto it = std::find_if(all_diseases.cbegin(), all_diseases.cend(),
 			[&code_key](const core::DiseaseInfo& other) {
@@ -101,7 +101,8 @@ namespace hgps {
 			return diseases_.at(info.code);
 		}
 		catch (const std::exception& ex) {
-			throw std::runtime_error(fmt::format("Filed to load disease {} definition, {}", info.code, ex.what()));
+			auto code_str = info.code.to_string();
+			throw std::runtime_error(fmt::format("Filed to load disease {} definition, {}", code_str, ex.what()));
 		}
 	}
 

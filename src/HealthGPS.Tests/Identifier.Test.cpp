@@ -10,13 +10,28 @@ TEST(TestCore_Identity, CreateEmpty)
 	using namespace hgps::core;
 	auto empty = Identifier::empty();
 	auto other = Identifier{};
+	auto again = Identifier{""};
 
 	ASSERT_TRUE(empty.is_empty());
 	ASSERT_TRUE(other.is_empty());
+	ASSERT_TRUE(again.is_empty());
 
 	ASSERT_EQ(0, empty.size());
 	ASSERT_EQ(0, other.size());
+	ASSERT_EQ(0, again.size());
+
 	ASSERT_EQ(other, empty);
+	ASSERT_EQ(again, empty);
+	ASSERT_EQ(other, again);
+}
+
+TEST(TestCore_Identity, CreateImplicit)
+{
+	using namespace hgps::core;
+	Identifier cat_char = "Cat";
+	Identifier cat_str = std::string{ "Cat" };
+
+	ASSERT_EQ(cat_char, cat_str);
 }
 
 TEST(TestCore_Identity, CreateValid)
@@ -76,7 +91,6 @@ TEST(TestCore_Identity, Comparable)
 TEST(TestCore_Identity, CreateInvalidThrow)
 {
 	using namespace hgps::core;
-	ASSERT_THROW(Identifier{ "" }, std::invalid_argument);
 	ASSERT_THROW(Identifier{ "5Start" }, std::invalid_argument);
 	ASSERT_THROW(Identifier{ "With Space" }, std::invalid_argument);
 	ASSERT_THROW(Identifier{ "With-10" }, std::invalid_argument);

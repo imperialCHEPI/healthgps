@@ -83,7 +83,7 @@ namespace hgps {
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
 		BaselineAdjustment baseline_adjustments_;
 		std::vector<core::DiseaseInfo> diseases_info_;
-		std::map<std::string, DiseaseDefinition> diseases_;
+		std::map<core::Identifier, DiseaseDefinition> diseases_;
 		LmsDefinition lms_parameters_;
 
 		void load_disease_definition(const core::DiseaseInfo& info, const ModelInput& config);

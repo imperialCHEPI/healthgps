@@ -19,7 +19,7 @@ namespace hgps {
 		void clear() noexcept override;
 
 		double apply(Random& generator, Person& entity, int time,
-			const std::string& risk_factor_key, double value) override;
+			const core::Identifier& risk_factor_key, double value) override;
 
 	private:
 		std::reference_wrapper<SyncChannel> channel_;

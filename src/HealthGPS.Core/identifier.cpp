@@ -13,8 +13,14 @@ namespace hgps::core {
 	Identifier::Identifier(std::string value)
 		: value_{ std::move(to_lower(value)) }
 	{
-		validate_identifeir();
+		if (!value_.empty()) {
+			validate_identifeir();
+		}
 	}
+
+	Identifier::Identifier(const char* const value)
+		: Identifier{ std::string(value) }
+	{}
 
 	bool Identifier::is_empty() const noexcept {
 		return value_.empty();
@@ -32,11 +38,15 @@ namespace hgps::core {
 		return std::hash<std::string>{}(value_);
 	}
 
-	void Identifier::validate_identifeir() const {
-		if (value_.empty() || value_.size() < std::size_t{ 1 }) {
-			throw std::invalid_argument("Identifier must not be empty");
-		}
+	bool Identifier::operator==(const Identifier& rhs) const noexcept {
+		return value_.size() == rhs.value_.size() && value_ == rhs.value_;
+	}
 
+	bool Identifier::equal(const std::string& rhs) const noexcept {
+		return value_.size() == rhs.size() && value_ == to_lower(rhs);
+	}
+
+	void Identifier::validate_identifeir() const {
 		if (std::isdigit(value_.at(0))) {
 			throw std::invalid_argument("Identifier must not start with a numeric value");
 		}

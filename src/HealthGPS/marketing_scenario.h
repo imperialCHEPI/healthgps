@@ -30,7 +30,7 @@ namespace hgps {
 		void clear() noexcept override;
 
 		double apply(Random& generator, Person& entity, int time,
-			const std::string& risk_factor_key, double value) override;
+			const core::Identifier& risk_factor_key, double value) override;
 
 		const PolicyInterval& active_period()  const noexcept override;
 
@@ -39,7 +39,7 @@ namespace hgps {
 	private:
 		std::reference_wrapper<SyncChannel> channel_;
 		MarketingPolicyDefinition definition_;
-		std::set<std::string> factor_impact_;
+		std::set<core::Identifier> factor_impact_;
 		std::unordered_map<std::size_t, int> interventions_book_{};
 	};
 }

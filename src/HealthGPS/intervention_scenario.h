@@ -1,6 +1,7 @@
 #pragma once
-
 #include "scenario.h"
+
+#include <optional>
 #include <vector>
 
 namespace hgps {
@@ -26,9 +27,9 @@ namespace hgps {
 	/// @brief Defines the policy impact on risk factors data structure
 	struct PolicyImpact {
 		PolicyImpact() = delete;
-		PolicyImpact(std::string risk_factor_key, double policy_impact, 
+		PolicyImpact(core::Identifier risk_factor_key, double policy_impact, 
 			unsigned int start_age, std::optional<unsigned int> end_age = std::nullopt)
-			: risk_factor{ risk_factor_key }, value{ policy_impact },
+			: risk_factor{ std::move(risk_factor_key) }, value{policy_impact},
 			from_age{ start_age }, to_age{ end_age } {
 
 			if (end_age.has_value() && start_age > end_age.value()) {
@@ -36,7 +37,7 @@ namespace hgps {
 			}
 		}
 
-		std::string risk_factor{};
+		core::Identifier risk_factor{};
 		double value{};
 		unsigned int from_age{};
 		std::optional<unsigned int> to_age{};

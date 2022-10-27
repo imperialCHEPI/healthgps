@@ -4,13 +4,13 @@ namespace hgps {
 
     std::atomic<std::size_t> Person::newUID{0};
 
-    std::map<std::string,std::function<double(const Person&)>> Person::current_dispatcher {
-        {"intercept",[](const Person&) { return 1.0; } },
-        {"gender",[](const Person& p) { return p.gender_to_value(); } },
-        {"age",[](const Person& p) { return static_cast<double>(p.age); } },
-        {"age2",[](const Person& p) { return pow(p.age, 2); } },
-        {"age3",[](const Person& p) { return pow(p.age, 3); } },
-        {"ses",[](const Person& p) { return p.ses; } },
+    std::map<core::Identifier, std::function<double(const Person&)>> Person::current_dispatcher {
+        {core::Identifier{"intercept"},[](const Person&) { return 1.0; } },
+        {core::Identifier{"gender"},[](const Person& p) { return p.gender_to_value(); } },
+        {core::Identifier{"age"},[](const Person& p) { return static_cast<double>(p.age); } },
+        {core::Identifier{"age2"},[](const Person& p) { return pow(p.age, 2); } },
+        {core::Identifier{"age3"},[](const Person& p) { return pow(p.age, 3); } },
+        {core::Identifier{"ses"},[](const Person& p) { return p.ses; } },
     };
    
     Person::Person() 
@@ -43,7 +43,7 @@ namespace hgps {
         return is_alive_ && !has_emigrated_;
     }
 
-    double Person::get_risk_factor_value(const std::string& key) const noexcept {
+    double Person::get_risk_factor_value(const core::Identifier& key) const noexcept {
         if (current_dispatcher.contains(key)) {
             return current_dispatcher.at(key)(*this);
         }

@@ -6,8 +6,8 @@ namespace hgps {
 	SimplePolicyScenario::SimplePolicyScenario(SyncChannel& data_sync, SimplePolicyDefinition&& definition)
 		: channel_{ data_sync }, definition_{std::move(definition)}, factor_impact_{}
 	{
-		for (auto& factor : definition_.impacts) {
-			factor_impact_.emplace(core::to_lower(factor.risk_factor), factor);
+		for (const auto& factor : definition_.impacts) {
+			factor_impact_.emplace(factor.risk_factor, factor);
 		}
 	}
 
@@ -39,7 +39,7 @@ namespace hgps {
 	}
 
 	double SimplePolicyScenario::apply([[maybe_unused]] Random& generator, [[maybe_unused]] Person& entity,
-		int time, const std::string& risk_factor_key, double value) {
+		int time, const core::Identifier& risk_factor_key, double value) {
 		auto result = value;
 		if (definition_.active_period.contains(time) && factor_impact_.contains(risk_factor_key)) {
 			auto impact = factor_impact_.at(risk_factor_key).value;

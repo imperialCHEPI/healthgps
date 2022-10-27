@@ -21,6 +21,7 @@ namespace hgps {
 	}
 
 	void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext& context) {
+		auto age_key = core::Identifier{ "age" };
 		for (auto& entity : context.population()) {
 			// Ignore if inactive, newborn risk factors must be generated, not updated!
 			if (!entity.is_active() || entity.age == 0) {
@@ -32,8 +33,8 @@ namespace hgps {
 
 			// Model calibrated on previous year's age
 			auto model_age = static_cast<int>(entity.age - 1);
-			if (current_risk_factors.at("age") > model_age) {
-				current_risk_factors.at("age") = model_age;
+			if (current_risk_factors.at(age_key) > model_age) {
+				current_risk_factors.at(age_key) = model_age;
 			}
 
 			auto& equations = definition_.get().at(model_age);
@@ -47,10 +48,10 @@ namespace hgps {
 	}
 
 	void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(RuntimeContext& context, Person& entity,
-		const std::map<std::string, double>& current_risk_factors,
-		const std::map<std::string, FactorDynamicEquation>& equations)
+		const std::map<core::Identifier, double>& current_risk_factors,
+		const std::map<core::Identifier, FactorDynamicEquation>& equations)
 	{
-		auto delta_comp_factors = std::unordered_map<std::string, double>();
+		auto delta_comp_factors = std::unordered_map<core::Identifier, double>();
 		for (auto level = 1; level <= context.mapping().max_level(); level++) {
 			auto level_factors = context.mapping().at_level(level);
 			for (const auto& factor : level_factors) {
@@ -81,10 +82,10 @@ namespace hgps {
 		}
 	}
 
-	std::map<std::string, double> EnergyBalanceHierarchicalModel::get_current_risk_factors(
+	std::map<core::Identifier, double> EnergyBalanceHierarchicalModel::get_current_risk_factors(
 		const HierarchicalMapping& mapping, Person& entity, int time_year) const {
-		auto entity_risk_factors = std::map<std::string, double>();
-		entity_risk_factors.emplace("intercept", entity.get_risk_factor_value("intercept"));
+		auto entity_risk_factors = std::map<core::Identifier, double>();
+		entity_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
 		for (const auto& factor : mapping) {
 			if (factor.is_dynamic_factor()) {
 				entity_risk_factors.emplace(factor.key(), time_year - 1);

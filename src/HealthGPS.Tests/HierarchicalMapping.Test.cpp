@@ -2,6 +2,17 @@
 
 #include "HealthGPS/mapping.h"
 
+static std::vector<hgps::MappingEntry> create_mapping_entries() {
+	using namespace hgps;
+	return std::vector<MappingEntry>{
+		MappingEntry("Year", 0, core::Identifier::empty(), true),
+		MappingEntry("Gender", 0, core::Identifier{ "gender" }),
+		MappingEntry("Age", 0, core::Identifier{ "age" }),
+		MappingEntry("SmokingStatus", 1),
+		MappingEntry("AlcoholConsumption", 1),
+		MappingEntry("BMI", 2)};
+}
+
 TEST(TestHealthGPS_Mapping, CreateEmpty)
 {
 	using namespace hgps;
@@ -17,15 +28,7 @@ TEST(TestHealthGPS_Mapping, CreateFull)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto exp_size = entries.size();
 	auto mapping = HierarchicalMapping(std::move(entries));
 
@@ -45,28 +48,15 @@ TEST(TestHealthGPS_Mapping, AccessByInterator)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto exp_size = entries.size();
 	auto mapping = HierarchicalMapping(std::move(entries));
 
 	ASSERT_EQ(exp_size, mapping.size());
 	for (auto& entry : mapping)	{
 		ASSERT_GE(entry.level(), 0);
-		if (entry.entity_name().empty()) {
-			ASSERT_FALSE(entry.is_entity());
+		if (!entry.is_entity()) {
 			EXPECT_EQ(entry.key(), entry.entity_key());
-		}
-		else {
-			ASSERT_TRUE(entry.is_entity());
-			EXPECT_EQ(entry.entity_name(), entry.entity_key());
 		}
 	}
 }
@@ -75,28 +65,15 @@ TEST(TestHealthGPS_Mapping, AccessByConstInterator)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto exp_size = entries.size();
 	auto mapping = HierarchicalMapping(std::move(entries));
 
 	ASSERT_EQ(exp_size, mapping.size());
 	for (const auto& entry : mapping) {
 		ASSERT_GE(entry.level(), 0);
-		if (entry.entity_name().empty()) {
-			ASSERT_FALSE(entry.is_entity());
+		if (!entry.is_entity()) {
 			EXPECT_EQ(entry.key(), entry.entity_key());
-		}
-		else {
-			ASSERT_TRUE(entry.is_entity());
-			EXPECT_EQ(entry.entity_name(), entry.entity_key());
 		}
 	}
 }
@@ -105,19 +82,12 @@ TEST(TestHealthGPS_Mapping, CanIdentifyDynamicFactor)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto mapping = HierarchicalMapping(std::move(entries));
+	auto dynamic_factor = core::Identifier{ "year" };
 
 	for (auto& entry : mapping) {
-		if (entry.key() == "year") {
+		if (entry.key() == dynamic_factor) {
 			ASSERT_TRUE(entry.is_dynamic_factor());
 		}
 		else {
@@ -130,18 +100,10 @@ TEST(TestHealthGPS_Mapping, AccessAllEntries)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto exp_size = entries.size();
 	auto mapping = HierarchicalMapping(std::move(entries));
-	auto all_entries = mapping.entries();
+	auto& all_entries = mapping.entries();
 
 	ASSERT_EQ(exp_size, all_entries.size());
 }
@@ -150,56 +112,43 @@ TEST(TestHealthGPS_Mapping, AccessSingleEntry)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto mapping = HierarchicalMapping(std::move(entries));
-	auto age_entry = mapping.at("Age");
-	auto gender_entry = mapping.at("GENDER");
 
-	ASSERT_EQ("age", age_entry.key());
-	ASSERT_EQ("gender", gender_entry.key());
+	auto age_key = core::Identifier{ "Age" };
+	auto gender_key = core::Identifier{ "GENDER" };
+
+	auto age_entry = mapping.at(age_key);
+	auto gender_entry = mapping.at(gender_key);
+
+	ASSERT_EQ(age_key, age_entry.key());
+	ASSERT_EQ(gender_key, gender_entry.key());
 }
 
 TEST(TestHealthGPS_Mapping, AccessSingleEntryThrowForUnknowKey)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
+	auto entries = create_mapping_entries();
+	auto test_keys = std::vector<core::Identifier>{
+		core::Identifier{ "Cat" },
+		core::Identifier{ "Dog" },
+		core::Identifier{ "Cow" }
 	};
 
 	auto mapping = HierarchicalMapping(std::move(entries));
-	ASSERT_THROW(mapping.at("Cat"),std::out_of_range);
-	ASSERT_THROW(mapping.at("Dog"), std::out_of_range);
-	ASSERT_THROW(mapping.at("Cow"), std::out_of_range);
+	for (const auto& key : test_keys)
+	{
+		ASSERT_THROW(mapping.at(key), std::out_of_range);
+	}
 }
 
 TEST(TestHealthGPS_Mapping, AccessEntriesWithoutDynamicFactor)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
-	auto exp_size = entries.size() - 1;
+	auto entries = create_mapping_entries();
+	auto exp_size = entries.size() - 1u;
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto all_entries = mapping.entries_without_dynamic();
 
@@ -210,15 +159,7 @@ TEST(TestHealthGPS_Mapping, AccessAllLevelEntries)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	std::vector<int> exp_size = { 3, 2, 1 };
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto level_0_entries = mapping.at_level(0);
@@ -234,15 +175,7 @@ TEST(TestHealthGPS_Mapping, AccessLevelEntriesWithoutDynamicFactor)
 {
 	using namespace hgps;
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	std::vector<int> exp_size = { 2, 2, 1 };
 	auto mapping = HierarchicalMapping(std::move(entries));
 	auto level_0_entries = mapping.at_level_without_dynamic(0);

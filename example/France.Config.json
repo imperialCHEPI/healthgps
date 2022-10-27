@@ -96,7 +96,7 @@
                         "start_time": 2022,
                         "finish_time": 2050
                     },
-                    "dynamics":[0.15, 0.0, 0.0], 
+                    "dynamics":[1.0, 0.0, 0.0], 
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},

@@ -1,6 +1,8 @@
 #pragma once
 #include "person.h"
 #include "weight_category.h"
+#include "HealthGPS.Core/identifier.h"
+
 #include <memory>
 #include <string>
 
@@ -33,7 +35,7 @@ namespace hgps {
         }
 
         double adjust_risk_factor_value(const Person& entity,
-            const std::string& risk_factor_key, double value) const {
+            const core::Identifier& risk_factor_key, double value) const {
             return pimpl_->adjust_risk_factor_value(entity, risk_factor_key, value);
         }
 
@@ -45,7 +47,7 @@ namespace hgps {
             virtual unsigned int child_cutoff_age() const noexcept = 0;
             virtual WeightCategory classify_weight(const Person& entity) const = 0;
             virtual double adjust_risk_factor_value(const Person& entity,
-                const std::string& risk_factor_key, double value) const = 0;
+                const core::Identifier& risk_factor_key, double value) const = 0;
         };
 
         template<typename T>
@@ -66,7 +68,7 @@ namespace hgps {
             }
 
             double adjust_risk_factor_value(const Person& entity,
-                const std::string& risk_factor_key, double value) const override {
+                const core::Identifier& risk_factor_key, double value) const override {
                 return object_.adjust_risk_factor_value(entity, risk_factor_key, value);
             }
 

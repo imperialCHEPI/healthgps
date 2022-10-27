@@ -160,7 +160,8 @@ TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo)
 
 TEST_F(DatastoreTest, RetrieveDeseasesInfoHasNoValue)
 {
-	auto info = manager.get_disease_info("ghost369");
+	using namespace hgps::core;
+	auto info = manager.get_disease_info(Identifier{ "ghost369" });
 	EXPECT_FALSE(info.has_value());
 }
 
@@ -184,7 +185,11 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty)
 	using namespace hgps::core;
 
 	auto uk = manager.get_country("GB").value();
-	auto info = DiseaseInfo{ .group = DiseaseGroup::other, .code = "ghost369", .name = "Look at the flowers." };
+	auto info = DiseaseInfo{
+		.group = DiseaseGroup::other,
+		.code = Identifier{"ghost369"},
+		.name = "Look at the flowers." };
+
 	auto entity = manager.get_disease(info, uk);
 
 	ASSERT_TRUE(entity.empty());
@@ -196,8 +201,9 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty)
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease)
 {
-	auto asthma = manager.get_disease_info("asthma").value();
-	auto diabetes = manager.get_disease_info("diabetes").value();
+	using namespace hgps::core;
+	auto asthma = manager.get_disease_info(Identifier{ "asthma" }).value();
+	auto diabetes = manager.get_disease_info(Identifier{ "diabetes" }).value();
 	
 	auto table_self = manager.get_relative_risk_to_disease(diabetes, diabetes);
 	auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
@@ -218,10 +224,13 @@ TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease)
 {
 	using namespace hgps::core;
 
-	auto diabetes = manager.get_disease_info("diabetes").value();
-	auto ghost_disease = DiseaseInfo{ .group = DiseaseGroup::other, .code = "ghost369", .name = "Look at the flowers." };
-	auto default_table = manager.get_relative_risk_to_disease(diabetes, ghost_disease);
+	auto diabetes = manager.get_disease_info(Identifier{ "diabetes" }).value();
+	auto info = DiseaseInfo{
+	.group = DiseaseGroup::other,
+	.code = Identifier{"ghost369"},
+	.name = "Look at the flowers." };
 
+	auto default_table = manager.get_relative_risk_to_disease(diabetes, info);
 	ASSERT_EQ(3, default_table.columns.size());
 	ASSERT_GT(default_table.rows.size(), 0);
 	ASSERT_EQ(1.0, default_table.rows[0][1]);
@@ -233,8 +242,8 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor)
 {
 	using namespace hgps::core;
 
-	auto risk_factor = "bmi";
-	auto diabetes = manager.get_disease_info("diabetes").value();
+	auto risk_factor = Identifier{ "bmi" };
+	auto diabetes = manager.get_disease_info(Identifier{ "diabetes" }).value();
 
 	auto col_size = 8;
 

@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "string_benchs.h"
+#include "identifier_benchs.h"
 
 int main(int argc, char** argv)
 {

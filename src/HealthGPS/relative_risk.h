@@ -2,6 +2,7 @@
 #include "gender_table.h"
 #include "monotonic_vector.h"
 #include "HealthGPS.Core/array2d.h"
+#include "HealthGPS.Core/identifier.h"
 #include <map>
 
 namespace hgps {
@@ -37,8 +38,8 @@ namespace hgps {
 		float lookup_value(const int age, const float value) const noexcept;
 	};
 
-	using RelativeRiskTableMap = std::map<std::string, FloatAgeGenderTable>;
-	using RelativeRiskLookupMap = std::map<std::string, std::map<core::Gender, RelativeRiskLookup>>;
+	using RelativeRiskTableMap = std::map<core::Identifier, FloatAgeGenderTable>;
+	using RelativeRiskLookupMap = std::map<core::Identifier, std::map<core::Gender, RelativeRiskLookup>>;
 
 	struct RelativeRisk
 	{

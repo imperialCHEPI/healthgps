@@ -6,9 +6,11 @@
 namespace hgps::core {
 	struct Identifier final
 	{
-		Identifier() = default;
+		constexpr Identifier() = default;
 
-		explicit Identifier(std::string value);
+		Identifier(const char* const value);
+
+		Identifier(std::string value);
 
 		bool is_empty() const noexcept;
 
@@ -18,7 +20,11 @@ namespace hgps::core {
 
 		std::size_t hash() const noexcept;
 
-		auto operator<=>(const Identifier&) const noexcept = default;
+		bool equal(const std::string& other) const noexcept;
+
+		bool operator==(const Identifier& rhs) const noexcept;
+
+		std::strong_ordering operator<=>(const Identifier& rhs) const noexcept = default;
 
 		static Identifier empty();
 

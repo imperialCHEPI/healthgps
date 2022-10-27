@@ -135,7 +135,7 @@ namespace hgps {
 		// Social economics status
 		ses_->initialise_population(context_);
 
-		// Generate risk factors
+		// Generate risk factors*
 		risk_factor_->initialise_population(context_);
 		risk_factor_->apply_baseline_adjustments(context_);
 

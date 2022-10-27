@@ -1,6 +1,7 @@
 #pragma once
 #include <benchmark/benchmark.h>
 #include "HealthGPS.Core/string_util.h"
+
 #include <string>
 #include <algorithm>
 
@@ -46,7 +47,7 @@ bool less_char_ascii(unsigned char left, unsigned char right) noexcept {
 }
 
 bool less_string_ascii_simple(const std::string_view& left, const std::string_view& right) {
-	return to_lower(left) < to_lower(right);
+	return hgps::core::to_lower(left) < hgps::core::to_lower(right);
 }
 
 bool less_string_ascii_functor(const std::string_view& lhs, const std::string_view& rhs) noexcept {

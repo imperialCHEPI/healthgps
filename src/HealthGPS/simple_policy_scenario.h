@@ -43,7 +43,7 @@ namespace hgps {
 		void clear() noexcept override;
 
 		double apply(Random& generator, Person& entity, int time,
-			const std::string& risk_factor_key, double value) override;
+			const core::Identifier& risk_factor_key, double value) override;
 
 		const PolicyImpactType& impact_type() const noexcept;
 
@@ -54,6 +54,6 @@ namespace hgps {
 	private:
 		std::reference_wrapper<SyncChannel> channel_;
 		SimplePolicyDefinition definition_;
-		std::map<std::string, PolicyImpact> factor_impact_;
+		std::map<core::Identifier, PolicyImpact> factor_impact_;
 	};
 }

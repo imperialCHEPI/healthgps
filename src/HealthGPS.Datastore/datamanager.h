@@ -32,7 +32,7 @@ namespace hgps {
 
 			std::vector<DiseaseInfo> get_diseases() const override;
 
-			std::optional<DiseaseInfo> get_disease_info(std::string code) const override;
+			std::optional<DiseaseInfo> get_disease_info(core::Identifier code) const override;
 
 			DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
 
@@ -40,7 +40,7 @@ namespace hgps {
 				DiseaseInfo source, DiseaseInfo target) const override;
 
 			RelativeRiskEntity get_relative_risk_to_risk_factor(
-				DiseaseInfo source, Gender gender, std::string risk_factor) const override;
+				DiseaseInfo source, Gender gender, core::Identifier risk_factor_key) const override;
 
 			CancerParameterEntity get_disease_parameter(DiseaseInfo info, Country country) const override;
 

@@ -65,7 +65,7 @@ namespace hgps {
 		const auto& level_info = definition.levels().at(level);
 
 		// Residual Risk Factors Random Sampling
-		auto residual_risk_factors = std::map<std::string, double>();
+		auto residual_risk_factors = std::map<core::Identifier, double>();
 		for (const auto& factor : level_factors) {
 			auto row_idx = context.random().next_int(static_cast<int>(level_info.residual_distribution.rows() - 1));
 			auto col_idx = level_info.variables.at(factor.key());
@@ -73,7 +73,7 @@ namespace hgps {
 		}
 
 		// The Stochastic Component of The Risk Factors
-		auto stoch_comp_factors = std::map<std::string, double>();
+		auto stoch_comp_factors = std::map<core::Identifier, double>();
 		for (const auto& factor_row : level_factors) {
 			auto row_sum = 0.0;
 			auto row_idx = level_info.variables.at(factor_row.key());
@@ -86,8 +86,8 @@ namespace hgps {
 		}
 
 		// The Deterministic Risk Factors
-		auto determ_risk_factors = std::map<std::string, double>();
-		determ_risk_factors.emplace("intercept", entity.get_risk_factor_value("intercept"));
+		auto determ_risk_factors = std::map<core::Identifier, double>();
+		determ_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
 		for (const auto& item : context.mapping()) {
 			if (item.level() < level && !item.is_dynamic_factor()) {
 				determ_risk_factors.emplace(item.key(), entity.get_risk_factor_value(item.entity_key()));
@@ -95,7 +95,7 @@ namespace hgps {
 		}
 
 		// The Deterministic Components of Risk Factors
-		auto determ_comp_factors = std::map<std::string, double>();
+		auto determ_comp_factors = std::map<core::Identifier, double>();
 		for (const auto& factor : level_factors) {
 			auto sum = 0.0;
 			for (const auto& coeff : definition.models().at(factor.key()).coefficients) {

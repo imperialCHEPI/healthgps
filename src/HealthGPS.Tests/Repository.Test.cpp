@@ -53,7 +53,7 @@ TEST_F(RepositoryTest, DiseaseInfoIsCaseInsensitive)
 	ASSERT_GT(all_diseases.size(), 0);
 	auto& disease = all_diseases.at(0);
 
-	auto code_title = disease.code;
+	auto code_title = disease.code.to_string();
 	if (std::islower(code_title.at(0))) {
 		code_title.at(0) = static_cast<char>(std::toupper(code_title.at(0)));
 	}
@@ -61,10 +61,10 @@ TEST_F(RepositoryTest, DiseaseInfoIsCaseInsensitive)
 		code_title.at(0) = static_cast<char>(std::tolower(code_title.at(0)));
 	}
 
-	auto info_code = repository.get_disease_info(disease.code);
+	auto info_code = repository.get_disease_info(disease.code.to_string());
 	auto info_title = repository.get_disease_info(code_title);
-	auto info_upper = repository.get_disease_info(core::to_upper(disease.code));
-	auto info_lower = repository.get_disease_info(core::to_lower(disease.code));
+	auto info_upper = repository.get_disease_info(core::to_upper(code_title));
+	auto info_lower = repository.get_disease_info(core::to_lower(code_title));
 
 	ASSERT_TRUE(info_code.has_value());
 	ASSERT_TRUE(info_title.has_value());

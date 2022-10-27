@@ -1,12 +1,13 @@
 #pragma once
 #include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/identifier.h"
 
 #include "map2d.h"
 #include <vector>
 
 namespace hgps {
 
-	using FactorAdjustmentTable = Map2d<core::Gender, std::string, std::vector<double>>;
+	using FactorAdjustmentTable = Map2d<core::Gender, core::Identifier, std::vector<double>>;
 
 	struct BaselineAdjustment final {
 		BaselineAdjustment() = default;

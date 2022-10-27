@@ -4,7 +4,7 @@
 #include <atomic>
 
 #include "interfaces.h"
-#include "two_step_value.h"
+#include "HealthGPS.Core/identifier.h"
 
 namespace hgps {
 
@@ -42,9 +42,9 @@ namespace hgps {
 
 		double ses{};
 
-		std::map<std::string, double> risk_factors;
+		std::map<core::Identifier, double> risk_factors;
 
-		std::map<std::string, Disease> diseases;
+		std::map<core::Identifier, Disease> diseases;
 
 		bool is_alive() const noexcept;
 
@@ -56,7 +56,7 @@ namespace hgps {
 
 		bool is_active() const noexcept;
 
-		double get_risk_factor_value(const std::string& key) const noexcept;
+		double get_risk_factor_value(const core::Identifier& key) const noexcept;
 
 		float gender_to_value() const noexcept;
 
@@ -74,7 +74,7 @@ namespace hgps {
 		unsigned int time_of_migration_{};
 
 		static std::atomic<std::size_t> newUID;
-		static std::map<std::string, std::function<double(const Person&)>> current_dispatcher;
+		static std::map<core::Identifier, std::function<double(const Person&)>> current_dispatcher;
 	};
 }
 
