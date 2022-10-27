@@ -15,10 +15,6 @@ namespace hgps {
 		return ScenarioType::intervention;
 	}
 
-	std::string SimplePolicyScenario::name() const noexcept {
-		return "Intervention";
-	}
-
 	SyncChannel& SimplePolicyScenario::channel() {
 		return channel_;
 	}

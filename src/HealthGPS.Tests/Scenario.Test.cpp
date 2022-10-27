@@ -285,6 +285,7 @@ TEST(ScenarioTest, FiscalPolicyLowImpactNone)
 
     auto policy_delta = policy.apply(generator, entity, 2022, energy_key, delta_value);
     ASSERT_EQ(ScenarioType::intervention, policy.type());
+    ASSERT_EQ("Intervention", policy.name());
     ASSERT_EQ(expected, policy_delta);
 }
 
@@ -410,6 +411,7 @@ TEST(ScenarioTest, MarketingPolicyCreate)
     auto policy = MarketingDynamicScenario{ channel, create_dynamic_marketing_definition(dynamic) };
 
     ASSERT_EQ(ScenarioType::intervention, policy.type());
+    ASSERT_EQ("Intervention", policy.name());
     for (size_t i = 0; i < ages.size(); i++) {
         entity.age = ages.at(i);
         auto policy_delta = policy.apply(generator, entity, 2022, factor_key, factor_value);

@@ -12,7 +12,7 @@ namespace hgps {
 
 		ScenarioType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		SyncChannel& channel() override;
 
@@ -23,6 +23,7 @@ namespace hgps {
 
 	private:
 		std::reference_wrapper<SyncChannel> channel_;
+		std::string name_{ "Baseline" };
 	};
 }
 

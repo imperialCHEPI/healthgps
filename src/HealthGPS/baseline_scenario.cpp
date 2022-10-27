@@ -9,8 +9,8 @@ namespace hgps {
         return ScenarioType::baseline;
     }
 
-    std::string BaselineScenario::name() const noexcept {
-        return "Baseline";
+    const std::string& BaselineScenario::name() const noexcept {
+        return name_;
     }
 
     SyncChannel& BaselineScenario::channel() {

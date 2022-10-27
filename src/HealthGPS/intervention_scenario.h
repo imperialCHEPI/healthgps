@@ -16,6 +16,11 @@ namespace hgps {
 		virtual const PolicyInterval& active_period()  const noexcept = 0;
 
 		virtual const std::vector<PolicyImpact>& impacts() const noexcept = 0;
+
+		const std::string& name() const noexcept override { return name_; }
+
+	private:
+		std::string name_{"Intervention"};
 	};
 
 	/// @brief Health GPS dynamic intervention policy scenario interface

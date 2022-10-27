@@ -37,8 +37,6 @@ namespace hgps {
 
 		ScenarioType type() const noexcept override;
 
-		std::string name() const noexcept override;
-
 		SyncChannel& channel() override;
 
 		void clear() noexcept override;

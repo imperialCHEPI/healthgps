@@ -33,10 +33,6 @@ namespace hgps {
 		return ScenarioType::intervention;
 	}
 
-	std::string FiscalPolicyScenario::name() const noexcept {
-		return "Intervention";
-	}
-
 	SyncChannel& FiscalPolicyScenario::channel() {
 		return channel_;
 	}

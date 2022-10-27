@@ -9,7 +9,8 @@ namespace hgps {
 	struct MarketingDynamicDefinition
 	{
 		MarketingDynamicDefinition() = delete;
-		MarketingDynamicDefinition(const PolicyInterval& period, const std::vector<PolicyImpact>& sorted_impacts, PolicyDynamic dynamic)
+		MarketingDynamicDefinition( const PolicyInterval& period,
+			const std::vector<PolicyImpact>& sorted_impacts, PolicyDynamic dynamic)
 			: active_period{ period }, impacts{ sorted_impacts }, dynamic{ std::move(dynamic) } {}
 
 		PolicyInterval active_period;
@@ -24,8 +25,6 @@ namespace hgps {
 		MarketingDynamicScenario(SyncChannel& data_sync, MarketingDynamicDefinition&& definition);
 
 		ScenarioType type() const noexcept override;
-
-		std::string name() const noexcept override;
 
 		SyncChannel& channel() override;
 

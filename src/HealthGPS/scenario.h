@@ -30,7 +30,7 @@ namespace hgps {
 
 		virtual ScenarioType type() const noexcept = 0;
 
-		virtual std::string name() const noexcept = 0;
+		virtual const std::string& name() const noexcept = 0;
 
 		virtual SyncChannel& channel() = 0;
 

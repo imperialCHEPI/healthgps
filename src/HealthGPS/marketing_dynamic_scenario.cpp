@@ -9,8 +9,8 @@ namespace hgps {
 		: channel_{ data_sync }, definition_{ std::move(definition) },
 		factor_impact_{}, interventions_book_{}
 	{
-		if (definition_.impacts.size() != 3) {
-			throw std::invalid_argument("Number of impact levels mismatch, must be 3.");
+		if (definition_.impacts.size() < 1) {
+			throw std::invalid_argument("Number of impact levels mismatch, must be greater than 1.");
 		}
 
 		auto age = 0u;
@@ -30,10 +30,6 @@ namespace hgps {
 
 	ScenarioType MarketingDynamicScenario::type() const noexcept {
 		return ScenarioType::intervention;
-	}
-
-	std::string MarketingDynamicScenario::name() const noexcept {
-		return "intervention";
 	}
 
 	SyncChannel& MarketingDynamicScenario::channel() {

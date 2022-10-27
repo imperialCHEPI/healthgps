@@ -29,10 +29,6 @@ namespace hgps {
         return ScenarioType::intervention;
     }
 
-    std::string MarketingPolicyScenario::name() const noexcept {
-        return "Intervention";
-    }
-
     SyncChannel& MarketingPolicyScenario::channel() {
         return channel_;
     }
