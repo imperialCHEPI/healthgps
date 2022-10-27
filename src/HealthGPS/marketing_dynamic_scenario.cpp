@@ -75,15 +75,13 @@ namespace hgps {
 					current_policy_status = current_impact_index;
 				}
 			}
-			else {
-				if (probability < definition_.dynamic.beta) {
+			else if (probability < definition_.dynamic.beta) {
 					impact += get_differential_impact(FORMER, current_policy_status);
 					current_policy_status = FORMER;
-				}
-				else { // 1 - beta
-					impact += get_differential_impact(current_impact_index, current_policy_status);
-					current_policy_status = current_impact_index;
-				}
+			}
+			else { // 1 - beta
+				impact += get_differential_impact(current_impact_index, current_policy_status);
+				current_policy_status = current_impact_index;
 			}
 		}
 
