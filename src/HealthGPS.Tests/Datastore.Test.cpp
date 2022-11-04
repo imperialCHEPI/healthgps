@@ -50,8 +50,8 @@ TEST_F(DatastoreTest, CountryPopulation)
 	auto uk_pop = manager.get_population(uk.value());
 
 	// Filter out the ends of the years range
-	auto uk_pop_min = uk_pop.front().year;
-	auto uk_pop_max = uk_pop.back().year;
+	auto uk_pop_min = uk_pop.front().at_time;
+	auto uk_pop_max = uk_pop.back().at_time;
 	auto mid_year = std::midpoint(uk_pop_min, uk_pop_max);
 	auto uk_pop_flt = manager.get_population(uk.value(), [&mid_year](const int& value)
 		{return value >= (mid_year - 1) && value <= (mid_year + 1); });
@@ -60,16 +60,16 @@ TEST_F(DatastoreTest, CountryPopulation)
 	ASSERT_GT(uk_pop_flt.size(), 0);
 
 	ASSERT_GT(uk_pop.size(), uk_pop_flt.size());
-	ASSERT_LT(uk_pop_min, uk_pop_flt.front().year);
-	ASSERT_GT(uk_pop_max, uk_pop_flt.back().year);
+	ASSERT_LT(uk_pop_min, uk_pop_flt.front().at_time);
+	ASSERT_GT(uk_pop_max, uk_pop_flt.back().at_time);
 
 	auto table_pop = std::map<int, std::map<int, PopulationItem>>{};
 	for (auto& item : uk_pop) {
-		if (!table_pop.contains(item.year)) {
-			table_pop.emplace(item.year, std::map<int, PopulationItem>{});
+		if (!table_pop.contains(item.at_time)) {
+			table_pop.emplace(item.at_time, std::map<int, PopulationItem>{});
 		}
 
-		table_pop.at(item.year).emplace(item.age, PopulationItem{ .males = item.males, .females = item.females });
+		table_pop.at(item.at_time).emplace(item.with_age, PopulationItem{ .males = item.males, .females = item.females });
 	}
 
 	auto max_age = 100;
@@ -93,8 +93,8 @@ TEST_F(DatastoreTest, CountryMortality)
 	auto uk_deaths = manager.get_mortality(uk.value());
 
 	// Filter out the ends of the years range
-	auto uk_deaths_min = uk_deaths.front().year;
-	auto uk_deaths_max = uk_deaths.back().year;
+	auto uk_deaths_min = uk_deaths.front().at_time;
+	auto uk_deaths_max = uk_deaths.back().at_time;
 	auto mid_year = std::midpoint(uk_deaths_min, uk_deaths_max);
 	auto uk_deaths_flt = manager.get_mortality(uk.value(), [&mid_year](const int& value)
 		{return value >= (mid_year - 1) && value <= (mid_year + 1); });
@@ -104,16 +104,16 @@ TEST_F(DatastoreTest, CountryMortality)
 	ASSERT_GT(uk_deaths_max, uk_deaths_min);
 
 	ASSERT_GT(uk_deaths.size(), uk_deaths_flt.size());
-	ASSERT_LT(uk_deaths_min, uk_deaths_flt.front().year);
-	ASSERT_GT(uk_deaths_max, uk_deaths_flt.back().year);
+	ASSERT_LT(uk_deaths_min, uk_deaths_flt.front().at_time);
+	ASSERT_GT(uk_deaths_max, uk_deaths_flt.back().at_time);
 
 	auto table_deaths = std::map<int, std::map<int, MortalityItem>>{};
 	for (auto& item : uk_deaths) {
-		if (!table_deaths.contains(item.year)) {
-			table_deaths.emplace(item.year, std::map<int, MortalityItem>{});
+		if (!table_deaths.contains(item.at_time)) {
+			table_deaths.emplace(item.at_time, std::map<int, MortalityItem>{});
 		}
 
-		table_deaths.at(item.year).emplace(item.age, MortalityItem{.males = item.males, .females = item.females});
+		table_deaths.at(item.at_time).emplace(item.with_age, MortalityItem{.males = item.males, .females = item.females});
 	}
 
 	auto max_age = 100;
@@ -281,8 +281,8 @@ TEST_F(DatastoreTest, RetrieveBirthIndicators)
 	auto uk_births = manager.get_birth_indicators(uk.value());
 
 	// Filter out the ends of the years range
-	auto uk_births_min = uk_births.front().time;
-	auto uk_births_max = uk_births.back().time;
+	auto uk_births_min = uk_births.front().at_time;
+	auto uk_births_max = uk_births.back().at_time;
 	auto mid_year = std::midpoint(uk_births_min, uk_births_max);
 	auto uk_births_flt = manager.get_birth_indicators(uk.value(), [&mid_year](const int& value)
 		{return value >= (mid_year - 1) && value <= (mid_year + 1); });
@@ -293,8 +293,8 @@ TEST_F(DatastoreTest, RetrieveBirthIndicators)
 	ASSERT_GT(uk_births_max, uk_births_min);
 
 	ASSERT_GT(uk_births.size(), uk_births_flt.size());
-	ASSERT_LT(uk_births_min, uk_births_flt.front().time);
-	ASSERT_GT(uk_births_max, uk_births_flt.back().time);
+	ASSERT_LT(uk_births_min, uk_births_flt.front().at_time);
+	ASSERT_GT(uk_births_max, uk_births_flt.back().at_time);
 }
 
 TEST_F(DatastoreTest, RetrieveCancerDefinition)
@@ -336,7 +336,7 @@ TEST_F(DatastoreTest, RetrieveCancerParameters)
 
 		cancer_count++;
 		auto entity = manager.get_disease_parameter(item, uk.value());
-		ASSERT_GT(entity.time_year, 0);
+		ASSERT_GT(entity.at_time, 0);
 		ASSERT_FALSE(entity.prevalence_distribution.empty());
 		ASSERT_FALSE(entity.survival_rate.empty());
 		ASSERT_FALSE(entity.death_weight.empty());

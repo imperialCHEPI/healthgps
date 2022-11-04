@@ -163,14 +163,19 @@ Configuration load_configuration(CommandOptions& options)
 		config.app_name = PROJECT_NAME;
 		config.app_version = PROJECT_VERSION;
 
-		// input data file
-		config.file = opt["inputs"]["file"].get<FileInfo>();
+		// input dataset file
+		auto dataset_key = "dataset";
+		if (version == 1) {
+			dataset_key = "file";
+		}
+
+		config.file = opt["inputs"][dataset_key].get<FileInfo>();
 		fs::path full_path = config.file.name;
 		if (full_path.is_relative()) {
 			full_path = options.config_file.parent_path() / config.file.name;
 			if (fs::exists(full_path)) {
 				config.file.name = full_path.string();
-				fmt::print("Input data file.....: {}\n", config.file.name);
+				fmt::print("Input dataset file..: {}\n", config.file.name);
 			}
 		}
 

@@ -198,7 +198,7 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 	}
 	else {
 		fmt::print(fg(fmt::color::red),
-			"Model: {:<7}, file: {} not found.\n", "static", model_filename);
+			"Model: {:<7}, file: {} not found.\n", "dynamic", model_filename);
 	}
 
 	ifs.close();

@@ -6,7 +6,7 @@ namespace hgps {
 
 		struct BirthItem
 		{
-			int time;
+			int at_time;
 			float number;
 			float sex_ratio;
 		};

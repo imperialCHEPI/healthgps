@@ -33,7 +33,16 @@ namespace hgps {
 		HierarchicalLinearModelDefinition(
 			std::unordered_map<core::Identifier, LinearModel>&& linear_models,
 			std::map<int, HierarchicalLevel>&& model_levels)
-			: models_{ std::move(linear_models) }, levels_{ std::move(model_levels) }{}
+			: models_{ std::move(linear_models) }, levels_{ std::move(model_levels) }
+		{
+			if (models_.empty()) {
+				throw std::invalid_argument("The hierarchical model equations definition must not be empty");
+			}
+
+			if (model_levels.empty()) {
+				throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+			}
+		}
 
 		const std::unordered_map<core::Identifier, LinearModel>& models() const noexcept {
 			return models_;
@@ -70,7 +79,7 @@ namespace hgps {
 			, boundary_percentage_{ boundary_percentage } {
 
 			if (equations_.empty()) {
-				throw std::invalid_argument("The model definition equations must not be empty.");
+				throw std::invalid_argument("The model equations definition must not be empty");
 			}
 		}
 

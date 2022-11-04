@@ -20,8 +20,9 @@ namespace hgps {
 				}
 
 				auto version = index_["version"].get<int>();
-				if (version != 1) {
-					throw std::runtime_error("File-based store, index schema version mismatch, supported = 1");
+				if (version != 2) {
+					throw std::runtime_error(
+						fmt::format("File-based store, index schema version: {} mismatch, supported: 2", version));
 				}
 			}
 			else {
@@ -86,7 +87,7 @@ namespace hgps {
 		}
 
 		std::vector<PopulationItem> DataManager::get_population(
-			Country country, const std::function<bool(const unsigned int&)> year_filter) const {
+			Country country, const std::function<bool(const unsigned int&)> time_filter) const {
 			auto results = std::vector<PopulationItem>();
 
 			if (index_.contains("demographic")) {
@@ -102,20 +103,20 @@ namespace hgps {
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-						{ "LocID", "Time", "AgeGrp", "PopMale", "PopFemale", "PopTotal" });
+						{ "LocID", "Time", "Age", "PopMale", "PopFemale", "PopTotal" });
 
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
-						auto time_year = std::stoi(row[mapping["Time"]]);
-						if (!year_filter(time_year)) {
+						auto row_time = std::stoi(row[mapping["Time"]]);
+						if (!time_filter(row_time)) {
 							continue;
 						}
 
 						results.push_back(PopulationItem
 							{
 								.location_id = std::stoi(row[mapping["LocID"]]),
-								.year = time_year,
-								.age = std::stoi(row[mapping["AgeGrp"]]),
+								.at_time = row_time,
+								.with_age = std::stoi(row[mapping["Age"]]),
 								.males = std::stof(row[mapping["PopMale"]]),
 								.females = std::stof(row[mapping["PopFemale"]]),
 								.total = std::stof(row[mapping["PopTotal"]])
@@ -140,7 +141,7 @@ namespace hgps {
 		}
 
 		std::vector<MortalityItem> DataManager::get_mortality(Country country,
-			const std::function<bool(const unsigned int&)> year_filter) const
+			const std::function<bool(const unsigned int&)> time_filter) const
 		{
 			auto results = std::vector<MortalityItem>();
 			if (index_.contains("demographic")) {
@@ -152,26 +153,25 @@ namespace hgps {
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
 				filename = (root_ / nodepath / filepath / filename).string();
 
-				// LocID,Location,Variant,Time,TimeYear,AgeGrp,Age,DeathsMale,DeathsFemale,DeathsTotal
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-						{ "LocID", "TimeYear", "Age", "DeathsMale", "DeathsFemale", "DeathsTotal" });
+						{ "LocID", "Time", "Age", "DeathMale", "DeathFemale", "DeathTotal" });
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
-						auto time_year = std::stoi(row[mapping["TimeYear"]]);
-						if (!year_filter(time_year)) {
+						auto row_time = std::stoi(row[mapping["Time"]]);
+						if (!time_filter(row_time)) {
 							continue;
 						}
 
 						results.push_back(MortalityItem
 							{
 								.location_id = std::stoi(row[mapping["LocID"]]),
-								.year = time_year,
-								.age = std::stoi(row[mapping["Age"]]),
-								.males = std::stof(row[mapping["DeathsMale"]]),
-								.females = std::stof(row[mapping["DeathsFemale"]]),
-								.total = std::stof(row[mapping["DeathsTotal"]])
+								.at_time = row_time,
+								.with_age = std::stoi(row[mapping["Age"]]),
+								.males = std::stof(row[mapping["DeathMale"]]),
+								.females = std::stof(row[mapping["DeathFemale"]]),
+								.total = std::stof(row[mapping["DeathTotal"]])
 							});
 					}
 
@@ -296,9 +296,9 @@ namespace hgps {
 					for (auto& pair : table) {
 						for (auto& child : pair.second) {
 							result.items.emplace_back(DiseaseItem{
-								.age = pair.first,
-								.gender = child.first,
-								.measures = child.second
+									.with_age = pair.first,
+									.gender = child.first,
+									.measures = child.second
 								});
 						}
 					}
@@ -502,7 +502,7 @@ namespace hgps {
 				}
 			}
 
-			index_["diseases"]["time_year"].get_to(table.time_year);
+			index_["diseases"]["time_year"].get_to(table.at_time);
 			return table;
 		}
 
@@ -511,7 +511,7 @@ namespace hgps {
 		}
 
 		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country,
-			const std::function<bool(const unsigned int&)> year_filter) const
+			const std::function<bool(const unsigned int&)> time_filter) const
 		{
 			std::vector<BirthItem> result;
 			if (index_.contains("demographic")) {
@@ -531,16 +531,16 @@ namespace hgps {
 
 				rapidcsv::Document doc(filename);
 				auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-					{ "TimeYear", "Births", "SRB" });
+					{ "Time", "Births", "SRB" });
 				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
-					auto time_year = std::stoi(row[mapping["TimeYear"]]);
-					if (!year_filter(time_year)) {
+					auto row_time = std::stoi(row[mapping["Time"]]);
+					if (!time_filter(row_time)) {
 						continue;
 					}
 
 					result.push_back(BirthItem{
-							.time = time_year,
+							.at_time = row_time,
 							.number = std::stof(row[mapping["Births"]]),
 							.sex_ratio = std::stof(row[mapping["SRB"]])
 						});
@@ -699,7 +699,7 @@ namespace hgps {
 
 				rapidcsv::Document doc(filename);
 				auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-					{ "TimeYear", "LEx", "LExMale", "LExFemale"});
+					{ "Time", "LEx", "LExMale", "LExFemale"});
 				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
 					if (row.size() < 4) {
@@ -707,7 +707,7 @@ namespace hgps {
 					}
 
 					result.emplace_back(LifeExpectancyItem{
-							.time = std::stoi(row[mapping["TimeYear"]]),
+							.at_time = std::stoi(row[mapping["Time"]]),
 							.both = std::stof(row[mapping["LEx"]]),
 							.male = std::stof(row[mapping["LExMale"]]),
 							.female = std::stof(row[mapping["LExFemale"]])
@@ -744,7 +744,7 @@ namespace hgps {
 			for (auto& field : fields) {
 				auto field_index = core::case_insensitive::index_of(column_names, field);
 				if (field_index < 0) {
-					throw std::out_of_range(fmt::format("Required field {} not found.", field));
+					throw std::out_of_range(fmt::format("File-based store, required field {} not found", field));
 				}
 
 				mapping.emplace(field, field_index);

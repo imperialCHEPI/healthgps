@@ -1,7 +1,7 @@
 {
     "version": 2,
     "inputs": {
-        "file": {
+        "dataset": {
             "name": "France.DataFile.csv",
             "format": "csv",
             "delimiter": ",",
@@ -23,7 +23,7 @@
         },
         "settings": {
             "country_code": "FRA",
-            "size_fraction": 0.0001,
+            "size_fraction": 0.001,
             "age_range": [0, 100]
         }
     },
@@ -64,11 +64,15 @@
         "seed": [123456789],
         "start_time": 2010,
         "stop_time": 2050,
-        "trial_runs": 1,
-        "sync_timeout_ms": 5000,
-        "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
+        "trial_runs": 100,
+        "sync_timeout_ms": 15000,
+        "diseases": ["alzheimer","angina","anxiety","asthma","dermatitis","cataract","pulmonar","pancreatitis"
+            ,"cirrhosis","diabetes","gallbladder","reflux","gout","lowbackpain","depression", "migraine"
+            ,"multiplesclerosis","myocardial","osteoarthritiship","osteoarthritisknee","parkinson", "psoriasis"
+            ,"arthritis","visionimpairment","breastcancer","colorectalcancer","esophaguscancer", "gallbladdercancer"
+            ,"kidneycancer","livercancer","ovarycancer","pancreascancer","stomachcancer","thyroidcancer"],
         "interventions": {
-            "active_type_id": null,
+            "active_type_id": "dynamic_marketing",
             "types": {
                 "simple": {
                     "active_period": {
@@ -88,7 +92,7 @@
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
-                        {"risk_factor":"BMI", "impact_value":-0.16,"from_age":19, "to_age":null}
+                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
                     ]
                 },
                 "dynamic_marketing": {
@@ -100,7 +104,7 @@
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
-                        {"risk_factor":"BMI", "impact_value":-0.16,"from_age":19, "to_age":null}
+                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
                     ]
                 },
                 "fiscal": {
@@ -119,8 +123,8 @@
         }
     },
     "output": {
-        "comorbidities": 4,
-        "folder": "${HOME}/healthgps/results",
+        "comorbidities": 5,
+        "folder": "${HOME}/healthgps/results/france",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
 }

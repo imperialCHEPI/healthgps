@@ -23,12 +23,12 @@ namespace hgps {
 			std::vector<PopulationItem> get_population(Country country) const;
 
 			std::vector<PopulationItem> get_population(Country country,
-				const std::function<bool(const unsigned int&)> year_filter) const override;
+				const std::function<bool(const unsigned int&)> time_filter) const override;
 
 			std::vector<MortalityItem> get_mortality(Country country) const;
 
 			std::vector<MortalityItem> get_mortality(Country country,
-				const std::function<bool(const unsigned int&)> year_filter) const override;
+				const std::function<bool(const unsigned int&)> time_filter) const override;
 
 			std::vector<DiseaseInfo> get_diseases() const override;
 
@@ -49,7 +49,7 @@ namespace hgps {
 			std::vector<BirthItem> get_birth_indicators(const Country country) const;
 
 			std::vector<BirthItem> get_birth_indicators(const Country country,
-				const std::function<bool(const unsigned int&)> year_filter) const override;
+				const std::function<bool(const unsigned int&)> time_filter) const override;
 
 			std::vector<LmsDataRow> get_lms_parameters() const override;
 

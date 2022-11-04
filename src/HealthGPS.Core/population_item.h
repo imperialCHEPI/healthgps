@@ -7,19 +7,19 @@ namespace hgps {
 		struct PopulationItem
 		{
 			int location_id{};
-			int year{};
-			int age{};
+			int at_time{};
+			int with_age{};
 			float males{};
 			float females{};
 			float total{};
 		};
 
 		inline bool operator< (PopulationItem const& lhs, PopulationItem const& rhs) {
-			return std::tie(lhs.year, lhs.age) < std::tie(rhs.year, rhs.age);
+			return std::tie(lhs.at_time, lhs.with_age) < std::tie(rhs.at_time, rhs.with_age);
 		}
 
 		inline bool operator> (PopulationItem const& lhs, PopulationItem const& rhs) {
-			return std::tie(lhs.year, lhs.age) > std::tie(rhs.year, rhs.age);
+			return std::tie(lhs.at_time, lhs.with_age) > std::tie(rhs.at_time, rhs.with_age);
 		}
 	}
 }

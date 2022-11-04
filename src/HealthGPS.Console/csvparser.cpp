@@ -6,7 +6,7 @@
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
-#include <fmt/format.h>
+#include <fmt/color.h>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                     \
@@ -101,7 +101,7 @@ bool load_datatable_csv(hc::DataTable& out_table, std::string full_filename,
 		}
 		else {
 			mismatch++;
-			std::cout << "Column: " << pair.first << " not found." << std::endl;
+			fmt::print(fg(fmt::color::dark_salmon), "Column: {} not found in dataset.\n", pair.first);
 		}
 	}
 
@@ -109,6 +109,7 @@ bool load_datatable_csv(hc::DataTable& out_table, std::string full_filename,
 		return false;
 	}
 
+	auto result = true;
 	for (auto& pair : csv_cols)
 	{
 		auto col_type = hc::to_lower(columns.at(pair.first));
@@ -130,16 +131,18 @@ bool load_datatable_csv(hc::DataTable& out_table, std::string full_filename,
 				out_table.add(get_string_column(pair.first, data).build());
 			}
 			else {
-				std::cout << fmt::format("Invalid data type: {} in column: {}\n", col_type, pair.first);
+				fmt::print(fg(fmt::color::dark_salmon), "Unknown data type: {} in column: {}\n", col_type, pair.first);
+				result = false;
 			}
 		}
 		catch (const std::exception& ex)
 		{
-			std::cout << fmt::format("Error passing column: {}, cause: {}\n", pair.first, ex.what());
+			fmt::print(fg(fmt::color::red), "Error passing column: {}, cause: {}\n", pair.first, ex.what());
+			result = false;
 		}
 	}
 
-	return true;
+	return result;
 }
 
 std::map<std::string, std::size_t> create_fields_index_mapping(
