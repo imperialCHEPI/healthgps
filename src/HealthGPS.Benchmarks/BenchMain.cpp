@@ -13,8 +13,6 @@ int main(int argc, char** argv)
 	std::cout << "\nInitialising benchmarks with a custom main function.\n\n";
 	std::cout << "Hardware: " << '\n';
 	std::cout << "Concurrent threads............: " << std::thread::hardware_concurrency() << '\n';
-	std::cout << "Destructive interference size.: " << std::hardware_destructive_interference_size << '\n';
-	std::cout << "Constructive interference size: " << std::hardware_constructive_interference_size << "\n\n";
 
 	::benchmark::RunSpecifiedBenchmarks();
 	::benchmark::Shutdown();
