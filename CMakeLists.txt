@@ -15,13 +15,12 @@ include(cmake/PreventInSourceBuilds.cmake)
 
 # Generate compile_commands.json to make it easier to work with clang based tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Enable compiler warnings and standard conformance
 if(MSVC)
     add_compile_options(/W4 /permissive-) # /WX 
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-variable) # -Werror
+    add_compile_options(-Wall -Wextra -Wpedantic) # -Werror
 endif()
 
 include(CTest)
