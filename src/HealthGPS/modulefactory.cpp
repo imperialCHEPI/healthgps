@@ -10,7 +10,7 @@ namespace hgps {
 		return builders_.size();
 	}
 
-	bool SimulationModuleFactory::countains(const SimulationModuleType type) const noexcept {
+	bool SimulationModuleFactory::contains(const SimulationModuleType type) const noexcept {
 		return builders_.contains(type);
 	}
 
