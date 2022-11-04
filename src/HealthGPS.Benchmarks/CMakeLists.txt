@@ -2,7 +2,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(benchmark CONFIG REQUIRED)
 find_package(Threads REQUIRED)
-find_package(TBB REQUIRED)
+#find_package(TBB REQUIRED)
 
 add_executable(HealthGPS.Benchmarks "")
 target_compile_features(HealthGPS.Tests PUBLIC cxx_std_${CMAKE_CXX_STANDARD})

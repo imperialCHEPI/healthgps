@@ -4,7 +4,7 @@ find_package(indicators CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
 find_package(Threads REQUIRED)
-find_package(TBB REQUIRED)
+#find_package(TBB REQUIRED)
 
 add_executable(HealthGPS.Console "")
 target_compile_features(HealthGPS.Console PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
