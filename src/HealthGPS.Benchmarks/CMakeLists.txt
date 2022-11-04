@@ -1,6 +1,8 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(benchmark CONFIG REQUIRED)
+find_package(Threads REQUIRED)
+find_package(TBB REQUIRED)
 
 add_executable(HealthGPS.Benchmarks "")
 target_compile_features(HealthGPS.Tests PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -13,7 +15,8 @@ target_sources(HealthGPS.Benchmarks
 
 set(ROOT_NAMESPACE hgps::bench)
 
-target_link_libraries(HealthGPS.Benchmarks
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_link_libraries(HealthGPS.Benchmarks
     PRIVATE
         HealthGPS.Core
         HealthGPS.Datastore
@@ -21,3 +24,15 @@ target_link_libraries(HealthGPS.Benchmarks
         fmt::fmt
         cxxopts::cxxopts
         benchmark::benchmark)
+else()
+    target_link_libraries(HealthGPS.Benchmarks
+    PRIVATE
+        HealthGPS.Core
+        HealthGPS.Datastore
+        HealthGPS
+        Threads::Threads
+		TBB::tbb
+        fmt::fmt
+        cxxopts::cxxopts
+        benchmark::benchmark)
+endif()

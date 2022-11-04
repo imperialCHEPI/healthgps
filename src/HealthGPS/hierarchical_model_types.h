@@ -39,7 +39,7 @@ namespace hgps {
 				throw std::invalid_argument("The hierarchical model equations definition must not be empty");
 			}
 
-			if (model_levels.empty()) {
+			if (levels_.empty()) {
 				throw std::invalid_argument("The hierarchical model levels definition must not be empty");
 			}
 		}

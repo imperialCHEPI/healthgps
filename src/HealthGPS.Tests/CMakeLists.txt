@@ -1,6 +1,8 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
+find_package(Threads REQUIRED)
+find_package(TBB REQUIRED)
 
 include(CTest)
 include(GoogleTest)
@@ -41,7 +43,8 @@ target_sources(HealthGPS.Tests
 
 set(ROOT_NAMESPACE hgps::test)
 
-target_link_libraries(HealthGPS.Tests
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_link_libraries(HealthGPS.Tests
     PRIVATE
         HealthGPS.Core
         HealthGPS.Datastore
@@ -49,6 +52,18 @@ target_link_libraries(HealthGPS.Tests
         fmt::fmt
         cxxopts::cxxopts
         GTest::gtest)
+else()
+    target_link_libraries(HealthGPS.Tests
+    PRIVATE
+        HealthGPS.Core
+        HealthGPS.Datastore
+        HealthGPS
+        Threads::Threads
+		TBB::tbb
+        fmt::fmt
+        cxxopts::cxxopts
+        GTest::gtest)    
+endif()
 
 gtest_discover_tests(HealthGPS.Tests)
 
