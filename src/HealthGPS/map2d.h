@@ -6,8 +6,8 @@ namespace hgps {
 	class Map2d
 	{
 	public:
-		using IteratorType = std::map<TROW, std::map<TCOL, TCell>>::iterator;
-		using ConstIteratorType = std::map<TROW, std::map<TCOL, TCell>>::const_iterator;
+		using IteratorType = typename std::map<TROW, std::map<TCOL, TCell>>::iterator;
+		using ConstIteratorType = typename std::map<TROW, std::map<TCOL, TCell>>::const_iterator;
 
 		Map2d() = default;
 		Map2d(std::map<TROW, std::map<TCOL, TCell>>&& data) noexcept
