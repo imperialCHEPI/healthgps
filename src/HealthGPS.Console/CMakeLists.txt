@@ -60,7 +60,7 @@ else()
 		indicators::indicators
 		nlohmann_json::nlohmann_json
 		Threads::Threads
-		TBB::tbb
+		#TBB::tbb
 		HealthGPS.Core
 		HealthGPS.Datastore
 		HealthGPS)

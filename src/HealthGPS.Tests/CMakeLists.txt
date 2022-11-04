@@ -59,7 +59,7 @@ else()
         HealthGPS.Datastore
         HealthGPS
         Threads::Threads
-		TBB::tbb
+		#TBB::tbb
         fmt::fmt
         cxxopts::cxxopts
         GTest::gtest)    
