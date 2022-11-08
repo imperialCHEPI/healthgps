@@ -19,7 +19,7 @@ namespace hgps {
 
         std::size_t size() const noexcept;
 
-        bool countains(const SimulationModuleType type) const noexcept;
+        bool contains(const SimulationModuleType type) const noexcept;
 
         void register_builder(const SimulationModuleType type, const ConcreteBuilder builder);
 
