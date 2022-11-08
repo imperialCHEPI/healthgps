@@ -21,7 +21,7 @@ namespace hgps {
 			      typename ValueAccessor = detail::DefaultValueAccessor<ColumnType>>
 		class DataTableColumnIterator {
 		public:
-			using value_type = ValueAccessor::ValueType;
+			using value_type = typename ValueAccessor::ValueType;
 			using difference_type = std::size_t;
 			using reference = value_type&;
 			using iterator_category = std::random_access_iterator_tag;
