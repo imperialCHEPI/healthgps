@@ -37,8 +37,8 @@ namespace hgps {
 	template<core::Numerical TYPE>
 	class MonotonicVector {
 	public:
-		using IteratorType = std::vector<TYPE>::iterator;
-		using ConstIteratorType = std::vector<TYPE>::const_iterator;
+		using IteratorType = typename std::vector<TYPE>::iterator;
+		using ConstIteratorType = typename std::vector<TYPE>::const_iterator;
 
 		MonotonicVector(std::vector<TYPE>& values)
 			: data_{ values }

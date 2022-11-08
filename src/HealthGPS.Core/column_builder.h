@@ -13,7 +13,7 @@ namespace hgps {
 		class PrimitiveDataTableColumnBuilder {
 
 		public:
-			using value_type = ColumnType::value_type;
+			using value_type = typename ColumnType::value_type;
 
 			PrimitiveDataTableColumnBuilder() = delete;
 
