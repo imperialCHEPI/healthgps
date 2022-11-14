@@ -6,7 +6,7 @@ find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
 find_package(Threads REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	find_package(TBB REQUIRED)
+	find_package(TBB REQUIRED tbb)
 endif()
 
 add_executable(HealthGPS.Console "")
