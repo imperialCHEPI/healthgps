@@ -17,9 +17,9 @@ namespace hgps {
 
 		const std::string& name() const noexcept override;
 
-		std::size_t size() const noexcept;
+		std::size_t size() const noexcept override;
 
-		bool contains(const HierarchicalModelType& modelType) const noexcept;
+		bool contains(const HierarchicalModelType& modelType) const noexcept override;
 
 		HierarchicalLinearModel& at(const HierarchicalModelType& model_type) const;
 

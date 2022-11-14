@@ -14,7 +14,7 @@ struct CoefficientInfo {
 struct LinearModelInfo {
 	std::string formula;
 	std::unordered_map<std::string, CoefficientInfo> coefficients;
-	double residuals_standard_deviation;
+	double residuals_standard_deviation{};
 	double rsquared{};
 };
 
@@ -43,7 +43,7 @@ struct HierarchicalModelInfo {
 struct VariableInfo
 {
 	std::string name;
-	short level;
+	short level{};
 	std::string factor;
 };
 

@@ -68,7 +68,7 @@
         "sync_timeout_ms": 15000,
         "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
         "interventions": {
-            "active_type_id": "dynamic_marketing",
+            "active_type_id": null,
             "types": {
                 "simple": {
                     "active_period": {

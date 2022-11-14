@@ -20,7 +20,7 @@ namespace hgps {
 
 	struct Disease
 	{
-		DiseaseStatus status;
+		DiseaseStatus status{};
 		int start_time{};
 		int time_since_onset{ -1 };
 
@@ -59,6 +59,8 @@ namespace hgps {
 		double get_risk_factor_value(const core::Identifier& key) const noexcept;
 
 		float gender_to_value() const noexcept;
+
+		std::string gender_to_string() const noexcept;
 
 		void emigrate(const unsigned int time);
 

@@ -11,7 +11,7 @@ namespace hgps::core {
 	}
 
 	Identifier::Identifier(std::string value)
-		: value_{ std::move(to_lower(value)) }
+		: value_{ to_lower(value) }
 	{
 		if (!value_.empty()) {
 			validate_identifeir();

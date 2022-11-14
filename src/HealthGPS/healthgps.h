@@ -18,10 +18,10 @@ namespace hgps {
 		void initialize() override;
 		void terminate() override;
 
-		adevs::Time init(adevs::SimEnv<int>* env);
-		adevs::Time update(adevs::SimEnv<int>* env);
-		adevs::Time update(adevs::SimEnv<int>*, std::vector<int>&);
-		void fini(adevs::Time clock);
+		adevs::Time init(adevs::SimEnv<int>* env) override;
+		adevs::Time update(adevs::SimEnv<int>* env) override;
+		adevs::Time update(adevs::SimEnv<int>*, std::vector<int>&) override;
+		void fini(adevs::Time clock) override;
 
 		void setup_run(unsigned int run_number) noexcept override;
 

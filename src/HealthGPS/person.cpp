@@ -63,6 +63,15 @@ namespace hgps {
         return 0.0f;
     }
 
+    std::string Person::gender_to_string() const noexcept
+    {
+        if (gender == core::Gender::male) {
+            return "male";
+        }
+
+        return "female";
+    }
+
     void Person::emigrate(const unsigned int time) {
         if (!is_active()) {
             throw std::logic_error("Entity must be active prior to emigrate.");

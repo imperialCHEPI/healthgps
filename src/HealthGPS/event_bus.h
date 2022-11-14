@@ -20,7 +20,7 @@ namespace hgps {
 
         void publish_async(std::unique_ptr<EventMessage> message) override;
 
-        bool unsubscribe(const EventSubscriber& subscriber);
+        bool unsubscribe(const EventSubscriber& subscriber) override;
 
         [[nodiscard]] std::size_t count();
 
