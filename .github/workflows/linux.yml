@@ -23,7 +23,7 @@ jobs:
       RELEASE_BUILD_PRESET: 'release-build-linux'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up GCC
       id: install_gcc
@@ -44,6 +44,10 @@ jobs:
       id: install_ninja
       uses: seanmiddleditch/gha-setup-ninja@master
 
+    - name: Get TBB library
+      id: install_tbb
+      run: sudo apt install libtbb-dev
+
     - name: Tool Check
       id: toos_version
       run: |
@@ -52,6 +56,7 @@ jobs:
         ninja --version
         ./vcpkg/vcpkg --version
         g++ --version
+        sudo apt list *tbb*
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug

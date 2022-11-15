@@ -3,9 +3,9 @@ find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	find_package(TBB REQUIRED tbb)
-endif()
+#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+#	find_package(TBB REQUIRED tbb)
+#endif()
 
 include(CTest)
 include(GoogleTest)
@@ -56,8 +56,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
         fmt::fmt
         Threads::Threads
         cxxopts::cxxopts
-        GTest::gtest
-        TBB::tbb)    
+        GTest::gtest "-ltbb")    
 else()
     target_link_libraries(HealthGPS.Tests
     PRIVATE
