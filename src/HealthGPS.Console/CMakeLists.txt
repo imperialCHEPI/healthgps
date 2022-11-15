@@ -5,9 +5,9 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
 find_package(Threads REQUIRED)
 
-#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-#	find_package(TBB REQUIRED tbb)
-#endif()
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	find_package(TBB REQUIRED tbb)
+endif()
 
 add_executable(HealthGPS.Console "")
 target_compile_features(HealthGPS.Console PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -54,7 +54,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
 		Threads::Threads
 		cxxopts::cxxopts
 		indicators::indicators
-		nlohmann_json::nlohmann_json "-ltbb")
+		nlohmann_json::nlohmann_json
+		TBB::tbb "-ltbb")
 else()
 	target_link_libraries(HealthGPS.Console
 	PRIVATE

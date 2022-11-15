@@ -3,6 +3,11 @@ find_package(cxxopts CONFIG REQUIRED)
 find_package(benchmark CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	find_package(TBB REQUIRED tbb)
+endif()
+
+
 add_executable(HealthGPS.Benchmarks "")
 target_compile_features(HealthGPS.Tests PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
@@ -24,7 +29,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
         fmt::fmt
         Threads::Threads
         cxxopts::cxxopts
-        benchmark::benchmark "-ltbb")
+        benchmark::benchmark
+        TBB::tbb "-ltbb")
 else()
     target_link_libraries(HealthGPS.Benchmarks
     PRIVATE
