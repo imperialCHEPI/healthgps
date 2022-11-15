@@ -55,7 +55,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
 		cxxopts::cxxopts
 		indicators::indicators
 		nlohmann_json::nlohmann_json
-		TBB::tbb "-ltbb")
+		TBB::tbb)
 else()
 	target_link_libraries(HealthGPS.Console
 	PRIVATE
