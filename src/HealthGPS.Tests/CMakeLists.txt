@@ -63,7 +63,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
         Threads::Threads
         cxxopts::cxxopts
         GTest::gtest
-        TBB::tbb)    
+        TBB::tbb "-ltbb")    
 else()
     target_link_libraries(HealthGPS.Tests
     PRIVATE
