@@ -7,6 +7,12 @@ find_package(Threads REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	find_package(TBB REQUIRED tbb)
+	if (TBB_FOUND)
+		message(STATUS "TBB library version: ${TBB_VERSION}")
+		option(TBB_ENABLE_IPO "Enable Interprocedural Optimization (IPO) during the compilation" OFF)
+	else()
+		message(STATUS "TBB library NOT found.")
+	endif()
 endif()
 
 add_executable(HealthGPS.Console "")

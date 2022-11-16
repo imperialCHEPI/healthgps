@@ -6,6 +6,7 @@
 #include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
 #include "HealthGPS/marketing_dynamic_scenario.h"
+#include "HealthGPS/food_labelling_scenario.h"
 #include "HealthGPS/fiscal_scenario.h"
 #include "HealthGPS/mtrandom.h"
 
@@ -494,6 +495,21 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 		auto dynamic = PolicyDynamic{ info.dynamics };
 		auto definition = MarketingDynamicDefinition{ period, risk_impacts, dynamic };
 		return std::make_unique<MarketingDynamicScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "food_labelling") {
+		// TODO: Validate JSON definition!!!
+		auto& adjustment = info.adjustments.at(0);
+		auto definition = FoodLabellingDefinition
+		{
+			.active_period = period,
+			.impacts = risk_impacts,
+			.adjustment_risk_factor = AdjustmentFactor { adjustment.risk_factor, adjustment.value },
+			.coverage = PolicyCoverage { info.coverage_rates, info.coverage_cutoff_time.value()},
+			.transfer_coefficient = TransferCoefficient {info.coefficients, info.child_cutoff_age.value() }
+		};
+
+		return std::make_unique<FoodLabellingScenario>(channel, std::move(definition));
 	}
 
 	if (info.identifier == "fiscal") {

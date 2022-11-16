@@ -64,6 +64,9 @@ void from_json(const json& j, PolicyPeriodInfo& p);
 void to_json(json& j, const PolicyImpactInfo& p);
 void from_json(const json& j, PolicyImpactInfo& p);
 
+void to_json(json& j, const PolicyAdjustmentInfo& p);
+void from_json(const json& j, PolicyAdjustmentInfo& p);
+
 void to_json(json& j, const PolicyScenarioInfo& p);
 void from_json(const json& j, PolicyScenarioInfo& p);
 

@@ -103,6 +103,22 @@
                         {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
                     ]
                 },
+                "food_labelling": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "coefficients": [0.012, 0.013, 0.014, 0.016],
+                    "coverage_rates": [0.26, 0.70],
+                    "coverage_cutoff_time": 4,
+                    "child_cutoff_age": 18,
+                    "adjustments": [
+                        {"risk_factor":"Energy", "value": 0.55}
+                    ],
+                    "impacts": [
+                        {"risk_factor":"BMI", "impact_value":-0.0103, "from_age":1,  "to_age":null}
+                    ]
+                },
                 "fiscal": {
                     "active_period": {
                         "start_time": 2022,

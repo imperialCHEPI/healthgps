@@ -72,7 +72,6 @@ int main(int argc, char* argv[])
 		}
 
 		// wait for datatable to complete
-
 		if (!table_future.get()) {
 			fmt::print(fg(fmt::color::red), "\nInvalid input dataset in configuration.\n");
 			return exit_application(EXIT_FAILURE);

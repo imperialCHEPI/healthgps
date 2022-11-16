@@ -33,6 +33,8 @@ target_sources(HealthGPS
 		"event_subscriber.cpp"
 		"fiscal_scenario.cpp"
 		"fiscal_scenario.h"
+		"food_labelling_scenario.cpp"
+		"food_labelling_scenario.h"
 		"healthgps.cpp"
 		"healthgps.h"
 		"hierarchical_model_static.cpp"
