@@ -84,7 +84,7 @@ namespace hgps {
 		TransferCoefficient transfer_coefficient;
 	};
 
-	class FoodLabellingScenario : public InterventionScenario
+	class FoodLabellingScenario final : public InterventionScenario
 	{
 	public:
 		FoodLabellingScenario() = delete;

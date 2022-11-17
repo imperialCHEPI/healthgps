@@ -119,6 +119,17 @@
                         {"risk_factor":"BMI", "impact_value":-0.0103, "from_age":1,  "to_age":null}
                     ]
                 },
+                "physical_activity": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "coverage_rates": [0.90],
+                    "impacts": [
+                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":6,  "to_age":15},
+                        {"risk_factor":"BMI", "impact_value":-0.08, "from_age":16,  "to_age":null}
+                    ]
+                },
                 "fiscal": {
                     "active_period": {
                         "start_time": 2022,

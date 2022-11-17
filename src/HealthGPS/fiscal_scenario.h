@@ -30,7 +30,7 @@ namespace hgps {
 		std::vector<PolicyImpact> impacts;
 	};
 
-	class FiscalPolicyScenario : public InterventionScenario {
+	class FiscalPolicyScenario final : public InterventionScenario {
 	public:
 		FiscalPolicyScenario() = delete;
 		FiscalPolicyScenario(SyncChannel& data_sync, FiscalPolicyDefinition&& definition);

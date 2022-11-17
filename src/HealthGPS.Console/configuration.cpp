@@ -7,6 +7,7 @@
 #include "HealthGPS/marketing_scenario.h"
 #include "HealthGPS/marketing_dynamic_scenario.h"
 #include "HealthGPS/food_labelling_scenario.h"
+#include "HealthGPS/physical_activity_scenario.h"
 #include "HealthGPS/fiscal_scenario.h"
 #include "HealthGPS/mtrandom.h"
 
@@ -473,6 +474,7 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 			core::Identifier{item.risk_factor}, item.impact_value, item.from_age, item.to_age });
 	}
 
+	// TODO: Validate intervention JSON definitions!!!
 	if (info.identifier == "simple") {
 		auto impact_type = PolicyImpactType::absolute;
 		if (core::case_insensitive::equals(info.impact_type, "relative")) {
@@ -498,7 +500,6 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	}
 
 	if (info.identifier == "food_labelling") {
-		// TODO: Validate JSON definition!!!
 		auto& adjustment = info.adjustments.at(0);
 		auto definition = FoodLabellingDefinition
 		{
@@ -510,6 +511,17 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 		};
 
 		return std::make_unique<FoodLabellingScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "physical_activity") {
+		auto definition = PhysicalActivityDefinition
+		{
+			.active_period = period,
+			.impacts = risk_impacts,
+			.coverage_rate = info.coverage_rates.at(0)
+		};
+
+		return std::make_unique<PhysicalActivityScenario>(channel, std::move(definition));
 	}
 
 	if (info.identifier == "fiscal") {

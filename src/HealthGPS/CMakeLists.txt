@@ -66,6 +66,8 @@ target_sources(HealthGPS
 		"person.h"
 		"population.cpp"
 		"population.h"
+		"physical_activity_scenario.cpp"
+		"physical_activity_scenario.h"
 		"random_algorithm.cpp"
 		"random_algorithm.h"
 		"relative_risk.cpp"

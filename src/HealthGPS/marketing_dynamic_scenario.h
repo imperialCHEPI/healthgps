@@ -18,7 +18,7 @@ namespace hgps {
 		PolicyDynamic dynamic;
 	};
 
-	class MarketingDynamicScenario : public DynamicInterventionScenario
+	class MarketingDynamicScenario final : public DynamicInterventionScenario
 	{
 	public:
 		MarketingDynamicScenario() = delete;

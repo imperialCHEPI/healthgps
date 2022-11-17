@@ -2,7 +2,7 @@
 
 namespace hgps {
 	/// @brief The entity qualify but is not affected by the policy
-	inline constexpr int NO_EFFECT = -1;
+	inline constexpr int NO_EFFECT = -2;
 
 	FoodLabellingScenario::FoodLabellingScenario(SyncChannel& data_sync, FoodLabellingDefinition&& definition)
 		: channel_{ data_sync }, definition_{ std::move(definition) }, factor_impact_{}, interventions_book_{}

@@ -83,6 +83,11 @@ jobs:
       working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
+    - name: Check TBB Linking
+      id: tbb_linking_check
+      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
+      run: ldd HealthGPS.Console
+
     - name: Zip output folder
       id: zip_folder
       working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
