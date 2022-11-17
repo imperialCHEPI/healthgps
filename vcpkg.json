@@ -10,7 +10,6 @@
     "rapidcsv",
     "crossguid",
     "gtest",
-    "benchmark",
-    "tbb"
+    "benchmark"
   ]
 }
