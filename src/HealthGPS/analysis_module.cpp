@@ -97,7 +97,6 @@ namespace hgps {
 		auto handle = core::run_async(&hgps::AnalysisModule::calculate_historical_statistics,
 			this, std::ref(context), std::ref(result));
 
-		// calculate_historical_statistics(context, result);
 		calculate_population_statistics(context, result.series);
 		handle.get();
 
@@ -124,8 +123,8 @@ namespace hgps {
 			comorbidity.emplace(i, ResultByGender{});
 		}
 
-		auto age_sum = std::map<core::Gender, int>{};
-		auto age_count = std::map<core::Gender, int>{};
+		auto gender_age_sum = std::map<core::Gender, int>{};
+		auto gender_count = std::map<core::Gender, int>{};
 		auto age_upper_bound = context.age_range().upper();
 		auto analysis_time = static_cast<unsigned int>(context.time_now());
 
@@ -133,7 +132,6 @@ namespace hgps {
 			this, std::ref(context.population()), age_upper_bound, analysis_time);
 
 		auto population_size = static_cast<int>(context.population().size());
-		auto population_alive = 0;
 		auto population_dead = 0;
 		auto population_migrated = 0;
 		for (const auto& entity : context.population()) {
@@ -149,9 +147,8 @@ namespace hgps {
 				continue;
 			}
 
-			population_alive++;
-			age_sum[entity.gender] += entity.age;
-			age_count[entity.gender]++;
+			gender_age_sum[entity.gender] += entity.age;
+			gender_count[entity.gender]++;
 			for (auto& item : risk_factors) {
 				auto factor_value = entity.get_risk_factor_value(item.first);
 				if (std::isnan(factor_value)) {
@@ -182,14 +179,14 @@ namespace hgps {
 		}
 
 		// Calculate the averages avoiding division by zero
+		auto males_count = std::max(1, gender_count[core::Gender::male]);
+		auto females_count = std::max(1, gender_count[core::Gender::female]);
 		result.population_size = population_size;
-		result.number_alive = population_alive;
+		result.number_alive = IntegerGenderValue{males_count, females_count};
 		result.number_dead = population_dead;
 		result.number_emigrated = population_migrated;
-		auto males_count = std::max(1, age_count[core::Gender::male]);
-		auto females_count = std::max(1, age_count[core::Gender::female]);
-		result.average_age.male = age_sum[core::Gender::male] * 1.0 / males_count;
-		result.average_age.female = age_sum[core::Gender::female] * 1.0 / females_count;
+		result.average_age.male = gender_age_sum[core::Gender::male] * 1.0 / males_count;
+		result.average_age.female = gender_age_sum[core::Gender::female] * 1.0 / females_count;
 		for (auto& item : risk_factors) {
 			auto user_name = context.mapping().at(item.first).name();
 			result.risk_ractor_average.emplace(user_name, ResultByGender{
@@ -239,7 +236,7 @@ namespace hgps {
 		unsigned int max_age, unsigned int death_year) const {
 		auto yll_sum = 0.0;
 		auto yld_sum = 0.0;
-		auto count = 0;
+		auto count = 0.0;
 		for (const auto& entity : population) {
 				if (entity.time_of_death() == death_year && entity.age <= max_age) {
 					auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);

@@ -112,7 +112,9 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage& mes
 		{"time", message.model_time},
 		{"population", {
 			{"size", message.content.population_size},
-			{"alive", message.content.number_alive},
+			{"alive", message.content.number_alive.total()},
+			{"alive_male", message.content.number_alive.males},
+			{"alive_female", message.content.number_alive.females},
 			{"migrating", message.content.number_emigrated},
 			{"dead", message.content.number_dead},
 			{"recycle", message.content.number_of_recyclable()},
