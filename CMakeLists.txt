@@ -20,7 +20,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(MSVC)
     add_compile_options(/W4 /permissive-) # /WX 
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-variable) # -Werror
+    add_compile_options(-Wall -Wextra -Wpedantic) # -Werror
 endif()
 
 include(CTest)
