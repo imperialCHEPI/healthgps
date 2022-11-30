@@ -30,6 +30,5 @@ namespace hgps {
 		GenderTable<int, float> life_expectancy_;
 		DoubleAgeGenderTable observed_YLD_;
 		std::map<std::string, float> disability_weights_;
-		unsigned int comorbidities_;
 	};
 }

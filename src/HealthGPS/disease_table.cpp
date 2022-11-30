@@ -31,13 +31,13 @@ namespace hgps {
 		if (info.code.empty()) {
 			throw std::invalid_argument("Invalid disease information with empty identifier");
 		}
-		else if (data.empty()) {
+		else if (data_.empty()) {
 			return; // empty table
 		}
 
 		// Consistence checks, otherwise number of columns is wrong.
-		auto col_size = data.begin()->second.size();
-		for (auto& age : data) {
+		auto col_size = data_.begin()->second.size();
+		for (auto& age : data_) {
 			if (age.second.size() != col_size) {
 				throw std::invalid_argument(
 					fmt::format("Number of columns mismatch at age: {} ({} vs {}).",

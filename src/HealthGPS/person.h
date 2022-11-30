@@ -20,7 +20,7 @@ namespace hgps {
 
 	struct Disease
 	{
-		DiseaseStatus status;
+		DiseaseStatus status{};
 		int start_time{};
 		int time_since_onset{ -1 };
 

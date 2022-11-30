@@ -16,7 +16,7 @@ namespace hgps {
 
 		const std::string& name() const noexcept override;
 
-		std::size_t size() const noexcept;
+		std::size_t size() const noexcept override;
 
 		bool contains(const std::string& disease_code) const noexcept override;
 

@@ -333,7 +333,7 @@ TEST_F(DatastoreTest, RetrieveCancerParameters)
 		ASSERT_FALSE(entity.death_weight.empty());
 	}
 
-	ASSERT_GT(diseases.size(), 0);
+	ASSERT_GT(diseases.size(), 0u);
 	ASSERT_GT(cancer_count, 0);
 }
 
@@ -349,7 +349,7 @@ TEST_F(DatastoreTest, RetrieveLmsParameters)
 		return row.gender == Gender::female; });
 
 	ASSERT_FALSE(lms.empty());
-	ASSERT_GT(male_count, 0);
-	ASSERT_LT(male_count, lms.size());
+	ASSERT_GT(male_count, 0u);
+	ASSERT_LT(static_cast<size_t>(male_count), lms.size());
 	ASSERT_EQ(male_count, feme_count);
 }

@@ -19,7 +19,7 @@ namespace hgps {
 
 		void initialise_population(RuntimeContext& context) override;
 
-		void update_population(RuntimeContext& context);
+		void update_population(RuntimeContext& context) override;
 
 	private:
 		std::string function_;

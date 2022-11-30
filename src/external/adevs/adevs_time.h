@@ -26,9 +26,9 @@ class SuperDenseTime
 {
 	public:
 		/// The real, physically meaningful part of time
-		RealType real;
+		RealType real{};
 		/// The logical part of time for order at a real instant
-		int logical;
+		int logical{};
 		/// Default constructor
 		SuperDenseTime(){}
 		/// Constructor assigns initial values to real and logical

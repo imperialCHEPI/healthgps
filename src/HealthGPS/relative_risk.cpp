@@ -6,7 +6,7 @@ namespace hgps {
 		const MonotonicVector<int>& rows, const MonotonicVector<float>& cols, core::FloatArray2D&& values)
 		: table_{ std::move(values) }, rows_index_{}, cols_index_{}
 	{
-		if (rows.size() != values.rows() || cols.size() != values.columns()) {
+		if (rows.size() != table_.rows() || cols.size() != table_.columns()) {
 			throw std::invalid_argument("Lookup breakpoints and values size mismatch.");
 		}
 

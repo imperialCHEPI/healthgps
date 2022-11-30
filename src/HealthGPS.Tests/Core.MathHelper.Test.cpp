@@ -39,8 +39,8 @@ TEST(TestCore_MathHelper, EqualsDefaultPrecision)
 TEST(TestCore_MathHelper, EqualsEpsilonPrecision)
 {
 	using namespace hgps::core;
-	double a = 1;
-	double b = 1 + std::numeric_limits<double>::epsilon();
+	auto a = 1.0;
+	constexpr auto b = 1.0 + std::numeric_limits<double>::epsilon();
 	ASSERT_TRUE(MathHelper::equal(a, b));
 }
 

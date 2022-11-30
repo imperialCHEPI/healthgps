@@ -97,8 +97,7 @@ namespace hgps {
 				"The 'range lower' value must be greater than zero and less than the 'range upper' value.");
 		}
 
-		int offset = 1;
-		auto rows = std::vector<int>(rows_range.length() + offset);
+		auto rows = std::vector<int>(static_cast<size_t>(rows_range.length()) + 1);
 		std::iota(rows.begin(), rows.end(), rows_range.lower());
 
 		auto cols = std::vector<core::Gender>{ core::Gender::male, core::Gender::female };
@@ -113,8 +112,7 @@ namespace hgps {
 				"The 'age lower' value must be greater than zero and less than the 'age upper' value.");
 		}
 
-		int offset = 1;
-		auto rows = std::vector<int>(age_range.length() + offset);
+		auto rows = std::vector<int>(static_cast<size_t>(age_range.length()) + 1);
 		std::iota(rows.begin(), rows.end(), age_range.lower());
 
 		auto cols = std::vector<core::Gender>{ core::Gender::male, core::Gender::female };
