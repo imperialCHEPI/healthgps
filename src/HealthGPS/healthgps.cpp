@@ -247,7 +247,7 @@ namespace hgps {
 				for (auto trial = 0; trial < net_value; trial++) {
 					auto index = context_.random().next_int(static_cast<int>(similar_indeces.size()) - 1);
 					const auto& source = pop.at(similar_indeces.at(index));
-					context_.population().add(std::move(partial_clone_entity(source)), context_.time_now());
+					context_.population().add(partial_clone_entity(source), context_.time_now());
 				}
 			}
 		}

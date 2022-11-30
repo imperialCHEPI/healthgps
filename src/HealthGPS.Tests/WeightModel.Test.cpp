@@ -48,7 +48,7 @@ TEST_F(WeightModelTest, CreateWeightModel)
 	auto entity = create_test_entity();
 	auto classifier = WeightModel{ create_lms_model(manager) };
 	auto category = classifier.classify_weight(entity);
-	ASSERT_EQ(18, classifier.child_cutoff_age());
+	ASSERT_EQ(18u, classifier.child_cutoff_age());
 	ASSERT_EQ(WeightCategory::normal, category);
 }
 

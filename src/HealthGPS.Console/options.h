@@ -52,7 +52,7 @@ struct BaselineInfo
 struct RiskFactorInfo
 {
 	std::string name;
-	short level;
+	short level{};
 	std::string proxy;
 	std::vector<double> range;
 };
