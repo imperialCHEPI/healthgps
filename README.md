@@ -48,7 +48,7 @@ To start working on the *Health GPS* code base, the suggested development machin
 2. [Git](https://git-scm.com/downloads) 2.3 or newer.
 3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
 4. [Ninja](https://ninja-build.org/) 1.10 or newer.
-5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer with CMake presets integration.
+5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
 6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment, plus.
    * [Intel TBB](https://github.com/oneapi-src/oneTBB) library version 2018 or later installed (e.g. `sudo apt update && sudo apt install libtbb-dev`) 
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
