@@ -39,16 +39,30 @@ if(WIN32)
 	target_sources(HealthGPS.Console PRIVATE versioninfo.rc)
 endif(WIN32)
 
-target_link_libraries(HealthGPS.Console
+message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	target_link_libraries(HealthGPS.Console
 	PRIVATE
-		fmt::fmt
-		cxxopts::cxxopts
-		indicators::indicators
-		nlohmann_json::nlohmann_json
-		Threads::Threads
 		HealthGPS.Core
 		HealthGPS.Datastore
-		HealthGPS)
+		HealthGPS
+		fmt::fmt
+		Threads::Threads
+		cxxopts::cxxopts
+		indicators::indicators
+		nlohmann_json::nlohmann_json "-ltbb")
+else()
+	target_link_libraries(HealthGPS.Console
+	PRIVATE
+		HealthGPS.Core
+		HealthGPS.Datastore
+		HealthGPS
+		fmt::fmt
+		Threads::Threads
+		cxxopts::cxxopts
+		indicators::indicators
+		nlohmann_json::nlohmann_json)
+endif()
 
 target_include_directories(HealthGPS.Console
 	PRIVATE

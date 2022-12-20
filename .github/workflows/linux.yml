@@ -23,7 +23,7 @@ jobs:
       RELEASE_BUILD_PRESET: 'release-build-linux'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up GCC
       id: install_gcc
@@ -43,6 +43,10 @@ jobs:
     - name: Get Ninja
       id: install_ninja
       uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Get TBB library
+      id: install_tbb
+      run: sudo apt install libtbb-dev
 
     - name: Tool Check
       id: toos_version
@@ -77,6 +81,11 @@ jobs:
       id: cmake_build_release
       working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
+
+    - name: Check TBB Linking
+      id: tbb_linking_check
+      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
+      run: ldd HealthGPS.Console
 
     - name: Zip output folder
       id: zip_folder
