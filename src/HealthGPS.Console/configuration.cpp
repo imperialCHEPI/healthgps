@@ -2,8 +2,12 @@
 #include "jsonparser.h"
 #include "version.h"
 
+#include "HealthGPS/baseline_scenario.h"
 #include "HealthGPS/simple_policy_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
+#include "HealthGPS/marketing_dynamic_scenario.h"
+#include "HealthGPS/food_labelling_scenario.h"
+#include "HealthGPS/physical_activity_scenario.h"
 #include "HealthGPS/fiscal_scenario.h"
 #include "HealthGPS/mtrandom.h"
 
@@ -153,22 +157,27 @@ Configuration load_configuration(CommandOptions& options)
 		}
 
 		auto version = opt["version"].get<int>();
-		if (version != 1) {
-			throw std::runtime_error("definition schema version mismatch, supported = 1");
+		if (version != 1 && version != 2) {
+			throw std::runtime_error(fmt::format("configuration schema version: {} mismatch, supported: 1 and 2", version));
 		}
 
 		// application version
 		config.app_name = PROJECT_NAME;
 		config.app_version = PROJECT_VERSION;
 
-		// input data file
-		config.file = opt["inputs"]["file"].get<FileInfo>();
+		// input dataset file
+		auto dataset_key = "dataset";
+		if (version == 1) {
+			dataset_key = "file";
+		}
+
+		config.file = opt["inputs"][dataset_key].get<FileInfo>();
 		fs::path full_path = config.file.name;
 		if (full_path.is_relative()) {
 			full_path = options.config_file.parent_path() / config.file.name;
 			if (fs::exists(full_path)) {
 				config.file.name = full_path.string();
-				fmt::print("Input data file.....: {}\n", config.file.name);
+				fmt::print("Input dataset file..: {}\n", config.file.name);
 			}
 		}
 
@@ -255,6 +264,10 @@ Configuration load_configuration(CommandOptions& options)
 					break;
 				}
 			}
+
+			if (!core::case_insensitive::equals(config.intervention.identifier, active_type)) {
+				throw std::runtime_error(fmt::format("Unknown active intervention type identifier: {}", active_type));
+			}
 		}
 
 		config.job_id = options.job_id;
@@ -291,8 +304,9 @@ std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configura
 	fmt::print("\nThere are {} diseases in storage, {} selected.\n",
 		diseases.size(), config.diseases.size());
 
-	for (auto& code : config.diseases) {
-		auto item = data_api.get_disease_info(core::to_lower(code));
+	for (const auto& code : config.diseases) {
+		auto code_key = core::Identifier{ code };
+		auto item = data_api.get_disease_info(code_key);
 		if (item.has_value()) {
 			result.emplace_back(item.value());
 		}
@@ -339,19 +353,19 @@ ModelInput create_model_input(core::DataTable& input_table, core::Country countr
 	for (auto& item : config.modelling.risk_factors) {
 		if (core::case_insensitive::equals(item.name, config.modelling.dynamic_risk_factor)) {
 			if (item.range.empty()) {
-				mapping.emplace_back(MappingEntry(item.name, item.level, item.proxy, true));
+				mapping.emplace_back(MappingEntry(item.name, item.level, core::Identifier{ item.proxy }, true));
 			}
 			else {
 				auto boundary = FactorRange{ item.range[0], item.range[1] };
-				mapping.emplace_back(MappingEntry(item.name, item.level, item.proxy, boundary, true));
+				mapping.emplace_back(MappingEntry(item.name, item.level, core::Identifier{ item.proxy }, boundary, true));
 			}
 		}
 		else if (!item.range.empty()) {
 			auto boundary = FactorRange{ item.range[0], item.range[1] };
-			mapping.emplace_back(MappingEntry{ item.name, item.level, item.proxy, boundary });
+			mapping.emplace_back(MappingEntry{ item.name, item.level, core::Identifier{item.proxy}, boundary });
 		}
 		else {
-			mapping.emplace_back(MappingEntry{ item.name, item.level, item.proxy });
+			mapping.emplace_back(MappingEntry{ item.name, item.level, core::Identifier{item.proxy} });
 		}
 	}
 
@@ -403,6 +417,50 @@ std::string create_output_file_name(const OutputInfo& info, int job_id)
 	return log_file_name;
 }
 
+ResultFileWriter create_results_file_logger(const Configuration& config, const hgps::ModelInput& input)
+{
+	return ResultFileWriter{
+		create_output_file_name(config.output, config.job_id),
+		ExperimentInfo{
+			.model = config.app_name,
+			.version = config.app_version,
+			.intervention = config.intervention.identifier,
+			.job_id = config.job_id,
+			.seed = input.seed().value_or(0u)}
+	};
+}
+
+std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel& channel, const PolicyScenarioInfo& info)
+{
+	if (!info.identifier.empty()) {
+		// TODO: Baseline scenario with population labelling
+	}
+
+	return std::make_unique<BaselineScenario>(channel);
+}
+
+hgps::HealthGPS create_baseline_simulation(hgps::SyncChannel& channel, hgps::SimulationModuleFactory& factory,
+	hgps::EventAggregator& event_bus, hgps::ModelInput& input, const PolicyScenarioInfo& info)
+{
+	auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
+	auto baseline_scenario = create_baseline_scenario(channel, info);
+	return HealthGPS {
+		SimulationDefinition{ input, std::move(baseline_scenario) , std::move(baseline_rnd) },
+		factory,
+		event_bus };
+}
+
+hgps::HealthGPS create_intervention_simulation(hgps::SyncChannel& channel, hgps::SimulationModuleFactory& factory,
+	hgps::EventAggregator& event_bus, hgps::ModelInput& input, const PolicyScenarioInfo& info)
+{
+	auto policy_scenario = create_intervention_scenario(channel, info);
+	auto policy_rnd = std::make_unique<hgps::MTRandom32>();
+	return HealthGPS {
+		SimulationDefinition{ input, std::move(policy_scenario), std::move(policy_rnd) },
+		factory,
+		event_bus };
+}
+
 std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	SyncChannel& channel, const PolicyScenarioInfo& info)
 {
@@ -413,9 +471,10 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	auto risk_impacts = std::vector<PolicyImpact>{};
 	for (auto& item : info.impacts) {
 		risk_impacts.emplace_back(PolicyImpact{
-			core::to_lower(item.risk_factor), item.impact_value, item.from_age, item.to_age });
+			core::Identifier{item.risk_factor}, item.impact_value, item.from_age, item.to_age });
 	}
 
+	// TODO: Validate intervention JSON definitions!!!
 	if (info.identifier == "simple") {
 		auto impact_type = PolicyImpactType::absolute;
 		if (core::case_insensitive::equals(info.impact_type, "relative")) {
@@ -432,6 +491,37 @@ std::unique_ptr<hgps::InterventionScenario> create_intervention_scenario(
 	if (info.identifier == "marketing") {
 		auto definition = MarketingPolicyDefinition(period, risk_impacts);
 		return std::make_unique<MarketingPolicyScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "dynamic_marketing") {
+		auto dynamic = PolicyDynamic{ info.dynamics };
+		auto definition = MarketingDynamicDefinition{ period, risk_impacts, dynamic };
+		return std::make_unique<MarketingDynamicScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "food_labelling") {
+		auto& adjustment = info.adjustments.at(0);
+		auto definition = FoodLabellingDefinition
+		{
+			.active_period = period,
+			.impacts = risk_impacts,
+			.adjustment_risk_factor = AdjustmentFactor { adjustment.risk_factor, adjustment.value },
+			.coverage = PolicyCoverage { info.coverage_rates, info.coverage_cutoff_time.value()},
+			.transfer_coefficient = TransferCoefficient {info.coefficients, info.child_cutoff_age.value() }
+		};
+
+		return std::make_unique<FoodLabellingScenario>(channel, std::move(definition));
+	}
+
+	if (info.identifier == "physical_activity") {
+		auto definition = PhysicalActivityDefinition
+		{
+			.active_period = period,
+			.impacts = risk_impacts,
+			.coverage_rate = info.coverage_rates.at(0)
+		};
+
+		return std::make_unique<PhysicalActivityScenario>(channel, std::move(definition));
 	}
 
 	if (info.identifier == "fiscal") {

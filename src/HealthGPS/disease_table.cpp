@@ -28,7 +28,7 @@ namespace hgps {
 		std::map<int, std::map<core::Gender, DiseaseMeasure>>&& data)
 		: info_{ info }, measures_{ std::move(measures) }, data_{ std::move(data) } {
 
-		if (info.code.empty()) {
+		if (info.code.is_empty()) {
 			throw std::invalid_argument("Invalid disease information with empty identifier");
 		}
 		else if (data_.empty()) {
@@ -37,7 +37,7 @@ namespace hgps {
 
 		// Consistence checks, otherwise number of columns is wrong.
 		auto col_size = data_.begin()->second.size();
-		for (auto& age : data_) {
+		for (const auto& age : data_) {
 			if (age.second.size() != col_size) {
 				throw std::invalid_argument(
 					fmt::format("Number of columns mismatch at age: {} ({} vs {}).",

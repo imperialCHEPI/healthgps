@@ -9,8 +9,8 @@ namespace hgps {
         return ScenarioType::baseline;
     }
 
-    std::string BaselineScenario::name() const noexcept {
-        return "Baseline";
+    const std::string& BaselineScenario::name() const noexcept {
+        return name_;
     }
 
     SyncChannel& BaselineScenario::channel() {
@@ -20,8 +20,9 @@ namespace hgps {
     void BaselineScenario::clear() noexcept {
     }
 
-    double BaselineScenario::apply([[maybe_unused]] Person& entity, [[maybe_unused]] const int time,
-        [[maybe_unused]] const std::string risk_factor_key, [[maybe_unused]] const double value) {
+    double BaselineScenario::apply([[maybe_unused]] Random& generator, [[maybe_unused]] Person& entity,
+        [[maybe_unused]] int time,[[maybe_unused]] const core::Identifier& risk_factor_key,
+        [[maybe_unused]] double value) {
         return value;
     }
 }

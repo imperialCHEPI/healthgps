@@ -1,7 +1,7 @@
 {
-    "version": 1,
+    "version": 2,
     "inputs": {
-        "file": {
+        "dataset": {
             "name": "France.DataFile.csv",
             "format": "csv",
             "delimiter": ",",
@@ -65,7 +65,7 @@
         "start_time": 2010,
         "stop_time": 2050,
         "trial_runs": 1,
-        "sync_timeout_ms": 5000,
+        "sync_timeout_ms": 15000,
         "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
         "interventions": {
             "active_type_id": null,
@@ -88,7 +88,46 @@
                     "impacts": [
                         {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                         {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
-                        {"risk_factor":"BMI", "impact_value":-0.16,"from_age":19, "to_age":null}
+                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
+                    ]
+                },
+                "dynamic_marketing": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "dynamics":[1.0, 0.0, 0.0], 
+                    "impacts": [
+                        {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
+                        {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
+                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
+                    ]
+                },
+                "food_labelling": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "coefficients": [0.012, 0.013, 0.014, 0.016],
+                    "coverage_rates": [0.26, 0.70],
+                    "coverage_cutoff_time": 4,
+                    "child_cutoff_age": 18,
+                    "adjustments": [
+                        {"risk_factor":"Energy", "value": 0.55}
+                    ],
+                    "impacts": [
+                        {"risk_factor":"BMI", "impact_value":-0.0103, "from_age":1,  "to_age":null}
+                    ]
+                },
+                "physical_activity": {
+                    "active_period": {
+                        "start_time": 2022,
+                        "finish_time": 2050
+                    },
+                    "coverage_rates": [0.90],
+                    "impacts": [
+                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":6,  "to_age":15},
+                        {"risk_factor":"BMI", "impact_value":-0.08, "from_age":16,  "to_age":null}
                     ]
                 },
                 "fiscal": {
@@ -107,8 +146,8 @@
         }
     },
     "output": {
-        "comorbidities": 4,
-        "folder": "${HOME}/healthgps/results",
+        "comorbidities": 5,
+        "folder": "${HOME}/healthgps/results/france",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
 }

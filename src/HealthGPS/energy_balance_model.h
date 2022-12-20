@@ -23,10 +23,10 @@ namespace hgps {
 		std::string name_{ "Dynamic" };
 
 		void update_risk_factors_exposure(RuntimeContext& context, Person& entity,
-			const std::map<std::string, double>& current_risk_factors,
-			const std::map<std::string, FactorDynamicEquation>& equations);
+			const std::map<core::Identifier, double>& current_risk_factors,
+			const std::map<core::Identifier, FactorDynamicEquation>& equations);
 
-		std::map<std::string, double> get_current_risk_factors(
+		std::map<core::Identifier, double> get_current_risk_factors(
 			const HierarchicalMapping& mapping, Person& entity, int time_year) const;
 
 		double sample_normal_with_boundary(Random& random,

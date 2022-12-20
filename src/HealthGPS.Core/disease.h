@@ -5,6 +5,7 @@
 #include <map>
 
 #include "forward_type.h"
+#include "identifier.h"
 
 namespace hgps {
 	namespace core {
@@ -12,7 +13,7 @@ namespace hgps {
 		struct DiseaseInfo
 		{
 			DiseaseGroup group{};
-			std::string code{};
+			Identifier code{};
 			std::string name{};
 		};
 
@@ -26,7 +27,7 @@ namespace hgps {
 
 		struct DiseaseItem
 		{
-			int age;
+			int with_age;
 			Gender gender;
 			std::map<int, double> measures;
 		};
@@ -54,7 +55,7 @@ namespace hgps {
 
 		struct CancerParameterEntity
 		{
-			int time_year{};
+			int at_time{};
 			std::vector<LookupGenderValue> death_weight{};
 			std::vector<LookupGenderValue> prevalence_distribution{};
 			std::vector<LookupGenderValue> survival_rate{};

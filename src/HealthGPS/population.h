@@ -30,10 +30,13 @@ namespace hgps {
 
 		void add(Person&& person, unsigned int time) noexcept;
 
-		void add_newborn_babies(const std::size_t number, core::Gender gender, unsigned int time) noexcept;
+		void add_newborn_babies(std::size_t number, core::Gender gender, unsigned int time) noexcept;
 
 		IteratorType begin() noexcept { return people_.begin(); }
 		IteratorType end() noexcept { return people_.end(); }
+
+		ConstIteratorType begin() const noexcept { return people_.begin(); }
+		ConstIteratorType end() const noexcept { return people_.end(); }
 
 		ConstIteratorType cbegin() const noexcept { return people_.cbegin(); }
 		ConstIteratorType cend() const noexcept { return people_.cend(); }

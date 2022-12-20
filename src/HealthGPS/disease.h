@@ -10,7 +10,7 @@ namespace hgps {
 
 	public:
 		DiseaseModule() = delete;
-		DiseaseModule(std::map<std::string, std::shared_ptr<DiseaseModel>>&& models);
+		DiseaseModule(std::map<core::Identifier, std::shared_ptr<DiseaseModel>>&& models);
 
 		SimulationModuleType type() const noexcept override;
 
@@ -18,21 +18,21 @@ namespace hgps {
 
 		std::size_t size() const noexcept override;
 
-		bool contains(const std::string& disease_code) const noexcept override;
+		bool contains(const core::Identifier& disease_core) const noexcept override;
 
-		std::shared_ptr<DiseaseModel>& operator[](const std::string& disease_code);
+		std::shared_ptr<DiseaseModel>& operator[](const core::Identifier& disease_core);
 
-		const std::shared_ptr<DiseaseModel>& operator[](const std::string& disease_code) const;
+		const std::shared_ptr<DiseaseModel>& operator[](const core::Identifier& disease_code) const;
 
 		void initialise_population(RuntimeContext& context) override;
 
 		void update_population(RuntimeContext& context) override;
 
 		double get_excess_mortality(
-			const std::string& disease_code, const Person& entity) const noexcept override;
+			const core::Identifier& disease_code, const Person& entity) const noexcept override;
 
 	private:
-		std::map<std::string, std::shared_ptr<DiseaseModel>> models_;
+		std::map<core::Identifier, std::shared_ptr<DiseaseModel>> models_;
 		std::string name_{ "Disease" };
 	};
 

@@ -9,7 +9,7 @@ namespace hgps {
 
 		struct LifeExpectancyItem
 		{
-			int time{};
+			int at_time{};
 			float both{};
 			float male{};
 			float female{};

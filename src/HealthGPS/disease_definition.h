@@ -11,17 +11,17 @@ namespace hgps {
 
 	struct DiseaseParameter final {
 		DiseaseParameter() = default;
-		DiseaseParameter(const int data_time, const ParameterLookup& prevalence,
+		DiseaseParameter(int data_time, const ParameterLookup& prevalence,
 			const ParameterLookup& survival, const ParameterLookup& deaths)
 			: time_year{ data_time }, prevalence_distribution{ prevalence },
 			survival_rate{ survival }, death_weight{ deaths },
 			max_time_since_onset{ prevalence.rbegin()->first + 1 } {}
 
-		const int time_year{};
-		const ParameterLookup prevalence_distribution{};
-		const ParameterLookup survival_rate{};
-		const ParameterLookup death_weight{};
-		const int max_time_since_onset{};
+		int time_year{};
+		ParameterLookup prevalence_distribution{};
+		ParameterLookup survival_rate{};
+		ParameterLookup death_weight{};
+		int max_time_since_onset{};
 	};
 
 	class DiseaseDefinition final {

@@ -377,7 +377,7 @@ namespace hgps {
 
 		auto pop = repository.manager().get_population(config.settings().country(), time_filter);
 		for (auto& item : pop) {
-			pop_data[item.year].emplace(item.age, PopulationRecord(item.age, item.males, item.females));
+			pop_data[item.at_time].emplace(item.with_age, PopulationRecord(item.with_age, item.males, item.females));
 		}
 
 		auto births = repository.manager().get_birth_indicators(config.settings().country(), time_filter);

@@ -1,46 +1,44 @@
+#include "mapping.h"
+#include "HealthGPS.Core/string_util.h"
+
 #include <tuple>
 #include <algorithm>
 #include <iterator>
-
-#include "mapping.h"
-#include "HealthGPS.Core/string_util.h"
 #include <stdexcept>
 
 namespace hgps {
 	hgps::MappingEntry::MappingEntry(std::string name, short level,
-		std::string entity_name, FactorRange range, bool dynamic_factor)
-		: name_{ name }, name_key_{ core::to_lower(name) }, level_{ level }
-		, entity_name_{ core::to_lower(entity_name) }, range_{range}
+		core::Identifier entity_key, FactorRange range, bool dynamic_factor)
+		: name_{ name }, name_key_{ core::Identifier{name} }, level_{ level }
+		, entity_key_{ std::move(entity_key) }, range_{range}
 		, dynamic_factor_{ dynamic_factor } { }
 
 	MappingEntry::MappingEntry(std::string name, short level,
-		std::string entity_name, bool dynamic_factor)
-		: MappingEntry(name, level, entity_name, FactorRange{}, dynamic_factor) {}
+		core::Identifier entity_key, bool dynamic_factor)
+		: MappingEntry(name, level, entity_key, FactorRange{}, dynamic_factor) {}
 
-	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name, FactorRange range)
-		: MappingEntry(name, level, entity_name, range, false) {}
+	MappingEntry::MappingEntry(std::string name, short level, core::Identifier entity_key, FactorRange range)
+		: MappingEntry(name, level, entity_key, range, false) {}
 
-	MappingEntry::MappingEntry(std::string name, short level, std::string entity_name)
-		: MappingEntry(name, level, entity_name, FactorRange{}, false) {}
+	MappingEntry::MappingEntry(std::string name, short level, core::Identifier entity_key)
+		: MappingEntry(name, level, entity_key, FactorRange{}, false) {}
 
 	MappingEntry::MappingEntry(std::string name, short level)
-		: MappingEntry(name, level, std::string{}, FactorRange{}, false) {}
+		: MappingEntry(name, level, core::Identifier::empty(), FactorRange{}, false) {}
 
 	const std::string&  MappingEntry::name() const noexcept { return name_; }
 
 	short MappingEntry::level() const noexcept { return level_; }
 
-	const std::string& MappingEntry::entity_name() const noexcept { return entity_name_; }
-
-	const std::string& MappingEntry::entity_key() const noexcept {
-		return is_entity() ? entity_name_ : name_key_;
+	const core::Identifier& MappingEntry::entity_key() const noexcept {
+		return is_entity() ? entity_key_ : name_key_;
 	}
 
-	bool MappingEntry::is_entity() const noexcept { return entity_name_.length() > 0; }
+	bool MappingEntry::is_entity() const noexcept { return !entity_key_.is_empty(); }
 
 	bool MappingEntry::is_dynamic_factor() const noexcept { return dynamic_factor_; }
 
-	const std::string& MappingEntry::key() const noexcept { return name_key_; }
+	const core::Identifier& MappingEntry::key() const noexcept { return name_key_; }
 
 	const FactorRange& MappingEntry::range() const noexcept {
 		return range_;
@@ -97,9 +95,9 @@ namespace hgps {
 		return mapping_.back().level();
 	}
 
-	MappingEntry HierarchicalMapping::at(const std::string name) const {
-		auto it = std::find_if(mapping_.begin(), mapping_.end(),
-			[&name](const auto& item) {return item.key() == core::to_lower(name); });
+	MappingEntry HierarchicalMapping::at(const core::Identifier& key) const {
+		auto it = std::find_if(mapping_.cbegin(), mapping_.cend(),
+			[&key](const auto& item) { return item.key() == key; });
 		if (it != mapping_.end()) {
 			return *it;
 		}
@@ -108,21 +106,21 @@ namespace hgps {
 			"The mapping container does not have an element with the specified key.");
 	}
 
-	std::vector<MappingEntry> HierarchicalMapping::at_level(const int level) const noexcept {
-		std::vector<MappingEntry> out;
-		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(out),
+	std::vector<MappingEntry> HierarchicalMapping::at_level(int level) const noexcept {
+		std::vector<MappingEntry> result;
+		std::copy_if(mapping_.cbegin(), mapping_.cend(), std::back_inserter(result),
 			[&level](const auto& elem) {return elem.level() == level; });
 
-		return out;
+		return result;
 	}
 
-	std::vector<MappingEntry> HierarchicalMapping::at_level_without_dynamic(const int level) const noexcept {
-		std::vector<MappingEntry> out;
-		std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(out),
+	std::vector<MappingEntry> HierarchicalMapping::at_level_without_dynamic(int level) const noexcept {
+		std::vector<MappingEntry> result;
+		std::copy_if(mapping_.cbegin(), mapping_.cend(), std::back_inserter(result),
 			[&level](const auto& elem) {
 				return elem.level() == level && !elem.is_dynamic_factor();
 			});
 
-		return out;
+		return result;
 	}
 }

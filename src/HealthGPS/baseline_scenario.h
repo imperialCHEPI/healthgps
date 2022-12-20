@@ -12,17 +12,18 @@ namespace hgps {
 
 		ScenarioType type() const noexcept override;
 
-		std::string name() const noexcept override;
+		const std::string& name() const noexcept override;
 
 		SyncChannel& channel() override;
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int time,
-			const std::string risk_factor_key, const double value) override;
+		double apply(Random& generator, Person& entity, int time,
+			const core::Identifier& risk_factor_key, double value) override;
 
 	private:
 		std::reference_wrapper<SyncChannel> channel_;
+		std::string name_{ "Baseline" };
 	};
 }
 

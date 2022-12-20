@@ -19,7 +19,6 @@ namespace hgps {
 			explicit PrimitiveDataTableColumn(std::string&& name, std::vector<TYPE>&& data)
 				: DataTableColumn(), name_{ name }, data_{ data }
 			{
-				// TODO: disable public construction and always use the builder
 				if (name_.length() < 2 || !std::isalpha(name_.front())) {
 					throw std::invalid_argument(
 						"Invalid column name: minimum length of two and start with alpha character.");
@@ -31,7 +30,6 @@ namespace hgps {
 			explicit PrimitiveDataTableColumn(std::string&& name, std::vector<TYPE>&& data, std::vector<bool>&& null_bitmap)
 				: DataTableColumn(), name_{ name }, data_{ data }, null_bitmap_{ null_bitmap }
 			{
-				// TODO: disable public construction and always use the builder
 				if (name_.length() < 2 || !std::isalpha(name_.front())) {
 					throw std::invalid_argument(
 						"Invalid column name: minimum length of two and start with alpha character.");

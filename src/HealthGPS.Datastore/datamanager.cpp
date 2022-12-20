@@ -20,8 +20,9 @@ namespace hgps {
 				}
 
 				auto version = index_["version"].get<int>();
-				if (version != 1) {
-					throw std::runtime_error("File-based store, index schema version mismatch, supported = 1");
+				if (version != 2) {
+					throw std::runtime_error(
+						fmt::format("File-based store, index schema version: {} mismatch, supported: 2", version));
 				}
 			}
 			else {
@@ -86,7 +87,7 @@ namespace hgps {
 		}
 
 		std::vector<PopulationItem> DataManager::get_population(
-			Country country, const std::function<bool(const unsigned int&)> year_filter) const {
+			Country country, const std::function<bool(const unsigned int&)> time_filter) const {
 			auto results = std::vector<PopulationItem>();
 
 			if (index_.contains("demographic")) {
@@ -102,20 +103,20 @@ namespace hgps {
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-						{ "LocID", "Time", "AgeGrp", "PopMale", "PopFemale", "PopTotal" });
+						{ "LocID", "Time", "Age", "PopMale", "PopFemale", "PopTotal" });
 
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
-						auto time_year = std::stoi(row[mapping["Time"]]);
-						if (!year_filter(time_year)) {
+						auto row_time = std::stoi(row[mapping["Time"]]);
+						if (!time_filter(row_time)) {
 							continue;
 						}
 
 						results.push_back(PopulationItem
 							{
 								.location_id = std::stoi(row[mapping["LocID"]]),
-								.year = time_year,
-								.age = std::stoi(row[mapping["AgeGrp"]]),
+								.at_time = row_time,
+								.with_age = std::stoi(row[mapping["Age"]]),
 								.males = std::stof(row[mapping["PopMale"]]),
 								.females = std::stof(row[mapping["PopFemale"]]),
 								.total = std::stof(row[mapping["PopTotal"]])
@@ -140,7 +141,7 @@ namespace hgps {
 		}
 
 		std::vector<MortalityItem> DataManager::get_mortality(Country country,
-			const std::function<bool(const unsigned int&)> year_filter) const
+			const std::function<bool(const unsigned int&)> time_filter) const
 		{
 			auto results = std::vector<MortalityItem>();
 			if (index_.contains("demographic")) {
@@ -152,26 +153,25 @@ namespace hgps {
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
 				filename = (root_ / nodepath / filepath / filename).string();
 
-				// LocID,Location,Variant,Time,TimeYear,AgeGrp,Age,DeathsMale,DeathsFemale,DeathsTotal
 				if (std::filesystem::exists(filename)) {
 					rapidcsv::Document doc(filename);
 					auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-						{ "LocID", "TimeYear", "Age", "DeathsMale", "DeathsFemale", "DeathsTotal" });
+						{ "LocID", "Time", "Age", "DeathMale", "DeathFemale", "DeathTotal" });
 					for (size_t i = 0; i < doc.GetRowCount(); i++) {
 						auto row = doc.GetRow<std::string>(i);
-						auto time_year = std::stoi(row[mapping["TimeYear"]]);
-						if (!year_filter(time_year)) {
+						auto row_time = std::stoi(row[mapping["Time"]]);
+						if (!time_filter(row_time)) {
 							continue;
 						}
 
 						results.push_back(MortalityItem
 							{
 								.location_id = std::stoi(row[mapping["LocID"]]),
-								.year = time_year,
-								.age = std::stoi(row[mapping["Age"]]),
-								.males = std::stof(row[mapping["DeathsMale"]]),
-								.females = std::stof(row[mapping["DeathsFemale"]]),
-								.total = std::stof(row[mapping["DeathsTotal"]])
+								.at_time = row_time,
+								.with_age = std::stoi(row[mapping["Age"]]),
+								.males = std::stof(row[mapping["DeathMale"]]),
+								.females = std::stof(row[mapping["DeathFemale"]]),
+								.total = std::stof(row[mapping["DeathTotal"]])
 							});
 					}
 
@@ -196,10 +196,12 @@ namespace hgps {
 				for (auto& item : registry) {
 					auto info = DiseaseInfo{};
 					auto group_str = std::string{};
+					auto code_srt = std::string{};
 					item["group"].get_to(group_str);
-					item["id"].get_to(info.code);
+					item["id"].get_to(code_srt);
 					item["name"].get_to(info.name);
 					info.group = DiseaseGroup::other;
+					info.code = Identifier{ code_srt };
 					if (core::case_insensitive::equals(group_str, "cancer")) {
 						info.group = DiseaseGroup::cancer;
 					}
@@ -216,18 +218,20 @@ namespace hgps {
 			return result;
 		}
 
-		std::optional<DiseaseInfo> DataManager::get_disease_info(std::string code) const
+		std::optional<DiseaseInfo> DataManager::get_disease_info(core::Identifier code) const
 		{
 			if (index_.contains("diseases")) {
 				auto& registry = index_["diseases"]["registry"];
-				auto disease_code = core::to_lower(code);
+				auto disease_code_str = code.to_string();
 				auto info = DiseaseInfo{};
 				for (auto& item : registry) {
-					item["id"].get_to(info.code);
-					if (info.code == disease_code) {
+					auto item_code_str = std::string{};
+					item["id"].get_to(item_code_str);
+					if (item_code_str == disease_code_str) {
 						auto group_str = std::string{};
 						item["group"].get_to(group_str);
 						item["name"].get_to(info.name);
+						info.code = code;
 						info.group = DiseaseGroup::other;
 						if (core::case_insensitive::equals(group_str, "cancer")) {
 							info.group = DiseaseGroup::cancer;
@@ -256,7 +260,7 @@ namespace hgps {
 				auto filename = index_["diseases"]["disease"]["file_name"].get<std::string>();
 
 				// Tokenized folder name X{info.code}X
-				disease_folder = replace_string_tokens(disease_folder, { info.code });
+				disease_folder = replace_string_tokens(disease_folder, { info.code.to_string() });
 
 				// Tokenized file names X{country.code}X.xxx
 				filename = replace_string_tokens(filename, { std::to_string(country.code) });
@@ -292,9 +296,9 @@ namespace hgps {
 					for (auto& pair : table) {
 						for (auto& child : pair.second) {
 							result.items.emplace_back(DiseaseItem{
-								.age = pair.first,
-								.gender = child.first,
-								.measures = child.second
+									.with_age = pair.first,
+									.gender = child.first,
+									.measures = child.second
 								});
 						}
 					}
@@ -326,10 +330,12 @@ namespace hgps {
 				auto filename = risk_node["to_disease"]["file_name"].get<std::string>();
 
 				// Tokenized folder name X{info.code}X
-				disease_folder = replace_string_tokens(disease_folder, { source.code });
+				auto source_code_str = source.code.to_string();
+				disease_folder = replace_string_tokens(disease_folder, std::vector<std::string>{ source_code_str });
 
 				// Tokenized file name{ DISEASE_TYPE }_{ DISEASE_TYPE }.xxx
-				auto tokens = { source.code, target.code };
+				auto target_code_str = target.code.to_string();
+				auto tokens = { source_code_str, target_code_str };
 				filename = replace_string_tokens(filename, tokens);
 
 				filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
@@ -359,14 +365,14 @@ namespace hgps {
 					if (non_default_count < 1) {
 						table.is_default_value = true;
 						notify_warning(fmt::format(
-							"{} to {} relative risk file has only default values.", source.code, target.code));
+							"{} to {} relative risk file has only default values.", source_code_str, target_code_str));
 					}
 
 					return table;
 				}
 				else {
 					notify_warning(fmt::format(
-						"{} to {} relative risk file not found, using default.", source.code, target.code));
+						"{} to {} relative risk file not found, using default.", source_code_str, target_code_str));
 				}
 
 				return generate_default_relative_risk_to_disease();
@@ -379,7 +385,7 @@ namespace hgps {
 		}
 
 		RelativeRiskEntity DataManager::get_relative_risk_to_risk_factor(
-			DiseaseInfo source, Gender gender, std::string risk_factor) const
+			DiseaseInfo source, Gender gender, core::Identifier risk_factor_key) const
 		{
 			auto table = RelativeRiskEntity();
 			if (!index_.contains("diseases")) {
@@ -397,16 +403,18 @@ namespace hgps {
 			auto filename = risk_node["to_risk_factor"]["file_name"].get<std::string>();
 
 			// Tokenized folder name X{info.code}X
-			disease_folder = replace_string_tokens(disease_folder, { source.code });
+			auto source_code_str = source.code.to_string();
+			disease_folder = replace_string_tokens(disease_folder, { source_code_str });
 
 			// Tokenized file name {GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.xxx
+			auto factor_key_str = risk_factor_key.to_string();
 			std::string gender_name = gender == Gender::male ? "male" : "female";
-			auto tokens = { gender_name, source.code, risk_factor };
+			auto tokens = { gender_name, source_code_str, factor_key_str };
 			filename = replace_string_tokens(filename, tokens);
 			filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
 			if (!std::filesystem::exists(filename)) {
 				notify_warning(fmt::format(
-					"{} to {} relative risk file not found, disabled.", source.code, risk_factor));
+					"{} to {} relative risk file not found, disabled.", source_code_str, factor_key_str));
 				return table;
 			}
 
@@ -447,7 +455,8 @@ namespace hgps {
 			auto& params_files = params_node["files"];
 
 			// Tokenized folder name X{info.code}X
-			disease_folder = replace_string_tokens(disease_folder, { info.code });
+			auto info_code_str = info.code.to_string();
+			disease_folder = replace_string_tokens(disease_folder, { info_code_str });
 
 			// Tokenized path name P{COUNTRY_CODE}
 			auto tokens = std::vector<std::string>{std::to_string(country.code)};
@@ -455,7 +464,7 @@ namespace hgps {
 			auto files_folder = (root_ / disease_path / disease_folder / params_folder);
 			if (!std::filesystem::exists(files_folder)) {
 				notify_warning(fmt::format(
-					"{}, {} parameters folder: '{}' not found.", info.code, country.name, files_folder.string()));
+					"{}, {} parameters folder: '{}' not found.", info_code_str, country.name, files_folder.string()));
 				return table;
 			}
 
@@ -463,7 +472,7 @@ namespace hgps {
 				auto file_name = (files_folder / file.value().get<std::string>());
 				if (!std::filesystem::exists(file_name)) {
 					notify_warning(fmt::format(
-						"{}, {} parameters file: '{}' not found.", info.code, country.name, file_name.string()));
+						"{}, {} parameters file: '{}' not found.", info_code_str, country.name, file_name.string()));
 					continue;
 				}
 
@@ -493,7 +502,7 @@ namespace hgps {
 				}
 			}
 
-			index_["diseases"]["time_year"].get_to(table.time_year);
+			index_["diseases"]["time_year"].get_to(table.at_time);
 			return table;
 		}
 
@@ -502,7 +511,7 @@ namespace hgps {
 		}
 
 		std::vector<BirthItem> DataManager::get_birth_indicators(const Country country,
-			const std::function<bool(const unsigned int&)> year_filter) const
+			const std::function<bool(const unsigned int&)> time_filter) const
 		{
 			std::vector<BirthItem> result;
 			if (index_.contains("demographic")) {
@@ -522,16 +531,16 @@ namespace hgps {
 
 				rapidcsv::Document doc(filename);
 				auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-					{ "TimeYear", "Births", "SRB" });
+					{ "Time", "Births", "SRB" });
 				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
-					auto time_year = std::stoi(row[mapping["TimeYear"]]);
-					if (!year_filter(time_year)) {
+					auto row_time = std::stoi(row[mapping["Time"]]);
+					if (!time_filter(row_time)) {
 						continue;
 					}
 
 					result.push_back(BirthItem{
-							.time = time_year,
+							.at_time = row_time,
 							.number = std::stof(row[mapping["Births"]]),
 							.sex_ratio = std::stof(row[mapping["SRB"]])
 						});
@@ -690,7 +699,7 @@ namespace hgps {
 
 				rapidcsv::Document doc(filename);
 				auto mapping = create_fields_index_mapping(doc.GetColumnNames(),
-					{ "TimeYear", "LEx", "LExMale", "LExFemale"});
+					{ "Time", "LEx", "LExMale", "LExFemale"});
 				for (size_t i = 0; i < doc.GetRowCount(); i++) {
 					auto row = doc.GetRow<std::string>(i);
 					if (row.size() < 4) {
@@ -698,7 +707,7 @@ namespace hgps {
 					}
 
 					result.emplace_back(LifeExpectancyItem{
-							.time = std::stoi(row[mapping["TimeYear"]]),
+							.at_time = std::stoi(row[mapping["Time"]]),
 							.both = std::stof(row[mapping["LEx"]]),
 							.male = std::stof(row[mapping["LExMale"]]),
 							.female = std::stof(row[mapping["LExFemale"]])
@@ -735,7 +744,7 @@ namespace hgps {
 			for (auto& field : fields) {
 				auto field_index = core::case_insensitive::index_of(column_names, field);
 				if (field_index < 0) {
-					throw std::out_of_range(fmt::format("Required field {} not found.", field));
+					throw std::out_of_range(fmt::format("File-based store, required field {} not found", field));
 				}
 
 				mapping.emplace(field, field_index);

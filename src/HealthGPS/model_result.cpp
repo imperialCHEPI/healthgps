@@ -12,7 +12,7 @@ namespace hgps {
 
 		auto pad = std::max<std::size_t>(24, caluclate_min_padding()) + 2;
 		ss << fmt::format("Population.: {}, alive = {}, migrating = {}, dead = {}\n",
-			population_size, number_alive, number_emigrated, number_dead);
+			population_size, number_alive.total(), number_emigrated, number_dead);
 
 		ss << fmt::format("Average Age: Male = {:.5f}, Female = {:.5f}\n", average_age.male, average_age.female);
 
@@ -33,7 +33,7 @@ namespace hgps {
 	}
 
 	int ModelResult::number_of_recyclable() const noexcept {
-		return population_size - (number_alive + number_dead + number_emigrated);
+		return population_size - (number_alive.total() + number_dead + number_emigrated);
 	}
 
 	std::size_t ModelResult::caluclate_min_padding() const noexcept {

@@ -79,7 +79,7 @@ namespace hgps {
 
         bool case_insensitive::contains(const std::string_view& text, const std::string_view& str) noexcept {
 
-            if (str.length() > text.length()) {
+            if (str.size() > text.size()) {
                 return false;
             }
 
@@ -93,7 +93,7 @@ namespace hgps {
 
         bool case_insensitive::starts_with(const std::string_view& text, const std::string_view& str) noexcept {
 
-            if (str.length() > text.length()) {
+            if (str.size() > text.size()) {
                 return false;
             }
 
@@ -105,7 +105,7 @@ namespace hgps {
 
         bool case_insensitive::ends_with(const std::string_view& text, const std::string_view& str) noexcept {
 
-            if (str.length() > text.length()) {
+            if (str.size() > text.size()) {
                 return false;
             }
 

@@ -135,7 +135,7 @@ namespace hgps {
 		// Social economics status
 		ses_->initialise_population(context_);
 
-		// Generate risk factors
+		// Generate risk factors*
 		risk_factor_->initialise_population(context_);
 		risk_factor_->apply_baseline_adjustments(context_);
 
@@ -160,13 +160,13 @@ namespace hgps {
 
 		// initialise risk factors for newborns and updates population risk factors
 		risk_factor_->update_population(context_);
-
+		
 		// Calculate the net immigration by gender and age, update the population accordingly
 		update_net_immigration();
 
 		// apply risk factors baseline adjustment to population
 		risk_factor_->apply_baseline_adjustments(context_);
-
+		
 		// Update diseases status: remission and incidence
 		disease_->update_population(context_);
 
@@ -194,7 +194,7 @@ namespace hgps {
 		}
 	}
 
-	hgps::IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
+	IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
 		auto sim_start_time = context_.start_time();
 		auto total_initial_population = demographic_->get_total_population_size(sim_start_time);
 		auto start_population_size = static_cast<int>(definition_.inputs().settings().size_fraction() * total_initial_population);
@@ -215,7 +215,7 @@ namespace hgps {
 		return expected_population;
 	}
 
-	hgps::IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
+	IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
 		auto simulated_population = create_age_gender_table<int>(context_.age_range());
 		auto& pop = context_.population();
 		auto count_mutex = std::mutex{};

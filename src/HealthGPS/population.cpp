@@ -47,7 +47,7 @@ namespace hgps {
         people_.emplace_back(entity);
     }
 
-    void Population::add_newborn_babies(const std::size_t number, core::Gender gender, unsigned int time) noexcept {
+    void Population::add_newborn_babies(std::size_t number, core::Gender gender, unsigned int time) noexcept {
         auto recycle = find_index_of_recyclables(time, number);
         auto remaining = number;
         if (recycle.size() > 0) {

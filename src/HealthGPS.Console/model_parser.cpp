@@ -27,7 +27,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const BaselineInfo& info)
 	try {
 
 		if (core::case_insensitive::equals(info.format, "CSV")) {
-			auto data = std::map<core::Gender, std::map<std::string, std::vector<double>>>{};
+			auto data = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
 			data.emplace(core::Gender::male, load_baseline_csv(male_filename, info.delimiter));
 			data.emplace(core::Gender::female, load_baseline_csv(female_filename, info.delimiter));
 			return BaselineAdjustment{ FactorAdjustmentTable{ std::move(data) } };
@@ -47,7 +47,7 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string 
 {
 	MEASURE_FUNCTION();
 	std::map<int, HierarchicalLevel> levels;
-	std::unordered_map<std::string, LinearModel> models;
+	std::unordered_map<core::Identifier, LinearModel> models;
 	std::ifstream ifs(model_filename, std::ifstream::in);
 	if (ifs) {
 		try {
@@ -59,9 +59,9 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string 
 			for (auto& model_item : model_info.models) {
 				auto& at = model_item.second;
 
-				std::unordered_map<std::string, Coefficient> coeffs;
+				std::unordered_map<core::Identifier, Coefficient> coeffs;
 				for (auto& pair : at.coefficients) {
-					coeffs.emplace(core::to_lower(pair.first), Coefficient{
+					coeffs.emplace(core::Identifier(pair.first), Coefficient{
 							.value = pair.second.value,
 							.pvalue = pair.second.pvalue,
 							.tvalue = pair.second.tvalue,
@@ -69,7 +69,7 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string 
 						});
 				}
 
-				models.emplace(core::to_lower(model_item.first), LinearModel{
+				models.emplace(core::Identifier(model_item.first), LinearModel{
 					.coefficients = coeffs,
 					.residuals_standard_deviation = at.residuals_standard_deviation,
 					.rsquared = at.rsquared
@@ -78,10 +78,10 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string 
 
 			for (auto& level_item : model_info.levels) {
 				auto& at = level_item.second;
-				std::unordered_map<std::string, int> col_names;
+				std::unordered_map<core::Identifier, int> col_names;
 				auto variables_count = static_cast<int>(at.variables.size());
 				for (auto i = 0; i < variables_count; i++) {
-					col_names.emplace(core::to_lower(at.variables[i]), i);
+					col_names.emplace(core::Identifier{ at.variables[i] }, i);
 				}
 
 				levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
@@ -121,7 +121,7 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 {
 	MEASURE_FUNCTION();
 	auto percentage = 0.05;
-	std::map<std::string, std::string> variables;
+	std::map<core::Identifier, core::Identifier> variables;
 	std::map<core::IntegerInterval, AgeGroupGenderEquation> equations;
 
 	std::ifstream ifs(model_filename, std::ifstream::in);
@@ -150,7 +150,7 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 			}
 
 			for (auto& item : info.variables) {
-				variables.emplace(core::to_lower(item.name), core::to_lower(item.factor));
+				variables.emplace(core::Identifier{ item.name }, core::Identifier{ item.factor });
 			}
 
 			for (auto& age_grp : info.equations) {
@@ -198,7 +198,7 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_f
 	}
 	else {
 		fmt::print(fg(fmt::color::red),
-			"Model: {:<7}, file: {} not found.\n", "static", model_filename);
+			"Model: {:<7}, file: {} not found.\n", "dynamic", model_filename);
 	}
 
 	ifs.close();

@@ -96,7 +96,7 @@ jobs:
 
     - name: Upload artefacts
       id: upload_zip
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: health-gps-archive
         path: artifact/health_gps_linux.zip

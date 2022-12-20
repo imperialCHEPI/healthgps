@@ -24,9 +24,9 @@ namespace hgps {
 			const std::vector<PolicyImpact>& sorted_impacts, const PolicyInterval& period)
 			: impact_type{ type_of_impact }, impacts{ sorted_impacts }, active_period{ period }{}
 
-		const PolicyImpactType impact_type;
-		const std::vector<PolicyImpact> impacts;
-		const PolicyInterval active_period;
+		PolicyImpactType impact_type;
+		std::vector<PolicyImpact> impacts;
+		PolicyInterval active_period;
 	};
 
 	class SimplePolicyScenario final : public InterventionScenario {
@@ -36,14 +36,12 @@ namespace hgps {
 
 		ScenarioType type() const noexcept override;
 
-		std::string name() const noexcept override;
-
 		SyncChannel& channel() override;
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int time, 
-			const std::string risk_factor_key, const double value) override;
+		double apply(Random& generator, Person& entity, int time,
+			const core::Identifier& risk_factor_key, double value) override;
 
 		const PolicyImpactType& impact_type() const noexcept;
 
@@ -54,6 +52,6 @@ namespace hgps {
 	private:
 		std::reference_wrapper<SyncChannel> channel_;
 		SimplePolicyDefinition definition_;
-		std::map<std::string, PolicyImpact> factor_impact_;
+		std::map<core::Identifier, PolicyImpact> factor_impact_;
 	};
 }

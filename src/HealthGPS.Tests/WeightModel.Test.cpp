@@ -13,6 +13,8 @@ namespace fs = std::filesystem;
 
 hgps::LmsDefinition lms_parameters;
 
+inline const hgps::core::Identifier bmi_key = hgps::core::Identifier{ "bmi" };
+
 hgps::LmsModel create_lms_model(hgps::data::DataManager& manager) {
 	using namespace hgps;
 
@@ -28,7 +30,7 @@ hgps::Person create_test_entity(
 	auto entity = hgps::Person{};
 	entity.gender = gender;
 	entity.age = age;
-	entity.risk_factors.emplace("bmi", bmi);
+	entity.risk_factors.emplace(bmi_key, bmi);
 
 	return entity;
 }
@@ -111,7 +113,7 @@ TEST_F(WeightModelTest, AdjustAdultBmi)
 	for (auto& item : genders) {
 		for (auto idx = 0; auto & bmi : bmi_values) {
 			auto entity = create_test_entity(item, adult_age, bmi);
-			auto equivalent = classifier.adjust_risk_factor_value(entity, "bmi", bmi);
+			auto equivalent = classifier.adjust_risk_factor_value(entity, bmi_key, bmi);
 			ASSERT_EQ(bmi, equivalent);
 			idx++;
 		}
@@ -131,7 +133,7 @@ TEST_F(WeightModelTest, AdjustChildBmi)
 	for (auto& item : genders) {
 		for (auto idx = 0; auto & bmi : bmi_values) {
 			auto entity = create_test_entity(item, child_age, bmi);
-			auto equivalent = classifier.adjust_risk_factor_value(entity, "bmi", bmi);
+			auto equivalent = classifier.adjust_risk_factor_value(entity, bmi_key, bmi);
 			ASSERT_EQ(expected[idx], equivalent);
 			idx++;
 		}

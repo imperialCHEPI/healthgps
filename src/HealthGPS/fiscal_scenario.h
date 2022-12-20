@@ -30,21 +30,19 @@ namespace hgps {
 		std::vector<PolicyImpact> impacts;
 	};
 
-	class FiscalPolicyScenario : public InterventionScenario {
+	class FiscalPolicyScenario final : public InterventionScenario {
 	public:
 		FiscalPolicyScenario() = delete;
 		FiscalPolicyScenario(SyncChannel& data_sync, FiscalPolicyDefinition&& definition);
 
 		ScenarioType type() const noexcept override;
 
-		std::string name() const noexcept override;
-
 		SyncChannel& channel() override;
 
 		void clear() noexcept override;
 
-		double apply(Person& entity, const int time,
-			const std::string risk_factor_key, const double value) override;
+		double apply(Random& generator, Person& entity, int time,
+			const core::Identifier& risk_factor_key, double value) override;
 
 		const PolicyInterval& active_period()  const noexcept override;
 
@@ -53,7 +51,7 @@ namespace hgps {
 	private:
 		std::reference_wrapper<SyncChannel> channel_;
 		FiscalPolicyDefinition definition_;
-		std::set<std::string> factor_impact_;
+		std::set<core::Identifier> factor_impact_;
 		std::unordered_map<std::size_t, int> interventions_book_{};
 	};
 

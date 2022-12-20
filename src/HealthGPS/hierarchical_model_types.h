@@ -13,13 +13,13 @@ namespace hgps {
 	};
 
 	struct LinearModel {
-		std::unordered_map<std::string, Coefficient> coefficients;
+		std::unordered_map<core::Identifier, Coefficient> coefficients;
 		double residuals_standard_deviation;
 		double rsquared{};
 	};
 
 	struct HierarchicalLevel {
-		std::unordered_map<std::string, int> variables;
+		std::unordered_map<core::Identifier, int> variables;
 		core::DoubleArray2D transition;
 		core::DoubleArray2D inverse_transition;
 		core::DoubleArray2D residual_distribution;
@@ -31,11 +31,20 @@ namespace hgps {
 	public:
 		HierarchicalLinearModelDefinition() = delete;
 		HierarchicalLinearModelDefinition(
-			std::unordered_map<std::string, LinearModel>&& linear_models,
+			std::unordered_map<core::Identifier, LinearModel>&& linear_models,
 			std::map<int, HierarchicalLevel>&& model_levels)
-			: models_{ std::move(linear_models) }, levels_{ std::move(model_levels) }{}
+			: models_{ std::move(linear_models) }, levels_{ std::move(model_levels) }
+		{
+			if (models_.empty()) {
+				throw std::invalid_argument("The hierarchical model equations definition must not be empty");
+			}
 
-		const std::unordered_map<std::string, LinearModel>& models() const noexcept {
+			if (levels_.empty()) {
+				throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+			}
+		}
+
+		const std::unordered_map<core::Identifier, LinearModel>& models() const noexcept {
 			return models_;
 		}
 
@@ -44,20 +53,20 @@ namespace hgps {
 		}
 
 	private:
-		std::unordered_map<std::string, LinearModel> models_;
+		std::unordered_map<core::Identifier, LinearModel> models_;
 		std::map<int, HierarchicalLevel> levels_;
 	};
 
 	struct FactorDynamicEquation {
 		std::string name;
-		std::map<std::string, double> coefficients{};
+		std::map<core::Identifier, double> coefficients{};
 		double residuals_standard_deviation{};
 	};
 
 	struct AgeGroupGenderEquation {
 		core::IntegerInterval age_group;
-		std::map<std::string, FactorDynamicEquation> male{};
-		std::map<std::string, FactorDynamicEquation> female{};
+		std::map<core::Identifier, FactorDynamicEquation> male{};
+		std::map<core::Identifier, FactorDynamicEquation> female{};
 	};
 
 	class LiteHierarchicalModelDefinition final {
@@ -65,16 +74,16 @@ namespace hgps {
 		LiteHierarchicalModelDefinition() = delete;
 		LiteHierarchicalModelDefinition(
 			std::map<core::IntegerInterval, AgeGroupGenderEquation>&& equations,
-			std::map<std::string, std::string>&& variables, const double boundary_percentage = 0.05)
+			std::map<core::Identifier, core::Identifier>&& variables, const double boundary_percentage = 0.05)
 			: equations_{ std::move(equations) }, variables_{ std::move(variables) }
 			, boundary_percentage_{ boundary_percentage } {
 
 			if (equations_.empty()) {
-				throw std::invalid_argument("The model definition equations must not be empty.");
+				throw std::invalid_argument("The model equations definition must not be empty");
 			}
 		}
 
-		const std::map<std::string, std::string>& variables() const noexcept {
+		const std::map<core::Identifier, core::Identifier>& variables() const noexcept {
 			return variables_;
 		}
 
@@ -98,7 +107,7 @@ namespace hgps {
 
 	private:
 		std::map<core::IntegerInterval, AgeGroupGenderEquation> equations_;
-		std::map<std::string, std::string> variables_;
+		std::map<core::Identifier, core::Identifier> variables_;
 		double boundary_percentage_;
 	};
 }

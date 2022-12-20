@@ -1,5 +1,4 @@
 #pragma once
-
 #include "HealthGPS.Core/forward_type.h"
 
 #include <string>
@@ -101,12 +100,40 @@ struct PolicyImpactInfo
 	}
 };
 
+struct PolicyAdjustmentInfo
+{
+	std::string risk_factor{};
+	double value{};
+};
+
 struct PolicyScenarioInfo
 {
 	std::string identifier{};
 	PolicyPeriodInfo active_period;
+	std::vector<double> dynamics;
+	std::vector<double> coefficients;
+	std::vector<double> coverage_rates;
+	std::optional<unsigned int> coverage_cutoff_time{};
+	std::optional<unsigned int> child_cutoff_age{};
+	std::vector<PolicyAdjustmentInfo> adjustments;
 	std::string impact_type{};
 	std::vector<PolicyImpactInfo> impacts;
+
+	std::string to_coverage_cutoff_time_str() const {
+		if (coverage_cutoff_time.has_value()) {
+			return std::to_string(coverage_cutoff_time.value());
+		}
+
+		return "null";
+	}
+
+	std::string to_child_cutoff_age_str() const {
+		if (child_cutoff_age.has_value()) {
+			return std::to_string(child_cutoff_age.value());
+		}
+
+		return "null";
+	}
 };
 
 struct Configuration

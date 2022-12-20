@@ -61,7 +61,7 @@ class SuperDenseTime
 			return (real < other.real) ||
 				((real == other.real) && (logical < other.logical));
 		}
-		/// Order is lexicographical favoring real then logical.
+		/// Order is lexicographical favouring real then logical.
 		bool operator<=(const SuperDenseTime<RealType>& other) const
 		{
 			return (real < other.real) ||

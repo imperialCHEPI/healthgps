@@ -11,7 +11,7 @@
 
 namespace hgps {
 
-	constexpr double DALY_UNITS = 100'000.0;
+	inline constexpr double DALY_UNITS = 100'000.0;
 
 	AnalysisModule::AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
 		const core::IntegerInterval age_range, unsigned int comorbidities)
@@ -97,7 +97,6 @@ namespace hgps {
 		auto handle = core::run_async(&hgps::AnalysisModule::calculate_historical_statistics,
 			this, std::ref(context), std::ref(result));
 
-		// calculate_historical_statistics(context, result);
 		calculate_population_statistics(context, result.series);
 		handle.get();
 
@@ -106,14 +105,14 @@ namespace hgps {
 	}
 
 	void AnalysisModule::calculate_historical_statistics(RuntimeContext& context, ModelResult& result) const {
-		auto risk_factors = std::map<std::string, std::map<core::Gender, double>>();
+		auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
 		for (const auto& item : context.mapping()) {
 			if (item.level() > 0) {
 				risk_factors.emplace(item.key(), std::map<core::Gender, double>{});
 			}
 		}
 
-		auto prevalence = std::map<std::string, std::map<core::Gender, int>>();
+		auto prevalence = std::map<core::Identifier, std::map<core::Gender, int>>();
 		for (const auto& item : context.diseases()) {
 			prevalence.emplace(item.code, std::map<core::Gender, int>{});
 		}
@@ -124,8 +123,8 @@ namespace hgps {
 			comorbidity.emplace(i, ResultByGender{});
 		}
 
-		auto age_sum = std::map<core::Gender, int>{};
-		auto age_count = std::map<core::Gender, int>{};
+		auto gender_age_sum = std::map<core::Gender, int>{};
+		auto gender_count = std::map<core::Gender, int>{};
 		auto age_upper_bound = context.age_range().upper();
 		auto analysis_time = static_cast<unsigned int>(context.time_now());
 
@@ -133,7 +132,6 @@ namespace hgps {
 			this, std::ref(context.population()), age_upper_bound, analysis_time);
 
 		auto population_size = static_cast<int>(context.population().size());
-		auto population_alive = 0;
 		auto population_dead = 0;
 		auto population_migrated = 0;
 		for (const auto& entity : context.population()) {
@@ -149,9 +147,8 @@ namespace hgps {
 				continue;
 			}
 
-			population_alive++;
-			age_sum[entity.gender] += entity.age;
-			age_count[entity.gender]++;
+			gender_age_sum[entity.gender] += entity.age;
+			gender_count[entity.gender]++;
 			for (auto& item : risk_factors) {
 				auto factor_value = entity.get_risk_factor_value(item.first);
 				if (std::isnan(factor_value)) {
@@ -182,14 +179,14 @@ namespace hgps {
 		}
 
 		// Calculate the averages avoiding division by zero
+		auto males_count = std::max(1, gender_count[core::Gender::male]);
+		auto females_count = std::max(1, gender_count[core::Gender::female]);
 		result.population_size = population_size;
-		result.number_alive = population_alive;
+		result.number_alive = IntegerGenderValue{males_count, females_count};
 		result.number_dead = population_dead;
 		result.number_emigrated = population_migrated;
-		auto males_count = std::max(1, age_count[core::Gender::male]);
-		auto females_count = std::max(1, age_count[core::Gender::female]);
-		result.average_age.male = age_sum[core::Gender::male] * 1.0 / males_count;
-		result.average_age.female = age_sum[core::Gender::female] * 1.0 / females_count;
+		result.average_age.male = gender_age_sum[core::Gender::male] * 1.0 / males_count;
+		result.average_age.female = gender_age_sum[core::Gender::female] * 1.0 / females_count;
 		for (auto& item : risk_factors) {
 			auto user_name = context.mapping().at(item.first).name();
 			result.risk_ractor_average.emplace(user_name, ResultByGender{
@@ -199,7 +196,7 @@ namespace hgps {
 		}
 
 		for (const auto& item : context.diseases()) {
-			result.disease_prevalence.emplace(item.code, ResultByGender{
+			result.disease_prevalence.emplace(item.code.to_string(), ResultByGender{
 					.male = prevalence.at(item.code)[core::Gender::male] * 100.0 / males_count,
 					.female = prevalence.at(item.code)[core::Gender::female] * 100.0 / females_count
 				});
@@ -239,22 +236,22 @@ namespace hgps {
 		unsigned int max_age, unsigned int death_year) const {
 		auto yll_sum = 0.0;
 		auto yld_sum = 0.0;
-		auto count = 0;
+		auto count = 0.0;
 		for (const auto& entity : population) {
 				if (entity.time_of_death() == death_year && entity.age <= max_age) {
 					auto male_reference_age = definition_.life_expectancy().at(death_year, core::Gender::male);
 					auto female_reference_age = definition_.life_expectancy().at(death_year, core::Gender::female);
 
 					auto reference_age = std::max(male_reference_age, female_reference_age);
-				auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
-				yll_sum += lifeExpectancy;
+					auto lifeExpectancy = std::max(reference_age - entity.age, 0.0f);
+					yll_sum += lifeExpectancy;
 				}
 
 				if (entity.is_active()) {
-				yld_sum += calculate_disability_weight(entity);
-				count++;
-			}
+					yld_sum += calculate_disability_weight(entity);
+					count++;
 				}
+		}
 
 		auto yll = yll_sum * DALY_UNITS / count;
 		auto yld = yld_sum * DALY_UNITS / count;
@@ -299,12 +296,12 @@ namespace hgps {
 
 			series(gender, "count").at(age)++;
 			for (auto& factor : context.mapping().entries()) {
-				series(gender, factor.key()).at(age) += entity.get_risk_factor_value(factor.key());
+				series(gender, factor.key().to_string()).at(age) += entity.get_risk_factor_value(factor.key());
 			}
 
 			for (auto& item : entity.diseases) {
 				if (item.second.status == DiseaseStatus::active) {
-					series(gender, item.first).at(age)++;
+					series(gender, item.first.to_string()).at(age)++;
 				}
 			}
 
@@ -377,11 +374,11 @@ namespace hgps {
 
 		channels_.push_back("count");
 		for (auto& factor : context.mapping().entries_without_dynamic()) {
-			channels_.emplace_back(factor.key());
+			channels_.emplace_back(factor.key().to_string());
 		}
 
 		for (auto& disease : context.diseases()) {
-			channels_.emplace_back(disease.code);
+			channels_.emplace_back(disease.code.to_string());
 		}
 
 		channels_.emplace_back("disability_weight");

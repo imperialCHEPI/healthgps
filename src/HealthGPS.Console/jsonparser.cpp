@@ -220,20 +220,61 @@ void from_json(const json& j, PolicyImpactInfo& p) {
 	}
 }
 
+void to_json(json& j, const PolicyAdjustmentInfo& p) {
+	j = json{
+		{"risk_factor", p.risk_factor},
+		{"value", p.value } };
+}
+
+void from_json(const json& j, PolicyAdjustmentInfo& p) {
+	j.at("risk_factor").get_to(p.risk_factor);
+	j.at("value").get_to(p.value);
+}
+
 void to_json(json& j, const PolicyScenarioInfo& p) {
 	j = json{
-	{"impact_type", p.impact_type},
-	{"impacts", p.impacts},
-	{"active_period", p.active_period } };
+		{"active_period", p.active_period },
+		{"impact_type", p.impact_type},
+		{"dynamics", p.dynamics},
+		{"coefficients", p.coefficients},
+		{"coverage_rates", p.coverage_rates},
+		{"coverage_cutoff_time", p.to_coverage_cutoff_time_str()},
+		{"child_cutoff_age", p.to_child_cutoff_age_str()},
+		{"adjustments", p.adjustments},
+		{"impacts", p.impacts} };
 }
 
 void from_json(const json& j, PolicyScenarioInfo& p) {
+	j.at("active_period").get_to(p.active_period);
 	if (j.contains("impact_type")) {
 		j.at("impact_type").get_to(p.impact_type);
 	}
 
+	if (j.contains("dynamics")) {
+		j.at("dynamics").get_to(p.dynamics);
+	}
+
+	if (j.contains("coefficients")) {
+		j.at("coefficients").get_to(p.coefficients);
+	}
+
+	if (j.contains("coverage_rates")) {
+		j.at("coverage_rates").get_to(p.coverage_rates);
+	}
+
+	if (j.contains("coverage_cutoff_time")) {
+		p.coverage_cutoff_time = j.at("coverage_cutoff_time").get<unsigned int>();
+	}
+
+	if (j.contains("child_cutoff_age")) {
+		p.child_cutoff_age = j.at("child_cutoff_age").get<unsigned int>();
+	}
+
+	if (j.contains("adjustments")) {
+		j.at("adjustments").get_to(p.adjustments);
+	}
+
 	j.at("impacts").get_to(p.impacts);
-	j.at("active_period").get_to(p.active_period);
 }
 
 // Result information

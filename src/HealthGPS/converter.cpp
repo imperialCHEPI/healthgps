@@ -24,7 +24,7 @@ namespace hgps {
 			auto measures = entity.measures;
 			auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>();
 			for (auto& v : entity.items) {
-				data[v.age][v.gender] = DiseaseMeasure(v.measures);
+				data[v.with_age][v.gender] = DiseaseMeasure(v.measures);
 			}
 
 			return DiseaseTable(entity.info, std::move(measures), std::move(data));
@@ -117,7 +117,7 @@ namespace hgps {
 			auto lex_data = core::FloatArray2D(lex_rows.size(), cols.size());
 			for (size_t index = 0; index < entity.life_expectancy.size(); index++) {
 				const auto& item = entity.life_expectancy.at(index);
-				lex_rows[index] = item.time;
+				lex_rows[index] = item.at_time;
 				lex_data(index, 0) = item.male;
 				lex_data(index, 1) = item.female;
 			}
@@ -132,7 +132,11 @@ namespace hgps {
 				cost_of_disease(item.first, core::Gender::female) = item.second.at(core::Gender::female);
 			}
 
-			auto weights = std::map<std::string, float>(entity.disability_weights);
+			auto weights = std::map<core::Identifier, float>{};
+			for (const auto& item : entity.disability_weights) {
+				weights.emplace(core::Identifier{ item.first }, item.second);
+			}
+
 			return AnalysisDefinition(std::move(life_expectancy), std::move(cost_of_disease), std::move(weights));
 		}
 
@@ -141,12 +145,12 @@ namespace hgps {
 		{
 			auto table_births = std::map<int, Birth>{};
 			for (auto& item : births) {
-				table_births.emplace(item.time, Birth{ item.number, item.sex_ratio });
+				table_births.emplace(item.at_time, Birth{ item.number, item.sex_ratio });
 			}
 
 			auto table_deaths = std::map<int, std::map<int, Mortality>>{};
 			for (auto& item : deaths) {
-				table_deaths[item.year].emplace(item.age, Mortality(item.males, item.females));
+				table_deaths[item.at_time].emplace(item.with_age, Mortality(item.males, item.females));
 			}
 
 			return LifeTable(std::move(table_births), std::move(table_deaths));
@@ -171,7 +175,7 @@ namespace hgps {
 				deaths.emplace(item.value - offset, DoubleGenderValue(item.male, item.female));
 			}
 
-			return DiseaseParameter(entity.time_year, distribution, survival, deaths);
+			return DiseaseParameter(entity.at_time, distribution, survival, deaths);
 		}
 
 		LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataRow>& dataset)

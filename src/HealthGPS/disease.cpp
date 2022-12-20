@@ -6,7 +6,7 @@
 
 namespace hgps {
 
-	DiseaseModule::DiseaseModule(std::map<std::string, std::shared_ptr<DiseaseModel>>&& models)
+	DiseaseModule::DiseaseModule(std::map<core::Identifier, std::shared_ptr<DiseaseModel>>&& models)
 		: models_{ std::move(models) } {}
 
 	SimulationModuleType DiseaseModule::type() const noexcept {
@@ -21,15 +21,15 @@ namespace hgps {
 		return models_.size();
 	}
 
-	bool DiseaseModule::contains(const std::string& disease_code) const noexcept {
+	bool DiseaseModule::contains(const core::Identifier& disease_code) const noexcept {
 		return models_.contains(disease_code);
 	}
 
-	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const std::string& disease_code) {
+	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const core::Identifier& disease_code) {
 		return models_.at(disease_code);
 	}
 
-	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const std::string& disease_code) const {
+	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const core::Identifier& disease_code) const {
 		return models_.at(disease_code);
 	}
 
@@ -51,7 +51,7 @@ namespace hgps {
 	}
 
 	double DiseaseModule::get_excess_mortality(
-		const std::string& disease_code, const Person& entity) const noexcept {
+		const core::Identifier& disease_code, const Person& entity) const noexcept {
 		if (!models_.contains(disease_code)) {
 			return 0.0;
 		}
@@ -63,15 +63,16 @@ namespace hgps {
 	{
 		// Models must be registered prior to be created.
 		auto registry = get_default_disease_model_registry();
-		auto models = std::map<std::string, std::shared_ptr<DiseaseModel>>();
+		auto models = std::map<core::Identifier, std::shared_ptr<DiseaseModel>>();
 
 		auto& diseases = config.diseases();
 		std::mutex m;
 		std::for_each(core::execution_policy, std::begin(diseases), std::end(diseases),
 			[&](auto& info) {
-				auto other = repository.get_disease_info(info.code);
+				auto info_code_str = info.code.to_string();
+				auto other = repository.get_disease_info(info_code_str);
 				if (!registry.contains(info.group) || !other.has_value()) {
-					throw std::runtime_error("Unknown disease definition: " + info.code);
+					throw std::runtime_error("Unknown disease definition: " + info_code_str);
 				}
 
 				auto& disease_definition = repository.get_disease_definition(info, config);
@@ -80,7 +81,7 @@ namespace hgps {
 
 				// Sync region
 				std::scoped_lock lock(m);
-				models.emplace(info.code, registry.at(info.group)(
+				models.emplace(core::Identifier{ info.code }, registry.at(info.group)(
 					disease_definition, std::move(classifier), config.settings().age_range()));
 			});
 

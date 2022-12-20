@@ -1,5 +1,5 @@
 {
-    "version": 1,
+    "version": 2,
     "country": {
         "format": "csv",
         "delimiter": ",",
@@ -22,19 +22,19 @@
         "path": "undb",
         "age_limits": [0, 100],
         "time_limits": [1950, 2100],
-        "projections": 2020,
+        "projections": 2022,
         "population": {
             "description": "Total population by sex, annually from 1950 to 2100.",
             "path": "population",
             "file_name": "P{COUNTRY_CODE}.csv"
         },
         "mortality": {
-            "description": "Number of deaths by sex in five-year age groups.",
+            "description": "Number of deaths by sex, annually from 1950 to 2100.",
             "path": "mortality",
             "file_name": "M{COUNTRY_CODE}.csv"
         },
         "indicators": {
-            "description": "Several indicators in 5-year periods, e.g. births, deaths and life expectancy.",
+            "description": "Several demographic indicators by year, e.g. births, deaths and life expectancy.",
             "path": "indicators",
             "file_name": "Pi{COUNTRY_CODE}.csv"
         }

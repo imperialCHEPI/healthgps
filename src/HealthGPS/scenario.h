@@ -1,11 +1,12 @@
 #pragma once
-
-#include <string>
-#include <memory>
-
 #include "channel.h"
 #include "sync_message.h"
 #include "person.h"
+#include "random_algorithm.h"
+#include "HealthGPS.Core/identifier.h"
+
+#include <string>
+#include <memory>
 
 namespace hgps {
 
@@ -29,13 +30,13 @@ namespace hgps {
 
 		virtual ScenarioType type() const noexcept = 0;
 
-		virtual std::string name() const noexcept = 0;
+		virtual const std::string& name() const noexcept = 0;
 
 		virtual SyncChannel& channel() = 0;
 
 		virtual void clear() noexcept = 0;
 
-		virtual double apply(Person& entity, const int time,
-			const std::string risk_factor_key, const double value) = 0;
+		virtual double apply(Random& generator, Person& entity, int time,
+			const core::Identifier& risk_factor_key, double value) = 0;
 	};
 }

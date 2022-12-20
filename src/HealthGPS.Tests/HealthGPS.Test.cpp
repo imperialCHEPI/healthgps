@@ -15,6 +15,17 @@
 
 namespace fs = std::filesystem;
 
+static std::vector<hgps::MappingEntry> create_mapping_entries() {
+	using namespace hgps;
+	return std::vector<MappingEntry>{
+		MappingEntry("Year", 0, core::Identifier::empty(), true),
+			MappingEntry("Gender", 0, core::Identifier{ "gender" }),
+			MappingEntry("Age", 0, core::Identifier{ "age" }),
+			MappingEntry("SmokingStatus", 1),
+			MappingEntry("AlcoholConsumption", 1),
+			MappingEntry("BMI", 2)};
+}
+
 void create_test_datatable(hgps::core::DataTable& data) {
 	using namespace hgps;
 	using namespace hgps::core;
@@ -63,21 +74,22 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable& data) {
 		.parameters = std::vector<double>{0.0, 1.0}
 	};
 
-	auto entries = std::vector<MappingEntry>{
-		MappingEntry("Year", 0, "", true),
-		MappingEntry("Gender", 0, "gender"),
-		MappingEntry("Age", 0, "age"),
-		MappingEntry("SmokingStatus", 1),
-		MappingEntry("AlcoholConsumption", 1),
-		MappingEntry("BMI", 2)
-	};
-
+	auto entries = create_mapping_entries();
 	auto mapping = HierarchicalMapping(std::move(entries));
 
 	auto diseases = std::vector<core::DiseaseInfo>{
-		DiseaseInfo{.group = DiseaseGroup::other, .code = "asthma", .name = "Asthma"},
-		DiseaseInfo{.group = DiseaseGroup::other, .code = "diabetes", .name = "Diabetes Mellitus"},
-		DiseaseInfo{.group = DiseaseGroup::cancer, .code = "colorectalcancer", .name = "Colorectal cancer"},
+		DiseaseInfo{
+			.group = DiseaseGroup::other,
+			.code = core::Identifier{"asthma"},
+			.name = "Asthma"},
+		DiseaseInfo{
+			.group = DiseaseGroup::other,
+			.code = core::Identifier{"diabetes"},
+			.name = "Diabetes Mellitus"},
+		DiseaseInfo{
+			.group = DiseaseGroup::cancer,
+			.code = core::Identifier{"colorectalcancer"},
+			.name = "Colorectal cancer"},
 	};
 
 	return ModelInput(data, settings, info, ses, mapping, diseases);
@@ -309,14 +321,20 @@ TEST(TestHealthGPS, ModuleFactoryRegistry)
 
 	auto mapping = HierarchicalMapping(
 		std::vector<MappingEntry>{
-			MappingEntry("Year", 0),
-			MappingEntry("Gender", 0, "gender"),
-			MappingEntry("Age", 0, "age"),
+		MappingEntry("Year", 0),
+			MappingEntry("Gender", 0, core::Identifier{ "gender" }),
+			MappingEntry("Age", 0, core::Identifier{ "age" }),
 	});
 
 	auto diseases = std::vector<core::DiseaseInfo>{
-		DiseaseInfo{.group = DiseaseGroup::other, .code = "angina", .name = "Angina Pectoris"},
-		DiseaseInfo{.group = DiseaseGroup::other, .code = "diabetes", .name = "Diabetes Mellitus"}
+		DiseaseInfo{
+			.group = DiseaseGroup::other,
+			.code = core::Identifier{ "angina"},
+			.name = "Angina Pectoris"},
+		DiseaseInfo{
+			.group = DiseaseGroup::other,
+			.code = core::Identifier{ "diabetes"},
+			.name = "Diabetes Mellitus"}
 	};
 
 	auto config = ModelInput(data, settings, info, ses, mapping, diseases);
@@ -474,15 +492,17 @@ TEST(TestHealthGPS, CreateDiseaseModule)
 	auto test_person = Person{};
 	test_person.age = 50;
 	test_person.gender = core::Gender::male;
+	auto diabetes_key = core::Identifier{ "diabetes" };
+	auto moonshot_key = core::Identifier{ "moonshot" };
 
 	auto disease_module = build_disease_module(repository, inputs);
 	ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
 	ASSERT_EQ("Disease", disease_module->name());
 	ASSERT_GT(disease_module->size(), 0);
-	ASSERT_TRUE(disease_module->contains("diabetes"));
-	ASSERT_FALSE(disease_module->contains("moonshot"));
-	ASSERT_GT(disease_module->get_excess_mortality("diabetes", test_person), 0);
-	ASSERT_EQ(0.0, disease_module->get_excess_mortality("moonshot", test_person));
+	ASSERT_TRUE(disease_module->contains(diabetes_key));
+	ASSERT_FALSE(disease_module->contains(moonshot_key));
+	ASSERT_GT(disease_module->get_excess_mortality(diabetes_key, test_person), 0);
+	ASSERT_EQ(0.0, disease_module->get_excess_mortality(moonshot_key, test_person));
 }
 
 TEST(TestHealthGPS, CreateAnalysisModule)

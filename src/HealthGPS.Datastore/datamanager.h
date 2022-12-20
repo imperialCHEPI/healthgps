@@ -23,16 +23,16 @@ namespace hgps {
 			std::vector<PopulationItem> get_population(Country country) const;
 
 			std::vector<PopulationItem> get_population(Country country,
-				const std::function<bool(const unsigned int&)> year_filter) const override;
+				const std::function<bool(const unsigned int&)> time_filter) const override;
 
 			std::vector<MortalityItem> get_mortality(Country country) const;
 
 			std::vector<MortalityItem> get_mortality(Country country,
-				const std::function<bool(const unsigned int&)> year_filter) const override;
+				const std::function<bool(const unsigned int&)> time_filter) const override;
 
 			std::vector<DiseaseInfo> get_diseases() const override;
 
-			std::optional<DiseaseInfo> get_disease_info(std::string code) const override;
+			std::optional<DiseaseInfo> get_disease_info(core::Identifier code) const override;
 
 			DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
 
@@ -40,7 +40,7 @@ namespace hgps {
 				DiseaseInfo source, DiseaseInfo target) const override;
 
 			RelativeRiskEntity get_relative_risk_to_risk_factor(
-				DiseaseInfo source, Gender gender, std::string risk_factor) const override;
+				DiseaseInfo source, Gender gender, core::Identifier risk_factor_key) const override;
 
 			CancerParameterEntity get_disease_parameter(DiseaseInfo info, Country country) const override;
 
@@ -49,7 +49,7 @@ namespace hgps {
 			std::vector<BirthItem> get_birth_indicators(const Country country) const;
 
 			std::vector<BirthItem> get_birth_indicators(const Country country,
-				const std::function<bool(const unsigned int&)> year_filter) const override;
+				const std::function<bool(const unsigned int&)> time_filter) const override;
 
 			std::vector<LmsDataRow> get_lms_parameters() const override;
 

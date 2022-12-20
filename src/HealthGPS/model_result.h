@@ -1,5 +1,6 @@
 #pragma once
 #include "data_series.h"
+#include "gender_value.h"
 
 #include <string>
 #include <map>
@@ -24,7 +25,7 @@ namespace hgps {
 
         int population_size{};
 
-        int number_alive{};
+        IntegerGenderValue number_alive{};
 
         int number_dead{};
 

@@ -11,15 +11,14 @@ namespace hgps {
         }
 
         auto age = 0u;
-        for (auto& level : definition_.impacts) {
-            auto factor_key = core::to_lower(level.risk_factor);
+        for (const auto& level : definition_.impacts) {
             if (level.from_age < age) {
                 throw std::invalid_argument(
                     "Impact levels must be non-overlapping and ordered.");
             }
 
-            if (!factor_impact_.contains(factor_key)) {
-                factor_impact_.emplace(factor_key);
+            if (!factor_impact_.contains(level.risk_factor)) {
+                factor_impact_.emplace(level.risk_factor);
             }
 
             age = level.from_age + 1u;
@@ -30,10 +29,6 @@ namespace hgps {
         return ScenarioType::intervention;
     }
 
-    std::string MarketingPolicyScenario::name() const noexcept {
-        return "Intervention";
-    }
-
     SyncChannel& MarketingPolicyScenario::channel() {
         return channel_;
     }
@@ -42,8 +37,8 @@ namespace hgps {
         interventions_book_.clear();
     }
 
-    double MarketingPolicyScenario::apply(Person& entity, const int time,
-        const std::string risk_factor_key, const double value) {
+    double MarketingPolicyScenario::apply([[maybe_unused]] Random& generator, Person& entity,
+        int time, const core::Identifier& risk_factor_key, double value) {
         if (!factor_impact_.contains(risk_factor_key) ||
             !definition_.active_period.contains(time)) {
             return value;

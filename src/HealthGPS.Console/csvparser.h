@@ -18,5 +18,5 @@ bool load_datatable_csv(hc::DataTable& out_table, std::string full_filename,
 std::map<std::string, std::size_t> create_fields_index_mapping(
 	const std::vector<std::string>& column_names, const std::vector<std::string> fields);
 
-std::map<std::string, std::vector<double>> load_baseline_csv(
+std::map<hc::Identifier, std::vector<double>> load_baseline_csv(
 	const std::string& full_filename, const std::string delimiter = ",");
