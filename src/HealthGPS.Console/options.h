@@ -1,5 +1,4 @@
 #pragma once
-
 #include "HealthGPS.Core/forward_type.h"
 
 #include <string>
@@ -52,7 +51,7 @@ struct BaselineInfo
 struct RiskFactorInfo
 {
 	std::string name;
-	short level;
+	short level{};
 	std::string proxy;
 	std::vector<double> range;
 };

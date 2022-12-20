@@ -26,9 +26,9 @@ class SuperDenseTime
 {
 	public:
 		/// The real, physically meaningful part of time
-		RealType real;
+		RealType real{};
 		/// The logical part of time for order at a real instant
-		int logical;
+		int logical{};
 		/// Default constructor
 		SuperDenseTime(){}
 		/// Constructor assigns initial values to real and logical
@@ -61,7 +61,7 @@ class SuperDenseTime
 			return (real < other.real) ||
 				((real == other.real) && (logical < other.logical));
 		}
-		/// Order is lexicographical favoring real then logical.
+		/// Order is lexicographical favouring real then logical.
 		bool operator<=(const SuperDenseTime<RealType>& other) const
 		{
 			return (real < other.real) ||

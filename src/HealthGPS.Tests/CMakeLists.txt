@@ -76,5 +76,3 @@ else()
 endif()
 
 gtest_discover_tests(HealthGPS.Tests)
-
-

@@ -50,7 +50,7 @@ struct VariableInfo
 struct FactorDynamicEquationInfo {
 	std::string name;
 	std::map<std::string, double> coefficients;
-	double residuals_standard_deviation;
+	double residuals_standard_deviation{};
 };
 
 

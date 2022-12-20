@@ -1,4 +1,3 @@
-![MSBuild](https://github.com/imperialCHEPI/healthgps/actions/workflows/msbuild.yml/badge.svg)
 ![windows](https://github.com/imperialCHEPI/healthgps/actions/workflows/windows.yml/badge.svg)
 ![Linux](https://github.com/imperialCHEPI/healthgps/actions/workflows/linux.yml/badge.svg)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
@@ -15,10 +14,10 @@ The *Health GPS microsimulation* is being developed in collaboration between the
 
 # Quick Start
 
-The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a *configuration file* (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing the provided example configuration file and running the model again.
+The **Health GPS** application provides a command line interface (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a *configuration file* (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing the provided example configuration file and running the model again. See the [technical documentation](https://imperialchepi.github.io/healthgps/) for model description, user guides, software design, data model and development guidelines.
 
 ### Windows OS
-You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version to be installed.
+You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2022 x64` version to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
@@ -28,7 +27,7 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 5. The default output folder is `C:\HealthGPS\Results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ### Linux OS
-You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires `GCC 11.1` or newer version to be installed.
+You may need to install the latest [GCC Compiler](https://gcc.gnu.org/) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
 2. Unzip the file contents into a local directory of your choice (xxx).
@@ -37,7 +36,7 @@ You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/
 `-s` the path to the root folder of the *backend storage* respectively.
 5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
->**NOTE:** The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpose to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
+>**NOTE:** The development datasets provided in this example is for demonstration purpose, showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
 
 >***Known Issue:*** Windows 10 support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the Windows 11 installation.
 
@@ -49,8 +48,9 @@ To start working on the *Health GPS* code base, the suggested development machin
 2. [Git](https://git-scm.com/downloads) 2.3 or newer.
 3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
 4. [Ninja](https://ninja-build.org/) 1.10 or newer.
-5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer with CMake presets integration.
-6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment.
+5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
+6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment, plus.
+   * [Intel TBB](https://github.com/oneapi-src/oneTBB) library version 2018 or later installed (e.g. `sudo apt update && sudo apt install libtbb-dev`) 
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
 8. Internet connection.
 
@@ -60,7 +60,7 @@ Download the *Health GPS* source code to the local machine, we recommend somewhe
 ```
 Finally, open the `.../healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
->**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
+>**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command line.*
 
 ### CMake Build
 
@@ -117,3 +117,4 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 |:---   |:---     |
 | [vcpkg](https://github.com/microsoft/vcpkg)          | MIT          |
 | [googletest](https://github.com/google/googletest)   | BSD 3-Clause |
+| [benchmark](https://github.com/google/benchmark)     | Apache-2.0   |

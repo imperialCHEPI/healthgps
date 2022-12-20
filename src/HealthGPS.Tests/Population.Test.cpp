@@ -61,17 +61,17 @@ TEST(TestHealthGPS_Population, PersonStateDeath)
 	ASSERT_TRUE(p.is_alive());
 	ASSERT_TRUE(p.is_active());
 	ASSERT_FALSE(p.has_emigrated());
-	ASSERT_EQ(0, p.time_of_death());
-	ASSERT_EQ(0, p.time_of_migration());
+	ASSERT_EQ(0u, p.time_of_death());
+	ASSERT_EQ(0u, p.time_of_migration());
 
-	auto time_now = 2022;
+	auto time_now = 2022u;
 	p.die(time_now);
 
 	ASSERT_FALSE(p.is_alive());
 	ASSERT_FALSE(p.is_active());
 	ASSERT_FALSE(p.has_emigrated());
 	ASSERT_EQ(time_now, p.time_of_death());
-	ASSERT_EQ(0, p.time_of_migration());
+	ASSERT_EQ(0u, p.time_of_migration());
 	ASSERT_THROW(p.die(time_now), std::logic_error);
 	ASSERT_THROW(p.emigrate(time_now), std::logic_error);
 }
@@ -84,16 +84,16 @@ TEST(TestHealthGPS_Population, PersonStateEmigrated)
 	ASSERT_TRUE(p.is_alive());
 	ASSERT_TRUE(p.is_active());
 	ASSERT_FALSE(p.has_emigrated());
-	ASSERT_EQ(0, p.time_of_death());
-	ASSERT_EQ(0, p.time_of_migration());
+	ASSERT_EQ(0u, p.time_of_death());
+	ASSERT_EQ(0u, p.time_of_migration());
 
-	auto time_now = 2022;
+	auto time_now = 2022u;
 	p.emigrate(time_now);
 
 	ASSERT_TRUE(p.is_alive());
 	ASSERT_FALSE(p.is_active());
 	ASSERT_TRUE(p.has_emigrated());
-	ASSERT_EQ(0, p.time_of_death());
+	ASSERT_EQ(0u, p.time_of_death());
 	ASSERT_EQ(time_now, p.time_of_migration());
 	ASSERT_THROW(p.die(time_now), std::logic_error);
 	ASSERT_THROW(p.emigrate(time_now), std::logic_error);
