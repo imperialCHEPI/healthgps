@@ -25,10 +25,10 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 4. Rename the *data source* subfolder (healthgps) by removing the version from folder's name.
 5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `C:\HealthGPS\Results\France`, but this can be changed in the *configuration file* `(France.Config.json)`.
+6. The default output folder is `C:/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ### Linux OS
-You may need to install the latest [GCC Compiler](https://gcc.gnu.org/) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
+You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
 2. Unzip both files content into a local directory of your choice (xxx).
