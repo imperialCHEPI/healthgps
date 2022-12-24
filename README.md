@@ -20,23 +20,23 @@ The **Health GPS** application provides a command line interface (CLI) and runs 
 You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2022 x64` version to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
-2. Unzip both file contents into a local directory of your choice (xxx).
+2. Unzip both files content into a local directory of your choice (xxx).
 3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
 4. Rename the *data source* subfolder (healthgps) by removing the version from folder's name.
-5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* fullname and
+5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `C:\HealthGPS\Results`, but this can be changed in the *configuration file* `(France.Config.json)`.
+6. The default output folder is `C:\HealthGPS\Results\France`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 ### Linux OS
 You may need to install the latest [GCC Compiler](https://gcc.gnu.org/) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
-2. Unzip both files contents into a local directory of your choice (xxx).
+2. Unzip both files content into a local directory of your choice (xxx).
 3. Open a command terminal and navigate to the directory used in step 2 (xxx).
 4. Rename the *data source* subfolder (healthgps) by removing the version from folder's name.
-4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* fullname and
+4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
-5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
+5. The default output folder is `$HOME/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 >**NOTE:** The development datasets provided in this example is for demonstration purpose, showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the `index.json` file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
 
