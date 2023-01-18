@@ -24,7 +24,7 @@ Health-GPS is a flexible and modular framework, written in modern C++, designed 
 |:--:|
 |*Health-GPS Concept Diagram*|
 
-### Module Dynamics
+### Modules Dynamic
 
 The framework defines multi-dimensional interactions on *demographics*, *risk factors*, *diseases* and *intervention* modules as shown below. The model dynamics capture the effects of the various interacting modules overtime to stablish the population *baseline* projection and quantify the impact of *interventions* on risk factors, the *burden of diseases* (BoD) module estimate population outcomes such as risk factors, disease prevalence, and health care expenditure. Finally, *the different between the two scenarios* is the effect of the intervention.
 

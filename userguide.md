@@ -20,9 +20,9 @@ The high-level structure of the [configuration][configjson] file used to create 
 
 ```json
 {
-    "version": 1,
+    "version": 2,
     "inputs": {
-        "file": {},
+        "dataset": {},
         "settings": {
             "country_code": "FRA",
             "size_fraction": 0.0001,
@@ -36,12 +36,12 @@ The high-level structure of the [configuration][configjson] file used to create 
         "risk_factor_models": {},
         "baseline_adjustments": {}
     },
-    "experiment": {
+    "running": {
         "seed": [123456789],
         "start_time": 2010,
         "stop_time": 2050,
         "trial_runs": 1,
-        "sync_timeout_ms": 5000,
+        "sync_timeout_ms": 15000,
         "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
         "interventions": {
             "active_type_id": "",
@@ -49,8 +49,8 @@ The high-level structure of the [configuration][configjson] file used to create 
         }
     },
     "output": {
-        "comorbidities": 4,
-        "folder": "${HOME}/healthgps/results",
+        "comorbidities": 5,
+        "folder": "${HOME}/healthgps/results/france",
         "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
     }
 }
@@ -63,8 +63,8 @@ The ***inputs*** section sets the target country information, the *file* sub-sec
 ```json
 ...
 "inputs": {
-    "file": {
-        "name": "france.data_file.csv",
+    "dataset": {
+        "name": "France.DataFile.csv",
         "format": "csv",
         "delimiter": ",",
         "encoding": "ASCII",
@@ -99,17 +99,17 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
         "function_parameters":[0.0, 1.0]
     },
     "risk_factors": [
-        {"name":"Gender",   "level":0, "proxy":"gender", "range":[0, 1]},
-        {"name":"Age",      "level":0, "proxy":"age",    "range":[1, 87]},
-        {"name":"Age2",     "level":0, "proxy":"",       "range":[1, 7569]},
-        {"name":"Age3",     "level":0, "proxy":"",       "range":[1, 658503]},
-        {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.314, 2.310]},
-        {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.146, 8.675]},
-        {"name":"Protein",  "level":1, "proxy":"",       "range":[42.093, 238.414]},
-        {"name":"Fat",      "level":1, "proxy":"",       "range":[44.781, 381.666]},
-        {"name":"PA",       "level":2, "proxy":"",       "range":[400.0, 9769.837]},
-        {"name":"Energy",   "level":2, "proxy":"",       "range":[1315.532, 7545.832]},
-        {"name":"BMI",      "level":3, "proxy":"",       "range":[13.532, 45.265]}
+        {"name":"Gender",   "level":0, "proxy":"gender", "range":[0,1]},
+        {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
+        {"name":"Age2",     "level":0, "proxy":"",       "range":[1,7569]},
+        {"name":"Age3",     "level":0, "proxy":"",       "range":[1,658503]},
+        {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.316299,2.296689]},
+        {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.127384,8.656519]},
+        {"name":"Protein",  "level":1, "proxy":"",       "range":[43.50682,238.4145]},
+        {"name":"Fat",      "level":1, "proxy":"",       "range":[45.04756,382.664]},
+        {"name":"PA",       "level":2, "proxy":"",       "range":[22.22314,9765.512]},
+        {"name":"Energy",   "level":2, "proxy":"",       "range":[1326.14051,7522.496]},
+        {"name":"BMI",      "level":3, "proxy":"",       "range":[13.88,39.48983]}
     ],
     "dynamic_risk_factor": "",
     "risk_factor_models": {
@@ -130,21 +130,21 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
 ```
 The *risk factor model* and *baseline adjustment* files have their own schemas and formats requirements, these files structure are defined separately below, after all the *configuration file* sections.
 
-## 1.3 Experiment
+## 1.3 Running
 
-The ***experiment*** section defines simulation *runtime* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
+The ***running*** section defines simulation *run-time* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
 
 ```json
 ...
-"experiment": {
+"running": {
     "seed": [123456789],
     "start_time": 2010,
     "stop_time": 2050,
     "trial_runs": 1,
-    "sync_timeout_ms": 5000,
+    "sync_timeout_ms": 15000,
     "diseases": ["alzheimer", "asthma", "colorectalcancer", "diabetes", "lowbackpain", "osteoarthritisknee"],
     "interventions": {
-        "active_type_id": "marketing",
+        "active_type_id": "dynamic_marketing",
         "types": {
             "simple": {
                 "active_period": {
@@ -156,17 +156,30 @@ The ***experiment*** section defines simulation *runtime* period, *start/stop ti
                     { "risk_factor":"BMI", "impact_value": -1.0, "from_age":0, "to_age":null}
                 ]
             },
-            "marketing": {
+            "dynamic_marketing": {
                 "active_period": {
-                    "start_time": 2021,
+                    "start_time": 2022,
                     "finish_time": 2050
                 },
+                "dynamics":[0.15, 0.0, 0.0], 
                 "impacts": [
-                    { "risk_factor":"BMI", "impact_value": -0.12, "from_age": 5, "to_age": 12 },
-                    { "risk_factor":"BMI", "impact_value": -0.31, "from_age": 13, "to_age": 18 },
-                    { "risk_factor":"BMI", "impact_value": -0.155, "from_age": 19, "to_age": null }
+                    {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
+                    {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
+                    {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
                 ]
-            }
+            },
+            "physical_activity": {
+                "active_period": {
+                    "start_time": 2022,
+                    "finish_time": 2050
+                },
+                "coverage_rates": [0.90],
+                "impacts": [
+                    {"risk_factor":"BMI", "impact_value":-0.16, "from_age":6,  "to_age":15},
+                    {"risk_factor":"BMI", "impact_value":-0.08, "from_age":16,  "to_age":null}
+                ]
+            },
+            ...
         }
     }
 }
@@ -182,8 +195,8 @@ Finally, ***output*** section repeated below, defines  the maximum number of *co
 ```json
 ...
 "output": {
-    "comorbidities": 4,
-    "folder": "${HOME}/healthgps/results",
+    "comorbidities": 5,
+    "folder": "${HOME}/healthgps/results/france",
     "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
 }
 ...
@@ -380,7 +393,7 @@ The data model defines many data hierarchies, which have been flatten for file-b
 
 ```json
 {
-    "version": 1,
+    "version": 2,
     "country": {
         "format": "csv",
         "delimiter": ",",
@@ -394,8 +407,10 @@ The data model defines many data hierarchies, which have been flatten for file-b
     },
     "demographic": {},
     "diseases": {
-        "relative_risk":{ },
-        "parameters":{ },
+        "disease": {
+            "relative_risk":{ },
+            "parameters":{ },
+        },
         "registry":[ ]
     },
     "analysis":{ }
@@ -422,7 +437,7 @@ Defines the file storage for country specific data containing historic estimates
     "path": "undb",
     "age_limits": [0, 100],
     "time_limits": [1950, 2100],
-    "projections": 2020,
+    "projections": 2022,
     "population": {
         "description": "Total population by sex, annually from 1950 to 2100.",
         "path": "population",
@@ -529,26 +544,27 @@ Health-GPS has been designed to be portable, producing stable, and comparable re
 
 The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health-GPS application on each platform using the include example model and reference dataset.
 
-## Windows
+## Windows OS
+You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2022 x64` version to be installed.
 
-You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2019 x64` version or newer to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Windows from the repository.
-2. Unzip the file contents into a local directory of your choice (xxx).
+1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
+2. Unzip both files content into a local directory of your choice (xxx).
 3. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-4. Run: `X:\xxx> .\HealthGPS.Console -f "example\France.Config.json" -s "data"` where `-f` gives the *configuration file* full-name and
+4. Rename the *data source* subfolder (healthgps) by removing the version from folder's name.
+5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
-5. The default output folder is `C:\healthgps\results`, but this can be changed in the *configuration file* `(France.Config.json)`.
+6. The default output folder is `C:/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
-## Linux
+## Linux OS
+You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
 
-You may need to install the latest [GCC Compiler Libraries](https://gcc.gnu.org/) on the machine, the application requires the `GCC 11.1` or newer version to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) binaries for Linux from the repository.
-2. Unzip the file contents into a local directory of your choice (xxx).
-3. Navigate to the directory used in step 2 (xxx).
-4. Run: `user@machine:~/xxx$ ./HealthGPS.Console -f example/France.Config.json -s data` where `-f` gives the *configuration file* full-name and `-s` the path to the root folder of the *backend storage* respectively.
-5. The default output folder is `~/healthgps/results`, but this can be changed in the *configuration file* `(France.Config.json)`.
+1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
+2. Unzip both files content into a local directory of your choice (xxx).
+3. Open a command terminal and navigate to the directory used in step 2 (xxx).
+4. Rename the *data source* subfolder (healthgps) by removing the version from folder's name.
+4. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
+`-s` the path to the root folder of the *backend storage* respectively.
+5. The default output folder is `$HOME/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
 
 > See [Quick Start](getstarted) for details on the example dataset and known issues.
 
@@ -562,8 +578,8 @@ The model results file structure is composed of two parts: *experiment metadata*
 {
     "experiment": {
         "model": "HealthGPS",
-        "version": "1.1.3.0",
-        "intervention": "marketing",
+        "version": "1.2.0.0",
+        "intervention": "dynamic_marketing",
         "job_id": 0,
         "custom_seed": 123456789,
         "time_of_day": "2022-07-04 17:50:37.5678259 GMT Summer Time",
@@ -591,7 +607,7 @@ The model results file structure is composed of two parts: *experiment metadata*
 The content of each message is implementation dependent, JSON (JavaScript Object Notation), an open standard file format designed for data interchange in human-readable text, can represent complex data structures. It is language-independent; however, all programming language and major data science tools supports JSON format because they have libraries and functions to read/write JSON structures. To read the model results in [R](https://www.r-project.org/), for example, you need the [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) package:
 ```R
 require(jsonlite)
-data <- fromJSON(result_filename)
+data <- fromJSON(result_filename.json)
 View(data)
 ```
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
@@ -614,7 +630,7 @@ colnames(groups) <- c("scenario", "run", "time")
 risk_factor <- "BMI"
 sim_data <- cbind(groups, data$result$risk_factors_average[[risk_factor]])
 
-# pivot data
+# pivot dataset
 info <- sim_data %>% group_by(scenario, time) %>% 
   summarise(runs = n(),
             avg_male = mean(male, na.rm = TRUE),
@@ -623,7 +639,7 @@ info <- sim_data %>% group_by(scenario, time) %>%
             sd_female = sd(female, na.rm = TRUE),
             .groups = "keep")
 
-# reshape data
+# reshape dataset
 df <- data.frame(scenario = info$scenario, time = info$time, runs = info$runs,
       bmi = c(info$avg_male, info$avg_female),
       sd = c(info$sd_male, info$sd_female),

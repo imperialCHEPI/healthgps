@@ -4,26 +4,26 @@
 
 # Developer Guide
 
-The *Health-GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for automate build.
+The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for continuous integration (CI) builds and testing.
 
-To start working on the *Health-GPS* code base, the suggested development machine needs:
+To start working on the *Health GPS* code base, the suggested development machine needs:
 1. Windows 10 or newer, [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/) enabled and Linux distribution of choice installed.
 2. [Git](https://git-scm.com/downloads) 2.3 or newer.
 3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
 4. [Ninja](https://ninja-build.org/) 1.10 or newer.
-5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2019 or newer with CMake presets integration.
-6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment.
+5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
+6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment, plus.
+   * [Intel TBB](https://github.com/oneapi-src/oneTBB) library version 2018 or later installed (e.g. `sudo apt update && sudo apt install libtbb-dev`) 
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
 8. Internet connection.
 
-Download the *Health-GPS* source code to the local machine, we recommend somewhere like root `src` or `source`, since otherwise you may run into path issues with the build systems.
+Download the *Health GPS* source code to the local machine, we recommend somewhere like root `/src` or `/source`, since otherwise you may run into path issues with the build systems.
 ```cmd
 > git clone https://github.com/imperialCHEPI/healthgps
 ```
+Finally, open the `healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
-Finally, open the `.../healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
-
->**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 20.04 LTS using only the CMake command line.*
+>**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command line.*
 
 ### CMake Build
 
@@ -61,14 +61,16 @@ The project dependencies are included using [vcpkg](https://github.com/microsoft
 
 | Name  | License |
 |:---   |:---     |
-| [Adevs](https://sourceforge.net/projects/adevs)                            | BSD 3-Clause |
-| [crossguid](https://github.com/graeme-hill/crossguid)                      | MIT          |
-| [cxxopts](https://github.com/jarro2783/cxxopts)                            | MIT          |
-| [indicators](https://github.com/p-ranav/indicators)                        | MIT          |
-| [fmt](https://github.com/fmtlib/fmt)                                       | MIT          |
-| [nlohmann-json](https://github.com/nlohmann/json)                          | MIT          |
-| [rapidcsv](https://github.com/d99kris/rapidcsv)                            | BSD 3-Clause |
-| [googletest](https://github.com/google/googletest)   | BSD 3-Clause |
+| [Adevs](https://sourceforge.net/projects/adevs)       | BSD 3-Clause |
+| [crossguid](https://github.com/graeme-hill/crossguid) | MIT          |
+| [cxxopts](https://github.com/jarro2783/cxxopts)       | MIT          |
+| [indicators](https://github.com/p-ranav/indicators)   | MIT          |
+| [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
+| [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
+| [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
+| [googletest](https://github.com/google/googletest)    | BSD 3-Clause |
+| [googletest](https://github.com/google/googletest)    | BSD 3-Clause |
+| [benchmark](https://github.com/google/benchmark)      | Apache-2.0   |
 
 # Implementation
 
@@ -90,26 +92,21 @@ EventMonitor class has been created to receive all messages from the microsimula
 The following code snippet shows how to compose a microsimulation using the classes discussed above. The modules factory holds the backend datastore instance and allows dynamic registration of implementations for the required module types, the default module factory function registers the current production implementations. The contents of the input configuration file is loaded and processed to create the model input, a read-only data structure shared with all the simulation engines. An implementation of *scenario* interface must be provided for each simulation definition, the *BaselineScenario* class is a generic type, while the intervention scenarios are defined to test specific policies.
 
 ```cpp
-// Create factory with backend data store and modules implementation
-auto factory = get_default_simulation_module_factory(...);
-
-// Create the complete model input from configuration
-auto model_input = create_model_input(...);
-
-// Create event bus and monitor
-auto event_bus = DefaultEventBus();
-auto json_file_logger = ResultFileWriter{
-    create_output_file_name(config.output),
-    ExperimentInfo{
-        .model = config.app_name, 
-        .version = config.app_version, 
-        .intervention = config.intervention.identifier, 
-        .job_id = config.job_id, 
-        .seed = model_input.seed().value_or(0u)}
-};
-auto event_monitor = EventMonitor{ event_bus, json_file_logger };
+// Parse configuration file from command line arguments
+auto config = load_configuration(cmd_args);
 
 try {
+    // Create factory with backend data store and modules implementation
+    auto factory = get_default_simulation_module_factory(...);
+
+    // Create the complete model input from configuration
+    auto model_input = create_model_input(...);
+
+    // Create event bus and monitor
+    auto event_bus = DefaultEventBus();
+    auto json_file_logger = create_results_file_logger(config, model_input);
+    auto event_monitor = EventMonitor{ event_bus, json_file_logger };
+
     // Create simulation executive
     auto seed_generator = std::make_unique<hgps::MTRandom32>();
     if (model_input.seed().has_value()) {
