@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(HealthGPS
-        VERSION 1.2.0.0
+        VERSION 1.2.0.1
         DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
         HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
         LANGUAGES CXX)
