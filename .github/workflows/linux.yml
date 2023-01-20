@@ -45,7 +45,7 @@ jobs:
         cmake --version
         ninja --version
         g++ --version
-        ./$VCPKG_INSTALLATION_ROOT/vcpkg --version
+        .$VCPKG_INSTALLATION_ROOT/vcpkg --version
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
