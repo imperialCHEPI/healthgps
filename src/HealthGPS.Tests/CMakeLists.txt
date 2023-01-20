@@ -3,16 +3,6 @@ find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
-#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-#   find_package(TBB REQUIRED tbb)
-#	if (TBB_FOUND)
-#		message(STATUS "TBB library version: ${TBB_VERSION}")
-#		option(TBB_ENABLE_IPO "Enable Interprocedural Optimization (IPO) during the compilation" OFF)
-#	else()
-#		message(STATUS "TBB library NOT found.")
-#	endif()
-#endif()
-
 include(CTest)
 include(GoogleTest)
 
@@ -50,9 +40,6 @@ target_sources(HealthGPS.Tests
         "CountryModule.h"
         "RiskFactorData.h")
 
-set(ROOT_NAMESPACE hgps::test)
-
-message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_link_libraries(HealthGPS.Tests
     PRIVATE
@@ -76,3 +63,11 @@ else()
 endif()
 
 gtest_discover_tests(HealthGPS.Tests)
+
+install(TARGETS HealthGPS.Tests DESTINATION "")
+if(WIN32)
+	install(IMPORTED_RUNTIME_ARTIFACTS fmt::fmt)
+    install(IMPORTED_RUNTIME_ARTIFACTS GTest::gtest)
+endif()
+
+set(ROOT_NAMESPACE hgps::test)
