@@ -29,7 +29,7 @@ jobs:
     - name: Set up GCC
       id: install_gcc
       run: sudo apt install build-essential
-      
+
     - name: Install TBB library
       id: install_tbb
       run: sudo apt install libtbb-dev
@@ -49,7 +49,7 @@ jobs:
     - name: Tool Check
       id: toos_version
       run: |
-        ls
+        ls -l
         cmake --version
         ninja --version
         g++ --version
@@ -58,7 +58,7 @@ jobs:
     - name: Configure debug HealthGPS
       id: cmake_config_debug
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON      
+      run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
@@ -89,7 +89,7 @@ jobs:
       id: tbb_linking_check
       working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
       run: |
-         ls
+         ls -l
          ldd HealthGPS.Console
 
     - name: Zip output folder
@@ -97,7 +97,7 @@ jobs:
       working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
       run: |
         mkdir ${{github.workspace}}/artifact
-        7z a -tzip ${{github.workspace}}/artifact/health_gps_linux.zip *.*
+        7z a -tzip ${{github.workspace}}/artifact/health_gps_linux.zip *.Console*
 
     - name: Upload artefacts
       id: upload_zip
@@ -105,3 +105,9 @@ jobs:
       with:
         name: health-gps-archive
         path: artifact/health_gps_linux.zip
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+          files: artifact/health_gps_linux.zip
