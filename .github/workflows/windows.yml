@@ -26,6 +26,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Set up MSVC
+      id: install_MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+          arch: x64
+
     - name: Install vcpkg
       id: install_vcpkg
       run: |
