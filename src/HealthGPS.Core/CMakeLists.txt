@@ -40,6 +40,8 @@ target_sources(HealthGPS.Core
 		"thread_util.h"
 		"visitor.h")
 
-target_link_libraries(HealthGPS.Core PRIVATE fmt::fmt)
+target_link_libraries(HealthGPS.Core
+	PRIVATE
+		fmt::fmt)
 
 set(ROOT_NAMESPACE hgps::core)

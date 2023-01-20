@@ -129,11 +129,10 @@ target_sources(HealthGPS
 		"weight_model.cpp"
 		"weight_model.h")
 
-set(ROOT_NAMESPACE hgps)
-
 target_link_libraries(HealthGPS
 	PRIVATE
 		HealthGPS.Core
 		fmt::fmt
 		crossguid)
 
+set(ROOT_NAMESPACE hgps)

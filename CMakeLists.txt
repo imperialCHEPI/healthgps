@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.20)
 
+option(BUILD_BENCHMARKS "Build benchmark application" OFF)
+
 # minimum default standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,6 +19,7 @@ include(cmake/PreventInSourceBuilds.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enable compiler warnings and standard conformance
+message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 if(MSVC)
     add_compile_options(/W4 /permissive-) # /WX 
 else()

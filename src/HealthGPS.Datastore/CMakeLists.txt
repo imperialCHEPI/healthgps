@@ -9,10 +9,9 @@ target_sources(HealthGPS.Datastore
 		"datamanager.h"		
 		"api.h")
 
-set(ROOT_NAMESPACE hgps::data)
-
 target_link_libraries(HealthGPS.Datastore
 	PRIVATE
 		HealthGPS.Core
 		fmt::fmt)
 
+set(ROOT_NAMESPACE hgps::data)
