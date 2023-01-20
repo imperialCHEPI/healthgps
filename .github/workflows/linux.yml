@@ -58,7 +58,7 @@ jobs:
     - name: Configure debug HealthGPS
       id: cmake_config_debug
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.DEBUG_PRESET}}        
+      run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON      
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
@@ -73,7 +73,7 @@ jobs:
     - name: Configure release HealthGPS
       id: cmake_config_release
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.RELEASE_PRESET}}
+      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build release HealthGPS
       id: cmake_build_release

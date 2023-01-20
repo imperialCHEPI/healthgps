@@ -54,7 +54,7 @@ jobs:
     - name: Configure debug HealthGPS
       id: cmake_config_debug
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.DEBUG_PRESET}}
+      run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
@@ -69,12 +69,22 @@ jobs:
     - name: Configure release HealthGPS
       id: cmake_config_release
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.RELEASE_PRESET}}
+      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build release HealthGPS
       id: cmake_build_release
       working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
+
+    - name: Install release HealthGPS
+      id: cmake_install_release
+      working-directory: ${{github.workspace}}
+      run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}} --target install --config Release
+
+    - name: Check install artefacts
+      id: tbb_linking_check
+      working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
+      run: ls
 
     - name: Zip output folder
       id: zip_folder
