@@ -11,11 +11,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Run CMake Linux Workflow
 
     env:
-      VCPKG_ROOT: 'vcpkg'
+      VCPKG_ROOT: $VCPKG_INSTALLATION_ROOT
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
       DEBUG_PRESET: 'linux-debug'
       DEBUG_BUILD_PRESET: 'debug-build-linux'
@@ -28,23 +28,8 @@ jobs:
 
     - name: Set up GCC
       id: install_gcc
-      uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 11
-        platform: x64
-
-    - name: Get vcpkg
-      id: install_vcpkg
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        git checkout --force 2022.09.27
-        ./bootstrap-vcpkg.sh -disableMetrics
-
-    - name: Get Ninja
-      id: install_ninja
-      uses: seanmiddleditch/gha-setup-ninja@master
-
+      run: sudo apt install build-essential ninja-build cmake gdb zip libssl-dev pkg-config
+      
     - name: Get TBB library
       id: install_tbb
       run: sudo apt install libtbb-dev
@@ -55,7 +40,7 @@ jobs:
         ls
         cmake --version
         ninja --version
-        ./vcpkg/vcpkg --version
+        ./$VCPKG_ROOT/vcpkg --version
         g++ --version
 
     - name: Configure debug HealthGPS
@@ -83,17 +68,24 @@ jobs:
       working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
+    - name: Install release HealthGPS
+      id: cmake_install_release
+      working-directory: ${{github.workspace}}
+      run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}} --target install --config Release
+
     - name: Check TBB Linking
       id: tbb_linking_check
-      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
-      run: ldd HealthGPS.Console
+      working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
+      run: |
+         ls
+         ldd HealthGPS.Console
 
     - name: Zip output folder
       id: zip_folder
-      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
+      working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
       run: |
         mkdir ${{github.workspace}}/artifact
-        7z a -tzip ${{github.workspace}}/artifact/health_gps_linux.zip HealthGPS.Console
+        7z a -tzip ${{github.workspace}}/artifact/health_gps_linux.zip *.*
 
     - name: Upload artefacts
       id: upload_zip
