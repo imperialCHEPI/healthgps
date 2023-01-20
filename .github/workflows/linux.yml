@@ -28,11 +28,15 @@ jobs:
 
     - name: Set up GCC
       id: install_gcc
-      run: sudo apt install build-essential ninja-build cmake gdb zip libssl-dev pkg-config
+      run: sudo apt install build-essential
       
-    - name: Get TBB library
+    - name: Install TBB library
       id: install_tbb
       run: sudo apt install libtbb-dev
+
+    - name: Install Ninja
+      id: install_ninja
+      run: sudo apt install ninja-build
 
     - name: Tool Check
       id: toos_version
@@ -40,8 +44,8 @@ jobs:
         ls
         cmake --version
         ninja --version
-        ./$VCPKG_ROOT/vcpkg --version
         g++ --version
+        ./$VCPKG_INSTALLATION_ROOT/vcpkg --version
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
