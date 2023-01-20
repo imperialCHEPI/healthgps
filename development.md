@@ -32,14 +32,15 @@ cmake --list-presets=all
 
 # Windows
 cmake --preset='x64-release'
-cmake --build --preset='release-build-windows'
+cmake --build --preset='release-build-windows' --target install --config Release
 
 # Linux
 cmake --preset='linux-release'
-cmake --build --preset='release-build-linux'
+cmake --build --preset='release-build-linux' --target install --config Release
 ```
+> To build the `Benchmark` application, add `-DBUILD_BENCHMARKS=ON` to the CMake configuration command (first for each OS).
 
-The `HealthGPS` binary will now be inside the `./out/build/[preset]/src/HealthGPS.Console` directory.
+The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/bin` directory.
 
 To run the unit tests:
 ```cmd
@@ -53,7 +54,7 @@ cmake --preset='linux-debug'
 cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
-All available options are defined using CMake *prestes* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to CMake via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
+All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to CMake via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
 
 ## Third-party components
 
