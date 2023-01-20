@@ -88,9 +88,7 @@ jobs:
     - name: Check TBB Linking
       id: tbb_linking_check
       working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
-      run: |
-         ls -l
-         ldd HealthGPS.Console
+      run: ldd HealthGPS.Console
 
     - name: Zip output folder
       id: zip_folder
