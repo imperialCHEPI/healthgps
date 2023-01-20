@@ -24,7 +24,7 @@ jobs:
       RELEASE_BUILD_PRESET: 'release-build-windows'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up MSVC
       id: install_MSVC
@@ -97,7 +97,7 @@ jobs:
 
     - name: Upload artefacts
       id: upload_zip
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: health-gps-archive
         path: artifact/health_gps_win64.zip
