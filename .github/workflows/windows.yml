@@ -26,7 +26,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Get vcpkg
+    - name: Install vcpkg
       id: install_vcpkg
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
@@ -34,22 +34,18 @@ jobs:
         git checkout --force 2022.09.27
         .\bootstrap-vcpkg.bat -disableMetrics    
 
-    - name: Get Ninja
+    - name: Install Ninja
       id: install_ninja
-      uses: seanmiddleditch/gha-setup-ninja@master
+      run: choco install ninja
 
-    - name: Get MSVC Tools
-      id: install_MSVC
-      uses: ilammy/msvc-dev-cmd@v1
-     
     - name: Tool Check
       id: toos_version
       run: |
         ls
         cmake --version
         ninja --version
-        ./vcpkg/vcpkg --version
         cl
+        ./vcpkg/vcpkg --version
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
@@ -81,14 +77,14 @@ jobs:
       working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}} --target install --config Release
 
-    - name: Check install artefacts
-      id: tbb_linking_check
+    - name: Check installed artefacts
+      id: cmake_install_check
       working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
       run: ls
 
     - name: Zip output folder
       id: zip_folder
-      working-directory: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/HealthGPS.Console/
+      working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
       run: |
         mkdir ${{github.workspace}}/artifact
         7z a -tzip ${{github.workspace}}/artifact/health_gps_win64.zip *.dll *.exe
