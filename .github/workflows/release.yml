@@ -1,0 +1,21 @@
+# release.yml - Automatic creation of sha256 file for release tarball
+
+name: Release
+run-name: Publishing release ${{ github.ref_name }}
+on:
+  release:
+    types: [published]
+    branches: [ main ]
+jobs:
+  sha256:
+    name: sha256
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tarball url
+        run: echo "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz"
+      - name: Create tarball sha256 
+        run: curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | shasum -a 256 > sha256sum.txt
+      - name: Upload sha256sum file
+        uses: softprops/action-gh-release@v1
+        with:
+          files: sha256sum.txt

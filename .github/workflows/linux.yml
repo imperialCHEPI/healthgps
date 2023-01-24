@@ -104,7 +104,7 @@ jobs:
         name: health-gps-archive
         path: artifact/health_gps_linux.zip
 
-    - name: Release
+    - name: Upload release artefacts
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
