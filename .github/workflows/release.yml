@@ -3,6 +3,7 @@
 name: Release action
 run-name: ${{ github.actor }} is publishing release ${{ github.ref_name }}
 on:
+  push:
   release:
     types: [published]
     branches: [ main ]
