@@ -1,9 +1,8 @@
 # release.yml - Automatic creation of sha256 file for release tarball
 
-name: Release action
-run-name: ${{ github.actor }} is publishing release ${{ github.ref_name }}
+name: Release
+run-name: Publishing release ${{ github.ref_name }}
 on:
-  push:
   release:
     types: [published]
     branches: [ main ]
