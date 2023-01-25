@@ -32,7 +32,7 @@ jobs:
 
     - name: Install TBB library
       id: install_tbb
-      run: sudo apt install libtbb-dev
+      run: echo "sudo apt install libtbb-dev"
 
     - name: Install Ninja
       id: install_ninja
