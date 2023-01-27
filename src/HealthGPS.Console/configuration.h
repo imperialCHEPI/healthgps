@@ -21,6 +21,8 @@ CommandOptions parse_arguments(cxxopts::Options& options, int& argc, char* argv[
 
 Configuration load_configuration(CommandOptions& options);
 
+bool create_output_folder(std::filesystem::path folder_path, unsigned int num_retries = 3);
+
 std::vector<hgps::core::DiseaseInfo> get_diseases(hgps::core::Datastore& data_api, Configuration& config);
 
 hgps::ModelInput create_model_input(hgps::core::DataTable& input_table, hgps::core::Country country,

@@ -14,6 +14,7 @@
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <chrono>
+#include <thread>
 #include <iostream>
 #include <optional>
 #include <fstream>
@@ -274,8 +275,8 @@ Configuration load_configuration(CommandOptions& options)
 		config.output = opt["output"].get<OutputInfo>();
 		config.output.folder = expand_environment_variables(config.output.folder);
 		if (!fs::exists(config.output.folder)) {
-			fmt::print(fg(fmt::color::dark_salmon), "Creating output folder: {}\n", config.output.folder);
-			if (!fs::create_directories(config.output.folder)) {
+			fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n", config.output.folder);
+			if (!create_output_folder(config.output.folder)) {
 				throw std::runtime_error(fmt::format("Failed to create output folder: {}", config.output.folder));
 			}
 		}
@@ -295,6 +296,25 @@ Configuration load_configuration(CommandOptions& options)
 
 	ifs.close();
 	return config;
+}
+
+bool create_output_folder(std::filesystem::path folder_path, unsigned int num_retries)
+{
+	using namespace std::chrono_literals;
+	for (unsigned int i = 1; i <= num_retries; i++) {
+		try {
+			if (std::filesystem::create_directories(folder_path)) {
+				return true;
+			}
+		}
+		catch (const std::exception& ex) {
+			fmt::print(fg(fmt::color::red), "Failed to create output folder, attempt #{} - {}.\n", i, ex.what());
+		}
+
+		std::this_thread::sleep_for(1000ms);
+	}
+
+	return false;
 }
 
 std::vector<core::DiseaseInfo> get_diseases(core::Datastore& data_api, Configuration& config)
