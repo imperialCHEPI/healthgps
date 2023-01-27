@@ -53,14 +53,14 @@ To start working on the *Health GPS* code base, the suggested development machin
 5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
 6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment, plus.
    * [Intel TBB](https://github.com/oneapi-src/oneTBB) library version 2018 or later installed (e.g. `sudo apt update && sudo apt install libtbb-dev`) 
-7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
+7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the `VCPKG_ROOT` *environment variable* set to the installation directory.
 8. Internet connection.
 
 Download the *Health GPS* source code to the local machine, we recommend somewhere like root `/src` or `/source`, since otherwise you may run into path issues with the build systems.
 ```cmd
 > git clone https://github.com/imperialCHEPI/healthgps
 ```
-Finally, open the `.../healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
+Finally, open the `healthgps` folder in Visual Studio and build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
 >**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command line.*
 
