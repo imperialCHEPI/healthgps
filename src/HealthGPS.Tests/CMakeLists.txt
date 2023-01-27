@@ -2,6 +2,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(Threads REQUIRED)
+find_package(TBB QUIET)
 
 include(CTest)
 include(GoogleTest)
@@ -40,7 +41,7 @@ target_sources(HealthGPS.Tests
         "CountryModule.h"
         "RiskFactorData.h")
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if(TBB_FOUND AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
     target_link_libraries(HealthGPS.Tests
     PRIVATE
         HealthGPS.Core

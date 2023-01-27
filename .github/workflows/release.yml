@@ -13,8 +13,10 @@ jobs:
     steps:
       - name: Tarball url
         run: echo "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz"
-      - name: Create tarball sha256 
-        run: curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | shasum -a 256 > sha256sum.txt
+      - name: Create tarball sha256
+        run: |
+          curl -O -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | sha256sum > sha256sum.txt
+          sha256sum ${{ github.ref_name }}.tar.gz > sha256sum.txt
       - name: Upload sha256sum file
         uses: softprops/action-gh-release@v1
         with:
