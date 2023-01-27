@@ -101,8 +101,8 @@ jobs:
       id: upload_zip
       uses: actions/upload-artifact@v3
       with:
-        name: health_gps_linux.zip
-        path: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/*.Console*
+        name: health-gps-archive
+        path: artifact/health_gps_linux.zip
 
     - name: Upload release artefacts
       uses: softprops/action-gh-release@v1
