@@ -25,7 +25,9 @@ Finally, open the `healthgps` folder in Visual Studio and hit build. The first b
 
 >**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command line.*
 
-### CMake Build
+## CMake Build
+
+Health-GPS source code is configured to use [CMake](https://cmake.org/) by default for development, building and testing. The following steps are recommended for building and testing Health-GPS from source code without modification.
 
 ```cmd
 cmake --list-presets=all
@@ -54,7 +56,98 @@ cmake --preset='linux-debug'
 cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
-All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to CMake via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
+All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to [CMake](https://cmake.org/) via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
+
+## HPC Build
+
+Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. The HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, build programs, run applications, and automate repetitive tasks. See the [User Guide](userguide#50-hpc-running) for a very brief introduction to Imperial HPC system.
+
+
+This tutorial describes building Health-GPS using [EasyBuild](https://easybuild.io/), a framework specially designed to manage (scientific) software on HPC systems, adopted by the Imperial HPC to manage the installation of users' software on different stacks depending on maturity and quality.
+
+Software can be installed via three stacks:
+- **local** (tools/eb-dev) - allows the building and installation of software in your own user space, one can create locally modified version of a software, or set up a reproducible build environment for you own software development projects.
+- **development** (tools/dev) - a generic stack for software not current available directly from EasyBuild, available on the login nodes but without any guarantees,  software on this stack might change on short notice due to required rebuilds.
+- **production** (tools/prod) - a generic stack for software available as an [EasyBuild package](https://github.com/easybuilders/easybuild-easyconfigs), built to support specific architectures, and is *not* available on the login nodes. To *view* which software is installed, load the *'tools/prod-headnode'* and search for the software. 
+
+> **Warning**  
+> Modules name are case sensitive for both script and search. 
+
+> **Note**  
+> To get access to [Imperial HPC](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/) and learn more about [EasyBuild](https://easybuild.io/), users should consider taking the hands-on [workshops](https://www.imperial.ac.uk/students/academic-support/graduate-school/students/doctoral/professional-development/research-computing-data-science/courses/) offered by the Imperial's Professional Development Programme, specially **the Linux command line & large-scale computing** courses.
+
+The remaining of this tutorial focus on building a Health-GPS *release* source code, `version 1.2.1.0 or newer`, on the *Imperial HPC* using *EasyBuild* on the **local** stack. Installing Health-GPS on the *development* and *production* stacks must be done via the [Software Install](https://servicemgt.imperial.ac.uk/ask?id=sc_cat_item&sys_id=7c8e0ddf1b6eb8101fd24043b24bcb7f) request service. Health-GPS still has dependencies missing in the EasyBuild production pipeline, configuration [pull requests](https://github.com/easybuilders/easybuild-easyconfigs/pulls?q=healthgps) are under review, the following script builds on the latest Health-GPS version (1.3.0.0) that is available on the *development stack*.
+
+```bash
+# Clear all modules
+module purge
+
+# Load the local stack module
+module add tools/eb-dev
+
+# Create a new directory, change into that directory
+mkdir easybuild/healthgps
+cd easybuild/healthgps
+
+# Download EasyConfig config file for Health-GPS from
+# https://github.com/easybuilders/easybuild-easyconfigs/pulls
+eb --copy-ec --from-pr=16212
+
+# Create a copy of file: healthgps-1.1.3.0-GCCcore-11.3.0.eb for a new release (X.Y.Z.B)
+cp healthgps-1.1.3.0-GCCcore-11.3.0.eb healthgps-X.Y.Z.B-GCCcore-11.3.0.eb
+
+# Download the release X.Y.Z.B source code's checksum file locally
+wget https://github.com/imperialCHEPI/healthgps/releases/download/vX.Y.Z.B/sha256sum.txt
+
+# Edit and replace the release [version] and code [checksum] in the config file
+nano healthgps-X.Y.Z.B-GCCcore-11.3.0.eb
+
+# Check the configuration file syntax and dependencies (dry-run)
+eb -D healthgps-X.Y.Z.B-GCCcore-11.3.0.eb
+
+# Install the Health-GPS program locally
+eb -r healthgps-X.Y.Z.B-GCCcore-11.3.0.eb
+
+# Check for versions of Health-GPS installed, version X.Y.Z.B should be available
+module av healthgps
+
+# Load the newly installed Health-GPS module
+module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+
+# Finally, check the Health-GPS location, version and we are done!
+which HealthGPS.Console
+HealthGPS.Console --version
+```
+
+The Health-GPS build and installation on the HPC is now complete using EasyBuild software management tool. The resulting *configuration* file should now be checked-in to the [easybuild-easyconfigs](https://github.com/easybuilders/easybuild-easyconfigs) repository via pull request to create a *reproducible* build of the application, see the EasyBuild [documentation](https://docs.easybuild.io/en/latest/Integration_with_GitHub.html) for details. 
+
+### Known Issues
+- EasyBuild by default optimises the software for different types of hardware available within a HPC systems, the following compiler flags: `-ftree-vectorize -march=native -fno-math-errno` are typical used for Health-GPS builds using GCC version 11.1 or newer. The cluster contains many CPU types, e.g., AMD rome, and Intel skylake, haswell, ivy, sandy. The mismatch between building and using CPUs might cause performance issues, a **workaround** is to lock the `cpu_type=rome` in the PBS job script, *if you know the build CPU type*.
+
+- Imperial HPC job scheduler, PBS, does not provided good support non-OpenMP threading, e.g., Threading Building Blocks ([oneTBB](https://github.com/oneapi-src/oneTBB)). PBS relays on old fashion environment variables to control the number of threads an application should use, e.g., `ompthreads=8` will set `OMP_NUM_THREADS=8`, the OpenMP runtime reads this value and behaves accordingly as a good citizen. There is no hardware isolation, like a VM or container, the application still sees all the CPU cores available in the running node. Modern threading libraries are controlled via code, the aim is to maximize the available hardware usage, and might result on the following error: `PBS: job killed: ncpus 15.25 exceeded limit 8 (sum)`. The **workaround** is to size the job to use a full node, e.g., `#PBS -l select=1:ncpus=64:mem=XXgb:cpu_type=rome` to provide hardware isolation, but this might be inefficient for the HPC system.
+
+### Using Health-GPS Module
+
+The EasyBuild installation described above, installs the Health-GPS software in the users' own space, usually `$HOME/apps/software/healthgps` folder, where EasyBuild store logs and other information for reproducibility of the build environment. The `$HOME/apps/*` directory structure is created and updated by EasyBuild during local software installation and *should be left alone by the user*. To load a specific version of the Health-GPS software for use, the following steps are suggested:
+
+```bash
+# Clear all modules
+module purge
+
+# Load the software stack, e.g., local
+module add tools/eb-dev
+
+# Check for Health-GPS module versions available
+module av healthgps
+
+# Load the desirable Health-GPS module version
+module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+
+# Use the Health-GPS application. e.g. using development example and dataset
+HealthGPS.Console -f healthgps/example/France.Config.json -s ~/healthgps/data
+```
+
+In general, you should avoid running you own applications on the shared HPC login nodes, the *etiquette* for working with HPC system is the create and submit jobs to be evaluated by the HPC nodes instead. See the [User Guide](userguide#50-hpc-running) for details on how to use the installed Health-GPS modules on the Imperial HPC system.
 
 ## Third-party components
 
@@ -240,37 +333,4 @@ Simulation experiment results reproducibility is a fundamental requirement for a
 |:--:|
 |*Experiment reproducibility algorithm (seed management)*|
 
-When running the simulation as a single experiment, the solution is trivial, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. The following script, ***example.pbs*** in *Portable Batch System* (PBS) language, illustrate the mechanism by scheduling 50 simulation batches using *Health-GPS* on a *HPC computer* to evaluate the *same experiment* in parallel. The custom seed is used to create predictable master seeds for each batch, resulting in a total of `50 x number of runs in each batch` repeatable simulation runs. The number of runs in each batch must be configured to complete in less than 8 hours in this example.
-
-```bash
-#PBS -l walltime=8:00:00
-#PBS -l select=1:ncpus=8:mem=96gb:ompthreads=16
-#PBS -J 1-50
-
-module load gcc/11.2.0
-
-cd $PBS_O_WORKDIR
-
-user@machine:~/xxx$ ./HealthGPS.Console -f example/France.Config.json -s data -j $PBS_ARRAY_INDEX$
-```
-To submit the job, using PBS, use the following command on a HPC login node:
-```
-user@machine:~/xxx$ qsub example.pbs
-```
-Each simulation batch results file has the HPC *arrays index number* appended to the filename, enabling a full reconstruction of the experiment results for analysis. This mechanism enables new simulation runs to be added to an existing experiment's results dataset to improved convergence without repeating simulations by incrementing the job range in the schedule script. For example, to added 25 simulation batches to the same experiment's results, change the script as follows, submit the job again, and process the results as before:
-
-``` bash
-...
-#PBS -J 51-75
-...
-```
-
-To repeat the full experiment, keep track of the configuration file, Health-GPS executable version, backend storage state, and HPC job range used, for example, the following change to the script repeat the full experiment above and produce \`exact\` the same results:
-
-``` bash
-...
-#PBS -J 1-75
-...
-```
-
-Please note that HPC machine configuration can also influence the results due to floating-point calculation, Health-GPS will use shared libraries installed in the system such as C++ standard library, however the difference should be negligible within the machine numerical precision.
+When running the simulation as a single experiment, the solution is trivial using the same seed, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](userguide#50-hpc-running) for an worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.

@@ -570,9 +570,9 @@ You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Inte
 
 The included model and dataset provide an complete exemplar of the files and procedures described in this document. Users should use this exemplar as a starting point when creating production environments to aid the design and testing of intervention policies. 
 
-# 4.1 Results
+## 4.1 Results
 
-The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation.
+The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation. The model also output a detailed results file in Comma Separated Values (.csv), this associated output file name is included in the global summary file as shown below.
 
 ```json
 {
@@ -665,7 +665,284 @@ show(p)
 
 In a similar manner, the resulting dataset *`df`*, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
+### 4.1.1 Detailed Results
+
+The simulation detailed results file contains a dynamic number of columns, which depends on the risk factor model definition and diseases selection. The file's data is grouped by **sex** and **age**, each row in the file can be *unique identified* by the following columns:
+- **source** - the simulation scenario: *baseline* or *intervention*.
+- **run** - the simulation run number, e.g., 1, 5, 50,
+- **time** - the simulation clock time, e.g., 2010, 2023, 2050.
+- **gender_name** - the sex group identifier: *male* or *female*.
+- **index_id** - the age group identifier, e.g., 0, 30, 70, 100.
+
+The column **count** gives the *number of individuals* in the *row group*, the remaining columns contain average values for the group's data at each column. This result file can easily be used to construct pivot tables and plots. The column *count* can be combined with the averaged columns to estimate other statistical measures, such as *variance* and *standard deviation*.
+
 [comment]: # (References)
 [configjson]:https://github.com/imperialCHEPI/healthgps/blob/main/example/France.Config.json "Configuration file example"
 
 [datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"
+
+# 5.0 HPC Running
+
+Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. This HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, run programs, and automate repetitive tasks.
+
+Every software package installed in the HPC is called a **module**. The *module system* for centrally installed packages, must be used to find, load and unload installed modules and dependencies required to use a software package. The following *module commands* are essential to get started with Imperial HPC system:
+| Command             | Description                                            |
+|:---                 |:---                                                    |
+|module avail         | List all modules available                             |
+|module avail tools   | Find all available versions of a software module       |
+|module add tools/dev | Load a module to be used into the job or user own space|
+|module list          | List all loaded modules                                |
+|module rm tools/dev  | Remove a loaded module version                         |
+|module purge         | Unload all loaded modules, clear all modules           |
+
+> **Warning**  
+> Modules name are *case sensitive* for both script and search.
+
+Module packages can be installed *globally* within the HPC system, old style, or different stacks depending on Software maturity and quality (recommended). To see all available stacks, type command: `module av tools`, the Health-GPS Software can be installed via three stacks:
+- **local** (tools/eb-dev) - installed locally in the user space, software development projects.
+- **development** (tools/dev) - a generic stack available on the login nodes but without any guarantees, software can change on short notice.
+- **production** (tools/prod) - a generic stack for software built to support specific architectures, and *not* available on the login nodes, only via job scripts. To *view* which software is installed, load the *'tools/prod-headnode'* and search for the software.
+
+Furthermore, the [Portable Batch System](https://en.wikipedia.org/wiki/Portable_Batch_System) (PBS), a batch job and computer system resource management package, is used by the Imperial HPC for job scheduling and users also need learn the PBS commands. A list of useful PBS commands used to submit, monitor, modify, and delete jobs can be found below:
+
+| Command | Action | Example    | Description                                     |
+|:---     |:---    | :---       | :---                                            |
+| qsub 	  | Submit | qsub myjob | Submits the job "myjob" for the execution       |
+| qstat   | Monitor| qstat        | Show the status of all the jobs               |
+| ' '     | ' '    | qstat job_id | Show the status of single job                 |
+| qalter  | Modify | qalter -l ncpus = 4 job_id| Changes the attributes of the job|
+| qdel    | Delete | qdel job_id  | Deletes the job with job id = job_id          |
+
+An introduction to the PBS is beyond this tutorial, users are encouraged to attend dedicated [courses](https://www.imperial.ac.uk/students/academic-support/graduate-school/students/doctoral/professional-development/research-computing-data-science/courses/) provided by Imperial's professional development programme to familiarise themselves with the HPC system and usage guidelines. *This tutorial provides the basic steps required for finding, loading, and using installed Health-GPS software within the Imperial HPC system*.
+
+A job script using PBS comprises of three parts:
+1. *job parameters* - resource allocation and job duration using BPS options.
+2. *required software* - load required software modules to execute the application.
+3. *user command* - execute the user application with given arguments.
+
+The following job script (`healthgps.pbs`) executes Health-GPS version X.Y.Z.B on the *development example* and writes the console output to text file: `healthgps.pbs.txt`. The `-GCCcore-11.3.0` part of the *version name* refers to the *compiler toolset* used to build the Health-GPS software and install on the HPC as described in the [Developer Guide](development#hpc-build), this guide concerns only the use of installed modules.
+
+```bash
+#PBS -l walltime=00:30:00
+#PBS -l select=1:ncpus=8:mem=64gb
+
+module add tools/eb-dev
+module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+
+HealthGPS.Console -f healthgps/example/France.Config.json -s healthgps/data > healthgps.pbs.txt
+```
+To submit the above job script, check its status, and view the console output, the following PBS commands can be used: 
+```bash
+# Submit Health-GPS job, print out the job id
+qsub healthgps.pbs
+
+# Check the status of all submitted jobs (not completed only). 
+qstat
+
+# View Health-GPS console output
+cat healthgps.pbs.txt
+```
+
+Every job produces two log files, by default alongside the submitted job script, in this example:
+- `healthgps.pbs.ejob_id` - error messages (`stderr`)
+- `healthgps.pbs.ojob_id` - screen outputs and resource management messages (`stdout`)
+
+Environment variable: `$PBS_O_WORKDIR` points to the submit directory and will exist while the job is running. This is where you submitted your job, usually a directory where your job script resides, and this variable can be used in a job script. The console output log file (`healthgps.pbs.txt`) is optional, it can be very useful when diagnosing Health-GPS configuration problem. This file also provides detailed simulation run-time information that can be harvested to quantify performance.
+
+### 5.1 Array job script
+
+The above example runs a single Health-GPS configuration, like a desktop computer (sequential), however, to run experiments with thousands of simulations, parallelisation is required, and HPC system when used effectively, can make a huge difference. One way of parallelising Health-GPS experiments using Imperial HPC is to use *array job* instead of *single job* per script, this breaks down a large experiment into small batches to be evaluated as parallel jobs.
+
+To illustrate this mechanism, lets modify the job script above, and schedule 5 simulation batches using *Health-GPS* on the HPC to be evaluated in parallel.
+
+```bash
+#PBS -l walltime=01:00:00
+#PBS -l select=1:ncpus=8:mem=64gb
+#PBS -J 1-5
+
+cd $PBS_O_WORKDIR
+
+module add tools/eb-dev
+module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+
+HealthGPS.Console -f healthgps/example/France.Config.json -s healthgps/data -j $PBS_ARRAY_INDEX > healthgps.pbs.$PBS_ARRAY_INDEX.txt
+```
+
+Environment variable `$PBS_ARRAY_INDEX` takes the values from 1 to 5. The *custom seed* in the configuration file is used to create predictable master seeds for each batch in the array job, a total of `5 x number of runs in each batch` repeatable simulations run are evaluated in parallel. It is very important that the number of simulations run within *each batch* do not exceed the configured job duration (`walltime`) and complete in less than 1 hour, in this example.
+
+Each simulation batch result file will have the HPC *arrays index number* appended to the filename, enabling the full reconstruction of the experiment results for analysis. This mechanism also enables new simulation runs to be added to an existing experiment's results dataset, e.g., to improved convergence, without repeating simulations by incrementing the job range in the array job script. For example, to add 5 simulation batches to the previous experiment's results, change the job script as follows, submit the job again, and process the combined results as before:
+
+``` bash
+...
+#PBS -J 6-10
+...
+```
+> **Note**   
+> The range does not need to start at 1, but there is a **maximum limit** in size of **10,000**. That is 10,000 sub-jobs per array job.
+
+To repeat the full experiment, keep track of the configuration file, Health-GPS executable version, backend storage state, and HPC array job range used, for example, the following change to the job script will repeat the full experiment above and produce \`exact\` the same results:
+
+``` bash
+...
+#PBS -J 1-10
+...
+```
+**Important**: The HPC machine configuration can potentially influence the results due to floating-point calculation, Health-GPS will use shared libraries installed in the system such as C++ standard library, however the differences should be negligible within the machine numerical precision.
+
+### 5.2 HPC Data Store
+
+All computers in the Imperial HPC are connected to one parallel filesystem, 
+[Research Data Store](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/service-offering/rds/) (RDS) for storing large volume of non-sensitive or personally-identifiable research data. This service is available for non-HPC users too, but in both cases, users must register to get access to the RDS service.
+
+In the case of the HPC user account, you get access to:
+
+| Command     | Description                                                          |
+|:---         |:---                                                                  |
+|$HOME        | Home directory, personal working space                               |
+|$EPHEMERAL   | Additional individual working space, files are deleted after 30 days |
+|$RDS_PROJECT | Allocated project shared space *if your project has any (paid for one)*  |
+
+The storages available for each user is usually printed during login to the HPC, to check your usage at any point, use command `quota -s`.
+
+There are many ways to connect to the RDS from your personal computer and operating system (OS) of choice, but in general you must be connected to the Imperial network on campus or via VPN, check the website for details. In the context of Health-GPS, we recommend using the [Secure copy](https://en.wikipedia.org/wiki/Secure_copy_protocol) `scp` command line tool, distributed by most OS installation, for transferring data to and from the RDS.
+
+To copy file `file.txt` from the current directory on your machine to your home
+directory on RDS
+```bash
+scp file.txt username@login.hpc.ic.ac.uk:~
+```
+
+To copy file `file2.txt` from your home directory on RDS to the current directory on your machine
+
+```
+scp username@login.hpc.ic.ac.uk:~/file2.txt .
+```
+To copy a folder from remote host (use the -r switch):
+```
+scp -r username@login.hpc.ic.ac.uk:~/example local_target_folder
+```
+You can use wildcards characters such as `*.txt` to refer to multiple files or folders at once from the `scp` command line.
+
+### 5.3 HPC Example
+
+The [STOP project](https://www.stopchildobesity.eu/) has RDS allocated storage space for managing the research data, this example puts together the above information to illustrate how to use the Health-GPS software within the Imperial HPC and RDS services. 
+
+To access the STOP project storage, named `stop`, from the user space:
+```bash
+# Show the RDS root directory (should print out /rds/general/project/)
+echo $RDS_PROJECT
+
+# The STOP project storage root folder can be accessed via: 
+ls ${RDS_PROJECT}/stop
+
+# Or via explicit full path
+ls /rds/general/project/stop
+```
+
+The project RDS storage contains three top folders:
+- ***live*** - data that is being actively worked on, or frequently referenced.
+- ***ephemeral*** - temporary files and data of short-term use, deleted 30 days after creation.
+- ***archive*** - long-term storage of data that will be infrequently accessed.
+
+The development dataset: *example* and backend *data* folders, is distributed as part of the Health-GPS source code. In this example, the development dataset has been copied into the `demo` folder, inside the STOP project RDS storage `live` sub-folder, and the remaining of this example will be using this dataset to illustrate the process. The STOP project's production *inputs* and *backend storage* can be found in folder: `${RDS_PROJECT}/stop/live/healthgps_v2`.
+
+First change the configuration file (`example/France.Config.json`) as shown below: 
+
+```json
+{
+    "version": 2,
+    "inputs": {
+        "settings": {
+            "size_fraction": 0.001,
+        }
+    },
+    "running": {
+        "trial_runs": 10,
+        "interventions": {
+            "active_type_id": "dynamic_marketing",
+        }
+    },
+    "output": {
+        "folder": "${RDS_PROJECT}stop/live/demo/results/france",
+    }
+}
+```
+
+This will create a virtual population of size equivalent to 0.1% of the French population (~62 thousands), run 10 simulations, evaluate the impact of the marketing restriction intervention, and output the results to sub-folder `results/france` within `demo` folder. Health-GPS will attempt to create the output folder, if it does not exist, however, *array jobs* can create a race condition on the filesystem, to avoid this problem, *you should create the output folder before starting an array job*.
+
+Next create the array job script (`healthgps_demo.pbs`) to load an installed Health-GPS module version and evaluate the configuration file modified above as shown below.
+
+```bash
+#PBS -l walltime=01:00:00
+#PBS -l select=1:ncpus=8:mem=64gb
+#PBS -J 1-5
+
+cd $PBS_O_WORKDIR
+
+module add tools/eb-dev
+module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+
+HealthGPS.Console -f ${RDS_PROJECT}stop/live/demo/example/France.Config.json -s ${RDS_PROJECT}stop/live/demo/data -j $PBS_ARRAY_INDEX > healthgps_demo.pbs.$PBS_ARRAY_INDEX.txt
+
+```
+
+The array job must complete within 1 hour, run on a single compute node, with 8 CPU cores and 64GB of memory. The experiment comprises of 5 parallel batches with 10 simulation runs in each, performing a total of 50 simulation runs to evaluate the impact of the intervention scenario above.
+
+>**Note**  
+> In practice, `walltime` is around 8 hours, each batch or sub-job contains 50 simulation runs, the array size ranges from 50 to 100 sub-jobs, resulting on 2500 to 5000 simulation runs per array job, or simulation experiment. *The job configuration affects the queuing system where the job ends up*.
+
+Now submit the array job to be evaluated by the HPC system, and check the status until complete
+
+```bash
+# Submit the array job, note the array job_id number: XXX[]
+qsub healthgps_demo.pbs
+
+# Check the status of all submitted and unfinished jobs
+qstat
+
+# Check the status of a single array job
+qstat XXX[]
+
+# Check the status of each job within a array job
+qstat -t XXX[]
+```
+
+You can also monitor your job status and other HPC resources information via the [self service portal](https://selfservice.rcs.imperial.ac.uk), subject to being connected to Imperial network on campus or via VPN. Finally, this experiment will generate two simulation result files per batch in the output folder: `.../demo/results/france`:
+1. `HealthGPS_Result_{TIMESTAMP}_X.json` - global average summary of the simulation batch results.
+2. `HealthGPS_Result_{TIMESTAMP}_X.csv`  - detailed simulation results associated with batch X.
+
+where `X = $PBS_ARRAY_INDEX` value appended to the fine name to allow the reconstruction of the overall experiment for analysis. The simulation results file can be large, and grow with the size of the experiment, users should create results processing scripts or tools to be executed on the HPC to tabulate the results, create plots dataset, etc to minimise the coping of large files over the network. 
+
+> **Note**  
+> The processing of the detailed simulation result files requires the use of the **array index** as a column to *unique identify* each row across multiple files in the combined file. The array batches run independent in parallel, when combining the result files, the *run* column will have duplicates in the resulting file.
+
+The simulation logs are generated next to the array job script (`$PBS_O_WORKDIR`) by default, each array batch generates three log files:
+1. `healthgps_demo.pbs.ejob_id.X` - error messages (`stderr`).
+2. `healthgps_demo.pbs.ojob_id.X` - screen outputs and resource management messages (`stdout`).
+3. `healthgps_demo.pbs.X.txt` - the Health-GPS application console output information for batch X run.
+
+With large array jobs, this can cause the number of files in the submission directory to increase very quickly. Alternatively, consider redirecting the PBS log files to a different directory, *that the directory needs to exist prior submitting the array job*. You would specify the directory with the PBS parameters (-e [dir] and -o [dir]):
+
+```bash
+...
+#PBS -o /rds/general/user/[login_name]/home/project_name/logs/
+#PBS -e /rds/general/user/[login_name]/home/project_name/logs/
+#PBS -J 1-5
+...
+```
+
+>**Warning**  
+*Create one logs directory per-project job*. Using a single 'logs' directory for all your submitted jobs' log files defeats the purpose.
+
+If you end-up with many job log files in a folder, the following command can be used to clear all log files from the current directory:
+```bash
+rm *.pbs.[oet]*
+```
+
+Finally, array jobs are not suitable to all workflows. Because array jobs are intended to run many copies (potentially thousands) of the same workflow, typical of Monte-Carlo simulations, workflows with high load on the filesystem, where each sub-job is going to be reading/writing to the same file, for example, can result in slowdown of access to all HPC users. ***Be especially careful during the holidays when the HPC system has minimum support***.
+
+
+
+
+
+
