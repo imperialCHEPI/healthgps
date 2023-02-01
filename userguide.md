@@ -686,6 +686,7 @@ The column **count** gives the *number of individuals* in the *row group*, the r
 Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. This HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, run programs, and automate repetitive tasks.
 
 Every software package installed in the HPC is called a **module**. The *module system* for centrally installed packages, must be used to find, load and unload installed modules and dependencies required to use a software package. The following *module commands* are essential to get started with Imperial HPC system:
+
 | Command             | Description                                            |
 |:---                 |:---                                                    |
 |module avail         | List all modules available                             |
