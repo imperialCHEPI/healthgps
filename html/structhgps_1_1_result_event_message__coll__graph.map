@@ -1,0 +1,9 @@
+<map id="hgps::ResultEventMessage" name="hgps::ResultEventMessage">
+<area shape="rect" id="node1" title=" " alt="" coords="105,196,285,221"/>
+<area shape="rect" id="node2" href="$structhgps_1_1_event_message.html" title="Event message interface." alt="" coords="102,108,245,133"/>
+<area shape="rect" id="node3" href="$structhgps_1_1_model_result.html" title=" " alt="" coords="269,108,400,133"/>
+<area shape="rect" id="node4" href="$structhgps_1_1_gender_value.html" title=" " alt="" coords="5,5,147,45"/>
+<area shape="rect" id="node5" href="$structhgps_1_1_result_by_gender.html" title=" " alt="" coords="171,13,325,38"/>
+<area shape="rect" id="node6" href="$structhgps_1_1_d_a_l_ys_indicator.html" title=" " alt="" coords="349,13,497,38"/>
+<area shape="rect" id="node7" href="$classhgps_1_1_data_series.html" title=" " alt="" coords="521,13,644,38"/>
+</map>

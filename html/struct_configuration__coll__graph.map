@@ -1,0 +1,11 @@
+<map id="Configuration" name="Configuration">
+<area shape="rect" id="node1" title=" " alt="" coords="235,181,332,207"/>
+<area shape="rect" id="node2" href="$struct_file_info.html" title=" " alt="" coords="5,93,68,119"/>
+<area shape="rect" id="node3" href="$struct_settings_info.html" title=" " alt="" coords="93,93,183,119"/>
+<area shape="rect" id="node4" href="$struct_s_e_s_info.html" title=" " alt="" coords="207,93,277,119"/>
+<area shape="rect" id="node5" href="$struct_modelling_info.html" title=" " alt="" coords="301,93,399,119"/>
+<area shape="rect" id="node6" href="$struct_baseline_info.html" title=" " alt="" coords="295,5,387,31"/>
+<area shape="rect" id="node7" href="$struct_policy_scenario_info.html" title=" " alt="" coords="423,93,552,119"/>
+<area shape="rect" id="node8" href="$struct_policy_period_info.html" title=" " alt="" coords="438,5,553,31"/>
+<area shape="rect" id="node9" href="$struct_output_info.html" title=" " alt="" coords="576,93,657,119"/>
+</map>

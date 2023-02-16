@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['action_0',['action',['../structhgps_1_1_runner_event_message.html#a1f471078aef65739ec31a4ca2f41cae2',1,'hgps::RunnerEventMessage']]],
+  ['active_5fperiod_1',['active_period',['../struct_policy_scenario_info.html#a54113d4fd94588285373319d7378baa6',1,'PolicyScenarioInfo::active_period()'],['../structhgps_1_1_fiscal_policy_definition.html#abb74ad4fa0c0bacb7cd74a905328d0b6',1,'hgps::FiscalPolicyDefinition::active_period()'],['../structhgps_1_1_food_labelling_definition.html#a39dbc6a4f46894eacc258aed55197629',1,'hgps::FoodLabellingDefinition::active_period()'],['../structhgps_1_1_marketing_dynamic_definition.html#a9a292449519bca42e6a0abad3ff10e5c',1,'hgps::MarketingDynamicDefinition::active_period()'],['../structhgps_1_1_marketing_policy_definition.html#a4dec0ee1c5ed56eb6c1cb52dd8c77b7a',1,'hgps::MarketingPolicyDefinition::active_period()'],['../structhgps_1_1_physical_activity_definition.html#a1260c2647c8446f7b2bb2c1197bc4e08',1,'hgps::PhysicalActivityDefinition::active_period()'],['../structhgps_1_1_simple_policy_definition.html#ad2f46bb31e7663b05b2d643e2a296928',1,'hgps::SimplePolicyDefinition::active_period()']]],
+  ['adjustment_2',['adjustment',['../structhgps_1_1_adjustment_factor.html#a1fa4ed034cfd89b42ce4a5fa63ea02ac',1,'hgps::AdjustmentFactor']]],
+  ['adjustment_5frisk_5ffactor_3',['adjustment_risk_factor',['../structhgps_1_1_food_labelling_definition.html#aa74b7909c3596d58c71518bc35c2f55e',1,'hgps::FoodLabellingDefinition']]],
+  ['adjustments_4',['adjustments',['../struct_policy_scenario_info.html#a7c752febabc57c93e7c027579c1bac62',1,'PolicyScenarioInfo']]],
+  ['adult_5',['adult',['../structhgps_1_1_transfer_coefficient.html#ae302f1c842185b312a315a6c363b2e08',1,'hgps::TransferCoefficient']]],
+  ['age_6',['age',['../structhgps_1_1core_1_1_lms_data_row.html#a05f1bd4ee74bf460bbe789829dd5ff29',1,'hgps::core::LmsDataRow::age()'],['../structhgps_1_1_population_record.html#a2363c358d9de8ebd76d5325d2043484f',1,'hgps::PopulationRecord::age()'],['../structhgps_1_1_person.html#ac1ec0a210a404b62c730c705391aea61',1,'hgps::Person::age()']]],
+  ['age_5fgroup_7',['age_group',['../structhgps_1_1_age_group_gender_equation.html#a7cd4a95e7d24ed04cf21d024cd20d576',1,'hgps::AgeGroupGenderEquation']]],
+  ['age_5frange_8',['age_range',['../struct_settings_info.html#a59af9d62a487bc89078afebe681268fd',1,'SettingsInfo']]],
+  ['alpha_9',['alpha',['../structhgps_1_1_policy_dynamic.html#ae217a73fe64e328c1eccd28f7fcf0aa8',1,'hgps::PolicyDynamic']]],
+  ['alpha2_10',['alpha2',['../structhgps_1_1core_1_1_country.html#a62d3ffa7a4b0bf6046132a4dce2353b9',1,'hgps::core::Country']]],
+  ['alpha3_11',['alpha3',['../structhgps_1_1core_1_1_country.html#adb9cf4ba7b73bad5bb360003283c3c77',1,'hgps::core::Country']]],
+  ['api_5fmajor_12',['API_MAJOR',['../namespacehgps_1_1core.html#a5d4cc2566aadccbba22d473aba2c2fc7',1,'hgps::core']]],
+  ['api_5fminor_13',['API_MINOR',['../namespacehgps_1_1core.html#a62e3a457137479b76f351ee969cdef88',1,'hgps::core']]],
+  ['api_5fpatch_14',['API_PATCH',['../namespacehgps_1_1core.html#aece92c5373e376f44c2c844e26d5d91a',1,'hgps::core']]],
+  ['app_5fname_15',['app_name',['../struct_configuration.html#a8c8c901db3941997493c0534845cbb52',1,'Configuration']]],
+  ['app_5fversion_16',['app_version',['../struct_configuration.html#ac88d68bac6e8c6b223b15c7edfd67832',1,'Configuration']]],
+  ['at_5ftime_17',['at_time',['../structhgps_1_1core_1_1_life_expectancy_item.html#a9b90cbd194979324a969fd4cc5822734',1,'hgps::core::LifeExpectancyItem::at_time()'],['../structhgps_1_1core_1_1_cancer_parameter_entity.html#af6bc64b3ee96280a2b6042a425d0e272',1,'hgps::core::CancerParameterEntity::at_time()'],['../structhgps_1_1core_1_1_birth_item.html#abcba87cf68a12928dbb27b8f3c4c2a65',1,'hgps::core::BirthItem::at_time()'],['../structhgps_1_1core_1_1_mortality_item.html#a70bcb0fb96c33a4805a4eb018939ff93',1,'hgps::core::MortalityItem::at_time()'],['../structhgps_1_1core_1_1_population_item.html#a4a0535c1a8d90b5d97562ddb93abccc6',1,'hgps::core::PopulationItem::at_time()']]],
+  ['average_5fage_18',['average_age',['../structhgps_1_1_model_result.html#a5eedd127efef08599fdb2f6db527af68',1,'hgps::ModelResult']]]
+];

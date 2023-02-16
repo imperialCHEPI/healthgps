@@ -1,0 +1,12 @@
+<map id="hgps::Scenario" name="hgps::Scenario">
+<area shape="rect" id="node1" title="Health GPS simulation scenario interface." alt="" coords="5,121,115,146"/>
+<area shape="rect" id="node2" href="$classhgps_1_1_baseline_scenario.html" title=" " alt="" coords="171,95,329,121"/>
+<area shape="rect" id="node3" href="$classhgps_1_1_intervention_scenario.html" title="Health GPS scripted intervention policy scenario interface." alt="" coords="163,145,337,170"/>
+<area shape="rect" id="node4" href="$classhgps_1_1_dynamic_intervention_scenario.html" title="Health GPS dynamic intervention policy scenario interface." alt="" coords="399,5,574,45"/>
+<area shape="rect" id="node6" href="$classhgps_1_1_fiscal_policy_scenario.html" title=" " alt="" coords="397,70,577,95"/>
+<area shape="rect" id="node7" href="$classhgps_1_1_food_labelling_scenario.html" title=" " alt="" coords="392,119,581,145"/>
+<area shape="rect" id="node8" href="$classhgps_1_1_marketing_policy_scenario.html" title=" " alt="" coords="385,169,588,194"/>
+<area shape="rect" id="node9" href="$classhgps_1_1_physical_activity_scenario.html" title=" " alt="" coords="386,218,587,243"/>
+<area shape="rect" id="node10" href="$classhgps_1_1_simple_policy_scenario.html" title=" " alt="" coords="394,267,579,293"/>
+<area shape="rect" id="node5" href="$classhgps_1_1_marketing_dynamic_scenario.html" title=" " alt="" coords="636,13,853,38"/>
+</map>

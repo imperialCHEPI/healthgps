@@ -1,0 +1,10 @@
+<map id="hgps::PopulationModule::update_population" name="hgps::PopulationModule::update_population">
+<area shape="rect" id="node1" title="Updates the virtual population status." alt="" coords="5,197,167,237"/>
+<area shape="rect" id="node2" href="$classhgps_1_1_population.html#ace8256fba4946bcc0555474d7687d429" title=" " alt="" coords="229,5,377,45"/>
+<area shape="rect" id="node3" href="$classhgps_1_1_population.html#a67406e28d8144d8d4bbf3ec9e3cae573" title=" " alt="" coords="220,69,387,109"/>
+<area shape="rect" id="node4" href="$classhgps_1_1_population_module.html#a3bb8e9f20ef78774f88f9acbed832b3e" title="Gets the total population at a specific point in time." alt="" coords="215,133,392,173"/>
+<area shape="rect" id="node5" href="$classhgps_1_1_runtime_context.html#a0e888d326a217dcf378f1cb29eecf3b0" title=" " alt="" coords="228,197,379,237"/>
+<area shape="rect" id="node6" href="$classhgps_1_1_runtime_context.html#a346d7fdd33294a4836c708b1073df653" title=" " alt="" coords="228,261,379,301"/>
+<area shape="rect" id="node7" href="$namespacehgps_1_1core.html#a46c52a5e953821a3c37786635acfd9b5" title=" " alt="" coords="228,326,379,351"/>
+<area shape="rect" id="node8" href="$classhgps_1_1_runtime_context.html#a5eb9de9f095d934ababb9119d506b781" title=" " alt="" coords="228,376,379,416"/>
+</map>

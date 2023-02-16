@@ -1,0 +1,12 @@
+<map id="hgps::SimulationModule" name="hgps::SimulationModule">
+<area shape="rect" id="node1" title="Simulation modules interface." alt="" coords="5,80,167,105"/>
+<area shape="rect" id="node2" href="$classhgps_1_1_demographic_module.html" title="Population prospects module interface." alt="" coords="215,31,391,56"/>
+<area shape="rect" id="node4" href="$classhgps_1_1_updatable_module.html" title="Generic disease module interface to host multiple diseases model." alt="" coords="223,104,382,129"/>
+<area shape="rect" id="node3" href="$classhgps_1_1_population_module.html" title=" " alt="" coords="453,5,615,31"/>
+<area shape="rect" id="node5" href="$classhgps_1_1_analysis_module.html" title=" " alt="" coords="459,55,609,80"/>
+<area shape="rect" id="node6" href="$classhgps_1_1_disease_host_module.html" title="Generic disease module interface to host multiple disease models." alt="" coords="447,104,621,129"/>
+<area shape="rect" id="node8" href="$classhgps_1_1_risk_factor_host_module.html" title="Generic risk factors module interface to host hierarchical models." alt="" coords="439,153,629,179"/>
+<area shape="rect" id="node10" href="$classhgps_1_1_s_e_s_noise_module.html" title=" " alt="" coords="454,203,614,228"/>
+<area shape="rect" id="node7" href="$classhgps_1_1_disease_module.html" title=" " alt="" coords="685,104,832,129"/>
+<area shape="rect" id="node9" href="$classhgps_1_1_risk_factor_module.html" title=" " alt="" coords="677,153,840,179"/>
+</map>
