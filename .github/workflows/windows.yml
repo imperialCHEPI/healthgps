@@ -44,6 +44,10 @@ jobs:
       id: install_ninja
       run: choco install ninja
 
+    - name: Install Doxygen
+      id: install_doxygen
+      run: choco install doxygen
+
     - name: Tool Check
       id: toos_version
       run: |
@@ -52,6 +56,7 @@ jobs:
         ninja --version
         cl
         ./vcpkg/vcpkg --version
+        doxygen --version
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
@@ -71,7 +76,7 @@ jobs:
     - name: Configure release HealthGPS
       id: cmake_config_release
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON -DBUILD_DOC=OFF
+      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build release HealthGPS
       id: cmake_build_release
@@ -107,4 +112,14 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
           files: artifact/health_gps_win64.zip
+
+    - name: Doxygen release API deploy
+      uses: peaceiris/actions-gh-pages@v3
+      #if: startsWith(github.ref, 'refs/tags/')
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/html
+        destination_dir: html
+        enable_jekyll: true
+        commit_message: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
                   
