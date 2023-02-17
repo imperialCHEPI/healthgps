@@ -40,7 +40,7 @@ jobs:
 
     - name: Install Doxygen
       id: install_doxygen
-      run: sudo apt install doxygen
+      run: sudo apt install doxygen graphviz
 
     - name: Install VCPKG
       id: install_vcpkg
