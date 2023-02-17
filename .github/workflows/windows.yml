@@ -46,7 +46,7 @@ jobs:
 
     - name: Install Doxygen
       id: install_doxygen
-      run: choco install doxygen
+      run: choco install doxygen.install -y
 
     - name: Tool Check
       id: toos_version
