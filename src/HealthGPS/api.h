@@ -10,5 +10,5 @@
 #include "baseline_scenario.h"
 #include "intervention_scenario.h"
 
-/// \brief Top-level namespace for Health GPS C++ API
+/// \brief Top-level namespace for Health-GPS C++ API
 namespace hgps {}

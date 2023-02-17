@@ -15,6 +15,11 @@ if (BUILD_BENCHMARKS)
 	add_subdirectory (HealthGPS.Benchmarks)
 endif()
 
+if (BUILD_DOC AND CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+	set(DOXYGEN_EXCLUDE_PATTERNS "*/out/*" "*/Docs/*" "*/vcpkg_installed/*" "*/external/*" "*/HealthGPS.Tests/*" "*/HealthGPS.Benchmarks/*")
+    enable_doxygen("awesome-sidebar")
+endif()
+
 # PUBLIC needed to make heathers and library available to other project
 target_include_directories(HealthGPS.Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(HealthGPS.Datastore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

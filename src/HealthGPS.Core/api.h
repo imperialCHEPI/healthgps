@@ -13,5 +13,7 @@
 #include "identifier.h"
 #include "poco.h"
 
-/// \brief Top-level namespace for Health GPS Core C++ API
-namespace hgps { namespace core {} }
+namespace hgps {
+	/// \brief Top-level namespace for Health-GPS Core C++ API
+	namespace core {}
+}
