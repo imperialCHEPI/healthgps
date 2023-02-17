@@ -84,11 +84,133 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">Health-GPS Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
+<div class="textblock"><p><a class="anchor" id="md__home_runner_work_healthgps_healthgps_README"></a> <img src="https://github.com/imperialCHEPI/healthgps/actions/workflows/windows.yml/badge.svg" alt="windows" style="pointer-events: none;" class="inline"/> <img src="https://github.com/imperialCHEPI/healthgps/actions/workflows/linux.yml/badge.svg" alt="Linux" style="pointer-events: none;" class="inline"/> <img src="https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases" alt="GitHub release (latest by date including pre-releases)" class="inline"/> <img src="https://img.shields.io/github/license/imperialCHEPI/healthgps" alt="GitHub" class="inline"/></p>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Global Health Policy Simulation model (Health-GPS)</h1>
+<p>| <a href="#quick-start">Quick Start</a> | <a href="#development-tools">Development Tools</a> | <a href="#license">License</a> | <a href="#third-party-components">Third-party Components</a> |</p>
+<p>Health-GPS microsimulation is part of the <a href="https://www.stopchildobesity.eu/">STOP project</a>, and support researchers and policy makers in the analysis of the health and economic impacts of alternative measures to tackle <em>chronic diseases</em> and <em>obesity in children</em>. The model reproduces the characteristics of a population and simulates key individual event histories associated with key components of relevant behaviours, such as physical activity, and diseases such as diabetes or cancer.</p>
+<p>Childhood obesity is one of the major public health challenges throughout the world and is rising at an alarming rate in most countries. In particular, the rates of increase in obesity prevalence in developing countries have been more than 30% higher than those in developed countries. Simulation models are especially useful for assessing the long-term impacts of the wide range of policies that will be needed to tackle the obesity epidemic.</p>
+<p>The <em>Health GPS microsimulation</em> is being developed in collaboration between the <a href="https://www.imperial.ac.uk/business-school/faculty-research/research-centres/centre-health-economics-policy-innovation/">Centre for Health Economics &amp; Policy Innovation (CHEPI)</a>, Imperial College London; and <a href="https://www.inrae.fr">INRAE</a>, France; as part of the <a href="https://www.stopchildobesity.eu/">STOP project</a>. The software architecture uses a modular design approach to provide the building blocks of the <em>Health GPS application</em>, which is implemented using object-oriented principles in <em>Modern C++</em> programming language targeting the <a href="https://en.cppreference.com/w/cpp/20">C++20 standard</a>.</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Quick Start</h1>
+<p>The <b>Health GPS</b> application provides a command line interface (CLI) and runs on <em>Windows 10 (and newer)</em> and <em>Linux</em> devices. All supported options are provided to the model via a <em>configuration file</em> (JSON format), including intervention scenarios and multiple runs. Users are encouraged to start exploring the model by changing the provided example configuration file and running the model again. See the <a href="https://imperialchepi.github.io/healthgps/">technical documentation</a> for model description, user guides, software design, data model and development guidelines.</p>
+<h3><a class="anchor" id="autotoc_md4"></a>
+Windows OS</h3>
+<p>You may need to install the latest <a href="https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160">Visual C++ Redistributable</a> on the machine, the application requires the <code>2022 x64</code> version to be installed.</p>
+<ol type="1">
+<li>Download the latest <a href="https://github.com/imperialCHEPI/healthgps/releases">release</a> <em>source code</em> and <em>binaries</em> for Windows from the repository.</li>
+<li>Unzip both files content into a local directory of your choice (xxx).</li>
+<li>Open a command terminal, e.g. <a href="https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&amp;activetab=pivot:overviewtab">Windows Terminal</a>, and navigate to the directory used in step 2 (xxx).</li>
+<li>Rename the <em>data source</em> subfolder (healthgps) by removing the version from folder's name.</li>
+<li>Run: <code>X:\xxx&gt; .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data</code> where <code>-f</code> gives the <em>configuration file</em> full-name and <code>-s</code> the path to the root folder of the <em>backend storage</em> respectively.</li>
+<li>The default output folder is <code>C:/healthgps/results/france</code>, but this can be changed in the <em>configuration file</em> <code>(France.Config.json)</code>.</li>
+</ol>
+<h3><a class="anchor" id="autotoc_md5"></a>
+Linux OS</h3>
+<p>You may need to install the latest <a href="https://gcc.gnu.org">GCC Compiler</a> and <a href="https://github.com/oneapi-src/oneTBB">Intel TBB</a> runtime libraries in your system, the application requires <code>GCC 11.1</code> and <code>TBB 2018</code> or newer versions to be installed.</p>
+<ol type="1">
+<li>Download the latest <a href="https://github.com/imperialCHEPI/healthgps/releases">release</a> <em>source code</em> and <em>binaries</em> for Linux from the repository.</li>
+<li>Unzip both files content into a local directory of your choice (xxx).</li>
+<li>Open a command terminal and navigate to the directory used in step 2 (xxx).</li>
+<li>Rename the <em>data source</em> subfolder (healthgps) by removing the version from folder's name.</li>
+</ol>
+<ol type="1">
+<li>Run: <code>user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data</code> where <code>-f</code> gives the <em>configuration file</em> full-name and <code>-s</code> the path to the root folder of the <em>backend storage</em> respectively.</li>
+<li>The default output folder is <code>$HOME/healthgps/results/france</code>, but this can be changed in the <em>configuration file</em> <code>(France.Config.json)</code>.</li>
+</ol>
+<p>&gt;<b>NOTE:</b> The development datasets provided in this example is for demonstration purpose, showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the <code>index.json</code> file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*</p>
+<p>&gt;<em><b>Known Issue:</b></em> Windows 10 support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows <a href="https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251">registry keys</a>, however we recommend the use of <a href="https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&amp;activetab=pivot:overviewtab">Windows Terminal</a>, which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the Windows 11 installation.</p>
+<h1><a class="anchor" id="autotoc_md6"></a>
+Development Tools</h1>
+<p>The <em>Health GPS</em> software is written in modern, standard ANSI C++, targeting the <a href="https://en.cppreference.com/w/cpp/20">C++20 version</a> and using the C++ Standard Library. The project is fully managed by <a href="https://cmake.org/">CMake</a> and <a href="https://visualstudio.microsoft.com">Microsoft Visual Studio</a>, the code base is portable but requires a C++20 compatible compiler to build. The development toolset users <a href="https://ninja-build.org/">Ninja</a> for build, <a href="https://github.com/microsoft/vcpkg">vcpkg</a> package manager for dependencies, <a href="https://github.com/google/googletest">googletest</a> for unit testing and <a href="https://docs.github.com/en/actions">GitHub Actions</a> for automate build.</p>
+<p>To start working on the <em>Health GPS</em> code base, the suggested development machine needs:</p><ol type="1">
+<li>Windows 10 or newer, <a href="https://docs.microsoft.com/en-us/windows/wsl/">WSL 2</a> enabled and Linux distribution of choice installed.</li>
+<li><a href="https://git-scm.com/downloads">Git</a> 2.3 or newer.</li>
+<li><a href="https://cmake.org/">CMake</a> 3.20 or newer with support for <a href="https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html">presets</a>.</li>
+<li><a href="https://ninja-build.org/">Ninja</a> 1.10 or newer.</li>
+<li><a href="https://visualstudio.microsoft.com">Microsoft Visual Studio</a> 2022 or newer with CMake presets integration.</li>
+<li><a href="https://gcc.gnu.org/">GCC</a> 11.1 or newer installed on <em>Linux</em> environment, plus.<ul>
+<li><a href="https://github.com/oneapi-src/oneTBB">Intel TBB</a> library version 2018 or later installed (e.g. <code>sudo apt update &amp;&amp; sudo apt install libtbb-dev</code>)</li>
+</ul>
+</li>
+<li>The latest <a href="https://github.com/microsoft/vcpkg">vcpkg</a> installed globally for Visual Studio projects, and the <code>VCPKG_ROOT</code> <em>environment variable</em> set to the installation directory.</li>
+<li>Internet connection.</li>
+</ol>
+<p>Download the <em>Health GPS</em> source code to the local machine, we recommend somewhere like root <code>/src</code> or <code>/source</code>, since otherwise you may run into path issues with the build systems. </p><div class="fragment"><div class="line">&gt; git clone https://github.com/imperialCHEPI/healthgps</div>
+</div><!-- fragment --><p> Finally, open the <code>healthgps</code> folder in Visual Studio and build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.</p>
+<p>&gt;<b>NOTE:</b> <em>This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command line.</em></p>
+<h3><a class="anchor" id="autotoc_md7"></a>
+CMake Build</h3>
+<div class="fragment"><div class="line">cmake --list-presets=all</div>
+<div class="line"> </div>
+<div class="line"># Windows</div>
+<div class="line">cmake --preset=&#39;x64-release&#39;</div>
+<div class="line">cmake --build --preset=&#39;release-build-windows&#39; --target install --config Release</div>
+<div class="line"> </div>
+<div class="line"># Linux</div>
+<div class="line">cmake --preset=&#39;linux-release&#39;</div>
+<div class="line">cmake --build --preset=&#39;release-build-linux&#39; --target install --config Release</div>
+</div><!-- fragment --> <blockquote class="doxtable">
+<p>To build the <code>Benchmark</code> application, add <code>-DBUILD_BENCHMARKS=ON</code> to the CMake configuration command (first for each OS). </p>
+</blockquote>
+<p>The <code>HealthGPS</code> binaries will now be inside the <code>healthgps/out/install/[preset]/bin</code> directory.</p>
+<p>To run the unit tests: </p><div class="fragment"><div class="line"># Windows</div>
+<div class="line">cmake --preset=&#39;x64-debug&#39;</div>
+<div class="line">cmake --build --preset=&#39;debug-build-windows&#39;</div>
+<div class="line">ctest --preset=&#39;core-test-windows&#39;</div>
+<div class="line"> </div>
+<div class="line"># Linux</div>
+<div class="line">cmake --preset=&#39;linux-debug&#39;</div>
+<div class="line">cmake --build --preset=&#39;debug-build-linux&#39;</div>
+<div class="line">ctest --preset=&#39;core-test-linux&#39;</div>
+</div><!-- fragment --><p>All available options are defined using CMake <em>presets</em> in the <code>CMakePresets.json</code> file, which also declare <em>build presets</em> to be used via the CMake command line arguments.</p>
+<h1><a class="anchor" id="autotoc_md8"></a>
+License</h1>
+<p>The code in this repository is licensed under the <a class="el" href="md__home_runner_work_healthgps_healthgps_LICENSE.html">BSD 3-Clause</a> license.</p>
+<h1><a class="anchor" id="autotoc_md9"></a>
+Third-party components</h1>
+<h2><a class="anchor" id="autotoc_md10"></a>
+Libraries</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Name   </th><th class="markdownTableHeadLeft">License    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://sourceforge.net/projects/adevs">Adevs</a>   </td><td class="markdownTableBodyLeft">BSD 3-Clause    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><a href="https://github.com/graeme-hill/crossguid">crossguid</a>   </td><td class="markdownTableBodyLeft">MIT    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://github.com/jarro2783/cxxopts">cxxopts</a>   </td><td class="markdownTableBodyLeft">MIT    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><a href="https://github.com/p-ranav/indicators">indicators</a>   </td><td class="markdownTableBodyLeft">MIT    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://github.com/fmtlib/fmt">fmt</a>   </td><td class="markdownTableBodyLeft">MIT    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><a href="https://github.com/nlohmann/json">nlohmann-json</a>   </td><td class="markdownTableBodyLeft">MIT    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://github.com/d99kris/rapidcsv">rapidcsv</a>   </td><td class="markdownTableBodyLeft">BSD 3-Clause    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft" colspan="2"><em>Experimental</em>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://github.com/apache/arrow">arrow</a>   </td><td class="markdownTableBodyLeft">Apache-2.0   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md11"></a>
+Tools and Frameworks</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft">Name   </th><th class="markdownTableHeadLeft">License    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://github.com/microsoft/vcpkg">vcpkg</a>   </td><td class="markdownTableBodyLeft">MIT    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft"><a href="https://github.com/google/googletest">googletest</a>   </td><td class="markdownTableBodyLeft">BSD 3-Clause    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft"><a href="https://github.com/google/benchmark">benchmark</a>   </td><td class="markdownTableBodyLeft">Apache-2.0   </td></tr>
+</table>
+</div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
