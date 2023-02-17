@@ -1,12 +1,12 @@
 var interfaces_8h =
 [
-    [ "SimulationModule", "classhgps_1_1SimulationModule.html", "classhgps_1_1SimulationModule" ],
-    [ "UpdatableModule", "classhgps_1_1UpdatableModule.html", "classhgps_1_1UpdatableModule" ],
-    [ "DiseaseHostModule", "classhgps_1_1DiseaseHostModule.html", "classhgps_1_1DiseaseHostModule" ],
-    [ "RiskFactorHostModule", "classhgps_1_1RiskFactorHostModule.html", "classhgps_1_1RiskFactorHostModule" ],
-    [ "DemographicModule", "classhgps_1_1DemographicModule.html", "classhgps_1_1DemographicModule" ],
-    [ "HierarchicalLinearModel", "classhgps_1_1HierarchicalLinearModel.html", "classhgps_1_1HierarchicalLinearModel" ],
-    [ "DiseaseModel", "classhgps_1_1DiseaseModel.html", "classhgps_1_1DiseaseModel" ],
+    [ "SimulationModule", "classhgps_1_1_simulation_module.html", "classhgps_1_1_simulation_module" ],
+    [ "UpdatableModule", "classhgps_1_1_updatable_module.html", "classhgps_1_1_updatable_module" ],
+    [ "DiseaseHostModule", "classhgps_1_1_disease_host_module.html", "classhgps_1_1_disease_host_module" ],
+    [ "RiskFactorHostModule", "classhgps_1_1_risk_factor_host_module.html", "classhgps_1_1_risk_factor_host_module" ],
+    [ "DemographicModule", "classhgps_1_1_demographic_module.html", "classhgps_1_1_demographic_module" ],
+    [ "HierarchicalLinearModel", "classhgps_1_1_hierarchical_linear_model.html", "classhgps_1_1_hierarchical_linear_model" ],
+    [ "DiseaseModel", "classhgps_1_1_disease_model.html", "classhgps_1_1_disease_model" ],
     [ "case_insensitive_map", "interfaces_8h.html#a97c2a243c9d80d5cbe4f69ccd178695b", null ],
     [ "HierarchicalModelType", "interfaces_8h.html#a16ed54c31953b6b860ee10d7d112eb60", [
       [ "Static", "interfaces_8h.html#a16ed54c31953b6b860ee10d7d112eb60a84a8921b25f505d0d2077aeb5db4bc16", null ],

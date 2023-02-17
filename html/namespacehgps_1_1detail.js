@@ -1,7 +1,7 @@
 var namespacehgps_1_1detail =
 [
-    [ "RelativeRiskInfo", "structhgps_1_1detail_1_1RelativeRiskInfo.html", "structhgps_1_1detail_1_1RelativeRiskInfo" ],
-    [ "StoreConverter", "classhgps_1_1detail_1_1StoreConverter.html", "classhgps_1_1detail_1_1StoreConverter" ],
+    [ "RelativeRiskInfo", "structhgps_1_1detail_1_1_relative_risk_info.html", "structhgps_1_1detail_1_1_relative_risk_info" ],
+    [ "StoreConverter", "classhgps_1_1detail_1_1_store_converter.html", "classhgps_1_1detail_1_1_store_converter" ],
     [ "DiseaseModelBuilder", "namespacehgps_1_1detail.html#ad17d1eeaa9b3ed452fe8d951d0ef3474", null ],
     [ "HierarchicalModelBuilder", "namespacehgps_1_1detail.html#aa8460f214815c7385e973fc2600d2cc1", null ],
     [ "LiteHierarchicalModelBuilder", "namespacehgps_1_1detail.html#a5521891ae66502926878b59dca458730", null ],

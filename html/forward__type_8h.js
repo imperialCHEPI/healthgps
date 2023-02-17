@@ -1,6 +1,6 @@
 var forward__type_8h =
 [
-    [ "LookupGenderValue", "structhgps_1_1core_1_1LookupGenderValue.html", "structhgps_1_1core_1_1LookupGenderValue" ],
+    [ "LookupGenderValue", "structhgps_1_1core_1_1_lookup_gender_value.html", "structhgps_1_1core_1_1_lookup_gender_value" ],
     [ "DiseaseGroup", "forward__type_8h.html#aa2ade1bd9713197e55b2fb7291bfc176", [
       [ "other", "forward__type_8h.html#aa2ade1bd9713197e55b2fb7291bfc176a795f3202b17cb6bc3d4b771d8c6c9eaf", null ],
       [ "cancer", "forward__type_8h.html#aa2ade1bd9713197e55b2fb7291bfc176aa99dca5593185c498b63a5eed917bd4f", null ]

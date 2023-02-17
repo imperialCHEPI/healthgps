@@ -1,6 +1,6 @@
 var event__message_8h =
 [
-    [ "EventMessage", "structhgps_1_1EventMessage.html", "structhgps_1_1EventMessage" ],
+    [ "EventMessage", "structhgps_1_1_event_message.html", "structhgps_1_1_event_message" ],
     [ "EventType", "event__message_8h.html#a21cace154e33201910d1474162851f5d", [
       [ "runner", "event__message_8h.html#a21cace154e33201910d1474162851f5da4bad0b8dd3074cd43f641c2ac22a3571", null ],
       [ "info", "event__message_8h.html#a21cace154e33201910d1474162851f5dacaf9b6b99962bf5c2264824231d7a40c", null ],

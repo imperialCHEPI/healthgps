@@ -1,7 +1,7 @@
 var gender__table_8h =
 [
-    [ "GenderTable", "classhgps_1_1GenderTable.html", "classhgps_1_1GenderTable" ],
-    [ "AgeGenderTable", "classhgps_1_1AgeGenderTable.html", "classhgps_1_1AgeGenderTable" ],
+    [ "GenderTable", "classhgps_1_1_gender_table.html", "classhgps_1_1_gender_table" ],
+    [ "AgeGenderTable", "classhgps_1_1_age_gender_table.html", "classhgps_1_1_age_gender_table" ],
     [ "DoubleAgeGenderTable", "gender__table_8h.html#a94d6245bcdfdbb0e57ae71c04aa680ef", null ],
     [ "FloatAgeGenderTable", "gender__table_8h.html#af614cca342b8c530f040a05e6bc3a164", null ],
     [ "IntegerAgeGenderTable", "gender__table_8h.html#a20e0c550f0791db54b2459fc6a8eb34a", null ],

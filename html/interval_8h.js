@@ -1,6 +1,6 @@
 var interval_8h =
 [
-    [ "Interval", "classhgps_1_1core_1_1Interval.html", "classhgps_1_1core_1_1Interval" ],
+    [ "Interval", "classhgps_1_1core_1_1_interval.html", "classhgps_1_1core_1_1_interval" ],
     [ "DoubleInterval", "interval_8h.html#a01a542a10e742d1c33a955a2aeacca76", null ],
     [ "FloatInterval", "interval_8h.html#ae6ed131e909b4af138f94ada7f0c6b6e", null ],
     [ "IntegerInterval", "interval_8h.html#a8ab1bfc2be0b48235269c436f17bb549", null ],
