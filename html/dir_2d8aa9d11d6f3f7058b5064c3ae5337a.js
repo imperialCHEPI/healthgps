@@ -1,6 +1,0 @@
-var dir_2d8aa9d11d6f3f7058b5064c3ae5337a =
-[
-    [ "docs", "dir_519a668f2a9806fece20087ac925c92d.html", "dir_519a668f2a9806fece20087ac925c92d" ],
-    [ "googlemock", "dir_537c48e0975ff66dd911a872776c410e.html", "dir_537c48e0975ff66dd911a872776c410e" ],
-    [ "googletest", "dir_7109657e0e60f952531491922489d388.html", "dir_7109657e0e60f952531491922489d388" ]
-];
