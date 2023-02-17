@@ -1,4 +1,0 @@
-<map id="hgps::PopulationModule::get_total_population_size" name="hgps::PopulationModule::get_total_population_size">
-<area shape="rect" id="node1" title="Gets the total population at a specific point in time." alt="" coords="215,5,392,45"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_population_module.html#aee3e42276edae4477f41ca360b090323" title="Updates the virtual population status." alt="" coords="5,5,167,45"/>
-</map>

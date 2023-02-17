@@ -1,6 +1,0 @@
-<map id="hgps::StaticHierarchicalLinearModel::generate_risk_factors" name="hgps::StaticHierarchicalLinearModel::generate_risk_factors">
-<area shape="rect" id="node1" title="Generates the initial risk factors for a population and newborns." alt="" coords="5,62,165,117"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_hierarchical_mapping.html#a9773bbbb829cd02f3901ea6d9726adee" title=" " alt="" coords="213,5,391,45"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_runtime_context.html#a6b4e9897cf7892cafa62def6cb5cdfcf" title=" " alt="" coords="227,69,377,109"/>
-<area shape="rect" id="node4" href="$classhgps_1_1_runtime_context.html#a346d7fdd33294a4836c708b1073df653" title=" " alt="" coords="227,133,377,173"/>
-</map>

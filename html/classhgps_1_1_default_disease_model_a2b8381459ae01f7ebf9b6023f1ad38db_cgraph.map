@@ -1,8 +1,0 @@
-<map id="hgps::DefaultDiseaseModel::initialise_disease_status" name="hgps::DefaultDiseaseModel::initialise_disease_status">
-<area shape="rect" id="node1" title="Initialises the population disease status." alt="" coords="5,133,185,173"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_default_disease_model.html#adbd6b97a672469be6982d3af348c514f" title="Gets the model disease type unique identifier." alt="" coords="233,5,413,45"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_random.html#a3ec62063a29794f049c6d972a75ee29c" title=" " alt="" coords="254,69,393,109"/>
-<area shape="rect" id="node4" href="$classhgps_1_1_runtime_context.html#a346d7fdd33294a4836c708b1073df653" title=" " alt="" coords="248,133,399,173"/>
-<area shape="rect" id="node5" href="$classhgps_1_1_runtime_context.html#a437e1ab725b8f8ab71eb04222173eda3" title=" " alt="" coords="248,197,399,237"/>
-<area shape="rect" id="node6" href="$classhgps_1_1_runtime_context.html#a5eb9de9f095d934ababb9119d506b781" title=" " alt="" coords="248,261,399,301"/>
-</map>

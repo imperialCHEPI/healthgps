@@ -1,9 +1,0 @@
-<map id="HealthGPS.Console" name="HealthGPS.Console">
-<area shape="rect" id="node1" href="dir_aabdfeaa932d822e45e68ea9ba99cfe4.html" title="HealthGPS.Console" alt="" coords="151,5,289,31"/>
-<area shape="rect" id="node2" href="dir_88bbf9e9d68a194eda33b5dbc105b17c.html" title="HealthGPS.Datastore" alt="" coords="5,79,152,104"/>
-<area shape="rect" id="edge1-headlabel" href="dir_000001_000003.html" title="1" alt="" coords="118,70,126,85"/>
-<area shape="rect" id="node3" href="dir_dab824df37ba02169fac86e6f23b00e7.html" title="HealthGPS" alt="" coords="177,79,263,104"/>
-<area shape="rect" id="edge3-headlabel" href="dir_000001_000000.html" title="26" alt="" coords="221,53,236,67"/>
-<area shape="rect" id="node4" href="dir_d2cb4d7268994d5bb552b9ff4076d9cb.html" title="HealthGPS.Core" alt="" coords="287,79,406,104"/>
-<area shape="rect" id="edge2-headlabel" href="dir_000001_000002.html" title="10" alt="" coords="306,55,321,69"/>
-</map>

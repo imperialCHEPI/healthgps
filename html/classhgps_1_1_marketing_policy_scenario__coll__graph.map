@@ -1,5 +1,0 @@
-<map id="hgps::MarketingPolicyScenario" name="hgps::MarketingPolicyScenario">
-<area shape="rect" id="node1" title=" " alt="" coords="5,152,208,177"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_intervention_scenario.html" title="Health GPS scripted intervention policy scenario interface." alt="" coords="19,79,194,104"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_scenario.html" title="Health GPS simulation scenario interface." alt="" coords="52,5,161,31"/>
-</map>

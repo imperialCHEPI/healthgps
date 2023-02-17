@@ -1,5 +1,0 @@
-<map id="hgps::FoodLabellingScenario" name="hgps::FoodLabellingScenario">
-<area shape="rect" id="node1" title=" " alt="" coords="5,152,195,177"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_intervention_scenario.html" title="Health GPS scripted intervention policy scenario interface." alt="" coords="13,79,187,104"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_scenario.html" title="Health GPS simulation scenario interface." alt="" coords="45,5,155,31"/>
-</map>

@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['variableinfo_0',['VariableInfo',['../struct_variable_info.html',1,'']]],
-  ['version_1',['Version',['../classhgps_1_1core_1_1_version.html',1,'hgps::core']]]
+  ['querydata_12342',['QueryData',['../structdoctest_1_1QueryData.html',1,'doctest']]],
+  ['queue_12343',['Queue',['../classQueue.html',1,'']]],
+  ['queuenode_12344',['QueueNode',['../classQueueNode.html',1,'']]]
 ];

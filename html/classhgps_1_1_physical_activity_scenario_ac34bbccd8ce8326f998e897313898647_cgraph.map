@@ -1,6 +1,0 @@
-<map id="hgps::PhysicalActivityScenario::apply" name="hgps::PhysicalActivityScenario::apply">
-<area shape="rect" id="node1" title=" " alt="" coords="5,63,207,103"/>
-<area shape="rect" id="node2" href="$structhgps_1_1_policy_interval.html#a920ea4c319e42738ede74c2c5fd3f307" title=" " alt="" coords="257,5,391,45"/>
-<area shape="rect" id="node3" href="$structhgps_1_1_person.html#a55a222e5e970c4fb8646079effbb279a" title=" " alt="" coords="265,70,383,95"/>
-<area shape="rect" id="node4" href="$classhgps_1_1_random.html#a3ec62063a29794f049c6d972a75ee29c" title=" " alt="" coords="255,120,393,160"/>
-</map>

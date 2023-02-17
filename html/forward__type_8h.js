@@ -1,7 +1,6 @@
 var forward__type_8h =
 [
-    [ "hgps::core::LookupGenderValue", "structhgps_1_1core_1_1_lookup_gender_value.html", "structhgps_1_1core_1_1_lookup_gender_value" ],
-    [ "hgps::core::Numerical", "concepthgps_1_1core_1_1_numerical.html", null ],
+    [ "LookupGenderValue", "structhgps_1_1core_1_1LookupGenderValue.html", "structhgps_1_1core_1_1LookupGenderValue" ],
     [ "DiseaseGroup", "forward__type_8h.html#aa2ade1bd9713197e55b2fb7291bfc176", [
       [ "other", "forward__type_8h.html#aa2ade1bd9713197e55b2fb7291bfc176a795f3202b17cb6bc3d4b771d8c6c9eaf", null ],
       [ "cancer", "forward__type_8h.html#aa2ade1bd9713197e55b2fb7291bfc176aa99dca5593185c498b63a5eed917bd4f", null ]
@@ -14,5 +13,6 @@ var forward__type_8h =
     [ "VerboseMode", "forward__type_8h.html#a408868094d8a2eaf185df41a52acb4e3", [
       [ "none", "forward__type_8h.html#a408868094d8a2eaf185df41a52acb4e3a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "verbose", "forward__type_8h.html#a408868094d8a2eaf185df41a52acb4e3a2c7aea4237e25b4f8ee3b0bf77d6fed0", null ]
-    ] ]
+    ] ],
+    [ "Numerical", "forward__type_8h.html#a376e918de1b806c7ee2fd2ab0e1f7086", null ]
 ];

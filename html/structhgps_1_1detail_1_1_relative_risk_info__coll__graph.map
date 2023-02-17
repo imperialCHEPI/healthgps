@@ -1,7 +1,0 @@
-<map id="hgps::detail::RelativeRiskInfo" name="hgps::detail::RelativeRiskInfo">
-<area shape="rect" id="node1" title=" " alt="" coords="168,181,356,207"/>
-<area shape="rect" id="node2" href="$structhgps_1_1core_1_1_disease_info.html" title=" " alt="" coords="5,93,164,119"/>
-<area shape="rect" id="node3" href="$structhgps_1_1core_1_1_identifier.html" title=" " alt="" coords="15,5,154,31"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1_datastore.html" title=" " alt="" coords="189,93,335,119"/>
-<area shape="rect" id="node5" href="$classhgps_1_1_model_input.html" title=" " alt="" coords="360,93,481,119"/>
-</map>

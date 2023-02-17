@@ -1,9 +1,0 @@
-<map id="hgps::Random::next_double" name="hgps::Random::next_double">
-<area shape="rect" id="node1" title=" " alt="" coords="271,165,409,205"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_food_labelling_scenario.html#aa834940afe9a25e18be90b058767feff" title=" " alt="" coords="19,5,209,45"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_marketing_dynamic_scenario.html#a84574c7750050d6d3b1b0c91276df416" title=" " alt="" coords="5,69,223,109"/>
-<area shape="rect" id="node4" href="$classhgps_1_1_physical_activity_scenario.html#ac34bbccd8ce8326f998e897313898647" title=" " alt="" coords="13,133,215,173"/>
-<area shape="rect" id="node5" href="$classhgps_1_1_default_cancer_model.html#a59790779c6af498fed3df81b168cd504" title="Initialises the population disease status." alt="" coords="27,197,201,237"/>
-<area shape="rect" id="node6" href="$classhgps_1_1_default_disease_model.html#a2b8381459ae01f7ebf9b6023f1ad38db" title="Initialises the population disease status." alt="" coords="24,261,204,301"/>
-<area shape="rect" id="node7" href="$classhgps_1_1_random.html#ad27457392d0893a9f7f01efea5bc6478" title=" " alt="" coords="45,325,183,365"/>
-</map>

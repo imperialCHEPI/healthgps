@@ -1,7 +1,0 @@
-<map id="hgps::RuntimeContext::random" name="hgps::RuntimeContext::random">
-<area shape="rect" id="node1" title=" " alt="" coords="233,101,384,141"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_default_cancer_model.html#a59790779c6af498fed3df81b168cd504" title="Initialises the population disease status." alt="" coords="8,5,183,45"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_default_disease_model.html#a2b8381459ae01f7ebf9b6023f1ad38db" title="Initialises the population disease status." alt="" coords="5,69,185,109"/>
-<area shape="rect" id="node4" href="$classhgps_1_1_s_e_s_noise_module.html#ae0a5e4a940571744b83d420bcb5f99b1" title="Initialises the virtual population." alt="" coords="15,133,175,173"/>
-<area shape="rect" id="node5" href="$classhgps_1_1_s_e_s_noise_module.html#ad24d0002d518f941159a9873fe918c44" title="Updates the virtual population status." alt="" coords="15,197,175,237"/>
-</map>

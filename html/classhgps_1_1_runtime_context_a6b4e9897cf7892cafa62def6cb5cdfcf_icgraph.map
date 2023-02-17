@@ -1,6 +1,0 @@
-<map id="hgps::RuntimeContext::mapping" name="hgps::RuntimeContext::mapping">
-<area shape="rect" id="node1" title=" " alt="" coords="268,85,419,125"/>
-<area shape="rect" id="node2" href="$classhgps_1_1_static_hierarchical_linear_model.html#aed69f3d22a37908a2e350b73f4b3dfd0" title="Generates the initial risk factors for a population and newborns." alt="" coords="33,5,193,60"/>
-<area shape="rect" id="node3" href="$classhgps_1_1_energy_balance_hierarchical_model.html#a3b51c4a34acc3382b17d6c251884e619" title="Update risk factors for population." alt="" coords="5,85,220,125"/>
-<area shape="rect" id="node4" href="$classhgps_1_1_static_hierarchical_linear_model.html#a2501846cb781316081a03317bfabfeca" title="Update risk factors for population." alt="" coords="29,149,196,204"/>
-</map>

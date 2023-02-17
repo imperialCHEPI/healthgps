@@ -1,0 +1,27 @@
+var unit_regression2_8cpp =
+[
+    [ "Data", "structData.html", "structData" ],
+    [ "adl_serializer< NonDefaultFromJsonStruct >", "structnlohmann_1_1adl__serializer_3_01NonDefaultFromJsonStruct_01_4.html", null ],
+    [ "NotSerializableData", "structNotSerializableData.html", "structNotSerializableData" ],
+    [ "NonDefaultConstructible", "structNonDefaultConstructible.html", "structNonDefaultConstructible" ],
+    [ "adl_serializer< NonDefaultConstructible >", "structnlohmann_1_1adl__serializer_3_01NonDefaultConstructible_01_4.html", null ],
+    [ "sax_no_exception", "classsax__no__exception.html", "classsax__no__exception" ],
+    [ "my_allocator", "classmy__allocator.html", null ],
+    [ "FooAlloc", "classFooAlloc.html", null ],
+    [ "Foo", "classFoo.html", "classFoo" ],
+    [ "FooBar", "classFooBar.html", "classFooBar" ],
+    [ "for_3171_base", "structfor__3171__base.html", "structfor__3171__base" ],
+    [ "for_3171_derived", "structfor__3171__derived.html", "structfor__3171__derived" ],
+    [ "for_3204_foo", "structfor__3204__foo.html", "structfor__3204__foo" ],
+    [ "for_3204_bar", "structfor__3204__bar.html", "structfor__3204__bar" ],
+    [ "for_3333", "structfor__3333.html", "structfor__3333" ],
+    [ "JSON_TESTS_PRIVATE", "unit-regression2_8cpp.html#aac81588c35115b6f19794f631c05cbe4", null ],
+    [ "float_json", "unit-regression2_8cpp.html#a5978f8da8252891e513419a0546a2e37", null ],
+    [ "json", "unit-regression2_8cpp.html#ab701e3ac61a85b337ec5c1abaad6742d", null ],
+    [ "ordered_json", "unit-regression2_8cpp.html#a7a7eb87c9ed558274a643ed90dc01eb4", null ],
+    [ "from_json", "unit-regression2_8cpp.html#ae14d47158b902877a3fc6840ea80dd02", null ],
+    [ "from_json", "unit-regression2_8cpp.html#acbdb92b656a54fd2e9ad1428c23258d3", null ],
+    [ "from_json", "unit-regression2_8cpp.html#a11859b18f00265a59bfb968d1ecfe1cb", null ],
+    [ "operator==", "unit-regression2_8cpp.html#adcd61d2936c5f4f652496b7f8184c143", null ],
+    [ "TEST_CASE", "unit-regression2_8cpp.html#ae883c8adabfa3509d184fc46902df3bb", null ]
+];

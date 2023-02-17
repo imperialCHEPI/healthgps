@@ -1,9 +1,0 @@
-<map id="hgps::FoodLabellingDefinition" name="hgps::FoodLabellingDefinition">
-<area shape="rect" id="node1" title=" " alt="" coords="596,80,787,105"/>
-<area shape="rect" id="node2" href="$structhgps_1_1_policy_interval.html" title="Defines the policy active interval." alt="" coords="263,5,397,31"/>
-<area shape="rect" id="node3" href="$structhgps_1_1_adjustment_factor.html" title=" " alt="" coords="249,55,411,80"/>
-<area shape="rect" id="node4" href="$structhgps_1_1core_1_1_identifier.html" title=" " alt="" coords="7,55,145,80"/>
-<area shape="rect" id="node5" href="$structhgps_1_1_policy_coverage.html" title=" " alt="" coords="257,104,403,129"/>
-<area shape="rect" id="node6" href="$structhgps_1_1_transfer_coefficient.html" title=" " alt="" coords="248,153,412,179"/>
-<area shape="rect" id="node7" href="$structhgps_1_1_gender_value.html" title=" " alt="" coords="5,146,147,186"/>
-</map>

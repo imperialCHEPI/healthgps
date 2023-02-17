@@ -1,4 +1,0 @@
-<map id="hgps::core::MathHelper::default_numerical_precision" name="hgps::core::MathHelper::default_numerical_precision">
-<area shape="rect" id="node1" title="Gets the typical meaningful precision for numerical calculations." alt="" coords="5,5,196,45"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1_math_helper.html#a8b3886fcf605aad46c3c6c7e496cd364" title="Gets the largest positive value which, when added to 1.0, yields 0." alt="" coords="244,5,401,45"/>
-</map>

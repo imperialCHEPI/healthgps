@@ -1,6 +1,0 @@
-<map id="hgps::core::DiseaseEntity" name="hgps::core::DiseaseEntity">
-<area shape="rect" id="node1" title=" " alt="" coords="26,181,198,207"/>
-<area shape="rect" id="node2" href="$structhgps_1_1core_1_1_country.html" title=" " alt="" coords="5,93,141,119"/>
-<area shape="rect" id="node3" href="$structhgps_1_1core_1_1_disease_info.html" title=" " alt="" coords="166,93,325,119"/>
-<area shape="rect" id="node4" href="$structhgps_1_1core_1_1_identifier.html" title=" " alt="" coords="176,5,315,31"/>
-</map>

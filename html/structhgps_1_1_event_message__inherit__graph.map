@@ -1,7 +1,0 @@
-<map id="hgps::EventMessage" name="hgps::EventMessage">
-<area shape="rect" id="node1" title="Event message interface." alt="" coords="5,80,148,105"/>
-<area shape="rect" id="node2" href="$structhgps_1_1_error_event_message.html" title=" " alt="" coords="203,5,373,31"/>
-<area shape="rect" id="node3" href="$structhgps_1_1_info_event_message.html" title=" " alt="" coords="207,55,369,80"/>
-<area shape="rect" id="node4" href="$structhgps_1_1_result_event_message.html" title=" " alt="" coords="198,104,378,129"/>
-<area shape="rect" id="node5" href="$structhgps_1_1_runner_event_message.html" title=" " alt="" coords="196,153,380,179"/>
-</map>

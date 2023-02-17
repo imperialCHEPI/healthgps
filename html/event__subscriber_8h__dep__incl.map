@@ -1,7 +1,0 @@
-<map id="HealthGPS/event_subscriber.h" name="HealthGPS/event_subscriber.h">
-<area shape="rect" id="node1" title=" " alt="" coords="228,5,427,31"/>
-<area shape="rect" id="node2" href="$event__bus_8h.html" title=" " alt="" coords="142,79,302,104"/>
-<area shape="rect" id="node5" href="$event__subscriber_8cpp.html" title=" " alt="" coords="326,79,539,104"/>
-<area shape="rect" id="node3" href="$program_8cpp.html" title=" " alt="" coords="5,152,220,177"/>
-<area shape="rect" id="node4" href="$event__bus_8cpp.html" title=" " alt="" coords="244,152,419,177"/>
-</map>

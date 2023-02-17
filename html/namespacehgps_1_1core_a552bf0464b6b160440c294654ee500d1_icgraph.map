@@ -1,6 +1,0 @@
-<map id="hgps::core::trim" name="hgps::core::trim">
-<area shape="rect" id="node1" title="Trim leading and trailing occurrences of white&#45;space characters from string." alt="" coords="460,5,573,31"/>
-<area shape="rect" id="node2" href="$csvparser_8cpp.html#aef4d3e51d3ef1bd72a04d915dfb7ab62" title=" " alt="" coords="284,5,412,31"/>
-<area shape="rect" id="node3" href="$csvparser_8cpp.html#aa36bf705a50d4f460573db11852ca40c" title=" " alt="" coords="104,5,236,31"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,56,31"/>
-</map>
