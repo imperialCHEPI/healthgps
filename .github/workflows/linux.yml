@@ -62,35 +62,30 @@ jobs:
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
-      working-directory: ${{github.workspace}}
       run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
 
     - name: Test debug HealthGPS
       id: ctest_run
-      working-directory: ${{github.workspace}}
       run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
     - name: Configure release HealthGPS
       id: cmake_config_release
-      working-directory: ${{github.workspace}}
       run: |
-        ls -l
+        ls -l /out/build/${{env.RELEASE_PRESET}}
         cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build release HealthGPS
       id: cmake_build_release
       run: |
-        ls -l
+        ls -l /out/build/${{env.RELEASE_PRESET}}
         cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Install release HealthGPS
       id: cmake_install_release
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}} --target install --config Release
 
     - name: Check TBB Linking

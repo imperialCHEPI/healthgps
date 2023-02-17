@@ -16,7 +16,7 @@ if (BUILD_BENCHMARKS)
 endif()
 
 if (BUILD_DOC AND CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
-	set(DOXYGEN_EXCLUDE_PATTERNS "*/out/*" "*/Docs/*" "*/vcpkg_installed/*" "*/external/*" "*/HealthGPS.Tests/*" "*/HealthGPS.Benchmarks/*")
+	set(DOXYGEN_EXCLUDE_PATTERNS "*/out/* */Docs/* */vcpkg_installed/* */external/* */HealthGPS.Tests/* */HealthGPS.Benchmarks/*")
     enable_doxygen("awesome-sidebar")
 endif()
 
