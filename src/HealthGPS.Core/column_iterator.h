@@ -78,6 +78,7 @@ namespace hgps {
 	}
 }
 
+/// @brief Global namespace
 namespace std {
 
 	template <typename ColumnType>

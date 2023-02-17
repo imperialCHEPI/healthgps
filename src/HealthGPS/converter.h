@@ -12,6 +12,7 @@
 #include "HealthGPS.Core/datastore.h"
 
 namespace hgps {
+	/// @brief Internal namespace for private data types
 	namespace detail {
 
 		struct RelativeRiskInfo

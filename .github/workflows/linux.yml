@@ -38,6 +38,10 @@ jobs:
       id: install_ninja
       run: sudo apt install ninja-build
 
+    - name: Install Doxygen
+      id: install_doxygen
+      run: sudo apt install doxygen graphviz
+
     - name: Install VCPKG
       id: install_vcpkg
       run: |
@@ -54,35 +58,31 @@ jobs:
         ninja --version
         g++ --version
         ./vcpkg/vcpkg --version
+        doxygen --version
+        dot -V
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
-      working-directory: ${{github.workspace}}
       run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
 
     - name: Test debug HealthGPS
       id: ctest_run
-      working-directory: ${{github.workspace}}
       run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
     - name: Configure release HealthGPS
       id: cmake_config_release
-      working-directory: ${{github.workspace}}
       run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build release HealthGPS
       id: cmake_build_release
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Install release HealthGPS
       id: cmake_install_release
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}} --target install --config Release
 
     - name: Check TBB Linking
@@ -109,3 +109,13 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
           files: artifact/health_gps_linux.zip
+
+    - name: Doxygen release API deploy
+      uses: peaceiris/actions-gh-pages@v3
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/html
+        destination_dir: html
+        enable_jekyll: true
+        commit_message: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}

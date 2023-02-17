@@ -43,14 +43,14 @@ namespace hgps {
 			/// Let <c>a</c> and <c>b</c> be the two numbers to be compared, we build 
 			/// the following expression:
 			/// 
-			/// <math> &#1013; = |a - b| / max(|a|, |b|) </math>
+			/// <c>x = |a - b| / max(|a|, |b|)</c>
 			/// 
-			/// The two numbers can be considered equal if <math>&#1013;</math> is smaller 
-			/// than a given number <math>&#1013;<sub>max</sub></math>. If the denominator of
-			/// the fraction on the above equation is less than <math>&#1013;<sub>max</sub></math>,
+			/// The two numbers can be considered equal if <c>x</c> is smaller 
+			/// than a given number <c>x<sub>max</sub></c>. If the denominator of
+			/// the fraction on the above equation is less than <c>x<sub>max</sub></c>,
 			/// than the two numbers can be considered as being equal. For lack of information
-			/// on how the numbers a and b have been obtained, one uses for
-			/// <math>&#1013;<sub>max</sub></math> the <see cref="DefaultNumericalPrecision"/>.
+			/// on how the numbers <c>a</c> and <c>b</c> have been obtained, one uses for
+			/// <c>x<sub>max</sub></c> the <see cref="DefaultNumericalPrecision"/>.
 			/// If one can determine the precision of each number, then this relative equality
 			/// method can be used.
 			///  

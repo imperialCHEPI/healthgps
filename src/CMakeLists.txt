@@ -15,6 +15,13 @@ if (BUILD_BENCHMARKS)
 	add_subdirectory (HealthGPS.Benchmarks)
 endif()
 
+if (BUILD_DOC AND CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+    message(STATUS "Doxygen build folder: ${CMAKE_CURRENT_BINARY_DIR}")
+	set(DOXYGEN_FILE_PATTERNS *.h *.cpp *.md)
+	set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*" "*/HealthGPS.Tests/*" "*/HealthGPS.Benchmarks/*")
+    enable_doxygen("awesome-sidebar")
+endif()
+
 # PUBLIC needed to make heathers and library available to other project
 target_include_directories(HealthGPS.Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(HealthGPS.Datastore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

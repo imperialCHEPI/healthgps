@@ -9,6 +9,8 @@
 
 namespace hgps {
 
+	/// @brief Defines the Health-GPS simulation engine, which holds the modules instances and
+	/// run-time context, manages the simulation clock and core algorithm sequencing.
 	class HealthGPS : public Simulation
 	{
 	public:

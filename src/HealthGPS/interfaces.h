@@ -87,7 +87,7 @@ namespace hgps {
 		virtual std::size_t size() const noexcept = 0;
 
 		/// @brief Indicates whether the host contains an disease identified by code.
-		/// @param disease_core The disease unique identification code 
+		/// @param disease_code The disease unique identification code 
 		/// @return true if the disease is found, otherwise false.
 		virtual bool contains(const core::Identifier& disease_code) const noexcept = 0;
 
@@ -174,15 +174,15 @@ namespace hgps {
 		virtual const core::Identifier& disease_type() const noexcept = 0;
 
 		/// @brief Initialises the population disease status.
-		/// @param The simulation run-time context
+		/// @param context The simulation run-time context
 		virtual void initialise_disease_status(RuntimeContext& context) = 0;
 
 		/// @brief Initialises the average relative risks once all diseases status were initialised.
-		/// @param The simulation run-time context
+		/// @param context The simulation run-time context
 		virtual void initialise_average_relative_risk(RuntimeContext& context) = 0;
 
 		/// @brief Updates the disease cases remission and incidence in the population
-		/// @param The simulation run-time context
+		/// @param context The simulation run-time context
 		virtual void update_disease_status(RuntimeContext& context) = 0;
 
 		/// @brief Gets the excess mortality associated with a disease for an individual
