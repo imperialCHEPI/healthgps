@@ -39,7 +39,7 @@ jobs:
       run: sudo apt install ninja-build
 
     - name: Install Doxygen
-      id: install_ninja
+      id: install_doxygen
       run: sudo apt install doxygen
 
     - name: Install VCPKG
@@ -58,6 +58,7 @@ jobs:
         ninja --version
         g++ --version
         ./vcpkg/vcpkg --version
+        doxygen --version
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
