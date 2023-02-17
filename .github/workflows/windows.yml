@@ -44,10 +44,6 @@ jobs:
       id: install_ninja
       run: choco install ninja
 
-    - name: Install Doxygen
-      id: install_doxygen
-      run: choco install doxygen.install -y
-
     - name: Tool Check
       id: toos_version
       run: |
@@ -56,42 +52,35 @@ jobs:
         ninja --version
         cl
         ./vcpkg/vcpkg --version
-        doxygen --version
 
     - name: Configure debug HealthGPS
       id: cmake_config_debug
-      working-directory: ${{github.workspace}}
       run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build debug HealthGPS
       id: cmake_build_debug
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
       
     - name: Test debug HealthGPS
       id: ctest_run
-      working-directory: ${{github.workspace}}
       run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
     - name: Configure release HealthGPS
       id: cmake_config_release
-      working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
+      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON -DBUILD_DOC=OFF
 
     - name: Build release HealthGPS
       id: cmake_build_release
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Install release HealthGPS
       id: cmake_install_release
-      working-directory: ${{github.workspace}}
       run: cmake --build --preset=${{env.RELEASE_BUILD_PRESET}} --target install --config Release
 
     - name: Check installed artefacts
       id: cmake_install_check
       working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
-      run: ls
+      run: ls -l
 
     - name: Zip output folder
       id: zip_folder
@@ -112,14 +101,3 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
           files: artifact/health_gps_win64.zip
-
-    - name: Doxygen release API deploy
-      uses: peaceiris/actions-gh-pages@v3
-      #if: startsWith(github.ref, 'refs/tags/')
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/html
-        destination_dir: html
-        enable_jekyll: true
-        commit_message: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
-                  

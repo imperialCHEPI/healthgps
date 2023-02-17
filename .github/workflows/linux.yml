@@ -59,18 +59,19 @@ jobs:
         g++ --version
         ./vcpkg/vcpkg --version
         doxygen --version
+        dot -V
 
-    #- name: Configure debug HealthGPS
-    #  id: cmake_config_debug
-    #  run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
+    - name: Configure debug HealthGPS
+      id: cmake_config_debug
+      run: cmake --preset=${{env.DEBUG_PRESET}} -DBUILD_BENCHMARKS=ON
 
-    #- name: Build debug HealthGPS
-    #  id: cmake_build_debug
-    #  run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
+    - name: Build debug HealthGPS
+      id: cmake_build_debug
+      run: cmake --build --preset=${{env.DEBUG_BUILD_PRESET}}
 
-    #- name: Test debug HealthGPS
-    #  id: ctest_run
-    #  run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
+    - name: Test debug HealthGPS
+      id: ctest_run
+      run: ctest --preset=${{env.DEBUG_TEST_PRESET}}
 
     - name: Configure release HealthGPS
       id: cmake_config_release
