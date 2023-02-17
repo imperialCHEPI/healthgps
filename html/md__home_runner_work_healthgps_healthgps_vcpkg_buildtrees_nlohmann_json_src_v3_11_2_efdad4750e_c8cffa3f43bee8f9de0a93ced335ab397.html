@@ -105,23 +105,23 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Creates a JSON binary array value from a given binary container with subtype.</li>
 </ol>
 <p>Binary values are part of various binary formats, such as CBOR, MessagePack, and BSON. This constructor is used to create a value for serialization to those formats.</p>
-<h1><a class="anchor" id="autotoc_md723"></a>
+<h1><a class="anchor" id="autotoc_md947"></a>
 Parameters</h1>
 <p><code>init</code> (in) : container containing bytes to use as binary type</p>
 <p><code>subtype</code> (in) : subtype to use in CBOR, MessagePack, and BSON</p>
-<h1><a class="anchor" id="autotoc_md724"></a>
+<h1><a class="anchor" id="autotoc_md948"></a>
 Return value</h1>
 <p>JSON binary array value</p>
-<h1><a class="anchor" id="autotoc_md725"></a>
+<h1><a class="anchor" id="autotoc_md949"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md726"></a>
+<h1><a class="anchor" id="autotoc_md950"></a>
 Complexity</h1>
 <p>Linear in the size of <code>init</code>; constant for <code>typename binary_t::container_type&amp;&amp; init</code> versions.</p>
-<h1><a class="anchor" id="autotoc_md727"></a>
+<h1><a class="anchor" id="autotoc_md951"></a>
 Notes</h1>
 <p>Note, this function exists because of the difficulty in correctly specifying the correct template overload in the standard value ctor, as both JSON arrays and JSON binary arrays are backed with some form of a <code>std::vector</code>. Because JSON binary arrays are a non-standard extension it was decided that it would be best to prevent automatic initialization of a binary array type, for backwards compatibility and so it does not happen on accident.</p>
-<h1><a class="anchor" id="autotoc_md728"></a>
+<h1><a class="anchor" id="autotoc_md952"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows how to create a binary value.
 
@@ -134,7 +134,7 @@ Output:
 ```json
 --8&lt;-- "examples/binary.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md729"></a>
+</pre> <h1><a class="anchor" id="autotoc_md953"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.8.0. </li>

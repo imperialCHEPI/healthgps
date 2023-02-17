@@ -91,17 +91,17 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_backup_restore_env_vars.md">vcpkg repo</a>.</p>
 <p>Backup or restore the environment variables</p>
-<h1><a class="anchor" id="autotoc_md3031"></a>
+<h1><a class="anchor" id="autotoc_md3255"></a>
 Usage:</h1>
 <div class="fragment"><div class="line">vcpkg_backup_env_variables(VARS [&lt;environment-variable&gt;...])</div>
 <div class="line">vcpkg_restore_env_variables(VARS [&lt;environment-variable&gt;...])</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3032"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3256"></a>
 VARS</h2>
 <p>The variables to back up or restore. These are placed in the parent scope, so you must backup and restore from the same scope.</p>
-<h1><a class="anchor" id="autotoc_md3033"></a>
+<h1><a class="anchor" id="autotoc_md3257"></a>
 Notes</h1>
 <p>One must always call <code>vcpkg_backup_env_variables</code> before <code>vcpkg_restore_env_variables</code>; however, <code>vcpkg_restore_env_variables</code> does not change the back up variables, and so you may call <code>restore</code> multiple times for one <code>backup</code>.</p>
-<h1><a class="anchor" id="autotoc_md3034"></a>
+<h1><a class="anchor" id="autotoc_md3258"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_backup_restore_env_vars.cmake">scripts/cmake/vcpkg_backup_restore_env_vars.cmake</a> </p>
 </div></div><!-- contents -->

@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Reads from an iterator range.</li>
 </ol>
 <p>The exact mapping and its limitations is described on a <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cba10fa61ba847bc8f2f422ce9b712108.html">dedicated page</a>.</p>
-<h1><a class="anchor" id="autotoc_md887"></a>
+<h1><a class="anchor" id="autotoc_md1111"></a>
 Template parameters</h1>
 <p><code>InputType</code> : A compatible input, for instance: </p><pre class="fragment">- an `std::istream` object
 - a `FILE` pointer
@@ -116,30 +116,30 @@ Template parameters</h1>
 - a pointer to a null-terminated string of single byte characters
 - an object `obj` for which `begin(obj)` and `end(obj)` produces a valid pair of iterators.
 </pre><p> <code>IteratorType</code> : a compatible iterator type</p>
-<h1><a class="anchor" id="autotoc_md888"></a>
+<h1><a class="anchor" id="autotoc_md1112"></a>
 Parameters</h1>
 <p><code>i</code> (in) : an input in BJData format convertible to an input adapter</p>
 <p><code>first</code> (in) : iterator to start of the input</p>
 <p><code>last</code> (in) : iterator to end of the input</p>
 <p><code>strict</code> (in) : whether to expect the input to be consumed until EOF (<code>#!cpp true</code> by default)</p>
 <p><code>allow_exceptions</code> (in) : whether to throw exceptions in case of a parse error (optional, <code>#!cpp true</code> by default)</p>
-<h1><a class="anchor" id="autotoc_md889"></a>
+<h1><a class="anchor" id="autotoc_md1113"></a>
 Return value</h1>
 <p>deserialized JSON value; in case of a parse error and <code>allow_exceptions</code> set to <code>#!cpp false</code>, the return value will be <code>value_t::discarded</code>. The latter can be checked with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c55d9d38063156c68a8e3611580edc497.html">`is_discarded`</a>.</p>
-<h1><a class="anchor" id="autotoc_md890"></a>
+<h1><a class="anchor" id="autotoc_md1114"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md891"></a>
+<h1><a class="anchor" id="autotoc_md1115"></a>
 Exceptions</h1>
 <ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error110">parse_error.110</a> if the given input ends prematurely or the end of file was not reached when <code>strict</code> was set to true</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error112">parse_error.112</a> if a parse error occurs</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error113">parse_error.113</a> if a string could not be parsed successfully</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md892"></a>
+<h1><a class="anchor" id="autotoc_md1116"></a>
 Complexity</h1>
 <p>Linear in the size of the input.</p>
-<h1><a class="anchor" id="autotoc_md893"></a>
+<h1><a class="anchor" id="autotoc_md1117"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example shows the deserialization of a byte vector in BJData format to a JSON value.
 
@@ -152,7 +152,7 @@ Output:
 ```json
 --8&lt;-- "examples/from_bjdata.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md894"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1118"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.11.0. </li>

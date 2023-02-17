@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_configure_make.md">vcpkg repo</a>.</p>
 <p>Configure configure for Debug and Release builds of a project.</p>
-<h1><a class="anchor" id="autotoc_md3191"></a>
+<h1><a class="anchor" id="autotoc_md3415"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_configure_make(</div>
 <div class="line">    SOURCE_PATH &lt;${SOURCE_PATH}&gt;</div>
@@ -112,63 +112,63 @@ Usage</h1>
 <div class="line">    [OPTIONS_RELEASE &lt;-DOPTIMIZE=1&gt;...]</div>
 <div class="line">    [OPTIONS_DEBUG &lt;-DDEBUGGABLE=1&gt;...]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3192"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3416"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3193"></a>
+<h2><a class="anchor" id="autotoc_md3417"></a>
 SOURCE_PATH</h2>
 <p>Specifies the directory containing the <code>configure</code>/<code>configure.ac</code>. By convention, this is usually set in the portfile as the variable <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3194"></a>
+<h2><a class="anchor" id="autotoc_md3418"></a>
 PROJECT_SUBPATH</h2>
 <p>Specifies the directory containing the `<code>configure</code>/<code>configure.ac</code>. By convention, this is usually set in the portfile as the variable <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3195"></a>
+<h2><a class="anchor" id="autotoc_md3419"></a>
 SKIP_CONFIGURE</h2>
 <p>Skip configure process</p>
-<h2><a class="anchor" id="autotoc_md3196"></a>
+<h2><a class="anchor" id="autotoc_md3420"></a>
 USE_WRAPPERS</h2>
 <p>Use autotools ar-lib and compile wrappers (only applies to windows cl and lib)</p>
-<h2><a class="anchor" id="autotoc_md3197"></a>
+<h2><a class="anchor" id="autotoc_md3421"></a>
 NO_WRAPPERS</h2>
 <p>Deactivate the use of autotools ar-lib and compile wrappers (only applies to windows cl and lib)</p>
-<h2><a class="anchor" id="autotoc_md3198"></a>
+<h2><a class="anchor" id="autotoc_md3422"></a>
 BUILD_TRIPLET</h2>
 <p>Used to pass custom &ndash;build/&ndash;target/&ndash;host to configure. Can be globally overwritten by VCPKG_MAKE_BUILD_TRIPLET</p>
-<h2><a class="anchor" id="autotoc_md3199"></a>
+<h2><a class="anchor" id="autotoc_md3423"></a>
 DETERMINE_BUILD_TRIPLET</h2>
 <p>For ports having a configure script following the autotools rules for selecting the triplet</p>
-<h2><a class="anchor" id="autotoc_md3200"></a>
+<h2><a class="anchor" id="autotoc_md3424"></a>
 NO_ADDITIONAL_PATHS</h2>
 <p>Don't pass any additional paths except for &ndash;prefix to the configure call</p>
-<h2><a class="anchor" id="autotoc_md3201"></a>
+<h2><a class="anchor" id="autotoc_md3425"></a>
 AUTOCONFIG</h2>
 <p>Need to use autoconfig to generate configure file.</p>
-<h2><a class="anchor" id="autotoc_md3202"></a>
+<h2><a class="anchor" id="autotoc_md3426"></a>
 PRERUN_SHELL</h2>
 <p>Script that needs to be called before configuration (do not use for batch files which simply call autoconf or configure)</p>
-<h2><a class="anchor" id="autotoc_md3203"></a>
+<h2><a class="anchor" id="autotoc_md3427"></a>
 ADD_BIN_TO_PATH</h2>
 <p>Adds the appropriate Release and Debug <code>bin\</code> directories to the path during configure such that executables can run against the in-tree DLLs.</p>
-<h2><a class="anchor" id="autotoc_md3204"></a>
+<h2><a class="anchor" id="autotoc_md3428"></a>
 DISABLE_VERBOSE_FLAGS</h2>
 <p>Do not pass '&ndash;disable-silent-rules &ndash;verbose' to configure.</p>
-<h2><a class="anchor" id="autotoc_md3205"></a>
+<h2><a class="anchor" id="autotoc_md3429"></a>
 OPTIONS</h2>
 <p>Additional options passed to configure during the configuration.</p>
-<h2><a class="anchor" id="autotoc_md3206"></a>
+<h2><a class="anchor" id="autotoc_md3430"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options passed to configure during the Release configuration. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3207"></a>
+<h2><a class="anchor" id="autotoc_md3431"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options passed to configure during the Debug configuration. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3208"></a>
+<h2><a class="anchor" id="autotoc_md3432"></a>
 CONFIG_DEPENDENT_ENVIRONMENT</h2>
 <p>List of additional configuration dependent environment variables to set. Pass SOMEVAR to set the environment and have SOMEVAR_(DEBUG|RELEASE) set in the portfile to the appropriate values General environment variables can be set from within the portfile itself.</p>
-<h2><a class="anchor" id="autotoc_md3209"></a>
+<h2><a class="anchor" id="autotoc_md3433"></a>
 CONFIGURE_ENVIRONMENT_VARIABLES</h2>
 <p>List of additional environment variables to pass via the configure call.</p>
-<h1><a class="anchor" id="autotoc_md3210"></a>
+<h1><a class="anchor" id="autotoc_md3434"></a>
 Notes</h1>
 <p>This command supplies many common arguments to configure. To see the full list, examine the source.</p>
-<h1><a class="anchor" id="autotoc_md3211"></a>
+<h1><a class="anchor" id="autotoc_md3435"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/x264/portfile.cmake">x264</a></li>
@@ -176,7 +176,7 @@ Examples</h1>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/freexl/portfile.cmake">freexl</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/libosip2/portfile.cmake">libosip2</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3212"></a>
+<h1><a class="anchor" id="autotoc_md3436"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_configure_make.cmake">scripts/cmake/vcpkg_configure_make.cmake</a> </p>
 </div></div><!-- contents -->

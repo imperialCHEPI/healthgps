@@ -90,14 +90,14 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/users/versioning.implementation-details.md">GitHub</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md3852"></a>
+<h1><a class="anchor" id="autotoc_md4076"></a>
 Contents</h1>
 <ul>
 <li><a href="#minimum-versioning">Minimum versioning</a></li>
 <li><a href="#constraint-resolution">Constraint resolution</a></li>
 <li><a href="#acquiring-port-versions">Acquiring port versions</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3853"></a>
+<h2><a class="anchor" id="autotoc_md4077"></a>
 Minimum versioning</h2>
 <p>Vcpkg uses a minimal selection approach to versioning, inspired by the one <a href="https://research.swtch.com/vgo-mvs">used by Go</a>. But modified in some ways:</p>
 <ul>
@@ -142,7 +142,7 @@ Minimum versioning</h2>
 <li><code>B 1.0</code>, transitively required by <code>A 1.1</code>.</li>
 <li><code>C 3.0</code>, upgraded by the transitive constraint added by <code>B 1.0</code> in order to satisfy version constraints.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3854"></a>
+<h1><a class="anchor" id="autotoc_md4078"></a>
 Constraint resolution</h1>
 <p>Given a manifest with a set of versioned dependencies, vcpkg will attempt to calculate a package installation plan that satisfies all the constraints.</p>
 <p>Version constraints come in the following flavors:</p><ul>
@@ -201,7 +201,7 @@ Constraint resolution</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3855"></a>
+<h1><a class="anchor" id="autotoc_md4079"></a>
 Acquiring port versions</h1>
 <p>Although the concept of package versions has always been present in vcpkg, the concept of version constraints has been not.</p>
 <p>With the introduction of versioning constraints, it is now possible that a package depends on a port version that does not match the one available locally. This raises a problem as vcpkg needs to know how to acquire the port files for the requested version.</p>

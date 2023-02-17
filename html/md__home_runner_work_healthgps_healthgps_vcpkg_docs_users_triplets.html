@@ -94,34 +94,34 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>In Vcpkg, we use triplets to describe an imaginary "target configuration set" for every library. Within a triplet, libraries are generally built with the same configuration, but it is not a requirement. For example, you could have one triplet that builds <code>openssl</code> statically and <code>zlib</code> dynamically, one that builds them both statically, and one that builds them both dynamically (all for the same target OS and architecture). A single build will consume files from a single triplet.</p>
 <p>We currently provide many triplets by default (run <code>vcpkg help triplet</code>). However, you can easily customize or add your own by copying a built-in triplet from the <code>triplets\</code> directory into a project local location. Then, use <code>--overlay-triplets=</code> (or equivalent such as <a href="config-environment.md#vcpkg_overlay_triplets"><code>$VCPKG_OVERLAY_TRIPLETS</code></a>, <a href="buildsystems/cmake-integration.md#vcpkg_overlay_triplets">CMake <code>VCPKG_OVERLAY_TRIPLETS</code></a>, or <a href="buildsystems/msbuild-integration.md#vcpkg-additional-install-options">MSBuild Additional Options</a>) to add that directory to vcpkg. See our <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_overlay_triplets_linux_dynamic.html">overlay triplets example</a> for a more detailed walkthrough.</p>
 <p>To change the triplet used by your project, you can pass <code>--triplet=&lt;triplet&gt;</code> on the command line or see our <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">Buildsystem-Specific Documentation</a>.</p>
-<h1><a class="anchor" id="autotoc_md3815"></a>
+<h1><a class="anchor" id="autotoc_md4039"></a>
 Community triplets</h1>
 <p>Triplets contained in the <code>triplets\community</code> folder are not tested by continuous integration, but are commonly requested by the community.</p>
 <p>Because we do not have continuous coverage, port updates may break compatibility with community triplets. Because of this, community involvement is paramount!</p>
 <p>We will gladly accept and review contributions that aim to solve issues with these triplets.</p>
-<h2><a class="anchor" id="autotoc_md3816"></a>
+<h2><a class="anchor" id="autotoc_md4040"></a>
 Usage</h2>
 <p>Community Triplets are enabled by default, when using a community triplet a message like the following one will be printed during a package install:</p>
 <div class="fragment"><div class="line">-- Using community triplet x86-uwp. This triplet configuration is not guaranteed to succeed.</div>
 <div class="line">-- [COMMUNITY] Loading triplet configuration from: D:\src\viromer\vcpkg\triplets\community\x86-uwp.cmake</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3817"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4041"></a>
 Variables</h1>
-<h2><a class="anchor" id="autotoc_md3818"></a>
+<h2><a class="anchor" id="autotoc_md4042"></a>
 VCPKG_TARGET_ARCHITECTURE</h2>
 <p>Specifies the target machine architecture.</p>
 <p>Valid options are <code>x86</code>, <code>x64</code>, <code>arm</code>, <code>arm64</code> and <code>wasm32</code>.</p>
-<h2><a class="anchor" id="autotoc_md3819"></a>
+<h2><a class="anchor" id="autotoc_md4043"></a>
 VCPKG_CRT_LINKAGE</h2>
 <p>Specifies the desired CRT linkage (for MSVC).</p>
 <p>Valid options are <code>dynamic</code> and <code>static</code>.</p>
-<h2><a class="anchor" id="autotoc_md3820"></a>
+<h2><a class="anchor" id="autotoc_md4044"></a>
 VCPKG_LIBRARY_LINKAGE</h2>
 <p>Specifies the preferred library linkage.</p>
 <p>Valid options are <code>dynamic</code> and <code>static</code>. Note that libraries can ignore this setting if they do not support the preferred linkage type.</p>
-<h2><a class="anchor" id="autotoc_md3821"></a>
+<h2><a class="anchor" id="autotoc_md4045"></a>
 VCPKG_BUILD_TYPE</h2>
 <p>You can set this value to <code>release</code> to only build release versions of the ports. By default this value is empty and release and debug versions of a port are built.</p>
-<h2><a class="anchor" id="autotoc_md3822"></a>
+<h2><a class="anchor" id="autotoc_md4046"></a>
 VCPKG_CMAKE_SYSTEM_NAME</h2>
 <p>Specifies the target platform.</p>
 <p>Valid options include any CMake system name, such as:</p><ul>
@@ -133,18 +133,18 @@ VCPKG_CMAKE_SYSTEM_NAME</h2>
 <li><code>Linux</code> (Linux)</li>
 <li><code>Emscripten</code> (WebAssembly)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3823"></a>
+<h2><a class="anchor" id="autotoc_md4047"></a>
 VCPKG_CMAKE_SYSTEM_VERSION</h2>
 <p>Specifies the target platform system version.</p>
 <p>This field is optional and, if present, will be passed into the build as <code>CMAKE_SYSTEM_VERSION</code>.</p>
 <p>See also the CMake documentation for <code>CMAKE_SYSTEM_VERSION</code>: <a href="https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_VERSION.html">https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_VERSION.html</a>.</p>
 <p><a class="anchor" id="VCPKG_CHAINLOAD_TOOLCHAIN_FILE"></a> </p>
-<h2><a class="anchor" id="autotoc_md3824"></a>
+<h2><a class="anchor" id="autotoc_md4048"></a>
 VCPKG_CHAINLOAD_TOOLCHAIN_FILE</h2>
 <p>Specifies an alternate CMake Toolchain file to use.</p>
 <p>This (if set) will override all other compiler detection logic. By default, a toolchain file is selected from <code>scripts/toolchains/</code> appropriate to the platform.</p>
 <p>See also the CMake documentation for toolchain files: <a href="https://cmake.org/cmake/help/v3.11/manual/cmake-toolchains.7.html">https://cmake.org/cmake/help/v3.11/manual/cmake-toolchains.7.html</a>.</p>
-<h2><a class="anchor" id="autotoc_md3825"></a>
+<h2><a class="anchor" id="autotoc_md4049"></a>
 VCPKG_CXX_FLAGS</h2>
 <p>Sets additional compiler flags to be used when not using <code>VCPKG_CHAINLOAD_TOOLCHAIN_FILE</code>.</p>
 <p>This option also has forms for configuration-specific and C flags:</p><ul>
@@ -155,7 +155,7 @@ VCPKG_CXX_FLAGS</h2>
 <li><code>VCPKG_C_FLAGS_DEBUG</code></li>
 <li><code>VCPKG_C_FLAGS_RELEASE</code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3826"></a>
+<h2><a class="anchor" id="autotoc_md4050"></a>
 VCPKG_LINKER_FLAGS</h2>
 <p>Sets additional linker flags to be used while building dynamic libraries and executables in the absence of <code>VCPKG_CHAINLOAD_TOOLCHAIN_FILE</code>.</p>
 <p>This option also has forms for configuration-specific flags:</p><ul>
@@ -163,28 +163,28 @@ VCPKG_LINKER_FLAGS</h2>
 <li><code>VCPKG_LINKER_FLAGS_DEBUG</code></li>
 <li><code>VCPKG_LINKER_FLAGS_RELEASE</code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3827"></a>
+<h2><a class="anchor" id="autotoc_md4051"></a>
 VCPKG_MESON_CONFIGURE_OPTIONS</h2>
 <p>Set additional Meson configure options that are appended to the configure command (in <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_configure_meson.html">`vcpkg_configure_meson`</a>).</p>
 <p>This field is optional.</p>
 <p>Also available as build-type specific <code>VCPKG_MESON_CONFIGURE_OPTIONS_DEBUG</code> and <code>VCPKG_MESON_CONFIGURE_OPTIONS_RELEASE</code> variables.</p>
-<h2><a class="anchor" id="autotoc_md3828"></a>
+<h2><a class="anchor" id="autotoc_md4052"></a>
 VCPKG_MESON_(CROSS|NATIVE)_FILE(_RELEASE|_DEBUG)</h2>
 <p>Provide an additional (configuration dependent) file as a meson cross/native file. Can be used to override settings provided by vcpkg since it will be passed after vcpkg's generated cross/native files are passed.</p>
 <p>Especially usefull to provide your own build_machine and host_machine entries.</p>
-<h2><a class="anchor" id="autotoc_md3829"></a>
+<h2><a class="anchor" id="autotoc_md4053"></a>
 VCPKG_CMAKE_CONFIGURE_OPTIONS</h2>
 <p>Set additional CMake configure options that are appended to the configure command (in <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_cmake_configure.html">`vcpkg_cmake_configure`</a>).</p>
 <p>This field is optional.</p>
 <p>Also available as build-type specific <code>VCPKG_CMAKE_CONFIGURE_OPTIONS_DEBUG</code> and <code>VCPKG_CMAKE_CONFIGURE_OPTIONS_RELEASE</code> variables.</p>
-<h2><a class="anchor" id="autotoc_md3830"></a>
+<h2><a class="anchor" id="autotoc_md4054"></a>
 VCPKG_MAKE_CONFIGURE_OPTIONS</h2>
 <p>Set additional automake / autoconf configure options that are appended to the configure command (in <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_configure_make.html">`vcpkg_configure_make`</a>).</p>
 <p>This field is optional.</p>
 <p>For example, to skip certain libtool checks that may errantly fail: </p><div class="fragment"><div class="line">set(VCPKG_MAKE_CONFIGURE_OPTIONS &quot;lt_cv_deplibs_check_method=pass_all&quot;)</div>
 </div><!-- fragment --><p>Also available as build-type specific <code>VCPKG_MAKE_CONFIGURE_OPTIONS_DEBUG</code> and <code>VCPKG_MAKE_CONFIGURE_OPTIONS_RELEASE</code> variables.</p>
 <p><a class="anchor" id="VCPKG_DEP_INFO_OVERRIDE_VARS"></a> </p>
-<h2><a class="anchor" id="autotoc_md3831"></a>
+<h2><a class="anchor" id="autotoc_md4055"></a>
 VCPKG_DEP_INFO_OVERRIDE_VARS</h2>
 <p>Replaces the default computed list of triplet "Supports" terms.</p>
 <p>This option (if set) will override the default set of terms used for qualified dependency resolution and "Supports" field evaluation.</p>
@@ -192,13 +192,13 @@ VCPKG_DEP_INFO_OVERRIDE_VARS</h2>
 <blockquote class="doxtable">
 <p>Implementers' Note: this list is extracted via the <code>vcpkg_get_dep_info</code> mechanism. </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md3832"></a>
+<h2><a class="anchor" id="autotoc_md4056"></a>
 VCPKG_DISABLE_COMPILER_TRACKING</h2>
 <p>When this option is set to (true|1|on), the compiler is ignored in the abi tracking.</p>
-<h1><a class="anchor" id="autotoc_md3833"></a>
+<h1><a class="anchor" id="autotoc_md4057"></a>
 Windows Variables</h1>
 <p><a class="anchor" id="VCPKG_ENV_PASSTHROUGH"></a> </p>
-<h2><a class="anchor" id="autotoc_md3834"></a>
+<h2><a class="anchor" id="autotoc_md4058"></a>
 VCPKG_ENV_PASSTHROUGH</h2>
 <p>Instructs vcpkg to allow additional environment variables into the build process.</p>
 <p>On Windows, vcpkg builds packages in a special clean environment that is isolated from the current command prompt to ensure build reliability and consistency. This triplet option can be set to a list of additional environment variables that will be added to the clean environment. The values of these environment variables will be hashed into the package abi &ndash; to pass through environment variables without abi tracking, see <code>VCPKG_ENV_PASSTHROUGH_UNTRACKED</code>.</p>
@@ -206,12 +206,12 @@ VCPKG_ENV_PASSTHROUGH</h2>
 <blockquote class="doxtable">
 <p>Implementers' Note: this list is extracted via the <code>vcpkg_get_tags</code> mechanism. </p>
 </blockquote>
-<h2><a class="anchor" id="autotoc_md3835"></a>
+<h2><a class="anchor" id="autotoc_md4059"></a>
 VCPKG_ENV_PASSTHROUGH_UNTRACKED</h2>
 <p>Instructs vcpkg to allow additional environment variables into the build process without abi tracking.</p>
 <p>See <code>VCPKG_ENV_PASSTHROUGH</code>.</p>
 <p><a class="anchor" id="VCPKG_VISUAL_STUDIO_PATH"></a> </p>
-<h2><a class="anchor" id="autotoc_md3836"></a>
+<h2><a class="anchor" id="autotoc_md4060"></a>
 VCPKG_VISUAL_STUDIO_PATH</h2>
 <p>Specifies the Visual Studio installation to use.</p>
 <p>To select the precise combination of Visual Studio instance and toolset version, we walk through the following algorithm:</p><ol type="1">
@@ -225,7 +225,7 @@ VCPKG_VISUAL_STUDIO_PATH</h2>
 <li>Select the best remaining option</li>
 </ol>
 <p>The path should be absolute, formatted with backslashes, and have no trailing slash: </p><div class="fragment"><div class="line">set(VCPKG_VISUAL_STUDIO_PATH &quot;C:\\Program Files (x86)\\Microsoft Visual Studio\\Preview\\Community&quot;)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3837"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4061"></a>
 VCPKG_PLATFORM_TOOLSET</h2>
 <p>Specifies the VS-based C/C++ compiler toolchain to use.</p>
 <p>See <a href="#VCPKG_VISUAL_STUDIO_PATH"><code>VCPKG_VISUAL_STUDIO_PATH</code></a> for the full selection algorithm.</p>
@@ -235,33 +235,33 @@ VCPKG_PLATFORM_TOOLSET</h2>
 <li>The Visual Studio 2017 platform toolset is <code>v141</code>.</li>
 <li>The Visual Studio 2015 platform toolset is <code>v140</code>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3838"></a>
+<h2><a class="anchor" id="autotoc_md4062"></a>
 VCPKG_PLATFORM_TOOLSET_VERSION</h2>
 <p>Specifies the detailed MSVC C/C++ compiler toolchain to use.</p>
 <p>By default, [<code>VCPKG_PLATFORM_TOOLSET</code>] always chooses the latest installed minor version of the selected toolset. If you need more granularity, you can use this variable. Valid values are, for example, <code>14.25</code> or <code>14.27.29110</code>.</p>
-<h2><a class="anchor" id="autotoc_md3839"></a>
+<h2><a class="anchor" id="autotoc_md4063"></a>
 VCPKG_LOAD_VCVARS_ENV</h2>
 <p>If <code>VCPKG_CHAINLOAD_TOOLCHAIN_FILE</code> is used, VCPKG will not setup the Visual Studio environment. Setting <code>VCPKG_LOAD_VCVARS_ENV</code> to (true|1|on) changes this behavior so that the Visual Studio environment is setup following the same rules as if <code>VCPKG_CHAINLOAD_TOOLCHAIN_FILE</code> was not set.</p>
-<h1><a class="anchor" id="autotoc_md3840"></a>
+<h1><a class="anchor" id="autotoc_md4064"></a>
 Linux Variables</h1>
-<h2><a class="anchor" id="autotoc_md3841"></a>
+<h2><a class="anchor" id="autotoc_md4065"></a>
 VCPKG_FIXUP_ELF_RPATH</h2>
 <p>When this option is set to (true|1|on), vcpkg will add <code>$ORIGIN</code> and <code>$ORIGIN/&lt;path_relative_to_lib&gt;</code> to the <code>RUNPATH</code> header of executables and shared libraries. This allows packages to be relocated on Linux.</p>
-<h1><a class="anchor" id="autotoc_md3842"></a>
+<h1><a class="anchor" id="autotoc_md4066"></a>
 MacOS Variables</h1>
-<h2><a class="anchor" id="autotoc_md3843"></a>
+<h2><a class="anchor" id="autotoc_md4067"></a>
 VCPKG_INSTALL_NAME_DIR</h2>
 <p>Sets the install name used when building macOS dynamic libraries. Default value is <code>@rpath</code>. See the CMake documentation for <a href="https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_NAME_DIR.html">CMAKE_INSTALL_NAME_DIR</a> for more information.</p>
-<h2><a class="anchor" id="autotoc_md3844"></a>
+<h2><a class="anchor" id="autotoc_md4068"></a>
 VCPKG_OSX_DEPLOYMENT_TARGET</h2>
 <p>Sets the minimum macOS version for compiled binaries. This also changes what versions of the macOS platform SDK that CMake will search for. See the CMake documentation for <a href="https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html">CMAKE_OSX_DEPLOYMENT_TARGET</a> for more information.</p>
-<h2><a class="anchor" id="autotoc_md3845"></a>
+<h2><a class="anchor" id="autotoc_md4069"></a>
 VCPKG_OSX_SYSROOT</h2>
 <p>Set the name or path of the macOS platform SDK that will be used by CMake. See the CMake documentation for <a href="https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_SYSROOT.html">CMAKE_OSX_SYSROOT</a> for more information.</p>
-<h2><a class="anchor" id="autotoc_md3846"></a>
+<h2><a class="anchor" id="autotoc_md4070"></a>
 VCPKG_OSX_ARCHITECTURES</h2>
 <p>Set the macOS / iOS target architecture which will be used by CMake. See the CMake documentation for <a href="https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_ARCHITECTURES.html">CMAKE_OSX_ARCHITECTURES</a> for more information.</p>
-<h1><a class="anchor" id="autotoc_md3847"></a>
+<h1><a class="anchor" id="autotoc_md4071"></a>
 Per-port customization</h1>
 <p>The CMake Macro <code>PORT</code> will be set when interpreting the triplet file and can be used to change settings (such as <code>VCPKG_LIBRARY_LINKAGE</code>) on a per-port basis.</p>
 <p>Example: </p><div class="fragment"><div class="line">set(VCPKG_LIBRARY_LINKAGE static)</div>
@@ -270,7 +270,7 @@ Per-port customization</h1>
 <div class="line">endif()</div>
 </div><!-- fragment --><p> This will build all the <code>qt5-*</code> libraries as DLLs, but every other library as a static library.</p>
 <p>For an example in a real project, see <a href="https://github.com/Intelight/vcpkg/blob/master/triplets/x86-windows-mixed.cmake">https://github.com/Intelight/vcpkg/blob/master/triplets/x86-windows-mixed.cmake</a>.</p>
-<h1><a class="anchor" id="autotoc_md3848"></a>
+<h1><a class="anchor" id="autotoc_md4072"></a>
 Additional Remarks</h1>
 <p>The default triplet when running any vcpkg command is <code>VCPKG_DEFAULT_TRIPLET%</code> or a platform-specific choice if that environment variable is undefined.</p>
 <ul>
@@ -279,10 +279,10 @@ Additional Remarks</h1>
 <li>OSX: <code>x64-osx</code></li>
 </ul>
 <p>We recommend using a systematic naming scheme when creating new triplets. The Android toolchain naming scheme is a good source of inspiration: <a href="https://developer.android.com/ndk/guides/standalone_toolchain.html">https://developer.android.com/ndk/guides/standalone_toolchain.html</a>.</p>
-<h1><a class="anchor" id="autotoc_md3849"></a>
+<h1><a class="anchor" id="autotoc_md4073"></a>
 Android triplets</h1>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_android.html">android.md</a></p>
-<h1><a class="anchor" id="autotoc_md3850"></a>
+<h1><a class="anchor" id="autotoc_md4074"></a>
 Mingw-w64 triplets</h1>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_mingw.html">mingw.md</a> </p>
 </div></div><!-- contents -->

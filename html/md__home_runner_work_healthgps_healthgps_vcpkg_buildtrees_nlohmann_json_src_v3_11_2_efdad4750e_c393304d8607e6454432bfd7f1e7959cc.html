@@ -110,26 +110,26 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p class="startli"><code>init</code> is converted into an object element and added using <code>push_back(const typename object_t::value_type&amp;)</code>. Otherwise, <code>init</code> is converted to a JSON value and added using <code>push_back(basic_json&amp;&amp;)</code>.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1369"></a>
+<h1><a class="anchor" id="autotoc_md1593"></a>
 Parameters</h1>
 <p><code>val</code> (in) : the value to add to the JSON array/object</p>
 <p><code>init</code> (in) : an initializer list</p>
-<h1><a class="anchor" id="autotoc_md1370"></a>
+<h1><a class="anchor" id="autotoc_md1594"></a>
 Exceptions</h1>
 <p>All functions can throw the following exception:</p><ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error308"><code>type_error.308</code></a> when called on a type other than JSON array or null; example: <code>"cannot use push_back() with number"</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1371"></a>
+<h1><a class="anchor" id="autotoc_md1595"></a>
 Complexity</h1>
 <ol type="1">
 <li>Amortized constant.</li>
 <li>Logarithmic in the size of the container, O(log(<code><a class="el" href="namespaceconvert__lib__params__windows.html#ab4517e5b23748a1ad8b351e74aebe1bf">size()</a></code>)).</li>
 <li>Linear in the size of the initializer list <code>init</code>.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1372"></a>
+<h1><a class="anchor" id="autotoc_md1596"></a>
 Notes</h1>
 <p>(3) This function is required to resolve an ambiguous overload error, because pairs like <code>{"key", "value"}</code> can be both interpreted as <code>object_t::value_type</code> or <code>std::initializer_list&lt;<a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a>&gt;</code>, see <a href="https://github.com/nlohmann/json/issues/235">#235</a> for more information.</p>
-<h1><a class="anchor" id="autotoc_md1373"></a>
+<h1><a class="anchor" id="autotoc_md1597"></a>
 Examples</h1>
 <p>??? example "Example: (1) add element to array" </p><pre class="fragment">The example shows how `push_back()` and `+=` can be used to add elements to a JSON array. Note how the `null` value
 was silently converted to a JSON array.
@@ -166,7 +166,7 @@ Output:
 ```json
 --8&lt;-- "examples/push_back__initializer_list.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1374"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1598"></a>
 Version history</h1>
 <ol type="1">
 <li>Since version 1.0.0.</li>

@@ -96,22 +96,22 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line">constexpr const PointerType get_ptr() const noexcept;</div>
 <div class="ttc" id="anamespacegenerate__natvis_html_a01a7981524efc650e578691e1b5a8660"><div class="ttname"><a href="namespacegenerate__natvis.html#a01a7981524efc650e578691e1b5a8660">generate_natvis.template</a></div><div class="ttdeci">template</div><div class="ttdef"><b>Definition:</b> generate_natvis.py:37</div></div>
 </div><!-- fragment --><p>Implicit pointer access to the internally stored JSON value. No copies are made.</p>
-<h1><a class="anchor" id="autotoc_md960"></a>
+<h1><a class="anchor" id="autotoc_md1184"></a>
 Template parameters</h1>
 <p><code>PointerType</code> : pointer type; must be a pointer to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0150913bbd2e11a7cecd2977b96d6061.html">`array_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f974e10e5661bc477b8ce49351e9f5d.html">`object_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8cb44d26fcc9e736c3cd62fdeedc1db9.html">`string_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ca1393b8f34107fa75c5c2cb37c622002.html">`boolean_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8fad9bbe7fddf99841dc225dd67548c6.html">`number_integer_t`</a>, or <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb48ee65dfa3181b9fc3867f565566629.html">`number_unsigned_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c71599dcf1550afc67a6f1ffbeeaef2f3.html">`number_float_t`</a>, or <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0fb81146da4fe75feb276197ce7e8594.html">`binary_t`</a>. Other types will not compile.</p>
-<h1><a class="anchor" id="autotoc_md961"></a>
+<h1><a class="anchor" id="autotoc_md1185"></a>
 Return value</h1>
 <p>pointer to the internally stored JSON value if the requested pointer type fits to the JSON value; <code>#!cpp nullptr</code> otherwise</p>
-<h1><a class="anchor" id="autotoc_md962"></a>
+<h1><a class="anchor" id="autotoc_md1186"></a>
 Exception safety</h1>
 <p>No-throw guarantee: this function never throws exceptions.</p>
-<h1><a class="anchor" id="autotoc_md963"></a>
+<h1><a class="anchor" id="autotoc_md1187"></a>
 Complexity</h1>
 <p>Constant.</p>
-<h1><a class="anchor" id="autotoc_md964"></a>
+<h1><a class="anchor" id="autotoc_md1188"></a>
 Notes</h1>
 <p>!!! danger "Undefined behavior" </p><pre class="fragment">Writing data to the pointee of the result yields an undefined state.
-</pre> <h1><a class="anchor" id="autotoc_md965"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1189"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below shows how pointers to internal values of a JSON value can be requested. Note that no type
 conversions are made and a `#!cpp nullptr` is returned if the value and the requested pointer type does not match.
@@ -125,7 +125,7 @@ Output:
 ```json
 --8&lt;-- "examples/get_ptr.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md966"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1190"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0.</li>

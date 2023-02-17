@@ -95,17 +95,21 @@ $(document).ready(function(){initNavTree('classbenchmark_1_1BenchmarkReporter.ht
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="buildtrees_2benchmark_2src_2v1_87_81-1d39cd1386_8clean_2include_2benchmark_2benchmark_8h_source.html">benchmark.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2benchmark_2benchmark_8h_source.html">benchmark.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for benchmark::BenchmarkReporter:</div>
 <div class="dyncontent">
  <div class="center">
   <img src="classbenchmark_1_1BenchmarkReporter.png" usemap="#benchmark::BenchmarkReporter_map" alt=""/>
   <map id="benchmark::BenchmarkReporter_map" name="benchmark::BenchmarkReporter_map">
-<area href="classbenchmark_1_1ConsoleReporter.html" alt="benchmark::ConsoleReporter" shape="rect" coords="0,56,192,80"/>
 <area href="classbenchmark_1_1ConsoleReporter.html" alt="benchmark::ConsoleReporter" shape="rect" coords="202,56,394,80"/>
-<area href="classbenchmark_1_1JSONReporter.html" alt="benchmark::JSONReporter" shape="rect" coords="404,56,596,80"/>
-<area href="classbenchmark_1_1JSONReporter.html" alt="benchmark::JSONReporter" shape="rect" coords="606,56,798,80"/>
+<area href="classbenchmark_1_1ConsoleReporter.html" alt="benchmark::ConsoleReporter" shape="rect" coords="202,112,394,136"/>
+<area href="classbenchmark_1_1ConsoleReporter.html" alt="benchmark::ConsoleReporter" shape="rect" coords="202,168,394,192"/>
+<area href="classbenchmark_1_1ConsoleReporter.html" alt="benchmark::ConsoleReporter" shape="rect" coords="202,224,394,248"/>
+<area href="classbenchmark_1_1JSONReporter.html" alt="benchmark::JSONReporter" shape="rect" coords="202,280,394,304"/>
+<area href="classbenchmark_1_1JSONReporter.html" alt="benchmark::JSONReporter" shape="rect" coords="202,336,394,360"/>
+<area href="classbenchmark_1_1JSONReporter.html" alt="benchmark::JSONReporter" shape="rect" coords="202,392,394,416"/>
+<area href="classbenchmark_1_1JSONReporter.html" alt="benchmark::JSONReporter" shape="rect" coords="202,448,394,472"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -156,6 +160,42 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a748af2901286cb8118f940ef3e04d8b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace4f845da3c91c32c301b7ec328e60e5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#ace4f845da3c91c32c301b7ec328e60e5">~BenchmarkReporter</a> ()</td></tr>
 <tr class="separator:ace4f845da3c91c32c301b7ec328e60e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0db7ab1fc39bba5a5e59622eaf79341e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a0db7ab1fc39bba5a5e59622eaf79341e">BenchmarkReporter</a> ()</td></tr>
+<tr class="separator:a0db7ab1fc39bba5a5e59622eaf79341e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d1834470fe47a308a8f5c8b9900706e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a0d1834470fe47a308a8f5c8b9900706e">ReportContext</a> (const <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> &amp;context)=0</td></tr>
+<tr class="separator:a0d1834470fe47a308a8f5c8b9900706e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b4fd50b7b1d441d7ca44249a5971ad8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a9b4fd50b7b1d441d7ca44249a5971ad8">ReportRuns</a> (const std::vector&lt; <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Run.html">Run</a> &gt; &amp;report)=0</td></tr>
+<tr class="separator:a9b4fd50b7b1d441d7ca44249a5971ad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9116282f2e2fa984ee7f11d53d5fa15"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#aa9116282f2e2fa984ee7f11d53d5fa15">Finalize</a> ()</td></tr>
+<tr class="separator:aa9116282f2e2fa984ee7f11d53d5fa15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a703e2a25fee7050b7badd1922dca945d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a703e2a25fee7050b7badd1922dca945d">SetOutputStream</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *out)</td></tr>
+<tr class="separator:a703e2a25fee7050b7badd1922dca945d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9289e45f81a88cab04dbdaf8f102c4e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a9289e45f81a88cab04dbdaf8f102c4e3">SetErrorStream</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *<a class="el" href="c_8h.html#a900286818b5b9ec834104f4dcccad220">err</a>)</td></tr>
+<tr class="separator:a9289e45f81a88cab04dbdaf8f102c4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8579c6156afd8a0c5c7569262dcf034d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a8579c6156afd8a0c5c7569262dcf034d">GetOutputStream</a> () const</td></tr>
+<tr class="separator:a8579c6156afd8a0c5c7569262dcf034d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a748af2901286cb8118f940ef3e04d8b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a748af2901286cb8118f940ef3e04d8b3">GetErrorStream</a> () const</td></tr>
+<tr class="separator:a748af2901286cb8118f940ef3e04d8b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace4f845da3c91c32c301b7ec328e60e5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#ace4f845da3c91c32c301b7ec328e60e5">~BenchmarkReporter</a> ()</td></tr>
+<tr class="separator:ace4f845da3c91c32c301b7ec328e60e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0db7ab1fc39bba5a5e59622eaf79341e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a0db7ab1fc39bba5a5e59622eaf79341e">BenchmarkReporter</a> ()</td></tr>
+<tr class="separator:a0db7ab1fc39bba5a5e59622eaf79341e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d1834470fe47a308a8f5c8b9900706e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a0d1834470fe47a308a8f5c8b9900706e">ReportContext</a> (const <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> &amp;context)=0</td></tr>
+<tr class="separator:a0d1834470fe47a308a8f5c8b9900706e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b4fd50b7b1d441d7ca44249a5971ad8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a9b4fd50b7b1d441d7ca44249a5971ad8">ReportRuns</a> (const std::vector&lt; <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Run.html">Run</a> &gt; &amp;report)=0</td></tr>
+<tr class="separator:a9b4fd50b7b1d441d7ca44249a5971ad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9116282f2e2fa984ee7f11d53d5fa15"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#aa9116282f2e2fa984ee7f11d53d5fa15">Finalize</a> ()</td></tr>
+<tr class="separator:aa9116282f2e2fa984ee7f11d53d5fa15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a703e2a25fee7050b7badd1922dca945d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a703e2a25fee7050b7badd1922dca945d">SetOutputStream</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *out)</td></tr>
+<tr class="separator:a703e2a25fee7050b7badd1922dca945d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9289e45f81a88cab04dbdaf8f102c4e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a9289e45f81a88cab04dbdaf8f102c4e3">SetErrorStream</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *<a class="el" href="c_8h.html#a900286818b5b9ec834104f4dcccad220">err</a>)</td></tr>
+<tr class="separator:a9289e45f81a88cab04dbdaf8f102c4e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8579c6156afd8a0c5c7569262dcf034d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a8579c6156afd8a0c5c7569262dcf034d">GetOutputStream</a> () const</td></tr>
+<tr class="separator:a8579c6156afd8a0c5c7569262dcf034d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a748af2901286cb8118f940ef3e04d8b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a748af2901286cb8118f940ef3e04d8b3">GetErrorStream</a> () const</td></tr>
+<tr class="separator:a748af2901286cb8118f940ef3e04d8b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace4f845da3c91c32c301b7ec328e60e5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#ace4f845da3c91c32c301b7ec328e60e5">~BenchmarkReporter</a> ()</td></tr>
+<tr class="separator:ace4f845da3c91c32c301b7ec328e60e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -163,10 +203,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a2c34777aff00c141056eb52292808099"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a244aa85dc2f9fdb4abbccb145d4a287b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a244aa85dc2f9fdb4abbccb145d4a287b">PrintBasicContext</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *out, <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> const &amp;context)</td></tr>
 <tr class="separator:a244aa85dc2f9fdb4abbccb145d4a287b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a244aa85dc2f9fdb4abbccb145d4a287b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a244aa85dc2f9fdb4abbccb145d4a287b">PrintBasicContext</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *out, <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> const &amp;context)</td></tr>
+<tr class="separator:a244aa85dc2f9fdb4abbccb145d4a287b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a244aa85dc2f9fdb4abbccb145d4a287b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classbenchmark_1_1BenchmarkReporter.html#a244aa85dc2f9fdb4abbccb145d4a287b">PrintBasicContext</a> (<a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *out, <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> const &amp;context)</td></tr>
+<tr class="separator:a244aa85dc2f9fdb4abbccb145d4a287b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0db7ab1fc39bba5a5e59622eaf79341e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0db7ab1fc39bba5a5e59622eaf79341e">&#9670;&nbsp;</a></span>BenchmarkReporter() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0db7ab1fc39bba5a5e59622eaf79341e">&#9670;&nbsp;</a></span>BenchmarkReporter() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +227,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a5529e7604d50f9196fdfa01e4898e16f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5529e7604d50f9196fdfa01e4898e16f">&#9670;&nbsp;</a></span>~BenchmarkReporter() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5529e7604d50f9196fdfa01e4898e16f">&#9670;&nbsp;</a></span>~BenchmarkReporter() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -208,7 +252,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a0db7ab1fc39bba5a5e59622eaf79341e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0db7ab1fc39bba5a5e59622eaf79341e">&#9670;&nbsp;</a></span>BenchmarkReporter() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0db7ab1fc39bba5a5e59622eaf79341e">&#9670;&nbsp;</a></span>BenchmarkReporter() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -225,7 +269,91 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ace4f845da3c91c32c301b7ec328e60e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace4f845da3c91c32c301b7ec328e60e5">&#9670;&nbsp;</a></span>~BenchmarkReporter() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ace4f845da3c91c32c301b7ec328e60e5">&#9670;&nbsp;</a></span>~BenchmarkReporter() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual benchmark::BenchmarkReporter::~BenchmarkReporter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0db7ab1fc39bba5a5e59622eaf79341e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0db7ab1fc39bba5a5e59622eaf79341e">&#9670;&nbsp;</a></span>BenchmarkReporter() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">benchmark::BenchmarkReporter::BenchmarkReporter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ace4f845da3c91c32c301b7ec328e60e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace4f845da3c91c32c301b7ec328e60e5">&#9670;&nbsp;</a></span>~BenchmarkReporter() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual benchmark::BenchmarkReporter::~BenchmarkReporter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0db7ab1fc39bba5a5e59622eaf79341e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0db7ab1fc39bba5a5e59622eaf79341e">&#9670;&nbsp;</a></span>BenchmarkReporter() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">benchmark::BenchmarkReporter::BenchmarkReporter </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ace4f845da3c91c32c301b7ec328e60e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace4f845da3c91c32c301b7ec328e60e5">&#9670;&nbsp;</a></span>~BenchmarkReporter() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -251,7 +379,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="aa9116282f2e2fa984ee7f11d53d5fa15"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9116282f2e2fa984ee7f11d53d5fa15">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9116282f2e2fa984ee7f11d53d5fa15">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -273,12 +401,12 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1JSONReporter.html#acc6e8175a575127132cb747f8acc207f">benchmark::JSONReporter</a>.</p>
+<p>Reimplemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1JSONReporter.html#acc6e8175a575127132cb747f8acc207f">benchmark::JSONReporter</a>.</p>
 
 </div>
 </div>
 <a id="aa9116282f2e2fa984ee7f11d53d5fa15"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9116282f2e2fa984ee7f11d53d5fa15">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9116282f2e2fa984ee7f11d53d5fa15">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,12 +428,66 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1JSONReporter.html#acc6e8175a575127132cb747f8acc207f">benchmark::JSONReporter</a>.</p>
+<p>Reimplemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1JSONReporter.html#acc6e8175a575127132cb747f8acc207f">benchmark::JSONReporter</a>.</p>
+
+</div>
+</div>
+<a id="aa9116282f2e2fa984ee7f11d53d5fa15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9116282f2e2fa984ee7f11d53d5fa15">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void benchmark::BenchmarkReporter::Finalize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1JSONReporter.html#acc6e8175a575127132cb747f8acc207f">benchmark::JSONReporter</a>.</p>
+
+</div>
+</div>
+<a id="aa9116282f2e2fa984ee7f11d53d5fa15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9116282f2e2fa984ee7f11d53d5fa15">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void benchmark::BenchmarkReporter::Finalize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ab9b8a23d94c30bd9df5774fcc7ae41dc">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1JSONReporter.html#acc6e8175a575127132cb747f8acc207f">benchmark::JSONReporter</a>.</p>
 
 </div>
 </div>
 <a id="a748af2901286cb8118f940ef3e04d8b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a748af2901286cb8118f940ef3e04d8b3">&#9670;&nbsp;</a></span>GetErrorStream() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a748af2901286cb8118f940ef3e04d8b3">&#9670;&nbsp;</a></span>GetErrorStream() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -330,7 +512,57 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a748af2901286cb8118f940ef3e04d8b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a748af2901286cb8118f940ef3e04d8b3">&#9670;&nbsp;</a></span>GetErrorStream() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a748af2901286cb8118f940ef3e04d8b3">&#9670;&nbsp;</a></span>GetErrorStream() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a>&amp; benchmark::BenchmarkReporter::GetErrorStream </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a748af2901286cb8118f940ef3e04d8b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a748af2901286cb8118f940ef3e04d8b3">&#9670;&nbsp;</a></span>GetErrorStream() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a>&amp; benchmark::BenchmarkReporter::GetErrorStream </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a748af2901286cb8118f940ef3e04d8b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a748af2901286cb8118f940ef3e04d8b3">&#9670;&nbsp;</a></span>GetErrorStream() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -355,7 +587,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a8579c6156afd8a0c5c7569262dcf034d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8579c6156afd8a0c5c7569262dcf034d">&#9670;&nbsp;</a></span>GetOutputStream() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8579c6156afd8a0c5c7569262dcf034d">&#9670;&nbsp;</a></span>GetOutputStream() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -380,7 +612,57 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a8579c6156afd8a0c5c7569262dcf034d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8579c6156afd8a0c5c7569262dcf034d">&#9670;&nbsp;</a></span>GetOutputStream() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8579c6156afd8a0c5c7569262dcf034d">&#9670;&nbsp;</a></span>GetOutputStream() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a>&amp; benchmark::BenchmarkReporter::GetOutputStream </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8579c6156afd8a0c5c7569262dcf034d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8579c6156afd8a0c5c7569262dcf034d">&#9670;&nbsp;</a></span>GetOutputStream() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a>&amp; benchmark::BenchmarkReporter::GetOutputStream </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8579c6156afd8a0c5c7569262dcf034d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8579c6156afd8a0c5c7569262dcf034d">&#9670;&nbsp;</a></span>GetOutputStream() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -405,7 +687,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a2c34777aff00c141056eb52292808099"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c34777aff00c141056eb52292808099">&#9670;&nbsp;</a></span>PrintBasicContext() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c34777aff00c141056eb52292808099">&#9670;&nbsp;</a></span>PrintBasicContext() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -441,7 +723,79 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a244aa85dc2f9fdb4abbccb145d4a287b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a244aa85dc2f9fdb4abbccb145d4a287b">&#9670;&nbsp;</a></span>PrintBasicContext() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a244aa85dc2f9fdb4abbccb145d4a287b">&#9670;&nbsp;</a></span>PrintBasicContext() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void benchmark::BenchmarkReporter::PrintBasicContext </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> const &amp;&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a244aa85dc2f9fdb4abbccb145d4a287b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a244aa85dc2f9fdb4abbccb145d4a287b">&#9670;&nbsp;</a></span>PrintBasicContext() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void benchmark::BenchmarkReporter::PrintBasicContext </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> const &amp;&#160;</td>
+          <td class="paramname"><em>context</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a244aa85dc2f9fdb4abbccb145d4a287b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a244aa85dc2f9fdb4abbccb145d4a287b">&#9670;&nbsp;</a></span>PrintBasicContext() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -477,7 +831,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a0d1834470fe47a308a8f5c8b9900706e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d1834470fe47a308a8f5c8b9900706e">&#9670;&nbsp;</a></span>ReportContext() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d1834470fe47a308a8f5c8b9900706e">&#9670;&nbsp;</a></span>ReportContext() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -500,12 +854,12 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8d12162138fef23f18f69984ac71ef3c">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9f667057b524ba3a11d8f7790e7157c5">benchmark::ConsoleReporter</a>.</p>
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8d12162138fef23f18f69984ac71ef3c">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9f667057b524ba3a11d8f7790e7157c5">benchmark::ConsoleReporter</a>.</p>
 
 </div>
 </div>
 <a id="a0d1834470fe47a308a8f5c8b9900706e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d1834470fe47a308a8f5c8b9900706e">&#9670;&nbsp;</a></span>ReportContext() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d1834470fe47a308a8f5c8b9900706e">&#9670;&nbsp;</a></span>ReportContext() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -528,12 +882,68 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8d12162138fef23f18f69984ac71ef3c">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9f667057b524ba3a11d8f7790e7157c5">benchmark::ConsoleReporter</a>.</p>
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8d12162138fef23f18f69984ac71ef3c">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9f667057b524ba3a11d8f7790e7157c5">benchmark::ConsoleReporter</a>.</p>
+
+</div>
+</div>
+<a id="a0d1834470fe47a308a8f5c8b9900706e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d1834470fe47a308a8f5c8b9900706e">&#9670;&nbsp;</a></span>ReportContext() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool benchmark::BenchmarkReporter::ReportContext </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> &amp;&#160;</td>
+          <td class="paramname"><em>context</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8d12162138fef23f18f69984ac71ef3c">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9f667057b524ba3a11d8f7790e7157c5">benchmark::ConsoleReporter</a>.</p>
+
+</div>
+</div>
+<a id="a0d1834470fe47a308a8f5c8b9900706e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d1834470fe47a308a8f5c8b9900706e">&#9670;&nbsp;</a></span>ReportContext() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool benchmark::BenchmarkReporter::ReportContext </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Context.html">Context</a> &amp;&#160;</td>
+          <td class="paramname"><em>context</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8a493e22147b5ba2795a130fbfbee5d7">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a168e6748d2cd997962f14477360ae1cc">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8d12162138fef23f18f69984ac71ef3c">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9f667057b524ba3a11d8f7790e7157c5">benchmark::ConsoleReporter</a>.</p>
 
 </div>
 </div>
 <a id="a9b4fd50b7b1d441d7ca44249a5971ad8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b4fd50b7b1d441d7ca44249a5971ad8">&#9670;&nbsp;</a></span>ReportRuns() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b4fd50b7b1d441d7ca44249a5971ad8">&#9670;&nbsp;</a></span>ReportRuns() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -556,12 +966,12 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ad2ba0c7245aeafb849c59325dfd35dec">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9fcc7ea79267c9c7e79a042c36a631db">benchmark::ConsoleReporter</a>.</p>
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ad2ba0c7245aeafb849c59325dfd35dec">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9fcc7ea79267c9c7e79a042c36a631db">benchmark::ConsoleReporter</a>.</p>
 
 </div>
 </div>
 <a id="a9b4fd50b7b1d441d7ca44249a5971ad8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b4fd50b7b1d441d7ca44249a5971ad8">&#9670;&nbsp;</a></span>ReportRuns() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b4fd50b7b1d441d7ca44249a5971ad8">&#9670;&nbsp;</a></span>ReportRuns() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -584,12 +994,68 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ad2ba0c7245aeafb849c59325dfd35dec">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9fcc7ea79267c9c7e79a042c36a631db">benchmark::ConsoleReporter</a>.</p>
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ad2ba0c7245aeafb849c59325dfd35dec">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9fcc7ea79267c9c7e79a042c36a631db">benchmark::ConsoleReporter</a>.</p>
+
+</div>
+</div>
+<a id="a9b4fd50b7b1d441d7ca44249a5971ad8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b4fd50b7b1d441d7ca44249a5971ad8">&#9670;&nbsp;</a></span>ReportRuns() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void benchmark::BenchmarkReporter::ReportRuns </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Run.html">Run</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>report</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ad2ba0c7245aeafb849c59325dfd35dec">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9fcc7ea79267c9c7e79a042c36a631db">benchmark::ConsoleReporter</a>.</p>
+
+</div>
+</div>
+<a id="a9b4fd50b7b1d441d7ca44249a5971ad8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b4fd50b7b1d441d7ca44249a5971ad8">&#9670;&nbsp;</a></span>ReportRuns() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void benchmark::BenchmarkReporter::ReportRuns </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structbenchmark_1_1BenchmarkReporter_1_1Run.html">Run</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>report</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#a8b7d524433356cf91e3e07d44a6e319e">benchmark::JSONReporter</a>, <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a380baef5839ba3ebd20d593c881f005c">benchmark::ConsoleReporter</a>, <a class="el" href="classbenchmark_1_1JSONReporter.html#ad2ba0c7245aeafb849c59325dfd35dec">benchmark::JSONReporter</a>, and <a class="el" href="classbenchmark_1_1ConsoleReporter.html#a9fcc7ea79267c9c7e79a042c36a631db">benchmark::ConsoleReporter</a>.</p>
 
 </div>
 </div>
 <a id="a9289e45f81a88cab04dbdaf8f102c4e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9289e45f81a88cab04dbdaf8f102c4e3">&#9670;&nbsp;</a></span>SetErrorStream() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9289e45f81a88cab04dbdaf8f102c4e3">&#9670;&nbsp;</a></span>SetErrorStream() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -615,7 +1081,59 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a9289e45f81a88cab04dbdaf8f102c4e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9289e45f81a88cab04dbdaf8f102c4e3">&#9670;&nbsp;</a></span>SetErrorStream() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9289e45f81a88cab04dbdaf8f102c4e3">&#9670;&nbsp;</a></span>SetErrorStream() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void benchmark::BenchmarkReporter::SetErrorStream </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *&#160;</td>
+          <td class="paramname"><em>err</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9289e45f81a88cab04dbdaf8f102c4e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9289e45f81a88cab04dbdaf8f102c4e3">&#9670;&nbsp;</a></span>SetErrorStream() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void benchmark::BenchmarkReporter::SetErrorStream </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *&#160;</td>
+          <td class="paramname"><em>err</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9289e45f81a88cab04dbdaf8f102c4e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9289e45f81a88cab04dbdaf8f102c4e3">&#9670;&nbsp;</a></span>SetErrorStream() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -641,7 +1159,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a703e2a25fee7050b7badd1922dca945d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a703e2a25fee7050b7badd1922dca945d">&#9670;&nbsp;</a></span>SetOutputStream() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a703e2a25fee7050b7badd1922dca945d">&#9670;&nbsp;</a></span>SetOutputStream() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -667,7 +1185,59 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a703e2a25fee7050b7badd1922dca945d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a703e2a25fee7050b7badd1922dca945d">&#9670;&nbsp;</a></span>SetOutputStream() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a703e2a25fee7050b7badd1922dca945d">&#9670;&nbsp;</a></span>SetOutputStream() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void benchmark::BenchmarkReporter::SetOutputStream </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *&#160;</td>
+          <td class="paramname"><em>out</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a703e2a25fee7050b7badd1922dca945d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a703e2a25fee7050b7badd1922dca945d">&#9670;&nbsp;</a></span>SetOutputStream() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void benchmark::BenchmarkReporter::SetOutputStream </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="doctest_8h.html#a116af65cb5e924b33ad9d9ecd7a783f3">std::ostream</a> *&#160;</td>
+          <td class="paramname"><em>out</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a703e2a25fee7050b7badd1922dca945d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a703e2a25fee7050b7badd1922dca945d">&#9670;&nbsp;</a></span>SetOutputStream() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -693,7 +1263,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/runner/work/healthgps/healthgps/vcpkg/buildtrees/benchmark/src/v1.7.1-1d39cd1386.clean/include/benchmark/<a class="el" href="buildtrees_2benchmark_2src_2v1_87_81-1d39cd1386_8clean_2include_2benchmark_2benchmark_8h_source.html">benchmark.h</a></li>
+<li>/home/runner/work/healthgps/healthgps/out/build/linux-debug/vcpkg_installed/x64-linux/include/benchmark/<a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2benchmark_2benchmark_8h_source.html">benchmark.h</a></li>
 <li>/home/runner/work/healthgps/healthgps/vcpkg/buildtrees/benchmark/src/v1.7.1-1d39cd1386.clean/src/<a class="el" href="reporter_8cc.html">reporter.cc</a></li>
 </ul>
 </div><!-- contents -->

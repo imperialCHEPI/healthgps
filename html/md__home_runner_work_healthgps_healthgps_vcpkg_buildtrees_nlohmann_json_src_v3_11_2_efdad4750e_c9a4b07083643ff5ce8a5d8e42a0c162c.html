@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><div class="fragment"><div class="line"><span class="comment">// (1)</span></div>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
 <div class="line">ValueType <a class="code" href="ranges-test_8cc.html#a8e624d7aa6bce5ed675cecb2d3f0bb67">get</a>() const noexcept(</div>
-<div class="line">    noexcept(JSONSerializer&lt;ValueType&gt;::<a class="code" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a>(</div>
+<div class="line">    noexcept(JSONSerializer&lt;ValueType&gt;::<a class="code" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json</a>(</div>
 <div class="line">        <a class="code" href="namespacestd.html">std</a>::<a class="code" href="namespacedoctest_1_1detail.html#a356d5b0ba6a3d0cb9e7af15614f9250b">declval</a>&lt;const basic_json_t&amp;&gt;(), <a class="code" href="namespacestd.html">std</a>::<a class="code" href="namespacedoctest_1_1detail.html#a356d5b0ba6a3d0cb9e7af15614f9250b">declval</a>&lt;ValueType&amp;&gt;())));</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (2)</span></div>
@@ -105,49 +105,49 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"> </div>
 <div class="line"><a class="code" href="namespacegenerate__natvis.html#a01a7981524efc650e578691e1b5a8660">template</a>&lt;typename PointerType&gt;</div>
 <div class="line">constexpr const PointerType get_ptr() const noexcept;</div>
-<div class="ttc" id="ajsonparser_8cpp_html_a863cfc8afb5397b781ef4ea4c0c61a7a"><div class="ttname"><a href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a></div><div class="ttdeci">void from_json(const json &amp;j, CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:16</div></div>
+<div class="ttc" id="anamespacedetail_html_ac8fc7fc4703cbd8edd7bb43a94adf92b"><div class="ttname"><a href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">detail::from_json</a></div><div class="ttdeci">void from_json(const BasicJsonType &amp;j, typename std::nullptr_t &amp;n)</div><div class="ttdef"><b>Definition:</b> from_json.hpp:37</div></div>
 <div class="ttc" id="anamespacedoctest_1_1detail_html_a356d5b0ba6a3d0cb9e7af15614f9250b"><div class="ttname"><a href="namespacedoctest_1_1detail.html#a356d5b0ba6a3d0cb9e7af15614f9250b">doctest::detail::declval</a></div><div class="ttdeci">U declval(int)</div></div>
 <div class="ttc" id="anamespacegenerate__natvis_html_a01a7981524efc650e578691e1b5a8660"><div class="ttname"><a href="namespacegenerate__natvis.html#a01a7981524efc650e578691e1b5a8660">generate_natvis.template</a></div><div class="ttdeci">template</div><div class="ttdef"><b>Definition:</b> generate_natvis.py:37</div></div>
-<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> column_iterator.h:82</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> guid.hpp:131</div></div>
 <div class="ttc" id="aranges-test_8cc_html_a8e624d7aa6bce5ed675cecb2d3f0bb67"><div class="ttname"><a href="ranges-test_8cc.html#a8e624d7aa6bce5ed675cecb2d3f0bb67">get</a></div><div class="ttdeci">auto get(const tuple_like &amp;t) noexcept -&gt; decltype(t.get&lt; N &gt;())</div><div class="ttdef"><b>Definition:</b> ranges-test.cc:126</div></div>
 </div><!-- fragment --><ol type="1">
-<li><p class="startli">Explicit type conversion between the JSON value and a compatible value which is <a href="https://en.cppreference.com/w/cpp/named_req/CopyConstructible">CopyConstructible</a> and <a href="https://en.cppreference.com/w/cpp/named_req/DefaultConstructible">DefaultConstructible</a>. The value is converted by calling the <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method.</p>
+<li><p class="startli">Explicit type conversion between the JSON value and a compatible value which is <a href="https://en.cppreference.com/w/cpp/named_req/CopyConstructible">CopyConstructible</a> and <a href="https://en.cppreference.com/w/cpp/named_req/DefaultConstructible">DefaultConstructible</a>. The value is converted by calling the <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method.</p>
 <p class="startli">The function is equivalent to executing ```cpp ValueType ret; JSONSerializer&lt;ValueType&gt;::from_json(*this, ret); return ret; ```</p>
 <p class="startli">This overload is chosen if:</p><ul>
 <li><code>ValueType</code> is not <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code>,</li>
-<li><code>json_serializer&lt;ValueType&gt;</code> has a <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method of the form <code>void from_json(const basic_json&amp;, ValueType&amp;)</code>, and</li>
-<li><code>json_serializer&lt;ValueType&gt;</code> does not have a <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method of the form <code>ValueType from_json(const basic_json&amp;)</code></li>
+<li><code>json_serializer&lt;ValueType&gt;</code> has a <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method of the form <code>void from_json(const basic_json&amp;, ValueType&amp;)</code>, and</li>
+<li><code>json_serializer&lt;ValueType&gt;</code> does not have a <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method of the form <code>ValueType from_json(const basic_json&amp;)</code></li>
 </ul>
-<p class="startli">If the type is <b>not</b> <a href="https://en.cppreference.com/w/cpp/named_req/CopyConstructible">CopyConstructible</a> and <b>not</b> <a href="https://en.cppreference.com/w/cpp/named_req/DefaultConstructible">DefaultConstructible</a>, the value is converted by calling the <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method.</p>
+<p class="startli">If the type is <b>not</b> <a href="https://en.cppreference.com/w/cpp/named_req/CopyConstructible">CopyConstructible</a> and <b>not</b> <a href="https://en.cppreference.com/w/cpp/named_req/DefaultConstructible">DefaultConstructible</a>, the value is converted by calling the <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method.</p>
 <p class="startli">The function is then equivalent to executing ```cpp return JSONSerializer&lt;ValueTypeCV&gt;::from_json(*this); ```</p>
 <p class="startli">This overload is chosen if:</p><ul>
 <li><code>ValueType</code> is not <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> and</li>
-<li><code>json_serializer&lt;ValueType&gt;</code> has a <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method of the form <code>ValueType from_json(const basic_json&amp;)</code></li>
+<li><code>json_serializer&lt;ValueType&gt;</code> has a <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method of the form <code>ValueType from_json(const basic_json&amp;)</code></li>
 </ul>
-<p class="startli">If <code>json_serializer&lt;ValueType&gt;</code> has both overloads of <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code>, the latter one is chosen.</p>
+<p class="startli">If <code>json_serializer&lt;ValueType&gt;</code> has both overloads of <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code>, the latter one is chosen.</p>
 </li>
 <li>Overload for <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> specializations. The function is equivalent to executing ```cpp return *this; ```</li>
 <li>Explicit pointer access to the internally stored JSON value. No copies are made.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md942"></a>
+<h1><a class="anchor" id="autotoc_md1166"></a>
 Template parameters</h1>
 <p><code>ValueType</code> : the value type to return</p>
 <p><code>BasicJsonType</code> : a specialization of <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code></p>
 <p><code>PointerType</code> : pointer type; must be a pointer to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0150913bbd2e11a7cecd2977b96d6061.html">`array_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f974e10e5661bc477b8ce49351e9f5d.html">`object_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8cb44d26fcc9e736c3cd62fdeedc1db9.html">`string_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ca1393b8f34107fa75c5c2cb37c622002.html">`boolean_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8fad9bbe7fddf99841dc225dd67548c6.html">`number_integer_t`</a>, or <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb48ee65dfa3181b9fc3867f565566629.html">`number_unsigned_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c71599dcf1550afc67a6f1ffbeeaef2f3.html">`number_float_t`</a>, or <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0fb81146da4fe75feb276197ce7e8594.html">`binary_t`</a>. Other types will not compile.</p>
-<h1><a class="anchor" id="autotoc_md943"></a>
+<h1><a class="anchor" id="autotoc_md1167"></a>
 Return value</h1>
 <ol type="1">
 <li>copy of the JSON value, converted to <code>ValueType</code></li>
 <li>a copy of <code>#!cpp *this</code>, converted into <code>BasicJsonType</code></li>
 <li>pointer to the internally stored JSON value if the requested pointer type fits to the JSON value; <code>#!cpp nullptr</code> otherwise</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md944"></a>
+<h1><a class="anchor" id="autotoc_md1168"></a>
 Exceptions</h1>
-<p>Depends on what <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method throws</p>
-<h1><a class="anchor" id="autotoc_md945"></a>
+<p>Depends on what <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method throws</p>
+<h1><a class="anchor" id="autotoc_md1169"></a>
 Notes</h1>
 <p>!!! danger "Undefined behavior" </p><pre class="fragment">Writing data to the pointee (overload 3) of the result yields an undefined state.
-</pre> <h1><a class="anchor" id="autotoc_md946"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1170"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below shows several conversions from JSON values
 to other types. There a few things to note: (1) Floating-point numbers can
@@ -176,7 +176,7 @@ Output:
 ```json
 --8&lt;-- "examples/get__PointerType.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md947"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1171"></a>
 Version history</h1>
 <ol type="1">
 <li>Since version 2.1.0.</li>

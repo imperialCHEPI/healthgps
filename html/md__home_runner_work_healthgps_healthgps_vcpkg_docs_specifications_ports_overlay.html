@@ -90,9 +90,9 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Note: this is the feature as it was initially specified and does not necessarily reflect the current behavior.</b></p>
-<h1><a class="anchor" id="autotoc_md3584"></a>
+<h1><a class="anchor" id="autotoc_md3808"></a>
 1. Motivation</h1>
-<h2><a class="anchor" id="autotoc_md3585"></a>
+<h2><a class="anchor" id="autotoc_md3809"></a>
 A. Allow users to override ports with alternate versions</h2>
 <p>It's a common scenario for <code>vcpkg</code> users to keep specific versions of libraries to use in their own projects. The current recommendation for users is to fork <code>vcpkg</code>'s repository and create tags for commits containing the specific versions of the ports they want to use.</p>
 <p>This proposal adds an alternative to solve this problem. By allowing <code>vcpkg</code> users to specify additional locations in their file system containing ports for:</p>
@@ -102,10 +102,10 @@ A. Allow users to override ports with alternate versions</h2>
 <li>libraries not available in <code>vcpkg</code>.</li>
 </ul>
 <p>These locations will be searched when resolving port names during package installation, and override ports in <code>&lt;vcpkg-root&gt;/ports</code>.</p>
-<h2><a class="anchor" id="autotoc_md3586"></a>
+<h2><a class="anchor" id="autotoc_md3810"></a>
 B. Allow users to keep unmodified upstream ports</h2>
 <p>Users will be able to keep unmodified versions of the ports shipped with <code>vcpkg</code> and update them via <code>vcpkg update</code> and <code>vcpkg upgrade</code> without having to solve merge conflicts.</p>
-<h1><a class="anchor" id="autotoc_md3587"></a>
+<h1><a class="anchor" id="autotoc_md3811"></a>
 2. Other design concerns</h1>
 <ul>
 <li>Allow a set of <code>vcpkg</code> commands to optionally accept additional paths to be used when searching for ports.</li>
@@ -115,7 +115,7 @@ B. Allow users to keep unmodified upstream ports</h2>
 <li>After resolving a port name, the installation process has to work the same as for ports shipped by <code>vcpkg</code>.</li>
 <li>This <b>DOES NOT ENABLE MULTIPLE VERSIONS</b> of a same library to be <b>INSTALLED SIDE-BY-SIDE</b>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3588"></a>
+<h1><a class="anchor" id="autotoc_md3812"></a>
 3. Proposed solution</h1>
 <p>This document proposes allowing additional locations to search for ports during package installation that will override and complement the set of ports provided by <code>vcpkg</code> (ports under the <code>&lt;vcpkg_root&gt;/ports</code> directory).`</p>
 <p>A new option <code>--overlay-ports</code> will be added to the <code>vcpkg install</code>, <code>vcpkg update</code>, <code>vcpkg upgrade</code>, <code>vcpkg export</code>, and <code>vcpkg depend-info</code> commands to specify additional paths containing ports.</p>
@@ -142,18 +142,18 @@ B. Allow users to keep unmodified upstream ports</h2>
 </li>
 </ul>
 <p><em>NOTE: It is not the goal of this document to discuss library versioning or project dependency management solutions, which require the ability to install multiple versions of a same library side-by-side.</em></p>
-<h2><a class="anchor" id="autotoc_md3589"></a>
+<h2><a class="anchor" id="autotoc_md3813"></a>
 Multiple additional paths</h2>
 <p>Users can provide multiple additional paths by repeating the <code>--overlay-ports</code> option.</p>
 <div class="fragment"><div class="line">vcpkg install sqlite3 </div>
 <div class="line">    --overlay-ports=&quot;..\experimental-ports\sqlite3&quot; </div>
 <div class="line">    --overlay-ports=&quot;C:\custom-ports&quot; </div>
 <div class="line">    --overlay-ports=&quot;\\share\team\custom-ports</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3590"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3814"></a>
 Overlaying ports</h2>
 <p>Port name resolution follows the order in which additional paths are specified, with the first match being selected for installation, and falling back to <code>&lt;vcpkg-root&gt;/ports</code> if the port is not found in any of the additional paths.</p>
 <p>No effort is made to compare version numbers inside the <code>CONTROL</code> files, or to determine which port contains newer or older files.</p>
-<h2><a class="anchor" id="autotoc_md3591"></a>
+<h2><a class="anchor" id="autotoc_md3815"></a>
 Examples</h2>
 <p>Given the following directory structure:</p>
 <div class="fragment"><div class="line">team-ports/</div>
@@ -208,9 +208,9 @@ Examples</h2>
 </div><!-- fragment --><p>A location can be appended or prepended to those included in <code>preferred-ports.txt</code> via the command line, like this:</p>
 <div class="fragment"><div class="line">vcpkg/vcpkg.exe install sqlite3 curl --overlay-ports=my-ports --overlay-ports=vcpkg/preferred-ports.txt</div>
 </div><!-- fragment --><p>Which results in <code>my-ports/sqlite3</code> and <code>vcpkg/ports/curl</code> getting installed.</p>
-<h1><a class="anchor" id="autotoc_md3592"></a>
+<h1><a class="anchor" id="autotoc_md3816"></a>
 4. Proposed User experience</h1>
-<h2><a class="anchor" id="autotoc_md3593"></a>
+<h2><a class="anchor" id="autotoc_md3817"></a>
 i. User wants to preserve an older version of a port</h2>
 <p>Developer Alice and her team use <code>vcpkg</code> to acquire <b>OpenCV</b> and some other packages. She has even contributed many patches to add features to the <b>OpenCV 3</b> port in <code>vcpkg</code>. But, one day, she notices that a PR to update <b>OpenCV</b> to the next major version has been merged.</p>
 <p>Alice wants to update some packages available in <code>vcpkg</code>. Unfortunately, updating her project to use the latest <b>OpenCV</b> is not immediately possible.</p>

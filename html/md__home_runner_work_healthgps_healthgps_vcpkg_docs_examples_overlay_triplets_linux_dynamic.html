@@ -89,11 +89,11 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Using Overlay Triplets </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md2777"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md3001"></a>
 Building dynamic libraries on Linux</h1>
 <p>Using <b>vcpkg</b> you can build libraries for many configurations out of the box. However, this doesn't currently include shared libraries on Linux and Mac OS.</p>
 <p>This doesn't mean that you cannot use <b>vcpkg</b> to build your dynamic libraries on these platforms! This document will guide you through creating your own custom triplets with <code>--overlay-triplets</code> to easily build dynamic libraries on Linux.</p>
-<h2><a class="anchor" id="autotoc_md2778"></a>
+<h2><a class="anchor" id="autotoc_md3002"></a>
 Step 1: Create the custom triplet files</h2>
 <p>To save time, copy the existing <code>x64-linux.cmake</code> triplet file.</p>
 <div class="fragment"><div class="line">~/git$ mkdir custom-triplets</div>
@@ -104,7 +104,7 @@ Step 1: Create the custom triplet files</h2>
 <div class="line">set(VCPKG_LIBRARY_LINKAGE dynamic) # This changed from static to dynamic</div>
 <div class="line"> </div>
 <div class="line">set(VCPKG_CMAKE_SYSTEM_NAME Linux)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2779"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3003"></a>
 Step 2: Use &lt;tt&gt;--overlay-triplets&lt;/tt&gt; to build dynamic libraries</h2>
 <p>Use the <code>--overlay-triplets</code> option to include the triplets in the <code>custom-triplets</code> directory.</p>
 <div class="fragment"><div class="line">~/git$ vcpkg/vcpkg install sqlite3:x64-linux-dynamic --overlay-triplets=custom-triplets</div>
@@ -137,7 +137,7 @@ Step 2: Use &lt;tt&gt;--overlay-triplets&lt;/tt&gt; to build dynamic libraries</
 </div><!-- fragment --><p>Overlay triplets enables your custom triplet files when using <code>vcpkg install</code>, <code>vcpkg update</code>, <code>vcpkg upgrade</code>, and <code>vcpkg remove</code>.</p>
 <p>When using the <code>--overlay-triplets</code> option, a message like the following lets you know that a custom triplet is being used:</p>
 <div class="fragment"><div class="line">-- Loading triplet configuration from: /home/custom-triplets/x64-linux-dynamic.cmake</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2780"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3004"></a>
 Overriding default triplets</h1>
 <p>As you may have noticed, the default triplets for Windows (<code>x86-windows</code> and <code>x64-windows</code>) install dynamic libraries, while a suffix (<code>-static</code>) is needed for static libraries. This is different with Linux and Mac OS where static libraries are built by <code>x64-linux</code> and <code>x64-osx</code>.</p>
 <p>Using <code>--overlay-triplets</code> it is possible to override the default triplets to accomplish the same behavior on Linux:</p>
@@ -145,12 +145,12 @@ Overriding default triplets</h1>
 <li><code>x64-linux</code>: Builds dynamic libraries,</li>
 <li><code>x64-linux-static</code>: Builds static libraries.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2781"></a>
+<h2><a class="anchor" id="autotoc_md3005"></a>
 Step 1: Create the overlay triplets</h2>
 <p>Using the custom triplet created in the previous example, rename <code>custom-triplets/x64-linux-dynamic.cmake</code> to <code>custom-triplets/x64-linux.cmake</code>. Then, copy the default <code>x64-linux</code> triplet (which builds static libraries) in your <code>custom-triplets</code> folder and rename it to <code>x64-linux-static.cmake</code>.</p>
 <div class="fragment"><div class="line">~/git$ mv custom-triplets/x64-linux-dynamic.cmake custom-triplets/x64-linux.cmake</div>
 <div class="line">~/git$ cp vcpkg/triplets/x64-linux.cmake custom-triplets/x64-linux-static.cmake</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2782"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3006"></a>
 Step 2: Use &lt;tt&gt;--overlay-triplets&lt;/tt&gt; to override default triplets</h2>
 <p>Use the <code>--overlay-triplets</code> option to include the triplets in the <code>custom-triplets</code> directory.</p>
 <div class="fragment"><div class="line">~/git$ vcpkg/vcpkg install sqlite3:x64-linux --overlay-triplets=custom-triplets</div>

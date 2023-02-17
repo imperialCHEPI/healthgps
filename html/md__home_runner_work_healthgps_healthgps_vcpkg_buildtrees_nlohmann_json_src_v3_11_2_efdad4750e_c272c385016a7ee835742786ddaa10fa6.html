@@ -91,27 +91,27 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
 <div class="line">ValueType&amp; get_to(ValueType&amp; v) <span class="keyword">const</span> noexcept(</div>
-<div class="line">    noexcept(<a class="code" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">JSONSerializer&lt;ValueType&gt;::from_json</a>(</div>
+<div class="line">    noexcept(<a class="code" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">JSONSerializer&lt;ValueType&gt;::from_json</a>(</div>
 <div class="line">        std::declval&lt;const basic_json_t&amp;&gt;(), v)));</div>
-<div class="ttc" id="ajsonparser_8cpp_html_a863cfc8afb5397b781ef4ea4c0c61a7a"><div class="ttname"><a href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a></div><div class="ttdeci">void from_json(const json &amp;j, CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:16</div></div>
-</div><!-- fragment --><p>Explicit type conversion between the JSON value and a compatible value. The value is filled into the input parameter by calling the <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method.</p>
+<div class="ttc" id="anamespacedetail_html_ac8fc7fc4703cbd8edd7bb43a94adf92b"><div class="ttname"><a href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">detail::from_json</a></div><div class="ttdeci">void from_json(const BasicJsonType &amp;j, typename std::nullptr_t &amp;n)</div><div class="ttdef"><b>Definition:</b> from_json.hpp:37</div></div>
+</div><!-- fragment --><p>Explicit type conversion between the JSON value and a compatible value. The value is filled into the input parameter by calling the <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method.</p>
 <p>The function is equivalent to executing </p><div class="fragment"><div class="line">ValueType v;</div>
-<div class="line"><a class="code" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">JSONSerializer&lt;ValueType&gt;::from_json</a>(*<span class="keyword">this</span>, v);</div>
+<div class="line"><a class="code" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">JSONSerializer&lt;ValueType&gt;::from_json</a>(*<span class="keyword">this</span>, v);</div>
 </div><!-- fragment --><p>This overload is chosen if:</p>
 <ul>
 <li><code>ValueType</code> is not <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code>,</li>
-<li><code>json_serializer&lt;ValueType&gt;</code> has a <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method of the form <code>void from_json(const basic_json&amp;, ValueType&amp;)</code></li>
+<li><code>json_serializer&lt;ValueType&gt;</code> has a <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method of the form <code>void from_json(const basic_json&amp;, ValueType&amp;)</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md977"></a>
+<h1><a class="anchor" id="autotoc_md1201"></a>
 Template parameters</h1>
 <p><code>ValueType</code> : the value type to return</p>
-<h1><a class="anchor" id="autotoc_md978"></a>
+<h1><a class="anchor" id="autotoc_md1202"></a>
 Return value</h1>
 <p>the input parameter, allowing chaining calls</p>
-<h1><a class="anchor" id="autotoc_md979"></a>
+<h1><a class="anchor" id="autotoc_md1203"></a>
 Exceptions</h1>
-<p>Depends on what <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method throws</p>
-<h1><a class="anchor" id="autotoc_md980"></a>
+<p>Depends on what <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method throws</p>
+<h1><a class="anchor" id="autotoc_md1204"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below shows several conversions from JSON values to other types. There a few things to note: (1)
 Floating-point numbers can be converted to integers, (2) A JSON array can be converted to a standard
@@ -127,7 +127,7 @@ Output:
 ```json
 --8&lt;-- "examples/get_to.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md981"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1205"></a>
 Version history</h1>
 <ul>
 <li>Since version 3.3.0. </li>

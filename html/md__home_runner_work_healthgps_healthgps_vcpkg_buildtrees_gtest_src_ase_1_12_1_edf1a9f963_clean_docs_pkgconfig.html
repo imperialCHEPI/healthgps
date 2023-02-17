@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>the library (-l) to link to</li>
 </ul>
 <p>All current build systems support pkg-config in one way or another. For all examples here we assume you want to compile the sample <code><a class="el" href="sample3__unittest_8cc.html">samples/sample3_unittest.cc</a></code>.</p>
-<h2><a class="anchor" id="autotoc_md361"></a>
+<h2><a class="anchor" id="autotoc_md585"></a>
 CMake</h2>
 <p>Using <code>pkg-config</code> in CMake is fairly easy:</p>
 <div class="fragment"><div class="line">cmake_minimum_required(VERSION 3.0)</div>
@@ -116,7 +116,7 @@ CMake</h2>
 <div class="line">include(CTest)</div>
 <div class="line">add_test(first_and_only_test testapp)</div>
 </div><!-- fragment --><p>It is generally recommended that you use <code>target_compile_options</code> + <code>_CFLAGS</code> over <code>target_include_directories</code> + <code>_INCLUDE_DIRS</code> as the former includes not just -I flags (GoogleTest might require a macro indicating to internal headers that all libraries have been compiled with threading enabled. In addition, GoogleTest might also require <code>-pthread</code> in the compiling step, and as such splitting the pkg-config <code>Cflags</code> variable into include dirs and macros for <code>target_compile_definitions()</code> might still miss this). The same recommendation goes for using <code>_LDFLAGS</code> over the more commonplace <code>_LIBRARIES</code>, which happens to discard <code>-L</code> flags and <code>-pthread</code>.</p>
-<h2><a class="anchor" id="autotoc_md362"></a>
+<h2><a class="anchor" id="autotoc_md586"></a>
 Help! pkg-config can't find GoogleTest!</h2>
 <p>Let's say you have a <code>CMakeLists.txt</code> along the lines of the one in this tutorial and you try to run <code>cmake</code>. It is very possible that you get a failure along the lines of:</p>
 <div class="fragment"><div class="line">-- Checking for one of the modules &#39;gtest_main&#39;</div>
@@ -125,7 +125,7 @@ Help! pkg-config can't find GoogleTest!</h2>
 </div><!-- fragment --><p>These failures are common if you installed GoogleTest yourself and have not sourced it from a distro or other package manager. If so, you need to tell pkg-config where it can find the <code>.pc</code> files containing the information. Say you installed GoogleTest to <code>/usr/local</code>, then it might be that the <code>.pc</code> files are installed under <code>/usr/local/lib64/pkgconfig</code>. If you set</p>
 <div class="fragment"><div class="line">export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig</div>
 </div><!-- fragment --><p>pkg-config will also try to look in <code>PKG_CONFIG_PATH</code> to find <code>gtest_main.pc</code>.</p>
-<h2><a class="anchor" id="autotoc_md363"></a>
+<h2><a class="anchor" id="autotoc_md587"></a>
 Using pkg-config in a cross-compilation setting</h2>
 <p>Pkg-config can be used in a cross-compilation setting too. To do this, let's assume the final prefix of the cross-compiled installation will be <code>/usr</code>, and your sysroot is <code>/home/MYUSER/sysroot</code>. Configure and install GTest using</p>
 <div class="fragment"><div class="line">mkdir build &amp;&amp; cmake -DCMAKE_INSTALL_PREFIX=/usr ..</div>

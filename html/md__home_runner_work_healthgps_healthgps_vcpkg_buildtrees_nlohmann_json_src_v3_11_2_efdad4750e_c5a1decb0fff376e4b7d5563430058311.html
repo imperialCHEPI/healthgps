@@ -91,12 +91,12 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line"><span class="preprocessor">#define JSON_USE_GLOBAL_UDLS </span><span class="comment">/* value */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --><p>When defined to <code>1</code>, the user-defined string literals (UDLs) are placed into the global namespace instead of <code>nlohmann::literals::json_literals</code>.</p>
-<h1><a class="anchor" id="autotoc_md1786"></a>
+<h1><a class="anchor" id="autotoc_md2010"></a>
 Default definition</h1>
 <p>The default value is <code>1</code>.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define JSON_USE_GLOBAL_UDLS 1</span></div>
 </div><!-- fragment --><p>When the macro is not defined, the library will define it to its default value.</p>
-<h1><a class="anchor" id="autotoc_md1787"></a>
+<h1><a class="anchor" id="autotoc_md2011"></a>
 Notes</h1>
 <p>!!! info "Future behavior change" </p><pre class="fragment">The user-defined string literals will be removed from the global namespace in the next major release of the library.
 
@@ -105,7 +105,7 @@ needed. Refer to any of the [string literals](#see-also) for details.
 </pre><p> !!! hint "CMake option" </p><pre class="fragment">The placement of user-defined string literals can also be controlled with the CMake option
 [`JSON_GlobalUDLs`](../../integration/cmake.md#json_globaludls) (`ON` by default) which defines
 `JSON_USE_GLOBAL_UDLS` accordingly.
-</pre> <h1><a class="anchor" id="autotoc_md1788"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2012"></a>
 Examples</h1>
 <p>??? example "Example 1: Default behavior" </p><pre class="fragment">The code below shows the default behavior using the `_json` UDL.
 
@@ -155,13 +155,13 @@ Output:
 ```json
 42
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1789"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2013"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c153bbfd4265b3edb7c129fd180d090cd.html">`operator</a>"_json`"</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ce7139227c589d3d1a68558b804180b10.html">`operator</a>"_json_pointer`"</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1790"></a>
+<h1><a class="anchor" id="autotoc_md2014"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.11.0. </li>

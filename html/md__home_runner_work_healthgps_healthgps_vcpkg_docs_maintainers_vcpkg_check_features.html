@@ -117,9 +117,9 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>If <code>&lt;prefix&gt;</code> is not passed, then the feature vars set are simply <code>&lt;feature-var&gt;</code>, not <code>_&lt;feature-var&gt;</code>.</p>
 <p>If <code>INVERTED_FEATURES</code> is not passed, then the <code>FEATURES</code> keyword is optional. This behavior is deprecated.</p>
 <p>If the same <code>&lt;feature-var&gt;</code> is passed multiple times, then <code>vcpkg_check_features</code> will cause a fatal error, since that is a bug.</p>
-<h1><a class="anchor" id="autotoc_md3103"></a>
+<h1><a class="anchor" id="autotoc_md3327"></a>
 Examples</h1>
-<h2><a class="anchor" id="autotoc_md3104"></a>
+<h2><a class="anchor" id="autotoc_md3328"></a>
 Example 1: Regular features</h2>
 <div class="fragment"><div class="line">$ ./vcpkg install mimalloc[asm,secure]</div>
 <div class="line"> </div>
@@ -137,7 +137,7 @@ Example 1: Regular features</h2>
 <div class="line">        # Expands to &quot;-DMI_SEE_ASM=ON;-DMI_OVERRIDE=OFF;-DMI_SECURE=ON&quot;</div>
 <div class="line">        ${FEATURE_OPTIONS}</div>
 <div class="line">)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3105"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3329"></a>
 Example 2: Inverted features</h2>
 <div class="fragment"><div class="line">$ ./vcpkg install cpprestsdk[websockets]</div>
 <div class="line"> </div>
@@ -154,7 +154,7 @@ Example 2: Inverted features</h2>
 <div class="line">        # Expands to &quot;-DCPPREST_EXCLUDE_BROTLI=ON;-DCPPREST_EXCLUDE_WEBSOCKETS=OFF&quot;</div>
 <div class="line">        ${FEATURE_OPTIONS}</div>
 <div class="line">)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3106"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3330"></a>
 Example 3: Set multiple options for same feature</h2>
 <div class="fragment"><div class="line">$ ./vcpkg install pcl[cuda]</div>
 <div class="line"> </div>
@@ -172,7 +172,7 @@ Example 3: Set multiple options for same feature</h2>
 <div class="line">        # Expands to &quot;-DWITH_CUDA=ON;-DBUILD_CUDA=ON;-DBUILD_GPU=ON&quot;</div>
 <div class="line">        ${FEATURE_OPTIONS}</div>
 <div class="line">)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3107"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3331"></a>
 Example 4: Use regular and inverted features</h2>
 <div class="fragment"><div class="line">$ ./vcpkg install rocksdb[tbb]</div>
 <div class="line"> </div>
@@ -190,14 +190,14 @@ Example 4: Use regular and inverted features</h2>
 <div class="line">        # Expands to &quot;-DWITH_TBB=ON;-DROCKSDB_IGNORE_PACKAGE_TBB=OFF&quot;</div>
 <div class="line">        ${FEATURE_OPTIONS}</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3108"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3332"></a>
 Examples in portfiles</h1>
 <ul>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/cpprestsdk/portfile.cmake">cpprestsdk</a></li>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/pcl/portfile.cmake">pcl</a></li>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/rocksdb/portfile.cmake">rocksdb</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3109"></a>
+<h1><a class="anchor" id="autotoc_md3333"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_check_features.cmake">scripts/cmake/vcpkg_check_features.cmake</a> </p>
 </div></div><!-- contents -->

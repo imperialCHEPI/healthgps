@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Discord: <a href="https://www.includecpp.org">#include &lt;C++&gt;</a>, en el canal #🌏vcpkg</li>
 <li>Docs: <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_README.html">Documentación</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3981"></a>
+<h1><a class="anchor" id="autotoc_md4205"></a>
 Tabla de contenido</h1>
 <ul>
 <li><a href="#vcpkg">Vcpkg</a><ul>
@@ -131,13 +131,13 @@ Tabla de contenido</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3982"></a>
+<h1><a class="anchor" id="autotoc_md4206"></a>
 Primeros pasos</h1>
 <p>Antes de iniciar, siga la guía ya sea para <a href="#inicio-rápido-windows">Windows</a>, o <a href="#inicio-rápido-unix">macOS y Linux</a> dependiendo del SO que use.</p>
 <p>Para más información, ver <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_installing_and_using_packages.html">Instalando y Usando Paquetes</a>. Si una biblioteca que necesita no está presente en el catálogo de vcpkg, puede <a href="https://github.com/microsoft/vcpkg/issues/new/choose">abrir una incidencia en el repositorio de GitHub</a> donde el equipo de vcpkg y la comunidad pueden verlo, y potencialmente hacer un port a vcpkg.</p>
 <p>Después de tener Vcpkg instalado y funcionando, puede que desee añadir <a href="#Completado-TabAuto-Completado">completado con tab</a> en su terminal.</p>
 <p>Finalmente, si está interesado en el futuro de Vcpkg, puede ver la guía de <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_manifests.html">archivos de manifiesto</a>! esta es una característica experimental y es probable que tenga errores, así que se recomienda revisar y <a href="https://github.com/microsoft/vcpkg/issues/new/choose">crear incidencias</a>!</p>
-<h2><a class="anchor" id="autotoc_md3983"></a>
+<h2><a class="anchor" id="autotoc_md4207"></a>
 Inicio Rápido: Windows</h2>
 <p>Prerrequisitos:</p>
 <ul>
@@ -161,7 +161,7 @@ Inicio Rápido: Windows</h2>
 <div class="line">&gt; cmake --build [directorio de compilación]</div>
 </div><!-- fragment --><p>Con CMake, todavía necesitara <code>find_package</code> y las configuraciones adicionales de la biblioteca. Revise la <a href="#usando-vcpkg-con-cmake">Sección de Cmake</a> para más información, incluyendo el uso de CMake con un IDE.</p>
 <p>Para cualquier otra herramienta, incluyendo Visual Studio Code, reviste la <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">guía de integración</a>.</p>
-<h2><a class="anchor" id="autotoc_md3984"></a>
+<h2><a class="anchor" id="autotoc_md4208"></a>
 Inicio rápido: Unix</h2>
 <p>Prerrequisitos para Linux:</p>
 <ul>
@@ -188,7 +188,7 @@ Inicio rápido: Unix</h2>
 <div class="line">$ cmake --build [directorio de compilación]</div>
 </div><!-- fragment --><p>Con CMake, todavía necesitara <code>find_package</code> y las configuraciones adicionales de la biblioteca. Revise la <a href="#usando-vcpkg-con-cmake">Sección de CMake</a> para más información en cómo aprovechar mejor Vcpkg con CMake, y CMake tools para VSCode.</p>
 <p>Para cualquier otra herramienta, visite la <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">guía de integración</a>.</p>
-<h2><a class="anchor" id="autotoc_md3985"></a>
+<h2><a class="anchor" id="autotoc_md4209"></a>
 Instalando Herramientas de desarrollo en Linux</h2>
 <p>Según las distribuciones de Linux, hay diferentes paquetes que necesitará instalar:</p>
 <ul>
@@ -203,16 +203,16 @@ Instalando Herramientas de desarrollo en Linux</h2>
 <div class="line">$ sudo yum install devtoolset-7</div>
 <div class="line">$ scl enable devtoolset-7 bash</div>
 </div><!-- fragment --><p>Para cualquier otra distribución, asegúrese que dispone de g++ 6 o superior. Si desea añadir instrucción para una distribución específica, <a href="https://github.com/microsoft/vcpkg/pulls">cree un pull request</a></p>
-<h2><a class="anchor" id="autotoc_md3986"></a>
+<h2><a class="anchor" id="autotoc_md4210"></a>
 Instalando Herramientas de desarrollo en macOS</h2>
 <p>En macOS 10.15, solo tiene que ejecutar el siguiente comando en la terminal:</p>
 <div class="fragment"><div class="line">$ xcode-select --install</div>
 </div><!-- fragment --><p>Luego seguir los pasos que aparecerán en las ventanas que se muestran.</p>
 <p>Posteriormente podrá compilar vcpkg junto con la <a href="#inicio-rápido-unix">guía de inicio rápido</a></p>
-<h2><a class="anchor" id="autotoc_md3987"></a>
+<h2><a class="anchor" id="autotoc_md4211"></a>
 Usando Vcpkg con CMake</h2>
 <p>¡Si está usando Vcpkg con CMake, lo siguiente puede ayudar!</p>
-<h3><a class="anchor" id="autotoc_md3988"></a>
+<h3><a class="anchor" id="autotoc_md4212"></a>
 Visual Studio Code con CMake Tools</h3>
 <p>Agregando lo siguiente al espacio de trabajo <code>settings.json</code> permitirá que CMake Tools use automáticamente Vcpkg para las bibliotecas:</p>
 <div class="fragment"><div class="line">{</div>
@@ -220,22 +220,22 @@ Visual Studio Code con CMake Tools</h3>
 <div class="line">    &quot;CMAKE_TOOLCHAIN_FILE&quot;: &quot;[raíz de vcpkg]/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3989"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4213"></a>
 Vcpkg con proyectos de Visual Studio(CMake)</h3>
 <p>Abra el editor de Ajustes de CMake, bajo la sección <code>CMake toolchain file</code>, posteriormente agregue al path el archivo de cadena de herramientas de Vcpkg:</p>
 <div class="fragment"><div class="line">[raíz de vcpkg]/scripts/buildsystems/vcpkg.cmake</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3990"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4214"></a>
 Vcpkg con CLion</h3>
 <p>Abra los ajustes de Cadena de Herramientas (Toolchains) (File &gt; Settings en Windows y Linux, Clion &gt; Preferences en macOS), y entre en la sección de ajustes de CMake (Build, Execution, Deployment &gt; CMake). Finalmente, en <code>CMake options</code>, agregue la línea siguiente:</p>
 <div class="fragment"><div class="line">-DCMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake</div>
 </div><!-- fragment --><p>Desafortunadamente, tendrá que hacerlo para cada perfil.</p>
-<h3><a class="anchor" id="autotoc_md3991"></a>
+<h3><a class="anchor" id="autotoc_md4215"></a>
 Vcpkg como Submódulo</h3>
 <p>Cuando este usando Vcpkg como un submódulo para su proyecto, puede agregar lo siguiente as su CMakeLists,txt antes de la primera llamada a <code><a class="el" href="namespaceconf.html#a45653c983098153b78e33600e39230eb">project()</a></code>, en vez de pasar <code>CMAKE_TOOLCHAIN_FILE</code> a la invocación de CMake.</p>
 <div class="fragment"><div class="line">set(CMAKE_TOOLCHAIN_FILE &quot;${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line">  CACHE STRING &quot;Vcpkg toolchain file&quot;)</div>
 </div><!-- fragment --><p>Esto permitirá a las personas no usar Vcpkg, indicando el <code>CMAKE_TOOLCHAIN_FILE</code> directamente, sin embargo, hará el proceso de configuración y compilación más sencillo.</p>
-<h2><a class="anchor" id="autotoc_md3992"></a>
+<h2><a class="anchor" id="autotoc_md4216"></a>
 Inicio rápido: Manifiestos</h2>
 <p>Así que desea ver cómo será el futuro de Vcpkg! realmente lo apreciamos. Sin embargo, primero una advertencia: el soporte de archivos de manifiesto aún está en beta, aun así la mayoría debería funcionar, pero no hay garantía de esto y es muy probable que encuentre uno o más bugs mientras use Vcpkg en este modo. Adicionalmente, es probablemente que se rompan comportamientos antes de que se pueda considerar estable, así que está advertido. Por favor <a href="https://github.com/microsoft/vcpkg/issues/new/choose">Abra un Problema</a> si encuentra algún error</p>
 <p>Primero, instale vcpkg normalmente para <a href="#inicio-rápido-windows">Windows</a> o <a href="#inicio-rápido-unix">Unix</a>. Puede que desee instalar Vcpkg en un lugar centralizado, ya que el directorio existe localmente, y está bien ejecutar múltiples comandos desde el mismo directorio de vcpkg al mismo tiempo.</p>
@@ -252,19 +252,19 @@ Inicio rápido: Manifiestos</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p>Las bibliotecas serán instaladas en el directorio <code>vcpkg_installed</code>, en el mismo directorio que su <code>vcpkg.json</code>. Si puede usar el regular conjunto de herramientas de CMake, o mediante la integración de Visual Studio/MSBuild, este instalará las dependencias automáticamente, pero necesitará ajustar <code>VcpkgManifestEnabled</code> en <code>On</code> para MSBuild. Si desea instalar sus dependencias sin usar CMake o MSBuild, puede usar un simple <code>vcpkg install --feature-flags=manifests</code></p>
 <p>Para más información, revise la especificación de <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_manifests.html">manifiesto</a></p>
-<h1><a class="anchor" id="autotoc_md3993"></a>
+<h1><a class="anchor" id="autotoc_md4217"></a>
 Completado-Tab/Autocompletado</h1>
 <p><code>vcpkg</code> soporta autocompletado para los comandos, nombres de paquetes, y opciones, tanto en PowerShell como en bash. para activar el autocompletado en la terminal de elección ejecute:</p>
 <div class="fragment"><div class="line">&gt; .\vcpkg integrate powershell</div>
 </div><!-- fragment --><p>o</p>
 <div class="fragment"><div class="line">$ ./vcpkg integrate bash # o zsh</div>
 </div><!-- fragment --><p>según la terminal que use, luego reinicie la consola.</p>
-<h1><a class="anchor" id="autotoc_md3994"></a>
+<h1><a class="anchor" id="autotoc_md4218"></a>
 Ejemplos</h1>
 <p>ver la <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_README.html">documentación</a> para tutoriales específicos, incluyendo <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_installing_and_using_packages.html">instalando y usando un paquete</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_zipfiles.html">agregando un nuevo paquete desde un archivo comprimido</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_github_repos.html">agregando un nuevo paquete desde un repositorio en GitHub</a>.</p>
 <p>Nuestra documentación también esta disponible en nuestro sitio web <a href="https://vcpkg.io/">vcpkg.io</a>. Si necesita ayuda puede <a href="https://github.com/vcpkg/vcpkg.github.io/issues">crear un incidente</a>. ¡Apreciamos cualquier retroalimentación!</p>
 <p>Ver un <a href="https://www.youtube.com/watch?v=y41WFKbQFTw">video de demostración</a> de 4 minutos.</p>
-<h1><a class="anchor" id="autotoc_md3995"></a>
+<h1><a class="anchor" id="autotoc_md4219"></a>
 Contribuyendo</h1>
 <p>Vcpkg es un proyecto de código abierto, y está construido con sus contribuciones. Aquí hay unas de las maneras en las que puede contribuir:</p>
 <ul>
@@ -273,13 +273,13 @@ Contribuyendo</h1>
 </ul>
 <p>Por favor visite nuestra <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_CONTRIBUTING.html">Guía de Contribución</a> para más detalles.</p>
 <p>Este proyecto ha adoptado el <a href="https://opensource.microsoft.com/codeofconduct/">Código de Conducta de Microsoft de Código Abierto</a>. Para más información ver <a href="https://opensource.microsoft.com/codeofconduct/">Preguntas frecuentes del Código de Conducta</a> o envíe un correo a <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'nc'+'ode'+'@m'+'icr'+'os'+'oft'+'.c'+'om'; return false;">opencode@microsoft.com</a> con cualquier pregunta adicional o comentarios.</p>
-<h1><a class="anchor" id="autotoc_md3996"></a>
+<h1><a class="anchor" id="autotoc_md4220"></a>
 Licencia</h1>
 <p>El código en este repositorio se encuentra licenciado mediante la <a href="LICENSE.txt">Licencia MIT</a>. Las bibliotecas proveídas por los <code>ports</code> están licenciadas mediante los terminos de los autores originales. Donde estén disponibles, vcpkg almacena las licencias asociadas en la siguiente ubicación <code>installed/&lt;triplet&gt;/share/&lt;port&gt;/copyright</code>.</p>
-<h1><a class="anchor" id="autotoc_md3997"></a>
+<h1><a class="anchor" id="autotoc_md4221"></a>
 Seguridad</h1>
 <p>La mayoría de los <code>ports</code> en vcpkg construyen las bibliotecas usando su sistema de compilación preferido por los autores originales de las bibliotecas, y descargan el código fuente asi como las herramientas de compilación de sus ubicaciones de distribucion oficiales. Para aquellos que usan un firewall, el acceso dependerá de cuales <code>ports</code> están siendo instalados. Si tiene que instalarlos en un entorno aislado, puede instalarlos previamente en un entorno no aislado, generando un <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_assetcaching.html">caché del paquete</a> compartido con el entorno aislado.</p>
-<h2><a class="anchor" id="autotoc_md3998"></a>
+<h2><a class="anchor" id="autotoc_md4222"></a>
 Telemetría</h2>
 <p>vcpkg recolecta datos de uso para mejorar su experiencia. La información obtenida por Microsoft es anónima. puede ser dado de baja de la telemetría realizando lo siguiente:</p>
 <ul>

@@ -90,9 +90,9 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This is the changelog for <code>cxxopts</code>, a C++11 library for parsing command line options. The project adheres to semantic versioning.</p>
-<h1><a class="anchor" id="autotoc_md106"></a>
+<h1><a class="anchor" id="autotoc_md330"></a>
 3.0</h1>
-<h2><a class="anchor" id="autotoc_md107"></a>
+<h2><a class="anchor" id="autotoc_md331"></a>
 Changed</h2>
 <ul>
 <li>Only search for a C++ compiler in CMakeLists.txt.</li>
@@ -107,28 +107,28 @@ Changed</h2>
 <li>Improved formatting for help descriptions.</li>
 <li>Improve integer parsing.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md108"></a>
+<h2><a class="anchor" id="autotoc_md332"></a>
 Added</h2>
 <ul>
 <li>A list of unmatched arguments is available in <code>ParseResult</code>.</li>
 <li>Support single letter options with argument attached.</li>
 <li>Use &lt;optional&gt; if it is present.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md109"></a>
+<h2><a class="anchor" id="autotoc_md333"></a>
 Bug Fixes</h2>
 <ul>
 <li>Fix missing option name in exception.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md110"></a>
+<h1><a class="anchor" id="autotoc_md334"></a>
 2.2</h1>
-<h2><a class="anchor" id="autotoc_md111"></a>
+<h2><a class="anchor" id="autotoc_md335"></a>
 Changed</h2>
 <ul>
 <li>Allow integers to have leading zeroes.</li>
 <li>Build the tests by default.</li>
 <li>Don't check for container when showing positional help.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md112"></a>
+<h2><a class="anchor" id="autotoc_md336"></a>
 Added</h2>
 <ul>
 <li>Iterator inputs to <code>parse_positional</code>.</li>
@@ -136,7 +136,7 @@ Added</h2>
 <li>Parse a delimited list in a single argument for vector options.</li>
 <li>Add an option to disable implicit value on booleans.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md113"></a>
+<h2><a class="anchor" id="autotoc_md337"></a>
 Bug Fixes</h2>
 <ul>
 <li>Fix a warning about possible loss of data.</li>
@@ -147,44 +147,44 @@ Bug Fixes</h2>
 <li>Fix catching exceptions by reference.</li>
 <li>Fix out of bounds errors parsing integers.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md114"></a>
+<h1><a class="anchor" id="autotoc_md338"></a>
 2.1.1</h1>
-<h2><a class="anchor" id="autotoc_md115"></a>
+<h2><a class="anchor" id="autotoc_md339"></a>
 Bug Fixes</h2>
 <ul>
 <li>Revert the change adding <code>const</code> type for <code>argv</code>, because most users expect to pass a non-const <code>argv</code> from <code>main</code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md116"></a>
+<h1><a class="anchor" id="autotoc_md340"></a>
 2.1</h1>
-<h2><a class="anchor" id="autotoc_md117"></a>
+<h2><a class="anchor" id="autotoc_md341"></a>
 Changed</h2>
 <ul>
 <li>Options with implicit arguments now require the <code>--option=value</code> form if they are to be specified with an option. This is to remove the ambiguity when a positional argument could follow an option with an implicit value. For example, <code>--foo value</code>, where <code>foo</code> has an implicit value, will be parsed as <code>--foo=implicit</code> and a positional argument <code>value</code>.</li>
 <li>Boolean values are no longer special, but are just an option with a default and implicit value.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md118"></a>
+<h2><a class="anchor" id="autotoc_md342"></a>
 Added</h2>
 <ul>
 <li>Added support for <code>std::optional</code> as a storage type.</li>
 <li>Allow the help string to be customised.</li>
 <li>Use <code>const</code> for the type in the <code>argv</code> parameter, since the contents of the arguments is never modified.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md119"></a>
+<h2><a class="anchor" id="autotoc_md343"></a>
 Bug Fixes</h2>
 <ul>
 <li>Building against GCC 4.9 was broken due to overly strict shadow warnings.</li>
 <li>Fixed an ambiguous overload in the <code>parse_positional</code> function when an <code>initializer_list</code> was directly passed.</li>
 <li>Fixed precedence in the Boolean value regex.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md120"></a>
+<h1><a class="anchor" id="autotoc_md344"></a>
 2.0</h1>
-<h2><a class="anchor" id="autotoc_md121"></a>
+<h2><a class="anchor" id="autotoc_md345"></a>
 Changed</h2>
 <ul>
 <li><code>Options::parse</code> returns a ParseResult rather than storing the parse result internally.</li>
 <li>Options with default values now get counted as appearing once if they were not specified by the user.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md122"></a>
+<h2><a class="anchor" id="autotoc_md346"></a>
 Added</h2>
 <ul>
 <li>A new <code>ParseResult</code> object that is the immutable result of parsing. It responds to the same <code>count</code> and <code>operator[]</code> as <code>Options</code> of 1.x did.</li>
@@ -192,7 +192,7 @@ Added</h2>
 <li>The symbol <code>cxxopts::version</code> for the version of the library.</li>
 <li>Booleans can be specified with various strings and explicitly set false.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md123"></a>
+<h1><a class="anchor" id="autotoc_md347"></a>
 1.x</h1>
 <p>The 1.x series was the first major version of the library, with release numbers starting to follow semantic versioning, after 0.x being unstable. It never had a changelog maintained for it. Releases mostly contained bug fixes, with the occasional feature added. </p>
 </div></div><!-- contents -->

@@ -90,9 +90,9 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Note: this is the feature as it was initially specified and does not necessarily reflect the current behavior.</b></p>
-<h1><a class="anchor" id="autotoc_md3544"></a>
+<h1><a class="anchor" id="autotoc_md3768"></a>
 1. Motivation</h1>
-<h2><a class="anchor" id="autotoc_md3545"></a>
+<h2><a class="anchor" id="autotoc_md3769"></a>
 A. Build once and share</h2>
 <p>Customers want to be able to build their set of required libraries once, and then distribute the resulting binaries to all members of the "group". This has been brought up in</p><ul>
 <li>Enterprise environments, in which there are dedicated teams to acquire libraries and then share them with other teams to consume them</li>
@@ -100,10 +100,10 @@ A. Build once and share</h2>
 <li>CI Systems, in which developers want to quickly distribute their exact set of dependencies to a cloud-based farm of build machines</li>
 </ul>
 <p>Building once and sharing ensures that everyone gets exactly the same binaries, isolates the building effort to a small number of people and minimizes friction to obtain them. Therefore, there is value in enabling users to easily export ready-to-share binaries from <code>vcpkg</code>.</p>
-<h2><a class="anchor" id="autotoc_md3546"></a>
+<h2><a class="anchor" id="autotoc_md3770"></a>
 B. Very large libraries</h2>
 <p>Libraries like <a href="https://www.qt.io/">Qt</a> can take a very long time to build (5+ hours). Therefore, having the ability to build them and then distribute the binaries can save a lot of time.</p>
-<h2><a class="anchor" id="autotoc_md3547"></a>
+<h2><a class="anchor" id="autotoc_md3771"></a>
 C. Flexibility and uses without &lt;tt&gt;vcpkg&lt;/tt&gt;</h2>
 <p><code>vcpkg</code> currently handles cases where you have a <code>vcpkg</code> enlistment on your machine and use it for acquiring libraries and integrating into Visual Studio, CMake etc. However, users need the ability to build the libraries and then use them outside of and independently of <code>vcpkg</code>. For example:</p><ul>
 <li>Use <code>vcpkg</code> for the build, then host the binaries in a website (similarly to nuget)</li>
@@ -113,26 +113,26 @@ C. Flexibility and uses without &lt;tt&gt;vcpkg&lt;/tt&gt;</h2>
 <li>not a concern, like in a short term project or assignment</li>
 <li>explicitly desired, like in the development of a game where libraries and their versions are sealed for a particular release, never to be modified</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3548"></a>
+<h2><a class="anchor" id="autotoc_md3772"></a>
 D. Easy consumption in Visual Studio for NuGet users</h2>
 <p>Customers have requested C++ NuGet packages to integrate into their project. This has come from:</p><ul>
 <li>Customers than have used NuGet (e.g. in C#) and find it very convenient</li>
 <li>Customers who are working on a C# project that has a few dependencies on C++ and just want those dependencies to be satisfied in the most automatic way possible</li>
 </ul>
 <p>Providing a way to create NuGet packages provides great value to those customers. In an enterprise environment which focuses on C#, the dedicated acquisition team can create the NuGet packages with <code>vcpkg</code> and provide them to the other developers. For the "end-developer", this makes the consumption of C++ libraries the same as C# ones.</p>
-<h1><a class="anchor" id="autotoc_md3549"></a>
+<h1><a class="anchor" id="autotoc_md3773"></a>
 2. Other design concerns</h1>
 <ul>
 <li>The <code>vcpkg</code> root may have a variety of packages built and many of them might be unrelated to the current task. Providing an easy way to export a subset of them will enhance user experience.</li>
 <li>Since binary compatibility is not guaranteed, it is not safe to individually export packages. Therefore, when exporting a particular package, all of the dependencies that it was built against must also be present in the export format (e.g. zip file). When a <code>vcpkg export</code> command succeeds, there is a guarantee that all required headers/binaries are available in the target bundle.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3550"></a>
+<h1><a class="anchor" id="autotoc_md3774"></a>
 3. Proposed solution</h1>
 <p>This document proposes the <code>vcpkg export</code> command to pack the desired binaries in a convenient format. It is not the goal of this document to discuss binary distribution for C++ in a similar way that NuGet does for C#. It proposes exporting "library sets" instead of individual libraries as a solution to the C++ binary incompatibility problem.</p>
 <p>From a user experience perspective, the user expresses interest in exporting a particular library (e.g. <code>vcpkg export cpprestsdk</code>). <code>vcpkg export</code> should then make sure that the output contains <code>cpprestsdk</code> along with all dependencies it was actually built against.</p>
-<h1><a class="anchor" id="autotoc_md3551"></a>
+<h1><a class="anchor" id="autotoc_md3775"></a>
 4. Proposed User experience</h1>
-<h2><a class="anchor" id="autotoc_md3552"></a>
+<h2><a class="anchor" id="autotoc_md3776"></a>
 i. User knows what libraries he needs and wants to export them to an archive format (zip)</h2>
 <p>Developer Bob needs gtest and cpprestsdk and has been manually building them and their dependencies, then using the binaries in his project via applocal deployment. Bob has been experimenting with <code>vcpkg</code> and wants to use <code>vcpkg</code> for the building part only.</p>
 <p>Bob tries to export the libraries: </p><div class="fragment"><div class="line">&gt; vcpkg export gtest cpprestsdk --zip</div>
@@ -180,7 +180,7 @@ i. User knows what libraries he needs and wants to export them to an archive for
 <div class="line">Creating zip archive... done</div>
 <div class="line">zip archive exported at: C:/vcpkg/vcpkg-export-20170428-155351.zip</div>
 </div><!-- fragment --><p>Bob takes the zip file and extracts the contents next to his other dependencies. Bob can now proceed with building his own project as before.</p>
-<h2><a class="anchor" id="autotoc_md3553"></a>
+<h2><a class="anchor" id="autotoc_md3777"></a>
 ii. User has a vcpkg root that works and wants to share it</h2>
 <p>Developer Alice has been using <code>vcpkg</code> and has a Visual Studio project that consumes libraries from it (via <code>vcpkg integrate</code>). The project is built for both 32-bit and 64-bit architectures. Alice wants to quickly share the dependencies with Bob so he can test the project. </p><div class="fragment"><div class="line">&gt; vcpkg export gtest zlib gtest:x64-windows zlib:x64-windows --nuget</div>
 <div class="line">The following packages are already built and will be exported:</div>
@@ -200,7 +200,7 @@ ii. User has a vcpkg root that works and wants to share it</h2>
 <div class="line">Creating nuget package... done</div>
 <div class="line">Nuget package exported at: C:/vcpkg/scripts/buildsystems/tmp/vcpkg-export-20170428-164312.nupkg</div>
 </div><!-- fragment --><p>Alice gives to Bob: a) The link to her project and b) The NuGet package "vcpkg-export-20170428-164312.nupkg". Bob clones the project and then installs the NuGet package. Bob is now ready to build Alice's project.</p>
-<h2><a class="anchor" id="autotoc_md3554"></a>
+<h2><a class="anchor" id="autotoc_md3778"></a>
 iii. User has a vcpkg root that works and wants to share it #2</h2>
 <p>Developer Alice has been using <code>vcpkg</code> and has a CMake project that consumes libraries from it (via CMake toolchain file). Alice wants to quickly share the dependencies with Bob so he can test the project. </p><div class="fragment"><div class="line">&gt; vcpkg export cpprestsdk zlib --zip</div>
 <div class="line">The following packages are already built and will be exported:</div>
@@ -227,7 +227,7 @@ iii. User has a vcpkg root that works and wants to share it #2</h2>
 <div class="line">Creating zip archive... done</div>
 <div class="line">zip archive exported at: C:/vcpkg/vcpkg-export-20170428-155351.zip</div>
 </div><!-- fragment --><p>Alice gives to Bob: a) The links to her project and b) The zip file "vcpkg-export-20170428-155351.zip". Bob clones the project, extracts the zip file and uses the provided (in the zip) CMake toolchain file to make the dependencies available to CMake. Bob is now ready to build Alice's project.</p>
-<h1><a class="anchor" id="autotoc_md3555"></a>
+<h1><a class="anchor" id="autotoc_md3779"></a>
 5. Technical model</h1>
 <ul>
 <li>Each exported library, must be accompanied with all of its dependencies, even if they are not explicitly specified in the <code>vcpkg export</code> command.</li>

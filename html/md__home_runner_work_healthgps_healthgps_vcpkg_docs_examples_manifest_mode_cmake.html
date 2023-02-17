@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>We would like to add <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_manifests.html">vcpkg manifest support</a> to an existing cmake project! Let's create a simple project that prints the fibonacci sequence up to a certain number, using some common dependencies.</p>
-<h1><a class="anchor" id="autotoc_md2765"></a>
+<h1><a class="anchor" id="autotoc_md2989"></a>
 Initial Layout</h1>
 <p>Let's create the following file layout:</p>
 <div class="fragment"><div class="line">fibo/</div>
@@ -135,7 +135,7 @@ Initial Layout</h1>
 <div class="line">  <span class="keywordflow">return</span> a;</div>
 <div class="line">}</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** <a class="code" href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a>) {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** <a class="code" href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a>) {</div>
 <div class="line">  <a class="code" href="classcxxopts_1_1Options.html">cxxopts::Options</a> options(<span class="stringliteral">&quot;fibo&quot;</span>, <span class="stringliteral">&quot;Print the fibonacci sequence up to a value &#39;n&#39;&quot;</span>);</div>
 <div class="line">    options.add_options()</div>
 <div class="line">      (<span class="stringliteral">&quot;n,value&quot;</span>, <span class="stringliteral">&quot;The value to print to&quot;</span>, cxxopts::value&lt;int&gt;()-&gt;default_value(<span class="stringliteral">&quot;10&quot;</span>));</div>
@@ -144,15 +144,15 @@ Initial Layout</h1>
 <div class="line">  <span class="keyword">auto</span> <a class="code" href="unit-udt_8cpp.html#aeda809c9c9c3a54beef6a1870365e3c4">n</a> = <a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>[<span class="stringliteral">&quot;value&quot;</span>].as&lt;<span class="keywordtype">int</span>&gt;();</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">for</span> (<span class="keywordtype">int</span> <a class="code" href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a> : view::iota(1) | view::take(<a class="code" href="unit-udt_8cpp.html#aeda809c9c9c3a54beef6a1870365e3c4">n</a>)) {</div>
-<div class="line">    <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">fmt::print</a>(<span class="stringliteral">&quot;fib({}) = {}\n&quot;</span>, <a class="code" href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a>, fib(<a class="code" href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a>));</div>
+<div class="line">    <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">fmt::print</a>(<span class="stringliteral">&quot;fib({}) = {}\n&quot;</span>, <a class="code" href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a>, fib(<a class="code" href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a>));</div>
 <div class="line">  }</div>
 <div class="line">}</div>
 <div class="ttc" id="aafl__driver_8cpp_html_a5d7d76db953dad5fc7ae40344df71c58"><div class="ttname"><a href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a></div><div class="ttdeci">char *** argv</div><div class="ttdef"><b>Definition:</b> afl_driver.cpp:87</div></div>
-<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h_html_a2fead8330d19b9d2f10e6ed9c59e0174"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">print</a></div><div class="ttdeci">void print(std::FILE *f, const text_style &amp;ts, const S &amp;format_str, const Args &amp;... args)</div><div class="ttdef"><b>Definition:</b> color.h:508</div></div>
 <div class="ttc" id="aclasscxxopts_1_1Options_html"><div class="ttname"><a href="classcxxopts_1_1Options.html">cxxopts::Options</a></div><div class="ttdef"><b>Definition:</b> cxxopts.hpp:1617</div></div>
 <div class="ttc" id="agmock-matchers-containers__test_8cc_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdef"><b>Definition:</b> gmock-matchers-containers_test.cc:366</div></div>
 <div class="ttc" id="anamespacegenerate__static__link__cmd__macos_html_a7c2dcd7f9bee7a5258b5c61341deb157"><div class="ttname"><a href="namespacegenerate__static__link__cmd__macos.html#a7c2dcd7f9bee7a5258b5c61341deb157">generate_static_link_cmd_macos.tmp</a></div><div class="ttdeci">list tmp</div><div class="ttdef"><b>Definition:</b> generate_static_link_cmd_macos.py:51</div></div>
-<div class="ttc" id="aprogram_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> program.cpp:15</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2color_8h_html_a2fead8330d19b9d2f10e6ed9c59e0174"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">print</a></div><div class="ttdeci">void print(std::FILE *f, const text_style &amp;ts, const S &amp;format_str, const Args &amp;... args)</div><div class="ttdef"><b>Definition:</b> color.h:508</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc_html_a7f83bdc516d2cb86e20235d94ddf055a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a></div><div class="ttdeci">GTEST_API_ int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> gtest_main.cc:48</div></div>
 <div class="ttc" id="asax__parse_8cpp_html_a5734a27c6f335279bf9b0b57ae9b8f76"><div class="ttname"><a href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a></div><div class="ttdeci">bool result</div><div class="ttdef"><b>Definition:</b> sax_parse.cpp:121</div></div>
 <div class="ttc" id="astructview_html"><div class="ttname"><a href="structview.html">view</a></div><div class="ttdef"><b>Definition:</b> core.h:1136</div></div>
 <div class="ttc" id="aunit-udt_8cpp_html_aeda809c9c9c3a54beef6a1870365e3c4"><div class="ttname"><a href="unit-udt_8cpp.html#aeda809c9c9c3a54beef6a1870365e3c4">n</a></div><div class="ttdeci">const udt::name n</div><div class="ttdef"><b>Definition:</b> unit-udt.cpp:234</div></div>
@@ -190,7 +190,7 @@ Initial Layout</h1>
 <div class="line">fib(6) = 8</div>
 <div class="line">fib(7) = 13</div>
 </div><!-- fragment --><p>it works!</p>
-<h1><a class="anchor" id="autotoc_md2766"></a>
+<h1><a class="anchor" id="autotoc_md2990"></a>
 Converting to Manifest Mode</h1>
 <p>We now wish to use manifest mode, so all of our dependencies are managed for us! Let's write a <code>vcpkg.json</code>:</p>
 <div class="fragment"><div class="line">{</div>

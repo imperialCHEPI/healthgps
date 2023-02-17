@@ -93,25 +93,25 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
 <div class="ttc" id="aclassobject_html"><div class="ttname"><a href="classobject.html">object</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1508</div></div>
 </div><!-- fragment --><p>Creates a JSON object value from a given initializer list. The initializer lists elements must be pairs, and their first elements must be strings. If the initializer list is empty, the empty object <code>#!json {}</code> is created.</p>
-<h1><a class="anchor" id="autotoc_md1183"></a>
+<h1><a class="anchor" id="autotoc_md1407"></a>
 Parameters</h1>
 <p><code>init</code> (in) : initializer list with JSON values to create an object from (optional)</p>
-<h1><a class="anchor" id="autotoc_md1184"></a>
+<h1><a class="anchor" id="autotoc_md1408"></a>
 Return value</h1>
 <p>JSON object value</p>
-<h1><a class="anchor" id="autotoc_md1185"></a>
+<h1><a class="anchor" id="autotoc_md1409"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1186"></a>
+<h1><a class="anchor" id="autotoc_md1410"></a>
 Exceptions</h1>
 <p>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error301"><code>type_error.301</code></a> if <code>init</code> is not a list of pairs whose first elements are strings. In this case, no object can be created. When such a value is passed to <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json(initializer_list_t, bool, value_t)</a></code>, an array would have been created from the passed initializer list <code>init</code>. See example below.</p>
-<h1><a class="anchor" id="autotoc_md1187"></a>
+<h1><a class="anchor" id="autotoc_md1411"></a>
 Complexity</h1>
 <p>Linear in the size of <code>init</code>.</p>
-<h1><a class="anchor" id="autotoc_md1188"></a>
+<h1><a class="anchor" id="autotoc_md1412"></a>
 Notes</h1>
 <p>This function is only added for symmetry reasons. In contrast to the related function <code><a class="el" href="classarray.html">array(initializer_list_t)</a></code>, there are no cases which can only be expressed by this function. That is, any initializer list <code>init</code> can also be passed to the initializer list constructor <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json(initializer_list_t, bool, value_t)</a></code>.</p>
-<h1><a class="anchor" id="autotoc_md1189"></a>
+<h1><a class="anchor" id="autotoc_md1413"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows an example for the `object` function.
 
@@ -124,13 +124,13 @@ Output:
 ```json
 --8&lt;-- "examples/object.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1190"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1414"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c9266cc4beef82b2cc93cf90fb1d8d1b7.html">`basic_json(initializer_list_t)`</a> - create a JSON value from an initializer list</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cdfa15c07355a5926849fcd7853d7dca7.html">`array`</a> - create a JSON array value from an initializer list</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1191"></a>
+<h1><a class="anchor" id="autotoc_md1415"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

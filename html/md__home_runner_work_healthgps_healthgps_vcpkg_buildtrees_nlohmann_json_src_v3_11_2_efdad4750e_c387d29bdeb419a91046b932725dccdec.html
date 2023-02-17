@@ -101,11 +101,11 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"> </div>
 <div class="line"><span class="comment">// (3)</span></div>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> ValueType&gt;</div>
-<div class="line">ValueType <a class="code" href="gmock-actions__test_8cc.html#ac4f474c82e82cbb89ca7c36dd52be0ed">value</a>(<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>,</div>
+<div class="line">ValueType <a class="code" href="gmock-actions__test_8cc.html#ac4f474c82e82cbb89ca7c36dd52be0ed">value</a>(<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>,</div>
 <div class="line">                <span class="keyword">const</span> ValueType&amp; default_value) <span class="keyword">const</span>;</div>
-<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 <div class="ttc" id="aclassjson__pointer_html"><div class="ttname"><a href="classjson__pointer.html">json_pointer</a></div><div class="ttdoc">JSON Pointer defines a string syntax for identifying a specific value within a JSON document.</div><div class="ttdef"><b>Definition:</b> json_pointer.hpp:36</div></div>
 <div class="ttc" id="agmock-actions__test_8cc_html_ac4f474c82e82cbb89ca7c36dd52be0ed"><div class="ttname"><a href="gmock-actions__test_8cc.html#ac4f474c82e82cbb89ca7c36dd52be0ed">value</a></div><div class="ttdeci">int value</div><div class="ttdef"><b>Definition:</b> gmock-actions_test.cc:1713</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 </div><!-- fragment --><ol type="1">
 <li><p class="startli">Returns either a copy of an object's element at the specified key <code>key</code> or a given default value if no element with key <code>key</code> exists.</p>
 <p class="startli">The function is basically equivalent to executing ```cpp try { return at(key); } catch(out_of_range) { return default_value; } ```</p>
@@ -118,25 +118,25 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>!!! note "Differences to `at` and `operator[]`" </p><pre class="fragment">- Unlike [`at`](at.md), this function does not throw if the given `key`/`ptr` was not found.
 - Unlike [`operator[]`](operator[].md), this function does not implicitly add an element to the position defined by
  `key`/`ptr` key. This function is furthermore also applicable to const objects.
-</pre> <h1><a class="anchor" id="autotoc_md1507"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1731"></a>
 Template parameters</h1>
 <p><code>KeyType</code> : A type for an object key other than <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c622d8f8d011b5b9ab972c417054ac609.html">`json_pointer`</a> that is comparable with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8cb44d26fcc9e736c3cd62fdeedc1db9.html">`string_t`</a> using <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cd00f5861c54b75c7eeb2edb6ed4a64c8.html">`object_comparator_t`</a>. This can also be a string view (C++17). <code>ValueType</code> : type compatible to JSON values, for instance <code>#!cpp int</code> for JSON integer numbers, <code>#!cpp bool</code> for JSON booleans, or <code>#!cpp std::vector</code> types for JSON arrays. Note the type of the expected value at <code>key</code>/<code>ptr</code> and the default value <code>default_value</code> must be compatible.</p>
-<h1><a class="anchor" id="autotoc_md1508"></a>
+<h1><a class="anchor" id="autotoc_md1732"></a>
 Parameters</h1>
 <p><code>key</code> (in) : key of the element to access</p>
 <p><code>default_value</code> (in) : the value to return if <code>key</code>/<code>ptr</code> found no value</p>
 <p><code>ptr</code> (in) : a JSON pointer to the element to access</p>
-<h1><a class="anchor" id="autotoc_md1509"></a>
+<h1><a class="anchor" id="autotoc_md1733"></a>
 Return value</h1>
 <ol type="1">
 <li>copy of the element at key <code>key</code> or <code>default_value</code> if <code>key</code> is not found</li>
 <li>copy of the element at key <code>key</code> or <code>default_value</code> if <code>key</code> is not found</li>
 <li>copy of the element at JSON Pointer <code>ptr</code> or <code>default_value</code> if no value for <code>ptr</code> is found</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1510"></a>
+<h1><a class="anchor" id="autotoc_md1734"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes to any JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1511"></a>
+<h1><a class="anchor" id="autotoc_md1735"></a>
 Exceptions</h1>
 <ol type="1">
 <li>The function can throw the following exceptions:<ul>
@@ -151,14 +151,14 @@ Exceptions</h1>
 </ul>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1512"></a>
+<h1><a class="anchor" id="autotoc_md1736"></a>
 Complexity</h1>
 <ol type="1">
 <li>Logarithmic in the size of the container.</li>
 <li>Logarithmic in the size of the container.</li>
 <li>Logarithmic in the size of the container.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1513"></a>
+<h1><a class="anchor" id="autotoc_md1737"></a>
 Examples</h1>
 <p>??? example "Example: (1) access specified object element with default value" </p><pre class="fragment">The example below shows how object elements can be queried with a default value.
 
@@ -193,13 +193,13 @@ Output:
 ```json
 --8&lt;-- "examples/value__json_ptr.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1514"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1738"></a>
 See also</h1>
 <ul>
 <li>see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c047013ee24c26cf93d13054bb6a9ad26.html">`at`</a> for access by reference with range checking</li>
 <li>see 5B%5D.md "`operator[]`" for unchecked access by reference</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1515"></a>
+<h1><a class="anchor" id="autotoc_md1739"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 1.0.0. Changed parameter <code>default_value</code> type from <code>const ValueType&amp;</code> to <code>ValueType&amp;&amp;</code> in version 3.11.0.</li>

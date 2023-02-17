@@ -89,10 +89,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title"><a class="el" href="serve__header_8py.html">serve_header.py</a> </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Serves the <code><a class="el" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp.html">single_include/nlohmann/json.hpp</a></code> header file over HTTP(S).</p>
+<div class="textblock"><p>Serves the <code><a class="el" href="vcpkg_2buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp.html">single_include/nlohmann/json.hpp</a></code> header file over HTTP(S).</p>
 <p>The header file is automatically amalgamated on demand.</p>
 <p><img src="demo.png" alt="serve_header.py demo" class="inline"/></p>
-<h1><a class="anchor" id="autotoc_md2388"></a>
+<h1><a class="anchor" id="autotoc_md2612"></a>
 Prerequisites</h1>
 <ol type="1">
 <li>Make sure these Python packages are installed. ``` PyYAML watchdog ``<code> (see</code>tools/serve_header/requirements.txt`)</li>
@@ -102,30 +102,30 @@ Prerequisites</h1>
 </ul>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md2389"></a>
+<h1><a class="anchor" id="autotoc_md2613"></a>
 Usage</h1>
-<p><code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> has a built-in default configuration that will serve the <code><a class="el" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp.html">single_include/nlohmann/json.hpp</a></code> header file relative to the top level or project root directory it is homed in. The built-in configuration expects the certificate <code>localhost.pem</code> and the private key <code>localhost-key.pem</code>to be located in the top level or project root directory.</p>
+<p><code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> has a built-in default configuration that will serve the <code><a class="el" href="vcpkg_2buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp.html">single_include/nlohmann/json.hpp</a></code> header file relative to the top level or project root directory it is homed in. The built-in configuration expects the certificate <code>localhost.pem</code> and the private key <code>localhost-key.pem</code>to be located in the top level or project root directory.</p>
 <p>To start serving the <code>json.hpp</code> header file at <code><a href="https://localhost:8443/json.hpp">https://localhost:8443/json.hpp</a></code>, run this command from the top level or project root directory: </p><div class="fragment"><div class="line">$ make serve_header</div>
 </div><!-- fragment --><p>Open <a href="https://godbolt.org/">Compiler Explorer</a> and try it out: </p><div class="fragment"><div class="line"><span class="preprocessor">#include &lt;https://localhost:8443/json.hpp&gt;</span></div>
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacenlohmann.html">nlohmann</a>;</div>
 <div class="line"> </div>
 <div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">    <span class="comment">// these macros are dynamically injected into the header file</span></div>
 <div class="line">    std::cout &lt;&lt; JSON_BUILD_TIME &lt;&lt; <span class="stringliteral">&quot; (&quot;</span> &lt;&lt; JSON_BUILD_COUNT &lt;&lt; <span class="stringliteral">&quot;)\n&quot;</span>;</div>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="anamespacenlohmann_html"><div class="ttname"><a href="namespacenlohmann.html">nlohmann</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> from_json__non_default_constructible.cpp:22</div></div>
-<div class="ttc" id="aprogram_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> program.cpp:15</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc_html_a7f83bdc516d2cb86e20235d94ddf055a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a></div><div class="ttdeci">GTEST_API_ int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> gtest_main.cc:48</div></div>
 </div><!-- fragment --><blockquote class="doxtable">
 <p><code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> dynamically injects the macros <code>JSON_BUILD_COUNT</code> and <code>JSON_BUILD_TIME</code> into the served header file. By comparing build count or time output from the compiled program with the output from <code><a class="el" href="serve__header_8py.html">serve_header.py</a></code>, one can be reasonably sure the compiled code uses the expected revision of the header file. </p>
 </blockquote>
-<h1><a class="anchor" id="autotoc_md2390"></a>
+<h1><a class="anchor" id="autotoc_md2614"></a>
 Configuration</h1>
 <p><code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> will try to read a configuration file <code>serve_header.yml</code> in the top level or project root directory, and will fall back on built-in defaults if the file cannot be read. An annotated example configuration can be found in <code>tools/serve_header/serve_header.yml.example</code>.</p>
-<h1><a class="anchor" id="autotoc_md2391"></a>
+<h1><a class="anchor" id="autotoc_md2615"></a>
 Serving &lt;tt&gt;json.hpp&lt;/tt&gt; from multiple project directory instances or working trees</h1>
 <p><code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> was designed with the goal of supporting multiple project roots or working trees at the same time. The recommended directory structure is shown below but <code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> can work with other structures as well, including a nested hierarchy. </p><div class="fragment"><div class="line">json/          ⮜ the parent or web server root directoy</div>
 <div class="line">├── develop/   ⮜ the main git checkout</div>
@@ -137,7 +137,7 @@ Serving &lt;tt&gt;json.hpp&lt;/tt&gt; from multiple project directory instances 
 <div class="line">└── feature3/</div>
 <div class="line">    └── ...</div>
 </div><!-- fragment --><p>To serve the header of each working tree at <code><a href="https://localhost:8443/">https://localhost:8443/</a>&lt;worktree&gt;/json.hpp</code>, a configuration file is needed.</p><ol type="1">
-<li>Create the file <code>serve_header.yml</code> in the top level or project root directory of any working tree: ```yaml root: .. ``<code> By shifting the web server root directory up one level, the</code><a class="el" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp.html">single_include/nlohmann/json.hpp</a>` header files relative to each sibling directory or working tree will be served.</li>
+<li>Create the file <code>serve_header.yml</code> in the top level or project root directory of any working tree: ```yaml root: .. ``<code> By shifting the web server root directory up one level, the</code><a class="el" href="vcpkg_2buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp.html">single_include/nlohmann/json.hpp</a>` header files relative to each sibling directory or working tree will be served.</li>
 <li>Start <code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> by running this command from the same top level or project root directory the configuration file is located in: ``` $ make <a class="el" href="namespaceserve__header.html">serve_header</a> ```</li>
 </ol>
 <p><code><a class="el" href="serve__header_8py.html">serve_header.py</a></code> will automatically detect the addition or removal of working trees anywhere within the configured web server root directory. </p>

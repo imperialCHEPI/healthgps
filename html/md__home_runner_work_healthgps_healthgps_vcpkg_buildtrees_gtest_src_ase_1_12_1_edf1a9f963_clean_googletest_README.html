@@ -89,14 +89,14 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Generic Build Instructions </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h3><a class="anchor" id="autotoc_md538"></a>
+<div class="textblock"><h3><a class="anchor" id="autotoc_md762"></a>
 Setup</h3>
 <p>To build GoogleTest and your tests that use it, you need to tell your build system where to find its headers and source files. The exact way to do it depends on which build system you use, and is usually straightforward.</p>
-<h2><a class="anchor" id="autotoc_md539"></a>
+<h2><a class="anchor" id="autotoc_md763"></a>
 Build with CMake</h2>
 <p>GoogleTest comes with a CMake build script (<a href="https://github.com/google/googletest/blob/master/CMakeLists.txt">CMakeLists.txt</a>) that can be used on a wide range of platforms ("C" stands for cross-platform.). If you don't have CMake installed already, you can download it for free from <a href="http://www.cmake.org/">http://www.cmake.org/</a>.</p>
 <p>CMake works by generating native makefiles or build projects that can be used in the compiler environment of your choice. You can either build GoogleTest as a standalone project or it can be incorporated into an existing CMake build for another project.</p>
-<h3><a class="anchor" id="autotoc_md540"></a>
+<h3><a class="anchor" id="autotoc_md764"></a>
 Standalone CMake Project</h3>
 <p>When building GoogleTest as a standalone project, the typical workflow starts with</p>
 <div class="fragment"><div class="line">git clone https://github.com/google/googletest.git -b release-1.11.0</div>
@@ -111,7 +111,7 @@ Standalone CMake Project</h3>
 <div class="line">sudo make install    # Install in /usr/local/ by default</div>
 </div><!-- fragment --><p>If you use Windows and have Visual Studio installed, a <code>gtest.sln</code> file and several <code>.vcproj</code> files will be created. You can then build them using Visual Studio.</p>
 <p>On Mac OS X with Xcode installed, a <code>.xcodeproj</code> file will be generated.</p>
-<h3><a class="anchor" id="autotoc_md541"></a>
+<h3><a class="anchor" id="autotoc_md765"></a>
 Incorporating Into An Existing CMake Project</h3>
 <p>If you want to use GoogleTest in a project which already uses CMake, the easiest way is to get installed libraries and headers.</p>
 <ul>
@@ -141,25 +141,25 @@ Incorporating Into An Existing CMake Project</h3>
 <div class="line">target_link_libraries(example gtest_main)</div>
 <div class="line">add_test(NAME example_test COMMAND example)</div>
 </div><!-- fragment --><p>Note that this approach requires CMake 3.14 or later due to its use of the <code>FetchContent_MakeAvailable()</code> command.</p>
-<h4><a class="anchor" id="autotoc_md542"></a>
+<h4><a class="anchor" id="autotoc_md766"></a>
 Visual Studio Dynamic vs Static Runtimes</h4>
 <p>By default, new Visual Studio projects link the C runtimes dynamically but GoogleTest links them statically. This will generate an error that looks something like the following: gtest.lib(gtest-all.obj) : error LNK2038: mismatch detected for 'RuntimeLibrary': value 'MTd_StaticDebug' doesn't match value 'MDd_DynamicDebug' in main.obj</p>
 <p>GoogleTest already has a CMake option for this: <code>gtest_force_shared_crt</code></p>
 <p>Enabling this option will make gtest link the runtimes dynamically too, and match the project in which it is included.</p>
-<h3><a class="anchor" id="autotoc_md543"></a>
+<h3><a class="anchor" id="autotoc_md767"></a>
 C++ Standard Version</h3>
 <p>An environment that supports C++11 is required in order to successfully build GoogleTest. One way to ensure this is to specify the standard in the top-level project, for example by using the <code>set(CMAKE_CXX_STANDARD 11)</code> command. If this is not feasible, for example in a C project using GoogleTest for validation, then it can be specified by adding it to the options for cmake via the <code>DCMAKE_CXX_FLAGS</code> option.</p>
-<h2><a class="anchor" id="autotoc_md544"></a>
+<h2><a class="anchor" id="autotoc_md768"></a>
 Tweaking GoogleTest</h2>
 <p>GoogleTest can be used in diverse environments. The default configuration may not work (or may not work well) out of the box in some environments. However, you can easily tweak GoogleTest by defining control macros on the compiler command line. Generally, these macros are named like <code>GTEST_XYZ</code> and you define them to either 1 or 0 to enable or disable a certain feature.</p>
 <p>We list the most frequently used macros below. For a complete list, see file <a href="https://github.com/google/googletest/blob/master/googletest/include/gtest/internal/gtest-port.h">include/gtest/internal/gtest-port.h</a>.</p>
-<h2><a class="anchor" id="autotoc_md545"></a>
+<h2><a class="anchor" id="autotoc_md769"></a>
 Multi-threaded Tests</h2>
 <p>GoogleTest is thread-safe where the pthread library is available. After <code>#include "gtest/gtest.h"</code>, you can check the <code>GTEST_IS_THREADSAFE</code> macro to see whether this is the case (yes if the macro is <code>#defined</code> to 1, no if it's undefined.).</p>
 <p>If GoogleTest doesn't correctly detect whether pthread is available in your environment, you can force it with </p><pre class="fragment">-DGTEST_HAS_PTHREAD=1
 </pre><p> or </p><pre class="fragment">-DGTEST_HAS_PTHREAD=0
 </pre><p> When GoogleTest uses pthread, you may need to add flags to your compiler and/or linker to select the pthread library, or you'll get link errors. If you use the CMake script, this is taken care of for you. If you use your own build script, you'll need to read your compiler and linker's manual to figure out what flags to add.</p>
-<h2><a class="anchor" id="autotoc_md546"></a>
+<h2><a class="anchor" id="autotoc_md770"></a>
 As a Shared Library (DLL)</h2>
 <p>GoogleTest is compact, so most users can build and link it as a static library for the simplicity. You can choose to use GoogleTest as a shared library (known as a DLL on Windows) if you prefer.</p>
 <p>To compile <em>gtest</em> as a shared library, add </p><pre class="fragment">-DGTEST_CREATE_SHARED_LIBRARY=1
@@ -167,7 +167,7 @@ As a Shared Library (DLL)</h2>
 <p>To compile your <em>tests</em> that use the gtest shared library, add </p><pre class="fragment">-DGTEST_LINKED_AS_SHARED_LIBRARY=1
 </pre><p> to the compiler flags.</p>
 <p>Note: while the above steps aren't technically necessary today when using some compilers (e.g. GCC), they may become necessary in the future, if we decide to improve the speed of loading the library (see <a href="http://gcc.gnu.org/wiki/Visibility">http://gcc.gnu.org/wiki/Visibility</a> for details). Therefore you are recommended to always add the above flags when using GoogleTest as a shared library. Otherwise a future release of GoogleTest may break your build script.</p>
-<h2><a class="anchor" id="autotoc_md547"></a>
+<h2><a class="anchor" id="autotoc_md771"></a>
 Avoiding Macro Name Clashes</h2>
 <p>In C++, macros don't obey namespaces. Therefore two libraries that both define a macro of the same name will clash if you <code>#include</code> both definitions. In case a GoogleTest macro clashes with another library, you can force GoogleTest to rename its macro to avoid the conflict.</p>
 <p>Specifically, if both GoogleTest and some other code define macro FOO, you can add </p><pre class="fragment">-DGTEST_DONT_DEFINE_FOO=1

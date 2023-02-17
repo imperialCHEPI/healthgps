@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </ul>
 <hr  />
 <p> <a class="anchor" id="install"></a> </p>
-<h1><a class="anchor" id="autotoc_md2758"></a>
+<h1><a class="anchor" id="autotoc_md2982"></a>
 Step 1: Install</h1>
 <p>First, we need to know what name <a href="https://sqlite.org">SQLite</a> goes by in the ports tree. To do that, we'll run the <code>search</code> command and inspect the output: </p><div class="fragment"><div class="line">PS D:\src\vcpkg&gt; .\vcpkg search sqlite</div>
 <div class="line">libodb-sqlite        2.4.0            Sqlite support for the ODB ORM library</div>
@@ -142,10 +142,10 @@ Step 1: Install</h1>
 </div><!-- fragment --><p>See <code>.\vcpkg help triplet</code> for all supported targets.</p>
 <hr  />
 <p> <a class="anchor" id="use"></a> </p>
-<h1><a class="anchor" id="autotoc_md2760"></a>
+<h1><a class="anchor" id="autotoc_md2984"></a>
 Step 2: Use</h1>
 <p><a class="anchor" id="msbuild"></a> </p>
-<h3><a class="anchor" id="autotoc_md2761"></a>
+<h3><a class="anchor" id="autotoc_md2985"></a>
 VS/MSBuild Project (User-wide integration)</h3>
 <p>The recommended and most productive way to use vcpkg is via user-wide integration, making the system available for all projects you build. The user-wide integration will prompt for administrator access the first time it is used on a given machine, but afterwards is no longer required and the integration is configured on a per-user basis. </p><div class="fragment"><div class="line">PS D:\src\vcpkg&gt; .\vcpkg integrate install</div>
 <div class="line">Applied user-wide integration for this vcpkg root.</div>
@@ -157,7 +157,7 @@ VS/MSBuild Project (User-wide integration)</h3>
 <p>You can now simply use File -&gt; New Project in Visual Studio and the library will be automatically available. For SQLite, you can try out their <a href="https://sqlite.org/quickstart.html">C/C++ sample</a>.</p>
 <p>To remove the integration for your user, you can use <code>.\vcpkg integrate remove</code>.</p>
 <p><a class="anchor" id="cmake"></a> </p>
-<h3><a class="anchor" id="autotoc_md2762"></a>
+<h3><a class="anchor" id="autotoc_md2986"></a>
 CMake (Toolchain File)</h3>
 <p>The best way to use installed libraries with cmake is via the toolchain file <code>scripts\buildsystems\vcpkg.cmake</code>. To use this file, you simply need to add it onto your CMake command line as: <br  />
  <code>-DCMAKE_TOOLCHAIN_FILE=D:\src\vcpkg\scripts\buildsystems\vcpkg.cmake</code>.</p>
@@ -190,13 +190,13 @@ CMake (Toolchain File)</h3>
 <div class="line"><span class="preprocessor">#include &lt;sqlite3.h&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>()</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>()</div>
 <div class="line">{</div>
-<div class="line">    <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2printf_8h.html#aa3739712ffc6e717626ef803d2782ad5">printf</a>(<span class="stringliteral">&quot;%s\n&quot;</span>, sqlite3_libversion());</div>
+<div class="line">    <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2printf_8h.html#aa3739712ffc6e717626ef803d2782ad5">printf</a>(<span class="stringliteral">&quot;%s\n&quot;</span>, sqlite3_libversion());</div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2printf_8h_html_aa3739712ffc6e717626ef803d2782ad5"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2printf_8h.html#aa3739712ffc6e717626ef803d2782ad5">printf</a></div><div class="ttdeci">auto printf(const S &amp;fmt, const T &amp;... args) -&gt; int</div><div class="ttdef"><b>Definition:</b> printf.h:631</div></div>
-<div class="ttc" id="aprogram_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> program.cpp:15</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2printf_8h_html_aa3739712ffc6e717626ef803d2782ad5"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2printf_8h.html#aa3739712ffc6e717626ef803d2782ad5">printf</a></div><div class="ttdeci">auto printf(const S &amp;fmt, const T &amp;... args) -&gt; int</div><div class="ttdef"><b>Definition:</b> printf.h:631</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc_html_a7f83bdc516d2cb86e20235d94ddf055a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a></div><div class="ttdeci">GTEST_API_ int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> gtest_main.cc:48</div></div>
 </div><!-- fragment --><p>Then, we build our project in the normal CMake way: </p><div class="fragment"><div class="line">PS D:\src\cmake-test&gt; mkdir build </div>
 <div class="line">PS D:\src\cmake-test&gt; cd build</div>
 <div class="line">PS D:\src\cmake-test\build&gt; cmake .. &quot;-DCMAKE_TOOLCHAIN_FILE=D:\src\vcpkg\scripts\buildsystems\vcpkg.cmake&quot;</div>
@@ -212,7 +212,7 @@ CMake (Toolchain File)</h3>
 <div class="line">PS D:\src\cmake-test\build&gt; .\Debug\main.exe</div>
 <div class="line">3.15.0</div>
 </div><!-- fragment --><p><em>Note: The correct sqlite3.dll is automatically copied to the output folder when building for x86-windows. You will need to distribute this along with your application.</em></p>
-<h4><a class="anchor" id="autotoc_md2763"></a>
+<h4><a class="anchor" id="autotoc_md2987"></a>
 Handling libraries without native cmake support</h4>
 <p>Unlike other platforms, we do not automatically add the <code>include\</code> directory to your compilation line by default. If you're using a library that does not provide CMake integration, you will need to explicitly search for the files and add them yourself using <a href="https://cmake.org/cmake/help/latest/command/find_path.html"><code>find_path()</code></a> and <a href="https://cmake.org/cmake/help/latest/command/find_library.html"><code>find_library()</code></a>.</p>
 <div class="fragment"><div class="line"># To find and use catch</div>

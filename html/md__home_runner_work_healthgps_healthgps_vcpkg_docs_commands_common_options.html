@@ -92,72 +92,72 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/commands/common-options.md">GitHub</a>.</b></p>
 <p>Most vcpkg commands accept a group of common options that control cross-cutting aspects of the tool. Not all options affect every command. For example, a command that does not download any files will be unaffected by changing the downloads directory.</p>
 <p><a class="anchor" id="asset-sources"></a></p>
-<h1><a class="anchor" id="autotoc_md2676"></a>
+<h1><a class="anchor" id="autotoc_md2900"></a>
 &lt;tt&gt;--x-asset-sources=&lt;config&gt;&lt;/tt&gt;</h1>
 <p><b>Experimental: will change or be removed at any time</b></p>
 <p>Specify the cache configuration for <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_assetcaching.html">Asset Caching</a>.</p>
 <p><a class="anchor" id="binarysource"></a></p>
-<h1><a class="anchor" id="autotoc_md2677"></a>
+<h1><a class="anchor" id="autotoc_md2901"></a>
 &lt;tt&gt;--binarysource=&lt;config&gt;&lt;/tt&gt;</h1>
 <p>Add a source for <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_binarycaching.html">Binary Caching</a>.</p>
 <p>This option can be specified multiple times; see the Binary Caching documentation for how multiple binary sources interact.</p>
 <p><a class="anchor" id="buildtrees-root"></a></p>
-<h1><a class="anchor" id="autotoc_md2678"></a>
+<h1><a class="anchor" id="autotoc_md2902"></a>
 &lt;tt&gt;--x-buildtrees-root=&lt;path&gt;&lt;/tt&gt;</h1>
 <p><b>Experimental: will change or be removed at any time</b></p>
 <p>Specifies the temporary path to store intermediate build files, such as objects or unpacked source code.</p>
 <p>Defaults to <code>buildtrees/</code> under the vcpkg root folder.</p>
 <p><a class="anchor" id="downloads-root"></a></p>
-<h1><a class="anchor" id="autotoc_md2679"></a>
+<h1><a class="anchor" id="autotoc_md2903"></a>
 &lt;tt&gt;--downloads-root=&lt;path&gt;&lt;/tt&gt;</h1>
 <p>Specify where downloaded tools and source code archives should be kept.</p>
 <p>Defaults to the <code>VCPKG_DOWNLOADS</code> environment variable. If that is unset, defaults to <code>downloads/</code> under the vcpkg root folder.</p>
 <p><a class="anchor" id="host-triplet"></a></p>
-<h1><a class="anchor" id="autotoc_md2680"></a>
+<h1><a class="anchor" id="autotoc_md2904"></a>
 &lt;tt&gt;--host-triplet=&lt;triplet&gt;&lt;/tt&gt;</h1>
 <p>Specify the host <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html">architecture triplet</a>.</p>
 <p>Defaults to the <code>VCPKG_DEFAULT_HOST_TRIPLET</code> environment variable. If that is unset, deduced based on the host architecture and operating system.</p>
 <p><a class="anchor" id="install-root"></a></p>
-<h1><a class="anchor" id="autotoc_md2681"></a>
+<h1><a class="anchor" id="autotoc_md2905"></a>
 &lt;tt&gt;--x-install-root=&lt;path&gt;&lt;/tt&gt;</h1>
 <p><b>Experimental: will change or be removed at any time</b></p>
 <p>Specifies the path to lay out installed packages.</p>
 <p>In Classic Mode, defaults to <code>installed/</code> under the vcpkg root folder.</p>
 <p>In <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_manifests.html">Manifest Mode</a>, defaults to <code>vcpkg_installed/</code> under the manifest folder.</p>
 <p><a class="anchor" id="manifest-root"></a></p>
-<h1><a class="anchor" id="autotoc_md2682"></a>
+<h1><a class="anchor" id="autotoc_md2906"></a>
 &lt;tt&gt;--x-manifest-root=&lt;path&gt;&lt;/tt&gt;</h1>
 <p><b>Experimental: will change or be removed at any time</b></p>
 <p>Specifies the directory containing <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_manifests.html">`vcpkg.json`</a>.</p>
 <p>Defaults to searching upwards from the current working directory for the nearest <code>vcpkg.json</code>.</p>
 <p><a class="anchor" id="overlay-ports"></a></p>
-<h1><a class="anchor" id="autotoc_md2683"></a>
+<h1><a class="anchor" id="autotoc_md2907"></a>
 &lt;tt&gt;--overlay-ports=&lt;path&gt;&lt;/tt&gt;</h1>
 <p>Specifies a directory containing <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_ports_overlay.html">overlay ports</a>.</p>
 <p>This option can be specified multiple times; ports will resolve to the first match.</p>
 <p><a class="anchor" id="overlay-triplets"></a></p>
-<h1><a class="anchor" id="autotoc_md2684"></a>
+<h1><a class="anchor" id="autotoc_md2908"></a>
 &lt;tt&gt;--overlay-triplets=&lt;path&gt;&lt;/tt&gt;</h1>
 <p>Specifies a directory containing <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_overlay_triplets_linux_dynamic.html">overlay triplets</a>.</p>
 <p>This option can be specified multiple times; <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html">triplets</a> will resolve to the first match.</p>
 <p><a class="anchor" id="packages-root"></a></p>
-<h1><a class="anchor" id="autotoc_md2685"></a>
+<h1><a class="anchor" id="autotoc_md2909"></a>
 &lt;tt&gt;--x-packages-root=&lt;path&gt;&lt;/tt&gt;</h1>
 <p><b>Experimental: will change or be removed at any time</b></p>
 <p>Specifies the temporary path to stage intermediate package files before final install.</p>
 <p>Defaults to <code>packages/</code> under the vcpkg root folder.</p>
 <p><a class="anchor" id="triplet"></a></p>
-<h1><a class="anchor" id="autotoc_md2686"></a>
+<h1><a class="anchor" id="autotoc_md2910"></a>
 &lt;tt&gt;--triplet=&lt;triplet&gt;&lt;/tt&gt;</h1>
 <p>Specify the target <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html">architecture triplet</a>.</p>
 <p>Defaults to the <code>VCPKG_DEFAULT_TRIPLET</code> environment variable. If that is unset, deduced based on the host architecture and operating system.</p>
 <p>Note that on Windows operating systems, the architecture is always deduced as x86 for legacy reasons.</p>
 <p><a class="anchor" id="vcpkg-root"></a></p>
-<h1><a class="anchor" id="autotoc_md2687"></a>
+<h1><a class="anchor" id="autotoc_md2911"></a>
 &lt;tt&gt;--vcpkg-root=&lt;path&gt;&lt;/tt&gt;</h1>
 <p>Specifies the vcpkg root folder.</p>
 <p>Defaults to the directory containing the vcpkg program. The directory must be a valid vcpkg instance, such as a <code>git clone</code> of <code><a href="https://github.com/microsoft/vcpkg">https://github.com/microsoft/vcpkg</a></code>. This option can be used to run a custom-built copy of the tool directly from the build folder.</p>
-<h1><a class="anchor" id="autotoc_md2688"></a>
+<h1><a class="anchor" id="autotoc_md2912"></a>
 Response Files (&lt;tt&gt;@&lt;file&gt;&lt;/tt&gt;)</h1>
 <p>The vcpkg command line accepts text files containing newline-separated command line parameters.</p>
 <p>The tool will act as though the items in the file were spliced into the command line in place of the <code>@</code> reference. Response files cannot contain additional response files. </p>

@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p><a href="https://travis-ci.com/p-ranav/indicators"><img src="https://travis-ci.com/p-ranav/indicators.svg?branch=master" alt="ci status" style="pointer-events: none;" class="inline"/> </a> <a href="https://www.codacy.com/manual/p-ranav/indicators?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=p-ranav/indicators&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/93401e73f250407cb32445afec4e3e99" alt="codacy" class="inline"/> </a> <a href="https://github.com/p-ranav/indicators/blob/master/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="license" style="pointer-events: none;" class="inline"/> </a> <img src="https://img.shields.io/badge/version-2.2-blue.svg?cacheSeconds=2592000" alt="version" style="pointer-events: none;" class="inline"/> </p>
 <p align="center"></p>
 <p><img src="img/demo.gif" alt="" class="inline"/> </p>
-<h2><a class="anchor" id="autotoc_md566"></a>
+<h2><a class="anchor" id="autotoc_md790"></a>
 Highlights</h2>
 <ul>
 <li>Thread-safe progress bars and spinners</li>
@@ -105,7 +105,7 @@ Highlights</h2>
 <li>Source for the above GIF can be found <a href="demo/demo.cpp">here</a></li>
 <li>MIT License</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md567"></a>
+<h2><a class="anchor" id="autotoc_md791"></a>
 Table of Contents</h2>
 <ul>
 <li>Supported Indicators<ul>
@@ -128,14 +128,14 @@ Table of Contents</h2>
 <li><a href="#contributing">Contributing</a></li>
 <li><a href="#license">License</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md568"></a>
+<h2><a class="anchor" id="autotoc_md792"></a>
 Basic Progress bar</h2>
 <p>To introduce a progress bar in your application, include <code>indicators/progress_bar.hpp</code> and create a <code>ProgressBar</code> object. Here's the general structure of a progress bar:</p>
 <div class="fragment"><div class="line">{prefix} {start} {fill} {lead} {remaining} {end} {percentage} [{elapsed}&lt;{remaining}] {postfix}</div>
 <div class="line">         ^^^^^^^^^^^^^ Bar Width ^^^^^^^^^^^^^^^   </div>
 </div><!-- fragment --><p>The amount of progress in ProgressBar is maintained as a <code>size_t</code> in range <code>[0, 100]</code>. When progress reaches 100, the progression is complete.</p>
 <p>From application-level code, there are two ways in which you can update this progress:</p>
-<h3><a class="anchor" id="autotoc_md569"></a>
+<h3><a class="anchor" id="autotoc_md793"></a>
 Update progress using &lt;tt&gt;bar.tick()&lt;/tt&gt;</h3>
 <p>You can update the progress bar using <code>bar.tick()</code> which increments progress by exactly <code>1%</code>.</p>
 <p><img src="img/progress_bar_tick.gif" alt="" class="inline"/> <br  />
@@ -144,7 +144,7 @@ Update progress using &lt;tt&gt;bar.tick()&lt;/tt&gt;</h3>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;chrono&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">  <span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line">  ProgressBar <a class="code" href="namespacebar.html">bar</a>{</div>
 <div class="line">    <a class="code" href="namespaceindicators_1_1option.html#a571435ed5715036ea70ac875757b580b">option::BarWidth</a>{50},</div>
@@ -181,9 +181,9 @@ Update progress using &lt;tt&gt;bar.tick()&lt;/tt&gt;</h3>
 <div class="ttc" id="anamespaceindicators_html"><div class="ttname"><a href="namespaceindicators.html">indicators</a></div><div class="ttdef"><b>Definition:</b> block_progress_bar.hpp:22</div></div>
 <div class="ttc" id="anamespaceindicators_html_a21cb670516a74f8f15aa29d22223349fa9f27410725ab8cc8854a2769c7a516b8"><div class="ttname"><a href="namespaceindicators.html#a21cb670516a74f8f15aa29d22223349fa9f27410725ab8cc8854a2769c7a516b8">indicators::Color::green</a></div><div class="ttdeci">@ green</div></div>
 <div class="ttc" id="anamespaceindicators_html_ae7df6316e62332d1ef7f35253aca27dca69dcab4a73aeec2113f69b61e6263da8"><div class="ttname"><a href="namespaceindicators.html#ae7df6316e62332d1ef7f35253aca27dca69dcab4a73aeec2113f69b61e6263da8">indicators::FontStyle::bold</a></div><div class="ttdeci">@ bold</div></div>
-<div class="ttc" id="aprogram_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> program.cpp:15</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc_html_a7f83bdc516d2cb86e20235d94ddf055a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a></div><div class="ttdeci">GTEST_API_ int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> gtest_main.cc:48</div></div>
 </div><!-- fragment --><p>The above code will print a progress bar that goes from 0 to 100% at the rate of 1% every 100 ms.</p>
-<h3><a class="anchor" id="autotoc_md570"></a>
+<h3><a class="anchor" id="autotoc_md794"></a>
 Updating progress using &lt;tt&gt;bar.set_progress(value)&lt;/tt&gt;</h3>
 <p>If you'd rather control progress of the bar in discrete steps, consider using <code>bar.set_progress(value)</code>. Example:</p>
 <p><img src="img/progress_bar_set_progress.gif" alt="" class="inline"/> <br  />
@@ -193,7 +193,7 @@ Updating progress using &lt;tt&gt;bar.set_progress(value)&lt;/tt&gt;</h3>
 <div class="line"><span class="preprocessor">#include &lt;indicators/progress_bar.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">  <span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Hide cursor</span></div>
@@ -241,7 +241,7 @@ Updating progress using &lt;tt&gt;bar.set_progress(value)&lt;/tt&gt;</h3>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="anamespaceindicators_html_a21cb670516a74f8f15aa29d22223349fa6411532ba4971f378391776a9db629d3"><div class="ttname"><a href="namespaceindicators.html#a21cb670516a74f8f15aa29d22223349fa6411532ba4971f378391776a9db629d3">indicators::Color::cyan</a></div><div class="ttdeci">@ cyan</div></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md571"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md795"></a>
 Showing Time Elapsed/Remaining</h3>
 <p>All progress bars and spinners in <code>indicators</code> support showing time elapsed and time remaining. Inspired by python's <a href="https://github.com/tqdm/tqdm">tqdm</a> module, the format of this meter is <code>[{elapsed}&lt;{remaining}]</code>:</p>
 <p><img src="img/time_meter.gif" alt="" class="inline"/> <br  />
@@ -251,7 +251,7 @@ Showing Time Elapsed/Remaining</h3>
 <div class="line"><span class="preprocessor">#include &lt;indicators/progress_bar.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">  <span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Hide cursor</span></div>
@@ -289,7 +289,7 @@ Showing Time Elapsed/Remaining</h3>
 <div class="ttc" id="anamespaceindicators_1_1option_html_acb1bfaf439379fbb1274c965da09bdd3"><div class="ttname"><a href="namespaceindicators_1_1option.html#acb1bfaf439379fbb1274c965da09bdd3">indicators::option::ShowElapsedTime</a></div><div class="ttdeci">details::BooleanSetting&lt; details::ProgressBarOption::show_elapsed_time &gt; ShowElapsedTime</div><div class="ttdef"><b>Definition:</b> setting.hpp:204</div></div>
 <div class="ttc" id="anamespaceindicators_1_1option_html_ad78c0164867b5395c055825f02e2d006"><div class="ttname"><a href="namespaceindicators_1_1option.html#ad78c0164867b5395c055825f02e2d006">indicators::option::ShowRemainingTime</a></div><div class="ttdeci">details::BooleanSetting&lt; details::ProgressBarOption::show_remaining_time &gt; ShowRemainingTime</div><div class="ttdef"><b>Definition:</b> setting.hpp:205</div></div>
 <div class="ttc" id="anamespaceindicators_html_a21cb670516a74f8f15aa29d22223349fad487dd0b55dfcacdd920ccbdaeafa351"><div class="ttname"><a href="namespaceindicators.html#a21cb670516a74f8f15aa29d22223349fad487dd0b55dfcacdd920ccbdaeafa351">indicators::Color::yellow</a></div><div class="ttdeci">@ yellow</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md572"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md796"></a>
 Indeterminate Progress Bar</h2>
 <p>You might have a use-case for a progress bar where the maximum amount of progress is unknown, e.g., you're downloading from a remote server that isn't advertising the total bytes.</p>
 <p>Use an <code><a class="el" href="classindicators_1_1IndeterminateProgressBar.html">indicators::IndeterminateProgressBar</a></code> for such cases. An <code>IndeterminateProgressBar</code> is similar to a regular progress bar except the total amount to progress towards is unknown. Ticking on this progress bar will happily run forever.</p>
@@ -302,7 +302,7 @@ Indeterminate Progress Bar</h2>
 <div class="line"><span class="preprocessor">#include &lt;indicators/termcolor.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">  <a class="code" href="classindicators_1_1IndeterminateProgressBar.html">indicators::IndeterminateProgressBar</a> <a class="code" href="namespacebar.html">bar</a>{</div>
 <div class="line">      <a class="code" href="structindicators_1_1details_1_1Setting.html">indicators::option::BarWidth</a>{40},</div>
 <div class="line">      <a class="code" href="structindicators_1_1details_1_1Setting.html">indicators::option::Start</a>{<span class="stringliteral">&quot;[&quot;</span>},</div>
@@ -320,7 +320,7 @@ Indeterminate Progress Bar</h2>
 <div class="line">  <span class="keyword">auto</span> job = [&amp;<a class="code" href="format-test_8cc.html#a6069c29f9d594b35a452e67e4be71846a381ec4a2fa41752a7a12cde35b7f180b">bar</a>]() {</div>
 <div class="line">    std::this_thread::sleep_for(std::chrono::milliseconds(10000));</div>
 <div class="line">    <a class="code" href="namespacebar.html">bar</a>.mark_as_completed();</div>
-<div class="line">    std::cout &lt;&lt; termcolor::bold &lt;&lt; termcolor::green </div>
+<div class="line">    std::cout &lt;&lt; termcolor::bold &lt;&lt; <a class="code" href="namespaceMyLibrary.html#a79a9f4bbb675f6c082b09249c5a95ceda7170352a3cd8a59b864c0166ff98182e">termcolor::green</a> </div>
 <div class="line">        &lt;&lt; <span class="stringliteral">&quot;System is up to date!\n&quot;</span> &lt;&lt; termcolor::reset;</div>
 <div class="line">  };</div>
 <div class="line">  std::thread job_completion_thread(job);</div>
@@ -338,8 +338,9 @@ Indeterminate Progress Bar</h2>
 <div class="line">}</div>
 <div class="ttc" id="aclassindicators_1_1IndeterminateProgressBar_html"><div class="ttname"><a href="classindicators_1_1IndeterminateProgressBar.html">indicators::IndeterminateProgressBar</a></div><div class="ttdef"><b>Definition:</b> indeterminate_progress_bar.hpp:26</div></div>
 <div class="ttc" id="aformat-test_8cc_html_a6069c29f9d594b35a452e67e4be71846a381ec4a2fa41752a7a12cde35b7f180b"><div class="ttname"><a href="format-test_8cc.html#a6069c29f9d594b35a452e67e4be71846a381ec4a2fa41752a7a12cde35b7f180b">bar</a></div><div class="ttdeci">@ bar</div><div class="ttdef"><b>Definition:</b> format-test.cc:1761</div></div>
+<div class="ttc" id="anamespaceMyLibrary_html_a79a9f4bbb675f6c082b09249c5a95ceda7170352a3cd8a59b864c0166ff98182e"><div class="ttname"><a href="namespaceMyLibrary.html#a79a9f4bbb675f6c082b09249c5a95ceda7170352a3cd8a59b864c0166ff98182e">MyLibrary::green</a></div><div class="ttdeci">@ green</div><div class="ttdef"><b>Definition:</b> example.hpp:6</div></div>
 <div class="ttc" id="astructindicators_1_1details_1_1Setting_html"><div class="ttname"><a href="structindicators_1_1details_1_1Setting.html">indicators::details::Setting</a></div><div class="ttdef"><b>Definition:</b> setting.hpp:103</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md573"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md797"></a>
 Block Progress Bar</h2>
 <p>Are you in need of a smooth block progress bar using <a href="https://en.wikipedia.org/wiki/Block_Elements">unicode block elements</a>? Use <code>BlockProgressBar</code> instead of <code>ProgressBar</code>. Thanks to <a href="https://mike42.me/blog/2018-06-make-better-cli-progress-bars-with-unicode-block-characters">this blog post</a> for making <code>BlockProgressBar</code> an easy addition to the library.</p>
 <p><img src="img/block_progress_bar.gif" alt="" class="inline"/> <br  />
@@ -348,7 +349,7 @@ Block Progress Bar</h2>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;chrono&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line"> </div>
 <div class="line">  <span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line"> </div>
@@ -379,7 +380,7 @@ Block Progress Bar</h2>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
 <div class="ttc" id="anamespaceindicators_html_a21cb670516a74f8f15aa29d22223349fad508fe45cecaf653904a0e774084bb5c"><div class="ttname"><a href="namespaceindicators.html#a21cb670516a74f8f15aa29d22223349fad508fe45cecaf653904a0e774084bb5c">indicators::Color::white</a></div><div class="ttdeci">@ white</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md574"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md798"></a>
 MultiProgress</h2>
 <p><code>indicators</code> supports management of multiple progress bars with the <code>MultiProgress</code> class template.</p>
 <p><code>template &lt;typename Indicator, size_t count&gt; class MultiProgress</code> is a class template that holds references to multiple progress bars and provides a safe interface to update the state of each bar. <code>MultiProgress</code> works with both <code>ProgressBar</code> and <code>BlockProgressBar</code> classes.</p>
@@ -390,7 +391,7 @@ MultiProgress</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;indicators/multi_progress.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;indicators/progress_bar.hpp&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">  <span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line">  <span class="comment">// Configure first progress bar</span></div>
 <div class="line">  ProgressBar bar1{</div>
@@ -482,7 +483,7 @@ MultiProgress</h2>
 <div class="line">}</div>
 <div class="ttc" id="aclassindicators_1_1MultiProgress_html"><div class="ttname"><a href="classindicators_1_1MultiProgress.html">indicators::MultiProgress</a></div><div class="ttdef"><b>Definition:</b> multi_progress.hpp:16</div></div>
 <div class="ttc" id="anamespaceindicators_html_a21cb670516a74f8f15aa29d22223349fabda9643ac6601722a28f238714274da4"><div class="ttname"><a href="namespaceindicators.html#a21cb670516a74f8f15aa29d22223349fabda9643ac6601722a28f238714274da4">indicators::Color::red</a></div><div class="ttdeci">@ red</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md575"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md799"></a>
 DynamicProgress</h2>
 <p><code>DynamicProgress</code> is a container class, similar to <code>MultiProgress</code>, for managing multiple progress bars. As the name suggests, with <code>DynamicProgress</code>, you can dynamically add new progress bars.</p>
 <p>To add new progress bars, call <code>bars.push_back(new_bar)</code>. This call will return the index of the appended bar. You can then refer to this bar with the indexing operator, e.g., <code>bars[4].set_progress(55)</code>. <br  />
@@ -495,7 +496,7 @@ DynamicProgress</h2>
 <div class="line"><span class="preprocessor">#include &lt;indicators/progress_bar.hpp&gt;</span></div>
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line"> </div>
 <div class="line">  ProgressBar bar1{<a class="code" href="namespaceindicators_1_1option.html#a571435ed5715036ea70ac875757b580b">option::BarWidth</a>{50}, <a class="code" href="namespaceindicators_1_1option.html#a0339aa72904a5b4397d15066d0ddf4ba">option::ForegroundColor</a>{<a class="code" href="namespaceindicators.html#a21cb670516a74f8f15aa29d22223349fabda9643ac6601722a28f238714274da4">Color::red</a>},</div>
 <div class="line">                   <a class="code" href="namespaceindicators_1_1option.html#acb1bfaf439379fbb1274c965da09bdd3">option::ShowElapsedTime</a>{<span class="keyword">true</span>}, <a class="code" href="namespaceindicators_1_1option.html#ad78c0164867b5395c055825f02e2d006">option::ShowRemainingTime</a>{<span class="keyword">true</span>},</div>
@@ -620,7 +621,7 @@ DynamicProgress</h2>
 <div class="line">  second_job.join();</div>
 <div class="line">  first_job.join();</div>
 <div class="line"> </div>
-<div class="line">  std::cout &lt;&lt; termcolor::bold &lt;&lt; termcolor::green &lt;&lt; <span class="stringliteral">&quot;✔ Downloaded image foo/bar:baz&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line">  std::cout &lt;&lt; termcolor::bold &lt;&lt; <a class="code" href="namespaceMyLibrary.html#a79a9f4bbb675f6c082b09249c5a95ceda7170352a3cd8a59b864c0166ff98182e">termcolor::green</a> &lt;&lt; <span class="stringliteral">&quot;✔ Downloaded image foo/bar:baz&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line">  std::cout &lt;&lt; termcolor::reset;</div>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
@@ -631,7 +632,7 @@ DynamicProgress</h2>
 </div><!-- fragment --><p>In the above code, notice the option <code>bars.set_option(option::HideBarWhenComplete{true});</code>. Yes, you can hide progress bars as and when they complete by setting this option to <code>true</code>. If you do so, the above example will look like this:</p>
 <p><img src="img/dynamic_progress_bar_hide_completed.gif" alt="" class="inline"/> <br  />
  </p>
-<h2><a class="anchor" id="autotoc_md576"></a>
+<h2><a class="anchor" id="autotoc_md800"></a>
 Progress Spinner</h2>
 <p>To introduce a progress spinner in your application, include <code>indicators/progress_spinner.hpp</code> and create a <code>ProgressSpinner</code> object. Here's the general structure of a progress spinner:</p>
 <div class="fragment"><div class="line">{prefix} {spinner} {percentage} [{elapsed}&lt;{remaining}] {postfix}</div>
@@ -640,7 +641,7 @@ Progress Spinner</h2>
  </p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;indicators/progress_spinner.hpp&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line">  <span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line">  <a class="code" href="classindicators_1_1ProgressSpinner.html">indicators::ProgressSpinner</a> spinner{</div>
 <div class="line">    <a class="code" href="namespaceindicators_1_1option.html#a56171addf693a8211a3fa2506b67355e">option::PostfixText</a>{<span class="stringliteral">&quot;Checking credentials&quot;</span>},</div>
@@ -674,7 +675,7 @@ Progress Spinner</h2>
 <div class="ttc" id="anamespaceindicators_1_1option_html_a58b7a138ac2f5dac4fb7296909c52fb5"><div class="ttname"><a href="namespaceindicators_1_1option.html#a58b7a138ac2f5dac4fb7296909c52fb5">indicators::option::SpinnerStates</a></div><div class="ttdeci">details::Setting&lt; std::vector&lt; std::string &gt;, details::ProgressBarOption::spinner_states &gt; SpinnerStates</div><div class="ttdef"><b>Definition:</b> setting.hpp:210</div></div>
 <div class="ttc" id="anamespaceindicators_1_1option_html_a81c3beade10f09b3d4438844a5b93231"><div class="ttname"><a href="namespaceindicators_1_1option.html#a81c3beade10f09b3d4438844a5b93231">indicators::option::ShowSpinner</a></div><div class="ttdeci">details::BooleanSetting&lt; details::ProgressBarOption::spinner_show &gt; ShowSpinner</div><div class="ttdef"><b>Definition:</b> setting.hpp:208</div></div>
 <div class="ttc" id="anamespaceindicators_1_1option_html_aceed3b5655c39477a638816ef797b9e0"><div class="ttname"><a href="namespaceindicators_1_1option.html#aceed3b5655c39477a638816ef797b9e0">indicators::option::ShowPercentage</a></div><div class="ttdeci">details::BooleanSetting&lt; details::ProgressBarOption::show_percentage &gt; ShowPercentage</div><div class="ttdef"><b>Definition:</b> setting.hpp:203</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md577"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md801"></a>
 Decremental Progress</h2>
 <p><code>indicators</code> allows you to easily control the progress direction, i.e., incremental or decremental progress by using <code>option::ProgressType</code>. To program a countdown progress bar, use <code>option::ProgressType::decremental</code></p>
 <p><img src="img/progress_bar_countdown.gif" alt="" class="inline"/> <br  />
@@ -684,7 +685,7 @@ Decremental Progress</h2>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespaceindicators.html">indicators</a>;</div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line"> </div>
 <div class="line">  ProgressBar <a class="code" href="namespacebar.html">bar</a>{<a class="code" href="namespaceindicators_1_1option.html#a571435ed5715036ea70ac875757b580b">option::BarWidth</a>{50},</div>
 <div class="line">                  <a class="code" href="namespaceindicators_1_1option.html#a4f36b8e91f835fde93cdfaf7989c8fe9">option::ProgressType</a>{<a class="code" href="namespaceindicators.html#a458cab7e6f3aea9f31820e8eb0102b90af4a7a844a60aa57ff7aef6060bdec414">ProgressType::decremental</a>},</div>
@@ -712,7 +713,7 @@ Decremental Progress</h2>
 <div class="line">}</div>
 <div class="ttc" id="anamespaceindicators_1_1option_html_a4f36b8e91f835fde93cdfaf7989c8fe9"><div class="ttname"><a href="namespaceindicators_1_1option.html#a4f36b8e91f835fde93cdfaf7989c8fe9">indicators::option::ProgressType</a></div><div class="ttdeci">details::Setting&lt; ProgressType, details::ProgressBarOption::progress_type &gt; ProgressType</div><div class="ttdef"><b>Definition:</b> setting.hpp:217</div></div>
 <div class="ttc" id="anamespaceindicators_html_a458cab7e6f3aea9f31820e8eb0102b90af4a7a844a60aa57ff7aef6060bdec414"><div class="ttname"><a href="namespaceindicators.html#a458cab7e6f3aea9f31820e8eb0102b90af4a7a844a60aa57ff7aef6060bdec414">indicators::ProgressType::decremental</a></div><div class="ttdeci">@ decremental</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md578"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md802"></a>
 Working with Iterables</h2>
 <p>If you'd like to use progress bars to indicate progress while iterating over iterables, e.g., a list of numbers, this can be achieved by using the <code>option::MaxProgress</code>:</p>
 <p><img src="img/block_progress_bar_iterable.gif" alt="" class="inline"/> <br  />
@@ -722,7 +723,7 @@ Working with Iterables</h2>
 <div class="line"><span class="preprocessor">#include &lt;indicators/cursor_control.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">// Hide cursor</span></div>
 <div class="line">  indicators::show_console_cursor(<span class="keyword">false</span>);</div>
@@ -753,7 +754,7 @@ Working with Iterables</h2>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Show iteration as postfix text</span></div>
 <div class="line">    <a class="code" href="namespacebar.html">bar</a>.set_option(<a class="code" href="namespaceindicators_1_1option.html#a56171addf693a8211a3fa2506b67355e">option::PostfixText</a>{</div>
-<div class="line">      <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#aa1899efcee92a5f5ca77b11423b256c5">std::to_string</a>(<a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a>) + <span class="stringliteral">&quot;/&quot;</span> + <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#aa1899efcee92a5f5ca77b11423b256c5">std::to_string</a>(numbers.size())</div>
+<div class="line">      <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#aa1899efcee92a5f5ca77b11423b256c5">std::to_string</a>(<a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a>) + <span class="stringliteral">&quot;/&quot;</span> + <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#aa1899efcee92a5f5ca77b11423b256c5">std::to_string</a>(numbers.size())</div>
 <div class="line">    });</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// update progress bar</span></div>
@@ -767,10 +768,10 @@ Working with Iterables</h2>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h_html_aa1899efcee92a5f5ca77b11423b256c5"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#aa1899efcee92a5f5ca77b11423b256c5">to_string</a></div><div class="ttdeci">auto to_string(const T &amp;value) -&gt; std::string</div><div class="ttdef"><b>Definition:</b> format.h:4029</div></div>
 <div class="ttc" id="anamespacedigits_html_a8875a3e1d62490230fa116b4c1f99c8b"><div class="ttname"><a href="namespacedigits.html#a8875a3e1d62490230fa116b4c1f99c8b">digits::result</a></div><div class="ttdeci">result</div><div class="ttdef"><b>Definition:</b> format.h:2556</div></div>
 <div class="ttc" id="anamespaceindicators_1_1option_html_a68e9ccd095cd85b334c5ce5134a88f90"><div class="ttname"><a href="namespaceindicators_1_1option.html#a68e9ccd095cd85b334c5ce5134a88f90">indicators::option::MaxProgress</a></div><div class="ttdeci">details::IntegerSetting&lt; details::ProgressBarOption::max_progress &gt; MaxProgress</div><div class="ttdef"><b>Definition:</b> setting.hpp:216</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md579"></a>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h_html_aa1899efcee92a5f5ca77b11423b256c5"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#aa1899efcee92a5f5ca77b11423b256c5">to_string</a></div><div class="ttdeci">auto to_string(const T &amp;value) -&gt; std::string</div><div class="ttdef"><b>Definition:</b> format.h:4029</div></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md803"></a>
 Unicode Support</h2>
 <p><code>indicators</code> supports multi-byte unicode characters in progress bars.</p>
 <p>If the <code>option::BarWidth</code> is set, the library aims to respect this setting. When filling the bar, if the next <code>Fill</code> string has a display width that would exceed the bar width, then the library will fill the remainder of the bar with &lsquo;&rsquo; '` space characters instead.</p>
@@ -783,7 +784,7 @@ Unicode Support</h2>
 <div class="line"><span class="preprocessor">#include &lt;indicators/cursor_control.hpp&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;thread&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
 <div class="line"> </div>
 <div class="line">    indicators::show_console_cursor(<span class="keyword">false</span>);</div>
 <div class="line"> </div>
@@ -963,26 +964,26 @@ Unicode Support</h2>
 <div class="line"> </div>
 <div class="line">  <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md580"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md804"></a>
 Building Samples</h2>
 <div class="fragment"><div class="line">git clone https://github.com/p-ranav/indicators</div>
 <div class="line">cd indicators</div>
 <div class="line">mkdir build &amp;&amp; cd build</div>
 <div class="line">cmake -DINDICATORS_SAMPLES=ON -DINDICATORS_DEMO=ON ..</div>
 <div class="line">make</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md581"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md805"></a>
 WinLibs + MinGW</h3>
 <p>For Windows, if you use WinLibs like I do, the cmake command would look like this:</p>
 <div class="fragment"><div class="line">foo@bar:~$ mkdir build &amp;&amp; cd build</div>
 <div class="line">foo@bar:~$ cmake -G &quot;MinGW Makefiles&quot; -DCMAKE_CXX_COMPILER=&quot;C:/WinLibs/mingw64/bin/g++.exe&quot; -DINDICATORS_SAMPLES=ON -DINDICATORS_DEMO=ON ..</div>
 <div class="line">foo@bar:~$ make -j4</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md582"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md806"></a>
 Generating Single Header</h2>
 <div class="fragment"><div class="line">python3 utils/amalgamate/amalgamate.py -c single_include.json -s .</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md583"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md807"></a>
 Contributing</h2>
 <p>Contributions are welcome, have a look at the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_indicators_src_v2_2_7e10c11a96_clean_CONTRIBUTING.html">CONTRIBUTING.md</a> document for more information.</p>
-<h2><a class="anchor" id="autotoc_md584"></a>
+<h2><a class="anchor" id="autotoc_md808"></a>
 License</h2>
 <p>The project is available under the <a href="https://opensource.org/licenses/MIT">MIT</a> license. </p>
 </div></div><!-- contents -->

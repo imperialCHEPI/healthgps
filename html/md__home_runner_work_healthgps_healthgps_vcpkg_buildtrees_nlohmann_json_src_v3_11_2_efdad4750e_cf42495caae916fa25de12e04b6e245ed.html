@@ -95,25 +95,25 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ReferenceType&gt;</div>
 <div class="line"><span class="keyword">const</span> ReferenceType get_ref() <span class="keyword">const</span>;</div>
 </div><!-- fragment --><p>Implicit reference access to the internally stored JSON value. No copies are made.</p>
-<h1><a class="anchor" id="autotoc_md968"></a>
+<h1><a class="anchor" id="autotoc_md1192"></a>
 Template parameters</h1>
 <p><code>ReferenceType</code> : reference type; must be a reference to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0150913bbd2e11a7cecd2977b96d6061.html">`array_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f974e10e5661bc477b8ce49351e9f5d.html">`object_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8cb44d26fcc9e736c3cd62fdeedc1db9.html">`string_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ca1393b8f34107fa75c5c2cb37c622002.html">`boolean_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8fad9bbe7fddf99841dc225dd67548c6.html">`number_integer_t`</a>, or <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb48ee65dfa3181b9fc3867f565566629.html">`number_unsigned_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c71599dcf1550afc67a6f1ffbeeaef2f3.html">`number_float_t`</a>, or <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0fb81146da4fe75feb276197ce7e8594.html">`binary_t`</a>. Enforced by a static assertion.</p>
-<h1><a class="anchor" id="autotoc_md969"></a>
+<h1><a class="anchor" id="autotoc_md1193"></a>
 Return value</h1>
 <p>reference to the internally stored JSON value if the requested reference type fits to the JSON value; throws <a href="../../home/exceptions.md#jsonexceptiontype_error303"><code>type_error.303</code></a> otherwise</p>
-<h1><a class="anchor" id="autotoc_md970"></a>
+<h1><a class="anchor" id="autotoc_md1194"></a>
 Exception safety</h1>
 <p>Strong exception safety: if an exception occurs, the original value stays intact.</p>
-<h1><a class="anchor" id="autotoc_md971"></a>
+<h1><a class="anchor" id="autotoc_md1195"></a>
 Exceptions</h1>
 <p>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error303"><code>type_error.303</code></a> if the requested reference type does not match the stored JSON value type; example: <code>"incompatible ReferenceType for get_ref, actual type is binary"</code>.</p>
-<h1><a class="anchor" id="autotoc_md972"></a>
+<h1><a class="anchor" id="autotoc_md1196"></a>
 Complexity</h1>
 <p>Constant.</p>
-<h1><a class="anchor" id="autotoc_md973"></a>
+<h1><a class="anchor" id="autotoc_md1197"></a>
 Notes</h1>
 <p>!!! danger "Undefined behavior" </p><pre class="fragment">Writing data to the referee of the result yields an undefined state.
-</pre> <h1><a class="anchor" id="autotoc_md974"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1198"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example shows several calls to `get_ref()`.
 
@@ -126,7 +126,7 @@ Output:
 ```json
 --8&lt;-- "examples/get_ref.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md975"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1199"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.1.0.</li>

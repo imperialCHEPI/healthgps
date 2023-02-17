@@ -99,14 +99,14 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>An object is an unordered collection of zero or more name/value pairs, where a name is a string and a value is a string, number, boolean, null, object, or array. </p>
 </blockquote>
 <p>To store objects in C++, a type is defined by the template parameters described below.</p>
-<h1><a class="anchor" id="autotoc_md1196"></a>
+<h1><a class="anchor" id="autotoc_md1420"></a>
 Template parameters</h1>
 <p><code>ObjectType</code> : the container to store objects (e.g., <code>std::map</code> or <code>std::unordered_map</code>)</p>
 <p><code>StringType</code> : the type of the keys or names (e.g., <code>std::string</code>). The comparison function <code>std::less&lt;StringType&gt;</code> is used to order elements inside the container.</p>
 <p><code>AllocatorType</code> : the allocator to use for objects (e.g., <code>std::allocator</code>)</p>
-<h1><a class="anchor" id="autotoc_md1197"></a>
+<h1><a class="anchor" id="autotoc_md1421"></a>
 Notes</h1>
-<h3><a class="anchor" id="autotoc_md1198"></a>
+<h3><a class="anchor" id="autotoc_md1422"></a>
 Default type</h3>
 <p>With the default values for <code>ObjectType</code> (<code>std::map</code>), <code>StringType</code> (<code>std::string</code>), and <code>AllocatorType</code> (<code>std::allocator</code>), the default value for <code>object_t</code> is:</p>
 <div class="fragment"><div class="line"><span class="comment">// until C++14</span></div>
@@ -125,7 +125,7 @@ Default type</h3>
 <div class="line">  std::allocator&lt;std::pair&lt;const std::string, basic_json&gt;&gt; <span class="comment">// allocator_type</span></div>
 <div class="line">&gt;</div>
 </div><!-- fragment --><p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c72602de78ffca8f29d13d53f8b8cb0bb.html">`default_object_comparator_t`</a> for more information.</p>
-<h3><a class="anchor" id="autotoc_md1199"></a>
+<h3><a class="anchor" id="autotoc_md1423"></a>
 Behavior</h3>
 <p>The choice of <code>object_t</code> influences the behavior of the JSON class. With the default type, objects have the following behavior:</p>
 <ul>
@@ -134,19 +134,19 @@ Behavior</h3>
 <li>Internally, name/value pairs are stored in lexicographical order of the names. Objects will also be serialized (see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cfd3014018b086dfc27f66f60b805d69d.html">`dump`</a>) in this order. For instance, <code>#!json {"b": 1, "a": 2}</code> and <code>#!json {"a": 2, "b": 1}</code> will be stored and serialized as <code>#!json {"a": 2, "b": 1}</code>.</li>
 <li>When comparing objects, the order of the name/value pairs is irrelevant. This makes objects interoperable in the sense that they will not be affected by these differences. For instance, <code>#!json {"b": 1, "a": 2}</code> and <code>#!json {"a": 2, "b": 1}</code> will be treated as equal.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1200"></a>
+<h3><a class="anchor" id="autotoc_md1424"></a>
 Limits</h3>
 <p><a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a> specifies: </p><blockquote class="doxtable">
 <p>An implementation may set limits on the maximum depth of nesting. </p>
 </blockquote>
 <p>In this class, the object's limit of nesting is not explicitly constrained. However, a maximum depth of nesting may be introduced by the compiler or runtime environment. A theoretical limit can be queried by calling the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c01af4f154480892f1ad4737d1d141a6a.html">`max_size`</a> function of a JSON object.</p>
-<h3><a class="anchor" id="autotoc_md1201"></a>
+<h3><a class="anchor" id="autotoc_md1425"></a>
 Storage</h3>
 <p>Objects are stored as pointers in a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> type. That is, for any access to object values, a pointer of type <code>object_t*</code> must be dereferenced.</p>
-<h3><a class="anchor" id="autotoc_md1202"></a>
+<h3><a class="anchor" id="autotoc_md1426"></a>
 Object key order</h3>
 <p>The order name/value pairs are added to the object is <em>not</em> preserved by the library. Therefore, iterating an object may return name/value pairs in a different order than they were originally stored. In fact, keys will be traversed in alphabetical order as <code>std::map</code> with <code>std::less</code> is used by default. Please note this behavior conforms to <a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a>, because any order implements the specified "unordered" nature of JSON objects.</p>
-<h1><a class="anchor" id="autotoc_md1203"></a>
+<h1><a class="anchor" id="autotoc_md1427"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows that `object_t` is by default, a typedef to `#!cpp std::map&lt;json::string_t, json&gt;`.
 
@@ -159,7 +159,7 @@ Output:
 ```json
 --8&lt;-- "examples/object_t.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1204"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1428"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

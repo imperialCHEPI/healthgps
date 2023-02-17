@@ -91,25 +91,25 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_clean_executables_in_bin.md">vcpkg repo</a>.</p>
 <p>Remove specified executables found in <code>${CURRENT_PACKAGES_DIR}/bin</code> and <code>${CURRENT_PACKAGES_DIR}/debug/bin</code>. If, after all specified executables have been removed, and the <code>bin</code> and <code>debug/bin</code> directories are empty, then also delete <code>bin</code> and <code>debug/bin</code> directories.</p>
-<h1><a class="anchor" id="autotoc_md3121"></a>
+<h1><a class="anchor" id="autotoc_md3345"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_clean_executables_in_bin(</div>
 <div class="line">    FILE_NAMES &lt;file1&gt;...</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3122"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3346"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3123"></a>
+<h2><a class="anchor" id="autotoc_md3347"></a>
 FILE_NAMES</h2>
 <p>A list of executable filenames without extension.</p>
-<h1><a class="anchor" id="autotoc_md3124"></a>
+<h1><a class="anchor" id="autotoc_md3348"></a>
 Notes</h1>
 <p>Generally, there is no need to call this function manually. Instead, pass an extra <code>AUTO_CLEAN</code> argument when calling <code>vcpkg_copy_tools</code>.</p>
-<h1><a class="anchor" id="autotoc_md3125"></a>
+<h1><a class="anchor" id="autotoc_md3349"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/czmq/portfile.cmake">czmq</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3126"></a>
+<h1><a class="anchor" id="autotoc_md3350"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_clean_executables_in_bin.cmake">scripts/cmake/vcpkg_clean_executables_in_bin.cmake</a> </p>
 </div></div><!-- contents -->

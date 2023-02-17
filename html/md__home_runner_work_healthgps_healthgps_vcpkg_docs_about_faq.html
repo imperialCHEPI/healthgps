@@ -89,30 +89,30 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Frequently Asked Questions </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md2646"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md2870"></a>
 Can I contribute a new library?</h1>
 <p>Yes! Start out by reading our <a href="https://github.com/Microsoft/vcpkg/blob/master/CONTRIBUTING.md">contribution guidelines</a>. If you want to contribute but don't have a particular library in mind then take a look at the list of <a href="https://github.com/Microsoft/vcpkg/issues?q=is%3Aissue+is%3Aopen+label%3Acategory%3Anew-port">new port requests</a>.</p>
-<h1><a class="anchor" id="autotoc_md2647"></a>
+<h1><a class="anchor" id="autotoc_md2871"></a>
 Can vcpkg create pre-built binary packages? What is the binary format used by vcpkg?</h1>
 <p>Yes! See the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_export_command.html">`export` command</a> if you wish to produce binaries for exporting into other environments.</p>
 <p>Alternatively, if your goal is to preserve binaries produced by <code>vcpkg install</code> operations for later re-use, see the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_binarycaching.html">Binary Caching feature</a></p>
-<h1><a class="anchor" id="autotoc_md2648"></a>
+<h1><a class="anchor" id="autotoc_md2872"></a>
 How do I update libraries?</h1>
 <p>The <code>vcpkg update</code> command lists all packages which are out-of-sync with your current portfiles. To update a package, follow the instructions in the command.</p>
-<h1><a class="anchor" id="autotoc_md2649"></a>
+<h1><a class="anchor" id="autotoc_md2873"></a>
 How do I get more libraries?</h1>
 <p>The list of libraries is enumerated from the <a href="https://github.com/Microsoft/vcpkg/blob/master/ports"><code>ports\</code></a> directory. By design, you can add and remove libraries from this directory as you see fit for yourself or your company &ndash; see our examples on packaging <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_zipfiles.html">zipfiles</a> and <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_github_repos.html">GitHub repos</a>.</p>
 <p>We recommend cloning directly from <a href="https://github.com/microsoft/vcpkg">GitHub</a> and using <code>git pull</code> to update the list of portfiles. Once you've updated your portfiles, <code>vcpkg update</code> will indicate any installed libraries that are now out of date.</p>
-<h1><a class="anchor" id="autotoc_md2650"></a>
+<h1><a class="anchor" id="autotoc_md2874"></a>
 Can I build a private library with this tool?</h1>
 <p>Yes. Follow <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_zipfiles.html">our packaging zlib Example</a> for creating a portfile using a fake URL. Then, either pre-seed the <code>downloads\</code> folder with a zip containing your private sources or replace the normal calls to <code>vcpkg_download_distfile</code> and <code>vcpkg_extract_source_archive</code> with functions that unpack your source code.</p>
 <p>You can take this further by publishing your private libraries into a registry. See the article on <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_registries.html">Creating Registries</a>. A registry is a catalog of ports, similar to the one provided with vcpkg that contains open source libraries. <br  />
 </p>
-<h1><a class="anchor" id="autotoc_md2651"></a>
+<h1><a class="anchor" id="autotoc_md2875"></a>
 Can I use a prebuilt private library with this tool?</h1>
 <p>Yes. The <code>portfile.cmake</code> for a library is fundamentally a script that places the headers and binaries into the correct arrangement in the <code>${CURRENT_PACKAGES_DIR}</code>, so to pull in prebuilt binaries you can write a portfile which directly downloads and arranges the files.</p>
 <p>To see an example of this, look at <a href="https://github.com/microsoft/vcpkg/blob/master/ports/opengl/portfile.cmake"><code>ports\opengl\portfile.cmake</code></a> which simply copies files out of the Windows SDK.</p>
-<h1><a class="anchor" id="autotoc_md2652"></a>
+<h1><a class="anchor" id="autotoc_md2876"></a>
 Which platforms can I target with vcpkg?</h1>
 <p>Our built-in, CI-tested triplets are:</p><ul>
 <li>Windows Desktop (x86, x64, x64-static, arm64)</li>
@@ -123,28 +123,28 @@ Which platforms can I target with vcpkg?</h1>
 <p>However, there is an even larger number of community triplets available with more platforms and architectures, including for iOS, Android, MinGW, WebAssembly, freeBSD, and openBSD.</p>
 <p>You can also define your own triplets depending on your needs.</p>
 <p>See <code>vcpkg help triplet</code> for the current list.</p>
-<h1><a class="anchor" id="autotoc_md2653"></a>
+<h1><a class="anchor" id="autotoc_md2877"></a>
 Does vcpkg run on Linux/OS X?</h1>
 <p>Yes! We continuously test on OS X and Ubuntu 16.04, however we know users have been successful with Arch, Fedora, and FreeBSD. If you have trouble with your favorite Linux distribution, let us know in an issue and we'd be happy to help!</p>
-<h1><a class="anchor" id="autotoc_md2654"></a>
+<h1><a class="anchor" id="autotoc_md2878"></a>
 How do I update vcpkg?</h1>
 <p>Execute <code>git pull</code> to get the latest sources, then run <code>bootstrap-vcpkg.bat</code> (Windows) or <code>./bootstrap-vcpkg.sh</code> (Unix) to update vcpkg.</p>
-<h1><a class="anchor" id="autotoc_md2655"></a>
+<h1><a class="anchor" id="autotoc_md2879"></a>
 How do I use different versions of a library on one machine?</h1>
 <p>Within a single instance of vcpkg (e.g. one set of <code>installed\</code>, <code>packages\</code>, <code>ports\</code> and so forth), you can only have one version of a library installed (otherwise, the headers would conflict with each other!). For those with experience with system-wide package managers, packages in vcpkg correspond to the <code>X-dev</code> or <code>X-devel</code> packages.</p>
 <p>To use different versions of a library for different projects, we recommend making separate instances of vcpkg and using the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">per-project integration mechanisms</a>. The versions of each library are specified by the files in <code>ports\</code>, so they are easily manipulated using standard <code>git</code> commands. This makes it very easy to roll back the entire set of libraries to a consistent set of older versions which all work with each other. If you need to then pin a specific library forward, that is as easy as checking out the appropriate version of <code>ports\&lt;package&gt;\</code>.</p>
 <p>If your application is very sensitive to the versions of libraries, we recommend checking in the specific set of portfiles you need into your source control along with your project sources and using the <code>--vcpkg-root</code> option to redirect the working directory of <code>vcpkg.exe</code>.</p>
-<h1><a class="anchor" id="autotoc_md2656"></a>
+<h1><a class="anchor" id="autotoc_md2880"></a>
 How does vcpkg protect my privacy?</h1>
 <p>See the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_about_privacy.html">Privacy document</a> for all information regarding privacy.</p>
-<h1><a class="anchor" id="autotoc_md2657"></a>
+<h1><a class="anchor" id="autotoc_md2881"></a>
 Can I use my own CMake toolchain file with vcpkg's toolchain file?</h1>
 <p>Yes. If you already have a CMake toolchain file, you will need to include our toolchain file at the end of yours. This should be as simple as an <code>include(&lt;vcpkg_root&gt;\scripts\buildsystems\vcpkg.cmake)</code> directive. Alternatively, you could copy the contents of our <code>scripts\buildsystems\vcpkg.cmake</code> into the end of your existing toolchain file.</p>
-<h1><a class="anchor" id="autotoc_md2658"></a>
+<h1><a class="anchor" id="autotoc_md2882"></a>
 Can I use my own/specific flags for rebuilding libs?</h1>
 <p>Yes. In the current version, there is not yet a standardized global way to change them, however you can edit individual portfiles and tweak the exact build process however you'd like.</p>
 <p>By saving the changes to the portfile (and checking them in), you'll get the same results even if you're rebuilding from scratch in the future and forgot what exact settings you used.</p>
-<h1><a class="anchor" id="autotoc_md2659"></a>
+<h1><a class="anchor" id="autotoc_md2883"></a>
 Can I get vcpkg integration for custom configurations?</h1>
 <p>Yes. While vcpkg will only produce the standard "Release" and "Debug" configurations when building a library, you can get integration support for your projects' custom configurations, in addition to your project's standard configurations.</p>
 <p>First of all, vcpkg will automatically assume any custom configuration starting with "Release" (resp. "Debug") as a configuration that is compatible with the standard "Release" (resp. "Debug") configuration and will act accordingly.</p>
@@ -154,28 +154,28 @@ Can I get vcpkg integration for custom configurations?</h1>
 <div class="line">  &lt;VcpkgConfiguration Condition=&quot;&#39;$(Configuration)&#39; == &#39;MyRelease&#39;&quot;&gt;Release&lt;/VcpkgConfiguration&gt;</div>
 <div class="line">&lt;/PropertyGroup&gt;</div>
 </div><!-- fragment --><p> Of course, this will only produce viable binaries if your custom configuration is compatible with the target configuration (e.g. they should both link with the same runtime library).</p>
-<h1><a class="anchor" id="autotoc_md2660"></a>
+<h1><a class="anchor" id="autotoc_md2884"></a>
 I can't use user-wide integration. Can I use a per-project integration?</h1>
 <p>Yes. A NuGet package suitable for per-project use can be generated via either the <code>vcpkg integrate project</code> command (lightweight linking) or the <code>vcpkg export --nuget</code> command (shrinkwrapped).</p>
 <p>A lower level mechanism to achieve the same as the <code>vcpkg integrate project</code> NuGet package is via the <code>&lt;vcpkg_root&gt;\scripts\buildsystems\msbuild\vcpkg.targets</code> file. All you need is to import it in your .vcxproj file, replacing <code>&lt;vcpkg_root&gt;</code> with the path where you installed vcpkg:</p>
 <div class="fragment"><div class="line">&lt;Import Project=&quot;&lt;vcpkg_root&gt;\scripts\buildsystems\msbuild\vcpkg.targets&quot; /&gt;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2661"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2885"></a>
 How can I remove temporary files?</h1>
 <p>You can save some disk space by completely removing the <code>packages\</code>, <code>buildtrees\</code>, and <code>downloads\</code> folders.</p>
-<h1><a class="anchor" id="autotoc_md2662"></a>
+<h1><a class="anchor" id="autotoc_md2886"></a>
 How is CMake used internally by vcpkg?</h1>
 <p>Vcpkg uses CMake internally as a build scripting language. This is because CMake is already an extremely common build system for cross-platform open source libraries and is becoming very popular for C++ projects in general. It is easy to acquire on Windows, does not require system-wide installation, and legible for unfamiliar users.</p>
-<h1><a class="anchor" id="autotoc_md2663"></a>
+<h1><a class="anchor" id="autotoc_md2887"></a>
 Will vcpkg support downloading compiled binaries from a public or private server?</h1>
 <p>We would like to eventually support downloading precompiled binaries, similar to other system package managers.</p>
 <p>In a corporate scenario, we currently recommend building the libraries once and using the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_binarycaching.html">Binary Caching</a> feature to re-use binaries across different machines and for local development vs. CI scenarios.</p>
-<h1><a class="anchor" id="autotoc_md2664"></a>
+<h1><a class="anchor" id="autotoc_md2888"></a>
 What Visual C++ toolsets are supported?</h1>
 <p>We support Visual Studio 2015 Update 3 and above.</p>
-<h1><a class="anchor" id="autotoc_md2665"></a>
+<h1><a class="anchor" id="autotoc_md2889"></a>
 Why does Visual Studio not use my libraries with user-wide integration enabled?</h1>
 <p>Enabling user-wide integration (<code>vcpkg integrate install</code>) changes the default for some project properties. In particular, "C/C++/General/Additional Include Directories" and "Linker/General/Additional Library Directories" are normally blank <em>without</em> user-wide integration. <em>With</em> integration, a blank value means that the augmented default supplied by vcpkg is overridden, and headers/libraries will not be found. To reinstate the default, set the properties to inherit from parent.</p>
-<h1><a class="anchor" id="autotoc_md2666"></a>
+<h1><a class="anchor" id="autotoc_md2890"></a>
 Why not NuGet?</h1>
 <p>NuGet is a package manager for .NET libraries with a strong dependency on MSBuild. It does not meet the specific needs of Native C++ customers in at least three ways.</p>
 <ul>
@@ -183,7 +183,7 @@ Why not NuGet?</h1>
 <li><b>Binary vs Source</b>. Very closely tied to the first point, NuGet is designed from the ground up to provide relatively small, prebuilt binaries. Due to the nature of native code, developers need to have access to the source code to ensure ABI compatibility, performance, integrity, and debuggability.</li>
 <li><b>Per-dll vs Per-application</b>. NuGet is highly project centric. This works well in managed languages with naturally stable ABIs, because base libraries can continue to evolve without breaking those higher up. However, in native languages where the ABI is much more fragile, the only robust strategy is to explicitly build each library against the exact dependencies that will be included in the final application. This is difficult to ensure in NuGet and leads to a highly disconnected and independently versioned ecosystem.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2667"></a>
+<h1><a class="anchor" id="autotoc_md2891"></a>
 Why not Conan?</h1>
 <p>Conan.io is a publicly-federated, project-centric, cross-platform, C++ package manager written in python. Our primary differences are:</p>
 <ul>
@@ -192,7 +192,7 @@ Why not Conan?</h1>
 <li><b>Cross-platform vs single-platform</b>. While being hosted on many platforms is an excellent north star, we believe the level of system integration and stability provided by apt-get, yum, and homebrew is well worth needing to exchange <code>apt-get install libboost-all-dev</code> with <code>brew install boost</code> in automated scripts. We chose to make our system as easy as possible to integrate into a world with these very successful system managers &ndash; one more line for <code>vcpkg install boost</code> &ndash; instead of attempting to replace them where they are already so successful and well-loved.</li>
 <li><b>C++/CMake vs python</b>. While Python is an excellent language loved by many, we believe that transparency and familiarity are the most important factors when choosing a tool as important to your workflow as a package manager. Consequently, we chose to make the implementation languages be as universally accepted as possible: C++ should be used in a C++ package manager for C++ programmers. You should not be required to learn another programming language just to understand your package manager.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2668"></a>
+<h1><a class="anchor" id="autotoc_md2892"></a>
 Why not Chocolatey?</h1>
 <p>Chocolatey is an excellent system for managing applications. However, it is not currently designed to acquire redistributable developer assets and help you with debugging. Vcpkg, in comparison, is designed to get you the libraries you need to build your application and help you deliver through any platform you'd like (including Chocolatey!). </p>
 </div></div><!-- contents -->

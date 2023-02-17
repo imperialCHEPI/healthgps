@@ -91,22 +91,22 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line"><span class="preprocessor">#define JSON_ASSERT(x) </span><span class="comment">/* value */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --><p>This macro controls which code is executed for <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c2fde0d5cded6950da783e8ca4d843413.html">runtime assertions</a> of the library.</p>
-<h1><a class="anchor" id="autotoc_md1726"></a>
+<h1><a class="anchor" id="autotoc_md1950"></a>
 Parameters</h1>
 <p><code>x</code> (in) : expression of scalar type</p>
-<h1><a class="anchor" id="autotoc_md1727"></a>
+<h1><a class="anchor" id="autotoc_md1951"></a>
 Default definition</h1>
 <p>The default value is <a href="https://en.cppreference.com/w/cpp/error/assert"><code>#!cpp assert(x)</code></a>.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define JSON_ASSERT(x) assert(x)</span></div>
 </div><!-- fragment --><p>Therefore, assertions can be switched off by defining <code>NDEBUG</code>.</p>
-<h1><a class="anchor" id="autotoc_md1728"></a>
+<h1><a class="anchor" id="autotoc_md1952"></a>
 Notes</h1>
 <ul>
 <li>The library uses numerous assertions to guarantee invariants and to abort in case of otherwise undefined behavior (e.g., when calling ../basic_json/operator%5B%5D.md "operator[]" with a missing object key on a <code>const</code> object). See page <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c2fde0d5cded6950da783e8ca4d843413.html">runtime assertions</a> for more information.</li>
 <li>Defining the macro to code that does not call <code>std::abort</code> may leave the library in an undefined state.</li>
 <li>The macro is undefined outside the library.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1729"></a>
+<h1><a class="anchor" id="autotoc_md1953"></a>
 Examples</h1>
 <p>??? example "Example 1: default behavior" </p><pre class="fragment">The following code will trigger an assertion at runtime:
 
@@ -150,7 +150,7 @@ Output:
 ```
 assertion error in operator[]
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1730"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1954"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.9.0. </li>

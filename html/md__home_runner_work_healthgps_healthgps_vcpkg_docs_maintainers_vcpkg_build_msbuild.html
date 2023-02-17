@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_build_msbuild.md">vcpkg repo</a>.</p>
 <p>Build a msbuild-based project. Deprecated in favor of <code>vcpkg_install_msbuild()</code>.</p>
-<h1><a class="anchor" id="autotoc_md3058"></a>
+<h1><a class="anchor" id="autotoc_md3282"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_build_msbuild(</div>
 <div class="line">    PROJECT_PATH &lt;${SOURCE_PATH}/port.sln&gt;</div>
@@ -106,48 +106,48 @@ Usage</h1>
 <div class="line">    [OPTIONS_DEBUG &lt;/p:ZLIB_LIB=X&gt;...]</div>
 <div class="line">    [USE_VCPKG_INTEGRATION]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3059"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3283"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3060"></a>
+<h2><a class="anchor" id="autotoc_md3284"></a>
 USE_VCPKG_INTEGRATION</h2>
 <p>Apply the normal <code>integrate install</code> integration for building the project.</p>
 <p>By default, projects built with this command will not automatically link libraries or have header paths set.</p>
-<h2><a class="anchor" id="autotoc_md3061"></a>
+<h2><a class="anchor" id="autotoc_md3285"></a>
 PROJECT_PATH</h2>
 <p>The path to the solution (<code>.sln</code>) or project (<code>.vcxproj</code>) file.</p>
-<h2><a class="anchor" id="autotoc_md3062"></a>
+<h2><a class="anchor" id="autotoc_md3286"></a>
 RELEASE_CONFIGURATION</h2>
 <p>The configuration (<code>/p:<a class="el" href="structConfiguration.html">Configuration</a></code> msbuild parameter) used for Release builds.</p>
-<h2><a class="anchor" id="autotoc_md3063"></a>
+<h2><a class="anchor" id="autotoc_md3287"></a>
 DEBUG_CONFIGURATION</h2>
 <p>The configuration (<code>/p:<a class="el" href="structConfiguration.html">Configuration</a></code> msbuild parameter) used for Debug builds.</p>
-<h2><a class="anchor" id="autotoc_md3064"></a>
+<h2><a class="anchor" id="autotoc_md3288"></a>
 TARGET_PLATFORM_VERSION</h2>
 <p>The WindowsTargetPlatformVersion (<code>/p:WindowsTargetPlatformVersion</code> msbuild parameter)</p>
-<h2><a class="anchor" id="autotoc_md3065"></a>
+<h2><a class="anchor" id="autotoc_md3289"></a>
 TARGET</h2>
 <p>The MSBuild target to build. (<code>/t:&lt;TARGET&gt;</code>)</p>
-<h2><a class="anchor" id="autotoc_md3066"></a>
+<h2><a class="anchor" id="autotoc_md3290"></a>
 PLATFORM</h2>
 <p>The platform (<code>/p:Platform</code> msbuild parameter) used for the build.</p>
-<h2><a class="anchor" id="autotoc_md3067"></a>
+<h2><a class="anchor" id="autotoc_md3291"></a>
 PLATFORM_TOOLSET</h2>
 <p>The platform toolset (<code>/p:PlatformToolset</code> msbuild parameter) used for the build.</p>
-<h2><a class="anchor" id="autotoc_md3068"></a>
+<h2><a class="anchor" id="autotoc_md3292"></a>
 OPTIONS</h2>
 <p>Additional options passed to msbuild for all builds.</p>
-<h2><a class="anchor" id="autotoc_md3069"></a>
+<h2><a class="anchor" id="autotoc_md3293"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options passed to msbuild for Release builds. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3070"></a>
+<h2><a class="anchor" id="autotoc_md3294"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options passed to msbuild for Debug builds. These are in addition to <code>OPTIONS</code>.</p>
-<h1><a class="anchor" id="autotoc_md3071"></a>
+<h1><a class="anchor" id="autotoc_md3295"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/chakracore/portfile.cmake">chakracore</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3072"></a>
+<h1><a class="anchor" id="autotoc_md3296"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_build_msbuild.cmake">scripts/cmake/vcpkg_build_msbuild.cmake</a> </p>
 </div></div><!-- contents -->

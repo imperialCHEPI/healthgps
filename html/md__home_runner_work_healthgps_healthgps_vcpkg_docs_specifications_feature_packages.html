@@ -91,29 +91,29 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>Note: this is the feature as it was initially specified and does not necessarily reflect the current behavior.</b></p>
 <p><b>Up-to-date documentation is available at <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_selecting_library_features.html">Selecting Library Features</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md3557"></a>
+<h1><a class="anchor" id="autotoc_md3781"></a>
 1. Motivation</h1>
-<h2><a class="anchor" id="autotoc_md3558"></a>
+<h2><a class="anchor" id="autotoc_md3782"></a>
 A. OpenCV + CUDA</h2>
 <p><a href="http://opencv.org/">OpenCV</a> is a computer vision library that can optionally be built with CUDA support to massively accelerate certain tasks when using computers with NVidia GPUs. For users without NVidia GPUs, building with CUDA support provides no benefit. <a href="http://www.nvidia.com/object/cuda_home_new.html">CUDA</a> is provided only via a 1.3 GB installer (at the time of this authoring), which requires administrator access to install and modifies the global system state.</p>
 <p>Therefore, there is significant value in enabling users to choose whether they find CUDA support valuable for their particular scenario.</p>
-<h2><a class="anchor" id="autotoc_md3559"></a>
+<h2><a class="anchor" id="autotoc_md3783"></a>
 B. OpenCV + OpenCV_contrib</h2>
 <p>The community around <a href="http://opencv.org/">OpenCV</a> has built up a library of extensions called <a href="https://github.com/opencv/opencv_contrib">OpenCV_contrib</a>. However, these extensions are a source-level patch onto the main OpenCV codebase and therefore must be applied <em>during</em> the core OpenCV build. Further confounding the problem, it is the author's understanding that these community extensions have only been developed with <a href="http://www.nvidia.com/object/cuda_home_new.html">CUDA</a> enabled and cannot be built without that dependency.</p>
 <p>Therefore, if CUDA is disabled, OpenCV_contrib must also be disabled. Likewise, when a user requests OpenCV_contrib, CUDA must be enabled. It would be convenient, but not a requirement, to enable CUDA without enabling the community extensions.</p>
 <p>Finally, these extensions add additional exports and headers which could be depended upon by other libraries. For maintainers, there must be a way to specify this requirement such that <code>vcpkg install mylib-depends-ocv-contrib</code> will verify/build/rebuild OpenCV with the community extensions enabled.</p>
-<h2><a class="anchor" id="autotoc_md3560"></a>
+<h2><a class="anchor" id="autotoc_md3784"></a>
 C. C++ REST SDK + SignalR</h2>
 <p>The <a href="https://github.com/Microsoft/cpprestsdk">C++ REST SDK</a> is a networking library that provides (among other features) HTTP and Websockets clients. To implement the HTTP client functionality on Windows Desktop, only the core Win32 platform APIs are needed (<code>zlib</code> is optional).</p>
 <p>However, the websockets client is based on <a href="https://www.zaphoyd.com/websocketpp/">Websockets++</a>, which adds mandatory dependencies on <code>boost</code>, <code>openssl</code>, and <code>zlib</code>. Many users of the C++ REST SDK do not use the websockets component, so to minimize their overall dependency footprint it can be disabled at build time. Ideally, these kinds of options would be easily accessible to users in Vcpkg who are concerned about the final size or licensing of their deployment.</p>
 <p><a href="https://github.com/aspnet/SignalR-Client-Cpp">SignalR-Client-Cpp</a> depends on the websockets functionality provided by the C++ REST SDK. Therefore, the maintainers of the <code>signalrclient</code> port would ideally like to express this dependency such that <code>cpprestsdk</code> will be automatically correctly built for their needs. Note that <code>signalrclient</code> does not <em>inherently</em> care about <code>boost</code>, <code>websocketspp</code> or <code>openssl</code> &ndash; it depends only on the public websocket client APIs provided by <code>cpprestsdk</code>. It would be much more maintainable to declare dependencies based on the public APIs rather than the dependencies themselves.</p>
-<h1><a class="anchor" id="autotoc_md3561"></a>
+<h1><a class="anchor" id="autotoc_md3785"></a>
 2. Other design concerns</h1>
 <ul>
 <li>General-purpose Open Source projects must be able to easily and succinctly describe their build dependencies inside Vcpkg. This should be no more verbose than a single <code>vcpkg install</code> line and, when that command succeeds, there is a strong expectation that all required functionality/headers/imports are available.</li>
 <li>The internal state of the Vcpkg enlistment must be either extremely transparent OR managed by version control (git). This enables larger projects to efficiently transfer the entire state of their customized Vcpkg system between machines (and onto build servers) by having the destination clone and then run a single <code>vcpkg install</code> line for the subset of dependencies required. The results of this operation should be as repeatable as reasonably achievable given the current limits of the underlying toolchain.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3562"></a>
+<h1><a class="anchor" id="autotoc_md3786"></a>
 3. Proposed solution</h1>
 <p>A key summary of the above motivations is that they are all scenarios surrounding APIs that are not independently buildable from each other. We have an existing solution for APIs that are independently buildable: separate packages. Therefore, we seek to extend the user-facing notion of "packages" to include capabilities and contracts that cannot be made into independent builds.</p>
 <p>This document proposes "features" (also called feature packages). These features are intended to model semi-independently toggleable API sets/contracts such that they can be sanely depended upon by other packages. It is not a goal to model exclusive alternatives (such as implementation choices that are not directly user-observable) through this mechanism.</p>
@@ -123,9 +123,9 @@ C. C++ REST SDK + SignalR</h2>
 </ul>
 <p>From a user experience perspective (i.e. from <code>vcpkg install</code>) feature packages act as much as possible like completely independent packages. However, internally, any change to a package's features will result in a rebuild of the associated "parent" package. This will invoke a package rebuild experience similar to upgrading.</p>
 <p>When using <code>vcpkg install &lt;package&gt;</code>, some features will be enabled by default. These default features can be avoided by referring to the packages as <code>&lt;package&gt;[core]</code> and features can be added by supplying them on the same installation line.</p>
-<h2><a class="anchor" id="autotoc_md3563"></a>
+<h2><a class="anchor" id="autotoc_md3787"></a>
 A. Proposed User experience</h2>
-<h3><a class="anchor" id="autotoc_md3564"></a>
+<h3><a class="anchor" id="autotoc_md3788"></a>
 i. User with no preference about options</h3>
 <p>Install of a library with default features: </p><div class="fragment"><div class="line">&gt; vcpkg install cpprestsdk</div>
 <div class="line">// -- omitted build information -- //</div>
@@ -143,7 +143,7 @@ i. User with no preference about options</h3>
 </div><!-- fragment --><p>Installation of a library with optional features: </p><div class="fragment"><div class="line">&gt; vcpkg install opencv</div>
 <div class="line">// -- omitted build information -- //</div>
 <div class="line">Package opencv[core]:x86-windows is installed.</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3565"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3789"></a>
 ii. User desires CUDA support for OpenCV directly, and is unfamiliar with feature packages</h3>
 <p>Developer Bob knows he wants OpenCV, so he guesses what the package is called </p><div class="fragment"><div class="line">&gt; vcpkg install opencv</div>
 <div class="line">// -- omitted build information -- //</div>
@@ -169,7 +169,7 @@ ii. User desires CUDA support for OpenCV directly, and is unfamiliar with featur
 <div class="line">Package opencv[core]:x86-windows is installed.</div>
 <div class="line">Package opencv[cuda]:x86-windows is installed.</div>
 </div><!-- fragment --><p> and he can now use OpenCV's CUDA support in his application.</p>
-<h3><a class="anchor" id="autotoc_md3566"></a>
+<h3><a class="anchor" id="autotoc_md3790"></a>
 iii. User is familiar with feature packages, and wants to opt-out of a feature</h3>
 <p>Developer Alice has used <code>cpprestsdk</code>, built it from source, and she knows about the option to disable websockets. She uses <code>search</code> to find the complete list of features: </p><div class="fragment"><div class="line">&gt; vcpkg search cpprestsdk</div>
 <div class="line">cpprestsdk                  2.9.0-2       C++11 JSON, REST, and OAuth library The C++ RES...</div>
@@ -221,7 +221,7 @@ iii. User is familiar with feature packages, and wants to opt-out of a feature</
 <div class="line">azure-storage-cpp[core]:x86-windows 2.6.0           Microsoft Azure Storage Client SDK for ...</div>
 <div class="line">cpprestsdk[core]:x86-windows        2.9.0-2         C++11 JSON, REST, and OAuth library</div>
 <div class="line">cpprestsdk[compression]:x86-windows                 Gzip compression support in the HTTP client.</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3567"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3791"></a>
 B. Technical model</h2>
 <ul>
 <li>Each package can have any number "features".</li>
@@ -252,9 +252,9 @@ B. Technical model</h2>
 </li>
 </ul>
 <p>As a conclusion of the above, it is expected that all packages will be buildable with all features disabled (just the <code>core</code> feature) and with all features enabled.</p>
-<h2><a class="anchor" id="autotoc_md3568"></a>
+<h2><a class="anchor" id="autotoc_md3792"></a>
 C. Proposed Control File Syntax</h2>
-<h3><a class="anchor" id="autotoc_md3569"></a>
+<h3><a class="anchor" id="autotoc_md3793"></a>
 OpenCV and CUDA</h3>
 <p>To add the feature CUDA to OpenCV, we will adopt the following syntax in the CONTROL file: </p><div class="fragment"><div class="line"># opencv/CONTROL</div>
 <div class="line">Source: opencv</div>
@@ -270,7 +270,7 @@ OpenCV and CUDA</h3>
 <div class="line">Feature: contrib</div>
 <div class="line">Build-Depends: opencv[cuda]</div>
 <div class="line">Description: library of OpenCV Extensions</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3570"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3794"></a>
 Signalrclient</h3>
 <div class="fragment"><div class="line"># signalrclient/CONTROL</div>
 <div class="line">Source: signalrclient</div>
@@ -291,14 +291,14 @@ Signalrclient</h3>
 <div class="line">Feature: ws-client</div>
 <div class="line">Build-Depends: boost (windows), openssl (windows), websocketpp (windows)</div>
 <div class="line">Description: Websocket client support based on websocketspp</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3571"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3795"></a>
 D. Additional Control File Technical Details</h2>
 <ul>
 <li>If any feature paragraphs exist, the field <code>Default-Features</code> must be present.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3572"></a>
+<h1><a class="anchor" id="autotoc_md3796"></a>
 4. Related Work</h1>
-<h2><a class="anchor" id="autotoc_md3573"></a>
+<h2><a class="anchor" id="autotoc_md3797"></a>
 Cargo's Features (from Rust): &lt;http://doc.crates.io/manifest.html#the-features-section&gt;</h2>
 <p>The proposed feature packages are exceedingly similar to Cargo's Features, with the following changes:</p>
 <ul>
@@ -307,7 +307,7 @@ Cargo's Features (from Rust): &lt;http://doc.crates.io/manifest.html#the-feature
 <li>Because of the nature of C and C++, it is extremely commonplace that large software packages can have features disabled to remove their dependencies upon other libraries. Changing this configuration requires a rebuild of the package and potentially rippling ABI changes to any downstream dependencies. Therefore, we expect significantly more use of this feature to manage optional API contracts instead of the intended use in Cargo (curation).</li>
 <li>We do not intend feature packages to be used to express the curation relationship, beyond the notion of a "default" set within a package.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3574"></a>
+<h2><a class="anchor" id="autotoc_md3798"></a>
 Gentoo's USE flags: &lt;https://wiki.gentoo.org/wiki/Handbook:X86/Working/USE&gt;</h2>
 <p>Gentoo's USE flags can be shortly summarized as a global set of keywords that is used to make cross-cutting changes to the entire package graph's build configuration. This system standardizes many common settings such that they can be simultaneously toggled for the entire graph.</p>
 <p>The most common example of this would be using KDE vs Gnome. A user who knows that, given the choice, they would prefer the KDE/Qt interface can manage the massive space of package configuration efficiently without learning the particular term that each package has decided to call "build using Qt instead of GTK".</p>

@@ -276,7 +276,14 @@ var menudata={children:[
 {text:"t",url:"functions_type_t.html#index_t"},
 {text:"u",url:"functions_type_u.html#index_u"},
 {text:"v",url:"functions_type_v.html#index_v"}]},
-{text:"Enumerations",url:"functions_enum.html"},
+{text:"Enumerations",url:"functions_enum.html",children:[
+{text:"b",url:"functions_enum.html#index_b"},
+{text:"c",url:"functions_enum.html#index_c"},
+{text:"f",url:"functions_enum.html#index_f"},
+{text:"o",url:"functions_enum.html#index_o"},
+{text:"r",url:"functions_enum.html#index_r"},
+{text:"s",url:"functions_enum.html#index_s"},
+{text:"t",url:"functions_enum.html#index_t"}]},
 {text:"Enumerator",url:"functions_eval.html",children:[
 {text:"c",url:"functions_eval.html#index_c"},
 {text:"d",url:"functions_eval.html#index_d"},
@@ -307,6 +314,7 @@ var menudata={children:[
 {text:"i",url:"functions_rela_i.html#index_i"},
 {text:"j",url:"functions_rela_j.html#index_j"},
 {text:"m",url:"functions_rela_m.html#index_m"},
+{text:"n",url:"functions_rela_n.html#index_n"},
 {text:"o",url:"functions_rela_o.html#index_o"},
 {text:"p",url:"functions_rela_p.html#index_p"},
 {text:"q",url:"functions_rela_q.html#index_q"},

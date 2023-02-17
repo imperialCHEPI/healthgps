@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p class="startli">The <code>value_type</code> of the iterator must be an integral type with size of 1, 2 or 4 bytes, which will be interpreted respectively as UTF-8, UTF-16 and UTF-32.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1324"></a>
+<h1><a class="anchor" id="autotoc_md1548"></a>
 Template parameters</h1>
 <p><code>InputType</code> : A compatible input, for instance: </p><pre class="fragment">- an `std::istream` object
 - a `FILE` pointer (must not be null)
@@ -124,7 +124,7 @@ Template parameters</h1>
 - an object `obj` for which `begin(obj)` and `end(obj)` produces a valid pair of iterators.
 </pre><p> <code>IteratorType</code> : a compatible iterator type, for instance. </p><pre class="fragment">- a pair of `std::string::iterator` or `std::vector&lt;std::uint8_t&gt;::iterator`
 - a pair of pointers such as `ptr` and `ptr + len`
-</pre> <h1><a class="anchor" id="autotoc_md1325"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1549"></a>
 Parameters</h1>
 <p><code>i</code> (in) : Input to parse from.</p>
 <p><code>cb</code> (in) : a parser callback function of type <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c18a05abc3e142821c56962d442050356.html">`parser_callback_t`</a> which is used to control the deserialization by filtering unwanted values (optional)</p>
@@ -132,28 +132,28 @@ Parameters</h1>
 <p><code>ignore_comments</code> (in) : whether comments should be ignored and treated like whitespace (<code>#!cpp true</code>) or yield a parse error (<code>#!cpp false</code>); (optional, <code>#!cpp false</code> by default)</p>
 <p><code>first</code> (in) : iterator to start of character range</p>
 <p><code>last</code> (in) : iterator to end of character range</p>
-<h1><a class="anchor" id="autotoc_md1326"></a>
+<h1><a class="anchor" id="autotoc_md1550"></a>
 Return value</h1>
 <p>Deserialized JSON value; in case of a parse error and <code>allow_exceptions</code> set to <code>#!cpp false</code>, the return value will be <code>value_t::discarded</code>. The latter can be checked with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c55d9d38063156c68a8e3611580edc497.html">`is_discarded`</a>.</p>
-<h1><a class="anchor" id="autotoc_md1327"></a>
+<h1><a class="anchor" id="autotoc_md1551"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1328"></a>
+<h1><a class="anchor" id="autotoc_md1552"></a>
 Exceptions</h1>
 <ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error101"><code>parse_error.101</code></a> in case of an unexpected token.</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error102"><code>parse_error.102</code></a> if to_unicode fails or surrogate error.</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error103"><code>parse_error.103</code></a> if to_unicode fails.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1329"></a>
+<h1><a class="anchor" id="autotoc_md1553"></a>
 Complexity</h1>
 <p>Linear in the length of the input. The parser is a predictive LL(1) parser. The complexity can be higher if the parser callback function <code>cb</code> or reading from (1) the input <code>i</code> or (2) the iterator range [<code>first</code>, <code>last</code>] has a super-linear complexity.</p>
-<h1><a class="anchor" id="autotoc_md1330"></a>
+<h1><a class="anchor" id="autotoc_md1554"></a>
 Notes</h1>
 <p>(1) A UTF-8 byte order mark is silently ignored.</p>
 <p>!!! danger "Runtime assertion" </p><pre class="fragment">The precondition that a passed `#!cpp FILE` pointer must not be null is enforced with a
 [runtime assertion](../../features/assertions.md).
-</pre> <h1><a class="anchor" id="autotoc_md1331"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1555"></a>
 Examples</h1>
 <p>??? example "Parsing from a character array" </p><pre class="fragment">The example below demonstrates the `parse()` function reading from an array.
 
@@ -232,13 +232,13 @@ Output:
 ```json
 --8&lt;-- "examples/parse__allow_exceptions.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1332"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1556"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c3ea58ede365db38b4f7f39788bd17e36.html">accept</a> - check if the input is valid JSON</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c385c14208eb6977c1b4d53b40662532e.html">operator&gt;&gt;</a> - deserialize from stream</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1333"></a>
+<h1><a class="anchor" id="autotoc_md1557"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0.</li>

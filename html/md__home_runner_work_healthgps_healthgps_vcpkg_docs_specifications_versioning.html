@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>Note: this is the feature as it was initially specified and does not necessarily reflect the current behavior.</b></p>
 <p><b>Up-to-date documentation is available at <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_versioning.html">Versioning</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md3632"></a>
+<h1><a class="anchor" id="autotoc_md3856"></a>
 Glossary</h1>
 <p>Some of the terms used in this document have similar meaning when discussed by the community, and because of that, they can cause confusion and ambiguity. To solve this issue, we will assign specific meaning to these terms and try to keep a consistent usage through the document.</p>
 <p><b>Library</b>: A piece of software (source code, binary files, documentation, license, etc.) that is intended to be reused by other software.</p>
@@ -101,11 +101,11 @@ Glossary</h1>
 <li>Metadata about a package: package version, supported features, dependencies, etc.</li>
 <li>Instructions to acquire, build if necessary, and install the package.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3633"></a>
+<h1><a class="anchor" id="autotoc_md3857"></a>
 1 Enabling package versioning</h1>
 <p>On launch, the versioning feature will be disabled by default. Users can enable this feature by setting the <code>versions</code> feature flag.</p>
 <p>Example: </p><div class="fragment"><div class="line">vcpkg --feature-flags=versions install</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3634"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3858"></a>
 1.1 Proposed experience</h2>
 <p>This feature requires the use of manifests to declare project dependencies. To allow versioning, the following features are added to manifests:</p>
 <ul>
@@ -126,7 +126,7 @@ Glossary</h1>
 <li><code>"$x-default-baseline"</code>: Declares a baseline version for all packages.</li>
 </ul>
 <p>All these new features are described in more detail in this document.</p>
-<h1><a class="anchor" id="autotoc_md3635"></a>
+<h1><a class="anchor" id="autotoc_md3859"></a>
 2 Specifying package versions</h1>
 <p>Through the years, C++ software authors have adopted multiple versioning schemes and practices that sometimes conflict between each other. On vcpkg, the most recurrent versioning schemes found are:</p><ul>
 <li>Semantic versions</li>
@@ -135,11 +135,11 @@ Glossary</h1>
 <li>Arbitrary strings</li>
 </ul>
 <p>For vcpkg to achieve wide adoption and compatibility with existing projects, it is important that we respect the versioning schemes used by each of the packages contained in our ports catalog.</p>
-<h2><a class="anchor" id="autotoc_md3636"></a>
+<h2><a class="anchor" id="autotoc_md3860"></a>
 2.1 Port versions</h2>
 <p>Package versioning information is divided in two parts: a version string and a port version. Port versions are a concept exclusive to vcpkg, they do not form part of a package’s upstream. But allow for versioning of the vcpkg ports themselves.</p>
 <p>Packages can also include the port version as part of a version constraint by using the “port-version” property on their dependencies.</p>
-<h3><a class="anchor" id="autotoc_md3637"></a>
+<h3><a class="anchor" id="autotoc_md3861"></a>
 &lt;tt&gt;port-version&lt;/tt&gt;</h3>
 <p>An integer value that increases each time a vcpkg-specific change is made to the port. <br  />
 </p>
@@ -149,7 +149,7 @@ Glossary</h1>
 <li>and reset to 0 each time the version of the package is updated.</li>
 </ul>
 <p>Defaults to 0 if omitted.</p>
-<h2><a class="anchor" id="autotoc_md3638"></a>
+<h2><a class="anchor" id="autotoc_md3862"></a>
 2.2 Package versions</h2>
 <p>Versions are an important part of a package’s upstream metadata. Ports in vcpkg should attempt to follow the versioning conventions used by the package’s authors. For that reason, when declaring a package’s version the appropriate scheme should be used.</p>
 <p>Each versioning scheme defines their own rules on what is a valid version string and more importantly the rules for how to sort versions using the same scheme.</p>
@@ -167,7 +167,7 @@ Glossary</h1>
 <td class="markdownTableBodyNone"><code>version-string</code>   </td><td class="markdownTableBodyNone">For arbitrary strings   </td></tr>
 </table>
 <p>A manifest must contain only one version declaration.</p>
-<h3><a class="anchor" id="autotoc_md3639"></a>
+<h3><a class="anchor" id="autotoc_md3863"></a>
 &lt;tt&gt;version&lt;/tt&gt;</h3>
 <p>Accepts version strings that follow a relaxed, dot-separated-, semver-like scheme.</p>
 <p>The version is logically composed of dot-separated (<code>.</code>) numeric sections. Each section must contain an integer positive number with no leading zeroes.</p>
@@ -175,24 +175,24 @@ Glossary</h1>
 <p><em>Sorting behavior</em>: When comparing two versions, each section is compared from left to right by their numeric value, until the first difference is found. A version with the smallest set of sections takes precedence over another with a larger set of sections, given that all their preceding sections compare equally.</p>
 <p>Example: <br  />
  <code>0</code> &lt; <code>0.1</code> &lt; <code>0.1.0</code> &lt; <code>1</code> &lt; <code>1.0.0</code> &lt; <code>1.0.1</code> &lt; <code>1.1</code>&lt; <code>2.0.0</code></p>
-<h3><a class="anchor" id="autotoc_md3640"></a>
+<h3><a class="anchor" id="autotoc_md3864"></a>
 &lt;tt&gt;version-semver&lt;/tt&gt;</h3>
 <p>Accepts version strings that follow semantic versioning conventions as described in the <a href="https://semver.org/#semantic-versioning-specification-semver">semantic versioning specification</a>.</p>
 <p><em>Sorting behavior</em>: Strings are sorted following the rules described in the semantic versioning specification.</p>
 <p>Example: <code>1.0.0-1</code> &lt; <code>1.0.0-alpha</code> &lt; <code>1.0.0-beta</code> &lt; <code>1.0.0</code> &lt; <code>1.0.1</code> &lt; <code>1.1.0</code></p>
-<h3><a class="anchor" id="autotoc_md3641"></a>
+<h3><a class="anchor" id="autotoc_md3865"></a>
 &lt;tt&gt;version-date&lt;/tt&gt;</h3>
 <p>Accepts version strings that can be parsed to a date following the ISO-8601 format <code>YYYY-MM-DD</code>. Disambiguation identifiers are allowed in the form of dot-separated-, positive-, integer-numbers with no leading zeroes.</p>
 <p>The regex pattern for this versioning scheme is: <code>\d{4}-\d{2}-\d{2}(\.(0|[1-9]\d*))*</code>.</p>
 <p><em>Sorting behavior</em>: Strings are sorted first by their date part, then by numeric comparison of their disambiguation identifiers. Disambiguation identifiers follow the rules of the relaxed (version) scheme.</p>
 <p>Examples: <code>2020-01-01</code> &lt; <code>2020-01-01.1</code> &lt; <code>2020-02-01.1.2</code> &lt; <code>2020-02-01.1.3</code> &lt; <code>2020-02-01</code></p>
-<h3><a class="anchor" id="autotoc_md3642"></a>
+<h3><a class="anchor" id="autotoc_md3866"></a>
 &lt;tt&gt;version-string&lt;/tt&gt;</h3>
 <p>For packages using version strings that do not fit any of the other schemes, it accepts most arbitrary strings, but some special characters like <code>#</code> are disallowed.</p>
 <p><em>Sorting behavior</em>: No sorting is attempted on the version string itself. However, if the strings match exactly, the port versions can be compared and sorted.</p>
 <p>Examples: <code>apple</code> &lt;&gt; <code>orange</code> &lt;&gt; <code>orange.2</code> &lt;&gt; <code>orange2</code> <br  />
  <code>watermelon</code> (<code>port-version</code>: 0) &lt; <code>watermelon</code> (<code>port-version</code>: 1)</p>
-<h4><a class="anchor" id="autotoc_md3643"></a>
+<h4><a class="anchor" id="autotoc_md3867"></a>
 Example: Manifests using different versioning schemes</h4>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    &quot;name&quot;: &quot;openssl&quot;,</div>
@@ -213,16 +213,16 @@ Example: Manifests using different versioning schemes</h4>
 <div class="line">    &quot;version-string&quot;: &quot;may2020&quot;,</div>
 <div class="line">    &quot;port-version&quot;: 0</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3644"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3868"></a>
 3 Specifying dependency versions</h1>
-<h2><a class="anchor" id="autotoc_md3645"></a>
+<h2><a class="anchor" id="autotoc_md3869"></a>
 3.1 On manifest files</h2>
 <p>Manifest files help users specify complex versioned dependency graphs in a declarative manner. In this document we define a top-level manifest as the manifest file written by a user to declare their project’s dependencies. This is opposed to a port’s manifest file, which is used by port’s to declare the dependencies of the package it contains.</p>
 <p>There are three mechanisms you can use in your manifest files to control which versions of your packages are installed: <b>version constraints, registry baselines and overrides</b>.</p>
-<h3><a class="anchor" id="autotoc_md3646"></a>
+<h3><a class="anchor" id="autotoc_md3870"></a>
 Version constraints</h3>
 <p>Specifying a version constraint is the most direct way to control which version of a package is installed, in vcpkg you can declare minimum version constraints using the syntax <code>"version&gt;=": "1.0.0"</code>.</p>
-<h3><a class="anchor" id="autotoc_md3647"></a>
+<h3><a class="anchor" id="autotoc_md3871"></a>
 Registry baseline</h3>
 <p>Baselines are used to set lower boundaries on package versions. A baseline effectively adds a minimum version constraint on all the packages declared in it.</p>
 <p>But what is a baseline?</p>
@@ -241,16 +241,16 @@ Registry baseline</h3>
 <p>Baselines define a minimum version constraint an all packages contained in it.</p>
 <p>For example, if the baseline contains the entry: </p><div class="fragment"><div class="line">“fmt”: { “version-semver”: “7.1.2”, “port-version”: 0 }</div>
 </div><!-- fragment --><p>A minimum version constraint will be added to <code>fmt</code> so that vcpkg won’t install a version lower than <code>7.1.2</code> with port version <code>0</code>.</p>
-<h3><a class="anchor" id="autotoc_md3648"></a>
+<h3><a class="anchor" id="autotoc_md3872"></a>
 Overrides</h3>
 <p>Declaring an override forces vcpkg to ignore all other constraints, both top-level and transitive constraints, and use the version specified in the override. This is useful for pinning exact versions and for resolving version conflicts.</p>
-<h1><a class="anchor" id="autotoc_md3649"></a>
+<h1><a class="anchor" id="autotoc_md3873"></a>
 4 Version constraints</h1>
-<h2><a class="anchor" id="autotoc_md3650"></a>
+<h2><a class="anchor" id="autotoc_md3874"></a>
 4.1 Declaring a baseline</h2>
 <p>For the initial implementation, the method to declare a baseline is to set the <code>“$x-default-baseline”</code> property.</p>
 <p>The use of <code>“$x-default-baseline”</code> is temporary and will very likely change in the future, as we work on implementing custom registries.</p>
-<h3><a class="anchor" id="autotoc_md3651"></a>
+<h3><a class="anchor" id="autotoc_md3875"></a>
 &lt;tt&gt;$x-default-baseline&lt;/tt&gt;</h3>
 <p>Accepts a Git commit ID. Vcpkg will try to find a baseline file in the given commit ID and use that to set the baseline versions (lower bound versions) of all declared dependencies.</p>
 <p>When resolving version constraints for a package, vcpkg will look for a baseline version:</p><ul>
@@ -266,7 +266,7 @@ Overrides</h3>
 <div class="line">  &quot;$x-default-baseline&quot;:&quot;9fd3bd594f41afb8747e20f6ac9619f26f333cbe&quot;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Baselines can be used without any other version constraints to obtain behavior close to using “classic” mode.</p>
-<h2><a class="anchor" id="autotoc_md3652"></a>
+<h2><a class="anchor" id="autotoc_md3876"></a>
 4.2 Declaring minimum version constraints</h2>
 <p>A minimum version requirement puts a lower boundary on the versions that can be used to satisfy a dependency. This means that any version that is newer than the requirement is valid (including major version changes).</p>
 <p>Vcpkg will use the oldest identified version that can satisfy all the version requirements in a build graph. Using a minimum version approach has the following advantages:</p><ul>
@@ -283,7 +283,7 @@ Overrides</h3>
 <div class="line">    { &quot;name&quot;: &quot;rapidjson&quot;, &quot;version&gt;=&quot;: &quot;2020-02-01&quot; }</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3653"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3877"></a>
 4.3 Declaring port version constraints</h2>
 <p>To be consistent with the minimum version approach, vcpkg uses the lowest available port version that matches the package version. There are many scenarios where a higher port version is desirable, e.g.: support for new platforms, fixing installation issues, among others.</p>
 <p>As part of the dependency object a port version can be specified. An error will be emitted if a non-existent port-version for the given package version is requested.</p>
@@ -295,7 +295,7 @@ Overrides</h3>
 <div class="line">    { &quot;name&quot;: &quot;rapidjson&quot;, &quot;version=&quot;: &quot;2020-02-01&quot;, &quot;port-version&quot;: 2 }</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3654"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3878"></a>
 4.4 Declaring overrides</h2>
 <p>Overrides are declared as an array of package version declarations.</p>
 <p>For an override to take effect, the overridden package must form part of the dependency graph. That means that a dependency must be declared either by the top-level manifest or be part of a transitive dependency.</p>
@@ -307,9 +307,9 @@ Overrides</h3>
 <div class="line">  &quot;$x-default-baseline&quot;:&quot;9fd3bd594f41afb8747e20f6ac9619f26f333cbe&quot;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>In the previous example, <code>zlib</code> is not a direct dependency of the project but it is a dependency for <code>cpprestsdk</code>, so the override takes effect forcing <code>zlib</code> to version <code>1.2.10</code>.</p>
-<h1><a class="anchor" id="autotoc_md3655"></a>
+<h1><a class="anchor" id="autotoc_md3879"></a>
 5 Design considerations</h1>
-<h2><a class="anchor" id="autotoc_md3656"></a>
+<h2><a class="anchor" id="autotoc_md3880"></a>
 5.1 Constraint resolution</h2>
 <p>Given a manifest with a set of versioned dependencies, vcpkg will attempt to calculate a package installation plan that satisfies all the constraints. Constraints can be declared in the top-level manifest but can also be added transitively by indirect dependencies.</p>
 <p>Vcpkg roughly follows the steps below to compute an installation plan, the installation plan will either contain a valid set of package versions, or a list of version conflicts.</p>
@@ -350,7 +350,7 @@ Overrides</h3>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3657"></a>
+<h2><a class="anchor" id="autotoc_md3881"></a>
 5.2 Acquiring port versions</h2>
 <p>Although the concept of package versions has always been present in vcpkg, the concept of version constraints has been not.</p>
 <p>With the introduction of versioning constraints, it is now possible that a package depends on a port version that does not match the one available locally. This raises a problem as vcpkg needs to know how to acquire the port files for the requested version.</p>

@@ -90,16 +90,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>CrossGuid is a minimal, cross platform, C++ GUID library. It uses the best native GUID/UUID generator on the given platform and has a generic class for parsing, stringifying, and comparing IDs. The guid generation technique is determined by your platform:</p>
-<h1><a class="anchor" id="autotoc_md3934"></a>
+<h1><a class="anchor" id="autotoc_md4158"></a>
 Linux</h1>
 <p>On linux you can use <code>libuuid</code> which is pretty standard. On distros like Ubuntu it is available by default but to use it you need the header files so you have to do: </p><pre class="fragment">sudo apt-get install uuid-dev
-</pre> <h1><a class="anchor" id="autotoc_md3935"></a>
+</pre> <h1><a class="anchor" id="autotoc_md4159"></a>
 Mac/iOS</h1>
 <p>On Mac or iOS you can use <code>CFUUIDCreate</code> from <code>CoreFoundation</code>. Since it's a plain C function you don't even need to compile as Objective-C++.</p>
-<h1><a class="anchor" id="autotoc_md3936"></a>
+<h1><a class="anchor" id="autotoc_md4160"></a>
 Windows</h1>
 <p>On Windows we just use the the built-in function <code>CoCreateGuid</code>. CMake can generate a Visual Studio project if that's your thing.</p>
-<h1><a class="anchor" id="autotoc_md3937"></a>
+<h1><a class="anchor" id="autotoc_md4161"></a>
 Android</h1>
 <p>The Android version uses a handle to a <code>JNIEnv</code> object to invoke the <code>randomUUID()</code> function on <code>java.util.UUID</code> from C++. The Android specific code is all in the <code>android/</code> subdirectory. If you have an emulator already running, then you can run the <code>android.sh</code> script in the root directory. It has the following requirements:</p>
 <ul>
@@ -108,7 +108,7 @@ Android</h1>
 <li>adb is in your path.</li>
 <li>You have an Android sdk setup including <code>ANDROID_HOME</code> environment variable.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3938"></a>
+<h1><a class="anchor" id="autotoc_md4162"></a>
 Versions</h1>
 <p>This is version 0.2 of CrossGuid. If you all already using CrossGuid and your code uses <code>GuidGenerator</code> then you are using version 0.1. Differences in version 0.2:</p>
 <ul>
@@ -119,32 +119,32 @@ Versions</h1>
 <li>More error checking (like if you try to create a guid with invalid number of bytes).</li>
 </ul>
 <p>If you're happily using version 0.1 then there's not really any reason to change.</p>
-<h1><a class="anchor" id="autotoc_md3939"></a>
+<h1><a class="anchor" id="autotoc_md4163"></a>
 Compiling</h1>
 <p>Just do the normal cmake thing:</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake ..</div>
 <div class="line">make install</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3940"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4164"></a>
 Running tests</h1>
 <p>After compiling as described above you should get two files: <code>libcrossguid.a</code> (the static library) and <code>crossguid-test</code> (the test runner). So to run the tests just do:</p>
 <div class="fragment"><div class="line">./crossguid-test</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3941"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4165"></a>
 Basic usage</h1>
-<h2><a class="anchor" id="autotoc_md3942"></a>
+<h2><a class="anchor" id="autotoc_md4166"></a>
 Creating guids</h2>
 <p>Create a new random guid:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;crossguid/guid.hpp&gt;</span></div>
 <div class="line">...</div>
-<div class="line">auto g = <a class="code" href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
-<div class="ttc" id="abuildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp_html_addb30feb9fe80e7c64b61d558621f6e6"><div class="ttname"><a href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">newGuid</a></div><div class="ttdeci">Guid newGuid()</div></div>
+<div class="line">auto g = <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp_html_addb30feb9fe80e7c64b61d558621f6e6"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">newGuid</a></div><div class="ttdeci">Guid newGuid()</div></div>
 </div><!-- fragment --><p><b>NOTE:</b> On Android you need to call <code>xg::initJni(JNIEnv *)</code> first so that it is possible for <code>xg::newGuid()</code> to call back into java libraries. <code>initJni</code> only needs to be called once when the process starts.</p>
 <p>Create a new zero guid:</p>
 <div class="fragment"><div class="line">xg::Guid g;</div>
 </div><!-- fragment --><p>Create from a string:</p>
 <div class="fragment"><div class="line">xg::Guid g(<span class="stringliteral">&quot;c405c66c-ccbb-4ffd-9b62-c286c0fd7a3b&quot;</span>);</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3943"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4167"></a>
 Checking validity</h2>
 <p>If you have some string value and you need to check whether it is a valid guid then you can simply attempt to construct the guid:</p>
 <div class="fragment"><div class="line">xg::Guid g(<span class="stringliteral">&quot;bad-guid-string&quot;</span>);</div>
@@ -153,27 +153,27 @@ Checking validity</h2>
 <div class="line">    <span class="comment">// do stuff</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><p>If the guid string is not valid then all bytes are set to zero and <code>isValid()</code> returns <code>false</code>.</p>
-<h2><a class="anchor" id="autotoc_md3944"></a>
+<h2><a class="anchor" id="autotoc_md4168"></a>
 Converting guid to string</h2>
 <p>First of all, there is normally no reason to convert a guid to a string except for in debugging or when serializing for API calls or whatever. You should definitely avoid storing guids as strings or using strings for any computations. If you do need to convert a guid to a string, then you can utilize strings because the <code>&lt;&lt;</code> operator is overloaded. To print a guid to <code>std::cout</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> doGuidStuff()</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">auto</span> myGuid = <a class="code" href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
+<div class="line">    <span class="keyword">auto</span> myGuid = <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
 <div class="line">    std::cout &lt;&lt; <span class="stringliteral">&quot;Here is a guid: &quot;</span> &lt;&lt; myGuid &lt;&lt; std::endl;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Or to store a guid in a <code>std::string</code>:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> doGuidStuff()</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">auto</span> myGuid = <a class="code" href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
+<div class="line">    <span class="keyword">auto</span> myGuid = <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
 <div class="line">    std::stringstream <a class="code" href="namespaceindicators_1_1details.html#ab2422a182ffecd25789549d8aec2a2abaf7b44cfafd5c52223d5498196c8a2e7b">stream</a>;</div>
 <div class="line">    <a class="code" href="namespaceindicators_1_1details.html#ab2422a182ffecd25789549d8aec2a2abaf7b44cfafd5c52223d5498196c8a2e7b">stream</a> &lt;&lt; myGuid;</div>
 <div class="line">    <span class="keyword">auto</span> guidString = <a class="code" href="namespaceindicators_1_1details.html#ab2422a182ffecd25789549d8aec2a2abaf7b44cfafd5c52223d5498196c8a2e7b">stream</a>.str();</div>
 <div class="line">}</div>
 <div class="ttc" id="anamespaceindicators_1_1details_html_ab2422a182ffecd25789549d8aec2a2abaf7b44cfafd5c52223d5498196c8a2e7b"><div class="ttname"><a href="namespaceindicators_1_1details.html#ab2422a182ffecd25789549d8aec2a2abaf7b44cfafd5c52223d5498196c8a2e7b">indicators::details::ProgressBarOption::stream</a></div><div class="ttdeci">@ stream</div></div>
 </div><!-- fragment --><p>There is also a <code>str()</code> function that returns a <code>std::string</code>:</p>
-<div class="fragment"><div class="line">std::string guidStr = <a class="code" href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>().<a class="code" href="classGuid.html#a13bf8186675b39230c5055b5a9056a0d">str</a>();</div>
+<div class="fragment"><div class="line">std::string guidStr = <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>().<a class="code" href="classGuid.html#a13bf8186675b39230c5055b5a9056a0d">str</a>();</div>
 <div class="ttc" id="aclassGuid_html_a13bf8186675b39230c5055b5a9056a0d"><div class="ttname"><a href="classGuid.html#a13bf8186675b39230c5055b5a9056a0d">Guid::str</a></div><div class="ttdeci">std::string str() const</div><div class="ttdef"><b>Definition:</b> guid.cpp:114</div></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3945"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4169"></a>
 Creating a guid from raw bytes</h2>
 <p>It's unlikely that you will need this, but this is done within the library internally to construct a <code><a class="el" href="classGuid.html">Guid</a></code> object from the raw data given by the system's built-in guid generation function. There are two key constructors for this:</p>
 <div class="fragment"><div class="line"><a class="code" href="classGuid.html">Guid</a>(std::array&lt;unsigned char, 16&gt; &amp;<a class="code" href="classbytes.html">bytes</a>);</div>
@@ -182,21 +182,21 @@ Creating a guid from raw bytes</h2>
 </div><!-- fragment --><p>and</p>
 <div class="fragment"><div class="line"><a class="code" href="classGuid.html">Guid</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> * <a class="code" href="classbytes.html">bytes</a>);</div>
 </div><!-- fragment --><p>When possible prefer the <code>std::array</code> constructor because it is safer. If you pass in an incorrectly sized C array then bad things will happen.</p>
-<h2><a class="anchor" id="autotoc_md3946"></a>
+<h2><a class="anchor" id="autotoc_md4170"></a>
 Comparing guids</h2>
 <p><code>==</code> and <code>!=</code> are implemented, so the following works as expected:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> doGuidStuff()</div>
 <div class="line">{</div>
-<div class="line">    <span class="keyword">auto</span> guid1 = <a class="code" href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
-<div class="line">    <span class="keyword">auto</span> guid2 = <a class="code" href="buildtrees_2crossguid_2src_208ee1b7681-f70a1f9530_8clean_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
+<div class="line">    <span class="keyword">auto</span> guid1 = <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
+<div class="line">    <span class="keyword">auto</span> guid2 = <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2crossguid_2guid_8hpp.html#addb30feb9fe80e7c64b61d558621f6e6">xg::newGuid</a>();</div>
 <div class="line"> </div>
 <div class="line">    <span class="keyword">auto</span> guidsAreEqual = guid1 == guid2;</div>
 <div class="line">    <span class="keyword">auto</span> guidsAreNotEqual = guid1 != guid2;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3947"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4171"></a>
 Hashing guids</h2>
 <p>Guids can be used directly in containers requireing <code>std::hash</code> such as <code>std::map,</code>std::unordered_map` etc.</p>
-<h1><a class="anchor" id="autotoc_md3948"></a>
+<h1><a class="anchor" id="autotoc_md4172"></a>
 License</h1>
 <p>The MIT License (MIT)</p>
 <p>Copyright (c) 2014 Graeme Hill (<a href="http://graemehill.ca">http://graemehill.ca</a>)</p>

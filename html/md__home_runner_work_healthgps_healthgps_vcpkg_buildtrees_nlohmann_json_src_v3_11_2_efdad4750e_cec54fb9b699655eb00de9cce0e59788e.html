@@ -90,14 +90,14 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line"><span class="comment">// until C++20</span></div>
-<div class="line"><span class="keywordtype">bool</span> <a class="code" href="namespacehgps.html#a5c85bd56f021b531a95835e8c7287126">operator&lt;</a>(const_reference lhs, const_reference rhs) noexcept;   <span class="comment">// (1)</span></div>
+<div class="line"><span class="keywordtype">bool</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp.html#af8c9bbaed20be0634a2e522f54265d96">operator&lt;</a>(const_reference lhs, const_reference rhs) noexcept;   <span class="comment">// (1)</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ScalarType&gt;</div>
-<div class="line"><span class="keywordtype">bool</span> <a class="code" href="namespacehgps.html#a5c85bd56f021b531a95835e8c7287126">operator&lt;</a>(const_reference lhs, <span class="keyword">const</span> ScalarType rhs) noexcept;  <span class="comment">// (2)</span></div>
+<div class="line"><span class="keywordtype">bool</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp.html#af8c9bbaed20be0634a2e522f54265d96">operator&lt;</a>(const_reference lhs, <span class="keyword">const</span> ScalarType rhs) noexcept;  <span class="comment">// (2)</span></div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ScalarType&gt;</div>
-<div class="line"><span class="keywordtype">bool</span> <a class="code" href="namespacehgps.html#a5c85bd56f021b531a95835e8c7287126">operator&lt;</a>(ScalarType lhs, <span class="keyword">const</span> const_reference rhs) noexcept;  <span class="comment">// (2)</span></div>
-<div class="ttc" id="anamespacehgps_html_a5c85bd56f021b531a95835e8c7287126"><div class="ttname"><a href="namespacehgps.html#a5c85bd56f021b531a95835e8c7287126">hgps::operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const MappingEntry &amp;lhs, const MappingEntry &amp;rhs)</div><div class="ttdef"><b>Definition:</b> mapping.cpp:60</div></div>
+<div class="line"><span class="keywordtype">bool</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp.html#af8c9bbaed20be0634a2e522f54265d96">operator&lt;</a>(ScalarType lhs, <span class="keyword">const</span> const_reference rhs) noexcept;  <span class="comment">// (2)</span></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp_html_af8c9bbaed20be0634a2e522f54265d96"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp.html#af8c9bbaed20be0634a2e522f54265d96">operator&lt;</a></div><div class="ttdeci">bool operator&lt;(const json_pointer&lt; RefStringTypeLhs &gt; &amp;lhs, const json_pointer&lt; RefStringTypeRhs &gt; &amp;rhs) noexcept</div><div class="ttdef"><b>Definition:</b> json_pointer.hpp:981</div></div>
 </div><!-- fragment --><ol type="1">
 <li>Compares whether one JSON value <code>lhs</code> is less than another JSON value <code>rhs</code> according to the following rules:<ul>
 <li>If either operand is discarded, the comparison yields <code>#!cpp false</code>.</li>
@@ -117,23 +117,23 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </li>
 <li>Compares wether a JSON value is less than a scalar or a scalar is less than a JSON value by converting the scalar to a JSON value and comparing both JSON values according to 1.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1269"></a>
+<h1><a class="anchor" id="autotoc_md1493"></a>
 Template parameters</h1>
 <p><code>ScalarType</code> : a scalar type according to <code>std::is_scalar&lt;ScalarType&gt;<a class="el" href="classvalue.html">value</a></code></p>
-<h1><a class="anchor" id="autotoc_md1270"></a>
+<h1><a class="anchor" id="autotoc_md1494"></a>
 Parameters</h1>
 <p><code>lhs</code> (in) : first value to consider</p>
 <p><code>rhs</code> (in) : second value to consider</p>
-<h1><a class="anchor" id="autotoc_md1271"></a>
+<h1><a class="anchor" id="autotoc_md1495"></a>
 Return value</h1>
 <p>whether <code>lhs</code> is less than <code>rhs</code></p>
-<h1><a class="anchor" id="autotoc_md1272"></a>
+<h1><a class="anchor" id="autotoc_md1496"></a>
 Exception safety</h1>
 <p>No-throw guarantee: this function never throws exceptions.</p>
-<h1><a class="anchor" id="autotoc_md1273"></a>
+<h1><a class="anchor" id="autotoc_md1497"></a>
 Complexity</h1>
 <p>Linear.</p>
-<h1><a class="anchor" id="autotoc_md1274"></a>
+<h1><a class="anchor" id="autotoc_md1498"></a>
 Notes</h1>
 <p>!!! note "Comparing `NaN`" </p><pre class="fragment">`NaN` values are unordered within the domain of numbers.
 The following comparisons all yield `#!cpp false`:
@@ -142,7 +142,7 @@ The following comparisons all yield `#!cpp false`:
   3. Comparing a `NaN` and any other number.
 </pre><p> !!! note "Operator overload resolution" </p><pre class="fragment">Since C++20 overload resolution will consider the _rewritten candidate_ generated from
 [`operator&lt;=&gt;`](operator_spaceship.md).
-</pre> <h1><a class="anchor" id="autotoc_md1275"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1499"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example demonstrates comparing several JSON types.
 
@@ -155,12 +155,12 @@ Output:
 ```json
 --8&lt;-- "examples/operator__less.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1276"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1500"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c7a929971a1351e55ff6eaeaec1e8191e.html">**operator&lt;=&gt;**</a> comparison: 3-way</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1277"></a>
+<h1><a class="anchor" id="autotoc_md1501"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 1.0.0. Conditionally removed since C++20 in version 3.11.0.</li>

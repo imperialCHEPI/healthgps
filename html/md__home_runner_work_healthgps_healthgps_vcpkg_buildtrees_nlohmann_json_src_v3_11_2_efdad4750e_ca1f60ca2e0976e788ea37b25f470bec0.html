@@ -90,10 +90,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This document describes how the library is handling numbers.</p>
-<h1><a class="anchor" id="autotoc_md2037"></a>
+<h1><a class="anchor" id="autotoc_md2261"></a>
 Background</h1>
 <p>This section briefly summarizes how the JSON specification describes how numbers should be handled.</p>
-<h2><a class="anchor" id="autotoc_md2038"></a>
+<h2><a class="anchor" id="autotoc_md2262"></a>
 JSON number syntax</h2>
 <p>JSON defines the syntax of numbers as follows:</p>
 <p>!!! quote "[RFC 8259](https://tools.ietf.org/html/rfc8259#section-6), Section 6" </p><pre class="fragment">The representation of numbers is similar to that used in most
@@ -110,7 +110,7 @@ which may be followed by a plus or minus sign.  The E and optional
 sign are followed by one or more digits.
 </pre><p> The following railroad diagram from <a href="https://json.org">json.org</a> visualizes the number syntax:</p>
 <p><img src="../../images/json_syntax_number.png" alt="Syntax for JSON numbers" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md2039"></a>
+<h2><a class="anchor" id="autotoc_md2263"></a>
 Number interoperability</h2>
 <p>On number interoperability, the following remarks are made:</p>
 <p>!!! quote "[RFC 8259](https://tools.ietf.org/html/rfc8259#section-6), Section 6" </p><pre class="fragment">This specification allows implementations to set limits on the range
@@ -129,10 +129,10 @@ Note that when such software is used, numbers that are integers and
 are in the range $[-2^{53}+1, 2^{53}-1]$ are interoperable in the
 sense that implementations will agree exactly on their numeric
 values.
-</pre> <h1><a class="anchor" id="autotoc_md2040"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2264"></a>
 Library implementation</h1>
 <p>This section describes how the above number specification is implemented by this library.</p>
-<h2><a class="anchor" id="autotoc_md2041"></a>
+<h2><a class="anchor" id="autotoc_md2265"></a>
 Number storage</h2>
 <p>In the default <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_clean_docs_mkdocs_docs_api_json.html">`json`</a> type, numbers are stored as <code>#!c std::uint64_t</code>, <code>#!c std::int64_t</code>, and <code>#!c double</code>, respectively. Thereby, <code>#!c std::uint64_t</code> and <code>#!c std::int64_t</code> are used only if they can store the number without loss of precision. If this is impossible (e.g., if the number is too large), the number is stored as <code>#!c double</code>.</p>
 <p>!!! info "Notes" </p><pre class="fragment">- Numbers with a decimal digit or scientific notation are always stored as `#!c double`.
@@ -144,7 +144,7 @@ Number storage</h2>
 </pre><p> !!! example "Examples" </p><pre class="fragment">- Integer `#!c -12345678912345789123456789` is smaller than `#!c INT64_MIN` and will be stored as floating-point
   number `#!c -1.2345678912345788e+25`.
 - Integer `#!c 1E3` will be stored as floating-point number `#!c 1000.0`.
-</pre> <h2><a class="anchor" id="autotoc_md2042"></a>
+</pre> <h2><a class="anchor" id="autotoc_md2266"></a>
 Number limits</h2>
 <ul>
 <li>Any 64-bit signed or unsigned integer can be stored without loss of precision.</li>
@@ -155,7 +155,7 @@ Number limits</h2>
   larger than the described range $[-2^{53}+1, 2^{53}-1]$.
 - All integers outside the range $[-2^{63}, 2^{64}-1]$, as well as floating-point numbers are stored as `double`.
   This also concurs with the specification above.
-</pre> <h2><a class="anchor" id="autotoc_md2043"></a>
+</pre> <h2><a class="anchor" id="autotoc_md2267"></a>
 Zeros</h2>
 <p>The JSON number grammar allows for different ways to express zero, and this library will store zeros differently:</p>
 <table class="markdownTable">
@@ -175,7 +175,7 @@ Zeros</h2>
 <td class="markdownTableBodyNone"><code>-0E0</code>   </td><td class="markdownTableBodyNone"><code>#!c double(-0.0)</code>   </td><td class="markdownTableBodyNone"><code>-0.0</code>   </td></tr>
 </table>
 <p>That is, <code>-0</code> is stored as a signed integer, but the serialization does not reproduce the <code>-</code>.</p>
-<h2><a class="anchor" id="autotoc_md2044"></a>
+<h2><a class="anchor" id="autotoc_md2268"></a>
 Number serialization</h2>
 <ul>
 <li>Integer numbers are serialized as is; that is, no scientific notation is used.</li>
@@ -202,7 +202,7 @@ All examples here can be reproduced by passing the original double value to
 ```cpp
 std::printf("%.*g\n", std::numeric_limits&lt;double&gt;::max_digits10, double_value);
 ```
-</pre> <h3><a class="anchor" id="autotoc_md2045"></a>
+</pre> <h3><a class="anchor" id="autotoc_md2269"></a>
 NaN handling</h3>
 <p>NaN (not-a-number) cannot be expressed with the number syntax described above and are in fact explicitly excluded:</p>
 <p>!!! quote "[RFC 8259](https://tools.ietf.org/html/rfc8259#section-6), Section 6" </p><pre class="fragment">Numeric values that cannot be represented in the grammar below (such
@@ -230,7 +230,7 @@ val=nan
 j=null
 val=nan
 ```
-</pre> <h2><a class="anchor" id="autotoc_md2046"></a>
+</pre> <h2><a class="anchor" id="autotoc_md2270"></a>
 Number comparison</h2>
 <p>Floating-point inside JSON values numbers are compared with <code>#!c json::number_float_t::operator==</code> which is <code>#!c double::operator==</code> by default.</p>
 <p>!!! example "Alternative comparison functions" </p><pre class="fragment">To compare floating-point while respecting an epsilon, an alternative
@@ -269,7 +269,7 @@ bool my_equal(const_reference lhs, const_reference rhs)
 
 (see [#703](https://github.com/nlohmann/json/issues/703) for more information.)
 </pre><p> !!! note </p><pre class="fragment">NaN values never compare equal to themselves or to other NaN values. See [#514](https://github.com/nlohmann/json/issues/514).
-</pre> <h2><a class="anchor" id="autotoc_md2047"></a>
+</pre> <h2><a class="anchor" id="autotoc_md2271"></a>
 Number conversion</h2>
 <p>Just like the C++ language itself, the <code>get</code> family of functions allows conversions between unsigned and signed integers, and between integers and floating-point values to integers. This behavior may be surprising.</p>
 <p>!!! warning "Unconditional number conversions" </p><pre class="fragment">```cpp hl_lines="3"
@@ -282,7 +282,7 @@ Note the last line with throw a [`json.exception.type_error.302`](../../home/exc
 exception if `jd` is not a numerical type, for instance a string.
 </pre><p> The rationale is twofold:</p>
 <ol type="1">
-<li>JSON does not define a number type or precision (see [<a class="el" href="packages_2nlohmann-json__x64-linux_2include_2nlohmann_2json__fwd_8hpp.html#ae6eede511f01c9f33342044d36a388fa" title="default specialization">json</a>-specification](above)).</li>
+<li>JSON does not define a number type or precision (see [<a class="el" href="vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2json__fwd_8hpp.html#ae6eede511f01c9f33342044d36a388fa" title="default specialization">json</a>-specification](above)).</li>
 <li>C++ also allows to silently convert between number types.</li>
 </ol>
 <p>!!! success "Conditional number conversion" </p><pre class="fragment">The code above can be solved by explicitly checking the nature of the value with members such as
@@ -307,7 +307,7 @@ else
 Note this approach also has the advantage that it can react on non-numerical JSON value types such as strings.
 
 (Example taken from [#777](https://github.com/nlohmann/json/issues/777#issuecomment-459968458).)
-</pre> <h2><a class="anchor" id="autotoc_md2048"></a>
+</pre> <h2><a class="anchor" id="autotoc_md2272"></a>
 Determine number types</h2>
 <p>As the example in <a href="#number-conversion">Number conversion</a> shows, there are different functions to determine the type of the stored number:</p>
 <ul>
@@ -334,7 +334,7 @@ Determine number types</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1abbcd32a1d72faa3d326957eb281e6f.html">`type()`</a>   </td><td class="markdownTableBodyNone"><code><a class="el" href="classnumber__unsigned.html">number_unsigned</a></code>   </td><td class="markdownTableBodyNone"><code><a class="el" href="classnumber__integer.html">number_integer</a></code>   </td><td class="markdownTableBodyNone"><code><a class="el" href="classnumber__float.html">number_float</a></code>   </td><td class="markdownTableBodyNone"><code>string</code>   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md2049"></a>
+<h2><a class="anchor" id="autotoc_md2273"></a>
 Template number types</h2>
 <p>The number types can be changed with template parameters.</p>
 <table class="markdownTable">

@@ -110,29 +110,29 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p class="startli"><code>init</code> is converted into an object element and added using <code>operator+=(const typename object_t::value_type&amp;)</code>. Otherwise, <code>init</code> is converted to a JSON value and added using <code>operator+=(basic_json&amp;&amp;)</code>.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1206"></a>
+<h1><a class="anchor" id="autotoc_md1430"></a>
 Parameters</h1>
 <p><code>val</code> (in) : the value to add to the JSON array/object</p>
 <p><code>init</code> (in) : an initializer list</p>
-<h1><a class="anchor" id="autotoc_md1207"></a>
+<h1><a class="anchor" id="autotoc_md1431"></a>
 Return value</h1>
 <p><code>#!cpp *this</code></p>
-<h1><a class="anchor" id="autotoc_md1208"></a>
+<h1><a class="anchor" id="autotoc_md1432"></a>
 Exceptions</h1>
 <p>All functions can throw the following exception:</p><ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error308"><code>type_error.308</code></a> when called on a type other than JSON array or null; example: <code>"cannot use operator+=() with number"</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1209"></a>
+<h1><a class="anchor" id="autotoc_md1433"></a>
 Complexity</h1>
 <ol type="1">
 <li>Amortized constant.</li>
 <li>Logarithmic in the size of the container, O(log(<code><a class="el" href="namespaceconvert__lib__params__windows.html#ab4517e5b23748a1ad8b351e74aebe1bf">size()</a></code>)).</li>
 <li>Linear in the size of the initializer list <code>init</code>.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1210"></a>
+<h1><a class="anchor" id="autotoc_md1434"></a>
 Notes</h1>
 <p>(3) This function is required to resolve an ambiguous overload error, because pairs like <code>{"key", "value"}</code> can be both interpreted as <code>object_t::value_type</code> or <code>std::initializer_list&lt;<a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a>&gt;</code>, see <a href="https://github.com/nlohmann/json/issues/235">#235</a> for more information.</p>
-<h1><a class="anchor" id="autotoc_md1211"></a>
+<h1><a class="anchor" id="autotoc_md1435"></a>
 Examples</h1>
 <p>??? example "Example: (1) add element to array" </p><pre class="fragment">The example shows how `push_back()` and `+=` can be used to add elements to a JSON array. Note how the `null` value
 was silently converted to a JSON array.
@@ -169,7 +169,7 @@ Output:
 ```json
 --8&lt;-- "examples/push_back__initializer_list.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1212"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1436"></a>
 Version history</h1>
 <ol type="1">
 <li>Since version 1.0.0.</li>
@@ -193,25 +193,25 @@ Version history</h1>
 <div class="line">const_reference operator[](KeyType&amp;&amp; key) <span class="keyword">const</span>;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (4)</span></div>
-<div class="line">reference operator[](<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>);</div>
-<div class="line">const_reference operator[](<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>) <span class="keyword">const</span>;</div>
-<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
+<div class="line">reference operator[](<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>);</div>
+<div class="line">const_reference operator[](<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>) <span class="keyword">const</span>;</div>
 <div class="ttc" id="aclassjson__pointer_html"><div class="ttname"><a href="classjson__pointer.html">json_pointer</a></div><div class="ttdoc">JSON Pointer defines a string syntax for identifying a specific value within a JSON document.</div><div class="ttdef"><b>Definition:</b> json_pointer.hpp:36</div></div>
+<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 </div><!-- fragment --><ol type="1">
 <li>Returns a reference to the array element at specified location <code>idx</code>.</li>
 <li>Returns a reference to the object element with specified key <code>key</code>. The non-const qualified overload takes the key by value.</li>
 <li>See 2. This overload is only available if <code>KeyType</code> is comparable with <code>#!cpp typename object_t::key_type</code> and <code>#!cpp typename object_comparator_t::is_transparent</code> denotes a type.</li>
 <li>Returns a reference to the element with specified JSON pointer <code>ptr</code>.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1219"></a>
+<h1><a class="anchor" id="autotoc_md1443"></a>
 Template parameters</h1>
 <p><code>KeyType</code> : A type for an object key other than <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c622d8f8d011b5b9ab972c417054ac609.html">`json_pointer`</a> that is comparable with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8cb44d26fcc9e736c3cd62fdeedc1db9.html">`string_t`</a> using <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cd00f5861c54b75c7eeb2edb6ed4a64c8.html">`object_comparator_t`</a>. This can also be a string view (C++17).</p>
-<h1><a class="anchor" id="autotoc_md1220"></a>
+<h1><a class="anchor" id="autotoc_md1444"></a>
 Parameters</h1>
 <p><code>idx</code> (in) : index of the element to access</p>
 <p><code>key</code> (in) : object key of the element to access</p>
 <p><code>ptr</code> (in) : JSON pointer to the desired element</p>
-<h1><a class="anchor" id="autotoc_md1221"></a>
+<h1><a class="anchor" id="autotoc_md1445"></a>
 Return value</h1>
 <ol type="1">
 <li>(const) reference to the element at index <code>idx</code></li>
@@ -219,10 +219,10 @@ Return value</h1>
 <li>(const) reference to the element at key <code>key</code></li>
 <li>(const) reference to the element pointed to by <code>ptr</code></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1222"></a>
+<h1><a class="anchor" id="autotoc_md1446"></a>
 Exception safety</h1>
 <p>Strong exception safety: if an exception occurs, the original value stays intact.</p>
-<h1><a class="anchor" id="autotoc_md1223"></a>
+<h1><a class="anchor" id="autotoc_md1447"></a>
 Exceptions</h1>
 <ol type="1">
 <li>The function can throw the following exceptions:<ul>
@@ -242,7 +242,7 @@ Exceptions</h1>
 </ul>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1224"></a>
+<h1><a class="anchor" id="autotoc_md1448"></a>
 Complexity</h1>
 <ol type="1">
 <li>Constant if <code>idx</code> is in the range of the array. Otherwise, linear in <code>idx - <a class="el" href="namespaceconvert__lib__params__windows.html#ab4517e5b23748a1ad8b351e74aebe1bf">size()</a></code>.</li>
@@ -250,7 +250,7 @@ Complexity</h1>
 <li>Logarithmic in the size of the container.</li>
 <li>Logarithmic in the size of the container.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1225"></a>
+<h1><a class="anchor" id="autotoc_md1449"></a>
 Notes</h1>
 <p>!!! danger "Undefined behavior and runtime assertions" </p><pre class="fragment">1. If the element with key `idx` does not exist, the behavior is undefined.
 2. If the element with key `key` does not exist, the behavior is undefined and is **guarded by a
@@ -267,7 +267,7 @@ Notes</h1>
 </ul>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1226"></a>
+<h1><a class="anchor" id="autotoc_md1450"></a>
 Examples</h1>
 <p>??? example "Example: (1) access specified array element" </p><pre class="fragment">The example below shows how array elements can be read and written using `[]` operator. Note the addition of
 `#!json null` values.
@@ -358,7 +358,7 @@ Output:
 ```json
 --8&lt;-- "examples/operator_array__json_pointer_const.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1227"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1451"></a>
 See also</h1>
 <ul>
 <li>documentation on <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c09092b6547322aac2912a0b8c080682e.html">unchecked access</a></li>
@@ -366,7 +366,7 @@ See also</h1>
 <li>see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c047013ee24c26cf93d13054bb6a9ad26.html">`at`</a> for access by reference with range checking</li>
 <li>see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> for access with default value</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1228"></a>
+<h1><a class="anchor" id="autotoc_md1452"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 1.0.0.</li>

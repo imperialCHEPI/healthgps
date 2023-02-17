@@ -1,5 +1,7 @@
 var structdragonbox_1_1float__info_3_01T_00_01enable__if__t_3_01std_1_1numeric__limits_3_01T_01_4_1_7e1c1cfa1d6bd4e2d2b46b046e72f187 =
 [
     [ "carrier_uint", "structdragonbox_1_1float__info_3_01T_00_01enable__if__t_3_01std_1_1numeric__limits_3_01T_01_4_1_7e1c1cfa1d6bd4e2d2b46b046e72f187.html#aa25701cc79178cd6767a0c9444498dba", null ],
+    [ "carrier_uint", "structdragonbox_1_1float__info_3_01T_00_01enable__if__t_3_01std_1_1numeric__limits_3_01T_01_4_1_7e1c1cfa1d6bd4e2d2b46b046e72f187.html#aa25701cc79178cd6767a0c9444498dba", null ],
+    [ "carrier_uint", "structdragonbox_1_1float__info_3_01T_00_01enable__if__t_3_01std_1_1numeric__limits_3_01T_01_4_1_7e1c1cfa1d6bd4e2d2b46b046e72f187.html#aa25701cc79178cd6767a0c9444498dba", null ],
     [ "carrier_uint", "structdragonbox_1_1float__info_3_01T_00_01enable__if__t_3_01std_1_1numeric__limits_3_01T_01_4_1_7e1c1cfa1d6bd4e2d2b46b046e72f187.html#aa25701cc79178cd6767a0c9444498dba", null ]
 ];

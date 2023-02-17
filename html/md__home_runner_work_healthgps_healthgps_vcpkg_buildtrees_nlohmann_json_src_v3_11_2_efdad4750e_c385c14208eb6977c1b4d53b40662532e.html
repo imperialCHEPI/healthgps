@@ -94,30 +94,30 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="ttc" id="agmock-matchers-comparisons__test_8cc_html_acb559820d9ca11295b4500f179ef6392"><div class="ttname"><a href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a></div><div class="ttdeci">int i</div><div class="ttdef"><b>Definition:</b> gmock-matchers-comparisons_test.cc:600</div></div>
 <div class="ttc" id="aparse____allow__exceptions_8cpp_html_ac657f5945687365edd0e109857d4fec0"><div class="ttname"><a href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a></div><div class="ttdeci">json j</div><div class="ttdef"><b>Definition:</b> parse__allow_exceptions.cpp:26</div></div>
 </div><!-- fragment --><p>Deserializes an input stream to a JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1844"></a>
+<h1><a class="anchor" id="autotoc_md2068"></a>
 Parameters</h1>
 <p><code>i</code> (in, out) : input stream to read a serialized JSON value from</p>
 <p><code>j</code> (in, out) : JSON value to write the deserialized input to</p>
-<h1><a class="anchor" id="autotoc_md1845"></a>
+<h1><a class="anchor" id="autotoc_md2069"></a>
 Return value</h1>
 <p>the stream <code>i</code></p>
-<h1><a class="anchor" id="autotoc_md1846"></a>
+<h1><a class="anchor" id="autotoc_md2070"></a>
 Exceptions</h1>
 <ul>
 <li>Throws <a href="../home/exceptions.md#jsonexceptionparse_error101"><code>parse_error.101</code></a> in case of an unexpected token.</li>
 <li>Throws <a href="../home/exceptions.md#jsonexceptionparse_error102"><code>parse_error.102</code></a> if to_unicode fails or surrogate error.</li>
 <li>Throws <a href="../home/exceptions.md#jsonexceptionparse_error103"><code>parse_error.103</code></a> if to_unicode fails.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1847"></a>
+<h1><a class="anchor" id="autotoc_md2071"></a>
 Complexity</h1>
 <p>Linear in the length of the input. The parser is a predictive LL(1) parser.</p>
-<h1><a class="anchor" id="autotoc_md1848"></a>
+<h1><a class="anchor" id="autotoc_md2072"></a>
 Notes</h1>
 <p>A UTF-8 byte order mark is silently ignored.</p>
 <p>!!! warning "Deprecation" </p><pre class="fragment">This function replaces function `#!cpp std::istream&amp; operator&lt;&lt;(basic_json&amp; j, std::istream&amp; i)` which has
 been deprecated in version 3.0.0. It will be removed in version 4.0.0. Please replace calls like `#!cpp j &lt;&lt; i;`
 with `#!cpp i &gt;&gt; j;`.
-</pre> <h1><a class="anchor" id="autotoc_md1849"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2073"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below shows how a JSON value is constructed by reading a serialization from a stream.
 
@@ -130,13 +130,13 @@ Output:
 ```json
 --8&lt;-- "examples/operator_deserialize.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1850"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2074"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c3ea58ede365db38b4f7f39788bd17e36.html">accept</a> - check if the input is valid JSON</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ccaaadffd6a44dbcd7dee1101b62407e0.html">parse</a> - deserialize from a compatible input</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1851"></a>
+<h1><a class="anchor" id="autotoc_md2075"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. Deprecated in version 3.0.0. </li>

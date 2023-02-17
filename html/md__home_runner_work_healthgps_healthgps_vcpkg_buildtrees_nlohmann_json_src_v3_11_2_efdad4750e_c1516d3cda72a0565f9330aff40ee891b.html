@@ -93,7 +93,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="fragment"><div class="line">--8&lt;-- <span class="stringliteral">&quot;integration/example.cpp&quot;</span></div>
 </div><!-- fragment --><p>When executed, this program should create output similar to</p>
 <div class="fragment"><div class="line">--8&lt;-- &quot;../../examples/meta.output&quot;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2304"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2528"></a>
 Homebrew</h1>
 <p>If you are using OS X and <a href="http://brew.sh">Homebrew</a>, just type</p>
 <div class="fragment"><div class="line">brew install nlohmann-json</div>
@@ -124,11 +124,11 @@ Homebrew</h1>
     clang++ example.cpp -I/usr/local/Cellar/nlohmann-json/3.7.3/include -std=c++11 -o example
     ```
 </pre><p> :material-update: The <a href="https://formulae.brew.sh/formula/nlohmann-json">formula</a> is updated automatically.</p>
-<h1><a class="anchor" id="autotoc_md2305"></a>
+<h1><a class="anchor" id="autotoc_md2529"></a>
 Meson</h1>
 <p>If you are using the <a href="http://mesonbuild.com">Meson Build System</a>, add this source tree as a <a href="https://mesonbuild.com/Subprojects.html#using-a-subproject">meson subproject</a>. You may also use the <code>include.zip</code> published in this project's <a href="https://github.com/nlohmann/json/releases">Releases</a> to reduce the size of the vendored source tree. Alternatively, you can get a wrap file by downloading it from <a href="https://wrapdb.mesonbuild.com/nlohmann_json">Meson WrapDB</a>, or simply use <code>meson wrap install nlohmann_json</code>. Please see the meson project for any issues regarding the packaging.</p>
 <p>The provided <code>meson.build</code> can also be used as an alternative to cmake for installing <code>nlohmann_json</code> system-wide in which case a pkg-config file is installed. To use it, simply have your build system require the <code>nlohmann_json</code> pkg-config dependency. In Meson, it is preferred to use the <a href="https://mesonbuild.com/Reference-manual.html#dependency"><code>dependency()</code></a> object with a subproject fallback, rather than using the subproject directly.</p>
-<h1><a class="anchor" id="autotoc_md2306"></a>
+<h1><a class="anchor" id="autotoc_md2530"></a>
 Conan</h1>
 <p>If you are using <a href="https://www.conan.io/">Conan</a> to manage your dependencies, merely add <code>nlohmann_json/x.y.z</code> to your <code>conanfile</code>'s requires, where <code>x.y.z</code> is the release version you want to use. Please file issues <a href="https://github.com/conan-io/conan-center-index/issues">here</a> if you experience problems with the packages.</p>
 <p>??? example </p><pre class="fragment">1. Create the following files:
@@ -155,16 +155,16 @@ Conan</h1>
     cmake --build .
     ```
 </pre><p> :material-update: The <a href="https://conan.io/center/nlohmann_json">package</a> is updated automatically.</p>
-<h1><a class="anchor" id="autotoc_md2307"></a>
+<h1><a class="anchor" id="autotoc_md2531"></a>
 Spack</h1>
 <p>If you are using <a href="https://www.spack.io/">Spack</a> to manage your dependencies, you can use the <a href="https://spack.readthedocs.io/en/latest/package_list.html#nlohmann-json"><code>nlohmann-json</code> package</a>. Please see the <a href="https://github.com/spack/spack">spack project</a> for any issues regarding the packaging.</p>
-<h1><a class="anchor" id="autotoc_md2308"></a>
+<h1><a class="anchor" id="autotoc_md2532"></a>
 Hunter</h1>
 <p>If you are using <a href="https://github.com/cpp-pm/hunter">hunter</a> on your project for external dependencies, then you can use the <a href="https://hunter.readthedocs.io/en/latest/packages/pkg/nlohmann_json.html">nlohmann_json package</a>. Please see the hunter project for any issues regarding the packaging.</p>
-<h1><a class="anchor" id="autotoc_md2309"></a>
+<h1><a class="anchor" id="autotoc_md2533"></a>
 Buckaroo</h1>
 <p>If you are using <a href="https://buckaroo.pm">Buckaroo</a>, you can install this library's module with <code>buckaroo add github.com/buckaroo-pm/nlohmann-json</code>. Please file issues <a href="https://github.com/buckaroo-pm/nlohmann-json">here</a>. There is a demo repo <a href="https://github.com/njlr/buckaroo-nholmann-json-example">here</a>.</p>
-<h1><a class="anchor" id="autotoc_md2310"></a>
+<h1><a class="anchor" id="autotoc_md2534"></a>
 vcpkg</h1>
 <p>If you are using <a href="https://github.com/Microsoft/vcpkg/">vcpkg</a> on your project for external dependencies, then you can install the <a href="https://github.com/Microsoft/vcpkg/tree/master/ports/nlohmann-json">nlohmann-json package</a> with <code>vcpkg install nlohmann-json</code> and follow the then displayed descriptions. Please see the vcpkg project for any issues regarding the packaging.</p>
 <p>??? example </p><pre class="fragment">1. Create the following files:
@@ -193,36 +193,36 @@ vcpkg</h1>
     ```
 
 Note you need to adjust `/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake` to your system.
-</pre> <h1><a class="anchor" id="autotoc_md2311"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2535"></a>
 cget</h1>
 <p>If you are using <a href="http://cget.readthedocs.io/en/latest/">cget</a>, you can install the latest development version with <code>cget install nlohmann/json</code>. A specific version can be installed with <code>cget install nlohmann/json@v3.1.0</code>. Also, the multiple header version can be installed by adding the <code>-DJSON_MultipleHeaders=ON</code> flag (i.e., <code>cget install nlohmann/json -DJSON_MultipleHeaders=ON</code>).</p>
 <p>:material-update: cget reads directly from the <a href="https://github.com/nlohmann/json">GitHub repository</a> and is always up-to-date.</p>
-<h1><a class="anchor" id="autotoc_md2312"></a>
+<h1><a class="anchor" id="autotoc_md2536"></a>
 CocoaPods</h1>
 <p>If you are using <a href="https://cocoapods.org">CocoaPods</a>, you can use the library by adding pod &lsquo;"nlohmann_json", &rsquo;~&gt;3.1.2'` to your podfile (see <a href="https://bitbucket.org/benman/nlohmann_json-cocoapod/src/master/">an example</a>). Please file issues <a href="https://bitbucket.org/benman/nlohmann_json-cocoapod/issues?status=new&amp;status=open">here</a>.</p>
-<h1><a class="anchor" id="autotoc_md2313"></a>
+<h1><a class="anchor" id="autotoc_md2537"></a>
 NuGet</h1>
 <p>If you are using <a href="https://www.nuget.org">NuGet</a>, you can use the package <a href="https://www.nuget.org/packages/nlohmann.json/">nlohmann.json</a>. Please check <a href="https://github.com/nlohmann/json/issues/1132#issuecomment-452250255">this extensive description</a> on how to use the package. Please file issues <a href="https://github.com/hnkb/nlohmann-json-nuget/issues">here</a>.</p>
-<h1><a class="anchor" id="autotoc_md2314"></a>
+<h1><a class="anchor" id="autotoc_md2538"></a>
 Conda</h1>
 <p>If you are using <a href="https://conda.io/">conda</a>, you can use the package <a href="https://github.com/conda-forge/nlohmann_json-feedstock">nlohmann_json</a> from <a href="https://conda-forge.org">conda-forge</a> executing <code>conda install -c conda-forge nlohmann_json</code>. Please file issues <a href="https://github.com/conda-forge/nlohmann_json-feedstock/issues">here</a>.</p>
-<h1><a class="anchor" id="autotoc_md2315"></a>
+<h1><a class="anchor" id="autotoc_md2539"></a>
 MSYS2</h1>
 <p>If you are using <a href="http://www.msys2.org/">MSYS2</a>, you can use the <a href="https://packages.msys2.org/base/mingw-w64-nlohmann-json">mingw-w64-nlohmann-json</a> package, just type <code>pacman -S mingw-w64-i686-nlohmann-json</code> or <code>pacman -S mingw-w64-x86_64-nlohmann-json</code> for installation. Please file issues <a href="https://github.com/msys2/MINGW-packages/issues/new?title=%5Bnlohmann-json%5D">here</a> if you experience problems with the packages.</p>
 <p>:material-update: The <a href="https://packages.msys2.org/base/mingw-w64-nlohmann-json">package</a> is updated automatically.</p>
-<h1><a class="anchor" id="autotoc_md2316"></a>
+<h1><a class="anchor" id="autotoc_md2540"></a>
 MacPorts</h1>
 <p>If you are using <a href="https://ports.macports.org">MacPorts</a>, execute <code>sudo port install nlohmann-json</code> to install the <a href="https://ports.macports.org/port/nlohmann-json/">nlohmann-json</a> package.</p>
 <p>:material-update: The <a href="https://ports.macports.org/port/nlohmann-json/">package</a> is updated automatically.</p>
-<h1><a class="anchor" id="autotoc_md2317"></a>
+<h1><a class="anchor" id="autotoc_md2541"></a>
 build2</h1>
 <p>If you are using <a href="https://build2.org"><code>build2</code></a>, you can use the <a href="https://cppget.org/nlohmann-json"><code>nlohmann-json</code></a> package from the public repository <a href="http://cppget.org">http://cppget.org</a> or directly from the <a href="https://github.com/build2-packaging/nlohmann-json">package's sources repository</a>. In your project's <code>manifest</code> file, just add <code>depends: nlohmann-json</code> (probably with some <a href="https://build2.org/build2-toolchain/doc/build2-toolchain-intro.xhtml#guide-add-remove-deps">version constraints</a>). If you are not familiar with using dependencies in <code>build2</code>, <a href="https://build2.org/build2-toolchain/doc/build2-toolchain-intro.xhtml">please read this introduction</a>. Please file issues <a href="https://github.com/build2-packaging/nlohmann-json">here</a> if you experience problems with the packages.</p>
 <p>:material-update: The <a href="https://cppget.org/nlohmann-json">package</a> is updated automatically.</p>
-<h1><a class="anchor" id="autotoc_md2318"></a>
+<h1><a class="anchor" id="autotoc_md2542"></a>
 wsjcpp</h1>
 <p>If you are using <a href="http://wsjcpp.org"><code>wsjcpp</code></a>, you can use the command <code>wsjcpp install "https://github.com/nlohmann/json:develop"</code> to get the latest version. Note you can change the branch ":develop" to an existing tag or another branch.</p>
 <p>:material-update: wsjcpp reads directly from the <a href="https://github.com/nlohmann/json">GitHub repository</a> and is always up-to-date.</p>
-<h1><a class="anchor" id="autotoc_md2319"></a>
+<h1><a class="anchor" id="autotoc_md2543"></a>
 CPM.cmake</h1>
 <p>If you are using <a href="https://github.com/TheLartians/CPM.cmake"><code>CPM.cmake</code></a>, you can check this <a href="https://github.com/TheLartians/CPM.cmake/tree/master/examples/json"><code>example</code></a>. After <a href="https://github.com/TheLartians/CPM.cmake#adding-cpm">adding CPM script</a> to your project, implement the following snippet to your CMake:</p>
 <div class="fragment"><div class="line">CPMAddPackage(</div>

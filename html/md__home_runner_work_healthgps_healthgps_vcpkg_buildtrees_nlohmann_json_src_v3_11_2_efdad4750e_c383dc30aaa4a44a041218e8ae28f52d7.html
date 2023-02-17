@@ -94,23 +94,23 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
 </div><!-- fragment --><p>Creates a <a href="http://jsonpatch.com">JSON Patch</a> so that value <code>source</code> can be changed into the value <code>target</code> by calling <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0142c55d24e14b0b6e409d2fa3cb6739.html">`patch`</a> function.</p>
 <p>For two JSON values <code>source</code> and <code>target</code>, the following code yields always <code>#!cpp true</code>: </p><div class="fragment"><div class="line">source.patch(diff(source, target)) == target;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md801"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1025"></a>
 Parameters</h1>
 <p><code>source</code> (in) : JSON value to compare from</p>
 <p><code>target</code> (in) : JSON value to compare against</p>
-<h1><a class="anchor" id="autotoc_md802"></a>
+<h1><a class="anchor" id="autotoc_md1026"></a>
 Return value</h1>
 <p>a JSON patch to convert the <code>source</code> to <code>target</code></p>
-<h1><a class="anchor" id="autotoc_md803"></a>
+<h1><a class="anchor" id="autotoc_md1027"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md804"></a>
+<h1><a class="anchor" id="autotoc_md1028"></a>
 Complexity</h1>
 <p>Linear in the lengths of <code>source</code> and <code>target</code>.</p>
-<h1><a class="anchor" id="autotoc_md805"></a>
+<h1><a class="anchor" id="autotoc_md1029"></a>
 Notes</h1>
 <p>Currently, only <code>remove</code>, <code>add</code>, and <code>replace</code> operations are generated.</p>
-<h1><a class="anchor" id="autotoc_md806"></a>
+<h1><a class="anchor" id="autotoc_md1030"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows how a JSON patch is created as a diff for two JSON values.
 
@@ -123,12 +123,12 @@ Output:
 ```json
 --8&lt;-- "examples/diff.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md807"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1031"></a>
 See also</h1>
 <ul>
 <li><a href="https://tools.ietf.org/html/rfc6902">RFC 6902 (JSON Patch)</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md808"></a>
+<h1><a class="anchor" id="autotoc_md1032"></a>
 Version history</h1>
 <ul>
 <li>Added in version 2.0.0. </li>

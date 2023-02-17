@@ -89,16 +89,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Benchmark Tools </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md3893"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md4117"></a>
 compare.py</h1>
 <p>The <code><a class="el" href="compare_8py.html">compare.py</a></code> can be used to compare the result of benchmarks.</p>
-<h2><a class="anchor" id="autotoc_md3894"></a>
+<h2><a class="anchor" id="autotoc_md4118"></a>
 Dependencies</h2>
 <p>The utility relies on the <a href="https://www.scipy.org">scipy</a> package which can be installed using pip: </p><div class="fragment"><div class="line">pip3 install -r requirements.txt</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3895"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4119"></a>
 Displaying aggregates only</h2>
 <p>The switch <code>-a</code> / <code>--display_aggregates_only</code> can be used to control the displayment of the normal iterations vs the aggregates. When passed, it will be passthrough to the benchmark binaries to be run, and will be accounted for in the tool itself; only the aggregates will be displayed, but not normal runs. It only affects the display, the separate runs will still be used to calculate the U test.</p>
-<h2><a class="anchor" id="autotoc_md3896"></a>
+<h2><a class="anchor" id="autotoc_md4120"></a>
 Modes of operation</h2>
 <p>There are three modes of operation:</p>
 <ol type="1">
@@ -232,7 +232,7 @@ Modes of operation</h2>
 <div class="line">[BM_memcpy vs. BM_copy]/1024       +221.5903       +221.4790           120         26679           120         26666</div>
 <div class="line">[BM_memcpy vs. BM_copy]/8192       +322.9059       +323.0096           664        215068           664        215053</div>
 </div><!-- fragment --><p> This is a mix of the previous two modes, two (potentially different) benchmark binaries are run, and a different filter is applied to each one. As you can note, the values in <code>Time</code> and <code>CPU</code> columns are calculated as <code>(new - old) / |old|</code>.</p>
-<h2><a class="anchor" id="autotoc_md3897"></a>
+<h2><a class="anchor" id="autotoc_md4121"></a>
 U test</h2>
 <p>If there is a sufficient repetition count of the benchmarks, the tool can do a <a href="https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test">U Test</a>, of the null hypothesis that it is equally likely that a randomly selected value from one sample will be less than or greater than a randomly selected value from a second sample.</p>
 <p>If the calculated p-value is below this value is lower than the significance level alpha, then the result is said to be statistically significant and the null hypothesis is rejected. Which in other words means that the two benchmarks aren't identical.</p>

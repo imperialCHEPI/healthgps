@@ -109,29 +109,29 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </li>
 <li>3-way compares a JSON value and a scalar or a scalar and a JSON value by converting the scalar to a JSON value and 3-way comparing both JSON values (see 1).</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1288"></a>
+<h1><a class="anchor" id="autotoc_md1512"></a>
 Template parameters</h1>
 <p><code>ScalarType</code> : a scalar type according to <code>std::is_scalar&lt;ScalarType&gt;<a class="el" href="classvalue.html">value</a></code></p>
-<h1><a class="anchor" id="autotoc_md1289"></a>
+<h1><a class="anchor" id="autotoc_md1513"></a>
 Parameters</h1>
 <p><code>rhs</code> (in) : second value to consider</p>
-<h1><a class="anchor" id="autotoc_md1290"></a>
+<h1><a class="anchor" id="autotoc_md1514"></a>
 Return value</h1>
 <p>the <code>std::partial_ordering</code> of the 3-way comparison of <code>*this</code> and <code>rhs</code></p>
-<h1><a class="anchor" id="autotoc_md1291"></a>
+<h1><a class="anchor" id="autotoc_md1515"></a>
 Exception safety</h1>
 <p>No-throw guarantee: this function never throws exceptions.</p>
-<h1><a class="anchor" id="autotoc_md1292"></a>
+<h1><a class="anchor" id="autotoc_md1516"></a>
 Complexity</h1>
 <p>Linear.</p>
-<h1><a class="anchor" id="autotoc_md1293"></a>
+<h1><a class="anchor" id="autotoc_md1517"></a>
 Notes</h1>
 <p>!!! note "Comparing `NaN`" </p><pre class="fragment">- `NaN` values are unordered within the domain of numbers.
   The following comparisons all yield `std::partial_ordering::unordered`:
     1. Comparing a `NaN` with itself.
     2. Comparing a `NaN` with another `NaN`.
     3. Comparing a `NaN` and any other number.
-</pre> <h1><a class="anchor" id="autotoc_md1294"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1518"></a>
 Examples</h1>
 <p>??? example "Example: (1) comparing JSON values" </p><pre class="fragment">The example demonstrates comparing several JSON values.
 
@@ -155,7 +155,7 @@ Output:
 ```json
 --8&lt;-- "examples/operator_spaceship__scalartype.c++20.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1295"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1519"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0c34c8c027b0dbdaea679caed023f7cc.html">**operator==**</a> - comparison: equal</li>
@@ -165,7 +165,7 @@ See also</h1>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf39fbcac4eeee3acb0d0154c60177ac2.html">**operator&gt;**</a> - comparison: greater than</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f2d6ad836fc3f1626ebc76fcf40ec11.html">**operator&gt;=**</a> - comparison: greater than or equal</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1296"></a>
+<h1><a class="anchor" id="autotoc_md1520"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 3.11.0.</li>

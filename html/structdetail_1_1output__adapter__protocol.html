@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('structdetail_1_1output__adapter__proto
 <p>abstract output adapter interface  
  <a href="structdetail_1_1output__adapter__protocol.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2output_2output__adapters_8hpp_source.html">output_adapters.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2output_2output__adapters_8hpp_source.html">output_adapters.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for detail::output_adapter_protocol&lt; CharType &gt;:</div>
 <div class="dyncontent">
@@ -106,17 +106,55 @@ Inheritance diagram for detail::output_adapter_protocol&lt; CharType &gt;:</div>
 <area href="classdetail_1_1output__stream__adapter.html" title="output adapter for output streams" alt="detail::output_stream_adapter&lt; CharType &gt;" shape="rect" coords="353,56,696,80"/>
 <area href="classdetail_1_1output__stream__adapter.html" title="output adapter for output streams" alt="detail::output_stream_adapter&lt; CharType &gt;" shape="rect" coords="353,112,696,136"/>
 <area href="classdetail_1_1output__stream__adapter.html" title="output adapter for output streams" alt="detail::output_stream_adapter&lt; CharType &gt;" shape="rect" coords="353,168,696,192"/>
-<area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,224,696,248"/>
-<area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,280,696,304"/>
+<area href="classdetail_1_1output__stream__adapter.html" title="output adapter for output streams" alt="detail::output_stream_adapter&lt; CharType &gt;" shape="rect" coords="353,224,696,248"/>
+<area href="classdetail_1_1output__stream__adapter.html" title="output adapter for output streams" alt="detail::output_stream_adapter&lt; CharType &gt;" shape="rect" coords="353,280,696,304"/>
 <area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,336,696,360"/>
-<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,392,696,416"/>
-<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,448,696,472"/>
-<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,504,696,528"/>
+<area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,392,696,416"/>
+<area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,448,696,472"/>
+<area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,504,696,528"/>
+<area href="classdetail_1_1output__string__adapter.html" title="output adapter for basic_string" alt="detail::output_string_adapter&lt; CharType, StringType &gt;" shape="rect" coords="353,560,696,584"/>
+<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,616,696,640"/>
+<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,672,696,696"/>
+<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,728,696,752"/>
+<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,784,696,808"/>
+<area href="classdetail_1_1output__vector__adapter.html" title="output adapter for byte vectors" alt="detail::output_vector_adapter&lt; CharType, AllocatorType &gt;" shape="rect" coords="353,840,696,864"/>
   </map>
 </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a57fbeab6c9e6dac2def4f0a7708b807a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a57fbeab6c9e6dac2def4f0a7708b807a">write_character</a> (CharType <a class="el" href="unit-udt_8cpp.html#ad05251febe96c2da9d4527834d3b92c5">c</a>)=0</td></tr>
+<tr class="separator:a57fbeab6c9e6dac2def4f0a7708b807a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afefb88bb4c134a02e136aaf69d0ecee9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#afefb88bb4c134a02e136aaf69d0ecee9">write_characters</a> (const CharType *s, std::size_t length)=0</td></tr>
+<tr class="separator:afefb88bb4c134a02e136aaf69d0ecee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c588cc9ce24c3a46460f33580dc5f11"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a4c588cc9ce24c3a46460f33580dc5f11">~output_adapter_protocol</a> ()=default</td></tr>
+<tr class="separator:a4c588cc9ce24c3a46460f33580dc5f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc3c05de1a9637889969f59da9ba0a03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#abc3c05de1a9637889969f59da9ba0a03">output_adapter_protocol</a> ()=default</td></tr>
+<tr class="separator:abc3c05de1a9637889969f59da9ba0a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03466aec8b97f99d19e27f0f05c66655"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a03466aec8b97f99d19e27f0f05c66655">output_adapter_protocol</a> (const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;)=default</td></tr>
+<tr class="separator:a03466aec8b97f99d19e27f0f05c66655"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a641001ae666e338cb9753901a8a3ef91"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a641001ae666e338cb9753901a8a3ef91">output_adapter_protocol</a> (<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:a641001ae666e338cb9753901a8a3ef91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2684c414aaa72a693d0810766e70083"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#ae2684c414aaa72a693d0810766e70083">operator=</a> (const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;)=default</td></tr>
+<tr class="separator:ae2684c414aaa72a693d0810766e70083"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0674a6aa1a081351c90b0646a20dc4be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a0674a6aa1a081351c90b0646a20dc4be">operator=</a> (<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:a0674a6aa1a081351c90b0646a20dc4be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57fbeab6c9e6dac2def4f0a7708b807a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a57fbeab6c9e6dac2def4f0a7708b807a">write_character</a> (CharType <a class="el" href="unit-udt_8cpp.html#ad05251febe96c2da9d4527834d3b92c5">c</a>)=0</td></tr>
+<tr class="separator:a57fbeab6c9e6dac2def4f0a7708b807a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afefb88bb4c134a02e136aaf69d0ecee9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#afefb88bb4c134a02e136aaf69d0ecee9">write_characters</a> (const CharType *s, std::size_t length)=0</td></tr>
+<tr class="separator:afefb88bb4c134a02e136aaf69d0ecee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c588cc9ce24c3a46460f33580dc5f11"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a4c588cc9ce24c3a46460f33580dc5f11">~output_adapter_protocol</a> ()=default</td></tr>
+<tr class="separator:a4c588cc9ce24c3a46460f33580dc5f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc3c05de1a9637889969f59da9ba0a03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#abc3c05de1a9637889969f59da9ba0a03">output_adapter_protocol</a> ()=default</td></tr>
+<tr class="separator:abc3c05de1a9637889969f59da9ba0a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03466aec8b97f99d19e27f0f05c66655"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a03466aec8b97f99d19e27f0f05c66655">output_adapter_protocol</a> (const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;)=default</td></tr>
+<tr class="separator:a03466aec8b97f99d19e27f0f05c66655"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a641001ae666e338cb9753901a8a3ef91"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a641001ae666e338cb9753901a8a3ef91">output_adapter_protocol</a> (<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:a641001ae666e338cb9753901a8a3ef91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2684c414aaa72a693d0810766e70083"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#ae2684c414aaa72a693d0810766e70083">operator=</a> (const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;)=default</td></tr>
+<tr class="separator:ae2684c414aaa72a693d0810766e70083"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0674a6aa1a081351c90b0646a20dc4be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a0674a6aa1a081351c90b0646a20dc4be">operator=</a> (<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> &amp;&amp;) noexcept=default</td></tr>
+<tr class="separator:a0674a6aa1a081351c90b0646a20dc4be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57fbeab6c9e6dac2def4f0a7708b807a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#a57fbeab6c9e6dac2def4f0a7708b807a">write_character</a> (CharType <a class="el" href="unit-udt_8cpp.html#ad05251febe96c2da9d4527834d3b92c5">c</a>)=0</td></tr>
 <tr class="separator:a57fbeab6c9e6dac2def4f0a7708b807a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afefb88bb4c134a02e136aaf69d0ecee9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdetail_1_1output__adapter__protocol.html#afefb88bb4c134a02e136aaf69d0ecee9">write_characters</a> (const CharType *s, std::size_t length)=0</td></tr>
@@ -173,7 +211,7 @@ struct detail::output_adapter_protocol&lt; CharType &gt;</h3>
 <p>abstract output adapter interface </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4c588cc9ce24c3a46460f33580dc5f11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -200,7 +238,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="abc3c05de1a9637889969f59da9ba0a03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[1/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[1/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -227,7 +265,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a03466aec8b97f99d19e27f0f05c66655"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[2/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[2/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -255,7 +293,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a641001ae666e338cb9753901a8a3ef91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[3/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[3/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -283,7 +321,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a4c588cc9ce24c3a46460f33580dc5f11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -310,7 +348,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="abc3c05de1a9637889969f59da9ba0a03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[4/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[4/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -337,7 +375,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a03466aec8b97f99d19e27f0f05c66655"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[5/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[5/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +403,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a641001ae666e338cb9753901a8a3ef91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[6/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[6/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -393,7 +431,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a4c588cc9ce24c3a46460f33580dc5f11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -420,7 +458,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="abc3c05de1a9637889969f59da9ba0a03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[7/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[7/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -447,7 +485,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a03466aec8b97f99d19e27f0f05c66655"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[8/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[8/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -475,7 +513,227 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a641001ae666e338cb9753901a8a3ef91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[9/9]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[9/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c588cc9ce24c3a46460f33580dc5f11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::~<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abc3c05de1a9637889969f59da9ba0a03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[10/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a03466aec8b97f99d19e27f0f05c66655"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[11/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a641001ae666e338cb9753901a8a3ef91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[12/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c588cc9ce24c3a46460f33580dc5f11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c588cc9ce24c3a46460f33580dc5f11">&#9670;&nbsp;</a></span>~output_adapter_protocol() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::~<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abc3c05de1a9637889969f59da9ba0a03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3c05de1a9637889969f59da9ba0a03">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[13/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a03466aec8b97f99d19e27f0f05c66655"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03466aec8b97f99d19e27f0f05c66655">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[14/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::<a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a641001ae666e338cb9753901a8a3ef91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a641001ae666e338cb9753901a8a3ef91">&#9670;&nbsp;</a></span>output_adapter_protocol() <span class="overload">[15/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -504,7 +762,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="ae2684c414aaa72a693d0810766e70083"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[1/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -532,7 +790,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="ae2684c414aaa72a693d0810766e70083"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[2/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -560,7 +818,63 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="ae2684c414aaa72a693d0810766e70083"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[3/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[3/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&amp; <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae2684c414aaa72a693d0810766e70083"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[4/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&amp; <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae2684c414aaa72a693d0810766e70083"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2684c414aaa72a693d0810766e70083">&#9670;&nbsp;</a></span>operator=() <span class="overload">[5/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -588,7 +902,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a0674a6aa1a081351c90b0646a20dc4be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[4/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[6/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -616,7 +930,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a0674a6aa1a081351c90b0646a20dc4be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[5/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[7/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -644,7 +958,63 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a0674a6aa1a081351c90b0646a20dc4be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[6/6]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[8/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&amp; <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0674a6aa1a081351c90b0646a20dc4be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[9/10]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&amp; <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdetail_1_1output__adapter__protocol.html">output_adapter_protocol</a>&lt; CharType &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">default</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0674a6aa1a081351c90b0646a20dc4be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0674a6aa1a081351c90b0646a20dc4be">&#9670;&nbsp;</a></span>operator=() <span class="overload">[10/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -672,7 +1042,7 @@ template&lt;typename CharType &gt; </div>
 </div>
 </div>
 <a id="a57fbeab6c9e6dac2def4f0a7708b807a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -697,12 +1067,12 @@ template&lt;typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
 
 </div>
 </div>
 <a id="a57fbeab6c9e6dac2def4f0a7708b807a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -727,12 +1097,12 @@ template&lt;typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
 
 </div>
 </div>
 <a id="a57fbeab6c9e6dac2def4f0a7708b807a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -757,12 +1127,72 @@ template&lt;typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a57fbeab6c9e6dac2def4f0a7708b807a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::write_character </td>
+          <td>(</td>
+          <td class="paramtype">CharType&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a57fbeab6c9e6dac2def4f0a7708b807a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57fbeab6c9e6dac2def4f0a7708b807a">&#9670;&nbsp;</a></span>write_character() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::write_character </td>
+          <td>(</td>
+          <td class="paramtype">CharType&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#a15ef2742beddbc80d2468755ecf0a21e">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a4267cde53202637ff7d7b877fb9ac859">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#ab2f37bf696c716ddb6c0b88b30304da5">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
 
 </div>
 </div>
 <a id="afefb88bb4c134a02e136aaf69d0ecee9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -797,12 +1227,12 @@ template&lt;typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
 
 </div>
 </div>
 <a id="afefb88bb4c134a02e136aaf69d0ecee9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -837,12 +1267,12 @@ template&lt;typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
 
 </div>
 </div>
 <a id="afefb88bb4c134a02e136aaf69d0ecee9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -877,13 +1307,93 @@ template&lt;typename CharType &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="afefb88bb4c134a02e136aaf69d0ecee9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::write_characters </td>
+          <td>(</td>
+          <td class="paramtype">const CharType *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
+
+</div>
+</div>
+<a id="afefb88bb4c134a02e136aaf69d0ecee9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afefb88bb4c134a02e136aaf69d0ecee9">&#9670;&nbsp;</a></span>write_characters() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="structdetail_1_1output__adapter__protocol.html">detail::output_adapter_protocol</a>&lt; CharType &gt;::write_characters </td>
+          <td>(</td>
+          <td class="paramtype">const CharType *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implemented in <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>, <a class="el" href="classdetail_1_1output__string__adapter.html#aae38554067dbef5006db25256a702416">detail::output_string_adapter&lt; CharType, StringType &gt;</a>, <a class="el" href="classdetail_1_1output__stream__adapter.html#a19fd5667f311a1dcd86469c25c21d13d">detail::output_stream_adapter&lt; CharType &gt;</a>, and <a class="el" href="classdetail_1_1output__vector__adapter.html#a6744f381ec104be129327caadcede1f7">detail::output_vector_adapter&lt; CharType, AllocatorType &gt;</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following files:<ul>
-<li>/home/runner/work/healthgps/healthgps/vcpkg/buildtrees/nlohmann-json/src/v3.11.2-efdad4750e.clean/include/nlohmann/detail/output/<a class="el" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2output_2output__adapters_8hpp_source.html">output_adapters.hpp</a></li>
-<li>/home/runner/work/healthgps/healthgps/vcpkg/buildtrees/nlohmann-json/src/v3.11.2-efdad4750e.clean/single_include/nlohmann/<a class="el" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp_source.html">json.hpp</a></li>
+<li>/home/runner/work/healthgps/healthgps/out/build/linux-debug/vcpkg_installed/x64-linux/include/nlohmann/detail/output/<a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2output_2output__adapters_8hpp_source.html">output_adapters.hpp</a></li>
+<li>/home/runner/work/healthgps/healthgps/vcpkg/buildtrees/nlohmann-json/src/v3.11.2-efdad4750e.clean/single_include/nlohmann/<a class="el" href="vcpkg_2buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2single__include_2nlohmann_2json_8hpp_source.html">json.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

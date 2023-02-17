@@ -118,15 +118,15 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Discarded values in structured types are skipped. That is, the parser will behave as if the discarded value was never read.</li>
 <li>In case a value outside a structured type is skipped, it is replaced with <code>null</code>. This case happens if the top-level element is skipped.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1345"></a>
+<h1><a class="anchor" id="autotoc_md1569"></a>
 Parameters</h1>
 <p><code>depth</code> (in) : the depth of the recursion during parsing</p>
 <p><code>event</code> (in) : an event of type <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c7545576e29efba2e92df79dad9140260.html">`parse_event_t`</a> indicating the context in the callback function has been called</p>
 <p><code>parsed</code> (in, out) : the current intermediate parse result; note that writing to this value has no effect for <code>parse_event_t::key</code> events</p>
-<h1><a class="anchor" id="autotoc_md1346"></a>
+<h1><a class="anchor" id="autotoc_md1570"></a>
 Return value</h1>
 <p>Whether the JSON value which called the function during parsing should be kept (<code>#!cpp true</code>) or not (<code>#!cpp false</code>). In the latter case, it is either skipped completely or replaced by an empty discarded object.</p>
-<h1><a class="anchor" id="autotoc_md1347"></a>
+<h1><a class="anchor" id="autotoc_md1571"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below demonstrates the `parse()` function with
 and without callback function.
@@ -140,7 +140,7 @@ Output:
 ```json
 --8&lt;-- "examples/parse__string__parser_callback_t.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1348"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1572"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/ports/vcpkg-pkgconfig-get-modules/x_vcpkg_pkgconfig_get_modules.md">vcpkg repo</a>.</p>
 <p>Experimental Retrieve required module information from pkgconfig modules</p>
-<h1><a class="anchor" id="autotoc_md2978"></a>
+<h1><a class="anchor" id="autotoc_md3202"></a>
 Usage</h1>
 <div class="fragment"><div class="line">x_vcpkg_pkgconfig_get_modules(</div>
 <div class="line">    PREFIX &lt;prefix&gt;</div>
@@ -102,32 +102,32 @@ Usage</h1>
 <div class="line">    [LIBRARIES_DIRS]</div>
 <div class="line">    [INCLUDE_DIRS]</div>
 <div class="line">)</div>
-</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md2979"></a>
+</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md3203"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md2980"></a>
+<h2><a class="anchor" id="autotoc_md3204"></a>
 PREFIX</h2>
 <p>Used variable prefix to use</p>
-<h2><a class="anchor" id="autotoc_md2981"></a>
+<h2><a class="anchor" id="autotoc_md3205"></a>
 MODULES</h2>
 <p>List of pkgconfig modules to retrieve information for.</p>
-<h2><a class="anchor" id="autotoc_md2982"></a>
+<h2><a class="anchor" id="autotoc_md3206"></a>
 LIBS</h2>
 <p>Returns <code>"${PKGCONFIG}" --libs</code> in &lt;prefix&gt;<em>LIBS</em>(DEBUG|RELEASE)</p>
-<h2><a class="anchor" id="autotoc_md2983"></a>
+<h2><a class="anchor" id="autotoc_md3207"></a>
 LIBRARIES</h2>
 <p>Returns <code>"${PKGCONFIG}" --libs-only-l</code> in &lt;prefix&gt;<em>LIBRARIES</em>(DEBUG|RELEASE)</p>
-<h2><a class="anchor" id="autotoc_md2984"></a>
+<h2><a class="anchor" id="autotoc_md3208"></a>
 LIBRARIES_DIRS</h2>
 <p>Returns <code>"${PKGCONFIG}" --libs-only-L</code> in &lt;prefix&gt;<em>LIBRARIES_DIRS</em>(DEBUG|RELEASE)</p>
-<h2><a class="anchor" id="autotoc_md2985"></a>
+<h2><a class="anchor" id="autotoc_md3209"></a>
 INCLUDE_DIRS</h2>
 <p>Returns <code>"${PKGCONFIG}" --cflags-only-I</code> in &lt;prefix&gt;<em>INCLUDE_DIRS</em>(DEBUG|RELEASE)</p>
-<h1><a class="anchor" id="autotoc_md2986"></a>
+<h1><a class="anchor" id="autotoc_md3210"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/qt5-base/portfile.cmake">qt5-base</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2987"></a>
+<h1><a class="anchor" id="autotoc_md3211"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/vcpkg-pkgconfig-get-modules/x_vcpkg_pkgconfig_get_modules.cmake">ports/vcpkg-pkgconfig-get-modules/x_vcpkg_pkgconfig_get_modules.cmake</a> </p>
 </div></div><!-- contents -->

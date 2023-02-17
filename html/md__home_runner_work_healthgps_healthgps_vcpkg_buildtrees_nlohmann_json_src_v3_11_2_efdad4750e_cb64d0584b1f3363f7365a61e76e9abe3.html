@@ -97,26 +97,26 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>The keys must be JSON pointers (see <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>)</li>
 <li>The mapped values must be primitive JSON types.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1492"></a>
+<h1><a class="anchor" id="autotoc_md1716"></a>
 Return value</h1>
 <p>the original JSON from a flattened version</p>
-<h1><a class="anchor" id="autotoc_md1493"></a>
+<h1><a class="anchor" id="autotoc_md1717"></a>
 Exception safety</h1>
 <p>Strong exception safety: if an exception occurs, the original value stays intact.</p>
-<h1><a class="anchor" id="autotoc_md1494"></a>
+<h1><a class="anchor" id="autotoc_md1718"></a>
 Exceptions</h1>
 <p>The function can throw the following exceptions:</p>
 <ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error314"><code>type_error.314</code></a> if value is not an object</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error315"><code>type_error.315</code></a> if object values are not primitive</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1495"></a>
+<h1><a class="anchor" id="autotoc_md1719"></a>
 Complexity</h1>
 <p>Linear in the size the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1496"></a>
+<h1><a class="anchor" id="autotoc_md1720"></a>
 Notes</h1>
 <p>Empty objects and arrays are flattened by <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb0e09fc390c1cc3994333172774ee194.html">`flatten()`</a> to <code>#!json null</code> values and can not unflattened to their original type. Apart from this example, for a JSON value <code>j</code>, the following is always true: <code>#!cpp j == j.flatten().unflatten()</code>.</p>
-<h1><a class="anchor" id="autotoc_md1497"></a>
+<h1><a class="anchor" id="autotoc_md1721"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows how a flattened JSON object is unflattened into the original nested JSON object.
 
@@ -129,12 +129,12 @@ Output:
 ```json
 --8&lt;-- "examples/unflatten.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1498"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1722"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb0e09fc390c1cc3994333172774ee194.html">flatten</a> the reverse function</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1499"></a>
+<h1><a class="anchor" id="autotoc_md1723"></a>
 Version history</h1>
 <ul>
 <li>Added in version 2.0.0. </li>

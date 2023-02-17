@@ -89,9 +89,9 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Frequently Asked Questions (FAQ) </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md2124"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md2348"></a>
 Known bugs</h1>
-<h2><a class="anchor" id="autotoc_md2125"></a>
+<h2><a class="anchor" id="autotoc_md2349"></a>
 Brace initialization yields arrays</h2>
 <p>!!! question </p><pre class="fragment">Why does
 
@@ -107,20 +107,20 @@ json j(true);
 
 yield different results (`#!json [true]` vs. `#!json true`)?
 </pre><p> This is a known issue, and &ndash; even worse &ndash; the behavior differs between GCC and Clang. The "culprit" for this is the library's constructor overloads for initializer lists to allow syntax like</p>
-<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="classarray.html">array</a> = {1, 2, 3, 4};</div>
+<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="classarray.html">array</a> = {1, 2, 3, 4};</div>
 <div class="ttc" id="aclassarray_html"><div class="ttname"><a href="classarray.html">array</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1507</div></div>
-<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:17282</div></div>
+<div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
 </div><!-- fragment --><p>for arrays and</p>
-<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <span class="keywordtype">object</span> = {{<span class="stringliteral">&quot;one&quot;</span>, 1}, {<span class="stringliteral">&quot;two&quot;</span>, 2}}; </div>
+<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <span class="keywordtype">object</span> = {{<span class="stringliteral">&quot;one&quot;</span>, 1}, {<span class="stringliteral">&quot;two&quot;</span>, 2}}; </div>
 </div><!-- fragment --><p>for objects.</p>
 <p>!!! tip </p><pre class="fragment">To avoid any confusion and ensure portable code, **do not** use brace initialization with the types `basic_json`, `json`, or `ordered_json` unless you want to create an object or array as shown in the examples above.
-</pre> <h1><a class="anchor" id="autotoc_md2126"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2350"></a>
 Limitations</h1>
-<h2><a class="anchor" id="autotoc_md2127"></a>
+<h2><a class="anchor" id="autotoc_md2351"></a>
 Relaxed parsing</h2>
 <p>!!! question </p><pre class="fragment">Can you add an option to ignore trailing commas?
 </pre><p> This library does not support any feature which would jeopardize interoperability.</p>
-<h2><a class="anchor" id="autotoc_md2128"></a>
+<h2><a class="anchor" id="autotoc_md2352"></a>
 Parse errors reading non-ASCII characters</h2>
 <p>!!! question "Questions" </p><pre class="fragment">- Why is the parser complaining about a Chinese character?
 - Does the library support Unicode?
@@ -133,10 +133,10 @@ Parse errors reading non-ASCII characters</h2>
 <li><a href="http://www.unicode.org/faq/private_use.html#nonchar1">Unicode noncharacters</a> will not be replaced by the library.</li>
 <li>Invalid surrogates (e.g., incomplete pairs such as <code>\uDEAD</code>) will yield parse errors.</li>
 <li>The strings stored in the library are UTF-8 encoded. When using the default string type (<code>std::string</code>), note that its length/size functions return the number of stored bytes rather than the number of characters or glyphs.</li>
-<li>When you store strings with different encodings in the library, calling <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_a50ec80b02d0f3f51130d4abb5d1cfdc5.html#a50ec80b02d0f3f51130d4abb5d1cfdc5"><code>dump()</code></a> may throw an exception unless <code><a class="el" href="namespacenlohmann_1_1detail.html#a5a76b60b26dc8c47256a996d18d967dfa9dde360102c103867bd2f45872f1129c" title="replace invalid UTF-8 sequences with U+FFFD">json::error_handler_t::replace</a></code> or <code>json::error_handler_t::ignore</code> are used as error handlers.</li>
+<li>When you store strings with different encodings in the library, calling <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_a50ec80b02d0f3f51130d4abb5d1cfdc5.html#a50ec80b02d0f3f51130d4abb5d1cfdc5"><code>dump()</code></a> may throw an exception unless <code><a class="el" href="namespacedetail.html#abe7cfa1fd8fa706ff4392bff9d1a8298a9dde360102c103867bd2f45872f1129c" title="replace invalid UTF-8 sequences with U+FFFD">json::error_handler_t::replace</a></code> or <code>json::error_handler_t::ignore</code> are used as error handlers.</li>
 </ul>
 <p>In most cases, the parser is right to complain, because the input is not UTF-8 encoded. This is especially true for Microsoft Windows where Latin-1 or ISO 8859-1 is often the standard encoding.</p>
-<h2><a class="anchor" id="autotoc_md2129"></a>
+<h2><a class="anchor" id="autotoc_md2353"></a>
 Wide string handling</h2>
 <p>!!! question </p><pre class="fragment">Why are wide strings (e.g., `std::wstring`) dumped as arrays of numbers?
 </pre><p> As described <a href="#parse-errors-reading-non-ascii-characters">above</a>, the library assumes UTF-8 as encoding. To store a wide string, you need to change the encoding.</p>
@@ -168,29 +168,29 @@ The result is:
   "original": [36554, 66, 49, 50, 51, 52, 32, 12371, 12435, 12395, 12385, 12399]
 }
 ```
-</pre> <h1><a class="anchor" id="autotoc_md2130"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2354"></a>
 Exceptions</h1>
-<h2><a class="anchor" id="autotoc_md2131"></a>
+<h2><a class="anchor" id="autotoc_md2355"></a>
 Parsing without exceptions</h2>
 <p>!!! question </p><pre class="fragment">Is it possible to indicate a parse error without throwing an exception?
 </pre><p> Yes, see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c309ed4bd6cf424b37f0c6b4e80a9e747.html">Parsing and exceptions</a>.</p>
-<h2><a class="anchor" id="autotoc_md2132"></a>
+<h2><a class="anchor" id="autotoc_md2356"></a>
 Key name in exceptions</h2>
 <p>!!! question </p><pre class="fragment">Can I get the key of the object item that caused an exception?
 </pre><p> Yes, you can. Please define the symbol <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1f38699056edc408a3a19cb42f8e0edc.html">`JSON_DIAGNOSTICS`</a> to get <a href="exceptions.md#extended-diagnostic-messages">extended diagnostics messages</a>.</p>
-<h1><a class="anchor" id="autotoc_md2133"></a>
+<h1><a class="anchor" id="autotoc_md2357"></a>
 Serialization issues</h1>
-<h2><a class="anchor" id="autotoc_md2134"></a>
+<h2><a class="anchor" id="autotoc_md2358"></a>
 Number precision</h2>
 <p>!!! question </p><pre class="fragment">- It seems that precision is lost when serializing a double.
 - Can I change the precision for floating-point serialization?
-</pre><p> The library uses <code>std::numeric_limits&lt;number_float_t&gt;<a class="el" href="packages_2fmt__x64-linux_2include_2fmt_2format_8h.html#a0ff2a6d81d2949ea20ee638c8e2790ca">digits10</a></code> (15 for IEEE <code>double</code>s) digits for serialization. This value is sufficient to guarantee roundtripping. If one uses more than this number of digits of precision, then string -&gt; value -&gt; string is not guaranteed to round-trip.</p>
+</pre><p> The library uses <code>std::numeric_limits&lt;number_float_t&gt;<a class="el" href="vcpkg_2packages_2fmt__x64-linux_2include_2fmt_2format_8h.html#a0ff2a6d81d2949ea20ee638c8e2790ca">digits10</a></code> (15 for IEEE <code>double</code>s) digits for serialization. This value is sufficient to guarantee roundtripping. If one uses more than this number of digits of precision, then string -&gt; value -&gt; string is not guaranteed to round-trip.</p>
 <p>!!! quote "[cppreference.com](https://en.cppreference.com/w/cpp/types/numeric_limits/digits10)" </p><pre class="fragment">The value of `std::numeric_limits&lt;T&gt;::digits10` is the number of base-10 digits that can be represented by the type T without change, that is, any number with this many significant decimal digits can be converted to a value of type T and back to decimal form, without change due to rounding or overflow. 
 </pre><p> !!! tip </p><pre class="fragment">The website https://float.exposed gives a good insight into the internal storage of floating-point numbers.
 </pre><p> See <a href="../features/types/number_handling.md#number-serialization">this section</a> on the library's number handling for more information.</p>
-<h1><a class="anchor" id="autotoc_md2135"></a>
+<h1><a class="anchor" id="autotoc_md2359"></a>
 Compilation issues</h1>
-<h2><a class="anchor" id="autotoc_md2136"></a>
+<h2><a class="anchor" id="autotoc_md2360"></a>
 Android SDK</h2>
 <p>!!! question </p><pre class="fragment">Why does the code not compile with Android SDK?
 </pre><p> Android defaults to using very old compilers and C++ libraries. To fix this, add the following to your <code>Application.mk</code>. This will switch to the LLVM C++ library, the Clang compiler, and enable C++11 and other features disabled by default.</p>
@@ -198,7 +198,7 @@ Android SDK</h2>
 <div class="line">NDK_TOOLCHAIN_VERSION := clang3.6</div>
 <div class="line">APP_CPPFLAGS += -frtti -fexceptions</div>
 </div><!-- fragment --><p>The code compiles successfully with <a href="https://developer.android.com/ndk/index.html?hl=ml">Android NDK</a>, Revision 9 - 11 (and possibly later) and <a href="https://www.crystax.net/en/android/ndk">CrystaX's Android NDK</a> version 10.</p>
-<h2><a class="anchor" id="autotoc_md2137"></a>
+<h2><a class="anchor" id="autotoc_md2361"></a>
 Missing STL function</h2>
 <p>!!! question "Questions" </p><pre class="fragment">- Why do I get a compilation error `'to_string' is not a member of 'std'` (or similarly, for `strtod` or `strtof`)?
 - Why does the code not compile with MinGW or Android SDK?

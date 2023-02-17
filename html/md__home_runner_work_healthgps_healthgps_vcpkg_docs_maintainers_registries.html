@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/maintainers/registries.md">GitHub</a>.</b></p>
 <p>There are two parts to using registries; this documents the creation side of the relationship. In order to learn more about using registries that others have created, please read <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_registries.html">this documentation</a>. </p>
-<h1><a class="anchor" id="autotoc_md3008"></a>
+<h1><a class="anchor" id="autotoc_md3232"></a>
 Table of Contents</h1>
 <ul>
 <li><a href="#creating-registries">Creating Registries</a><ul>
@@ -111,7 +111,7 @@ Table of Contents</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3009"></a>
+<h1><a class="anchor" id="autotoc_md3233"></a>
 Overview</h1>
 <p>Registries are collections of ports and their versions. There are two major choices of implementation for registries, if you want to create your own - git registries, and filesystem registries.</p>
 <p>Git registries are simple git repositories, and can be shared publicly or privately via normal mechanisms for git repositories. The vcpkg repository at <a href="https://github.com/microsoft/vcpkg">https://github.com/microsoft/vcpkg</a>, for example, is a git registry.</p>
@@ -122,7 +122,7 @@ Overview</h1>
 <li>The set of versions that are considered "latest" at certain times in history, known as the "baseline".</li>
 <li>The set of all the versions of all the ports, and where to find each of these in the registry.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3010"></a>
+<h2><a class="anchor" id="autotoc_md3234"></a>
 Git Registries</h2>
 <p>As you're following along with this documentation, it may be helpful to have a working example to refer to. We've written one and put it here: <a href="https://github.com/northwindtraders/vcpkg-registry">https://github.com/northwindtraders/vcpkg-registry</a>.</p>
 <p>All git registries must have a <code>versions/baseline.json</code> file. This file contains the set of "latest versions" at a certain commit. It is laid out as a top-level object containing only the <code>"default"</code> field. This field should contain an object mapping port names to the version which is currently the latest.</p>
@@ -159,10 +159,10 @@ Git Registries</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p>In general, it's not important where you place port directories. However, the idiom in vcpkg is to follow what the built in vcpkg registry does: your <code>kitten</code> port should be placed in <code>ports/kitten</code>.</p>
 <p><em>WARNING</em>: One other thing to keep in mind is that when you update a registry, all previous versions should also be accessible. Since your user will set their baseline to a commit ID, that commit ID must always exist, and be accessible from your HEAD commit, which is what is actually fetched. This means that your HEAD commit should be a child of all previous HEAD commits.</p>
-<h2><a class="anchor" id="autotoc_md3011"></a>
+<h2><a class="anchor" id="autotoc_md3235"></a>
 Builtin Registries</h2>
 <p>Builtin registries are treated as special <a href="#git-registries">Git registries</a>. Instead of fetching from a remote url, builtin registries consult the <code>$VCPKG_ROOT/.git</code> directory of the vcpkg clone. They use the currently checked out <code>$VCPKG_ROOT/versions</code> directory as the source for versioning information.</p>
-<h3><a class="anchor" id="autotoc_md3012"></a>
+<h3><a class="anchor" id="autotoc_md3236"></a>
 Adding a New Version</h3>
 <p>There is some git trickery involved in creating a new version of a port. The first thing to do is make some changes, update the <code>"port-version"</code> and regular version field as you need to, and then test with <code>overlay-ports</code>: <code>vcpkg install kitten --overlay-ports=ports/kitten</code>.</p>
 <p>Once you've finished your testing, you'll need to make sure that the directory as it is is under git's purview. You'll do this by creating a temporary commit:</p>
@@ -202,7 +202,7 @@ Adding a New Version</h3>
 </div><!-- fragment --><p>and amend your current commit:</p>
 <div class="fragment"><div class="line">&gt; git commit --amend</div>
 </div><!-- fragment --><p>then share away!</p>
-<h2><a class="anchor" id="autotoc_md3013"></a>
+<h2><a class="anchor" id="autotoc_md3237"></a>
 Filesystem Registries</h2>
 <p>As you're following along with this documentation, it may be helpful to have a working example to refer to. We've written one and put it here: <a href="https://github.com/vcpkg/example-filesystem-registry">https://github.com/vcpkg/example-filesystem-registry</a>.</p>
 <p>All filesystem registries must have a <code>versions/baseline.json</code> file. This file contains the set of "latest versions" for a certain version of the registry. It is laid out as a top-level object containing a map from version name to "baseline objects", which map port names to the version which is considered "latest" for that version of the registry.</p>
@@ -252,7 +252,7 @@ Filesystem Registries</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p></code></p>
 <p><code></code></p>
-<h3><a class="anchor" id="autotoc_md3014"></a>
+<h3><a class="anchor" id="autotoc_md3238"></a>
 Adding a New Version</h3>
 <p><code> Unlike git registries, adding a new version to a filesystem registry mostly involves a lot of copying. The first thing to do is to copy the latest version of your port into a new version directory, update the version and <code>"port-version"</code> fields as you need to, and then test with <code>overlay-ports</code>: <code>vcpkg install kitten --overlay-ports=ports/kitten/new-version</code>.</code></p>
 <p><code>Once you've finished your testing, you can add this new version to the top of your <code>versions/k-/kitten.json</code>:</code></p>

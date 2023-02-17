@@ -93,14 +93,14 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p><b>Only for internal use in vcpkg helpers. Behavior and arguments will change without notice.</b> Get a list of the arguments which were passed in. Unlike <code>ARGV</code>, which is simply the arguments joined with <code>;</code>, so that <code>(A B)</code> is not distinguishable from <code>("A;B")</code>, this macro gives <code>"A;B"</code> for the first argument list, and <code>"A\;B"</code> for the second.</p>
 <div class="fragment"><div class="line">z_vcpkg_function_arguments(&lt;out-var&gt; [&lt;N&gt;])</div>
 </div><!-- fragment --><p><code>z_vcpkg_function_arguments</code> gets the arguments between <code>ARGV&lt;N&gt;</code> and the last argument. <code>&lt;N&gt;</code> defaults to <code>0</code>, so that all arguments are taken.</p>
-<h1><a class="anchor" id="autotoc_md2847"></a>
+<h1><a class="anchor" id="autotoc_md3071"></a>
 Example:</h1>
 <div class="fragment"><div class="line">function(foo_replacement)</div>
 <div class="line">    z_vcpkg_function_arguments(ARGS)</div>
 <div class="line">    foo(${ARGS})</div>
 <div class="line">    ...</div>
 <div class="line">endfunction()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2848"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3072"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/z_vcpkg_function_arguments.cmake">scripts/cmake/z_vcpkg_function_arguments.cmake</a> </p>
 </div></div><!-- contents -->

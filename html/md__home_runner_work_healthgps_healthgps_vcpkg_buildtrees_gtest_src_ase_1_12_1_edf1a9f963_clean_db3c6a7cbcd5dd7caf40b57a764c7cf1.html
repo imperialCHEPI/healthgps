@@ -90,43 +90,43 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The custom directory is an injection point for custom user configurations.</p>
-<h1><a class="anchor" id="autotoc_md529"></a>
+<h1><a class="anchor" id="autotoc_md753"></a>
 Header &lt;tt&gt;gtest.h&lt;/tt&gt;</h1>
-<h2><a class="anchor" id="autotoc_md530"></a>
+<h2><a class="anchor" id="autotoc_md754"></a>
 The following macros can be defined:</h2>
 <ul>
 <li><code>GTEST_OS_STACK_TRACE_GETTER_</code> - The name of an implementation of <code>OsStackTraceGetterInterface</code>.</li>
 <li><code>GTEST_CUSTOM_TEMPDIR_FUNCTION_</code> - An override for <code><a class="el" href="namespacetesting.html#aae1bbe7c3cc99bf56263d51d3982a52e">testing::TempDir()</a></code>. See <code><a class="el" href="namespacetesting.html#aae1bbe7c3cc99bf56263d51d3982a52e">testing::TempDir</a></code> for semantics and signature.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md531"></a>
+<h1><a class="anchor" id="autotoc_md755"></a>
 Header &lt;tt&gt;gtest-port.h&lt;/tt&gt;</h1>
 <p>The following macros can be defined:</p>
-<h2><a class="anchor" id="autotoc_md532"></a>
+<h2><a class="anchor" id="autotoc_md756"></a>
 Logging:</h2>
 <ul>
-<li><code><a class="el" href="packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a8ef4cb4c465db8c15464aecc6d9510ef">GTEST_LOG_(severity)</a></code></li>
-<li><code><a class="el" href="packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#ab54343f0a36dc4cb0ce8a478dd7847b8">GTEST_CHECK_(condition)</a></code></li>
+<li><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a8ef4cb4c465db8c15464aecc6d9510ef">GTEST_LOG_(severity)</a></code></li>
+<li><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#ab54343f0a36dc4cb0ce8a478dd7847b8">GTEST_CHECK_(condition)</a></code></li>
 <li>Functions <code><a class="el" href="namespacetesting_1_1internal.html#a06b1b20029fbd1dbeb59752f914fab84">LogToStderr()</a></code> and <code><a class="el" href="namespacetesting_1_1internal.html#a2135f223bf6b527729aeaa651115183b">FlushInfoLog()</a></code> have to be provided too.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md533"></a>
+<h2><a class="anchor" id="autotoc_md757"></a>
 Threading:</h2>
 <ul>
 <li><code>GTEST_HAS_NOTIFICATION_</code> - Enabled if Notification is already provided.</li>
-<li><code>GTEST_HAS_MUTEX_AND_THREAD_LOCAL_</code> - Enabled if <code>Mutex</code> and <code>ThreadLocal</code> are already provided. Must also provide <code><a class="el" href="packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#af0970cdea09f16dbb1dbfccdaa693eeb">GTEST_DECLARE_STATIC_MUTEX_(mutex)</a></code> and <code><a class="el" href="packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a85d5cd679fdbe87383e7dfd1c6651eaa">GTEST_DEFINE_STATIC_MUTEX_(mutex)</a></code></li>
-<li><code><a class="el" href="packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a149f693bd59fa1bc937af54c0cdcb32f">GTEST_EXCLUSIVE_LOCK_REQUIRED_(locks)</a></code></li>
-<li><code><a class="el" href="packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a69abff5a4efdd07bd5faebe3dd318d06">GTEST_LOCK_EXCLUDED_(locks)</a></code></li>
+<li><code>GTEST_HAS_MUTEX_AND_THREAD_LOCAL_</code> - Enabled if <code>Mutex</code> and <code>ThreadLocal</code> are already provided. Must also provide <code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#af0970cdea09f16dbb1dbfccdaa693eeb">GTEST_DECLARE_STATIC_MUTEX_(mutex)</a></code> and <code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a85d5cd679fdbe87383e7dfd1c6651eaa">GTEST_DEFINE_STATIC_MUTEX_(mutex)</a></code></li>
+<li><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a149f693bd59fa1bc937af54c0cdcb32f">GTEST_EXCLUSIVE_LOCK_REQUIRED_(locks)</a></code></li>
+<li><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gtest_2internal_2gtest-port_8h.html#a69abff5a4efdd07bd5faebe3dd318d06">GTEST_LOCK_EXCLUDED_(locks)</a></code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md534"></a>
+<h2><a class="anchor" id="autotoc_md758"></a>
 Underlying library support features</h2>
 <ul>
 <li><code>GTEST_HAS_CXXABI_H_</code></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md535"></a>
+<h2><a class="anchor" id="autotoc_md759"></a>
 Exporting API symbols:</h2>
 <ul>
 <li><code>GTEST_API_</code> - Specifier for exported symbols.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md536"></a>
+<h1><a class="anchor" id="autotoc_md760"></a>
 Header &lt;tt&gt;gtest-printers.h&lt;/tt&gt;</h1>
 <ul>
 <li>See documentation at <code>gtest/gtest-printers.h</code> for details on how to define a custom printer. </li>

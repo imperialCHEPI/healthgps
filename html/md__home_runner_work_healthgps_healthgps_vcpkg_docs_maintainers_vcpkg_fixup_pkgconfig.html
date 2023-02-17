@@ -91,42 +91,42 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_fixup_pkgconfig.md">vcpkg repo</a>.</p>
 <p>Fix common paths in *.pc files and make everything relative to . Additionally, on static triplets, private entries are merged with their non-private counterparts, allowing pkg-config to be called without the <code>--static</code> flag. Note that vcpkg is designed to never have to call pkg-config with the <code>--static</code> flag, since a consumer cannot know if a dependent library has been built statically or not.</p>
-<h1><a class="anchor" id="autotoc_md3341"></a>
+<h1><a class="anchor" id="autotoc_md3565"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_fixup_pkgconfig(</div>
 <div class="line">    [RELEASE_FILES &lt;PATHS&gt;...]</div>
 <div class="line">    [DEBUG_FILES &lt;PATHS&gt;...]</div>
 <div class="line">    [SKIP_CHECK]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3342"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3566"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3343"></a>
+<h2><a class="anchor" id="autotoc_md3567"></a>
 RELEASE_FILES</h2>
 <p>Specifies a list of files to apply the fixes for release paths. Defaults to every *.pc file in the folder ${CURRENT_PACKAGES_DIR} without ${CURRENT_PACKAGES_DIR}/debug/</p>
-<h2><a class="anchor" id="autotoc_md3344"></a>
+<h2><a class="anchor" id="autotoc_md3568"></a>
 DEBUG_FILES</h2>
 <p>Specifies a list of files to apply the fixes for debug paths. Defaults to every *.pc file in the folder ${CURRENT_PACKAGES_DIR}/debug/</p>
-<h2><a class="anchor" id="autotoc_md3345"></a>
+<h2><a class="anchor" id="autotoc_md3569"></a>
 SKIP_CHECK</h2>
 <p>Skips the library checks in vcpkg_fixup_pkgconfig. Only use if the script itself has unhandled cases.</p>
-<h2><a class="anchor" id="autotoc_md3346"></a>
+<h2><a class="anchor" id="autotoc_md3570"></a>
 SYSTEM_PACKAGES (deprecated)</h2>
 <p>This argument has been deprecated and has no effect.</p>
-<h2><a class="anchor" id="autotoc_md3347"></a>
+<h2><a class="anchor" id="autotoc_md3571"></a>
 SYSTEM_LIBRARIES (deprecated)</h2>
 <p>This argument has been deprecated and has no effect.</p>
-<h2><a class="anchor" id="autotoc_md3348"></a>
+<h2><a class="anchor" id="autotoc_md3572"></a>
 IGNORE_FLAGS (deprecated)</h2>
 <p>This argument has been deprecated and has no effect.</p>
-<h1><a class="anchor" id="autotoc_md3349"></a>
+<h1><a class="anchor" id="autotoc_md3573"></a>
 Notes</h1>
 <p>Still work in progress. If there are more cases which can be handled here feel free to add them</p>
-<h1><a class="anchor" id="autotoc_md3350"></a>
+<h1><a class="anchor" id="autotoc_md3574"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/brotli/portfile.cmake">brotli</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3351"></a>
+<h1><a class="anchor" id="autotoc_md3575"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_fixup_pkgconfig.cmake">scripts/cmake/vcpkg_fixup_pkgconfig.cmake</a> </p>
 </div></div><!-- contents -->

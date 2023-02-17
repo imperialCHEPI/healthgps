@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"><span class="comment">// (3)</span></div>
 <div class="line"><a class="code" href="namespacegenerate__natvis.html#a01a7981524efc650e578691e1b5a8660">template</a>&lt;typename CompatibleType&gt;</div>
 <div class="line"><a class="code" href="classbasic__json.html">basic_json</a>(CompatibleType&amp;&amp; val) noexcept(noexcept(</div>
-<div class="line">           JSONSerializer&lt;U&gt;::<a class="code" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json</a>(<a class="code" href="namespacestd.html">std</a>::<a class="code" href="namespacedoctest_1_1detail.html#a356d5b0ba6a3d0cb9e7af15614f9250b">declval</a>&lt;basic_json_t&amp;&gt;(),</div>
+<div class="line">           JSONSerializer&lt;U&gt;::<a class="code" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json</a>(<a class="code" href="namespacestd.html">std</a>::<a class="code" href="namespacedoctest_1_1detail.html#a356d5b0ba6a3d0cb9e7af15614f9250b">declval</a>&lt;basic_json_t&amp;&gt;(),</div>
 <div class="line">                                      <a class="code" href="namespacestd.html">std</a>::<a class="code" href="namespacedoctest_1_1detail.html#a24164dbeae487b495627136bd01ebe14">forward</a>&lt;CompatibleType&gt;(val))));</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (4)</span></div>
@@ -124,13 +124,13 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"><a class="code" href="classbasic__json.html">basic_json</a>(<a class="code" href="classbasic__json.html">basic_json</a>&amp;&amp; other) noexcept;</div>
 <div class="ttc" id="aclassarray_html"><div class="ttname"><a href="classarray.html">array</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1507</div></div>
 <div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
-<div class="ttc" id="ajsonparser_8cpp_html_a8db632883091c922ea55bb8612395bdb"><div class="ttname"><a href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json</a></div><div class="ttdeci">void to_json(json &amp;j, const CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:8</div></div>
 <div class="ttc" id="anamespacedetail_html_a7c8bc5fb5ef4750d192614dd7f0cf396"><div class="ttname"><a href="namespacedetail.html#a7c8bc5fb5ef4750d192614dd7f0cf396">detail::first</a></div><div class="ttdeci">const T &amp; first(const T &amp;value, const Tail &amp;...)</div><div class="ttdef"><b>Definition:</b> compile.h:138</div></div>
 <div class="ttc" id="anamespacedetail_html_a917c3efabea8a20dc72d9ae2c673d632"><div class="ttname"><a href="namespacedetail.html#a917c3efabea8a20dc72d9ae2c673d632">detail::value_t</a></div><div class="ttdeci">value_t</div><div class="ttdoc">the JSON type enumeration</div><div class="ttdef"><b>Definition:</b> value_t.hpp:54</div></div>
+<div class="ttc" id="anamespacedetail_html_acfdf2e4c8f09d5acaa2841358db51f82"><div class="ttname"><a href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">detail::to_json</a></div><div class="ttdeci">void to_json(BasicJsonType &amp;j, T b) noexcept</div><div class="ttdef"><b>Definition:</b> to_json.hpp:265</div></div>
 <div class="ttc" id="anamespacedoctest_1_1detail_html_a24164dbeae487b495627136bd01ebe14"><div class="ttname"><a href="namespacedoctest_1_1detail.html#a24164dbeae487b495627136bd01ebe14">doctest::detail::forward</a></div><div class="ttdeci">T &amp;&amp; forward(typename remove_reference&lt; T &gt;::type &amp;t) DOCTEST_NOEXCEPT</div><div class="ttdef"><b>Definition:</b> doctest.h:794</div></div>
 <div class="ttc" id="anamespacedoctest_1_1detail_html_a356d5b0ba6a3d0cb9e7af15614f9250b"><div class="ttname"><a href="namespacedoctest_1_1detail.html#a356d5b0ba6a3d0cb9e7af15614f9250b">doctest::detail::declval</a></div><div class="ttdeci">U declval(int)</div></div>
 <div class="ttc" id="anamespacegenerate__natvis_html_a01a7981524efc650e578691e1b5a8660"><div class="ttname"><a href="namespacegenerate__natvis.html#a01a7981524efc650e578691e1b5a8660">generate_natvis.template</a></div><div class="ttdeci">template</div><div class="ttdef"><b>Definition:</b> generate_natvis.py:37</div></div>
-<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> column_iterator.h:82</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> guid.hpp:131</div></div>
 </div><!-- fragment --><ol type="1">
 <li>Create an empty JSON value with a given type. The value will be default initialized with an empty value which depends on the type:</li>
 </ol>
@@ -155,7 +155,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>The postcondition of this constructor can be restored by calling <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c77dad8dbd7d44da9793f2915a48e96c1.html">`clear()`</a>.</p>
 <ol type="1">
 <li>Create a <code>#!json null</code> JSON value. It either takes a null pointer as parameter (explicitly creating <code>#!json null</code>) or no parameter (implicitly creating <code>#!json null</code>). The passed null pointer itself is not read &ndash; it is only used to choose the right constructor.</li>
-<li><p class="startli">This is a "catch all" constructor for all compatible JSON types; that is, types for which a <code><a class="el" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json()</a></code> method exists. The constructor forwards the parameter <code>val</code> to that method (to <code>json_serializer&lt;U&gt;<a class="el" href="jsonparser_8h.html#a92bc04039e4f06e52fd684100cc324b8">to_json</a></code> method with <code>U = uncvref_t&lt;CompatibleType&gt;</code>, to be exact).</p>
+<li><p class="startli">This is a "catch all" constructor for all compatible JSON types; that is, types for which a <code><a class="el" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json()</a></code> method exists. The constructor forwards the parameter <code>val</code> to that method (to <code>json_serializer&lt;U&gt;<a class="el" href="jsonparser_8h.html#a92bc04039e4f06e52fd684100cc324b8">to_json</a></code> method with <code>U = uncvref_t&lt;CompatibleType&gt;</code>, to be exact).</p>
 <p class="startli">Template type <code>CompatibleType</code> includes, but is not limited to, the following types:</p><ul>
 <li><b>arrays</b>: <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0150913bbd2e11a7cecd2977b96d6061.html">`array_t`</a> and all kinds of compatible containers such as <code>std::vector</code>, <code>std::deque</code>, <code>std::list</code>, <code>std::forward_list</code>, <code>std::array</code>, <code>std::valarray</code>, <code>std::set</code>, <code>std::unordered_set</code>, <code>std::multiset</code>, and <code>std::unordered_multiset</code> with a <code>value_type</code> from which a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> value can be constructed.</li>
 <li><b>objects</b>: <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f974e10e5661bc477b8ce49351e9f5d.html">`object_t`</a> and all kinds of compatible associative containers such as <code>std::map</code>, <code>std::unordered_map</code>, <code>std::multimap</code>, and <code>std::unordered_multimap</code> with a <code>key_type</code> compatible to <code>string_t</code> and a <code>value_type</code> from which a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> value can be constructed.</li>
@@ -195,7 +195,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Creates a copy of a given JSON value.</li>
 <li>Move constructor. Constructs a JSON value with the contents of the given value <code>other</code> using move semantics. It "steals" the resources from <code>other</code> and leaves it as JSON <code>#!json null</code> value.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md708"></a>
+<h1><a class="anchor" id="autotoc_md932"></a>
 Template parameters</h1>
 <p><code>CompatibleType</code> : a type such that: </p><pre class="fragment">- `CompatibleType` is not derived from `std::istream`,
 - `CompatibleType` is not `basic_json` (to avoid hijacking copy/move constructors),
@@ -206,7 +206,7 @@ Template parameters</h1>
 </pre><p> <code>BasicJsonType</code>: : a type such that: </p><pre class="fragment">- `BasicJsonType` is a `basic_json` type.
 - `BasicJsonType` has different template arguments than `basic_json_t`.
 </pre><p> <code>U</code>: : <code>uncvref_t&lt;CompatibleType&gt;</code></p>
-<h1><a class="anchor" id="autotoc_md709"></a>
+<h1><a class="anchor" id="autotoc_md933"></a>
 Parameters</h1>
 <p><code>v</code> (in) : the type of the value to create</p>
 <p><code>val</code> (in) : the value to be forwarded to the respective constructor</p>
@@ -217,20 +217,20 @@ Parameters</h1>
 <p><code>first</code> (in) : begin of the range to copy from (included)</p>
 <p><code>last</code> (in) : end of the range to copy from (excluded)</p>
 <p><code>other</code> (in) : the JSON value to copy/move</p>
-<h1><a class="anchor" id="autotoc_md710"></a>
+<h1><a class="anchor" id="autotoc_md934"></a>
 Exception safety</h1>
 <ol type="1">
 <li>Strong guarantee: if an exception is thrown, there are no changes to any JSON value.</li>
 <li>No-throw guarantee: this constructor never throws exceptions.</li>
-<li>Depends on the called constructor. For types directly supported by the library (i.e., all types for which no <code><a class="el" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json()</a></code> function was provided), strong guarantee holds: if an exception is thrown, there are no changes to any JSON value.</li>
-<li>Depends on the called constructor. For types directly supported by the library (i.e., all types for which no <code><a class="el" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json()</a></code> function was provided), strong guarantee holds: if an exception is thrown, there are no changes to any JSON value.</li>
+<li>Depends on the called constructor. For types directly supported by the library (i.e., all types for which no <code><a class="el" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json()</a></code> function was provided), strong guarantee holds: if an exception is thrown, there are no changes to any JSON value.</li>
+<li>Depends on the called constructor. For types directly supported by the library (i.e., all types for which no <code><a class="el" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json()</a></code> function was provided), strong guarantee holds: if an exception is thrown, there are no changes to any JSON value.</li>
 <li>Strong guarantee: if an exception is thrown, there are no changes to any JSON value.</li>
 <li>Strong guarantee: if an exception is thrown, there are no changes to any JSON value.</li>
 <li>Strong guarantee: if an exception is thrown, there are no changes to any JSON value.</li>
 <li>Strong guarantee: if an exception is thrown, there are no changes to any JSON value.</li>
 <li>No-throw guarantee: this constructor never throws exceptions.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md711"></a>
+<h1><a class="anchor" id="autotoc_md935"></a>
 Exceptions</h1>
 <ol type="1">
 <li>(none)</li>
@@ -251,20 +251,20 @@ Exceptions</h1>
 <li>(none)</li>
 <li>The function does not throw exceptions.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md712"></a>
+<h1><a class="anchor" id="autotoc_md936"></a>
 Complexity</h1>
 <ol type="1">
 <li>Constant.</li>
 <li>Constant.</li>
-<li>Usually linear in the size of the passed <code>val</code>, also depending on the implementation of the called <code><a class="el" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json()</a></code> method.</li>
-<li>Usually linear in the size of the passed <code>val</code>, also depending on the implementation of the called <code><a class="el" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json()</a></code> method.</li>
+<li>Usually linear in the size of the passed <code>val</code>, also depending on the implementation of the called <code><a class="el" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json()</a></code> method.</li>
+<li>Usually linear in the size of the passed <code>val</code>, also depending on the implementation of the called <code><a class="el" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json()</a></code> method.</li>
 <li>Linear in the size of the initializer list <code>init</code>.</li>
 <li>Linear in <code>cnt</code>.</li>
 <li>Linear in distance between <code>first</code> and <code>last</code>.</li>
 <li>Linear in the size of <code>other</code>.</li>
 <li>Constant.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md713"></a>
+<h1><a class="anchor" id="autotoc_md937"></a>
 Notes</h1>
 <ul>
 <li><p class="startli">Overload 5:</p>
@@ -287,7 +287,7 @@ function, yielding the JSON `#!json null` value.
 - `other` is a JSON `#!json null` value
 </pre> </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md714"></a>
+<h1><a class="anchor" id="autotoc_md938"></a>
 Examples</h1>
 <p>??? example "Example: (1) create an empty value with a given type" </p><pre class="fragment">The following code shows the constructor for different `value_t` values.
 
@@ -379,7 +379,7 @@ Output:
 ```json
 --8&lt;-- "examples/basic_json__moveconstructor.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md715"></a>
+</pre> <h1><a class="anchor" id="autotoc_md939"></a>
 Version history</h1>
 <ol type="1">
 <li>Since version 1.0.0.</li>

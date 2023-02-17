@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </li>
 </ol>
 <p>Unlike the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ccaaadffd6a44dbcd7dee1101b62407e0.html">`parse`</a> function, this function neither throws an exception in case of invalid JSON input (i.e., a parse error) nor creates diagnostic information.</p>
-<h1><a class="anchor" id="autotoc_md662"></a>
+<h1><a class="anchor" id="autotoc_md886"></a>
 Template parameters</h1>
 <p><code>InputType</code> : A compatible input, for instance: </p><pre class="fragment">- an `std::istream` object
 - a `FILE` pointer (must not be null)
@@ -118,27 +118,27 @@ Template parameters</h1>
 - an object `obj` for which `begin(obj)` and `end(obj)` produces a valid pair of iterators.
 </pre><p> <code>IteratorType</code> : a compatible iterator type, for instance. </p><pre class="fragment">- a pair of `std::string::iterator` or `std::vector&lt;std::uint8_t&gt;::iterator`
 - a pair of pointers such as `ptr` and `ptr + len`
-</pre> <h1><a class="anchor" id="autotoc_md663"></a>
+</pre> <h1><a class="anchor" id="autotoc_md887"></a>
 Parameters</h1>
 <p><code>i</code> (in) : Input to parse from.</p>
 <p><code>ignore_comments</code> (in) : whether comments should be ignored and treated like whitespace (<code>#!cpp true</code>) or yield a parse error (<code>#!cpp false</code>); (optional, <code>#!cpp false</code> by default)</p>
 <p><code>first</code> (in) : iterator to start of character range</p>
 <p><code>last</code> (in) : iterator to end of character range</p>
-<h1><a class="anchor" id="autotoc_md664"></a>
+<h1><a class="anchor" id="autotoc_md888"></a>
 Return value</h1>
 <p>Whether the input is valid JSON.</p>
-<h1><a class="anchor" id="autotoc_md665"></a>
+<h1><a class="anchor" id="autotoc_md889"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md666"></a>
+<h1><a class="anchor" id="autotoc_md890"></a>
 Complexity</h1>
 <p>Linear in the length of the input. The parser is a predictive LL(1) parser.</p>
-<h1><a class="anchor" id="autotoc_md667"></a>
+<h1><a class="anchor" id="autotoc_md891"></a>
 Notes</h1>
 <p>(1) A UTF-8 byte order mark is silently ignored.</p>
 <p>!!! danger "Runtime assertion" </p><pre class="fragment">The precondition that a passed `#!cpp FILE` pointer must not be null is enforced with a
 [runtime assertion](../../features/assertions.md).
-</pre> <h1><a class="anchor" id="autotoc_md668"></a>
+</pre> <h1><a class="anchor" id="autotoc_md892"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below demonstrates the `accept()` function reading from a string.
 
@@ -151,13 +151,13 @@ Output:
 ```json
 --8&lt;-- "examples/accept__string.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md669"></a>
+</pre> <h1><a class="anchor" id="autotoc_md893"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ccaaadffd6a44dbcd7dee1101b62407e0.html">parse</a> - deserialize from a compatible input</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c385c14208eb6977c1b4d53b40662532e.html">operator&gt;&gt;</a> - deserialize from stream</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md670"></a>
+<h1><a class="anchor" id="autotoc_md894"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.0.0.</li>

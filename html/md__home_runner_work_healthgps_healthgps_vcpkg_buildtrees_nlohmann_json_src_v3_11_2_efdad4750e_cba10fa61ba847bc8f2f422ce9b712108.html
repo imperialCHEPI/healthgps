@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p>The <a href="https://neurojson.org">BJData format</a> was derived from and improved upon <a href="https://ubjson.org">Universal Binary JSON(UBJSON)</a> specification (Draft 12). Specifically, it introduces an optimized array container for efficient storage of N-dimensional packed arrays (<b>ND-arrays</b>); it also adds 4 new type markers - <code>[u] - uint16</code>, <code>[m] - uint32</code>, <code>[M] - uint64</code> and <code>[h] - float16</code> - to unambiguously map common binary numeric types; furthermore, it uses little-endian (LE) to store all numerics instead of big-endian (BE) as in UBJSON to avoid unnecessary conversions on commonly available platforms.</p>
 <p>Compared to other binary JSON-like formats such as MessagePack and CBOR, both BJData and UBJSON demonstrate a rare combination of being both binary and <b>quasi-human-readable</b>. This is because all semantic elements in BJData and UBJSON, including the data-type markers and name/string types are directly human-readable. <a class="el" href="structData.html">Data</a> stored in the BJData/UBJSON format are not only compact in size, fast to read/write, but also can be directly searched or read using simple processing.</p>
 <p>!!! abstract "References" </p><pre class="fragment">- [BJData Specification](https://neurojson.org/bjdata/draft2)
-</pre> <h1><a class="anchor" id="autotoc_md1901"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2125"></a>
 Serialization</h1>
 <p>The library uses the following mapping from JSON values types to BJData types according to the BJData specification:</p>
 <table class="markdownTable">
@@ -221,7 +221,7 @@ Output:
 ```c
 --8&lt;-- "examples/to_bjdata.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1902"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2126"></a>
 Deserialization</h1>
 <p>The library maps BJData types to JSON value types as follows:</p>
 <table class="markdownTable">

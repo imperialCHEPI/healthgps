@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href="../gmock_for_dummies.md#actions-what-should-it-do"><b>Actions</b></a> specify what a mock function should do when invoked. This page lists the built-in actions provided by GoogleTest. All actions are defined in the <code><a class="el" href="namespacetesting.html">testing</a></code> namespace.</p>
-<h1><a class="anchor" id="autotoc_md388"></a>
+<h1><a class="anchor" id="autotoc_md612"></a>
 Returning a Value</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -114,7 +114,7 @@ Returning a Value</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>ReturnRoundRobin({a1, ..., ak})</code>   </td><td class="markdownTableBodyLeft">Each call will return the next <code>ai</code> in the list, starting at the beginning when the end of the list is reached.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md389"></a>
+<h1><a class="anchor" id="autotoc_md613"></a>
 Side Effects</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -140,7 +140,7 @@ Side Effects</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>Throw(exception)</code>   </td><td class="markdownTableBodyLeft">Throws the given exception, which can be any copyable value. Available since v1.1.0.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md390"></a>
+<h1><a class="anchor" id="autotoc_md614"></a>
 Using a Function, Functor, or Lambda as an Action</h1>
 <p>In the following, by "callable" we mean a free function, <code>std::function</code>, functor, or lambda.</p>
 <table class="markdownTable">
@@ -167,8 +167,8 @@ Using a Function, Functor, or Lambda as an Action</h1>
 <div class="line">EXPECT_CALL(mock, Foo(<span class="stringliteral">&quot;Hi&quot;</span>, _, _)).WillOnce(<a class="code" href="namespacetesting.html#af5cacf4475557b5a3e37af3836564235">Invoke</a>(<a class="code" href="sax__parse_8cpp.html#a528212c35bbcc5a82c612f1378c58c9a">Distance</a>));</div>
 <div class="ttc" id="agmock-matchers-containers__test_8cc_html_a39cb44155237f0205e0feb931d5acbed"><div class="ttname"><a href="gmock-matchers-containers__test_8cc.html#a39cb44155237f0205e0feb931d5acbed">y</a></div><div class="ttdeci">const double y</div><div class="ttdef"><b>Definition:</b> gmock-matchers-containers_test.cc:367</div></div>
 <div class="ttc" id="agmock-matchers-containers__test_8cc_html_a6150e0515f7202e2fb518f7206ed97dc"><div class="ttname"><a href="gmock-matchers-containers__test_8cc.html#a6150e0515f7202e2fb518f7206ed97dc">x</a></div><div class="ttdeci">int x</div><div class="ttdef"><b>Definition:</b> gmock-matchers-containers_test.cc:366</div></div>
-<div class="ttc" id="anamespacetesting_html_a603e329ec0263ebfcf16f712810bd511"><div class="ttname"><a href="namespacetesting.html#a603e329ec0263ebfcf16f712810bd511">testing::Unused</a></div><div class="ttdeci">internal::IgnoredValue Unused</div><div class="ttdef"><b>Definition:</b> gmock.h:2114</div></div>
-<div class="ttc" id="anamespacetesting_html_af5cacf4475557b5a3e37af3836564235"><div class="ttname"><a href="namespacetesting.html#af5cacf4475557b5a3e37af3836564235">testing::Invoke</a></div><div class="ttdeci">std::decay&lt; FunctionImpl &gt;::type Invoke(FunctionImpl &amp;&amp;function_impl)</div><div class="ttdef"><b>Definition:</b> gmock.h:2261</div></div>
+<div class="ttc" id="anamespacetesting_html_a603e329ec0263ebfcf16f712810bd511"><div class="ttname"><a href="namespacetesting.html#a603e329ec0263ebfcf16f712810bd511">testing::Unused</a></div><div class="ttdeci">internal::IgnoredValue Unused</div><div class="ttdef"><b>Definition:</b> gmock-actions.h:1776</div></div>
+<div class="ttc" id="anamespacetesting_html_af5cacf4475557b5a3e37af3836564235"><div class="ttname"><a href="namespacetesting.html#af5cacf4475557b5a3e37af3836564235">testing::Invoke</a></div><div class="ttdeci">std::decay&lt; FunctionImpl &gt;::type Invoke(FunctionImpl &amp;&amp;function_impl)</div><div class="ttdef"><b>Definition:</b> gmock-actions.h:1947</div></div>
 <div class="ttc" id="asax__parse_8cpp_html_a528212c35bbcc5a82c612f1378c58c9a"><div class="ttname"><a href="sax__parse_8cpp.html#a528212c35bbcc5a82c612f1378c58c9a">Distance</a></div><div class="ttdeci">Animated Distance</div><div class="ttdef"><b>Definition:</b> sax_parse.cpp:115</div></div>
 </div><!-- fragment --><p><code>Invoke(callback)</code> and <code>InvokeWithoutArgs(callback)</code> take ownership of <code>callback</code>, which must be permanent. The type of <code>callback</code> must be a base callback type instead of a derived one, e.g.</p>
 <div class="fragment"><div class="line">BlockingClosure* <a class="code" href="namespacedigits.html#a8875a3e1d62490230fa116b4c1f99c8ba6fbc2728db24637fb712bb7906dc7f79">done</a> = <span class="keyword">new</span> BlockingClosure;</div>
@@ -183,18 +183,18 @@ Using a Function, Functor, or Lambda as an Action</h1>
 <div class="line">InvokeArgument&lt;2&gt;(5, <a class="code" href="classstring.html">string</a>(<span class="stringliteral">&quot;Hi&quot;</span>), std::ref(<a class="code" href="namespacefoo.html">foo</a>))</div>
 <div class="ttc" id="aclassstring_html"><div class="ttname"><a href="classstring.html">string</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1509</div></div>
 <div class="ttc" id="anamespacefoo_html"><div class="ttname"><a href="namespacefoo.html">foo</a></div><div class="ttdef"><b>Definition:</b> googletest-output-test_.cc:470</div></div>
-<div class="ttc" id="anamespacetesting_1_1internal_html_a4c6f0469015303fe29a4f08ba036e6d6"><div class="ttname"><a href="namespacetesting_1_1internal.html#a4c6f0469015303fe29a4f08ba036e6d6">testing::internal::InvokeArgument</a></div><div class="ttdeci">auto InvokeArgument(F f, Args... args) -&gt; decltype(f(args...))</div><div class="ttdef"><b>Definition:</b> gmock.h:11199</div></div>
+<div class="ttc" id="anamespacetesting_1_1internal_html_a4c6f0469015303fe29a4f08ba036e6d6"><div class="ttname"><a href="namespacetesting_1_1internal.html#a4c6f0469015303fe29a4f08ba036e6d6">testing::internal::InvokeArgument</a></div><div class="ttdeci">auto InvokeArgument(F f, Args... args) -&gt; decltype(f(args...))</div><div class="ttdef"><b>Definition:</b> gmock-more-actions.h:597</div></div>
 </div><!-- fragment --><p>calls the mock function's #2 argument, passing to it <code>5</code> and <code>string("Hi")</code> by value, and <code>foo</code> by reference.</p>
-<h1><a class="anchor" id="autotoc_md391"></a>
+<h1><a class="anchor" id="autotoc_md615"></a>
 Default Action</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft">Action   </th><th class="markdownTableHeadLeft">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code><a class="el" href="namespacetesting.html#ae041df61ff61ccb9753ba15b4309e1a6">DoDefault()</a></code>   </td><td class="markdownTableBodyLeft">Do the default action (specified by <code><a class="el" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gmock_2gmock_8h.html#a5b12ae6cf84f0a544ca811b380c37334">ON_CALL()</a></code> or the built-in one).   </td></tr>
+<td class="markdownTableBodyLeft"><code><a class="el" href="namespacetesting.html#ae041df61ff61ccb9753ba15b4309e1a6">DoDefault()</a></code>   </td><td class="markdownTableBodyLeft">Do the default action (specified by <code><a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gmock_2gmock-spec-builders_8h.html#a5b12ae6cf84f0a544ca811b380c37334">ON_CALL()</a></code> or the built-in one).   </td></tr>
 </table>
 <p>{: .callout .note} <b>Note:</b> due to technical reasons, <code><a class="el" href="namespacetesting.html#ae041df61ff61ccb9753ba15b4309e1a6">DoDefault()</a></code> cannot be used inside a composite action - trying to do so will result in a run-time error.</p>
-<h1><a class="anchor" id="autotoc_md392"></a>
+<h1><a class="anchor" id="autotoc_md616"></a>
 Composite Actions</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -210,15 +210,15 @@ Composite Actions</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>WithoutArgs(a)</code>   </td><td class="markdownTableBodyLeft">Perform action <code>a</code> without any arguments.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md393"></a>
+<h1><a class="anchor" id="autotoc_md617"></a>
 Defining Actions</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft">Macro   </th><th class="markdownTableHeadLeft">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-actions_8h.html#a7af7137aa4871df4235881af377205fe">ACTION(Sum)</a> { return arg0 + arg1; }</code>   </td><td class="markdownTableBodyLeft">Defines an action <code>Sum()</code> to return the sum of the mock function's argument #0 and #1.    </td></tr>
+<td class="markdownTableBodyLeft"><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-actions_8h.html#a7af7137aa4871df4235881af377205fe">ACTION(Sum)</a> { return arg0 + arg1; }</code>   </td><td class="markdownTableBodyLeft">Defines an action <code>Sum()</code> to return the sum of the mock function's argument #0 and #1.    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-actions_8h.html#af5f47e069acb517db9f743f029471aa7">ACTION_P(Plus, n)</a> { return arg0 + n; }</code>   </td><td class="markdownTableBodyLeft">Defines an action <code>Plus(n)</code> to return the sum of the mock function's argument #0 and <code>n</code>.    </td></tr>
+<td class="markdownTableBodyLeft"><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-actions_8h.html#af5f47e069acb517db9f743f029471aa7">ACTION_P(Plus, n)</a> { return arg0 + n; }</code>   </td><td class="markdownTableBodyLeft">Defines an action <code>Plus(n)</code> to return the sum of the mock function's argument #0 and <code>n</code>.    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>ACTION_Pk(Foo, p1, ..., pk) { statements; }</code>   </td><td class="markdownTableBodyLeft">Defines a parameterized action <code><a class="el" href="classFoo.html">Foo(p1, ..., pk)</a></code> to execute the given <code>statements</code>.   </td></tr>
 </table>

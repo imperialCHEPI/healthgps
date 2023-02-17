@@ -138,8 +138,8 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"><span class="keywordtype">bool</span> <a class="code" href="namespacedetail.html#a47b1bb0bbd3596589ed9187059c312efa3c6e0b8a9c15224a8228b9a98ca1531d">key</a>(string_t&amp; val);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// called when a parse error occurs; byte position, the last token, and an exception is passed</span></div>
-<div class="line"><span class="keywordtype">bool</span> parse_error(std::size_t position, <span class="keyword">const</span> std::string&amp; last_token, <span class="keyword">const</span> <a class="code" href="classnlohmann_1_1detail_1_1exception.html">json::exception</a>&amp; ex);</div>
-<div class="ttc" id="aclassnlohmann_1_1detail_1_1exception_html"><div class="ttname"><a href="classnlohmann_1_1detail_1_1exception.html">nlohmann::detail::exception</a></div><div class="ttdoc">general exception of the basic_json class</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:2809</div></div>
+<div class="line"><span class="keywordtype">bool</span> parse_error(std::size_t position, <span class="keyword">const</span> std::string&amp; last_token, <span class="keyword">const</span> <a class="code" href="classdetail_1_1exception.html">json::exception</a>&amp; ex);</div>
+<div class="ttc" id="aclassdetail_1_1exception_html"><div class="ttname"><a href="classdetail_1_1exception.html">detail::exception</a></div><div class="ttdoc">general exception of the basic_json class</div><div class="ttdef"><b>Definition:</b> exceptions.hpp:37</div></div>
 <div class="ttc" id="aclassnumber__float_html"><div class="ttname"><a href="classnumber__float.html">number_float</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1512</div></div>
 <div class="ttc" id="aclassnumber__integer_html"><div class="ttname"><a href="classnumber__integer.html">number_integer</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1510</div></div>
 <div class="ttc" id="aclassnumber__unsigned_html"><div class="ttname"><a href="classnumber__unsigned.html">number_unsigned</a></div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1511</div></div>
@@ -155,7 +155,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Call <code>#!cpp bool json::sax_parse(input, &amp;my_sax);</code> where the first parameter can be any input like a string or an input stream and the second parameter is a pointer to your SAX interface.</li>
 </ol>
 <p>Note the <code>sax_parse</code> function only returns a <code>#!cpp bool</code> indicating the result of the last executed SAX event. It does not return <code>json</code> value - it is up to you to decide what to do with the SAX events. Furthermore, no exceptions are thrown in case of a parse error - it is up to you what to do with the exception object passed to your <code>parse_error</code> implementation. Internally, the SAX interface is used for the DOM parser (class <code>json_sax_dom_parser</code>) as well as the acceptor (<code>json_sax_acceptor</code>), see file <code>json_sax.hpp</code>.</p>
-<h1><a class="anchor" id="autotoc_md2008"></a>
+<h1><a class="anchor" id="autotoc_md2232"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ca7bf740e15cd472f63076f94eb1b774e.html">json_sax</a> - documentation of the SAX interface</li>

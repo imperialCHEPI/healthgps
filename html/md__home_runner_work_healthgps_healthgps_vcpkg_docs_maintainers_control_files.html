@@ -92,10 +92,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p><b>CONTROL files are retained for backwards compatibility with earlier versions of vcpkg; all new features are added only to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_manifest_files.html">vcpkg.json manifest files</a>, and we recommend using vcpkg.json for any newly authored port. Use <code>./vcpkg format-manifest ports/&lt;portname&gt;/CONTROL</code> to convert an existing CONTROL file to a vcpkg.json file.</b></p>
 <p>The <code>CONTROL</code> file contains metadata about the port. The syntax is based on <a href="https://www.debian.org/doc/debian-policy/ch-controlfields.html">the Debian <code>control</code> format</a> although we only support the subset of fields documented here.</p>
 <p>Field names are case-sensitive and start the line without leading whitespace. Paragraphs are separated by one or more empty lines.</p>
-<h1><a class="anchor" id="autotoc_md2816"></a>
+<h1><a class="anchor" id="autotoc_md3040"></a>
 Source Paragraph</h1>
 <p>The first paragraph in a <code>CONTROL</code> file is the Source paragraph. It must have a <code>Source</code>, <code>Version</code>, and <code>Description</code> field. The full set of fields is documented below.</p>
-<h2><a class="anchor" id="autotoc_md2817"></a>
+<h2><a class="anchor" id="autotoc_md3041"></a>
 Examples:</h2>
 <div class="fragment"><div class="line">Source: ace</div>
 <div class="line">Version: 6.5.5</div>
@@ -105,9 +105,9 @@ Examples:</h2>
 <div class="line">Port-Version: 2</div>
 <div class="line">Description: Software system for 3D computer graphics, image processing, and visualization</div>
 <div class="line">Build-Depends: zlib, libpng, tiff, libxml2, jsoncpp, glew, freetype, expat, hdf5, libjpeg-turbo, proj4, lz4, libtheora, atlmfc (windows), eigen3, double-conversion, pugixml, libharu, sqlite3, netcdf-c</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2818"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3042"></a>
 Recognized fields</h2>
-<h3><a class="anchor" id="autotoc_md2819"></a>
+<h3><a class="anchor" id="autotoc_md3043"></a>
 Source</h3>
 <p>The name of the port.</p>
 <p>When adding new ports be aware that the name may conflict with other projects that are not a part of vcpkg. For example <code>json</code> conflicts with too many other projects so you should add a scope to the name such as <code>taocpp-json</code> to make it unique. Verify there are no conflicts on a search engine as well as on other package collections.</p>
@@ -117,7 +117,7 @@ Source</h3>
 <li><a href="https://www.debian.org/distrib/packages">Debian packages</a></li>
 <li><a href="https://pkgs.org/">Packages search</a></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md2820"></a>
+<h3><a class="anchor" id="autotoc_md3044"></a>
 Version</h3>
 <p>The library version.</p>
 <p>This field is an alphanumeric string that may also contain <code>.</code>, <code>_</code>, or <code>-</code>. No attempt at ordering versions is made; all versions are treated as bit strings and are only evaluated for equality.</p>
@@ -133,48 +133,48 @@ Version</h3>
 <li>Today's date is 2019-06-01.</li>
 </ol>
 <p>Then if you update the source version today, you should give it version <code>2019-06-01</code>.</p>
-<h3><a class="anchor" id="autotoc_md2821"></a>
+<h3><a class="anchor" id="autotoc_md3045"></a>
 Port-Version</h3>
 <p>The version of the port.</p>
 <p>This field is a non-negative integer. It allows one to version the port file separately from the version of the underlying library; if you make a change to a port, without changing the underlying version of the library, you should increment this field by one (starting at <code>0</code>, which is equivalent to no <code>Port-Version</code> field). When the version of the underlying library is upgraded, this field should be set back to <code>0</code> (i.e., delete the <code>Port-Version</code> field).</p>
-<h4><a class="anchor" id="autotoc_md2822"></a>
+<h4><a class="anchor" id="autotoc_md3046"></a>
 Examples:</h4>
 <div class="fragment"><div class="line">Version: 1.0.5</div>
 <div class="line">Port-Version: 2</div>
 </div><!-- fragment --> <div class="fragment"><div class="line">Version: 2019-03-21</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md2823"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3047"></a>
 Description</h3>
 <p>A description of the library.</p>
 <p>By convention the first line of the description is a summary of the library. An optional detailed description follows. The detailed description can be multiple lines, all starting with whitespace.</p>
-<h4><a class="anchor" id="autotoc_md2824"></a>
+<h4><a class="anchor" id="autotoc_md3048"></a>
 Examples:</h4>
 <div class="fragment"><div class="line">Description: C++ header-only JSON library</div>
 </div><!-- fragment --> <div class="fragment"><div class="line">Description: Mosquitto is an open source message broker that implements the MQ Telemetry Transport protocol versions 3.1 and 3.1.1.</div>
 <div class="line">  MQTT provides a lightweight method of carrying out messaging using a publish/subscribe model. This makes it suitable for &quot;machine</div>
 <div class="line">  to machine&quot; messaging such as with low power sensors or mobile devices such as phones, embedded computers or microcontrollers like the Arduino.</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md2825"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3049"></a>
 Homepage</h3>
 <p>The URL of the homepage for the library where a user is able to find additional documentation or the original source code.</p>
 <p>Example: </p><div class="fragment"><div class="line">Homepage: https://github.com/Microsoft/vcpkg</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md2826"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3050"></a>
 Build-Depends</h3>
 <p>Comma separated list of vcpkg ports the library has a dependency on.</p>
 <p>Vcpkg does not distinguish between build-only dependencies and runtime dependencies. The complete list of dependencies needed to successfully use the library should be specified.</p>
 <p><em>For example: websocketpp is a header only library, and thus does not require any dependencies at install time. However, downstream users need boost and openssl to make use of the library. Therefore, websocketpp lists boost and openssl as dependencies</em></p>
 <p>If the port is dependent on optional features of another library those can be specified using the <code>portname[featurelist]</code> syntax. If the port does not require any features from the dependency, this should be specified as <code>portname[core]</code>.</p>
 <p>Dependencies can be filtered based on the target triplet to support differing requirements. These filters use the same syntax as the Supports field below and are surrounded in parentheses following the portname and feature list.</p>
-<h4><a class="anchor" id="autotoc_md2827"></a>
+<h4><a class="anchor" id="autotoc_md3051"></a>
 Example:</h4>
 <div class="fragment"><div class="line">Build-Depends: rapidjson, curl[core,openssl] (!windows), curl[core,winssl] (windows)</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md2828"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3052"></a>
 Default-Features</h3>
 <p>Comma separated list of optional port features to install by default.</p>
 <p>This field is optional.</p>
-<h4><a class="anchor" id="autotoc_md2829"></a>
+<h4><a class="anchor" id="autotoc_md3053"></a>
 Example:</h4>
 <div class="fragment"><div class="line">Default-Features: dynamodb, s3, kinesis</div>
 </div><!-- fragment --><p><a class="anchor" id="Supports"></a> </p>
-<h3><a class="anchor" id="autotoc_md2830"></a>
+<h3><a class="anchor" id="autotoc_md3054"></a>
 Supports</h3>
 <p>Expression that evaluates to true when the port is expected to build successfully for a triplet.</p>
 <p>Currently, this field is only used in the CI testing to skip ports. In the future, this mechanism is intended to warn users in advance that a given install tree is not expected to succeed. Therefore, this field should be used optimistically; in cases where a port is expected to succeed 10% of the time, it should still be marked "supported".</p>
@@ -204,13 +204,13 @@ Supports</h3>
 <blockquote class="doxtable">
 <p>Implementers' Note: these terms are computed from the triplet via the <code>vcpkg_get_dep_info</code> mechanism. </p>
 </blockquote>
-<h4><a class="anchor" id="autotoc_md2831"></a>
+<h4><a class="anchor" id="autotoc_md3055"></a>
 Example:</h4>
 <div class="fragment"><div class="line">Supports: !(uwp|arm)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2832"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3056"></a>
 Feature Paragraphs</h1>
 <p>Multiple optional features can be specified in the <code>CONTROL</code> files. It must have a <code>Feature</code> and <code>Description</code> field. It can optionally have a <code>Build-Depends</code> field. It must be separated from other paragraphs by one or more empty lines.</p>
-<h2><a class="anchor" id="autotoc_md2833"></a>
+<h2><a class="anchor" id="autotoc_md3057"></a>
 Example:</h2>
 <div class="fragment"><div class="line">Source: vtk</div>
 <div class="line">Version: 8.2.0-2</div>
@@ -232,15 +232,15 @@ Example:</h2>
 <div class="line">Feature: python</div>
 <div class="line">Description: Python functionality for VTK</div>
 <div class="line">Build-Depends: python3</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2834"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3058"></a>
 Recognized fields</h2>
-<h3><a class="anchor" id="autotoc_md2835"></a>
+<h3><a class="anchor" id="autotoc_md3059"></a>
 Feature</h3>
 <p>The name of the feature.</p>
-<h3><a class="anchor" id="autotoc_md2836"></a>
+<h3><a class="anchor" id="autotoc_md3060"></a>
 Description</h3>
 <p>A description of the feature using the same syntax as the port <code>Description</code> field.</p>
-<h3><a class="anchor" id="autotoc_md2837"></a>
+<h3><a class="anchor" id="autotoc_md3061"></a>
 Build-Depends</h3>
 <p>The list of dependencies required to build and use this feature.</p>
 <p>On installation the dependencies from all selected features are combined to produce the full dependency list for the build. This field follows the same syntax as <code>Build-Depends</code> in the Source Paragraph. </p>

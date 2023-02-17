@@ -113,7 +113,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Reads from an iterator range.</li>
 </ol>
 <p>The exact mapping and its limitations is described on a <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0e83ce900fb840ce8608777f1082f375.html">dedicated page</a>.</p>
-<h1><a class="anchor" id="autotoc_md906"></a>
+<h1><a class="anchor" id="autotoc_md1130"></a>
 Template parameters</h1>
 <p><code>InputType</code> : A compatible input, for instance: </p><pre class="fragment">- an `std::istream` object
 - a `FILE` pointer
@@ -121,7 +121,7 @@ Template parameters</h1>
 - a pointer to a null-terminated string of single byte characters
 - an object `obj` for which `begin(obj)` and `end(obj)` produces a valid pair of iterators.
 </pre><p> <code>IteratorType</code> : a compatible iterator type</p>
-<h1><a class="anchor" id="autotoc_md907"></a>
+<h1><a class="anchor" id="autotoc_md1131"></a>
 Parameters</h1>
 <p><code>i</code> (in) : an input in CBOR format convertible to an input adapter</p>
 <p><code>first</code> (in) : iterator to start of the input</p>
@@ -129,23 +129,23 @@ Parameters</h1>
 <p><code>strict</code> (in) : whether to expect the input to be consumed until EOF (<code>#!cpp true</code> by default)</p>
 <p><code>allow_exceptions</code> (in) : whether to throw exceptions in case of a parse error (optional, <code>#!cpp true</code> by default)</p>
 <p><code>tag_handler</code> (in) : how to treat CBOR tags (optional, <code>error</code> by default); see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cc8c4c81f0da9a773c282fd793fadb6c2.html">`cbor_tag_handler_t`</a> for more information</p>
-<h1><a class="anchor" id="autotoc_md908"></a>
+<h1><a class="anchor" id="autotoc_md1132"></a>
 Return value</h1>
 <p>deserialized JSON value; in case of a parse error and <code>allow_exceptions</code> set to <code>#!cpp false</code>, the return value will be <code>value_t::discarded</code>. The latter can be checked with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c55d9d38063156c68a8e3611580edc497.html">`is_discarded`</a>.</p>
-<h1><a class="anchor" id="autotoc_md909"></a>
+<h1><a class="anchor" id="autotoc_md1133"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md910"></a>
+<h1><a class="anchor" id="autotoc_md1134"></a>
 Exceptions</h1>
 <ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error110">parse_error.110</a> if the given input ends prematurely or the end of file was not reached when <code>strict</code> was set to true</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error112">parse_error.112</a> if unsupported features from CBOR were used in the given input or if the input is not valid CBOR</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error113">parse_error.113</a> if a string was expected as map key, but not found</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md911"></a>
+<h1><a class="anchor" id="autotoc_md1135"></a>
 Complexity</h1>
 <p>Linear in the size of the input.</p>
-<h1><a class="anchor" id="autotoc_md912"></a>
+<h1><a class="anchor" id="autotoc_md1136"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example shows the deserialization of a byte vector in CBOR format to a JSON value.
 
@@ -158,7 +158,7 @@ Output:
 ```json
 --8&lt;-- "examples/from_cbor.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md913"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1137"></a>
 Version history</h1>
 <ul>
 <li>Added in version 2.0.9.</li>

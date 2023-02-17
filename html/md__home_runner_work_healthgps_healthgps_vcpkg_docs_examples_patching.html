@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Patching Example: Patching libpng to work for x64-uwp </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2><a class="anchor" id="autotoc_md2793"></a>
+<div class="textblock"><h2><a class="anchor" id="autotoc_md3017"></a>
 Initial error logs</h2>
 <p>First, try building:</p>
 <div class="fragment"><div class="line">PS D:\src\vcpkg&gt; vcpkg install libpng:x64-uwp --editable</div>
@@ -139,7 +139,7 @@ Initial error logs</h2>
 <div class="line">    2 Error(s)</div>
 <div class="line"> </div>
 <div class="line">Time Elapsed 00:00:04.19</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2794"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3018"></a>
 Identify the problematic code</h2>
 <p>Taking a look at <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms682658(v=vs.85).aspx">MSDN</a> shows that <code>ExitProcess</code> is only available for desktop apps. Additionally, it's useful to see the surrounding context:</p>
 <div class="fragment"><div class="line"><span class="comment">/* buildtrees\libpng\src\v1.6.37-c993153cdf\pngerror.c:769 */</span></div>
@@ -178,7 +178,7 @@ Identify the problematic code</h2>
 <div class="line"><span class="preprocessor">#  endif</span></div>
 <div class="line"><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --><p><code>abort()</code> is a standard CRT call and certainly available in UWP, so we just need to convince libpng to be more platform agnostic. The easiest and most reliable way to achieve this is to patch the code; while in this particular case we could pass in a compiler flag to override <code>PNG_ABORT</code> because this is a private header, in general it is more reliable to avoid adding more required compiler switches when possible (especially when it isn't already exposed as a CMake option).</p>
-<h2><a class="anchor" id="autotoc_md2795"></a>
+<h2><a class="anchor" id="autotoc_md3019"></a>
 Patching the code to improve compatibility</h2>
 <p>We recommend using git to create the patch file, since you'll already have it installed. </p><div class="fragment"><div class="line">PS D:\src\vcpkg\buildtrees\libpng\src\v1.6.37-c993153cdf&gt; git init .</div>
 <div class="line">Initialized empty Git repository in D:/src/vcpkg/buildtrees/libpng/src/v1.6.37-c993153cdf/.git/</div>
@@ -208,7 +208,7 @@ Patching the code to improve compatibility</h2>
 <div class="line"> </div>
 <div class="line">vcpkg_cmake_configure(</div>
 <div class="line">...</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2796"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3020"></a>
 Verification</h2>
 <p>To be completely sure this works from scratch, we need to remove the package and rebuild it:</p>
 <div class="fragment"><div class="line">PS D:\src\vcpkg&gt; vcpkg remove libpng:x64-uwp</div>

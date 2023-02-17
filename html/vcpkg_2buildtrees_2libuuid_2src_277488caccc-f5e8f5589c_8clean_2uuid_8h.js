@@ -1,0 +1,26 @@
+var vcpkg_2buildtrees_2libuuid_2src_277488caccc_f5e8f5589c_8clean_2uuid_8h =
+[
+    [ "UUID_DEFINE", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a84c04d7f90ec0056a71f32f83f51f17b", null ],
+    [ "UUID_TYPE_DCE_RANDOM", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#af340e294e1dbe7b9132c87402fa221f8", null ],
+    [ "UUID_TYPE_DCE_TIME", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a756c83af73d37e47521a60c1f18dfd2c", null ],
+    [ "UUID_VARIANT_DCE", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#aa10bfe9f7ea7762151bebc841117d2a0", null ],
+    [ "UUID_VARIANT_MICROSOFT", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a7b6b2e67138c91112ecfb6c63b98e720", null ],
+    [ "UUID_VARIANT_NCS", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a96eea04272860973eb057fb119211a89", null ],
+    [ "UUID_VARIANT_OTHER", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#ab080868393be7d17d0ef1609ae7852cd", null ],
+    [ "uuid_t", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#afe72ea97f61d26d4b92d56c4d3b40a78", null ],
+    [ "uuid_clear", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#aa39e286931426a49953b7561cb68a0ac", null ],
+    [ "uuid_compare", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a3924b3a31ed8dba10259cc74a78e6fa6", null ],
+    [ "uuid_copy", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#ad2d4f2b8ed9928f615e65d0820ae5f3f", null ],
+    [ "uuid_generate", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a804579c25f4e14c9f7b2d6252efdecea", null ],
+    [ "uuid_generate_random", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a7c4e3960c7460adf5491ee6445dc92dd", null ],
+    [ "uuid_generate_time", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#ab6a83c8c0da7ea1b2dd35389670ec38e", null ],
+    [ "uuid_generate_time_safe", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#ae4ceddd8905bfec24d66c421f0c918af", null ],
+    [ "uuid_is_null", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a3b32ab5ccc9a84ebf860fb7538867036", null ],
+    [ "uuid_parse", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a36e03ea393dabc0d2a3fca3a26785deb", null ],
+    [ "uuid_time", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a1c918aeffe2c1bc8628f514deb4761f1", null ],
+    [ "uuid_type", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a96ea9dab0afeb229ef41059c606b4b03", null ],
+    [ "uuid_unparse", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#ace9f965469a6d0871f557e619ca20fe0", null ],
+    [ "uuid_unparse_lower", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a0588d28ea4da8b7f660ecd042e408b8a", null ],
+    [ "uuid_unparse_upper", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#a58bdc3a6019fea193367a75f45fadb12", null ],
+    [ "uuid_variant", "vcpkg_2buildtrees_2libuuid_2src_277488caccc-f5e8f5589c_8clean_2uuid_8h.html#ae9f2bbd8e910d50c176d7a3398491690", null ]
+];

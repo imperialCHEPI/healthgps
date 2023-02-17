@@ -61,7 +61,7 @@ var dir_cd58467f905e607d7bb439efd5f614e9 =
       [ "UnivariateSummary", "classhgps_1_1core_1_1UnivariateSummary.html", "classhgps_1_1core_1_1UnivariateSummary" ]
     ] ],
     [ "version.cpp", "version_8cpp.html", null ],
-    [ "version.h", "version_8h.html", "version_8h" ],
+    [ "version.h", "src_2HealthGPS_8Core_2version_8h.html", "src_2HealthGPS_8Core_2version_8h" ],
     [ "visitor.h", "visitor_8h.html", [
       [ "DataTableColumnVisitor", "classhgps_1_1core_1_1DataTableColumnVisitor.html", "classhgps_1_1core_1_1DataTableColumnVisitor" ]
     ] ]

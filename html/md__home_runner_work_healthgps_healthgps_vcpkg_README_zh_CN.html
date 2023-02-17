@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Discord: <a href="https://www.includecpp.org">#include &lt;C++&gt;</a>， #🌏vcpkg 频道</li>
 <li>文档: <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_README.html">Documentation</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4053"></a>
+<h1><a class="anchor" id="autotoc_md4277"></a>
 目录</h1>
 <ul>
 <li><a href="#vcpkg-总览">Vcpkg: 总览</a></li>
@@ -125,13 +125,13 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li><a href="#安全事项">安全事项</a></li>
 <li><a href="#数据收集">数据收集</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4054"></a>
+<h1><a class="anchor" id="autotoc_md4278"></a>
 入门</h1>
 <p>首先，请阅读以下任一快速入门指南： <a href="#快速开始-windows">Windows</a> 或 <a href="#快速开始-unix">macOS 和 Linux</a>， 这取决于您使用的是什么平台。</p>
 <p>更多有关信息，请参见 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_installing_and_using_packages.html">安装和使用软件包</a>。 如果 vcpkg 目录中没有您需要的库， 您可以 <a href="https://github.com/microsoft/vcpkg/issues/new/choose">在 GitHub 上打开问题</a>。 vcpkg 团队和贡献者可以在这里看到它， 并可能将这个库添加到 vcpkg。</p>
 <p>安装并运行 vcpkg 后， 您可能希望将 <a href="#tab补全自动补全">TAB 补全</a> 添加到您的 Shell 中。</p>
 <p>最后，如果您对 vcpkg 的未来感兴趣，请查看 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_manifests.html">清单</a>！ 这是一项实验性功能，可能会出现错误。 因此，请尝试一下并<a href="https://github.com/microsoft/vcpkg/issues/new/choose">打开所有问题</a>!</p>
-<h2><a class="anchor" id="autotoc_md4055"></a>
+<h2><a class="anchor" id="autotoc_md4279"></a>
 快速开始: Windows</h2>
 <p>前置条件:</p><ul>
 <li>Windows 7 或更新的版本</li>
@@ -158,7 +158,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line">&gt; cmake --build [build directory]</div>
 </div><!-- fragment --><p>在 CMake 中，您仍需通过 <code>find_package</code> 来使用 vcpkg 中已安装的库。 请查阅 <a href="#在-cmake-中使用-vcpkg">CMake 章节</a> 获取更多信息，其中包含了在 IDE 中使用 CMake 的内容。</p>
 <p>对于其他工具 (包括 Visual Studio Code)，请查阅 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">集成指南</a>。</p>
-<h2><a class="anchor" id="autotoc_md4056"></a>
+<h2><a class="anchor" id="autotoc_md4280"></a>
 快速开始: Unix</h2>
 <p>Linux平台前置条件:</p><ul>
 <li><a href="https://git-scm.com/downloads">Git</a></li>
@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line">$ cmake --build [build directory]</div>
 </div><!-- fragment --><p>在 CMake 中，您仍需通过 <code>find_package</code> 来使用 vcpkg 中已安装的库。 为了您更好的在 CMake 或 VSCode CMake Tools 中使用 vcpkg， 请查阅 <a href="#在-cmake-中使用-vcpkg">CMake 章节</a> 获取更多信息， 其中包含了在 IDE 中使用 CMake 的内容。</p>
 <p>对于其他工具，请查阅 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">集成指南</a>。</p>
-<h2><a class="anchor" id="autotoc_md4057"></a>
+<h2><a class="anchor" id="autotoc_md4281"></a>
 安装 Linux Developer Tools</h2>
 <p>在 Linux 的不同发行版中，您需要安装不同的工具包:</p>
 <ul>
@@ -194,14 +194,14 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line">$ sudo yum install devtoolset-7</div>
 <div class="line">$ scl enable devtoolset-7 bash</div>
 </div><!-- fragment --><p>对于其他的发行版，请确保已安装 g++ 6 或更新的版本。 若您希望添加特定发行版的说明，<a href="https://github.com/microsoft/vcpkg/pulls">请提交一个 PR</a>!</p>
-<h2><a class="anchor" id="autotoc_md4058"></a>
+<h2><a class="anchor" id="autotoc_md4282"></a>
 安装 macOS Developer Tools</h2>
 <p>在 macOS 中，您唯一需要做的是在终端中运行以下命令:</p>
 <div class="fragment"><div class="line">$ xcode-select --install</div>
 </div><!-- fragment --><p>然后按照出现的窗口中的提示进行操作。 此时，您就可以使用 bootstrap.sh 编译 vcpkg 了。 请参阅 <a href="#快速开始-unix">快速开始</a></p>
-<h2><a class="anchor" id="autotoc_md4059"></a>
+<h2><a class="anchor" id="autotoc_md4283"></a>
 在 CMake 中使用 vcpkg</h2>
-<h3><a class="anchor" id="autotoc_md4060"></a>
+<h3><a class="anchor" id="autotoc_md4284"></a>
 Visual Studio Code 中的 CMake Tools</h3>
 <p>将以下内容添加到您的工作区的 <code>settings.json</code> 中将使 CMake Tools 自动使用 vcpkg 中的第三方库:</p>
 <div class="fragment"><div class="line">{</div>
@@ -209,34 +209,34 @@ Visual Studio Code 中的 CMake Tools</h3>
 <div class="line">    &quot;CMAKE_TOOLCHAIN_FILE&quot;: &quot;[vcpkg root]/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4061"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4285"></a>
 Visual Studio CMake 工程中使用 vcpkg</h3>
 <p>打开 CMake 设置选项，将 vcpkg toolchain 文件路径在 <code>CMake toolchain file</code> 中：</p>
 <div class="fragment"><div class="line">[vcpkg root]/scripts/buildsystems/vcpkg.cmake</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4062"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4286"></a>
 CLion 中使用 vcpkg</h3>
 <p>打开 Toolchains 设置 (File &gt; Settings on Windows and Linux, CLion &gt; Preferences on macOS)， 并打开 CMake 设置 (Build, Execution, Deployment &gt; CMake)。 最后在 <code>CMake options</code> 中添加以下行:</p>
 <div class="fragment"><div class="line">-DCMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake</div>
 </div><!-- fragment --><p>您必须手动将此选项加入每个项目配置文件中。</p>
-<h3><a class="anchor" id="autotoc_md4063"></a>
+<h3><a class="anchor" id="autotoc_md4287"></a>
 将 vcpkg 作为一个子模块</h3>
 <p>当您希望将 vcpkg 作为一个子模块加入到您的工程中时， 您可以在第一个 <code><a class="el" href="namespaceconf.html#a45653c983098153b78e33600e39230eb">project()</a></code> 调用之前将以下内容添加到 CMakeLists.txt 中， 而无需将 <code>CMAKE_TOOLCHAIN_FILE</code> 传递给 CMake 调用。</p>
 <div class="fragment"><div class="line">set(CMAKE_TOOLCHAIN_FILE &quot;${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line">  CACHE STRING &quot;Vcpkg toolchain file&quot;)</div>
 </div><!-- fragment --><p>使用此种方式可无需设置 <code>CMAKE_TOOLCHAIN_FILE</code> 即可使用 vcpkg，且更容易完成配置工作。</p>
-<h1><a class="anchor" id="autotoc_md4064"></a>
+<h1><a class="anchor" id="autotoc_md4288"></a>
 Tab 补全/自动补全</h1>
 <p><code>vcpkg</code> 支持在 Powershell 和 Bash 中自动补全命令，包名称及选项。 若您需要在指定的 shell 中启用 Tab 补全功能，请依据您使用的 shell 运行：</p>
 <div class="fragment"><div class="line">&gt; .\vcpkg integrate powershell</div>
 </div><!-- fragment --><p>或</p>
 <div class="fragment"><div class="line">$ ./vcpkg integrate bash # 或 zsh</div>
 </div><!-- fragment --><p>然后重新启动控制台。</p>
-<h2><a class="anchor" id="autotoc_md4065"></a>
+<h2><a class="anchor" id="autotoc_md4289"></a>
 示例</h2>
 <p>请查看 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_README.html">文档</a> 获取具体示例， 其包含 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_installing_and_using_packages.html">安装并使用包</a>， <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_zipfiles.html">使用压缩文件添加包</a> 和 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_github_repos.html">从 GitHub 源中添加一个包</a>。</p>
 <p>我们的文档现在也可以从 <a href="https://vcpkg.io/">vcpkg.io</a> 在线获取。 我们真诚的希望您向我们提出关于此网站的任何建议! 请在<a href="https://github.com/vcpkg/vcpkg.github.io/issues">这里</a> 创建 issue.</p>
 <p>观看 4 分钟 <a href="https://www.youtube.com/watch?v=y41WFKbQFTw">demo 视频</a>。</p>
-<h2><a class="anchor" id="autotoc_md4066"></a>
+<h2><a class="anchor" id="autotoc_md4290"></a>
 贡献</h2>
 <p>Vcpkg是一个开源项目，并通过您的贡献不断发展。 下面是一些您可以贡献的方式:</p>
 <ul>
@@ -245,13 +245,13 @@ Tab 补全/自动补全</h1>
 </ul>
 <p>请参阅我们的 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_CONTRIBUTING_zh.html">贡献准则</a> 了解更多详细信息。</p>
 <p>该项目采用了 <a href="https://opensource.microsoft.com/codeofconduct/">Microsoft 开源行为准则</a>。 获取更多信息请查看 <a href="https://opensource.microsoft.com/codeofconduct/">行为准则 FAQ</a> 或联系 <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'nc'+'ode'+'@m'+'icr'+'os'+'oft'+'.c'+'om'; return false;">opencode@microsoft.com</a> 提出其他问题或意见。</p>
-<h1><a class="anchor" id="autotoc_md4067"></a>
+<h1><a class="anchor" id="autotoc_md4291"></a>
 开源协议</h1>
 <p>在此存储库中使用的代码均遵循 <a href="LICENSE.txt">MIT License</a>。这些库是根据其作者的开源协议受到许可的。 vcpkg会将库的协议文件放置在 <code>installed/&lt;triplet&gt;/share/&lt;port&gt;/copyright</code> 中。</p>
-<h1><a class="anchor" id="autotoc_md4068"></a>
+<h1><a class="anchor" id="autotoc_md4292"></a>
 安全事项</h1>
 <p>大多数vcpkg中的库采用其官方发布的构建工具来构建它们，并从其官方渠道下载源码及构建工具。 若您的环境包含防火墙或反病毒程序，为了避免构建失败，请考虑在禁用防火墙与反病毒程序的环境中构建它们一次， 再将它们生成的二进制缓存共享给原始环境中使用。</p>
-<h1><a class="anchor" id="autotoc_md4069"></a>
+<h1><a class="anchor" id="autotoc_md4293"></a>
 数据收集</h1>
 <p>vcpkg 会收集使用情况数据，以帮助我们改善您的体验。 Microsoft 收集的数据是匿名的。 您也可以通过以下步骤禁用数据收集：</p><ul>
 <li>将选项 <code>-disableMetrics</code> 传递给 bootstrap-vcpkg 脚本并重新运行此脚本</li>

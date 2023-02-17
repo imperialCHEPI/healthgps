@@ -94,16 +94,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"><span class="preprocessor">#define JSON_HAS_CPP_17</span></div>
 <div class="line"><span class="preprocessor">#define JSON_HAS_CPP_20</span></div>
 </div><!-- fragment --><p>The library targets C++11, but also supports some features introduced in later C++ versions (e.g., <code>std::string_view</code> support for C++17). For these new features, the library implements some preprocessor checks to determine the C++ standard. By defining any of these symbols, the internal check is overridden and the provided C++ version is unconditionally assumed. This can be helpful for compilers that only implement parts of the standard and would be detected incorrectly.</p>
-<h1><a class="anchor" id="autotoc_md1743"></a>
+<h1><a class="anchor" id="autotoc_md1967"></a>
 Default definition</h1>
 <p>The default value is detected based on preprocessor macros such as <code>#!cpp __cplusplus</code>, <code>#!cpp _HAS_CXX17</code>, or <code>#!cpp _MSVC_LANG</code>.</p>
-<h1><a class="anchor" id="autotoc_md1744"></a>
+<h1><a class="anchor" id="autotoc_md1968"></a>
 Notes</h1>
 <ul>
 <li><code>#!cpp JSON_HAS_CPP_11</code> is always defined.</li>
 <li>All macros are undefined outside the library.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1745"></a>
+<h1><a class="anchor" id="autotoc_md1969"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The code below forces the library to use the C++14 standard:
 
@@ -113,7 +113,7 @@ Examples</h1>
 
 ...
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1746"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1970"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.10.5. </li>

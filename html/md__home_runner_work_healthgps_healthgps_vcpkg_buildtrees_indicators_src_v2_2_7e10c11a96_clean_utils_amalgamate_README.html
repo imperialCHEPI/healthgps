@@ -93,7 +93,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>Mirror: <a href="https://github.com/edlund/amalgamate">https://github.com/edlund/amalgamate</a></p>
 <p><code>amalgamate.py</code> aims to make it easy to use SQLite-style C source and header amalgamation in projects.</p>
 <p>For more information, please refer to: <a href="http://sqlite.org/amalgamation.html">http://sqlite.org/amalgamation.html</a></p>
-<h1><a class="anchor" id="autotoc_md586"></a>
+<h1><a class="anchor" id="autotoc_md810"></a>
 Here be dragons</h1>
 <p><code>amalgamate.py</code> is quite dumb, it only knows the bare minimum about C code required in order to be able to handle trivial include directives. It can produce weird results for unexpected code.</p>
 <p>Things to be aware of:</p>
@@ -104,11 +104,11 @@ Here be dragons</h1>
 <p><code>amalgamate.py</code> should be usable with C++ code, but raw string literals from C++11 will definitely cause problems: </p><pre class="fragment">    R"delimiter(Terrible raw \ data " #include &lt;sneaky.hpp&gt;)delimiter"
     R"delimiter(Terrible raw \ data " escaping)delimiter"
 </pre><p> In the examples above, <code>amalgamate.py</code> will stop parsing the raw string literal when it encounters the first quotation mark, which will produce unexpected results.</p>
-<h1><a class="anchor" id="autotoc_md587"></a>
+<h1><a class="anchor" id="autotoc_md811"></a>
 Installing amalgamate.py</h1>
 <p>Python v.2.7.0 or higher is required.</p>
 <p><code>amalgamate.py</code> can be tested and installed using the following commands: </p><pre class="fragment">    ./test.sh &amp;&amp; sudo -k cp ./amalgamate.py /usr/local/bin/
-</pre> <h1><a class="anchor" id="autotoc_md588"></a>
+</pre> <h1><a class="anchor" id="autotoc_md812"></a>
 Using amalgamate.py</h1>
 <pre class="fragment">    amalgamate.py [-v] -c path/to/config.json -s path/to/source/dir \
             [-p path/to/prologue.(c|h)]

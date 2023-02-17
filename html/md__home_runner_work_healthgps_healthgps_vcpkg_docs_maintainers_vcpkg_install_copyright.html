@@ -91,18 +91,18 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_install_copyright.md">vcpkg repo</a>.</p>
 <p>Merges multiple copyright files into a single file and install it. Installs a single copyright file.</p>
-<h1><a class="anchor" id="autotoc_md3434"></a>
+<h1><a class="anchor" id="autotoc_md3658"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_install_copyright(FILE_LIST &lt;file1&gt; &lt;file2&gt;... [COMMENT])</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3435"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3659"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3436"></a>
+<h2><a class="anchor" id="autotoc_md3660"></a>
 FILE_LIST</h2>
 <p>Specifies a list of license files with absolute paths. You must provide at least one file.</p>
-<h2><a class="anchor" id="autotoc_md3437"></a>
+<h2><a class="anchor" id="autotoc_md3661"></a>
 COMMENT</h2>
 <p>This optional parameter adds a comment before at the top of the file.</p>
-<h1><a class="anchor" id="autotoc_md3438"></a>
+<h1><a class="anchor" id="autotoc_md3662"></a>
 Notes</h1>
 <p>This function creates a file called <code>copyright</code> inside <code>${CURRENT_PACKAGES_DIR}/share/${PORT}</code></p>
 <p>If more than one file is provided, this function concatenates the contents of multiple copyright files to a single file.</p>
@@ -124,13 +124,13 @@ Notes</h1>
 <div class="line">LICENSE-MIT.txt:</div>
 <div class="line"> </div>
 <div class="line">Lorem ipsum dolor sit amet...</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3439"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3663"></a>
 Examples</h1>
 <div class="fragment"><div class="line">vcpkg_install_copyright(FILE_LIST &quot;${SOURCE_PATH}/LICENSE/license.md&quot; &quot;${SOURCE_PATH}/LICENSE/license_gpl.md&quot; COMMENT &quot;This is a comment&quot;)</div>
 </div><!-- fragment --><p>You can also collect the required files using a <code>GLOB</code> pattern:</p>
 <div class="fragment"><div class="line">file(GLOB LICENSE_FILES &quot;${SOURCE_PATH}/LICENSES/*&quot;)</div>
 <div class="line">vcpkg_install_copyright(FILE_LIST ${LICENSE_FILES})</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3440"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3664"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_install_copyright.cmake">vcpkg_install_copyright.md</a> </p>
 </div></div><!-- contents -->

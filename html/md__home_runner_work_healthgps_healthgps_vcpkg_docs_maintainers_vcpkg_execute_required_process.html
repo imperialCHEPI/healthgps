@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_execute_required_process.md">vcpkg repo</a>.</p>
 <p>Execute a process with logging and fail the build if the command fails.</p>
-<h1><a class="anchor" id="autotoc_md3275"></a>
+<h1><a class="anchor" id="autotoc_md3499"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_execute_required_process(</div>
 <div class="line">    COMMAND &lt;${PERL}&gt; [&lt;arguments&gt;...]</div>
@@ -102,34 +102,34 @@ Usage</h1>
 <div class="line">    [ERROR_VARIABLE &lt;var&gt;]</div>
 <div class="line">    [SAVE_LOG_FILES &lt;relative-path&gt; [&lt;relative-path&gt;...]]</div>
 <div class="line">)</div>
-</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md3276"></a>
+</div><!-- fragment --> <h1><a class="anchor" id="autotoc_md3500"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3277"></a>
+<h2><a class="anchor" id="autotoc_md3501"></a>
 ALLOW_IN_DOWNLOAD_MODE</h2>
 <p>Allows the command to execute in Download Mode. <a href="../../scripts/cmake/execute_process.cmake">See execute_process() override</a>.</p>
-<h2><a class="anchor" id="autotoc_md3278"></a>
+<h2><a class="anchor" id="autotoc_md3502"></a>
 COMMAND</h2>
 <p>The command to be executed, along with its arguments.</p>
-<h2><a class="anchor" id="autotoc_md3279"></a>
+<h2><a class="anchor" id="autotoc_md3503"></a>
 WORKING_DIRECTORY</h2>
 <p>The directory to execute the command in.</p>
-<h2><a class="anchor" id="autotoc_md3280"></a>
+<h2><a class="anchor" id="autotoc_md3504"></a>
 LOGNAME</h2>
 <p>The prefix to use for the log files.</p>
-<h2><a class="anchor" id="autotoc_md3281"></a>
+<h2><a class="anchor" id="autotoc_md3505"></a>
 TIMEOUT</h2>
 <p>Optional timeout after which to terminate the command.</p>
-<h2><a class="anchor" id="autotoc_md3282"></a>
+<h2><a class="anchor" id="autotoc_md3506"></a>
 OUTPUT_VARIABLE</h2>
 <p>Optional variable to receive stdout of the command.</p>
-<h2><a class="anchor" id="autotoc_md3283"></a>
+<h2><a class="anchor" id="autotoc_md3507"></a>
 ERROR_VARIABLE</h2>
 <p>Optional variable to receive stderr of the command.</p>
 <p>This should be a unique name for different triplets so that the logs don't conflict when building multiple at once.</p>
-<h2><a class="anchor" id="autotoc_md3284"></a>
+<h2><a class="anchor" id="autotoc_md3508"></a>
 SAVE_LOG_FILES</h2>
 <p>Optional files to be moved from the working directory to <code>${CURRENT_BUILDTREES_DIR}</code>. The files are copied even if the process failed. The target file names are constructed from the <code>LOGNAME</code> parameter and the source filename. If the target file name doesn't end in <code>.log</code>, this suffix is appended. This helps to collect relevant log files in CI setups.</p>
-<h1><a class="anchor" id="autotoc_md3285"></a>
+<h1><a class="anchor" id="autotoc_md3509"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/ffmpeg/portfile.cmake">ffmpeg</a></li>
@@ -137,7 +137,7 @@ Examples</h1>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/boost/portfile.cmake">boost</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/qt5/portfile.cmake">qt5</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3286"></a>
+<h1><a class="anchor" id="autotoc_md3510"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_execute_required_process.cmake">scripts/cmake/vcpkg_execute_required_process.cmake</a> </p>
 </div></div><!-- contents -->

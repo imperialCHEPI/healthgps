@@ -93,17 +93,17 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p><b>Experimental feature: this may change or be removed at any time</b></p>
 <p>Vcpkg can utilize mirrors to cache downloaded assets, ensuring continued operation even if the original source changes or disappears.</p>
 <p>In-tool help is available via <code>vcpkg help assetcaching</code>.</p>
-<h1><a class="anchor" id="autotoc_md3668"></a>
+<h1><a class="anchor" id="autotoc_md3892"></a>
 Configuration</h1>
 <p>Asset caching can be configured by setting the environment variable <code>X_VCPKG_ASSET_SOURCES</code> to a semicolon-delimited list of source strings. Characters can be escaped using backtick (`).</p>
-<h2><a class="anchor" id="autotoc_md3669"></a>
+<h2><a class="anchor" id="autotoc_md3893"></a>
 Valid source strings</h2>
 <p>The <code>&lt;rw&gt;</code> optional parameter for certain strings controls how they will be accessed. It can be specified as <code>read</code>, <code>write</code>, or <code>readwrite</code> and defaults to <code>read</code>.</p>
-<h3><a class="anchor" id="autotoc_md3670"></a>
+<h3><a class="anchor" id="autotoc_md3894"></a>
 &lt;tt&gt;clear&lt;/tt&gt;</h3>
 <p>Syntax: <code>clear</code></p>
 <p>Removes all previous sources</p>
-<h3><a class="anchor" id="autotoc_md3671"></a>
+<h3><a class="anchor" id="autotoc_md3895"></a>
 &lt;tt&gt;x-azurl&lt;/tt&gt;</h3>
 <p>Syntax: <code>x-azurl,&lt;url&gt;[,&lt;sas&gt;[,&lt;rw&gt;]]</code></p>
 <p>Adds an Azure Blob Storage source, optionally using Shared Access Signature validation. URL should include the container path and be terminated with a trailing <code>/</code>. SAS, if defined, should be prefixed with a <code>?</code>. Non-Azure servers will also work if they respond to GET and PUT requests of the form: <code>&lt;url&gt;&lt;sha512&gt;&lt;sas&gt;</code>. As an example, if you set <code>X_VCPKG_ASSET_SOURCES</code> to <code>x-azurl,<a href="https://mydomain.com/vcpkg/,token=abc123,readwrite">https://mydomain.com/vcpkg/,token=abc123,readwrite</a></code> your server should respond to <code>GET</code> and <code>PUT</code> requests of the form <code><a href="https://mydomain.com/vcpkg/">https://mydomain.com/vcpkg/</a>&lt;sha512&gt;?token=abc123</code>.</p>
@@ -116,7 +116,7 @@ Valid source strings</h2>
 </ol>
 <p>You can enable/disable steps 1 and 3 via the <a href="#valid-source-strings"><code>&lt;rw&gt;</code></a> specifier and you can disable step 2 via <code>x-block-origin</code> below.</p>
 <p>See also the <a href="binarycaching.md#azure-blob-storage-experimental">binary caching documentation for Azure Blob Storage</a> for more information on how to set up an <code>x-azurl</code> source.</p>
-<h3><a class="anchor" id="autotoc_md3672"></a>
+<h3><a class="anchor" id="autotoc_md3896"></a>
 &lt;tt&gt;x-block-origin&lt;/tt&gt;</h3>
 <p>Syntax: <code>x-block-origin</code></p>
 <p>Disables use of the original URLs in case the mirror does not have the file available. </p>

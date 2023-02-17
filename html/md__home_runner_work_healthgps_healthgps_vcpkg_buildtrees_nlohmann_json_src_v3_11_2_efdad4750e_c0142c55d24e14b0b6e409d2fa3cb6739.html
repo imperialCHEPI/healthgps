@@ -93,16 +93,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
 <div class="ttc" id="anamespacecxxopts_html_a6d7d82764847cde60d24c9077234adef"><div class="ttname"><a href="namespacecxxopts.html#a6d7d82764847cde60d24c9077234adef">cxxopts::patch</a></div><div class="ttdeci">uint8_t patch</div><div class="ttdef"><b>Definition:</b> cxxopts.hpp:85</div></div>
 </div><!-- fragment --><p><a href="http://jsonpatch.com">JSON Patch</a> defines a JSON document structure for expressing a sequence of operations to apply to a JSON document. With this function, a JSON Patch is applied to the current JSON value by executing all operations from the patch.</p>
-<h1><a class="anchor" id="autotoc_md1350"></a>
+<h1><a class="anchor" id="autotoc_md1574"></a>
 Parameters</h1>
 <p><code>json_patch</code> (in) : JSON patch document</p>
-<h1><a class="anchor" id="autotoc_md1351"></a>
+<h1><a class="anchor" id="autotoc_md1575"></a>
 Return value</h1>
 <p>patched document</p>
-<h1><a class="anchor" id="autotoc_md1352"></a>
+<h1><a class="anchor" id="autotoc_md1576"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1353"></a>
+<h1><a class="anchor" id="autotoc_md1577"></a>
 Exceptions</h1>
 <ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error104"><code>parse_error.104</code></a> if the JSON patch does not consist of an array of objects.</li>
@@ -112,13 +112,13 @@ Exceptions</h1>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionout_of_range405"><code>out_of_range.405</code></a> if JSON pointer has no parent ("add", "remove", "move")</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionother_error501"><code>out_of_range.501</code></a> if "test" operation was unsuccessful.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1354"></a>
+<h1><a class="anchor" id="autotoc_md1578"></a>
 Complexity</h1>
 <p>Linear in the size of the JSON value and the length of the JSON patch. As usually only a fraction of the JSON value is affected by the patch, the complexity can usually be neglected.</p>
-<h1><a class="anchor" id="autotoc_md1355"></a>
+<h1><a class="anchor" id="autotoc_md1579"></a>
 Notes</h1>
 <p>The application of a patch is atomic: Either all operations succeed and the patched document is returned or an exception is thrown. In any case, the original value is not changed: the patch is applied to a copy of the value.</p>
-<h1><a class="anchor" id="autotoc_md1356"></a>
+<h1><a class="anchor" id="autotoc_md1580"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows how a JSON patch is applied to a value.
 
@@ -131,7 +131,7 @@ Output:
 ```json
 --8&lt;-- "examples/patch.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1357"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1581"></a>
 See also</h1>
 <ul>
 <li><a href="https://tools.ietf.org/html/rfc6902">RFC 6902 (JSON Patch)</a></li>
@@ -139,7 +139,7 @@ See also</h1>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cdb7281c217863adf25902b384f54e74d.html">patch_inplace</a> applies a JSON Patch without creating a copy of the document</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c33d81a0da5f9c3902cddb475137f29af.html">merge_patch</a> applies a JSON Merge Patch</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1358"></a>
+<h1><a class="anchor" id="autotoc_md1582"></a>
 Version history</h1>
 <ul>
 <li>Added in version 2.0.0. </li>

@@ -96,27 +96,27 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </blockquote>
 <p>This description includes both integer and floating-point numbers. However, C++ allows more precise storage if it is known whether the number is a signed integer, an unsigned integer or a floating-point number. Therefore, three different types, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8fad9bbe7fddf99841dc225dd67548c6.html">`number_integer_t`</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb48ee65dfa3181b9fc3867f565566629.html">`number_unsigned_t`</a> and <code>number_float_t</code> are used.</p>
 <p>To store floating-point numbers in C++, a type is defined by the template parameter <code>NumberFloatType</code> which chooses the type to use.</p>
-<h1><a class="anchor" id="autotoc_md1159"></a>
+<h1><a class="anchor" id="autotoc_md1383"></a>
 Notes</h1>
-<h3><a class="anchor" id="autotoc_md1160"></a>
+<h3><a class="anchor" id="autotoc_md1384"></a>
 Default type</h3>
 <p>With the default values for <code>NumberFloatType</code> (<code>double</code>), the default value for <code>number_float_t</code> is <code>#!cpp double</code>.</p>
-<h3><a class="anchor" id="autotoc_md1161"></a>
+<h3><a class="anchor" id="autotoc_md1385"></a>
 Default behavior</h3>
 <ul>
 <li>The restrictions about leading zeros is not enforced in C++. Instead, leading zeros in floating-point literals will be ignored. Internally, the value will be stored as decimal number. For instance, the C++ floating-point literal <code>01.2</code> will be serialized to <code>1.2</code>. During deserialization, leading zeros yield an error.</li>
 <li>Not-a-number (NaN) values will be serialized to <code>null</code>.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1162"></a>
+<h3><a class="anchor" id="autotoc_md1386"></a>
 Limits</h3>
 <p><a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a> states: </p><blockquote class="doxtable">
 <p>This specification allows implementations to set limits on the range and precision of numbers accepted. Since software that implements IEEE 754-2008 binary64 (double precision) numbers is generally available and widely used, good interoperability can be achieved by implementations that expect no more precision or range than these provide, in the sense that implementations will approximate JSON numbers within the expected precision. </p>
 </blockquote>
 <p>This implementation does exactly follow this approach, as it uses double precision floating-point numbers. Note values smaller than <code>-1.79769313486232e+308</code> and values greater than <code>1.79769313486232e+308</code> will be stored as NaN internally and be serialized to <code>null</code>.</p>
-<h3><a class="anchor" id="autotoc_md1163"></a>
+<h3><a class="anchor" id="autotoc_md1387"></a>
 Storage</h3>
 <p>Floating-point number values are stored directly inside a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> type.</p>
-<h1><a class="anchor" id="autotoc_md1164"></a>
+<h1><a class="anchor" id="autotoc_md1388"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows that `number_float_t` is by default, a typedef to `#!cpp double`.
 
@@ -129,7 +129,7 @@ Output:
 ```json
 --8&lt;-- "examples/number_float_t.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1165"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1389"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

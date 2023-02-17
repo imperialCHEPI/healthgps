@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title"><code>vcpkg-eg-mac</code> VMs </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md4071"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md4295"></a>
 Table of Contents</h1>
 <ul>
 <li><a href="#vcpkg-eg-mac-vms"><code>vcpkg-eg-mac</code> VMs</a><ul>
@@ -110,7 +110,7 @@ Table of Contents</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4072"></a>
+<h1><a class="anchor" id="autotoc_md4296"></a>
 Basic Usage</h1>
 <p>The most common operation here is to set up a new VM for Azure pipelines; we try to make that operation as easy as possible. It should take all of three steps, assuming the machine is already set up (or read <a href="#setting-up-a-new-macos-machine">these instructions</a> for how to set up a machine):</p>
 <ol type="1">
@@ -119,7 +119,7 @@ Basic Usage</h1>
 <li><a href="#running-the-vm">Setup and run the vagrant VM</a></li>
 <li>Update <code>azure-pipelines.yml</code> and <code>azure-pipelines-osx.yml</code> to point to the new macOS pool.</li>
 </ol>
-<h2><a class="anchor" id="autotoc_md4073"></a>
+<h2><a class="anchor" id="autotoc_md4297"></a>
 Creating a new Vagrant box</h2>
 <p>Whenever we want to install updated versions of the command line tools, or of macOS, we need to create a new vagrant box. This is pretty easy, but the results of the creation are not public, since we're concerned about licensing. However, if you're sure you're following Apple's licensing, you can set up your own vagrant boxes that are the same as ours by doing the following:</p>
 <p>You'll need some prerequisites:</p>
@@ -152,7 +152,7 @@ Creating a new Vagrant box</h2>
 <div class="fragment"><div class="line">$ vagrant up</div>
 <div class="line">$ vagrant package</div>
 </div><!-- fragment --><p>This will create a <code>package.box</code>, which is the box file for the base VM. Once you've created this box, if you're making it the new box for the CI, upload it to the fileshare, under <code>share/boxes/macos-ci</code>. Then, add the metadata about the box (the name and version) to <code>share/boxes/macos-ci.json</code>. Once you've done that, add the software versions under <a href="#vm-software-versions">VM Software Versions</a>.</p>
-<h3><a class="anchor" id="autotoc_md4074"></a>
+<h3><a class="anchor" id="autotoc_md4298"></a>
 VM Software Versions</h3>
 <ul>
 <li>2022-02-04 (minor update to 2022-01-03)<ul>
@@ -181,12 +181,12 @@ VM Software Versions</h3>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md4075"></a>
+<h2><a class="anchor" id="autotoc_md4299"></a>
 Creating a New Azure Agent Pool</h2>
 <p>When updating the macOS machines to a new version, you'll need to create a new agent pool for the machines to join. The standard for this is to name it <code>PrOsx-YYYY-MM-DD</code>, with <code>YYYY-MM-DD</code> the day that the process is started.</p>
 <p>In order to create a new agent pool, go to the <code>vcpkg/public</code> project; go to <code>Project settings</code>, then go to <code>Agent pools</code> under <code>Pipelines</code>. Add a new self-hosted pool, name it as above, and make certain to check the box for "Grant access permission to all pipelines".</p>
 <p>Once you've done this, you are done; you can start adding new machines to the pool!</p>
-<h2><a class="anchor" id="autotoc_md4076"></a>
+<h2><a class="anchor" id="autotoc_md4300"></a>
 Running the VM</h2>
 <p>First, make sure that your software is up to date: </p><div class="fragment"><div class="line">$ cd ~/vcpkg</div>
 <div class="line">$ git fetch</div>
@@ -199,11 +199,11 @@ Running the VM</h2>
 <div class="line">$ ~/vcpkg/scripts/azure-pipelines/osx/Setup-VagrantMachines.ps1 -Date &lt;box version YYYY-MM-DD&gt; -DevopsPat &lt;PAT&gt;</div>
 <div class="line">$ cd ~/vagrant/vcpkg-eg-mac</div>
 <div class="line">$ vagrant up # if this fails, reboot through the kvm and/or log in interactively, then come back here</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4077"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4301"></a>
 Getting an Azure Pipelines PAT</h1>
 <p>Personal Access Tokens are an important part of this process, and they are fairly easy to generate. On ADO, under the correct project (in vcpkg's case, "vcpkg"), click on the "User Settings" icon, then go to "Personal access tokens". It is the icon to the left of your user icon, in the top right corner.</p>
 <p>Then, create a new token, give it a name, make sure it expires quickly, and give it a custom defined scope that includes the "Agent pools: Read &amp; manage" permission (you'll need to "Show all scopes" to access this). You can now copy this token and use it to allow machines to join.</p>
-<h1><a class="anchor" id="autotoc_md4078"></a>
+<h1><a class="anchor" id="autotoc_md4302"></a>
 Setting up a new macOS machine</h1>
 <p>Before anything else, one must download <code>brew</code> and <code>powershell</code>.</p>
 <div class="fragment"><div class="line">$ /bin/bash -c &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)&quot;</div>
@@ -217,7 +217,7 @@ Setting up a new macOS machine</h1>
 <p>Next, install prerequisites: </p><div class="fragment"><div class="line">$ cd vcpkg/scripts/azure-pipelines/osx</div>
 <div class="line">$ ./Install-Prerequisites.ps1 -Force</div>
 </div><!-- fragment --><p>And finally, make sure you can <a href="#internal-accessing-the-macos-fileshare">access ~/vagrant/share</a>.</p>
-<h1><a class="anchor" id="autotoc_md4079"></a>
+<h1><a class="anchor" id="autotoc_md4303"></a>
 Troubleshooting</h1>
 <p>The following are issues that we've run into:</p>
 <ul>
@@ -232,7 +232,7 @@ Troubleshooting</h1>
 </code></li>
 </ul>
 <p><code></code></p>
-<h1><a class="anchor" id="autotoc_md4080"></a>
+<h1><a class="anchor" id="autotoc_md4304"></a>
 (Internal) Accessing the macOS fileshare</h1>
 <p><code> The fileshare is located on <code>vcpkgmm-01</code>, under the <code>fileshare</code> user, in the <code>share</code> directory. In order to get <code>sshfs</code> working on the physical machine, You can run <code>Install-Prerequisites.ps1</code> to grab the right software, then either:</code></p>
 <p><code></p><div class="fragment"><div class="line">$ mkdir -p ~/vagrant/share</div>

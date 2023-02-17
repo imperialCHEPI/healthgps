@@ -90,13 +90,13 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>Note: this is the feature as it was initially specified and does not necessarily reflect the current behavior.</b></p>
-<h1><a class="anchor" id="autotoc_md3627"></a>
+<h1><a class="anchor" id="autotoc_md3851"></a>
 Background</h1>
 <p>We extracted vcpkg-tool as part of a future wherein Registries are the primary mechanism for interacting with the ports tree, which would allow the vcpkg tool and associated artifacts to be deployed and figure the rest out on their own. Unfortunately, we have concurrently edited things in the so called "scripts" tree which lives in support of ports but really probably belongs in the vcpkg-tool repo.</p>
 <p>Moreover, as part of stabilizing registries, the interface exposed by the scripts tree becomes contractual rather than something we can change in concert with ports, since we can no longer see the universe of ports to validate that changes are correct.</p>
 <p>To that end we are auditing the contents of the scripts tree to make sure it is a solid foundation for future work.</p>
 <p>The work list is contained in <a href="https://github.com/microsoft/vcpkg/issues/16188">Issue #16188</a>.</p>
-<h1><a class="anchor" id="autotoc_md3628"></a>
+<h1><a class="anchor" id="autotoc_md3852"></a>
 Audit Points</h1>
 <p>The following are assertions we want to be able to make about the contents of the scripts tree. Note that this does <em>not</em> refer to <code>vcpkg.cmake</code> since that needs to work with older versions of cmake.</p>
 <p>These are design ideals that we may break in some limited cases where that makes sense.</p>
@@ -126,7 +126,7 @@ Audit Points</h1>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3629"></a>
+<h2><a class="anchor" id="autotoc_md3853"></a>
 Naming Variables</h2>
 <ul>
 <li><code>cmake_parse_arguments</code>: set prefix to <code>"arg"</code></li>
@@ -142,7 +142,7 @@ Naming Variables</h2>
 </li>
 <li>Public global variables are named <code>VCPKG_</code>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3630"></a>
+<h1><a class="anchor" id="autotoc_md3854"></a>
 Prognosis</h1>
 <p>Not everything should remain in the scripts tree. As part of this audit, each helper will be dealt with in one of several ways:</p>
 <ul>

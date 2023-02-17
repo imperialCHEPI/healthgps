@@ -108,23 +108,23 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <ol type="1">
 <li>Compares wether a JSON value is less than or equal to a scalar or a scalar is less than or equal to a JSON value by converting the scalar to a JSON value and comparing both JSON values according to 1.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1259"></a>
+<h1><a class="anchor" id="autotoc_md1483"></a>
 Template parameters</h1>
 <p><code>ScalarType</code> : a scalar type according to <code>std::is_scalar&lt;ScalarType&gt;<a class="el" href="classvalue.html">value</a></code></p>
-<h1><a class="anchor" id="autotoc_md1260"></a>
+<h1><a class="anchor" id="autotoc_md1484"></a>
 Parameters</h1>
 <p><code>lhs</code> (in) : first value to consider</p>
 <p><code>rhs</code> (in) : second value to consider</p>
-<h1><a class="anchor" id="autotoc_md1261"></a>
+<h1><a class="anchor" id="autotoc_md1485"></a>
 Return value</h1>
 <p>whether <code>lhs</code> is less than or equal to <code>rhs</code></p>
-<h1><a class="anchor" id="autotoc_md1262"></a>
+<h1><a class="anchor" id="autotoc_md1486"></a>
 Exception safety</h1>
 <p>No-throw guarantee: this function never throws exceptions.</p>
-<h1><a class="anchor" id="autotoc_md1263"></a>
+<h1><a class="anchor" id="autotoc_md1487"></a>
 Complexity</h1>
 <p>Linear.</p>
-<h1><a class="anchor" id="autotoc_md1264"></a>
+<h1><a class="anchor" id="autotoc_md1488"></a>
 Notes</h1>
 <p>!!! note "Comparing `NaN`" </p><pre class="fragment">`NaN` values are unordered within the domain of numbers.
 The following comparisons all yield `#!cpp false`:
@@ -133,7 +133,7 @@ The following comparisons all yield `#!cpp false`:
   3. Comparing a `NaN` and any other number.
 </pre><p> !!! note "Operator overload resolution" </p><pre class="fragment">Since C++20 overload resolution will consider the _rewritten candidate_ generated from
 [`operator&lt;=&gt;`](operator_spaceship.md).
-</pre> <h1><a class="anchor" id="autotoc_md1265"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1489"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example demonstrates comparing several JSON types.
 
@@ -146,12 +146,12 @@ Output:
 ```json
 --8&lt;-- "examples/operator__lessequal.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1266"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1490"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c7a929971a1351e55ff6eaeaec1e8191e.html">**operator&lt;=&gt;**</a> comparison: 3-way</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1267"></a>
+<h1><a class="anchor" id="autotoc_md1491"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 1.0.0. Conditionally removed since C++20 in version 3.11.0.</li>

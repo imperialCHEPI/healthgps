@@ -92,19 +92,19 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">basic_json</a> flatten() <span class="keyword">const</span>;</div>
 <div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
 </div><!-- fragment --><p>The function creates a JSON object whose keys are JSON pointers (see <a href="https://tools.ietf.org/html/rfc6901">RFC 6901</a>) and whose values are all primitive (see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cffaaf4bae1ffd6e29a8841aab9fdc848.html">`is_primitive()`</a> for more information). The original JSON value can be restored using the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb64d0584b1f3363f7365a61e76e9abe3.html">`unflatten()`</a> function.</p>
-<h1><a class="anchor" id="autotoc_md879"></a>
+<h1><a class="anchor" id="autotoc_md1103"></a>
 Return value</h1>
 <p>an object that maps JSON pointers to primitive values</p>
-<h1><a class="anchor" id="autotoc_md880"></a>
+<h1><a class="anchor" id="autotoc_md1104"></a>
 Exception safety</h1>
 <p>Strong exception safety: if an exception occurs, the original value stays intact.</p>
-<h1><a class="anchor" id="autotoc_md881"></a>
+<h1><a class="anchor" id="autotoc_md1105"></a>
 Complexity</h1>
 <p>Linear in the size the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md882"></a>
+<h1><a class="anchor" id="autotoc_md1106"></a>
 Notes</h1>
 <p>Empty objects and arrays are flattened to <code>#!json null</code> and will not be reconstructed correctly by the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb64d0584b1f3363f7365a61e76e9abe3.html">`unflatten()`</a> function.</p>
-<h1><a class="anchor" id="autotoc_md883"></a>
+<h1><a class="anchor" id="autotoc_md1107"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows how a JSON object is flattened to an object whose keys consist of JSON pointers.
 
@@ -117,12 +117,12 @@ Output:
 ```json
 --8&lt;-- "examples/flatten.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md884"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1108"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb64d0584b1f3363f7365a61e76e9abe3.html">unflatten</a> the reverse function</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md885"></a>
+<h1><a class="anchor" id="autotoc_md1109"></a>
 Version history</h1>
 <ul>
 <li>Added in version 2.0.0. </li>

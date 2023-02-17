@@ -5,8 +5,8 @@ var dir_e0d5869749a0b25070e65c0fff638dc0 =
     [ "iterators", "dir_a8497865970966676c74a8adda2e17d4.html", "dir_a8497865970966676c74a8adda2e17d4" ],
     [ "meta", "dir_6cedfdf991228f7e639cc5b18630bd0f.html", "dir_6cedfdf991228f7e639cc5b18630bd0f" ],
     [ "output", "dir_65a4a95ab12532a6d50c6f78acdead20.html", "dir_65a4a95ab12532a6d50c6f78acdead20" ],
-    [ "abi_macros.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2abi__macros_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2abi__macros_8hpp" ],
-    [ "exceptions.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2exceptions_8hpp.html", [
+    [ "abi_macros.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2abi__macros_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2abi__macros_8hpp" ],
+    [ "exceptions.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2exceptions_8hpp.html", [
       [ "exception", "classdetail_1_1exception.html", "classdetail_1_1exception" ],
       [ "parse_error", "classdetail_1_1parse__error.html", "classdetail_1_1parse__error" ],
       [ "invalid_iterator", "classdetail_1_1invalid__iterator.html", null ],
@@ -14,14 +14,14 @@ var dir_e0d5869749a0b25070e65c0fff638dc0 =
       [ "out_of_range", "classdetail_1_1out__of__range.html", null ],
       [ "other_error", "classdetail_1_1other__error.html", null ]
     ] ],
-    [ "hash.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2hash_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2hash_8hpp" ],
-    [ "json_pointer.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp" ],
-    [ "json_ref.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2json__ref_8hpp.html", [
+    [ "hash.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2hash_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2hash_8hpp" ],
+    [ "json_pointer.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2json__pointer_8hpp" ],
+    [ "json_ref.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2json__ref_8hpp.html", [
       [ "json_ref", "classdetail_1_1json__ref.html", "classdetail_1_1json__ref" ]
     ] ],
-    [ "macro_scope.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp" ],
-    [ "macro_unscope.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2macro__unscope_8hpp.html", null ],
-    [ "string_concat.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__concat_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__concat_8hpp" ],
-    [ "string_escape.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__escape_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__escape_8hpp" ],
-    [ "value_t.hpp", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2value__t_8hpp.html", "packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2value__t_8hpp" ]
+    [ "macro_scope.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp" ],
+    [ "macro_unscope.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2macro__unscope_8hpp.html", null ],
+    [ "string_concat.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__concat_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__concat_8hpp" ],
+    [ "string_escape.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__escape_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2string__escape_8hpp" ],
+    [ "value_t.hpp", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2value__t_8hpp.html", "vcpkg_2packages_2nlohmann-json__x64-linux_2include_2nlohmann_2detail_2value__t_8hpp" ]
 ];

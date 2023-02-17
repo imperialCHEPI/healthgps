@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_from_gitlab.md">vcpkg repo</a>.</p>
 <p>Download and extract a project from Gitlab instances. Enables support for <code>install --head</code>.</p>
-<h1><a class="anchor" id="autotoc_md3393"></a>
+<h1><a class="anchor" id="autotoc_md3617"></a>
 Usage:</h1>
 <div class="fragment"><div class="line">vcpkg_from_gitlab(</div>
 <div class="line">    GITLAB_URL &lt;https://gitlab.com&gt;</div>
@@ -103,50 +103,50 @@ Usage:</h1>
 <div class="line">    [PATCHES &lt;patch1.patch&gt; &lt;patch2.patch&gt;...]</div>
 <div class="line">    [FILE_DISAMBIGUATOR &lt;N&gt;]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3394"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3618"></a>
 Parameters:</h1>
-<h2><a class="anchor" id="autotoc_md3395"></a>
+<h2><a class="anchor" id="autotoc_md3619"></a>
 GITLAB_URL</h2>
 <p>The URL of the Gitlab instance to use.</p>
-<h2><a class="anchor" id="autotoc_md3396"></a>
+<h2><a class="anchor" id="autotoc_md3620"></a>
 OUT_SOURCE_PATH</h2>
 <p>Specifies the out-variable that will contain the extracted location.</p>
 <p>This should be set to <code>SOURCE_PATH</code> by convention.</p>
-<h2><a class="anchor" id="autotoc_md3397"></a>
+<h2><a class="anchor" id="autotoc_md3621"></a>
 REPO</h2>
 <p>The organization or user plus the repository name on the Gitlab instance.</p>
-<h2><a class="anchor" id="autotoc_md3398"></a>
+<h2><a class="anchor" id="autotoc_md3622"></a>
 REF</h2>
 <p>A stable git commit-ish (ideally a tag) that will not change contents. <b>This should not be a branch.</b></p>
 <p>For repositories without official releases, this can be set to the full commit id of the current latest master.</p>
 <p>If <code>REF</code> is specified, <code>SHA512</code> must also be specified.</p>
-<h2><a class="anchor" id="autotoc_md3399"></a>
+<h2><a class="anchor" id="autotoc_md3623"></a>
 SHA512</h2>
 <p>The SHA512 hash that should match the archive (${GITLAB_URL}/${REPO}/-/archive/${REF}/${REPO_NAME}-${REF}.tar.gz). The REPO_NAME variable is parsed from the value of REPO.</p>
 <p>This is most easily determined by first setting it to <code>0</code>, then trying to build the port. The error message will contain the full hash, which can be copied back into the portfile.</p>
-<h2><a class="anchor" id="autotoc_md3400"></a>
+<h2><a class="anchor" id="autotoc_md3624"></a>
 HEAD_REF</h2>
 <p>The unstable git commit-ish (ideally a branch) to pull for <code>--head</code> builds.</p>
 <p>For most projects, this should be <code>master</code>. The chosen branch should be one that is expected to be always buildable on all supported platforms.</p>
-<h2><a class="anchor" id="autotoc_md3401"></a>
+<h2><a class="anchor" id="autotoc_md3625"></a>
 PATCHES</h2>
 <p>A list of patches to be applied to the extracted sources.</p>
 <p>Relative paths are based on the port directory.</p>
-<h2><a class="anchor" id="autotoc_md3402"></a>
+<h2><a class="anchor" id="autotoc_md3626"></a>
 FILE_DISAMBIGUATOR</h2>
 <p>A token to uniquely identify the resulting filename if the SHA512 changes even though a git ref does not, to avoid stepping on the same file name.</p>
-<h1><a class="anchor" id="autotoc_md3403"></a>
+<h1><a class="anchor" id="autotoc_md3627"></a>
 Notes:</h1>
 <p>At least one of <code>REF</code> and <code>HEAD_REF</code> must be specified, however it is preferable for both to be present.</p>
 <p>This exports the <code>VCPKG_HEAD_VERSION</code> variable during head builds.</p>
-<h1><a class="anchor" id="autotoc_md3404"></a>
+<h1><a class="anchor" id="autotoc_md3628"></a>
 Examples:</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/curl/portfile.cmake#L75">curl</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/folly/portfile.cmake#L15">folly</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/z3/portfile.cmake#L13">z3</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3405"></a>
+<h1><a class="anchor" id="autotoc_md3629"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_from_gitlab.cmake">scripts/cmake/vcpkg_from_gitlab.cmake</a> </p>
 </div></div><!-- contents -->

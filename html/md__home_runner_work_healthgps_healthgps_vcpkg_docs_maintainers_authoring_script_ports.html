@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>Only direct dependencies are considered for <code>vcpkg-port-config.cmake</code> inclusion. This means that if a script port relies on another script port, it must explicitly import the <code>vcpkg-port-config.cmake</code> of its dependency.</p>
 <p>Script-to-script dependencies should not be marked as host. The dependency from a target port to a script should be marked host, which means that scripts should always already be natively compiling. By making script-to-script dependencies <code>"host": false</code>, it ensures that one script can depend upon the other being in its same install directory.</p>
 <p>Ports should never provide a <code>vcpkg-port-config.cmake</code> file under a different <code>share/</code> subdirectory than the current port (<code>${PORT}</code>).</p>
-<h1><a class="anchor" id="autotoc_md2807"></a>
+<h1><a class="anchor" id="autotoc_md3031"></a>
 Example</h1>
 <div class="fragment"><div class="line"># ${CURRENT_PACKAGES_DIR}/share/my-helper/vcpkg-port-config.cmake</div>
 <div class="line"> </div>

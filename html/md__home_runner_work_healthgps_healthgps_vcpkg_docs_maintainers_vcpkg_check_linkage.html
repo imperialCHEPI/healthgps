@@ -91,36 +91,36 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_check_linkage.md">vcpkg repo</a>.</p>
 <p>Asserts the available library and CRT linkage options for the port.</p>
-<h1><a class="anchor" id="autotoc_md3111"></a>
+<h1><a class="anchor" id="autotoc_md3335"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_check_linkage(</div>
 <div class="line">    [ONLY_STATIC_LIBRARY | ONLY_DYNAMIC_LIBRARY]</div>
 <div class="line">    [ONLY_STATIC_CRT | ONLY_DYNAMIC_CRT]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3112"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3336"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3113"></a>
+<h2><a class="anchor" id="autotoc_md3337"></a>
 ONLY_STATIC_LIBRARY</h2>
 <p>Indicates that this port can only be built with static library linkage.</p>
 <p>Note: If the user requested a dynamic build ONLY_STATIC_LIBRARY will result in a note being printed, not a fatal error.</p>
-<h2><a class="anchor" id="autotoc_md3114"></a>
+<h2><a class="anchor" id="autotoc_md3338"></a>
 ONLY_DYNAMIC_LIBRARY</h2>
 <p>Indicates that this port can only be built with dynamic/shared library linkage.</p>
-<h2><a class="anchor" id="autotoc_md3115"></a>
+<h2><a class="anchor" id="autotoc_md3339"></a>
 ONLY_STATIC_CRT</h2>
 <p>Indicates that this port can only be built with static CRT linkage.</p>
-<h2><a class="anchor" id="autotoc_md3116"></a>
+<h2><a class="anchor" id="autotoc_md3340"></a>
 ONLY_DYNAMIC_CRT</h2>
 <p>Indicates that this port can only be built with dynamic/shared CRT linkage.</p>
-<h1><a class="anchor" id="autotoc_md3117"></a>
+<h1><a class="anchor" id="autotoc_md3341"></a>
 Notes</h1>
 <p>This command will either alter the settings for <code>VCPKG_LIBRARY_LINKAGE</code> or fail, depending on what was requested by the user versus what the library supports.</p>
-<h1><a class="anchor" id="autotoc_md3118"></a>
+<h1><a class="anchor" id="autotoc_md3342"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/abseil/portfile.cmake">abseil</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3119"></a>
+<h1><a class="anchor" id="autotoc_md3343"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_check_linkage.cmake">scripts/cmake/vcpkg_check_linkage.cmake</a> </p>
 </div></div><!-- contents -->

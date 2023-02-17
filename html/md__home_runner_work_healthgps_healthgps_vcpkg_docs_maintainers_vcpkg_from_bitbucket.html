@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_from_bitbucket.md">vcpkg repo</a>.</p>
 <p>Download and extract a project from Bitbucket.</p>
-<h1><a class="anchor" id="autotoc_md3353"></a>
+<h1><a class="anchor" id="autotoc_md3577"></a>
 Usage:</h1>
 <div class="fragment"><div class="line">vcpkg_from_bitbucket(</div>
 <div class="line">    OUT_SOURCE_PATH &lt;SOURCE_PATH&gt;</div>
@@ -101,42 +101,42 @@ Usage:</h1>
 <div class="line">    [HEAD_REF &lt;master&gt;]</div>
 <div class="line">    [PATCHES &lt;patch1.patch&gt; &lt;patch2.patch&gt;...]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3354"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3578"></a>
 Parameters:</h1>
-<h2><a class="anchor" id="autotoc_md3355"></a>
+<h2><a class="anchor" id="autotoc_md3579"></a>
 OUT_SOURCE_PATH</h2>
 <p>Specifies the out-variable that will contain the extracted location.</p>
 <p>This should be set to <code>SOURCE_PATH</code> by convention.</p>
-<h2><a class="anchor" id="autotoc_md3356"></a>
+<h2><a class="anchor" id="autotoc_md3580"></a>
 REPO</h2>
 <p>The organization or user and repository on GitHub.</p>
-<h2><a class="anchor" id="autotoc_md3357"></a>
+<h2><a class="anchor" id="autotoc_md3581"></a>
 REF</h2>
 <p>A stable git commit-ish (ideally a tag) that will not change contents. <b>This should not be a branch.</b></p>
 <p>For repositories without official releases, this can be set to the full commit id of the current latest master.</p>
 <p>If <code>REF</code> is specified, <code>SHA512</code> must also be specified.</p>
-<h2><a class="anchor" id="autotoc_md3358"></a>
+<h2><a class="anchor" id="autotoc_md3582"></a>
 SHA512</h2>
 <p>The SHA512 hash that should match the archive (<a href="https://bitbucket.com/${REPO}/get/${REF}.tar.gz">https://bitbucket.com/${REPO}/get/${REF}.tar.gz</a>).</p>
 <p>This is most easily determined by first setting it to <code>0</code>, then trying to build the port. The error message will contain the full hash, which can be copied back into the portfile.</p>
-<h2><a class="anchor" id="autotoc_md3359"></a>
+<h2><a class="anchor" id="autotoc_md3583"></a>
 HEAD_REF</h2>
 <p>The unstable git commit-ish (ideally a branch) to pull for <code>--head</code> builds.</p>
 <p>For most projects, this should be <code>master</code>. The chosen branch should be one that is expected to be always buildable on all supported platforms.</p>
-<h2><a class="anchor" id="autotoc_md3360"></a>
+<h2><a class="anchor" id="autotoc_md3584"></a>
 PATCHES</h2>
 <p>A list of patches to be applied to the extracted sources.</p>
 <p>Relative paths are based on the port directory.</p>
-<h1><a class="anchor" id="autotoc_md3361"></a>
+<h1><a class="anchor" id="autotoc_md3585"></a>
 Notes:</h1>
 <p>At least one of <code>REF</code> and <code>HEAD_REF</code> must be specified, however it is preferable for both to be present.</p>
 <p>This exports the <code>VCPKG_HEAD_VERSION</code> variable during head builds.</p>
-<h1><a class="anchor" id="autotoc_md3362"></a>
+<h1><a class="anchor" id="autotoc_md3586"></a>
 Examples:</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/blaze/portfile.cmake">blaze</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3363"></a>
+<h1><a class="anchor" id="autotoc_md3587"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_from_bitbucket.cmake">scripts/cmake/vcpkg_from_bitbucket.cmake</a> </p>
 </div></div><!-- contents -->
