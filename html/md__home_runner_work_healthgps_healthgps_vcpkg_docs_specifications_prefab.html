@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>a blog post from Android developers blog: <a href="https://android-developers.googleblog.com/2020/02/native-dependencies-in-android-studio-40.html">Native Dependencies in Android Studio 4.0</a></li>
 </ul>
 <p><em>Note for Android Studio users: prefab packages are supported on Android Studio 4+</em></p>
-<h1><a class="anchor" id="autotoc_md3819"></a>
+<h1><a class="anchor" id="autotoc_md3595"></a>
 Requirements</h1>
 <ol type="1">
 <li><code>ndk &lt;required&gt;</code></li>
@@ -110,7 +110,7 @@ Requirements</h1>
 </ol>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_android.html">android.md</a> for instructions on how to install the triplets.</p>
 <p><em>Please note that in order to use "prefab" (see below), the four architectures are required. If any is missing the export will fail</em></p>
-<h1><a class="anchor" id="autotoc_md3820"></a>
+<h1><a class="anchor" id="autotoc_md3596"></a>
 Example exporting [jsoncpp]</h1>
 <p>First "vcpkg install" the 4 android architectures (it is mandatory to export all 4 of them)</p>
 <div class="fragment"><div class="line">./vcpkg install jsoncpp:arm-android  jsoncpp:arm64-android  jsoncpp:x64-android  jsoncpp:x86-android</div>
@@ -171,7 +171,7 @@ Example exporting [jsoncpp]</h1>
 <div class="line">    android.prefabVersion=${prefab.version}</div>
 <div class="line"> </div>
 <div class="line">Successfully exported jsoncpp. Checkout .../vcpkg/prefab </div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3821"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3597"></a>
 The output directory after export</h3>
 <div class="fragment"><div class="line">prefab</div>
 <div class="line">└── jsoncpp/</div>
@@ -215,7 +215,7 @@ The output directory after export</h3>
 <div class="line">    │       └── prefab.json</div>
 <div class="line">    ├── jsoncpp-1.9.2.aar</div>
 <div class="line">    └── pom.xml</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3822"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3598"></a>
 Example consuming [jsoncpp] via vcpkg and prefab</h1>
 <p>See the example repo here:</p>
 <p><a href="https://github.com/atkawa7/prefab-vpkg-integration-sample">https://github.com/atkawa7/prefab-vpkg-integration-sample</a> </p>

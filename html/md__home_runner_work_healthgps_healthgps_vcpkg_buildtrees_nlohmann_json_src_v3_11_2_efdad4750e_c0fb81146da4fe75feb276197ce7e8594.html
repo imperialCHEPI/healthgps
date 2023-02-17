@@ -104,18 +104,18 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </blockquote>
 <p>None of these impose any limitations on the internal representation other than the basic unit of storage be some type of array whose parts are decomposable into bytes.</p>
 <p>The default representation of this binary format is a <code>#!cpp std::vector&lt;std::uint8_t&gt;</code>, which is a very common way to represent a byte array in modern C++.</p>
-<h1><a class="anchor" id="autotoc_md955"></a>
+<h1><a class="anchor" id="autotoc_md731"></a>
 Template parameters</h1>
 <p><code>BinaryType</code> : container type to store arrays</p>
-<h1><a class="anchor" id="autotoc_md956"></a>
+<h1><a class="anchor" id="autotoc_md732"></a>
 Notes</h1>
-<h3><a class="anchor" id="autotoc_md957"></a>
+<h3><a class="anchor" id="autotoc_md733"></a>
 Default type</h3>
 <p>The default values for <code>BinaryType</code> is <code>#!cpp std::vector&lt;std::uint8_t&gt;</code>.</p>
-<h3><a class="anchor" id="autotoc_md958"></a>
+<h3><a class="anchor" id="autotoc_md734"></a>
 Storage</h3>
 <p>Binary Arrays are stored as pointers in a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> type. That is, for any access to array values, a pointer of the type <code>#!cpp binary_t*</code> must be dereferenced.</p>
-<h3><a class="anchor" id="autotoc_md959"></a>
+<h3><a class="anchor" id="autotoc_md735"></a>
 Notes on subtypes</h3>
 <ul>
 <li>CBOR<ul>
@@ -133,7 +133,7 @@ Notes on subtypes</h3>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md960"></a>
+<h1><a class="anchor" id="autotoc_md736"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows that `binary_t` is by default, a typedef to
 `#!cpp nlohmann::byte_container_with_subtype&lt;std::vector&lt;std::uint8_t&gt;&gt;`.
@@ -147,12 +147,12 @@ Output:
 ```json
 --8&lt;-- "examples/binary_t.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md961"></a>
+</pre> <h1><a class="anchor" id="autotoc_md737"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c03db4055340fb647a5916e01dc55ba4a.html">byte_container_with_subtype</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md962"></a>
+<h1><a class="anchor" id="autotoc_md738"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.8.0. Changed type of subtype to <code>std::uint64_t</code> in version 3.10.0. </li>

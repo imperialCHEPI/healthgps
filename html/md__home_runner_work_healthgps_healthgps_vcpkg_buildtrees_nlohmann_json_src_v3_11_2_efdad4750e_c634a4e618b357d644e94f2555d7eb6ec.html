@@ -93,16 +93,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!-- fragment --><p>When defined to <code>1</code>, default serialization and deserialization functions for enums are excluded and have to be provided by the user, for example, using <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf322bdeb90965770532b1b7439ef1cd1.html">`NLOHMANN_JSON_SERIALIZE_ENUM`</a> (see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c7914debf4bed7ef52c5c5eb548e8a685.html">arbitrary type conversions</a> for more details).</p>
 <p>Parsing or serializing an enum will result in a compiler error.</p>
 <p>This works for both unscoped and scoped enums.</p>
-<h1><a class="anchor" id="autotoc_md1961"></a>
+<h1><a class="anchor" id="autotoc_md1737"></a>
 Default definition</h1>
 <p>The default value is <code>0</code>.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define JSON_DISABLE_ENUM_SERIALIZATION 0</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1962"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1738"></a>
 Notes</h1>
 <p>!!! hint "CMake option" </p><pre class="fragment">Enum serialization can also be controlled with the CMake option
 [`JSON_DisableEnumSerialization`](../../integration/cmake.md#json_disableenumserialization)
 (`OFF` by default) which defines `JSON_DISABLE_ENUM_SERIALIZATION` accordingly.
-</pre> <h1><a class="anchor" id="autotoc_md1963"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1739"></a>
 Examples</h1>
 <p>??? example "Example 1: Disabled behavior" </p><pre class="fragment">The code below forces the library **not** to create default serialization/deserialization functions `from_json` and `to_json`, meaning the code below
 **does not** compile.
@@ -208,12 +208,12 @@ int main()
     Choice ch = j.get&lt;Choice&gt;();
 }
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1964"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1740"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf322bdeb90965770532b1b7439ef1cd1.html">`NLOHMANN_JSON_SERIALIZE_ENUM`</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1965"></a>
+<h1><a class="anchor" id="autotoc_md1741"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.11.0. </li>

@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Vcpkg 是一个尝试由社区驱动，旨在构建一个多产的、健壮的本地库生态系统 - 您的贡献价值不可估量！</p>
-<h1><a class="anchor" id="autotoc_md2865"></a>
+<h1><a class="anchor" id="autotoc_md2641"></a>
 报告问题</h1>
 <p>最简单的方法是通过 <code>vcpkg.exe</code> 或 <a href="https://github.com/Microsoft/vcpkg">GitHub</a> 报告已有的包的问题。 当报告 <code>vcpkg.exe</code> 的问题时，确保清楚地说明:</p><ul>
 <li>机器设置: “我用的是Windows 10周年更新。 我的机器正位于fr-fr区域。 我成功地运行了'install boost'。”</li>
@@ -103,17 +103,17 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>您正在构建什么包以及它的版本，例如: “opencv 3.1.0”</li>
 <li>构建过程中的任何相关错误日志</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2866"></a>
+<h1><a class="anchor" id="autotoc_md2642"></a>
 贡献 (PR)</h1>
 <p>我们很乐意接受关于修复、特性、新包和更新现有包的拉取请求。 为了避免浪费您的时间，我们强烈建议您提交一个问题来讨论您想要制作的PR是否能被接受。 对于特性和新包来说也是如此。</p>
-<h2><a class="anchor" id="autotoc_md2867"></a>
+<h2><a class="anchor" id="autotoc_md2643"></a>
 新包贡献准则</h2>
 <p>我们很高兴您有兴趣来提交一个新的包! 这里有一些指导方针来帮助您编写一个优秀的端口文件:</p><ul>
 <li>避免功能补丁。 当没有其他方法时，补丁应该被视为实现兼容性的最后手段。</li>
 <li>当无法避免补丁时，请不要修改默认行为。 一个补丁的理想生命周期是与上游合并，不再被需要。 在决定如何修补某些内容时，请记住这一目标。</li>
 <li>相比原始的 <code>execute_command</code> 调用，尽量改为通过 <code>vcpkg_xyz</code> 函数实现。这使得在添加新特性(如自定义编译器标志或生成器)时更容易进行长期维护。</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2868"></a>
+<h1><a class="anchor" id="autotoc_md2644"></a>
 法律声明</h1>
 <p>在您的拉取请求被接受之前，您需要完成一个贡献者许可协议 (CLA)。 本协议证明您允许我们使用您提交的源代码，并且本作品是在合适的许可下提交的，我们可以使用它。</p>
 <p>您可以通过 <a href="https://cla.microsoft.com">https://cla.microsoft.com</a> 上的步骤来完成CLA。 一旦我们收到已签署的CLA，我们将审查请求。 您只需要这样做一次。 </p>

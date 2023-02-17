@@ -93,12 +93,12 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p><b>Up-to-date documentation is available at <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_registries.html">Registries</a>.</b></p>
 <p>Originally, the design of registries was decided upon and written up in the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_registries.html">Registries RFC</a>. However, as we've gotten further into the design process of git registries and versioning, and discussed the interaction of versioning with registries, it's become clear that the existing design was lacking. We need to have an on-disk port database that is not tied to the ports tree.</p>
 <p>This RFC is a new design for registries, that includes this registry database. It also includes the design for git registries, which are likely to be the predominant form of registries in the wild. They are also what we will start to treat the default registry as, to allow for updating ports without updating the vcpkg executable (likely necessary for binary releases).</p>
-<h1><a class="anchor" id="autotoc_md3824"></a>
+<h1><a class="anchor" id="autotoc_md3600"></a>
 Design Considerations</h1>
 <p>After internal discussions of the relationship between versioning and registries, it was clear that the existing design of registries does not play well with versioning. It was also clear that it was necessary to have metadata about ports in a separate place from the ports tree; in fact, after discussion, it was clear that the ports tree should be considered an implementation detail; a backing store for build process information (e.g., <code>portfile.cmake</code> and the patches) and the manifest.</p>
 <p>From this, it's clear that vcpkg needs to add a new set of metadata. The versioning implementation has decided on <code>port_versions</code>, and thus that's what this RFC uses.</p>
 <p>Since we're replacing the existing ports directory with a new method of describing ports, this means that the ports directory is no longer anything but a data store. This also means that the existing rules around locations of ports is no longer required; however, it will still keep getting followed for the main repository, and it's recommended that other registries follow the same pattern to make contributing easier.</p>
-<h1><a class="anchor" id="autotoc_md3825"></a>
+<h1><a class="anchor" id="autotoc_md3601"></a>
 What does the registry database look like?</h1>
 <p>We don't wish to have the same problem as we do right now, where there are nearly 1500 entries in a single directory. We solve this by placing each database entry into <code>port_versions/&lt;first character of port name&gt;-/&lt;port name&gt;.json</code>. For example, the database entry for 7zip is in <code>port_versions/7-/7zip.json</code>.</p>
 <p>Each of these database entries contains all of the versions of the port throughout history, along with versioning and feature metadata, so that we do not have to check out old manifests or CONTROL files to get at that information.</p>
@@ -120,7 +120,7 @@ What does the registry database look like?</h1>
 <p>Additionally, we'd like a new way of describing the set of ports that make up a "baseline". This is currently done with the reference of the vcpkg git repository - each reference has a set of versions that are tested against each other, and this is a major feature of vcpkg. We wish to have the same feature in the new versioning world, and so we'll have a set of baseline versions in the registry database.</p>
 <p>Baselines act differently between git registries or the builtin registry, and in filesystem registries. In git registries and the builtin registry, since there's a history that one can access, a baseline is the <code>"default"</code> entry in the baseline at the reference specified. In filesystem registries, since there is no accessible history, the baseline identifiers are mapped directly to entries in the baseline file, without translation; by default, the <code>"default"</code> entry is used.</p>
 <p>These baselines are placed in <code>port_versions/baseline.json</code>. This is an object mapping baseline names to baseline objects, where baseline objects map port names to version objects. A version object contains <code>"baseline"</code>, which is un-schemed version, and optionally <code>"port-version"</code>.</p>
-<h2><a class="anchor" id="autotoc_md3826"></a>
+<h2><a class="anchor" id="autotoc_md3602"></a>
 Example of a baseline file</h2>
 <p>The following is a reasonable baseline.json for a filesystem registry that only has two ports:</p>
 <div class="fragment"><div class="line">{</div>
@@ -136,7 +136,7 @@ Example of a baseline file</h2>
 <div class="line">    &quot;zlib&quot;: { &quot;baseline&quot;: &quot;1.2.9&quot; }</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3827"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3603"></a>
 Example of a registry database entry file</h2>
 <p>Note: This file assumes that the versions RFC has been implemented, and thus that minimum versions are required; the syntax may change in the time between now and finishing the implementation.</p>
 <p>This example is of <code>ogre</code>, since this port has both features and dependencies; remember that this file would be <code>port_versions/o-/ogre.json</code>.</p>
@@ -152,7 +152,7 @@ Example of a registry database entry file</h2>
 <div class="line">  },</div>
 <div class="line">  ...</div>
 <div class="line">]</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3828"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3604"></a>
 Filesystem Registry Databases</h3>
 <p>Filesystem registries are the simplest possible registry; they have a <code>port_versions</code> directory at the top-level, which contains the registry database. It's expected that the filesystem registry would have a filesystem backing store: something like the existing <code>ports</code> directory, except with separate versions. There won't be a specific way to lay the ports tree out as mandated by the tool, as we are treating the ports tree as an implementation detail of the registry; it's simply a way to get the files for a port. As an example, let's assume that the registry is laid out something like this:</p>
 <div class="fragment"><div class="line">&lt;registry&gt;/</div>
@@ -246,7 +246,7 @@ Filesystem Registry Databases</h3>
 <div class="line">  }</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>and we're done 😊.</p>
-<h3><a class="anchor" id="autotoc_md3829"></a>
+<h3><a class="anchor" id="autotoc_md3605"></a>
 Git Registry Databases</h3>
 <p>Git registries are not quite as simple as filesystem registries, but they're still pretty simple, and are likely to be the most common: the default registry is a git registry, for example. There is not a specific way the tool requires one to lay out the backing store, as long as it's possible to get an object hash that corresponds to a checked-in git tree of the build information. This allows, for example, the current vcpkg default registry way of laying out ports, where the latest version of a port <code>&lt;P&gt;</code> is at <code>ports/&lt;P&gt;</code>, and it also allows for any number of other designs. One interesting design, for example, is having an <code>old-ports</code> branch which is updated whenever someone want to backfill versions; then, one could push the old version to the <code>old-ports</code> branch, and then update the HEAD branch with the git tree of the old version in <code>port_versions/p-/&lt;P&gt;</code>.</p>
 <p>As above, we want to update <code>asmjit</code> to latest; let's assume we're working in the default vcpkg registry (the <a href="https://github.com/microsoft/vcpkg">https://github.com/microsoft/vcpkg</a> repository):</p>
@@ -294,7 +294,7 @@ Git Registry Databases</h3>
 <div class="fragment"><div class="line">$ git add port_versions</div>
 <div class="line">$ git commit --amend --no-edit</div>
 <div class="line">$ git push</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3830"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3606"></a>
 Consuming Registries</h1>
 <p>The <code>vcpkg-configuration.json</code> file from the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_registries.html">first registries RFC</a> is still the same, except that the registries have a slightly different layout. A <code>&lt;configuration&gt;</code> is still an object with the following fields:</p><ul>
 <li>Optionally, <code>"default-registry"</code>: A <code>&lt;registry-implementation&gt;</code> or <code>null</code></li>
@@ -335,7 +335,7 @@ Consuming Registries</h1>
 <div class="line">  ]</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This will install <code>fmt</code> from <code>&lt;directory-of-vcpkg-configuration.json&gt;/vcpkg-ports</code>, and <code>cppitertools</code> and the <code>boost</code> ports from the registry that ships with vcpkg. Notably, this does not replace behavior up the tree &ndash; only the <code>vcpkg-configuration.json</code>s for the current invocation do anything.</p>
-<h2><a class="anchor" id="autotoc_md3831"></a>
+<h2><a class="anchor" id="autotoc_md3607"></a>
 Filesystem Registries</h2>
 <p>A filesystem registry takes on the form:</p>
 <ul>
@@ -347,7 +347,7 @@ Filesystem Registries</h2>
 <div class="line">  &quot;path&quot;: &quot;vcpkg-registry&quot;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Unlike git registries, where there's quite a bit of interesting stuff going on, there isn't much stuff to do with filesystem registries. We simply use the registry database at <code>&lt;registry root&gt;/port_versions</code> to get information about ports.</p>
-<h2><a class="anchor" id="autotoc_md3832"></a>
+<h2><a class="anchor" id="autotoc_md3608"></a>
 Git Registries</h2>
 <p>A git registry takes on the form:</p>
 <ul>
@@ -360,7 +360,7 @@ Git Registries</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p>Whenever the first vcpkg command is run with a git registry, vcpkg notes down the exact commit that HEAD points to at the time of the run in the <code>vcpkg-lock.json</code> file. This will be used as the commit which vcpkg takes the <code>"default"</code> baseline from, and vcpkg will only update that commit when <code>vcpkg update</code> is run.</p>
 <p>Since the <code>"versions"</code> field is strictly additive, we don't consider older refs than <code>HEAD</code>. We update the repository on some reasonable clip. Likely, whenever a command is run that will change the set of installed ports.</p>
-<h3><a class="anchor" id="autotoc_md3833"></a>
+<h3><a class="anchor" id="autotoc_md3609"></a>
 &lt;tt&gt;vcpkg-lock.json&lt;/tt&gt;</h3>
 <p>This file will contain metadata that we need to save across runs, to allow us to keep a "state-of-the-world" that doesn't change unless one explicitly asks for it to change. This means that, even across different machines, the same registries will be used. We will also be able to write down version resolution in this file as soon as that feature is added.</p>
 <p>It is recommended that one adds this <code>vcpkg-lock.json</code> to one's version control. This file is machine generated, and it is not specified how it's laid out; however, for purposes of this RFC, we will define how it relates to git registries.</p>
@@ -382,25 +382,25 @@ Git Registries</h2>
 <div class="line">    ]</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3834"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3610"></a>
 &lt;tt&gt;vcpkg update&lt;/tt&gt;</h3>
 <p>You'll notice that once the repository is added the first time, there is only one way to update the repository to the tag at a later date - deleting the lock file. We additionally want to add support for the user updating the registry by themselves - they will be able to do this via the <code>vcpkg update</code> command. The <code>vcpkg update</code> command will, for each git registry, update the registry and repoint the <code>"commit"</code> field in <code>vcpkg-lock.json</code> to the latest <code>HEAD</code>.</p>
 <p>There is no way to update only one git registry to a later date, since versions are strictly additive.</p>
-<h1><a class="anchor" id="autotoc_md3835"></a>
+<h1><a class="anchor" id="autotoc_md3611"></a>
 Git Registries: Implementation on Disk</h1>
 <p>There are two implementations on disk to consider here: the implementation of the registry database, and once we have the database entries for the ports, accessing the port data from the git tree object.</p>
 <p>Both of these implementations are placed in the vcpkg cache home (shared by binary caching archives). On unix, this is located at <code>$XDG_CACHE_HOME/vcpkg</code> if the environment variable exists, otherwise <code>$HOME/.cache/vcpkg</code>; on Windows, it's located at <code>LOCALAPPDATA%\vcpkg</code>. In this document, we use the variable <code>$CACHE_ROOT</code> to refer to this folder. We will add a new folder, <code>$CACHE_ROOT/registries</code>, which will contain all the data we need.</p>
 <p>First, we'll discuss the registry database.</p>
-<h2><a class="anchor" id="autotoc_md3836"></a>
+<h2><a class="anchor" id="autotoc_md3612"></a>
 Registry Database</h2>
 <p>At <code>$CACHE_ROOT/registries/git</code>, we'll create a new git repository root which contains all information from all git registries, since the hashes should be unique, and this allows for deduplication across repositories which have the same commits (e.g., for mirrors). In order to get the data from git registries, we simply <code>fetch</code> the URL of the git registry.</p>
 <p>In order to grab a specific database entry from a git registry, <code>git show</code> is used to grab the file from the right commit: <code>git show &lt;commit id&gt; -- port_versions/&lt;first character&gt;-/&lt;portname&gt;.json</code>.</p>
 <p>One unfortunate thing about having one directory being used for all vcpkg instances on a machine is that it's possible to have an issue with concurrency - for example, after <code>fetch</code>ing the latest HEAD of <code><a href="https://github.com/microsoft/vcpkg">https://github.com/microsoft/vcpkg</a></code>, another vcpkg process might fetch the latest HEAD of <code><a href="https://github.com/meow/vcpkg">https://github.com/meow/vcpkg</a></code> before the first vcpkg process has the chance to <code>git rev-parse FETCH_HEAD</code>. Since the first vcpkg process will run <code>git rev-parse</code> after the second fetch is done, instead of getting the <code>HEAD</code> of <code>microsoft/vcpkg</code>, they instead get the <code>HEAD</code> of <code>meow/vcpkg</code>. We will solve this by having a mutex file in <code>$CACHE_ROOT/registries/git</code> that vcpkg locks before any fetches (and unlocks after <code>rev-parse</code>ing).</p>
-<h2><a class="anchor" id="autotoc_md3837"></a>
+<h2><a class="anchor" id="autotoc_md3613"></a>
 Accessing Port Data from &lt;tt&gt;git-tree&lt;/tt&gt;s</h2>
 <p>Once we've done version resolution and everything with the database, we then need to access the port data from the git history. We will add a new folder, <code>$CACHE_ROOT/registries/git-trees</code>, into which we'll check out the port data.</p>
 <p>In this <code>git-trees</code> directory, we will have all of the trees we check out, at their hashes. For example, the asmjit port data from above will be located at <code>git-trees/2bb51d8ec8b43bb9b21032185ca8123da10ecc6c</code>. We will add a mutex file in this <code>git-trees</code> directory as well which is taken whenever we are checking out a new git tree. We wish to allow multiple vcpkg instances to read port data at a time, and thus we do the check outs semi-atomically - if <code>git-trees/&lt;hash&gt;</code> exists, then the <code>&lt;hash&gt;</code> must be completely checked out. vcpkg does this by first checking out to a temporary directory, and then renaming to the actual hash.</p>
-<h1><a class="anchor" id="autotoc_md3838"></a>
+<h1><a class="anchor" id="autotoc_md3614"></a>
 Future Extensions</h1>
 <p>The way forward for this is to allow the <code>"builtin"</code> registry to be a git registry, in order to support packaging and shipping vcpkg as a binary. This is currently our plan, although it definitely is still a ways out. Git registries <em>are</em> an important step on that road, but are also a good way to support both enterprise, and experimentation by our users. They allow us a lot more flexibility than we've had in the past. </p>
 </div></div><!-- contents -->

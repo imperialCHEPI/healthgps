@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line">size_type max_size() const noexcept;</div>
 </div><!-- fragment --><p>Returns the maximum number of elements a JSON value is able to hold due to system or library implementation limitations, i.e. <code>std::distance(<a class="el" href="namespaceadl.html#a231caa82458b85c59fc34071e2fa300b">begin()</a>, <a class="el" href="namespacecompute-powers.html#a621547d214d9dd76969a9561d7d4bcc2">end()</a>)</code> for the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1363"></a>
+<h1><a class="anchor" id="autotoc_md1139"></a>
 Return value</h1>
 <p>The return value depends on the different types and is defined as follows:</p>
 <table class="markdownTable">
@@ -112,16 +112,16 @@ Return value</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">array   </td><td class="markdownTableBodyNone">result of function <code>array_t::max_size()</code>   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md1364"></a>
+<h1><a class="anchor" id="autotoc_md1140"></a>
 Exception safety</h1>
 <p>No-throw guarantee: this function never throws exceptions.</p>
-<h1><a class="anchor" id="autotoc_md1365"></a>
+<h1><a class="anchor" id="autotoc_md1141"></a>
 Complexity</h1>
 <p>Constant, as long as <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0150913bbd2e11a7cecd2977b96d6061.html">`array_t`</a> and <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f974e10e5661bc477b8ce49351e9f5d.html">`object_t`</a> satisfy the <a href="https://en.cppreference.com/w/cpp/named_req/Container">Container</a> concept; that is, their <code>max_size()</code> functions have constant complexity.</p>
-<h1><a class="anchor" id="autotoc_md1366"></a>
+<h1><a class="anchor" id="autotoc_md1142"></a>
 Notes</h1>
 <p>This function does not return the maximal length of a string stored as JSON value &ndash; it returns the maximal number of string elements the JSON value can store which is <code>1</code>.</p>
-<h1><a class="anchor" id="autotoc_md1367"></a>
+<h1><a class="anchor" id="autotoc_md1143"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code calls `max_size()` on the different value types.
 
@@ -136,7 +136,7 @@ Output:
 ```
 
 Note the output is platform-dependent.
-</pre> <h1><a class="anchor" id="autotoc_md1368"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1144"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0.</li>

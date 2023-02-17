@@ -89,19 +89,19 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Matchers Reference </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>A <b>matcher</b> matches a <em>single</em> argument. You can use it inside <code><a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gmock_2gmock-spec-builders_8h.html#a5b12ae6cf84f0a544ca811b380c37334">ON_CALL()</a></code> or <code><a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gmock_2gmock-spec-builders_8h.html#a535a6156de72c1a2e25a127e38ee5232">EXPECT_CALL()</a></code>, or use it to validate a value directly using two macros:</p>
+<div class="textblock"><p>A <b>matcher</b> matches a <em>single</em> argument. You can use it inside <code><a class="el" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gmock_2gmock_8h.html#a5b12ae6cf84f0a544ca811b380c37334">ON_CALL()</a></code> or <code><a class="el" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gmock_2gmock_8h.html#a535a6156de72c1a2e25a127e38ee5232">EXPECT_CALL()</a></code>, or use it to validate a value directly using two macros:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadLeft">Macro   </th><th class="markdownTableHeadLeft">Description    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyLeft"><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, matcher)</a></code>   </td><td class="markdownTableBodyLeft">Asserts that <code>actual_value</code> matches <code>matcher</code>.    </td></tr>
+<td class="markdownTableBodyLeft"><code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, matcher)</a></code>   </td><td class="markdownTableBodyLeft">Asserts that <code>actual_value</code> matches <code>matcher</code>.    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#a41d888579850c16583baea33ee8d057e">ASSERT_THAT(actual_value, matcher)</a></code>   </td><td class="markdownTableBodyLeft">The same as <code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, matcher)</a></code>, except that it generates a <b>fatal</b> failure.   </td></tr>
+<td class="markdownTableBodyLeft"><code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#a41d888579850c16583baea33ee8d057e">ASSERT_THAT(actual_value, matcher)</a></code>   </td><td class="markdownTableBodyLeft">The same as <code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, matcher)</a></code>, except that it generates a <b>fatal</b> failure.   </td></tr>
 </table>
-<p>{: .callout .warning} <b>WARNING:</b> Equality matching via <code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, expected_value)</a></code> is supported, however note that implicit conversions can cause surprising results. For example, <code>EXPECT_THAT(some_bool, "some string")</code> will compile and may pass unintentionally.</p>
-<p><b>BEST PRACTICE:</b> Prefer to make the comparison explicit via <code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, Eq(expected_value))</a></code> or <code>EXPECT_EQ(actual_value, expected_value)</code>.</p>
-<p>Built-in matchers (where <code>argument</code> is the function argument, e.g. <code>actual_value</code> in the example above, or when used in the context of <code><a class="el" href="vcpkg_2packages_2gtest__x64-linux_2include_2gmock_2gmock-spec-builders_8h.html#a535a6156de72c1a2e25a127e38ee5232">EXPECT_CALL(mock_object, method(matchers))</a></code>, the arguments of <code>method</code>) are divided into several categories. All matchers are defined in the <code><a class="el" href="namespacetesting.html">testing</a></code> namespace unless otherwise noted.</p>
-<h1><a class="anchor" id="autotoc_md620"></a>
+<p>{: .callout .warning} <b>WARNING:</b> Equality matching via <code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, expected_value)</a></code> is supported, however note that implicit conversions can cause surprising results. For example, <code>EXPECT_THAT(some_bool, "some string")</code> will compile and may pass unintentionally.</p>
+<p><b>BEST PRACTICE:</b> Prefer to make the comparison explicit via <code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-matchers_8h.html#ac31e206123aa702e1152bb2735b31409">EXPECT_THAT(actual_value, Eq(expected_value))</a></code> or <code>EXPECT_EQ(actual_value, expected_value)</code>.</p>
+<p>Built-in matchers (where <code>argument</code> is the function argument, e.g. <code>actual_value</code> in the example above, or when used in the context of <code><a class="el" href="packages_2gtest__x64-linux_2include_2gmock_2gmock-spec-builders_8h.html#a535a6156de72c1a2e25a127e38ee5232">EXPECT_CALL(mock_object, method(matchers))</a></code>, the arguments of <code>method</code>) are divided into several categories. All matchers are defined in the <code><a class="el" href="namespacetesting.html">testing</a></code> namespace unless otherwise noted.</p>
+<h1><a class="anchor" id="autotoc_md396"></a>
 Wildcard</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -111,7 +111,7 @@ Wildcard</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>A&lt;type&gt;()</code> or <code>An&lt;type&gt;()</code>   </td><td class="markdownTableBodyLeft"><code>argument</code> can be any value of type <code>type</code>.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md621"></a>
+<h1><a class="anchor" id="autotoc_md397"></a>
 Generic Comparison</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -176,7 +176,7 @@ Floating-Point Matchers</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>NanSensitiveFloatNear(a_float, max_abs_error)</code>   </td><td class="markdownTableBodyLeft"><code>argument</code> is a <code>float</code> value close to <code>a_float</code> (absolute error &lt;= <code>max_abs_error</code>), treating two NaNs as equal.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md622"></a>
+<h1><a class="anchor" id="autotoc_md398"></a>
 String Matchers</h1>
 <p>The <code>argument</code> can be either a C string or a C++ string object:</p>
 <table class="markdownTable">
@@ -206,7 +206,7 @@ String Matchers</h1>
 <td class="markdownTableBodyLeft"><code>WhenBase64Unescaped(m)</code>   </td><td class="markdownTableBodyLeft"><code>argument</code> is a base-64 escaped string whose unescaped string matches <code>m</code>.   </td></tr>
 </table>
 <p><code>ContainsRegex()</code> and <code>MatchesRegex()</code> take ownership of the <code>RE</code> object. They use the regular expression syntax defined <a href="../advanced.md#regular-expression-syntax">here</a>. All of these matchers, except <code>ContainsRegex()</code> and <code>MatchesRegex()</code> work for wide strings as well.</p>
-<h1><a class="anchor" id="autotoc_md623"></a>
+<h1><a class="anchor" id="autotoc_md399"></a>
 Container Matchers</h1>
 <p>Most STL-style containers support <code>==</code>, so you can use <code>Eq(expected_container)</code> or simply <code>expected_container</code> to match a container exactly. If you want to write the elements in-line, match them more flexibly, or get more informative messages, you can use:</p>
 <table class="markdownTable">
@@ -227,7 +227,7 @@ Container Matchers</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>ElementsAreArray({e0, e1, ..., en})</code>, <code>ElementsAreArray(a_container)</code>, <code>ElementsAreArray(begin, end)</code>, <code>ElementsAreArray(array)</code>, or <code>ElementsAreArray(array, count)</code>   </td><td class="markdownTableBodyLeft">The same as <code>ElementsAre()</code> except that the expected element values/matchers come from an initializer list, STL-style container, iterator range, or C-style array.    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyLeft"><code>IsEmpty()</code>   </td><td class="markdownTableBodyLeft"><code>argument</code> is an empty container (<code><a class="el" href="namespacecxxopts.html#a3ffde9e4565bba175bd56c06c0f99162">container.empty()</a></code>).    </td></tr>
+<td class="markdownTableBodyLeft"><code>IsEmpty()</code>   </td><td class="markdownTableBodyLeft"><code>argument</code> is an empty container (<code><a class="el" href="namespacegoogle__benchmark_1_1example.html#a1308c65820150fa43f5d1a1c9b7432da">container.empty()</a></code>).    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>IsSubsetOf({e0, e1, ..., en})</code>, <code>IsSubsetOf(a_container)</code>, <code>IsSubsetOf(begin, end)</code>, <code>IsSubsetOf(array)</code>, or <code>IsSubsetOf(array, count)</code>   </td><td class="markdownTableBodyLeft"><code>argument</code> matches <code>UnorderedElementsAre(x0, x1, ..., xk)</code> for some subset <code>{x0, x1, ..., xk}</code> of the expected matchers.    </td></tr>
 <tr class="markdownTableRowEven">
@@ -259,7 +259,7 @@ Container Matchers</h1>
 <p class="startli">```cpp MATCHER(FooEq, "") { return std::get&lt;0&gt;(arg).Equals(std::get&lt;1&gt;(arg)); } ... EXPECT_THAT(actual_foos, Pointwise(FooEq(), expected_foos)); ```</p>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md624"></a>
+<h1><a class="anchor" id="autotoc_md400"></a>
 Member Matchers</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -287,7 +287,7 @@ Member Matchers</h1>
 </li>
 <li>Don't use <code>Property()</code> against member functions that you do not own, because taking addresses of functions is fragile and generally not part of the contract of the function.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md625"></a>
+<h1><a class="anchor" id="autotoc_md401"></a>
 Matching the Result of a Function, Functor, or Callback</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -297,7 +297,7 @@ Matching the Result of a Function, Functor, or Callback</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>ResultOf(result_description, f, m)</code>   </td><td class="markdownTableBodyLeft">The same as the two-parameter version, but provides a better error message.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md626"></a>
+<h1><a class="anchor" id="autotoc_md402"></a>
 Pointer Matchers</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -339,7 +339,7 @@ Multi-argument Matchers</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>Args&lt;N1, N2, ..., Nk&gt;(m)</code>   </td><td class="markdownTableBodyLeft">The tuple of the <code>k</code> selected (using 0-based indices) arguments matches <code>m</code>, e.g. <code>Args&lt;1, 2&gt;(<a class="el" href="StrcmpTest_8cpp.html#ada30d5cdc2179d57f104cbe6eaa107ed">Eq()</a>)</code>.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md627"></a>
+<h1><a class="anchor" id="autotoc_md403"></a>
 Composite Matchers</h1>
 <p>You can make a matcher from one or more other matchers:</p>
 <table class="markdownTable">
@@ -358,7 +358,7 @@ Composite Matchers</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><code>Conditional(cond, m1, m2)</code>   </td><td class="markdownTableBodyLeft">Matches matcher <code>m1</code> if <code>cond</code> evaluates to true, else matches <code>m2</code>.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md628"></a>
+<h1><a class="anchor" id="autotoc_md404"></a>
 Adapters for Matchers</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -383,7 +383,7 @@ Using Matchers as Predicates</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyLeft"><code>Value(value, m)</code>   </td><td class="markdownTableBodyLeft">evaluates to <code>true</code> if <code>value</code> matches <code>m</code>.   </td></tr>
 </table>
-<h1><a class="anchor" id="autotoc_md629"></a>
+<h1><a class="anchor" id="autotoc_md405"></a>
 Defining Matchers</h1>
 <table class="markdownTable">
 <tr class="markdownTableHead">

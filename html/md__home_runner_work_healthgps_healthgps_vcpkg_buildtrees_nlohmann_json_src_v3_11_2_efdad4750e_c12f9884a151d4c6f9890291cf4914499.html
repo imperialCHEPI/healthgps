@@ -90,40 +90,40 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line"><span class="comment">// (1)</span></div>
-<div class="line"><a class="code" href="classjson__pointer.html">json_pointer</a>&amp; operator/=(<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>);</div>
+<div class="line"><a class="code" href="classjson__pointer.html">json_pointer</a>&amp; operator/=(<span class="keyword">const</span> <a class="code" href="classjson__pointer.html">json_pointer</a>&amp; <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (2)</span></div>
 <div class="line"><a class="code" href="classjson__pointer.html">json_pointer</a>&amp; operator/=(string_t token);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (3)</span></div>
 <div class="line"><a class="code" href="classjson__pointer.html">json_pointer</a>&amp; operator/=(std::size_t array_idx)</div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 <div class="ttc" id="aclassjson__pointer_html"><div class="ttname"><a href="classjson__pointer.html">json_pointer</a></div><div class="ttdoc">JSON Pointer defines a string syntax for identifying a specific value within a JSON document.</div><div class="ttdef"><b>Definition:</b> json_pointer.hpp:36</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 </div><!-- fragment --><ol type="1">
 <li>append another JSON pointer at the end of this JSON pointer</li>
 <li>append an unescaped reference token at the end of this JSON pointer</li>
 <li>append an array index at the end of this JSON pointer</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1834"></a>
+<h1><a class="anchor" id="autotoc_md1610"></a>
 Parameters</h1>
 <p><code>ptr</code> (in) : JSON pointer to append</p>
 <p><code>token</code> (in) : reference token to append</p>
 <p><code>array_idx</code> (in) : array index to append</p>
-<h1><a class="anchor" id="autotoc_md1835"></a>
+<h1><a class="anchor" id="autotoc_md1611"></a>
 Return value</h1>
 <ol type="1">
 <li>JSON pointer with <code>ptr</code> appended</li>
 <li>JSON pointer with <code>token</code> appended without escaping <code>token</code></li>
 <li>JSON pointer with <code>array_idx</code> appended</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1836"></a>
+<h1><a class="anchor" id="autotoc_md1612"></a>
 Complexity</h1>
 <ol type="1">
 <li>Linear in the length of <code>ptr</code>.</li>
 <li>Amortized constant.</li>
 <li>Amortized constant.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1837"></a>
+<h1><a class="anchor" id="autotoc_md1613"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example shows the usage of `operator/=`.
 
@@ -136,7 +136,7 @@ Output:
 ```json
 --8&lt;-- "examples/json_pointer__operator_add.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1838"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1614"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 3.6.0.</li>

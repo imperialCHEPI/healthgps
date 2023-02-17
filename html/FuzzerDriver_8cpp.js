@@ -15,5 +15,5 @@ var FuzzerDriver_8cpp =
     [ "MinimizeCrashInput", "FuzzerDriver_8cpp.html#ad1a84d03ed48306c3319143e4412ef59", null ],
     [ "MinimizeCrashInputInternalStep", "FuzzerDriver_8cpp.html#a1553a49adb4d4d19b4f4dd52ff54cb68", null ],
     [ "RunOneTest", "FuzzerDriver_8cpp.html#a1fe190c22f9575ec572ce81d57c7e483", null ],
-    [ "Flags", "FuzzerDriver_8cpp.html#aa8c8258c3094ba089d8323744f49d4ae", null ]
+    [ "Flags", "FuzzerDriver_8cpp.html#af82b66773389b64259cc13541f3d05fe", null ]
 ];

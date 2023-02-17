@@ -94,22 +94,22 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="ttc" id="aargs__product__test_8cc_html_acb210c55e9cb7e4cb6e7a2322fdc14e0"><div class="ttname"><a href="args__product__test_8cc.html#acb210c55e9cb7e4cb6e7a2322fdc14e0">Args</a></div><div class="ttdeci">Args({0, 100, 2000, 30000}) -&gt; ArgsProduct({{1, 2}, {15}, {3, 7, 10}, {8, 9}}) -&gt;Args({4, 5, 6, 11})</div></div>
 <div class="ttc" id="anamespacemanage_html_a175b25c4c5b53bd6346f9bf448cb57d6"><div class="ttname"><a href="namespacemanage.html#a175b25c4c5b53bd6346f9bf448cb57d6">manage.args</a></div><div class="ttdeci">args</div><div class="ttdef"><b>Definition:</b> manage.py:299</div></div>
 </div><!-- fragment --><p>Inserts a new element into a JSON object constructed in-place with the given <code>args</code> if there is no element with the key in the container. If the function is called on a JSON null value, an empty object is created before appending the value created from <code>args</code>.</p>
-<h1><a class="anchor" id="autotoc_md1043"></a>
+<h1><a class="anchor" id="autotoc_md819"></a>
 Template parameters</h1>
 <p><code>Args</code> : compatible types to create a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> object</p>
-<h1><a class="anchor" id="autotoc_md1044"></a>
+<h1><a class="anchor" id="autotoc_md820"></a>
 Parameters</h1>
 <p><code>args</code> (in) : arguments to forward to a constructor of <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code></p>
-<h1><a class="anchor" id="autotoc_md1045"></a>
+<h1><a class="anchor" id="autotoc_md821"></a>
 Return value</h1>
 <p>a pair consisting of an iterator to the inserted element, or the already-existing element if no insertion happened, and a <code>#!cpp bool</code> denoting whether the insertion took place.</p>
-<h1><a class="anchor" id="autotoc_md1046"></a>
+<h1><a class="anchor" id="autotoc_md822"></a>
 Exceptions</h1>
 <p>Throws <a href="../../home/exceptions.md#jsonexceptiontype_error311"><code>type_error.311</code></a> when called on a type other than JSON object or <code>#!json null</code>; example: <code>"cannot use emplace() with number"</code></p>
-<h1><a class="anchor" id="autotoc_md1047"></a>
+<h1><a class="anchor" id="autotoc_md823"></a>
 Complexity</h1>
 <p>Logarithmic in the size of the container, O(log(<code><a class="el" href="namespaceconvert__lib__params__windows.html#ab4517e5b23748a1ad8b351e74aebe1bf">size()</a></code>)).</p>
-<h1><a class="anchor" id="autotoc_md1048"></a>
+<h1><a class="anchor" id="autotoc_md824"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example shows how `emplace()` can be used to add elements to a JSON object. Note how the `#!json null` value was
 silently converted to a JSON object. Further note how no value is added if there was already one value stored with
@@ -124,7 +124,7 @@ Output:
 ```json
 --8&lt;-- "examples/emplace.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1049"></a>
+</pre> <h1><a class="anchor" id="autotoc_md825"></a>
 Version history</h1>
 <ul>
 <li>Since version 2.0.8. </li>

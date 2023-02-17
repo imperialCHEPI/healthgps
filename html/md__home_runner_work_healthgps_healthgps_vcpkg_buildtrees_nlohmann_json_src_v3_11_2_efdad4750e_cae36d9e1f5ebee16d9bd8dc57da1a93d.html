@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The <a href="https://tools.ietf.org/html/rfc8259.html">JSON standard</a> defines objects as "an unordered collection of zero or more name/value pairs". As such, an implementation does not need to preserve any specific order of object keys.</p>
-<h1><a class="anchor" id="autotoc_md2215"></a>
+<h1><a class="anchor" id="autotoc_md1991"></a>
 Default behavior: sort keys</h1>
 <p>The default type <code><a class="el" href="namespacenlohmann.html#a2bfd99e845a2e5cd90aeaf1b1431f474" title="default specialization">nlohmann::json</a></code> uses a <code>std::map</code> to store JSON objects, and thus stores object keys <b>sorted alphabetically</b>.</p>
 <p>??? example </p><pre class="fragment">```cpp
@@ -119,7 +119,7 @@ Output:
   "two": 2
 }
 ```
-</pre> <h1><a class="anchor" id="autotoc_md2216"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1992"></a>
 Alternative behavior: preserve insertion order</h1>
 <p>If you do want to preserve the <b>insertion order</b>, you can try the type <a href="https://github.com/nlohmann/json/issues/2179"><code>nlohmann::ordered_json</code></a>.</p>
 <p>??? example </p><pre class="fragment">```cpp
@@ -132,7 +132,7 @@ Output:
 --8&lt;-- "examples/ordered_json.output"
 ```
 </pre><p> Alternatively, you can use a more sophisticated ordered map like <a href="https://github.com/Tessil/ordered-map"><code>tsl::ordered_map</code></a> (<a href="https://github.com/nlohmann/json/issues/546#issuecomment-304447518">integration</a>) or <a href="https://github.com/nlohmann/fifo_map"><code>nlohmann::fifo_map</code></a> (<a href="https://github.com/nlohmann/json/issues/485#issuecomment-333652309">integration</a>).</p>
-<h2><a class="anchor" id="autotoc_md2217"></a>
+<h2><a class="anchor" id="autotoc_md1993"></a>
 Notes on parsing</h2>
 <p>Note that you also need to call the right <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ccaaadffd6a44dbcd7dee1101b62407e0.html">`parse`</a> function when reading from a file. Assume file <code>input.json</code> contains the JSON object above:</p>
 <div class="fragment"><div class="line">{</div>

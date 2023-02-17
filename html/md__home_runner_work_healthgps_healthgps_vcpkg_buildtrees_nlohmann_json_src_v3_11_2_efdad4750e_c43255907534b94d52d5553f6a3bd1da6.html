@@ -101,10 +101,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>This macro overrides <code>#!cpp throw</code> calls inside the library. The argument is the exception to be thrown. Note that <code>JSON_THROW_USER</code> should leave the current scope (e.g., by throwing or aborting), as continuing after it may yield undefined behavior.</li>
 <li>This macro overrides <code>#!cpp try</code> calls inside the library. It has no arguments and is always followed by a scope.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md2004"></a>
+<h1><a class="anchor" id="autotoc_md1780"></a>
 Parameters</h1>
 <p><code>exception</code> (in) : an exception type</p>
-<h1><a class="anchor" id="autotoc_md2005"></a>
+<h1><a class="anchor" id="autotoc_md1781"></a>
 Default definition</h1>
 <p>By default, the macros map to their respective C++ keywords:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define JSON_CATCH_USER(exception) catch(exception)</span></div>
@@ -114,7 +114,7 @@ Default definition</h1>
 <div class="fragment"><div class="line"><span class="preprocessor">#define JSON_THROW_USER(exception) std::abort()</span></div>
 <div class="line"><span class="preprocessor">#define JSON_TRY_USER              if (true)</span></div>
 <div class="line"><span class="preprocessor">#define JSON_CATCH_USER(exception) if (false)</span></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2006"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1782"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The code below switches off exceptions and creates a log entry with a detailed error message in case of errors.
 
@@ -131,13 +131,13 @@ Examples</h1>
 
 #include &lt;nlohmann/json.hpp&gt;
 ```
-</pre> <h1><a class="anchor" id="autotoc_md2007"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1783"></a>
 See also</h1>
 <ul>
 <li><a href="../../home/exceptions.md#switch-off-exceptions">Switch off exceptions</a> for more information how to switch off exceptions</li>
 <li>[JSON_NOEXCEPTION](JSON_NOEXCEPTION) - switch off exceptions</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2008"></a>
+<h1><a class="anchor" id="autotoc_md1784"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.1.0. </li>

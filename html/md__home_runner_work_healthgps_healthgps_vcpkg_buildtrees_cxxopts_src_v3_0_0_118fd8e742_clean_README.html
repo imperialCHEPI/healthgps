@@ -90,10 +90,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a href="https://travis-ci.org/jarro2783/cxxopts"><img src="https://travis-ci.org/jarro2783/cxxopts.svg?branch=master" alt="Build Status" style="pointer-events: none;" class="inline"/></a></p>
-<h1><a class="anchor" id="autotoc_md348"></a>
+<h1><a class="anchor" id="autotoc_md124"></a>
 Release versions</h1>
 <p>Note that <code>master</code> is generally a work in progress, and you probably want to use a tagged release version.</p>
-<h2><a class="anchor" id="autotoc_md349"></a>
+<h2><a class="anchor" id="autotoc_md125"></a>
 Version 3 breaking changes</h2>
 <p>If you have used version 2, there are a couple of breaking changes in version 3 that you should be aware of. If you are new to <code>cxxopts</code> you can skip this section.</p>
 <p>The parser no longer modifies its arguments, so you can pass a const <code>argc</code> and <code>argv</code> and expect them not to be changed.</p>
@@ -102,7 +102,7 @@ Version 3 breaking changes</h2>
 <div class="line"><a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>.unmatched(); <span class="comment">// get the unmatched arguments</span></div>
 <div class="ttc" id="aafl__driver_8cpp_html_a5d7d76db953dad5fc7ae40344df71c58"><div class="ttname"><a href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a></div><div class="ttdeci">char *** argv</div><div class="ttdef"><b>Definition:</b> afl_driver.cpp:87</div></div>
 <div class="ttc" id="asax__parse_8cpp_html_a5734a27c6f335279bf9b0b57ae9b8f76"><div class="ttname"><a href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a></div><div class="ttdeci">bool result</div><div class="ttdef"><b>Definition:</b> sax_parse.cpp:121</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md350"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md126"></a>
 Quick start</h1>
 <p>This is a lightweight C++ option parser library, supporting the standard GNU style syntax for options.</p>
 <p>Options can be given as: </p><pre class="fragment">--long
@@ -113,7 +113,7 @@ Quick start</h1>
 -abc argument
 </pre><p> where c takes an argument, but a and b do not.</p>
 <p>Additionally, anything after <code>--</code> will be parsed as a positional argument.</p>
-<h2><a class="anchor" id="autotoc_md351"></a>
+<h2><a class="anchor" id="autotoc_md127"></a>
 Basics</h2>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;cxxopts.hpp&gt;</span></div>
 </div><!-- fragment --><p>Create a <code><a class="el" href="classcxxopts_1_1Options.html">cxxopts::Options</a></code> instance.</p>
@@ -130,29 +130,29 @@ Basics</h2>
 <p>To parse the command line do:</p>
 <div class="fragment"><div class="line"><span class="keyword">auto</span> <a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a> = options.parse(argc, <a class="code" href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a>);</div>
 </div><!-- fragment --><p>To retrieve an option use <code>result.count("option")</code> to get the number of times it appeared, and</p>
-<div class="fragment"><div class="line"><a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>[<span class="stringliteral">&quot;opt&quot;</span>].as&lt;<a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&gt;()</div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
+<div class="fragment"><div class="line"><a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>[<span class="stringliteral">&quot;opt&quot;</span>].as&lt;<a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&gt;()</div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
 </div><!-- fragment --><p>to get its value. If "opt" doesn't exist, or isn't of the right type, then an exception will be thrown.</p>
 <p>Note that the result of <code>options.parse</code> should only be used as long as the <code>options</code> object that created it is in scope.</p>
-<h2><a class="anchor" id="autotoc_md352"></a>
+<h2><a class="anchor" id="autotoc_md128"></a>
 Unrecognised arguments</h2>
 <p>You can allow unrecognised arguments to be skipped. This applies to both positional arguments that are not parsed into another option, and <code>--</code> arguments that do not match an argument that you specify. This is done by calling:</p>
 <div class="fragment"><div class="line">options.allow_unrecognised_options();</div>
 </div><!-- fragment --><p>and in the result object they are retrieved with:</p>
 <div class="fragment"><div class="line"><a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>.unmatched()</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md353"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md129"></a>
 Exceptions</h2>
 <p>Exceptional situations throw C++ exceptions. There are two types of exceptions: errors defining the options, and errors when parsing a list of arguments. All exceptions derive from <code><a class="el" href="classcxxopts_1_1OptionException.html">cxxopts::OptionException</a></code>. Errors defining options derive from <code><a class="el" href="classcxxopts_1_1OptionSpecException.html">cxxopts::OptionSpecException</a></code> and errors parsing arguments derive from <code><a class="el" href="classcxxopts_1_1OptionParseException.html">cxxopts::OptionParseException</a></code>.</p>
 <p>All exceptions define a <code>what()</code> function to get a printable string explaining the error.</p>
-<h2><a class="anchor" id="autotoc_md354"></a>
+<h2><a class="anchor" id="autotoc_md130"></a>
 Help groups</h2>
 <p>Options can be placed into groups for the purposes of displaying help messages. To place options in a group, pass the group as a string to <code>add_options</code>. Then, when displaying the help, pass the groups that you would like displayed as a vector to the <code>help</code> function.</p>
-<h2><a class="anchor" id="autotoc_md355"></a>
+<h2><a class="anchor" id="autotoc_md131"></a>
 Positional Arguments</h2>
 <p>Positional arguments can be optionally parsed into one or more options. To set up positional arguments, call</p>
 <div class="fragment"><div class="line">options.parse_positional({<span class="stringliteral">&quot;first&quot;</span>, <span class="stringliteral">&quot;second&quot;</span>, <span class="stringliteral">&quot;last&quot;</span>})</div>
 </div><!-- fragment --><p>where "last" should be the name of an option with a container type, and the others should have a single value.</p>
-<h2><a class="anchor" id="autotoc_md356"></a>
+<h2><a class="anchor" id="autotoc_md132"></a>
 Default and implicit values</h2>
 <p>An option can be declared with a default or an implicit value, or both.</p>
 <p>A default value is the value that an option takes when it is not specified on the command line. The following specifies a default value for an option:</p>
@@ -162,26 +162,26 @@ Default and implicit values</h2>
 </div><!-- fragment --><p>If an option had both, then not specifying it would give the value <code>"value"</code>, writing it on the command line as <code>--option</code> would give the value <code>"implicit"</code>, and writing <code>--option=another</code> would give it the value <code>"another"</code>.</p>
 <p>Note that the default and implicit value is always stored as a string, regardless of the type that you want to store it in. It will be parsed as though it was given on the command line.</p>
 <p>Default values are not counted by <code>Options::count</code>.</p>
-<h2><a class="anchor" id="autotoc_md357"></a>
+<h2><a class="anchor" id="autotoc_md133"></a>
 Boolean values</h2>
 <p>Boolean options have a default implicit value of <code>"true"</code>, which can be overridden. The effect is that writing <code>-o</code> by itself will set option <code>o</code> to <code>true</code>. However, they can also be written with various strings using <code>=value</code>. There is no way to disambiguate positional arguments from the value following a boolean, so we have chosen that they will be positional arguments, and therefore, <code>-o false</code> does not work.</p>
-<h2><a class="anchor" id="autotoc_md358"></a>
+<h2><a class="anchor" id="autotoc_md134"></a>
 &lt;tt&gt;std::vector&lt;T&gt;&lt;/tt&gt; values</h2>
 <p>Parsing of list of values in form of an <code>std::vector&lt;T&gt;</code> is also supported, as long as <code>T</code> can be parsed. To separate single values in a list the definition <code>CXXOPTS_VECTOR_DELIMITER</code> is used, which is ',' by default. Ensure that you use no whitespaces between values because those would be interpreted as the next command line option. Example for a command line option that can be parsed as a <code>std::vector&lt;double&gt;</code>:</p>
 <div class="fragment"><div class="line">--my_list=1,-2.1,3,4.5</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md359"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md135"></a>
 Options specified multiple times</h2>
 <p>The same option can be specified several times, with different arguments, which will all be recorded in order of appearance. An example:</p>
 <div class="fragment"><div class="line">--use train --use bus --use ferry</div>
 </div><!-- fragment --><p>this is supported through the use of a vector of value for the option:</p>
 <div class="fragment"><div class="line">options.add_options()</div>
 <div class="line">  (&quot;use&quot;, &quot;Usable means of transport&quot;, cxxopts::value&lt;std::vector&lt;std::string&gt;&gt;())</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md360"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md136"></a>
 Custom help</h2>
 <p>The string after the program name on the first line of the help can be completely replaced by calling <code>options.custom_help</code>. Note that you might also want to override the positional help by calling <code>options.positional_help</code>.</p>
-<h2><a class="anchor" id="autotoc_md361"></a>
+<h2><a class="anchor" id="autotoc_md137"></a>
 Example</h2>
-<p>Putting all together: </p><div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** <a class="code" href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a>)</div>
+<p>Putting all together: </p><div class="fragment"><div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** <a class="code" href="afl__driver_8cpp.html#a5d7d76db953dad5fc7ae40344df71c58">argv</a>)</div>
 <div class="line">{</div>
 <div class="line">    <a class="code" href="classcxxopts_1_1Options.html">cxxopts::Options</a> options(<span class="stringliteral">&quot;test&quot;</span>, <span class="stringliteral">&quot;A brief description&quot;</span>);</div>
 <div class="line"> </div>
@@ -199,7 +199,7 @@ Example</h2>
 <div class="line">      std::cout &lt;&lt; options.help() &lt;&lt; std::endl;</div>
 <div class="line">      exit(0);</div>
 <div class="line">    }</div>
-<div class="line">    <span class="keywordtype">bool</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#adfa139c9a1902753b3696794759b2c48aad42f6697b035b7580e4fef93be20b4d">debug</a> = <a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>[<span class="stringliteral">&quot;debug&quot;</span>].as&lt;<span class="keywordtype">bool</span>&gt;();</div>
+<div class="line">    <span class="keywordtype">bool</span> <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#adfa139c9a1902753b3696794759b2c48aad42f6697b035b7580e4fef93be20b4d">debug</a> = <a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>[<span class="stringliteral">&quot;debug&quot;</span>].as&lt;<span class="keywordtype">bool</span>&gt;();</div>
 <div class="line">    std::string <a class="code" href="format-test_8cc.html#a6069c29f9d594b35a452e67e4be71846a381ec4a2fa41752a7a12cde35b7f180b">bar</a>;</div>
 <div class="line">    <span class="keywordflow">if</span> (<a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>.count(<span class="stringliteral">&quot;bar&quot;</span>))</div>
 <div class="line">      <a class="code" href="namespacebar.html">bar</a> = <a class="code" href="sax__parse_8cpp.html#a5734a27c6f335279bf9b0b57ae9b8f76">result</a>[<span class="stringliteral">&quot;bar&quot;</span>].as&lt;std::string&gt;();</div>
@@ -207,15 +207,15 @@ Example</h2>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">return</span> 0;</div>
 <div class="line">}</div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h_html_adfa139c9a1902753b3696794759b2c48aad42f6697b035b7580e4fef93be20b4d"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#adfa139c9a1902753b3696794759b2c48aad42f6697b035b7580e4fef93be20b4d">presentation_type::debug</a></div><div class="ttdeci">@ debug</div></div>
 <div class="ttc" id="aformat-test_8cc_html_a6069c29f9d594b35a452e67e4be71846a381ec4a2fa41752a7a12cde35b7f180b"><div class="ttname"><a href="format-test_8cc.html#a6069c29f9d594b35a452e67e4be71846a381ec4a2fa41752a7a12cde35b7f180b">bar</a></div><div class="ttdeci">@ bar</div><div class="ttdef"><b>Definition:</b> format-test.cc:1761</div></div>
 <div class="ttc" id="anamespacebar_html"><div class="ttname"><a href="namespacebar.html">bar</a></div><div class="ttdef"><b>Definition:</b> googletest-output-test_.cc:484</div></div>
 <div class="ttc" id="anamespacefoo_html"><div class="ttname"><a href="namespacefoo.html">foo</a></div><div class="ttdef"><b>Definition:</b> googletest-output-test_.cc:470</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h_html_adfa139c9a1902753b3696794759b2c48aad42f6697b035b7580e4fef93be20b4d"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#adfa139c9a1902753b3696794759b2c48aad42f6697b035b7580e4fef93be20b4d">presentation_type::debug</a></div><div class="ttdeci">@ debug</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc_html_a7f83bdc516d2cb86e20235d94ddf055a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a></div><div class="ttdeci">GTEST_API_ int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> gtest_main.cc:48</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md362"></a>
+<div class="ttc" id="aprogram_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> program.cpp:15</div></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md138"></a>
 Linking</h1>
 <p>This is a header only library.</p>
-<h1><a class="anchor" id="autotoc_md363"></a>
+<h1><a class="anchor" id="autotoc_md139"></a>
 Requirements</h1>
 <p>The only build requirement is a C++ compiler that supports C++11 features such as:</p>
 <ul>
@@ -228,7 +228,7 @@ Requirements</h1>
 <ul>
 <li>MSVC 2013</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md364"></a>
+<h1><a class="anchor" id="autotoc_md140"></a>
 TODO list</h1>
 <ul>
 <li>Allow unrecognised options. </li>

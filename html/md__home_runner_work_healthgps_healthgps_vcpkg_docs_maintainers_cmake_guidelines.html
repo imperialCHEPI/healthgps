@@ -96,7 +96,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </ul>
 <p>should follow the guidelines laid out in this document. Existing scripts may not follow these guidelines yet; it is expected that we will continue to update old scripts to fall in line with these guidelines.</p>
 <p>These guidelines are intended to create stability in our scripts. We hope that they will make both forwards and backwards compatibility easier.</p>
-<h1><a class="anchor" id="autotoc_md3033"></a>
+<h1><a class="anchor" id="autotoc_md2809"></a>
 The Guidelines</h1>
 <ul>
 <li>Except for out-parameters, we always use <code>cmake_parse_arguments()</code> rather than function parameters or referring to <code>${ARG&lt;N&gt;}</code>.<ul>
@@ -138,9 +138,9 @@ The Guidelines</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3034"></a>
+<h1><a class="anchor" id="autotoc_md2810"></a>
 calls do_the_thing() if NOT DEFINED arg_WORKING_DIRECTORY,</h1>
-<h1><a class="anchor" id="autotoc_md3035"></a>
+<h1><a class="anchor" id="autotoc_md2811"></a>
 else calls do_the_thing(WORKING_DIRECTORY "${arg_WORKING_DIRECTORY}")</h1>
 <p>do_the_thing(${working_directory}) ```</p><ul>
 <li>Otherwise, if the argument contains any escape sequences that are not <code>\\</code>, <code>\"&lt;/tt&gt;, or &lt;tt&gt;\\$&lt;/tt&gt;, that argument must be a quoted argument.
@@ -184,7 +184,7 @@ else calls do_the_thing(WORKING_DIRECTORY "${arg_WORKING_DIRECTORY}")</h1>
 </li>
 <li>All port-based scripts must use <code>include_guard(GLOBAL)</code> to avoid being included multiple times.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md3036"></a>
+<h3><a class="anchor" id="autotoc_md2812"></a>
 CMake Versions to Require</h3>
 <ul>
 <li>All CMake scripts, except for <code>vcpkg.cmake</code>, may assume the version of CMake that is present in the <code>cmake_minimum_required</code> of <code>ports.cmake</code>.<ul>
@@ -196,13 +196,13 @@ CMake Versions to Require</h3>
 </ul>
 </li>
 </ul>
-<h3><a class="anchor" id="autotoc_md3037"></a>
+<h3><a class="anchor" id="autotoc_md2813"></a>
 Changing Existing Functions</h3>
 <ul>
 <li>Never remove arguments in non-internal functions; if they should no longer do anything, just take them as normal and warn on use.</li>
 <li>Never add a new mandatory argument.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md3038"></a>
+<h3><a class="anchor" id="autotoc_md2814"></a>
 Naming Variables</h3>
 <ul>
 <li><code>cmake_parse_arguments</code>: set prefix to <code>"arg"</code></li>

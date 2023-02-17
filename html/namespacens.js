@@ -18,8 +18,6 @@ var namespacens =
       [ "TS_INVALID", "namespacens.html#a959f2abff14bca2c3fc8ce8c18e82424a15b842ceab541ad49fd2ab03d344800c", null ]
     ] ],
     [ "from_json", "namespacens.html#ad67f860ce03e82b028279f77f50cd6e7", null ],
-    [ "from_json", "namespacens.html#a1eb20a6856670460335edbf901f24caa", null ],
     [ "NLOHMANN_JSON_SERIALIZE_ENUM", "namespacens.html#ab78dc8b33fb51b2229d4d4842e501662", null ],
-    [ "to_json", "namespacens.html#ae87d01bb0c44dc6ba0f203d6b7aff611", null ],
     [ "to_json", "namespacens.html#a651f29af9e1ea7c702a6806105b16018", null ]
 ];

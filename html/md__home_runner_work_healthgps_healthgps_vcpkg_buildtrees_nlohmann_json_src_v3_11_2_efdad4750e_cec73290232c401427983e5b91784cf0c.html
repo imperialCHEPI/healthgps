@@ -89,10 +89,10 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">CMake </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md2509"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md2285"></a>
 Integration</h1>
 <p>You can use the <code>nlohmann_json::nlohmann_json</code> interface target in CMake. This target populates the appropriate usage requirements for <a href="https://cmake.org/cmake/help/latest/prop_tgt/INTERFACE_INCLUDE_DIRECTORIES.html"><code>INTERFACE_INCLUDE_DIRECTORIES</code></a> to point to the appropriate include directories and <a href="https://cmake.org/cmake/help/latest/prop_tgt/INTERFACE_COMPILE_FEATURES.html"><code>INTERFACE_COMPILE_FEATURES</code></a> for the necessary C++11 flags.</p>
-<h2><a class="anchor" id="autotoc_md2510"></a>
+<h2><a class="anchor" id="autotoc_md2286"></a>
 External</h2>
 <p>To use this library from a CMake project, you can locate it directly with <a href="https://cmake.org/cmake/help/latest/command/find_package.html"><code>find_package()</code></a> and use the namespaced imported target from the generated package configuration:</p>
 <p>!!! example </p><pre class="fragment">```cmake title="CMakeLists.txt"
@@ -105,7 +105,7 @@ add_executable(example example.cpp)
 target_link_libraries(example PRIVATE nlohmann_json::nlohmann_json)
 ```
 </pre><p> The package configuration file, <code>nlohmann_jsonConfig.cmake</code>, can be used either from an install tree or directly out of the build tree.</p>
-<h2><a class="anchor" id="autotoc_md2511"></a>
+<h2><a class="anchor" id="autotoc_md2287"></a>
 Embedded</h2>
 <p>To embed the library directly into an existing CMake project, place the entire source tree in a subdirectory and call <code>add_subdirectory()</code> in your <code>CMakeLists.txt</code> file.</p>
 <p>!!! example </p><pre class="fragment">```cmake title="CMakeLists.txt"
@@ -124,7 +124,7 @@ target_link_libraries(example PRIVATE nlohmann_json::nlohmann_json)
 </pre><p> !!! note </p><pre class="fragment">Do not use `#!cmake include(nlohmann_json/CMakeLists.txt)`, since that carries with it unintended consequences that
 will break the build. It is generally discouraged (although not necessarily well documented as such) to use
 `#!cmake include(...)` for pulling in other CMake projects anyways.
-</pre><h2><a class="anchor" id="autotoc_md2512"></a>
+</pre><h2><a class="anchor" id="autotoc_md2288"></a>
 Supporting Both</h2>
 <p>To allow your project to support either an externally supplied or an embedded JSON library, you can use a pattern akin to the following.</p>
 <p>!!! example </p><pre class="fragment">```cmake title="CMakeLists.txt"
@@ -150,7 +150,7 @@ endif()
 ```
 
 `thirdparty/nlohmann_json` is then a complete copy of this source tree.
-</pre><h2><a class="anchor" id="autotoc_md2513"></a>
+</pre><h2><a class="anchor" id="autotoc_md2289"></a>
 FetchContent</h2>
 <p>Since CMake v3.11, <a href="https://cmake.org/cmake/help/v3.11/module/FetchContent.html">FetchContent</a> can be used to automatically download a release as a dependency at configure type.</p>
 <p>!!! example </p><pre class="fragment">```cmake title="CMakeLists.txt"
@@ -178,39 +178,39 @@ FetchContent_Declare(json
 However, the repository &lt;https://github.com/nlohmann/json&gt; download size is quite large. You might want to depend on
 a smaller repository. For instance, you might want to replace the URL in the example by
 &lt;https://github.com/ArthurSonzogni/nlohmann_json_cmake_fetchcontent&gt;.
-</pre> <h1><a class="anchor" id="autotoc_md2514"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2290"></a>
 CMake Options</h1>
-<h2><a class="anchor" id="autotoc_md2515"></a>
+<h2><a class="anchor" id="autotoc_md2291"></a>
 &lt;tt&gt;JSON_BuildTests&lt;/tt&gt;</h2>
 <p>Build the unit tests when <a href="https://cmake.org/cmake/help/latest/command/enable_testing.html"><code>BUILD_TESTING</code></a> is enabled. This option is <code>ON</code> by default if the library's CMake project is the top project. That is, when integrating the library as described above, the test suite is not built unless explicitly switched on with this option.</p>
-<h2><a class="anchor" id="autotoc_md2516"></a>
+<h2><a class="anchor" id="autotoc_md2292"></a>
 &lt;tt&gt;JSON_CI&lt;/tt&gt;</h2>
 <p>Enable CI build targets. The exact targets are used during the several CI steps and are subject to change without notice. This option is <code>OFF</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2517"></a>
+<h2><a class="anchor" id="autotoc_md2293"></a>
 &lt;tt&gt;JSON_Diagnostics&lt;/tt&gt;</h2>
 <p>Enable <a href="../home/exceptions.md#extended-diagnostic-messages">extended diagnostic messages</a> by defining macro <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1f38699056edc408a3a19cb42f8e0edc.html">`JSON_DIAGNOSTICS`</a>. This option is <code>OFF</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2518"></a>
+<h2><a class="anchor" id="autotoc_md2294"></a>
 &lt;tt&gt;JSON_DisableEnumSerialization&lt;/tt&gt;</h2>
 <p>Disable default <code>enum</code> serialization by defining the macro <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c634a4e618b357d644e94f2555d7eb6ec.html">`JSON_DISABLE_ENUM_SERIALIZATION`</a>. This option is <code>OFF</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2519"></a>
+<h2><a class="anchor" id="autotoc_md2295"></a>
 &lt;tt&gt;JSON_FastTests&lt;/tt&gt;</h2>
 <p>Skip expensive/slow test suites. This option is <code>OFF</code> by default. Depends on <code>JSON_BuildTests</code>.</p>
-<h2><a class="anchor" id="autotoc_md2520"></a>
+<h2><a class="anchor" id="autotoc_md2296"></a>
 &lt;tt&gt;JSON_GlobalUDLs&lt;/tt&gt;</h2>
 <p>Place user-defined string literals in the global namespace by defining the macro <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c5a1decb0fff376e4b7d5563430058311.html">`JSON_USE_GLOBAL_UDLS`</a>. This option is <code>OFF</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2521"></a>
+<h2><a class="anchor" id="autotoc_md2297"></a>
 &lt;tt&gt;JSON_ImplicitConversions&lt;/tt&gt;</h2>
 <p>Enable implicit conversions by defining macro <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1d9fec932f07e648196f98119dec891b.html">`JSON_USE_IMPLICIT_CONVERSIONS`</a>. This option is <code>ON</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2522"></a>
+<h2><a class="anchor" id="autotoc_md2298"></a>
 &lt;tt&gt;JSON_Install&lt;/tt&gt;</h2>
 <p>Install CMake targets during install step. This option is <code>ON</code> by default if the library's CMake project is the top project.</p>
-<h2><a class="anchor" id="autotoc_md2523"></a>
+<h2><a class="anchor" id="autotoc_md2299"></a>
 &lt;tt&gt;JSON_MultipleHeaders&lt;/tt&gt;</h2>
 <p>Use non-amalgamated version of the library. This option is <code>OFF</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2524"></a>
+<h2><a class="anchor" id="autotoc_md2300"></a>
 &lt;tt&gt;JSON_SystemInclude&lt;/tt&gt;</h2>
 <p>Treat the library headers like system headers (i.e., adding <code>SYSTEM</code> to the <a href="https://cmake.org/cmake/help/latest/command/target_include_directories.html"><code>target_include_directories</code></a> call) to checks for this library by tools like Clang-Tidy. This option is <code>OFF</code> by default.</p>
-<h2><a class="anchor" id="autotoc_md2525"></a>
+<h2><a class="anchor" id="autotoc_md2301"></a>
 &lt;tt&gt;JSON_Valgrind&lt;/tt&gt;</h2>
 <p>Execute test suite with <a href="https://valgrind.org">Valgrind</a>. This option is <code>OFF</code> by default. Depends on <code>JSON_BuildTests</code>. </p>
 </div></div><!-- contents -->

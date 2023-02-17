@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/examples/versioning.getting-started.md">GitHub</a>.</b></p>
 <p>Vcpkg lets you take control of which version of packages to install in your projects using manifests.</p>
-<h1><a class="anchor" id="autotoc_md3022"></a>
+<h1><a class="anchor" id="autotoc_md2798"></a>
 Using versions with manifests</h1>
 <p>Let's start with creating a simple CMake project that depends on <code>fmt</code> and <code>zlib</code>.</p>
 <p>Create a folder with the following files:</p>
@@ -158,10 +158,10 @@ Using versions with manifests</h1>
 </div><!-- fragment --><p>Instead of using the portfiles in <code>ports/</code>, vcpkg is checking out the files for each version in <code>buildtrees/versioning/versions/</code>. The files in <code>ports/</code> are still used when running vcpkg in classic mode.</p>
 <p><em>NOTE: Output from vcpkg while configuring CMake is only available when using CMake version <code>3.18</code> or newer. If you're using an older CMake you can check the <code>vcpkg-manifest-install.log</code> file in your build directory instead.</em></p>
 <p>Read our <a href="https://devblogs.microsoft.com/cppblog/vcpkg-accelerate-your-team-development-environment-with-binary-caching-and-manifests/#using-manifests-with-msbuild-projects">manifests announcement blog post</a> to learn how to use manifests with MSBuild.</p>
-<h2><a class="anchor" id="autotoc_md3023"></a>
+<h2><a class="anchor" id="autotoc_md2799"></a>
 Manifest changes</h2>
 <p>If you have used manifests before you will notice that there are some new JSON properties. Let's review these changes:</p>
-<h3><a class="anchor" id="autotoc_md3024"></a>
+<h3><a class="anchor" id="autotoc_md2800"></a>
 **&lt;tt&gt;version&lt;/tt&gt;**</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    &quot;name&quot;: &quot;versions-test&quot;,</div>
@@ -180,7 +180,7 @@ Manifest changes</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>version-string</code>   </td><td class="markdownTableBodyNone">Arbitrary strings: <code>vista</code>, <code>candy</code>.   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md3025"></a>
+<h3><a class="anchor" id="autotoc_md2801"></a>
 **&lt;tt&gt;version&gt;=&lt;/tt&gt;**</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    &quot;dependencies&quot;: [</div>
@@ -192,7 +192,7 @@ Manifest changes</h2>
 <p>Vcpkg is allowed to upgrade this constraint if a transitive dependency requires a newer version. For example, if <code>zlib</code> were to declare a dependency on <code>fmt</code> version <code>7.1.4</code> then vcpkg would install <code>7.1.4</code> instead.</p>
 <p>Vcpkg uses a minimum version approach, in our example, even if <code>fmt</code> version <code>8.0.0</code> were to be released, vcpkg would still install version <code>7.1.3#1</code> as that is the minimum version that satisfies the constraint. The advantages of this approach are that you don't get unexpected dependency upgrades when you update vcpkg and you get reproducible builds (in terms of version used) as long as you use the same manifest.</p>
 <p>If you want to upgrade your dependencies, you can bump the minimum version constraint or use a newer baseline.</p>
-<h3><a class="anchor" id="autotoc_md3026"></a>
+<h3><a class="anchor" id="autotoc_md2802"></a>
 **&lt;tt&gt;builtin-baseline&lt;/tt&gt;**</h3>
 <div class="fragment"><div class="line">{ &quot;builtin-baseline&quot;: &quot;3426db05b996481ca31e95fff3734cf23e0f51bc&quot; }</div>
 </div><!-- fragment --><p>This field declares the versioning baseline for all ports. Setting a baseline is required to enable versioning, otherwise you will get the current versions on the ports directory. You can run 'git rev-parse HEAD' to get the current commit of vcpkg and set it as the builtin-baseline. See the <a href="../users/manifests.md#builtin-baseline"><code>builtin-baseline</code> documentation</a> for more information.</p>
@@ -212,7 +212,7 @@ Manifest changes</h2>
 <p>Since the baseline introduces a minimum version constraint for <code>zlib</code> at <code>1.2.11#9</code> and a higher version does satisfy the minimum version constraint for <code>1.2.11#7</code>, vcpkg is allowed to upgrade it.</p>
 <p>Baselines are also a convenient mechanism to upgrade multiple versions at a time, for example, if you wanted to depend on multiple <code>boost</code> libraries, it is more convenient to set the <code>baseline</code> once than declaring a version constraint on each package.</p>
 <p>But what if you want to pin a version older than the baseline?</p>
-<h3><a class="anchor" id="autotoc_md3027"></a>
+<h3><a class="anchor" id="autotoc_md2803"></a>
 **&lt;tt&gt;overrides&lt;/tt&gt;**</h3>
 <p>Since baselines establish a version floor for all packages and explicit constraints get upgraded when they are lower than the baseline, we need another mechanism to downgrade versions past the baseline.</p>
 <p>The mechanism vcpkg provides for that scenario is <code>overrides</code>. When an override is declared on a package, vcpkg will ignore all other version constraints either directly declared in the manifest or from transitive dependencies. In short, <code>overrides</code> will force vcpkg to use the exact version declared, period.</p>
@@ -254,12 +254,12 @@ Manifest changes</h2>
 <div class="line">fmt version is 60000</div>
 <div class="line">zlib version is 1.2.11</div>
 </div><!-- fragment --><p>Notice how the <code>fmt</code> is now at version <code>6.0.0</code> just like we wanted.</p>
-<h1><a class="anchor" id="autotoc_md3028"></a>
+<h1><a class="anchor" id="autotoc_md2804"></a>
 Versions and custom ports</h1>
 <p>The last thing to discuss is how overlay ports interact with versioning resolution. The answer is: they don't.</p>
 <p>Going into more detail, when you provide an overlay for a port, vcpkg will always use the overlay port without caring what version is contained in it. The reasons are two-fold: (1) it is consistent with the existing behavior of overlay ports of completely masking the existing port, and (2) overlay ports do not (and are not expected to) provide enough information to power vcpkg's versioning feature.</p>
 <p>If you want to have flexible port customization along with versioning, you should consider making your own custom registry. See our <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_registries.html">registries specification for more details</a>.</p>
-<h1><a class="anchor" id="autotoc_md3029"></a>
+<h1><a class="anchor" id="autotoc_md2805"></a>
 Further reading</h1>
 <p>If you're interested in delving deeper into the details of how versioning works we recommended that you read the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_versioning.html">original versioning specification</a> and the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_versioning_implementation_details.html">implementation details</a>.</p>
 <p>See also:</p>

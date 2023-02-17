@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Parser Callbacks </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md2228"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md2004"></a>
 Overview</h1>
 <p>With a parser callback function, the result of parsing a JSON text can be influenced. When passed to <code>parse</code>, it is called on certain events (passed as <code>parse_event_t</code> via parameter <code>event</code>) with a set recursion depth <code>depth</code> and context JSON value <code>parsed</code>. The return value of the callback function is a boolean indicating whether the element that emitted the callback shall be kept or not.</p>
 <p>The type of the callback function is:</p>
@@ -98,7 +98,7 @@ Overview</h1>
 <div class="line">    std::function&lt;bool(<span class="keywordtype">int</span> depth, <a class="code" href="namespacedetail.html#a47b1bb0bbd3596589ed9187059c312ef">parse_event_t</a> event, BasicJsonType&amp; parsed)&gt;;</div>
 <div class="ttc" id="anamespacedetail_html_a20a6b9b232b9f47ce057fe5cc5bbf511"><div class="ttname"><a href="namespacedetail.html#a20a6b9b232b9f47ce057fe5cc5bbf511">detail::parser_callback_t</a></div><div class="ttdeci">std::function&lt; bool(int, parse_event_t, BasicJsonType &amp;)&gt; parser_callback_t</div><div class="ttdef"><b>Definition:</b> parser.hpp:52</div></div>
 <div class="ttc" id="anamespacedetail_html_a47b1bb0bbd3596589ed9187059c312ef"><div class="ttname"><a href="namespacedetail.html#a47b1bb0bbd3596589ed9187059c312ef">detail::parse_event_t</a></div><div class="ttdeci">parse_event_t</div><div class="ttdef"><b>Definition:</b> parser.hpp:35</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2229"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2005"></a>
 Callback event types</h1>
 <p>We distinguish six scenarios (determined by the event type) in which the callback function can be called. The following table describes the values of the parameters <code>depth</code>, <code>event</code>, and <code>parsed</code>.</p>
 <table class="markdownTable">
@@ -142,7 +142,7 @@ these calls are made to the callback function:
 | `value`        | 2     | `#!json 13.406667` |
 | `array_end`    | 1     | `#!json [52.519444,13.406667]` |
 | `object_end`   | 0     | `#!json {"location":[52.519444,13.406667],"name":"Berlin"}` |
-</pre> <h1><a class="anchor" id="autotoc_md2230"></a>
+</pre> <h1><a class="anchor" id="autotoc_md2006"></a>
 Return value</h1>
 <p>Discarding a value (i.e., returning <code>#!c false</code>) has different effects depending on the context in which the function was called:</p>
 <ul>

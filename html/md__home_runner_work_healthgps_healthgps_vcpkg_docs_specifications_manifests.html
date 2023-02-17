@@ -98,9 +98,9 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Easy to extend later for new features like versioning and federation</li>
 <li><em>Declarative</em>, not <em>Imperative</em>.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3800"></a>
+<h1><a class="anchor" id="autotoc_md3576"></a>
 Reasoning</h1>
-<h2><a class="anchor" id="autotoc_md3801"></a>
+<h2><a class="anchor" id="autotoc_md3577"></a>
 Why JSON?</h2>
 <p>We choose JSON for five main reasons:</p>
 <ul>
@@ -123,7 +123,7 @@ Why JSON?</h2>
 <li>Schemas are almost a necessity</li>
 </ul>
 <p>Some have suggested allowing comments or commas in our parser; we chose to use JSON proper rather than JSON5 or JSON with comments because JSON is the everywhere-supported international standard. That is not necessarily true of JSON with comments. Additionally, if one needs to write a comment, they can do so via <code>"$reason"</code> or <code>"$comment"</code> fields.</p>
-<h1><a class="anchor" id="autotoc_md3802"></a>
+<h1><a class="anchor" id="autotoc_md3578"></a>
 Specification</h1>
 <p>A manifest file shall have the name <code>vcpkg.json</code>, and shall be in the root directory of a package. It also replaces CONTROL files, though existing CONTROL files will still be supported; there will be no difference between ports and packages, except that packages do not need to supply portfile.cmake (eventually we would like to remove the requirement of portfile.cmake for ports that already use CMake).</p>
 <p>The specification uses definitions from the <a href="#definitions">Definitions</a> section in order to specify the shape of a value. Note that any object may contain any directives, written as a field key that starts with a <code>$</code>; these directives shall be ignored by <code>vcpkg</code>. Common directives may include <code>"$schema"</code>, <code>"$comment"</code>, <code>"$reason"</code>.</p>
@@ -201,7 +201,7 @@ Specification</h1>
 <div class="line">    }</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3803"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3579"></a>
 Behavior of the Tool</h1>
 <p>There will be two "modes" for vcpkg from this point forward: "classic", and "manifest". The former will act exactly like the existing vcpkg workflow, so as to avoid breaking anyone. The latter will be the mode only when the user either:</p>
 <ul>
@@ -231,7 +231,7 @@ Behavior of the Tool</h1>
 <li><code>vcpkg export</code></li>
 </ul>
 <p>We may add these features back for manifest mode once we understand how best to implement them.</p>
-<h2><a class="anchor" id="autotoc_md3804"></a>
+<h2><a class="anchor" id="autotoc_md3580"></a>
 Behavior of the Toolchain</h2>
 <p>Mostly, the toolchain file stays the same; however, we shall add two public options:</p>
 <div class="fragment"><div class="line">VCPKG_MANIFEST_MODE:BOOL=&lt;we found a manifest&gt;</div>
@@ -239,7 +239,7 @@ Behavior of the Toolchain</h2>
 </div><!-- fragment --><p>The first option either explicitly turns on, or off, manifest mode; otherwise, we default to looking for a manifest file in the directory tree upwards from the source directory.</p>
 <p>The <code>VCPKG_MANIFEST_INSTALL</code> option tells the toolchain whether to install the packages or not &ndash; if you wish to install the manifest dependencies manually, you can set this to off, and we also turn it off for packages installed by vcpkg.</p>
 <p>Additionally, if <code>-manifests</code> is set in the feature flags environment variable, we turn off manifest mode in the toolchain, and we act like the classic toolchain.</p>
-<h2><a class="anchor" id="autotoc_md3805"></a>
+<h2><a class="anchor" id="autotoc_md3581"></a>
 Example - CMake Integration</h2>
 <p>An example of using the new vcpkg manifests feature for a new project follows:</p>
 <p>The filesystem structure should look something like:</p>
@@ -251,11 +251,11 @@ Example - CMake Integration</h2>
 </div><!-- fragment --><p>Then, <code>main.cxx</code> might look like:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;fmt/format.h&gt;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="keywordtype">int</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a>() {</div>
-<div class="line">  <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">fmt::print</a>(<span class="stringliteral">&quot;Hello, {}!&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line"><span class="keywordtype">int</span> <a class="code" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>() {</div>
+<div class="line">  <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">fmt::print</a>(<span class="stringliteral">&quot;Hello, {}!&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
 <div class="line">}</div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2color_8h_html_a2fead8330d19b9d2f10e6ed9c59e0174"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">print</a></div><div class="ttdeci">void print(std::FILE *f, const text_style &amp;ts, const S &amp;format_str, const Args &amp;... args)</div><div class="ttdef"><b>Definition:</b> color.h:508</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc_html_a7f83bdc516d2cb86e20235d94ddf055a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main</a></div><div class="ttdeci">GTEST_API_ int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> gtest_main.cc:48</div></div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h_html_a2fead8330d19b9d2f10e6ed9c59e0174"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a2fead8330d19b9d2f10e6ed9c59e0174">print</a></div><div class="ttdeci">void print(std::FILE *f, const text_style &amp;ts, const S &amp;format_str, const Args &amp;... args)</div><div class="ttdef"><b>Definition:</b> color.h:508</div></div>
+<div class="ttc" id="aprogram_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> program.cpp:15</div></div>
 </div><!-- fragment --><p>Therefore, in <code>vcpkg.json</code>, we'll need to depend on <code>fmt</code>:</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;name&quot;: &quot;example&quot;,</div>
@@ -284,7 +284,7 @@ Example - CMake Integration</h2>
 </div><!-- fragment --><p>and we're done! <code>fmt</code> will get installed into <code>example/build/vcpkg_installed</code>, and we can run our executable with:</p>
 <div class="fragment"><div class="line">$ build/example</div>
 <div class="line">Hello, world!</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3806"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3582"></a>
 Definitions</h1>
 <ul>
 <li><code>&lt;identifier&gt;</code>: A <code>string</code> which:<ul>

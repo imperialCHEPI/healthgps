@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_from_sourceforge.md">vcpkg repo</a>.</p>
 <p>Download and extract a project from sourceforge.</p>
 <p>This function automatically checks a set of sourceforge mirrors. Additional mirrors can be injected through the <code>VCPKG_SOURCEFORGE_EXTRA_MIRRORS</code> list variable in the triplet.</p>
-<h1><a class="anchor" id="autotoc_md3631"></a>
+<h1><a class="anchor" id="autotoc_md3407"></a>
 Usage:</h1>
 <div class="fragment"><div class="line">vcpkg_from_sourceforge(</div>
 <div class="line">    OUT_SOURCE_PATH SOURCE_PATH</div>
@@ -104,46 +104,46 @@ Usage:</h1>
 <div class="line">    [NO_REMOVE_ONE_LEVEL]</div>
 <div class="line">    [PATCHES &lt;patch1.patch&gt; &lt;patch2.patch&gt;...]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3632"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3408"></a>
 Parameters:</h1>
-<h2><a class="anchor" id="autotoc_md3633"></a>
+<h2><a class="anchor" id="autotoc_md3409"></a>
 OUT_SOURCE_PATH</h2>
 <p>Specifies the out-variable that will contain the extracted location.</p>
 <p>This should be set to <code>SOURCE_PATH</code> by convention.</p>
-<h2><a class="anchor" id="autotoc_md3634"></a>
+<h2><a class="anchor" id="autotoc_md3410"></a>
 REPO</h2>
 <p>The organization or user and repository (optional) on sourceforge.</p>
-<h2><a class="anchor" id="autotoc_md3635"></a>
+<h2><a class="anchor" id="autotoc_md3411"></a>
 REF</h2>
 <p>A stable version number that will not change contents.</p>
-<h2><a class="anchor" id="autotoc_md3636"></a>
+<h2><a class="anchor" id="autotoc_md3412"></a>
 FILENAME</h2>
 <p>The local name for the file. Files are shared between ports, so the file may need to be renamed to make it clearly attributed to this port and avoid conflicts.</p>
 <p>For example, we can get the download link: <a href="https://sourceforge.net/settings/mirror_choices?projectname=mad&filename=libmad/0.15.1b/libmad-0.15.1b.tar.gz&selected=nchc">https://sourceforge.net/settings/mirror_choices?projectname=mad&amp;filename=libmad/0.15.1b/libmad-0.15.1b.tar.gz&amp;selected=nchc</a> So the REPO is <code>mad/libmad</code>, the REF is <code>0.15.1b</code>, and the FILENAME is <code>libmad-0.15.1b.tar.gz</code></p>
 <p>For some special links: <a href="https://sourceforge.net/settings/mirror_choices?projectname=soxr&filename=soxr-0.1.3-Source.tar.xz&selected=nchc">https://sourceforge.net/settings/mirror_choices?projectname=soxr&amp;filename=soxr-0.1.3-Source.tar.xz&amp;selected=nchc</a> The REPO is <code>soxr</code>, REF is not exist, and the FILENAME is <code>soxr-0.1.3-Source.tar.xz</code></p>
-<h2><a class="anchor" id="autotoc_md3637"></a>
+<h2><a class="anchor" id="autotoc_md3413"></a>
 SHA512</h2>
 <p>The SHA512 hash that should match the archive.</p>
 <p>This is most easily determined by first setting it to <code>0</code>, then trying to build the port. The error message will contain the full hash, which can be copied back into the portfile.</p>
-<h2><a class="anchor" id="autotoc_md3638"></a>
+<h2><a class="anchor" id="autotoc_md3414"></a>
 WORKING_DIRECTORY</h2>
 <p>If specified, the archive will be extracted into the working directory instead of <code>${CURRENT_BUILDTREES_DIR}/src/</code>.</p>
 <p>Note that the archive will still be extracted into a subfolder underneath that directory (<code>${WORKING_DIRECTORY}/${REF}-${HASH}/</code>).</p>
-<h2><a class="anchor" id="autotoc_md3639"></a>
+<h2><a class="anchor" id="autotoc_md3415"></a>
 PATCHES</h2>
 <p>A list of patches to be applied to the extracted sources.</p>
 <p>Relative paths are based on the port directory.</p>
-<h2><a class="anchor" id="autotoc_md3640"></a>
+<h2><a class="anchor" id="autotoc_md3416"></a>
 NO_REMOVE_ONE_LEVEL</h2>
 <p>Specifies that the default removal of the top level folder should not occur.</p>
-<h1><a class="anchor" id="autotoc_md3641"></a>
+<h1><a class="anchor" id="autotoc_md3417"></a>
 Examples:</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/cunit/portfile.cmake">cunit</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/polyclipping/portfile.cmake">polyclipping</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/tinyfiledialogs/portfile.cmake">tinyfiledialogs</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3642"></a>
+<h1><a class="anchor" id="autotoc_md3418"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_from_sourceforge.cmake">scripts/cmake/vcpkg_from_sourceforge.cmake</a> </p>
 </div></div><!-- contents -->

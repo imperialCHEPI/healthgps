@@ -96,18 +96,18 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </blockquote>
 <p>This description includes both integer and floating-point numbers. However, C++ allows more precise storage if it is known whether the number is a signed integer, an unsigned integer or a floating-point number. Therefore, three different types, <code>number_integer_t</code>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cb48ee65dfa3181b9fc3867f565566629.html">`number_unsigned_t`</a> and <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c71599dcf1550afc67a6f1ffbeeaef2f3.html">`number_float_t`</a> are used.</p>
 <p>To store integer numbers in C++, a type is defined by the template parameter <code>NumberIntegerType</code> which chooses the type to use.</p>
-<h1><a class="anchor" id="autotoc_md1391"></a>
+<h1><a class="anchor" id="autotoc_md1167"></a>
 Notes</h1>
-<h3><a class="anchor" id="autotoc_md1392"></a>
+<h3><a class="anchor" id="autotoc_md1168"></a>
 Default type</h3>
 <p>With the default values for <code>NumberIntegerType</code> (<code>std::int64_t</code>), the default value for <code>number_integer_t</code> is <code>#!cpp std::int64_t</code>.</p>
-<h3><a class="anchor" id="autotoc_md1393"></a>
+<h3><a class="anchor" id="autotoc_md1169"></a>
 Default behavior</h3>
 <ul>
 <li>The restrictions about leading zeros is not enforced in C++. Instead, leading zeros in integer literals lead to an interpretation as octal number. Internally, the value will be stored as decimal number. For instance, the C++ integer literal <code>010</code> will be serialized to <code>8</code>. During deserialization, leading zeros yield an error.</li>
 <li>Not-a-number (NaN) values will be serialized to <code>null</code>.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md1394"></a>
+<h3><a class="anchor" id="autotoc_md1170"></a>
 Limits</h3>
 <p><a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a> specifies: </p><blockquote class="doxtable">
 <p>An implementation may set limits on the range and precision of numbers. </p>
@@ -117,10 +117,10 @@ Limits</h3>
 <p>Note that when such software is used, numbers that are integers and are in the range $[-2^{53}+1, 2^{53}-1]$ are interoperable in the sense that implementations will agree exactly on their numeric values. </p>
 </blockquote>
 <p>As this range is a subrange of the exactly supported range [INT64_MIN, INT64_MAX], this class's integer type is interoperable.</p>
-<h3><a class="anchor" id="autotoc_md1395"></a>
+<h3><a class="anchor" id="autotoc_md1171"></a>
 Storage</h3>
 <p>Integer number values are stored directly inside a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> type.</p>
-<h1><a class="anchor" id="autotoc_md1396"></a>
+<h1><a class="anchor" id="autotoc_md1172"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows that `number_integer_t` is by default, a typedef to `#!cpp std::int64_t`.
 
@@ -133,7 +133,7 @@ Output:
 ```json
 --8&lt;-- "examples/number_integer_t.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1397"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1173"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

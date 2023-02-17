@@ -109,12 +109,12 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <td class="markdownTableBodyNone"><code>&gt;</code>   </td><td class="markdownTableBodyNone"><code>#!cpp false</code>   </td></tr>
 </table>
 <p>Otherwise, comparisons involving at least one discarded JSON value always yield <code>#!cpp false</code>.</p>
-<h1><a class="anchor" id="autotoc_md2022"></a>
+<h1><a class="anchor" id="autotoc_md1798"></a>
 Default definition</h1>
 <p>The default value is <code>0</code>.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON 0</span></div>
 </div><!-- fragment --><p>When the macro is not defined, the library will define it to its default value.</p>
-<h1><a class="anchor" id="autotoc_md2023"></a>
+<h1><a class="anchor" id="autotoc_md1799"></a>
 Notes</h1>
 <p>!!! warning "Inconsistent behavior in C++20 and beyond" </p><pre class="fragment">When targeting C++20 or above, enabling the legacy comparison behavior is _strongly_
 discouraged.
@@ -134,7 +134,7 @@ New code should not depend on it and existing code should try to remove or rewri
 </pre><p> !!! hint "CMake option" </p><pre class="fragment">Legacy comparison can also be controlled with the CMake option
 [`JSON_LegacyDiscardedValueComparison`](../../integration/cmake.md#json_legacydiscardedvaluecomparison)
 (`OFF` by default) which defines `JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON` accordingly.
-</pre> <h1><a class="anchor" id="autotoc_md2024"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1800"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The code below switches on the legacy discarded value comparison behavior in the library.
 
@@ -144,7 +144,7 @@ Examples</h1>
 
 ...
 ```
-</pre> <h1><a class="anchor" id="autotoc_md2025"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1801"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.11.0. </li>

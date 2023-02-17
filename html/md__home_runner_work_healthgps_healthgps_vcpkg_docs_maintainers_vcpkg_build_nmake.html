@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_build_nmake.md">vcpkg repo</a>.</p>
 <p>Build a msvc makefile project.</p>
-<h1><a class="anchor" id="autotoc_md3303"></a>
+<h1><a class="anchor" id="autotoc_md3079"></a>
 Usage:</h1>
 <div class="fragment"><div class="line">vcpkg_build_nmake(</div>
 <div class="line">    SOURCE_PATH &lt;${SOURCE_PATH}&gt;</div>
@@ -109,60 +109,60 @@ Usage:</h1>
 <div class="line">    [TARGET &lt;all&gt;...]</div>
 <div class="line">    [ENABLE_INSTALL]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3304"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3080"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3305"></a>
+<h2><a class="anchor" id="autotoc_md3081"></a>
 SOURCE_PATH</h2>
 <p>Specifies the directory containing the source files. By convention, this is usually set in the portfile as the variable <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3306"></a>
+<h2><a class="anchor" id="autotoc_md3082"></a>
 PROJECT_SUBPATH</h2>
 <p>Specifies the sub directory containing the makefile.</p>
-<h2><a class="anchor" id="autotoc_md3307"></a>
+<h2><a class="anchor" id="autotoc_md3083"></a>
 PROJECT_NAME</h2>
 <p>Specifies the name of the makefile. Default is <code>makefile.vc</code></p>
-<h2><a class="anchor" id="autotoc_md3308"></a>
+<h2><a class="anchor" id="autotoc_md3084"></a>
 LOGFILE_ROOT</h2>
 <p>Specifies a log file prefix.</p>
-<h2><a class="anchor" id="autotoc_md3309"></a>
+<h2><a class="anchor" id="autotoc_md3085"></a>
 CL_LANGUAGE</h2>
 <p>Specifies the language for setting up flags in the <code>_CL_</code> environment variable. The default language is <code>CXX</code>. To disable the modification of <code>_CL_</code>, use <code>NONE</code>.</p>
-<h2><a class="anchor" id="autotoc_md3310"></a>
+<h2><a class="anchor" id="autotoc_md3086"></a>
 PREFER_JOM</h2>
 <p>Specifies that a parallel build with <code>jom</code> should be attempted. This is useful for faster builds of makefiles which process many independent targets and which cannot benefit from the <code>/MP</code> cl option. To mitigate issues with concurrency-unaware makefiles, a normal <code>nmake</code> build is run after <code>jom</code> errors.</p>
-<h2><a class="anchor" id="autotoc_md3311"></a>
+<h2><a class="anchor" id="autotoc_md3087"></a>
 PRERUN_SHELL</h2>
 <p>Script that needs to be called before build.</p>
-<h2><a class="anchor" id="autotoc_md3312"></a>
+<h2><a class="anchor" id="autotoc_md3088"></a>
 PRERUN_SHELL_DEBUG</h2>
 <p>Script that needs to be called before debug build.</p>
-<h2><a class="anchor" id="autotoc_md3313"></a>
+<h2><a class="anchor" id="autotoc_md3089"></a>
 PRERUN_SHELL_RELEASE</h2>
 <p>Script that needs to be called before release build.</p>
-<h2><a class="anchor" id="autotoc_md3314"></a>
+<h2><a class="anchor" id="autotoc_md3090"></a>
 OPTIONS</h2>
 <p>Additional options passed to the build command.</p>
-<h2><a class="anchor" id="autotoc_md3315"></a>
+<h2><a class="anchor" id="autotoc_md3091"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options passed to the build command for the release build. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3316"></a>
+<h2><a class="anchor" id="autotoc_md3092"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options passed to the build command for the debug build. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3317"></a>
+<h2><a class="anchor" id="autotoc_md3093"></a>
 TARGET</h2>
 <p>The list of targets passed to the build command. If not specified, target <code>all</code> will be passed.</p>
-<h2><a class="anchor" id="autotoc_md3318"></a>
+<h2><a class="anchor" id="autotoc_md3094"></a>
 ENABLE_INSTALL</h2>
 <p>Adds <code>install</code> to the list of targets passed to the build command, and passes the install prefix in the <code>INSTALLDIR</code> makefile variable.</p>
-<h1><a class="anchor" id="autotoc_md3319"></a>
+<h1><a class="anchor" id="autotoc_md3095"></a>
 Notes:</h1>
 <p>You can use the alias <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_install_nmake.html">`vcpkg_install_nmake()`</a> function if your makefile supports the "install" target.</p>
-<h1><a class="anchor" id="autotoc_md3320"></a>
+<h1><a class="anchor" id="autotoc_md3096"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/librttopo/portfile.cmake">librttopo</a></li>
 <li><a href="https://github.com/microsoft/vcpkg/blob/master/ports/openssl/portfile.cmake">openssl</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3321"></a>
+<h1><a class="anchor" id="autotoc_md3097"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_build_nmake.cmake">scripts/cmake/vcpkg_build_nmake.cmake</a> </p>
 </div></div><!-- contents -->

@@ -92,22 +92,22 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><div class="fragment"><div class="line">reference front();</div>
 <div class="line">const_reference front() <span class="keyword">const</span>;</div>
 </div><!-- fragment --><p>Returns a reference to the first element in the container. For a JSON container <code>#!cpp c</code>, the expression <code>#!cpp c.front()</code> is equivalent to <code>#!cpp *c.<a class="el" href="namespaceadl.html#a231caa82458b85c59fc34071e2fa300b">begin()</a></code>.</p>
-<h1><a class="anchor" id="autotoc_md1157"></a>
+<h1><a class="anchor" id="autotoc_md933"></a>
 Return value</h1>
 <p>In case of a structured type (array or object), a reference to the first element is returned. In case of number, string, boolean, or binary values, a reference to the value is returned.</p>
-<h1><a class="anchor" id="autotoc_md1158"></a>
+<h1><a class="anchor" id="autotoc_md934"></a>
 Exception safety</h1>
 <p>Strong guarantee: if an exception is thrown, there are no changes in the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1159"></a>
+<h1><a class="anchor" id="autotoc_md935"></a>
 Exceptions</h1>
 <p>If the JSON value is <code>#!json null</code>, exception <a href="../../home/exceptions.md#jsonexceptioninvalid_iterator214"><code>invalid_iterator.214</code></a> is thrown.</p>
-<h1><a class="anchor" id="autotoc_md1160"></a>
+<h1><a class="anchor" id="autotoc_md936"></a>
 Complexity</h1>
 <p>Constant.</p>
-<h1><a class="anchor" id="autotoc_md1161"></a>
+<h1><a class="anchor" id="autotoc_md937"></a>
 Notes</h1>
 <p>!!! info "Precondition" </p><pre class="fragment">The array or object must not be empty. Calling `front` on an empty array or object yields undefined behavior.
-</pre> <h1><a class="anchor" id="autotoc_md1162"></a>
+</pre> <h1><a class="anchor" id="autotoc_md938"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows an example for `front()`.
 
@@ -120,12 +120,12 @@ Output:
 ```json
 --8&lt;-- "examples/front.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1163"></a>
+</pre> <h1><a class="anchor" id="autotoc_md939"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ca839107bc1b38f67afa08d114fe431c7.html">back</a> to access the last element</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1164"></a>
+<h1><a class="anchor" id="autotoc_md940"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0.</li>

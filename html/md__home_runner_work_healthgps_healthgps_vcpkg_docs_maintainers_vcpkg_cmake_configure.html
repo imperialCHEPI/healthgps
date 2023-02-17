@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_cmake_configure.md">vcpkg repo</a>.</b></p>
 <p>Configure a CMake-based project.</p>
-<h1><a class="anchor" id="autotoc_md3364"></a>
+<h1><a class="anchor" id="autotoc_md3140"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_cmake_configure(</div>
 <div class="line">    SOURCE_PATH &lt;source-path&gt;</div>
@@ -115,49 +115,49 @@ Usage</h1>
 <div class="line">    &quot;host&quot;: true</div>
 <div class="line">  }</div>
 <div class="line">]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3365"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3141"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3366"></a>
+<h2><a class="anchor" id="autotoc_md3142"></a>
 SOURCE_PATH</h2>
 <p>Specifies the directory containing the <code>CMakeLists.txt</code>.</p>
 <p>This value is usually obtained as a result of calling a source acquisition command like <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_from_github.html">`vcpkg_from_github()`</a>.</p>
-<h2><a class="anchor" id="autotoc_md3367"></a>
+<h2><a class="anchor" id="autotoc_md3143"></a>
 DISABLE_PARALLEL_CONFIGURE</h2>
 <p>Disables running the CMake configure step in parallel.</p>
 <p>By default vcpkg disables writing back to the source directory (via the undocumented CMake flag <code>CMAKE_DISABLE_SOURCE_CHANGES</code>) and (on Windows) configures Release and Debug in parallel. This flag instructs vcpkg to allow source directory writes and to execute the configure steps sequentially.</p>
-<h2><a class="anchor" id="autotoc_md3368"></a>
+<h2><a class="anchor" id="autotoc_md3144"></a>
 NO_CHARSET_FLAG</h2>
 <p>Disables passing <code>/utf-8</code> when using the <a href="../users/triplets.md#VCPKG_CHAINLOAD_TOOLCHAIN_FILE">built-in Windows toolchain</a>.</p>
 <p>This is needed for libraries that set their own source code's character set when targeting MSVC. See the <a href="https://docs.microsoft.com/cpp/build/reference/utf-8-set-source-and-executable-character-sets-to-utf-8">MSVC documentation for <code>/utf-8</code></a> for more information.</p>
-<h2><a class="anchor" id="autotoc_md3369"></a>
+<h2><a class="anchor" id="autotoc_md3145"></a>
 WINDOWS_USE_MSBUILD</h2>
 <p>Use MSBuild instead of another generator when targeting a Windows platform.</p>
 <p>By default vcpkg prefers to use Ninja as the CMake Generator for all platforms. However, there are edge cases where MSBuild has different behavior than Ninja. This flag should only be passed if the project requires MSBuild to build correctly. This flag has no effect for MinGW targets.</p>
-<h2><a class="anchor" id="autotoc_md3370"></a>
+<h2><a class="anchor" id="autotoc_md3146"></a>
 GENERATOR</h2>
 <p>Specifies the Generator to use.</p>
 <p>By default vcpkg prefers to use Ninja as the CMake Generator for all platforms, or "Unix Makefiles" for non-Windows platforms when Ninja is not available. This parameter can be used for edge cases where project-specific buildsystems depend on a particular generator.</p>
-<h2><a class="anchor" id="autotoc_md3371"></a>
+<h2><a class="anchor" id="autotoc_md3147"></a>
 LOGFILE_BASE</h2>
 <p>An alternate root name for the configure logs.</p>
 <p>Defaults to <code>config-${TARGET_TRIPLET}</code>. It should not contain any path separators. Logs will be generated matching the pattern <code>${CURRENT_BUILDTREES_DIR}/${LOGFILE_BASE}-&lt;suffix&gt;.log</code></p>
-<h2><a class="anchor" id="autotoc_md3372"></a>
+<h2><a class="anchor" id="autotoc_md3148"></a>
 OPTIONS</h2>
 <p>Additional options to pass to CMake during the configuration.</p>
 <p>See also <a href="#implicit-options">Implicit Options</a>.</p>
-<h2><a class="anchor" id="autotoc_md3373"></a>
+<h2><a class="anchor" id="autotoc_md3149"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options to pass to CMake during the Release configuration.</p>
 <p>These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3374"></a>
+<h2><a class="anchor" id="autotoc_md3150"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options to pass to CMake during the Debug configuration.</p>
 <p>These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3375"></a>
+<h2><a class="anchor" id="autotoc_md3151"></a>
 MAYBE_UNUSED_VARIABLES</h2>
 <p>List of CMake options that may not be read during the configure step.</p>
 <p>vcpkg will warn about any options outside this list that were not read during the CMake configure step. This list should contain options that are only read during certain configurations (such as when <code>VCPKG_LIBRARY_LINKAGE</code> is <code>"static"</code> or when certain features are enabled).</p>
-<h1><a class="anchor" id="autotoc_md3376"></a>
+<h1><a class="anchor" id="autotoc_md3152"></a>
 Implicit Options</h1>
 <p>This command automatically provides several options to CMake.</p>
 <ul>
@@ -177,7 +177,7 @@ Implicit Options</h1>
 </ul>
 <p>This command also passes all options in <a href="../users/triplets.md#vcpkg_cmake_configure_options"><code>VCPKG_CMAKE_CONFIGURE_OPTIONS</code></a> and the configuration-specific options from <code>VCPKG_CMAKE_CONFIGURE_OPTIONS_RELEASE</code> or <code>VCPKG_CMAKE_CONFIGURE_OPTIONS_DEBUG</code>.</p>
 <p>Finally, there are additional internal options passed in (with a <code>VCPKG_</code> prefix) that should not be depended upon.</p>
-<h1><a class="anchor" id="autotoc_md3377"></a>
+<h1><a class="anchor" id="autotoc_md3153"></a>
 Examples</h1>
 <div class="fragment"><div class="line">vcpkg_from_github(OUT_SOURCE_PATH source_path ...)</div>
 <div class="line">vcpkg_cmake_configure(</div>
@@ -188,10 +188,10 @@ Examples</h1>
 <div class="line">)</div>
 <div class="line">vcpkg_cmake_install()</div>
 </div><!-- fragment --><p><a href="https://github.com/microsoft/vcpkg/search?q=vcpkg_cmake_configure+path%3A%2Fports">Search microsoft/vcpkg for Examples</a></p>
-<h1><a class="anchor" id="autotoc_md3378"></a>
+<h1><a class="anchor" id="autotoc_md3154"></a>
 Remarks</h1>
 <p>This command replaces <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_configure_cmake.html">`vcpkg_configure_cmake()`</a>.</p>
-<h1><a class="anchor" id="autotoc_md3379"></a>
+<h1><a class="anchor" id="autotoc_md3155"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/vcpkg-cmake/vcpkg_cmake_configure.cmake">ports/vcpkg-cmake/vcpkg_cmake_configure.cmake</a> </p>
 </div></div><!-- contents -->

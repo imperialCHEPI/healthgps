@@ -89,66 +89,66 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Releases </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md2364"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md2140"></a>
 v3.7.3</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip) (274 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.7.3/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp) (791 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.7.3/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2019-11-17 SHA-256: 3b5d2b8f8282b80557091514d8ab97e27f9574336c804ee666fda673a9b59926 (json.hpp), 87b5884741427220d3a33df1363ae0e8b898099fbc59f1c451113f6732891014 (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2365"></a>
+<h2><a class="anchor" id="autotoc_md2141"></a>
 Summary</h2>
 <p>This release fixes a bug introduced in release 3.7.2 which could yield quadratic complexity in destructor calls. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2366"></a>
+<h2><a class="anchor" id="autotoc_md2142"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Removed <code><a class="el" href="namespacedetail.html#a78de08fc5487b6cd087de260594c0db0">reserve()</a></code> calls from the destructor which could lead to quadratic complexity. #1837 #1838</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2367"></a>
+<h2><a class="anchor" id="autotoc_md2143"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2368"></a>
+<h1><a class="anchor" id="autotoc_md2144"></a>
 v3.7.2</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.7.2/include.zip) (274 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.7.2/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.7.2/json.hpp) (791 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.7.2/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2019-11-10 SHA-256: 0a65fcbbe1b334d3f45c9498e5ee28c3f3b2428aea98557da4a3ff12f0f14ad6 (json.hpp), 67f69c9a93b7fa0612dc1b6273119d2c560317333581845f358aaa68bff8f087 (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2369"></a>
+<h2><a class="anchor" id="autotoc_md2145"></a>
 Summary</h2>
 <p>Project <a href="https://github.com/lovasoa/bad_json_parsers">bad_json_parsers</a> tested how JSON parser libraries react on <b>deeply nested inputs</b>. It turns out that this library segfaulted at a certain nesting depth. This bug was fixed with this release. <b>Now the parsing is only bounded by the available memory.</b> All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2370"></a>
+<h2><a class="anchor" id="autotoc_md2146"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed a bug that lead to stack overflow for deeply nested JSON values (objects, array) by changing the implementation of the destructor from a recursive to an iterative approach. #832, #1419, #1835</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2371"></a>
+<h2><a class="anchor" id="autotoc_md2147"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>Added WhiteStone Bolt. #1830</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2372"></a>
+<h2><a class="anchor" id="autotoc_md2148"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2373"></a>
+<h1><a class="anchor" id="autotoc_md2149"></a>
 v3.7.1</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.7.1/include.zip) (273 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.7.1/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.7.1/json.hpp) (789 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.7.1/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2019-11-06 SHA-256: b5ba7228f3c22a882d379e93d08eab4349458ee16fbf45291347994eac7dc7ce (json.hpp), 77b9f54b34e7989e6f402afb516f7ff2830df551c3a36973085e2c7a6b1045fe (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2374"></a>
+<h2><a class="anchor" id="autotoc_md2150"></a>
 Summary</h2>
 <p>This release fixes several small bugs in the library. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2375"></a>
+<h2><a class="anchor" id="autotoc_md2151"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed a segmentation fault when serializing <code>std::int64_t</code> minimum value. #1708 #1722</li>
@@ -160,7 +160,7 @@ Summary</h2>
 <li>Fixed a compile error in enum deserialization of non non-default-constructible types. #1647 #1821</li>
 <li>Fixed the conversion from <code>json</code> to <code>std::valarray</code>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2376"></a>
+<h2><a class="anchor" id="autotoc_md2152"></a>
 :zap: Improvements</h2>
 <ul>
 <li>The <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> function can now be used with a custom string type. #1765</li>
@@ -168,7 +168,7 @@ Summary</h2>
 <li>Meson is part of the release archive. #1672 #1694</li>
 <li>Improved documentation on the Meson and Spack package manager. #1694 #1720</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2377"></a>
+<h2><a class="anchor" id="autotoc_md2153"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>Added GitHub Workflow with <code>ubuntu-latest</code>/GCC 7.4.0 as CI step.</li>
@@ -182,24 +182,24 @@ Summary</h2>
 <li>Removed <code>GLOB</code> from CMake files. #1779</li>
 <li>Updated to <a href="https://github.com/onqtam/doctest">Doctest</a> 2.3.5.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2378"></a>
+<h2><a class="anchor" id="autotoc_md2154"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2379"></a>
+<h1><a class="anchor" id="autotoc_md2155"></a>
 v3.7.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.7.0/include.zip) (143 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.7.0/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.7.0/json.hpp) (782 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.7.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2019-07-28 SHA-256: a503214947952b69f0062f572cb74c17582a495767446347ce2e452963fc2ca4 (json.hpp), 541c34438fd54182e9cdc68dd20c898d766713ad6d901fb2c6e28ff1f1e7c10d (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2380"></a>
+<h2><a class="anchor" id="autotoc_md2156"></a>
 Summary</h2>
 <p>This release introduces a few convenience functions and performs a lot of house keeping (bug fixes and small improvements). All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2381"></a>
+<h2><a class="anchor" id="autotoc_md2157"></a>
 :sparkles: New Features</h2>
 <ul>
 <li>Add overload of the **<a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab23b04802eb9da97dc3f664e54e09cb3.html#ab23b04802eb9da97dc3f664e54e09cb3"><code>contains</code></a> function** to check if a JSON pointer is valid without throwing exceptions, just like its <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9286acdc0578fc66e9346323e69fc0e3.html#a9286acdc0578fc66e9346323e69fc0e3">counterpart for object keys</a>. #1600</li>
@@ -207,7 +207,7 @@ Summary</h2>
 <li>Add **return value for the <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_abf29131f898b05aad2c01a9c80e7a002.html#abf29131f898b05aad2c01a9c80e7a002"><code>emplace_back</code></a> function**, returning a reference to the added element just like C++17 is <a href="https://en.cppreference.com/w/cpp/container/vector/emplace_back">introducing this</a> for <code>std::vector</code>. #1609</li>
 <li>Add info how to use the library with the <b><a href="https://wiki.archlinux.org/index.php/pacman">pacman</a> package manager</b> on MSYS2. #1670</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2382"></a>
+<h2><a class="anchor" id="autotoc_md2158"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fix an issue where typedefs with certain names yielded a compilation error. #1642 #1643</li>
@@ -216,13 +216,13 @@ Summary</h2>
 <li>Fix <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_a65753c68f06639eda0d355f919564e01.html#a65753c68f06639eda0d355f919564e01"><code>get_to</code></a> method to clear existing content before writing. #1511 #1555</li>
 <li>Fix a <code>-Wc++17-extensions</code> warning. <code>nodiscard</code> attributes are now only used with Clang when <code>-std=c++17</code> is used. #1535 #1551</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2383"></a>
+<h2><a class="anchor" id="autotoc_md2159"></a>
 :zap: Improvements</h2>
 <ul>
 <li>Switch from <a href="https://github.com/philsquared/Catch">Catch</a> to <b><a href="https://github.com/onqtam/doctest">doctest</a></b> for the unit tests which speeds up compilation and runtime of the 112,112,308 tests.</li>
 <li>Add an explicit section to the <a href="https://github.com/nlohmann/json/blob/develop/README.md">README</a> about the <b>frequently addressed topics</b> <a href="https://github.com/nlohmann/json#character-encoding">character encoding</a>, <a href="https://github.com/nlohmann/json#comments-in-json">comments in JSON</a>, and the <a href="https://github.com/nlohmann/json#order-of-object-keys">order of object keys</a>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2384"></a>
+<h2><a class="anchor" id="autotoc_md2160"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>Use <a href="https://cmake.org/cmake/help/v3.0/module/GNUInstallDirs.html"><code>GNUInstallDirs</code></a> to set library install directories. #1673</li>
@@ -237,42 +237,42 @@ Summary</h2>
 <li>Use <a href="https://nemequ.github.io/hedley/">Hedley</a> to avoid re-inventing several compiler-agnostic feature macros like <code>JSON_DEPRECATED</code>, <code>JSON_NODISCARD</code>, <code>JSON_LIKELY</code>, <code>JSON_UNLIKELY</code>, <code>JSON_HAS_CPP_14</code>, or <code>JSON_HAS_CPP_17</code>. Functions taking or returning pointers are annotated accordingly when a pointer will not be null.</li>
 <li>Build and run tests on <a href="https://ci.appveyor.com/project/nlohmann/json">AppVeyor</a> in DEBUG and RELEASE mode.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2385"></a>
+<h2><a class="anchor" id="autotoc_md2161"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2386"></a>
+<h1><a class="anchor" id="autotoc_md2162"></a>
 v3.6.1</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip) (136 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.6.1/json.hpp) (711 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.6.1/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2019-03-20 SHA-256: d2eeb25d2e95bffeb08ebb7704cdffd2e8fca7113eba9a0b38d60a5c391ea09a (json.hpp), 69cc88207ce91347ea530b227ff0776db82dcb8de6704e1a3d74f4841bc651cf (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2387"></a>
+<h2><a class="anchor" id="autotoc_md2163"></a>
 Summary</h2>
 <p>This release <b>fixes a regression and a bug</b> introduced by the earlier 3.6.0 release. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2388"></a>
+<h2><a class="anchor" id="autotoc_md2164"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed regression of #590 which could lead to compilation errors with GCC 7 and GCC 8. #1530</li>
 <li>Fixed a compilation error when <code>&lt;Windows.h&gt;</code> was included. #1531</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2389"></a>
+<h2><a class="anchor" id="autotoc_md2165"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>Fixed a warning for missing field initializers. #1527</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2390"></a>
+<h2><a class="anchor" id="autotoc_md2166"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2391"></a>
+<h1><a class="anchor" id="autotoc_md2167"></a>
 v3.6.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.6.0/include.zip) (136 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.6.0/include.zip.asc) (1 KB)
@@ -280,16 +280,16 @@ v3.6.0</h1>
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.6.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2019-03-20 SHA-256: ce9839370f28094c71107c405affb3b08c4a098154988014cbb0800b1c44a831 (json.hpp), 237c5e66e7f8186a02804ce9dbd5f69ce89fe7424ef84adf6142e973bd9532f4 (include.zip)</p>
 <p>ℹ️ <b>This release introduced a regression. Please update to <a href="https://github.com/nlohmann/json/releases/tag/v3.6.1">version 3.6.1</a>!</b></p>
-<h2><a class="anchor" id="autotoc_md2392"></a>
+<h2><a class="anchor" id="autotoc_md2168"></a>
 Summary</h2>
 <p>This release adds some <b>convenience functions for JSON Pointers</b>, introduces a <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a0a45fc740637123fdf05fef970f8be47.html#a0a45fc740637123fdf05fef970f8be47"><code>contains</code></a> function to check if a key is present in an object, and improves the <b>performance of integer serialization</b>. Furthermore, a lot of small bug fixes and improvements have been made. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2393"></a>
+<h2><a class="anchor" id="autotoc_md2169"></a>
 :sparkles: New Features</h2>
 <ul>
 <li>Overworked the public interface for JSON Pointers. The creation of JSON Pointers is simplified with <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_a90a11fe6c7f37b1746a3ff9cb24b0d53.html#a90a11fe6c7f37b1746a3ff9cb24b0d53"><code>operator/</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_a7395bd0af29ac23fd3f21543c935cdfa.html#a7395bd0af29ac23fd3f21543c935cdfa"><code>operator/=</code></a>. JSON Pointers can be inspected with <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_a649252bda4a2e75a0915b11a25d8bcc3.html#a649252bda4a2e75a0915b11a25d8bcc3"><code>empty</code></a>, <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_a6bd5b554c10f15672135c216893eef31.html#a6bd5b554c10f15672135c216893eef31"><code>back</code></a>, and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_afdaacce1edb7145e0434e014f0e8685a.html#afdaacce1edb7145e0434e014f0e8685a"><code>parent_pointer</code></a>, and manipulated with <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_a697d12b5bd6205f8866691b166b7c7dc.html#a697d12b5bd6205f8866691b166b7c7dc"><code>push_back</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1json__pointer_a4b1ee4d511ca195bed896a3da47e264c.html#a4b1ee4d511ca195bed896a3da47e264c"><code>pop_back</code></a>. #1434</li>
 <li>Added a boolean method <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a0a45fc740637123fdf05fef970f8be47.html#a0a45fc740637123fdf05fef970f8be47"><code>contains</code></a> to check whether an element exists in a JSON object with a given key. Returns false when called on non-object types. #1471 #1474</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2394"></a>
+<h2><a class="anchor" id="autotoc_md2170"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed a compilation issues with libc 2.12. #1483 #1514</li>
@@ -299,7 +299,7 @@ Summary</h2>
 <li>Fixed an integer overflow. #1447</li>
 <li>Fixed buffer flushing in serializer. #1445 #1446</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2395"></a>
+<h2><a class="anchor" id="autotoc_md2171"></a>
 :zap: Improvements</h2>
 <ul>
 <li>The performance of dumping integers has been greatly improved. #1411</li>
@@ -308,7 +308,7 @@ Summary</h2>
 <li>Reduced required CMake version from 3.8 to 3.1. #1409 #1428 #1441 #1498</li>
 <li>Added <code>nodiscard</code> attribute to <code>meta()</code>, <code><a class="el" href="LoadTest_8cpp.html#a792d6eeeb0acc4674d47aa40992d6014">array()</a></code>, <code><a class="el" href="classobject.html">object()</a></code>, <code>from_cbor</code>, <code>from_msgpack</code>, <code>from_ubjson</code>, <code>from_bson</code>, and <code>parse</code>. #1433</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2396"></a>
+<h2><a class="anchor" id="autotoc_md2172"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>Added missing headers. #1500</li>
@@ -335,46 +335,47 @@ Summary</h2>
 </ul>
 </li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2397"></a>
+<h2><a class="anchor" id="autotoc_md2173"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2398"></a>
+<h1><a class="anchor" id="autotoc_md2174"></a>
 v3.5.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.5.0/include.zip) (133 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.5.0/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.5.0/json.hpp) (693 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.5.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-12-22 SHA-256: 8a6dbf3bf01156f438d0ca7e78c2971bca50eec4ca6f0cf59adf3464c43bb9d5 (json.hpp), 3564da9c5b0cf2e032f97c69baedf10ddbc98030c337d0327a215ea72259ea21 (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2399"></a>
+<h2><a class="anchor" id="autotoc_md2175"></a>
 Summary</h2>
 <p>This release introduces the support for <b>structured bindings</b> and reading from **<code>FILE*</code>**. Besides, a few bugs have been fixed. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2400"></a>
+<h2><a class="anchor" id="autotoc_md2176"></a>
 :sparkles: New Features</h2>
 <ul>
-<li><b>Structured bindings</b> are now supported for JSON objects and arrays via the <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> member function, so finally this code is possible: <div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [key, val] : <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>.items()) {</div>
+<li><b>Structured bindings</b> are now supported for JSON objects and arrays via the <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> member function, so finally this code is possible: <div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [key, val] : <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>.<a class="code" href="classnlohmann_1_1basic__json.html#a916a6ba75ec7624e9c6c977a52d6fd17">items</a>()) {</div>
 <div class="line">    std::cout &lt;&lt; <a class="code" href="namespacedetail.html#a47b1bb0bbd3596589ed9187059c312efa3c6e0b8a9c15224a8228b9a98ca1531d">key</a> &lt;&lt; <span class="charliteral">&#39;:&#39;</span> &lt;&lt; val &lt;&lt; <span class="charliteral">&#39;\n&#39;</span>;</div>
 <div class="line">}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html_a916a6ba75ec7624e9c6c977a52d6fd17"><div class="ttname"><a href="classnlohmann_1_1basic__json.html#a916a6ba75ec7624e9c6c977a52d6fd17">nlohmann::basic_json::items</a></div><div class="ttdeci">iteration_proxy&lt; iterator &gt; items() noexcept</div><div class="ttdoc">helper to access iterator member functions in range-based for</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:19779</div></div>
 <div class="ttc" id="anamespacedetail_html_a47b1bb0bbd3596589ed9187059c312efa3c6e0b8a9c15224a8228b9a98ca1531d"><div class="ttname"><a href="namespacedetail.html#a47b1bb0bbd3596589ed9187059c312efa3c6e0b8a9c15224a8228b9a98ca1531d">detail::parse_event_t::key</a></div><div class="ttdeci">@ key</div><div class="ttdoc">the parser read a key of a value in an object</div></div>
 <div class="ttc" id="aparse____allow__exceptions_8cpp_html_ac657f5945687365edd0e109857d4fec0"><div class="ttname"><a href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a></div><div class="ttdeci">json j</div><div class="ttdef"><b>Definition:</b> parse__allow_exceptions.cpp:26</div></div>
 </div><!-- fragment --> #1388 #1391</li>
 <li>Added support for <b>reading from <code>FILE*</code></b> to support situations in which streams are nit available or would require too much RAM. #1370 #1392</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2401"></a>
+<h2><a class="anchor" id="autotoc_md2177"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>The <code>eofbit</code> was not set for input streams when the end of a stream was reached while parsing. #1340 #1343</li>
 <li>Fixed a bug in the SAX parser for BSON arrays.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2402"></a>
+<h2><a class="anchor" id="autotoc_md2178"></a>
 :zap: Improvements</h2>
 <ul>
 <li>Added support for Clang 5.0.1 (PS4 version). #1341 #1342</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2403"></a>
+<h2><a class="anchor" id="autotoc_md2179"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>Added a warning for implicit conversions to the documentation: It is not recommended to use implicit conversions when reading <b>from</b> a JSON value. Details about this recommendation can be found <a href="https://www.github.com/nlohmann/json/issues/958">here</a>. #1363</li>
@@ -384,21 +385,21 @@ Summary</h2>
 <li>Wrapped <code>std::snprintf</code> calls to avoid error in MSVC. #1337</li>
 <li>Added code to allow installation via Meson. #1345</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2404"></a>
+<h2><a class="anchor" id="autotoc_md2180"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2405"></a>
+<h1><a class="anchor" id="autotoc_md2181"></a>
 v3.4.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.4.0/include.zip) (132 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.4.0/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.4.0/json.hpp) (689 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.4.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-10-30 SHA-256: 63da6d1f22b2a7bb9e4ff7d6b255cf691a161ff49532dcc45d398a53e295835f (json.hpp), bfec46fc0cee01c509cf064d2254517e7fa80d1e7647fea37cf81d97c5682bdc (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2406"></a>
+<h2><a class="anchor" id="autotoc_md2182"></a>
 Summary</h2>
 <p>This release introduces three new features:</p>
 <ul>
@@ -407,14 +408,14 @@ Summary</h2>
 <li><b>Simplified enum/JSON mapping</b> with a macro in case the default mapping to integers is not desired.</li>
 </ul>
 <p>Furthermore, some effort has been invested in improving the <b>parse error messages</b>. Besides, a few bugs have been fixed. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2407"></a>
+<h2><a class="anchor" id="autotoc_md2183"></a>
 :sparkles: New Features</h2>
 <ul>
 <li>The library can read and write a subset of <b><a href="http://bsonspec.org/">BSON</a> (Binary JSON)</b>. All data types known from JSON are supported, whereas other types more tied to MongoDB such as timestamps, object ids, or binary data are currently not implemented. See <a href="https://github.com/nlohmann/json#binary-formats-bson-cbor-messagepack-and-ubjson">the README</a> for examples. #1244 #1320</li>
 <li>The behavior when the library encounters an invalid Unicode sequence during serialization can now be controlled by defining one of three <b>Unicode error handlers</b>: (1) throw an exception (default behavior), (2) replace invalid sequences by the Unicode replacement character (U+FFFD), or (3) ignore/filter invalid sequences. See the <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_a50ec80b02d0f3f51130d4abb5d1cfdc5.html#a50ec80b02d0f3f51130d4abb5d1cfdc5">documentation of the <code>dump</code> function</a> for examples. #1198 #1314</li>
 <li>To easily specify a user-defined <b>enum/JSON mapping</b>, a macro <code>NLOHMANN_JSON_SERIALIZE_ENUM</code> has been introduced. See the <a href="https://github.com/nlohmann/json#specializing-enum-conversion">README section</a> for more information. #1208 #1323</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2408"></a>
+<h2><a class="anchor" id="autotoc_md2184"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>fixed truncation #1286 #1315</li>
@@ -422,43 +423,43 @@ Summary</h2>
 <li>fixed an issue with std::variant #1292 #1294</li>
 <li>fixed a bug in the JSON Pointer parser</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2409"></a>
+<h2><a class="anchor" id="autotoc_md2185"></a>
 :zap: Improvements</h2>
 <ul>
 <li>The <b>diagnosis messages for parse errors</b> have been improved: error messages now indicated line/column positions where possible (in addition to a byte count) and also the context in which the error occurred (e.g., "while parsing a JSON string"). Example: error &lsquo;parse error at 2: syntax error - invalid string: control character must be escaped; last read: &rsquo;&lt;U+0009&gt;'<code>is now reported as</code>parse error at line 1, column 2: syntax error while parsing value - invalid string: control character U+0009 (HT) must be escaped to \u0009 or \t; last read: '&lt;U+0009&gt;'`. #1280 #1288 #1303</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2410"></a>
+<h2><a class="anchor" id="autotoc_md2186"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>improved Meson documentation #1305</li>
 <li>fixed some more linter warnings #1280</li>
 <li>fixed Clang detection for third-party Google Benchmark library #1277</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2411"></a>
+<h2><a class="anchor" id="autotoc_md2187"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2412"></a>
+<h1><a class="anchor" id="autotoc_md2188"></a>
 v3.3.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.3.0/include.zip) (123 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.3.0/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.3.0/json.hpp) (635 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.3.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-10-05 SHA-256: f1327bb60c58757a3dd2b0c9c45d49503d571337681d950ec621f8374bcc14d4 (json.hpp), 9588d63557333aaa485e92221ec38014a85a6134e7486fe3441e0541a5a89576 (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2413"></a>
+<h2><a class="anchor" id="autotoc_md2189"></a>
 Summary</h2>
 <p>This release adds support for <b>GCC 4.8</b>. Furthermore, it adds a function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a8a3db7d78f74232d3a6fb8f1abf69709.html#a8a3db7d78f74232d3a6fb8f1abf69709">**<code>get_to</code>**</a> to write a JSON value to a passed reference. Another topic of this release was the <b>CMake support</b> which has been overworked and documented.</p>
 <p>Besides, a lot of bugs have been fixed and slight improvements have been made. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2414"></a>
+<h2><a class="anchor" id="autotoc_md2190"></a>
 :sparkles: New Features</h2>
 <ul>
 <li>The library can now also built with <b>GCC 4.8</b>. Though this compiler does not fully support C++11, it can successfully compile and run the test suite. Note that bug <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=57824">57824</a> in GCC 4.8 still forbids to use multiline raw strings in arguments to macros. #1257</li>
 <li>Added new function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a8a3db7d78f74232d3a6fb8f1abf69709.html#a8a3db7d78f74232d3a6fb8f1abf69709">**<code>get_to</code>**</a> to write a JSON value to a passed reference. The destination type is automatically derived which allows more succinct code compared to the <code>get</code> function. #1227 #1231</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2415"></a>
+<h2><a class="anchor" id="autotoc_md2191"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed a bug in the CMake file that made <code>target_link_libraries</code> to not properly include <code>nlohmann_json</code>. #1243 #1245 #1260</li>
@@ -470,7 +471,7 @@ Summary</h2>
 <li>Fixed a bug introduced in version 3.2.0 where defining <code>JSON_CATCH_USER</code> led to duplicate macro definition of <code>JSON_INTERNAL_CATCH</code>. #1213 #1214</li>
 <li>Fixed a bug that prevented compilation with Clang 3.4.2 in RHEL 7. #1179 #1249</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2416"></a>
+<h2><a class="anchor" id="autotoc_md2192"></a>
 :zap: Improvements</h2>
 <ul>
 <li>Added <a href="https://github.com/nlohmann/json#cmake">documentation on CMake integration</a> of the library. #1270</li>
@@ -481,33 +482,33 @@ Summary</h2>
 <li>The test suite now does not wait forever if run in a wrong directory and input files are not found. #1262</li>
 <li>The test suite does not show deprecation warnings for deprecated functions which frequently led to confusion. #1271</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2417"></a>
+<h2><a class="anchor" id="autotoc_md2193"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>GCC 4.8 and Xcode 10 were added to the <a href="https://travis-ci.org/nlohmann/json">continuous integration suite</a> at Travis.</li>
 <li>Added <a href="https://lgtm.com/projects/g/nlohmann/json/context:cpp">lgtm</a> checks to pull requests.</li>
 <li>Added tests for CMake integration. #1260</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2418"></a>
+<h2><a class="anchor" id="autotoc_md2194"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2419"></a>
+<h1><a class="anchor" id="autotoc_md2195"></a>
 v3.2.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.2.0/include.zip) (124 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.2.0/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.2.0/json.hpp) (636 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.2.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-08-20 SHA-256: ce6b5610a051ec6795fa11c33854abebb086f0fd67c311f5921c3c07f9531b44 (json.hpp), 35ee642558b90e2f9bc758995c4788c4b4d4dec54eef95fb8f38cb4d49c8fc7c (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2420"></a>
+<h2><a class="anchor" id="autotoc_md2196"></a>
 Summary</h2>
 <p>This release introduces a <a href="https://nlohmann.github.io/json/structnlohmann_1_1json__sax.html"><b>SAX interface</b></a> to the library. While this may be a very special feature used by only few people, it allowed to unify all functions that consumed input and created some kind of JSON value. Internally, now all existing functions like <code>parse</code>, <code>accept</code>, <code>from_cbor</code>, <code>from_msgpack</code>, and <code>from_ubjson</code> use the SAX interface with different event processors. This allowed to separate the input processing from the value generation. Furthermore, throwing an exception in case of a parse error is now optional and up to the event processor. Finally, the JSON parser is now non-recursive (meaning it does not use the call stack, but <code>std::vector&lt;bool&gt;</code> to track the hierarchy of structured values) which allows to process nested input more efficiently.</p>
 <p>Furthermore, the library finally is able to parse from <b>wide string types</b>. This is the first step toward opening the library from UTF-8 to UTF-16 and UTF-32.</p>
 <p>This release further fixes several bugs in the library. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2421"></a>
+<h2><a class="anchor" id="autotoc_md2197"></a>
 :sparkles: New Features</h2>
 <ul>
 <li>added a parser with a <b>SAX interface</b> (#971, #1153)</li>
@@ -515,7 +516,7 @@ Summary</h2>
 <li>added support for **<code>std::string_view</code>** when using C++17 (#1028)</li>
 <li>allow to <b>roundtrip <code>std::map</code> and <code>std::unordered_map</code></b> from JSON if key type is not convertible to string; in these cases, values are serialized to arrays of pairs (#1079, #1089, #1133, #1138)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2422"></a>
+<h2><a class="anchor" id="autotoc_md2198"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>allow to create <code>nullptr_t</code> from JSON allowing to properly roundtrip <code>null</code> values (#1169)</li>
@@ -525,13 +526,13 @@ Summary</h2>
 <li>re-added accidentally skipped unit tests (#1176)</li>
 <li>fixed MSVC issue with <code><a class="el" href="namespacestd.html#a2fc2a505783a1f4b10e4c1a0fcff1e28">std::swap</a></code> (#1168)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2423"></a>
+<h2><a class="anchor" id="autotoc_md2199"></a>
 :zap: Improvements</h2>
 <ul>
 <li><code>key()</code> function for iterators returns a const reference rather than a string copy (#1098)</li>
 <li>binary formats CBOR, MessagePack, and UBJSON now supports <code>float</code> as type for floating-point numbers (#1021)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2424"></a>
+<h2><a class="anchor" id="autotoc_md2200"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li>changed issue templates</li>
@@ -549,59 +550,59 @@ Summary</h2>
 <li>added updated JSON Parsing Test Suite, described in <a href="http://seriot.ch/parsing_json.php">Parsing JSON is a Minefield 💣</a></li>
 <li>updated to <a class="el" href="namespaceCatch.html">Catch</a> 1.12.0</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2425"></a>
+<h2><a class="anchor" id="autotoc_md2201"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2426"></a>
+<h1><a class="anchor" id="autotoc_md2202"></a>
 v3.1.2</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.1.2/include.zip) (115 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.1.2/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp) (582 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.1.2/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-03-14 SHA-256: fbdfec4b4cf63b3b565d09f87e6c3c183bdd45c5be1864d3fcb338f6f02c1733 (json.hpp), 495362ee1b9d03d9526ba9ccf1b4a9c37691abe3a642ddbced13e5778c16660c (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2427"></a>
+<h2><a class="anchor" id="autotoc_md2203"></a>
 Summary</h2>
 <p>This release fixes several bugs in the library. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2428"></a>
+<h2><a class="anchor" id="autotoc_md2204"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed a <b>memory leak</b> occurring in the parser callback (#1001).</li>
 <li>Different <b>specializations of <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code></b> (e.g., using different template arguments for strings or objects) can now be used in assignments (#972, #977, #986).</li>
 <li>Fixed a logical error in an iterator range check (#992).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2429"></a>
+<h2><a class="anchor" id="autotoc_md2205"></a>
 :zap: Improvements</h2>
 <ul>
 <li>The parser and the serialization now support <b>user-defined string types</b> (#1006, #1009).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2430"></a>
+<h2><a class="anchor" id="autotoc_md2206"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li><b><a href="http://clang-analyzer.llvm.org">Clang Analyzer</a></b> is now used as additional static analyzer; see <code>make clang_analyze</code>.</li>
 <li>Overworked <a href="https://github.com/nlohmann/json/blob/develop/README.md">README</a> by adding links to the <a href="https://nlohmann.github.io/json/">documentation</a> (#981).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2431"></a>
+<h2><a class="anchor" id="autotoc_md2207"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2432"></a>
+<h1><a class="anchor" id="autotoc_md2208"></a>
 v3.1.1</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.1.1/include.zip) (114 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.1.1/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.1.1/json.hpp) (577 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.1.1/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-02-13 SHA-256: e14ce5e33d6a2daf748026bd4947f3d9686ca4cfd53d10c3da46a0a9aceb7f2e (json.hpp), fde771d4b9e4f222965c00758a2bdd627d04fb7b59e09b7f3d1965abdc848505 (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2433"></a>
+<h2><a class="anchor" id="autotoc_md2209"></a>
 Summary</h2>
 <p>This release fixes several bugs in the library. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2434"></a>
+<h2><a class="anchor" id="autotoc_md2210"></a>
 :bug: Bug Fixes</h2>
 <ul>
 <li>Fixed parsing of <b>CBOR strings with indefinite length</b> (#961). Earlier versions of this library misinterpreted the CBOR standard and rejected input with the <code>0x7F</code> start byte.</li>
@@ -609,7 +610,7 @@ Summary</h2>
 <li>Fixed documentation of the parser behavior for <b>objects with duplicate keys</b> (#963). The exact behavior is not specified by <a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a> and the library now also provides no guarantee which object key is stored.</li>
 <li>Added check to detect memory <b>overflow when parsing UBJSON containers</b> (#962). The optimized UBJSON format allowed for specifying an array with billions of <code>null</code> elements with a few bytes and the library did not check whether this size exceeded <code>max_size()</code>.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2435"></a>
+<h2><a class="anchor" id="autotoc_md2211"></a>
 :hammer: Further Changes</h2>
 <ul>
 <li><a href="https://coveralls.io/github/nlohmann/json">Code coverage</a> is now calculated for the individual header files, allowing to find uncovered lines more quickly than by browsing through the single header version (#953, #957).</li>
@@ -617,42 +618,42 @@ Summary</h2>
 <li>The documentation was harmonized with respect to the header inclusion (#955). Now all examples and the README use <code>#include &lt;nlohmann/json.hpp&gt;</code> to allow for selecting <code>single_include</code> or <code>include</code> or whatever installation folder as include directory.</li>
 <li>Added note on how to use the library with the <a href="http://cget.readthedocs.io/en/latest/">cget</a> package manager (#954).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2436"></a>
+<h2><a class="anchor" id="autotoc_md2212"></a>
 :fire: Deprecated functions</h2>
 <p>This release does not deprecate any functions. As an overview, the following functions have been deprecated in earlier versions and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> are deprecated. Please use the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> instead.</li>
 <li>Functions <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_ab7285a92514fcdbe6de505ebaba92ea3.html#ab7285a92514fcdbe6de505ebaba92ea3"><code>friend std::istream&amp; operator&lt;&lt;(basic_json&amp;, std::istream&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a> are deprecated. Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2437"></a>
+<h1><a class="anchor" id="autotoc_md2213"></a>
 v3.1.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [include.zip](https://github.com/nlohmann/json/releases/download/v3.1.0/include.zip) (114 KB)
 - [include.zip.asc](https://github.com/nlohmann/json/releases/download/v3.1.0/include.zip.asc) (1 KB)
 - [json.hpp](https://github.com/nlohmann/json/releases/download/v3.1.0/json.hpp) (577 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.1.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2018-02-01 SHA-256: d40f614d10a6e4e4e80dca9463da905285f20e93116c36d97d4dc1aa63d10ba4 (json.hpp), 2b7234fca394d1e27b7e017117ed80b7518fafbb4f4c13a7c069624f6f924673 (include.zip)</p>
-<h2><a class="anchor" id="autotoc_md2438"></a>
+<h2><a class="anchor" id="autotoc_md2214"></a>
 Summary</h2>
 <p>This release adds support for the <a href="http://ubjson.org"><b>UBJSON</b></a> format and <a href="https://tools.ietf.org/html/rfc7386"><b>JSON Merge Patch</b></a>. It also contains some minor changes and bug fixes. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2439"></a>
+<h2><a class="anchor" id="autotoc_md2215"></a>
 :sparkles: New features</h2>
 <ul>
 <li>The library now supports <a href="http://ubjson.org"><b>UBJSON</b></a> (Universal Binary JSON Specification) as binary format to read and write JSON values space-efficiently. See the <a href="https://github.com/nlohmann/json/blob/develop/doc/binary_formats.md">documentation overview</a> for a comparison of the different formats CBOR, MessagePack, and UBJSON.</li>
 <li><a href="https://tools.ietf.org/html/rfc7386"><b>JSON Merge Patch</b></a> (RFC 7386) offers an intuitive means to describe patches between JSON values (#876, #877). See the documentation of <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a0ec0cd19cce42ae6071f3cc6870ea295.html#a0ec0cd19cce42ae6071f3cc6870ea295"><code>merge_patch</code></a> for more information.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2440"></a>
+<h2><a class="anchor" id="autotoc_md2216"></a>
 :zap: Improvements</h2>
 <ul>
 <li>The library now uses the <b>Grisu2 algorithm</b> for printing floating-point numbers (based on the reference implementation by Florian Loitsch) which produces a short representation which is guaranteed to round-trip (#360, #935, #936).</li>
 <li>The <b>UTF-8 handling</b> was further simplified by using the decoder of Björn Hoehrmann in more scenarios.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2441"></a>
+<h2><a class="anchor" id="autotoc_md2217"></a>
 :truck: Reorganization</h2>
 <ul>
 <li>Though the library is released as a single header, its development got more and more complicated. With this release, the header is <b>split into several files</b> and the single-header file <code>json.hpp</code> can be generated from these development sources. In the repository, folder <code>include</code> contains the development sources and <code>single_include</code> contains the single <code>json.hpp</code> header (#700, #906, #907, #910, #911, #915, #920, #924, #925, #928, #944).</li>
 <li>The split further allowed for a <b>forward declaration header</b> <code>include/nlohmann/json_fwd.hpp</code> to speed up compilation times (#314).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2442"></a>
+<h2><a class="anchor" id="autotoc_md2218"></a>
 :hammer: Further changes</h2>
 <ul>
 <li><a href="https://github.com/google/benchmark">Google Benchmark</a> is now used for micro benchmarks (see <code>benchmarks</code> folder, #921).</li>
@@ -665,7 +666,7 @@ Summary</h2>
 <li>A compiler error related to incomplete types has been fixed (#919).</li>
 <li>The tests form the <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt">UTF-8 decoder stress test</a> have been added to the test suite.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2443"></a>
+<h2><a class="anchor" id="autotoc_md2219"></a>
 :fire: Deprecated functions</h2>
 <ul>
 <li>Function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_af1592a06bc63811886ade4f9d965045e.html#af1592a06bc63811886ade4f9d965045e"><code>iterator_wrapper</code></a> has been deprecated (#874). Since its introduction, the name was up for discussion, as it was too technical. We now introduced the member function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_afe3e137ace692efa08590d8df40f58dd.html#afe3e137ace692efa08590d8df40f58dd"><code>items()</code></a> with the same semantics. <code>iterator_wrapper</code> will be removed in the next major version (i.e., 4.0.0).</li>
@@ -676,15 +677,15 @@ Summary</h2>
 <li><a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a></li>
 </ul>
 <p>Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</p>
-<h1><a class="anchor" id="autotoc_md2444"></a>
+<h1><a class="anchor" id="autotoc_md2220"></a>
 v3.0.1</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v3.0.1/json.hpp) (502 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.0.1/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2017-12-29 SHA-256: c9b3591f1bb94e723a0cd7be861733a3a555b234ef132be1e9027a0364118c4c</p>
-<h2><a class="anchor" id="autotoc_md2445"></a>
+<h2><a class="anchor" id="autotoc_md2221"></a>
 Summary</h2>
 <p>This release fixes small issues in the implementation of <b>JSON Pointer</b> and <b>JSON Patch</b>. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2446"></a>
+<h2><a class="anchor" id="autotoc_md2222"></a>
 Changes</h2>
 <ul>
 <li>:bug: The **"copy" operation of JSON Patch** (<a href="https://tools.ietf.org/html/rfc6902">RFC 6902</a>) requests that it is an error if the target path points into a non-existing array or object (see #894 for a detailed description). This release fixes the implementation to detect such invalid target paths and throw an exception.</li>
@@ -695,7 +696,7 @@ Changes</h2>
 <li>:wrench: The CMake files now respect the <a href="https://cmake.org/cmake/help/latest/module/CTest.html?highlight=build_testing"><code>BUILD_TESTING</code></a> option (see #846, #885)</li>
 <li>:rotating_light: Fixed some compiler warnings (see #858, #882).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2447"></a>
+<h2><a class="anchor" id="autotoc_md2223"></a>
 Deprecated functions</h2>
 <p>:fire: To unify the interfaces and to improve similarity with the STL, the following functions are deprecated since version 3.0.0 and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
@@ -703,27 +704,27 @@ Deprecated functions</h2>
 <li><a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a></li>
 </ul>
 <p>Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</p>
-<h1><a class="anchor" id="autotoc_md2448"></a>
+<h1><a class="anchor" id="autotoc_md2224"></a>
 v3.0.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v3.0.0/json.hpp) (501 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v3.0.0/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2017-12-17 SHA-256: 076d4a0cb890a3c3d389c68421a11c3d77c64bd788e85d50f1b77ed252f2a462</p>
-<h2><a class="anchor" id="autotoc_md2449"></a>
+<h2><a class="anchor" id="autotoc_md2225"></a>
 Summary</h2>
 <p><img src="https://user-images.githubusercontent.com/159488/34072418-8f5ba396-e287-11e7-9de7-8bc7482ac23c.png" alt="" align="right" class="inline"/></p>
 <p>After almost a year, here is finally a new release of JSON for Modern C++, and it is a major one! As we adhere to <a href="https://semver.org">semantic versioning</a>, this means the release includes some breaking changes, so please read the next section carefully before you update. But don't worry, we also added a few new features and put a lot of effort into fixing a lot of bugs and straighten out a few inconsistencies.</p>
-<h2><a class="anchor" id="autotoc_md2450"></a>
+<h2><a class="anchor" id="autotoc_md2226"></a>
 :boom: Breaking changes</h2>
 <p>This section describes changes that change the public API of the library and may require changes in code using a previous version of the library. In section "Moving from 2.x.x to 3.0.0" at the end of the release notes, we describe in detail how existing code needs to be changed.</p>
 <ul>
 <li>The library now uses <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9a0aced019cb1d65bb49703406c84970.html#a9a0aced019cb1d65bb49703406c84970"><b>user-defined exceptions</b></a> instead of re-using those defined in <code>&lt;stdexcept&gt;</code> (#244). This not only allows to add more information to the exceptions (every exception now has an identifier, and parse errors contain the position of the error), but also to easily catch all library exceptions with a single <code>catch(json::exception)</code>.</li>
-<li>When strings with a different encoding as UTF-8 were stored in JSON values, their serialization could not be parsed by the library itself, as only UTF-8 is supported. To enforce this library limitation and improve consistency, <b>non-UTF-8 encoded strings now yield a <code><a class="el" href="classbasic__json.html#a14db56e21a2c72186979c6f6f0469557">json::type_error</a></code> exception during serialization</b> (#838). The check for valid UTF-8 is realized with code from <a href="http://bjoern.hoehrmann.de/">Björn Hoehrmann</a>.</li>
+<li>When strings with a different encoding as UTF-8 were stored in JSON values, their serialization could not be parsed by the library itself, as only UTF-8 is supported. To enforce this library limitation and improve consistency, <b>non-UTF-8 encoded strings now yield a <code><a class="el" href="classnlohmann_1_1basic__json.html#ace5bf851eafe85bd6332f978991bc11c">json::type_error</a></code> exception during serialization</b> (#838). The check for valid UTF-8 is realized with code from <a href="http://bjoern.hoehrmann.de/">Björn Hoehrmann</a>.</li>
 <li><b>NaN and infinity values can now be stored inside the JSON value</b> without throwing an exception. They are, however, still serialized as <code>null</code> (#388).</li>
 <li>The library's iterator tag was changed from RandomAccessIterator to <b><a href="http://en.cppreference.com/w/cpp/concept/BidirectionalIterator">BidirectionalIterator</a></b> (#593). Supporting RandomAccessIterator was incorrect as it assumed an ordering of values in a JSON objects which are unordered by definition.</li>
 <li>The library does not include the standard headers <code>&lt;iostream&gt;</code>, <code>&lt;ctype&gt;</code>, and <code>&lt;stdexcept&gt;</code> any more. You may need to add these headers to code relying on them.</li>
 <li>Removed constructor <code>explicit <a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a>(std::istream&amp; i, const parser_callback_t cb = nullptr)</code> which was deprecated in version 2.0.0 (#480).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2451"></a>
+<h2><a class="anchor" id="autotoc_md2227"></a>
 :fire: Deprecated functions</h2>
 <p>To unify the interfaces and to improve similarity with the STL, the following functions are now deprecated and will be removed in the next major version (i.e., 4.0.0):</p>
 <ul>
@@ -731,7 +732,7 @@ Summary</h2>
 <li><a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9e06deabe69262c3ffc5533d32856983.html#a9e06deabe69262c3ffc5533d32856983"><code>friend std::ostream&amp; operator&gt;&gt;(const basic_json&amp;, std::ostream&amp;)</code></a></li>
 </ul>
 <p>Please use <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_aaf363408931d76472ded14017e59c9e8.html#aaf363408931d76472ded14017e59c9e8"><code>friend std::istream&amp; operator&gt;&gt;(std::istream&amp;, basic_json&amp;)</code></a> and <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5e34c5435e557d0bf666bd7311211405.html#a5e34c5435e557d0bf666bd7311211405"><code>friend operator&lt;&lt;(std::ostream&amp;, const basic_json&amp;)</code></a> instead.</p>
-<h2><a class="anchor" id="autotoc_md2452"></a>
+<h2><a class="anchor" id="autotoc_md2228"></a>
 :sparkles: New features</h2>
 <p>With all this breaking and deprecation out of the way, let's talk about features!</p>
 <ul>
@@ -744,7 +745,7 @@ Summary</h2>
 <li>The serialization function <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a5adea76fedba9898d404fef8598aa663.html#a5adea76fedba9898d404fef8598aa663"><code>dump</code></a> now has two optional parameters <code>ensure_ascii</code> to <b>escape all non-ASCII characters</b> with <code>\uxxxx</code> and an <code>indent_char</code> parameter to choose whether to <b>indent with spaces or tabs</b> (#654).</li>
 <li>Added <b>built-in type support</b> for C arrays (#502), <code>std::pair</code> and <code>std::tuple</code> (#563, #614), <code>enum</code> and <code>enum class</code> (#545), <code>std::vector&lt;bool&gt;</code> (#494). Fixed support for <code>std::valarray</code> (#702), <code>std::array</code> (#553), and <code>std::map&lt;std::string, std::string&gt;</code> (#600, #607).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2453"></a>
+<h2><a class="anchor" id="autotoc_md2229"></a>
 :hammer: Further changes</h2>
 <p>Furthermore, there have been a lot of changes under the hood:</p>
 <ul>
@@ -760,9 +761,9 @@ Summary</h2>
 <li>Added support for package managers Meson (#576), Conan (#566), Hunter (#671, #829), and vcpkg (#753).</li>
 <li>Added CI builders: Xcode 8.3, 9.0, 9.1, and 9.2; GCC 7.2; Clang 3.8, 3.9, 4.0, and 5.0; Visual Studio 2017. The library is further built with C++17 settings on the latest Clang, GCC, and MSVC version to quickly detect new issues.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2454"></a>
+<h2><a class="anchor" id="autotoc_md2230"></a>
 Moving from 2.x.x to 3.0.0</h2>
-<h3><a class="anchor" id="autotoc_md2455"></a>
+<h3><a class="anchor" id="autotoc_md2231"></a>
 User-defined Exceptions</h3>
 <p>There are five different exceptions inheriting from <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a9a0aced019cb1d65bb49703406c84970.html#a9a0aced019cb1d65bb49703406c84970"><code>json::exception</code></a>:</p>
 <ul>
@@ -869,38 +870,38 @@ User-defined Exceptions</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft">other_error.501   </td><td class="markdownTableBodyLeft">domain_error   </td></tr>
 </table>
-<h3><a class="anchor" id="autotoc_md2456"></a>
+<h3><a class="anchor" id="autotoc_md2232"></a>
 Handling of NaN and INF</h3>
 <ul>
 <li>If an overflow occurs during parsing a number from a JSON text, an exception <a href="http://nlohmann.github.io/json/doxygen/classnlohmann_1_1basic__json_a28f7c2f087274a0012eb7a2333ee1580.html#a28f7c2f087274a0012eb7a2333ee1580"><code>json::out_of_range</code></a> is thrown so that the overflow is detected early and roundtripping is guaranteed.</li>
 <li>NaN and INF floating-point values can be stored in a JSON value and are not replaced by null. That is, the <a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a> class behaves like <code>double</code> in this regard (no exception occurs). However, NaN and INF are serialized to <code>null</code>.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md2457"></a>
+<h3><a class="anchor" id="autotoc_md2233"></a>
 Removal of deprecated functions</h3>
 <p>Function <code>explicit <a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a>(std::istream&amp; i, const parser_callback_t cb = nullptr)</code> should be replaced by the <code>parse</code> function: Let <code>ss</code> be a stream and <code>cb</code> be a parse callback function.</p>
 <p>Old code:</p>
-<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>(<a class="code" href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a>, <a class="code" href="unit-regression1_8cpp.html#aef201ffbbdd98d845f18980829202d1c">cb</a>);</div>
-<div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
+<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>(<a class="code" href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a>, <a class="code" href="unit-regression1_8cpp.html#aef201ffbbdd98d845f18980829202d1c">cb</a>);</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:17282</div></div>
 <div class="ttc" id="aparse____istream____parser__callback__t_8cpp_html_af2751f9355d47d15a2a767ef03f532ef"><div class="ttname"><a href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a></div><div class="ttdeci">Animated std::stringstream ss</div><div class="ttdef"><b>Definition:</b> parse__istream__parser_callback_t.cpp:23</div></div>
 <div class="ttc" id="aunit-regression1_8cpp_html_aef201ffbbdd98d845f18980829202d1c"><div class="ttname"><a href="unit-regression1_8cpp.html#aef201ffbbdd98d845f18980829202d1c">cb</a></div><div class="ttdeci">json::parser_callback_t cb</div><div class="ttdef"><b>Definition:</b> unit-regression1.cpp:1456</div></div>
 </div><!-- fragment --><p>New code:</p>
-<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> = <a class="code" href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">json::parse</a>(<a class="code" href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a>, <a class="code" href="unit-regression1_8cpp.html#aef201ffbbdd98d845f18980829202d1c">cb</a>);</div>
-<div class="ttc" id="acxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp_html_a3646fd1f04510384b3d634354a1a734d"><div class="ttname"><a href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">parse</a></div><div class="ttdeci">void parse(int argc, const char *argv[])</div><div class="ttdef"><b>Definition:</b> example.cpp:30</div></div>
+<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> = <a class="code" href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">json::parse</a>(<a class="code" href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a>, <a class="code" href="unit-regression1_8cpp.html#aef201ffbbdd98d845f18980829202d1c">cb</a>);</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:20814</div></div>
 </div><!-- fragment --><p>If no callback function is used, also the following code works:</p>
-<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
+<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
 <div class="line"><a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> &lt;&lt; <a class="code" href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a>;</div>
 </div><!-- fragment --><p>or</p>
-<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
+<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
 <div class="line"><a class="code" href="parse____istream____parser__callback__t_8cpp.html#af2751f9355d47d15a2a767ef03f532ef">ss</a> &gt;&gt; <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2458"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2234"></a>
 v2.1.1</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.1.1/json.hpp) (437 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.1.1/json.hpp.asc) (1 KB)
 </pre><p> Release date: 2017-02-25 SHA-256: faa2321beb1aa7416d035e7417fcfa59692ac3d8c202728f9bcc302e2d558f57</p>
-<h2><a class="anchor" id="autotoc_md2459"></a>
+<h2><a class="anchor" id="autotoc_md2235"></a>
 Summary</h2>
 <p>This release <b>fixes a locale-related bug in the parser</b>. To do so, the whole number handling (lexer, parser, and also the serialization) have been overworked. Furthermore, a lot of small changes added up that were added to this release. All changes are backward-compatible.</p>
-<h2><a class="anchor" id="autotoc_md2460"></a>
+<h2><a class="anchor" id="autotoc_md2236"></a>
 Changes</h2>
 <ul>
 <li>:bug: Locales that have a different character than <code>.</code> as decimal separator (e.g., the Norwegian locale <code>nb_NO.UTF-8</code>) led to truncated number parsing or parse errors. The library now has been fixed to work with <b>any locale</b>. Note that <code>.</code> is still the only valid decimal separator for JSON input.</li>
@@ -924,7 +925,7 @@ Changes</h2>
 <li>:construction_worker: Added Codacity.</li>
 <li>:arrow_up: Upgraded <a class="el" href="namespaceCatch.html">Catch</a> to version 1.7.2.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2461"></a>
+<h1><a class="anchor" id="autotoc_md2237"></a>
 v2.1.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.1.0/json.hpp) (426 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.1.0/json.hpp.asc) (1 KB)
@@ -932,11 +933,11 @@ v2.1.0</h1>
 <li>Release date: 2017-01-28</li>
 <li>SHA-256: a571dee92515b685784fd527e38405cf3f5e13e96edbfe3f03d6df2e363a767b</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2462"></a>
+<h2><a class="anchor" id="autotoc_md2238"></a>
 Summary</h2>
 <p>This release introduces a means to convert from/to user-defined types. The release is backwards compatible.</p>
 <p><img src="https://cloud.githubusercontent.com/assets/159488/22399173/aebe8f7a-e597-11e6-930f-7494ee615827.png" alt="conversion" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md2463"></a>
+<h2><a class="anchor" id="autotoc_md2239"></a>
 Changes</h2>
 <ul>
 <li>:sparkles: The library now offers an elegant way to <b>convert from and to arbitrary value types</b>. All you need to do is to implement two functions: <code>to_json</code> and <code>from_json</code>. Then, a conversion is as simple as putting a <code>=</code> between variables. See the <a href="https://github.com/nlohmann/json#arbitrary-types-conversions">README</a> for more information and examples.</li>
@@ -948,7 +949,7 @@ Changes</h2>
 <li>:arrow_up: Updated to <a href="https://github.com/philsquared/Catch/releases/tag/v1.6.0">Catch v1.6.0</a>.</li>
 <li>:memo: Some typos in the documentation have been fixed.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2464"></a>
+<h1><a class="anchor" id="autotoc_md2240"></a>
 v2.0.10</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.10/json.hpp) (409 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.10/json.hpp.asc) (1 KB)
@@ -956,20 +957,20 @@ v2.0.10</h1>
 <li>Release date: 2017-01-02</li>
 <li>SHA-256: ec27d4e74e9ce0f78066389a70724afd07f10761009322dc020656704ad5296d</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2465"></a>
+<h2><a class="anchor" id="autotoc_md2241"></a>
 Summary</h2>
 <p>This release fixes several security-relevant bugs in the MessagePack and CBOR parsers. The fixes are backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2466"></a>
+<h2><a class="anchor" id="autotoc_md2242"></a>
 Changes</h2>
 <ul>
 <li>:bug: Fixed a lot of <b>bugs in the CBOR and MesssagePack parsers</b>. These bugs occurred if invalid input was parsed and then could lead in buffer overflows. These bugs were found with Google's <a href="https://github.com/google/oss-fuzz">OSS-Fuzz</a>, see #405, #407, #408, #409, #411, and #412 for more information.</li>
 <li>:construction_worker: We now also use the <b><a href="https://doozer.io">Doozer</a> continuous integration platform</b>.</li>
 <li>:construction_worker: The complete test suite is now also run with <b>Clang's address sanitizer and undefined-behavior sanitizer</b>.</li>
 <li>:white_check_mark: Overworked <b>fuzz testing</b>; CBOR and MessagePack implementations are now fuzz-tested. Furthermore, all fuzz tests now include a round trip which ensures created output can again be properly parsed and yields the same JSON value.</li>
-<li>:memo: Clarified documentation of <code><a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a02307ec0131a3aa9df2db7c2f10b69f2">find()</a></code> function to always return <code><a class="el" href="namespacecompute-powers.html#a621547d214d9dd76969a9561d7d4bcc2">end()</a></code> when called on non-object value types.</li>
+<li>:memo: Clarified documentation of <code><a class="el" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a02307ec0131a3aa9df2db7c2f10b69f2">find()</a></code> function to always return <code><a class="el" href="namespacecompute-powers.html#a621547d214d9dd76969a9561d7d4bcc2">end()</a></code> when called on non-object value types.</li>
 <li>:hammer: Moved thirdparty test code to <code>test/thirdparty</code> directory.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2467"></a>
+<h1><a class="anchor" id="autotoc_md2243"></a>
 v2.0.9</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.9/json.hpp) (406 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.9/json.hpp.asc) (1 KB)
@@ -977,11 +978,11 @@ v2.0.9</h1>
 <li>Release date: 2016-12-16</li>
 <li>SHA-256: fbf3396f13e187d6c214c297bddc742d918ea9b55e10bfb3d9f458b9bfdc22e5</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2468"></a>
+<h2><a class="anchor" id="autotoc_md2244"></a>
 Summary</h2>
 <p>This release implements with <b><a href="http://cbor.io">CBOR</a></b> and <b><a href="http://msgpack.org">MessagePack</a></b> two <b>binary serialization/deserialization formats</b>. It further contains some small fixes and improvements. The fixes are backwards compatible.</p>
 <p><img src="https://cloud.githubusercontent.com/assets/159488/22399181/d4d60d32-e597-11e6-8dcb-825abcf9ac2a.png" alt="cbor" class="inline"/></p>
-<h2><a class="anchor" id="autotoc_md2469"></a>
+<h2><a class="anchor" id="autotoc_md2245"></a>
 Changes</h2>
 <ul>
 <li>:sparkles: The library can now read and write the binary formats <b><a href="http://cbor.io">CBOR</a></b> (Concise Binary Object Representation) and <b><a href="http://msgpack.org">MessagePack</a></b>. Both formats are aimed to produce a very compact representation of JSON which can be parsed very efficiently. See the <a href="https://github.com/nlohmann/json#binary-formats-cbor-and-messagepack">README file</a> for more information and examples.</li>
@@ -995,7 +996,7 @@ Changes</h2>
 <li>:hammer: split <a href="https://github.com/nlohmann/json/tree/develop/test/src">unit tests</a> into individual independent binaries to speed up compilation and testing</li>
 <li>:white_check_mark: the test suite now contains <b>11201886</b> tests</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2470"></a>
+<h1><a class="anchor" id="autotoc_md2246"></a>
 v2.0.8</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.8/json.hpp) (360 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.8/json.hpp.asc) (1 KB)
@@ -1003,10 +1004,10 @@ v2.0.8</h1>
 <li>Release date: 2016-12-02</li>
 <li>SHA-256: b70db0ad34f8e0e61dc3f0cbab88099336c9674c193d8a3439d93d6aca2d7120</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2471"></a>
+<h2><a class="anchor" id="autotoc_md2247"></a>
 Summary</h2>
 <p>This release combines a lot of small fixes and improvements. The fixes are backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2472"></a>
+<h2><a class="anchor" id="autotoc_md2248"></a>
 Changes</h2>
 <ul>
 <li>:bug: fixed a bug that froze the parser if a passed file was not found (now, <code>std::invalid_argument</code> is thrown)</li>
@@ -1021,7 +1022,7 @@ Changes</h2>
 <li>:white_check_mark: the test suite now contains 8905518 tests</li>
 <li>:arrow_up: updated <a href="https://github.com/philsquared/Catch">Catch</a> to version 1.5.8</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2473"></a>
+<h1><a class="anchor" id="autotoc_md2249"></a>
 v2.0.7</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.7/json.hpp) (355 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.7/json.hpp.asc) (1 KB)
@@ -1029,10 +1030,10 @@ v2.0.7</h1>
 <li>Release date: 2016-11-02</li>
 <li>SHA-256: 5545c323670f8165bae90b9dc6078825e86ec310d96cc4e5b47233ea43715bbf</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2474"></a>
+<h2><a class="anchor" id="autotoc_md2250"></a>
 Summary</h2>
 <p>This release fixes a few bugs in the JSON parser found in the <a href="http://seriot.ch/parsing_json.html">Parsing JSON is a Minefield 💣</a> article. The fixes are backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2475"></a>
+<h2><a class="anchor" id="autotoc_md2251"></a>
 Changes</h2>
 <ul>
 <li>The article <a href="http://seriot.ch/parsing_json.html">Parsing JSON is a Minefield 💣</a> discusses a lot of pitfalls of the JSON specification. When investigating the published test cases, a few bugs in the library were found and fixed:<ul>
@@ -1045,7 +1046,7 @@ Changes</h2>
 <li>The string length passed to a user-defined string literal is now exploited to choose a more efficient constructor.</li>
 <li>A few grammar mistakes in the README file have been fixed.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2476"></a>
+<h1><a class="anchor" id="autotoc_md2252"></a>
 v2.0.6</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.6/json.hpp) (349 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.6/json.hpp.asc) (1 KB)
@@ -1053,10 +1054,10 @@ v2.0.6</h1>
 <li>Release date: 2016-10-15</li>
 <li>SHA256: 459cc93d5e2f503e50c6d5876eb86bfea7daf405f5a567c5a2c9abc2383756ae</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2477"></a>
+<h2><a class="anchor" id="autotoc_md2253"></a>
 Summary</h2>
 <p>This release fixes the semantics of <code>operator[]</code> for JSON Pointers (see below). This fix is backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2478"></a>
+<h2><a class="anchor" id="autotoc_md2254"></a>
 Changes</h2>
 <ul>
 <li>**<code>operator[]</code> for JSON Pointers** now behaves like the other versions of <code>operator[]</code> and transforms <code>null</code> values into objects or arrays if required. This allows to created nested structures like <code>j["/foo/bar/2"] = 17</code> (yielding <code>{"foo": "bar": [null, null, 17]}</code>) without problems.</li>
@@ -1065,7 +1066,7 @@ Changes</h2>
 <li>fixed the CMake files to allow to run the test suite outside the main project directory</li>
 <li>restored test coverage to 100%.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2479"></a>
+<h1><a class="anchor" id="autotoc_md2255"></a>
 v2.0.5</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.5/json.hpp) (347 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.5/json.hpp.asc) (1 KB)
@@ -1073,15 +1074,15 @@ v2.0.5</h1>
 <li>Release date: 2016-09-14</li>
 <li>SHA-256: 8b7565263a44e2b7d3b89808bc73d2d639037ff0c1f379e3d56dbd77e00b98d9</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2480"></a>
+<h2><a class="anchor" id="autotoc_md2256"></a>
 Summary</h2>
 <p>This release fixes a regression bug in the stream parser (function <code><a class="el" href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">parse()</a></code> and the <code>&lt;&lt;</code>/<code>&gt;&gt;</code> operators). This fix is backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2481"></a>
+<h2><a class="anchor" id="autotoc_md2257"></a>
 Changes</h2>
 <ul>
 <li><b>Bug fix</b>: The end of a file stream was not detected properly which led to parse errors. This bug should have been fixed with 2.0.4, but there was still a flaw in the code.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2482"></a>
+<h1><a class="anchor" id="autotoc_md2258"></a>
 v2.0.4</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.4/json.hpp) (347 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.4/json.hpp.asc) (1 KB)
@@ -1089,16 +1090,16 @@ v2.0.4</h1>
 <li>Release date: 2016-09-11</li>
 <li>SHA-256: 632ceec4c25c4e2153f71470d3a2b992c8355f6d8b4d627d05dd16095cd3aeda</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2483"></a>
+<h2><a class="anchor" id="autotoc_md2259"></a>
 Summary</h2>
 <p>This release fixes a bug in the stream parser (function <code><a class="el" href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">parse()</a></code> and the <code>&lt;&lt;</code>/<code>&gt;&gt;</code> operators). This fix is backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2484"></a>
+<h2><a class="anchor" id="autotoc_md2260"></a>
 Changes</h2>
 <ul>
 <li><b>Bug fix</b>: The end of a file stream was not detected properly which led to parse errors.</li>
 <li>Fixed a compiler warning about an unused variable.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2485"></a>
+<h1><a class="anchor" id="autotoc_md2261"></a>
 v2.0.3</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.3/json.hpp) (347 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.3/json.hpp.asc) (1 KB)
@@ -1106,10 +1107,10 @@ v2.0.3</h1>
 <li>Release date: 2016-08-31</li>
 <li>SHA-256: 535b73efe5546fde9e763c14aeadfc7b58183c0b3cd43c29741025aba6cf6bd3</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2486"></a>
+<h2><a class="anchor" id="autotoc_md2262"></a>
 Summary</h2>
 <p>This release combines a lot of small fixes and improvements. The release is backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2487"></a>
+<h2><a class="anchor" id="autotoc_md2263"></a>
 Changes</h2>
 <ul>
 <li>The <b>parser/deserialization functions have been generalized</b> to process any contiguous sequence of 1-byte elements (e.g., <code>char</code>, <code>unsigned char</code>, <code>uint8_t</code>). This includes all kind of string representations (string literals, char arrays, <code>std::string</code>, <code>const char*</code>), contiguous containers (C-style arrays, <code>std::vector</code>, <code>std::array</code>, <code>std::valarray</code>, <code>std::initializer_list</code>). User-defined containers providing random-access iterator access via <code>std::begin</code> and <code>std::end</code> can be used as well. See the documentation (<a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_ace63ac4eb1dd7251a259d32e397461a3.html#ace63ac4eb1dd7251a259d32e397461a3">1</a>, <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_a90f05d55d9d0702c075cd281fd0d85ae.html#a90f05d55d9d0702c075cd281fd0d85ae">2</a>, <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_aeffd70f622f8f2a51fd3d95af64b63a7.html#aeffd70f622f8f2a51fd3d95af64b63a7">3</a>, <a href="https://nlohmann.github.io/json/classnlohmann_1_1basic__json_aa8dca2e91a6301c36890f844e64f0023.html#aa8dca2e91a6301c36890f844e64f0023">4</a>) for more information. Note that contiguous storage cannot be checked at compile time; if any of the parse functions are called with a noncompliant container, the behavior is undefined and will most likely yield segmentation violation. The preconditions are enforced by an assertion unless the library is compiled with preprocessor symbol <code>NDEBUG</code>.</li>
@@ -1128,7 +1129,7 @@ Changes</h2>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2488"></a>
+<h1><a class="anchor" id="autotoc_md2264"></a>
 v2.0.2</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.2/json.hpp) (338 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.2/json.hpp.asc) (1 KB)
@@ -1136,10 +1137,10 @@ v2.0.2</h1>
 <li>Release date: 2016-07-31</li>
 <li>SHA-256: 8e97b7965b4594b00998d6704465412360e1a0ed927badb51ded8b82291a8f3d</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2489"></a>
+<h2><a class="anchor" id="autotoc_md2265"></a>
 Summary</h2>
 <p>This release combines a lot of small fixes and improvements. The release is backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2490"></a>
+<h2><a class="anchor" id="autotoc_md2266"></a>
 Changes</h2>
 <ul>
 <li>The <b>parser</b> has been overworked, and a lot of small issues have been fixed:<ul>
@@ -1163,7 +1164,7 @@ Changes</h2>
 <li>The Homebrew formula (see <a href="https://github.com/nlohmann/json#integration">Integration</a>) is now tested for all Xcode builds (6.1 - 8.x) with Travis.</li>
 <li>Avoided output to <code>std::cout</code> in the test cases.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2491"></a>
+<h1><a class="anchor" id="autotoc_md2267"></a>
 v2.0.1</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.1/json.hpp) (321 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.1/json.hpp.asc) (1 KB)
@@ -1171,16 +1172,16 @@ v2.0.1</h1>
 <li>Release date: 2016-06-28</li>
 <li>SHA-256: ef550fcd7df572555bf068e9ec4e9d3b9e4cdd441cecb0dcea9ea7fd313f72dd</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2492"></a>
+<h2><a class="anchor" id="autotoc_md2268"></a>
 Summary</h2>
 <p>This release fixes a performance regression in the JSON serialization (function <code>dump()</code>). This fix is backwards compatible.</p>
-<h2><a class="anchor" id="autotoc_md2493"></a>
+<h2><a class="anchor" id="autotoc_md2269"></a>
 Changes</h2>
 <ul>
 <li>The locale of the output stream (or the internal string stream if a JSON value is serialized to a string) is now adjusted once for the whole serialization instead of for each floating-point number.</li>
 <li>The locale of an output stream is now correctly reset to the previous value by the JSON library.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2494"></a>
+<h1><a class="anchor" id="autotoc_md2270"></a>
 v2.0.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v2.0.0/json.hpp) (321 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v2.0.0/json.hpp.asc) (1 KB)
@@ -1188,11 +1189,11 @@ v2.0.0</h1>
 <li>Release date: 2016-06-24</li>
 <li>SHA-256: ac9e1fb25c2ac9ca5fc501fcd2fe3281fe04f07018a1b48820e7b1b11491bb6c</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2495"></a>
+<h2><a class="anchor" id="autotoc_md2271"></a>
 Summary</h2>
 <p>This release adds several features such as JSON Pointers, JSON Patch, or support for 64 bit unsigned integers. Furthermore, several (subtle) bugs have been fixed.</p>
 <p>As <code>noexcept</code> and <code>constexpr</code> specifier have been added to several functions, the public API has effectively been changed in a (potential) non-backwards compatible manner. As we adhere to <a href="http://semver.org">Semantic Versioning</a>, this calls for a new major version, so say hello to 2️⃣.0️⃣.0️⃣.</p>
-<h2><a class="anchor" id="autotoc_md2496"></a>
+<h2><a class="anchor" id="autotoc_md2272"></a>
 Changes</h2>
 <ul>
 <li>🔟 A JSON value now uses <code>uint64_t</code> (default value for template parameter <code>NumberUnsignedType</code>) as data type for <b>unsigned integer</b> values. This type is used automatically when an unsigned number is parsed. Furthermore, constructors, conversion operators and an <code>is_number_unsigned()</code> test have been added.</li>
@@ -1214,7 +1215,7 @@ Changes</h2>
 <li>Functions <code>push_back</code> and <code>operator+=</code> now work with key/value pairs passed as initializer list, e.g. <code>j_object += {"key", 1}</code>.</li>
 <li>Overworked <code>CMakeLists.txt</code> to make it easier to integrate the library into other projects.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2497"></a>
+<h2><a class="anchor" id="autotoc_md2273"></a>
 Notes</h2>
 <ul>
 <li>Parser error messages are still very vague and contain no information on the error location.</li>
@@ -1222,7 +1223,7 @@ Notes</h2>
 <li>The name of function <code>iteration_wrapper</code> may change in the future and the function will be deprecated in the next release.</li>
 <li>Roundtripping (i.e., parsing a JSON value from a string, serializing it, and comparing the strings) of floating-point numbers is not 100% accurate. Note that <a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a> defines no format to internally represent numbers and states not requirement for roundtripping. Nevertheless, benchmarks like <a href="https://github.com/miloyip/nativejson-benchmark">Native JSON Benchmark</a> treat roundtripping deviations as conformance errors.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2498"></a>
+<h1><a class="anchor" id="autotoc_md2274"></a>
 v1.1.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v1.1.0/json.hpp) (257 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v1.1.0/json.hpp.asc) (1 KB)
@@ -1230,10 +1231,10 @@ v1.1.0</h1>
 <li>Release date: 2016-01-24</li>
 <li>SHA-256: c0cf0e3017798ca6bb18e757ebc570d21a3bdac877845e2b9e9573d183ed2f05</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2499"></a>
+<h2><a class="anchor" id="autotoc_md2275"></a>
 Summary</h2>
 <p>This release fixes several small bugs and adds functionality in a backwards-compatible manner. Compared to the <a href="https://github.com/nlohmann/json/releases/tag/v1.0.0">last version (1.0.0)</a>, the following changes have been made:</p>
-<h2><a class="anchor" id="autotoc_md2500"></a>
+<h2><a class="anchor" id="autotoc_md2276"></a>
 Changes</h2>
 <ul>
 <li><em>Fixed</em>: <b>Floating-point numbers</b> are now serialized and deserialized properly such that rountripping works in more cases. [#185, #186, #190, #191, #194]</li>
@@ -1244,10 +1245,10 @@ Changes</h2>
 <li><em>Fixed</em>: All required headers are now included.</li>
 <li><em>Fixed</em>: Typos and other small issues. [#162, #166, #175, #177, #179, #180]</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2501"></a>
+<h2><a class="anchor" id="autotoc_md2277"></a>
 Notes</h2>
 <p>There are still known open issues (#178, #187) which will be fixed in version 2.0.0. However, these fixes will require a small API change and will not be entirely backwards-compatible.</p>
-<h1><a class="anchor" id="autotoc_md2502"></a>
+<h1><a class="anchor" id="autotoc_md2278"></a>
 v1.0.0</h1>
 <p>!!! summary "Files" </p><pre class="fragment">- [json.hpp](https://github.com/nlohmann/json/releases/download/v1.0.0/json.hpp) (243 KB)
 - [json.hpp.asc](https://github.com/nlohmann/json/releases/download/v1.0.0/json.hpp.asc) (1 KB)
@@ -1255,10 +1256,10 @@ v1.0.0</h1>
 <li>Release date: 2015-12-28</li>
 <li>SHA-256: 767dc2fab1819d7b9e19b6e456d61e38d21ef7182606ecf01516e3f5230446de</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md2503"></a>
+<h2><a class="anchor" id="autotoc_md2279"></a>
 Summary</h2>
 <p>This is the first official release. Compared to the <a href="https://github.com/nlohmann/json/releases/tag/v1.0.0-rc1">prerelease version 1.0.0-rc1</a>, only a few minor improvements have been made:</p>
-<h2><a class="anchor" id="autotoc_md2504"></a>
+<h2><a class="anchor" id="autotoc_md2280"></a>
 Changes</h2>
 <ul>
 <li><em>Changed</em>: A <b>UTF-8 byte order mark</b> is silently ignored.</li>

@@ -93,7 +93,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>Build a cmake project with a custom install target.</p>
 <p>Conventionally, CMake uses the target <code>install</code> to build and copy binaries into the <a href="https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html"><code>CMAKE_INSTALL_PREFIX</code></a>. In rare circumstances, a project might have more specific targets that should be used instead.</p>
 <p>Ports should prefer calling <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_cmake_install.html">`vcpkg_cmake_install()`</a> when possible.</p>
-<h1><a class="anchor" id="autotoc_md3356"></a>
+<h1><a class="anchor" id="autotoc_md3132"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_cmake_build(</div>
 <div class="line">    [TARGET &lt;target&gt;]</div>
@@ -107,18 +107,18 @@ Usage</h1>
 <div class="line">    &quot;host&quot;: true</div>
 <div class="line">  }</div>
 <div class="line">]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3357"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3133"></a>
 Parameters</h1>
 <p>All supported parameters to <a href="vcpkg_cmake_install.md#parameters"><code>vcpkg_cmake_install()</code></a> are supported by <code>vcpkg_cmake_build()</code>. See <a href="vcpkg_cmake_install.md#parameters"><code>vcpkg_cmake_install()</code></a> for additional parameter documentation.</p>
-<h2><a class="anchor" id="autotoc_md3358"></a>
+<h2><a class="anchor" id="autotoc_md3134"></a>
 TARGET</h2>
 <p>The CMake target to build.</p>
 <p>If this parameter is not passed, no target will be passed to the build.</p>
-<h2><a class="anchor" id="autotoc_md3359"></a>
+<h2><a class="anchor" id="autotoc_md3135"></a>
 LOGFILE_BASE</h2>
 <p>An alternate root name for the logs.</p>
 <p>Defaults to <code>build-${TARGET_TRIPLET}</code>. It should not contain any path separators. Logs will be generated matching the pattern <code>${CURRENT_BUILDTREES_DIR}/${LOGFILE_BASE}-&lt;suffix&gt;.log</code></p>
-<h1><a class="anchor" id="autotoc_md3360"></a>
+<h1><a class="anchor" id="autotoc_md3136"></a>
 Examples</h1>
 <div class="fragment"><div class="line">vcpkg_from_github(OUT_SOURCE_PATH source_path ...)</div>
 <div class="line">vcpkg_cmake_configure(</div>
@@ -129,10 +129,10 @@ Examples</h1>
 <div class="line">)</div>
 <div class="line">vcpkg_cmake_build(TARGET my.install.target)</div>
 </div><!-- fragment --><p><a href="https://github.com/microsoft/vcpkg/search?q=vcpkg_cmake_build+path%3A%2Fports">Search microsoft/vcpkg for Examples</a></p>
-<h1><a class="anchor" id="autotoc_md3361"></a>
+<h1><a class="anchor" id="autotoc_md3137"></a>
 Remarks</h1>
 <p>This command replaces <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_build_cmake.html">`vcpkg_build_cmake()`</a>.</p>
-<h1><a class="anchor" id="autotoc_md3362"></a>
+<h1><a class="anchor" id="autotoc_md3138"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/vcpkg-cmake/vcpkg_cmake_build.cmake">ports/vcpkg-cmake/vcpkg_cmake_build.cmake</a> </p>
 </div></div><!-- contents -->

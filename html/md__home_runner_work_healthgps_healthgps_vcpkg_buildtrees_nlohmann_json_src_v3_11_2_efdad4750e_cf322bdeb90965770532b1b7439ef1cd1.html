@@ -92,30 +92,30 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><div class="fragment"><div class="line"><span class="preprocessor">#define NLOHMANN_JSON_SERIALIZE_ENUM(type, conversion...)</span></div>
 </div><!-- fragment --><p>By default, enum values are serialized to JSON as integers. In some cases this could result in undesired behavior. If an enum is modified or re-ordered after data has been serialized to JSON, the later de-serialized JSON data may be undefined or a different enum value than was originally intended.</p>
 <p>The <code>NLOHMANN_JSON_SERIALIZE_ENUM</code> allows to define a user-defined serialization for every enumerator.</p>
-<h1><a class="anchor" id="autotoc_md2056"></a>
+<h1><a class="anchor" id="autotoc_md1832"></a>
 Parameters</h1>
 <p><code>type</code> (in) : name of the enum to serialize/deserialize</p>
 <p><code>conversion</code> (in) : a pair of an enumerator and a JSON serialization; arbitrary pairs can can be given as comma-separated list</p>
-<h1><a class="anchor" id="autotoc_md2057"></a>
+<h1><a class="anchor" id="autotoc_md1833"></a>
 Default definition</h1>
 <p>The macros add two friend functions to the class which take care of the serialization and deserialization:</p>
 <div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> BasicJsonType&gt;</div>
-<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json</a>(BasicJsonType&amp; <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>, <span class="keyword">const</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp; <a class="code" href="namespacecompute-powers.html#a0bfa2048c4a5d9fda0b71ac3d2224425">e</a>);</div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json</a>(BasicJsonType&amp; <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>, <span class="keyword">const</span> <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp; <a class="code" href="namespacecompute-powers.html#a0bfa2048c4a5d9fda0b71ac3d2224425">e</a>);</div>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> BasicJsonType&gt;</div>
-<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json</a>(<span class="keyword">const</span> BasicJsonType&amp; <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>, <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp; <a class="code" href="namespacecompute-powers.html#a0bfa2048c4a5d9fda0b71ac3d2224425">e</a>);</div>
+<div class="line"><span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a>(<span class="keyword">const</span> BasicJsonType&amp; <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>, <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp; <a class="code" href="namespacecompute-powers.html#a0bfa2048c4a5d9fda0b71ac3d2224425">e</a>);</div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
+<div class="ttc" id="ajsonparser_8cpp_html_a863cfc8afb5397b781ef4ea4c0c61a7a"><div class="ttname"><a href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a></div><div class="ttdeci">void from_json(const json &amp;j, CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:16</div></div>
+<div class="ttc" id="ajsonparser_8cpp_html_a8db632883091c922ea55bb8612395bdb"><div class="ttname"><a href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json</a></div><div class="ttdeci">void to_json(json &amp;j, const CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:8</div></div>
 <div class="ttc" id="anamespacecompute-powers_html_a0bfa2048c4a5d9fda0b71ac3d2224425"><div class="ttname"><a href="namespacecompute-powers.html#a0bfa2048c4a5d9fda0b71ac3d2224425">compute-powers.e</a></div><div class="ttdeci">e</div><div class="ttdef"><b>Definition:</b> compute-powers.py:24</div></div>
-<div class="ttc" id="anamespacedetail_html_ac8fc7fc4703cbd8edd7bb43a94adf92b"><div class="ttname"><a href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">detail::from_json</a></div><div class="ttdeci">void from_json(const BasicJsonType &amp;j, typename std::nullptr_t &amp;n)</div><div class="ttdef"><b>Definition:</b> from_json.hpp:37</div></div>
-<div class="ttc" id="anamespacedetail_html_acfdf2e4c8f09d5acaa2841358db51f82"><div class="ttname"><a href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">detail::to_json</a></div><div class="ttdeci">void to_json(BasicJsonType &amp;j, T b) noexcept</div><div class="ttdef"><b>Definition:</b> to_json.hpp:265</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
 <div class="ttc" id="aparse____allow__exceptions_8cpp_html_ac657f5945687365edd0e109857d4fec0"><div class="ttname"><a href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a></div><div class="ttdeci">json j</div><div class="ttdef"><b>Definition:</b> parse__allow_exceptions.cpp:26</div></div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2058"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1834"></a>
 Notes</h1>
 <p>!!! info "Prerequisites" </p><pre class="fragment">The macro must be used inside the namespace of the enum.
 </pre><p> !!! important "Important notes" </p><pre class="fragment">- When using [`get&lt;ENUM_TYPE&gt;()`](../basic_json/get.md), undefined JSON values will default to the first specified
   conversion. Select this default pair carefully. See example 1 below.
 - If an enum or JSON value is specified in multiple conversions, the first matching conversion from the top of the
   list will be returned when converting to or from JSON. See example 2 below.
-</pre> <h1><a class="anchor" id="autotoc_md2059"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1835"></a>
 Examples</h1>
 <p>??? example "Example 1: Basic usage" </p><pre class="fragment">The example shows how `NLOHMANN_JSON_SERIALIZE_ENUM` can be used to serialize/deserialize both classical enums and
 C++11 enum classes:
@@ -142,13 +142,13 @@ Output:
 ```json
 --8&lt;-- "examples/nlohmann_json_serialize_enum_2.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md2060"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1836"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf4dddf2d0d657d2d7c7bbb21610c3fd7.html">Specializing enum conversion</a></li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c634a4e618b357d644e94f2555d7eb6ec.html">`JSON_DISABLE_ENUM_SERIALIZATION`</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2061"></a>
+<h1><a class="anchor" id="autotoc_md1837"></a>
 Version history</h1>
 <p>Added in version 3.4.0. </p>
 </div></div><!-- contents -->

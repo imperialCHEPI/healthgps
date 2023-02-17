@@ -92,16 +92,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><div class="fragment"><div class="line"><span class="keyword">explicit</span> <a class="code" href="classjson__pointer.html">json_pointer</a>(<span class="keyword">const</span> string_t&amp; s = <span class="stringliteral">&quot;&quot;</span>);</div>
 <div class="ttc" id="aclassjson__pointer_html"><div class="ttname"><a href="classjson__pointer.html">json_pointer</a></div><div class="ttdoc">JSON Pointer defines a string syntax for identifying a specific value within a JSON document.</div><div class="ttdef"><b>Definition:</b> json_pointer.hpp:36</div></div>
 </div><!-- fragment --><p>Create a JSON pointer according to the syntax described in <a href="https://tools.ietf.org/html/rfc6901#section-3">Section 3 of RFC6901</a>.</p>
-<h1><a class="anchor" id="autotoc_md1803"></a>
+<h1><a class="anchor" id="autotoc_md1579"></a>
 Parameters</h1>
 <p><code>s</code> (in) : string representing the JSON pointer; if omitted, the empty string is assumed which references the whole JSON value</p>
-<h1><a class="anchor" id="autotoc_md1804"></a>
+<h1><a class="anchor" id="autotoc_md1580"></a>
 Exceptions</h1>
 <ul>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error107">parse_error.107</a> if the given JSON pointer <code>s</code> is nonempty and does not begin with a slash (<code>/</code>); see example below.</li>
 <li>Throws <a href="../../home/exceptions.md#jsonexceptionparse_error108">parse_error.108</a> if a tilde (<code>~</code>) in the given JSON pointer <code>s</code> is not followed by <code>0</code> (representing <code>~</code>) or <code>1</code> (representing <code>/</code>); see example below.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1805"></a>
+<h1><a class="anchor" id="autotoc_md1581"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example shows the construction several valid JSON pointers as well as the exceptional behavior.
 
@@ -114,7 +114,7 @@ Output:
 ```json
 --8&lt;-- "examples/json_pointer.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1806"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1582"></a>
 Version history</h1>
 <ul>
 <li>Added in version 2.0.0.</li>

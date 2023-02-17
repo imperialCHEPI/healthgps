@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/commands/integrate.md">GitHub</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md2939"></a>
+<h1><a class="anchor" id="autotoc_md2715"></a>
 Synopsis</h1>
 <p><b>Buildsystem Integration</b> </p><div class="fragment"><div class="line">vcpkg integrate [options] install</div>
 <div class="line">vcpkg integrate [options] remove</div>
@@ -99,10 +99,10 @@ Synopsis</h1>
 <div class="line">vcpkg integrate [options] bash</div>
 <div class="line">vcpkg integrate [options] zsh</div>
 <div class="line">vcpkg integrate [options] x-fish</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2940"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2716"></a>
 Description</h1>
 <p>Integrate vcpkg with shells and buildsystems.</p>
-<h2><a class="anchor" id="autotoc_md2941"></a>
+<h2><a class="anchor" id="autotoc_md2717"></a>
 &lt;tt&gt;vcpkg integrate install&lt;/tt&gt;</h2>
 <p>Integrates with <a href="../users/buildsystems/msbuild-integration.md#user-wide-integration">Visual Studio</a> (Windows-only), sets the user-wide vcpkg instance, and displays CMake integration help.</p>
 <p>On Windows with Visual Studio 2015, this subcommand will add redirecting logic into the MSBuild installation which will automatically pick up each user's user-wide vcpkg instance. Visual Studio 2017 and newer have this logic in the box.</p>
@@ -112,37 +112,37 @@ Description</h1>
 <li><code>$HOME/.vcpkg</code> or <code>/var/.vcpkg</code> on non-Windows</li>
 </ul>
 <p>Displays the full path to the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_cmake_integration.html">CMake toolchain file</a>. Running this command is not required to use the toolchain file.</p>
-<h2><a class="anchor" id="autotoc_md2942"></a>
+<h2><a class="anchor" id="autotoc_md2718"></a>
 &lt;tt&gt;vcpkg integrate remove&lt;/tt&gt;</h2>
 <p>Removes the user-wide vcpkg instance setting.</p>
 <p>This command deletes the linking files from the user-wide configuration location created by <code>vcpkg integrate install</code>.</p>
-<h2><a class="anchor" id="autotoc_md2943"></a>
+<h2><a class="anchor" id="autotoc_md2719"></a>
 &lt;tt&gt;vcpkg integrate project&lt;/tt&gt;</h2>
 <p>Creates a linked NuGet package for MSBuild integration.</p>
 <p>See <a href="../users/buildsystems/msbuild-integration.md#linked-nuget-package">MSBuild Per-Project Integration</a> for more information.</p>
-<h2><a class="anchor" id="autotoc_md2944"></a>
+<h2><a class="anchor" id="autotoc_md2720"></a>
 &lt;tt&gt;vcpkg integrate powershell&lt;/tt&gt;</h2>
 <p><b>Windows Only</b></p>
 <p>Adds vcpkg tab-completion support to the current user's Powershell profile.</p>
-<h2><a class="anchor" id="autotoc_md2945"></a>
+<h2><a class="anchor" id="autotoc_md2721"></a>
 &lt;tt&gt;vcpkg integrate bash&lt;/tt&gt;</h2>
 <p><b>Non-Windows Only</b></p>
 <p>Adds vcpkg tab-completion support to the current user's <code>.bashrc</code> (<code>.bash_profile</code> on MacOS).</p>
-<h2><a class="anchor" id="autotoc_md2946"></a>
+<h2><a class="anchor" id="autotoc_md2722"></a>
 &lt;tt&gt;vcpkg integrate zsh&lt;/tt&gt;</h2>
 <p><b>Non-Windows Only</b></p>
 <p>Adds vcpkg tab-completion support to the current user's <code>.zshrc</code>.</p>
-<h2><a class="anchor" id="autotoc_md2947"></a>
+<h2><a class="anchor" id="autotoc_md2723"></a>
 &lt;tt&gt;vcpkg integrate x-fish&lt;/tt&gt;</h2>
 <p><b>Non-Windows Only</b></p>
 <p>Adds vcpkg tab-completion support to the current user's fish shell completions directory.</p>
-<h1><a class="anchor" id="autotoc_md2948"></a>
+<h1><a class="anchor" id="autotoc_md2724"></a>
 Example</h1>
 <div class="fragment"><div class="line">$ vcpkg integrate install</div>
 <div class="line">Applied user-wide integration for this vcpkg root.</div>
 <div class="line"> </div>
 <div class="line">CMake projects should use: &quot;-DCMAKE_TOOLCHAIN_FILE=/workspaces/vcpkg/scripts/buildsystems/vcpkg.cmake&quot;</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2949"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2725"></a>
 Options</h1>
 <p>All vcpkg commands support a set of <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_commands_common_options.html">common options</a>. </p>
 </div></div><!-- contents -->

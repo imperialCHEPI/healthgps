@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The <code>vcpkg.json</code> file contains metadata about the port. It's a JSON file, and replaces the existing CONTROL file metadata structure. It must have a top level object, and all fields are case sensitive.</p>
-<h1><a class="anchor" id="autotoc_md3130"></a>
+<h1><a class="anchor" id="autotoc_md2906"></a>
 Examples:</h1>
 <p>The most important fields in a manifest, the ones which are required for all ports, are the <code>"name"</code> field, and a version field (for now, just <code>"version-string"</code>). There's more information about these fields below.</p>
 <div class="fragment"><div class="line">{</div>
@@ -128,9 +128,9 @@ Examples:</h1>
 <div class="line">    &quot;zlib&quot;</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3131"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2907"></a>
 Fields</h1>
-<h2><a class="anchor" id="autotoc_md3132"></a>
+<h2><a class="anchor" id="autotoc_md2908"></a>
 &lt;tt&gt;"name"&lt;/tt&gt;</h2>
 <p>The name of the port.</p>
 <p>When adding new ports be aware that the name may conflict with other projects that are not a part of vcpkg. For example <code>json</code> conflicts with too many other projects so you should add a scope to the name such as <code>taocpp-json</code> to make it unique. Verify there are no conflicts on a search engine as well as on other package collections.</p>
@@ -141,7 +141,7 @@ Fields</h1>
 <li><a href="https://pkgs.org/">Packages search</a></li>
 </ul>
 <p>A name must be an identifier: i.e., it must only consist of lowercase ascii alphabetic characters, numbers, and hyphens, and it must not begin nor end with a hyphen.</p>
-<h2><a class="anchor" id="autotoc_md3133"></a>
+<h2><a class="anchor" id="autotoc_md2909"></a>
 Version fields</h2>
 <p>Currently there are different fields for special versioning. Namely:</p>
 <table class="markdownTable">
@@ -158,7 +158,7 @@ Version fields</h2>
 </table>
 <p>See <a href="https://github.com/microsoft/vcpkg/blob/master/docs/specifications/versioning.md#22-package-versions">https://github.com/microsoft/vcpkg/blob/master/docs/specifications/versioning.md#22-package-versions</a> for more details.</p>
 <p>Additionally, <code>"port-version"</code> is used to differentiate between port changes that don't change the underlying library version.</p>
-<h3><a class="anchor" id="autotoc_md3134"></a>
+<h3><a class="anchor" id="autotoc_md2910"></a>
 &lt;tt&gt;"version-string"&lt;/tt&gt;</h3>
 <p>This field is an ascii string, and may contain alphanumeric characters, <code>.</code>, <code>_</code>, or <code>-</code>. No attempt at ordering versions is made; all versions are treated as byte strings and are only evaluated for equality.</p>
 <p>For tagged-release ports, we follow the following convention:</p>
@@ -174,11 +174,11 @@ Version fields</h2>
 <li>Today's date is 2019-06-01.</li>
 </ol>
 <p>Then if you update the source version today, you should give it version <code>2019-06-01</code>.</p>
-<h3><a class="anchor" id="autotoc_md3135"></a>
+<h3><a class="anchor" id="autotoc_md2911"></a>
 &lt;tt&gt;"port-version"&lt;/tt&gt;</h3>
 <p>The version of the port, aside from the library version.</p>
 <p>This field is a non-negative integer. It allows one to version the port file separately from the version of the underlying library; if you make a change to a port, without changing the underlying version of the library, you should increment this field by one (starting at <code>0</code>, which is equivalent to no <code>"port-version"</code> field). When the version of the underlying library is upgraded, this field should be set back to <code>0</code> (i.e., delete the <code>"port-version"</code> field).</p>
-<h3><a class="anchor" id="autotoc_md3136"></a>
+<h3><a class="anchor" id="autotoc_md2912"></a>
 Examples:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;version&quot;: &quot;1.0.5&quot;,</div>
@@ -187,11 +187,11 @@ Examples:</h3>
 </div><!-- fragment --><div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;version&quot;: &quot;2019-03-21&quot;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3137"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2913"></a>
 &lt;tt&gt;"description"&lt;/tt&gt;</h2>
 <p>A description of the library.</p>
 <p>This field can either be a single string, which should be a summary of the library, or can be an array, with the first line being a summary and the remaining lines being the detailed description - one string per line.</p>
-<h3><a class="anchor" id="autotoc_md3138"></a>
+<h3><a class="anchor" id="autotoc_md2914"></a>
 Examples:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;description&quot;: &quot;C++ header-only JSON library&quot;</div>
@@ -203,22 +203,22 @@ Examples:</h3>
 <div class="line">    &quot;This makes it suitable for &#39;machine to machine&#39; messaging such as with low power sensors or mobile devices such as phones, embedded computers or microcontrollers like the Arduino.&quot;</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3139"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2915"></a>
 &lt;tt&gt;"homepage"&lt;/tt&gt;</h2>
 <p>The URL of the homepage for the library where a user is able to find additional documentation or the original source code.</p>
-<h3><a class="anchor" id="autotoc_md3140"></a>
+<h3><a class="anchor" id="autotoc_md2916"></a>
 Example:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;homepage&quot;: &quot;https://github.com/microsoft/vcpkg&quot;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3141"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2917"></a>
 &lt;tt&gt;"documentation"&lt;/tt&gt;</h2>
 <p>The URL where a user would be able to find official documentation for the library. Optional.</p>
-<h2><a class="anchor" id="autotoc_md3142"></a>
+<h2><a class="anchor" id="autotoc_md2918"></a>
 &lt;tt&gt;"maintainers"&lt;/tt&gt;</h2>
 <p>A list of strings that define the set of maintainers of a package. It's recommended that these take the form of <code>Givenname Surname &lt;email&gt;</code>, but this field is not checked for consistency.</p>
 <p>Optional.</p>
-<h2><a class="anchor" id="autotoc_md3143"></a>
+<h2><a class="anchor" id="autotoc_md2919"></a>
 &lt;tt&gt;"dependencies"&lt;/tt&gt;</h2>
 <p>An array of ports the library has a dependency on.</p>
 <p>vcpkg does not distinguish between build-only dependencies and runtime dependencies. The complete list of dependencies needed to successfully use the library should be specified.</p>
@@ -226,7 +226,7 @@ Example:</h3>
 <p>Each dependency may be either an identifier, or an object. For many dependencies, just listing the name of the library should be fine; however, if one needs to add extra information to that dependency, one may use the dependency object. For a dependency object, the <code>"name"</code> field is used to designate the library; for example the dependency object <code>{ "name": "zlib" }</code> is equivalent to just writing <code>"zlib"</code>.</p>
 <p>If the port is dependent on optional features of another library, those can be specified using the <code>"features"</code> field of the dependency object. If the port does not require any features from the dependency, this should be specified with the <code>"default-features"</code> fields set to <code>false</code>.</p>
 <p>Dependencies can also be filtered based on the target triplet to support differing requirements. These filters use the same syntax as the <code>"supports"</code> field below, and are specified in the <code>"platform"</code> field.</p>
-<h3><a class="anchor" id="autotoc_md3144"></a>
+<h3><a class="anchor" id="autotoc_md2920"></a>
 Example:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;dependencies&quot;: [</div>
@@ -249,13 +249,13 @@ Example:</h3>
 <div class="line">    &quot;rapidjson&quot;</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3145"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2921"></a>
 &lt;tt&gt;"features"&lt;/tt&gt;</h2>
 <p>Multiple optional features can be specified in manifest files, in the <code>"features"</code> object field. This field is a map from the feature name, to the feature's information. Each one must have a <code>"description"</code> field, and may also optionally have a <code>"dependencies"</code> field.</p>
 <p>A feature's name must be an identifier - in other words, lowercase alphabetic characters, digits, and hyphens, neither starting nor ending with a hyphen.</p>
 <p>A feature's <code>"description"</code> is a description of the feature, and is the same kind of thing as the port <code>"description"</code> field.</p>
 <p>A feature's <code>"dependencies"</code> field contains the list of extra dependencies required to build and use this feature; this field isn't required if the feature doesn't require any extra dependencies. On installation the dependencies from all selected features are combined to produce the full dependency list for the build.</p>
-<h3><a class="anchor" id="autotoc_md3146"></a>
+<h3><a class="anchor" id="autotoc_md2922"></a>
 Example:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;name&quot;: &quot;vtk&quot;,</div>
@@ -321,10 +321,10 @@ Example:</h3>
 <div class="line">    }</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3147"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2923"></a>
 &lt;tt&gt;"default-features"&lt;/tt&gt;</h2>
 <p>An array of feature names that the library uses by default, if nothing else is specified.</p>
-<h3><a class="anchor" id="autotoc_md3148"></a>
+<h3><a class="anchor" id="autotoc_md2924"></a>
 Example:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;default-features&quot;: [</div>
@@ -342,7 +342,7 @@ Example:</h3>
 <div class="line">    }</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3149"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2925"></a>
 &lt;tt&gt;"supports"&lt;/tt&gt;</h2>
 <p>A string, formatted as a platform expression, that evaluates to true when the port should build successfully for a triplet.</p>
 <p>This field is used in the CI testing to skip ports, and warns users in advance that a given install tree is not expected to succeed. Therefore, this field should be used optimistically; in cases where a port is expected to succeed 10% of the time, it should still be marked "supported".</p>
@@ -432,13 +432,13 @@ Example:</h3>
 <blockquote class="doxtable">
 <p>Implementers' Note: these terms are computed from the triplet via the <code>vcpkg_get_dep_info</code> mechanism. </p>
 </blockquote>
-<h3><a class="anchor" id="autotoc_md3150"></a>
+<h3><a class="anchor" id="autotoc_md2926"></a>
 Example:</h3>
 <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;supports&quot;: &quot;!uwp &amp; !(arm &amp; !arm64)&quot;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>This means "doesn't support uwp, nor arm32 (but does support arm64)".</p>
-<h2><a class="anchor" id="autotoc_md3151"></a>
+<h2><a class="anchor" id="autotoc_md2927"></a>
 &lt;tt&gt;"license"&lt;/tt&gt;</h2>
 <p>The license of the port. This is an <a href="https://spdx.dev/ids/#how">SPDX license expression</a>, or <code>null</code> for proprietary licenses and other licenses for which one should "just read the `copyright` file" (e.g., Qt).</p>
 <p>Additionally, you can find the list of <a href="https://spdx.github.io/spdx-spec/SPDX-license-list/#a1-licenses-with-short-identifiers">recognized license IDs</a> and <a href="https://spdx.github.io/spdx-spec/SPDX-license-list/#a2-exceptions-list">recognized license exception IDs</a> in Annex A of the SPDX specification.</p>
@@ -476,7 +476,7 @@ Example:</h3>
 <div class="line">or-expression = and-expression, { or, and-exression } ;</div>
 <div class="line"> </div>
 <div class="line">license-expression = or-expression ;</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md3152"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md2928"></a>
 Examples</h3>
 <p>For libraries with simple licensing, only one license identifier may be needed;</p>
 <p>vcpkg, for example, would use this since it uses the MIT license:</p>

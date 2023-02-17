@@ -92,12 +92,12 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/users/authentication.md">GitHub</a>.</b></p>
 <p>Registries and <code>vcpkg_from_git()</code> directly use the git command line tools to fetch remote resources. Some of these resources may be protected from anonymous access and need authentication or credentials.</p>
 <p>The strategies below all seek to achieve the same fundamental goal: <code>git clone <a href="https://...">https://...</a>.</code> should succeed without interaction. This enables vcpkg to be separated from the specifics of your authentication scheme, ensuring forwards compatibility with any additional security improvements in the future.</p>
-<h1><a class="anchor" id="autotoc_md3898"></a>
+<h1><a class="anchor" id="autotoc_md3674"></a>
 Pre-seed git credentials</h1>
 <p>You can pre-seed git credentials via <code>git credential approve</code>:</p>
 <p>Powershell: </p><div class="fragment"><div class="line">&quot;url=https://github.com`npath=Microsoft/vcpkg`nusername=unused`npassword=$MY_PAT`n&quot; | git credential approve</div>
 </div><!-- fragment --><p> Bash: </p><div class="fragment"><div class="line">echo &quot;url=https://github.com&quot;$&#39;\n&#39;&quot;path=Microsoft/vcpkg&quot;$&#39;\n&#39;&quot;username=unused&quot;$&#39;\n&#39;&quot;password=$MY_PAT&quot;$&#39;\n&#39; | git credential approve</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3899"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3675"></a>
 Bearer auth</h1>
 <p>For systems which need bearer auth, you can use <code>git config</code>:</p>
 <p><b>Note: you must make these config changes with <code>--global</code></b> </p><div class="fragment"><div class="line">git config --global --unset-all http.&lt;uri&gt;.extraheader</div>
@@ -118,7 +118,7 @@ Bearer auth</h1>
 <div class="line"> - job: Build</div>
 <div class="line">   uses:</div>
 <div class="line">     repositories: [&lt;FRIENDLYNAME&gt;]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3900"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3676"></a>
 Pass credentials in an environment variable (not recommended)</h1>
 <p>Using <code>VCPKG_KEEP_ENV_VARS</code> or <code>VCPKG_ENV_PASSTHROUGH_UNTRACKED</code>, we can smuggle credential info via another var like <code>MY_TOKEN_VAR</code>. </p><div class="fragment"><div class="line">export VCPKG_KEEP_ENV_VARS=MY_TOKEN_VAR</div>
 <div class="line">export MY_TOKEN_VAR=abc123</div>
@@ -136,7 +136,7 @@ Pass credentials in an environment variable (not recommended)</h1>
 <div class="line">    AUTHORIZATION_TOKEN &quot;$ENV{MY_TOKEN_VAR}&quot;</div>
 <div class="line">)</div>
 </div><!-- fragment --><p>For private ports, we recommend using <code>vcpkg_from_git()</code> instead of <code>vcpkg_from_github()</code> and the pre-seeding method above.</p>
-<h1><a class="anchor" id="autotoc_md3901"></a>
+<h1><a class="anchor" id="autotoc_md3677"></a>
 Pass Jenkins gitUsernamePassword credentials</h1>
 <p>The simplest and most secure option to Git authentication to GitHub from Jenkins is using <a href="https://github.com/jenkinsci/github-branch-source-plugin/blob/master/docs/github-app.adoc">GitHub App</a> and the following: </p><div class="fragment"><div class="line">withCredentials([gitUsernamePassword(credentialsId: &#39;jenkins-github-app&#39;)]) {</div>
 <div class="line">  withEnv([&#39;VCPKG_KEEP_ENV_VARS=GIT_ASKPASS&#39;]) {</div>

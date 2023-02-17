@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/users/registries.md">GitHub</a>.</b></p>
 <p>There are two parts to using registries; this documents the use side of the relationship. In order to learn more about creating registries for others to use, please read <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_registries.html">this documentation</a>.</p>
-<h1><a class="anchor" id="autotoc_md4014"></a>
+<h1><a class="anchor" id="autotoc_md3790"></a>
 Table of Contents</h1>
 <ul>
 <li><a href="#using-registries">Using Registries</a><ul>
@@ -120,10 +120,10 @@ Table of Contents</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4015"></a>
+<h1><a class="anchor" id="autotoc_md3791"></a>
 &lt;tt&gt;vcpkg-configuration.json&lt;/tt&gt;</h1>
 <p>From a high level perspective, everything that a project needs to define about registries is contained in the vcpkg configuration file. In classic mode, the configuration file lies in the vcpkg root; for manifest mode, the file must exist next to the project's <code>vcpkg.json</code> file. This file is named <code>vcpkg-configuration.json</code>, and it's a simple top-level object file.</p>
-<h2><a class="anchor" id="autotoc_md4016"></a>
+<h2><a class="anchor" id="autotoc_md3792"></a>
 Registry Objects</h2>
 <p>Registries are defined in JSON as objects. They must contain at least the <code>"kind"</code> and <code>"baseline"</code> fields, and additionally the different kinds of registry will have their own way of defining where the registry can be found:</p>
 <ul>
@@ -131,7 +131,7 @@ Registry Objects</h2>
 <li>filesystem registries require the <code>"path"</code> field</li>
 <li>built-in registries do not require a field, since there is only one built-in registry.</li>
 </ul>
-<h3><a class="anchor" id="autotoc_md4017"></a>
+<h3><a class="anchor" id="autotoc_md3793"></a>
 Registry Objects: &lt;tt&gt;"kind"&lt;/tt&gt;</h3>
 <p>The <code>"kind"</code> field must be a string:</p>
 <ul>
@@ -139,12 +139,12 @@ Registry Objects: &lt;tt&gt;"kind"&lt;/tt&gt;</h3>
 <li>For filesystem registries: <code>"filesystem"</code></li>
 <li>For the builtin registry: <code>"builtin"</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md4018"></a>
+<h3><a class="anchor" id="autotoc_md3794"></a>
 Registry Objects: &lt;tt&gt;"baseline"&lt;/tt&gt;</h3>
 <p>The <code>"baseline"</code> field must be a string. It defines a minimum version for all packages coming from this registry configuration.</p>
 <p>For <a href="../maintainers/registries.md#git-registries">Git Registries</a> and for the <a href="../maintainers/registries.md#builtin-registries">Builtin Registry</a>, it should be a 40-character git commit sha in the registry's repository that contains a <code>versions/baseline.json</code>.</p>
 <p>For <a href="../maintainers/registries.md#filesystem-registries">Filesystem Registries</a>, it can be any valid baseline string that the registry defines.</p>
-<h3><a class="anchor" id="autotoc_md4019"></a>
+<h3><a class="anchor" id="autotoc_md3795"></a>
 Registry Objects: &lt;tt&gt;"repository"&lt;/tt&gt;</h3>
 <p>This should be a string, of any repository format that git understands:</p>
 <ul>
@@ -152,10 +152,10 @@ Registry Objects: &lt;tt&gt;"repository"&lt;/tt&gt;</h3>
 <li><code>"git@github.com:microsoft/vcpkg"</code></li>
 <li><code>"/dev/vcpkg-registry"</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md4020"></a>
+<h3><a class="anchor" id="autotoc_md3796"></a>
 Registry Objects: &lt;tt&gt;"path"&lt;/tt&gt;</h3>
 <p>This should be a path; it can be either absolute or relative; relative paths will be based at the directory the <code>vcpkg-configuration.json</code> lives in.</p>
-<h3><a class="anchor" id="autotoc_md4021"></a>
+<h3><a class="anchor" id="autotoc_md3797"></a>
 Registry Objects: &lt;tt&gt;"packages"&lt;/tt&gt;</h3>
 <p>With exception of the default registry and artifacts registries. All registries must declare the packages they provide using the <code>"packages"</code> array.</p>
 <p>Each entry in the array must be:</p><ul>
@@ -184,30 +184,30 @@ Registry Objects: &lt;tt&gt;"packages"&lt;/tt&gt;</h3>
 <li><code>a?</code> (<code>?</code> is not a valid wildcard)</li>
 </ul>
 <p>See <a href="#package-name-resolution">package name resolution</a> for more details.</p>
-<h2><a class="anchor" id="autotoc_md4022"></a>
+<h2><a class="anchor" id="autotoc_md3798"></a>
 Configuration: &lt;tt&gt;"default-registry"&lt;/tt&gt;</h2>
 <p>The default registry is used as a fallback when resolving package names, if no other registry matches the package name, the default registry will be selected. Users can set the default registry to <code>null</code>, in which case, if no other registry matches a package name the install will fail.</p>
 <p>The default registry is either a registry object without a <code>"packages"</code> array (since it will automatically match any non-resolved package names) or <code>null</code>.</p>
 <p>If <code>vcpkg-configuration.json</code> does not declare a <code>"default-registry"</code>, vcpkg will automatically set the default registry to the <code>"builtin-registry"</code>.</p>
 <p>The <code>"builtin-registry"</code> is the local instance of <code><a href="https://github.com/Microsoft/vcpkg">https://github.com/Microsoft/vcpkg</a></code>. This is necessary so that a manifest with no explicit registry configuration can resolve port names in the official vcpkg catalog. The <code>"builtin-baseline"</code> property in <code>vcpkg.json</code> can be used to set the baseline for the <code>"builtin-registry"</code>.</p>
-<h2><a class="anchor" id="autotoc_md4023"></a>
+<h2><a class="anchor" id="autotoc_md3799"></a>
 Configuration: &lt;tt&gt;"registries"&lt;/tt&gt;</h2>
 <p>The <code>"registries"</code> field is used to define additional port and/or artifact registries. <br  />
 </p>
 <p>Port registries are also required to declare a list of packages they provide using the <code>"packages"</code> array.</p>
 <p>Using additional port registries also requires that a baseline is provided for the default registry or that the default registry is set to null. If using the <code>"builtin-registry"</code> you can set the baseline using the <code>"builtin-baseline"</code> field in <code>vcpkg.json</code>.</p>
-<h2><a class="anchor" id="autotoc_md4024"></a>
+<h2><a class="anchor" id="autotoc_md3800"></a>
 Configuration: &lt;tt&gt;"overlay-ports"&lt;/tt&gt;</h2>
 <p>An array of port overlay paths.</p>
 <p>Each path in the array must point to etiher:</p><ul>
 <li>a particular port directory (a directory containing <code>vcpkg.json</code> and <code>portfile.cmake</code>), or</li>
 <li>a directory containing port directories. Relative paths are resolved relative to the <code>vcpkg-configuration.json</code> file. Absolute paths can be used but are discouraged.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md4025"></a>
+<h2><a class="anchor" id="autotoc_md3801"></a>
 Configuration: &lt;tt&gt;"overlay-triplets"&lt;/tt&gt;</h2>
 <p>An array of triplet overlay paths.</p>
 <p>Each path in the array must point to a directory of triplet files (<a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html">see triplets documentation</a>). Relative paths are resolved relative to the <code>vcpkg-configuration.json</code> file. Absolute paths can be used but are discouraged.</p>
-<h2><a class="anchor" id="autotoc_md4026"></a>
+<h2><a class="anchor" id="autotoc_md3802"></a>
 Example Configuration File</h2>
 <p>Let's assume that you have mirrored <a href="https://github.com/microsoft/vcpkg">https://github.com/microsoft/vcpkg</a> at <a href="https://git.example.com/vcpkg">https://git.example.com/vcpkg</a>: this will be your default registry. Additionally, you want to use North Wind Trader's registry for their beison and beicode libraries, as well as configure overlay ports and overlay triplets from your custom directories. The following <code>vcpkg-configuration.json</code> will work:</p>
 <div class="fragment"><div class="line">{</div>
@@ -230,7 +230,7 @@ Example Configuration File</h2>
 <div class="line">   ],</div>
 <div class="line">  &quot;overlay-triplets&quot;: [ &quot;./my-triplets&quot; ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4027"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3803"></a>
 Package Name Resolution</h1>
 <p>Package name resolution in vcpkg is designed to be predictable and easy to understand. Given a <code>vcpkg-configuration.json</code> file, it should be simple to tell which registry will provide any given port name.</p>
 <p>When resolving a port name to a registry, we prioritize as follows:</p><ol type="1">
@@ -244,7 +244,7 @@ Package Name Resolution</h1>
 </ol>
 <p>Package names have higher priority than prefixes even if they both match the same amount of characters. For example, when resolving <code>boost</code>: <code>boost</code> &gt; <code>boost*</code>.</p>
 <p>If there is a tie in priority, vcpkg will use the first registry that declares the package name or prefix. <em>This makes the order in which registries are declared in the <code>"registries"</code> array important.</em></p>
-<h2><a class="anchor" id="autotoc_md4028"></a>
+<h2><a class="anchor" id="autotoc_md3804"></a>
 Example #1: Package name resolution</h2>
 <p><code>vcpkg-configuration.json</code> </p><div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;registries&quot;: [</div>
@@ -286,7 +286,7 @@ Example #1: Package name resolution</h2>
 <div class="line">    The following redeclarations will be ignored:</div>
 <div class="line">        location: $.registries[1].packages[1]</div>
 <div class="line">        registry: https://github.com/vicroms/vcpkg-registry</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4029"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3805"></a>
 Example #2: Overriding the default registry</h2>
 <p>There are two ways for a user to override the default registry.</p>
 <p>One way is to use the <code>"default-registry"</code> object: </p><div class="fragment"><div class="line">{</div>
@@ -308,7 +308,7 @@ Example #2: Overriding the default registry</h2>
 <div class="line">  ]</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>An advantage of the second form is that you can add more entries to the packages array, while the <code>"default-registry"</code> object doesn't allow you to define a packages array at all. This difference becomes important in cases where you need to ensure that a package comes from the default registry, like in the example below.</p>
-<h2><a class="anchor" id="autotoc_md4030"></a>
+<h2><a class="anchor" id="autotoc_md3806"></a>
 Example #3: Ensuring correct name resolution</h2>
 <p>Let's consider a registry that provides the Qt Framework libraries.</p>
 <p><code>vcpkg-configuration.json</code> </p><div class="fragment"><div class="line">{</div>
@@ -354,7 +354,7 @@ Example #3: Ensuring correct name resolution</h2>
 <div class="line">  ]</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Because exact matches are preferred over pattern matches, this configuration will make <code>qt-advanced-docking-system</code> and <code>qtkeychain</code> resolve to the default registry.</p>
-<h2><a class="anchor" id="autotoc_md4031"></a>
+<h2><a class="anchor" id="autotoc_md3807"></a>
 Overlays Resolution</h2>
 <p>Overlay ports and triplets are evaluated in this order:</p>
 <ol type="1">
@@ -368,7 +368,7 @@ Overlays Resolution</h2>
 <li>Overlays from <code>vcpkg-configuration.json</code> are evaluated in the order of the <code>"overlay-[ports|triplets]"</code> array.</li>
 <li>Overlays set by <code>VCPKG_OVERLAY_[PORTS|TRIPLETS]</code> are evaluated from left-to-right. Overlay locations are separated by an OS-specific path separator (<code>;</code> on Windows and <code>:</code> on non-Windows).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md4032"></a>
+<h2><a class="anchor" id="autotoc_md3808"></a>
 Versioning Support</h2>
 <p>Versioning with custom registries works exactly as it does in the built-in registry. You can read more about that in the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_versioning.html">versioning documentation</a>. </p>
 </div></div><!-- contents -->

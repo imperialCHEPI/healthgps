@@ -95,27 +95,27 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <p>A string is a sequence of zero or more Unicode characters. </p>
 </blockquote>
 <p>To store objects in C++, a type is defined by the template parameter described below. Unicode values are split by the JSON class into byte-sized characters during deserialization.</p>
-<h1><a class="anchor" id="autotoc_md1637"></a>
+<h1><a class="anchor" id="autotoc_md1413"></a>
 Template parameters</h1>
 <p><code>StringType</code> : the container to store strings (e.g., <code>std::string</code>). Note this container is used for keys/names in objects, see <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6f974e10e5661bc477b8ce49351e9f5d.html">object_t</a>.</p>
-<h1><a class="anchor" id="autotoc_md1638"></a>
+<h1><a class="anchor" id="autotoc_md1414"></a>
 Notes</h1>
-<h3><a class="anchor" id="autotoc_md1639"></a>
+<h3><a class="anchor" id="autotoc_md1415"></a>
 Default type</h3>
 <p>With the default values for <code>StringType</code> (<code>std::string</code>), the default value for <code>string_t</code> is <code>#!cpp std::string</code>.</p>
-<h3><a class="anchor" id="autotoc_md1640"></a>
+<h3><a class="anchor" id="autotoc_md1416"></a>
 Encoding</h3>
 <p>Strings are stored in UTF-8 encoding. Therefore, functions like <code><a class="el" href="namespaceconvert__lib__params__windows.html#ab4517e5b23748a1ad8b351e74aebe1bf">std::string::size()</a></code> or <code>std::string::length()</code> return the number of bytes in the string rather than the number of characters or glyphs.</p>
-<h3><a class="anchor" id="autotoc_md1641"></a>
+<h3><a class="anchor" id="autotoc_md1417"></a>
 String comparison</h3>
 <p><a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a> states: </p><blockquote class="doxtable">
 <p>Software implementations are typically required to test names of object members for equality. Implementations that transform the textual representation into sequences of Unicode code units and then perform the comparison numerically, code unit by code unit, are interoperable in the sense that implementations will agree in all cases on equality or inequality of two strings. For example, implementations that compare strings with escaped characters unconverted may incorrectly find that <code>"a\\b"</code> and <code>"a\u005Cb"</code> are not equal. </p>
 </blockquote>
 <p>This implementation is interoperable as it does compare strings code unit by code unit.</p>
-<h3><a class="anchor" id="autotoc_md1642"></a>
+<h3><a class="anchor" id="autotoc_md1418"></a>
 Storage</h3>
 <p>String values are stored as pointers in a <code><a class="el" href="classbasic__json.html" title="namespace for Niels Lohmann">basic_json</a></code> type. That is, for any access to string values, a pointer of type <code>string_t*</code> must be dereferenced.</p>
-<h1><a class="anchor" id="autotoc_md1643"></a>
+<h1><a class="anchor" id="autotoc_md1419"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows that `string_t` is by default, a typedef to `#!cpp std::string`.
 
@@ -128,7 +128,7 @@ Output:
 ```json
 --8&lt;-- "examples/string_t.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1644"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1420"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

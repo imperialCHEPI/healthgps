@@ -90,26 +90,26 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/commands/remove.md">GitHub</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md2957"></a>
+<h1><a class="anchor" id="autotoc_md2733"></a>
 Synopsis</h1>
 <div class="fragment"><div class="line">vcpkg remove [options] &lt;package&gt;...</div>
 </div><!-- fragment --><div class="fragment"><div class="line">vcpkg remove --outdated [options]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2958"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2734"></a>
 Description</h1>
 <p>Remove port packages from Classic Mode.</p>
 <p><code>remove</code> removes listed packages and any packages that require them from the Classic Mode <a href="common-options.md#install-root">installed directory</a>. See the <a href="install.md#package-syntax">install command documentation</a> for detailed syntax of the <code>&lt;package&gt;</code> parameter.</p>
 <p>This command is not currently supported in <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_manifests.html">Manifest Mode</a>.</p>
-<h1><a class="anchor" id="autotoc_md2959"></a>
+<h1><a class="anchor" id="autotoc_md2735"></a>
 Options</h1>
 <p>All vcpkg commands support a set of <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_commands_common_options.html">common options</a>.</p>
-<h2><a class="anchor" id="autotoc_md2960"></a>
+<h2><a class="anchor" id="autotoc_md2736"></a>
 &lt;tt&gt;--recurse&lt;/tt&gt;</h2>
 <p>Allow removing packages not specified on the command line.</p>
 <p>By default, vcpkg refuses to execute a removal plan that would remove packages not listed on the command line.</p>
-<h2><a class="anchor" id="autotoc_md2961"></a>
+<h2><a class="anchor" id="autotoc_md2737"></a>
 &lt;tt&gt;--dry-run&lt;/tt&gt;</h2>
 <p>Print the packages to be removed, but do not remove them.</p>
-<h2><a class="anchor" id="autotoc_md2962"></a>
+<h2><a class="anchor" id="autotoc_md2738"></a>
 &lt;tt&gt;--outdated&lt;/tt&gt;</h2>
 <p>Remove all packages that do not match the available port versions.</p>
 <p>For each installed package, vcpkg will compare the installed version string to the version string of the current recipe. If those versions differ, the package will be selected for removal. If <code>--outdated</code> is passed, no packages should be listed on the command line. </p>

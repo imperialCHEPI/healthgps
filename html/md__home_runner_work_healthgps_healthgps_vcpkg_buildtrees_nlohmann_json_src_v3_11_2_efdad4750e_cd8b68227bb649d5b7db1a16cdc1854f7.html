@@ -94,23 +94,23 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!-- fragment --><p>These macros can be used to simplify the serialization/deserialization of types if you want to use a JSON object as serialization and want to use the member variable names as object keys in that object. The macro is to be defined <b>inside</b> the class/struct to create code for. Unlike <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8c03d6288330e544da168e0a738dc7fc.html">`NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE`</a>, it can access private members. The first parameter is the name of the class/struct, and all remaining parameters name the members.</p>
 <ol type="1">
 <li>Will use <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c047013ee24c26cf93d13054bb6a9ad26.html">`at`</a> during deserialization and will throw <a href="../../home/exceptions.md#jsonexceptionout_of_range403"><code>out_of_range.403</code></a> if a key is missing in the JSON object.</li>
-<li>Will use <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> during deserialization and fall back to the default value for the respective type of the member variable if a key in the JSON object is missing. The generated <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> function default constructs an object and uses its values as the defaults when calling the <code>value</code> function.</li>
+<li>Will use <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> during deserialization and fall back to the default value for the respective type of the member variable if a key in the JSON object is missing. The generated <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> function default constructs an object and uses its values as the defaults when calling the <code>value</code> function.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md2027"></a>
+<h1><a class="anchor" id="autotoc_md1803"></a>
 Parameters</h1>
 <p><code>type</code> (in) : name of the type (class, struct) to serialize/deserialize</p>
 <p><code>member</code> (in) : name of the member variable to serialize/deserialize; up to 64 members can be given as comma-separated list</p>
-<h1><a class="anchor" id="autotoc_md2028"></a>
+<h1><a class="anchor" id="autotoc_md1804"></a>
 Default definition</h1>
 <p>The macros add two friend functions to the class which take care of the serialization and deserialization:</p>
-<div class="fragment"><div class="line"><span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">to_json</a>(<a class="code" href="classnlohmann_1_1basic__json.html">nlohmann::json</a>&amp;, <span class="keyword">const</span> <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp;);</div>
-<div class="line"><span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json</a>(<span class="keyword">const</span> <a class="code" href="classnlohmann_1_1basic__json.html">nlohmann::json</a>&amp;, <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp;);</div>
+<div class="fragment"><div class="line"><span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json</a>(<a class="code" href="classnlohmann_1_1basic__json.html">nlohmann::json</a>&amp;, <span class="keyword">const</span> <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp;);</div>
+<div class="line"><span class="keyword">friend</span> <span class="keywordtype">void</span> <a class="code" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a>(<span class="keyword">const</span> <a class="code" href="classnlohmann_1_1basic__json.html">nlohmann::json</a>&amp;, <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>&amp;);</div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
 <div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:17282</div></div>
-<div class="ttc" id="anamespacedetail_html_ac8fc7fc4703cbd8edd7bb43a94adf92b"><div class="ttname"><a href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">detail::from_json</a></div><div class="ttdeci">void from_json(const BasicJsonType &amp;j, typename std::nullptr_t &amp;n)</div><div class="ttdef"><b>Definition:</b> from_json.hpp:37</div></div>
-<div class="ttc" id="anamespacedetail_html_acfdf2e4c8f09d5acaa2841358db51f82"><div class="ttname"><a href="namespacedetail.html#acfdf2e4c8f09d5acaa2841358db51f82">detail::to_json</a></div><div class="ttdeci">void to_json(BasicJsonType &amp;j, T b) noexcept</div><div class="ttdef"><b>Definition:</b> to_json.hpp:265</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
+<div class="ttc" id="ajsonparser_8cpp_html_a863cfc8afb5397b781ef4ea4c0c61a7a"><div class="ttname"><a href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json</a></div><div class="ttdeci">void from_json(const json &amp;j, CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:16</div></div>
+<div class="ttc" id="ajsonparser_8cpp_html_a8db632883091c922ea55bb8612395bdb"><div class="ttname"><a href="jsonparser_8cpp.html#a8db632883091c922ea55bb8612395bdb">to_json</a></div><div class="ttdeci">void to_json(json &amp;j, const CoefficientInfo &amp;p)</div><div class="ttdef"><b>Definition:</b> jsonparser.cpp:8</div></div>
 </div><!-- fragment --><p>See examples below for the concrete generated code.</p>
-<h1><a class="anchor" id="autotoc_md2029"></a>
+<h1><a class="anchor" id="autotoc_md1805"></a>
 Notes</h1>
 <p>!!! info "Prerequisites" </p><pre class="fragment">1. The type `type` must be default constructible. See [How can I use `get()` for non-default
    constructible/non-copyable types?][GetNonDefNonCopy] for how to overcome this limitation.
@@ -119,7 +119,7 @@ Notes</h1>
   with more than 64 member variables, you need to define the `to_json`/`from_json` functions manually.
 - The macros only work for the [`nlohmann::json`](../json.md) type; other specializations such as
   [`nlohmann::ordered_json`](../ordered_json.md) are currently unsupported.
-</pre> <h1><a class="anchor" id="autotoc_md2030"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1806"></a>
 Examples</h1>
 <p>??? example "Example (1): NLOHMANN_DEFINE_TYPE_INTRUSIVE" </p><pre class="fragment">Consider the following complete example:
 
@@ -174,13 +174,13 @@ The macro is equivalent to:
 ```
 
 Note how a default-initialized `person` object is used in the `from_json` to fill missing values.
-</pre> <h1><a class="anchor" id="autotoc_md2031"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1807"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8c03d6288330e544da168e0a738dc7fc.html">NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE / NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT</a> for a similar macro that can be defined <em>outside</em> the type.</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c7914debf4bed7ef52c5c5eb548e8a685.html">Arbitrary Type Conversions</a> for an overview.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md2032"></a>
+<h1><a class="anchor" id="autotoc_md1808"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 3.9.0.</li>

@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_configure_meson.md">vcpkg repo</a>.</p>
 <p>Configure Meson for Debug and Release builds of a project.</p>
-<h1><a class="anchor" id="autotoc_md3438"></a>
+<h1><a class="anchor" id="autotoc_md3214"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_configure_meson(</div>
 <div class="line">    SOURCE_PATH &lt;${SOURCE_PATH}&gt;</div>
@@ -100,33 +100,33 @@ Usage</h1>
 <div class="line">    [OPTIONS_RELEASE &lt;-DOPTIMIZE=1&gt;...]</div>
 <div class="line">    [OPTIONS_DEBUG &lt;-DDEBUGGABLE=1&gt;...]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3439"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3215"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3440"></a>
+<h2><a class="anchor" id="autotoc_md3216"></a>
 SOURCE_PATH</h2>
 <p>Specifies the directory containing the <code>meson.build</code>. By convention, this is usually set in the portfile as the variable <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3441"></a>
+<h2><a class="anchor" id="autotoc_md3217"></a>
 OPTIONS</h2>
 <p>Additional options passed to Meson during the configuration.</p>
-<h2><a class="anchor" id="autotoc_md3442"></a>
+<h2><a class="anchor" id="autotoc_md3218"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options passed to Meson during the Release configuration. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3443"></a>
+<h2><a class="anchor" id="autotoc_md3219"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options passed to Meson during the Debug configuration. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3444"></a>
+<h2><a class="anchor" id="autotoc_md3220"></a>
 NO_PKG_CONFIG</h2>
 <p>Disable pkg-config setup</p>
-<h1><a class="anchor" id="autotoc_md3445"></a>
+<h1><a class="anchor" id="autotoc_md3221"></a>
 Notes</h1>
 <p>This command supplies many common arguments to Meson. To see the full list, examine the source.</p>
-<h1><a class="anchor" id="autotoc_md3446"></a>
+<h1><a class="anchor" id="autotoc_md3222"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/fribidi/portfile.cmake">fribidi</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/libepoxy/portfile.cmake">libepoxy</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3447"></a>
+<h1><a class="anchor" id="autotoc_md3223"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_configure_meson.cmake">scripts/cmake/vcpkg_configure_meson.cmake</a> </p>
 </div></div><!-- contents -->

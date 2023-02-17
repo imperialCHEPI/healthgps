@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>The 3.11.0 release introduced an <a href="https://en.cppreference.com/w/cpp/language/namespace#Inline_namespaces">inline namespace</a> to allow different parts of a codebase to safely use different versions of the JSON library as long as they never exchange instances of library types.</p>
-<h1><a class="anchor" id="autotoc_md2208"></a>
+<h1><a class="anchor" id="autotoc_md1984"></a>
 Structure</h1>
 <p>The complete default namespace name is derived as follows:</p>
 <ul>
@@ -104,7 +104,7 @@ Structure</h1>
 </ul>
 <p>For example, the namespace name for version 3.11.2 with <code>JSON_DIAGNOSTICS</code> defined to <code>1</code> is:</p>
 <div class="fragment"><div class="line">nlohmann::json_abi_diag_v3_11_2</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2209"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1985"></a>
 Purpose</h1>
 <p>Several incompatibilities have been observed. Amongst the most common ones is linking code compiled with different definitions of <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1f38699056edc408a3a19cb42f8e0edc.html">`JSON_DIAGNOSTICS`</a>. This is illustrated in the diagram below.</p>
 <div class="fragment"><div class="line">[**nlohmann_json (v3.10.5)**\nJSON_DIAGNOSTICS=0] as [json]</div>
@@ -116,25 +116,25 @@ Purpose</h1>
 <div class="line">[app] ..|&gt; [json_diag]</div>
 <div class="line">[app] ..|&gt;[library]</div>
 </div><!-- fragment --><p>In releases prior to 3.11.0, mixing any version of the JSON library with different <code>JSON_DIAGNOSTICS</code> settings would result in a crashing application. If <code>some_library</code> never passes instances of JSON library types to the application, this scenario became safe in version 3.11.0 and above due to the inline namespace yielding distinct symbol names.</p>
-<h1><a class="anchor" id="autotoc_md2210"></a>
+<h1><a class="anchor" id="autotoc_md1986"></a>
 Limitations</h1>
 <p>Neither the compiler nor the linker will issue as much as a warning when translation units – intended to be linked together and that include different versions and/or configurations of the JSON library – exchange and use library types.</p>
 <p>There is an exception when forward declarations are used (i.e., when including <code>json_fwd.hpp</code>) in which case the linker may complain about undefined references.</p>
-<h1><a class="anchor" id="autotoc_md2211"></a>
+<h1><a class="anchor" id="autotoc_md1987"></a>
 Disabling the version component</h1>
 <p>Different versions are not necessarily ABI-incompatible, but the project does not actively track changes in the ABI and recommends that all parts of a codebase exchanging library types be built with the same version. Users can, <b>at their own risk</b>, disable the version component of the linline namespace, allowing different versions – but not configurations – to be used in cases where the linker would otherwise output undefined reference errors.</p>
 <p>To do so, define <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c871e4d3fc62dedc6f11d601a9972a815.html">`NLOHMANN_JSON_NAMESPACE_NO_VERSION`</a> to <code>1</code>.</p>
 <p>This applies to version 3.11.2 and above only, versions 3.11.0 and 3.11.1 can apply the technique described in the next section to emulate the effect of the <code>NLOHMANN_JSON_NAMESPACE_NO_VERSION</code> macro.</p>
 <p>!!! danger "Use at your own risk" </p><pre class="fragment">Disabling the namespace version component and mixing ABI-incompatible versions will result in crashes or incorrect
 behavior. You have been warned!
-</pre> <h1><a class="anchor" id="autotoc_md2212"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1988"></a>
 Disabling the inline namespace completely</h1>
 <p>When interoperability with code using a pre-3.11.0 version of the library is required, users can, <b>at their own risk</b> restore the old namespace layout by redefining <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8e8a1240fba854dd1bbb1ba8dc0ad3af.html">`NLOHMANN_JSON_NAMESPACE_BEGIN, NLOHMANN_JSON_NAMESPACE_END`</a> as follows:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define NLOHMANN_JSON_NAMESPACE_BEGIN  namespace nlohmann {</span></div>
 <div class="line"><span class="preprocessor">#define NLOHMANN_JSON_NAMESPACE_END    }</span></div>
 </div><!-- fragment --><p>!!! danger "Use at your own risk" </p><pre class="fragment">Overriding the namespace and mixing ABI-incompatible versions will result in crashes or incorrect behavior. You
 have been warned!
-</pre> <h1><a class="anchor" id="autotoc_md2213"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1989"></a>
 Version history</h1>
 <ul>
 <li>Introduced inline namespace (<code>json_v3_11_0[_abi-tag]*</code>) in version 3.11.0.</li>

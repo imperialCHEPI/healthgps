@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Discord: <a href="https://www.includecpp.org">#include &lt;C++&gt;</a>, #🌏vcpkg 채널</li>
 <li>도움말: <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_README.html">Documentation</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4242"></a>
+<h1><a class="anchor" id="autotoc_md4018"></a>
 목차</h1>
 <ul>
 <li><a href="#vcpkg-개요">Vcpkg: 개요</a></li>
@@ -125,13 +125,13 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li><a href="#보안">보안</a></li>
 <li><a href="#데이터-수집">데이터 수집</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4243"></a>
+<h1><a class="anchor" id="autotoc_md4019"></a>
 시작하기</h1>
 <p>먼저, 사용하는 운영체제에 따라 <a href="#빠르게-시작하기-windows">윈도우</a> 또는 <a href="#빠르게-시작하기-unix">macOS와 Linux</a> 빠르게 시작하기 가이드를 따라가세요.</p>
 <p>더 자세한 정보는 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_installing_and_using_packages.html">패키지 설치 및 사용</a>에 있습니다. 만약 필요한 라이브러리가 vcpkg 카탈로그에 없는 경우, <a href="https://github.com/microsoft/vcpkg/issues/new/choose">GitHub 저장소에서 이슈를 열 ​​수 있습니다</a>. Vcpkg 팀과 커뮤니티가 이슈를 확인하면, 해당하는 port를 추가할 수 있습니다.</p>
 <p>Vcpkg의 설치가 완료되었다면, 셸에 <a href="#탭-완성자동-완성">탭 완성</a>을 추가할 수 있습니다.</p>
 <p>마지막으로, vcpkg의 미래에 관심이 있다면, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_manifests.html">manifest</a> 가이드를 확인하세요! 이것은 실험적인 기능이며 버그가 있을 가능성이 높습니다. 시도해보고 문제가 있다면 <a href="https://github.com/microsoft/vcpkg/issues/new/choose">이슈를 열어주세요</a>!</p>
-<h2><a class="anchor" id="autotoc_md4244"></a>
+<h2><a class="anchor" id="autotoc_md4020"></a>
 빠르게 시작하기: Windows</h2>
 <p>필요조건:</p><ul>
 <li>Windows 7 이상</li>
@@ -158,7 +158,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line">&gt; cmake --build [build directory]</div>
 </div><!-- fragment --><p>CMake에서 라이브러리를 사용하려면 여전히 <code>find_package</code> 등이 필요합니다. CMake를 IDE와 사용하는 방법을 포함한 자세한 정보는 <a href="#cmake와-함께-vcpkg-사용">CMake 섹션</a>을 확인하세요.</p>
 <p>Visual Studio Code를 포함한 다른 툴의 경우 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">통합 가이드</a>를 확인하세요.</p>
-<h2><a class="anchor" id="autotoc_md4245"></a>
+<h2><a class="anchor" id="autotoc_md4021"></a>
 빠르게 시작하기: Unix</h2>
 <p>Linux에서의 필요조건:</p><ul>
 <li><a href="https://git-scm.com/downloads">Git</a></li>
@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line">$ cmake --build [build directory]</div>
 </div><!-- fragment --><p>CMake에서 라이브러리를 사용하려면 여전히 <code>find_package</code> 등이 필요합니다. CMake와 VSCode를 위한 CMake Tools를 vcpkg와 함께 사용하는 최선의 방법을 포함한 자세한 정보는 <a href="#cmake와-함께-vcpkg-사용">CMake 섹션</a>을 확인하세요.</p>
 <p>다른 툴에 대해서는 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_integration.html">통합 가이드</a>를 확인하세요.</p>
-<h2><a class="anchor" id="autotoc_md4246"></a>
+<h2><a class="anchor" id="autotoc_md4022"></a>
 Linux 개발자 도구 설치하기</h2>
 <p>Linux의 배포판별로 설치해야 하는 개발자 소프트웨어가 다릅니다.</p>
 <ul>
@@ -194,16 +194,16 @@ Linux 개발자 도구 설치하기</h2>
 <div class="line">$ sudo yum install devtoolset-7</div>
 <div class="line">$ scl enable devtoolset-7 bash</div>
 </div><!-- fragment --><p>다른 배포판의 경우, g++ 6 이상의 버전을 설치하여야 합니다. 특정 배포판에 대한 안내를 추가하고 싶은 경우, <a href="https://github.com/microsoft/vcpkg/pulls">PR을 열어주세요</a>!</p>
-<h2><a class="anchor" id="autotoc_md4247"></a>
+<h2><a class="anchor" id="autotoc_md4023"></a>
 macOS 개발자 도구 설치하기</h2>
 <p>macOS에서는 터미널에서 다음 명령어를 실행하기만 하면 됩니다.</p>
 <div class="fragment"><div class="line">$ xcode-select --install</div>
 </div><!-- fragment --><p>그런 다음 나타나는 창의 안내에 따르세요.</p>
 <p>설치가 끝나면 <a href="#빠르게-시작하기-unix">빠른 시작 가이드</a>를 참고하여 vcpkg를 설치하세요.</p>
-<h2><a class="anchor" id="autotoc_md4248"></a>
+<h2><a class="anchor" id="autotoc_md4024"></a>
 CMake와 함께 vcpkg 사용</h2>
 <p>CMake와 함께 vcpkg를 사용하는 경우, 다음 내용이 도움이 될 것입니다!</p>
-<h3><a class="anchor" id="autotoc_md4249"></a>
+<h3><a class="anchor" id="autotoc_md4025"></a>
 Visual Studio Code와 CMake Tools</h3>
 <p>Workspace <code>settings.json</code> 파일에 다음을 추가하면 CMake Tools는 자동으로 vcpkg의 라이브러리를 사용할 것입니다.</p>
 <div class="fragment"><div class="line">{</div>
@@ -211,33 +211,33 @@ Visual Studio Code와 CMake Tools</h3>
 <div class="line">    &quot;CMAKE_TOOLCHAIN_FILE&quot;: &quot;[vcpkg root]/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4250"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4026"></a>
 Vcpkg와 Visual Studio CMake 프로젝트</h3>
 <p>CMake 설정 편집기를 열고 <code>CMake toolchain file</code>에서 vcpkg 툴체인 파일에 경로를 추가합니다.</p>
 <div class="fragment"><div class="line">[vcpkg root]/scripts/buildsystems/vcpkg.cmake</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4251"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4027"></a>
 Vcpkg와 CLion</h3>
 <p>Toolchains settings을 엽니다. (File &gt; Settings on Windows and Linux, CLion &gt; Preferences on macOS), 그리고 CMake 세팅을 엽니다 (Build, Execution, Deployment &gt; CMake). 마지막으로 <code>CMake options</code>에서 다음 줄을 추가합니다.</p>
 <div class="fragment"><div class="line">-DCMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake</div>
 </div><!-- fragment --><p>각 프로필에 이것을 추가해야합니다.</p>
-<h3><a class="anchor" id="autotoc_md4252"></a>
+<h3><a class="anchor" id="autotoc_md4028"></a>
 서브모듈로 vcpkg 사용하기</h3>
 <p>프로젝트의 서브모듈로 vcpkg를 사용하는 경우, cmake 실행 시 <code>CMAKE_TOOLCHAIN_FILE</code>을 전달하는 대신, 첫 번째 <code><a class="el" href="namespaceconf.html#a45653c983098153b78e33600e39230eb">project()</a></code> 호출 전에 CMakeLists.txt에 다음을 추가하는 방법도 있습니다.</p>
 <div class="fragment"><div class="line">set(CMAKE_TOOLCHAIN_FILE &quot;${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line">  CACHE STRING &quot;Vcpkg toolchain file&quot;)</div>
 </div><!-- fragment --><p>이렇게 하면 설정-빌드 단계가 약간 더 쉬워집니다. 또한, 여전히 <code>CMAKE_TOOLCHAIN_FILE</code>을 직접 전달하면 vcpkg를 사용하지 않을 수 있습니다.</p>
-<h1><a class="anchor" id="autotoc_md4253"></a>
+<h1><a class="anchor" id="autotoc_md4029"></a>
 탭 완성/자동 완성</h1>
 <p><code>vcpkg</code>는 powershell과 bash 모두에서 명령, 패키지 이름 및 옵션의 자동 완성을 지원합니다. 선택한 셸에서 탭 완성을 활성화하려면 다음 두 명령어 중 하나를 실행합니다.</p>
 <div class="fragment"><div class="line">&gt; .\vcpkg integrate powershell</div>
 </div><!-- fragment --><div class="fragment"><div class="line">$ ./vcpkg integrate bash # or zsh</div>
 </div><!-- fragment --><p>그 다음 콘솔을 재시작하세요.</p>
-<h1><a class="anchor" id="autotoc_md4254"></a>
+<h1><a class="anchor" id="autotoc_md4030"></a>
 예시</h1>
 <p><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_installing_and_using_packages.html">패키지 설치 및 사용</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_zipfiles.html">zip 파일에서 새 패키지 추가</a>, <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_packaging_github_repos.html">GitHub 저장소에서 새 패키지 추가</a>에 대한 구체적인 예시는 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_README.html">문서</a>를 참고하세요.</p>
 <p>문서는 이제 웹사이트 <a href="https://vcpkg.io/">https://vcpkg.io/</a> 에서도 온라인으로 확인 가능합니다. 모든 피드백에 진심으로 감사드립니다! <a href="https://github.com/vcpkg/vcpkg.github.io/issues">https://github.com/vcpkg/vcpkg.github.io/issues</a> 에서 이슈를 제출할 수 있습니다.</p>
 <p><a href="https://www.youtube.com/watch?v=y41WFKbQFTw">4분짜리 데모 영상도 준비되어 있습니다</a>.</p>
-<h1><a class="anchor" id="autotoc_md4255"></a>
+<h1><a class="anchor" id="autotoc_md4031"></a>
 기여하기</h1>
 <p>Vcpkg는 오픈소스 프로젝트입니다, 따라서 여러분의 기여를 통해 만들어집니다. 기여할 수 있는 몇 가지 방법은 다음과 같습니다.</p>
 <ul>
@@ -246,13 +246,13 @@ Vcpkg와 CLion</h3>
 </ul>
 <p>자세한 내용은 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_CONTRIBUTING.html">기여 가이드</a>를 참고하세요.</p>
 <p>이 프로젝트는 <a href="https://opensource.microsoft.com/codeofconduct/">Microsoft Open Source Code of Conduct</a>을 채택했습니다. 더 많은 정보를 얻고 싶다면 <a href="https://opensource.microsoft.com/codeofconduct/">Code of Conduct FAQ</a> 문서를 참고하세요. 추가 질문이나 의견은 이메일 <a href="#" onclick="location.href='mai'+'lto:'+'ope'+'nc'+'ode'+'@m'+'icr'+'os'+'oft'+'.c'+'om'; return false;">opencode@microsoft.com</a>로 보내주세요.</p>
-<h1><a class="anchor" id="autotoc_md4256"></a>
+<h1><a class="anchor" id="autotoc_md4032"></a>
 라이선스</h1>
 <p>이 저장소의 코드는 <a href="LICENSE.txt">MIT 라이선스</a>에 따라 사용이 허가됩니다. Port로 제공되는 라이브러리는 각 라이브러리의 원저자가 설정한 라이선스에 따라 제공됩니다. 가능한 경우, vcpkg는 <code>installed/&lt;triplet&gt;/share/&lt;port&gt;/copyright</code>에 관련된 라이선스를 저장합니다.</p>
-<h1><a class="anchor" id="autotoc_md4257"></a>
+<h1><a class="anchor" id="autotoc_md4033"></a>
 보안</h1>
 <p>Vcpk가 제공하는 대부분의 port는 각각의 라이브러리를 빌드할 때 원 개발자들이 권장하는 빌드 시스템을 이용하고, 소스 코드와 빌드 도구를 각각의 공식 배포처로부터 다운로드합니다. 방화벽 뒤에서 사용하는 경우, 어떤 port를 설치하느냐에 따라 필요한 접근 권한이 달라질 수 있습니다. 만약 "air gapped" 환경에서 설치해야만 한다면, "air gapped"가 아닌 환경에서 <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_assetcaching.html">asset 캐시</a>를 다운로드하고, 이후에 "air gapped" 환경에서 공유하는 것을 고려해 보십시오.</p>
-<h1><a class="anchor" id="autotoc_md4258"></a>
+<h1><a class="anchor" id="autotoc_md4034"></a>
 데이터 수집</h1>
 <p>vcpkg는 사용자 경험을 개선하는 데 도움이 되도록 사용 데이터를 수집합니다. Microsoft는 이 정보를 익명으로 수집합니다. 다음을 통해 원격 정보 제공을 비활성화할 수 있습니다.</p><ul>
 <li>-disableMetrics 옵션을 포함하여 bootstrap-vcpkg 스크립트 실행</li>

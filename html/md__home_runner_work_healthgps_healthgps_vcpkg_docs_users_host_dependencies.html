@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Tools used at build time by other ports to generate code or implement a custom build system can be packaged inside vcpkg.</p>
-<h1><a class="anchor" id="autotoc_md3981"></a>
+<h1><a class="anchor" id="autotoc_md3757"></a>
 Consuming</h1>
 <p>When consuming a port as a tool, you must set the dependency's <code>"host"</code> field to true. For example: </p><div class="fragment"><div class="line">{</div>
 <div class="line">    &quot;name&quot;: &quot;contoso-http-library&quot;,</div>
@@ -112,7 +112,7 @@ Consuming</h1>
 <p>&gt;Note: Consumers must use <code>vcpkg.json</code> instead of <code>CONTROL</code> as their metadata format. You can easily convert an existing <code>CONTROL</code> file using <code>vcpkg format-manifest /path/to/CONTROL</code>.</p>
 <p>Then, within the portfile of the consumer (<code>contoso-http-library</code> in the example), the CMake variable <code>CURRENT_HOST_INSTALLED_DIR</code> will be defined to <code>installed/&lt;host-triplet&gt;</code> and should be used to locate any required assets. In the example, <code>contoso-code-generator</code> might have installed <code>tools/contoso-code-generator/ccg.exe</code> which the consumer would add to its local path via </p><div class="fragment"><div class="line"># ports/contoso-http-library/portfile.cmake</div>
 <div class="line">vcpkg_add_to_path(${CURRENT_HOST_INSTALLED_DIR}/tools/contoso-code-generator)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3982"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3758"></a>
 Specifying the Host Triplet</h1>
 <p>The default host triplets are chosen based on the host architecture and operating system, for example <code>x64-windows</code>, <code>x64-linux</code>, or <code>x64-osx</code>. They can be overridden via:</p>
 <ol type="1">
@@ -121,7 +121,7 @@ Specifying the Host Triplet</h1>
 <li>On the command line, via the flag <code>--host-triplet=...</code></li>
 <li>The <code>VCPKG_DEFAULT_HOST_TRIPLET</code> environment variable</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md3983"></a>
+<h1><a class="anchor" id="autotoc_md3759"></a>
 Producing</h1>
 <p>Producing a tool has no special requirements; tools should be authored as a standard port, following all the normal policies and practices. Notably, they should build against <code>TARGET_TRIPLET</code>, not <code>HOST_TRIPLET</code> within the context of their portfile.</p>
 <p>If the current context is cross-compiling (<code>TARGET_TRIPLET</code> is not <code>HOST_TRIPLET</code>), then <code>VCPKG_CROSSCOMPILING</code> will be set to a truthy value.</p>
@@ -130,7 +130,7 @@ Producing</h1>
 <div class="line">else()</div>
 <div class="line">    # This is a cross build</div>
 <div class="line">endif()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3984"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3760"></a>
 Host-only ports</h1>
 <p>Some ports should only be depended upon via a host dependency; script ports and tool ports are common examples. In this case, you can use the <code>"native"</code> supports expression to describe this. This supports expression is true when <code>VCPKG_CROSSCOMPILING</code> is false (implying that <code>TARGET_TRIPLET == HOST_TRIPLET</code>). </p>
 </div></div><!-- contents -->

@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/users/versioning.md">GitHub</a>.</b></p>
 <p>Versioning allows you to deterministically control the precise revisions of dependencies used by your project from within your manifest file. Versioning only applies to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_manifests.html">Manifest Mode</a>.</p>
 <p>For an example with context, see our guide to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_examples_versioning_getting_started.html">getting started with versioning</a>.</p>
-<h1><a class="anchor" id="autotoc_md4081"></a>
+<h1><a class="anchor" id="autotoc_md3857"></a>
 Contents</h1>
 <ul>
 <li><a href="#version-schemes">Version schemes</a><ul>
@@ -109,7 +109,7 @@ Contents</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4082"></a>
+<h1><a class="anchor" id="autotoc_md3858"></a>
 Version schemes</h1>
 <p>Ports in vcpkg should attempt to follow the versioning conventions used by the package's authors. For that reason, when declaring a package's version the appropriate scheme should be used.</p>
 <p>Each versioning scheme defines its own rules on what is a valid version string and more importantly the rules for how to sort versions using the same scheme.</p>
@@ -128,26 +128,26 @@ Version schemes</h1>
 </table>
 <p>A manifest must contain only one version declaration.</p>
 <p><em>NOTE: By design, vcpkg does not compare versions that use different schemes. For example, a package that has a <code>version-string: 7.1.3</code> cannot be compared with the same package using <code>version: 7.1.4</code>, even if the conversion seems obvious.</em></p>
-<h3><a class="anchor" id="autotoc_md4083"></a>
+<h3><a class="anchor" id="autotoc_md3859"></a>
 &lt;tt&gt;version&lt;/tt&gt;</h3>
 <p>Accepts version strings that follow a relaxed, dot-separated-, semver-like scheme.</p>
 <p>The version is logically composed of dot-separated (<code>.</code>) numeric sections. Each section must contain an integer positive number with no leading zeroes.</p>
 <p>The regex pattern for this versioning scheme is: <code>(0|[1-9]\d*)(\.(0|[1-9]\d*))*</code></p>
 <p><em>Sorting behavior</em>: When comparing two versions, each section is compared from left to right by their numeric value, until the first difference is found. A version with the smallest set of sections takes precedence over another with a larger set of sections, given that all their preceding sections compare equally.</p>
 <p>Example: <code>0</code> &lt; <code>0.1</code> &lt; <code>0.1.0</code> &lt; <code>1</code> &lt; <code>1.0.0</code> &lt; <code>1.0.1</code> &lt; <code>1.1</code>&lt; <code>2.0.0</code></p>
-<h3><a class="anchor" id="autotoc_md4084"></a>
+<h3><a class="anchor" id="autotoc_md3860"></a>
 &lt;tt&gt;version-semver&lt;/tt&gt;</h3>
 <p>Accepts version strings that follow semantic versioning conventions as described in the <a href="https://semver.org/#semantic-versioning-specification-semver">semantic versioning specification</a>.</p>
 <p><em>Sorting behavior</em>: Strings are sorted following the rules described in the semantic versioning specification.</p>
 <p>Example: <code>1.0.0-1</code> &lt; <code>1.0.0-alpha</code> &lt; <code>1.0.0-beta</code> &lt; <code>1.0.0</code> &lt; <code>1.0.1</code> &lt; <code>1.1.0</code></p>
-<h3><a class="anchor" id="autotoc_md4085"></a>
+<h3><a class="anchor" id="autotoc_md3861"></a>
 &lt;tt&gt;version-date&lt;/tt&gt;</h3>
 <p>Accepts version strings that can be parsed to a date following the ISO-8601 format <code>YYYY-MM-DD</code>. Disambiguation identifiers are allowed in the form of dot-separated-, positive-, integer-numbers with no leading zeroes.</p>
 <p>This is the recommended versioning scheme for "Live at HEAD" libraries that don't have established release versions.</p>
 <p>The regex pattern for this versioning scheme is: <code>\d{4}-\d{2}-\d{2}(\.(0|[1-9]\d*))*</code></p>
 <p><em>Sorting behavior</em>: Strings are sorted first by their date part, then by numeric comparison of their disambiguation identifiers. Disambiguation identifiers follow the rules of the relaxed (<code>version</code>) scheme.</p>
 <p>Examples: <code>2021-01-01</code> &lt; <code>2021-01-01.1</code> &lt; <code>2021-02-01.1.2</code> &lt; <code>2021-02-01.1.3</code> &lt; <code>2021-02-01</code></p>
-<h3><a class="anchor" id="autotoc_md4086"></a>
+<h3><a class="anchor" id="autotoc_md3862"></a>
 &lt;tt&gt;version-string&lt;/tt&gt;</h3>
 <p>For packages using version strings that do not fit any of the other schemes, it accepts most arbitrary strings. The <code>#</code> which is used to denote port versions is disallowed.</p>
 <p><em>Sorting behavior</em>: No sorting is attempted on the version string itself. However, if the strings match exactly, their port versions can be compared and sorted.</p>
@@ -155,7 +155,7 @@ Version schemes</h1>
 <li><code>apple</code> &lt;&gt; <code>orange</code> &lt;&gt; <code>orange.2</code> &lt;&gt; <code>orange2</code></li>
 <li><code>watermelon#0</code>&lt; <code>watermelon#1</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md4087"></a>
+<h3><a class="anchor" id="autotoc_md3863"></a>
 &lt;tt&gt;port-version&lt;/tt&gt;</h3>
 <p>A positive integer value that increases each time the port changes without updating the sources.</p>
 <p>The rules for port versions are:</p><ul>
@@ -170,9 +170,9 @@ Version schemes</h1>
 <li><code>2021-01-01#20</code> &lt; <code>2021-01-01.1</code></li>
 <li><code>windows#7</code> &lt; <code>windows#8</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4088"></a>
+<h1><a class="anchor" id="autotoc_md3864"></a>
 Version constraints</h1>
-<h2><a class="anchor" id="autotoc_md4089"></a>
+<h2><a class="anchor" id="autotoc_md3865"></a>
 Baselines</h2>
 <p>Baselines define a global version floor for what versions will be considered. This enables top-level manifests to keep the entire graph of dependencies up-to-date without needing to individually specify direct <a href="#version-gte"><code>"version&gt;="</code></a> constraints.</p>
 <p>Every configured registry has an associated baseline. For manifests that don't configure any registries, the <a href="manifests.md#builtin-baseline"><code>"builtin-baseline"</code></a> field defines the baseline for the built-in registry. If a manifest does not configure any registries and does not have a <a href="manifests.md#builtin-baseline"><code>"builtin-baseline"</code></a>, the install operates according to the Classic Mode algorithm and ignores all versioning information.</p>
@@ -185,7 +185,7 @@ Baselines</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p>To add an initial <code>"builtin-baseline"</code>, use <a href="../commands/update-baseline.md#add-initial-baseline"><code>vcpkg x-update-baseline --add-initial-baseline</code></a>. To update baselines in a manifest, use <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_commands_update_baseline.html">`vcpkg x-update-baseline`</a>.</p>
 <p><a class="anchor" id="version-gte"></a></p>
-<h2><a class="anchor" id="autotoc_md4090"></a>
+<h2><a class="anchor" id="autotoc_md3866"></a>
 &lt;tt&gt;version&gt;=&lt;/tt&gt;</h2>
 <p>Expresses a minimum version requirement, <code>version&gt;=</code> declarations put a lower boundary on the versions that can be used to satisfy a dependency.</p>
 <p><b>Note: Vcpkg selects the lowest version that matches all constraints, so a less-than constraint is not required.</b></p>
@@ -200,7 +200,7 @@ Baselines</h2>
 <div class="line">}</div>
 </div><!-- fragment --><p>As part of a version constraint declaration, a port version can be specified by adding the suffix <code>#&lt;port-version&gt;</code>, in the previous example <code>1.2.11#9</code> refers to version <code>1.2.11</code> port version <code>9</code>.</p>
 <p><a class="anchor" id="overrides"></a> </p>
-<h2><a class="anchor" id="autotoc_md4091"></a>
+<h2><a class="anchor" id="autotoc_md3867"></a>
 &lt;tt&gt;overrides&lt;/tt&gt;</h2>
 <p>Declaring an override forces vcpkg to ignore all other version constraints and use the version specified in the override. This is useful for pinning exact versions and for resolving version conflicts.</p>
 <p>Overrides are declared as an array of package version declarations.</p>
@@ -217,7 +217,7 @@ Baselines</h2>
 <div class="line">    { &quot;name&quot;: &quot;fmt&quot;, &quot;version&quot;: &quot;6.0.0&quot; }</div>
 <div class="line">  ]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4092"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3868"></a>
 See Also</h1>
 <ul>
 <li>The <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_versioning_implementation_details.html">implementation details</a></li>

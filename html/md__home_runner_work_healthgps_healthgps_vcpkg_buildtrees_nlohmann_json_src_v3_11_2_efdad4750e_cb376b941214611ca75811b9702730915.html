@@ -90,22 +90,22 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt;</div>
-<div class="line"><a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp.html#aefed8cf27cadeea45f12c6f3db3ce774">JSON_EXPLICIT</a> <span class="keyword">operator</span> ValueType() <span class="keyword">const</span>;</div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp_html_aefed8cf27cadeea45f12c6f3db3ce774"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2nlohmann_2detail_2macro__scope_8hpp.html#aefed8cf27cadeea45f12c6f3db3ce774">JSON_EXPLICIT</a></div><div class="ttdeci">#define JSON_EXPLICIT</div><div class="ttdef"><b>Definition:</b> macro_scope.hpp:457</div></div>
+<div class="line"><a class="code" href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2macro__scope_8hpp.html#aefed8cf27cadeea45f12c6f3db3ce774">JSON_EXPLICIT</a> <span class="keyword">operator</span> ValueType() <span class="keyword">const</span>;</div>
+<div class="ttc" id="abuildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2macro__scope_8hpp_html_aefed8cf27cadeea45f12c6f3db3ce774"><div class="ttname"><a href="buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2macro__scope_8hpp.html#aefed8cf27cadeea45f12c6f3db3ce774">JSON_EXPLICIT</a></div><div class="ttdeci">#define JSON_EXPLICIT</div><div class="ttdef"><b>Definition:</b> macro_scope.hpp:457</div></div>
 </div><!-- fragment --><p>Implicit type conversion between the JSON value and a compatible value. The call is realized by calling <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c9a4b07083643ff5ce8a5d8e42a0c162c.html">`get()`</a>. See <a href="#notes">Notes</a> for the meaning of <code>JSON_EXPLICIT</code>.</p>
-<h1><a class="anchor" id="autotoc_md1528"></a>
+<h1><a class="anchor" id="autotoc_md1304"></a>
 Template parameters</h1>
 <p><code>ValueType</code> : the value type to return</p>
-<h1><a class="anchor" id="autotoc_md1529"></a>
+<h1><a class="anchor" id="autotoc_md1305"></a>
 Return value</h1>
 <p>copy of the JSON value, converted to <code>ValueType</code></p>
-<h1><a class="anchor" id="autotoc_md1530"></a>
+<h1><a class="anchor" id="autotoc_md1306"></a>
 Exceptions</h1>
-<p>Depends on what <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> method throws</p>
-<h1><a class="anchor" id="autotoc_md1531"></a>
+<p>Depends on what <code>json_serializer&lt;ValueType&gt;</code> <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> method throws</p>
+<h1><a class="anchor" id="autotoc_md1307"></a>
 Complexity</h1>
 <p>Linear in the size of the JSON value.</p>
-<h1><a class="anchor" id="autotoc_md1532"></a>
+<h1><a class="anchor" id="autotoc_md1308"></a>
 Notes</h1>
 <p>!!! note "Definition of `JSON_EXPLICIT`" </p><pre class="fragment">By default `JSON_EXPLICIT` is defined to the empty string, so the signature is:
 
@@ -130,7 +130,7 @@ That is, implicit conversions can be switched off by defining
 You can prepare existing code by already defining
 [`JSON_USE_IMPLICIT_CONVERSIONS`](../macros/json_use_implicit_conversions.md) to `0` and replace any implicit
 conversions with calls to [`get`](../basic_json/get.md).
-</pre> <h1><a class="anchor" id="autotoc_md1533"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1309"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The example below shows several conversions from JSON values to other types. There are a few things to note: (1)
 Floating-point numbers can be converted to integers, (2) A JSON array can be converted to a standard
@@ -146,7 +146,7 @@ Output:
 ```json
 --8&lt;-- "examples/operator__ValueType.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1534"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1310"></a>
 Version history</h1>
 <ul>
 <li>Since version 1.0.0.</li>

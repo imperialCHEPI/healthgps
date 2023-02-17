@@ -90,83 +90,83 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Some aspects of the library can be configured by defining preprocessor macros before including the <code>json.hpp</code> header. See also the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c74437b8f9f73e894854531a1026417cb.html">API documentation for macros</a> for examples and more information.</p>
-<h1><a class="anchor" id="autotoc_md2187"></a>
+<h1><a class="anchor" id="autotoc_md1963"></a>
 &lt;tt&gt;JSON_ASSERT(x)&lt;/tt&gt;</h1>
 <p>This macro controls which code is executed for <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c2fde0d5cded6950da783e8ca4d843413.html">runtime assertions</a> of the library.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cc4b09bc3d372e4b9529331ec3e607a45.html">full documentation of `JSON_ASSERT(x)`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2188"></a>
+<h1><a class="anchor" id="autotoc_md1964"></a>
 &lt;tt&gt;JSON_CATCH_USER(exception)&lt;/tt&gt;</h1>
 <p>This macro overrides <a href="https://en.cppreference.com/w/cpp/language/try_catch"><code>#!cpp catch</code></a> calls inside the library.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c43255907534b94d52d5553f6a3bd1da6.html">full documentation of `JSON_CATCH_USER(exception)`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2189"></a>
+<h1><a class="anchor" id="autotoc_md1965"></a>
 &lt;tt&gt;JSON_DIAGNOSTICS&lt;/tt&gt;</h1>
 <p>This macro enables extended diagnostics for exception messages. Possible values are <code>1</code> to enable or <code>0</code> to disable (default).</p>
 <p>When enabled, exception messages contain a <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c9b1dca418519f71942903cc1da63d9b0.html">JSON Pointer</a> to the JSON value that triggered the exception, see <a href="../home/exceptions.md#extended-diagnostic-messages">Extended diagnostic messages</a> for an example. Note that enabling this macro increases the size of every JSON value by one pointer and adds some runtime overhead.</p>
 <p>The diagnostics messages can also be controlled with the CMake option <code>JSON_Diagnostics</code> (<code>OFF</code> by default) which sets <code>JSON_DIAGNOSTICS</code> accordingly.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1f38699056edc408a3a19cb42f8e0edc.html">full documentation of `JSON_DIAGNOSTICS`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2190"></a>
+<h1><a class="anchor" id="autotoc_md1966"></a>
 &lt;tt&gt;JSON_HAS_CPP_11&lt;/tt&gt;, &lt;tt&gt;JSON_HAS_CPP_14&lt;/tt&gt;, &lt;tt&gt;JSON_HAS_CPP_17&lt;/tt&gt;, &lt;tt&gt;JSON_HAS_CPP_20&lt;/tt&gt;</h1>
 <p>The library targets C++11, but also supports some features introduced in later C++ versions (e.g., <code>std::string_view</code> support for C++17). For these new features, the library implements some preprocessor checks to determine the C++ standard. By defining any of these symbols, the internal check is overridden and the provided C++ version is unconditionally assumed. This can be helpful for compilers that only implement parts of the standard and would be detected incorrectly.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1d90f3c66b602cf4909e2123f88fd540.html">full documentation of `JSON_HAS_CPP_11`, `JSON_HAS_CPP_14`, `JSON_HAS_CPP_17`, and `JSON_HAS_CPP_20`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2191"></a>
+<h1><a class="anchor" id="autotoc_md1967"></a>
 &lt;tt&gt;JSON_HAS_FILESYSTEM&lt;/tt&gt;, &lt;tt&gt;JSON_HAS_EXPERIMENTAL_FILESYSTEM&lt;/tt&gt;</h1>
 <p>When compiling with C++17, the library provides conversions from and to <code>std::filesystem::path</code>. As compiler support for filesystem is limited, the library tries to detect whether <code>&lt;filesystem&gt;</code>/<code>std::filesystem</code> (<code>JSON_HAS_FILESYSTEM</code>) or <code>&lt;experimental/filesystem&gt;</code>/<code>std::experimental::filesystem</code> (<code>JSON_HAS_EXPERIMENTAL_FILESYSTEM</code>) should be used. To override the built-in check, define <code>JSON_HAS_FILESYSTEM</code> or <code>JSON_HAS_EXPERIMENTAL_FILESYSTEM</code> to <code>1</code>.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cdc8a5956ce76ca5d9553d6edeb7ba9b6.html">full documentation of `JSON_HAS_FILESYSTEM` and `JSON_HAS_EXPERIMENTAL_FILESYSTEM`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2192"></a>
+<h1><a class="anchor" id="autotoc_md1968"></a>
 &lt;tt&gt;JSON_NOEXCEPTION&lt;/tt&gt;</h1>
 <p>Exceptions can be switched off by defining the symbol <code>JSON_NOEXCEPTION</code>.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0dad41fd781806fd88fe2eb33947b3fc.html">full documentation of `JSON_NOEXCEPTION`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2193"></a>
+<h1><a class="anchor" id="autotoc_md1969"></a>
 &lt;tt&gt;JSON_DISABLE_ENUM_SERIALIZATION&lt;/tt&gt;</h1>
 <p>When defined, default parse and serialize functions for enums are excluded and have to be provided by the user, for example, using <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf322bdeb90965770532b1b7439ef1cd1.html">`NLOHMANN_JSON_SERIALIZE_ENUM`</a>.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c634a4e618b357d644e94f2555d7eb6ec.html">full documentation of `JSON_DISABLE_ENUM_SERIALIZATION`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2194"></a>
+<h1><a class="anchor" id="autotoc_md1970"></a>
 &lt;tt&gt;JSON_NO_IO&lt;/tt&gt;</h1>
 <p>When defined, headers <code>&lt;cstdio&gt;</code>, <code>&lt;ios&gt;</code>, <code>&lt;iosfwd&gt;</code>, <code>&lt;istream&gt;</code>, and <code>&lt;ostream&gt;</code> are not included and parse functions relying on these headers are excluded. This is relevant for environment where these I/O functions are disallowed for security reasons (e.g., Intel Software Guard Extensions (SGX)).</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c0a78c24cc7a79d359eb43f5db09b235c.html">full documentation of `JSON_NO_IO`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2195"></a>
+<h1><a class="anchor" id="autotoc_md1971"></a>
 &lt;tt&gt;JSON_SKIP_LIBRARY_VERSION_CHECK&lt;/tt&gt;</h1>
 <p>When defined, the library will not create a compiler warning when a different version of the library was already included.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c7f47e1962920cea1bf67fb782154d184.html">full documentation of `JSON_SKIP_LIBRARY_VERSION_CHECK`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2196"></a>
+<h1><a class="anchor" id="autotoc_md1972"></a>
 &lt;tt&gt;JSON_SKIP_UNSUPPORTED_COMPILER_CHECK&lt;/tt&gt;</h1>
 <p>When defined, the library will not create a compile error when a known unsupported compiler is detected. This allows to use the library with compilers that do not fully support C++11 and may only work if unsupported features are not used.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cefba4212608382ca8a90d484ce9933fa.html">full documentation of `JSON_SKIP_UNSUPPORTED_COMPILER_CHECK`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2197"></a>
+<h1><a class="anchor" id="autotoc_md1973"></a>
 &lt;tt&gt;JSON_THROW_USER(exception)&lt;/tt&gt;</h1>
 <p>This macro overrides <code>#!cpp throw</code> calls inside the library. The argument is the exception to be thrown.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c43255907534b94d52d5553f6a3bd1da6.html">full documentation of `JSON_THROW_USER(exception)`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2198"></a>
+<h1><a class="anchor" id="autotoc_md1974"></a>
 &lt;tt&gt;JSON_TRY_USER&lt;/tt&gt;</h1>
 <p>This macro overrides <code>#!cpp try</code> calls inside the library.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c43255907534b94d52d5553f6a3bd1da6.html">full documentation of `JSON_TRY_USER`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2199"></a>
+<h1><a class="anchor" id="autotoc_md1975"></a>
 &lt;tt&gt;JSON_USE_IMPLICIT_CONVERSIONS&lt;/tt&gt;</h1>
 <p>When defined to <code>0</code>, implicit conversions are switched off. By default, implicit conversions are switched on.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c1d9fec932f07e648196f98119dec891b.html">full documentation of `JSON_USE_IMPLICIT_CONVERSIONS`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2200"></a>
+<h1><a class="anchor" id="autotoc_md1976"></a>
 &lt;tt&gt;NLOHMANN_DEFINE_TYPE_INTRUSIVE(type, member...)&lt;/tt&gt;</h1>
 <p>This macro can be used to simplify the serialization/deserialization of types if (1) want to use a JSON object as serialization and (2) want to use the member variable names as object keys in that object.</p>
 <p>The macro is to be defined inside the class/struct to create code for. Unlike <a href="#nlohmann_define_type_non_intrusivetype-member"><code>NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</code></a>, it can access private members. The first parameter is the name of the class/struct, and all remaining parameters name the members.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cd8b68227bb649d5b7db1a16cdc1854f7.html">full documentation of `NLOHMANN_DEFINE_TYPE_INTRUSIVE`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2201"></a>
+<h1><a class="anchor" id="autotoc_md1977"></a>
 &lt;tt&gt;NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(type, member...)&lt;/tt&gt;</h1>
-<p>This macro is similar to <code>NLOHMANN_DEFINE_TYPE_INTRUSIVE</code>. It will not throw an exception in <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> due to a missing value in the JSON object, but can throw due to a mismatched type. The <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> function default constructs an object and uses its values as the defaults when calling the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> function.</p>
+<p>This macro is similar to <code>NLOHMANN_DEFINE_TYPE_INTRUSIVE</code>. It will not throw an exception in <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> due to a missing value in the JSON object, but can throw due to a mismatched type. The <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> function default constructs an object and uses its values as the defaults when calling the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> function.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cd8b68227bb649d5b7db1a16cdc1854f7.html">full documentation of `NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2202"></a>
+<h1><a class="anchor" id="autotoc_md1978"></a>
 &lt;tt&gt;NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(type, member...)&lt;/tt&gt;</h1>
 <p>This macro can be used to simplify the serialization/deserialization of types if (1) want to use a JSON object as serialization and (2) want to use the member variable names as object keys in that object.</p>
 <p>The macro is to be defined inside the namespace of the class/struct to create code for. Private members cannot be accessed. Use <a href="#nlohmann_define_type_intrusivetype-member"><code>NLOHMANN_DEFINE_TYPE_INTRUSIVE</code></a> in these scenarios. The first parameter is the name of the class/struct, and all remaining parameters name the members.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8c03d6288330e544da168e0a738dc7fc.html">full documentation of `NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2203"></a>
+<h1><a class="anchor" id="autotoc_md1979"></a>
 &lt;tt&gt;NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(type, member...)&lt;/tt&gt;</h1>
-<p>This macro is similar to <code>NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</code>. It will not throw an exception in <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> due to a missing value in the JSON object, but can throw due to a mismatched type. The <code><a class="el" href="namespacedetail.html#ac8fc7fc4703cbd8edd7bb43a94adf92b">from_json()</a></code> function default constructs an object and uses its values as the defaults when calling the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> function.</p>
+<p>This macro is similar to <code>NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE</code>. It will not throw an exception in <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> due to a missing value in the JSON object, but can throw due to a mismatched type. The <code><a class="el" href="jsonparser_8cpp.html#a863cfc8afb5397b781ef4ea4c0c61a7a">from_json()</a></code> function default constructs an object and uses its values as the defaults when calling the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c387d29bdeb419a91046b932725dccdec.html">`value`</a> function.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8c03d6288330e544da168e0a738dc7fc.html">full documentation of `NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2204"></a>
+<h1><a class="anchor" id="autotoc_md1980"></a>
 &lt;tt&gt;NLOHMANN_JSON_SERIALIZE_ENUM(type, ...)&lt;/tt&gt;</h1>
 <p>This macro simplifies the serialization/deserialization of enum types. See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf4dddf2d0d657d2d7c7bbb21610c3fd7.html">Specializing enum conversion</a> for more information.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cf322bdeb90965770532b1b7439ef1cd1.html">full documentation of `NLOHMANN_JSON_SERIALIZE_ENUM`</a>.</p>
-<h1><a class="anchor" id="autotoc_md2205"></a>
+<h1><a class="anchor" id="autotoc_md1981"></a>
 &lt;tt&gt;NLOHMANN_JSON_VERSION_MAJOR&lt;/tt&gt;, &lt;tt&gt;NLOHMANN_JSON_VERSION_MINOR&lt;/tt&gt;, &lt;tt&gt;NLOHMANN_JSON_VERSION_PATCH&lt;/tt&gt;</h1>
 <p>These macros are defined by the library and contain the version numbers according to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning 2.0.0</a>.</p>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c6aecd1cb9d1ee0eba0459b9e7dde1bf5.html">full documentation of `NLOHMANN_JSON_VERSION_MAJOR`, `NLOHMANN_JSON_VERSION_MINOR`, and `NLOHMANN_JSON_VERSION_PATCH`</a>. </p>

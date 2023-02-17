@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_install_msbuild.md">vcpkg repo</a>.</p>
 <p>Build and install a msbuild-based project. This replaces <code>vcpkg_build_msbuild()</code>.</p>
-<h1><a class="anchor" id="autotoc_md3684"></a>
+<h1><a class="anchor" id="autotoc_md3460"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_install_msbuild(</div>
 <div class="line">    SOURCE_PATH &lt;${SOURCE_PATH}&gt;</div>
@@ -110,70 +110,70 @@ Usage</h1>
 <div class="line">    [USE_VCPKG_INTEGRATION]</div>
 <div class="line">    [ALLOW_ROOT_INCLUDES | REMOVE_ROOT_INCLUDES]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3685"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3461"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3686"></a>
+<h2><a class="anchor" id="autotoc_md3462"></a>
 SOURCE_PATH</h2>
 <p>The path to the root of the source tree.</p>
 <p>Because MSBuild uses in-source builds, the source tree will be copied into a temporary location for the build. This parameter is the base for that copy and forms the base for all XYZ_SUBPATH options.</p>
-<h2><a class="anchor" id="autotoc_md3687"></a>
+<h2><a class="anchor" id="autotoc_md3463"></a>
 USE_VCPKG_INTEGRATION</h2>
 <p>Apply the normal <code>integrate install</code> integration for building the project.</p>
 <p>By default, projects built with this command will not automatically link libraries or have header paths set.</p>
-<h2><a class="anchor" id="autotoc_md3688"></a>
+<h2><a class="anchor" id="autotoc_md3464"></a>
 PROJECT_SUBPATH</h2>
 <p>The subpath to the solution (<code>.sln</code>) or project (<code>.vcxproj</code>) file relative to <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3689"></a>
+<h2><a class="anchor" id="autotoc_md3465"></a>
 LICENSE_SUBPATH</h2>
 <p>The subpath to the license file relative to <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3690"></a>
+<h2><a class="anchor" id="autotoc_md3466"></a>
 INCLUDES_SUBPATH</h2>
 <p>The subpath to the includes directory relative to <code>SOURCE_PATH</code>.</p>
 <p>This parameter should be a directory and should not end in a trailing slash.</p>
-<h2><a class="anchor" id="autotoc_md3691"></a>
+<h2><a class="anchor" id="autotoc_md3467"></a>
 ALLOW_ROOT_INCLUDES</h2>
 <p>Indicates that top-level include files (e.g. <code>include/zlib.h</code>) should be allowed.</p>
-<h2><a class="anchor" id="autotoc_md3692"></a>
+<h2><a class="anchor" id="autotoc_md3468"></a>
 REMOVE_ROOT_INCLUDES</h2>
 <p>Indicates that top-level include files (e.g. <code>include/Makefile.am</code>) should be removed.</p>
-<h2><a class="anchor" id="autotoc_md3693"></a>
+<h2><a class="anchor" id="autotoc_md3469"></a>
 SKIP_CLEAN</h2>
 <p>Indicates that the intermediate files should not be removed.</p>
 <p>Ports using this option should later call <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_clean_msbuild.html">`vcpkg_clean_msbuild()`</a> to manually clean up.</p>
-<h2><a class="anchor" id="autotoc_md3694"></a>
+<h2><a class="anchor" id="autotoc_md3470"></a>
 RELEASE_CONFIGURATION</h2>
 <p>The configuration (<code>/p:<a class="el" href="structConfiguration.html">Configuration</a></code> msbuild parameter) used for Release builds.</p>
-<h2><a class="anchor" id="autotoc_md3695"></a>
+<h2><a class="anchor" id="autotoc_md3471"></a>
 DEBUG_CONFIGURATION</h2>
 <p>The configuration (<code>/p:<a class="el" href="structConfiguration.html">Configuration</a></code> msbuild parameter) used for Debug builds.</p>
-<h2><a class="anchor" id="autotoc_md3696"></a>
+<h2><a class="anchor" id="autotoc_md3472"></a>
 TARGET_PLATFORM_VERSION</h2>
 <p>The WindowsTargetPlatformVersion (<code>/p:WindowsTargetPlatformVersion</code> msbuild parameter)</p>
-<h2><a class="anchor" id="autotoc_md3697"></a>
+<h2><a class="anchor" id="autotoc_md3473"></a>
 TARGET</h2>
 <p>The MSBuild target to build. (<code>/t:&lt;TARGET&gt;</code>)</p>
-<h2><a class="anchor" id="autotoc_md3698"></a>
+<h2><a class="anchor" id="autotoc_md3474"></a>
 PLATFORM</h2>
 <p>The platform (<code>/p:Platform</code> msbuild parameter) used for the build.</p>
-<h2><a class="anchor" id="autotoc_md3699"></a>
+<h2><a class="anchor" id="autotoc_md3475"></a>
 PLATFORM_TOOLSET</h2>
 <p>The platform toolset (<code>/p:PlatformToolset</code> msbuild parameter) used for the build.</p>
-<h2><a class="anchor" id="autotoc_md3700"></a>
+<h2><a class="anchor" id="autotoc_md3476"></a>
 OPTIONS</h2>
 <p>Additional options passed to msbuild for all builds.</p>
-<h2><a class="anchor" id="autotoc_md3701"></a>
+<h2><a class="anchor" id="autotoc_md3477"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options passed to msbuild for Release builds. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3702"></a>
+<h2><a class="anchor" id="autotoc_md3478"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options passed to msbuild for Debug builds. These are in addition to <code>OPTIONS</code>.</p>
-<h1><a class="anchor" id="autotoc_md3703"></a>
+<h1><a class="anchor" id="autotoc_md3479"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/libirecovery/portfile.cmake">libirecovery</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/libfabric/portfile.cmake">libfabric</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3704"></a>
+<h1><a class="anchor" id="autotoc_md3480"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_install_msbuild.cmake">scripts/cmake/vcpkg_install_msbuild.cmake</a> </p>
 </div></div><!-- contents -->

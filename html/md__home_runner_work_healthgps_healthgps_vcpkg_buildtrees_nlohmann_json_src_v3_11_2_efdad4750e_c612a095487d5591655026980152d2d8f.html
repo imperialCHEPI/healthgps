@@ -100,25 +100,25 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li>Returns the number of elements with key <code>key</code>. If <code>ObjectType</code> is the default <code>std::map</code> type, the return value will always be <code>0</code> (<code>key</code> was not found) or <code>1</code> (<code>key</code> was found).</li>
 <li>See 1. This overload is only available if <code>KeyType</code> is comparable with <code>#!cpp typename object_t::key_type</code> and <code>#!cpp typename object_comparator_t::is_transparent</code> denotes a type.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md1001"></a>
+<h1><a class="anchor" id="autotoc_md777"></a>
 Template parameters</h1>
 <p><code>KeyType</code> : A type for an object key other than <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c622d8f8d011b5b9ab972c417054ac609.html">`json_pointer`</a> that is comparable with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8cb44d26fcc9e736c3cd62fdeedc1db9.html">`string_t`</a> using <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cd00f5861c54b75c7eeb2edb6ed4a64c8.html">`object_comparator_t`</a>. This can also be a string view (C++17).</p>
-<h1><a class="anchor" id="autotoc_md1002"></a>
+<h1><a class="anchor" id="autotoc_md778"></a>
 Parameters</h1>
 <p><code>key</code> (in) : key value of the element to count.</p>
-<h1><a class="anchor" id="autotoc_md1003"></a>
+<h1><a class="anchor" id="autotoc_md779"></a>
 Return value</h1>
 <p>Number of elements with key <code>key</code>. If the JSON value is not an object, the return value will be <code>0</code>.</p>
-<h1><a class="anchor" id="autotoc_md1004"></a>
+<h1><a class="anchor" id="autotoc_md780"></a>
 Exception safety</h1>
 <p>Strong exception safety: if an exception occurs, the original value stays intact.</p>
-<h1><a class="anchor" id="autotoc_md1005"></a>
+<h1><a class="anchor" id="autotoc_md781"></a>
 Complexity</h1>
 <p>Logarithmic in the size of the JSON object.</p>
-<h1><a class="anchor" id="autotoc_md1006"></a>
+<h1><a class="anchor" id="autotoc_md782"></a>
 Notes</h1>
 <p>This method always returns <code>0</code> when executed on a JSON type that is not an object.</p>
-<h1><a class="anchor" id="autotoc_md1007"></a>
+<h1><a class="anchor" id="autotoc_md783"></a>
 Examples</h1>
 <p>??? example "Example: (1) count number of elements" </p><pre class="fragment">The example shows how `count()` is used.
 
@@ -142,7 +142,7 @@ Output:
 ```json
 --8&lt;-- "examples/count__keytype.c++17.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1008"></a>
+</pre> <h1><a class="anchor" id="autotoc_md784"></a>
 Version history</h1>
 <ol type="1">
 <li>Added in version 3.11.0.</li>

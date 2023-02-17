@@ -92,7 +92,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p>**This function has been deprecated in favor of <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_cmake_configure.html">`vcpkg_cmake_configure`</a> from the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_ports_vcpkg_cmake.html">`vcpkg-cmake`</a> port.**</p>
 <p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_configure_cmake.md">vcpkg repo</a>.</p>
 <p>Configure CMake for Debug and Release builds of a project.</p>
-<h1><a class="anchor" id="autotoc_md3391"></a>
+<h1><a class="anchor" id="autotoc_md3167"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_configure_cmake(</div>
 <div class="line">    SOURCE_PATH &lt;${SOURCE_PATH}&gt;</div>
@@ -105,36 +105,36 @@ Usage</h1>
 <div class="line">    [OPTIONS_DEBUG &lt;-DDEBUGGABLE=1&gt;...]</div>
 <div class="line">    [MAYBE_UNUSED_VARIABLES &lt;OPTION_NAME&gt;...]</div>
 <div class="line">)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3392"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3168"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3393"></a>
+<h2><a class="anchor" id="autotoc_md3169"></a>
 SOURCE_PATH</h2>
 <p>Specifies the directory containing the <code>CMakeLists.txt</code>. By convention, this is usually set in the portfile as the variable <code>SOURCE_PATH</code>.</p>
-<h2><a class="anchor" id="autotoc_md3394"></a>
+<h2><a class="anchor" id="autotoc_md3170"></a>
 PREFER_NINJA</h2>
 <p>Indicates that, when available, Vcpkg should use Ninja to perform the build. This should be specified unless the port is known to not work under Ninja.</p>
-<h2><a class="anchor" id="autotoc_md3395"></a>
+<h2><a class="anchor" id="autotoc_md3171"></a>
 DISABLE_PARALLEL_CONFIGURE</h2>
 <p>Disables running the CMake configure step in parallel. This is needed for libraries which write back into their source directory during configure.</p>
 <p>This also disables CMAKE_DISABLE_SOURCE_CHANGES.</p>
-<h2><a class="anchor" id="autotoc_md3396"></a>
+<h2><a class="anchor" id="autotoc_md3172"></a>
 NO_CHARSET_FLAG</h2>
 <p>Disables passing <code>utf-8</code> as the default character set to <code>CMAKE_C_FLAGS</code> and <code>CMAKE_CXX_FLAGS</code>.</p>
 <p>This is needed for libraries that set their own source code's character set.</p>
-<h2><a class="anchor" id="autotoc_md3397"></a>
+<h2><a class="anchor" id="autotoc_md3173"></a>
 GENERATOR</h2>
 <p>Specifies the precise generator to use.</p>
 <p>This is useful if some project-specific buildsystem has been wrapped in a cmake script that won't perform an actual build. If used for this purpose, it should be set to <code>"NMake Makefiles"</code>.</p>
-<h2><a class="anchor" id="autotoc_md3398"></a>
+<h2><a class="anchor" id="autotoc_md3174"></a>
 OPTIONS</h2>
 <p>Additional options passed to CMake during the configuration.</p>
-<h2><a class="anchor" id="autotoc_md3399"></a>
+<h2><a class="anchor" id="autotoc_md3175"></a>
 OPTIONS_RELEASE</h2>
 <p>Additional options passed to CMake during the Release configuration. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3400"></a>
+<h2><a class="anchor" id="autotoc_md3176"></a>
 OPTIONS_DEBUG</h2>
 <p>Additional options passed to CMake during the Debug configuration. These are in addition to <code>OPTIONS</code>.</p>
-<h2><a class="anchor" id="autotoc_md3401"></a>
+<h2><a class="anchor" id="autotoc_md3177"></a>
 MAYBE_UNUSED_VARIABLES</h2>
 <p>Any CMake variables which are explicitly passed in, but which may not be used on all platforms. For example: </p><div class="fragment"><div class="line">vcpkg_cmake_configure(</div>
 <div class="line">    ...</div>
@@ -144,13 +144,13 @@ MAYBE_UNUSED_VARIABLES</h2>
 <div class="line">    MAYBE_UNUSED_VARIABLES</div>
 <div class="line">        BUILD_EXAMPLE</div>
 <div class="line">)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3402"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3178"></a>
 LOGNAME</h2>
 <p>Name of the log to write the output of the configure call to.</p>
-<h1><a class="anchor" id="autotoc_md3403"></a>
+<h1><a class="anchor" id="autotoc_md3179"></a>
 Notes</h1>
 <p>This command supplies many common arguments to CMake. To see the full list, examine the source.</p>
-<h1><a class="anchor" id="autotoc_md3404"></a>
+<h1><a class="anchor" id="autotoc_md3180"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/zlib/portfile.cmake">zlib</a></li>
@@ -158,7 +158,7 @@ Examples</h1>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/poco/portfile.cmake">poco</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/opencv/portfile.cmake">opencv</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3405"></a>
+<h1><a class="anchor" id="autotoc_md3181"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_configure_cmake.cmake">scripts/cmake/vcpkg_configure_cmake.cmake</a> </p>
 </div></div><!-- contents -->

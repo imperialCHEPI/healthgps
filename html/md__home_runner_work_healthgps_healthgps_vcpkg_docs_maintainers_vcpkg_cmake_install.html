@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_cmake_install.md">vcpkg repo</a>.</b></p>
 <p>Build and install a cmake project.</p>
-<h1><a class="anchor" id="autotoc_md3381"></a>
+<h1><a class="anchor" id="autotoc_md3157"></a>
 Usage</h1>
 <div class="fragment"><div class="line">vcpkg_cmake_install(</div>
 <div class="line">    [DISABLE_PARALLEL]</div>
@@ -103,26 +103,26 @@ Usage</h1>
 <div class="line">    &quot;host&quot;: true</div>
 <div class="line">  }</div>
 <div class="line">]</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3382"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3158"></a>
 Parameters</h1>
-<h2><a class="anchor" id="autotoc_md3383"></a>
+<h2><a class="anchor" id="autotoc_md3159"></a>
 DISABLE_PARALLEL</h2>
 <p>Disables running the build in parallel.</p>
 <p>By default builds are run with up to <a href="../users/config-environment.md#VCPKG_MAX_CONCURRENCY">VCPKG_MAX_CONCURRENCY</a> jobs. This option limits the build to a single job and should be used only if the underlying build is unable to run correctly with concurrency.</p>
-<h2><a class="anchor" id="autotoc_md3384"></a>
+<h2><a class="anchor" id="autotoc_md3160"></a>
 ADD_BIN_TO_PATH</h2>
 <p>Adds the configuration-specific <code>bin/</code> directory to the <code>PATH</code> during the build.</p>
 <p>When building for a Windows dynamic triplet, newly built executables may not be immediately executable because their dependency DLLs may not be findable from the build environment. This flag instructs vcpkg to add any additional paths needed to locate those dependency DLLs to the <code>PATH</code> environment variable. This is required if the project needs to execute newly built binaries as part of the build (such as to generate code).</p>
-<h1><a class="anchor" id="autotoc_md3385"></a>
+<h1><a class="anchor" id="autotoc_md3161"></a>
 Examples:</h1>
 <div class="fragment"><div class="line">vcpkg_from_github(OUT_SOURCE_PATH source_path ...)</div>
 <div class="line">vcpkg_cmake_configure(SOURCE_PATH &quot;${source_path}&quot;)</div>
 <div class="line">vcpkg_cmake_install()</div>
 </div><!-- fragment --><p><a href="https://github.com/microsoft/vcpkg/search?q=vcpkg_cmake_install+path%3A%2Fports">Search microsoft/vcpkg for Examples</a></p>
-<h1><a class="anchor" id="autotoc_md3386"></a>
+<h1><a class="anchor" id="autotoc_md3162"></a>
 Remarks</h1>
 <p>This command replaces <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_install_cmake.html">`vcpkg_install_cmake()`</a>.</p>
-<h1><a class="anchor" id="autotoc_md3387"></a>
+<h1><a class="anchor" id="autotoc_md3163"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/vcpkg-cmake/vcpkg_cmake_install.cmake">ports/vcpkg-cmake/vcpkg_cmake_install.cmake</a> </p>
 </div></div><!-- contents -->

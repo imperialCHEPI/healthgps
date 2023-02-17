@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <li><code>FILTER</code> and <code>TRANSFORM</code> are unsupported.</li>
 </ul>
 <p>See the <a href="https://cmake.org/cmake/help/latest/command/list.html">CMake documentation for <code>list()</code></a> for more information.</p>
-<h1><a class="anchor" id="autotoc_md3730"></a>
+<h1><a class="anchor" id="autotoc_md3506"></a>
 Notes: Some Weirdnesses</h1>
 <p>The most major weirdness is due to <code>""</code> pulling double-duty as "list of zero elements", and "list of one element, which is empty". <code>vcpkg_list</code> always uses the former understanding. This can cause weird behavior, for example:</p>
 <div class="fragment"><div class="line">set(lst &quot;&quot;)</div>
@@ -116,27 +116,27 @@ Notes: Some Weirdnesses</h1>
 <div class="line">vcpkg_list(APPEND lst &quot;&quot;)</div>
 <div class="line"># lst = &quot;a;&quot;</div>
 </div><!-- fragment --><p>only the empty list has this odd behavior.</p>
-<h1><a class="anchor" id="autotoc_md3731"></a>
+<h1><a class="anchor" id="autotoc_md3507"></a>
 Examples</h1>
-<h2><a class="anchor" id="autotoc_md3732"></a>
+<h2><a class="anchor" id="autotoc_md3508"></a>
 Creating a list</h2>
 <div class="fragment"><div class="line">vcpkg_list(SET foo_param)</div>
 <div class="line">if(DEFINED arg_FOO)</div>
 <div class="line">    vcpkg_list(SET foo_param FOO &quot;${arg_FOO}&quot;)</div>
 <div class="line">endif()</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3733"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3509"></a>
 Appending to a list</h2>
 <div class="fragment"><div class="line">set(OPTIONS -DFOO=BAR)</div>
 <div class="line">if(VCPKG_TARGET_IS_WINDOWS)</div>
 <div class="line">    vcpkg_list(APPEND OPTIONS &quot;-DOS=WINDOWS;FOO&quot;)</div>
 <div class="line">endif()</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3734"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3510"></a>
 Popping the end off a list</h2>
 <div class="fragment"><div class="line">if(NOT list STREQUAL &quot;&quot;)</div>
 <div class="line">    vcpkg_list(GET list end -1)</div>
 <div class="line">    vcpkg_list(POP_BACK list)</div>
 <div class="line">endif()</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3735"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3511"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_list.cmake">scripts/cmake/vcpkg_list.cmake</a> </p>
 </div></div><!-- contents -->

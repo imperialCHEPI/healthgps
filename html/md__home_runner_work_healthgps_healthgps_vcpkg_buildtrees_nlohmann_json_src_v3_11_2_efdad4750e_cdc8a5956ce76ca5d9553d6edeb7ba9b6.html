@@ -92,16 +92,16 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><div class="fragment"><div class="line"><span class="preprocessor">#define JSON_HAS_FILESYSTEM </span><span class="comment">/* value */</span><span class="preprocessor"></span></div>
 <div class="line"><span class="preprocessor">#define JSON_HAS_EXPERIMENTAL_FILESYSTEM </span><span class="comment">/* value */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --><p>When compiling with C++17, the library provides conversions from and to <a href="https://en.cppreference.com/w/cpp/filesystem/path"><code>std::filesystem::path</code></a>. As compiler support for filesystem is limited, the library tries to detect whether <a href="https://en.cppreference.com/w/cpp/header/filesystem"><code>&lt;filesystem&gt;</code>/<code>std::filesystem</code></a> (<code>JSON_HAS_FILESYSTEM</code>) or <a href="https://en.cppreference.com/w/cpp/header/experimental/filesystem"><code>&lt;experimental/filesystem&gt;</code>/<code>std::experimental::filesystem</code></a> (<code>JSON_HAS_EXPERIMENTAL_FILESYSTEM</code>) should be used. To override the built-in check, define <code>JSON_HAS_FILESYSTEM</code> or <code>JSON_HAS_EXPERIMENTAL_FILESYSTEM</code> to <code>1</code>.</p>
-<h1><a class="anchor" id="autotoc_md1972"></a>
+<h1><a class="anchor" id="autotoc_md1748"></a>
 Default definition</h1>
 <p>The default value is detected based on the preprocessor macros <code>#!cpp __cpp_lib_filesystem</code>, <code>#!cpp __cpp_lib_experimental_filesystem</code>, <code>#!cpp __has_include(&lt;filesystem&gt;)</code>, or <code>#!cpp __has_include(&lt;experimental/filesystem&gt;)</code>.</p>
-<h1><a class="anchor" id="autotoc_md1973"></a>
+<h1><a class="anchor" id="autotoc_md1749"></a>
 Notes</h1>
 <ul>
 <li>Note that older compilers or older versions of libstd++ also require the library <code>stdc++fs</code> to be linked to for filesystem support.</li>
 <li>Both macros are undefined outside the library.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1974"></a>
+<h1><a class="anchor" id="autotoc_md1750"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The code below forces the library to use the header `&lt;experimental/filesystem&gt;`.
 
@@ -111,7 +111,7 @@ Examples</h1>
 
 ...
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1975"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1751"></a>
 Version history</h1>
 <ul>
 <li>Added in version 3.10.5. </li>

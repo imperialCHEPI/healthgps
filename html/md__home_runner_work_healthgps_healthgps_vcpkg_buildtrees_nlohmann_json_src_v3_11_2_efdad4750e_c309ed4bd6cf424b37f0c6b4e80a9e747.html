@@ -90,47 +90,48 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>When the input is not valid JSON, an exception of type <a href="../../home/exceptions.md#parse-errors"><code>parse_error</code></a> is thrown. This exception contains the position in the input where the error occurred, together with a diagnostic message and the last read input token. The exceptions page contains a <a href="../../home/exceptions.md#parse-errors">list of examples for parse error exceptions</a>. In case you process untrusted input, always enclose your code with a <code>#!cpp try</code>/<code>#!cpp catch</code> block, like</p>
-<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
+<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>;</div>
 <div class="line"><span class="keywordflow">try</span></div>
 <div class="line">{</div>
-<div class="line">    <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> = <a class="code" href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">json::parse</a>(my_input);</div>
+<div class="line">    <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> = <a class="code" href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">json::parse</a>(my_input);</div>
 <div class="line">}</div>
-<div class="line"><span class="keywordflow">catch</span> (<a class="code" href="classdetail_1_1parse__error.html">json::parse_error</a>&amp; ex)</div>
+<div class="line"><span class="keywordflow">catch</span> (<a class="code" href="classnlohmann_1_1detail_1_1parse__error.html">json::parse_error</a>&amp; ex)</div>
 <div class="line">{</div>
-<div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;parse error at byte &quot;</span> &lt;&lt; ex.<a class="code" href="classdetail_1_1parse__error.html#a5bce7d135aa3a38d1d3f4ed7bf8615e1">byte</a> &lt;&lt; std::endl;</div>
+<div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;parse error at byte &quot;</span> &lt;&lt; ex.<a class="code" href="classnlohmann_1_1detail_1_1parse__error.html#a9505aaa1ca943be927eec7cc579592ff">byte</a> &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
-<div class="ttc" id="aclassdetail_1_1parse__error_html"><div class="ttname"><a href="classdetail_1_1parse__error.html">detail::parse_error</a></div><div class="ttdoc">exception indicating a parse error</div><div class="ttdef"><b>Definition:</b> exceptions.hpp:135</div></div>
-<div class="ttc" id="aclassdetail_1_1parse__error_html_a5bce7d135aa3a38d1d3f4ed7bf8615e1"><div class="ttname"><a href="classdetail_1_1parse__error.html#a5bce7d135aa3a38d1d3f4ed7bf8615e1">detail::parse_error::byte</a></div><div class="ttdeci">const std::size_t byte</div><div class="ttdoc">byte index of the parse error</div><div class="ttdef"><b>Definition:</b> exceptions.hpp:172</div></div>
-<div class="ttc" id="acxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp_html_a3646fd1f04510384b3d634354a1a734d"><div class="ttname"><a href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">parse</a></div><div class="ttdeci">void parse(int argc, const char *argv[])</div><div class="ttdef"><b>Definition:</b> example.cpp:30</div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:17282</div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html_a15018ade392a844ea32d5188d1a0b9c6"><div class="ttname"><a href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">nlohmann::basic_json::parse</a></div><div class="ttdeci">static JSON_HEDLEY_WARN_UNUSED_RESULT basic_json parse(InputType &amp;&amp;i, const parser_callback_t cb=nullptr, const bool allow_exceptions=true, const bool ignore_comments=false)</div><div class="ttdoc">deserialize from a compatible input</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:20814</div></div>
+<div class="ttc" id="aclassnlohmann_1_1detail_1_1parse__error_html"><div class="ttname"><a href="classnlohmann_1_1detail_1_1parse__error.html">nlohmann::detail::parse_error</a></div><div class="ttdoc">exception indicating a parse error</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:2901</div></div>
+<div class="ttc" id="aclassnlohmann_1_1detail_1_1parse__error_html_a9505aaa1ca943be927eec7cc579592ff"><div class="ttname"><a href="classnlohmann_1_1detail_1_1parse__error.html#a9505aaa1ca943be927eec7cc579592ff">nlohmann::detail::parse_error::byte</a></div><div class="ttdeci">const std::size_t byte</div><div class="ttdoc">byte index of the parse error</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:2938</div></div>
 <div class="ttc" id="aparse____allow__exceptions_8cpp_html_ac657f5945687365edd0e109857d4fec0"><div class="ttname"><a href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a></div><div class="ttdeci">json j</div><div class="ttdef"><b>Definition:</b> parse__allow_exceptions.cpp:26</div></div>
 </div><!-- fragment --><p>In case exceptions are undesired or not supported by the environment, there are different ways to proceed:</p>
-<h1><a class="anchor" id="autotoc_md2224"></a>
+<h1><a class="anchor" id="autotoc_md2000"></a>
 Switch off exceptions</h1>
 <p>The <code><a class="el" href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">parse()</a></code> function accepts a <code>#!cpp bool</code> parameter <code>allow_exceptions</code> which controls whether an exception is thrown when a parse error occurs (<code>#!cpp true</code>, default) or whether a discarded value should be returned (<code>#!cpp false</code>).</p>
-<div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> = <a class="code" href="cxxopts_2src_2v3_80_80-118fd8e742_8clean_2src_2example_8cpp.html#a3646fd1f04510384b3d634354a1a734d">json::parse</a>(my_input, <span class="keyword">nullptr</span>, <span class="keyword">false</span>);</div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>.<a class="code" href="classbasic__json.html#abcc7082bb9fa07704c659f6be7c41bc9">is_discarded</a>())</div>
+<div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a> = <a class="code" href="classnlohmann_1_1basic__json.html#a15018ade392a844ea32d5188d1a0b9c6">json::parse</a>(my_input, <span class="keyword">nullptr</span>, <span class="keyword">false</span>);</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code" href="parse____allow__exceptions_8cpp.html#ac657f5945687365edd0e109857d4fec0">j</a>.<a class="code" href="classnlohmann_1_1basic__json.html#aecaaa0613d3f3a5b49b34b02afc5f85d">is_discarded</a>())</div>
 <div class="line">{</div>
 <div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;parse error&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line">}</div>
-<div class="ttc" id="aclassbasic__json_html_abcc7082bb9fa07704c659f6be7c41bc9"><div class="ttname"><a href="classbasic__json.html#abcc7082bb9fa07704c659f6be7c41bc9">basic_json::is_discarded</a></div><div class="ttdeci">constexpr bool is_discarded() const noexcept</div><div class="ttdoc">return whether value is discarded</div><div class="ttdef"><b>Definition:</b> json.hpp:1372</div></div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html_aecaaa0613d3f3a5b49b34b02afc5f85d"><div class="ttname"><a href="classnlohmann_1_1basic__json.html#aecaaa0613d3f3a5b49b34b02afc5f85d">nlohmann::basic_json::is_discarded</a></div><div class="ttdeci">constexpr bool is_discarded() const noexcept</div><div class="ttdoc">return whether value is discarded</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:18539</div></div>
 </div><!-- fragment --><p>Note there is no diagnostic information available in this scenario.</p>
-<h1><a class="anchor" id="autotoc_md2225"></a>
+<h1><a class="anchor" id="autotoc_md2001"></a>
 Use accept() function</h1>
 <p>Alternatively, function <code>accept()</code> can be used which does not return a <code>json</code> value, but a <code>#!cpp bool</code> indicating whether the input is valid JSON.</p>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (!json::accept(my_input))</div>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (!<a class="code" href="classnlohmann_1_1basic__json.html#a32872afe5bfd040777e3e2bb85f0ca55">json::accept</a>(my_input))</div>
 <div class="line">{</div>
 <div class="line">    std::cerr &lt;&lt; <span class="stringliteral">&quot;parse error&quot;</span> &lt;&lt; std::endl;</div>
 <div class="line">}</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html_a32872afe5bfd040777e3e2bb85f0ca55"><div class="ttname"><a href="classnlohmann_1_1basic__json.html#a32872afe5bfd040777e3e2bb85f0ca55">nlohmann::basic_json::accept</a></div><div class="ttdeci">static bool accept(InputType &amp;&amp;i, const bool ignore_comments=false)</div><div class="ttdoc">check if the input is valid JSON</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:20854</div></div>
 </div><!-- fragment --><p>Again, there is no diagnostic information available.</p>
-<h1><a class="anchor" id="autotoc_md2226"></a>
+<h1><a class="anchor" id="autotoc_md2002"></a>
 User-defined SAX interface</h1>
 <p>Finally, you can implement the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c8e3b1df3927e3a19c71d1a79d8f47fce.html">SAX interface</a> and decide what should happen in case of a parse error.</p>
 <p>This function has the following interface:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">bool</span> parse_error(std::size_t position,</div>
 <div class="line">                 <span class="keyword">const</span> std::string&amp; last_token,</div>
-<div class="line">                 <span class="keyword">const</span> <a class="code" href="classdetail_1_1exception.html">json::exception</a>&amp; ex);</div>
-<div class="ttc" id="aclassdetail_1_1exception_html"><div class="ttname"><a href="classdetail_1_1exception.html">detail::exception</a></div><div class="ttdoc">general exception of the basic_json class</div><div class="ttdef"><b>Definition:</b> exceptions.hpp:37</div></div>
+<div class="line">                 <span class="keyword">const</span> <a class="code" href="classnlohmann_1_1detail_1_1exception.html">json::exception</a>&amp; ex);</div>
+<div class="ttc" id="aclassnlohmann_1_1detail_1_1exception_html"><div class="ttname"><a href="classnlohmann_1_1detail_1_1exception.html">nlohmann::detail::exception</a></div><div class="ttdoc">general exception of the basic_json class</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:2809</div></div>
 </div><!-- fragment --><p>The return value indicates whether the parsing should continue, so the function should usually return <code>#!cpp false</code>.</p>
 <p>??? example </p><pre class="fragment">```cpp
 #include &lt;iostream&gt;

@@ -92,24 +92,24 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="textblock"><p>**This function has been deprecated in favor of <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_cmake_build.html">`vcpkg_cmake_build`</a> from the vcpkg-cmake port.**</p>
 <p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/maintainers/vcpkg_build_cmake.md">vcpkg repo</a>.</p>
 <p>Build a cmake project.</p>
-<h1><a class="anchor" id="autotoc_md3260"></a>
+<h1><a class="anchor" id="autotoc_md3036"></a>
 Usage:</h1>
 <div class="fragment"><div class="line">vcpkg_build_cmake([DISABLE_PARALLEL] [TARGET &lt;target&gt;])</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3261"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3037"></a>
 Parameters:</h1>
-<h2><a class="anchor" id="autotoc_md3262"></a>
+<h2><a class="anchor" id="autotoc_md3038"></a>
 DISABLE_PARALLEL</h2>
 <p>The underlying buildsystem will be instructed to not parallelize</p>
-<h2><a class="anchor" id="autotoc_md3263"></a>
+<h2><a class="anchor" id="autotoc_md3039"></a>
 TARGET</h2>
 <p>The target passed to the cmake build command (<code>cmake --build . --target &lt;target&gt;</code>). If not specified, no target will be passed.</p>
-<h2><a class="anchor" id="autotoc_md3264"></a>
+<h2><a class="anchor" id="autotoc_md3040"></a>
 ADD_BIN_TO_PATH</h2>
 <p>Adds the appropriate Release and Debug <code>bin</code> directories to the path during the build such that executables can run against the in-tree DLLs.</p>
-<h1><a class="anchor" id="autotoc_md3265"></a>
+<h1><a class="anchor" id="autotoc_md3041"></a>
 Notes:</h1>
 <p>This command should be preceded by a call to <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_configure_cmake.html">`vcpkg_configure_cmake()`</a>. You can use the alias <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_configure_cmake.html">`vcpkg_install_cmake()`</a> function if your CMake script supports the "install" target</p>
-<h1><a class="anchor" id="autotoc_md3266"></a>
+<h1><a class="anchor" id="autotoc_md3042"></a>
 Examples:</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/zlib/portfile.cmake">zlib</a></li>
@@ -117,7 +117,7 @@ Examples:</h1>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/poco/portfile.cmake">poco</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/opencv/portfile.cmake">opencv</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3267"></a>
+<h1><a class="anchor" id="autotoc_md3043"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_build_cmake.cmake">scripts/cmake/vcpkg_build_cmake.cmake</a> </p>
 </div></div><!-- contents -->

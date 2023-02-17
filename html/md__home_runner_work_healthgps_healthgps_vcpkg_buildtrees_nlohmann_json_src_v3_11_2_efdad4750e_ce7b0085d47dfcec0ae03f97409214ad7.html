@@ -91,29 +91,29 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><div class="fragment"><div class="line">constexpr <span class="keywordtype">bool</span> is_structured() const noexcept;</div>
 </div><!-- fragment --><p>This function returns <code>#!cpp true</code> if and only if the JSON type is structured (array or object).</p>
-<h1><a class="anchor" id="autotoc_md1341"></a>
+<h1><a class="anchor" id="autotoc_md1117"></a>
 Return value</h1>
 <p><code>#!cpp true</code> if type is structured (array or object), <code>#!cpp false</code> otherwise.</p>
-<h1><a class="anchor" id="autotoc_md1342"></a>
+<h1><a class="anchor" id="autotoc_md1118"></a>
 Exception safety</h1>
 <p>No-throw guarantee: this member function never throws exceptions.</p>
-<h1><a class="anchor" id="autotoc_md1343"></a>
+<h1><a class="anchor" id="autotoc_md1119"></a>
 Complexity</h1>
 <p>Constant.</p>
-<h1><a class="anchor" id="autotoc_md1344"></a>
+<h1><a class="anchor" id="autotoc_md1120"></a>
 Possible implementation</h1>
 <div class="fragment"><div class="line">constexpr <span class="keywordtype">bool</span> is_primitive() const noexcept</div>
 <div class="line">{</div>
 <div class="line">    <span class="keywordflow">return</span> is_array() || is_object();</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1345"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md1121"></a>
 Notes</h1>
 <p>The term <em>structured</em> stems from <a href="https://tools.ietf.org/html/rfc8259">RFC 8259</a>:</p>
 <blockquote class="doxtable">
 <p>JSON can represent four primitive types (strings, numbers, booleans, and null) and two structured types (objects and arrays). </p>
 </blockquote>
 <p>Note that though strings are containers in C++, they are treated as primitive values in JSON.</p>
-<h1><a class="anchor" id="autotoc_md1346"></a>
+<h1><a class="anchor" id="autotoc_md1122"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code exemplifies `is_structured()` for all JSON types.
 
@@ -126,14 +126,14 @@ Output:
 ```json
 --8&lt;-- "examples/is_structured.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md1347"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1123"></a>
 See also</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cffaaf4bae1ffd6e29a8841aab9fdc848.html">is_primitive()</a> returns whether JSON value is primitive</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_cc12d09292b2421d9fb43e6c86b6ef4bf.html">is_array()</a> returns whether value is an array</li>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_c68a74357f2bd6418e6c28910b1411b22.html">is_object()</a> returns whether value is an object</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md1348"></a>
+<h1><a class="anchor" id="autotoc_md1124"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0. </li>

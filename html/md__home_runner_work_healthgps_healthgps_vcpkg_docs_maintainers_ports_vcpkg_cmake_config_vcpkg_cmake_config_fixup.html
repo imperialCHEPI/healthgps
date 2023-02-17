@@ -102,7 +102,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!-- fragment --><p>For many ports, <code>vcpkg_cmake_config_fixup()</code> on its own should work, as <code>PACKAGE_NAME</code> defaults to <code>${PORT}</code> and <code>CONFIG_PATH</code> defaults to <code>share/${PACKAGE_NAME}</code>. For ports where the package name passed to <code>find_package</code> is distinct from the port name, <code>PACKAGE_NAME</code> should be changed to be that name instead. For ports where the directory of the <code>*config.cmake</code> files cannot be set, use the <code>CONFIG_PATH</code> to change the directory where the files come from.</p>
 <p>By default the parent directory of CONFIG_PATH is removed if it is named "cmake". Passing the <code>DO_NOT_DELETE_PARENT_CONFIG_PATH</code> option disable such behavior, as it is convenient for ports that install more than one CMake package configuration file.</p>
 <p>The <code>NO_PREFIX_CORRECTION</code> option disables the correction of <code>_IMPORT_PREFIX</code> done by vcpkg due to moving the config files. Currently the correction does not take into account how the files are moved, and applies a rather simply correction which in some cases will yield the wrong results.</p>
-<h1><a class="anchor" id="autotoc_md3164"></a>
+<h1><a class="anchor" id="autotoc_md2940"></a>
 How it Works</h1>
 <ol type="1">
 <li>Moves <code>/debug/&lt;CONFIG_PATH&gt;/*targets-debug.cmake</code> to <code>/share/${PACKAGE_NAME}</code>.</li>
@@ -114,14 +114,14 @@ How it Works</h1>
 <li>Replaces <code>${CURRENT_INSTALLED_DIR}</code> with <code>${VCPKG_IMPORT_PREFIX}</code> in targets.</li>
 <li>Removes <code>/debug/&lt;CONFIG_PATH&gt;/*config.cmake</code>.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md3165"></a>
+<h1><a class="anchor" id="autotoc_md2941"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/concurrentqueue/portfile.cmake">concurrentqueue</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/curl/portfile.cmake">curl</a></li>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/nlohmann-json/portfile.cmake">nlohmann-json</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3166"></a>
+<h1><a class="anchor" id="autotoc_md2942"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/ports/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake">ports/vcpkg-cmake-config/vcpkg_cmake_config_fixup.cmake</a> </p>
 </div></div><!-- contents -->

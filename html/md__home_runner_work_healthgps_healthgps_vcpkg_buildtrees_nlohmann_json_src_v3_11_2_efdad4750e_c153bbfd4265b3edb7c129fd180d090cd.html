@@ -89,8 +89,8 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title"><small>nlohmann::</small>operator""_json </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div class="fragment"><div class="line"><a class="code" href="classbasic__json.html">json</a> <span class="keyword">operator</span> <span class="stringliteral">&quot;&quot;</span> <a class="code" href="unit-json__pointer_8cpp.html#a4ff849685af2d1bc46095b4311f6a708">_json</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* s, std::size_t <a class="code" href="unit-udt_8cpp.html#aeda809c9c9c3a54beef6a1870365e3c4">n</a>);</div>
-<div class="ttc" id="aclassbasic__json_html"><div class="ttname"><a href="classbasic__json.html">basic_json</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> json.hpp:96</div></div>
+<div class="textblock"><div class="fragment"><div class="line"><a class="code" href="classnlohmann_1_1basic__json.html">json</a> <span class="keyword">operator</span> <span class="stringliteral">&quot;&quot;</span> <a class="code" href="unit-json__pointer_8cpp.html#a4ff849685af2d1bc46095b4311f6a708">_json</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* s, std::size_t <a class="code" href="unit-udt_8cpp.html#aeda809c9c9c3a54beef6a1870365e3c4">n</a>);</div>
+<div class="ttc" id="aclassnlohmann_1_1basic__json_html"><div class="ttname"><a href="classnlohmann_1_1basic__json.html">nlohmann::basic_json</a></div><div class="ttdoc">a class to store JSON values</div><div class="ttdef"><b>Definition:</b> json_v3_10_5.hpp:17282</div></div>
 <div class="ttc" id="aunit-json__pointer_8cpp_html_a4ff849685af2d1bc46095b4311f6a708"><div class="ttname"><a href="unit-json__pointer_8cpp.html#a4ff849685af2d1bc46095b4311f6a708">_json</a></div><div class="ttdeci">_json</div><div class="ttdef"><b>Definition:</b> unit-json_pointer.cpp:235</div></div>
 <div class="ttc" id="aunit-udt_8cpp_html_aeda809c9c9c3a54beef6a1870365e3c4"><div class="ttname"><a href="unit-udt_8cpp.html#aeda809c9c9c3a54beef6a1870365e3c4">n</a></div><div class="ttdeci">const udt::name n</div><div class="ttdef"><b>Definition:</b> unit-udt.cpp:234</div></div>
 </div><!-- fragment --><p>This operator implements a user-defined string literal for JSON objects. It can be used by adding <code>#!cpp _json</code> to a string literal and returns a <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_clean_docs_mkdocs_docs_api_json.html">`json`</a> object if no parse error occurred.</p>
@@ -101,20 +101,20 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacenlohmann.html">nlohmann</a>;</div>
 <div class="ttc" id="anamespacenlohmann_html"><div class="ttname"><a href="namespacenlohmann.html">nlohmann</a></div><div class="ttdoc">namespace for Niels Lohmann</div><div class="ttdef"><b>Definition:</b> from_json__non_default_constructible.cpp:22</div></div>
 </div><!-- fragment --><p>This is suggested to ease migration to the next major version release of the library. See <a href="macros/json_use_global_udls.md#notes">'JSON_USE_GLOBAL_UDLS`</a> for details.</p>
-<h1><a class="anchor" id="autotoc_md2077"></a>
+<h1><a class="anchor" id="autotoc_md1853"></a>
 Parameters</h1>
 <p><code>s</code> (in) : a string representation of a JSON object</p>
 <p><code>n</code> (in) : length of string <code>s</code></p>
-<h1><a class="anchor" id="autotoc_md2078"></a>
+<h1><a class="anchor" id="autotoc_md1854"></a>
 Return value</h1>
 <p><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_clean_docs_mkdocs_docs_api_json.html">`json`</a> value parsed from <code>s</code></p>
-<h1><a class="anchor" id="autotoc_md2079"></a>
+<h1><a class="anchor" id="autotoc_md1855"></a>
 Exceptions</h1>
 <p>The function can throw anything that <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_nlohmann_json_src_v3_11_2_efdad4750e_ccaaadffd6a44dbcd7dee1101b62407e0.html">`parse(s, s+n)`</a> would throw.</p>
-<h1><a class="anchor" id="autotoc_md2080"></a>
+<h1><a class="anchor" id="autotoc_md1856"></a>
 Complexity</h1>
 <p>Linear.</p>
-<h1><a class="anchor" id="autotoc_md2081"></a>
+<h1><a class="anchor" id="autotoc_md1857"></a>
 Examples</h1>
 <p>??? example </p><pre class="fragment">The following code shows how to create JSON values from string literals.
 
@@ -127,7 +127,7 @@ Output:
 ```json
 --8&lt;-- "examples/operator_literal_json.output"
 ```
-</pre> <h1><a class="anchor" id="autotoc_md2082"></a>
+</pre> <h1><a class="anchor" id="autotoc_md1858"></a>
 Version history</h1>
 <ul>
 <li>Added in version 1.0.0.</li>

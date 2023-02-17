@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Packaging <code>.zip</code> Files Example: zlib </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2><a class="anchor" id="autotoc_md3012"></a>
+<div class="textblock"><h2><a class="anchor" id="autotoc_md2788"></a>
 Bootstrap with &lt;tt&gt;create&lt;/tt&gt;</h2>
 <p>First, locate a globally accessible archive of the library's sources. Zip, gzip, and bzip are all supported. Strongly prefer official sources or mirrors over unofficial mirrors.</p>
 <p><em>Looking at zlib's website, the URL <a href="http://zlib.net/zlib-1.2.12.tar.gz">http://zlib.net/zlib-1.2.12.tar.gz</a> looks appropriate.</em></p>
@@ -100,7 +100,7 @@ Bootstrap with &lt;tt&gt;create&lt;/tt&gt;</h2>
 <p>All this information can then be passed into the <code>create</code> command, which will download the sources and bootstrap the packaging process inside <code>ports/&lt;packagename&gt;</code>.</p>
 <div class="fragment"><div class="line">PS D:\src\vcpkg&gt; .\vcpkg create zlib2 http://zlib.net/zlib-1.2.12.tar.gz zlib1212.tar.gz</div>
 <div class="line">-- Generated portfile: D:/src/vcpkg/ports/zlib2/portfile.cmake</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3013"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2789"></a>
 Create the manifest file</h2>
 <p>In addition to the generated <code>ports/&lt;package&gt;/portfile.cmake</code>, we also need a <code>ports/&lt;package&gt;/vcpkg.json</code> file. This file is a simple set of fields describing the package's metadata.</p>
 <p><em>For zlib2, we'll create the file <code>ports/zlib2/vcpkg.json</code> with the following contents:</em> </p><div class="fragment"><div class="line">{</div>
@@ -108,7 +108,7 @@ Create the manifest file</h2>
 <div class="line">  &quot;version-string&quot;: &quot;1.2.12&quot;,</div>
 <div class="line">  &quot;description&quot;: &quot;A Massively Spiffy Yet Delicately Unobtrusive Compression Library&quot;</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3014"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md2790"></a>
 Tweak the generated portfile</h2>
 <p>The generated <code>portfile.cmake</code> will need some editing to correctly package most libraries in the wild, however we can start by trying out the build.</p>
 <div class="fragment"><div class="line">PS D:\src\vcpkg&gt; .\vcpkg install zlib2</div>
@@ -135,7 +135,7 @@ Tweak the generated portfile</h2>
 <div class="line">Found 3 error(s). Please correct the portfile:</div>
 <div class="line">    D:\src\vcpkg\ports\zlib2\portfile.cmake</div>
 </div><!-- fragment --><p>At this point, it is a matter of reading the error messages and log files while steadily improving the quality of the portfile. Zlib required providing a discrete copy of the LICENSE to copy into the package, suppressing the build and installation of executables and headers, and removing the static libraries after they were installed.</p>
-<h2><a class="anchor" id="autotoc_md3015"></a>
+<h2><a class="anchor" id="autotoc_md2791"></a>
 Suggested example portfiles</h2>
 <p>In the <code>ports/</code> directory are many libraries that can be used as examples, including many that are not based on CMake.</p>
 <ul>

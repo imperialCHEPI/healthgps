@@ -89,11 +89,11 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Platform Specific Build Instructions </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md4106"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md3882"></a>
 Building with GCC</h1>
 <p>When the library is built using GCC it is necessary to link with the pthread library due to how GCC implements <code>std::thread</code>. Failing to link to pthread will lead to runtime exceptions (unless you're using libc++), not linker errors. See <a href="https://github.com/google/benchmark/issues/67">issue #67</a> for more details. You can link to pthread by adding <code>-pthread</code> to your linker command. Note, you can also use <code>-lpthread</code>, but there are potential issues with ordering of command line parameters if you use that.</p>
 <p>On QNX, the pthread library is part of libc and usually included automatically (see <a href="https://www.qnx.com/developers/docs/7.1/index.html#com.qnx.doc.neutrino.lib_ref/topic/p/pthread_create.html"><code>pthread_create()</code></a>). There's no separate pthread library to link.</p>
-<h1><a class="anchor" id="autotoc_md4107"></a>
+<h1><a class="anchor" id="autotoc_md3883"></a>
 Building with Visual Studio 2015 or 2017</h1>
 <p>The <code>shlwapi</code> library (<code>-lshlwapi</code>) is required to support a call to <code>CPUInfo</code> which reads the registry. Either add <code>shlwapi.lib</code> under <code>[ <a class="el" href="structConfiguration.html">Configuration</a> Properties &gt; Linker &gt; Input ]</code>, or use the following:</p>
 <div class="fragment"><div class="line">// Alternatively, can add libraries using linker options.</div>
@@ -112,10 +112,10 @@ Building with Visual Studio 2015 or 2017</h1>
 <li>Click <code>Configure</code>, <code>Generate</code>, <code>Open Project</code>.</li>
 <li>If build fails, try deleting entire directory and starting again, or unticking options to build less.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md4108"></a>
+<h1><a class="anchor" id="autotoc_md3884"></a>
 Building with Intel 2015 Update 1 or Intel System Studio Update 4</h1>
 <p>See instructions for building with Visual Studio. Once built, right click on the solution and change the build to Intel.</p>
-<h1><a class="anchor" id="autotoc_md4109"></a>
+<h1><a class="anchor" id="autotoc_md3885"></a>
 Building on Solaris</h1>
 <p>If you're running benchmarks on solaris, you'll want the kstat library linked in too (<code>-lkstat</code>). </p>
 </div></div><!-- contents -->

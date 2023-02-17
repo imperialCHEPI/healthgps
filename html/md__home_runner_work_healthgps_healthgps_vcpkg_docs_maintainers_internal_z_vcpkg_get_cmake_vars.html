@@ -91,25 +91,25 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="contents">
 <div class="textblock"><p>The latest version of this document lives in the <a href="https://github.com/Microsoft/vcpkg/blob/master/docs/">vcpkg repo</a>.</p>
 <p><b>Only for internal use in vcpkg helpers. Behavior and arguments will change without notice.</b> Runs a cmake configure with a dummy project to extract certain cmake variables</p>
-<h1><a class="anchor" id="autotoc_md3074"></a>
+<h1><a class="anchor" id="autotoc_md2850"></a>
 Usage</h1>
 <div class="fragment"><div class="line">z_vcpkg_get_cmake_vars(&lt;out-var&gt;)</div>
 </div><!-- fragment --><p><code>z_vcpkg_get_cmake_vars(cmake_vars_file)</code> sets <code>&lt;out-var&gt;</code> to a path to a generated CMake file, with the detected <code>CMAKE_*</code> variables re-exported as <code>VCPKG_DETECTED_*</code>.</p>
-<h1><a class="anchor" id="autotoc_md3075"></a>
+<h1><a class="anchor" id="autotoc_md2851"></a>
 Notes</h1>
 <p>Avoid usage in portfiles.</p>
 <p>All calls to <code>z_vcpkg_get_cmake_vars</code> will result in the same output file; the output file is not generated multiple times.</p>
-<h1><a class="anchor" id="autotoc_md3076"></a>
+<h1><a class="anchor" id="autotoc_md2852"></a>
 Examples</h1>
 <ul>
 <li><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/vcpkg_configure_make.cmake">vcpkg_configure_make</a></li>
 </ul>
-<h2><a class="anchor" id="autotoc_md3077"></a>
+<h2><a class="anchor" id="autotoc_md2853"></a>
 Basic Usage</h2>
 <div class="fragment"><div class="line">z_vcpkg_get_cmake_vars(cmake_vars_file)</div>
 <div class="line">include(&quot;${cmake_vars_file}&quot;)</div>
 <div class="line">message(STATUS &quot;detected CXX flags: ${VCPKG_DETECTED_CXX_FLAGS}&quot;)</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3078"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2854"></a>
 Source</h1>
 <p><a href="https://github.com/Microsoft/vcpkg/blob/master/scripts/cmake/z_vcpkg_get_cmake_vars.cmake">scripts/cmake/z_vcpkg_get_cmake_vars.cmake</a> </p>
 </div></div><!-- contents -->

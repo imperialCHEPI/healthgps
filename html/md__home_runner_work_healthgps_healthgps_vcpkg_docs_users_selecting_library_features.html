@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/users/selecting-library-features.md">GitHub</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md4034"></a>
+<h1><a class="anchor" id="autotoc_md3810"></a>
 Installing a library</h1>
 <p>We will look at <a href="https://llvm.org/">llvm</a> as an example. You could install it using:</p>
 <div class="fragment"><div class="line">&gt; vcpkg install llvm</div>
@@ -103,7 +103,7 @@ Installing a library</h1>
 <div class="fragment"><div class="line">Registered Targets:</div>
 <div class="line">  x86    - 32-bit X86: Pentium-Pro and above</div>
 <div class="line">  x86-64 - 64-bit X86: EM64T and AMD64</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4035"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3811"></a>
 Installing additional features</h1>
 <p>But <a href="https://llvm.org/docs/GettingStarted.html#local-llvm-configuration">llvm supports many more targets</a>, from ARM to SPARC to SystemZ. However, clearly our current installation doesn't include ARM as a target; thus, we need to learn how vcpkg allows us to install other LLVM targets. The llvm port allows this via the "target-*" features.</p>
 <p>If we do:</p>
@@ -122,7 +122,7 @@ Installing additional features</h1>
 </div><!-- fragment --> <div class="fragment"><div class="line">{</div>
 <div class="line">  &quot;dependencies&quot;: [{ &quot;name&quot;: &quot;llvm&quot;, &quot;features&quot;: [&quot;target-arm&quot;] }]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4036"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3812"></a>
 Opting out of default features</h1>
 <p>The llvm port includes a few default features that you as a user may not want: for example, the <code>clang</code> feature is default, which means that <code>vcpkg install llvm</code> will also build and install clang. If you are writing a compiler that uses LLVM as a backend, you're likely not interested in installing clang as well, and we can do that by disabling default features with the special <code>core</code> "feature": </p><div class="fragment"><div class="line">&gt; vcpkg install llvm[core,target-arm] # removing the default-feature with &quot;core&quot; also removes all of the default targets you get</div>
 </div><!-- fragment --><p> or in manifest files: </p><div class="fragment"><div class="line">{</div>
@@ -132,7 +132,7 @@ Opting out of default features</h1>
 <div class="line">    &quot;features&quot;: [&quot;target-arm&quot;]</div>
 <div class="line">  }]</div>
 <div class="line">}</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4037"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md3813"></a>
 Further reading</h1>
 <ul>
 <li>The <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html">Feature Packages</a> specification was the initial design for features. </li>

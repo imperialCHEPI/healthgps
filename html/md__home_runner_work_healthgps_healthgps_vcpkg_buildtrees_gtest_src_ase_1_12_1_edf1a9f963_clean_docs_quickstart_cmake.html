@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>This tutorial aims to get you up and running with GoogleTest using CMake. If you're using GoogleTest for the first time or need a refresher, we recommend this tutorial as a starting point. If your project uses Bazel, see the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_gtest_src_ase_1_12_1_edf1a9f963_clean_docs_quickstart_bazel.html">Quickstart for Bazel</a> instead.</p>
-<h1><a class="anchor" id="autotoc_md607"></a>
+<h1><a class="anchor" id="autotoc_md383"></a>
 Prerequisites</h1>
 <p>To complete this tutorial, you'll need:</p>
 <ul>
@@ -104,7 +104,7 @@ Prerequisites</h1>
 <p>See <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_gtest_src_ase_1_12_1_edf1a9f963_clean_docs_platforms.html">Supported Platforms</a> for more information about platforms compatible with GoogleTest.</p>
 <p>If you don't already have CMake installed, see the <a href="https://cmake.org/install">CMake installation guide</a>.</p>
 <p>{: .callout .note} Note: The terminal commands in this tutorial show a Unix shell prompt, but the commands work on the Windows command line as well.</p>
-<h1><a class="anchor" id="autotoc_md608"></a>
+<h1><a class="anchor" id="autotoc_md384"></a>
 Set up a project</h1>
 <p>CMake uses a file named <code>CMakeLists.txt</code> to configure the build system for a project. You'll use this file to set up your project and declare a dependency on GoogleTest.</p>
 <p>First, create a directory for your project:</p>
@@ -126,22 +126,22 @@ Set up a project</h1>
 <div class="line">FetchContent_MakeAvailable(googletest)</div>
 </div><!-- fragment --><p>The above configuration declares a dependency on GoogleTest which is downloaded from GitHub. In the above example, <code>609281088cfefc76f9d0ce82e1ff6c30cc3591e5</code> is the Git commit hash of the GoogleTest version to use; we recommend updating the hash often to point to the latest version.</p>
 <p>For more information about how to create <code>CMakeLists.txt</code> files, see the <a href="https://cmake.org/cmake/help/latest/guide/tutorial/index.html">CMake Tutorial</a>.</p>
-<h1><a class="anchor" id="autotoc_md609"></a>
+<h1><a class="anchor" id="autotoc_md385"></a>
 Create and run a binary</h1>
 <p>With GoogleTest declared as a dependency, you can use GoogleTest code within your own project.</p>
 <p>As an example, create a file named <code>hello_test.cc</code> in your <code>my_project</code> directory with the following contents:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;gtest/gtest.h&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Demonstrate some basic assertions.</span></div>
-<div class="line"><a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h.html#ab5540a6d621853916be8240ff51819cf">TEST</a>(HelloTest, BasicAssertions) {</div>
+<div class="line"><a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h.html#ab5540a6d621853916be8240ff51819cf">TEST</a>(HelloTest, BasicAssertions) {</div>
 <div class="line">  <span class="comment">// Expect two strings not to be equal.</span></div>
-<div class="line">  <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h.html#aee7e9c42f55549dbc0dfc42391eb9775">EXPECT_STRNE</a>(<span class="stringliteral">&quot;hello&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line">  <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h.html#aee7e9c42f55549dbc0dfc42391eb9775">EXPECT_STRNE</a>(<span class="stringliteral">&quot;hello&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
 <div class="line">  <span class="comment">// Expect equality.</span></div>
-<div class="line">  <a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(7 * 6, 42);</div>
+<div class="line">  <a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a>(7 * 6, 42);</div>
 <div class="line">}</div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h_html_a4159019abda84f5366acdb7604ff220a"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a></div><div class="ttdeci">#define EXPECT_EQ(val1, val2)</div><div class="ttdef"><b>Definition:</b> gtest.h:1847</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h_html_ab5540a6d621853916be8240ff51819cf"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h.html#ab5540a6d621853916be8240ff51819cf">TEST</a></div><div class="ttdeci">#define TEST(test_suite_name, test_name)</div><div class="ttdef"><b>Definition:</b> gtest.h:2157</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h_html_aee7e9c42f55549dbc0dfc42391eb9775"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2gtest_2gtest_8h.html#aee7e9c42f55549dbc0dfc42391eb9775">EXPECT_STRNE</a></div><div class="ttdeci">#define EXPECT_STRNE(s1, s2)</div><div class="ttdef"><b>Definition:</b> gtest.h:1918</div></div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h_html_a4159019abda84f5366acdb7604ff220a"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h.html#a4159019abda84f5366acdb7604ff220a">EXPECT_EQ</a></div><div class="ttdeci">#define EXPECT_EQ(val1, val2)</div><div class="ttdef"><b>Definition:</b> gtest.h:11946</div></div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h_html_ab5540a6d621853916be8240ff51819cf"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h.html#ab5540a6d621853916be8240ff51819cf">TEST</a></div><div class="ttdeci">#define TEST(test_suite_name, test_name)</div><div class="ttdef"><b>Definition:</b> gtest.h:12256</div></div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h_html_aee7e9c42f55549dbc0dfc42391eb9775"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2test_2gtest_2gtest_2gtest_8h.html#aee7e9c42f55549dbc0dfc42391eb9775">EXPECT_STRNE</a></div><div class="ttdeci">#define EXPECT_STRNE(s1, s2)</div><div class="ttdef"><b>Definition:</b> gtest.h:12017</div></div>
 </div><!-- fragment --><p>GoogleTest provides <a href="primer.md#assertions">assertions</a> that you use to test the behavior of your code. The above sample includes the main GoogleTest header file and demonstrates some basic assertions.</p>
 <p>To build the code, add the following to the end of your <code>CMakeLists.txt</code> file:</p>
 <div class="fragment"><div class="line">enable_testing()</div>
@@ -180,7 +180,7 @@ Test project .../my_project/build
 
 Total Test time (real) =   0.01 sec
 </pre><p>Congratulations! You've successfully built and run a test binary using GoogleTest.</p>
-<h1><a class="anchor" id="autotoc_md610"></a>
+<h1><a class="anchor" id="autotoc_md386"></a>
 Next steps</h1>
 <ul>
 <li><a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_buildtrees_gtest_src_ase_1_12_1_edf1a9f963_clean_docs_primer.html">Check out the Primer</a> to start learning how to write simple tests.</li>

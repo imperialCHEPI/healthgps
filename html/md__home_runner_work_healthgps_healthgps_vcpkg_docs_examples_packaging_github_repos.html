@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 <div class="title">Packaging Github Repos Example: libogg </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2><a class="anchor" id="autotoc_md3008"></a>
+<div class="textblock"><h2><a class="anchor" id="autotoc_md2784"></a>
 Create the manifest file</h2>
 <p>The manifest file (called <code>vcpkg.json</code>) is a json file describing the package's metadata.</p>
 <p>For libogg, we'll create the file <code>ports/libogg/vcpkg.json</code> with the following content:</p>
@@ -99,7 +99,7 @@ Create the manifest file</h2>
 <div class="line">  &quot;description&quot;: &quot;Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs.&quot;</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>You can format the manifest file to our specifications with <code>vcpkg format-manifest ports/libogg/vcpkg.json</code>.</p>
-<h2><a class="anchor" id="autotoc_md3009"></a>
+<h2><a class="anchor" id="autotoc_md2785"></a>
 Create the portfile</h2>
 <p><code>portfile.cmake</code> describes how to build and install the package. First we download the project from Github with <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_from_github.html">`vcpkg_from_github`</a>:</p>
 <div class="fragment"><div class="line">vcpkg_from_github(</div>
@@ -116,7 +116,7 @@ Create the portfile</h2>
 <div class="line">file(INSTALL &quot;${SOURCE_PATH}/COPYING&quot; DESTINATION &quot;${CURRENT_PACKAGES_DIR}/share/libogg&quot; RENAME copyright)</div>
 </div><!-- fragment --><p>Check the documentation for <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_cmake_configure.html">`vcpkg_cmake_configure`</a> and <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_maintainers_vcpkg_cmake_install.html">`vcpkg_cmake_install`</a> if your package needs additional options.</p>
 <p>Now you can run <code>vcpkg install libogg</code> to build and install the package.</p>
-<h2><a class="anchor" id="autotoc_md3010"></a>
+<h2><a class="anchor" id="autotoc_md2786"></a>
 Suggested example portfiles</h2>
 <p>In the <code>ports/</code> directory are many libraries that can be used as examples, including many that are not based on CMake.</p>
 <ul>

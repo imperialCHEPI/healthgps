@@ -137,7 +137,7 @@ Macros</h2></td></tr>
 <tr class="separator:ac39d9cef6a5e030ba8d9e11121054268"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a276e8a32e0bbf024aadd9420b8f2d3b3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c_8h.html#a276e8a32e0bbf024aadd9420b8f2d3b3">offsetof</a>(TYPE,  MEMBER)&#160;&#160;&#160;((size_t) &amp;((TYPE *)0)-&gt;MEMBER)</td></tr>
 <tr class="separator:a276e8a32e0bbf024aadd9420b8f2d3b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8c317a42292b61c93aae91e59118a46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c_8h.html#af8c317a42292b61c93aae91e59118a46">container_of</a>(<a class="el" href="vcpkg_2packages_2fmt__x64-linux_2include_2fmt_2format_8h.html#aa6ec2d4315570f27d9637ce3c770e787">ptr</a>,  <a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>,  member)</td></tr>
+<tr class="memitem:af8c317a42292b61c93aae91e59118a46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c_8h.html#af8c317a42292b61c93aae91e59118a46">container_of</a>(<a class="el" href="packages_2fmt__x64-linux_2include_2fmt_2format_8h.html#aa6ec2d4315570f27d9637ce3c770e787">ptr</a>,  <a class="el" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>,  member)</td></tr>
 <tr class="separator:af8c317a42292b61c93aae91e59118a46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71a619558acde2cfc48f6959d13b3e58"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c_8h.html#a71a619558acde2cfc48f6959d13b3e58">program_invocation_short_name</a>&#160;&#160;&#160;		prog_inv_sh_nm_from_file(__FILE__, 1)</td></tr>
 <tr class="separator:a71a619558acde2cfc48f6959d13b3e58"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -352,13 +352,13 @@ Typedefs</h2></td></tr>
           <td class="memname">#define container_of</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><a class="el" href="vcpkg_2packages_2fmt__x64-linux_2include_2fmt_2format_8h.html#aa6ec2d4315570f27d9637ce3c770e787">ptr</a>, </td>
+          <td class="paramname"><a class="el" href="packages_2fmt__x64-linux_2include_2fmt_2format_8h.html#aa6ec2d4315570f27d9637ce3c770e787">ptr</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>, </td>
+          <td class="paramname"><a class="el" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -374,11 +374,11 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                       \</div>
-<div class="line">    const __typeof__( ((<a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a> *)0)-&gt;member ) *__mptr = (<a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>); \</div>
-<div class="line">    (<a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a> *)( (<span class="keywordtype">char</span> *)__mptr - <a class="code" href="c_8h.html#a276e8a32e0bbf024aadd9420b8f2d3b3">offsetof</a>(<a class="code" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>,member) );})</div>
+<div class="line">    const __typeof__( ((<a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a> *)0)-&gt;member ) *__mptr = (<a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a>); \</div>
+<div class="line">    (<a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a> *)( (<span class="keywordtype">char</span> *)__mptr - <a class="code" href="c_8h.html#a276e8a32e0bbf024aadd9420b8f2d3b3">offsetof</a>(<a class="code" href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a>,member) );})</div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
+<div class="ttc" id="abuildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 <div class="ttc" id="ac_8h_html_a276e8a32e0bbf024aadd9420b8f2d3b3"><div class="ttname"><a href="c_8h.html#a276e8a32e0bbf024aadd9420b8f2d3b3">offsetof</a></div><div class="ttdeci">#define offsetof(TYPE, MEMBER)</div><div class="ttdef"><b>Definition:</b> c.h:126</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h_html_a7aead736a07eaf25623ad7bfa1f0ee2d"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2core_8h.html#a7aead736a07eaf25623ad7bfa1f0ee2d">type</a></div><div class="ttdeci">type</div><div class="ttdef"><b>Definition:</b> core.h:575</div></div>
-<div class="ttc" id="aout_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h_html_adb6e274f8eb0b74b2865215e1b49c535"><div class="ttname"><a href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2include_2fmt_2format_8h.html#adb6e274f8eb0b74b2865215e1b49c535">ptr</a></div><div class="ttdeci">auto ptr(T p) -&gt; const void *</div><div class="ttdef"><b>Definition:</b> format.h:3808</div></div>
 </div><!-- fragment -->
 </div>
 </div>

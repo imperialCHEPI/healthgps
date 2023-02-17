@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Each parser of the library (JSON, BJData, BSON, CBOR, MessagePack, and UBJSON) can be fuzz tested. Currently, <a href="https://llvm.org/docs/LibFuzzer.html">libFuzzer</a> and <a href="https://github.com/AFLplusplus/AFLplusplus">afl++</a> are supported.</p>
-<h1><a class="anchor" id="autotoc_md2599"></a>
+<h1><a class="anchor" id="autotoc_md2375"></a>
 Corpus creation</h1>
 <p>For most effective fuzzing, a <a href="https://llvm.org/docs/LibFuzzer.html#corpus">corpus</a> should be provided. A corpus is a directory with some simple input files that cover several features of the parser and is hence a good starting point for mutations.</p>
 <div class="fragment"><div class="line">TEST_DATA_VERSION=3.1.0</div>
@@ -105,7 +105,7 @@ Corpus creation</h1>
 <div class="line">done</div>
 <div class="line">rm -fr json_test_data-$TEST_DATA_VERSION</div>
 </div><!-- fragment --><p>The generated corpus can be used with both libFuzzer and afl++. The remainder of this documentation assumes the corpus directories have been created in the <code>tests</code> directory.</p>
-<h1><a class="anchor" id="autotoc_md2600"></a>
+<h1><a class="anchor" id="autotoc_md2376"></a>
 libFuzzer</h1>
 <p>To use libFuzzer, you need to pass <code>-fsanitize=fuzzer</code> as <code>FUZZER_ENGINE</code>. In the <code>tests</code> directory, call</p>
 <div class="fragment"><div class="line">make fuzzers FUZZER_ENGINE=&quot;-fsanitize=fuzzer&quot;</div>
@@ -115,14 +115,14 @@ libFuzzer</h1>
 </div><!-- fragment --><p>Then pass the corpus directory as command-line argument (assuming it is located in <code>tests</code>):</p>
 <div class="fragment"><div class="line">./parse_cbor_fuzzer corpus_cbor</div>
 </div><!-- fragment --><p>The fuzzer should be able to run indefinitely without crashing. In case of a crash, the tested input is dumped into a file starting with <code>crash-</code>.</p>
-<h1><a class="anchor" id="autotoc_md2601"></a>
+<h1><a class="anchor" id="autotoc_md2377"></a>
 afl++</h1>
 <p>To use afl++, you need to pass <code>-fsanitize=fuzzer</code> as <code>FUZZER_ENGINE</code>. It will be replaced by a <code>libAFLDriver.a</code> to re-use the same code written for libFuzzer with afl++. Furthermore, set <code>afl-clang-fast++</code> as compiler.</p>
 <div class="fragment"><div class="line">CXX=afl-clang-fast++ make fuzzers FUZZER_ENGINE=&quot;-fsanitize=fuzzer&quot; </div>
 </div><!-- fragment --><p>Then the fuzzer is called like this in the <code>tests</code> directory:</p>
 <div class="fragment"><div class="line">afl-fuzz -i corpus_cbor -o out  -- ./parse_cbor_fuzzer </div>
 </div><!-- fragment --><p>The fuzzer should be able to run indefinitely without crashing. In case of a crash, the tested input is written to the directory <code>out</code>.</p>
-<h1><a class="anchor" id="autotoc_md2602"></a>
+<h1><a class="anchor" id="autotoc_md2378"></a>
 OSS-Fuzz</h1>
 <p>The library is further fuzz-tested 24/7 by Google's <a href="https://github.com/google/oss-fuzz">OSS-Fuzz project</a>. It uses the same <code>fuzzers</code> target as above and also relies on the <code>FUZZER_ENGINE</code> variable. See the used <a href="https://github.com/google/oss-fuzz/blob/master/projects/json/build.sh">build script</a> for more information.</p>
 <p>In case the build at OSS-Fuzz fails, an issue will be created automatically. </p>

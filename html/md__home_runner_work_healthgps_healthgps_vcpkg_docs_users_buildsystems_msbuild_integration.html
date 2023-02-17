@@ -90,7 +90,7 @@ $(document).ready(function(){initNavTree('md__home_runner_work_healthgps_healthg
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><b>The latest version of this documentation is available on <a href="https://github.com/Microsoft/vcpkg/tree/master/docs/users/buildsystems/msbuild-integration.md">GitHub</a>.</b></p>
-<h1><a class="anchor" id="autotoc_md3944"></a>
+<h1><a class="anchor" id="autotoc_md3720"></a>
 Table of Contents</h1>
 <ul>
 <li><a href="#integration-methods">Integration Methods</a><ul>
@@ -102,13 +102,13 @@ Table of Contents</h1>
 <li><a href="#common-configuration">Common Configuration</a></li>
 <li><a href="#manifest-mode-configuration">Manifest Mode Configuration</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md3945"></a>
+<h1><a class="anchor" id="autotoc_md3721"></a>
 Integration Methods</h1>
-<h2><a class="anchor" id="autotoc_md3946"></a>
+<h2><a class="anchor" id="autotoc_md3722"></a>
 User-wide integration</h2>
 <div class="fragment"><div class="line">vcpkg integrate install</div>
 </div><!-- fragment --><p> This will implicitly add Include Directories, Link Directories, and Link Libraries for all packages installed with Vcpkg to all VS2015, VS2017 and VS2019 MSBuild projects. We also add a post-build action for executable projects that will analyze and copy any DLLs you need to the output folder, enabling a seamless F5 experience.</p>
-<p>For the vast majority of libraries, this is all you need to do &ndash; just File -&gt; New Project and write code! However, some libraries perform conflicting behaviors such as redefining <code><a class="el" href="out_2build_2linux-debug_2vcpkg__installed_2x64-linux_2src_2gtest__main_8cc.html#a7f83bdc516d2cb86e20235d94ddf055a">main()</a></code>. Since you need to choose per-project which of these conflicting options you want, you will need to add those libraries to your linker inputs manually.</p>
+<p>For the vast majority of libraries, this is all you need to do &ndash; just File -&gt; New Project and write code! However, some libraries perform conflicting behaviors such as redefining <code><a class="el" href="program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main()</a></code>. Since you need to choose per-project which of these conflicting options you want, you will need to add those libraries to your linker inputs manually.</p>
 <p>Here are some examples, though this is not an exhaustive list:</p>
 <ul>
 <li>Gtest provides <code>gtest</code>, <code>gmock</code>, <code>gtest_main</code>, and <code>gmock_main</code></li>
@@ -117,7 +117,7 @@ User-wide integration</h2>
 <li>Boost.Test provides <code>boost_test_exec_monitor</code></li>
 </ul>
 <p>To get a full list for all your installed packages, run <code>vcpkg owns manual-link</code>.</p>
-<h2><a class="anchor" id="autotoc_md3947"></a>
+<h2><a class="anchor" id="autotoc_md3723"></a>
 Import &lt;tt&gt;.props&lt;/tt&gt; and &lt;tt&gt;.targets&lt;/tt&gt;</h2>
 <p>vcpkg can also be integrated into MSBuild projects by explicitly importing the <code>scripts/buildsystems/vcpkg.props</code> and <code>scripts/buildsystems/vcpkg.targets</code> files into each <code>.vcxproj</code>. By using relative paths, this enables vcpkg to be consumed by a submodule and automatically acquired by users when they run <code>git clone</code>.</p>
 <p>The easiest way to add these to every project in your solution is to create <code>Directory.Build.props</code> and <code>Directory.Build.targets</code> files at the root of your repository.</p>
@@ -129,7 +129,7 @@ Import &lt;tt&gt;.props&lt;/tt&gt; and &lt;tt&gt;.targets&lt;/tt&gt;</h2>
 <div class="line"> &lt;<span class="keywordtype">Import</span> <span class="keyword">Project</span>=<span class="stringliteral">&quot;$(MSBuildThisFileDirectory)vcpkg\scripts\buildsystems\msbuild\vcpkg.targets&quot;</span> /&gt;</div>
 <div class="line">&lt;/<span class="keywordtype">Project</span>&gt;</div>
 </div><!-- fragment --><p>More information about <code>Directory.Build.targets</code> and <code>Directory.Build.props</code> can be found in the <a href="https://docs.microsoft.com/visualstudio/msbuild/customize-your-build#directorybuildprops-and-directorybuildtargets">Customize your build</a> section of the official MSBuild documentation.</p>
-<h2><a class="anchor" id="autotoc_md3948"></a>
+<h2><a class="anchor" id="autotoc_md3724"></a>
 Linked NuGet Package</h2>
 <p>**Note: This approach is not recommended for new projects, since it makes them difficult to share with others. For a portable, self-contained NuGet package, see the <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_buildsystems_export_command.html">`export command`</a>**</p>
 <p>VS projects can also be integrated through a NuGet package. This will modify the project file, so we do not recommend this approach for open source projects.</p>
@@ -139,19 +139,19 @@ Linked NuGet Package</h2>
 <div class="line">With a project open, go to Tools-&gt;NuGet Package Manager-&gt;Package Manager Console and paste:</div>
 <div class="line">    Install-Package vcpkg.D.src.vcpkg -Source &quot;D:/src/vcpkg/scripts/buildsystems&quot;</div>
 </div><!-- fragment --><p><em>Note: The generated NuGet package does not contain the actual libraries. It instead acts like a shortcut (or symlink) to the vcpkg install and will "automatically" update with any changes (install/remove) to the libraries. You do not need to regenerate or update the NuGet package.</em></p>
-<h1><a class="anchor" id="autotoc_md3949"></a>
+<h1><a class="anchor" id="autotoc_md3725"></a>
 Common Configuration</h1>
-<h2><a class="anchor" id="autotoc_md3950"></a>
+<h2><a class="anchor" id="autotoc_md3726"></a>
 &lt;tt&gt;VcpkgEnabled&lt;/tt&gt; (Use Vcpkg)</h2>
 <p>This can be set to "false" to explicitly disable vcpkg integration for the project</p>
-<h2><a class="anchor" id="autotoc_md3951"></a>
+<h2><a class="anchor" id="autotoc_md3727"></a>
 &lt;tt&gt;VcpkgConfiguration&lt;/tt&gt; (Vcpkg Configuration)</h2>
 <p>If your configuration names are too complex for vcpkg to guess correctly, you can assign this property to <code>Release</code> or <code>Debug</code> to explicitly tell vcpkg what variant of libraries you want to consume.</p>
-<h2><a class="anchor" id="autotoc_md3952"></a>
+<h2><a class="anchor" id="autotoc_md3728"></a>
 &lt;tt&gt;VcpkgEnableManifest&lt;/tt&gt; (Use Vcpkg Manifest)</h2>
 <p>This property must be set to <code>true</code> in order to consume from a local <code>vcpkg.json</code> file. If set to <code>false</code>, any local <code>vcpkg.json</code> files will be ignored.</p>
 <p>This currently defaults to <code>false</code>, but will default to <code>true</code> in the future.</p>
-<h2><a class="anchor" id="autotoc_md3953"></a>
+<h2><a class="anchor" id="autotoc_md3729"></a>
 &lt;tt&gt;VcpkgTriplet&lt;/tt&gt; (Triplet)</h2>
 <p>This property controls the triplet to consume libraries from, such as <code>x64-windows-static</code> or <code>arm64-windows</code>.</p>
 <p>If this is not explicitly set, vcpkg will deduce the correct triplet based on your Visual Studio settings. vcpkg will only deduce triplets that use dynamic library linkage and dynamic CRT linkage; if you want static dependencies or to use the static CRT (<code>/MT</code>), you will need to set the triplet manually.</p>
@@ -161,16 +161,16 @@ Common Configuration</h1>
 <p>Tools -&gt; Options -&gt; Projects and Solutions -&gt; Build and Run -&gt; MSBuild project build output verbosity </p>
 </blockquote>
 <p>See also <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html">Triplets</a></p>
-<h2><a class="anchor" id="autotoc_md3954"></a>
+<h2><a class="anchor" id="autotoc_md3730"></a>
 &lt;tt&gt;VcpkgHostTriplet&lt;/tt&gt; (Host Triplet)</h2>
 <p>This can be set to a custom triplet to use for resolving host dependencies.</p>
 <p>If unset, this will default to the "native" triplet (x64-windows).</p>
 <p>See also <a class="el" href="md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_host_dependencies.html">Host Dependencies</a>.</p>
-<h2><a class="anchor" id="autotoc_md3955"></a>
+<h2><a class="anchor" id="autotoc_md3731"></a>
 &lt;tt&gt;VcpkgInstalledDir&lt;/tt&gt; (Installed Directory)</h2>
 <p>This property defines the location vcpkg will install and consume libraries from.</p>
 <p>In manifest mode, this defaults to <code>\vcpkg_installed\\</code>. In classic mode, this defaults to <code>\installed\</code>.</p>
-<h1><a class="anchor" id="autotoc_md3956"></a>
+<h1><a class="anchor" id="autotoc_md3732"></a>
 Manifest Mode Configuration</h1>
 <p>To use manifests (<code>vcpkg.json</code>) with MSBuild, first you need to use one of the integration methods above. Then, add a vcpkg.json above your project file (such as in the root of your source repository) and set the property <code>VcpkgEnableManifest</code> to <code>true</code>. You can set this property via the IDE in <code>Project Properties -&gt; Vcpkg -&gt; Use Vcpkg Manifest</code> (note: you may need to reload the IDE to see the vcpkg Property Page).</p>
 <p>vcpkg will automatically run during your project's build and install any listed dependencies to <code>vcpkg_installed//</code> adjacent to the <code>vcpkg.json</code> file; these libraries will then automatically be included in and linked to your MSBuild projects.</p>
@@ -179,10 +179,10 @@ Manifest Mode Configuration</h1>
 <li>Visual Studio 2015 does not correctly track edits to the <code>vcpkg.json</code> and <code>vcpkg-configuration.json</code> files, and will not respond to changes unless a <code>.cpp</code> is edited.</li>
 </ul>
 <p><a class="anchor" id="vcpkg-additional-install-options"></a></p>
-<h2><a class="anchor" id="autotoc_md3957"></a>
+<h2><a class="anchor" id="autotoc_md3733"></a>
 &lt;tt&gt;VcpkgAdditionalInstallOptions&lt;/tt&gt; (Additional Options)</h2>
 <p>When using a manifest, this option specifies additional command line flags to pass to the underlying vcpkg tool invocation. This can be used to access features that have not yet been exposed through another option.</p>
-<h2><a class="anchor" id="autotoc_md3958"></a>
+<h2><a class="anchor" id="autotoc_md3734"></a>
 &lt;tt&gt;VcpkgManifestInstall&lt;/tt&gt; (Install Vcpkg Dependencies)</h2>
 <p>This property can be set to <code>false</code> to disable automatic dependency restoration during project build. Dependencies must be manually restored via the vcpkg command line separately. </p>
 </div></div><!-- contents -->
