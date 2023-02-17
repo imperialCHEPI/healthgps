@@ -81,7 +81,7 @@ jobs:
     - name: Build release HealthGPS
       id: cmake_build_release
       run: |
-        ls -l /out/build/${{env.RELEASE_PRESET}}
+        ls -l ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}
         cmake --build --preset=${{env.RELEASE_BUILD_PRESET}}
 
     - name: Install release HealthGPS
