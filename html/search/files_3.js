@@ -14,7 +14,7 @@ var searchData=
   ['demographic_2ecpp_1172',['demographic.cpp',['../demographic_8cpp.html',1,'']]],
   ['demographic_2eh_1173',['demographic.h',['../demographic_8h.html',1,'']]],
   ['disease_2ecpp_1174',['disease.cpp',['../disease_8cpp.html',1,'']]],
-  ['disease_2eh_1175',['disease.h',['../_health_g_p_s_2disease_8h.html',1,'(Global Namespace)'],['../_health_g_p_s_8_core_2disease_8h.html',1,'(Global Namespace)']]],
+  ['disease_2eh_1175',['disease.h',['../HealthGPS_2disease_8h.html',1,'(Global Namespace)'],['../HealthGPS_8Core_2disease_8h.html',1,'(Global Namespace)']]],
   ['disease_5fdefinition_2eh_1176',['disease_definition.h',['../disease__definition_8h.html',1,'']]],
   ['disease_5fregistry_2eh_1177',['disease_registry.h',['../disease__registry_8h.html',1,'']]],
   ['disease_5ftable_2ecpp_1178',['disease_table.cpp',['../disease__table_8cpp.html',1,'']]],

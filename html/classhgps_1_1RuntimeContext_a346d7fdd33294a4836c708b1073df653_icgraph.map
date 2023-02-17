@@ -1,0 +1,18 @@
+<map id="hgps::RuntimeContext::population" name="hgps::RuntimeContext::population">
+<area shape="rect" id="node1" title=" " alt="" coords="553,432,720,473"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e" title=" " alt="" coords="286,5,489,47"/>
+<area shape="rect" id="node4" href="$classhgps_1_1StaticHierarchicalLinearModel.html#aed69f3d22a37908a2e350b73f4b3dfd0" title="Generates the initial risk factors for a population and newborns." alt="" coords="299,71,475,127"/>
+<area shape="rect" id="node5" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title=" " alt="" coords="308,151,467,178"/>
+<area shape="rect" id="node6" href="$classhgps_1_1DefaultCancerModel.html#aec3e6ee1bc0d3dc97761638df893b82b" title="Initialises the average relative risks once all diseases status were initialised." alt="" coords="270,203,505,244"/>
+<area shape="rect" id="node7" href="$classhgps_1_1DefaultDiseaseModel.html#a31040870542eb041053bb70d14e4afc4" title="Initialises the average relative risks once all diseases status were initialised." alt="" coords="270,268,505,309"/>
+<area shape="rect" id="node8" href="$classhgps_1_1DefaultCancerModel.html#a59790779c6af498fed3df81b168cd504" title="Initialises the population disease status." alt="" coords="290,333,485,375"/>
+<area shape="rect" id="node9" href="$classhgps_1_1DefaultDiseaseModel.html#a2b8381459ae01f7ebf9b6023f1ad38db" title="Initialises the population disease status." alt="" coords="287,399,488,440"/>
+<area shape="rect" id="node10" href="$classhgps_1_1AnalysisModule.html#ad8a0a99804d6d01a1ed39c3e4f080999" title="Initialises the virtual population." alt="" coords="305,464,469,505"/>
+<area shape="rect" id="node11" href="$classhgps_1_1PopulationModule.html#a2fa854bc1b6185fa06418677bf0c2ab8" title="Initialises the virtual population." alt="" coords="298,529,477,571"/>
+<area shape="rect" id="node12" href="$classhgps_1_1SESNoiseModule.html#ae0a5e4a940571744b83d420bcb5f99b1" title="Initialises the virtual population." alt="" coords="302,595,473,636"/>
+<area shape="rect" id="node13" href="$classhgps_1_1SESNoiseModule.html#ad24d0002d518f941159a9873fe918c44" title="Updates the virtual population status." alt="" coords="302,660,473,701"/>
+<area shape="rect" id="node14" href="$classhgps_1_1PopulationModule.html#aee3e42276edae4477f41ca360b090323" title="Updates the virtual population status." alt="" coords="298,725,477,767"/>
+<area shape="rect" id="node15" href="$classhgps_1_1EnergyBalanceHierarchicalModel.html#a3b51c4a34acc3382b17d6c251884e619" title="Update risk factors for population." alt="" coords="269,791,505,832"/>
+<area shape="rect" id="node16" href="$classhgps_1_1StaticHierarchicalLinearModel.html#a2501846cb781316081a03317bfabfeca" title="Update risk factors for population." alt="" coords="294,857,481,913"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RiskFactorModule.html#a84146832e73a95c800de619eafceeabc" title="Apply baseline risk factor adjustments to population." alt="" coords="5,5,221,47"/>
+</map>

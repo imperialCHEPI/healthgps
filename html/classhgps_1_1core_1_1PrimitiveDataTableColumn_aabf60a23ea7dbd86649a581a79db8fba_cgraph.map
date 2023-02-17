@@ -1,0 +1,4 @@
+<map id="hgps::core::PrimitiveDataTableColumn::is_valid" name="hgps::core::PrimitiveDataTableColumn::is_valid">
+<area shape="rect" id="node1" title="Checks if value at column index is null, does not bounds check." alt="" coords="5,5,192,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a863f3c5ebb15684806b79c851892c9fe" title=" " alt="" coords="240,5,427,47"/>
+</map>

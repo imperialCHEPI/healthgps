@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['output_1887',['output',['../struct_configuration.html#a25b9a8355aad5d5e8e79e2ee3a316f59',1,'Configuration']]]
+  ['output_1887',['output',['../structConfiguration.html#a25b9a8355aad5d5e8e79e2ee3a316f59',1,'Configuration']]]
 ];

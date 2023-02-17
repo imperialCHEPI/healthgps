@@ -1,0 +1,5 @@
+<map id="hgps::AnalysisModule" name="hgps::AnalysisModule">
+<area shape="rect" id="node1" title=" " alt="" coords="13,155,177,181"/>
+<area shape="rect" id="node2" href="$classhgps_1_1UpdatableModule.html" title="Generic disease module interface to host multiple diseases model." alt="" coords="7,80,183,107"/>
+<area shape="rect" id="node3" href="$classhgps_1_1SimulationModule.html" title="Simulation modules interface." alt="" coords="5,5,184,32"/>
+</map>

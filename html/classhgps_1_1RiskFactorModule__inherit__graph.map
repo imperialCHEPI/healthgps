@@ -1,0 +1,6 @@
+<map id="hgps::RiskFactorModule" name="hgps::RiskFactorModule">
+<area shape="rect" id="node1" title=" " alt="" coords="21,229,197,256"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RiskFactorHostModule.html" title="Generic risk factors module interface to host hierarchical models." alt="" coords="5,155,212,181"/>
+<area shape="rect" id="node3" href="$classhgps_1_1UpdatableModule.html" title="Generic disease module interface to host multiple diseases model." alt="" coords="21,80,197,107"/>
+<area shape="rect" id="node4" href="$classhgps_1_1SimulationModule.html" title="Simulation modules interface." alt="" coords="19,5,198,32"/>
+</map>
