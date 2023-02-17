@@ -80,7 +80,7 @@ jobs:
     - name: Check installed artefacts
       id: cmake_install_check
       working-directory: ${{github.workspace}}/out/install/${{env.RELEASE_PRESET}}/bin/
-      run: ls -l
+      run: ls
 
     - name: Zip output folder
       id: zip_folder
