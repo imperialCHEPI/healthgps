@@ -122,4 +122,5 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/html
         destination_dir: html
+        enable_jekyll: true
         commit_message: ${{ github.event.head_commit.message }}
