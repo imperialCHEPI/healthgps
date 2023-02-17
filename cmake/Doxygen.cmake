@@ -95,7 +95,7 @@ function(enable_doxygen DOXYGEN_THEME)
   # add doxygen-docs target
   if (DOXYGEN_FOUND)
       message(STATUS "Adding `doxygen-docs` target that builds the documentation. Source: ${PROJECT_SOURCE_DIR}")
-      doxygen_add_docs(doxygen-docs ALL ${PROJECT_SOURCE_DIR} INPUT ${PROJECT_SOURCE_DIR}/scr README.md
+      doxygen_add_docs(doxygen-docs ALL ${PROJECT_SOURCE_DIR}/scr
                        COMMENT "Generating documentation - entry file: ${CMAKE_CURRENT_BINARY_DIR}/html/index.html")
   else()
       message(STATUS "Doxygen need to be installed to generate documentation.")
