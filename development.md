@@ -1,6 +1,6 @@
 ## Global Health Policy Simulation model
 
-| [Home](index) | [Quick Start](getstarted) | [User Guide](userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | Developer Guide |
+| [Home](index) | [Quick Start](getstarted) | [User Guide](userguide) | [Software Architecture](architecture) | [Data Model](datamodel) | Developer Guide | [API](/html/index.html) |
 
 # Developer Guide
 
