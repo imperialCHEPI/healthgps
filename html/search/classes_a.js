@@ -1,15 +1,19 @@
 var searchData=
 [
-  ['join_5fview_11991',['join_view',['../structjoin__view.html',1,'']]],
-  ['json_5fpointer_11992',['json_pointer',['../classjson__pointer.html',1,'json_pointer&lt; RefStringType &gt;'],['../classnlohmann_1_1json__pointer.html',1,'nlohmann::json_pointer&lt; BasicJsonType &gt;']]],
-  ['json_5fref_11993',['json_ref',['../classdetail_1_1json__ref.html',1,'detail::json_ref&lt; BasicJsonType &gt;'],['../classnlohmann_1_1detail_1_1json__ref.html',1,'nlohmann::detail::json_ref&lt; BasicJsonType &gt;']]],
-  ['json_5freverse_5fiterator_11994',['json_reverse_iterator',['../classdetail_1_1json__reverse__iterator.html',1,'detail::json_reverse_iterator&lt; Base &gt;'],['../classnlohmann_1_1detail_1_1json__reverse__iterator.html',1,'nlohmann::detail::json_reverse_iterator&lt; Base &gt;']]],
-  ['json_5fsax_11995',['json_sax',['../structjson__sax.html',1,'json_sax&lt; BasicJsonType &gt;'],['../structnlohmann_1_1json__sax.html',1,'nlohmann::json_sax&lt; BasicJsonType &gt;']]],
-  ['json_5fsax_5facceptor_11996',['json_sax_acceptor',['../classdetail_1_1json__sax__acceptor.html',1,'detail::json_sax_acceptor&lt; BasicJsonType &gt;'],['../classnlohmann_1_1detail_1_1json__sax__acceptor.html',1,'nlohmann::detail::json_sax_acceptor&lt; BasicJsonType &gt;']]],
-  ['json_5fsax_5fdom_5fcallback_5fparser_11997',['json_sax_dom_callback_parser',['../classdetail_1_1json__sax__dom__callback__parser.html',1,'detail::json_sax_dom_callback_parser&lt; BasicJsonType &gt;'],['../classnlohmann_1_1detail_1_1json__sax__dom__callback__parser.html',1,'nlohmann::detail::json_sax_dom_callback_parser&lt; BasicJsonType &gt;']]],
-  ['json_5fsax_5fdom_5fparser_11998',['json_sax_dom_parser',['../classdetail_1_1json__sax__dom__parser.html',1,'detail::json_sax_dom_parser&lt; BasicJsonType &gt;'],['../classnlohmann_1_1detail_1_1json__sax__dom__parser.html',1,'nlohmann::detail::json_sax_dom_parser&lt; BasicJsonType &gt;']]],
-  ['json_5fsax_5fdom_5fparser_3c_20json_20_3e_11999',['json_sax_dom_parser&lt; json &gt;',['../classnlohmann_1_1detail_1_1json__sax__dom__parser.html',1,'nlohmann::detail']]],
-  ['jsonreporter_12000',['JSONReporter',['../classbenchmark_1_1JSONReporter.html',1,'benchmark']]],
-  ['jsonunittestresultprinter_12001',['JsonUnitTestResultPrinter',['../classtesting_1_1internal_1_1JsonUnitTestResultPrinter.html',1,'testing::internal']]],
-  ['jsonvalueprinter_12002',['JsonValuePrinter',['../classnlohmann-json_1_1JsonValuePrinter.html',1,'nlohmann-json']]]
+  ['map2d_1049',['Map2d',['../classhgps_1_1Map2d.html',1,'hgps']]],
+  ['map2d_3c_20core_3a_3agender_2c_20core_3a_3aidentifier_2c_20std_3a_3avector_3c_20double_20_3e_20_3e_1050',['Map2d&lt; core::Gender, core::Identifier, std::vector&lt; double &gt; &gt;',['../classhgps_1_1Map2d.html',1,'hgps']]],
+  ['mappingentry_1051',['MappingEntry',['../classhgps_1_1MappingEntry.html',1,'hgps']]],
+  ['marketingdynamicdefinition_1052',['MarketingDynamicDefinition',['../structhgps_1_1MarketingDynamicDefinition.html',1,'hgps']]],
+  ['marketingdynamicscenario_1053',['MarketingDynamicScenario',['../classhgps_1_1MarketingDynamicScenario.html',1,'hgps']]],
+  ['marketingpolicydefinition_1054',['MarketingPolicyDefinition',['../structhgps_1_1MarketingPolicyDefinition.html',1,'hgps']]],
+  ['marketingpolicyscenario_1055',['MarketingPolicyScenario',['../classhgps_1_1MarketingPolicyScenario.html',1,'hgps']]],
+  ['mathhelper_1056',['MathHelper',['../classhgps_1_1core_1_1MathHelper.html',1,'hgps::core']]],
+  ['measurekey_1057',['MeasureKey',['../structhgps_1_1MeasureKey.html',1,'hgps']]],
+  ['modelinput_1058',['ModelInput',['../classhgps_1_1ModelInput.html',1,'hgps']]],
+  ['modellinginfo_1059',['ModellingInfo',['../structModellingInfo.html',1,'']]],
+  ['modelresult_1060',['ModelResult',['../structhgps_1_1ModelResult.html',1,'hgps']]],
+  ['modelrunner_1061',['ModelRunner',['../classhgps_1_1ModelRunner.html',1,'hgps']]],
+  ['monotonicvector_1062',['MonotonicVector',['../classhgps_1_1MonotonicVector.html',1,'hgps']]],
+  ['mortalityitem_1063',['MortalityItem',['../structhgps_1_1core_1_1MortalityItem.html',1,'hgps::core']]],
+  ['mtrandom32_1064',['MTRandom32',['../classhgps_1_1MTRandom32.html',1,'hgps']]]
 ];

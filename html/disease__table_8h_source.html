@@ -127,7 +127,7 @@ $(document).ready(function(){initNavTree('disease__table_8h_source.html',''); in
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classhgps_1_1DiseaseTable.html#ad602cea8a90294fe8b2052e643957a0d">   37</a></span>&#160;        <a class="code" href="classhgps_1_1DiseaseTable.html#ad602cea8a90294fe8b2052e643957a0d">DiseaseTable</a>() = <span class="keyword">delete</span>;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <a class="code" href="classhgps_1_1DiseaseTable.html">DiseaseTable</a>(<span class="keyword">const</span> <a class="code" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a>&amp; info, std::map&lt;std::string, int&gt;&amp;&amp; measures,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            std::map&lt;<span class="keywordtype">int</span>, std::map&lt;core::Gender, DiseaseMeasure&gt;&gt;&amp;&amp; <a class="code" href="structdata.html">data</a>);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            std::map&lt;<span class="keywordtype">int</span>, std::map&lt;core::Gender, DiseaseMeasure&gt;&gt;&amp;&amp; data);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keyword">const</span> <a class="code" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a>&amp; <a class="code" href="namespacehgps.html#a21cace154e33201910d1474162851f5dacaf9b6b99962bf5c2264824231d7a40c">info</a>() const noexcept;</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
@@ -137,7 +137,7 @@ $(document).ready(function(){initNavTree('disease__table_8h_source.html',''); in
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <a class="code" href="namespacestd.html">std</a>::<span class="keywordtype">size_t</span> cols() const noexcept;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="namespaceCatch.html#aa52974b0e426e7e2fbd725a900e9c36e">contains</a>(const <span class="keywordtype">int</span> age) const noexcept;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordtype">bool</span> contains(const <span class="keywordtype">int</span> age) const noexcept;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        const <a class="code" href="namespacestd.html">std</a>::map&lt;<a class="code" href="namespacestd.html">std</a>::<span class="keywordtype">string</span>, <span class="keywordtype">int</span>&gt;&amp; measures() const noexcept;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
@@ -162,13 +162,11 @@ $(document).ready(function(){initNavTree('disease__table_8h_source.html',''); in
 <div class="ttc" id="aclasshgps_1_1DiseaseTable_html"><div class="ttname"><a href="classhgps_1_1DiseaseTable.html">hgps::DiseaseTable</a></div><div class="ttdef"><b>Definition:</b> disease_table.h:35</div></div>
 <div class="ttc" id="aclasshgps_1_1DiseaseTable_html_ad602cea8a90294fe8b2052e643957a0d"><div class="ttname"><a href="classhgps_1_1DiseaseTable.html#ad602cea8a90294fe8b2052e643957a0d">hgps::DiseaseTable::DiseaseTable</a></div><div class="ttdeci">DiseaseTable()=delete</div></div>
 <div class="ttc" id="aforward__type_8h_html"><div class="ttname"><a href="forward__type_8h.html">forward_type.h</a></div></div>
-<div class="ttc" id="anamespaceCatch_html_aa52974b0e426e7e2fbd725a900e9c36e"><div class="ttname"><a href="namespaceCatch.html#aa52974b0e426e7e2fbd725a900e9c36e">Catch::contains</a></div><div class="ttdeci">bool contains(std::string const &amp;s, std::string const &amp;infix)</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81a"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">hgps::core::Gender</a></div><div class="ttdeci">Gender</div><div class="ttdoc">enumerates the gender</div><div class="ttdef"><b>Definition:</b> forward_type.h:20</div></div>
 <div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:9</div></div>
 <div class="ttc" id="anamespacehgps_html_a21cace154e33201910d1474162851f5dacaf9b6b99962bf5c2264824231d7a40c"><div class="ttname"><a href="namespacehgps.html#a21cace154e33201910d1474162851f5dacaf9b6b99962bf5c2264824231d7a40c">hgps::EventType::info</a></div><div class="ttdeci">@ info</div><div class="ttdoc">General notification and progress message.</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> column_iterator.h:82</div></div>
 <div class="ttc" id="apoco_8h_html"><div class="ttname"><a href="poco_8h.html">poco.h</a></div></div>
-<div class="ttc" id="astructdata_html"><div class="ttname"><a href="structdata.html">data</a></div><div class="ttdef"><b>Definition:</b> format.h:1544</div></div>
 <div class="ttc" id="astructhgps_1_1MeasureKey_html"><div class="ttname"><a href="structhgps_1_1MeasureKey.html">hgps::MeasureKey</a></div><div class="ttdef"><b>Definition:</b> disease_table.h:11</div></div>
 <div class="ttc" id="astructhgps_1_1MeasureKey_html_a0a3ebc17ed7f34c3827a4fd47509742e"><div class="ttname"><a href="structhgps_1_1MeasureKey.html#a0a3ebc17ed7f34c3827a4fd47509742e">hgps::MeasureKey::prevalence</a></div><div class="ttdeci">static const std::string prevalence</div><div class="ttdef"><b>Definition:</b> disease_table.h:12</div></div>
 <div class="ttc" id="astructhgps_1_1MeasureKey_html_a121c16fb6bc9b8dc4afc430f2389f14e"><div class="ttname"><a href="structhgps_1_1MeasureKey.html#a121c16fb6bc9b8dc4afc430f2389f14e">hgps::MeasureKey::mortality</a></div><div class="ttdeci">static const std::string mortality</div><div class="ttdef"><b>Definition:</b> disease_table.h:13</div></div>
@@ -180,7 +178,7 @@ $(document).ready(function(){initNavTree('disease__table_8h_source.html',''); in
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_6cad8a98650bc605ed7c83909fbc17c0.html">HealthGPS</a></li><li class="navelem"><a class="el" href="disease__table_8h.html">disease_table.h</a></li>
+    <li class="navelem"><a class="el" href="dir_dab824df37ba02169fac86e6f23b00e7.html">HealthGPS</a></li><li class="navelem"><a class="el" href="disease__table_8h.html">disease_table.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

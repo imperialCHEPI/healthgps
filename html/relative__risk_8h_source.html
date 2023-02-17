@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('relative__risk_8h_source.html',''); in
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;        <a class="code" href="classhgps_1_1RelativeRiskLookup.html#a186b3c3e601ea39e1be47085f5ef19fb">RelativeRiskLookup</a>(</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;            <span class="keyword">const</span> <a class="code" href="classhgps_1_1MonotonicVector.html">MonotonicVector&lt;int&gt;</a>&amp; <a class="code" href="classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083">rows</a>,</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;            <span class="keyword">const</span> <a class="code" href="classhgps_1_1MonotonicVector.html">MonotonicVector&lt;float&gt;</a>&amp; cols,</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;            <a class="code" href="classhgps_1_1core_1_1Array2D.html">core::FloatArray2D</a>&amp;&amp; <a class="code" href="namespaceCatch_1_1Generators.html#a7a2c5bebb3c06c5b0ca05a80289b9eb1">values</a>);</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;            <a class="code" href="classhgps_1_1core_1_1Array2D.html">core::FloatArray2D</a>&amp;&amp; values);</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        std::size_t <a class="code" href="classhgps_1_1RelativeRiskLookup.html#a133b99eadd726ce9d4e774e977f78581">size</a>() const noexcept;</div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
@@ -115,18 +115,18 @@ $(document).ready(function(){initNavTree('relative__risk_8h_source.html',''); in
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classhgps_1_1RelativeRiskLookup.html#a69c672321c0be177003491d479b15fdc">empty</a>() const noexcept;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">float</span> <a class="code" href="classhgps_1_1RelativeRiskLookup.html#a5618a0b0a7339e61317816455b1741f2">at</a>(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> <a class="code" href="classvalue.html">value</a>) const;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordtype">float</span> <a class="code" href="classhgps_1_1RelativeRiskLookup.html#a5618a0b0a7339e61317816455b1741f2">at</a>(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> value) const;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keywordtype">float</span> operator()(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> <a class="code" href="classvalue.html">value</a>) const;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        <span class="keywordtype">float</span> operator()(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> value) const;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classhgps_1_1RelativeRiskLookup.html#aaf9f02f69f1e3d03fd247f23ebfd4f37">contains</a>(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> <a class="code" href="classvalue.html">value</a>) const noexcept;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classhgps_1_1RelativeRiskLookup.html#aaf9f02f69f1e3d03fd247f23ebfd4f37">contains</a>(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> value) const noexcept;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    private:</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        core::<a class="code" href="namespacehgps_1_1core.html#a6fd40c5fdc889eff6cd129ab5ede0802">FloatArray2D</a> table_;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <a class="code" href="namespacestd.html">std</a>::map&lt;<span class="keywordtype">int</span>, <span class="keywordtype">int</span>&gt; rows_index_;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <a class="code" href="namespacestd.html">std</a>::map&lt;<span class="keywordtype">float</span>, <span class="keywordtype">int</span>&gt; cols_index_;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordtype">float</span> lookup_value(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> <a class="code" href="classvalue.html">value</a>) const noexcept;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordtype">float</span> lookup_value(const <span class="keywordtype">int</span> age, const <span class="keywordtype">float</span> value) const noexcept;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    };</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="namespacehgps.html#a74fffffff8fab9ac2040264fb309798e">   41</a></span>&#160;    using <a class="code" href="namespacehgps.html#a74fffffff8fab9ac2040264fb309798e">RelativeRiskTableMap</a> = <a class="code" href="namespacestd.html">std</a>::map&lt;core::Identifier, <a class="code" href="classhgps_1_1AgeGenderTable.html">FloatAgeGenderTable</a>&gt;;</div>
@@ -151,11 +151,9 @@ $(document).ready(function(){initNavTree('relative__risk_8h_source.html',''); in
 <div class="ttc" id="aclasshgps_1_1RelativeRiskLookup_html_aaf9f02f69f1e3d03fd247f23ebfd4f37"><div class="ttname"><a href="classhgps_1_1RelativeRiskLookup.html#aaf9f02f69f1e3d03fd247f23ebfd4f37">hgps::RelativeRiskLookup::contains</a></div><div class="ttdeci">bool contains(const int age, const float value) const noexcept</div><div class="ttdef"><b>Definition:</b> relative_risk.cpp:48</div></div>
 <div class="ttc" id="aclasshgps_1_1RelativeRiskLookup_html_af0a6ff699396be055d3b790e80d17127"><div class="ttname"><a href="classhgps_1_1RelativeRiskLookup.html#af0a6ff699396be055d3b790e80d17127">hgps::RelativeRiskLookup::columns</a></div><div class="ttdeci">std::size_t columns() const noexcept</div><div class="ttdef"><b>Definition:</b> relative_risk.cpp:32</div></div>
 <div class="ttc" id="aclasshgps_1_1core_1_1Array2D_html"><div class="ttname"><a href="classhgps_1_1core_1_1Array2D.html">hgps::core::Array2D</a></div><div class="ttdef"><b>Definition:</b> array2d.h:16</div></div>
-<div class="ttc" id="aclassvalue_html"><div class="ttname"><a href="classvalue.html">value</a></div><div class="ttdef"><b>Definition:</b> core.h:1240</div></div>
 <div class="ttc" id="agender__table_8h_html"><div class="ttname"><a href="gender__table_8h.html">gender_table.h</a></div></div>
 <div class="ttc" id="aidentifier_8h_html"><div class="ttname"><a href="identifier_8h.html">identifier.h</a></div></div>
 <div class="ttc" id="amonotonic__vector_8h_html"><div class="ttname"><a href="monotonic__vector_8h.html">monotonic_vector.h</a></div></div>
-<div class="ttc" id="anamespaceCatch_1_1Generators_html_a7a2c5bebb3c06c5b0ca05a80289b9eb1"><div class="ttname"><a href="namespaceCatch_1_1Generators.html#a7a2c5bebb3c06c5b0ca05a80289b9eb1">Catch::Generators::values</a></div><div class="ttdeci">CompositeGenerator&lt; T &gt; values(T val1, T val2)</div><div class="ttdef"><b>Definition:</b> catch.hpp:2466</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_a6fd40c5fdc889eff6cd129ab5ede0802"><div class="ttname"><a href="namespacehgps_1_1core.html#a6fd40c5fdc889eff6cd129ab5ede0802">hgps::core::FloatArray2D</a></div><div class="ttdeci">Array2D&lt; float &gt; FloatArray2D</div><div class="ttdef"><b>Definition:</b> array2d.h:101</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81a"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">hgps::core::Gender</a></div><div class="ttdeci">Gender</div><div class="ttdoc">enumerates the gender</div><div class="ttdef"><b>Definition:</b> forward_type.h:20</div></div>
 <div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:9</div></div>
@@ -170,7 +168,7 @@ $(document).ready(function(){initNavTree('relative__risk_8h_source.html',''); in
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_6cad8a98650bc605ed7c83909fbc17c0.html">HealthGPS</a></li><li class="navelem"><a class="el" href="relative__risk_8h.html">relative_risk.h</a></li>
+    <li class="navelem"><a class="el" href="dir_dab824df37ba02169fac86e6f23b00e7.html">HealthGPS</a></li><li class="navelem"><a class="el" href="relative__risk_8h.html">relative_risk.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

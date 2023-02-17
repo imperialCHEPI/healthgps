@@ -1,12 +1,4 @@
 var searchData=
 [
-  ['cards_20061',['cards',['../unit-conversions_8cpp.html#a9e9a02f7012b4b4430543ae1d5437d9f',1,'unit-conversions.cpp']]],
-  ['cbor_5ftag_5fhandler_5ft_20062',['cbor_tag_handler_t',['../namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592',1,'detail::cbor_tag_handler_t()'],['../namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592',1,'detail::cbor_tag_handler_t()'],['../namespacenlohmann_1_1detail.html#a58bb1ef1a9ad287a9cfaf1855784d9ac',1,'nlohmann::detail::cbor_tag_handler_t()'],['../namespacedetail.html#a7c070b2bf3d61e3d8b8013f6fb18d592',1,'detail::cbor_tag_handler_t()']]],
-  ['char8_5ftype_20063',['char8_type',['../namespacedetail.html#af2d1c9abcf61fc5c29bb85fdbd0c0153',1,'detail::char8_type()'],['../namespacedetail.html#af2d1c9abcf61fc5c29bb85fdbd0c0153',1,'detail::char8_type()']]],
-  ['charformat_20064',['CharFormat',['../namespacetesting_1_1internal.html#ae2ef98247c76a50cdc80ceb4a6c81793',1,'testing::internal::CharFormat()'],['../namespacetesting_1_1internal.html#ae2ef98247c76a50cdc80ceb4a6c81793',1,'testing::internal::CharFormat()'],['../namespacetesting_1_1internal.html#ae2ef98247c76a50cdc80ceb4a6c81793',1,'testing::internal::CharFormat()']]],
-  ['choice_20065',['Choice',['../structCatch_1_1CaseSensitive.html#aad49d3aee2d97066642fffa919685c6a',1,'Catch::CaseSensitive']]],
-  ['color_20066',['Color',['../namespaceindicators.html#a21cb670516a74f8f15aa29d22223349f',1,'indicators::Color()'],['../namespaceindicators.html#a21cb670516a74f8f15aa29d22223349f',1,'indicators::Color()'],['../namespacens.html#a47438d3e8996f24450a38e50fab3bd8e',1,'ns::Color()'],['../namespaceindicators.html#a21cb670516a74f8f15aa29d22223349f',1,'indicators::Color()']]],
-  ['color_20067',['color',['../buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203c',1,'color():&#160;color.h'],['../format-test_8cc.html#a37dbdc30935031c05304482e1be89d8f',1,'color():&#160;format-test.cc'],['../namespacetest__ns.html#ad2443acd15acba42c5cd97b5207abe01',1,'test_ns::color()'],['../packages_2fmt__x64-linux_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203c',1,'color():&#160;color.h']]],
-  ['constructed_5ffrom_5ft_20068',['constructed_from_t',['../structfor__3204__bar.html#a6fe5801dfe4e89505a871d4f4de8d635',1,'for_3204_bar']]],
-  ['country_20069',['country',['../namespaceudt.html#ad6b1c4693247dc2f73a545ffe859f3b3',1,'udt']]]
+  ['fiscalimpacttype_1988',['FiscalImpactType',['../namespacehgps.html#aad7b26c880aca74fa5d4dae4b4da3ebf',1,'hgps']]]
 ];

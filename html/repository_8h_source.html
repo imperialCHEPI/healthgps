@@ -126,7 +126,7 @@ $(document).ready(function(){initNavTree('repository_8h_source.html',''); initRe
 <div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classhgps_1_1Repository.html#a5a115c0ff9257b20dd7555132acb2619">   35</a></span>&#160;        virtual <a class="code" href="namespacestd.html">std</a>::optional&lt;core::DiseaseInfo&gt; <a class="code" href="classhgps_1_1Repository.html#a5a115c0ff9257b20dd7555132acb2619">get_disease_info</a>(<a class="code" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> code) = 0;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
 <div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classhgps_1_1Repository.html#a128ca9476585aa8ccae799158099a207">   37</a></span>&#160;        virtual <a class="code" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a>&amp; <a class="code" href="classhgps_1_1Repository.html#a128ca9476585aa8ccae799158099a207">get_disease_definition</a>(</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            const core::DiseaseInfo&amp; info, const <a class="code" href="classhgps_1_1ModelInput.html">ModelInput</a>&amp; <a class="code" href="namespaceserve__header.html#a1f993d141863d665b4356e7f0525de8b">config</a>) = 0;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            const core::DiseaseInfo&amp; info, const <a class="code" href="classhgps_1_1ModelInput.html">ModelInput</a>&amp; config) = 0;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
 <div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667">   40</a></span>&#160;        virtual <a class="code" href="classhgps_1_1LmsDefinition.html">LmsDefinition</a>&amp; <a class="code" href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667">get_lms_definition</a>() = 0;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    };</div>
@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('repository_8h_source.html',''); initRe
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <a class="code" href="namespacestd.html">std</a>::optional&lt;core::DiseaseInfo&gt; <a class="code" href="classhgps_1_1Repository.html#a5a115c0ff9257b20dd7555132acb2619">get_disease_info</a>(<a class="code" href="namespacestd.html">std</a>::<span class="keywordtype">string</span> code) override;</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <a class="code" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a>&amp; <a class="code" href="classhgps_1_1Repository.html#a128ca9476585aa8ccae799158099a207">get_disease_definition</a>(</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            const core::DiseaseInfo&amp; info, const <a class="code" href="classhgps_1_1ModelInput.html">ModelInput</a>&amp; <a class="code" href="namespaceserve__header.html#a1f993d141863d665b4356e7f0525de8b">config</a>) override;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            const core::DiseaseInfo&amp; info, const <a class="code" href="classhgps_1_1ModelInput.html">ModelInput</a>&amp; config) override;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <a class="code" href="classhgps_1_1LmsDefinition.html">LmsDefinition</a>&amp; <a class="code" href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667">get_lms_definition</a>() override;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
@@ -177,7 +177,7 @@ $(document).ready(function(){initNavTree('repository_8h_source.html',''); initRe
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <a class="code" href="namespacestd.html">std</a>::map&lt;core::Identifier, <a class="code" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a>&gt; diseases_;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <a class="code" href="classhgps_1_1LmsDefinition.html">LmsDefinition</a> lms_parameters_;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">void</span> load_disease_definition(const core::DiseaseInfo&amp; info, const <a class="code" href="classhgps_1_1ModelInput.html">ModelInput</a>&amp; <a class="code" href="namespaceserve__header.html#a1f993d141863d665b4356e7f0525de8b">config</a>);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">void</span> load_disease_definition(const core::DiseaseInfo&amp; info, const <a class="code" href="classhgps_1_1ModelInput.html">ModelInput</a>&amp; config);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    };</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;}</div>
 <div class="ttc" id="aclasshgps_1_1CachedRepository_html"><div class="ttname"><a href="classhgps_1_1CachedRepository.html">hgps::CachedRepository</a></div><div class="ttdef"><b>Definition:</b> repository.h:43</div></div>
@@ -210,7 +210,6 @@ $(document).ready(function(){initNavTree('repository_8h_source.html',''); initRe
 <div class="ttc" id="amodelinput_8h_html"><div class="ttname"><a href="modelinput_8h.html">modelinput.h</a></div></div>
 <div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:9</div></div>
 <div class="ttc" id="anamespacehgps_html_a16ed54c31953b6b860ee10d7d112eb60"><div class="ttname"><a href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">hgps::HierarchicalModelType</a></div><div class="ttdeci">HierarchicalModelType</div><div class="ttdoc">Health GPS risk factor module types enumeration.</div><div class="ttdef"><b>Definition:</b> interfaces.h:31</div></div>
-<div class="ttc" id="anamespaceserve__header_html_a1f993d141863d665b4356e7f0525de8b"><div class="ttname"><a href="namespaceserve__header.html#a1f993d141863d665b4356e7f0525de8b">serve_header.config</a></div><div class="ttdeci">dictionary config</div><div class="ttdef"><b>Definition:</b> serve_header.py:368</div></div>
 <div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> column_iterator.h:82</div></div>
 <div class="ttc" id="ariskfactor__adjustment__types_8h_html"><div class="ttname"><a href="riskfactor__adjustment__types_8h.html">riskfactor_adjustment_types.h</a></div></div>
 <div class="ttc" id="astructhgps_1_1BaselineAdjustment_html"><div class="ttname"><a href="structhgps_1_1BaselineAdjustment.html">hgps::BaselineAdjustment</a></div><div class="ttdef"><b>Definition:</b> riskfactor_adjustment_types.h:12</div></div>
@@ -219,7 +218,7 @@ $(document).ready(function(){initNavTree('repository_8h_source.html',''); initRe
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_6cad8a98650bc605ed7c83909fbc17c0.html">HealthGPS</a></li><li class="navelem"><a class="el" href="repository_8h.html">repository.h</a></li>
+    <li class="navelem"><a class="el" href="dir_dab824df37ba02169fac86e6f23b00e7.html">HealthGPS</a></li><li class="navelem"><a class="el" href="repository_8h.html">repository.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

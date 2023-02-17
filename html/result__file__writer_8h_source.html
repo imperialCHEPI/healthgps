@@ -108,7 +108,7 @@ $(document).ready(function(){initNavTree('result__file__writer_8h_source.html','
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    <a class="code" href="classResultFileWriter.html">ResultFileWriter</a>&amp; <a class="code" href="classResultFileWriter.html#a75df9edca2ba0577a11a77901bea92ea">operator=</a>(<a class="code" href="classResultFileWriter.html">ResultFileWriter</a>&amp;&amp; other) noexcept;</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <a class="code" href="classResultFileWriter.html#adbae513814e6c709f5c7ffb6ffee1612">~ResultFileWriter</a>();</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classResultFileWriter.html#a89cee933daf4010c4f015c5a4c4d156d">write</a>(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; <a class="code" href="namespacegoogletest-output-test.html#ac8183a857acd7838ccb984117377852e">message</a>) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classResultFileWriter.html#a89cee933daf4010c4f015c5a4c4d156d">write</a>(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; message) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    std::ofstream stream_;</div>
@@ -117,12 +117,12 @@ $(document).ready(function(){initNavTree('result__file__writer_8h_source.html','
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    std::atomic&lt;bool&gt; first_row_{ <span class="keyword">true</span> };</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <a class="code" href="structExperimentInfo.html">ExperimentInfo</a> info_;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> write_json_begin(<span class="keyword">const</span> std::filesystem::path <a class="code" href="ordered__map_8cpp.html#ab916cefa993ae4a2ef8d43dc1a428fe9">output</a>);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">void</span> write_json_begin(<span class="keyword">const</span> std::filesystem::path output);</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keywordtype">void</span> write_json_end();</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    std::string to_json_string(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; <a class="code" href="namespacegoogletest-output-test.html#ac8183a857acd7838ccb984117377852e">message</a>) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> write_csv_channels(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; <a class="code" href="namespacegoogletest-output-test.html#ac8183a857acd7838ccb984117377852e">message</a>);</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">void</span> write_csv_header(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; <a class="code" href="namespacegoogletest-output-test.html#ac8183a857acd7838ccb984117377852e">message</a>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    std::string to_json_string(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; message) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> write_csv_channels(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; message);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordtype">void</span> write_csv_header(<span class="keyword">const</span> <a class="code" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a>&amp; message);</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
 <div class="ttc" id="aclassResultFileWriter_html"><div class="ttname"><a href="classResultFileWriter.html">ResultFileWriter</a></div><div class="ttdef"><b>Definition:</b> result_file_writer.h:10</div></div>
@@ -133,8 +133,6 @@ $(document).ready(function(){initNavTree('result__file__writer_8h_source.html','
 <div class="ttc" id="aclassResultFileWriter_html_adbae513814e6c709f5c7ffb6ffee1612"><div class="ttname"><a href="classResultFileWriter.html#adbae513814e6c709f5c7ffb6ffee1612">ResultFileWriter::~ResultFileWriter</a></div><div class="ttdeci">~ResultFileWriter()</div><div class="ttdef"><b>Definition:</b> result_file_writer.cpp:51</div></div>
 <div class="ttc" id="aclassResultWriter_html"><div class="ttname"><a href="classResultWriter.html">ResultWriter</a></div><div class="ttdef"><b>Definition:</b> result_writer.h:5</div></div>
 <div class="ttc" id="amodel__info_8h_html"><div class="ttname"><a href="model__info_8h.html">model_info.h</a></div></div>
-<div class="ttc" id="anamespacegoogletest-output-test_html_ac8183a857acd7838ccb984117377852e"><div class="ttname"><a href="namespacegoogletest-output-test.html#ac8183a857acd7838ccb984117377852e">googletest-output-test.message</a></div><div class="ttdeci">tuple message</div><div class="ttdef"><b>Definition:</b> googletest-output-test.py:337</div></div>
-<div class="ttc" id="aordered__map_8cpp_html_ab916cefa993ae4a2ef8d43dc1a428fe9"><div class="ttname"><a href="ordered__map_8cpp.html#ab916cefa993ae4a2ef8d43dc1a428fe9">output</a></div><div class="ttdeci">void output(const char *prefix, const Map &amp;m)</div><div class="ttdef"><b>Definition:</b> ordered_map.cpp:6</div></div>
 <div class="ttc" id="aresult__writer_8h_html"><div class="ttname"><a href="result__writer_8h.html">result_writer.h</a></div></div>
 <div class="ttc" id="astructExperimentInfo_html"><div class="ttname"><a href="structExperimentInfo.html">ExperimentInfo</a></div><div class="ttdef"><b>Definition:</b> model_info.h:7</div></div>
 <div class="ttc" id="astructhgps_1_1ResultEventMessage_html"><div class="ttname"><a href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a></div><div class="ttdef"><b>Definition:</b> result_message.h:7</div></div>
@@ -143,7 +141,7 @@ $(document).ready(function(){initNavTree('result__file__writer_8h_source.html','
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_d4d053799e81c0e83d386c10c3a4f4cf.html">HealthGPS.Console</a></li><li class="navelem"><a class="el" href="result__file__writer_8h.html">result_file_writer.h</a></li>
+    <li class="navelem"><a class="el" href="dir_aabdfeaa932d822e45e68ea9ba99cfe4.html">HealthGPS.Console</a></li><li class="navelem"><a class="el" href="result__file__writer_8h.html">result_file_writer.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>

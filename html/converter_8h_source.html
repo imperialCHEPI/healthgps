@@ -103,7 +103,7 @@ $(document).ready(function(){initNavTree('converter_8h_source.html',''); initRes
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="datastore_8h.html">HealthGPS.Core/datastore.h</a>&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehgps.html">hgps</a> {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keyword">namespace </span><a class="code" href="namespacedetail.html">detail</a> {</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <span class="keyword">namespace </span>detail {</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="structhgps_1_1detail_1_1RelativeRiskInfo.html">   18</a></span>&#160;        <span class="keyword">struct </span><a class="code" href="structhgps_1_1detail_1_1RelativeRiskInfo.html">RelativeRiskInfo</a></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        {</div>
@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('converter_8h_source.html',''); initRes
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <span class="keyword">auto</span> sum = std::accumulate(std::cbegin(frequency), std::cend(frequency), 0.0f);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keyword">auto</span> pdf = std::vector&lt;float&gt;(frequency.size());</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            <span class="keywordflow">if</span> (sum &gt; 0) {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                <a class="code" href="namespacedocopt.html#ac17ca047684d246e6bee7caabf8f00a2">std::transform</a>(std::cbegin(frequency), std::cend(frequency),</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                std::transform(std::cbegin(frequency), std::cend(frequency),</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                    pdf.begin(), [&amp;sum](<span class="keyword">auto</span>&amp; v) {return v / sum; });</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            }</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            <span class="keywordflow">else</span> {</div>
@@ -156,8 +156,8 @@ $(document).ready(function(){initNavTree('converter_8h_source.html',''); initRes
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keyword">auto</span> cdf = std::vector&lt;float&gt;(pdf.size());</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            cdf[0] = pdf[0];</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> <a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a> = 1; <a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a> &lt; pdf.size(); <a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a>++) {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                cdf[<a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a>] = cdf[<a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a> - 1] + pdf[<a class="code" href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a>];</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 1; i &lt; pdf.size(); i++) {</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                cdf[i] = cdf[i - 1] + pdf[i];</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            }</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <span class="keywordflow">return</span> cdf;</div>
@@ -187,12 +187,9 @@ $(document).ready(function(){initNavTree('converter_8h_source.html',''); initRes
 <div class="ttc" id="adisease__definition_8h_html"><div class="ttname"><a href="disease__definition_8h.html">disease_definition.h</a></div></div>
 <div class="ttc" id="adisease__table_8h_html"><div class="ttname"><a href="disease__table_8h.html">disease_table.h</a></div></div>
 <div class="ttc" id="agender__table_8h_html"><div class="ttname"><a href="gender__table_8h.html">gender_table.h</a></div></div>
-<div class="ttc" id="agmock-matchers-comparisons__test_8cc_html_acb559820d9ca11295b4500f179ef6392"><div class="ttname"><a href="gmock-matchers-comparisons__test_8cc.html#acb559820d9ca11295b4500f179ef6392">i</a></div><div class="ttdeci">int i</div><div class="ttdef"><b>Definition:</b> gmock-matchers-comparisons_test.cc:600</div></div>
 <div class="ttc" id="alife__table_8h_html"><div class="ttname"><a href="life__table_8h.html">life_table.h</a></div></div>
 <div class="ttc" id="alms__definition_8h_html"><div class="ttname"><a href="lms__definition_8h.html">lms_definition.h</a></div></div>
 <div class="ttc" id="amodelinput_8h_html"><div class="ttname"><a href="modelinput_8h.html">modelinput.h</a></div></div>
-<div class="ttc" id="anamespacedetail_html"><div class="ttname"><a href="namespacedetail.html">detail</a></div><div class="ttdoc">detail namespace with internal helper functions</div><div class="ttdef"><b>Definition:</b> args.h:19</div></div>
-<div class="ttc" id="anamespacedocopt_html_ac17ca047684d246e6bee7caabf8f00a2"><div class="ttname"><a href="namespacedocopt.html#ac17ca047684d246e6bee7caabf8f00a2">docopt.transform</a></div><div class="ttdeci">def transform(pattern)</div><div class="ttdef"><b>Definition:</b> docopt.py:72</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81a"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">hgps::core::Gender</a></div><div class="ttdeci">Gender</div><div class="ttdoc">enumerates the gender</div><div class="ttdef"><b>Definition:</b> forward_type.h:20</div></div>
 <div class="ttc" id="anamespacehgps_1_1detail_html_a7919ba23ba1ff6b87eada303f679277a"><div class="ttname"><a href="namespacehgps_1_1detail.html#a7919ba23ba1ff6b87eada303f679277a">hgps::detail::create_relative_risk</a></div><div class="ttdeci">RelativeRisk create_relative_risk(const RelativeRiskInfo &amp;info)</div><div class="ttdef"><b>Definition:</b> converter.cpp:83</div></div>
 <div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:9</div></div>
@@ -215,7 +212,7 @@ $(document).ready(function(){initNavTree('converter_8h_source.html',''); initRes
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_6cad8a98650bc605ed7c83909fbc17c0.html">HealthGPS</a></li><li class="navelem"><a class="el" href="converter_8h.html">converter.h</a></li>
+    <li class="navelem"><a class="el" href="dir_dab824df37ba02169fac86e6f23b00e7.html">HealthGPS</a></li><li class="navelem"><a class="el" href="converter_8h.html">converter.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
