@@ -1,5 +1,8 @@
 var NAVTREEINDEX40 =
 {
+"classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html#a8e448244058ea16b0ba3148678c0b9e6":[469,0,28,0,0],
+"classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html#abfb6b8448b7af79621f6f663e40ebca3":[469,0,28,0,1],
+"classgoogletest-color-test_1_1GTestColorTest.html":[469,0,29,0],
 "classgoogletest-color-test_1_1GTestColorTest.html#a1f0a2bab46c123e865a821307bd689de":[469,0,29,0,2],
 "classgoogletest-color-test_1_1GTestColorTest.html#a82dd36b6a0fa82d417b7ec5e660c6e41":[469,0,29,0,0],
 "classgoogletest-color-test_1_1GTestColorTest.html#a8f6cbbaa18feb66b8b03e6cc1f493f49":[469,0,29,0,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX40 =
 "classhgps_1_1DemographicModule.html":[469,0,53,52],
 "classhgps_1_1DemographicModule.html#a11e4ac8535cd8fe45b8b1b5a7a1ec28b":[469,0,53,52,0],
 "classhgps_1_1DemographicModule.html#a245b59ae0fa2a8221520fefa1aced515":[469,0,53,52,2],
-"classhgps_1_1DemographicModule.html#ab18d0e5d5e138c0399b57adf313683b2":[469,0,53,52,1],
-"classhgps_1_1DiseaseDefinition.html":[469,0,53,14],
-"classhgps_1_1DiseaseDefinition.html#a01565f638512c2fb9cdfcb3ad887a8f8":[469,0,53,14,3],
-"classhgps_1_1DiseaseDefinition.html#a118335a79ee2d0f47572364f167c2149":[469,0,53,14,4]
+"classhgps_1_1DemographicModule.html#ab18d0e5d5e138c0399b57adf313683b2":[469,0,53,52,1]
 };

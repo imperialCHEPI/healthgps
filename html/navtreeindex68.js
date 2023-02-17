@@ -1,5 +1,8 @@
 var NAVTREEINDEX68 =
 {
+"globals_type_e.html":[470,1,3,4],
+"globals_type_f.html":[470,1,3,5],
+"globals_type_h.html":[470,1,3,6],
 "globals_type_i.html":[470,1,3,7],
 "globals_type_j.html":[470,1,3,8],
 "globals_type_l.html":[470,1,3,9],
@@ -246,8 +249,5 @@ var NAVTREEINDEX68 =
 "gmock-matchers-misc__test_8cc.html#a545f93fe606de188711fa1e3ff393d6d":[470,0,5,0,4,0,0,1,3,7,3],
 "gmock-matchers-misc__test_8cc.html#a656301417b9a2b5e085771fa3c49b01f":[470,0,5,0,4,0,0,1,3,7,9],
 "gmock-matchers-misc__test_8cc.html#a6f821e50a2ad8ee2658234db0d48fd7b":[470,0,5,0,4,0,0,1,3,7,2],
-"gmock-matchers-misc__test_8cc.html#a92a5f54fbf6a5d2eab027a03744756f3":[470,0,5,0,4,0,0,1,3,7,8],
-"gmock-matchers-misc__test_8cc.html#aaaf1ac02dfa554a3cdffc647d512a77b":[470,0,5,0,4,0,0,1,3,7,5],
-"gmock-matchers-misc__test_8cc.html#aab3de6f08394dc65ac9dba5b3bcc5a44":[470,0,5,0,4,0,0,1,3,7,7],
-"gmock-matchers-misc__test_8cc.html#ad88eea96f82ba29e252f3e07cdb84378":[470,0,5,0,4,0,0,1,3,7,1]
+"gmock-matchers-misc__test_8cc.html#a92a5f54fbf6a5d2eab027a03744756f3":[470,0,5,0,4,0,0,1,3,7,8]
 };

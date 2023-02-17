@@ -1,5 +1,8 @@
 var NAVTREEINDEX41 =
 {
+"classhgps_1_1DiseaseDefinition.html":[469,0,53,14],
+"classhgps_1_1DiseaseDefinition.html#a01565f638512c2fb9cdfcb3ad887a8f8":[469,0,53,14,3],
+"classhgps_1_1DiseaseDefinition.html#a118335a79ee2d0f47572364f167c2149":[469,0,53,14,4],
 "classhgps_1_1DiseaseDefinition.html#a67d021e7e2de9ce3cbcdda1660167d67":[469,0,53,14,2],
 "classhgps_1_1DiseaseDefinition.html#a75b76723294b7efe2ab666dea6710fe0":[469,0,53,14,0],
 "classhgps_1_1DiseaseDefinition.html#a8ca961bbcc28968860f1280795f60a45":[469,0,53,14,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX41 =
 "classhgps_1_1MappingEntry.html#a6c5be50d073b1725deecf9166692f872":[469,0,53,67,11],
 "classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574":[469,0,53,67,12],
 "classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23":[469,0,53,67,6],
-"classhgps_1_1MappingEntry.html#a9618cfe3e6164dc50540362aa640d540":[469,0,53,67,13],
-"classhgps_1_1MappingEntry.html#a9c8cf29283ede3874788ab061a517107":[469,0,53,67,3],
-"classhgps_1_1MappingEntry.html#aa3ccb8d6471b9be5ac5069b1f3504e7e":[469,0,53,67,2],
-"classhgps_1_1MappingEntry.html#aa97dd5776f646b22d1233b3b3eca4013":[469,0,53,67,1]
+"classhgps_1_1MappingEntry.html#a9618cfe3e6164dc50540362aa640d540":[469,0,53,67,13]
 };

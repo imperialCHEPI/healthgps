@@ -1,5 +1,8 @@
 var NAVTREEINDEX4 =
 {
+"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2chrono_8h.html#aae864c224427534abeeaf8c31cd2e0da":[470,0,5,0,3,0,0,1,0,1,52],
+"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2chrono_8h.html#aaf8e0f0ff843757380c35a9ec5321168":[470,0,5,0,3,0,0,1,0,1,38],
+"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2chrono_8h.html#ab3aa5f1b3f6fdfc96c0bd4b5f14bcb88":[470,0,5,0,3,0,0,1,0,1,41],
 "buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2chrono_8h.html#ab97ee334f1d5281ed6371a5f0021952c":[470,0,5,0,3,0,0,1,0,1,51],
 "buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2chrono_8h.html#ac9b448822712d899ac8814dd4e0b6cc9":[470,0,5,0,3,0,0,1,0,1,45],
 "buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2chrono_8h.html#acca4638afe6cbc4e38e3901cd0c16186":[470,0,5,0,3,0,0,1,0,1,44],
@@ -246,8 +249,5 @@ var NAVTREEINDEX4 =
 "buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca97f014516561ef487ec368d6158eb3f4":[470,0,5,0,3,0,0,1,0,2,7,267],
 "buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca98cf43657dbee14ae37662526484911d":[470,0,5,0,3,0,0,1,0,2,7,71],
 "buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca98cf43657dbee14ae37662526484911d":[470,0,5,0,3,0,0,1,0,2,7,215],
-"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca996483b6f227bb90a1a066a4d1d6ce10":[470,0,5,0,3,0,0,1,0,2,7,43],
-"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca996483b6f227bb90a1a066a4d1d6ce10":[470,0,5,0,3,0,0,1,0,2,7,187],
-"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca996976a37b7f6296cc3cbf388ac91cee":[470,0,5,0,3,0,0,1,0,2,7,86],
-"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca996976a37b7f6296cc3cbf388ac91cee":[470,0,5,0,3,0,0,1,0,2,7,230]
+"buildtrees_2fmt_2src_29_81_80-20bc1f56f3_8clean_2include_2fmt_2color_8h.html#a80d1dc5f416b97f92939a4166d41203ca996483b6f227bb90a1a066a4d1d6ce10":[470,0,5,0,3,0,0,1,0,2,7,43]
 };

@@ -1,5 +1,8 @@
 var NAVTREEINDEX30 =
 {
+"classbenchmark_1_1Counter.html#a39dc8ef8557683263e9b548df5e87c0fa675d82d20830e1e07433e6e37e03e920":[469,0,5,2,0,14],
+"classbenchmark_1_1Counter.html#a39dc8ef8557683263e9b548df5e87c0fa675d82d20830e1e07433e6e37e03e920":[469,0,5,2,1,5],
+"classbenchmark_1_1Counter.html#a39dc8ef8557683263e9b548df5e87c0fa675d82d20830e1e07433e6e37e03e920":[469,0,5,2,1,14],
 "classbenchmark_1_1Counter.html#a39dc8ef8557683263e9b548df5e87c0fa742d84fb72b1b75c460d2fd17c1d5d36":[469,0,5,2,0,3],
 "classbenchmark_1_1Counter.html#a39dc8ef8557683263e9b548df5e87c0fa742d84fb72b1b75c460d2fd17c1d5d36":[469,0,5,2,0,12],
 "classbenchmark_1_1Counter.html#a39dc8ef8557683263e9b548df5e87c0fa742d84fb72b1b75c460d2fd17c1d5d36":[469,0,5,2,1,3],
@@ -246,8 +249,5 @@ var NAVTREEINDEX30 =
 "classbenchmark_1_1internal_1_1FunctionBenchmark.html#ad5fd6bc24428640e8370a2a1b7da95cc":[469,0,5,0,2,1],
 "classbenchmark_1_1internal_1_1LogType.html":[469,0,5,0,8],
 "classbenchmark_1_1internal_1_1LogType.html#a2a8ab66b9d1e7d986eafa829be97de70":[469,0,5,0,8,0],
-"classbenchmark_1_1internal_1_1LogType.html#a51977218828dc0831b493b3228a94682":[469,0,5,0,8,3],
-"classbenchmark_1_1internal_1_1LogType.html#ae3b69aa5e0156cfadb1bf06be8ca2a6c":[469,0,5,0,8,1],
-"classbenchmark_1_1internal_1_1LogType.html#afca3579a0c4c293f25cb3e93937ce983":[469,0,5,0,8,2],
-"classbenchmark_1_1internal_1_1PerfCounterValues.html":[469,0,5,0,9]
+"classbenchmark_1_1internal_1_1LogType.html#a51977218828dc0831b493b3228a94682":[469,0,5,0,8,3]
 };

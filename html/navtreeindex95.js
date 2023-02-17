@@ -1,5 +1,8 @@
 var NAVTREEINDEX95 =
 {
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3815":[440,0],
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3816":[440,0,0],
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3817":[440,1],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3818":[440,1,0],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3819":[440,1,1],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3820":[440,1,2],
@@ -246,8 +249,5 @@ var NAVTREEINDEX95 =
 "module-test_8cc.html#abbc02c9c6a5cf598c721432e8ffd74df":[470,0,5,0,3,0,0,4,22,25],
 "module-test_8cc.html#abcee25f5a8b060c337520c2f1f3675bf":[470,0,5,0,3,0,0,4,22,58],
 "module-test_8cc.html#ac5d01d9cbbd1b7077d180dbb2870b0ef":[470,0,5,0,3,0,0,4,22,22],
-"module-test_8cc.html#ac66f764bd02b82c7f52f60dce754b871":[470,0,5,0,3,0,0,4,22,57],
-"module-test_8cc.html#ac9c86627cb0e12f4039325a4c2b12662":[470,0,5,0,3,0,0,4,22,41],
-"module-test_8cc.html#acdf9430691a0020d707406bfa2e24bad":[470,0,5,0,3,0,0,4,22,45],
-"module-test_8cc.html#ad0d02112a0ff5db5670ba9e3cf17d14a":[470,0,5,0,3,0,0,4,22,15]
+"module-test_8cc.html#ac66f764bd02b82c7f52f60dce754b871":[470,0,5,0,3,0,0,4,22,57]
 };

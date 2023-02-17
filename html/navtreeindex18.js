@@ -1,5 +1,8 @@
 var NAVTREEINDEX18 =
 {
+"buildtrees_2indicators_2src_2v2_82-7e10c11a96_8clean_2include_2indicators_2setting_8hpp.html#ab2422a182ffecd25789549d8aec2a2aba3bc8bf46ecc1090c5e2c712ac4c768cf":[470,0,5,0,5,0,0,1,0,13,45,15],
+"buildtrees_2indicators_2src_2v2_82-7e10c11a96_8clean_2include_2indicators_2setting_8hpp.html#ab2422a182ffecd25789549d8aec2a2aba3bc8bf46ecc1090c5e2c712ac4c768cf":[470,0,5,0,5,0,0,1,0,13,45,38],
+"buildtrees_2indicators_2src_2v2_82-7e10c11a96_8clean_2include_2indicators_2setting_8hpp.html#ab2422a182ffecd25789549d8aec2a2aba41a8e8ee8ab556cb054c4d5ae246d79f":[470,0,5,0,5,0,0,1,0,13,45,2],
 "buildtrees_2indicators_2src_2v2_82-7e10c11a96_8clean_2include_2indicators_2setting_8hpp.html#ab2422a182ffecd25789549d8aec2a2aba41a8e8ee8ab556cb054c4d5ae246d79f":[470,0,5,0,5,0,0,1,0,13,45,25],
 "buildtrees_2indicators_2src_2v2_82-7e10c11a96_8clean_2include_2indicators_2setting_8hpp.html#ab2422a182ffecd25789549d8aec2a2aba4651744392ce157d034160d1299a25f8":[470,0,5,0,5,0,0,1,0,13,45,21],
 "buildtrees_2indicators_2src_2v2_82-7e10c11a96_8clean_2include_2indicators_2setting_8hpp.html#ab2422a182ffecd25789549d8aec2a2aba4651744392ce157d034160d1299a25f8":[470,0,5,0,5,0,0,1,0,13,45,44],
@@ -246,8 +249,5 @@ var NAVTREEINDEX18 =
 "buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa42facb1448d9878ab35f152ae236e0b8":[470,0,5,0,7,0,0,1,0,0,1,1,13,17],
 "buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa4537f20910e85437f6d07701864084e8":[470,0,5,0,7,0,0,1,0,0,1,1,13,3],
 "buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa4537f20910e85437f6d07701864084e8":[470,0,5,0,7,0,0,1,0,0,1,1,13,9],
-"buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa4537f20910e85437f6d07701864084e8":[470,0,5,0,7,0,0,1,0,0,1,1,13,15],
-"buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa466deec76ecdf5fca6d38571f6324d54":[470,0,5,0,7,0,0,1,0,0,1,1,13,0],
-"buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa466deec76ecdf5fca6d38571f6324d54":[470,0,5,0,7,0,0,1,0,0,1,1,13,6],
-"buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa466deec76ecdf5fca6d38571f6324d54":[470,0,5,0,7,0,0,1,0,0,1,1,13,12]
+"buildtrees_2nlohmann-json_2src_2v3_811_82-efdad4750e_8clean_2include_2nlohmann_2detail_2input_2input__adapters_8hpp.html#a0ab3b338d0eadc6890b72cccef0ea04fa4537f20910e85437f6d07701864084e8":[470,0,5,0,7,0,0,1,0,0,1,1,13,15]
 };

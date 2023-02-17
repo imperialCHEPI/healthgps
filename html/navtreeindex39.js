@@ -1,5 +1,8 @@
 var NAVTREEINDEX39 =
 {
+"classformat__string__checker.html#a3fb3f60390074eddbea11d45898c402c":[469,0,257,8],
+"classformat__string__checker.html#a3fb3f60390074eddbea11d45898c402c":[469,0,257,9],
+"classformat__string__checker.html#a4a891a65c1481f8773dbfa4c6e5f787e":[469,0,257,0],
 "classformat__string__checker.html#a4a891a65c1481f8773dbfa4c6e5f787e":[469,0,257,1],
 "classformat__string__checker.html#a4ed60f0c8233ac6fb5b4120d0f5afab6":[469,0,257,14],
 "classformat__string__checker.html#a4ed60f0c8233ac6fb5b4120d0f5afab6":[469,0,257,15],
@@ -246,8 +249,5 @@ var NAVTREEINDEX39 =
 "classgoogletest-catch-exceptions-test_1_1CatchCxxExceptionsTest.html#ae5ed341fb122b7d03da8ce86043166c3":[469,0,28,1,1],
 "classgoogletest-catch-exceptions-test_1_1CatchCxxExceptionsTest.html#aefd6501c46ece89e1558b708d2b7f932":[469,0,28,1,2],
 "classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html":[469,0,28,0],
-"classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html#a86d5639a464b9ee5e05816758bd1ae1f":[469,0,28,0,2],
-"classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html#a8e448244058ea16b0ba3148678c0b9e6":[469,0,28,0,0],
-"classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html#abfb6b8448b7af79621f6f663e40ebca3":[469,0,28,0,1],
-"classgoogletest-color-test_1_1GTestColorTest.html":[469,0,29,0]
+"classgoogletest-catch-exceptions-test_1_1CatchSehExceptionsTest.html#a86d5639a464b9ee5e05816758bd1ae1f":[469,0,28,0,2]
 };

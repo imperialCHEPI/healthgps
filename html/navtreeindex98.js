@@ -1,5 +1,8 @@
 var NAVTREEINDEX98 =
 {
+"namespacecompute-powers.html":[468,0,18],
+"namespacecompute-powers.html#a0bfa2048c4a5d9fda0b71ac3d2224425":[468,0,18,3],
+"namespacecompute-powers.html#a21345f1e1658af0c670cea72fa82afad":[468,0,18,17],
 "namespacecompute-powers.html#a27398825bfffd3e9fcfbb7cba3f55484":[468,0,18,13],
 "namespacecompute-powers.html#a5140cdcdd8bd161619cecb89241c2210":[468,0,18,7],
 "namespacecompute-powers.html#a56bfc8fc15c4d14bb2e33a7aa5f8fc8b":[468,0,18,12],
@@ -246,8 +249,5 @@ var NAVTREEINDEX98 =
 "namespacecpplint.html#afde06f22c5a88b7c79e687b9ecef350a":[468,0,25,17],
 "namespacecpplint.html#afe92711322d062e5f8f44cf07607f237":[468,0,25,167],
 "namespacecpplint.html#afedcf56f0eede3aa5608cbcfd09f56e1":[468,0,25,177],
-"namespacecxxopts.html":[468,0,26],
-"namespacecxxopts.html#a048495cf530eaa8711f29bac5cc5d313":[468,0,26,27],
-"namespacecxxopts.html#a095b3fd6a666292bf51b52a16ce4e57e":[468,0,26,31],
-"namespacecxxopts.html#a21f7a08caacc41cc3475f4bc7f9a1a67":[468,0,26,39]
+"namespacecxxopts.html":[468,0,26]
 };

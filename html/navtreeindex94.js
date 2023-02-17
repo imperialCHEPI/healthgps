@@ -1,5 +1,8 @@
 var NAVTREEINDEX94 =
 {
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html#autotoc_md3565":[417,2,0,1],
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html#autotoc_md3566":[417,2,0,2],
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html#autotoc_md3567":[417,2,1],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html#autotoc_md3568":[417,2,2],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html#autotoc_md3569":[417,2,2,0],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_specifications_feature_packages.html#autotoc_md3570":[417,2,2,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX94 =
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_selecting_library_features.html#autotoc_md3811":[439,1],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_selecting_library_features.html#autotoc_md3812":[439,2],
 "md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_selecting_library_features.html#autotoc_md3813":[439,3],
-"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html":[440],
-"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3815":[440,0],
-"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3816":[440,0,0],
-"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html#autotoc_md3817":[440,1]
+"md__home_runner_work_healthgps_healthgps_vcpkg_docs_users_triplets.html":[440]
 };

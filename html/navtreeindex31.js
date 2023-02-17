@@ -1,5 +1,8 @@
 var NAVTREEINDEX31 =
 {
+"classbenchmark_1_1internal_1_1LogType.html#ae3b69aa5e0156cfadb1bf06be8ca2a6c":[469,0,5,0,8,1],
+"classbenchmark_1_1internal_1_1LogType.html#afca3579a0c4c293f25cb3e93937ce983":[469,0,5,0,8,2],
+"classbenchmark_1_1internal_1_1PerfCounterValues.html":[469,0,5,0,9],
 "classbenchmark_1_1internal_1_1PerfCounterValues.html#aaeffa3f998b6829cc04d96effe3a8b4d":[469,0,5,0,9,2],
 "classbenchmark_1_1internal_1_1PerfCounterValues.html#ac74ee3a39c39040aaa34d3c2449a834f":[469,0,5,0,9,1],
 "classbenchmark_1_1internal_1_1PerfCounterValues.html#adb228d1c4414820fdd8b1629f6fd2843":[469,0,5,0,9,0],
@@ -246,8 +249,5 @@ var NAVTREEINDEX31 =
 "classcompute-powers_1_1fp.html":[469,0,10,0],
 "classconanfile_1_1IndicatorsConan.html":[469,0,11,0],
 "classconanfile_1_1IndicatorsConan.html#a08f248035bdf123b7cb20b1c938d0e6e":[469,0,11,0,2],
-"classconanfile_1_1IndicatorsConan.html#a804c6e6fba956b61a39ca15de710bbe7":[469,0,11,0,1],
-"classconanfile_1_1IndicatorsConan.html#a9108166cb2f270ec0c16a2a25f6590b2":[469,0,11,0,0],
-"classconanfile_1_1IndicatorsConan.html#ac3c454cd41e4c201225d853afea56081":[469,0,11,0,3],
-"classconanfile_1_1IndicatorsConan.html#ac702b215af5177c20a0f39ead3877569":[469,0,11,0,4]
+"classconanfile_1_1IndicatorsConan.html#a804c6e6fba956b61a39ca15de710bbe7":[469,0,11,0,1]
 };
