@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" target="_top" xlink:title="Gets the simulation name.">
 <polygon fill="none" stroke="black" points="173,-197 173,-216 305,-216 305,-197 173,-197"/>
 <text text-anchor="middle" x="239" y="-204" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Simulation::name</text>
 </a>

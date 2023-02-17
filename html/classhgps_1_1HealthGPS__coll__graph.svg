@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Defines the Health&#45;GPS simulation engine, which holds the modules instances and run&#45;time context,...">
 <polygon fill="#bfbfbf" stroke="black" points="84.5,-0.5 84.5,-19.5 182.5,-19.5 182.5,-0.5 84.5,-0.5"/>
 <text text-anchor="middle" x="133.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::HealthGPS</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Simulation.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1Simulation.html" target="_top" xlink:title="Defines the simulation class interface.">
 <polygon fill="none" stroke="black" points="84.5,-57.5 84.5,-76.5 182.5,-76.5 182.5,-57.5 84.5,-57.5"/>
 <text text-anchor="middle" x="133.5" y="-64.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Simulation</text>
 </a>

@@ -25,6 +25,14 @@
 var NAVTREE =
 [
   [ "Health-GPS", "index.html", [
+    [ "Global Health Policy Simulation model (Health-GPS)", "index.html#autotoc_md0", null ],
+    [ "Quick Start", "index.html#autotoc_md1", null ],
+    [ "Development Tools", "index.html#autotoc_md4", null ],
+    [ "License", "index.html#autotoc_md6", null ],
+    [ "Third-party components", "index.html#autotoc_md7", [
+      [ "Libraries", "index.html#autotoc_md8", null ],
+      [ "Tools and Frameworks", "index.html#autotoc_md9", null ]
+    ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -66,10 +74,10 @@ var NAVTREEINDEX =
 "classhgps_1_1Random.html",
 "classhgps_1_1core_1_1DataTableColumnIterator.html#a66e21823305e7bcfdf7ff48dd1ffd7cb",
 "datastore_8h_source.html",
-"jsonparser_8cpp.html#a85dad247ef5958fa08213f8aa0ae79e7",
-"namespacehgps_1_1core.html#aff54baeb443c5c7a46f42d74e830dc5f",
-"structRiskFactorInfo.html#a385b420fa3a065c7942ad291ebbd0c1b",
-"structhgps_1_1RunnerEventMessage.html#adfee730a264dee231c0c7bc09a06848b"
+"jsonparser_8cpp.html#a39ae358b348fb4b5db878ccc2f861b3e",
+"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a",
+"structPolicyScenarioInfo.html#a7c752febabc57c93e7c027579c1bac62",
+"structhgps_1_1RunnerEventMessage.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

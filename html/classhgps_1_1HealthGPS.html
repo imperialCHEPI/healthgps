@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1HealthGPS.html',''); init
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the Health-GPS simulation engine, which holds the modules instances and run-time context, manages the simulation clock and core algorithm sequencing.  
+ <a href="classhgps_1_1HealthGPS.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="healthgps_8h_source.html">healthgps.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::HealthGPS:</div>
@@ -112,8 +115,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acf7604a6205ff3002dff2bf6bb65a452"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#acf7604a6205ff3002dff2bf6bb65a452">HealthGPS</a> (<a class="el" href="structhgps_1_1SimulationDefinition.html">SimulationDefinition</a> &amp;&amp;definition, <a class="el" href="classhgps_1_1SimulationModuleFactory.html">SimulationModuleFactory</a> &amp;factory, <a class="el" href="classhgps_1_1EventAggregator.html">EventAggregator</a> &amp;bus)</td></tr>
 <tr class="separator:acf7604a6205ff3002dff2bf6bb65a452"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9b065171ddebcefd5827688a79472c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#a7b9b065171ddebcefd5827688a79472c">initialize</a> () override</td></tr>
+<tr class="memdesc:a7b9b065171ddebcefd5827688a79472c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the simulation experiment.  <a href="classhgps_1_1HealthGPS.html#a7b9b065171ddebcefd5827688a79472c">More...</a><br /></td></tr>
 <tr class="separator:a7b9b065171ddebcefd5827688a79472c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af715c66fe03390d21ef76484a7d0893c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#af715c66fe03390d21ef76484a7d0893c">terminate</a> () override</td></tr>
+<tr class="memdesc:af715c66fe03390d21ef76484a7d0893c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terminates the simulation experiment.  <a href="classhgps_1_1HealthGPS.html#af715c66fe03390d21ef76484a7d0893c">More...</a><br /></td></tr>
 <tr class="separator:af715c66fe03390d21ef76484a7d0893c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c23ed4aa847824887750396e4f28637"><td class="memItemLeft" align="right" valign="top">adevs::Time&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637">init</a> (adevs::SimEnv&lt; int &gt; *env) override</td></tr>
 <tr class="separator:a2c23ed4aa847824887750396e4f28637"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -124,19 +129,25 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5914cc38a777cdb4d694f52ba90bc054"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#a5914cc38a777cdb4d694f52ba90bc054">fini</a> (adevs::Time clock) override</td></tr>
 <tr class="separator:a5914cc38a777cdb4d694f52ba90bc054"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8823f1ec49a3e74dcb094bae83820f58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#a8823f1ec49a3e74dcb094bae83820f58">setup_run</a> (unsigned int run_number) noexcept override</td></tr>
+<tr class="memdesc:a8823f1ec49a3e74dcb094bae83820f58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set-up a new simulation run with default seed.  <a href="classhgps_1_1HealthGPS.html#a8823f1ec49a3e74dcb094bae83820f58">More...</a><br /></td></tr>
 <tr class="separator:a8823f1ec49a3e74dcb094bae83820f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2ec3e5dd654ba88bea5b2b734063718"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HealthGPS.html#ab2ec3e5dd654ba88bea5b2b734063718">setup_run</a> (unsigned int run_number, unsigned int seed) noexcept override</td></tr>
+<tr class="memdesc:ab2ec3e5dd654ba88bea5b2b734063718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set-up a new simulation run.  <a href="classhgps_1_1HealthGPS.html#ab2ec3e5dd654ba88bea5b2b734063718">More...</a><br /></td></tr>
 <tr class="separator:ab2ec3e5dd654ba88bea5b2b734063718"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classhgps_1_1Simulation"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classhgps_1_1Simulation')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classhgps_1_1Simulation.html">hgps::Simulation</a></td></tr>
 <tr class="memitem:a40282b526963876a4e69750c9fb8cd90 inherit pub_methods_classhgps_1_1Simulation"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a40282b526963876a4e69750c9fb8cd90">Simulation</a> ()=delete</td></tr>
 <tr class="separator:a40282b526963876a4e69750c9fb8cd90 inherit pub_methods_classhgps_1_1Simulation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9be4f42dbef42757e0ce29b850c97d59 inherit pub_methods_classhgps_1_1Simulation"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a9be4f42dbef42757e0ce29b850c97d59">Simulation</a> (<a class="el" href="structhgps_1_1SimulationDefinition.html">SimulationDefinition</a> &amp;&amp;definition)</td></tr>
+<tr class="memdesc:a9be4f42dbef42757e0ce29b850c97d59 inherit pub_methods_classhgps_1_1Simulation"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new instance of the simulation class.  <a href="classhgps_1_1Simulation.html#a9be4f42dbef42757e0ce29b850c97d59">More...</a><br /></td></tr>
 <tr class="separator:a9be4f42dbef42757e0ce29b850c97d59 inherit pub_methods_classhgps_1_1Simulation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04546cabf2b39087893fd89f74b42889 inherit pub_methods_classhgps_1_1Simulation"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a04546cabf2b39087893fd89f74b42889">~Simulation</a> ()=default</td></tr>
+<tr class="memdesc:a04546cabf2b39087893fd89f74b42889 inherit pub_methods_classhgps_1_1Simulation"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a simulation instance.  <a href="classhgps_1_1Simulation.html#a04546cabf2b39087893fd89f74b42889">More...</a><br /></td></tr>
 <tr class="separator:a04546cabf2b39087893fd89f74b42889 inherit pub_methods_classhgps_1_1Simulation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a069348c5a9aa1c31952487bd60aa314c inherit pub_methods_classhgps_1_1Simulation"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#ada2628493fd19805edb6367898c6967b">ScenarioType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a069348c5a9aa1c31952487bd60aa314c">type</a> () noexcept</td></tr>
+<tr class="memdesc:a069348c5a9aa1c31952487bd60aa314c inherit pub_methods_classhgps_1_1Simulation"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation type.  <a href="classhgps_1_1Simulation.html#a069348c5a9aa1c31952487bd60aa314c">More...</a><br /></td></tr>
 <tr class="separator:a069348c5a9aa1c31952487bd60aa314c inherit pub_methods_classhgps_1_1Simulation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a405fa37a049c3a5e1ee9f16c8c8e2a80 inherit pub_methods_classhgps_1_1Simulation"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80">name</a> () override</td></tr>
+<tr class="memdesc:a405fa37a049c3a5e1ee9f16c8c8e2a80 inherit pub_methods_classhgps_1_1Simulation"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation name.  <a href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80">More...</a><br /></td></tr>
 <tr class="separator:a405fa37a049c3a5e1ee9f16c8c8e2a80 inherit pub_methods_classhgps_1_1Simulation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
@@ -145,7 +156,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:aa84d301f6cf397331557cbb6850aaf58 inherit pro_attribs_classhgps_1_1Simulation"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1SimulationDefinition.html">SimulationDefinition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#aa84d301f6cf397331557cbb6850aaf58">definition_</a></td></tr>
 <tr class="separator:aa84d301f6cf397331557cbb6850aaf58 inherit pro_attribs_classhgps_1_1Simulation"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the Health-GPS simulation engine, which holds the modules instances and run-time context, manages the simulation clock and core algorithm sequencing. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab42778427723a8ddfcf944d1c5a1084c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab42778427723a8ddfcf944d1c5a1084c">&#9670;&nbsp;</a></span>HealthGPS() <span class="overload">[1/2]</span></h2>
 
@@ -304,6 +317,8 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises the simulation experiment. </p>
+
 <p>Implements <a class="el" href="classhgps_1_1Simulation.html#a8b3835b81233eb7291950d5ed049c2ea">hgps::Simulation</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
@@ -337,6 +352,14 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Set-up a new simulation run with default seed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">run_number</td><td>The run number </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Implements <a class="el" href="classhgps_1_1Simulation.html#af0b10b233642dd08f6b2c1738c212811">hgps::Simulation</a>.</p>
 
 </div>
@@ -360,7 +383,7 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">unsigned int&#160;</td>
-          <td class="paramname"><em>seed</em>&#160;</td>
+          <td class="paramname"><em>run_seed</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -374,6 +397,15 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Set-up a new simulation run. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">run_number</td><td>The run number </td></tr>
+    <tr><td class="paramname">run_seed</td><td>The custom seed for random number generation </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="classhgps_1_1Simulation.html#aebae8f96c9c42f2edf08cd0527d9e917">hgps::Simulation</a>.</p>
 
@@ -401,6 +433,8 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Terminates the simulation experiment. </p>
 
 <p>Implements <a class="el" href="classhgps_1_1Simulation.html#ac1152bf67f5887246a3ecafe3bc77c90">hgps::Simulation</a>.</p>
 <div class="dynheader">

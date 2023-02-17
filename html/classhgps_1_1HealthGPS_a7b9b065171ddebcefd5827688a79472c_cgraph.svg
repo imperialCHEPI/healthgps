@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Initialises the simulation experiment.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-107.5 0,-126.5 146,-126.5 146,-107.5 0,-107.5"/>
 <text text-anchor="middle" x="73" y="-114.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::HealthGPS::initialize</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" target="_top" xlink:title="Gets the simulation name.">
 <polygon fill="none" stroke="black" points="199.5,-164.5 199.5,-183.5 331.5,-183.5 331.5,-164.5 199.5,-164.5"/>
 <text text-anchor="middle" x="265.5" y="-171.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Simulation::name</text>
 </a>

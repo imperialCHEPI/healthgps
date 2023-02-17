@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" target="_top" xlink:title="Gets the simulation name.">
 <polygon fill="none" stroke="black" points="188,-76.5 188,-95.5 320,-95.5 320,-76.5 188,-76.5"/>
 <text text-anchor="middle" x="254" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Simulation::name</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1HealthGPS.html#a7b9b065171ddebcefd5827688a79472c" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1HealthGPS.html#a7b9b065171ddebcefd5827688a79472c" target="_top" xlink:title="Initialises the simulation experiment.">
 <polygon fill="none" stroke="black" points="3,-76.5 3,-95.5 149,-95.5 149,-76.5 3,-76.5"/>
 <text text-anchor="middle" x="76" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::HealthGPS::initialize</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1HealthGPS.html#af715c66fe03390d21ef76484a7d0893c" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1HealthGPS.html#af715c66fe03390d21ef76484a7d0893c" target="_top" xlink:title="Terminates the simulation experiment.">
 <polygon fill="none" stroke="black" points="0,-38.5 0,-57.5 152,-57.5 152,-38.5 0,-38.5"/>
 <text text-anchor="middle" x="76" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::HealthGPS::terminate</text>
 </a>

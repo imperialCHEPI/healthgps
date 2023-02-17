@@ -277,8 +277,8 @@ Here is the call graph for this function:</div>
 <p>Compares two floating-point numbers for relative equality. </p>
 <p>Since the floating-point representation is keeping a constant relative precision, comparison must be made using relative error.</p>
 <p>Let <code>a</code> and <code>b</code> be the two numbers to be compared, we build the following expression:</p>
-<p>&lt;math&gt; &amp;#1013; = |a - b| / max(|a|, |b|) &lt;/math&gt;</p>
-<p>The two numbers can be considered equal if &lt;math&gt;&amp;#1013;&lt;/math&gt; is smaller than a given number &lt;math&gt;&amp;#1013;<sub>max</sub>&lt;/math&gt;. If the denominator of the fraction on the above equation is less than &lt;math&gt;&amp;#1013;<sub>max</sub>&lt;/math&gt;, than the two numbers can be considered as being equal. For lack of information on how the numbers a and b have been obtained, one uses for &lt;math&gt;&amp;#1013;<sub>max</sub>&lt;/math&gt; the DefaultNumericalPrecision. If one can determine the precision of each number, then this relative equality method can be used.</p>
+<p><code>x = |a - b| / max(|a|, |b|)</code></p>
+<p>The two numbers can be considered equal if <code>x</code> is smaller than a given number <code>x<sub>max</sub></code>. If the denominator of the fraction on the above equation is less than <code>x<sub>max</sub></code>, than the two numbers can be considered as being equal. For lack of information on how the numbers <code>a</code> and <code>b</code> have been obtained, one uses for <code>x<sub>max</sub></code> the DefaultNumericalPrecision. If one can determine the precision of each number, then this relative equality method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">left</td><td>The left double to compare. </td></tr>

@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1Simulation.html',''); ini
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the simulation class interface.  
+ <a href="classhgps_1_1Simulation.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="simulation_8h_source.html">simulation.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::Simulation:</div>
@@ -111,20 +114,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a40282b526963876a4e69750c9fb8cd90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a40282b526963876a4e69750c9fb8cd90">Simulation</a> ()=delete</td></tr>
 <tr class="separator:a40282b526963876a4e69750c9fb8cd90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9be4f42dbef42757e0ce29b850c97d59"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a9be4f42dbef42757e0ce29b850c97d59">Simulation</a> (<a class="el" href="structhgps_1_1SimulationDefinition.html">SimulationDefinition</a> &amp;&amp;definition)</td></tr>
+<tr class="memdesc:a9be4f42dbef42757e0ce29b850c97d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new instance of the simulation class.  <a href="classhgps_1_1Simulation.html#a9be4f42dbef42757e0ce29b850c97d59">More...</a><br /></td></tr>
 <tr class="separator:a9be4f42dbef42757e0ce29b850c97d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04546cabf2b39087893fd89f74b42889"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a04546cabf2b39087893fd89f74b42889">~Simulation</a> ()=default</td></tr>
+<tr class="memdesc:a04546cabf2b39087893fd89f74b42889"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a simulation instance.  <a href="classhgps_1_1Simulation.html#a04546cabf2b39087893fd89f74b42889">More...</a><br /></td></tr>
 <tr class="separator:a04546cabf2b39087893fd89f74b42889"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b3835b81233eb7291950d5ed049c2ea"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a8b3835b81233eb7291950d5ed049c2ea">initialize</a> ()=0</td></tr>
+<tr class="memdesc:a8b3835b81233eb7291950d5ed049c2ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the simulation experiment.  <a href="classhgps_1_1Simulation.html#a8b3835b81233eb7291950d5ed049c2ea">More...</a><br /></td></tr>
 <tr class="separator:a8b3835b81233eb7291950d5ed049c2ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1152bf67f5887246a3ecafe3bc77c90"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#ac1152bf67f5887246a3ecafe3bc77c90">terminate</a> ()=0</td></tr>
+<tr class="memdesc:ac1152bf67f5887246a3ecafe3bc77c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Terminates the simulation experiment.  <a href="classhgps_1_1Simulation.html#ac1152bf67f5887246a3ecafe3bc77c90">More...</a><br /></td></tr>
 <tr class="separator:ac1152bf67f5887246a3ecafe3bc77c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0b10b233642dd08f6b2c1738c212811"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#af0b10b233642dd08f6b2c1738c212811">setup_run</a> (const unsigned int run_number) noexcept=0</td></tr>
+<tr class="memdesc:af0b10b233642dd08f6b2c1738c212811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set-up a new simulation run with default seed.  <a href="classhgps_1_1Simulation.html#af0b10b233642dd08f6b2c1738c212811">More...</a><br /></td></tr>
 <tr class="separator:af0b10b233642dd08f6b2c1738c212811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebae8f96c9c42f2edf08cd0527d9e917"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#aebae8f96c9c42f2edf08cd0527d9e917">setup_run</a> (const unsigned int run_number, const unsigned int run_seed) noexcept=0</td></tr>
+<tr class="memdesc:aebae8f96c9c42f2edf08cd0527d9e917"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set-up a new simulation run.  <a href="classhgps_1_1Simulation.html#aebae8f96c9c42f2edf08cd0527d9e917">More...</a><br /></td></tr>
 <tr class="separator:aebae8f96c9c42f2edf08cd0527d9e917"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a069348c5a9aa1c31952487bd60aa314c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#ada2628493fd19805edb6367898c6967b">ScenarioType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a069348c5a9aa1c31952487bd60aa314c">type</a> () noexcept</td></tr>
+<tr class="memdesc:a069348c5a9aa1c31952487bd60aa314c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation type.  <a href="classhgps_1_1Simulation.html#a069348c5a9aa1c31952487bd60aa314c">More...</a><br /></td></tr>
 <tr class="separator:a069348c5a9aa1c31952487bd60aa314c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a405fa37a049c3a5e1ee9f16c8c8e2a80"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80">name</a> () override</td></tr>
+<tr class="memdesc:a405fa37a049c3a5e1ee9f16c8c8e2a80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation name.  <a href="classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80">More...</a><br /></td></tr>
 <tr class="separator:a405fa37a049c3a5e1ee9f16c8c8e2a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
@@ -132,7 +143,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:aa84d301f6cf397331557cbb6850aaf58"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1SimulationDefinition.html">SimulationDefinition</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Simulation.html#aa84d301f6cf397331557cbb6850aaf58">definition_</a></td></tr>
 <tr class="separator:aa84d301f6cf397331557cbb6850aaf58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the simulation class interface. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a40282b526963876a4e69750c9fb8cd90"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a40282b526963876a4e69750c9fb8cd90">&#9670;&nbsp;</a></span>Simulation() <span class="overload">[1/2]</span></h2>
 
@@ -182,6 +195,14 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Creates a new instance of the simulation class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">definition</td><td>The simulation configuration </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a04546cabf2b39087893fd89f74b42889"></a>
@@ -206,6 +227,8 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroys a simulation instance. </p>
 
 </div>
 </div>
@@ -233,6 +256,8 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises the simulation experiment. </p>
+
 <p>Implemented in <a class="el" href="classhgps_1_1HealthGPS.html#a7b9b065171ddebcefd5827688a79472c">hgps::HealthGPS</a>.</p>
 
 </div>
@@ -259,6 +284,9 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the simulation name. </p>
+<dl class="section return"><dt>Returns</dt><dd>The intervention scenario name </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -295,6 +323,14 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Set-up a new simulation run with default seed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">run_number</td><td>The run number </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1HealthGPS.html#a8823f1ec49a3e74dcb094bae83820f58">hgps::HealthGPS</a>.</p>
 
@@ -334,6 +370,15 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Set-up a new simulation run. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">run_number</td><td>The run number </td></tr>
+    <tr><td class="paramname">run_seed</td><td>The custom seed for random number generation </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1HealthGPS.html#ab2ec3e5dd654ba88bea5b2b734063718">hgps::HealthGPS</a>.</p>
 
 </div>
@@ -361,6 +406,8 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Terminates the simulation experiment. </p>
+
 <p>Implemented in <a class="el" href="classhgps_1_1HealthGPS.html#af715c66fe03390d21ef76484a7d0893c">hgps::HealthGPS</a>.</p>
 
 </div>
@@ -387,6 +434,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the simulation type. </p>
+<dl class="section return"><dt>Returns</dt><dd>The intervention scenario type enumeration </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
