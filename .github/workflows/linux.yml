@@ -78,7 +78,7 @@ jobs:
     - name: Configure release HealthGPS
       id: cmake_config_release
       working-directory: ${{github.workspace}}
-      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON -DBUILD_DOC=ON
+      run: cmake --preset=${{env.RELEASE_PRESET}} -DBUILD_BENCHMARKS=ON
 
     - name: Build release HealthGPS
       id: cmake_build_release

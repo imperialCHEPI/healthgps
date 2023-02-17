@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.20)
 
 option(BUILD_BENCHMARKS "Build benchmark application" OFF)
-option(BUILD_DOC "Build API documentation" OFF)
+option(BUILD_DOC "Build API documentation" ON)
 
 # minimum default standard
 set(CMAKE_CXX_STANDARD 20)
