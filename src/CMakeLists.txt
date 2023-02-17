@@ -16,7 +16,9 @@ if (BUILD_BENCHMARKS)
 endif()
 
 if (BUILD_DOC AND CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
-	set(DOXYGEN_EXCLUDE_PATTERNS */out/* */Docs/* */vcpkg_installed/* */_deps/* */external/* */HealthGPS.Tests/* */HealthGPS.Benchmarks/*)
+    message(STATUS "Doxygen build folder: ${CMAKE_CURRENT_BINARY_DIR}")
+	set(DOXYGEN_FILE_PATTERNS, *.h *.cpp *.md)
+	set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/CMakeFiles/*" "*/docs/*" "*/external/*" "*/HealthGPS.Tests/*" "*/HealthGPS.Benchmarks/*")
     enable_doxygen("awesome-sidebar")
 endif()
 
