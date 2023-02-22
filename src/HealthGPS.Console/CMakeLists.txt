@@ -31,7 +31,8 @@ target_sources(HealthGPS.Console
 		"options.h"
 		"resource.h"
 		"result_writer.h"
-		"riskmodel.h")
+		"riskmodel.h"
+		"poco.h")
 
 # Under Windows, we also include a resource file to the build
 if(WIN32)
