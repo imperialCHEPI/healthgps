@@ -10,10 +10,16 @@
 namespace hgps {
 	namespace core {
 
+		/// @brief Disease information structure
 		struct DiseaseInfo
 		{
+			/// @brief The disease group
 			DiseaseGroup group{};
+
+			/// @brief Unique identifier
 			Identifier code{};
+
+			/// @brief Disease full name
 			std::string name{};
 		};
 
@@ -25,40 +31,78 @@ namespace hgps {
 			return lhs.name < rhs.name;
 		}
 
+		/// @brief Disease data item structure
 		struct DiseaseItem
 		{
+			/// @brief Item age reference
 			int with_age;
+
+			/// @brief Gender identifier
 			Gender gender;
+
+			/// @brief Associated data measure values
 			std::map<int, double> measures;
 		};
 
+		/// @brief Disease full definition data structure
 		struct DiseaseEntity
 		{
+			/// @brief The associate country
 			Country country;
+
+			/// @brief Disease information
 			DiseaseInfo info;
+
+			/// @brief Data measures lookup by name
 			std::map<std::string, int> measures;
+
+			/// @brief The collection of data measure items
 			std::vector<DiseaseItem> items;
 
+			/// @brief Checks whether the disease data definition is empty
+			/// @return true for an empty definition, otherwise false.
 			bool empty() const noexcept {
 				return measures.empty() || items.empty();
 			}
 		};
 
+		/// @brief Diseases relative risk effect table data structure 
 		struct RelativeRiskEntity
 		{
+			/// @brief Value indicating whether the rows contain default value only.
 			bool is_default_value{};
+
+			/// @brief The table column identifiers
 			std::vector<std::string> columns;
+
+			/// @brief The table rows with data for each column
 			std::vector<std::vector<float>> rows;
 
+			/// @brief Checks whether the relative risk table data is empty
+			/// @return true for an empty table, otherwise false.
 			bool empty() const noexcept { return rows.empty(); }
 		};
 
+		/// @brief Cancer disease parameters per country data structure
 		struct CancerParameterEntity
 		{
+			/// @brief The reference time
 			int at_time{};
+
+			/// @brief The cancer death weight values
 			std::vector<LookupGenderValue> death_weight{};
+
+			/// @brief The cancer prevalence distribution
 			std::vector<LookupGenderValue> prevalence_distribution{};
+
+			/// @brief The cancer survival rates
 			std::vector<LookupGenderValue> survival_rate{};
+
+			/// @brief Checks whether the cancer parameters data is empty
+			/// @return true for an empty definition, otherwise false.
+			bool empty() const noexcept {
+				return death_weight.empty() || prevalence_distribution.empty() || survival_rate.empty();
+			}
 		};
 	}
 }

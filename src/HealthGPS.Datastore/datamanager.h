@@ -10,10 +10,28 @@ namespace hgps {
 
 		using namespace hgps::core;
 
+		/// @brief Implements Health-GPS back-end data store interface using a file-based storage
+		///
+		/// The storage is based on a folder structure and indexed by a file, `index.json`, with
+		/// a versioned schema defining the storage sub-folders structure, file names, data limits,
+		/// metadata, and rules for accessing the stored contents.
+		/// 
+		/// @note To avoid storing <em>disease-disease</em> interaction files filled with a `default value`
+		/// representing <em>no relative risk effect</em>, the `default value` is defined in the index
+		/// file, and the respective dataset populated at run-time with the `default value` when
+		/// the an associated file does not exists in the store.
+		/// 
+		/// @sa https://imperialchepi.github.io/healthgps/datamodel for the `Data Model` details.
 		class DataManager : public Datastore
 		{
 		public:
 			DataManager() = delete;
+
+			/// @brief Initialises a new instance of the hgps::data::DataManager class.
+			/// @param root_directory The store root folder containing the index.json file.
+			/// @param verbosity The terminal logging verbosity mode to use.
+			/// @throws std::invalid_argument if the given folder does exists or contains the index.json file.
+			/// @throws std::runtime_error for invalid or unsupported index.json file schema version.
 			explicit DataManager(const std::filesystem::path root_directory, VerboseMode verbosity = VerboseMode::none);
 
 			std::vector<Country> get_countries() const override;
@@ -41,7 +59,9 @@ namespace hgps {
 
 			RelativeRiskEntity get_relative_risk_to_risk_factor(
 				DiseaseInfo source, Gender gender, core::Identifier risk_factor_key) const override;
-
+			
+			/// @copydoc core::Datastore::get_disease_parameter
+			/// @throws std::out_of_range for unknown disease parameter file type.
 			CancerParameterEntity get_disease_parameter(DiseaseInfo info, Country country) const override;
 
 			DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
