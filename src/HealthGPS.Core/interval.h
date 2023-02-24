@@ -10,10 +10,10 @@ namespace hgps::core {
 	template <Numerical TYPE>
 	class Interval {
 	public:
-		/// @brief Initialises a new instance of the hgps::core::Interval{TYPE} class
+		/// @brief Initialises a new instance of the Interval class
 		Interval() = default;
 
-		/// @brief @brief Initialises a new instance of the hgps::core::Interval{TYPE} class
+		/// @brief @brief Initialises a new instance of the Interval class
 		/// @param lower_value Lower bound value
 		/// @param upper_value Upper bound value
 		explicit Interval(TYPE lower_value, TYPE upper_value)

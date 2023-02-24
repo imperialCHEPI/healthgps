@@ -2,23 +2,25 @@
 
 #include <iterator>
 
-namespace hgps {
-	namespace core {
+namespace hgps::core {
 
-		namespace detail {
+	namespace detail {
 
-			template <typename ColumnType>
-			struct DefaultValueAccessor {
-				using ValueType = decltype(std::declval<ColumnType>().value_safe(0));
+		template <typename ColumnType>
+		struct DefaultValueAccessor {
+			using ValueType = decltype(std::declval<ColumnType>().value_safe(0));
 
-				ValueType operator()(const ColumnType& column, std::size_t index) {
-					return column.value_safe(index);
-				}
-			};
-		}  // namespace detail
+			ValueType operator()(const ColumnType& column, std::size_t index) {
+				return column.value_safe(index);
+			}
+		};
+	}  // namespace detail
 
-		template <typename ColumnType, 
-			      typename ValueAccessor = detail::DefaultValueAccessor<ColumnType>>
+	/// @brief DataTable column iterator data type class
+	/// @tparam ColumnType Column type
+	/// @tparam ValueAccessor Column value accessor type
+	template <typename ColumnType,
+		typename ValueAccessor = detail::DefaultValueAccessor<ColumnType>>
 		class DataTableColumnIterator {
 		public:
 			using value_type = typename ValueAccessor::ValueType;
@@ -26,15 +28,22 @@ namespace hgps {
 			using reference = value_type&;
 			using iterator_category = std::random_access_iterator_tag;
 
-			// Some algorithms need to default-construct an iterator
+			/// @brief Initialise a new instance of the DataTableColumnIterator{ColumnType, ValueAccessor} class.
+			/// @details Some algorithms need to default-construct an iterator.
 			DataTableColumnIterator() : column_(nullptr), index_(0) {}
 
+			/// @brief Initialise a new instance of the DataTableColumnIterator{ColumnType, ValueAccessor} class.
+			/// @param column The column instance to iterate
+			/// @param index Current index
 			explicit DataTableColumnIterator(const ColumnType& column, std::size_t index = 0)
 				: column_(&column), index_(index) {}
 
+			/// @brief Gets the current iterator index
+			/// @return Current iterator index
 			std::size_t index() const { return index_; }
 
-			// Value access
+			/// @brief Gets the current iterator value
+			/// @return Iterator value access
 			value_type operator*() const {
 				return column_->is_null(index_) ? value_type{} : column_->value_safe(index_).value();
 			}
@@ -74,13 +83,14 @@ namespace hgps {
 		private:
 			const ColumnType* column_;
 			std::size_t index_;
-		};
-	}
+	};
 }
 
 /// @brief Global namespace
 namespace std {
 
+	/// @brief DataTable column iterator traits
+	/// @tparam ColumnType Column type
 	template <typename ColumnType>
 	struct iterator_traits<::hgps::core::DataTableColumnIterator<ColumnType>> {
 		using IteratorType = ::hgps::core::DataTableColumnIterator<ColumnType>;

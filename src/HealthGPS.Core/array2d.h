@@ -16,10 +16,10 @@ namespace hgps::core {
 	class Array2D
 	{
 	public:
-		/// @brief Initialises new instance of the hgps::core::Array2D{TYPE} class with no storage.
+		/// @brief Initialises new instance of the Array2D class with no storage.
 		Array2D() = default;
 
-		/// @brief Initialises new instance of the hgps::core::Array2D{TYPE} class.
+		/// @brief Initialises new instance of the Array2D class.
 		/// @param nrows The number of rows in the array
 		/// @param ncols The number fo columns in the array
 		/// @throws std::invalid_argument for array with zero size storage;
@@ -33,7 +33,7 @@ namespace hgps::core {
 			data_.shrink_to_fit();
 		}
 
-		/// @brief Initialises new instance of the hgps::core::Array2D{TYPE} class with custom default value.
+		/// @brief Initialises new instance of the Array2D class with custom default value.
 		/// @param nrows The number of rows in the array
 		/// @param ncols The number of columns in the array
 		/// @param value The default value to initialise the array values
@@ -43,7 +43,7 @@ namespace hgps::core {
 			fill(value);
 		}
 
-		/// @brief Initialises new instance of the hgps::core::Array2D{TYPE} class with custom values.
+		/// @brief Initialises new instance of the Array2D class with custom values.
 		/// @param nrows The number of rows in the array
 		/// @param ncols The number of columns in the array
 		/// @param values Array of values to initialise the storage

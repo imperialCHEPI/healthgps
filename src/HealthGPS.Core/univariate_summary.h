@@ -116,7 +116,7 @@ namespace hgps::core {
 		/// @return The equivalent string representation
 		std::string to_string() const noexcept;
 
-		/// @brief Output streams operator for Identifier type.
+		/// @brief Output streams operator for UnivariateSummary type.
 		/// @param stream The stream to output
 		/// @param summary The UnivariateSummary instance
 		/// @return The output stream

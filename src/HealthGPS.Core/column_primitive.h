@@ -7,118 +7,128 @@
 #include "column.h"
 #include "column_iterator.h"
 
-namespace hgps {
-	namespace core {
+namespace hgps::core {
 
-		template<typename TYPE>
-		class PrimitiveDataTableColumn : public DataTableColumn {
-		public:
-			using value_type = TYPE;
-			using IteratorType = DataTableColumnIterator<PrimitiveDataTableColumn<TYPE>>;
+	/// @brief Primitive data type DataTable columns class.
+	/// @tparam TYPE Column data type
+	template<typename TYPE>
+	class PrimitiveDataTableColumn : public DataTableColumn {
+	public:
+		using value_type = TYPE;
+		using IteratorType = DataTableColumnIterator<PrimitiveDataTableColumn<TYPE>>;
 
-			explicit PrimitiveDataTableColumn(std::string&& name, std::vector<TYPE>&& data)
-				: DataTableColumn(), name_{ name }, data_{ data }
-			{
-				if (name_.length() < 2 || !std::isalpha(name_.front())) {
-					throw std::invalid_argument(
-						"Invalid column name: minimum length of two and start with alpha character.");
-				}
-
-				null_count_ = 0;
+		/// @brief Initialises a new instance of the PrimitiveDataTableColumn class.
+		/// @param name Column name
+		/// @param data Column data
+		/// @throws std::invalid_argument for column name starting with non-alpha character or less than two length. 
+		explicit PrimitiveDataTableColumn(std::string&& name, std::vector<TYPE>&& data)
+			: DataTableColumn(), name_{ name }, data_{ data }
+		{
+			if (name_.length() < 2 || !std::isalpha(name_.front())) {
+				throw std::invalid_argument(
+					"Invalid column name: minimum length of two and start with alpha character.");
 			}
 
-			explicit PrimitiveDataTableColumn(std::string&& name, std::vector<TYPE>&& data, std::vector<bool>&& null_bitmap)
-				: DataTableColumn(), name_{ name }, data_{ data }, null_bitmap_{ null_bitmap }
-			{
-				if (name_.length() < 2 || !std::isalpha(name_.front())) {
-					throw std::invalid_argument(
-						"Invalid column name: minimum length of two and start with alpha character.");
-				}
+			null_count_ = 0;
+		}
 
-				if (data_.size() != null_bitmap_.size()) {
-					throw std::invalid_argument(
-						"Input vectors size mismatch, the data and valid vectors size must be the same.");
-				}
-
-				null_count_ = std::count(null_bitmap_.begin(), null_bitmap_.end(), false);
+		/// @brief Initialises a new instance of the PrimitiveDataTableColumn class.
+		/// @param name Column name
+		/// @param data Column data, which may contain null values
+		/// @param null_bitmap Column null values index
+		/// @throws std::invalid_argument for column name starting with non-alpha character or less than two length.
+		/// @throws std::out_of_range for data and null bitmap vectors size mismatch. 
+		explicit PrimitiveDataTableColumn(std::string&& name, std::vector<TYPE>&& data, std::vector<bool>&& null_bitmap)
+			: DataTableColumn(), name_{ name }, data_{ data }, null_bitmap_{ null_bitmap }
+		{
+			if (name_.length() < 2 || !std::isalpha(name_.front())) {
+				throw std::invalid_argument(
+					"Invalid column name: minimum length of two and start with alpha character.");
 			}
 
-			std::string type() const noexcept override { return typeid(TYPE).name(); }
-
-			std::string name() const noexcept override { return name_; }
-
-			std::size_t null_count() const noexcept override { return null_count_; }
-
-			std::size_t length() const noexcept override { return data_.size(); }
-
-			/// @brief Checks if value at column index is null
-			/// @param index of the columns to check
-			/// @return true if the value is null, otherwise false.
-			bool is_null(std::size_t index) const noexcept override {
-				// Bound checks hit performance!
-				if (index >= length()) {
-					return true;
-				}
-
-				return !null_bitmap_.empty() && !null_bitmap_[index];
+			if (data_.size() != null_bitmap_.size()) {
+				throw std::out_of_range(
+					"Input vectors size mismatch, the data and valid vectors size must be the same.");
 			}
 
-			/// @brief Checks if value at column index is null, does not bounds check
-			/// @param index of the columns to check
-			/// @return true if the value is null, otherwise false.
-			bool is_valid(std::size_t index) const noexcept override {
-				// Bound checks hit performance!
-				if (index >= length()) {
-					return false;
-				}
+			null_count_ = std::count(null_bitmap_.begin(), null_bitmap_.end(), false);
+		}
 
-				return null_bitmap_.empty() || null_bitmap_[index];
+		std::string type() const noexcept override { return typeid(TYPE).name(); }
+
+		std::string name() const noexcept override { return name_; }
+
+		std::size_t null_count() const noexcept override { return null_count_; }
+
+		std::size_t size() const noexcept override { return data_.size(); }
+
+		bool is_null(std::size_t index) const noexcept override {
+			// Bound checks hit performance!
+			if (index >= size()) {
+				return true;
 			}
 
-			const std::any value(std::size_t index) const noexcept override {
-				if (is_valid(index)) {
-					return data_[index];
-				}
+			return !null_bitmap_.empty() && !null_bitmap_[index];
+		}
 
-				return std::any();
+		bool is_valid(std::size_t index) const noexcept override {
+			// Bound checks hit performance!
+			if (index >= size()) {
+				return false;
 			}
 
-			const std::optional<value_type> value_safe(const std::size_t index) const noexcept {
-				if (is_valid(index)) {
-					return data_[index];
-				}
+			return null_bitmap_.empty() || null_bitmap_[index];
+		}
 
-				return std::nullopt;
+		const std::any value(std::size_t index) const noexcept override {
+			if (is_valid(index)) {
+				return data_[index];
 			}
 
-			const value_type value_unsafe(const std::size_t index) const {
-					return data_[index];
+			return std::any();
+		}
+
+		/// @brief Gets the column value at a given index.
+		/// @param index Column index
+		/// @return The value at index, if inside bounds; otherwise empty
+		const std::optional<value_type> value_safe(const std::size_t index) const noexcept {
+			if (is_valid(index)) {
+				return data_[index];
 			}
 
-			IteratorType begin() const { return IteratorType(*this); }
+			return std::nullopt;
+		}
 
-			IteratorType end() const { return IteratorType(*this, length()); }
+		/// @brief Gets the column value at a given index, unsafe without boundary checks.
+		/// @warning Accessing a column element outside the boundaries is undefined behaviour.
+		/// @param index Column index
+		/// @return The value at index
+		const value_type value_unsafe(const std::size_t index) const {
+			return data_[index];
+		}
 
-		private:
-			std::string name_;
-			std::vector<TYPE> data_;
-			std::vector<bool> null_bitmap_{};
-			std::size_t null_count_ = 0;
-		};
+		/// @brief Gets the iterator to the first element of the column.
+		/// @return An iterator to the beginning
+		IteratorType begin() const { return IteratorType(*this); }
 
-		class StringDataTableColumn : public PrimitiveDataTableColumn<std::string> {
-		public:
-			StringDataTableColumn(std::string&& name, std::vector<std::string>&& data)
-				: PrimitiveDataTableColumn{ std::move(name), std::move(data) }
-			{}
+		/// @brief Gets the iterator element following the last element of the column.
+		/// @return An iterator to the end
+		IteratorType end() const { return IteratorType(*this, size()); }
 
-			StringDataTableColumn(std::string&& name, std::vector<std::string>&& data, std::vector<bool>&& null_bitmap)
-				: PrimitiveDataTableColumn{ std::move(name), std::move(data), std::move(null_bitmap) }
-			{}
+	private:
+		std::string name_;
+		std::vector<TYPE> data_;
+		std::vector<bool> null_bitmap_{};
+		std::size_t null_count_ = 0;
+	};
 
-			std::string type() const noexcept override { return "string"; }
+	/// @brief DataTable column for storing @c string data type class.
+	class StringDataTableColumn : public PrimitiveDataTableColumn<std::string> {
+	public:
+		using PrimitiveDataTableColumn<std::string>::PrimitiveDataTableColumn;
 
-			void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
-		};
-	}
+		std::string type() const noexcept override { return "string"; }
+
+		void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
+	};
 }

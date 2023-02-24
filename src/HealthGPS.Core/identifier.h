@@ -81,9 +81,12 @@ namespace hgps::core {
 	};
 }
 
-/// @brief Hash code function for Identifier type to be used in unordered containers
-template<>
-struct std::hash<hgps::core::Identifier>
-{
-	std::size_t operator()(const hgps::core::Identifier& id) const noexcept { return id.hash(); }
-};
+namespace std {
+
+	/// @brief Hash code function for Identifier type to be used in unordered containers
+	template<>
+	struct hash<hgps::core::Identifier>
+	{
+		size_t operator()(const hgps::core::Identifier& id) const noexcept { return id.hash(); }
+	};
+}

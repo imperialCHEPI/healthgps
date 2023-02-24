@@ -2,47 +2,29 @@
 
 #include "column_primitive.h"
 
-namespace hgps {
-    namespace core {
+namespace hgps::core {
 
-        class FloatDataTableColumn : public PrimitiveDataTableColumn<float> {
-        public:
-            FloatDataTableColumn(std::string&& name, std::vector<float>&& data)
-                : PrimitiveDataTableColumn{ std::move(name), std::move(data) }
-            {}
+	/// @brief DataTable column for storing @c float data type class.
+	class FloatDataTableColumn : public PrimitiveDataTableColumn<float> {
+	public:
+		using PrimitiveDataTableColumn<float>::PrimitiveDataTableColumn;
 
-            FloatDataTableColumn(std::string&& name, std::vector<float>&& data, std::vector<bool>&& null_bitmap)
-                : PrimitiveDataTableColumn{ std::move(name), std::move(data), std::move(null_bitmap) }
-            {}
+		void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
+	};
 
-            void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
-        };
+	/// @brief DataTable column for storing @c double data type class.
+	class DoubleDataTableColumn : public PrimitiveDataTableColumn<double> {
+	public:
+		using PrimitiveDataTableColumn<double>::PrimitiveDataTableColumn;
 
-        class DoubleDataTableColumn : public PrimitiveDataTableColumn<double> {
-        public:
+		void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
+	};
 
-            DoubleDataTableColumn(std::string&& name, std::vector<double>&& data)
-                : PrimitiveDataTableColumn{ std::move(name), std::move(data) }
-            {}
+	/// @brief DataTable column for storing @c integer data type class.
+	class IntegerDataTableColumn : public PrimitiveDataTableColumn<int> {
+	public:
+		using PrimitiveDataTableColumn<int>::PrimitiveDataTableColumn;
 
-            DoubleDataTableColumn(std::string&& name, std::vector<double>&& data, std::vector<bool>&& null_bitmap)
-                : PrimitiveDataTableColumn{ std::move(name), std::move(data), std::move(null_bitmap) }
-            {}
-
-            void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
-        };
-
-        class IntegerDataTableColumn : public PrimitiveDataTableColumn<int> {
-        public:
-            IntegerDataTableColumn(std::string&& name, std::vector<int>&& data)
-                : PrimitiveDataTableColumn{ std::move(name), std::move(data) }
-            {}
-
-            IntegerDataTableColumn(std::string&& name, std::vector<int>&& data, std::vector<bool>&& null_bitmap)
-                : PrimitiveDataTableColumn{ std::move(name), std::move(data), std::move(null_bitmap) }
-            {}
-
-            void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
-        };
-    }
+		void accept(DataTableColumnVisitor& visitor) const override { visitor.visit(*this); }
+	};
 }
