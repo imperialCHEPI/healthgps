@@ -61,9 +61,12 @@ TEST(TestCore_Identity, Equality)
 	ASSERT_EQ(dodo.hash(), dodo_upper.hash());
 
 	ASSERT_TRUE(dodo == dodo_lower);
+	ASSERT_TRUE(dodo.equal(dodo_lower));
 	ASSERT_TRUE(dodo_lower == dodo_upper);
+	ASSERT_TRUE(dodo_lower.equal(dodo_upper));
 	ASSERT_TRUE(dodo != duck);
 	ASSERT_FALSE(dodo == duck);
+	ASSERT_FALSE(dodo.equal(duck));
 }
 
 TEST(TestCore_Identity, Comparable)
@@ -133,7 +136,7 @@ TEST(TestCore_Identity, CreateUnorderedMapKey)
 	ASSERT_FALSE(animals.contains(tmp));
 }
 
-TEST(TestCore_Identity, ConvertToStrem)
+TEST(TestCore_Identity, ConvertToStream)
 {
 	using namespace hgps::core;
 

@@ -16,6 +16,8 @@ namespace hgps::core {
 		if (!value_.empty()) {
 			validate_identifeir();
 		}
+
+		hash_code_ = std::hash<std::string>{}(value_);
 	}
 
 	Identifier::Identifier(const char* const value)
@@ -35,15 +37,19 @@ namespace hgps::core {
 	}
 
 	std::size_t Identifier::hash() const noexcept {
-		return std::hash<std::string>{}(value_);
+		return hash_code_;
 	}
 
 	bool Identifier::operator==(const Identifier& rhs) const noexcept {
-		return value_.size() == rhs.value_.size() && value_ == rhs.value_;
+		return hash_code_ == rhs.hash_code_;
 	}
 
-	bool Identifier::equal(const std::string& rhs) const noexcept {
-		return value_.size() == rhs.size() && value_ == to_lower(rhs);
+	bool Identifier::equal(const std::string& other) const noexcept {
+		return value_.size() == other.size() && value_ == to_lower(other);
+	}
+
+	bool Identifier::equal(const Identifier& other) const noexcept {
+		return hash_code_ == other.hash_code_;
 	}
 
 	void Identifier::validate_identifeir() const {
