@@ -60,7 +60,6 @@ var NAVTREE =
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
         [ "Functions", "globals_func.html", null ],
-        [ "Typedefs", "globals_type.html", null ],
         [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
@@ -70,14 +69,14 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "HealthGPS_2api_8h.html",
-"classhgps_1_1EventSubscriberHandler.html#a52a55b6fb9d1bd4c435e809205dd6836",
-"classhgps_1_1Random.html",
-"classhgps_1_1core_1_1DataTableColumnIterator.html#a66e21823305e7bcfdf7ff48dd1ffd7cb",
-"datastore_8h_source.html",
-"jsonparser_8cpp.html#a39ae358b348fb4b5db878ccc2f861b3e",
-"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a",
-"structPolicyScenarioInfo.html#a7c752febabc57c93e7c027579c1bac62",
-"structhgps_1_1RunnerEventMessage.html"
+"classhgps_1_1FiscalPolicyScenario.html#a91936295bcf6d0f4d6b171c0e2e513ae",
+"classhgps_1_1RandomBitGenerator.html#af3cfe735fdaf4882d746e6d75edf6a76",
+"classhgps_1_1core_1_1DataTableColumnVisitor.html#a0801a89cbfefb2540d91ec3e83595b06",
+"datatable_8h.html",
+"jsonparser_8cpp.html#a22b8447df7337b5f7ac21b45f5cd1623",
+"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a",
+"structhgps_1_1ErrorEventMessage.html#a63d111960e0057677b552af78c436376",
+"structhgps_1_1core_1_1DiseaseEntity.html#aa61e1c6ca7fea3a3d494654af4620544"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

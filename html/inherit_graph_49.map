@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classhgps_1_1DiseaseDefinition.html" title=" " alt="" coords="5,5,181,32"/>
+<area shape="rect" id="node1" href="$classhgps_1_1EventMessageVisitor.html" title="Event message types visitor interface (double dispatcher)" alt="" coords="5,5,204,32"/>
+<area shape="rect" id="node2" href="$classhost_1_1EventMonitor.html" title="Defined the event monitor class used for processing Health&#45;GPS event messages." alt="" coords="252,5,397,32"/>
 </map>

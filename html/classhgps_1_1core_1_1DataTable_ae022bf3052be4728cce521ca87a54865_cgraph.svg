@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Adds a new column to the table.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-93.5 0,-112.5 146,-112.5 146,-93.5 0,-93.5"/>
 <text text-anchor="middle" x="73" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTable::add</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1DataTable.html#aea4b85552bb60b81746a68bdcf95e059" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1DataTable.html#aea4b85552bb60b81746a68bdcf95e059" target="_top" xlink:title="Gets the column at a given index.">
 <polygon fill="none" stroke="black" points="200.5,-176 200.5,-206 322.5,-206 322.5,-176 200.5,-176"/>
 <text text-anchor="start" x="208.5" y="-194" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTable</text>
 <text text-anchor="middle" x="261.5" y="-183" font-family="Helvetica,sans-Serif" font-size="10.00">::column</text>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1DataTable.html#a5b4ada045a3551ea156edd2888fbb425" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1DataTable.html#a5b4ada045a3551ea156edd2888fbb425" target="_top" xlink:title="Gets the number of columns.">
 <polygon fill="none" stroke="black" points="377,-154 377,-184 499,-184 499,-154 377,-154"/>
 <text text-anchor="start" x="385" y="-172" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTable</text>
 <text text-anchor="middle" x="438" y="-161" font-family="Helvetica,sans-Serif" font-size="10.00">::num_columns</text>
@@ -44,7 +44,7 @@
 </g>
 </g>
 <!-- Node1&#45;&gt;Node3 -->
-<g id="edge5" class="edge">
+<g id="edge4" class="edge">
 <title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M112.35,-112.55C132.93,-117.5 158.77,-123.45 182,-128 244.19,-140.18 315.43,-151.41 366.78,-159.02"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="366.37,-162.5 376.77,-160.5 367.39,-155.58 366.37,-162.5"/>
@@ -52,10 +52,10 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1DataTableColumn.html#a6c4fca6541099b0471948cf9f00178bd" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1DataTableColumn.html#aead9fbd8096b197bd3c1889f09af21d8" target="_top" xlink:title="Gets the column name identifier.">
 <polygon fill="none" stroke="black" points="182,-88 182,-118 341,-118 341,-88 182,-88"/>
 <text text-anchor="start" x="190" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTableColumn</text>
-<text text-anchor="middle" x="261.5" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">::length</text>
+<text text-anchor="middle" x="261.5" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">::name</text>
 </a>
 </g>
 </g>
@@ -68,15 +68,15 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1DataTableColumn.html#aead9fbd8096b197bd3c1889f09af21d8" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1DataTableColumn.html#a6e7f8368bb2d10e1cf9679af121e19fb" target="_top" xlink:title="The size of the column data, number of rows.">
 <polygon fill="none" stroke="black" points="182,-39 182,-69 341,-69 341,-39 182,-39"/>
 <text text-anchor="start" x="190" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTableColumn</text>
-<text text-anchor="middle" x="261.5" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::name</text>
+<text text-anchor="middle" x="261.5" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::size</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node5 -->
-<g id="edge4" class="edge">
+<g id="edge5" class="edge">
 <title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M110.4,-93.44C134.01,-87.23 165.49,-78.96 193.52,-71.6"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="194.49,-74.96 203.27,-69.04 192.71,-68.19 194.49,-74.96"/>
@@ -84,7 +84,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" target="_top" xlink:title="Converts the given ASCII string to lower&#45;case.">
 <polygon fill="none" stroke="black" points="204,-0.5 204,-19.5 319,-19.5 319,-0.5 204,-0.5"/>
 <text text-anchor="middle" x="261.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::to_lower</text>
 </a>

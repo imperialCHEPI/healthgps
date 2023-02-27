@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1EventMessageVisitor.html'
 </div><!--header-->
 <div class="contents">
 
+<p>Event message types visitor interface (double dispatcher)  
+ <a href="classhgps_1_1EventMessageVisitor.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="event__visitor_8h_source.html">event_visitor.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::EventMessageVisitor:</div>
@@ -103,6 +106,7 @@ Inheritance diagram for hgps::EventMessageVisitor:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:acec6a503d32020a499756093ba7bc637"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#acec6a503d32020a499756093ba7bc637">EventMessageVisitor</a> ()=default</td></tr>
+<tr class="memdesc:acec6a503d32020a499756093ba7bc637"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the visitor class.  <a href="classhgps_1_1EventMessageVisitor.html#acec6a503d32020a499756093ba7bc637">More...</a><br /></td></tr>
 <tr class="separator:acec6a503d32020a499756093ba7bc637"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a568de53d30f53b3108fbce6521264186"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#a568de53d30f53b3108fbce6521264186">EventMessageVisitor</a> (const <a class="el" href="classhgps_1_1EventMessageVisitor.html">EventMessageVisitor</a> &amp;)=delete</td></tr>
 <tr class="separator:a568de53d30f53b3108fbce6521264186"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -113,17 +117,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0dd11e1266fda499fdab55268db36949"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1EventMessageVisitor.html">EventMessageVisitor</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#a0dd11e1266fda499fdab55268db36949">operator=</a> (<a class="el" href="classhgps_1_1EventMessageVisitor.html">EventMessageVisitor</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:a0dd11e1266fda499fdab55268db36949"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b3873b5cca63bb6931d5b58989ec6ed"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#a2b3873b5cca63bb6931d5b58989ec6ed">~EventMessageVisitor</a> ()</td></tr>
+<tr class="memdesc:a2b3873b5cca63bb6931d5b58989ec6ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy an instance of the visitor class.  <a href="classhgps_1_1EventMessageVisitor.html#a2b3873b5cca63bb6931d5b58989ec6ed">More...</a><br /></td></tr>
 <tr class="separator:a2b3873b5cca63bb6931d5b58989ec6ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0245c8fd61cd9f8e6846e530fb3fc5d1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#a0245c8fd61cd9f8e6846e530fb3fc5d1">visit</a> (const <a class="el" href="structhgps_1_1RunnerEventMessage.html">RunnerEventMessage</a> &amp;message)=0</td></tr>
+<tr class="memdesc:a0245c8fd61cd9f8e6846e530fb3fc5d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a <a class="el" href="structhgps_1_1RunnerEventMessage.html">hgps::RunnerEventMessage</a> message type.  <a href="classhgps_1_1EventMessageVisitor.html#a0245c8fd61cd9f8e6846e530fb3fc5d1">More...</a><br /></td></tr>
 <tr class="separator:a0245c8fd61cd9f8e6846e530fb3fc5d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3df98df5a11a8630748f5dfa721f023"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#ac3df98df5a11a8630748f5dfa721f023">visit</a> (const <a class="el" href="structhgps_1_1InfoEventMessage.html">InfoEventMessage</a> &amp;message)=0</td></tr>
+<tr class="memdesc:ac3df98df5a11a8630748f5dfa721f023"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a <a class="el" href="structhgps_1_1InfoEventMessage.html">hgps::InfoEventMessage</a> message type.  <a href="classhgps_1_1EventMessageVisitor.html#ac3df98df5a11a8630748f5dfa721f023">More...</a><br /></td></tr>
 <tr class="separator:ac3df98df5a11a8630748f5dfa721f023"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7691e040e3f4ddcb38d39dbb471fcde1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#a7691e040e3f4ddcb38d39dbb471fcde1">visit</a> (const <a class="el" href="structhgps_1_1ErrorEventMessage.html">ErrorEventMessage</a> &amp;message)=0</td></tr>
+<tr class="memdesc:a7691e040e3f4ddcb38d39dbb471fcde1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a <a class="el" href="structhgps_1_1ErrorEventMessage.html">hgps::ErrorEventMessage</a> message type.  <a href="classhgps_1_1EventMessageVisitor.html#a7691e040e3f4ddcb38d39dbb471fcde1">More...</a><br /></td></tr>
 <tr class="separator:a7691e040e3f4ddcb38d39dbb471fcde1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5550d22072db27e4da1b898781ba35b0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventMessageVisitor.html#a5550d22072db27e4da1b898781ba35b0">visit</a> (const <a class="el" href="structhgps_1_1ResultEventMessage.html">ResultEventMessage</a> &amp;message)=0</td></tr>
+<tr class="memdesc:a5550d22072db27e4da1b898781ba35b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a <a class="el" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a> message type.  <a href="classhgps_1_1EventMessageVisitor.html#a5550d22072db27e4da1b898781ba35b0">More...</a><br /></td></tr>
 <tr class="separator:a5550d22072db27e4da1b898781ba35b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Event message types visitor interface (double dispatcher) </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="acec6a503d32020a499756093ba7bc637"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acec6a503d32020a499756093ba7bc637">&#9670;&nbsp;</a></span>EventMessageVisitor() <span class="overload">[1/3]</span></h2>
 
@@ -146,6 +157,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the visitor class. </p>
 
 </div>
 </div>
@@ -223,6 +236,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroy an instance of the visitor class. </p>
 
 </div>
 </div>
@@ -303,7 +318,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classEventMonitor.html#a6ce494d7c2d19927fef1289f86a47c78">EventMonitor</a>.</p>
+<p>Visits a <a class="el" href="structhgps_1_1ErrorEventMessage.html">hgps::ErrorEventMessage</a> message type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to visit </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classhost_1_1EventMonitor.html#a5dfc87560665a90da3b577e816d4e5cb">host::EventMonitor</a>.</p>
 
 </div>
 </div>
@@ -331,7 +354,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classEventMonitor.html#a926511edf589075014ad1de2e748fc1e">EventMonitor</a>.</p>
+<p>Visits a <a class="el" href="structhgps_1_1InfoEventMessage.html">hgps::InfoEventMessage</a> message type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to visit </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classhost_1_1EventMonitor.html#ac3f9b662a14a8033eaf1a9cb35285a1f">host::EventMonitor</a>.</p>
 
 </div>
 </div>
@@ -359,7 +390,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classEventMonitor.html#a5a9eadb903fc050344de576464f275a4">EventMonitor</a>.</p>
+<p>Visits a <a class="el" href="structhgps_1_1ResultEventMessage.html">hgps::ResultEventMessage</a> message type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to visit </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classhost_1_1EventMonitor.html#aafe37c03f93b750ef7e62ceab2c0de1d">host::EventMonitor</a>.</p>
 
 </div>
 </div>
@@ -387,7 +426,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classEventMonitor.html#a5b5392b4d5db1f8fdadd0c4459353dd7">EventMonitor</a>.</p>
+<p>Visits a <a class="el" href="structhgps_1_1RunnerEventMessage.html">hgps::RunnerEventMessage</a> message type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to visit </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classhost_1_1EventMonitor.html#a63f197d878980d940542718b885c2d61">host::EventMonitor</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

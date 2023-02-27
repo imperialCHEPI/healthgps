@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1HealthGPS.html#acf7604a6205ff3002dff2bf6bb65a452" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1HealthGPS.html#acf7604a6205ff3002dff2bf6bb65a452" target="_top" xlink:title="Initialises a new instance of the HealthGPS class.">
 <polygon fill="none" stroke="black" points="0,-76.5 0,-95.5 155,-95.5 155,-76.5 0,-76.5"/>
 <text text-anchor="middle" x="77.5" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::HealthGPS::HealthGPS</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" target="_top" xlink:title="Called when the model is added to the simulation executive.">
 <polygon fill="none" stroke="black" points="18,-38.5 18,-57.5 137,-57.5 137,-38.5 18,-38.5"/>
 <text text-anchor="middle" x="77.5" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::HealthGPS::init</text>
 </a>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the number of rows.">
 <polygon fill="#bfbfbf" stroke="black" points="268,-0.5 268,-30.5 390,-30.5 390,-0.5 268,-0.5"/>
 <text text-anchor="start" x="276" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTable</text>
 <text text-anchor="middle" x="329" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::num_rows</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1DataTable.html#ab4a773277858efb48c2dcc9286a81f40" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1DataTable.html#ac538073abf34df84a75f0ddbceba36a4" target="_top" xlink:title="Creates a string representation of the DataTable structure.">
 <polygon fill="none" stroke="black" points="110,-0.5 110,-30.5 232,-30.5 232,-0.5 110,-0.5"/>
 <text text-anchor="start" x="118" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTable</text>
 <text text-anchor="middle" x="171" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4" target="_top" xlink:title="Output streams operator for DataTable type.">
 <polygon fill="none" stroke="black" points="0,-6 0,-25 74,-25 74,-6 0,-6"/>
 <text text-anchor="middle" x="37" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">operator&lt;&lt;</text>
 </a>

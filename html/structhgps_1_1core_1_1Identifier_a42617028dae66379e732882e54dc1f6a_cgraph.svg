@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Determines whether a string representation and this instance have same value.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-30.5 116,-30.5 116,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Identifier</text>
 <text text-anchor="middle" x="58" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::equal</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" target="_top" xlink:title="Converts the given ASCII string to lower&#45;case.">
 <polygon fill="none" stroke="black" points="152,-6 152,-25 267,-25 267,-6 152,-6"/>
 <text text-anchor="middle" x="209.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::to_lower</text>
 </a>

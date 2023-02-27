@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Event message types visitor interface (double dispatcher)">
 <polygon fill="#bfbfbf" stroke="black" points="0,-56.5 0,-75.5 149,-75.5 149,-56.5 0,-56.5"/>
 <text text-anchor="middle" x="74.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventMessageVisitor</text>
 </a>
@@ -20,9 +20,9 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classEventMonitor.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="33.5,-0.5 33.5,-19.5 115.5,-19.5 115.5,-0.5 33.5,-0.5"/>
-<text text-anchor="middle" x="74.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">EventMonitor</text>
+<g id="a_node2"><a xlink:href="classhost_1_1EventMonitor.html" target="_top" xlink:title="Defined the event monitor class used for processing Health&#45;GPS event messages.">
+<polygon fill="none" stroke="black" points="20,-0.5 20,-19.5 129,-19.5 129,-0.5 20,-0.5"/>
+<text text-anchor="middle" x="74.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">host::EventMonitor</text>
 </a>
 </g>
 </g>

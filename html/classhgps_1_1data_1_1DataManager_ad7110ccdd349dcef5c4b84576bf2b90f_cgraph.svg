@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a single country by the alpha code.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-24.5 0,-54.5 140,-54.5 140,-24.5 0,-24.5"/>
 <text text-anchor="start" x="8" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="middle" x="70" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_country</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" target="_top" xlink:title="Compare two case&#45;insensitive ASCII string for equality.">
 <polygon fill="none" stroke="black" points="176,-49.5 176,-79.5 330,-79.5 330,-49.5 176,-49.5"/>
 <text text-anchor="start" x="184" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::case_insensitive</text>
 <text text-anchor="middle" x="253" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::equals</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1data_1_1DataManager.html#abc42fa2dd5e12e64a82848a0b31b2826" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1data_1_1DataManager.html#abc42fa2dd5e12e64a82848a0b31b2826" target="_top" xlink:title="Gets the full collection of countries in the store.">
 <polygon fill="none" stroke="black" points="183,-0.5 183,-30.5 323,-30.5 323,-0.5 183,-0.5"/>
 <text text-anchor="start" x="191" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="middle" x="253" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_countries</text>

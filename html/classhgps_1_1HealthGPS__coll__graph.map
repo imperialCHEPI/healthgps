@@ -1,5 +1,5 @@
 <map id="hgps::HealthGPS" name="hgps::HealthGPS">
-<area shape="rect" id="node1" title="Defines the Health&#45;GPS simulation engine, which holds the modules instances and run&#45;time context,..." alt="" coords="118,171,249,197"/>
+<area shape="rect" id="node1" title="Defines the simulation engine data type class." alt="" coords="118,171,249,197"/>
 <area shape="rect" id="node2" href="$classhgps_1_1Simulation.html" title="Defines the simulation class interface." alt="" coords="118,95,249,121"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,5,161,32"/>
 <area shape="rect" id="node4" href="$structhgps_1_1SimulationDefinition.html" title=" " alt="" coords="186,5,381,32"/>

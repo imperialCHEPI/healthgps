@@ -1,6 +1,6 @@
 <map id="hgps::UnivariateVisitor::visit" name="hgps::UnivariateVisitor::visit">
-<area shape="rect" id="node1" title=" " alt="" coords="5,71,176,112"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#a57fe04a50a149564fcf103f43a675dcb" title=" " alt="" coords="224,5,452,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aaa7fee516e57699b7d2e5b95fa503eaf" title=" " alt="" coords="245,71,431,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#ac03e5bf33ed4db02588b197c483964d0" title=" " alt="" coords="245,136,431,177"/>
+<area shape="rect" id="node1" title="Visits a column of DoubleDataTableColumn type." alt="" coords="5,71,176,112"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#acc2a6a5a218c755aeaba56358aa846d1" title="Append a new data point to the summary." alt="" coords="224,5,452,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aaa7fee516e57699b7d2e5b95fa503eaf" title="Gets the column name identifier." alt="" coords="245,71,431,112"/>
+<area shape="rect" id="node4" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#ac03e5bf33ed4db02588b197c483964d0" title="Gets the number of null values in the column data." alt="" coords="245,136,431,177"/>
 </map>

@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1Interval.html#affaf454f4784636969cfc40856796ef1" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1Interval.html#a668fd071ff56c0019147b8763cf747b9" target="_top" xlink:title="Gets the interval length.">
 <polygon fill="none" stroke="black" points="152,-98.5 152,-128.5 262,-128.5 262,-98.5 152,-98.5"/>
 <text text-anchor="start" x="160" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Interval</text>
 <text text-anchor="middle" x="207" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">::length</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1Interval.html#af1fc648e4af92fcee095b9e432c43923" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1Interval.html#ae9995123ed22bb10f9b39a03bd573159" target="_top" xlink:title="Gets the interval lower bound.">
 <polygon fill="none" stroke="black" points="152,-49.5 152,-79.5 262,-79.5 262,-49.5 152,-49.5"/>
 <text text-anchor="start" x="160" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Interval</text>
 <text text-anchor="middle" x="207" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::lower</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1Interval.html#aa6ef86b72f70e424bf1b4382d443e0b8" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1Interval.html#a2cdf9a6b543eaae1a0010212fcb3e20c" target="_top" xlink:title="Gets the interval upper bound.">
 <polygon fill="none" stroke="black" points="152,-0.5 152,-30.5 262,-30.5 262,-0.5 152,-0.5"/>
 <text text-anchor="start" x="160" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Interval</text>
 <text text-anchor="middle" x="207" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::upper</text>

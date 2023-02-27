@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Convert the identifier to a string representation.">
 <polygon fill="#bfbfbf" stroke="black" points="176,-66 176,-96 292,-96 292,-66 176,-66"/>
 <text text-anchor="start" x="184" y="-84" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Identifier</text>
 <text text-anchor="middle" x="234" y="-73" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1data_1_1DataManager.html#a5b35385195f7d17aae7544debdd7006c" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1data_1_1DataManager.html#a5b35385195f7d17aae7544debdd7006c" target="_top" xlink:title="Gets a single disease information by identifier.">
 <polygon fill="none" stroke="black" points="0,-121 0,-151 140,-151 140,-121 0,-121"/>
 <text text-anchor="start" x="8" y="-139" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="middle" x="70" y="-128" font-family="Helvetica,sans-Serif" font-size="10.00">::get_disease_info</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1data_1_1DataManager.html#ad4f4d08756941ec69da16fc70bf01f8b" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1data_1_1DataManager.html#ad4f4d08756941ec69da16fc70bf01f8b" target="_top" xlink:title="Gets the relative risk effects for disease to disease interactions.">
 <polygon fill="none" stroke="black" points="0,-60.5 0,-101.5 140,-101.5 140,-60.5 0,-60.5"/>
 <text text-anchor="start" x="8" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="start" x="8" y="-78.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_relative_risk_to</text>
@@ -54,7 +54,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1data_1_1DataManager.html#a2426abc02aae4f318bcdf4572e3777af" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1data_1_1DataManager.html#a2426abc02aae4f318bcdf4572e3777af" target="_top" xlink:title="Gets the relative risk effects for risk factor to disease interactions.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 140,-41.5 140,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_relative_risk_to</text>

@@ -2,7 +2,7 @@
 <area shape="rect" id="node1" title=" " alt="" coords="553,432,720,473"/>
 <area shape="rect" id="node2" href="$classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e" title=" " alt="" coords="286,5,489,47"/>
 <area shape="rect" id="node4" href="$classhgps_1_1StaticHierarchicalLinearModel.html#aed69f3d22a37908a2e350b73f4b3dfd0" title="Generates the initial risk factors for a population and newborns." alt="" coords="299,71,475,127"/>
-<area shape="rect" id="node5" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title=" " alt="" coords="308,151,467,178"/>
+<area shape="rect" id="node5" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="308,151,467,178"/>
 <area shape="rect" id="node6" href="$classhgps_1_1DefaultCancerModel.html#aec3e6ee1bc0d3dc97761638df893b82b" title="Initialises the average relative risks once all diseases status were initialised." alt="" coords="270,203,505,244"/>
 <area shape="rect" id="node7" href="$classhgps_1_1DefaultDiseaseModel.html#a31040870542eb041053bb70d14e4afc4" title="Initialises the average relative risks once all diseases status were initialised." alt="" coords="270,268,505,309"/>
 <area shape="rect" id="node8" href="$classhgps_1_1DefaultCancerModel.html#a59790779c6af498fed3df81b168cd504" title="Initialises the population disease status." alt="" coords="290,333,485,375"/>

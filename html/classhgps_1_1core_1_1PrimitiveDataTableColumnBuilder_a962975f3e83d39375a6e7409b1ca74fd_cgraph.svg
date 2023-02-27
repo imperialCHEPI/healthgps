@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumnBuilder.html#aba10a6bb34f2ee8000514d6555e303d6" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumnBuilder.html#aba10a6bb34f2ee8000514d6555e303d6" target="_top" xlink:title="Gets the column value at a given index, no boundary checks.">
 <polygon fill="none" stroke="black" points="192,-0.5 192,-30.5 339,-30.5 339,-0.5 192,-0.5"/>
 <text text-anchor="start" x="200" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="265.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumnBuilder::value</text>

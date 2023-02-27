@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Checks if value at column index is null, does not bounds check.">
+<g id="a_node1"><a xlink:title="Determine whether a column value is not null.">
 <polygon fill="#bfbfbf" stroke="black" points="176,-24.5 176,-54.5 316,-54.5 316,-24.5 176,-24.5"/>
 <text text-anchor="start" x="184" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="246" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::is_valid</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a3f6c98d0500418b4a2a89095e8d1af57" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a3f6c98d0500418b4a2a89095e8d1af57" target="_top" xlink:title="Gets the column value at a given index.">
 <polygon fill="none" stroke="black" points="0,-49.5 0,-79.5 140,-79.5 140,-49.5 0,-49.5"/>
 <text text-anchor="start" x="8" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="70" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::value</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a6e571415ddd86575a3111e9a805c45b2" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a6e571415ddd86575a3111e9a805c45b2" target="_top" xlink:title="Gets the column value at a given index.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 140,-30.5 140,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="70" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::value_safe</text>

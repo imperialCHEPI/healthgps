@@ -1,5 +1,5 @@
 <map id="hgps::core::FloatDataTableColumn" name="hgps::core::FloatDataTableColumn">
-<area shape="rect" id="node1" title=" " alt="" coords="14,169,209,211"/>
+<area shape="rect" id="node1" title="DataTable column for storing float data type class." alt="" coords="14,169,209,211"/>
 <area shape="rect" id="node2" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html" title=" " alt="" coords="18,80,205,121"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1DataTableColumn.html" title=" " alt="" coords="5,5,217,32"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1DataTableColumn.html" title="DataTable columns interface data type." alt="" coords="5,5,217,32"/>
 </map>

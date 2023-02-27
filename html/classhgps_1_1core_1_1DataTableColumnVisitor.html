@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1core_1_1DataTableColumnVi
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="classhgps_1_1core_1_1DataTable.html" title="Defines a Datatable for in memory data class.">DataTable</a> column visitor interface.  
+ <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="visitor_8h_source.html">visitor.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::core::DataTableColumnVisitor:</div>
@@ -103,6 +106,7 @@ Inheritance diagram for hgps::core::DataTableColumnVisitor:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a0801a89cbfefb2540d91ec3e83595b06"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a0801a89cbfefb2540d91ec3e83595b06">DataTableColumnVisitor</a> ()=default</td></tr>
+<tr class="memdesc:a0801a89cbfefb2540d91ec3e83595b06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html" title="DataTable column visitor interface.">DataTableColumnVisitor</a> class.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a0801a89cbfefb2540d91ec3e83595b06">More...</a><br /></td></tr>
 <tr class="separator:a0801a89cbfefb2540d91ec3e83595b06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fdb0957137a03b44da4ffbcf5034f3f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a3fdb0957137a03b44da4ffbcf5034f3f">DataTableColumnVisitor</a> (const <a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html">DataTableColumnVisitor</a> &amp;)=delete</td></tr>
 <tr class="separator:a3fdb0957137a03b44da4ffbcf5034f3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -113,17 +117,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3b8526a8f20547413c64657e5d887226"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html">DataTableColumnVisitor</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a3b8526a8f20547413c64657e5d887226">operator=</a> (<a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html">DataTableColumnVisitor</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:a3b8526a8f20547413c64657e5d887226"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86231e0c9489ca3d4ce0b7b886419d09"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a86231e0c9489ca3d4ce0b7b886419d09">~DataTableColumnVisitor</a> ()</td></tr>
+<tr class="memdesc:a86231e0c9489ca3d4ce0b7b886419d09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html" title="DataTable column visitor interface.">DataTableColumnVisitor</a> instance.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a86231e0c9489ca3d4ce0b7b886419d09">More...</a><br /></td></tr>
 <tr class="separator:a86231e0c9489ca3d4ce0b7b886419d09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19c5279083aa76dc4c0ab2b87ab0b8ae"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a19c5279083aa76dc4c0ab2b87ab0b8ae">visit</a> (const <a class="el" href="classhgps_1_1core_1_1StringDataTableColumn.html">StringDataTableColumn</a> &amp;column)=0</td></tr>
+<tr class="memdesc:a19c5279083aa76dc4c0ab2b87ab0b8ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a column of <a class="el" href="classhgps_1_1core_1_1StringDataTableColumn.html" title="DataTable column for storing string data type class.">StringDataTableColumn</a> type.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a19c5279083aa76dc4c0ab2b87ab0b8ae">More...</a><br /></td></tr>
 <tr class="separator:a19c5279083aa76dc4c0ab2b87ab0b8ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9016cd8b071355373c79c48db4ee60fb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a9016cd8b071355373c79c48db4ee60fb">visit</a> (const <a class="el" href="classhgps_1_1core_1_1FloatDataTableColumn.html">FloatDataTableColumn</a> &amp;column)=0</td></tr>
+<tr class="memdesc:a9016cd8b071355373c79c48db4ee60fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a column of <a class="el" href="classhgps_1_1core_1_1FloatDataTableColumn.html" title="DataTable column for storing float data type class.">FloatDataTableColumn</a> type.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a9016cd8b071355373c79c48db4ee60fb">More...</a><br /></td></tr>
 <tr class="separator:a9016cd8b071355373c79c48db4ee60fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a366544dafd6829a1434504756e04da98"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a366544dafd6829a1434504756e04da98">visit</a> (const <a class="el" href="classhgps_1_1core_1_1DoubleDataTableColumn.html">DoubleDataTableColumn</a> &amp;column)=0</td></tr>
+<tr class="memdesc:a366544dafd6829a1434504756e04da98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a column of <a class="el" href="classhgps_1_1core_1_1DoubleDataTableColumn.html" title="DataTable column for storing double data type class.">DoubleDataTableColumn</a> type.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a366544dafd6829a1434504756e04da98">More...</a><br /></td></tr>
 <tr class="separator:a366544dafd6829a1434504756e04da98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea56535bff3ab5356019dac8ff463e6c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html#aea56535bff3ab5356019dac8ff463e6c">visit</a> (const <a class="el" href="classhgps_1_1core_1_1IntegerDataTableColumn.html">IntegerDataTableColumn</a> &amp;column)=0</td></tr>
+<tr class="memdesc:aea56535bff3ab5356019dac8ff463e6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a column of <a class="el" href="classhgps_1_1core_1_1IntegerDataTableColumn.html" title="DataTable column for storing integer data type class.">IntegerDataTableColumn</a> type.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#aea56535bff3ab5356019dac8ff463e6c">More...</a><br /></td></tr>
 <tr class="separator:aea56535bff3ab5356019dac8ff463e6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="classhgps_1_1core_1_1DataTable.html" title="Defines a Datatable for in memory data class.">DataTable</a> column visitor interface. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0801a89cbfefb2540d91ec3e83595b06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0801a89cbfefb2540d91ec3e83595b06">&#9670;&nbsp;</a></span>DataTableColumnVisitor() <span class="overload">[1/3]</span></h2>
 
@@ -146,6 +157,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html" title="DataTable column visitor interface.">DataTableColumnVisitor</a> class. </p>
 
 </div>
 </div>
@@ -223,6 +236,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroys a <a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html" title="DataTable column visitor interface.">DataTableColumnVisitor</a> instance. </p>
 
 </div>
 </div>
@@ -303,6 +318,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Visits a column of <a class="el" href="classhgps_1_1core_1_1DoubleDataTableColumn.html" title="DataTable column for storing double data type class.">DoubleDataTableColumn</a> type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">column</td><td>The column instance </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1UnivariateVisitor.html#afb7e6c6813f4c3cb2aa27cb535882cf0">hgps::UnivariateVisitor</a>.</p>
 
 </div>
@@ -330,6 +353,14 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visits a column of <a class="el" href="classhgps_1_1core_1_1FloatDataTableColumn.html" title="DataTable column for storing float data type class.">FloatDataTableColumn</a> type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">column</td><td>The column instance </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1UnivariateVisitor.html#a6f2f70efdc94b776beea162666eba1f9">hgps::UnivariateVisitor</a>.</p>
 
@@ -359,6 +390,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Visits a column of <a class="el" href="classhgps_1_1core_1_1IntegerDataTableColumn.html" title="DataTable column for storing integer data type class.">IntegerDataTableColumn</a> type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">column</td><td>The column instance </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1UnivariateVisitor.html#a4772666e91881404cd68b4365efecb86">hgps::UnivariateVisitor</a>.</p>
 
 </div>
@@ -386,6 +425,14 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Visits a column of <a class="el" href="classhgps_1_1core_1_1StringDataTableColumn.html" title="DataTable column for storing string data type class.">StringDataTableColumn</a> type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">column</td><td>The column instance </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1UnivariateVisitor.html#abc1e4dc5cafdbcf2ff2b8c4a10d8950f">hgps::UnivariateVisitor</a>.</p>
 <div class="dynheader">

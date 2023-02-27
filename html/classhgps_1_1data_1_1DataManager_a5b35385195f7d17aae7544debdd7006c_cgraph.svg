@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a single disease information by identifier.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-24.5 0,-54.5 140,-54.5 140,-24.5 0,-24.5"/>
 <text text-anchor="start" x="8" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="middle" x="70" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_disease_info</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" target="_top" xlink:title="Compare two case&#45;insensitive ASCII string for equality.">
 <polygon fill="none" stroke="black" points="176,-49.5 176,-79.5 330,-79.5 330,-49.5 176,-49.5"/>
 <text text-anchor="start" x="184" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::case_insensitive</text>
 <text text-anchor="middle" x="253" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::equals</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1Identifier.html#a35155d48deab7530b7285a90d09b8c9d" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1Identifier.html#a35155d48deab7530b7285a90d09b8c9d" target="_top" xlink:title="Convert the identifier to a string representation.">
 <polygon fill="none" stroke="black" points="195,-0.5 195,-30.5 311,-30.5 311,-0.5 195,-0.5"/>
 <text text-anchor="start" x="203" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Identifier</text>
 <text text-anchor="middle" x="253" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>

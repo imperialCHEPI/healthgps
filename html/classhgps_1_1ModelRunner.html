@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1ModelRunner.html',''); in
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the simulation executive data type class.  
+ <a href="classhgps_1_1ModelRunner.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="modelrunner_8h_source.html">modelrunner.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,17 +103,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7b739ac9b79ec3b8a8aea06abf66073b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelRunner.html#a7b739ac9b79ec3b8a8aea06abf66073b">ModelRunner</a> ()=delete</td></tr>
 <tr class="separator:a7b739ac9b79ec3b8a8aea06abf66073b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd791d387fd6ddc2de098723fa6516e2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelRunner.html#acd791d387fd6ddc2de098723fa6516e2">ModelRunner</a> (<a class="el" href="classhgps_1_1EventAggregator.html">EventAggregator</a> &amp;bus, std::unique_ptr&lt; <a class="el" href="classhgps_1_1RandomBitGenerator.html">RandomBitGenerator</a> &gt; generator) noexcept</td></tr>
+<tr class="memdesc:acd791d387fd6ddc2de098723fa6516e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1ModelRunner.html" title="Defines the simulation executive data type class.">ModelRunner</a> class.  <a href="classhgps_1_1ModelRunner.html#acd791d387fd6ddc2de098723fa6516e2">More...</a><br /></td></tr>
 <tr class="separator:acd791d387fd6ddc2de098723fa6516e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cff7c405b8ceaeadcbe2091e1f88375"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelRunner.html#a7cff7c405b8ceaeadcbe2091e1f88375">run</a> (<a class="el" href="classhgps_1_1Simulation.html">Simulation</a> &amp;baseline, const unsigned int trial_runs)</td></tr>
+<tr class="memdesc:a7cff7c405b8ceaeadcbe2091e1f88375"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run an experiment for baseline scenario only.  <a href="classhgps_1_1ModelRunner.html#a7cff7c405b8ceaeadcbe2091e1f88375">More...</a><br /></td></tr>
 <tr class="separator:a7cff7c405b8ceaeadcbe2091e1f88375"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d9cb1ef8fd7abcb080c9ca730af0841"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelRunner.html#a4d9cb1ef8fd7abcb080c9ca730af0841">run</a> (<a class="el" href="classhgps_1_1Simulation.html">Simulation</a> &amp;baseline, <a class="el" href="classhgps_1_1Simulation.html">Simulation</a> &amp;intervention, const unsigned int trial_runs)</td></tr>
+<tr class="memdesc:a4d9cb1ef8fd7abcb080c9ca730af0841"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run an experiment for baseline and intervention scenarios.  <a href="classhgps_1_1ModelRunner.html#a4d9cb1ef8fd7abcb080c9ca730af0841">More...</a><br /></td></tr>
 <tr class="separator:a4d9cb1ef8fd7abcb080c9ca730af0841"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8686193d1609fb0d77989144d50e04a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelRunner.html#ae8686193d1609fb0d77989144d50e04a">is_running</a> () const noexcept</td></tr>
+<tr class="memdesc:ae8686193d1609fb0d77989144d50e04a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a value indicating whether an experiment is current running.  <a href="classhgps_1_1ModelRunner.html#ae8686193d1609fb0d77989144d50e04a">More...</a><br /></td></tr>
 <tr class="separator:ae8686193d1609fb0d77989144d50e04a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75074fc64f2e95b15e4c3bc306af7af7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelRunner.html#a75074fc64f2e95b15e4c3bc306af7af7">cancel</a> () noexcept</td></tr>
+<tr class="memdesc:a75074fc64f2e95b15e4c3bc306af7af7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cancel a running experiment.  <a href="classhgps_1_1ModelRunner.html#a75074fc64f2e95b15e4c3bc306af7af7">More...</a><br /></td></tr>
 <tr class="separator:a75074fc64f2e95b15e4c3bc306af7af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the simulation executive data type class. </p>
+<p>The simulation executive holds the simulation engine instances and manages the execution of experiments by completing multiple runs of the same scenario. The executive controls the number of runs required, current run number, progress notifications, random number generator seeds for each run, and the parallel evaluation for the two scenarios..</p>
+<p>Health-GPS uses a simpler version of adevs (A Discrete EVent System simulator) library (<a href="https://sourceforge.net/projects/bdevs">https://sourceforge.net/projects/bdevs</a>), which contain only four header files, but provides an intuitive modelling interface for agent-based models, without requiring familiarity with the full aspects of the DEVS formalism. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7b739ac9b79ec3b8a8aea06abf66073b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7b739ac9b79ec3b8a8aea06abf66073b">&#9670;&nbsp;</a></span>ModelRunner() <span class="overload">[1/2]</span></h2>
 
@@ -170,6 +182,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1ModelRunner.html" title="Defines the simulation executive data type class.">ModelRunner</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bus</td><td>The message bus instance to use for notification </td></tr>
+    <tr><td class="paramname">generator</td><td><a class="el" href="classhgps_1_1Random.html" title="General purpose random number interface.">Random</a> number generator for runs management </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -195,6 +216,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Cancel a running experiment. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -225,6 +248,9 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a value indicating whether an experiment is current running. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if a experiment is underway; otherwise, false. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -258,6 +284,22 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Run an experiment for baseline scenario only. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baseline</td><td>The simulation engine instance </td></tr>
+    <tr><td class="paramname">trial_runs</td><td>Experiment number of runs </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The experiment total elapsed time, in milliseconds </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for non-baseline scenario type or negative number of runs. </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -302,6 +344,23 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Run an experiment for baseline and intervention scenarios. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baseline</td><td>The simulation engine instance for baseline scenario </td></tr>
+    <tr><td class="paramname">intervention</td><td>The simulation engine instance for intervention scenario </td></tr>
+    <tr><td class="paramname">trial_runs</td><td>Experiment number of runs </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The experiment total elapsed time, in milliseconds </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for scenario type mismatch or negative number of runs. </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

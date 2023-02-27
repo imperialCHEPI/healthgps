@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the number of valid data points included in the summary.">
 <polygon fill="#bfbfbf" stroke="black" points="621,-229.5 621,-259.5 792,-259.5 792,-229.5 621,-229.5"/>
 <text text-anchor="start" x="629" y="-247.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="706.5" y="-236.5" font-family="Helvetica,sans-Serif" font-size="10.00">::count_valid</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a728329f04594446f26ab3c3cdab552ec" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a728329f04594446f26ab3c3cdab552ec" target="_top" xlink:title="Gets the total number of data points.">
 <polygon fill="none" stroke="black" points="414,-273.5 414,-303.5 585,-303.5 585,-273.5 414,-273.5"/>
 <text text-anchor="start" x="422" y="-291.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="499.5" y="-280.5" font-family="Helvetica,sans-Serif" font-size="10.00">::count_total</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" target="_top" xlink:title="Convert this instance to a string representation.">
 <polygon fill="none" stroke="black" points="0,-147.5 0,-177.5 171,-177.5 171,-147.5 0,-147.5"/>
 <text text-anchor="start" x="8" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="85.5" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a0be60fa3713183e9943d1e694b12a731" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a0be60fa3713183e9943d1e694b12a731" target="_top" xlink:title="Gets the sample variance.">
 <polygon fill="none" stroke="black" points="414,-123.5 414,-153.5 585,-153.5 585,-123.5 414,-123.5"/>
 <text text-anchor="start" x="422" y="-141.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="499.5" y="-130.5" font-family="Helvetica,sans-Serif" font-size="10.00">::variance</text>
@@ -81,7 +81,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a60b5e4a3172619b5880c222b7d9ad8ee" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a60b5e4a3172619b5880c222b7d9ad8ee" target="_top" xlink:title="Gets the kurtosis.">
 <polygon fill="none" stroke="black" points="207,-147.5 207,-177.5 378,-177.5 378,-147.5 207,-147.5"/>
 <text text-anchor="start" x="215" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="292.5" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">::kurtosis</text>
@@ -97,7 +97,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a39a6327c4a6b555454a41c233eb90242" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a39a6327c4a6b555454a41c233eb90242" target="_top" xlink:title="Gets the skewness.">
 <polygon fill="none" stroke="black" points="207,-98.5 207,-128.5 378,-128.5 378,-98.5 207,-98.5"/>
 <text text-anchor="start" x="215" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="292.5" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">::skewness</text>
@@ -113,7 +113,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a3d021888aae889b79fb9c9123f8b1d69" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a3d021888aae889b79fb9c9123f8b1d69" target="_top" xlink:title="Gets the sample standard deviation.">
 <polygon fill="none" stroke="black" points="207,-49.5 207,-79.5 378,-79.5 378,-49.5 207,-49.5"/>
 <text text-anchor="start" x="215" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="292.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::std_deviation</text>
@@ -129,7 +129,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#aa22f4d3eebe7a220290ae53521081599" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#aa22f4d3eebe7a220290ae53521081599" target="_top" xlink:title="Gets the standard error.">
 <polygon fill="none" stroke="black" points="207,-0.5 207,-30.5 378,-30.5 378,-0.5 207,-0.5"/>
 <text text-anchor="start" x="215" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="292.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::std_error</text>

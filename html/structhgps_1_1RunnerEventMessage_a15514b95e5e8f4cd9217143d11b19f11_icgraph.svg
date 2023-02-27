@@ -21,9 +21,10 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classEventMonitor.html#a5b5392b4d5db1f8fdadd0c4459353dd7" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="0,-6 0,-25 109,-25 109,-6 0,-6"/>
-<text text-anchor="middle" x="54.5" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">EventMonitor::visit</text>
+<g id="a_node2"><a xlink:href="classhost_1_1EventMonitor.html#a63f197d878980d940542718b885c2d61" target="_top" xlink:title="Visits a hgps::RunnerEventMessage message type.">
+<polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 109,-30.5 109,-0.5 0,-0.5"/>
+<text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">host::EventMonitor</text>
+<text text-anchor="middle" x="54.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::visit</text>
 </a>
 </g>
 </g>

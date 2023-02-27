@@ -1,7 +1,7 @@
 <map id="hgps::detail::RelativeRiskInfo" name="hgps::detail::RelativeRiskInfo">
 <area shape="rect" id="node1" title=" " alt="" coords="178,184,391,211"/>
-<area shape="rect" id="node2" href="$structhgps_1_1core_1_1DiseaseInfo.html" title=" " alt="" coords="5,95,180,121"/>
-<area shape="rect" id="node3" href="$structhgps_1_1core_1_1Identifier.html" title=" " alt="" coords="15,5,170,32"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1Datastore.html" title=" " alt="" coords="204,95,365,121"/>
+<area shape="rect" id="node2" href="$structhgps_1_1core_1_1DiseaseInfo.html" title="Disease information structure." alt="" coords="5,95,180,121"/>
+<area shape="rect" id="node3" href="$structhgps_1_1core_1_1Identifier.html" title="Entity unique identifier data type." alt="" coords="15,5,170,32"/>
+<area shape="rect" id="node4" href="$classhgps_1_1core_1_1Datastore.html" title="Defines the Health&#45;GPS back&#45;end data store interface for all implementations." alt="" coords="204,95,365,121"/>
 <area shape="rect" id="node5" href="$classhgps_1_1ModelInput.html" title=" " alt="" coords="389,95,524,121"/>
 </map>

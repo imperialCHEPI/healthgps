@@ -94,16 +94,21 @@ $(document).ready(function(){initNavTree('classhgps_1_1core_1_1ScopedTimer.html'
 </div><!--header-->
 <div class="contents">
 
+<p>Timer to printout scope execution time in milliseconds.  
+ <a href="classhgps_1_1core_1_1ScopedTimer.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="scoped__timer_8h_source.html">scoped_timer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:af8d1ae96eb9150283946a2bcc954ee5e"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1ScopedTimer.html#af8d1ae96eb9150283946a2bcc954ee5e">ClockType</a> = std::chrono::steady_clock</td></tr>
+<tr class="memdesc:af8d1ae96eb9150283946a2bcc954ee5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time measuring clock.  <a href="classhgps_1_1core_1_1ScopedTimer.html#af8d1ae96eb9150283946a2bcc954ee5e">More...</a><br /></td></tr>
 <tr class="separator:af8d1ae96eb9150283946a2bcc954ee5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a23bec67ab1ce922fe4e480043e82e5df"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1ScopedTimer.html#a23bec67ab1ce922fe4e480043e82e5df">ScopedTimer</a> (const char *func)</td></tr>
+<tr class="memdesc:a23bec67ab1ce922fe4e480043e82e5df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="classhgps_1_1core_1_1ScopedTimer.html" title="Timer to printout scope execution time in milliseconds.">ScopedTimer</a> class.  <a href="classhgps_1_1core_1_1ScopedTimer.html#a23bec67ab1ce922fe4e480043e82e5df">More...</a><br /></td></tr>
 <tr class="separator:a23bec67ab1ce922fe4e480043e82e5df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdbc5aedaa3bdd675205713a2ea049c7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1ScopedTimer.html#afdbc5aedaa3bdd675205713a2ea049c7">ScopedTimer</a> (const <a class="el" href="classhgps_1_1core_1_1ScopedTimer.html">ScopedTimer</a> &amp;)=delete</td></tr>
 <tr class="separator:afdbc5aedaa3bdd675205713a2ea049c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -114,9 +119,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af9114413a4aa01c6403a915cb2790b65"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1ScopedTimer.html#af9114413a4aa01c6403a915cb2790b65">operator=</a> (<a class="el" href="classhgps_1_1core_1_1ScopedTimer.html">ScopedTimer</a> &amp;&amp;) -&gt; <a class="el" href="classhgps_1_1core_1_1ScopedTimer.html">ScopedTimer</a> &amp;=delete</td></tr>
 <tr class="separator:af9114413a4aa01c6403a915cb2790b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfcc1cdf9507a6067affde872efcebdc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1ScopedTimer.html#abfcc1cdf9507a6067affde872efcebdc">~ScopedTimer</a> ()</td></tr>
+<tr class="memdesc:abfcc1cdf9507a6067affde872efcebdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys the <a class="el" href="classhgps_1_1core_1_1ScopedTimer.html" title="Timer to printout scope execution time in milliseconds.">ScopedTimer</a> instance, printout lifetime duration.  <a href="classhgps_1_1core_1_1ScopedTimer.html#abfcc1cdf9507a6067affde872efcebdc">More...</a><br /></td></tr>
 <tr class="separator:abfcc1cdf9507a6067affde872efcebdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Timer to printout scope execution time in milliseconds. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="af8d1ae96eb9150283946a2bcc954ee5e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af8d1ae96eb9150283946a2bcc954ee5e">&#9670;&nbsp;</a></span>ClockType</h2>
 
@@ -128,6 +136,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The time measuring clock. </p>
 
 </div>
 </div>
@@ -155,6 +165,14 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialise a new instance of the <a class="el" href="classhgps_1_1core_1_1ScopedTimer.html" title="Timer to printout scope execution time in milliseconds.">ScopedTimer</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>The scope function name identification </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -232,6 +250,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroys the <a class="el" href="classhgps_1_1core_1_1ScopedTimer.html" title="Timer to printout scope execution time in milliseconds.">ScopedTimer</a> instance, printout lifetime duration. </p>
 
 </div>
 </div>

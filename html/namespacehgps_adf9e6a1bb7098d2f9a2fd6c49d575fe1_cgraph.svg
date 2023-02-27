@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" target="_top" xlink:title="Compare two case&#45;insensitive ASCII string for equality.">
 <polygon fill="none" stroke="black" points="140,-0.5 140,-30.5 294,-30.5 294,-0.5 140,-0.5"/>
 <text text-anchor="start" x="148" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::case_insensitive</text>
 <text text-anchor="middle" x="217" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::equals</text>

@@ -1,4 +1,4 @@
 <map id="hgps::core::Array2D::to_string" name="hgps::core::Array2D::to_string">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,156,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Array2D.html#a56394037eaa912ae9cb6b884074525ae" title=" " alt="" coords="204,5,355,47"/>
+<area shape="rect" id="node1" title="Creates a string representation of the array data." alt="" coords="5,5,156,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Array2D.html#a56394037eaa912ae9cb6b884074525ae" title="Gets a value from the array." alt="" coords="204,5,355,47"/>
 </map>

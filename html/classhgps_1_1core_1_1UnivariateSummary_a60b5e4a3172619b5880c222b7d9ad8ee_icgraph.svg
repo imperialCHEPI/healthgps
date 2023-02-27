@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the kurtosis.">
 <polygon fill="#bfbfbf" stroke="black" points="207,-0.5 207,-30.5 378,-30.5 378,-0.5 207,-0.5"/>
 <text text-anchor="start" x="215" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="292.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::kurtosis</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" target="_top" xlink:title="Convert this instance to a string representation.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 171,-30.5 171,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="85.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>

@@ -7,7 +7,7 @@
 <area shape="rect" id="node28" href="$namespacehgps.html#a5e12849e2055f3e1f5ffdaf234380e16" title=" " alt="" coords="267,1287,431,1328"/>
 <area shape="rect" id="node3" href="$classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" title=" " alt="" coords="517,253,664,295"/>
 <area shape="rect" id="node4" href="$classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" title=" " alt="" coords="505,618,676,645"/>
-<area shape="rect" id="node5" href="$classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f" title=" " alt="" coords="506,5,675,47"/>
+<area shape="rect" id="node5" href="$classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f" title="Gets the Burden of Diseases (BoD) analysis dataset for a country." alt="" coords="506,5,675,47"/>
 <area shape="rect" id="node6" href="$classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667" title=" " alt="" coords="511,188,670,229"/>
 <area shape="rect" id="node7" href="$classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b" title=" " alt="" coords="493,669,689,695"/>
 <area shape="rect" id="node8" href="$classhgps_1_1ModelInput.html#abd88dd970c41908601acde18d5d69b8e" title=" " alt="" coords="509,71,672,98"/>
@@ -17,9 +17,9 @@
 <area shape="rect" id="node13" href="$namespacehgps.html#abad57caf5bece7e34b2f81cc94709d40" title=" " alt="" coords="495,421,687,463"/>
 <area shape="rect" id="node14" href="$classhgps_1_1Repository.html#a128ca9476585aa8ccae799158099a207" title=" " alt="" coords="511,487,670,528"/>
 <area shape="rect" id="node15" href="$classhgps_1_1Repository.html#a5a115c0ff9257b20dd7555132acb2619" title=" " alt="" coords="511,552,670,593"/>
-<area shape="rect" id="node17" href="$classhgps_1_1core_1_1Datastore.html#a831a6921110b5f8a7ff68d4a97054e50" title=" " alt="" coords="510,953,671,995"/>
-<area shape="rect" id="node18" href="$classhgps_1_1core_1_1Datastore.html#aaa732a5f00487550198c971ba1977bf9" title=" " alt="" coords="510,720,671,761"/>
-<area shape="rect" id="node19" href="$classhgps_1_1core_1_1Datastore.html#a5e4ec41b2dbf12abfaacfd75a738e173" title=" " alt="" coords="510,785,671,827"/>
+<area shape="rect" id="node17" href="$classhgps_1_1core_1_1Datastore.html#a478f1c3eca4cd2166eb77d7d6488a569" title="Gets the population birth indicators for a country filtered by time." alt="" coords="510,953,671,995"/>
+<area shape="rect" id="node18" href="$classhgps_1_1core_1_1Datastore.html#a80544f7a15b4d8069e6013ad7df22c01" title="Gets the population mortality trend for a country filtered by time." alt="" coords="510,720,671,761"/>
+<area shape="rect" id="node19" href="$classhgps_1_1core_1_1Datastore.html#a18209be1995680018625c2276ad68853" title="Gets the population growth trend for a country filtered by time." alt="" coords="510,785,671,827"/>
 <area shape="rect" id="node20" href="$classhgps_1_1ModelInput.html#a4e4bfd49abcbe8999f611d2235fcef4e" title=" " alt="" coords="486,851,695,878"/>
 <area shape="rect" id="node21" href="$classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" title=" " alt="" coords="487,902,694,929"/>
 <area shape="rect" id="node23" href="$classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74" title=" " alt="" coords="508,1281,673,1337"/>

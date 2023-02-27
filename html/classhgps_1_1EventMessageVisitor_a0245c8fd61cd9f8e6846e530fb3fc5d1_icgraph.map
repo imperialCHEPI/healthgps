@@ -1,5 +1,5 @@
 <map id="hgps::EventMessageVisitor::visit" name="hgps::EventMessageVisitor::visit">
-<area shape="rect" id="node1" title=" " alt="" coords="256,104,455,145"/>
+<area shape="rect" id="node1" title="Visits a hgps::RunnerEventMessage message type." alt="" coords="256,104,455,145"/>
 <area shape="rect" id="node2" href="$structhgps_1_1ErrorEventMessage.html#a2ee505893217c4509114ad44a93d7f4b" title=" " alt="" coords="13,5,200,47"/>
 <area shape="rect" id="node3" href="$structhgps_1_1InfoEventMessage.html#a30fa106e698b2b11556a540267afee12" title=" " alt="" coords="16,71,197,112"/>
 <area shape="rect" id="node4" href="$structhgps_1_1ResultEventMessage.html#af26b6d2cb6afdeed1065e4e9e9f3c38d" title=" " alt="" coords="8,136,205,177"/>

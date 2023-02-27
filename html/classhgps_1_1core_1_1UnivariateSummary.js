@@ -4,11 +4,11 @@ var classhgps_1_1core_1_1UnivariateSummary =
     [ "UnivariateSummary", "classhgps_1_1core_1_1UnivariateSummary.html#aa1583be44f5a4d153f3d78484ebf1391", null ],
     [ "UnivariateSummary", "classhgps_1_1core_1_1UnivariateSummary.html#a80e81c6f813f98ef90fb8e4935f44d6d", null ],
     [ "UnivariateSummary", "classhgps_1_1core_1_1UnivariateSummary.html#a83f17f6516fc5460c3a497cccfb93213", null ],
-    [ "append", "classhgps_1_1core_1_1UnivariateSummary.html#a57fe04a50a149564fcf103f43a675dcb", null ],
-    [ "append", "classhgps_1_1core_1_1UnivariateSummary.html#ae81a2791d7b9caf0dabfafb0d46215c0", null ],
-    [ "append", "classhgps_1_1core_1_1UnivariateSummary.html#aebcd16da13cb981631d2670e9bac3930", null ],
+    [ "append", "classhgps_1_1core_1_1UnivariateSummary.html#a983503669a009cb6f27b8f9652835513", null ],
+    [ "append", "classhgps_1_1core_1_1UnivariateSummary.html#acb8ab784145aa20d3472d85dcf258484", null ],
+    [ "append", "classhgps_1_1core_1_1UnivariateSummary.html#acc2a6a5a218c755aeaba56358aa846d1", null ],
     [ "append_null", "classhgps_1_1core_1_1UnivariateSummary.html#a9b717757f82b8a0e45ddff04087189bc", null ],
-    [ "append_null", "classhgps_1_1core_1_1UnivariateSummary.html#a272b6f134bad5ef1269f6688f6bdcfa0", null ],
+    [ "append_null", "classhgps_1_1core_1_1UnivariateSummary.html#a1f57dc5cfca53c60274d314875bc623a", null ],
     [ "average", "classhgps_1_1core_1_1UnivariateSummary.html#a482f522093e26eba6bf0170ab036307f", null ],
     [ "clear", "classhgps_1_1core_1_1UnivariateSummary.html#ad4f133fde53e64320044795e9c316345", null ],
     [ "count_null", "classhgps_1_1core_1_1UnivariateSummary.html#ad6666baff8ce41a1d743c62165c98ee2", null ],
@@ -25,5 +25,6 @@ var classhgps_1_1core_1_1UnivariateSummary =
     [ "std_error", "classhgps_1_1core_1_1UnivariateSummary.html#aa22f4d3eebe7a220290ae53521081599", null ],
     [ "sum", "classhgps_1_1core_1_1UnivariateSummary.html#ac1bf1e5761dcf88f1b3c856722df9600", null ],
     [ "to_string", "classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772", null ],
-    [ "variance", "classhgps_1_1core_1_1UnivariateSummary.html#a0be60fa3713183e9943d1e694b12a731", null ]
+    [ "variance", "classhgps_1_1core_1_1UnivariateSummary.html#a0be60fa3713183e9943d1e694b12a731", null ],
+    [ "operator<<", "classhgps_1_1core_1_1UnivariateSummary.html#a298383c0dd6fdc0deaa83a9444e941d4", null ]
 ];

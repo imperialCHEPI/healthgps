@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Visits a column of DoubleDataTableColumn type.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-49.5 0,-79.5 128,-79.5 128,-49.5 0,-49.5"/>
 <text text-anchor="start" x="8" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::UnivariateVisitor</text>
 <text text-anchor="middle" x="64" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::visit</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#a57fe04a50a149564fcf103f43a675dcb" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1UnivariateSummary.html#acc2a6a5a218c755aeaba56358aa846d1" target="_top" xlink:title="Append a new data point to the summary.">
 <polygon fill="none" stroke="black" points="164,-98.5 164,-128.5 335,-128.5 335,-98.5 164,-98.5"/>
 <text text-anchor="start" x="172" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::UnivariateSummary</text>
 <text text-anchor="middle" x="249.5" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">::append</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aaa7fee516e57699b7d2e5b95fa503eaf" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aaa7fee516e57699b7d2e5b95fa503eaf" target="_top" xlink:title="Gets the column name identifier.">
 <polygon fill="none" stroke="black" points="179.5,-49.5 179.5,-79.5 319.5,-79.5 319.5,-49.5 179.5,-49.5"/>
 <text text-anchor="start" x="187.5" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="249.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::name</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#ac03e5bf33ed4db02588b197c483964d0" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#ac03e5bf33ed4db02588b197c483964d0" target="_top" xlink:title="Gets the number of null values in the column data.">
 <polygon fill="none" stroke="black" points="179.5,-0.5 179.5,-30.5 319.5,-30.5 319.5,-0.5 179.5,-0.5"/>
 <text text-anchor="start" x="187.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="249.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::null_count</text>

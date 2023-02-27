@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Run an experiment for baseline and intervention scenarios.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-19.5 0,-38.5 132,-38.5 132,-19.5 0,-19.5"/>
 <text text-anchor="middle" x="66" y="-26.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelRunner::run</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1ModelRunner.html#a7cff7c405b8ceaeadcbe2091e1f88375" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1ModelRunner.html#a7cff7c405b8ceaeadcbe2091e1f88375" target="_top" xlink:title="Run an experiment for baseline scenario only.">
 <polygon fill="none" stroke="black" points="168,-0.5 168,-19.5 300,-19.5 300,-0.5 168,-0.5"/>
 <text text-anchor="middle" x="234" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelRunner::run</text>
 </a>

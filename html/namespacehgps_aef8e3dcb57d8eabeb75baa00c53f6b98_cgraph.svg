@@ -132,7 +132,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f" target="_top" xlink:title="Gets the Burden of Diseases (BoD) analysis dataset for a country.">
 <polygon fill="none" stroke="black" points="375.5,-1017.5 375.5,-1047.5 502.5,-1047.5 502.5,-1017.5 375.5,-1017.5"/>
 <text text-anchor="start" x="383.5" y="-1035.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="439" y="-1024.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_disease_analysis</text>
@@ -324,7 +324,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a831a6921110b5f8a7ff68d4a97054e50" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a478f1c3eca4cd2166eb77d7d6488a569" target="_top" xlink:title="Gets the population birth indicators for a country filtered by time.">
 <polygon fill="none" stroke="black" points="378.5,-306.5 378.5,-336.5 499.5,-336.5 499.5,-306.5 378.5,-306.5"/>
 <text text-anchor="start" x="386.5" y="-324.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="439" y="-313.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_birth_indicators</text>
@@ -340,7 +340,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="classhgps_1_1core_1_1Datastore.html#aaa732a5f00487550198c971ba1977bf9" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a80544f7a15b4d8069e6013ad7df22c01" target="_top" xlink:title="Gets the population mortality trend for a country filtered by time.">
 <polygon fill="none" stroke="black" points="378.5,-481.5 378.5,-511.5 499.5,-511.5 499.5,-481.5 378.5,-481.5"/>
 <text text-anchor="start" x="386.5" y="-499.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="439" y="-488.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_mortality</text>
@@ -356,7 +356,7 @@
 <!-- Node19 -->
 <g id="node19" class="node">
 <title>Node19</title>
-<g id="a_node19"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a5e4ec41b2dbf12abfaacfd75a738e173" target="_top" xlink:title=" ">
+<g id="a_node19"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a18209be1995680018625c2276ad68853" target="_top" xlink:title="Gets the population growth trend for a country filtered by time.">
 <polygon fill="none" stroke="black" points="378.5,-432.5 378.5,-462.5 499.5,-462.5 499.5,-432.5 378.5,-432.5"/>
 <text text-anchor="start" x="386.5" y="-450.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="439" y="-439.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_population</text>

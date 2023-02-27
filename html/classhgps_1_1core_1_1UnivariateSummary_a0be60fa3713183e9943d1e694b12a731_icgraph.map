@@ -1,8 +1,8 @@
 <map id="hgps::core::UnivariateSummary::variance" name="hgps::core::UnivariateSummary::variance">
-<area shape="rect" id="node1" title=" " alt="" coords="557,123,785,164"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#a60b5e4a3172619b5880c222b7d9ad8ee" title=" " alt="" coords="281,5,509,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" title=" " alt="" coords="5,123,233,164"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1UnivariateSummary.html#a39a6327c4a6b555454a41c233eb90242" title=" " alt="" coords="281,123,509,164"/>
-<area shape="rect" id="node5" href="$classhgps_1_1core_1_1UnivariateSummary.html#a3d021888aae889b79fb9c9123f8b1d69" title=" " alt="" coords="281,188,509,229"/>
-<area shape="rect" id="node6" href="$classhgps_1_1core_1_1UnivariateSummary.html#aa22f4d3eebe7a220290ae53521081599" title=" " alt="" coords="281,253,509,295"/>
+<area shape="rect" id="node1" title="Gets the sample variance." alt="" coords="557,123,785,164"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#a60b5e4a3172619b5880c222b7d9ad8ee" title="Gets the kurtosis." alt="" coords="281,5,509,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" title="Convert this instance to a string representation." alt="" coords="5,123,233,164"/>
+<area shape="rect" id="node4" href="$classhgps_1_1core_1_1UnivariateSummary.html#a39a6327c4a6b555454a41c233eb90242" title="Gets the skewness." alt="" coords="281,123,509,164"/>
+<area shape="rect" id="node5" href="$classhgps_1_1core_1_1UnivariateSummary.html#a3d021888aae889b79fb9c9123f8b1d69" title="Gets the sample standard deviation." alt="" coords="281,188,509,229"/>
+<area shape="rect" id="node6" href="$classhgps_1_1core_1_1UnivariateSummary.html#aa22f4d3eebe7a220290ae53521081599" title="Gets the standard error." alt="" coords="281,253,509,295"/>
 </map>

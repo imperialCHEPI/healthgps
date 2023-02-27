@@ -4,5 +4,6 @@ var namespaces_dup =
     [ "Linux OS", "index.html#autotoc_md3", null ],
     [ "CMake Build", "index.html#autotoc_md5", null ],
     [ "hgps", "namespacehgps.html", "namespacehgps" ],
+    [ "host", "namespacehost.html", "namespacehost" ],
     [ "std", "namespacestd.html", "namespacestd" ]
 ];

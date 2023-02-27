@@ -1,5 +1,5 @@
 <map id="hgps::HealthGPS::fini" name="hgps::HealthGPS::fini">
-<area shape="rect" id="node1" title=" " alt="" coords="5,101,164,127"/>
+<area shape="rect" id="node1" title="Called after the model has been removed from the simulation executive." alt="" coords="5,101,164,127"/>
 <area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" title=" " alt="" coords="217,5,383,47"/>
 <area shape="rect" id="node3" href="$classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" title="Gets the simulation name." alt="" coords="212,71,388,98"/>
 <area shape="rect" id="node5" href="$classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7" title=" " alt="" coords="217,123,383,164"/>

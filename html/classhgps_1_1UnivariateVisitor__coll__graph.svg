@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1DataTableColumnVisitor.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1DataTableColumnVisitor.html" target="_top" xlink:title="DataTable column visitor interface.">
 <polygon fill="none" stroke="black" points="0,-56.5 0,-86.5 159,-86.5 159,-56.5 0,-56.5"/>
 <text text-anchor="start" x="8" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DataTableColumn</text>
 <text text-anchor="middle" x="79.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">Visitor</text>

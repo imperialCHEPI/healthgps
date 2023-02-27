@@ -1,6 +1,6 @@
 <map id="hgps::create_integer_gender_table" name="hgps::create_integer_gender_table">
 <area shape="rect" id="node1" title=" " alt="" coords="5,71,160,112"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Interval.html#affaf454f4784636969cfc40856796ef1" title=" " alt="" coords="208,5,355,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1Interval.html#af1fc648e4af92fcee095b9e432c43923" title=" " alt="" coords="208,71,355,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1Interval.html#aa6ef86b72f70e424bf1b4382d443e0b8" title=" " alt="" coords="208,136,355,177"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Interval.html#a668fd071ff56c0019147b8763cf747b9" title="Gets the interval length." alt="" coords="208,5,355,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1Interval.html#ae9995123ed22bb10f9b39a03bd573159" title="Gets the interval lower bound." alt="" coords="208,71,355,112"/>
+<area shape="rect" id="node4" href="$classhgps_1_1core_1_1Interval.html#a2cdf9a6b543eaae1a0010212fcb3e20c" title="Gets the interval upper bound." alt="" coords="208,136,355,177"/>
 </map>

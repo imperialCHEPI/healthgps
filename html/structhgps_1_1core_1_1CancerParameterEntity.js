@@ -1,5 +1,6 @@
 var structhgps_1_1core_1_1CancerParameterEntity =
 [
+    [ "empty", "structhgps_1_1core_1_1CancerParameterEntity.html#ab44f3fc83d7f348c7d35d8c3b4c17431", null ],
     [ "at_time", "structhgps_1_1core_1_1CancerParameterEntity.html#af6bc64b3ee96280a2b6042a425d0e272", null ],
     [ "death_weight", "structhgps_1_1core_1_1CancerParameterEntity.html#aee3c4bc258f287d365bdc89f6792e2b8", null ],
     [ "prevalence_distribution", "structhgps_1_1core_1_1CancerParameterEntity.html#a05e5f198ca73f6808fb99f32c39efb66", null ],

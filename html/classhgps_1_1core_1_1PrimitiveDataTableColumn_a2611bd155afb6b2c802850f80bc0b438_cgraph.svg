@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Checks if value at column index is null.">
+<g id="a_node1"><a xlink:title="Determine whether a column value is null.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-30.5 140,-30.5 140,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
 <text text-anchor="middle" x="70" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::is_null</text>
@@ -21,10 +21,10 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a863f3c5ebb15684806b79c851892c9fe" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a98ef8047c67a1b9ea3f2c3e0623ed582" target="_top" xlink:title="The size of the column data, number of rows.">
 <polygon fill="none" stroke="black" points="176,-0.5 176,-30.5 316,-30.5 316,-0.5 176,-0.5"/>
 <text text-anchor="start" x="184" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::PrimitiveData</text>
-<text text-anchor="middle" x="246" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::length</text>
+<text text-anchor="middle" x="246" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">TableColumn::size</text>
 </a>
 </g>
 </g>

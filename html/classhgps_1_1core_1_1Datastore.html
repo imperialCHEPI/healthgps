@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1core_1_1Datastore.html','
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the <code>Health-GPS</code> back-end data store interface for all implementations.  
+ <a href="classhgps_1_1core_1_1Datastore.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="datastore_8h_source.html">datastore.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::core::Datastore:</div>
@@ -103,35 +106,52 @@ Inheritance diagram for hgps::core::Datastore:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac3a17726bca07175c4cf43b16a251baa"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#ac3a17726bca07175c4cf43b16a251baa">~Datastore</a> ()=default</td></tr>
+<tr class="memdesc:ac3a17726bca07175c4cf43b16a251baa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1core_1_1Datastore.html" title="Defines the Health-GPS back-end data store interface for all implementations.">Datastore</a> instance.  <a href="classhgps_1_1core_1_1Datastore.html#ac3a17726bca07175c4cf43b16a251baa">More...</a><br /></td></tr>
 <tr class="separator:ac3a17726bca07175c4cf43b16a251baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab183f3b51c5dfdd39f50c0bc3ba55811"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#ab183f3b51c5dfdd39f50c0bc3ba55811">get_countries</a> () const =0</td></tr>
+<tr class="memdesc:ab183f3b51c5dfdd39f50c0bc3ba55811"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the full collection of countries in the store.  <a href="classhgps_1_1core_1_1Datastore.html#ab183f3b51c5dfdd39f50c0bc3ba55811">More...</a><br /></td></tr>
 <tr class="separator:ab183f3b51c5dfdd39f50c0bc3ba55811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a875a50811c0006a50a7a489b17b2f982"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a875a50811c0006a50a7a489b17b2f982">get_country</a> (std::string alpha) const =0</td></tr>
+<tr class="memdesc:a875a50811c0006a50a7a489b17b2f982"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a single country by the alpha code.  <a href="classhgps_1_1core_1_1Datastore.html#a875a50811c0006a50a7a489b17b2f982">More...</a><br /></td></tr>
 <tr class="separator:a875a50811c0006a50a7a489b17b2f982"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e4ec41b2dbf12abfaacfd75a738e173"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1PopulationItem.html">PopulationItem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a5e4ec41b2dbf12abfaacfd75a738e173">get_population</a> (<a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country, const std::function&lt; bool(const unsigned int &amp;)&gt; year_filter) const =0</td></tr>
-<tr class="separator:a5e4ec41b2dbf12abfaacfd75a738e173"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa732a5f00487550198c971ba1977bf9"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1MortalityItem.html">MortalityItem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#aaa732a5f00487550198c971ba1977bf9">get_mortality</a> (<a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country, const std::function&lt; bool(const unsigned int &amp;)&gt; year_filter) const =0</td></tr>
-<tr class="separator:aaa732a5f00487550198c971ba1977bf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18209be1995680018625c2276ad68853"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1PopulationItem.html">PopulationItem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a18209be1995680018625c2276ad68853">get_population</a> (<a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country, const std::function&lt; bool(const unsigned int &amp;)&gt; time_filter) const =0</td></tr>
+<tr class="memdesc:a18209be1995680018625c2276ad68853"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the population growth trend for a country filtered by time.  <a href="classhgps_1_1core_1_1Datastore.html#a18209be1995680018625c2276ad68853">More...</a><br /></td></tr>
+<tr class="separator:a18209be1995680018625c2276ad68853"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80544f7a15b4d8069e6013ad7df22c01"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1MortalityItem.html">MortalityItem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a80544f7a15b4d8069e6013ad7df22c01">get_mortality</a> (<a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country, const std::function&lt; bool(const unsigned int &amp;)&gt; time_filter) const =0</td></tr>
+<tr class="memdesc:a80544f7a15b4d8069e6013ad7df22c01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the population mortality trend for a country filtered by time.  <a href="classhgps_1_1core_1_1Datastore.html#a80544f7a15b4d8069e6013ad7df22c01">More...</a><br /></td></tr>
+<tr class="separator:a80544f7a15b4d8069e6013ad7df22c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb377ccc2f5b2f34aa4709ca984c1bc9"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#afb377ccc2f5b2f34aa4709ca984c1bc9">get_diseases</a> () const =0</td></tr>
+<tr class="memdesc:afb377ccc2f5b2f34aa4709ca984c1bc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the collection of diseases information in the store.  <a href="classhgps_1_1core_1_1Datastore.html#afb377ccc2f5b2f34aa4709ca984c1bc9">More...</a><br /></td></tr>
 <tr class="separator:afb377ccc2f5b2f34aa4709ca984c1bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e9c261f4185d034ba4398e0e0d6ac8c"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a3e9c261f4185d034ba4398e0e0d6ac8c">get_disease_info</a> (<a class="el" href="structhgps_1_1core_1_1Identifier.html">Identifier</a> code) const =0</td></tr>
+<tr class="memdesc:a3e9c261f4185d034ba4398e0e0d6ac8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a single disease information by identifier.  <a href="classhgps_1_1core_1_1Datastore.html#a3e9c261f4185d034ba4398e0e0d6ac8c">More...</a><br /></td></tr>
 <tr class="separator:a3e9c261f4185d034ba4398e0e0d6ac8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99e01766631eba7a9822878d2bd9a63e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1core_1_1DiseaseEntity.html">DiseaseEntity</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a99e01766631eba7a9822878d2bd9a63e">get_disease</a> (<a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> info, <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country) const =0</td></tr>
+<tr class="memdesc:a99e01766631eba7a9822878d2bd9a63e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a disease full definition by identifier for a country.  <a href="classhgps_1_1core_1_1Datastore.html#a99e01766631eba7a9822878d2bd9a63e">More...</a><br /></td></tr>
 <tr class="separator:a99e01766631eba7a9822878d2bd9a63e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65d5c9ae0d29f251a51fc274f37cce97"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1core_1_1RelativeRiskEntity.html">RelativeRiskEntity</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a65d5c9ae0d29f251a51fc274f37cce97">get_relative_risk_to_disease</a> (<a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> source, <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> target) const =0</td></tr>
+<tr class="memdesc:a65d5c9ae0d29f251a51fc274f37cce97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the relative risk effects for disease to disease interactions.  <a href="classhgps_1_1core_1_1Datastore.html#a65d5c9ae0d29f251a51fc274f37cce97">More...</a><br /></td></tr>
 <tr class="separator:a65d5c9ae0d29f251a51fc274f37cce97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f6b696369a9fb2fa5f7b9ee32f9d1ff"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1core_1_1RelativeRiskEntity.html">RelativeRiskEntity</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a5f6b696369a9fb2fa5f7b9ee32f9d1ff">get_relative_risk_to_risk_factor</a> (<a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> source, <a class="el" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">Gender</a> gender, <a class="el" href="structhgps_1_1core_1_1Identifier.html">Identifier</a> risk_factor_key) const =0</td></tr>
+<tr class="memdesc:a5f6b696369a9fb2fa5f7b9ee32f9d1ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the relative risk effects for risk factor to disease interactions.  <a href="classhgps_1_1core_1_1Datastore.html#a5f6b696369a9fb2fa5f7b9ee32f9d1ff">More...</a><br /></td></tr>
 <tr class="separator:a5f6b696369a9fb2fa5f7b9ee32f9d1ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45f18846effd4984349a012fb5442855"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1core_1_1CancerParameterEntity.html">CancerParameterEntity</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a45f18846effd4984349a012fb5442855">get_disease_parameter</a> (<a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">DiseaseInfo</a> info, <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country) const =0</td></tr>
+<tr class="memdesc:a45f18846effd4984349a012fb5442855"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the parameters required by cancer type diseases for a country.  <a href="classhgps_1_1core_1_1Datastore.html#a45f18846effd4984349a012fb5442855">More...</a><br /></td></tr>
 <tr class="separator:a45f18846effd4984349a012fb5442855"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac22a342da438569f5b97c5c0540e628f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1core_1_1DiseaseAnalysisEntity.html">DiseaseAnalysisEntity</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f">get_disease_analysis</a> (const <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country) const =0</td></tr>
+<tr class="memdesc:ac22a342da438569f5b97c5c0540e628f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the Burden of Diseases (BoD) analysis dataset for a country.  <a href="classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f">More...</a><br /></td></tr>
 <tr class="separator:ac22a342da438569f5b97c5c0540e628f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a831a6921110b5f8a7ff68d4a97054e50"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1BirthItem.html">BirthItem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a831a6921110b5f8a7ff68d4a97054e50">get_birth_indicators</a> (const <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country, const std::function&lt; bool(const unsigned int &amp;)&gt; year_filter) const =0</td></tr>
-<tr class="separator:a831a6921110b5f8a7ff68d4a97054e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a478f1c3eca4cd2166eb77d7d6488a569"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1BirthItem.html">BirthItem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a478f1c3eca4cd2166eb77d7d6488a569">get_birth_indicators</a> (const <a class="el" href="structhgps_1_1core_1_1Country.html">Country</a> country, const std::function&lt; bool(const unsigned int &amp;)&gt; time_filter) const =0</td></tr>
+<tr class="memdesc:a478f1c3eca4cd2166eb77d7d6488a569"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the population birth indicators for a country filtered by time.  <a href="classhgps_1_1core_1_1Datastore.html#a478f1c3eca4cd2166eb77d7d6488a569">More...</a><br /></td></tr>
+<tr class="separator:a478f1c3eca4cd2166eb77d7d6488a569"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31dd7d1120a6c53679220b295744633d"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structhgps_1_1core_1_1LmsDataRow.html">LmsDataRow</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1core_1_1Datastore.html#a31dd7d1120a6c53679220b295744633d">get_lms_parameters</a> () const =0</td></tr>
+<tr class="memdesc:a31dd7d1120a6c53679220b295744633d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the LMS (lambda-mu-sigma) parameters for childhood growth charts.  <a href="classhgps_1_1core_1_1Datastore.html#a31dd7d1120a6c53679220b295744633d">More...</a><br /></td></tr>
 <tr class="separator:a31dd7d1120a6c53679220b295744633d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the <code>Health-GPS</code> back-end data store interface for all implementations. </p>
+<dl class="section see"><dt>See also</dt><dd><a href="https://imperialchepi.github.io/healthgps/datamodel">https://imperialchepi.github.io/healthgps/datamodel</a> for the <code>Data Model</code> details. </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac3a17726bca07175c4cf43b16a251baa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac3a17726bca07175c4cf43b16a251baa">&#9670;&nbsp;</a></span>~Datastore()</h2>
 
@@ -155,11 +175,13 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Destroys a <a class="el" href="classhgps_1_1core_1_1Datastore.html" title="Defines the Health-GPS back-end data store interface for all implementations.">Datastore</a> instance. </p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a831a6921110b5f8a7ff68d4a97054e50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a831a6921110b5f8a7ff68d4a97054e50">&#9670;&nbsp;</a></span>get_birth_indicators()</h2>
+<a id="a478f1c3eca4cd2166eb77d7d6488a569"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a478f1c3eca4cd2166eb77d7d6488a569">&#9670;&nbsp;</a></span>get_birth_indicators()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -177,7 +199,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::function&lt; bool(const unsigned int &amp;)&gt;&#160;</td>
-          <td class="paramname"><em>year_filter</em>&#160;</td>
+          <td class="paramname"><em>time_filter</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -192,11 +214,21 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the population birth indicators for a country filtered by time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">country</td><td>The target country definition </td></tr>
+    <tr><td class="paramname">time_filter</td><td>The time filter predicate, e.g. years range </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resulting list of birth indicator items </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a2284854e01ced83a3e71d5ad9fbdba92">hgps::data::DataManager</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a831a6921110b5f8a7ff68d4a97054e50_icgraph.svg" width="751" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a478f1c3eca4cd2166eb77d7d6488a569_icgraph.svg" width="751" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -223,6 +255,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the full collection of countries in the store. </p>
+<dl class="section return"><dt>Returns</dt><dd>The list of countries </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#abc42fa2dd5e12e64a82848a0b31b2826">hgps::data::DataManager</a>.</p>
 
@@ -251,6 +286,15 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a single country by the alpha code. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">alpha</td><td>The country alpha 2 or 3 format code to search </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The country's definition, if found, otherwise empty </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#ad7110ccdd349dcef5c4b84576bf2b90f">hgps::data::DataManager</a>.</p>
 
@@ -290,6 +334,16 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a disease full definition by identifier for a country. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">info</td><td>The target disease information </td></tr>
+    <tr><td class="paramname">country</td><td>The target country definition </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease definition, check empty() = true for missing data. </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a0da4317997c2f64df07b1eee4f06c2e9">hgps::data::DataManager</a>.</p>
 
 </div>
@@ -317,6 +371,15 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the Burden of Diseases (BoD) analysis dataset for a country. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">country</td><td>The target country definition </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The BoD analysis data, check empty() = true for missing data. </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a26a3224e13af068fdab4dd92ebf4f91d">hgps::data::DataManager</a>.</p>
 <div class="dynheader">
@@ -351,11 +414,20 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a single disease information by identifier. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">code</td><td>The target disease identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease information, if found, otherwise empty </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a5b35385195f7d17aae7544debdd7006c">hgps::data::DataManager</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a3e9c261f4185d034ba4398e0e0d6ac8c_icgraph.svg" width="430" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a3e9c261f4185d034ba4398e0e0d6ac8c_icgraph.svg" width="498" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -394,6 +466,16 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the parameters required by cancer type diseases for a country. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">info</td><td>The disease of type cancer information </td></tr>
+    <tr><td class="paramname">country</td><td>The target country definition </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The cancer parameters, check empty() = true for missing data. </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a550b807b6c1d736d24e4f09e0d911399">hgps::data::DataManager</a>.</p>
 
 </div>
@@ -421,11 +503,14 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the collection of diseases information in the store. </p>
+<dl class="section return"><dt>Returns</dt><dd>The list of diseases defined </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a32f472233810c0450149d12c3df859a4">hgps::data::DataManager</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_afb377ccc2f5b2f34aa4709ca984c1bc9_icgraph.svg" width="430" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_afb377ccc2f5b2f34aa4709ca984c1bc9_icgraph.svg" width="498" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -453,12 +538,15 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the LMS (lambda-mu-sigma) parameters for childhood growth charts. </p>
+<dl class="section return"><dt>Returns</dt><dd>The parameters for the LMS model </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a7e623bd583c695ed5548e35dae78676c">hgps::data::DataManager</a>.</p>
 
 </div>
 </div>
-<a id="aaa732a5f00487550198c971ba1977bf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa732a5f00487550198c971ba1977bf9">&#9670;&nbsp;</a></span>get_mortality()</h2>
+<a id="a80544f7a15b4d8069e6013ad7df22c01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80544f7a15b4d8069e6013ad7df22c01">&#9670;&nbsp;</a></span>get_mortality()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -476,7 +564,7 @@ Here is the caller graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::function&lt; bool(const unsigned int &amp;)&gt;&#160;</td>
-          <td class="paramname"><em>year_filter</em>&#160;</td>
+          <td class="paramname"><em>time_filter</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -491,17 +579,27 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the population mortality trend for a country filtered by time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">country</td><td>The target country definition </td></tr>
+    <tr><td class="paramname">time_filter</td><td>The time filter predicate, e.g., years range </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resulting list of mortality trend items </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#ae9127b3ec2d992a892a4473cb2fb180d">hgps::data::DataManager</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_aaa732a5f00487550198c971ba1977bf9_icgraph.svg" width="751" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a80544f7a15b4d8069e6013ad7df22c01_icgraph.svg" width="751" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a5e4ec41b2dbf12abfaacfd75a738e173"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e4ec41b2dbf12abfaacfd75a738e173">&#9670;&nbsp;</a></span>get_population()</h2>
+<a id="a18209be1995680018625c2276ad68853"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18209be1995680018625c2276ad68853">&#9670;&nbsp;</a></span>get_population()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -519,7 +617,7 @@ Here is the caller graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::function&lt; bool(const unsigned int &amp;)&gt;&#160;</td>
-          <td class="paramname"><em>year_filter</em>&#160;</td>
+          <td class="paramname"><em>time_filter</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -534,11 +632,21 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the population growth trend for a country filtered by time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">country</td><td>The target country definition </td></tr>
+    <tr><td class="paramname">time_filter</td><td>The time filter predicate, e.g., years range </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The resulting list of population trend items </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a899f208732830ed6616a3e2b3d7a34f6">hgps::data::DataManager</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a5e4ec41b2dbf12abfaacfd75a738e173_icgraph.svg" width="751" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1core_1_1Datastore_a18209be1995680018625c2276ad68853_icgraph.svg" width="751" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -576,6 +684,16 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the relative risk effects for disease to disease interactions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The source disease information </td></tr>
+    <tr><td class="paramname">target</td><td>The target disease information </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease-disease effects, check empty() = true for missing data. </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#ad4f4d08756941ec69da16fc70bf01f8b">hgps::data::DataManager</a>.</p>
 
@@ -620,6 +738,17 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the relative risk effects for risk factor to disease interactions. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>The disease information </td></tr>
+    <tr><td class="paramname">gender</td><td>The gender enumeration </td></tr>
+    <tr><td class="paramname">risk_factor_key</td><td>The risk factor identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The risk factor-disease effects, check empty() = true for missing data. </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1data_1_1DataManager.html#a2426abc02aae4f318bcdf4572e3777af">hgps::data::DataManager</a>.</p>
 

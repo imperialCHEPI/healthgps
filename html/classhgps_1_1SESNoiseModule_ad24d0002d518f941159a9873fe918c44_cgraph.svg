@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps_1_1core.html#a7f89b08ae3f9edbb57adaafce8bd9114" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps_1_1core.html#a7f89b08ae3f9edbb57adaafce8bd9114" target="_top" xlink:title="Finds index of all occurrences in a container.">
 <polygon fill="none" stroke="black" points="165,-147.5 165,-177.5 288,-177.5 288,-147.5 165,-147.5"/>
 <text text-anchor="start" x="173" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::find_index</text>
 <text text-anchor="middle" x="226.5" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">_of_all</text>
@@ -85,7 +85,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="namespacehgps_1_1core.html#ae6eacd437c5d1c6764e6c728a12d0de3" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="namespacehgps_1_1core.html#ae6eacd437c5d1c6764e6c728a12d0de3" target="_top" xlink:title="Parallel for each over an indexed accessed containers.">
 <polygon fill="none" stroke="black" points="325,-153 325,-172 453,-172 453,-153 325,-153"/>
 <text text-anchor="middle" x="389" y="-160" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::parallel_for</text>
 </a>

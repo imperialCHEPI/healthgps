@@ -1,7 +1,7 @@
 <map id="hgps::RelativeRiskLookup::RelativeRiskLookup" name="hgps::RelativeRiskLookup::RelativeRiskLookup">
 <area shape="rect" id="node1" title=" " alt="" coords="5,93,195,135"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Array2D.html#af87838b154483145034cd854c402d726" title=" " alt="" coords="262,5,413,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1Array2D.html#ad60e06e81e15e37a2ec58d8c2b39755d" title=" " alt="" coords="480,93,631,135"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Array2D.html#af87838b154483145034cd854c402d726" title="Gets the number of coluns in the array." alt="" coords="262,5,413,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1Array2D.html#ad60e06e81e15e37a2ec58d8c2b39755d" title="Gets the number of rows in the array." alt="" coords="480,93,631,135"/>
 <area shape="rect" id="node4" href="$classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083" title=" " alt="" coords="243,123,432,164"/>
 <area shape="rect" id="node5" href="$classhgps_1_1MonotonicVector.html#a4034db763740e2cef762f60521cf79a4" title=" " alt="" coords="252,188,423,229"/>
 </map>

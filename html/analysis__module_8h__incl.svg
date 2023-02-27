@@ -261,7 +261,7 @@
 <!-- Node18 -->
 <g id="node15" class="node">
 <title>Node18</title>
-<g id="a_node15"><a xlink:href="poco_8h.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="HealthGPS_8Core_2poco_8h.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="red" points="556.5,-112.5 556.5,-131.5 605.5,-131.5 605.5,-112.5 556.5,-112.5"/>
 <text text-anchor="middle" x="581" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">poco.h</text>
 </a>
@@ -367,7 +367,7 @@
 <g id="node24" class="node">
 <title>Node47</title>
 <g id="a_node24"><a xlink:href="univariate__summary_8h.html" target="_top" xlink:title=" ">
-<polygon fill="none" stroke="black" points="1024.5,-168.5 1024.5,-187.5 1149.5,-187.5 1149.5,-168.5 1024.5,-168.5"/>
+<polygon fill="none" stroke="red" points="1024.5,-168.5 1024.5,-187.5 1149.5,-187.5 1149.5,-168.5 1024.5,-168.5"/>
 <text text-anchor="middle" x="1087" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00">univariate_summary.h</text>
 </a>
 </g>

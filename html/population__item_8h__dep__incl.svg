@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="poco_8h.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="HealthGPS_8Core_2poco_8h.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="419.5,-626.5 419.5,-645.5 548.5,-645.5 548.5,-626.5 419.5,-626.5"/>
 <text text-anchor="middle" x="484" y="-633.5" font-family="Helvetica,sans-Serif" font-size="10.00">HealthGPS.Core/poco.h</text>
 </a>

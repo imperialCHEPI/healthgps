@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a831a6921110b5f8a7ff68d4a97054e50" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a478f1c3eca4cd2166eb77d7d6488a569" target="_top" xlink:title="Gets the population birth indicators for a country filtered by time.">
 <polygon fill="none" stroke="black" points="181,-251 181,-281 302,-281 302,-251 181,-251"/>
 <text text-anchor="start" x="189" y="-269" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="241.5" y="-258" font-family="Helvetica,sans-Serif" font-size="10.00">::get_birth_indicators</text>
@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1Datastore.html#aaa732a5f00487550198c971ba1977bf9" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a80544f7a15b4d8069e6013ad7df22c01" target="_top" xlink:title="Gets the population mortality trend for a country filtered by time.">
 <polygon fill="none" stroke="black" points="181,-202 181,-232 302,-232 302,-202 181,-202"/>
 <text text-anchor="start" x="189" y="-220" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="241.5" y="-209" font-family="Helvetica,sans-Serif" font-size="10.00">::get_mortality</text>
@@ -68,7 +68,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a5e4ec41b2dbf12abfaacfd75a738e173" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1core_1_1Datastore.html#a18209be1995680018625c2276ad68853" target="_top" xlink:title="Gets the population growth trend for a country filtered by time.">
 <polygon fill="none" stroke="black" points="181,-153 181,-183 302,-183 302,-153 181,-153"/>
 <text text-anchor="start" x="189" y="-171" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 <text text-anchor="middle" x="241.5" y="-160" font-family="Helvetica,sans-Serif" font-size="10.00">::get_population</text>

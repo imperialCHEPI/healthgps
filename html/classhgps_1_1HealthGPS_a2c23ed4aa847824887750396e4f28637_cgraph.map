@@ -1,5 +1,5 @@
 <map id="hgps::HealthGPS::init" name="hgps::HealthGPS::init">
-<area shape="rect" id="node1" title=" " alt="" coords="5,371,164,398"/>
+<area shape="rect" id="node1" title="Called when the model is added to the simulation executive." alt="" coords="5,371,164,398"/>
 <area shape="rect" id="node2" href="$classhgps_1_1RuntimeMetric.html#ab532edb9d29ad922f31ef13aff96a5ef" title=" " alt="" coords="238,5,395,47"/>
 <area shape="rect" id="node3" href="$classhgps_1_1Scenario.html#a2c6544f327294f09f3eaa7a3e8f4e972" title=" " alt="" coords="238,71,395,98"/>
 <area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" title=" " alt="" coords="233,123,400,164"/>

@@ -2,8 +2,8 @@ var dir_d2cb4d7268994d5bb552b9ff4076d9cb =
 [
     [ "analysis.h", "analysis_8h.html", [
       [ "LifeExpectancyItem", "structhgps_1_1core_1_1LifeExpectancyItem.html", "structhgps_1_1core_1_1LifeExpectancyItem" ],
-      [ "LmsDataRow", "structhgps_1_1core_1_1LmsDataRow.html", "structhgps_1_1core_1_1LmsDataRow" ],
-      [ "DiseaseAnalysisEntity", "structhgps_1_1core_1_1DiseaseAnalysisEntity.html", "structhgps_1_1core_1_1DiseaseAnalysisEntity" ]
+      [ "DiseaseAnalysisEntity", "structhgps_1_1core_1_1DiseaseAnalysisEntity.html", "structhgps_1_1core_1_1DiseaseAnalysisEntity" ],
+      [ "LmsDataRow", "structhgps_1_1core_1_1LmsDataRow.html", "structhgps_1_1core_1_1LmsDataRow" ]
     ] ],
     [ "api.h", "HealthGPS_8Core_2api_8h.html", null ],
     [ "array2d.h", "array2d_8h.html", "array2d_8h" ],
@@ -48,7 +48,7 @@ var dir_d2cb4d7268994d5bb552b9ff4076d9cb =
       [ "MathHelper", "classhgps_1_1core_1_1MathHelper.html", "classhgps_1_1core_1_1MathHelper" ]
     ] ],
     [ "mortality.h", "mortality_8h.html", "mortality_8h" ],
-    [ "poco.h", "poco_8h.html", null ],
+    [ "poco.h", "HealthGPS_8Core_2poco_8h.html", null ],
     [ "population_item.h", "population__item_8h.html", "population__item_8h" ],
     [ "scoped_timer.h", "scoped__timer_8h.html", [
       [ "ScopedTimer", "classhgps_1_1core_1_1ScopedTimer.html", "classhgps_1_1core_1_1ScopedTimer" ]
@@ -56,7 +56,7 @@ var dir_d2cb4d7268994d5bb552b9ff4076d9cb =
     [ "string_util.cpp", "string__util_8cpp.html", "string__util_8cpp" ],
     [ "string_util.h", "string__util_8h.html", "string__util_8h" ],
     [ "thread_util.h", "thread__util_8h.html", "thread__util_8h" ],
-    [ "univariate_summary.cpp", "univariate__summary_8cpp.html", null ],
+    [ "univariate_summary.cpp", "univariate__summary_8cpp.html", "univariate__summary_8cpp" ],
     [ "univariate_summary.h", "univariate__summary_8h.html", [
       [ "UnivariateSummary", "classhgps_1_1core_1_1UnivariateSummary.html", "classhgps_1_1core_1_1UnivariateSummary" ]
     ] ],

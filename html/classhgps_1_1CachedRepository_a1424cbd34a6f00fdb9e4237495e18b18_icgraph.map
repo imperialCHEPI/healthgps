@@ -1,5 +1,5 @@
 <map id="hgps::CachedRepository::register_lite_linear_model_definition" name="hgps::CachedRepository::register_lite_linear_model_definition">
-<area shape="rect" id="node1" title=" " alt="" coords="304,5,483,61"/>
-<area shape="rect" id="node2" href="$model__parser_8cpp.html#a63714a3138c1b3676cfb45b209522ce4" title=" " alt="" coords="108,13,256,54"/>
-<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,20,60,47"/>
+<area shape="rect" id="node1" title=" " alt="" coords="347,5,525,61"/>
+<area shape="rect" id="node2" href="$namespacehost.html#af872a17121b8dc250c7397fb6af921cf" title="Registers a risk factor model definition with the repository." alt="" coords="108,13,299,54"/>
+<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,20,60,47"/>
 </map>

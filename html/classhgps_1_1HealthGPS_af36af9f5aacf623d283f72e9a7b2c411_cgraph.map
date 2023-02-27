@@ -1,5 +1,5 @@
 <map id="hgps::HealthGPS::update" name="hgps::HealthGPS::update">
-<area shape="rect" id="node1" title=" " alt="" coords="5,195,188,222"/>
+<area shape="rect" id="node1" title="Called to assign a new state to the model at current time." alt="" coords="5,195,188,222"/>
 <area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" title=" " alt="" coords="241,5,407,47"/>
 <area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a0e888d326a217dcf378f1cb29eecf3b0" title=" " alt="" coords="241,71,407,112"/>
 <area shape="rect" id="node4" href="$classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" title="Gets the simulation name." alt="" coords="236,137,412,163"/>

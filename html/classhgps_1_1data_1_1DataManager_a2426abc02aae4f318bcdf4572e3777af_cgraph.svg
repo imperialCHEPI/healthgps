@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the relative risk effects for risk factor to disease interactions.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-41.5 140,-41.5 140,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::data::DataManager</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_relative_risk_to</text>
@@ -22,7 +22,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1Identifier.html#a35155d48deab7530b7285a90d09b8c9d" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1Identifier.html#a35155d48deab7530b7285a90d09b8c9d" target="_top" xlink:title="Convert the identifier to a string representation.">
 <polygon fill="none" stroke="black" points="176,-6 176,-36 292,-36 292,-6 176,-6"/>
 <text text-anchor="start" x="184" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Identifier</text>
 <text text-anchor="middle" x="234" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>

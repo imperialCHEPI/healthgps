@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Cancel a running experiment.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-30.5 116,-30.5 116,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelRunner::</text>
 <text text-anchor="middle" x="58" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">cancel</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1ModelRunner.html#ae8686193d1609fb0d77989144d50e04a" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1ModelRunner.html#ae8686193d1609fb0d77989144d50e04a" target="_top" xlink:title="Gets a value indicating whether an experiment is current running.">
 <polygon fill="none" stroke="black" points="152,-0.5 152,-30.5 268,-30.5 268,-0.5 152,-0.5"/>
 <text text-anchor="start" x="160" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelRunner::</text>
 <text text-anchor="middle" x="210" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">is_running</text>

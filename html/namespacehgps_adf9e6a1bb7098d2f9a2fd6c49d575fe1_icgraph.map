@@ -1,6 +1,6 @@
 <map id="hgps::parse_fiscal_impact_type" name="hgps::parse_fiscal_impact_type">
-<area shape="rect" id="node1" title=" " alt="" coords="503,5,641,47"/>
-<area shape="rect" id="node2" href="$configuration_8cpp.html#a3059dc347db0d2d69f5703cba550eccb" title=" " alt="" coords="305,5,455,47"/>
-<area shape="rect" id="node3" href="$configuration_8cpp.html#a32941ab19338506c6bf94a654a8ef756" title=" " alt="" coords="108,5,257,47"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,13,60,39"/>
+<area shape="rect" id="node1" title=" " alt="" coords="575,5,713,47"/>
+<area shape="rect" id="node2" href="$namespacehost.html#a4552f895418d563b0dac59718d48b4d8" title="Creates the intervention scenario instance." alt="" coords="341,5,527,47"/>
+<area shape="rect" id="node3" href="$namespacehost.html#afabde855725160143379c1dfbfeda48a" title="Creates the intervention simulation engine instance." alt="" coords="108,5,293,47"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
 </map>

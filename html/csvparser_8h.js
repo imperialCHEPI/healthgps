@@ -1,10 +1,10 @@
 var csvparser_8h =
 [
-    [ "create_fields_index_mapping", "csvparser_8h.html#a0fb48cebc2ff64557e1eac382d876cbc", null ],
-    [ "get_double_column", "csvparser_8h.html#a2a241ea6ea1080044f2c94df5f66bf10", null ],
-    [ "get_float_column", "csvparser_8h.html#a93c50966061a3748752a54f837d72c52", null ],
-    [ "get_int_column", "csvparser_8h.html#a45de9c7efc2ee516888807b173e4e064", null ],
-    [ "get_string_column", "csvparser_8h.html#aef4d3e51d3ef1bd72a04d915dfb7ab62", null ],
-    [ "load_baseline_csv", "csvparser_8h.html#af9ec3baa602a6067ece1c411bc49d252", null ],
-    [ "load_datatable_csv", "csvparser_8h.html#a630db734c897187e308f2a95dfc5c244", null ]
+    [ "create_fields_index_mapping", "csvparser_8h.html#a7700289188d3722cff0da5b3904a20d9", null ],
+    [ "load_baseline_from_csv", "csvparser_8h.html#ae3e061207e4dd21d8c9e59710356c614", null ],
+    [ "load_datatable_from_csv", "csvparser_8h.html#a186b46487783fb34e9ac1ce3d52778aa", null ],
+    [ "parse_double_column", "csvparser_8h.html#a918cca25f7d11e0008f7aa8e428c5b8c", null ],
+    [ "parse_float_column", "csvparser_8h.html#a2ecb10006bc4e39991b2029cd8e188a9", null ],
+    [ "parse_int_column", "csvparser_8h.html#a37790aeb69b717077251401e27f63273", null ],
+    [ "parse_string_column", "csvparser_8h.html#a175fabf9aa46f5c7d47f52a6d5cd2505", null ]
 ];

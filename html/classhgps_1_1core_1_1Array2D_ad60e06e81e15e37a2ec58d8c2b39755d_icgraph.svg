@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the number of rows in the array.">
 <polygon fill="#bfbfbf" stroke="black" points="356,-22.5 356,-52.5 469,-52.5 469,-22.5 356,-22.5"/>
 <text text-anchor="start" x="364" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Array2D</text>
 <text text-anchor="middle" x="412.5" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">::rows</text>

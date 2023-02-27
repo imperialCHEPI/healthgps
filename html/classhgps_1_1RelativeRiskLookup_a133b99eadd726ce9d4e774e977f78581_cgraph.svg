@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1Array2D.html#aa902b675fe4d921285b7ab3d1ec99fdd" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1core_1_1Array2D.html#aa902b675fe4d921285b7ab3d1ec99fdd" target="_top" xlink:title="Gets the total size of the array storage.">
 <polygon fill="none" stroke="black" points="178,-0.5 178,-30.5 291,-30.5 291,-0.5 178,-0.5"/>
 <text text-anchor="start" x="186" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Array2D</text>
 <text text-anchor="middle" x="234.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::size</text>

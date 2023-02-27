@@ -1,23 +1,23 @@
 <map id="hgps::core::case_insensitive::equals" name="hgps::core::case_insensitive::equals">
-<area shape="rect" id="node1" title=" " alt="" coords="831,414,1036,456"/>
-<area shape="rect" id="node2" href="$configuration_8cpp.html#a3059dc347db0d2d69f5703cba550eccb" title=" " alt="" coords="344,356,493,397"/>
-<area shape="rect" id="node5" href="$configuration_8cpp.html#af1f2ff12e096dc8f70dd6c15201acbe6" title=" " alt="" coords="108,114,259,140"/>
-<area shape="rect" id="node6" href="$configuration_8cpp.html#ab41af12c9a317e192dba580788e542fe" title=" " alt="" coords="589,115,772,142"/>
-<area shape="rect" id="node8" href="$classhgps_1_1data_1_1DataManager.html#ad7110ccdd349dcef5c4b84576bf2b90f" title=" " alt="" coords="587,166,774,208"/>
-<area shape="rect" id="node9" href="$classhgps_1_1data_1_1DataManager.html#a5b35385195f7d17aae7544debdd7006c" title=" " alt="" coords="587,232,774,273"/>
-<area shape="rect" id="node10" href="$classhgps_1_1data_1_1DataManager.html#a32f472233810c0450149d12c3df859a4" title=" " alt="" coords="587,297,774,338"/>
-<area shape="rect" id="node11" href="$model__parser_8cpp.html#a23c45f2fc31cd0836f491f52f6170f8d" title=" " alt="" coords="319,582,519,608"/>
-<area shape="rect" id="node12" href="$model__parser_8cpp.html#a63714a3138c1b3676cfb45b209522ce4" title=" " alt="" coords="109,498,257,540"/>
-<area shape="rect" id="node13" href="$csvparser_8cpp.html#a62df83c91a23bce371f55f20b9825ffc" title=" " alt="" coords="610,632,751,659"/>
-<area shape="rect" id="node14" href="$configuration_8cpp.html#af1d74f465c1ecdaac9ccef435ca1462c" title=" " alt="" coords="112,611,255,638"/>
-<area shape="rect" id="node15" href="$csvparser_8cpp.html#aa36bf705a50d4f460573db11852ca40c" title=" " alt="" coords="345,14,493,40"/>
-<area shape="rect" id="node16" href="$model__parser_8cpp.html#a6383bd1b70a0eb2be74798ff8197afc7" title=" " alt="" coords="307,531,531,558"/>
-<area shape="rect" id="node17" href="$namespacehgps.html#adf9e6a1bb7098d2f9a2fd6c49d575fe1" title=" " alt="" coords="611,414,750,456"/>
-<area shape="rect" id="node18" href="$classhgps_1_1SESNoiseModule.html#a1b0798cbf7f9d2ac0bc4ff0cf861cf3e" title=" " alt="" coords="595,734,766,776"/>
-<area shape="rect" id="node19" href="$classhgps_1_1detail_1_1StoreConverter.html#a066dd7e4f199e2b8442edbe49ee71bcd" title=" " alt="" coords="579,800,783,841"/>
-<area shape="rect" id="node3" href="$configuration_8cpp.html#a32941ab19338506c6bf94a654a8ef756" title=" " alt="" coords="109,340,258,381"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,292,60,319"/>
-<area shape="rect" id="node7" href="$configuration_8cpp.html#af5bcc5029f8d8a94e399e6570cbcd645" title=" " alt="" coords="113,229,254,270"/>
-<area shape="rect" id="node20" href="$classhgps_1_1detail_1_1StoreConverter.html#ab84ed9dfdfc47787731e596e99daa19d" title=" " alt="" coords="317,800,521,841"/>
-<area shape="rect" id="node21" href="$namespacehgps_1_1detail.html#a7919ba23ba1ff6b87eada303f679277a" title=" " alt="" coords="110,800,257,841"/>
+<area shape="rect" id="node1" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="851,436,1056,477"/>
+<area shape="rect" id="node2" href="$namespacehost.html#a4552f895418d563b0dac59718d48b4d8" title="Creates the intervention scenario instance." alt="" coords="356,377,541,419"/>
+<area shape="rect" id="node5" href="$namespacehost.html#a582511be039f0908f942b738900378bb" title=" " alt="" coords="130,115,277,156"/>
+<area shape="rect" id="node6" href="$namespacehost.html#a009475c30ce55d73b02a78b212742e39" title="Creates the full output file name from user input configuration." alt="" coords="627,123,775,164"/>
+<area shape="rect" id="node8" href="$classhgps_1_1data_1_1DataManager.html#ad7110ccdd349dcef5c4b84576bf2b90f" title="Gets a single country by the alpha code." alt="" coords="607,188,794,229"/>
+<area shape="rect" id="node9" href="$classhgps_1_1data_1_1DataManager.html#a5b35385195f7d17aae7544debdd7006c" title="Gets a single disease information by identifier." alt="" coords="607,253,794,295"/>
+<area shape="rect" id="node10" href="$classhgps_1_1data_1_1DataManager.html#a32f472233810c0450149d12c3df859a4" title="Gets the collection of diseases information in the store." alt="" coords="607,319,794,360"/>
+<area shape="rect" id="node11" href="$namespacehost.html#a4b5ca710f860350ad9e1d5b97fd7709c" title="Loads baseline adjustments information from a file." alt="" coords="375,619,523,660"/>
+<area shape="rect" id="node12" href="$namespacehost.html#af872a17121b8dc250c7397fb6af921cf" title="Registers a risk factor model definition with the repository." alt="" coords="108,524,299,565"/>
+<area shape="rect" id="node13" href="$namespacehost.html#ae3e061207e4dd21d8c9e59710356c614" title="Loads the contents of baseline adjustments file into a table." alt="" coords="627,655,775,696"/>
+<area shape="rect" id="node14" href="$namespacehost.html#af79a5d1675d5305364c34cc2f44541e7" title="Loads the input configuration file, *.json, information." alt="" coords="114,641,293,667"/>
+<area shape="rect" id="node15" href="$namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa" title="Populates a datatable with the input data file contents." alt="" coords="371,5,526,47"/>
+<area shape="rect" id="node16" href="$namespacehost.html#a863b7fcd46376d19914cb6635cd20764" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="374,553,523,595"/>
+<area shape="rect" id="node17" href="$namespacehgps.html#adf9e6a1bb7098d2f9a2fd6c49d575fe1" title=" " alt="" coords="631,436,770,477"/>
+<area shape="rect" id="node18" href="$classhgps_1_1SESNoiseModule.html#a1b0798cbf7f9d2ac0bc4ff0cf861cf3e" title=" " alt="" coords="615,772,786,813"/>
+<area shape="rect" id="node19" href="$classhgps_1_1detail_1_1StoreConverter.html#a066dd7e4f199e2b8442edbe49ee71bcd" title=" " alt="" coords="599,837,803,879"/>
+<area shape="rect" id="node3" href="$namespacehost.html#afabde855725160143379c1dfbfeda48a" title="Creates the intervention simulation engine instance." alt="" coords="111,360,296,401"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,311,60,338"/>
+<area shape="rect" id="node7" href="$namespacehost.html#a07367da68854f50923957b8f86a7bc4c" title="Creates the simulation results file logger instance." alt="" coords="128,248,279,289"/>
+<area shape="rect" id="node20" href="$classhgps_1_1detail_1_1StoreConverter.html#ab84ed9dfdfc47787731e596e99daa19d" title=" " alt="" coords="347,837,551,879"/>
+<area shape="rect" id="node21" href="$namespacehgps_1_1detail.html#a7919ba23ba1ff6b87eada303f679277a" title=" " alt="" coords="130,837,277,879"/>
 </map>

@@ -1,0 +1,4 @@
+<map id="hgps::core::Interval::contains" name="hgps::core::Interval::contains">
+<area shape="rect" id="node1" title="Determines whether an Interval is inside this instance interval." alt="" coords="5,5,152,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Interval.html#affac507b341a89f6f5ba901c87c4eed2" title="Determines whether a value is in the Interval." alt="" coords="200,5,347,47"/>
+</map>

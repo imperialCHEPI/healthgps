@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1Identifier.html#a12ec4bf7f0b4d13883ac7addb1f2a6a9" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1Identifier.html#a12ec4bf7f0b4d13883ac7addb1f2a6a9" target="_top" xlink:title="Checks whether this is an empty identifier.">
 <polygon fill="none" stroke="black" points="298,-0.5 298,-30.5 414,-30.5 414,-0.5 298,-0.5"/>
 <text text-anchor="start" x="306" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Identifier</text>
 <text text-anchor="middle" x="356" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::is_empty</text>

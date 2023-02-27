@@ -1,7 +1,7 @@
 <map id="hgps::MappingEntry::name" name="hgps::MappingEntry::name">
-<area shape="rect" id="node1" title=" " alt="" coords="307,49,457,90"/>
-<area shape="rect" id="node2" href="$configuration_8cpp.html#af1f2ff12e096dc8f70dd6c15201acbe6" title=" " alt="" coords="108,5,259,32"/>
-<area shape="rect" id="node4" href="$namespacehgps.html#a5c85bd56f021b531a95835e8c7287126" title=" " alt="" coords="120,56,247,83"/>
-<area shape="rect" id="node5" href="$namespacehgps.html#a29a13330f3ff2e03901be85a54d11aeb" title=" " alt="" coords="120,107,247,133"/>
-<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,60,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="303,64,453,105"/>
+<area shape="rect" id="node2" href="$namespacehost.html#a582511be039f0908f942b738900378bb" title=" " alt="" coords="108,5,255,47"/>
+<area shape="rect" id="node4" href="$namespacehgps.html#a5c85bd56f021b531a95835e8c7287126" title=" " alt="" coords="118,71,245,98"/>
+<area shape="rect" id="node5" href="$namespacehgps.html#a29a13330f3ff2e03901be85a54d11aeb" title=" " alt="" coords="118,122,245,149"/>
+<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
 </map>

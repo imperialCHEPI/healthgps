@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1EventMessageVisitor.html#a0245c8fd61cd9f8e6846e530fb3fc5d1" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1EventMessageVisitor.html#a0245c8fd61cd9f8e6846e530fb3fc5d1" target="_top" xlink:title="Visits a hgps::RunnerEventMessage message type.">
 <polygon fill="none" stroke="black" points="188,-0.5 188,-30.5 337,-30.5 337,-0.5 188,-0.5"/>
 <text text-anchor="start" x="196" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventMessageVisitor</text>
 <text text-anchor="middle" x="262.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::visit</text>

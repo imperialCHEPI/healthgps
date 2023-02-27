@@ -1,5 +1,5 @@
 <map id="hgps::core::UnivariateSummary::count_total" name="hgps::core::UnivariateSummary::count_total">
-<area shape="rect" id="node1" title=" " alt="" coords="5,39,233,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#ad6666baff8ce41a1d743c62165c98ee2" title=" " alt="" coords="281,5,509,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1UnivariateSummary.html#a0d9ff342a85afcc337e930c0f7487e05" title=" " alt="" coords="281,71,509,112"/>
+<area shape="rect" id="node1" title="Gets the total number of data points." alt="" coords="5,39,233,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#ad6666baff8ce41a1d743c62165c98ee2" title="Gets the number of null data points, not included in the summary." alt="" coords="281,5,509,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1UnivariateSummary.html#a0d9ff342a85afcc337e930c0f7487e05" title="Gets the number of valid data points included in the summary." alt="" coords="281,71,509,112"/>
 </map>

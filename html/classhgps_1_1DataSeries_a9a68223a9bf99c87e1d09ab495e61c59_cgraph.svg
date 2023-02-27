@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a83bdacfb623688d6405453d17ff798e6" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1case__insensitive.html#a83bdacfb623688d6405453d17ff798e6" target="_top" xlink:title="Checks whether a specified substring occurs within a ASCII string.">
 <polygon fill="none" stroke="black" points="318,-39 318,-69 472,-69 472,-39 318,-39"/>
 <text text-anchor="start" x="326" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::case_insensitive</text>
 <text text-anchor="middle" x="395" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::contains</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" target="_top" xlink:title="Converts the given ASCII string to lower&#45;case.">
 <polygon fill="none" stroke="black" points="337.5,-0.5 337.5,-19.5 452.5,-19.5 452.5,-0.5 337.5,-0.5"/>
 <text text-anchor="middle" x="395" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::to_lower</text>
 </a>

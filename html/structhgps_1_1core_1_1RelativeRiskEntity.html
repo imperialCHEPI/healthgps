@@ -94,23 +94,32 @@ $(document).ready(function(){initNavTree('structhgps_1_1core_1_1RelativeRiskEnti
 </div><!--header-->
 <div class="contents">
 
+<p>Diseases relative risk effect table data structure.  
+ <a href="structhgps_1_1core_1_1RelativeRiskEntity.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="HealthGPS_8Core_2disease_8h_source.html">disease.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a273c8b92660945c48c964aa54f1f1d20"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1core_1_1RelativeRiskEntity.html#a273c8b92660945c48c964aa54f1f1d20">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:a273c8b92660945c48c964aa54f1f1d20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the relative risk table data is empty.  <a href="structhgps_1_1core_1_1RelativeRiskEntity.html#a273c8b92660945c48c964aa54f1f1d20">More...</a><br /></td></tr>
 <tr class="separator:a273c8b92660945c48c964aa54f1f1d20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a1fb2feaa02d808527cb4ba088a6dd9ea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1core_1_1RelativeRiskEntity.html#a1fb2feaa02d808527cb4ba088a6dd9ea">is_default_value</a> {}</td></tr>
+<tr class="memdesc:a1fb2feaa02d808527cb4ba088a6dd9ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value indicating whether the rows contain default value only.  <a href="structhgps_1_1core_1_1RelativeRiskEntity.html#a1fb2feaa02d808527cb4ba088a6dd9ea">More...</a><br /></td></tr>
 <tr class="separator:a1fb2feaa02d808527cb4ba088a6dd9ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1873fb28dea8623e649053b4d98e6dd4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1core_1_1RelativeRiskEntity.html#a1873fb28dea8623e649053b4d98e6dd4">columns</a></td></tr>
+<tr class="memdesc:a1873fb28dea8623e649053b4d98e6dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The table column identifiers.  <a href="structhgps_1_1core_1_1RelativeRiskEntity.html#a1873fb28dea8623e649053b4d98e6dd4">More...</a><br /></td></tr>
 <tr class="separator:a1873fb28dea8623e649053b4d98e6dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15e3adb87f7a06d2178177e21c26dfc7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; float &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1core_1_1RelativeRiskEntity.html#a15e3adb87f7a06d2178177e21c26dfc7">rows</a></td></tr>
+<tr class="memdesc:a15e3adb87f7a06d2178177e21c26dfc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The table rows with data for each column.  <a href="structhgps_1_1core_1_1RelativeRiskEntity.html#a15e3adb87f7a06d2178177e21c26dfc7">More...</a><br /></td></tr>
 <tr class="separator:a15e3adb87f7a06d2178177e21c26dfc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Diseases relative risk effect table data structure. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a273c8b92660945c48c964aa54f1f1d20"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a273c8b92660945c48c964aa54f1f1d20">&#9670;&nbsp;</a></span>empty()</h2>
 
@@ -134,6 +143,9 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Checks whether the relative risk table data is empty. </p>
+<dl class="section return"><dt>Returns</dt><dd>true for an empty table, otherwise false. </dd></dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -149,6 +161,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>The table column identifiers. </p>
+
 </div>
 </div>
 <a id="a1fb2feaa02d808527cb4ba088a6dd9ea"></a>
@@ -163,6 +177,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Value indicating whether the rows contain default value only. </p>
+
 </div>
 </div>
 <a id="a15e3adb87f7a06d2178177e21c26dfc7"></a>
@@ -176,6 +192,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The table rows with data for each column. </p>
 
 </div>
 </div>

@@ -1,5 +1,5 @@
 <map id="hgps::MappingEntry::entity_key" name="hgps::MappingEntry::entity_key">
 <area shape="rect" id="node1" title=" " alt="" coords="5,5,156,47"/>
 <area shape="rect" id="node2" href="$classhgps_1_1MappingEntry.html#a09cdddeb8893a92310b268ab19ba8409" title=" " alt="" coords="204,5,355,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1core_1_1Identifier.html#a12ec4bf7f0b4d13883ac7addb1f2a6a9" title=" " alt="" coords="403,5,557,47"/>
+<area shape="rect" id="node3" href="$structhgps_1_1core_1_1Identifier.html#a12ec4bf7f0b4d13883ac7addb1f2a6a9" title="Checks whether this is an empty identifier." alt="" coords="403,5,557,47"/>
 </map>

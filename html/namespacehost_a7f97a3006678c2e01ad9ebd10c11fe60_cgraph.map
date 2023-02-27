@@ -1,0 +1,5 @@
+<map id="host::get_diseases_info" name="host::get_diseases_info">
+<area shape="rect" id="node1" title="Gets the collection of diseases that matches the selected input list." alt="" coords="5,46,180,73"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Datastore.html#a3e9c261f4185d034ba4398e0e0d6ac8c" title="Gets a single disease information by identifier." alt="" coords="228,5,389,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1Datastore.html#afb377ccc2f5b2f34aa4709ca984c1bc9" title="Gets the collection of diseases information in the store." alt="" coords="228,71,389,112"/>
+</map>

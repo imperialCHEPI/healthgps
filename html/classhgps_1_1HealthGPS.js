@@ -8,6 +8,6 @@ var classhgps_1_1HealthGPS =
     [ "setup_run", "classhgps_1_1HealthGPS.html#a8823f1ec49a3e74dcb094bae83820f58", null ],
     [ "setup_run", "classhgps_1_1HealthGPS.html#ab2ec3e5dd654ba88bea5b2b734063718", null ],
     [ "terminate", "classhgps_1_1HealthGPS.html#af715c66fe03390d21ef76484a7d0893c", null ],
-    [ "update", "classhgps_1_1HealthGPS.html#ad56c838fded6d36ee54448d2d65ab78b", null ],
-    [ "update", "classhgps_1_1HealthGPS.html#af36af9f5aacf623d283f72e9a7b2c411", null ]
+    [ "update", "classhgps_1_1HealthGPS.html#af36af9f5aacf623d283f72e9a7b2c411", null ],
+    [ "update", "classhgps_1_1HealthGPS.html#a2ac64ab5b035b64fd94ff041109d4b48", null ]
 ];

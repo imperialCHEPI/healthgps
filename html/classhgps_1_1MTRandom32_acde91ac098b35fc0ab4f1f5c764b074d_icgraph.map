@@ -1,6 +1,6 @@
 <map id="hgps::MTRandom32::discard" name="hgps::MTRandom32::discard">
-<area shape="rect" id="node1" title=" " alt="" coords="483,5,689,32"/>
-<area shape="rect" id="node2" href="$configuration_8cpp.html#a8d70bdc5b9f283b483eff46410b23d1c" title=" " alt="" coords="307,5,435,32"/>
-<area shape="rect" id="node3" href="$configuration_8cpp.html#af1f2ff12e096dc8f70dd6c15201acbe6" title=" " alt="" coords="108,5,259,32"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title=" " alt="" coords="5,5,60,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="515,13,721,39"/>
+<area shape="rect" id="node2" href="$namespacehost.html#a5e2e0a1a89f429fc1ccff6b778805017" title="Creates the experiment random number generator seed." alt="" coords="303,13,467,39"/>
+<area shape="rect" id="node3" href="$namespacehost.html#a582511be039f0908f942b738900378bb" title=" " alt="" coords="108,5,255,47"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
 </map>

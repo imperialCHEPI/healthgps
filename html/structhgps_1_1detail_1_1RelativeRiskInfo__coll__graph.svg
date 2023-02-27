@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1DiseaseInfo.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1core_1_1DiseaseInfo.html" target="_top" xlink:title="Disease information structure.">
 <polygon fill="none" stroke="black" points="0,-67.5 0,-86.5 131,-86.5 131,-67.5 0,-67.5"/>
 <text text-anchor="middle" x="65.5" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::DiseaseInfo</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1Identifier.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1core_1_1Identifier.html" target="_top" xlink:title="Entity unique identifier data type.">
 <polygon fill="none" stroke="black" points="7.5,-134.5 7.5,-153.5 123.5,-153.5 123.5,-134.5 7.5,-134.5"/>
 <text text-anchor="middle" x="65.5" y="-141.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Identifier</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1Datastore.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1core_1_1Datastore.html" target="_top" xlink:title="Defines the Health&#45;GPS back&#45;end data store interface for all implementations.">
 <polygon fill="none" stroke="black" points="149,-67.5 149,-86.5 270,-86.5 270,-67.5 149,-67.5"/>
 <text text-anchor="middle" x="209.5" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::Datastore</text>
 </a>
