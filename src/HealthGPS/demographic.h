@@ -10,20 +10,37 @@
 
 namespace hgps {
 
+	/// @brief Define the population dataset entry record data type
 	struct PopulationRecord {
+		/// @brief Initialise a new instance of the PopulationRecord structure
+		/// @param pop_age Age reference
+		/// @param num_males Number of males
+		/// @param num_females Number of females
 		PopulationRecord(int pop_age, float num_males, float num_females)
 			: age{ pop_age }, males{ num_males }, females{ num_females } {}
 
+		/// @brief Age reference in years
 		int age{};
+
+		/// @brief Number of males
 		float males{};
+
+		/// @brief NUmber of females
 		float females{};
 
+		/// @brief Gets the total number at age
+		/// @return Total number for age
 		float total() const noexcept { return males + females; }
 	};
 
+	/// @brief Implements the population demographic module data type
 	class PopulationModule final : public DemographicModule {
 	public:
 		PopulationModule() = delete;
+
+		/// @brief Initialise a new instance of the PopulationModule class.
+		/// @param pop_data Population table with year and age lookup
+		/// @param life_table Population life table with births and deaths
 		PopulationModule(std::map<int, std::map<int, PopulationRecord>>&& pop_data,
 			LifeTable&& life_table);
 
