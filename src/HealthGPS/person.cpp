@@ -44,10 +44,12 @@ namespace hgps {
     }
 
     double Person::get_risk_factor_value(const core::Identifier& key) const noexcept {
+        // Static properties
         if (current_dispatcher.contains(key)) {
             return current_dispatcher.at(key)(*this);
         }
 
+        // Dynamic properties
         if (risk_factors.contains(key)) {
             return risk_factors.at(key);
         }

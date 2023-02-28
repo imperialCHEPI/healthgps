@@ -14,18 +14,23 @@
 namespace hgps {
 	/// @brief Internal details namespace for private data types and functions
 	namespace detail {
-
+		/// @brief Collate the information for retrieving relative risks for a disease
 		struct RelativeRiskInfo
 		{
+			/// @brief The target disease information
 			const core::DiseaseInfo& disease;
 
+			/// @brief Back-end data store manager instance
 			core::Datastore& manager;
 
+			/// @brief The model inputs 
 			const ModelInput& inputs;
 
+			/// @brief The risk factor model mappings
 			std::vector<MappingEntry>& risk_factors;
 		};
 
+		/// @brief Back-end data stop POCO types converter to Health-GPS types
 		class StoreConverter
 		{
 		public:
@@ -49,8 +54,15 @@ namespace hgps {
 			static LmsDefinition to_lms_definition(const std::vector<core::LmsDataRow>& dataset);
 		};
 
+		/// @brief Creates the relative risk definition for a disease
+		/// @param info The relative risk information
+		/// @return The disease relative risk instance 
 		RelativeRisk create_relative_risk(const RelativeRiskInfo& info);
 
+		/// @brief Creates a commutative distribution function (CDF) from a frequency list
+		/// @tparam TYPE Frequency data type
+		/// @param frequency The frequency list
+		/// @return The respective CDF data
 		template<std::floating_point TYPE>
 		static std::vector<TYPE> create_cdf(std::vector<TYPE>& frequency) {
 			auto sum = std::accumulate(std::cbegin(frequency), std::cend(frequency), 0.0f);

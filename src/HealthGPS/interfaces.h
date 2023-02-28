@@ -54,6 +54,7 @@ namespace hgps {
 	class SimulationModule
 	{
 	public:
+		/// @brief Destroys a SimulationModule instance
 		virtual ~SimulationModule() = default;
 
 		/// @brief Gets the module type identifier
@@ -87,16 +88,16 @@ namespace hgps {
 		virtual std::size_t size() const noexcept = 0;
 
 		/// @brief Indicates whether the host contains an disease identified by code.
-		/// @param disease_code The disease unique identification code 
+		/// @param disease_id The disease unique identifier
 		/// @return true if the disease is found, otherwise false.
-		virtual bool contains(const core::Identifier& disease_code) const noexcept = 0;
+		virtual bool contains(const core::Identifier& disease_id) const noexcept = 0;
 
 		/// @brief Gets the mortality rate associated with a disease for an individual
-		/// @param disease_code The disease unique identification code 
+		/// @param disease_id The disease unique identifier
 		/// @param entity The entity associated with the mortality value
 		/// @return the mortality rate value, if found, otherwise zero.
 		virtual double get_excess_mortality(
-			const core::Identifier& disease_code, const Person& entity) const noexcept = 0;
+			const core::Identifier& disease_id, const Person& entity) const noexcept = 0;
 	};
 
 	/// @brief Generic risk factors module interface to host hierarchical models
@@ -140,6 +141,7 @@ namespace hgps {
 	/// @brief Hierarchical linear model interface
 	class HierarchicalLinearModel {
 	public:
+		/// @brief Destroys a HierarchicalLinearModel instance
 		virtual ~HierarchicalLinearModel() = default;
 
 		/// @brief Gets the model type identifier
@@ -163,6 +165,7 @@ namespace hgps {
 	class DiseaseModel
 	{
 	public:
+		/// @brief Destroys a DiseaseModel instance
 		virtual ~DiseaseModel() = default;
 
 		/// @brief Gets the disease group

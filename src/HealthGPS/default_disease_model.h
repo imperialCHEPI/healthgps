@@ -5,9 +5,15 @@
 #include "weight_model.h"
 
 namespace hgps {
+	/// @brief Defines the standard diseases (non-cancer) model data type.
 	class DefaultDiseaseModel final : public DiseaseModel {
 	public:
 		DefaultDiseaseModel() = delete;
+
+		/// @brief Initialise a new instance of the DefaultDiseaseModel class.
+		/// @param definition The disease definition instance
+		/// @param classifier The body weight classification model instance
+		/// @param age_range The valid age range for model dataset
 		DefaultDiseaseModel(DiseaseDefinition& definition,
 			WeightModel&& classifier, const core::IntegerInterval& age_range);
 
