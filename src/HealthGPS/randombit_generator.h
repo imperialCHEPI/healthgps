@@ -5,7 +5,7 @@
 
 namespace hgps {
 
-	/// @brief Random number generator algorithms interface
+	/// @brief Pseudo-random number generator algorithm interface
 	class RandomBitGenerator {
 	public:
 		using result_type = unsigned int;
