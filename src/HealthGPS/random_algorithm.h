@@ -5,7 +5,7 @@
 
 namespace hgps
 {
-	/// @brief General purpose random number interface 
+	/// @brief General purpose Random number interface 
 	class Random
 	{
 	public:

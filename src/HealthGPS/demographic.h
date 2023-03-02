@@ -10,7 +10,7 @@
 
 namespace hgps {
 
-	/// @brief Define the population dataset entry record data type
+	/// @brief Define the population record data type for the demographic dataset
 	struct PopulationRecord {
 		/// @brief Initialise a new instance of the PopulationRecord structure
 		/// @param pop_age Age reference
@@ -39,8 +39,8 @@ namespace hgps {
 		PopulationModule() = delete;
 
 		/// @brief Initialise a new instance of the PopulationModule class.
-		/// @param pop_data Population table with year and age lookup
-		/// @param life_table Population life table with births and deaths
+		/// @param pop_data Population demographic trends table with year and age lookup
+		/// @param life_table Population life trends table with births and deaths
 		PopulationModule(std::map<int, std::map<int, PopulationRecord>>&& pop_data,
 			LifeTable&& life_table);
 

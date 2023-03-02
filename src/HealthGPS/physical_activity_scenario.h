@@ -7,20 +7,31 @@
 
 namespace hgps {
 
+	/// @brief Physical activity intervention definition data type
 	struct PhysicalActivityDefinition
 	{
+		/// @brief Intervention active period
 		PolicyInterval active_period;
+
+		/// @brief Intervention impacts on risk factors
 		std::vector<PolicyImpact> impacts;
+		
+		/// @brief Intervention coverage rate
 		double coverage_rate{};
 	};
 
+	/// @brief Implements the physical activity regulation intervention scenario
 	class PhysicalActivityScenario final : public InterventionScenario
 	{
 	public:
 		PhysicalActivityScenario() = delete;
-		PhysicalActivityScenario(SyncChannel& data_sync, PhysicalActivityDefinition&& definition);
 
-		ScenarioType type() const noexcept override;
+		/// @brief Initialises a new instance of the MarketingDynamicScenario class.
+		/// @param data_sync The data synchronisation channel instance to use.
+		/// @param definition The intervention definition
+		/// @throws std::invalid_argument number of impact levels mismatch.
+		/// @throws std::out_of_range for overlapping or non-ordered impact levels.
+		PhysicalActivityScenario(SyncChannel& data_sync, PhysicalActivityDefinition&& definition);
 
 		SyncChannel& channel() override;
 

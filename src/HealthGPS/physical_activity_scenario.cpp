@@ -1,7 +1,10 @@
 #include "physical_activity_scenario.h"
 
 namespace hgps {
+	/// @brief Physical activity: children effect identifier
 	inline constexpr int CHILD_EFFECT = -1;
+
+	/// @brief Physical activity: no-effect identifier
 	inline constexpr int NO_EFFECT = -2;
 
 	PhysicalActivityScenario::PhysicalActivityScenario(
@@ -26,10 +29,6 @@ namespace hgps {
 
 			age = level.from_age + 1u;
 		}
-	}
-
-	ScenarioType PhysicalActivityScenario::type() const noexcept {
-		return ScenarioType::intervention;
 	}
 
 	SyncChannel& PhysicalActivityScenario::channel() {

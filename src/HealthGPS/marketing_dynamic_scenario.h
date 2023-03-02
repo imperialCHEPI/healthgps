@@ -6,25 +6,42 @@
 #include <functional>
 
 namespace hgps {
+
+	/// @brief Dynamic marketing intervention definition data type
 	struct MarketingDynamicDefinition
 	{
 		MarketingDynamicDefinition() = delete;
+
+		/// @brief Initialise a new instance of the MarketingDynamicDefinition structure
+		/// @param period The implementation period
+		/// @param sorted_impacts The impacts on risk factors
+		/// @param dynamic The population dynamic parameters
 		MarketingDynamicDefinition( const PolicyInterval& period,
 			const std::vector<PolicyImpact>& sorted_impacts, PolicyDynamic dynamic)
 			: active_period{ period }, impacts{ sorted_impacts }, dynamic{ std::move(dynamic) } {}
 
+		/// @brief Intervention active period
 		PolicyInterval active_period;
+
+		/// @brief Intervention impacts on risk factors
 		std::vector<PolicyImpact> impacts;
+
+		/// @brief Population dynamic parameters
 		PolicyDynamic dynamic;
 	};
 
+	/// @brief Implements the dynamic marketing regulation intervention scenario
 	class MarketingDynamicScenario final : public DynamicInterventionScenario
 	{
 	public:
 		MarketingDynamicScenario() = delete;
-		MarketingDynamicScenario(SyncChannel& data_sync, MarketingDynamicDefinition&& definition);
 
-		ScenarioType type() const noexcept override;
+		/// @brief Initialises a new instance of the MarketingDynamicScenario class.
+		/// @param data_sync The data synchronisation channel instance to use.
+		/// @param definition The intervention definition
+		/// @throws std::invalid_argument number of impact levels mismatch.
+		/// @throws std::out_of_range for overlapping or non-ordered impact levels.
+		MarketingDynamicScenario(SyncChannel& data_sync, MarketingDynamicDefinition&& definition);
 
 		SyncChannel& channel() override;
 

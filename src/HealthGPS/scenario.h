@@ -23,19 +23,38 @@ namespace hgps {
 		intervention,
 	};
 
-	/// @brief Health GPS simulation scenario interface
+	/// @brief Health-GPS simulation scenario interface
+	/// @details The scenarios communication is one way from
+	/// \c baseline to \c intervention, the ScenarioType is
+	/// by the Health-GPS simulation engine to identify the
+	/// data-flow direction and send or receive messages.
 	class Scenario {
 	public:
+		/// @brief Destroys a Scenario instance
 		virtual ~Scenario() = default;
 
+		/// @brief Gets the scenario type identifier
+		/// @return The scenario type
 		virtual ScenarioType type() const noexcept = 0;
 
+		/// @brief Gets the scenario type name
+		/// @return Scenario type name
 		virtual const std::string& name() const noexcept = 0;
 
+		/// @brief Gets the Scenario communication channel
+		/// @return The communication channel
 		virtual SyncChannel& channel() = 0;
 
+		/// @brief Clear the scenario log book data
 		virtual void clear() noexcept = 0;
 
+		/// @brief Applies this Scenario to the Person instance
+		/// @param generator Random number generator instance
+		/// @param entity Person instance to apply 
+		/// @param time Current simulation time
+		/// @param risk_factor_key Target risk factor identifier
+		/// @param value Current risk factor value
+		/// @return The risk factor new value
 		virtual double apply(Random& generator, Person& entity, int time,
 			const core::Identifier& risk_factor_key, double value) = 0;
 	};

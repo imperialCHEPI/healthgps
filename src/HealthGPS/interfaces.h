@@ -118,7 +118,7 @@ namespace hgps {
 		virtual void apply_baseline_adjustments(RuntimeContext& context) = 0;
 	};
 
-	/// @brief Population prospects module interface
+	/// @brief Demographic prospects module interface
 	class DemographicModule : public SimulationModule
 	{
 	public:

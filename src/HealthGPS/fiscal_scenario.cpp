@@ -17,7 +17,7 @@ namespace hgps {
 		auto age = 0u;
 		for (const auto& level : definition_.impacts) {
 			if (level.from_age < age) {
-				throw std::invalid_argument(
+				throw std::out_of_range(
 					"Impact levels must be non-overlapping and ordered.");
 			}
 
@@ -27,10 +27,6 @@ namespace hgps {
 
 			age = level.from_age + 1u;
 		}
-	}
-
-	ScenarioType FiscalPolicyScenario::type() const noexcept {
-		return ScenarioType::intervention;
 	}
 
 	SyncChannel& FiscalPolicyScenario::channel() {
