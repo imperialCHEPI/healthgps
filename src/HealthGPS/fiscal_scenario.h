@@ -11,10 +11,10 @@ namespace hgps {
 	/// @brief Health GPS policy impact types enumeration
 	enum class FiscalImpactType : uint8_t
 	{
-		/// @brief variable impact overtime    - option 1
+		/// @brief Variable impact overtime    - option 1
 		pessimist,
 
-		/// @brief incremental impact overtime - option 2
+		/// @brief Incremental impact overtime - option 2
 		optimist
 	};
 
