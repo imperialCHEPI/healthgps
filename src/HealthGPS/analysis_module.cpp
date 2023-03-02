@@ -11,6 +11,7 @@
 
 namespace hgps {
 
+	/// @brief DALYs result unit conversion constant.
 	inline constexpr double DALY_UNITS = 100'000.0;
 
 	AnalysisModule::AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,

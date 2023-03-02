@@ -8,6 +8,7 @@
 
 namespace hgps {
 
+	/// @brief The constant in the regression model presentation identifier 
 	inline const core::Identifier InterceptKey = core::Identifier{ "intercept" };
 
 	struct FactorRange {

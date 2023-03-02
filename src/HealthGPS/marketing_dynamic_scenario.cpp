@@ -1,8 +1,11 @@
 #include "marketing_dynamic_scenario.h"
 namespace hgps {
 
-	inline constexpr int NEVER = -1;
-	inline constexpr int FORMER = -2;
+	/// @brief Dynamic marketing: Never applied the intervention status identifier
+	inline constexpr int MARKETING_NEVER = -1;
+
+	/// @brief Dynamic marketing: Previous applied the intervention status identifier
+	inline constexpr int MARKETING_FORMER = -2;
 
 	hgps::MarketingDynamicScenario::MarketingDynamicScenario(
 		SyncChannel& data_sync, MarketingDynamicDefinition&& definition)
@@ -59,21 +62,21 @@ namespace hgps {
 		{
 			// Never intervened
 			if (probability < definition_.dynamic.alpha) {
-				impact += get_differential_impact(current_impact_index, NEVER);
+				impact += get_differential_impact(current_impact_index, MARKETING_NEVER);
 				interventions_book_.emplace(entity.id(), current_impact_index);
 			}
 		}
 		else {
 			auto& current_policy_status = interventions_book_.at(entity.id());
-			if (current_policy_status == FORMER) {
+			if (current_policy_status == MARKETING_FORMER) {
 				if (probability < definition_.dynamic.gamma) {
-					impact += get_differential_impact(current_impact_index, FORMER);
+					impact += get_differential_impact(current_impact_index, MARKETING_FORMER);
 					current_policy_status = current_impact_index;
 				}
 			}
 			else if (probability < definition_.dynamic.beta) {
-					impact += get_differential_impact(FORMER, current_policy_status);
-					current_policy_status = FORMER;
+					impact += get_differential_impact(MARKETING_FORMER, current_policy_status);
+					current_policy_status = MARKETING_FORMER;
 			}
 			else { // 1 - beta
 				impact += get_differential_impact(current_impact_index, current_policy_status);
@@ -105,18 +108,18 @@ namespace hgps {
 			index++;
 		}
 
-		return NEVER;
+		return MARKETING_NEVER;
 	}
 
 	double MarketingDynamicScenario::get_differential_impact(int current_index, int previous_index) const
 	{
 		auto current_impact = 0.0;
-		if (current_index > NEVER) {
+		if (current_index > MARKETING_NEVER) {
 			current_impact = definition_.impacts.at(current_index).value;
 		}
 
 		auto previous_impact = 0.0;
-		if (previous_index > NEVER) {
+		if (previous_index > MARKETING_NEVER) {
 			previous_impact = definition_.impacts.at(previous_index).value;
 		}
 
