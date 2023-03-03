@@ -727,8 +727,10 @@ The following job script (`healthgps.pbs`) executes Health-GPS version X.Y.Z.B o
 #PBS -l walltime=00:30:00
 #PBS -l select=1:ncpus=8:mem=64gb
 
+cd $PBS_O_WORKDIR
+
 module add tools/eb-dev
-module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
 
 HealthGPS.Console -f healthgps/example/France.Config.json -s healthgps/data > healthgps.pbs.txt
 ```
@@ -764,7 +766,7 @@ To illustrate this mechanism, lets modify the job script above, and schedule 5 s
 cd $PBS_O_WORKDIR
 
 module add tools/eb-dev
-module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
 
 HealthGPS.Console -f healthgps/example/France.Config.json -s healthgps/data -j $PBS_ARRAY_INDEX > healthgps.pbs.$PBS_ARRAY_INDEX.txt
 ```
@@ -881,7 +883,7 @@ Next create the array job script (`healthgps_demo.pbs`) to load an installed Hea
 cd $PBS_O_WORKDIR
 
 module add tools/eb-dev
-module add healthgps/X.Y.Z.B-GCCcore-11.3.0
+module add Health-GPS/X.Y.Z.B-GCCcore-11.3.0
 
 HealthGPS.Console -f ${RDS_PROJECT}stop/live/demo/example/France.Config.json -s ${RDS_PROJECT}stop/live/demo/data -j $PBS_ARRAY_INDEX > healthgps_demo.pbs.$PBS_ARRAY_INDEX.txt
 
