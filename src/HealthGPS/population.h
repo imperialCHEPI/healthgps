@@ -77,7 +77,15 @@ namespace hgps {
 		/// @return Iterator to the element following the last Person.
 		IteratorType end() noexcept { return people_.end(); }
 
-		/// @brief Gets an iterator to the beginning of the virtual population
+		/// @brief Gets an read-only iterator to the beginning of the virtual population
+		/// @return Iterator to the first Person
+		ConstIteratorType begin() const noexcept { return people_.cbegin(); }
+
+		/// @brief Gets a read-only iterator to the element following the last Person of the population
+		/// @return Iterator to the element following the last Person.
+		ConstIteratorType end() const noexcept { return people_.cend(); }
+
+		/// @brief Gets an read-only iterator to the beginning of the virtual population
 		/// @return Iterator to the first Person
 		ConstIteratorType cbegin() const noexcept { return people_.cbegin(); }
 

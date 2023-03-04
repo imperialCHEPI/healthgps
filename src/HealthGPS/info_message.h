@@ -3,7 +3,18 @@
 
 namespace hgps {
 
-	enum class ModelAction { start, update, stop };
+	/// @brief Enumerates simulation model actions
+	enum class ModelAction 
+	{
+		/// @brief Simulation has started, time = start
+		start,
+
+		/// @brief Simulation time has updated, time = time + 1
+		update,
+
+		/// @brief Simulation has stopped, time = end
+		stop
+	};
 
 	struct InfoEventMessage final : public EventMessage {
 

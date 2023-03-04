@@ -176,7 +176,8 @@ namespace host
 		auto& series = message.content.series;
 		std::stringstream mss;
 		std::stringstream fss;
-		for (auto& index : series.index_channel()) {
+
+		for (auto index = 0u; index < series.sample_size(); index++) {
 			mss << message.source << sep << message.run_number << sep << message.model_time << sep << "male" << sep << index;
 			fss << message.source << sep << message.run_number << sep << message.model_time << sep << "female" << sep << index;
 			for (auto& key : series.channels()) {
