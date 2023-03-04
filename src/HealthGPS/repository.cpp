@@ -72,12 +72,11 @@ namespace hgps {
 		return diseases_info_;
 	}
 
-	std::optional<core::DiseaseInfo> CachedRepository::get_disease_info(std::string code) {
-		auto code_key = core::Identifier{ code };
+	std::optional<core::DiseaseInfo> CachedRepository::get_disease_info(core::Identifier code) {
 		auto& all_diseases = get_diseases();
 		auto it = std::find_if(all_diseases.cbegin(), all_diseases.cend(),
-			[&code_key](const core::DiseaseInfo& other) {
-				return other.code == code_key;
+			[&code](const core::DiseaseInfo& other) {
+				return other.code == code;
 			});
 
 		if (it != all_diseases.cend()) {

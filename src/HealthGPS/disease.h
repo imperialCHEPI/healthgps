@@ -47,7 +47,7 @@ namespace hgps {
 		std::string name_{ "Disease" };
 	};
 
-	/// @brief Builds a new instance of the disease module using the given data infrastructure
+	/// @brief Builds a new instance of the DiseaseModule using the given data infrastructure
 	/// @param repository The data repository instance
 	/// @param config The model inputs instance
 	/// @return A new DiseaseModule instance
