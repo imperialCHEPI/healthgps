@@ -11,7 +11,7 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="structhgps_1_1core_1_1detail_1_1DefaultValueAccessor.html" target="_top" xlink:title=" ">
+<g id="a_node1"><a xlink:href="structhgps_1_1core_1_1detail_1_1DefaultValueAccessor.html" target="_top" xlink:title="Defines the default column value accessor type.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-41.5 129,-41.5 129,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::detail</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">::DefaultValueAccessor</text>
