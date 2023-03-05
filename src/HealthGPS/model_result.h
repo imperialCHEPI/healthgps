@@ -65,7 +65,7 @@ namespace hgps {
         /// @brief Average comorbidity in population
         std::map<unsigned int, ResultByGender> comorbidity{};
 
-        /// @brief Simulation metrics
+        /// @brief Simulation runtime metrics
         std::map<std::string, double> metrics{};
 
         /// @brief The detailed time series data results
