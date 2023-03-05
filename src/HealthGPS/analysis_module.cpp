@@ -11,6 +11,7 @@
 
 namespace hgps {
 
+	/// @brief DALYs result unit conversion constant.
 	inline constexpr double DALY_UNITS = 100'000.0;
 
 	AnalysisModule::AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
@@ -259,7 +260,7 @@ namespace hgps {
 		{
 			.years_of_life_lost = yll,
 			.years_lived_with_disability = yld,
-			.disablity_adjusted_life_years = yll + yld
+			.disability_adjusted_life_years = yll + yld
 		};
 	}
 

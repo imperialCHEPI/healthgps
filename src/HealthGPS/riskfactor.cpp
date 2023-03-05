@@ -17,14 +17,14 @@ namespace hgps {
 			throw std::invalid_argument("Missing required hierarchical model of type = static.");
 		}
 		else if (models_.at(HierarchicalModelType::Static)->type() != HierarchicalModelType::Static) {
-			throw std::invalid_argument("Model type mismatch in 'static' hierarchical model entry.");
+			throw std::out_of_range("Model type mismatch in 'static' hierarchical model entry.");
 		}
 
 		if (!models_.contains(HierarchicalModelType::Dynamic)) {
 			throw std::invalid_argument("Missing required hierarchical model of type = dynamic.");
 		}
 		else if (models_.at(HierarchicalModelType::Dynamic)->type() != HierarchicalModelType::Dynamic) {
-			throw std::invalid_argument("Model type mismatch in 'dynamic' hierarchical model entry.");
+			throw std::out_of_range("Model type mismatch in 'dynamic' hierarchical model entry.");
 		}
 	}
 

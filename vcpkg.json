@@ -5,7 +5,6 @@
   "dependencies": [
     "fmt",
     "cxxopts",
-    "indicators",
     "nlohmann-json",
     "rapidcsv",
     "crossguid",

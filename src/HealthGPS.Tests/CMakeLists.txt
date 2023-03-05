@@ -39,7 +39,8 @@ target_sources(HealthGPS.Tests
         "ThreadsafeQueue.Test.cpp"
         "WeightModel.Test.cpp"
         "CountryModule.h"
-        "RiskFactorData.h")
+        "RiskFactorData.h"
+        "Interval.Test.cpp")
 
 if(TBB_FOUND AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
     target_link_libraries(HealthGPS.Tests

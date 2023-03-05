@@ -1,6 +1,5 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
-find_package(indicators CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
 find_package(Threads REQUIRED)
@@ -31,7 +30,8 @@ target_sources(HealthGPS.Console
 		"options.h"
 		"resource.h"
 		"result_writer.h"
-		"riskmodel.h")
+		"riskmodel.h"
+		"poco.h")
 
 # Under Windows, we also include a resource file to the build
 if(WIN32)
@@ -50,7 +50,6 @@ if(TBB_FOUND AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID 
 		fmt::fmt
 		Threads::Threads
 		cxxopts::cxxopts
-		indicators::indicators
 		nlohmann_json::nlohmann_json "-ltbb")
 else()
 	target_link_libraries(HealthGPS.Console
@@ -61,7 +60,6 @@ else()
 		fmt::fmt
 		Threads::Threads
 		cxxopts::cxxopts
-		indicators::indicators
 		nlohmann_json::nlohmann_json)
 endif()
 

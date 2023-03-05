@@ -2,6 +2,7 @@
 #include "HealthGPS.Core/univariate_summary.h"
 #include <optional>
 #include <cmath>
+#include<sstream>
 
 TEST(TestCore_UnivariateSummary, CreateEmptyWithoutName)
 {
@@ -220,4 +221,19 @@ TEST(TestCore_UnivariateSummary, AppendNullValues)
 	EXPECT_NEAR(expected[9], summary.skewness(), tolerance);
 
 	
+}
+
+TEST(TestCore_UnivariateSummary, ConvertToStream)
+{
+	using namespace hgps::core;
+
+	auto data = std::vector<double>{ 3.4, 0.5, 2.5, 12.6, 5.7, 8.3, 10.2, 15.8, 7.3, 9.7 };
+
+	auto summary = UnivariateSummary("Test", data);
+
+	std::stringstream stream;
+
+	stream << summary;
+	auto stream_str = stream.str();
+	ASSERT_EQ(summary.to_string(), stream_str);
 }

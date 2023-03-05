@@ -10,41 +10,67 @@
 
 #include "column.h"
 
+namespace hgps::core {
 
-namespace hgps {
-	namespace core {
+	/// @brief Defines a Datatable for in memory data class
+	class DataTable
+	{
+	public:
+		/// @brief DataTable columns iterator type
+		using IteratorType = std::vector<std::unique_ptr<DataTableColumn>>::const_iterator;
+		
+		/// @brief Gets the number of columns
+		/// @return Number of columns
+		std::size_t num_columns() const noexcept;
 
-		class DataTable
-		{
-		public:
-			using IteratorType = std::vector<std::unique_ptr<DataTableColumn>>::const_iterator;
+		/// @brief Gets the number of rows
+		/// @return Number of rows
+		std::size_t num_rows() const noexcept;
 
-			std::size_t num_columns() const noexcept;
+		/// @brief Gets the collection of columns name
+		/// @return Columns name collection
+		std::vector<std::string> names() const;
 
-			std::size_t num_rows() const noexcept;
+		/// @brief Adds a new column to the table
+		/// @param column The column to add
+		/// @throws std::invalid_argument for duplicated column name or size mismatch.
+		void add(std::unique_ptr<DataTableColumn> column);
 
-			std::vector<std::string> names() const;
+		/// @brief Gets the column at a given index
+		/// @param index Column index
+		/// @return The column instance
+		/// @throws std::out_of_range for column index outside the range.
+		const DataTableColumn& column(std::size_t index) const;
 
-			void add(std::unique_ptr<DataTableColumn> column);
+		/// @brief Gets the column by name
+		/// @param name The column name
+		/// @return The column instance
+		/// @throws std::out_of_range for column name not found.
+		const DataTableColumn& column(std::string name) const;
 
-			const DataTableColumn& column(std::size_t index) const;
+		/// @brief Gets the iterator to the first column of the table.
+		/// @return An iterator to the beginning
+		IteratorType cbegin() const noexcept { return columns_.cbegin(); }
 
-			const DataTableColumn& column(std::string name) const;
+		/// @brief Gets the iterator element following the last column of the table.
+		/// @return An iterator to the end
+		IteratorType cend() const noexcept { return columns_.cend(); }
 
-			IteratorType begin() const noexcept { return columns_.begin(); }
+		/// @brief Creates a string representation of the DataTable structure
+		/// @return The structure string representation
+		std::string to_string() const noexcept;
 
-			IteratorType end() const noexcept { return columns_.end(); }
-
-			std::string to_string() const;
-
-		private:
-			std::vector<std::string> names_{};
-			std::unordered_map < std::string, std::size_t> index_{};
-			std::vector<std::unique_ptr<DataTableColumn>> columns_{};
-			size_t rows_count_ = 0;
-			std::mutex sync_mtx_{};
-		};
-	}
+	private:
+		std::vector<std::string> names_{};
+		std::unordered_map < std::string, std::size_t> index_{};
+		std::vector<std::unique_ptr<DataTableColumn>> columns_{};
+		size_t rows_count_ = 0;
+		std::mutex sync_mtx_{};
+	};
 }
 
+/// @brief Output streams operator for DataTable type.
+/// @param stream The stream to output
+/// @param table The DataTable instance
+/// @return The output stream
 std::ostream& operator<<(std::ostream& stream, const hgps::core::DataTable& table);

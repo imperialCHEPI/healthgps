@@ -86,7 +86,7 @@ TEST(TestHealthGPS_EventBus, AddEventSubscribers)
 	ASSERT_EQ(expected, hub.count());
 
 	hub.unsubscribe(*free_sub);
-	fun_sub->unregister();
+	fun_sub->unsubscribe();
 	//lam_sub->~EventSubscriber();
 	ASSERT_EQ(0, hub.count());
 }

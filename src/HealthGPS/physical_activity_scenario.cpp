@@ -1,8 +1,11 @@
 #include "physical_activity_scenario.h"
 
 namespace hgps {
-	inline constexpr int CHILD_EFFECT = -1;
-	inline constexpr int NO_EFFECT = -2;
+	/// @brief Physical activity: children effect identifier
+	inline constexpr int PA_CHILD_EFFECT = -1;
+
+	/// @brief Physical activity: no-effect identifier
+	inline constexpr int PA_NO_EFFECT = -2;
 
 	PhysicalActivityScenario::PhysicalActivityScenario(
 		SyncChannel& data_sync, PhysicalActivityDefinition&& definition)
@@ -26,10 +29,6 @@ namespace hgps {
 
 			age = level.from_age + 1u;
 		}
-	}
-
-	ScenarioType PhysicalActivityScenario::type() const noexcept {
-		return ScenarioType::intervention;
 	}
 
 	SyncChannel& PhysicalActivityScenario::channel() {
@@ -58,17 +57,17 @@ namespace hgps {
 		if (!interventions_book_.contains(entity.id()))
 		{
 			if (entity.age > child_effect.to_age) {
-				interventions_book_.emplace(entity.id(), NO_EFFECT);
+				interventions_book_.emplace(entity.id(), PA_NO_EFFECT);
 			}
 			else if (probability < definition_.coverage_rate) {
 				impact += child_effect.value;
-				interventions_book_.emplace(entity.id(), CHILD_EFFECT);
+				interventions_book_.emplace(entity.id(), PA_CHILD_EFFECT);
 			}
 			else {
-				interventions_book_.emplace(entity.id(), NO_EFFECT);
+				interventions_book_.emplace(entity.id(), PA_NO_EFFECT);
 			}
 		}
-		else if (interventions_book_.at(entity.id()) == CHILD_EFFECT)
+		else if (interventions_book_.at(entity.id()) == PA_CHILD_EFFECT)
 		{
 			if (entity.age > child_effect.to_age) {
 				auto& adult_risk = definition_.impacts.at(1);

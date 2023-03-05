@@ -50,12 +50,12 @@ TEST(TestCore, CreateTableColumnWithNulls)
 {
 	using namespace hgps::core;
 
-	auto str_col = StringDataTableColumn("string", { "Cat", "Dog", "" }, { true, true, false });
+	auto str_col = StringDataTableColumn{ "string", { "Cat", "Dog", "" }, { true, true, false } };
 	auto flt_col = FloatDataTableColumn("float", { 5.7f, 15.37f, 0.0f, 20.75f }, { true, true, false, true });
 	auto dbl_col = DoubleDataTableColumn("double", { 7.13, 15.37, 20.75 }, { true, true, true });
 	auto int_col = IntegerDataTableColumn("integer", { 0, 15, 200 }, { false, true, true });
 
-	ASSERT_EQ(3, str_col.length());
+	ASSERT_EQ(3, str_col.size());
 	ASSERT_EQ(1, str_col.null_count());
 	ASSERT_EQ("Dog", *str_col.value_safe(1));
 	ASSERT_EQ("Dog", str_col.value_unsafe(1));
@@ -64,7 +64,7 @@ TEST(TestCore, CreateTableColumnWithNulls)
 	ASSERT_FALSE(str_col.is_null(0));
 	ASSERT_TRUE(str_col.is_valid(0));
 
-	ASSERT_EQ(4, flt_col.length());
+	ASSERT_EQ(4, flt_col.size());
 	ASSERT_EQ(1, flt_col.null_count());
 	ASSERT_EQ(15.37f, *flt_col.value_safe(1));
 	ASSERT_EQ(15.37f, flt_col.value_unsafe(1));
@@ -73,14 +73,14 @@ TEST(TestCore, CreateTableColumnWithNulls)
 	ASSERT_FALSE(flt_col.is_null(0));
 	ASSERT_TRUE(flt_col.is_valid(0));
 
-	ASSERT_EQ(3, dbl_col.length());
+	ASSERT_EQ(3, dbl_col.size());
 	ASSERT_EQ(0, dbl_col.null_count());
 	ASSERT_EQ(15.37, *dbl_col.value_safe(1));
 	ASSERT_EQ(15.37, dbl_col.value_unsafe(1));
 	ASSERT_FALSE(dbl_col.is_null(1));
 	ASSERT_TRUE(dbl_col.is_valid(1));
 
-	ASSERT_EQ(3, int_col.length());
+	ASSERT_EQ(3, int_col.size());
 	ASSERT_EQ(1, int_col.null_count());
 	ASSERT_EQ(15, *int_col.value_safe(1));
 	ASSERT_EQ(15, int_col.value_unsafe(1));
@@ -99,28 +99,28 @@ TEST(TestCore, CreateTableColumnWithoutNulls)
 	auto dbl_col = DoubleDataTableColumn("double", { 7.13, 15.37, 20.75 });
 	auto int_col = IntegerDataTableColumn("integer", { 0, 15, 200 });
 
-	ASSERT_EQ(3, str_col.length());
+	ASSERT_EQ(3, str_col.size());
 	ASSERT_EQ(0, str_col.null_count());
 	ASSERT_EQ("Dog", *str_col.value_safe(1));
 	ASSERT_EQ("Dog", str_col.value_unsafe(1));
 	ASSERT_TRUE(str_col.is_valid(0));
 	ASSERT_FALSE(str_col.is_null(0));
 
-	ASSERT_EQ(4, flt_col.length());
+	ASSERT_EQ(4, flt_col.size());
 	ASSERT_EQ(0, flt_col.null_count());
 	ASSERT_EQ(15.37f, *flt_col.value_safe(1));
 	ASSERT_EQ(15.37f, flt_col.value_unsafe(1));
 	ASSERT_TRUE(flt_col.is_valid(0));
 	ASSERT_FALSE(flt_col.is_null(0));
 
-	ASSERT_EQ(3, dbl_col.length());
+	ASSERT_EQ(3, dbl_col.size());
 	ASSERT_EQ(0, dbl_col.null_count());
 	ASSERT_EQ(15.37, *dbl_col.value_safe(1));
 	ASSERT_EQ(15.37, dbl_col.value_unsafe(1));
 	ASSERT_TRUE(dbl_col.is_valid(1));
 	ASSERT_FALSE(dbl_col.is_null(1));
 
-	ASSERT_EQ(3, int_col.length());
+	ASSERT_EQ(3, int_col.size());
 	ASSERT_EQ(0, int_col.null_count());
 	ASSERT_EQ(15, *int_col.value_safe(1));
 	ASSERT_EQ(15, int_col.value_unsafe(1));
@@ -134,7 +134,7 @@ TEST(TestCore, CreateTableColumnFailWithLenMismatch)
 
 	ASSERT_THROW(
 		IntegerDataTableColumn("integer", { 5, 15, 0, 20 }, { true, false, true }),
-		std::invalid_argument);
+		std::out_of_range);
 }
 
 TEST(TestCore, CreateTableColumnFailWithShortName)
@@ -172,7 +172,7 @@ TEST(TestCore, TableColumnIterator)
 	auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0,
 		[](auto a, auto b) {return b.has_value() ? a + b.value() : a; });
 
-	ASSERT_EQ(7, dbl_col.length());
+	ASSERT_EQ(7, dbl_col.size());
 	ASSERT_EQ(2, dbl_col.null_count());
 	ASSERT_EQ(15.0, sum);
 	ASSERT_EQ(loop_sum, sum);
@@ -215,7 +215,7 @@ TEST(TestCore, CreateDataTable)
 
 	ASSERT_EQ(4, table.num_columns());
 	ASSERT_EQ(5, table.num_rows());
-	ASSERT_EQ(table.num_rows(), int_col.length());
+	ASSERT_EQ(table.num_rows(), int_col.size());
 	ASSERT_EQ(78, slow_value);
 	ASSERT_EQ(slow_value, *safe_value);
 	ASSERT_EQ(slow_value, fast_value);

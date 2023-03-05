@@ -1,8 +1,8 @@
 #include "food_labelling_scenario.h"
 
 namespace hgps {
-	/// @brief The entity qualify but is not affected by the policy
-	inline constexpr int NO_EFFECT = -2;
+	/// @brief Food labelling: the entity qualify but is not affected by the policy identifier
+	inline constexpr int FOP_NO_EFFECT = -2;
 
 	FoodLabellingScenario::FoodLabellingScenario(SyncChannel& data_sync, FoodLabellingDefinition&& definition)
 		: channel_{ data_sync }, definition_{ std::move(definition) }, factor_impact_{}, interventions_book_{}
@@ -14,7 +14,7 @@ namespace hgps {
 		auto age = 0u;
 		for (const auto& level : definition_.impacts) {
 			if (level.from_age < age) {
-				throw std::invalid_argument(
+				throw std::out_of_range(
 					"Impact levels must be non-overlapping and ordered.");
 			}
 
@@ -24,10 +24,6 @@ namespace hgps {
 
 			age = level.from_age + 1u;
 		}
-	}
-	
-	ScenarioType FoodLabellingScenario::type() const noexcept {
-		return ScenarioType::intervention;
 	}
 
 	SyncChannel& FoodLabellingScenario::channel() {
@@ -55,14 +51,14 @@ namespace hgps {
 		auto time_since_start = static_cast<unsigned int>(time - definition_.active_period.start_time);
 		if (time_since_start < definition_.coverage.cutoff_time)
 		{
-			if (!interventions_book_.contains(entity.id()) || interventions_book_.at(entity.id()) == NO_EFFECT)
+			if (!interventions_book_.contains(entity.id()) || interventions_book_.at(entity.id()) == FOP_NO_EFFECT)
 			{
 				if (probability < definition_.coverage.short_term_rate) {
 					impact += calculate_policy_impact(entity);
 					interventions_book_.try_emplace(entity.id(), time);
 				}
 				else {
-					interventions_book_.try_emplace(entity.id(), NO_EFFECT);
+					interventions_book_.try_emplace(entity.id(), FOP_NO_EFFECT);
 				}
 			}
 		}
@@ -73,7 +69,7 @@ namespace hgps {
 				interventions_book_.emplace(entity.id(), time);
 			}
 			else {
-				interventions_book_.emplace(entity.id(), NO_EFFECT);
+				interventions_book_.emplace(entity.id(), FOP_NO_EFFECT);
 			}
 		}
 

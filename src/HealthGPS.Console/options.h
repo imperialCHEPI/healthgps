@@ -1,158 +1,84 @@
 #pragma once
+#include "poco.h"
 #include "HealthGPS.Core/forward_type.h"
-
-#include <string>
-#include <vector>
-#include <map>
-#include <unordered_map>
 #include <filesystem>
-#include <optional>
 
-struct CommandOptions
+namespace host
 {
-	bool success{};
-	int exit_code{};
-	std::filesystem::path config_file{};
-	std::filesystem::path storage_folder{};
-	bool verbose{};
-	int job_id{};
-};
+	/// @brief Defines the Command Line Interface (CLI) arguments options
+	struct CommandOptions
+	{
+		/// @brief Indicates whether the argument parsing succeed
+		bool success{};
 
-struct FileInfo
-{
-	std::string name;
-	std::string format;
-	std::string delimiter;
-	std::string encoding;
-	std::map<std::string,std::string> columns;
-};
+		/// @brief The exit code to return, in case of CLI arguments parsing failure
+		int exit_code{};
 
-struct SettingsInfo
-{
-	std::string country{};
-	float size_fraction{};
-	std::vector<int> age_range;
-};
+		/// @brief The configuration file argument value
+		std::filesystem::path config_file{};
 
-struct SESInfo
-{
-	std::string function;
-	std::vector<double> parameters;
-};
+		/// @brief The back-end storage full path argument value
+		std::filesystem::path storage_folder{};
 
-struct BaselineInfo
-{
-	std::string format;
-	std::string delimiter;
-	std::string encoding;
-	std::map<std::string, std::string> file_names;
-};
+		/// @brief Indicates whether the application logging is verbose
+		bool verbose{};
 
-struct RiskFactorInfo
-{
-	std::string name;
-	short level{};
-	std::string proxy;
-	std::vector<double> range;
-};
+		/// @brief The batch job identifier value, optional.
+		int job_id{};
+	};
 
-struct ModellingInfo
-{
-	std::vector<RiskFactorInfo> risk_factors;
-	std::string dynamic_risk_factor;
-	std::unordered_map<std::string, std::string> risk_factor_models;
-	BaselineInfo baseline_adjustment;
-};
+	/// @brief Defines the application configuration data structure
+	struct Configuration
+	{
+		/// @brief The input data file details
+		poco::FileInfo file;
 
-struct OutputInfo
-{
-	unsigned int comorbidities{};
-	std::string folder{};
-	std::string file_name{};
-};
+		/// @brief Experiment population settings 
+		poco::SettingsInfo settings;
 
-struct PolicyPeriodInfo
-{
-	int start_time{};
-	std::optional<int> finish_time;
+		/// @brief Socio-economic status (SES) model inputs
+		poco::SESInfo ses;
 
-	std::string to_finish_time_str() const {
-		if (finish_time.has_value()) {
-			return std::to_string(finish_time.value());
-		}
+		/// @brief User defined model and parameters information
+		poco::ModellingInfo modelling;
 
-		return "null";
-	}
-};
+		/// @brief List of diseases to include in experiment
+		std::vector<std::string> diseases;
 
-struct PolicyImpactInfo
-{
-	std::string risk_factor{};
-	double impact_value{};
-	unsigned int from_age{};
-	std::optional<unsigned int> to_age{};
-	std::string to_age_str() const {
-		if (to_age.has_value()) {
-			return std::to_string(to_age.value());
-		}
+		/// @brief Simulation initialisation custom seed value, optional
+		std::optional<unsigned int> custom_seed;
 
-		return "null";
-	}
-};
+		/// @brief The experiment start time (simulation clock)
+		unsigned int start_time{};
 
-struct PolicyAdjustmentInfo
-{
-	std::string risk_factor{};
-	double value{};
-};
+		/// @brief The experiment stop time (simulation clock)
+		unsigned int stop_time{};
 
-struct PolicyScenarioInfo
-{
-	std::string identifier{};
-	PolicyPeriodInfo active_period;
-	std::vector<double> dynamics;
-	std::vector<double> coefficients;
-	std::vector<double> coverage_rates;
-	std::optional<unsigned int> coverage_cutoff_time{};
-	std::optional<unsigned int> child_cutoff_age{};
-	std::vector<PolicyAdjustmentInfo> adjustments;
-	std::string impact_type{};
-	std::vector<PolicyImpactInfo> impacts;
+		/// @brief The number of simulation runs (replications) to execute
+		unsigned int trial_runs{};
 
-	std::string to_coverage_cutoff_time_str() const {
-		if (coverage_cutoff_time.has_value()) {
-			return std::to_string(coverage_cutoff_time.value());
-		}
+		/// @brief Baseline to intervention data synchronisation time out (milliseconds)
+		unsigned int sync_timeout_ms{};
 
-		return "null";
-	}
+		/// @brief Indicates whether an alternative intervention policy is active
+		bool has_active_intervention{ false };
 
-	std::string to_child_cutoff_age_str() const {
-		if (child_cutoff_age.has_value()) {
-			return std::to_string(child_cutoff_age.value());
-		}
+		/// @brief The active intervention policy definition
+		poco::PolicyScenarioInfo intervention;
 
-		return "null";
-	}
-};
+		/// @brief Experiment output folder and file information
+		poco::OutputInfo output;
 
-struct Configuration
-{
-	FileInfo file;
-	SettingsInfo settings;
-	SESInfo ses;
-	ModellingInfo modelling;
-	std::vector<std::string> diseases;
-	std::optional<unsigned int> custom_seed;
-	unsigned int start_time{};
-	unsigned int stop_time{};
-	unsigned int trial_runs{};
-	unsigned int sync_timeout_ms{};
-	bool has_active_intervention{false};
-	PolicyScenarioInfo intervention;
-	OutputInfo output;
-	hgps::core::VerboseMode verbosity{};
-	int job_id{};
-	std::string app_name;
-	std::string app_version;
-};
+		/// @brief Application logging verbosity mode
+		hgps::core::VerboseMode verbosity{};
+
+		/// @brief Experiment batch job identifier
+		int job_id{};
+
+		/// @brief Experiment model name
+		std::string app_name;
+
+		/// @brief Experiment model version
+		std::string app_version;
+	};
+}

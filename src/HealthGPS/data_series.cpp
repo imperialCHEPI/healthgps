@@ -6,17 +6,12 @@
 
 namespace hgps
 {
-	DataSeries::DataSeries(const unsigned int sample_size)
+	DataSeries::DataSeries(std::size_t sample_size)
 		: sample_size_{ sample_size }
-		, sample_id_channel_(sample_size)
 		, channels_{}, data_{}
 	{
 		data_.emplace(core::Gender::male, std::map<std::string, std::vector<double>>{});
 		data_.emplace(core::Gender::female, std::map<std::string, std::vector<double>>{});
-
-		for (auto id = 0u; id < sample_size; id++) {
-			sample_id_channel_.at(id) = id;
-		}
 	}
 
 	std::vector<double>& DataSeries::operator()(core::Gender gender, std::string key) {
@@ -33,10 +28,6 @@ namespace hgps
 
 	const std::vector<std::string>& DataSeries::channels() const noexcept {
 		return channels_;
-	}
-
-	const std::vector<int>& DataSeries::index_channel() const noexcept {
-		return  sample_id_channel_;
 	}
 
 	void DataSeries::add_channel(std::string key) {
@@ -58,5 +49,9 @@ namespace hgps
 
 	std::size_t DataSeries::size() const noexcept {
 		return channels_.size();
+	}
+
+	std::size_t DataSeries::sample_size() const noexcept {
+		return sample_size_;
 	}
 }

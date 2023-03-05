@@ -6,9 +6,15 @@
 
 namespace hgps {
 
+	/// @brief Defines the cancer disease model data type.
 	class DefaultCancerModel final : public DiseaseModel {
 	public:
 		DefaultCancerModel() = delete;
+
+		/// @brief Initialise a new instance of the DefaultCancerModel class.
+		/// @param definition The disease definition instance
+		/// @param classifier The body weight classification model instance
+		/// @param age_range The valid age range for model dataset
 		DefaultCancerModel(DiseaseDefinition& definition,
 			WeightModel&& classifier, const core::IntegerInterval& age_range);
 

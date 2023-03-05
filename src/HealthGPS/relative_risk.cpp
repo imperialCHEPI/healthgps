@@ -7,7 +7,7 @@ namespace hgps {
 		: table_{ std::move(values) }, rows_index_{}, cols_index_{}
 	{
 		if (rows.size() != table_.rows() || cols.size() != table_.columns()) {
-			throw std::invalid_argument("Lookup breakpoints and values size mismatch.");
+			throw std::out_of_range("Lookup breakpoints and values size mismatch.");
 		}
 
 		auto rows_count = static_cast<int>(rows.size());

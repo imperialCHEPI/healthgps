@@ -9,6 +9,7 @@
 
 namespace hgps {
 
+	/// @brief Implements the default memory-based simulation event bus type
 	class DefaultEventBus final : public EventAggregator
 	{
 	public:
@@ -22,8 +23,11 @@ namespace hgps {
 
         bool unsubscribe(const EventSubscriber& subscriber) override;
 
+        /// @brief Gets the number of registered subscribers
+        /// @return Number of subscribers
         [[nodiscard]] std::size_t count();
 
+        /// @brief Clear all registered subscribers
         void clear() noexcept;
 
 	private:

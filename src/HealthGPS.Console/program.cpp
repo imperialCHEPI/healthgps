@@ -10,26 +10,35 @@
 
 #include <fmt/color.h>
 
+/// @brief Prints application exit message
+/// @param exit_code The application exit code
+/// @return The respective exit code
 int exit_application(int exit_code);
 
+/// @brief Health-GPS host application entry point
+/// @param argc The number of command arguments
+/// @param argv The list of arguments provided
+/// @return The application exit code
 int main(int argc, char* argv[])
 {
 	using namespace hgps;
+	using namespace host;
 
-	// Parse command line arguments
+	// Create CLI options and validate minimum arguments
 	auto options = create_options();
 	if (argc < 2) {
 		std::cout << options.help() << std::endl;
 		return exit_application(EXIT_FAILURE);
 	}
 
+	// Print application title and parse command line arguments
 	print_app_title();
 	auto cmd_args = parse_arguments(options, argc, argv);
 	if (!cmd_args.success) {
 		return cmd_args.exit_code;
 	}
 
-	// Parse configuration file
+	// Parse inputs configuration file, *.json.
 	Configuration config;
 	try {
 		config = load_configuration(cmd_args);
@@ -39,19 +48,23 @@ int main(int argc, char* argv[])
 		return exit_application(EXIT_FAILURE);
 	}
 
-	// load datatable asynchronous 
+	// Load input data file into a datatable asynchronous 
 	auto input_table = core::DataTable();
-	auto table_future = core::run_async(load_datatable_csv,
+	auto table_future = core::run_async(load_datatable_from_csv,
 		std::ref(input_table), config.file.name, config.file.columns, config.file.delimiter);
 
 	try {
-		// Create back-end data store and modules factory infrastructure
+		// Create back-end data store, cached data repository wrapper
 		auto data_api = data::DataManager(cmd_args.storage_folder, config.verbosity);
 		auto data_repository = hgps::CachedRepository{ data_api };
+
+		// Register the input risk factors model definitions
 		register_risk_factor_model_definitions(data_repository, config.modelling, config.settings);
+
+		// Compose Health-GPS with the required modules instances
 		auto factory = get_default_simulation_module_factory(data_repository);
 
-		// Validate the configuration target country
+		// Validate the configuration's target country for the simulation
 		auto countries = data_api.get_countries();
 		fmt::print("\nThere are {} countries in storage.\n", countries.size());
 		auto target = data_api.get_country(config.settings.country);
@@ -64,70 +77,80 @@ int main(int argc, char* argv[])
 			return exit_application(EXIT_FAILURE);
 		}
 
-		// Validate the configuration diseases list
-		auto diseases = get_diseases(data_api, config);
+		// Validate the configuration diseases list, must exists in back-end data store
+		auto diseases = get_diseases_info(data_api, config);
 		if (diseases.size() != config.diseases.size()) {
 			fmt::print(fg(fmt::color::red), "\nInvalid list of diseases in configuration.\n");
 			return exit_application(EXIT_FAILURE);
 		}
 
-		// wait for datatable to complete
+		// Request input datatable instance, wait, if not completed.
 		if (!table_future.get()) {
 			fmt::print(fg(fmt::color::red), "\nInvalid input dataset in configuration.\n");
 			return exit_application(EXIT_FAILURE);
 		}
+
+		// Print out the datatable structure information
 		std::cout << input_table;
 
-		// Create the complete model input from configuration
+		// Create complete model input from configuration
 		auto model_input = create_model_input(input_table, target.value(), config, diseases);
 
-		// Create event bus and monitor
+		// Create event bus and event monitor with a results file writer
 		auto event_bus = DefaultEventBus();
 		auto json_file_logger = create_results_file_logger(config, model_input);
 		auto event_monitor = EventMonitor{ event_bus, json_file_logger };
 		
-		// Create main simulation executive instance and run experiment
+		// Create simulation executive instance with master seed generator
 		auto seed_generator = std::make_unique<hgps::MTRandom32>();
 		if (model_input.seed().has_value()) {
 			seed_generator->seed(model_input.seed().value());
 		}
 		auto executive = ModelRunner(event_bus, std::move(seed_generator));
 
-		auto runtime = 0.0;
+		// Create communication channel, shared between the two scenarios.
 		auto channel = SyncChannel{};
+
+		// Create simulation engine for each scenario, baseline is always simulated.
+		auto runtime = 0.0;
 		std::atomic<bool> done(false);
 		fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
-		auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input, config.intervention);
+		auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input);
 		if (config.has_active_intervention) {
 			fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n", config.trial_runs);
 			auto policy_sim = create_intervention_simulation(channel, factory, event_bus, model_input, config.intervention);
 
+			// Run simulations side by side on a background thread
 			auto worker = std::jthread{ [&runtime, &executive, &baseline_sim, &policy_sim, &config, &done] {
 				runtime = executive.run(baseline_sim, policy_sim, config.trial_runs);
 				done.store(true);
 			} };
 
+			// Wait until done or error, before joining the thread
 			while (!done.load()) {
 				std::this_thread::sleep_for(std::chrono::microseconds(100));
 			}
-
 			worker.join();
 		}
 		else {
-			channel.close(); // Will not store any message
+			// Baseline only, close channel not store any message
+			channel.close();
+
+			// Run simulation on a background thread
 			auto worker = std::jthread{ [&runtime, &executive, &baseline_sim, &config, &done] {
 				runtime = executive.run(baseline_sim, config.trial_runs);
 				done.store(true);
 			} };
 
+			// Wait until done or error, before joining the thread
 			while (!done.load()) {
 				std::this_thread::sleep_for(std::chrono::microseconds(100));
 			}
-
 			worker.join();
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		// Waits for messages queue to be processed before stopping events monitor
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
 		event_monitor.stop();
 	}
@@ -141,6 +164,15 @@ int main(int argc, char* argv[])
 int exit_application(int exit_code) {
 	fmt::print("\n\n");
 	fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
-	fmt::print(" {}.\n\n", get_time_now_str());
+	fmt::print(" {}.\n\n", host::get_time_now_str());
 	return exit_code;
+}
+
+/// @brief Top-level namespace for Health-GPS Console host application
+namespace host {
+	/// @brief Internal details namespace for private data types and functions
+	namespace detail {}
+
+	/// @brief Plain old class object (POCO) types for loading configuration file
+	namespace poco {}
 }

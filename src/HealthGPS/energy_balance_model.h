@@ -5,15 +5,23 @@
 
 namespace hgps {
 
+	/// @brief Implements the dynamic hierarchical linear model (energy balance) type
+	/// 
+	/// @details The dynamic model is used to advance the virtual population over time.
 	class EnergyBalanceHierarchicalModel final : public HierarchicalLinearModel {
 	public:
 		EnergyBalanceHierarchicalModel() = delete;
+
+		/// @brief Initialises a new instance of the EnergyBalanceHierarchicalModel class
+		/// @param definition The model definition instance
 		EnergyBalanceHierarchicalModel(LiteHierarchicalModelDefinition& definition);
 
 		HierarchicalModelType type() const noexcept override;
 
 		const std::string& name() const noexcept override;
 
+		/// @copydoc HierarchicalLinearModel::generate_risk_factors
+		/// @throws std::logic_error the dynamic model does not generate risk factors.
 		void generate_risk_factors(RuntimeContext& context) override;
 
 		void update_risk_factors(RuntimeContext& context) override;

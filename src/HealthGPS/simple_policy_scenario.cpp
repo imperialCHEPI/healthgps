@@ -11,10 +11,6 @@ namespace hgps {
 		}
 	}
 
-	ScenarioType SimplePolicyScenario::type() const noexcept {
-		return ScenarioType::intervention;
-	}
-
 	SyncChannel& SimplePolicyScenario::channel() {
 		return channel_;
 	}

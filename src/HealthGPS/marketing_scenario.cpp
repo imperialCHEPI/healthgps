@@ -25,10 +25,6 @@ namespace hgps {
         }
     }
 
-    ScenarioType MarketingPolicyScenario::type() const noexcept {
-        return ScenarioType::intervention;
-    }
-
     SyncChannel& MarketingPolicyScenario::channel() {
         return channel_;
     }

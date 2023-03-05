@@ -41,7 +41,7 @@ namespace hgps {
 			case hgps::WeightCategory::obese:
 				return 35.0;
 			default:
-				throw std::logic_error("Unknown weight category definition.");
+				throw std::out_of_range("Unknown weight category definition.");
 			}
 		}
 

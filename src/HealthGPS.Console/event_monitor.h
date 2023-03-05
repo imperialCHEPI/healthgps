@@ -6,32 +6,45 @@
 
 #include "result_writer.h"
 
-class EventMonitor final : public hgps::EventMessageVisitor {
-public:
-	EventMonitor() = delete;
-	EventMonitor(hgps::EventAggregator& event_bus, ResultWriter& result_writer);
-	~EventMonitor() noexcept;
+namespace host
+{
+	/// @brief Defined the event monitor class used for processing Health-GPS event messages
+	/// 
+	/// All notification messages are written to the terminal, while the results messages are
+	/// queued to be processed by the host::ResultWriter instance provide at construction.
+	class EventMonitor final : public hgps::EventMessageVisitor {
+	public:
+		EventMonitor() = delete;
 
-	void stop() noexcept;
+		/// @brief Initialises a new instance of the host::EventMonitor class.
+		/// @param event_bus The message bus instance to monitor
+		/// @param result_writer The results message writer instance
+		EventMonitor(hgps::EventAggregator& event_bus, ResultWriter& result_writer);
 
-	void visit(const hgps::RunnerEventMessage& message) override;
-	void visit(const hgps::InfoEventMessage& message) override;
-	void visit(const hgps::ErrorEventMessage& message) override;
-	void visit(const hgps::ResultEventMessage& message) override;
+		/// @brief Destroys a host::EventMonitor instance 
+		~EventMonitor() noexcept;
 
-private:
-	ResultWriter& result_writer_;
-	std::vector<std::jthread> threads_;
-	std::vector <std::unique_ptr<hgps::EventSubscriber>> handlers_;
-	hgps::ThreadsafeQueue < std::shared_ptr<hgps::EventMessage>> info_queue_;
-	hgps::ThreadsafeQueue < std::shared_ptr<hgps::EventMessage>> results_queue_;
-	std::stop_source cancel_source_;
+		/// @brief Stops the monitor, no new messages are processed after stop
+		void stop() noexcept;
 
-	void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
-	void error_event_handler(std::shared_ptr<hgps::EventMessage> message);
-	void result_event_handler(std::shared_ptr<hgps::EventMessage> message);
+		void visit(const hgps::RunnerEventMessage& message) override;
+		void visit(const hgps::InfoEventMessage& message) override;
+		void visit(const hgps::ErrorEventMessage& message) override;
+		void visit(const hgps::ResultEventMessage& message) override;
 
-	void info_dispatch_thread(std::stop_token token);
-	void result_dispatch_thread(std::stop_token token);
-};
+	private:
+		ResultWriter& result_writer_;
+		std::vector<std::jthread> threads_;
+		std::vector <std::unique_ptr<hgps::EventSubscriber>> handlers_;
+		hgps::ThreadsafeQueue < std::shared_ptr<hgps::EventMessage>> info_queue_;
+		hgps::ThreadsafeQueue < std::shared_ptr<hgps::EventMessage>> results_queue_;
+		std::stop_source cancel_source_;
 
+		void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
+		void error_event_handler(std::shared_ptr<hgps::EventMessage> message);
+		void result_event_handler(std::shared_ptr<hgps::EventMessage> message);
+
+		void info_dispatch_thread(std::stop_token token);
+		void result_dispatch_thread(std::stop_token token);
+	};
+}

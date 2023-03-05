@@ -10,7 +10,7 @@ namespace hgps {
 	{
 	public:
 		Simulation() = delete;
-		/// @brief Creates a new instance of the simulation class
+		/// @brief Initialises a new instance of the Simulation class
 		/// @param definition The simulation configuration
 		explicit Simulation(SimulationDefinition&& definition)
 			: definition_{std::move(definition)} {}

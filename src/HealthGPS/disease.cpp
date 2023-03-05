@@ -21,16 +21,16 @@ namespace hgps {
 		return models_.size();
 	}
 
-	bool DiseaseModule::contains(const core::Identifier& disease_code) const noexcept {
-		return models_.contains(disease_code);
+	bool DiseaseModule::contains(const core::Identifier& disease_id) const noexcept {
+		return models_.contains(disease_id);
 	}
 
-	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const core::Identifier& disease_code) {
-		return models_.at(disease_code);
+	std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const core::Identifier& disease_id) {
+		return models_.at(disease_id);
 	}
 
-	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const core::Identifier& disease_code) const {
-		return models_.at(disease_code);
+	const std::shared_ptr<DiseaseModel>& DiseaseModule::operator[](const core::Identifier& disease_id) const {
+		return models_.at(disease_id);
 	}
 
 	void DiseaseModule::initialise_population(RuntimeContext& context) {
@@ -72,7 +72,7 @@ namespace hgps {
 				auto info_code_str = info.code.to_string();
 				auto other = repository.get_disease_info(info_code_str);
 				if (!registry.contains(info.group) || !other.has_value()) {
-					throw std::runtime_error("Unknown disease definition: " + info_code_str);
+					throw std::out_of_range("Unknown disease definition: " + info_code_str);
 				}
 
 				auto& disease_definition = repository.get_disease_definition(info, config);

@@ -10,7 +10,7 @@ namespace hgps {
 
 		// TODO: Create a fraction type wrapper
 		if (size_fraction <= 0.0 || size_fraction > 1.0) {
-			throw std::invalid_argument(
+			throw std::out_of_range(
 				"Invalid population size fraction value, must be between in range (0, 1].");
 		}
 	}
