@@ -17,7 +17,7 @@ namespace hgps {
 		ss << fmt::format("Average Age: Male = {:.5f}, Female = {:.5f}\n", average_age.male, average_age.female);
 
 		ss << fmt::format("Indicators.: YLL= {:.5f}, YLD = {:.5f}, DALY = {:.5f}\n", indicators.years_of_life_lost,
-			indicators.years_lived_with_disability, indicators.disablity_adjusted_life_years);
+			indicators.years_lived_with_disability, indicators.disability_adjusted_life_years);
 
 		ss << fmt::format("{:{}}  : {:>14} : {:>14}\n", "#Risk factors average", pad, "Male", "Female");
 		for (auto& item : risk_ractor_average) {

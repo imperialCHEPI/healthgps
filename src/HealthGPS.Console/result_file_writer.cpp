@@ -128,7 +128,7 @@ namespace host
 			{"indicators", {
 				{"YLL", message.content.indicators.years_of_life_lost},
 				{"YLD", message.content.indicators.years_lived_with_disability},
-				{"DALY", message.content.indicators.disablity_adjusted_life_years},
+				{"DALY", message.content.indicators.disability_adjusted_life_years},
 			}},
 		};
 

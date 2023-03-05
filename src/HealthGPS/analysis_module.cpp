@@ -260,7 +260,7 @@ namespace hgps {
 		{
 			.years_of_life_lost = yll,
 			.years_lived_with_disability = yld,
-			.disablity_adjusted_life_years = yll + yld
+			.disability_adjusted_life_years = yll + yld
 		};
 	}
 

@@ -79,6 +79,10 @@ namespace hgps {
 		int update_age_and_death_events(RuntimeContext& context, const DiseaseHostModule& disease_host);
 	};
 
+	/// @brief Builds a new instance of the PopulationModule using the given data infrastructure
+	/// @param repository The data repository instance
+	/// @param config The model inputs instance
+	/// @return A new PopulationModule instance
 	std::unique_ptr<PopulationModule> build_population_module(Repository& repository, const ModelInput& config);
 }
 

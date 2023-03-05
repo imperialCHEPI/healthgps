@@ -10,9 +10,16 @@
 
 namespace hgps {
 
+	/// @brief Implements the burden of diseases (BoD) analysis module
 	class AnalysisModule final : public UpdatableModule {
 	public:
 		AnalysisModule() = delete;
+
+		/// @brief Initialises a new instance of the AnalysisModule class.
+		/// @param definition The analysis module definition
+		/// @param classifier Body weight classifier model instance
+		/// @param age_range The experiment valid age range
+		/// @param comorbidities Maximum number of comorbidities to include
 		AnalysisModule(AnalysisDefinition&& definition, WeightModel&& classifier,
 					   const core::IntegerInterval age_range, unsigned int comorbidities);
 
@@ -45,5 +52,10 @@ namespace hgps {
 		void initialise_output_channels(RuntimeContext& context);
 	};
 
+	/// @brief Builds a new instance of the AnalysisModule using the given data infrastructure
+	/// @param repository The data repository instance
+	/// @param config The model inputs instance
+	/// @return A new AnalysisModule instance
+	/// @throws std::logic_error for invalid disease analysis definition
 	std::unique_ptr<AnalysisModule> build_analysis_module(Repository& repository, const ModelInput& config);
 }
