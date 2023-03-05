@@ -6,10 +6,17 @@ namespace hgps::core {
 
 	namespace detail {
 
+		/// @brief Defines the default column value accessor type
+		/// @tparam ColumnType The column type
 		template <typename ColumnType>
 		struct DefaultValueAccessor {
+			/// @brief The column value type
 			using ValueType = decltype(std::declval<ColumnType>().value_safe(0));
 
+			/// @brief Gets a value from the target column
+			/// @param column The column instance
+			/// @param index The value index
+			/// @return The respective column value
 			ValueType operator()(const ColumnType& column, std::size_t index) {
 				return column.value_safe(index);
 			}
