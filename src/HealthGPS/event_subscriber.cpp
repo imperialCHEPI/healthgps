@@ -11,10 +11,10 @@ namespace hgps {
 	}
 
 	EventSubscriberHandler::~EventSubscriberHandler()	{
-		unregister();
+		unsubscribe();
 	}
 
-	void EventSubscriberHandler::unregister() const {
+	void EventSubscriberHandler::unsubscribe() const {
 		if (event_hub_) {
 			event_hub_->unsubscribe(*this);
 		}

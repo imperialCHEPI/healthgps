@@ -31,7 +31,7 @@ namespace host
 
 	EventMonitor::~EventMonitor() noexcept {
 		for (auto& handler : handlers_) {
-			handler->unregister();
+			handler->unsubscribe();
 		}
 
 		stop();
