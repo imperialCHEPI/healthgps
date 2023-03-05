@@ -5,9 +5,16 @@
 
 namespace hgps {
 
+	/// @brief Implements the static hierarchical linear model type
+	///
+	/// @details The static model is used to initialise the virtual population,
+	/// the model uses principal component analysis for residual normalisation.
 	class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
 	public:
 		StaticHierarchicalLinearModel() = delete;
+
+		/// @brief Initialises a new instance of the StaticHierarchicalLinearModel class
+		/// @param definition The model definition instance
 		StaticHierarchicalLinearModel(HierarchicalLinearModelDefinition& definition);
 
 		HierarchicalModelType type() const noexcept override;
