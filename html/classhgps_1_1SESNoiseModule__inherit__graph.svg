@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements the socio&#45;economic status (SES) module.">
 <polygon fill="#bfbfbf" stroke="black" points="3,-0.5 3,-19.5 131,-19.5 131,-0.5 3,-0.5"/>
 <text text-anchor="middle" x="67" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SESNoiseModule</text>
 </a>

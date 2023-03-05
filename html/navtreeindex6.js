@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa07cf4f8f5d8b76282917320715dda2ad":[5,0,3,0,44,1],
+"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa273b9ae535de53399c86a9b83148a8ed":[5,0,3,0,44,2],
 "namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a":[5,0,3,0,44,0],
 "namespacehgps_1_1core.html#ad034e9648fc042c077b15693bfa9cb3e":[5,0,3,0,56],
 "namespacehgps_1_1core.html#ae6eacd437c5d1c6764e6c728a12d0de3":[5,0,3,0,57],
@@ -100,7 +102,8 @@ var NAVTREEINDEX6 =
 "person_8h.html#a70680feedf68d4716eac6efe1e173dd6ac76a5e84e4bdee527e274ea30c680d79":[7,0,0,77,2,1],
 "person_8h_source.html":[7,0,0,77],
 "physical__activity__scenario_8cpp.html":[7,0,0,78],
-"physical__activity__scenario_8cpp.html#a94b6feef3ad0120e2495bd089cb2a232":[7,0,0,78,0],
+"physical__activity__scenario_8cpp.html#a996be84890d28b5b02683c0f04669836":[7,0,0,78,1],
+"physical__activity__scenario_8cpp.html#ab24327998275a58b5a265a64a87d7571":[7,0,0,78,0],
 "physical__activity__scenario_8h.html":[7,0,0,79],
 "physical__activity__scenario_8h_source.html":[7,0,0,79],
 "population_8cpp.html":[7,0,0,80],
@@ -221,18 +224,18 @@ var NAVTREEINDEX6 =
 "structhgps_1_1BaselineAdjustment.html#a96be7e960802763cb0f1920a3313613a":[6,0,0,97,2],
 "structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341":[6,0,0,97,1],
 "structhgps_1_1Birth.html":[6,0,0,60],
-"structhgps_1_1Birth.html#a282d87681e5ddb2f9373ffd41989530c":[6,0,0,60,0],
 "structhgps_1_1Birth.html#a802b6b6516ae63b145d9df8abe98d090":[6,0,0,60,1],
 "structhgps_1_1Birth.html#ab11e993a12e0dadd0d1ea1681654d07d":[6,0,0,60,2],
+"structhgps_1_1Birth.html#abc3cac87314aef8522373a481b1e125d":[6,0,0,60,0],
 "structhgps_1_1Coefficient.html":[6,0,0,40],
 "structhgps_1_1Coefficient.html#a233a1e2b6164324ba2ab48b6a1dcd658":[6,0,0,40,3],
 "structhgps_1_1Coefficient.html#a9b099fb62e84ce1b9e27c836ed3d50ce":[6,0,0,40,1],
 "structhgps_1_1Coefficient.html#a9dc2da2bd336d1921399c3c395066225":[6,0,0,40,2],
 "structhgps_1_1Coefficient.html#aeb5642e697928225d31892a2f98bbb09":[6,0,0,40,0],
 "structhgps_1_1DALYsIndicator.html":[6,0,0,74],
+"structhgps_1_1DALYsIndicator.html#a082746584016f886ac3027b51590a44b":[6,0,0,74,0],
 "structhgps_1_1DALYsIndicator.html#a8edbc38380ffdbb3bf1ff3d07516c8ee":[6,0,0,74,2],
 "structhgps_1_1DALYsIndicator.html#a993d5d7cdd55595ae4e7c521a282271b":[6,0,0,74,1],
-"structhgps_1_1DALYsIndicator.html#aaab0b4592bc10aa038d4a1efa3f0a389":[6,0,0,74,0],
 "structhgps_1_1Disease.html":[6,0,0,83],
 "structhgps_1_1Disease.html#a31ef4fb8576b43cc3f1e104a046fc9a8":[6,0,0,83,2],
 "structhgps_1_1Disease.html#a3631ce4f8677d3fb1230a1b5218aca9e":[6,0,0,83,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX6 =
 "structhgps_1_1DiseaseParameter.html#ac4c83e9aa580117e42d0a9cc2171f0f1":[6,0,0,13,5],
 "structhgps_1_1DiseaseParameter.html#adcb68683c8acd95d9be19d0498f35cb7":[6,0,0,13,6],
 "structhgps_1_1DiseaseParameter.html#af3e5ebb754536ad13dc5a9c38582afee":[6,0,0,13,3],
-"structhgps_1_1ErrorEventMessage.html":[6,0,0,19],
-"structhgps_1_1ErrorEventMessage.html#a22446bbcb359c7121a2f9a1e029b26ca":[6,0,0,19,6],
-"structhgps_1_1ErrorEventMessage.html#a2ee505893217c4509114ad44a93d7f4b":[6,0,0,19,2],
-"structhgps_1_1ErrorEventMessage.html#a4ca17f23fbc1fa4183a9cb026fe77a7e":[6,0,0,19,0]
+"structhgps_1_1ErrorEventMessage.html":[6,0,0,19]
 };

@@ -1,5 +1,5 @@
 <map id="hgps::AnalysisModule::initialise_population" name="hgps::AnalysisModule::initialise_population">
 <area shape="rect" id="node1" title="Initialises the virtual population." alt="" coords="5,39,169,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a143ba237af957e455b95b6dd01e463c0" title=" " alt="" coords="217,5,384,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title=" " alt="" coords="217,71,384,112"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a143ba237af957e455b95b6dd01e463c0" title="Gets a read&#45;only reference to the population age range constraints." alt="" coords="217,5,384,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="217,71,384,112"/>
 </map>

@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="271,-0.5 271,-30.5 387,-30.5 387,-0.5 271,-0.5"/>
 <text text-anchor="start" x="279" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="329" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>

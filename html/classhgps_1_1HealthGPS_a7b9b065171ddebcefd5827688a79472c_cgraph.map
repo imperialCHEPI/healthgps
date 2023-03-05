@@ -1,10 +1,10 @@
 <map id="hgps::HealthGPS::initialize" name="hgps::HealthGPS::initialize">
 <area shape="rect" id="node1" title="Initialises the simulation experiment." alt="" coords="5,147,200,174"/>
-<area shape="rect" id="node2" href="$structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" title=" " alt="" coords="262,5,457,47"/>
+<area shape="rect" id="node2" href="$structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" title="Gets a read&#45;only reference to the model inputs definition." alt="" coords="262,5,457,47"/>
 <area shape="rect" id="node3" href="$classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" title="Gets the simulation name." alt="" coords="271,71,447,98"/>
-<area shape="rect" id="node5" href="$structhgps_1_1SimulationDefinition.html#a735106fc3ad7c814aa94b7d7aa40b8e5" title=" " alt="" coords="248,122,471,149"/>
-<area shape="rect" id="node6" href="$classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" title=" " alt="" coords="273,173,446,199"/>
-<area shape="rect" id="node7" href="$classhgps_1_1RandomBitGenerator.html#ac58717fa118fcd760ed04bed995c4d63" title=" " alt="" coords="260,224,459,265"/>
-<area shape="rect" id="node8" href="$classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" title=" " alt="" coords="256,290,463,317"/>
-<area shape="rect" id="node4" href="$structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" title=" " alt="" coords="519,64,713,105"/>
+<area shape="rect" id="node5" href="$structhgps_1_1SimulationDefinition.html#a735106fc3ad7c814aa94b7d7aa40b8e5" title="Gets a reference to the pseudo&#45;random number generator instance." alt="" coords="248,122,471,149"/>
+<area shape="rect" id="node6" href="$classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" title="Gets the user custom seed to initialise the pseudo&#45;number generator." alt="" coords="273,173,446,199"/>
+<area shape="rect" id="node7" href="$classhgps_1_1RandomBitGenerator.html#ac58717fa118fcd760ed04bed995c4d63" title="Sets the current state of the generator engine." alt="" coords="260,224,459,265"/>
+<area shape="rect" id="node8" href="$classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" title="Gets the experiment stop time." alt="" coords="256,290,463,317"/>
+<area shape="rect" id="node4" href="$structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" title="Gets the simulation scenario identifier." alt="" coords="519,64,713,105"/>
 </map>

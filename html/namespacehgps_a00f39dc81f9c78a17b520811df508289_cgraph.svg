@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-142.5 0,-172.5 116,-172.5 116,-142.5 0,-142.5"/>
 <text text-anchor="start" x="8" y="-160.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="58" y="-149.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" target="_top" xlink:title="The experiment population age range constraint.">
 <polygon fill="none" stroke="black" points="173.5,-301.5 173.5,-331.5 283.5,-331.5 283.5,-301.5 173.5,-301.5"/>
 <text text-anchor="start" x="181.5" y="-319.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Settings::age</text>
 <text text-anchor="middle" x="228.5" y="-308.5" font-family="Helvetica,sans-Serif" font-size="10.00">_range</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" target="_top" xlink:title="Gets the experiment target country information.">
 <polygon fill="none" stroke="black" points="164.5,-263 164.5,-282 292.5,-282 292.5,-263 164.5,-263"/>
 <text text-anchor="middle" x="228.5" y="-270" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Settings::country</text>
 </a>
@@ -68,7 +68,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667" target="_top" xlink:title="Gets the LMS (lambda&#45;mu&#45;sigma) definition.">
 <polygon fill="none" stroke="black" points="169,-164.5 169,-194.5 288,-194.5 288,-164.5 169,-164.5"/>
 <text text-anchor="start" x="177" y="-182.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::get</text>
 <text text-anchor="middle" x="228.5" y="-171.5" font-family="Helvetica,sans-Serif" font-size="10.00">_lms_definition</text>
@@ -84,7 +84,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b" target="_top" xlink:title="Gets a reference to the back&#45;end storage instance.">
 <polygon fill="none" stroke="black" points="155,-126 155,-145 302,-145 302,-126 155,-126"/>
 <text text-anchor="middle" x="228.5" y="-133" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::manager</text>
 </a>
@@ -99,7 +99,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classhgps_1_1ModelInput.html#abd88dd970c41908601acde18d5d69b8e" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="classhgps_1_1ModelInput.html#abd88dd970c41908601acde18d5d69b8e" target="_top" xlink:title="Gets the simulation run information.">
 <polygon fill="none" stroke="black" points="167.5,-88 167.5,-107 289.5,-107 289.5,-88 167.5,-88"/>
 <text text-anchor="middle" x="228.5" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::run</text>
 </a>
@@ -114,7 +114,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3" target="_top" xlink:title="Gets the simulation experiment settings definition.">
 <polygon fill="none" stroke="black" points="155.5,-50 155.5,-69 301.5,-69 301.5,-50 155.5,-50"/>
 <text text-anchor="middle" x="228.5" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::settings</text>
 </a>

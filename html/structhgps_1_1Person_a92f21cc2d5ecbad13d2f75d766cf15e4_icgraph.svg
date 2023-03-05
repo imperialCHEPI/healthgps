@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a risk factor current value.">
 <polygon fill="#bfbfbf" stroke="black" points="181,-24.5 181,-54.5 305,-54.5 305,-24.5 181,-24.5"/>
 <text text-anchor="start" x="189" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::get_risk</text>
 <text text-anchor="middle" x="243" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">_factor_value</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="0,-49.5 0,-79.5 145,-79.5 145,-49.5 0,-49.5"/>
 <text text-anchor="start" x="8" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FiscalPolicyScenario</text>
 <text text-anchor="middle" x="72.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1LmsModel.html#a17767cf2f6a8938dfee670369d73e9ad" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1LmsModel.html#a17767cf2f6a8938dfee670369d73e9ad" target="_top" xlink:title="Classify a person weight according with the predefined categories.">
 <polygon fill="none" stroke="black" points="3,-0.5 3,-30.5 142,-30.5 142,-0.5 3,-0.5"/>
 <text text-anchor="start" x="11" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::LmsModel::classify</text>
 <text text-anchor="middle" x="72.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_weight</text>

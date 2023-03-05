@@ -1,5 +1,5 @@
 <map id="hgps::SimplePolicyScenario" name="hgps::SimplePolicyScenario">
-<area shape="rect" id="node1" title=" " alt="" coords="5,155,207,181"/>
-<area shape="rect" id="node2" href="$classhgps_1_1InterventionScenario.html" title="Health GPS scripted intervention policy scenario interface." alt="" coords="8,80,204,107"/>
-<area shape="rect" id="node3" href="$classhgps_1_1Scenario.html" title="Health GPS simulation scenario interface." alt="" coords="47,5,165,32"/>
+<area shape="rect" id="node1" title="Defines the simple development intervention scenario." alt="" coords="5,155,207,181"/>
+<area shape="rect" id="node2" href="$classhgps_1_1InterventionScenario.html" title="Health&#45;GPS scripted intervention policy scenario interface." alt="" coords="8,80,204,107"/>
+<area shape="rect" id="node3" href="$classhgps_1_1Scenario.html" title="Health&#45;GPS simulation scenario interface." alt="" coords="47,5,165,32"/>
 </map>

@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1RiskfactorAdjustmentModel
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the baseline risk factors adjustment model.  
+ <a href="classhgps_1_1RiskfactorAdjustmentModel.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="riskfactor__adjustment_8h_source.html">riskfactor_adjustment.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,11 +103,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac4e14999ed1afec9fb66f094f0efd48d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RiskfactorAdjustmentModel.html#ac4e14999ed1afec9fb66f094f0efd48d">RiskfactorAdjustmentModel</a> ()=delete</td></tr>
 <tr class="separator:ac4e14999ed1afec9fb66f094f0efd48d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5dc8dff3187bdd847607f22ac225ac6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RiskfactorAdjustmentModel.html#af5dc8dff3187bdd847607f22ac225ac6">RiskfactorAdjustmentModel</a> (<a class="el" href="structhgps_1_1BaselineAdjustment.html">BaselineAdjustment</a> &amp;adjustments)</td></tr>
+<tr class="memdesc:af5dc8dff3187bdd847607f22ac225ac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1BaselineAdjustment.html" title="Defines the risk factor baseline adjustment data type.">BaselineAdjustment</a> class.  <a href="classhgps_1_1RiskfactorAdjustmentModel.html#af5dc8dff3187bdd847607f22ac225ac6">More...</a><br /></td></tr>
 <tr class="separator:af5dc8dff3187bdd847607f22ac225ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cfc148566739100cb533e439fbdd00e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e">Apply</a> (<a class="el" href="classhgps_1_1RuntimeContext.html">RuntimeContext</a> &amp;context)</td></tr>
+<tr class="memdesc:a1cfc148566739100cb533e439fbdd00e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the baseline adjustments to the population risk factor values.  <a href="classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e">More...</a><br /></td></tr>
 <tr class="separator:a1cfc148566739100cb533e439fbdd00e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the baseline risk factors adjustment model. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac4e14999ed1afec9fb66f094f0efd48d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac4e14999ed1afec9fb66f094f0efd48d">&#9670;&nbsp;</a></span>RiskfactorAdjustmentModel() <span class="overload">[1/2]</span></h2>
 
@@ -146,6 +153,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="structhgps_1_1BaselineAdjustment.html" title="Defines the risk factor baseline adjustment data type.">BaselineAdjustment</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">adjustments</td><td>The baseline adjustment definition </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -164,6 +179,20 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Applies the baseline adjustments to the population risk factor values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">context</td><td>The simulation shared runtime context instance </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>for simulation instances out of synchronisation or message timeout. </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

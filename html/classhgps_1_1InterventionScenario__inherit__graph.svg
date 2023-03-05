@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Health GPS scripted intervention policy scenario interface.">
+<g id="a_node1"><a xlink:title="Health&#45;GPS scripted intervention policy scenario interface.">
 <polygon fill="#bfbfbf" stroke="black" points="124,-95.5 124,-114.5 271,-114.5 271,-95.5 124,-95.5"/>
 <text text-anchor="middle" x="197.5" y="-102.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::InterventionScenario</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1DynamicInterventionScenario.html" target="_top" xlink:title="Health GPS dynamic intervention policy scenario interface.">
+<g id="a_node3"><a xlink:href="classhgps_1_1DynamicInterventionScenario.html" target="_top" xlink:title="Health&#45;GPS dynamic intervention policy scenario interface.">
 <polygon fill="none" stroke="black" points="315.5,-191 315.5,-221 464.5,-221 464.5,-191 315.5,-191"/>
 <text text-anchor="start" x="323.5" y="-209" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DynamicIntervention</text>
 <text text-anchor="middle" x="390" y="-198" font-family="Helvetica,sans-Serif" font-size="10.00">Scenario</text>
@@ -36,7 +36,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1FiscalPolicyScenario.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1FiscalPolicyScenario.html" target="_top" xlink:title="Implements the fiscal policy intervention scenario.">
 <polygon fill="none" stroke="black" points="317.5,-152.5 317.5,-171.5 462.5,-171.5 462.5,-152.5 317.5,-152.5"/>
 <text text-anchor="middle" x="390" y="-159.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FiscalPolicyScenario</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1FoodLabellingScenario.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1FoodLabellingScenario.html" target="_top" xlink:title="Implements the food labelling intervention scenario.">
 <polygon fill="none" stroke="black" points="312.5,-114.5 312.5,-133.5 467.5,-133.5 467.5,-114.5 312.5,-114.5"/>
 <text text-anchor="middle" x="390" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FoodLabellingScenario</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classhgps_1_1MarketingPolicyScenario.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="classhgps_1_1MarketingPolicyScenario.html" target="_top" xlink:title="Implements the marketing regulation intervention scenario.">
 <polygon fill="none" stroke="black" points="307,-76.5 307,-95.5 473,-95.5 473,-76.5 307,-76.5"/>
 <text text-anchor="middle" x="390" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MarketingPolicyScenario</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="classhgps_1_1PhysicalActivityScenario.html" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="classhgps_1_1PhysicalActivityScenario.html" target="_top" xlink:title="Implements the physical activity regulation intervention scenario.">
 <polygon fill="none" stroke="black" points="307,-38.5 307,-57.5 473,-57.5 473,-38.5 307,-38.5"/>
 <text text-anchor="middle" x="390" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::PhysicalActivityScenario</text>
 </a>
@@ -96,7 +96,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="classhgps_1_1SimplePolicyScenario.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="classhgps_1_1SimplePolicyScenario.html" target="_top" xlink:title="Defines the simple development intervention scenario.">
 <polygon fill="none" stroke="black" points="314.5,-0.5 314.5,-19.5 465.5,-19.5 465.5,-0.5 314.5,-0.5"/>
 <text text-anchor="middle" x="390" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimplePolicyScenario</text>
 </a>
@@ -111,7 +111,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Scenario.html" target="_top" xlink:title="Health GPS simulation scenario interface.">
+<g id="a_node2"><a xlink:href="classhgps_1_1Scenario.html" target="_top" xlink:title="Health&#45;GPS simulation scenario interface.">
 <polygon fill="none" stroke="black" points="0,-95.5 0,-114.5 88,-114.5 88,-95.5 0,-95.5"/>
 <text text-anchor="middle" x="44" y="-102.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Scenario</text>
 </a>
@@ -126,7 +126,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1MarketingDynamicScenario.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1MarketingDynamicScenario.html" target="_top" xlink:title="Implements the dynamic marketing regulation intervention scenario.">
 <polygon fill="none" stroke="black" points="509,-196.5 509,-215.5 689,-215.5 689,-196.5 509,-196.5"/>
 <text text-anchor="middle" x="599" y="-203.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MarketingDynamicScenario</text>
 </a>

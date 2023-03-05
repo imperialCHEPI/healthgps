@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('structhgps_1_1ModelResult.html',''); i
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the model results data type.  
+ <a href="structhgps_1_1ModelResult.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="model__result_8h_source.html">model_result.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for hgps::ModelResult:</div>
@@ -106,38 +109,54 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac8c6e7ff1ba79e38411bb52c38b81043"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#ac8c6e7ff1ba79e38411bb52c38b81043">ModelResult</a> ()=delete</td></tr>
 <tr class="separator:ac8c6e7ff1ba79e38411bb52c38b81043"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa234762b1e18d238c318ed65230ceb6a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#aa234762b1e18d238c318ed65230ceb6a">ModelResult</a> (const unsigned int sample_size)</td></tr>
+<tr class="memdesc:aa234762b1e18d238c318ed65230ceb6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1ModelResult.html" title="Defines the model results data type.">ModelResult</a> structure.  <a href="structhgps_1_1ModelResult.html#aa234762b1e18d238c318ed65230ceb6a">More...</a><br /></td></tr>
 <tr class="separator:aa234762b1e18d238c318ed65230ceb6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ec8799b43b43fcf85456e3e59085523"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a2ec8799b43b43fcf85456e3e59085523">to_string</a> () const noexcept</td></tr>
+<tr class="memdesc:a2ec8799b43b43fcf85456e3e59085523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a string representation of this instance.  <a href="structhgps_1_1ModelResult.html#a2ec8799b43b43fcf85456e3e59085523">More...</a><br /></td></tr>
 <tr class="separator:a2ec8799b43b43fcf85456e3e59085523"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bd1ad7de7e448d80924d817b3f15b91"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a6bd1ad7de7e448d80924d817b3f15b91">number_of_recyclable</a> () const noexcept</td></tr>
+<tr class="memdesc:a6bd1ad7de7e448d80924d817b3f15b91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of recycled population slots due to deaths and emigration.  <a href="structhgps_1_1ModelResult.html#a6bd1ad7de7e448d80924d817b3f15b91">More...</a><br /></td></tr>
 <tr class="separator:a6bd1ad7de7e448d80924d817b3f15b91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a32292651db4a37c2fb33293055911558"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a32292651db4a37c2fb33293055911558">population_size</a> {}</td></tr>
+<tr class="memdesc:a32292651db4a37c2fb33293055911558"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total population size.  <a href="structhgps_1_1ModelResult.html#a32292651db4a37c2fb33293055911558">More...</a><br /></td></tr>
 <tr class="separator:a32292651db4a37c2fb33293055911558"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4aaca8c5ee5c3798f16b0d375f13245"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#adc391bd01dae2c5fabf7bca91f169adb">IntegerGenderValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#aa4aaca8c5ee5c3798f16b0d375f13245">number_alive</a> {}</td></tr>
+<tr class="memdesc:aa4aaca8c5ee5c3798f16b0d375f13245"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of people alive in the population.  <a href="structhgps_1_1ModelResult.html#aa4aaca8c5ee5c3798f16b0d375f13245">More...</a><br /></td></tr>
 <tr class="separator:aa4aaca8c5ee5c3798f16b0d375f13245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8f2a6f61cf4cf8f7e0b82c01b64dae0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#ab8f2a6f61cf4cf8f7e0b82c01b64dae0">number_dead</a> {}</td></tr>
+<tr class="memdesc:ab8f2a6f61cf4cf8f7e0b82c01b64dae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of dead in the population.  <a href="structhgps_1_1ModelResult.html#ab8f2a6f61cf4cf8f7e0b82c01b64dae0">More...</a><br /></td></tr>
 <tr class="separator:ab8f2a6f61cf4cf8f7e0b82c01b64dae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a457142369558edd69835fdb79326ee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a8a457142369558edd69835fdb79326ee">number_emigrated</a> {}</td></tr>
+<tr class="memdesc:a8a457142369558edd69835fdb79326ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of emigrants in the population.  <a href="structhgps_1_1ModelResult.html#a8a457142369558edd69835fdb79326ee">More...</a><br /></td></tr>
 <tr class="separator:a8a457142369558edd69835fdb79326ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5eedd127efef08599fdb2f6db527af68"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1ResultByGender.html">ResultByGender</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a5eedd127efef08599fdb2f6db527af68">average_age</a> {}</td></tr>
+<tr class="memdesc:a5eedd127efef08599fdb2f6db527af68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average age of the population.  <a href="structhgps_1_1ModelResult.html#a5eedd127efef08599fdb2f6db527af68">More...</a><br /></td></tr>
 <tr class="separator:a5eedd127efef08599fdb2f6db527af68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ae7c5ff67bec83146d2176a570db4e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1DALYsIndicator.html">DALYsIndicator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a16ae7c5ff67bec83146d2176a570db4e">indicators</a> {}</td></tr>
+<tr class="memdesc:a16ae7c5ff67bec83146d2176a570db4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The DALYs indicator.  <a href="structhgps_1_1ModelResult.html#a16ae7c5ff67bec83146d2176a570db4e">More...</a><br /></td></tr>
 <tr class="separator:a16ae7c5ff67bec83146d2176a570db4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad792ea010c9a78d6e6bdeb557fe7f3ad"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structhgps_1_1ResultByGender.html">ResultByGender</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#ad792ea010c9a78d6e6bdeb557fe7f3ad">risk_ractor_average</a> {}</td></tr>
+<tr class="memdesc:ad792ea010c9a78d6e6bdeb557fe7f3ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average risk factors value in population.  <a href="structhgps_1_1ModelResult.html#ad792ea010c9a78d6e6bdeb557fe7f3ad">More...</a><br /></td></tr>
 <tr class="separator:ad792ea010c9a78d6e6bdeb557fe7f3ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70ccdfe1febf9167ecca4c1ddfd306f6"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structhgps_1_1ResultByGender.html">ResultByGender</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a70ccdfe1febf9167ecca4c1ddfd306f6">disease_prevalence</a> {}</td></tr>
+<tr class="memdesc:a70ccdfe1febf9167ecca4c1ddfd306f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average diseases prevalence value in population.  <a href="structhgps_1_1ModelResult.html#a70ccdfe1febf9167ecca4c1ddfd306f6">More...</a><br /></td></tr>
 <tr class="separator:a70ccdfe1febf9167ecca4c1ddfd306f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13383b213957faf3abe19b2881538f3c"><td class="memItemLeft" align="right" valign="top">std::map&lt; unsigned int, <a class="el" href="structhgps_1_1ResultByGender.html">ResultByGender</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a13383b213957faf3abe19b2881538f3c">comorbidity</a> {}</td></tr>
+<tr class="memdesc:a13383b213957faf3abe19b2881538f3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Average comorbidity in population.  <a href="structhgps_1_1ModelResult.html#a13383b213957faf3abe19b2881538f3c">More...</a><br /></td></tr>
 <tr class="separator:a13383b213957faf3abe19b2881538f3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ec6972569867e2e75d21dfbfa7222c8"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a4ec6972569867e2e75d21dfbfa7222c8">metrics</a> {}</td></tr>
+<tr class="memdesc:a4ec6972569867e2e75d21dfbfa7222c8"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> runtime metrics.  <a href="structhgps_1_1ModelResult.html#a4ec6972569867e2e75d21dfbfa7222c8">More...</a><br /></td></tr>
 <tr class="separator:a4ec6972569867e2e75d21dfbfa7222c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62079ecc6c38af6040fbaf8fe0bbe6aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1DataSeries.html">DataSeries</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ModelResult.html#a62079ecc6c38af6040fbaf8fe0bbe6aa">series</a></td></tr>
+<tr class="memdesc:a62079ecc6c38af6040fbaf8fe0bbe6aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">The detailed time series data results.  <a href="structhgps_1_1ModelResult.html#a62079ecc6c38af6040fbaf8fe0bbe6aa">More...</a><br /></td></tr>
 <tr class="separator:a62079ecc6c38af6040fbaf8fe0bbe6aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the model results data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac8c6e7ff1ba79e38411bb52c38b81043"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac8c6e7ff1ba79e38411bb52c38b81043">&#9670;&nbsp;</a></span>ModelResult() <span class="overload">[1/2]</span></h2>
 
@@ -179,6 +198,14 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="structhgps_1_1ModelResult.html" title="Defines the model results data type.">ModelResult</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sample_size</td><td>The results sample size value </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -204,6 +231,9 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of recycled population slots due to deaths and emigration. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of recycled population slots </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -234,6 +264,9 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a string representation of this instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>The string representation </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -260,6 +293,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Average age of the population. </p>
+
 </div>
 </div>
 <a id="a13383b213957faf3abe19b2881538f3c"></a>
@@ -273,6 +308,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Average comorbidity in population. </p>
 
 </div>
 </div>
@@ -288,6 +325,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Average diseases prevalence value in population. </p>
+
 </div>
 </div>
 <a id="a16ae7c5ff67bec83146d2176a570db4e"></a>
@@ -301,6 +340,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The DALYs indicator. </p>
 
 </div>
 </div>
@@ -316,6 +357,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p><a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> runtime metrics. </p>
+
 </div>
 </div>
 <a id="aa4aaca8c5ee5c3798f16b0d375f13245"></a>
@@ -329,6 +372,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The number of people alive in the population. </p>
 
 </div>
 </div>
@@ -344,6 +389,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>The number of dead in the population. </p>
+
 </div>
 </div>
 <a id="a8a457142369558edd69835fdb79326ee"></a>
@@ -357,6 +404,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The number of emigrants in the population. </p>
 
 </div>
 </div>
@@ -372,6 +421,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Total population size. </p>
+
 </div>
 </div>
 <a id="ad792ea010c9a78d6e6bdeb557fe7f3ad"></a>
@@ -386,6 +437,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Average risk factors value in population. </p>
+
 </div>
 </div>
 <a id="a62079ecc6c38af6040fbaf8fe0bbe6aa"></a>
@@ -399,6 +452,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The detailed time series data results. </p>
 
 </div>
 </div>

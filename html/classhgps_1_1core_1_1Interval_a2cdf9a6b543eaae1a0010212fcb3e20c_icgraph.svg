@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps.html#a3307e7f4f376cf642cd86be980c984f6" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps.html#a3307e7f4f376cf642cd86be980c984f6" target="_top" xlink:title="Creates an instance of the age and gender lookup table.">
 <polygon fill="none" stroke="black" points="0,-49.5 0,-79.5 139,-79.5 139,-49.5 0,-49.5"/>
 <text text-anchor="start" x="8" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::create_age_gender</text>
 <text text-anchor="middle" x="69.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">_table</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="namespacehgps.html#a21caec02e6321c6a5ea6217d55f713d6" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="namespacehgps.html#a21caec02e6321c6a5ea6217d55f713d6" target="_top" xlink:title="Creates an instance of the gender lookup table for integer rows breakpoints value.">
 <polygon fill="none" stroke="black" points="11.5,-0.5 11.5,-30.5 127.5,-30.5 127.5,-0.5 11.5,-0.5"/>
 <text text-anchor="start" x="19.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::create_integer</text>
 <text text-anchor="middle" x="69.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_gender_table</text>

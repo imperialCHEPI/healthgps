@@ -1,6 +1,6 @@
 <map id="hgps::core::Identifier::is_empty" name="hgps::core::Identifier::is_empty">
 <area shape="rect" id="node1" title="Checks whether this is an empty identifier." alt="" coords="403,39,557,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1DiseaseTable.html#a3db30c05a65e430acf14b5c2c332d9c2" title=" " alt="" coords="206,5,353,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1MappingEntry.html#a09cdddeb8893a92310b268ab19ba8409" title=" " alt="" coords="204,71,355,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23" title=" " alt="" coords="5,71,156,112"/>
+<area shape="rect" id="node2" href="$classhgps_1_1DiseaseTable.html#a3db30c05a65e430acf14b5c2c332d9c2" title="Initialise a new instance of the DiseaseTable class." alt="" coords="206,5,353,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1MappingEntry.html#a09cdddeb8893a92310b268ab19ba8409" title="Determine whether this factor has an associated Person property, e.g. age." alt="" coords="204,71,355,112"/>
+<area shape="rect" id="node4" href="$classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23" title="Gets the factor&#39;s associated Person property identifier." alt="" coords="5,71,156,112"/>
 </map>

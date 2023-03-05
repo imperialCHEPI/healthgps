@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Initialise a new instance of the PopulationModule class.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-44.5 0,-74.5 134,-74.5 134,-44.5 0,-44.5"/>
 <text text-anchor="start" x="8" y="-62.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::PopulationModule</text>
 <text text-anchor="middle" x="67" y="-51.5" font-family="Helvetica,sans-Serif" font-size="10.00">::PopulationModule</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1LifeTable.html#a3a5874b9d68337c799d05f12f6a9f7d8" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1LifeTable.html#a3a5874b9d68337c799d05f12f6a9f7d8" target="_top" xlink:title="Gets the LifeTable data age limits.">
 <polygon fill="none" stroke="black" points="177,-88.5 177,-118.5 290,-118.5 290,-88.5 177,-88.5"/>
 <text text-anchor="start" x="185" y="-106.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::LifeTable::age</text>
 <text text-anchor="middle" x="233.5" y="-95.5" font-family="Helvetica,sans-Serif" font-size="10.00">_limits</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1LifeTable.html#a4c892da22073f72a3cd9981e1e61cae0" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1LifeTable.html#a4c892da22073f72a3cd9981e1e61cae0" target="_top" xlink:title="Determine whether the LifeTable data is empty.">
 <polygon fill="none" stroke="black" points="170,-50 170,-69 297,-69 297,-50 170,-50"/>
 <text text-anchor="middle" x="233.5" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::LifeTable::empty</text>
 </a>
@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1LifeTable.html#aa1eeedafec56d98b192b4b4af0dcd19d" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1LifeTable.html#aa1eeedafec56d98b192b4b4af0dcd19d" target="_top" xlink:title="Gets the LifeTable data time limits.">
 <polygon fill="none" stroke="black" points="174.5,-0.5 174.5,-30.5 292.5,-30.5 292.5,-0.5 174.5,-0.5"/>
 <text text-anchor="start" x="182.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::LifeTable::time</text>
 <text text-anchor="middle" x="233.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_limits</text>

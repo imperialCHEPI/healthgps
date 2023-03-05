@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Classify a person weight according with the predefined categories.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-30.5 139,-30.5 139,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::LmsModel::classify</text>
 <text text-anchor="middle" x="69.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_weight</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1Person.html#a92f21cc2d5ecbad13d2f75d766cf15e4" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1Person.html#a92f21cc2d5ecbad13d2f75d766cf15e4" target="_top" xlink:title="Gets a risk factor current value.">
 <polygon fill="none" stroke="black" points="175,-0.5 175,-30.5 299,-30.5 299,-0.5 175,-0.5"/>
 <text text-anchor="start" x="183" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::get_risk</text>
 <text text-anchor="middle" x="237" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_factor_value</text>

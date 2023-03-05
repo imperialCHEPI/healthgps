@@ -102,15 +102,19 @@ $(document).ready(function(){initNavTree('structhgps_1_1PolicyDynamic.html','');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a525d014a7245287176035390f5df87e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">PolicyDynamic</a> (const std::vector&lt; double &gt; &amp;parameters)</td></tr>
+<tr class="memdesc:a525d014a7245287176035390f5df87e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1PolicyDynamic.html" title="Defines the policy dynamic parameters.">PolicyDynamic</a> structure.  <a href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">More...</a><br /></td></tr>
 <tr class="separator:a525d014a7245287176035390f5df87e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ae217a73fe64e328c1eccd28f7fcf0aa8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyDynamic.html#ae217a73fe64e328c1eccd28f7fcf0aa8">alpha</a> { 1.0 }</td></tr>
+<tr class="memdesc:ae217a73fe64e328c1eccd28f7fcf0aa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alpha parameter, default 1.0 (full effect at start)  <a href="structhgps_1_1PolicyDynamic.html#ae217a73fe64e328c1eccd28f7fcf0aa8">More...</a><br /></td></tr>
 <tr class="separator:ae217a73fe64e328c1eccd28f7fcf0aa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace4764c047907b3dc8a582a4b33eca83"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyDynamic.html#ace4764c047907b3dc8a582a4b33eca83">beta</a> { 0.0 }</td></tr>
+<tr class="memdesc:ace4764c047907b3dc8a582a4b33eca83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Beta parameter, default 0.0 (no effect)  <a href="structhgps_1_1PolicyDynamic.html#ace4764c047907b3dc8a582a4b33eca83">More...</a><br /></td></tr>
 <tr class="separator:ace4764c047907b3dc8a582a4b33eca83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1120ba2c39b46265a12c4cad37a97e1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyDynamic.html#aa1120ba2c39b46265a12c4cad37a97e1">gamma</a> { 0.0 }</td></tr>
+<tr class="memdesc:aa1120ba2c39b46265a12c4cad37a97e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gamma parameter, default 0.0 (no effect)  <a href="structhgps_1_1PolicyDynamic.html#aa1120ba2c39b46265a12c4cad37a97e1">More...</a><br /></td></tr>
 <tr class="separator:aa1120ba2c39b46265a12c4cad37a97e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -140,6 +144,21 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="structhgps_1_1PolicyDynamic.html" title="Defines the policy dynamic parameters.">PolicyDynamic</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>The System Dynamic parameters </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for parameters size different of three [alpha, beta, gamma] </td></tr>
+    <tr><td class="paramname">std::out_of_range</td><td>for parameters value outside of the valid range [0.0, 1.0] </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -155,6 +174,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Alpha parameter, default 1.0 (full effect at start) </p>
+
 </div>
 </div>
 <a id="ace4764c047907b3dc8a582a4b33eca83"></a>
@@ -169,6 +190,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Beta parameter, default 0.0 (no effect) </p>
+
 </div>
 </div>
 <a id="aa1120ba2c39b46265a12c4cad37a97e1"></a>
@@ -182,6 +205,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gamma parameter, default 0.0 (no effect) </p>
 
 </div>
 </div>

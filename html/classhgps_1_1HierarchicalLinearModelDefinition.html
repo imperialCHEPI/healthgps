@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1HierarchicalLinearModelDe
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the full hierarchical linear model data type.  
+ <a href="classhgps_1_1HierarchicalLinearModelDefinition.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="hierarchical__model__types_8h_source.html">hierarchical_model_types.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,13 +103,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab9e777ad99ca13c80ad9f39beb0293ce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html#ab9e777ad99ca13c80ad9f39beb0293ce">HierarchicalLinearModelDefinition</a> ()=delete</td></tr>
 <tr class="separator:ab9e777ad99ca13c80ad9f39beb0293ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a514d2b1b23fb8cf0b059538863faa09e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html#a514d2b1b23fb8cf0b059538863faa09e">HierarchicalLinearModelDefinition</a> (std::unordered_map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1LinearModel.html">LinearModel</a> &gt; &amp;&amp;linear_models, std::map&lt; int, <a class="el" href="structhgps_1_1HierarchicalLevel.html">HierarchicalLevel</a> &gt; &amp;&amp;model_levels)</td></tr>
+<tr class="memdesc:a514d2b1b23fb8cf0b059538863faa09e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html" title="Defines the full hierarchical linear model data type.">HierarchicalLinearModelDefinition</a> class.  <a href="classhgps_1_1HierarchicalLinearModelDefinition.html#a514d2b1b23fb8cf0b059538863faa09e">More...</a><br /></td></tr>
 <tr class="separator:a514d2b1b23fb8cf0b059538863faa09e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6e263345e9077ef0cbd8b48a85b890d"><td class="memItemLeft" align="right" valign="top">const std::unordered_map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1LinearModel.html">LinearModel</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html#ab6e263345e9077ef0cbd8b48a85b890d">models</a> () const noexcept</td></tr>
+<tr class="memdesc:ab6e263345e9077ef0cbd8b48a85b890d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the hierarchical model's linear regression equations.  <a href="classhgps_1_1HierarchicalLinearModelDefinition.html#ab6e263345e9077ef0cbd8b48a85b890d">More...</a><br /></td></tr>
 <tr class="separator:ab6e263345e9077ef0cbd8b48a85b890d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1105b099cf0d4c9e7fdd1e699c48e33"><td class="memItemLeft" align="right" valign="top">const std::map&lt; int, <a class="el" href="structhgps_1_1HierarchicalLevel.html">HierarchicalLevel</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html#ad1105b099cf0d4c9e7fdd1e699c48e33">levels</a> () const noexcept</td></tr>
+<tr class="memdesc:ad1105b099cf0d4c9e7fdd1e699c48e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the hierarchical model's levels definitions.  <a href="classhgps_1_1HierarchicalLinearModelDefinition.html#ad1105b099cf0d4c9e7fdd1e699c48e33">More...</a><br /></td></tr>
 <tr class="separator:ad1105b099cf0d4c9e7fdd1e699c48e33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the full hierarchical linear model data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab9e777ad99ca13c80ad9f39beb0293ce"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab9e777ad99ca13c80ad9f39beb0293ce">&#9670;&nbsp;</a></span>HierarchicalLinearModelDefinition() <span class="overload">[1/2]</span></h2>
 
@@ -166,6 +174,21 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html" title="Defines the full hierarchical linear model data type.">HierarchicalLinearModelDefinition</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">linear_models</td><td>The linear regression models equations </td></tr>
+    <tr><td class="paramname">model_levels</td><td>The hierarchical model levels definition </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for empty regression models equations or hierarchical model levels </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -192,6 +215,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the hierarchical model's levels definitions. </p>
+<dl class="section return"><dt>Returns</dt><dd>Hierarchical model levels </dd></dl>
+
 </div>
 </div>
 <a id="ab6e263345e9077ef0cbd8b48a85b890d"></a>
@@ -216,6 +242,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the hierarchical model's linear regression equations. </p>
+<dl class="section return"><dt>Returns</dt><dd>Linear regression equations </dd></dl>
 
 </div>
 </div>

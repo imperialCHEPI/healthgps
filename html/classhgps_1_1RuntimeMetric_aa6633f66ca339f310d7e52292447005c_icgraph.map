@@ -1,4 +1,4 @@
 <map id="hgps::RuntimeMetric::reset" name="hgps::RuntimeMetric::reset">
-<area shape="rect" id="node1" title=" " alt="" coords="236,5,393,47"/>
+<area shape="rect" id="node1" title="Resets the values of all metrics in the container to zero." alt="" coords="236,5,393,47"/>
 <area shape="rect" id="node2" href="$classhgps_1_1HealthGPS.html#af36af9f5aacf623d283f72e9a7b2c411" title="Called to assign a new state to the model at current time." alt="" coords="5,13,188,39"/>
 </map>

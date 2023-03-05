@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the simulation experiment settings definition.">
 <polygon fill="#bfbfbf" stroke="black" points="434,-55 434,-74 580,-74 580,-55 434,-55"/>
 <text text-anchor="middle" x="507" y="-62" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::settings</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="276.5,-98.5 276.5,-128.5 392.5,-128.5 392.5,-98.5 276.5,-98.5"/>
 <text text-anchor="start" x="284.5" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="334.5" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -36,7 +36,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" target="_top" xlink:title="Builds a new instance of the DiseaseModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="278,-49.5 278,-79.5 391,-79.5 391,-49.5 278,-49.5"/>
 <text text-anchor="start" x="286" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_disease</text>
 <text text-anchor="middle" x="334.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -52,7 +52,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" target="_top" xlink:title="Builds a new instance of the PopulationModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="271,-0.5 271,-30.5 398,-30.5 398,-0.5 271,-0.5"/>
 <text text-anchor="start" x="279" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_population</text>
 <text text-anchor="middle" x="334.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>

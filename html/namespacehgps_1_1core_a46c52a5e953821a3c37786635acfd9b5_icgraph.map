@@ -1,6 +1,6 @@
 <map id="hgps::core::run_async" name="hgps::core::run_async">
 <area shape="rect" id="node1" title="Run a given function asynchronous." alt="" coords="232,64,395,91"/>
 <area shape="rect" id="node2" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="67,5,122,32"/>
-<area shape="rect" id="node3" href="$classhgps_1_1DefaultEventBus.html#a4ea312a2bc9bdf9210ca7513432a95b2" title=" " alt="" coords="9,57,180,98"/>
+<area shape="rect" id="node3" href="$classhgps_1_1DefaultEventBus.html#a4ea312a2bc9bdf9210ca7513432a95b2" title="Publishes a message to all subscribers asynchronous." alt="" coords="9,57,180,98"/>
 <area shape="rect" id="node4" href="$classhgps_1_1PopulationModule.html#aee3e42276edae4477f41ca360b090323" title="Updates the virtual population status." alt="" coords="5,122,184,163"/>
 </map>

@@ -1,6 +1,6 @@
 <map id="hgps::PopulationModule::PopulationModule" name="hgps::PopulationModule::PopulationModule">
-<area shape="rect" id="node1" title=" " alt="" coords="5,64,184,105"/>
-<area shape="rect" id="node2" href="$classhgps_1_1LifeTable.html#a3a5874b9d68337c799d05f12f6a9f7d8" title=" " alt="" coords="241,5,392,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1LifeTable.html#a4c892da22073f72a3cd9981e1e61cae0" title=" " alt="" coords="232,71,401,98"/>
-<area shape="rect" id="node4" href="$classhgps_1_1LifeTable.html#aa1eeedafec56d98b192b4b4af0dcd19d" title=" " alt="" coords="238,123,395,164"/>
+<area shape="rect" id="node1" title="Initialise a new instance of the PopulationModule class." alt="" coords="5,64,184,105"/>
+<area shape="rect" id="node2" href="$classhgps_1_1LifeTable.html#a3a5874b9d68337c799d05f12f6a9f7d8" title="Gets the LifeTable data age limits." alt="" coords="241,5,392,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1LifeTable.html#a4c892da22073f72a3cd9981e1e61cae0" title="Determine whether the LifeTable data is empty." alt="" coords="232,71,401,98"/>
+<area shape="rect" id="node4" href="$classhgps_1_1LifeTable.html#aa1eeedafec56d98b192b4b4af0dcd19d" title="Gets the LifeTable data time limits." alt="" coords="238,123,395,164"/>
 </map>

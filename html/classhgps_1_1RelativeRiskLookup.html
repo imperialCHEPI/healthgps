@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1RelativeRiskLookup.html',
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the relative risk factors lookup data type.  
+ <a href="classhgps_1_1RelativeRiskLookup.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="relative__risk_8h_source.html">relative_risk.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,23 +103,34 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a186b3c3e601ea39e1be47085f5ef19fb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#a186b3c3e601ea39e1be47085f5ef19fb">RelativeRiskLookup</a> ()=delete</td></tr>
 <tr class="separator:a186b3c3e601ea39e1be47085f5ef19fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae807e285da2387e3b44ea68372b3f34c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#ae807e285da2387e3b44ea68372b3f34c">RelativeRiskLookup</a> (const <a class="el" href="classhgps_1_1MonotonicVector.html">MonotonicVector</a>&lt; int &gt; &amp;<a class="el" href="classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083">rows</a>, const <a class="el" href="classhgps_1_1MonotonicVector.html">MonotonicVector</a>&lt; float &gt; &amp;cols, <a class="el" href="namespacehgps_1_1core.html#a6fd40c5fdc889eff6cd129ab5ede0802">core::FloatArray2D</a> &amp;&amp;values)</td></tr>
+<tr class="memdesc:ae807e285da2387e3b44ea68372b3f34c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1RelativeRiskLookup.html" title="Defines the relative risk factors lookup data type.">RelativeRiskLookup</a> class.  <a href="classhgps_1_1RelativeRiskLookup.html#ae807e285da2387e3b44ea68372b3f34c">More...</a><br /></td></tr>
 <tr class="separator:ae807e285da2387e3b44ea68372b3f34c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a133b99eadd726ce9d4e774e977f78581"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#a133b99eadd726ce9d4e774e977f78581">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a133b99eadd726ce9d4e774e977f78581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of elements in the lookup dataset.  <a href="classhgps_1_1RelativeRiskLookup.html#a133b99eadd726ce9d4e774e977f78581">More...</a><br /></td></tr>
 <tr class="separator:a133b99eadd726ce9d4e774e977f78581"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c41a6fb0004de0f0eb9c680ef511083"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083">rows</a> () const noexcept</td></tr>
+<tr class="memdesc:a7c41a6fb0004de0f0eb9c680ef511083"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of rows lookup breakpoints.  <a href="classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083">More...</a><br /></td></tr>
 <tr class="separator:a7c41a6fb0004de0f0eb9c680ef511083"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0a6ff699396be055d3b790e80d17127"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#af0a6ff699396be055d3b790e80d17127">columns</a> () const noexcept</td></tr>
+<tr class="memdesc:af0a6ff699396be055d3b790e80d17127"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of columns lookup breakpoints.  <a href="classhgps_1_1RelativeRiskLookup.html#af0a6ff699396be055d3b790e80d17127">More...</a><br /></td></tr>
 <tr class="separator:af0a6ff699396be055d3b790e80d17127"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69c672321c0be177003491d479b15fdc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#a69c672321c0be177003491d479b15fdc">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:a69c672321c0be177003491d479b15fdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the lookup has no data.  <a href="classhgps_1_1RelativeRiskLookup.html#a69c672321c0be177003491d479b15fdc">More...</a><br /></td></tr>
 <tr class="separator:a69c672321c0be177003491d479b15fdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5618a0b0a7339e61317816455b1741f2"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#a5618a0b0a7339e61317816455b1741f2">at</a> (const int age, const float value) const</td></tr>
+<tr class="memdesc:a5618a0b0a7339e61317816455b1741f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lookup a value at specific breakpoints with bounds checking.  <a href="classhgps_1_1RelativeRiskLookup.html#a5618a0b0a7339e61317816455b1741f2">More...</a><br /></td></tr>
 <tr class="separator:a5618a0b0a7339e61317816455b1741f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb1c226571268d499fcdb30a8908069a"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#abb1c226571268d499fcdb30a8908069a">operator()</a> (const int age, const float value) const</td></tr>
+<tr class="memdesc:abb1c226571268d499fcdb30a8908069a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lookup a value at specific breakpoints with bounds checking.  <a href="classhgps_1_1RelativeRiskLookup.html#abb1c226571268d499fcdb30a8908069a">More...</a><br /></td></tr>
 <tr class="separator:abb1c226571268d499fcdb30a8908069a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf9f02f69f1e3d03fd247f23ebfd4f37"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RelativeRiskLookup.html#aaf9f02f69f1e3d03fd247f23ebfd4f37">contains</a> (const int age, const float value) const noexcept</td></tr>
+<tr class="memdesc:aaf9f02f69f1e3d03fd247f23ebfd4f37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the lookup contains a value with specific breakpoints.  <a href="classhgps_1_1RelativeRiskLookup.html#aaf9f02f69f1e3d03fd247f23ebfd4f37">More...</a><br /></td></tr>
 <tr class="separator:aaf9f02f69f1e3d03fd247f23ebfd4f37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the relative risk factors lookup data type. </p>
+<dl class="section note"><dt>Note</dt><dd>When a lookup value does not exists at the exact breakpoint values provided, a data at bound value or a linear interpolated value is returned for the operation. </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a186b3c3e601ea39e1be47085f5ef19fb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a186b3c3e601ea39e1be47085f5ef19fb">&#9670;&nbsp;</a></span>RelativeRiskLookup() <span class="overload">[1/2]</span></h2>
 
@@ -173,6 +187,22 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1RelativeRiskLookup.html" title="Defines the relative risk factors lookup data type.">RelativeRiskLookup</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rows</td><td>The rows lookup breakpoints </td></tr>
+    <tr><td class="paramname">cols</td><td>The columns lookup breakpoints </td></tr>
+    <tr><td class="paramname">values</td><td>The lookup data values </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for lookup breakpoints and values size mismatch. </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -208,6 +238,22 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Lookup a value at specific breakpoints with bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>The row value </td></tr>
+    <tr><td class="paramname">value</td><td>The column value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The lookup value </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for row breakpoint value outside of the bounds. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="af0a6ff699396be055d3b790e80d17127"></a>
@@ -232,6 +278,9 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of columns lookup breakpoints. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of columns </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -274,6 +323,16 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Checks if the lookup contains a value with specific breakpoints. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>The row value </td></tr>
+    <tr><td class="paramname">value</td><td>The column value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if there is such a value; otherwise, false. </dd></dl>
+
 </div>
 </div>
 <a id="a69c672321c0be177003491d479b15fdc"></a>
@@ -298,6 +357,9 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Checks if the lookup has no data. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if the lookup data is empty; otherwise, false. </dd></dl>
 
 </div>
 </div>
@@ -327,6 +389,22 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Lookup a value at specific breakpoints with bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>The row value </td></tr>
+    <tr><td class="paramname">value</td><td>The column value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The lookup value </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for row breakpoint value outside of the bounds. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a7c41a6fb0004de0f0eb9c680ef511083"></a>
@@ -351,6 +429,9 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of rows lookup breakpoints. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of rows </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -386,6 +467,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of elements in the lookup dataset. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of lookup elements. </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

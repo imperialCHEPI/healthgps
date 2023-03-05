@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Defines the model results data type.">
 <polygon fill="#bfbfbf" stroke="black" points="216,-0.5 216,-19.5 323,-19.5 323,-0.5 216,-0.5"/>
 <text text-anchor="middle" x="269.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelResult</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1ResultByGender.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1ResultByGender.html" target="_top" xlink:title="Defines the measure by gender result data type.">
 <polygon fill="none" stroke="black" points="0,-73 0,-92 125,-92 125,-73 0,-73"/>
 <text text-anchor="middle" x="62.5" y="-80" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultByGender</text>
 </a>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1DALYsIndicator.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1DALYsIndicator.html" target="_top" xlink:title="Defines the DALYs indicator result data type.">
 <polygon fill="none" stroke="black" points="278,-73 278,-92 397,-92 397,-73 278,-73"/>
 <text text-anchor="middle" x="337.5" y="-80" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DALYsIndicator</text>
 </a>
@@ -69,7 +69,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1DataSeries.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1DataSeries.html" target="_top" xlink:title="Defines the Simulation results container for time series data.">
 <polygon fill="none" stroke="black" points="415,-73 415,-92 514,-92 514,-73 415,-73"/>
 <text text-anchor="middle" x="464.5" y="-80" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DataSeries</text>
 </a>

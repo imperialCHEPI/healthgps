@@ -1,5 +1,5 @@
 <map id="hgps::ModelInput::seed" name="hgps::ModelInput::seed">
-<area shape="rect" id="node1" title=" " alt="" coords="351,42,524,69"/>
+<area shape="rect" id="node1" title="Gets the user custom seed to initialise the pseudo&#45;number generator." alt="" coords="351,42,524,69"/>
 <area shape="rect" id="node2" href="$namespacehost.html#a07367da68854f50923957b8f86a7bc4c" title="Creates the simulation results file logger instance." alt="" coords="130,5,281,47"/>
 <area shape="rect" id="node4" href="$classhgps_1_1HealthGPS.html#a7b9b065171ddebcefd5827688a79472c" title="Initialises the simulation experiment." alt="" coords="108,71,303,98"/>
 <area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>

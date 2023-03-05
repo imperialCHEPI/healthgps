@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1LiteHierarchicalModelDefi
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the lite hierarchical linear model data type.  
+ <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="hierarchical__model__types_8h_source.html">hierarchical_model_types.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,15 +103,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8f5c9855c2477e25559395e2fadcc03d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a8f5c9855c2477e25559395e2fadcc03d">LiteHierarchicalModelDefinition</a> ()=delete</td></tr>
 <tr class="separator:a8f5c9855c2477e25559395e2fadcc03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb8b25a47cf37b3319220fd7b77e5e82"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#adb8b25a47cf37b3319220fd7b77e5e82">LiteHierarchicalModelDefinition</a> (std::map&lt; <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a>, <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &gt; &amp;&amp;equations, std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt; &amp;&amp;<a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192">variables</a>, const double <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173">boundary_percentage</a>=0.05)</td></tr>
+<tr class="memdesc:adb8b25a47cf37b3319220fd7b77e5e82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html" title="Defines the lite hierarchical linear model data type.">LiteHierarchicalModelDefinition</a> class.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#adb8b25a47cf37b3319220fd7b77e5e82">More...</a><br /></td></tr>
 <tr class="separator:adb8b25a47cf37b3319220fd7b77e5e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2bfc2be77000d5ed68aa02b7d0d1192"><td class="memItemLeft" align="right" valign="top">const std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192">variables</a> () const noexcept</td></tr>
+<tr class="memdesc:ad2bfc2be77000d5ed68aa02b7d0d1192"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the model factors' delta variables mapping.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192">More...</a><br /></td></tr>
 <tr class="separator:ad2bfc2be77000d5ed68aa02b7d0d1192"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e0422017ba2e5e4d4f44841dda881fd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a1e0422017ba2e5e4d4f44841dda881fd">at</a> (const int &amp;age) const</td></tr>
+<tr class="memdesc:a1e0422017ba2e5e4d4f44841dda881fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the linear regression equations for a given age.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#a1e0422017ba2e5e4d4f44841dda881fd">More...</a><br /></td></tr>
 <tr class="separator:a1e0422017ba2e5e4d4f44841dda881fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a5b34bc27829c71deb2e1da073be173"><td class="memItemLeft" align="right" valign="top">const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173">boundary_percentage</a> () const</td></tr>
+<tr class="memdesc:a6a5b34bc27829c71deb2e1da073be173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the boundary percentage to sample.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173">More...</a><br /></td></tr>
 <tr class="separator:a6a5b34bc27829c71deb2e1da073be173"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the lite hierarchical linear model data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8f5c9855c2477e25559395e2fadcc03d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8f5c9855c2477e25559395e2fadcc03d">&#9670;&nbsp;</a></span>LiteHierarchicalModelDefinition() <span class="overload">[1/2]</span></h2>
 
@@ -174,6 +183,22 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html" title="Defines the lite hierarchical linear model data type.">LiteHierarchicalModelDefinition</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">equations</td><td>The linear regression equations </td></tr>
+    <tr><td class="paramname">variables</td><td>The factors delta variables mapping </td></tr>
+    <tr><td class="paramname">boundary_percentage</td><td>The boundary percentage to sample </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for empty model equations definition </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -201,6 +226,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the linear regression equations for a given age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>The target age </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The model equations </dd></dl>
+
 </div>
 </div>
 <a id="a6a5b34bc27829c71deb2e1da073be173"></a>
@@ -226,6 +260,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the boundary percentage to sample. </p>
+<dl class="section return"><dt>Returns</dt><dd>Boundary percentage value </dd></dl>
+
 </div>
 </div>
 <a id="ad2bfc2be77000d5ed68aa02b7d0d1192"></a>
@@ -250,6 +287,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the model factors' delta variables mapping. </p>
+<dl class="section return"><dt>Returns</dt><dd>Delta variables mapping </dd></dl>
 
 </div>
 </div>

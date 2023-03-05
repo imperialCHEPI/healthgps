@@ -1,5 +1,5 @@
 <map id="hgps::MarketingPolicyScenario::apply" name="hgps::MarketingPolicyScenario::apply">
-<area shape="rect" id="node1" title=" " alt="" coords="5,35,227,76"/>
-<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" title=" " alt="" coords="275,5,425,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" title=" " alt="" coords="287,71,413,98"/>
+<area shape="rect" id="node1" title="Applies this Scenario to the Person instance." alt="" coords="5,35,227,76"/>
+<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" title="Determine whether this interval contains a given time." alt="" coords="275,5,425,47"/>
+<area shape="rect" id="node3" href="$structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" title="Gets this instance unique identifier." alt="" coords="287,71,413,98"/>
 </map>

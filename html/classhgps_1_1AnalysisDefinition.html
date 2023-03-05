@@ -93,20 +93,29 @@ $(document).ready(function(){initNavTree('classhgps_1_1AnalysisDefinition.html',
 </div><!--header-->
 <div class="contents">
 
+<p>Burden of diseases (BoD) analysis module definition data type.  
+ <a href="classhgps_1_1AnalysisDefinition.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="analysis__definition_8h_source.html">analysis_definition.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7ba920e89a6f92e6a15ea2053415b5af"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1AnalysisDefinition.html#a7ba920e89a6f92e6a15ea2053415b5af">AnalysisDefinition</a> (<a class="el" href="classhgps_1_1GenderTable.html">GenderTable</a>&lt; int, float &gt; &amp;&amp;<a class="el" href="classhgps_1_1AnalysisDefinition.html#aa70c531ed99cf473d6d1984ae5546f91">life_expectancy</a>, <a class="el" href="namespacehgps.html#a94d6245bcdfdbb0e57ae71c04aa680ef">DoubleAgeGenderTable</a> &amp;&amp;<a class="el" href="classhgps_1_1AnalysisDefinition.html#a3b9f702e2bb695b700b604944f7ef9a7">observed_YLD</a>, std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, float &gt; &amp;&amp;<a class="el" href="classhgps_1_1AnalysisDefinition.html#a72ab9a9694602e18abb0cf5fb4aecd14">disability_weights</a>)</td></tr>
+<tr class="memdesc:a7ba920e89a6f92e6a15ea2053415b5af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1AnalysisDefinition.html" title="Burden of diseases (BoD) analysis module definition data type.">AnalysisDefinition</a> class.  <a href="classhgps_1_1AnalysisDefinition.html#a7ba920e89a6f92e6a15ea2053415b5af">More...</a><br /></td></tr>
 <tr class="separator:a7ba920e89a6f92e6a15ea2053415b5af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa70c531ed99cf473d6d1984ae5546f91"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhgps_1_1GenderTable.html">GenderTable</a>&lt; int, float &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1AnalysisDefinition.html#aa70c531ed99cf473d6d1984ae5546f91">life_expectancy</a> () const noexcept</td></tr>
+<tr class="memdesc:aa70c531ed99cf473d6d1984ae5546f91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the population life expectancy table.  <a href="classhgps_1_1AnalysisDefinition.html#aa70c531ed99cf473d6d1984ae5546f91">More...</a><br /></td></tr>
 <tr class="separator:aa70c531ed99cf473d6d1984ae5546f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b9f702e2bb695b700b604944f7ef9a7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehgps.html#a94d6245bcdfdbb0e57ae71c04aa680ef">DoubleAgeGenderTable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1AnalysisDefinition.html#a3b9f702e2bb695b700b604944f7ef9a7">observed_YLD</a> () const noexcept</td></tr>
+<tr class="memdesc:a3b9f702e2bb695b700b604944f7ef9a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the observed years lived with disability (YLD) table.  <a href="classhgps_1_1AnalysisDefinition.html#a3b9f702e2bb695b700b604944f7ef9a7">More...</a><br /></td></tr>
 <tr class="separator:a3b9f702e2bb695b700b604944f7ef9a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72ab9a9694602e18abb0cf5fb4aecd14"><td class="memItemLeft" align="right" valign="top">const std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, float &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1AnalysisDefinition.html#a72ab9a9694602e18abb0cf5fb4aecd14">disability_weights</a> () const noexcept</td></tr>
+<tr class="memdesc:a72ab9a9694602e18abb0cf5fb4aecd14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the diseases disability weights.  <a href="classhgps_1_1AnalysisDefinition.html#a72ab9a9694602e18abb0cf5fb4aecd14">More...</a><br /></td></tr>
 <tr class="separator:a72ab9a9694602e18abb0cf5fb4aecd14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Burden of diseases (BoD) analysis module definition data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a7ba920e89a6f92e6a15ea2053415b5af"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7ba920e89a6f92e6a15ea2053415b5af">&#9670;&nbsp;</a></span>AnalysisDefinition()</h2>
 
@@ -147,6 +156,16 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1AnalysisDefinition.html" title="Burden of diseases (BoD) analysis module definition data type.">AnalysisDefinition</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">life_expectancy</td><td><a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> life expectancy table </td></tr>
+    <tr><td class="paramname">observed_YLD</td><td>Observed years lived with disability (YLD) table </td></tr>
+    <tr><td class="paramname">disability_weights</td><td>Diseases disability weights </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -173,6 +192,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the diseases disability weights. </p>
+<dl class="section return"><dt>Returns</dt><dd>Disability weights </dd></dl>
+
 </div>
 </div>
 <a id="aa70c531ed99cf473d6d1984ae5546f91"></a>
@@ -198,6 +220,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the population life expectancy table. </p>
+<dl class="section return"><dt>Returns</dt><dd>Life expectancy table </dd></dl>
+
 </div>
 </div>
 <a id="a3b9f702e2bb695b700b604944f7ef9a7"></a>
@@ -222,6 +247,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the observed years lived with disability (YLD) table. </p>
+<dl class="section return"><dt>Returns</dt><dd>Observed YLD table </dd></dl>
 
 </div>
 </div>

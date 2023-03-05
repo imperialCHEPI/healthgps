@@ -1,5 +1,6 @@
 var NAVTREEINDEX3 =
 {
+"classhgps_1_1core_1_1DataTableColumnVisitor.html":[6,0,0,0,32],
 "classhgps_1_1core_1_1DataTableColumnVisitor.html#a0801a89cbfefb2540d91ec3e83595b06":[6,0,0,0,32,0],
 "classhgps_1_1core_1_1DataTableColumnVisitor.html#a19c5279083aa76dc4c0ab2b87ab0b8ae":[6,0,0,0,32,9],
 "classhgps_1_1core_1_1DataTableColumnVisitor.html#a366544dafd6829a1434504756e04da98":[6,0,0,0,32,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX3 =
 "datamanager_8h_source.html":[7,0,3,2],
 "datastore_8h.html":[7,0,2,9],
 "datastore_8h_source.html":[7,0,2,9],
-"datatable_8cpp.html":[7,0,2,10],
-"datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4":[7,0,2,10,0]
+"datatable_8cpp.html":[7,0,2,10]
 };

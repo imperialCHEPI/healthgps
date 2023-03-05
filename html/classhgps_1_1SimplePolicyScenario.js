@@ -7,6 +7,5 @@ var classhgps_1_1SimplePolicyScenario =
     [ "channel", "classhgps_1_1SimplePolicyScenario.html#a1a40c1176437c219cb1ebe0725ceb89e", null ],
     [ "clear", "classhgps_1_1SimplePolicyScenario.html#a065829263cf5bb8e7e26e91bbc8adf6c", null ],
     [ "impact_type", "classhgps_1_1SimplePolicyScenario.html#af51b2a6f49517f528ec5d69a78261031", null ],
-    [ "impacts", "classhgps_1_1SimplePolicyScenario.html#a81ecfbfec23e5e4509843612bc1eb7f4", null ],
-    [ "type", "classhgps_1_1SimplePolicyScenario.html#a7a37663f4f22a364704532bc3c3bc75c", null ]
+    [ "impacts", "classhgps_1_1SimplePolicyScenario.html#a81ecfbfec23e5e4509843612bc1eb7f4", null ]
 ];

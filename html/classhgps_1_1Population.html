@@ -94,13 +94,18 @@ $(document).ready(function(){initNavTree('classhgps_1_1Population.html',''); ini
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the virtual population data type.  
+ <a href="classhgps_1_1Population.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="population_8h_source.html">population.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:a1503f88037fcecce21c49ed93fcc0380"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a1503f88037fcecce21c49ed93fcc0380">IteratorType</a> = std::vector&lt; <a class="el" href="structhgps_1_1Person.html">Person</a> &gt;::iterator</td></tr>
+<tr class="memdesc:a1503f88037fcecce21c49ed93fcc0380"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> iterator.  <a href="classhgps_1_1Population.html#a1503f88037fcecce21c49ed93fcc0380">More...</a><br /></td></tr>
 <tr class="separator:a1503f88037fcecce21c49ed93fcc0380"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a359cf6a43516ad17fdf83e4b22481b2f"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a359cf6a43516ad17fdf83e4b22481b2f">ConstIteratorType</a> = std::vector&lt; <a class="el" href="structhgps_1_1Person.html">Person</a> &gt;::const_iterator</td></tr>
+<tr class="memdesc:a359cf6a43516ad17fdf83e4b22481b2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only population iterator.  <a href="classhgps_1_1Population.html#a359cf6a43516ad17fdf83e4b22481b2f">More...</a><br /></td></tr>
 <tr class="separator:a359cf6a43516ad17fdf83e4b22481b2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -108,39 +113,58 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a490cc9f20493cafd3378953a9405ad89"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a490cc9f20493cafd3378953a9405ad89">Population</a> ()=delete</td></tr>
 <tr class="separator:a490cc9f20493cafd3378953a9405ad89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7de7180ecb4957a0088dd5d3528f63f3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a7de7180ecb4957a0088dd5d3528f63f3">Population</a> (const std::size_t <a class="el" href="classhgps_1_1Population.html#a2a50b857e80ad7e19ae60ad2c98cb00a">size</a>)</td></tr>
+<tr class="memdesc:a7de7180ecb4957a0088dd5d3528f63f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> class.  <a href="classhgps_1_1Population.html#a7de7180ecb4957a0088dd5d3528f63f3">More...</a><br /></td></tr>
 <tr class="separator:a7de7180ecb4957a0088dd5d3528f63f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a50b857e80ad7e19ae60ad2c98cb00a"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a2a50b857e80ad7e19ae60ad2c98cb00a">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a2a50b857e80ad7e19ae60ad2c98cb00a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current size of the population.  <a href="classhgps_1_1Population.html#a2a50b857e80ad7e19ae60ad2c98cb00a">More...</a><br /></td></tr>
 <tr class="separator:a2a50b857e80ad7e19ae60ad2c98cb00a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44664f20bf1ee475b0ecbe35846b3371"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a44664f20bf1ee475b0ecbe35846b3371">initial_size</a> () const noexcept</td></tr>
+<tr class="memdesc:a44664f20bf1ee475b0ecbe35846b3371"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the initial size of the population.  <a href="classhgps_1_1Population.html#a44664f20bf1ee475b0ecbe35846b3371">More...</a><br /></td></tr>
 <tr class="separator:a44664f20bf1ee475b0ecbe35846b3371"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67406e28d8144d8d4bbf3ec9e3cae573"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a67406e28d8144d8d4bbf3ec9e3cae573">current_active_size</a> () const noexcept</td></tr>
+<tr class="memdesc:a67406e28d8144d8d4bbf3ec9e3cae573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current active size of the population.  <a href="classhgps_1_1Population.html#a67406e28d8144d8d4bbf3ec9e3cae573">More...</a><br /></td></tr>
 <tr class="separator:a67406e28d8144d8d4bbf3ec9e3cae573"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a708d9cc260357005ffe9ba6452ca1f25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1Person.html">Person</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a708d9cc260357005ffe9ba6452ca1f25">operator[]</a> (std::size_t index)</td></tr>
+<tr class="memdesc:a708d9cc260357005ffe9ba6452ca1f25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index without bounds checking.  <a href="classhgps_1_1Population.html#a708d9cc260357005ffe9ba6452ca1f25">More...</a><br /></td></tr>
 <tr class="separator:a708d9cc260357005ffe9ba6452ca1f25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76dccd33a46a2ebceda1ba74091887b1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1Person.html">Person</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a76dccd33a46a2ebceda1ba74091887b1">operator[]</a> (std::size_t index) const</td></tr>
+<tr class="memdesc:a76dccd33a46a2ebceda1ba74091887b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index without bounds checking.  <a href="classhgps_1_1Population.html#a76dccd33a46a2ebceda1ba74091887b1">More...</a><br /></td></tr>
 <tr class="separator:a76dccd33a46a2ebceda1ba74091887b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d53db08ac0327c4339239861769a8b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1Person.html">Person</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a7d53db08ac0327c4339239861769a8b1">at</a> (std::size_t index)</td></tr>
+<tr class="memdesc:a7d53db08ac0327c4339239861769a8b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index with bounds checking.  <a href="classhgps_1_1Population.html#a7d53db08ac0327c4339239861769a8b1">More...</a><br /></td></tr>
 <tr class="separator:a7d53db08ac0327c4339239861769a8b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0abbe3afb486ee6b4449ead6d02d186b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1Person.html">Person</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a0abbe3afb486ee6b4449ead6d02d186b">at</a> (std::size_t index) const</td></tr>
+<tr class="memdesc:a0abbe3afb486ee6b4449ead6d02d186b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index with bounds checking.  <a href="classhgps_1_1Population.html#a0abbe3afb486ee6b4449ead6d02d186b">More...</a><br /></td></tr>
 <tr class="separator:a0abbe3afb486ee6b4449ead6d02d186b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec9ebcc65fe4fceacc12b391196d4581"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#aec9ebcc65fe4fceacc12b391196d4581">add</a> (<a class="el" href="structhgps_1_1Person.html">Person</a> &amp;&amp;person, unsigned int time) noexcept</td></tr>
+<tr class="memdesc:aec9ebcc65fe4fceacc12b391196d4581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> to the virtual population.  <a href="classhgps_1_1Population.html#aec9ebcc65fe4fceacc12b391196d4581">More...</a><br /></td></tr>
 <tr class="separator:aec9ebcc65fe4fceacc12b391196d4581"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace8256fba4946bcc0555474d7687d429"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#ace8256fba4946bcc0555474d7687d429">add_newborn_babies</a> (std::size_t number, <a class="el" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">core::Gender</a> gender, unsigned int time) noexcept</td></tr>
+<tr class="memdesc:ace8256fba4946bcc0555474d7687d429"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds newborn babies of gender to the virtual population, age = 0.  <a href="classhgps_1_1Population.html#ace8256fba4946bcc0555474d7687d429">More...</a><br /></td></tr>
 <tr class="separator:ace8256fba4946bcc0555474d7687d429"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab016b36411a5cf9488787c02be3c5d74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html#a1503f88037fcecce21c49ed93fcc0380">IteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#ab016b36411a5cf9488787c02be3c5d74">begin</a> () noexcept</td></tr>
+<tr class="memdesc:ab016b36411a5cf9488787c02be3c5d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an iterator to the beginning of the virtual population.  <a href="classhgps_1_1Population.html#ab016b36411a5cf9488787c02be3c5d74">More...</a><br /></td></tr>
 <tr class="separator:ab016b36411a5cf9488787c02be3c5d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e5c9b6d731997ac46f39ea37dda0690"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html#a1503f88037fcecce21c49ed93fcc0380">IteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a0e5c9b6d731997ac46f39ea37dda0690">end</a> () noexcept</td></tr>
+<tr class="memdesc:a0e5c9b6d731997ac46f39ea37dda0690"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> of the population.  <a href="classhgps_1_1Population.html#a0e5c9b6d731997ac46f39ea37dda0690">More...</a><br /></td></tr>
 <tr class="separator:a0e5c9b6d731997ac46f39ea37dda0690"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4f8c5c3e5f751d3e8b6c3ea13dd3707"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html#a359cf6a43516ad17fdf83e4b22481b2f">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#af4f8c5c3e5f751d3e8b6c3ea13dd3707">begin</a> () const noexcept</td></tr>
+<tr class="memdesc:af4f8c5c3e5f751d3e8b6c3ea13dd3707"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the beginning of the virtual population.  <a href="classhgps_1_1Population.html#af4f8c5c3e5f751d3e8b6c3ea13dd3707">More...</a><br /></td></tr>
 <tr class="separator:af4f8c5c3e5f751d3e8b6c3ea13dd3707"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0401fef65279e4dd233da95dc9892b28"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html#a359cf6a43516ad17fdf83e4b22481b2f">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a0401fef65279e4dd233da95dc9892b28">end</a> () const noexcept</td></tr>
+<tr class="memdesc:a0401fef65279e4dd233da95dc9892b28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> of the population.  <a href="classhgps_1_1Population.html#a0401fef65279e4dd233da95dc9892b28">More...</a><br /></td></tr>
 <tr class="separator:a0401fef65279e4dd233da95dc9892b28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a724b2abe5a1c989efc89222334d96225"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html#a359cf6a43516ad17fdf83e4b22481b2f">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a724b2abe5a1c989efc89222334d96225">cbegin</a> () const noexcept</td></tr>
+<tr class="memdesc:a724b2abe5a1c989efc89222334d96225"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the beginning of the virtual population.  <a href="classhgps_1_1Population.html#a724b2abe5a1c989efc89222334d96225">More...</a><br /></td></tr>
 <tr class="separator:a724b2abe5a1c989efc89222334d96225"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1eda9828fb4bf7b0aa76ca60d8b6e49b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html#a359cf6a43516ad17fdf83e4b22481b2f">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Population.html#a1eda9828fb4bf7b0aa76ca60d8b6e49b">cend</a> () const noexcept</td></tr>
+<tr class="memdesc:a1eda9828fb4bf7b0aa76ca60d8b6e49b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> of the population.  <a href="classhgps_1_1Population.html#a1eda9828fb4bf7b0aa76ca60d8b6e49b">More...</a><br /></td></tr>
 <tr class="separator:a1eda9828fb4bf7b0aa76ca60d8b6e49b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the virtual population data type. </p>
+<p>The virtual population size is dynamic and can change due to births, deaths and emigration. When possible, the <a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> class recycles the dead and migrated individuals slots with newborn babies to minimise memory allocation and clear-up the inactive population. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a359cf6a43516ad17fdf83e4b22481b2f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a359cf6a43516ad17fdf83e4b22481b2f">&#9670;&nbsp;</a></span>ConstIteratorType</h2>
 
@@ -152,6 +176,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Read-only population iterator. </p>
 
 </div>
 </div>
@@ -166,6 +192,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p><a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> iterator. </p>
 
 </div>
 </div>
@@ -219,6 +247,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size</td><td>Initial population size </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -255,6 +291,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Adds a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> to the virtual population. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">person</td><td>The new <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> instance </td></tr>
+    <tr><td class="paramname">time</td><td>Current simulation time </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -297,6 +342,16 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Adds newborn babies of gender to the virtual population, age = 0. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">number</td><td>The number of newborn babies to add </td></tr>
+    <tr><td class="paramname">gender</td><td>The gender of the newborn babies </td></tr>
+    <tr><td class="paramname">time</td><td>Current simulation time </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -321,6 +376,21 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index with bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>The population index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for accessing outside of the bounds </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a0abbe3afb486ee6b4449ead6d02d186b"></a>
@@ -338,6 +408,21 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index with bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>The population index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for accessing outside of the bounds </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -364,6 +449,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an read-only iterator to the beginning of the virtual population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> </dd></dl>
+
 </div>
 </div>
 <a id="ab016b36411a5cf9488787c02be3c5d74"></a>
@@ -388,6 +476,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets an iterator to the beginning of the virtual population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> </dd></dl>
 
 </div>
 </div>
@@ -414,6 +505,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an read-only iterator to the beginning of the virtual population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> </dd></dl>
+
 </div>
 </div>
 <a id="a1eda9828fb4bf7b0aa76ca60d8b6e49b"></a>
@@ -439,6 +533,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a read-only iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> of the population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a>. </dd></dl>
+
 </div>
 </div>
 <a id="a67406e28d8144d8d4bbf3ec9e3cae573"></a>
@@ -463,6 +560,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the current active size of the population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current active population size </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -494,6 +594,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a read-only iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> of the population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a>. </dd></dl>
+
 </div>
 </div>
 <a id="a0e5c9b6d731997ac46f39ea37dda0690"></a>
@@ -519,6 +622,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> of the population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a>. </dd></dl>
+
 </div>
 </div>
 <a id="a44664f20bf1ee475b0ecbe35846b3371"></a>
@@ -543,6 +649,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the initial size of the population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Initial population size </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -567,6 +676,15 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index without bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>The population index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a>, out of bound access is undefined behaviour. </dd></dl>
+
 </div>
 </div>
 <a id="a76dccd33a46a2ebceda1ba74091887b1"></a>
@@ -584,6 +702,15 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> by index without bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>The population index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a>, out of bound access is undefined behaviour. </dd></dl>
 
 </div>
 </div>
@@ -609,6 +736,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the current size of the population. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current population size </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Determine whether the container is empty.">
 <polygon fill="#bfbfbf" stroke="black" points="180,-6 180,-25 296,-25 296,-6 180,-6"/>
 <text text-anchor="middle" x="238" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Map2d::empty</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341" target="_top" xlink:title="Initialises a new instance of the BaselineAdjustment structure.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 144,-30.5 144,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::BaselineAdjustment</text>
 <text text-anchor="middle" x="72" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::BaselineAdjustment</text>

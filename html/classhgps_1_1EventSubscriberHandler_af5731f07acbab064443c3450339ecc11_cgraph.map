@@ -1,5 +1,5 @@
 <map id="hgps::EventSubscriberHandler::~EventSubscriberHandler" name="hgps::EventSubscriberHandler::~EventSubscriberHandler">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,223,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriberHandler.html#a48ec449957b6970b27995994c52738d1" title=" " alt="" coords="271,5,488,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1EventAggregator.html#a512cbcbdb3e44fc503c3e82e15727127" title=" " alt="" coords="536,5,707,47"/>
+<area shape="rect" id="node1" title="Destroys a EventSubscriberHandler instance." alt="" coords="5,5,223,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriberHandler.html#accbcbfa91eee02a94c440162c5490ccd" title="Unsubscribes from the event." alt="" coords="271,5,488,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1EventAggregator.html#a512cbcbdb3e44fc503c3e82e15727127" title="Unsubscribes from an event notification." alt="" coords="536,5,707,47"/>
 </map>

@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title="Gets the simulation scenario identifier.">
 <polygon fill="none" stroke="black" points="168,-0.5 168,-30.5 314,-30.5 314,-0.5 168,-0.5"/>
 <text text-anchor="start" x="176" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="241" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::identifier</text>

@@ -5,7 +5,7 @@ var classhgps_1_1CachedRepository =
     [ "clear_cache", "classhgps_1_1CachedRepository.html#afc5ad4a87f57c418e46dcb4d32a5fd4c", null ],
     [ "get_baseline_adjustment_definition", "classhgps_1_1CachedRepository.html#a8b141e296df99df2d3d33f13222af67f", null ],
     [ "get_disease_definition", "classhgps_1_1CachedRepository.html#ab7ed3831cc4d3e96ece4ee3c94b4f58d", null ],
-    [ "get_disease_info", "classhgps_1_1CachedRepository.html#aff3045b1e8880931a9ffec8f0147c05c", null ],
+    [ "get_disease_info", "classhgps_1_1CachedRepository.html#a468350e697808e571187fb0c3d6e726f", null ],
     [ "get_diseases", "classhgps_1_1CachedRepository.html#aa8bf88aea28b9f4b76776c6b4c0d87d9", null ],
     [ "get_linear_model_definition", "classhgps_1_1CachedRepository.html#acc12f117f1e5b571d8b876eb14a2344a", null ],
     [ "get_lite_linear_model_definition", "classhgps_1_1CachedRepository.html#a944cc0e80465c1cf038bcf22021deb83", null ],

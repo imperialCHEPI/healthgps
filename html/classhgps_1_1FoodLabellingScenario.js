@@ -6,6 +6,5 @@ var classhgps_1_1FoodLabellingScenario =
     [ "apply", "classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff", null ],
     [ "channel", "classhgps_1_1FoodLabellingScenario.html#accebe105d8b25a0896855a77ffdb2ee9", null ],
     [ "clear", "classhgps_1_1FoodLabellingScenario.html#a7a5347749b1861b9423259f125168778", null ],
-    [ "impacts", "classhgps_1_1FoodLabellingScenario.html#a875088887d198db0405306a9f3ccf433", null ],
-    [ "type", "classhgps_1_1FoodLabellingScenario.html#a4b7da0408d5b313bbcb872bb027e8879", null ]
+    [ "impacts", "classhgps_1_1FoodLabellingScenario.html#a875088887d198db0405306a9f3ccf433", null ]
 ];

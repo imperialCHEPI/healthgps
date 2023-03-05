@@ -1,4 +1,4 @@
 <map id="hgps::SyncMessage" name="hgps::SyncMessage">
-<area shape="rect" id="node1" title=" " alt="" coords="21,5,171,32"/>
-<area shape="rect" id="node2" href="$classhgps_1_1SyncDataMessage.html" title=" " alt="" coords="5,80,187,121"/>
+<area shape="rect" id="node1" title="Scenario data synchronisation message data type." alt="" coords="21,5,171,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1SyncDataMessage.html" title="Implements a synchronisation message with payload." alt="" coords="5,80,187,121"/>
 </map>

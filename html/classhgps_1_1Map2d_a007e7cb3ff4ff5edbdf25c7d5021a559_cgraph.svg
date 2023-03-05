@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the total size of the container dataset.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-19.5 0,-38.5 104,-38.5 104,-19.5 0,-19.5"/>
 <text text-anchor="middle" x="52" y="-26.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Map2d::size</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Map2d.html#ab5025bb26f111b321db9ba349abd9be0" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1Map2d.html#ab5025bb26f111b321db9ba349abd9be0" target="_top" xlink:title="Gets the number of columns.">
 <polygon fill="none" stroke="black" points="140,-38.5 140,-57.5 266,-57.5 266,-38.5 140,-38.5"/>
 <text text-anchor="middle" x="203" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Map2d::columns</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1Map2d.html#a7b27abcf5782c049aca2846b11ba6dc3" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1Map2d.html#a7b27abcf5782c049aca2846b11ba6dc3" target="_top" xlink:title="Gets the number of rows.">
 <polygon fill="none" stroke="black" points="149,-0.5 149,-19.5 257,-19.5 257,-0.5 149,-0.5"/>
 <text text-anchor="middle" x="203" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Map2d::rows</text>
 </a>

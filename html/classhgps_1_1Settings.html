@@ -93,20 +93,29 @@ $(document).ready(function(){initNavTree('classhgps_1_1Settings.html',''); initR
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the simulation experiment settings data type.  
+ <a href="classhgps_1_1Settings.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="settings_8h_source.html">settings.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ab25b429e9f22ba0808e5b5e37825b51f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Settings.html#ab25b429e9f22ba0808e5b5e37825b51f">Settings</a> (const <a class="el" href="structhgps_1_1core_1_1Country.html">core::Country</a> &amp;<a class="el" href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7">country</a>, const float <a class="el" href="classhgps_1_1Settings.html#a3d681fae0a7eb29d03496cbbccdc93e1">size_fraction</a>, const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;<a class="el" href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e">age_range</a>)</td></tr>
+<tr class="memdesc:ab25b429e9f22ba0808e5b5e37825b51f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Settings.html" title="Defines the simulation experiment settings data type.">Settings</a> class.  <a href="classhgps_1_1Settings.html#ab25b429e9f22ba0808e5b5e37825b51f">More...</a><br /></td></tr>
 <tr class="separator:ab25b429e9f22ba0808e5b5e37825b51f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4538c7a82ccecddb077b8283bb7735f7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1core_1_1Country.html">core::Country</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7">country</a> () const noexcept</td></tr>
+<tr class="memdesc:a4538c7a82ccecddb077b8283bb7735f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the experiment target country information.  <a href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7">More...</a><br /></td></tr>
 <tr class="separator:a4538c7a82ccecddb077b8283bb7735f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d681fae0a7eb29d03496cbbccdc93e1"><td class="memItemLeft" align="right" valign="top">const float &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Settings.html#a3d681fae0a7eb29d03496cbbccdc93e1">size_fraction</a> () const noexcept</td></tr>
+<tr class="memdesc:a3d681fae0a7eb29d03496cbbccdc93e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The virtual population fraction from the real population size in range (0, 1].  <a href="classhgps_1_1Settings.html#a3d681fae0a7eb29d03496cbbccdc93e1">More...</a><br /></td></tr>
 <tr class="separator:a3d681fae0a7eb29d03496cbbccdc93e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a317e5711c6337e4ed6644edf7849988e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e">age_range</a> () const noexcept</td></tr>
+<tr class="memdesc:a317e5711c6337e4ed6644edf7849988e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The experiment population age range constraint.  <a href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e">More...</a><br /></td></tr>
 <tr class="separator:a317e5711c6337e4ed6644edf7849988e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the simulation experiment settings data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab25b429e9f22ba0808e5b5e37825b51f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab25b429e9f22ba0808e5b5e37825b51f">&#9670;&nbsp;</a></span>Settings()</h2>
 
@@ -139,6 +148,22 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Settings.html" title="Defines the simulation experiment settings data type.">Settings</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">country</td><td>Target country population </td></tr>
+    <tr><td class="paramname">size_fraction</td><td>Virtual population fraction of the real population </td></tr>
+    <tr><td class="paramname">age_range</td><td>Allowed age range in the population </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for size fraction value outside of the range (0, 1]. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -164,6 +189,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The experiment population age range constraint. </p>
+<dl class="section return"><dt>Returns</dt><dd>The allowed age range </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -194,6 +222,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the experiment target country information. </p>
+<dl class="section return"><dt>Returns</dt><dd>Country information </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -224,6 +255,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>The virtual population fraction from the real population size in range (0, 1]. </p>
+<dl class="section return"><dt>Returns</dt><dd>The size fraction in range (0, 1] </dd></dl>
 
 </div>
 </div>

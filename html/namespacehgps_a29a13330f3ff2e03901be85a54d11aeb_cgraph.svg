@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1MappingEntry.html#a6c5be50d073b1725deecf9166692f872" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1MappingEntry.html#a6c5be50d073b1725deecf9166692f872" target="_top" xlink:title="Gets the factor hierarchical level.">
 <polygon fill="none" stroke="black" points="131,-49.5 131,-79.5 244,-79.5 244,-49.5 131,-49.5"/>
 <text text-anchor="start" x="139" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MappingEntry</text>
 <text text-anchor="middle" x="187.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::level</text>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574" target="_top" xlink:title="Gets the factor name.">
 <polygon fill="none" stroke="black" points="131,-0.5 131,-30.5 244,-30.5 244,-0.5 131,-0.5"/>
 <text text-anchor="start" x="139" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MappingEntry</text>
 <text text-anchor="middle" x="187.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::name</text>

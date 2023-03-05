@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('structhgps_1_1PolicyCoverage.html','')
 </div><!--header-->
 <div class="contents">
 
+<p>Define the policy population coverage data type.  
+ <a href="structhgps_1_1PolicyCoverage.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="food__labelling__scenario_8h_source.html">food_labelling_scenario.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -101,18 +104,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac4ca49795e83d7e743738e1e2e710a22"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyCoverage.html#ac4ca49795e83d7e743738e1e2e710a22">PolicyCoverage</a> ()=delete</td></tr>
 <tr class="separator:ac4ca49795e83d7e743738e1e2e710a22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72db1e3cb0f764fc18f477d08a011ff3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyCoverage.html#a72db1e3cb0f764fc18f477d08a011ff3">PolicyCoverage</a> (const std::vector&lt; double &gt; &amp;rates, unsigned int effect_time)</td></tr>
+<tr class="memdesc:a72db1e3cb0f764fc18f477d08a011ff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="structhgps_1_1PolicyCoverage.html" title="Define the policy population coverage data type.">PolicyCoverage</a> structure.  <a href="structhgps_1_1PolicyCoverage.html#a72db1e3cb0f764fc18f477d08a011ff3">More...</a><br /></td></tr>
 <tr class="separator:a72db1e3cb0f764fc18f477d08a011ff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ab3dbde3bf7030b36099afe4e5ac191cc"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyCoverage.html#ab3dbde3bf7030b36099afe4e5ac191cc">short_term_rate</a> {}</td></tr>
+<tr class="memdesc:ab3dbde3bf7030b36099afe4e5ac191cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The short term transfer coefficient value.  <a href="structhgps_1_1PolicyCoverage.html#ab3dbde3bf7030b36099afe4e5ac191cc">More...</a><br /></td></tr>
 <tr class="separator:ab3dbde3bf7030b36099afe4e5ac191cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad84e680198010289e7653942cb3c5c82"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyCoverage.html#ad84e680198010289e7653942cb3c5c82">long_term_rate</a> {}</td></tr>
+<tr class="memdesc:ad84e680198010289e7653942cb3c5c82"><td class="mdescLeft">&#160;</td><td class="mdescRight">The long term transfer coefficient value.  <a href="structhgps_1_1PolicyCoverage.html#ad84e680198010289e7653942cb3c5c82">More...</a><br /></td></tr>
 <tr class="separator:ad84e680198010289e7653942cb3c5c82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82003ff440d31219996ad7367fff4b9d"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyCoverage.html#a82003ff440d31219996ad7367fff4b9d">cutoff_time</a> {}</td></tr>
+<tr class="memdesc:a82003ff440d31219996ad7367fff4b9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The coverage effect cut-off time.  <a href="structhgps_1_1PolicyCoverage.html#a82003ff440d31219996ad7367fff4b9d">More...</a><br /></td></tr>
 <tr class="separator:a82003ff440d31219996ad7367fff4b9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Define the policy population coverage data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac4ca49795e83d7e743738e1e2e710a22"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac4ca49795e83d7e743738e1e2e710a22">&#9670;&nbsp;</a></span>PolicyCoverage() <span class="overload">[1/2]</span></h2>
 
@@ -172,6 +181,21 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialise a new instance of the <a class="el" href="structhgps_1_1PolicyCoverage.html" title="Define the policy population coverage data type.">PolicyCoverage</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rates</td><td>Transfer coefficient rates </td></tr>
+    <tr><td class="paramname">effect_time</td><td>The effect cut-off time </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for transfer coefficient rates size mismatch </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -187,6 +211,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>The coverage effect cut-off time. </p>
+
 </div>
 </div>
 <a id="ad84e680198010289e7653942cb3c5c82"></a>
@@ -201,6 +227,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>The long term transfer coefficient value. </p>
+
 </div>
 </div>
 <a id="ab3dbde3bf7030b36099afe4e5ac191cc"></a>
@@ -214,6 +242,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The short term transfer coefficient value. </p>
 
 </div>
 </div>

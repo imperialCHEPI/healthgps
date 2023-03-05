@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Initialises a new instance of the RelativeRiskLookup class.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-71.5 0,-101.5 142,-101.5 142,-71.5 0,-71.5"/>
 <text text-anchor="start" x="8" y="-89.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RelativeRiskLookup</text>
 <text text-anchor="middle" x="71" y="-78.5" font-family="Helvetica,sans-Serif" font-size="10.00">::RelativeRiskLookup</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1RelativeRiskLookup.html#a7c41a6fb0004de0f0eb9c680ef511083" target="_top" xlink:title="Gets the number of rows lookup breakpoints.">
 <polygon fill="none" stroke="black" points="178,-49.5 178,-79.5 320,-79.5 320,-49.5 178,-49.5"/>
 <text text-anchor="start" x="186" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RelativeRiskLookup</text>
 <text text-anchor="middle" x="249" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::rows</text>
@@ -69,7 +69,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1MonotonicVector.html#a4034db763740e2cef762f60521cf79a4" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1MonotonicVector.html#a4034db763740e2cef762f60521cf79a4" target="_top" xlink:title="Gets the number of elements.">
 <polygon fill="none" stroke="black" points="185,-0.5 185,-30.5 313,-30.5 313,-0.5 185,-0.5"/>
 <text text-anchor="start" x="193" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MonotonicVector</text>
 <text text-anchor="middle" x="249" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::size</text>

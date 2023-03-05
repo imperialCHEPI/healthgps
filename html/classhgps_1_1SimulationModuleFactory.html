@@ -94,13 +94,18 @@ $(document).ready(function(){initNavTree('classhgps_1_1SimulationModuleFactory.h
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> factory data type.  
+ <a href="classhgps_1_1SimulationModuleFactory.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="modulefactory_8h_source.html">modulefactory.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:ae7e1cd43edcff6b64b2ba2d18ac20013"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#ae7e1cd43edcff6b64b2ba2d18ac20013">ModuleType</a> = std::shared_ptr&lt; <a class="el" href="classhgps_1_1SimulationModule.html">SimulationModule</a> &gt;</td></tr>
+<tr class="memdesc:ae7e1cd43edcff6b64b2ba2d18ac20013"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base module type.  <a href="classhgps_1_1SimulationModuleFactory.html#ae7e1cd43edcff6b64b2ba2d18ac20013">More...</a><br /></td></tr>
 <tr class="separator:ae7e1cd43edcff6b64b2ba2d18ac20013"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a139daaac8b49cdb5e6a6c75711e6eea3"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#a139daaac8b49cdb5e6a6c75711e6eea3">ConcreteBuilder</a> = <a class="el" href="classhgps_1_1SimulationModuleFactory.html#ae7e1cd43edcff6b64b2ba2d18ac20013">ModuleType</a>(*)(<a class="el" href="classhgps_1_1Repository.html">Repository</a> &amp;, const <a class="el" href="classhgps_1_1ModelInput.html">ModelInput</a> &amp;)</td></tr>
+<tr class="memdesc:a139daaac8b49cdb5e6a6c75711e6eea3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete module builder function signature.  <a href="classhgps_1_1SimulationModuleFactory.html#a139daaac8b49cdb5e6a6c75711e6eea3">More...</a><br /></td></tr>
 <tr class="separator:a139daaac8b49cdb5e6a6c75711e6eea3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -108,17 +113,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a222df5259097a036b3d7432d0d610f58"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#a222df5259097a036b3d7432d0d610f58">SimulationModuleFactory</a> ()=delete</td></tr>
 <tr class="separator:a222df5259097a036b3d7432d0d610f58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9a3a350c59dd02004045d6af698a427"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#ab9a3a350c59dd02004045d6af698a427">SimulationModuleFactory</a> (<a class="el" href="classhgps_1_1Repository.html">Repository</a> &amp;data_repository)</td></tr>
+<tr class="memdesc:ab9a3a350c59dd02004045d6af698a427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1SimulationModuleFactory.html" title="Defines the SimulationModule factory data type.">SimulationModuleFactory</a> class.  <a href="classhgps_1_1SimulationModuleFactory.html#ab9a3a350c59dd02004045d6af698a427">More...</a><br /></td></tr>
 <tr class="separator:ab9a3a350c59dd02004045d6af698a427"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71b1fc9dd0b5bdf3a82a0be2bf496bca"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#a71b1fc9dd0b5bdf3a82a0be2bf496bca">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a71b1fc9dd0b5bdf3a82a0be2bf496bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of registered module instance.  <a href="classhgps_1_1SimulationModuleFactory.html#a71b1fc9dd0b5bdf3a82a0be2bf496bca">More...</a><br /></td></tr>
 <tr class="separator:a71b1fc9dd0b5bdf3a82a0be2bf496bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2e55d67986b3a6bad71d965bfbd095d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#ab2e55d67986b3a6bad71d965bfbd095d">contains</a> (const <a class="el" href="namespacehgps.html#a83afa32bfd6200f17a92e853e9585936">SimulationModuleType</a> type) const noexcept</td></tr>
+<tr class="memdesc:ab2e55d67986b3a6bad71d965bfbd095d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the factory contains an instance of a module type.  <a href="classhgps_1_1SimulationModuleFactory.html#ab2e55d67986b3a6bad71d965bfbd095d">More...</a><br /></td></tr>
 <tr class="separator:ab2e55d67986b3a6bad71d965bfbd095d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae4440192d5166ebde7f1935cfc88e7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#aae4440192d5166ebde7f1935cfc88e7e">register_builder</a> (const <a class="el" href="namespacehgps.html#a83afa32bfd6200f17a92e853e9585936">SimulationModuleType</a> type, const <a class="el" href="classhgps_1_1SimulationModuleFactory.html#a139daaac8b49cdb5e6a6c75711e6eea3">ConcreteBuilder</a> builder)</td></tr>
+<tr class="memdesc:aae4440192d5166ebde7f1935cfc88e7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a simulation module type builder function.  <a href="classhgps_1_1SimulationModuleFactory.html#aae4440192d5166ebde7f1935cfc88e7e">More...</a><br /></td></tr>
 <tr class="separator:aae4440192d5166ebde7f1935cfc88e7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0071993f6ae47f0ff5e6dbee91f4a819"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#ae7e1cd43edcff6b64b2ba2d18ac20013">ModuleType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModuleFactory.html#a0071993f6ae47f0ff5e6dbee91f4a819">create</a> (const <a class="el" href="namespacehgps.html#a83afa32bfd6200f17a92e853e9585936">SimulationModuleType</a> type, const <a class="el" href="classhgps_1_1ModelInput.html">ModelInput</a> &amp;config)</td></tr>
+<tr class="memdesc:a0071993f6ae47f0ff5e6dbee91f4a819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a polymorphic <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> instance.  <a href="classhgps_1_1SimulationModuleFactory.html#a0071993f6ae47f0ff5e6dbee91f4a819">More...</a><br /></td></tr>
 <tr class="separator:a0071993f6ae47f0ff5e6dbee91f4a819"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> factory data type. </p>
+<p>The module factory is used to assemble the concrete modules implementation to compose the Health-GPS microsimulation instance. The simulation engine will request an instance of each of the SimulationModuleType enumeration module at construction.</p>
+<p>The concrete builder function receives an instance of the back-end data storage and the user simulation inputs to create the respective module type instance for use by the microsimulation algorithm. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a139daaac8b49cdb5e6a6c75711e6eea3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a139daaac8b49cdb5e6a6c75711e6eea3">&#9670;&nbsp;</a></span>ConcreteBuilder</h2>
 
@@ -130,6 +144,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Concrete module builder function signature. </p>
 
 </div>
 </div>
@@ -144,6 +160,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Base module type. </p>
 
 </div>
 </div>
@@ -189,6 +207,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1SimulationModuleFactory.html" title="Defines the SimulationModule factory data type.">SimulationModuleFactory</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data_repository</td><td>The back-end data repository instance to use </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -215,6 +241,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether the factory contains an instance of a module type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The simulation module type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the factory contains a instance; otherwise, false </dd></dl>
 
 </div>
 </div>
@@ -243,6 +278,16 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Create a polymorphic <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> instance. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The simulation module type </td></tr>
+    <tr><td class="paramname">config</td><td>The simulation model inputs definition </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> instance </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -277,6 +322,15 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Registers a simulation module type builder function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>The simulation module type </td></tr>
+    <tr><td class="paramname">builder</td><td>The module type instance builder function </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a71b1fc9dd0b5bdf3a82a0be2bf496bca"></a>
@@ -301,6 +355,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of registered module instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>NUmber of registered modules </dd></dl>
 
 </div>
 </div>

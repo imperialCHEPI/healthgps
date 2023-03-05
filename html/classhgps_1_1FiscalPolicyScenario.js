@@ -6,6 +6,5 @@ var classhgps_1_1FiscalPolicyScenario =
     [ "apply", "classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725", null ],
     [ "channel", "classhgps_1_1FiscalPolicyScenario.html#a6e812921c1666ec3441d485c2e865e65", null ],
     [ "clear", "classhgps_1_1FiscalPolicyScenario.html#a91936295bcf6d0f4d6b171c0e2e513ae", null ],
-    [ "impacts", "classhgps_1_1FiscalPolicyScenario.html#a355dfb7d296dfd488066ce7d41bfeb63", null ],
-    [ "type", "classhgps_1_1FiscalPolicyScenario.html#abb58940692312a948d5846ae0af4b465", null ]
+    [ "impacts", "classhgps_1_1FiscalPolicyScenario.html#a355dfb7d296dfd488066ce7d41bfeb63", null ]
 ];

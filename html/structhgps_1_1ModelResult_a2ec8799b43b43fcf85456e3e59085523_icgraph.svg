@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a string representation of this instance.">
 <polygon fill="#bfbfbf" stroke="black" points="184,-0.5 184,-30.5 297,-30.5 297,-0.5 184,-0.5"/>
 <text text-anchor="start" x="192" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelResult::</text>
 <text text-anchor="middle" x="240.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">to_string</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1ResultEventMessage.html#a9777d45b943b6c40a48583b609456936" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1ResultEventMessage.html#a9777d45b943b6c40a48583b609456936" target="_top" xlink:title="Create a string representation of this instance.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 148,-30.5 148,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultEventMessage</text>
 <text text-anchor="middle" x="74" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>

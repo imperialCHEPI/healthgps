@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the LMS (lambda&#45;mu&#45;sigma) definition.">
 <polygon fill="#bfbfbf" stroke="black" points="423,-24.5 423,-54.5 542,-54.5 542,-24.5 423,-24.5"/>
 <text text-anchor="start" x="431" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::get</text>
 <text text-anchor="middle" x="482.5" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">_lms_definition</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="271,-49.5 271,-79.5 387,-79.5 387,-49.5 271,-49.5"/>
 <text text-anchor="start" x="279" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="329" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -37,7 +37,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" target="_top" xlink:title="Builds a new instance of the DiseaseModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="272.5,-0.5 272.5,-30.5 385.5,-30.5 385.5,-0.5 272.5,-0.5"/>
 <text text-anchor="start" x="280.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_disease</text>
 <text text-anchor="middle" x="329" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>

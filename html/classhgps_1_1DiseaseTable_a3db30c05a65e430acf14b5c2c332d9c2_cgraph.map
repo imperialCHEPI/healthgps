@@ -1,5 +1,5 @@
 <map id="hgps::DiseaseTable::DiseaseTable" name="hgps::DiseaseTable::DiseaseTable">
-<area shape="rect" id="node1" title=" " alt="" coords="5,39,152,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1DiseaseTable.html#a34d90b0514afb09a3584bac147e37fdb" title=" " alt="" coords="204,5,351,47"/>
+<area shape="rect" id="node1" title="Initialise a new instance of the DiseaseTable class." alt="" coords="5,39,152,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1DiseaseTable.html#a34d90b0514afb09a3584bac147e37fdb" title="Gets the disease information." alt="" coords="204,5,351,47"/>
 <area shape="rect" id="node3" href="$structhgps_1_1core_1_1Identifier.html#a12ec4bf7f0b4d13883ac7addb1f2a6a9" title="Checks whether this is an empty identifier." alt="" coords="200,71,355,112"/>
 </map>

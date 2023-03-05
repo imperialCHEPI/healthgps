@@ -71,12 +71,12 @@ var NAVTREEINDEX =
 "HealthGPS_2api_8h.html",
 "classhgps_1_1FiscalPolicyScenario.html#a91936295bcf6d0f4d6b171c0e2e513ae",
 "classhgps_1_1RandomBitGenerator.html#af3cfe735fdaf4882d746e6d75edf6a76",
-"classhgps_1_1core_1_1DataTableColumnVisitor.html#a0801a89cbfefb2540d91ec3e83595b06",
-"datatable_8h.html",
-"jsonparser_8cpp.html#a22b8447df7337b5f7ac21b45f5cd1623",
-"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a",
-"structhgps_1_1ErrorEventMessage.html#a63d111960e0057677b552af78c436376",
-"structhgps_1_1core_1_1DiseaseEntity.html#aa61e1c6ca7fea3a3d494654af4620544"
+"classhgps_1_1core_1_1DataTableColumnVisitor.html",
+"datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4",
+"jsonparser_8cpp.html#a1f70133b7062e188cbd5459421828fe6",
+"namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa07cf4f8f5d8b76282917320715dda2ad",
+"structhgps_1_1ErrorEventMessage.html#a22446bbcb359c7121a2f9a1e029b26ca",
+"structhgps_1_1core_1_1DiseaseAnalysisEntity.html#abd68cc983f48632759f1e0c740db39d0"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

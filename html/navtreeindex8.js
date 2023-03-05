@@ -1,5 +1,8 @@
 var NAVTREEINDEX8 =
 {
+"structhgps_1_1core_1_1DiseaseAnalysisEntity.html#abd68cc983f48632759f1e0c740db39d0":[6,0,0,0,2,1],
+"structhgps_1_1core_1_1DiseaseAnalysisEntity.html#af8d40117b1cbfb65ae1703371ac705d6":[6,0,0,0,2,2],
+"structhgps_1_1core_1_1DiseaseEntity.html":[6,0,0,0,18],
 "structhgps_1_1core_1_1DiseaseEntity.html#aa61e1c6ca7fea3a3d494654af4620544":[6,0,0,0,18,0],
 "structhgps_1_1core_1_1DiseaseEntity.html#ab59d0b0bff88a9edb75fe5b70dc6c4dd":[6,0,0,0,18,1],
 "structhgps_1_1core_1_1DiseaseEntity.html#ac780d2c0065083bdcd062c8d239fdacb":[6,0,0,0,18,4],

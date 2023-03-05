@@ -6,6 +6,8 @@ var classhgps_1_1MonotonicVector =
     [ "at", "classhgps_1_1MonotonicVector.html#adc9e5cf1bca98c35597150531fd47ca1", null ],
     [ "begin", "classhgps_1_1MonotonicVector.html#a6ca75657f56f088f9eb4581bbc351fbf", null ],
     [ "begin", "classhgps_1_1MonotonicVector.html#abc032d86433bca20dd880e73e9e9f688", null ],
+    [ "cbegin", "classhgps_1_1MonotonicVector.html#a9f5e797961b566837df5b46d92ad6106", null ],
+    [ "cend", "classhgps_1_1MonotonicVector.html#a7688d94a7f74c0c89af9dd02082ab389", null ],
     [ "end", "classhgps_1_1MonotonicVector.html#ae7fad2cafc8c13bffbfa135712f6862b", null ],
     [ "end", "classhgps_1_1MonotonicVector.html#acc665f6431924ff0780d1eee05b81a8c", null ],
     [ "operator[]", "classhgps_1_1MonotonicVector.html#a6553e1db2c0496a682c4165819466a11", null ],

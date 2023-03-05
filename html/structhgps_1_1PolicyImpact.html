@@ -109,19 +109,25 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6dc8840580eeda61190a06db51475799"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#a6dc8840580eeda61190a06db51475799">PolicyImpact</a> ()=delete</td></tr>
 <tr class="separator:a6dc8840580eeda61190a06db51475799"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97aac49f043534e6926d101f42e33bb6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">PolicyImpact</a> (<a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> risk_factor_key, double policy_impact, unsigned int start_age, std::optional&lt; unsigned int &gt; end_age=std::nullopt)</td></tr>
+<tr class="memdesc:a97aac49f043534e6926d101f42e33bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="structhgps_1_1PolicyImpact.html" title="Defines the policy impact on risk factors data structure.">PolicyImpact</a> structure.  <a href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">More...</a><br /></td></tr>
 <tr class="separator:a97aac49f043534e6926d101f42e33bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89b2def3d9b103ff0d547cb4822ad328"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#a89b2def3d9b103ff0d547cb4822ad328">contains</a> (const unsigned int &amp;age) const noexcept</td></tr>
+<tr class="memdesc:a89b2def3d9b103ff0d547cb4822ad328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether this impact should be applied to a given age.  <a href="structhgps_1_1PolicyImpact.html#a89b2def3d9b103ff0d547cb4822ad328">More...</a><br /></td></tr>
 <tr class="separator:a89b2def3d9b103ff0d547cb4822ad328"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:aff172e759cfadfcd73e48dca63311d86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#aff172e759cfadfcd73e48dca63311d86">risk_factor</a> {}</td></tr>
+<tr class="memdesc:aff172e759cfadfcd73e48dca63311d86"><td class="mdescLeft">&#160;</td><td class="mdescRight">The risk factor identifier.  <a href="structhgps_1_1PolicyImpact.html#aff172e759cfadfcd73e48dca63311d86">More...</a><br /></td></tr>
 <tr class="separator:aff172e759cfadfcd73e48dca63311d86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a533887c0e59c5c000eb7c3eabe03cb24"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#a533887c0e59c5c000eb7c3eabe03cb24">value</a> {}</td></tr>
+<tr class="memdesc:a533887c0e59c5c000eb7c3eabe03cb24"><td class="mdescLeft">&#160;</td><td class="mdescRight">The effect value.  <a href="structhgps_1_1PolicyImpact.html#a533887c0e59c5c000eb7c3eabe03cb24">More...</a><br /></td></tr>
 <tr class="separator:a533887c0e59c5c000eb7c3eabe03cb24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bbc42599fe0f190af883eac9496b642"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#a8bbc42599fe0f190af883eac9496b642">from_age</a> {}</td></tr>
+<tr class="memdesc:a8bbc42599fe0f190af883eac9496b642"><td class="mdescLeft">&#160;</td><td class="mdescRight">Impact applies from age.  <a href="structhgps_1_1PolicyImpact.html#a8bbc42599fe0f190af883eac9496b642">More...</a><br /></td></tr>
 <tr class="separator:a8bbc42599fe0f190af883eac9496b642"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15d8af80b9c65e849643e4ddb10b6e0f"><td class="memItemLeft" align="right" valign="top">std::optional&lt; unsigned int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyImpact.html#a15d8af80b9c65e849643e4ddb10b6e0f">to_age</a> {}</td></tr>
+<tr class="memdesc:a15d8af80b9c65e849643e4ddb10b6e0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Impact applies to age, if no value, no upper limit.  <a href="structhgps_1_1PolicyImpact.html#a15d8af80b9c65e849643e4ddb10b6e0f">More...</a><br /></td></tr>
 <tr class="separator:a15d8af80b9c65e849643e4ddb10b6e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -198,6 +204,23 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialise a new instance of the <a class="el" href="structhgps_1_1PolicyImpact.html" title="Defines the policy impact on risk factors data structure.">PolicyImpact</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">risk_factor_key</td><td>Risk factor identifier </td></tr>
+    <tr><td class="paramname">policy_impact</td><td>The impact on risk factor value </td></tr>
+    <tr><td class="paramname">start_age</td><td>Impact start age, inclusive </td></tr>
+    <tr><td class="paramname">end_age</td><td>Impact end age, inclusive </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for impact end age less than the start age. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -225,6 +248,15 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Determine whether this impact should be applied to a given age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>The age to check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the age is in the impact valid range; otherwise, false. </dd></dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -240,6 +272,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Impact applies from age. </p>
+
 </div>
 </div>
 <a id="aff172e759cfadfcd73e48dca63311d86"></a>
@@ -253,6 +287,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The risk factor identifier. </p>
 
 </div>
 </div>
@@ -268,6 +304,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Impact applies to age, if no value, no upper limit. </p>
+
 </div>
 </div>
 <a id="a533887c0e59c5c000eb7c3eabe03cb24"></a>
@@ -281,6 +319,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The effect value. </p>
 
 </div>
 </div>

@@ -1,4 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classhgps_1_1EventSubscriber.html" title=" " alt="" coords="5,5,172,32"/>
-<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriberHandler.html" title=" " alt="" coords="220,5,437,32"/>
+<area shape="rect" id="node1" href="$classhgps_1_1EventSubscriber.html" title="Defines the event subscriber interface type." alt="" coords="5,5,172,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriberHandler.html" title="Implements the event subscriber handler data type." alt="" coords="220,5,437,32"/>
 </map>

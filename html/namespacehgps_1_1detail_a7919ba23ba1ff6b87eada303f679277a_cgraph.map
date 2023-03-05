@@ -1,5 +1,5 @@
 <map id="hgps::detail::create_relative_risk" name="hgps::detail::create_relative_risk">
-<area shape="rect" id="node1" title=" " alt="" coords="5,39,152,80"/>
+<area shape="rect" id="node1" title="Creates the relative risk definition for a disease." alt="" coords="5,39,152,80"/>
 <area shape="rect" id="node2" href="$classhgps_1_1detail_1_1StoreConverter.html#a5dff97954a34bfaeefcd4a85ff553038" title=" " alt="" coords="200,5,404,47"/>
 <area shape="rect" id="node3" href="$classhgps_1_1detail_1_1StoreConverter.html#ab84ed9dfdfc47787731e596e99daa19d" title=" " alt="" coords="200,71,404,112"/>
 <area shape="rect" id="node4" href="$classhgps_1_1detail_1_1StoreConverter.html#a066dd7e4f199e2b8442edbe49ee71bcd" title=" " alt="" coords="452,71,656,112"/>

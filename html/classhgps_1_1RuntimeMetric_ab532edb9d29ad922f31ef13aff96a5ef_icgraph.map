@@ -1,4 +1,4 @@
 <map id="hgps::RuntimeMetric::clear" name="hgps::RuntimeMetric::clear">
-<area shape="rect" id="node1" title=" " alt="" coords="212,5,369,47"/>
+<area shape="rect" id="node1" title="Erases all metrics from the container." alt="" coords="212,5,369,47"/>
 <area shape="rect" id="node2" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="5,13,164,39"/>
 </map>

@@ -20,7 +20,7 @@
 <!-- Node1 -->
 <g id="node2" class="node">
 <title>Node1</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1DefaultCancerModel.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1DefaultCancerModel.html" target="_top" xlink:title="Defines the cancer disease model data type.">
 <polygon fill="none" stroke="black" points="153.5,-38.5 153.5,-57.5 299.5,-57.5 299.5,-38.5 153.5,-38.5"/>
 <text text-anchor="middle" x="226.5" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DefaultCancerModel</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node2 -->
 <g id="node3" class="node">
 <title>Node2</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1DefaultDiseaseModel.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1DefaultDiseaseModel.html" target="_top" xlink:title="Defines the standard diseases (non&#45;cancer) model data type.">
 <polygon fill="none" stroke="black" points="151,-0.5 151,-19.5 302,-19.5 302,-0.5 151,-0.5"/>
 <text text-anchor="middle" x="226.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DefaultDiseaseModel</text>
 </a>

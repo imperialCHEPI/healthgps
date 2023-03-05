@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1ErrorEventMessage.html#a2ee505893217c4509114ad44a93d7f4b" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1ErrorEventMessage.html#a2ee505893217c4509114ad44a93d7f4b" target="_top" xlink:title="Double dispatch the message using a visitor implementation.">
 <polygon fill="none" stroke="black" points="6,-147.5 6,-177.5 146,-177.5 146,-147.5 6,-147.5"/>
 <text text-anchor="start" x="14" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ErrorEventMessage</text>
 <text text-anchor="middle" x="76" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">::accept</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1InfoEventMessage.html#a30fa106e698b2b11556a540267afee12" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1InfoEventMessage.html#a30fa106e698b2b11556a540267afee12" target="_top" xlink:title="Double dispatch the message using a visitor implementation.">
 <polygon fill="none" stroke="black" points="8,-98.5 8,-128.5 144,-128.5 144,-98.5 8,-98.5"/>
 <text text-anchor="start" x="16" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::InfoEventMessage</text>
 <text text-anchor="middle" x="76" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">::accept</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1ResultEventMessage.html#af26b6d2cb6afdeed1065e4e9e9f3c38d" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1ResultEventMessage.html#af26b6d2cb6afdeed1065e4e9e9f3c38d" target="_top" xlink:title="Double dispatch the message using a visitor implementation.">
 <polygon fill="none" stroke="black" points="2,-49.5 2,-79.5 150,-79.5 150,-49.5 2,-49.5"/>
 <text text-anchor="start" x="10" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultEventMessage</text>
 <text text-anchor="middle" x="76" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::accept</text>
@@ -69,7 +69,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="structhgps_1_1RunnerEventMessage.html#ad9b0042cabe3f2fb671338f65d84ebfa" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="structhgps_1_1RunnerEventMessage.html#ad9b0042cabe3f2fb671338f65d84ebfa" target="_top" xlink:title="Double dispatch the message using a visitor implementation.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 152,-30.5 152,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RunnerEventMessage</text>
 <text text-anchor="middle" x="76" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::accept</text>

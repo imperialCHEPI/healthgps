@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1Random.html#a3ec62063a29794f049c6d972a75ee29c" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1Random.html#a3ec62063a29794f049c6d972a75ee29c" target="_top" xlink:title="Generates a random floating point number in range [0,1)">
 <polygon fill="none" stroke="black" points="205.5,-147.5 205.5,-177.5 319.5,-177.5 319.5,-147.5 205.5,-147.5"/>
 <text text-anchor="start" x="213.5" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Random::next</text>
 <text text-anchor="middle" x="262.5" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">_double</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" target="_top" xlink:title="Gets a reference to the virtual population container.">
 <polygon fill="none" stroke="black" points="200,-98.5 200,-128.5 325,-128.5 325,-98.5 200,-98.5"/>
 <text text-anchor="start" x="208" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="262.5" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">::population</text>
@@ -69,7 +69,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3" target="_top" xlink:title="Gets a reference to the engine random number generator.">
 <polygon fill="none" stroke="black" points="200,-49.5 200,-79.5 325,-79.5 325,-49.5 200,-49.5"/>
 <text text-anchor="start" x="208" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="262.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::random</text>
@@ -85,7 +85,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" target="_top" xlink:title="Gets the current simulation time.">
 <polygon fill="none" stroke="black" points="200,-0.5 200,-30.5 325,-30.5 325,-0.5 200,-0.5"/>
 <text text-anchor="start" x="208" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="262.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::time_now</text>

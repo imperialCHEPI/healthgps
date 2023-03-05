@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Defines the simple development intervention scenario.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-19.5 151,-19.5 151,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="75.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimplePolicyScenario</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1InterventionScenario.html" target="_top" xlink:title="Health GPS scripted intervention policy scenario interface.">
+<g id="a_node2"><a xlink:href="classhgps_1_1InterventionScenario.html" target="_top" xlink:title="Health&#45;GPS scripted intervention policy scenario interface.">
 <polygon fill="none" stroke="black" points="2,-56.5 2,-75.5 149,-75.5 149,-56.5 2,-56.5"/>
 <text text-anchor="middle" x="75.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::InterventionScenario</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1Scenario.html" target="_top" xlink:title="Health GPS simulation scenario interface.">
+<g id="a_node3"><a xlink:href="classhgps_1_1Scenario.html" target="_top" xlink:title="Health&#45;GPS simulation scenario interface.">
 <polygon fill="none" stroke="black" points="31.5,-112.5 31.5,-131.5 119.5,-131.5 119.5,-112.5 31.5,-112.5"/>
 <text text-anchor="middle" x="75.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Scenario</text>
 </a>

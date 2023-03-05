@@ -1,4 +1,4 @@
 <map id="hgps::LifeTable::empty" name="hgps::LifeTable::empty">
-<area shape="rect" id="node1" title=" " alt="" coords="232,13,401,39"/>
-<area shape="rect" id="node2" href="$classhgps_1_1PopulationModule.html#ab5a094dd2a3e5ff5c72026c018467993" title=" " alt="" coords="5,5,184,47"/>
+<area shape="rect" id="node1" title="Determine whether the LifeTable data is empty." alt="" coords="232,13,401,39"/>
+<area shape="rect" id="node2" href="$classhgps_1_1PopulationModule.html#ab5a094dd2a3e5ff5c72026c018467993" title="Initialise a new instance of the PopulationModule class." alt="" coords="5,5,184,47"/>
 </map>

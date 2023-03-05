@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('structhgps_1_1BaselineAdjustment.html'
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the risk factor baseline adjustment data type.  
+ <a href="structhgps_1_1BaselineAdjustment.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="riskfactor__adjustment__types_8h_source.html">riskfactor_adjustment_types.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for hgps::BaselineAdjustment:</div>
@@ -104,16 +107,21 @@ Collaboration diagram for hgps::BaselineAdjustment:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a70ea1ad74e94922069388cfcb1ad3700"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1BaselineAdjustment.html#a70ea1ad74e94922069388cfcb1ad3700">BaselineAdjustment</a> ()=default</td></tr>
+<tr class="memdesc:a70ea1ad74e94922069388cfcb1ad3700"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1BaselineAdjustment.html" title="Defines the risk factor baseline adjustment data type.">BaselineAdjustment</a> structure.  <a href="structhgps_1_1BaselineAdjustment.html#a70ea1ad74e94922069388cfcb1ad3700">More...</a><br /></td></tr>
 <tr class="separator:a70ea1ad74e94922069388cfcb1ad3700"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9272f6e19861742aa7e73e80e36a341"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341">BaselineAdjustment</a> (<a class="el" href="namespacehgps.html#a3570cd03e9ddc3a8017a035397c34ac7">FactorAdjustmentTable</a> &amp;&amp;adjustment_table)</td></tr>
+<tr class="memdesc:aa9272f6e19861742aa7e73e80e36a341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1BaselineAdjustment.html" title="Defines the risk factor baseline adjustment data type.">BaselineAdjustment</a> structure.  <a href="structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341">More...</a><br /></td></tr>
 <tr class="separator:aa9272f6e19861742aa7e73e80e36a341"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a96be7e960802763cb0f1920a3313613a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#a3570cd03e9ddc3a8017a035397c34ac7">FactorAdjustmentTable</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1BaselineAdjustment.html#a96be7e960802763cb0f1920a3313613a">values</a> {}</td></tr>
+<tr class="memdesc:a96be7e960802763cb0f1920a3313613a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The risk factors adjustment table values.  <a href="structhgps_1_1BaselineAdjustment.html#a96be7e960802763cb0f1920a3313613a">More...</a><br /></td></tr>
 <tr class="separator:a96be7e960802763cb0f1920a3313613a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the risk factor baseline adjustment data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a70ea1ad74e94922069388cfcb1ad3700"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a70ea1ad74e94922069388cfcb1ad3700">&#9670;&nbsp;</a></span>BaselineAdjustment() <span class="overload">[1/2]</span></h2>
 
@@ -136,6 +144,8 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="structhgps_1_1BaselineAdjustment.html" title="Defines the risk factor baseline adjustment data type.">BaselineAdjustment</a> structure. </p>
 
 </div>
 </div>
@@ -162,6 +172,20 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="structhgps_1_1BaselineAdjustment.html" title="Defines the risk factor baseline adjustment data type.">BaselineAdjustment</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">adjustment_table</td><td>The baseline adjustment table </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for empty adjustment table or table missing a gender entry </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -182,6 +206,8 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The risk factors adjustment table values. </p>
 
 </div>
 </div>

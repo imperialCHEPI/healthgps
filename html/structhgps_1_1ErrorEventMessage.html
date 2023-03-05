@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('structhgps_1_1ErrorEventMessage.html',
 </div><!--header-->
 <div class="contents">
 
+<p>Implements the simulation error event message data type.  
+ <a href="structhgps_1_1ErrorEventMessage.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="error__message_8h_source.html">error_message.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::ErrorEventMessage:</div>
@@ -111,17 +114,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4ca17f23fbc1fa4183a9cb026fe77a7e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#a4ca17f23fbc1fa4183a9cb026fe77a7e">ErrorEventMessage</a> ()=delete</td></tr>
 <tr class="separator:a4ca17f23fbc1fa4183a9cb026fe77a7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed7c2e2a49e1e2c77fdc0820138f9310"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#aed7c2e2a49e1e2c77fdc0820138f9310">ErrorEventMessage</a> (std::string sender, unsigned int run, int time, std::string what) noexcept</td></tr>
+<tr class="memdesc:aed7c2e2a49e1e2c77fdc0820138f9310"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1ErrorEventMessage.html" title="Implements the simulation error event message data type.">ErrorEventMessage</a> structure.  <a href="structhgps_1_1ErrorEventMessage.html#aed7c2e2a49e1e2c77fdc0820138f9310">More...</a><br /></td></tr>
 <tr class="separator:aed7c2e2a49e1e2c77fdc0820138f9310"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed875444234cf5bcc7f73af91b6c249a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#aed875444234cf5bcc7f73af91b6c249a">id</a> () const noexcept override</td></tr>
+<tr class="memdesc:aed875444234cf5bcc7f73af91b6c249a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the unique message type identifier.  <a href="structhgps_1_1ErrorEventMessage.html#aed875444234cf5bcc7f73af91b6c249a">More...</a><br /></td></tr>
 <tr class="separator:aed875444234cf5bcc7f73af91b6c249a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a87095cf787b9f13c263e177d081a2a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#a6a87095cf787b9f13c263e177d081a2a">to_string</a> () const override</td></tr>
+<tr class="memdesc:a6a87095cf787b9f13c263e177d081a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a string representation of this instance.  <a href="structhgps_1_1ErrorEventMessage.html#a6a87095cf787b9f13c263e177d081a2a">More...</a><br /></td></tr>
 <tr class="separator:a6a87095cf787b9f13c263e177d081a2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ee505893217c4509114ad44a93d7f4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#a2ee505893217c4509114ad44a93d7f4b">accept</a> (<a class="el" href="classhgps_1_1EventMessageVisitor.html">EventMessageVisitor</a> &amp;visitor) const override</td></tr>
+<tr class="memdesc:a2ee505893217c4509114ad44a93d7f4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Double dispatch the message using a visitor implementation.  <a href="structhgps_1_1ErrorEventMessage.html#a2ee505893217c4509114ad44a93d7f4b">More...</a><br /></td></tr>
 <tr class="separator:a2ee505893217c4509114ad44a93d7f4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structhgps_1_1EventMessage"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structhgps_1_1EventMessage')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structhgps_1_1EventMessage.html">hgps::EventMessage</a></td></tr>
 <tr class="memitem:aa9e5d450f0ed196658dcd4d13d0edef8 inherit pub_methods_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#aa9e5d450f0ed196658dcd4d13d0edef8">EventMessage</a> ()=delete</td></tr>
 <tr class="separator:aa9e5d450f0ed196658dcd4d13d0edef8 inherit pub_methods_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9f5d718db6cab06e54101260f89b407 inherit pub_methods_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#af9f5d718db6cab06e54101260f89b407">EventMessage</a> (std::string sender, unsigned int run)</td></tr>
+<tr class="memdesc:af9f5d718db6cab06e54101260f89b407 inherit pub_methods_structhgps_1_1EventMessage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="structhgps_1_1EventMessage.html" title="Simulation event messages interface.">EventMessage</a> structure.  <a href="structhgps_1_1EventMessage.html#af9f5d718db6cab06e54101260f89b407">More...</a><br /></td></tr>
 <tr class="separator:af9f5d718db6cab06e54101260f89b407 inherit pub_methods_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb96851caf2ee5334a5525106fc00813 inherit pub_methods_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#aeb96851caf2ee5334a5525106fc00813">EventMessage</a> (const <a class="el" href="structhgps_1_1EventMessage.html">EventMessage</a> &amp;)=delete</td></tr>
 <tr class="separator:aeb96851caf2ee5334a5525106fc00813 inherit pub_methods_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,21 +140,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ada11a45d880e8a99a052df50230fdb58 inherit pub_methods_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1EventMessage.html">EventMessage</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#ada11a45d880e8a99a052df50230fdb58">operator=</a> (<a class="el" href="structhgps_1_1EventMessage.html">EventMessage</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:ada11a45d880e8a99a052df50230fdb58 inherit pub_methods_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57bc56ae273b9c2815fdaa9de52ed747 inherit pub_methods_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#a57bc56ae273b9c2815fdaa9de52ed747">~EventMessage</a> ()=default</td></tr>
+<tr class="memdesc:a57bc56ae273b9c2815fdaa9de52ed747 inherit pub_methods_structhgps_1_1EventMessage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys an <a class="el" href="structhgps_1_1EventMessage.html" title="Simulation event messages interface.">EventMessage</a> instance.  <a href="structhgps_1_1EventMessage.html#a57bc56ae273b9c2815fdaa9de52ed747">More...</a><br /></td></tr>
 <tr class="separator:a57bc56ae273b9c2815fdaa9de52ed747 inherit pub_methods_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a22446bbcb359c7121a2f9a1e029b26ca"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#a22446bbcb359c7121a2f9a1e029b26ca">model_time</a> {}</td></tr>
+<tr class="memdesc:a22446bbcb359c7121a2f9a1e029b26ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the associate <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> time.  <a href="structhgps_1_1ErrorEventMessage.html#a22446bbcb359c7121a2f9a1e029b26ca">More...</a><br /></td></tr>
 <tr class="separator:a22446bbcb359c7121a2f9a1e029b26ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63d111960e0057677b552af78c436376"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1ErrorEventMessage.html#a63d111960e0057677b552af78c436376">message</a></td></tr>
+<tr class="memdesc:a63d111960e0057677b552af78c436376"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the error message.  <a href="structhgps_1_1ErrorEventMessage.html#a63d111960e0057677b552af78c436376">More...</a><br /></td></tr>
 <tr class="separator:a63d111960e0057677b552af78c436376"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_structhgps_1_1EventMessage"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structhgps_1_1EventMessage')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structhgps_1_1EventMessage.html">hgps::EventMessage</a></td></tr>
 <tr class="memitem:a97148bdf0e828979e3f6c61538935e5e inherit pub_attribs_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#a97148bdf0e828979e3f6c61538935e5e">source</a></td></tr>
+<tr class="memdesc:a97148bdf0e828979e3f6c61538935e5e inherit pub_attribs_structhgps_1_1EventMessage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the sender identifier.  <a href="structhgps_1_1EventMessage.html#a97148bdf0e828979e3f6c61538935e5e">More...</a><br /></td></tr>
 <tr class="separator:a97148bdf0e828979e3f6c61538935e5e inherit pub_attribs_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5de1636560ae988609ccff6d5d0f92ba inherit pub_attribs_structhgps_1_1EventMessage"><td class="memItemLeft" align="right" valign="top">const unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1EventMessage.html#a5de1636560ae988609ccff6d5d0f92ba">run_number</a> {}</td></tr>
+<tr class="memdesc:a5de1636560ae988609ccff6d5d0f92ba inherit pub_attribs_structhgps_1_1EventMessage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the associated <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> run number.  <a href="structhgps_1_1EventMessage.html#a5de1636560ae988609ccff6d5d0f92ba">More...</a><br /></td></tr>
 <tr class="separator:a5de1636560ae988609ccff6d5d0f92ba inherit pub_attribs_structhgps_1_1EventMessage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implements the simulation error event message data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4ca17f23fbc1fa4183a9cb026fe77a7e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4ca17f23fbc1fa4183a9cb026fe77a7e">&#9670;&nbsp;</a></span>ErrorEventMessage() <span class="overload">[1/2]</span></h2>
 
@@ -218,6 +233,17 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="structhgps_1_1ErrorEventMessage.html" title="Implements the simulation error event message data type.">ErrorEventMessage</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sender</td><td>The sender identifier </td></tr>
+    <tr><td class="paramname">run</td><td>Current simulation run number </td></tr>
+    <tr><td class="paramname">time</td><td>Current simulation time </td></tr>
+    <tr><td class="paramname">what</td><td>The associated error message </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -244,6 +270,14 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Double dispatch the message using a visitor implementation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">visitor</td><td>The event message instance to accept </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="structhgps_1_1EventMessage.html#ac4bc7db16610e894beb8d867e0daba61">hgps::EventMessage</a>.</p>
 <div class="dynheader">
@@ -277,6 +311,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the unique message type identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>The message type identifier </dd></dl>
+
 <p>Implements <a class="el" href="structhgps_1_1EventMessage.html#a6bdeda9685d6d2ab08803c5013de65e8">hgps::EventMessage</a>.</p>
 
 </div>
@@ -304,6 +341,9 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Create a string representation of this instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>The string representation </dd></dl>
+
 <p>Implements <a class="el" href="structhgps_1_1EventMessage.html#aacaadd15420ece28488063ba40c8aa8a">hgps::EventMessage</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -326,6 +366,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Gets the error message. </p>
+
 </div>
 </div>
 <a id="a22446bbcb359c7121a2f9a1e029b26ca"></a>
@@ -339,6 +381,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets the associate <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> time. </p>
 
 </div>
 </div>

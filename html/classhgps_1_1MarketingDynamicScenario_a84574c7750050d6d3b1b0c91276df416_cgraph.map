@@ -1,6 +1,6 @@
 <map id="hgps::MarketingDynamicScenario::apply" name="hgps::MarketingDynamicScenario::apply">
-<area shape="rect" id="node1" title=" " alt="" coords="5,64,245,105"/>
-<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" title=" " alt="" coords="294,5,445,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" title=" " alt="" coords="307,71,432,98"/>
-<area shape="rect" id="node4" href="$classhgps_1_1Random.html#a3ec62063a29794f049c6d972a75ee29c" title=" " alt="" coords="293,123,445,164"/>
+<area shape="rect" id="node1" title="Applies this Scenario to the Person instance." alt="" coords="5,64,245,105"/>
+<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" title="Determine whether this interval contains a given time." alt="" coords="294,5,445,47"/>
+<area shape="rect" id="node3" href="$structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" title="Gets this instance unique identifier." alt="" coords="307,71,432,98"/>
+<area shape="rect" id="node4" href="$classhgps_1_1Random.html#a3ec62063a29794f049c6d972a75ee29c" title="Generates a random floating point number in range [0,1)" alt="" coords="293,123,445,164"/>
 </map>

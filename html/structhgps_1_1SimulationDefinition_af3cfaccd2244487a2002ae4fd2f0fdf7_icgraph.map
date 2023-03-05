@@ -1,5 +1,5 @@
 <map id="hgps::SimulationDefinition::identifier" name="hgps::SimulationDefinition::identifier">
-<area shape="rect" id="node1" title=" " alt="" coords="480,99,675,141"/>
+<area shape="rect" id="node1" title="Gets the simulation scenario identifier." alt="" coords="480,99,675,141"/>
 <area shape="rect" id="node2" href="$classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" title="Gets the simulation name." alt="" coords="256,107,432,133"/>
 <area shape="rect" id="node3" href="$classhgps_1_1HealthGPS.html#a5914cc38a777cdb4d694f52ba90bc054" title="Called after the model has been removed from the simulation executive." alt="" coords="27,5,186,32"/>
 <area shape="rect" id="node4" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="27,56,186,83"/>

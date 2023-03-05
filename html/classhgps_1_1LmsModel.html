@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1LmsModel.html',''); initR
 </div><!--header-->
 <div class="contents">
 
+<p>Implements the LMS (lambda-mu-sigma) model for children growth.  
+ <a href="classhgps_1_1LmsModel.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="lms__model_8h_source.html">lms_model.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,15 +103,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3ff7bbb1b0b5e5d0bf7b579ebbcae8e2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LmsModel.html#a3ff7bbb1b0b5e5d0bf7b579ebbcae8e2">LmsModel</a> ()=delete</td></tr>
 <tr class="separator:a3ff7bbb1b0b5e5d0bf7b579ebbcae8e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adeadf31db11d6ab6914fe5d4d4172f3b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LmsModel.html#adeadf31db11d6ab6914fe5d4d4172f3b">LmsModel</a> (<a class="el" href="classhgps_1_1LmsDefinition.html">LmsDefinition</a> &amp;definition)</td></tr>
+<tr class="memdesc:adeadf31db11d6ab6914fe5d4d4172f3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1LmsModel.html" title="Implements the LMS (lambda-mu-sigma) model for children growth.">LmsModel</a> class.  <a href="classhgps_1_1LmsModel.html#adeadf31db11d6ab6914fe5d4d4172f3b">More...</a><br /></td></tr>
 <tr class="separator:adeadf31db11d6ab6914fe5d4d4172f3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84c8b5e8655c4ce4d0f050a02a7243e2"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LmsModel.html#a84c8b5e8655c4ce4d0f050a02a7243e2">child_cutoff_age</a> () const noexcept</td></tr>
+<tr class="memdesc:a84c8b5e8655c4ce4d0f050a02a7243e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the children cut-off age (before adult)  <a href="classhgps_1_1LmsModel.html#a84c8b5e8655c4ce4d0f050a02a7243e2">More...</a><br /></td></tr>
 <tr class="separator:a84c8b5e8655c4ce4d0f050a02a7243e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17767cf2f6a8938dfee670369d73e9ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#a764f764c3efa580524186091840d151e">WeightCategory</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LmsModel.html#a17767cf2f6a8938dfee670369d73e9ad">classify_weight</a> (const <a class="el" href="structhgps_1_1Person.html">Person</a> &amp;entity) const</td></tr>
+<tr class="memdesc:a17767cf2f6a8938dfee670369d73e9ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Classify a person weight according with the predefined categories.  <a href="classhgps_1_1LmsModel.html#a17767cf2f6a8938dfee670369d73e9ad">More...</a><br /></td></tr>
 <tr class="separator:a17767cf2f6a8938dfee670369d73e9ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0826c442ae9773d83a544f80c31876be"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LmsModel.html#a0826c442ae9773d83a544f80c31876be">adjust_risk_factor_value</a> (const <a class="el" href="structhgps_1_1Person.html">Person</a> &amp;entity, const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;factor_key, double value) const</td></tr>
+<tr class="memdesc:a0826c442ae9773d83a544f80c31876be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> risk factor value.  <a href="classhgps_1_1LmsModel.html#a0826c442ae9773d83a544f80c31876be">More...</a><br /></td></tr>
 <tr class="separator:a0826c442ae9773d83a544f80c31876be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implements the LMS (lambda-mu-sigma) model for children growth. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a3ff7bbb1b0b5e5d0bf7b579ebbcae8e2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3ff7bbb1b0b5e5d0bf7b579ebbcae8e2">&#9670;&nbsp;</a></span>LmsModel() <span class="overload">[1/2]</span></h2>
 
@@ -150,6 +159,20 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1LmsModel.html" title="Implements the LMS (lambda-mu-sigma) model for children growth.">LmsModel</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">definition</td><td>The model definition </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for definition that don't include the child cut-off age. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -185,6 +208,23 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Adjust a <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> risk factor value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>The <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> instance to adjust </td></tr>
+    <tr><td class="paramname">factor_key</td><td>The risk factor identifier </td></tr>
+    <tr><td class="paramname">value</td><td>The amount of adjustment value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The adjusted risk factor value </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for unknown weight category definition </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a84c8b5e8655c4ce4d0f050a02a7243e2"></a>
@@ -210,6 +250,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the children cut-off age (before adult) </p>
+<dl class="section return"><dt>Returns</dt><dd>The cut-off age for children </dd></dl>
+
 </div>
 </div>
 <a id="a17767cf2f6a8938dfee670369d73e9ad"></a>
@@ -227,6 +270,15 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Classify a person weight according with the predefined categories. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">entity</td><td>The <a class="el" href="structhgps_1_1Person.html" title="Defines a virtual population person data type.">Person</a> instance to classify </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The respective weight classification </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

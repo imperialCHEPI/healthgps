@@ -1,4 +1,4 @@
 <map id="hgps::EventSubscriber" name="hgps::EventSubscriber">
-<area shape="rect" id="node1" title=" " alt="" coords="31,5,197,32"/>
-<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriberHandler.html" title=" " alt="" coords="5,80,223,107"/>
+<area shape="rect" id="node1" title="Defines the event subscriber interface type." alt="" coords="31,5,197,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriberHandler.html" title="Implements the event subscriber handler data type." alt="" coords="5,80,223,107"/>
 </map>

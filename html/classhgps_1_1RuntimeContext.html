@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1RuntimeContext.html','');
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> runtime context data type.  
+ <a href="classhgps_1_1RuntimeContext.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="runtime__context_8h_source.html">runtime_context.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,43 +103,64 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6dece3c3f093de65bbafe0113abfa5bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a6dece3c3f093de65bbafe0113abfa5bd">RuntimeContext</a> ()=delete</td></tr>
 <tr class="separator:a6dece3c3f093de65bbafe0113abfa5bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4723abacb009fc163c90b3cc3ed706ef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a4723abacb009fc163c90b3cc3ed706ef">RuntimeContext</a> (<a class="el" href="classhgps_1_1EventAggregator.html">EventAggregator</a> &amp;bus, <a class="el" href="structhgps_1_1SimulationDefinition.html">SimulationDefinition</a> &amp;definition)</td></tr>
+<tr class="memdesc:a4723abacb009fc163c90b3cc3ed706ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1RuntimeContext.html" title="Defines the Simulation runtime context data type.">RuntimeContext</a> class.  <a href="classhgps_1_1RuntimeContext.html#a4723abacb009fc163c90b3cc3ed706ef">More...</a><br /></td></tr>
 <tr class="separator:a4723abacb009fc163c90b3cc3ed706ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5eb9de9f095d934ababb9119d506b781"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781">time_now</a> () const noexcept</td></tr>
+<tr class="memdesc:a5eb9de9f095d934ababb9119d506b781"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current simulation time.  <a href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781">More...</a><br /></td></tr>
 <tr class="separator:a5eb9de9f095d934ababb9119d506b781"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9ea928aa7ad5ddd4ed45ab0e641fc0f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#ae9ea928aa7ad5ddd4ed45ab0e641fc0f">start_time</a> () const noexcept</td></tr>
+<tr class="memdesc:ae9ea928aa7ad5ddd4ed45ab0e641fc0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the experiment start time.  <a href="classhgps_1_1RuntimeContext.html#ae9ea928aa7ad5ddd4ed45ab0e641fc0f">More...</a><br /></td></tr>
 <tr class="separator:ae9ea928aa7ad5ddd4ed45ab0e641fc0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a283e5db3f10c4296241cc957122c87"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87">current_run</a> () const noexcept</td></tr>
+<tr class="memdesc:a1a283e5db3f10c4296241cc957122c87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the experiment current run number.  <a href="classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87">More...</a><br /></td></tr>
 <tr class="separator:a1a283e5db3f10c4296241cc957122c87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e0a9ed753e29fcddd5084754b7cdb9d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a1e0a9ed753e29fcddd5084754b7cdb9d">sync_timeout_millis</a> () const noexcept</td></tr>
+<tr class="memdesc:a1e0a9ed753e29fcddd5084754b7cdb9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the data synchronisation timeout in milliseconds.  <a href="classhgps_1_1RuntimeContext.html#a1e0a9ed753e29fcddd5084754b7cdb9d">More...</a><br /></td></tr>
 <tr class="separator:a1e0a9ed753e29fcddd5084754b7cdb9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a346d7fdd33294a4836c708b1073df653"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Population.html">Population</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653">population</a> () noexcept</td></tr>
+<tr class="memdesc:a346d7fdd33294a4836c708b1073df653"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the virtual population container.  <a href="classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653">More...</a><br /></td></tr>
 <tr class="separator:a346d7fdd33294a4836c708b1073df653"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e888d326a217dcf378f1cb29eecf3b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1RuntimeMetric.html">RuntimeMetric</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a0e888d326a217dcf378f1cb29eecf3b0">metrics</a> () noexcept</td></tr>
+<tr class="memdesc:a0e888d326a217dcf378f1cb29eecf3b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the runtime metrics container.  <a href="classhgps_1_1RuntimeContext.html#a0e888d326a217dcf378f1cb29eecf3b0">More...</a><br /></td></tr>
 <tr class="separator:a0e888d326a217dcf378f1cb29eecf3b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a188cf9cf3d8ad05b7e1b4c46ff0dfe7e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Scenario.html">Scenario</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a188cf9cf3d8ad05b7e1b4c46ff0dfe7e">scenario</a> () noexcept</td></tr>
+<tr class="memdesc:a188cf9cf3d8ad05b7e1b4c46ff0dfe7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the simulation experiment scenario.  <a href="classhgps_1_1RuntimeContext.html#a188cf9cf3d8ad05b7e1b4c46ff0dfe7e">More...</a><br /></td></tr>
 <tr class="separator:a188cf9cf3d8ad05b7e1b4c46ff0dfe7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a437e1ab725b8f8ab71eb04222173eda3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Random.html">Random</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3">random</a> () noexcept</td></tr>
+<tr class="memdesc:a437e1ab725b8f8ab71eb04222173eda3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the engine random number generator.  <a href="classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3">More...</a><br /></td></tr>
 <tr class="separator:a437e1ab725b8f8ab71eb04222173eda3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b4e9897cf7892cafa62def6cb5cdfcf"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhgps_1_1HierarchicalMapping.html">HierarchicalMapping</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a6b4e9897cf7892cafa62def6cb5cdfcf">mapping</a> () const noexcept</td></tr>
+<tr class="memdesc:a6b4e9897cf7892cafa62def6cb5cdfcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only reference to the hierarchical risk factors mapping.  <a href="classhgps_1_1RuntimeContext.html#a6b4e9897cf7892cafa62def6cb5cdfcf">More...</a><br /></td></tr>
 <tr class="separator:a6b4e9897cf7892cafa62def6cb5cdfcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4717665bdfebf9dd75e9a812a7bd11c9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a4717665bdfebf9dd75e9a812a7bd11c9">diseases</a> () const noexcept</td></tr>
+<tr class="memdesc:a4717665bdfebf9dd75e9a812a7bd11c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only reference to the select diseases information.  <a href="classhgps_1_1RuntimeContext.html#a4717665bdfebf9dd75e9a812a7bd11c9">More...</a><br /></td></tr>
 <tr class="separator:a4717665bdfebf9dd75e9a812a7bd11c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a143ba237af957e455b95b6dd01e463c0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a143ba237af957e455b95b6dd01e463c0">age_range</a> () const noexcept</td></tr>
+<tr class="memdesc:a143ba237af957e455b95b6dd01e463c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only reference to the population age range constraints.  <a href="classhgps_1_1RuntimeContext.html#a143ba237af957e455b95b6dd01e463c0">More...</a><br /></td></tr>
 <tr class="separator:a143ba237af957e455b95b6dd01e463c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b8e36f0fcde01c0ae67a7c5dbd32cff"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a4b8e36f0fcde01c0ae67a7c5dbd32cff">identifier</a> () const noexcept</td></tr>
+<tr class="memdesc:a4b8e36f0fcde01c0ae67a7c5dbd32cff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation identifier for outside world messages.  <a href="classhgps_1_1RuntimeContext.html#a4b8e36f0fcde01c0ae67a7c5dbd32cff">More...</a><br /></td></tr>
 <tr class="separator:a4b8e36f0fcde01c0ae67a7c5dbd32cff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25badead30720b70f16be9776a13cbfa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a25badead30720b70f16be9776a13cbfa">set_current_time</a> (const int <a class="el" href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781">time_now</a>) noexcept</td></tr>
+<tr class="memdesc:a25badead30720b70f16be9776a13cbfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the current simulation time value.  <a href="classhgps_1_1RuntimeContext.html#a25badead30720b70f16be9776a13cbfa">More...</a><br /></td></tr>
 <tr class="separator:a25badead30720b70f16be9776a13cbfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada3904d142959eff43bd210e0fb80293"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#ada3904d142959eff43bd210e0fb80293">set_current_run</a> (const unsigned int run_number) noexcept</td></tr>
+<tr class="memdesc:ada3904d142959eff43bd210e0fb80293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the current simulation run number.  <a href="classhgps_1_1RuntimeContext.html#ada3904d142959eff43bd210e0fb80293">More...</a><br /></td></tr>
 <tr class="separator:ada3904d142959eff43bd210e0fb80293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a00e3af979004ac2f55ea5c73799dff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a4a00e3af979004ac2f55ea5c73799dff">reset_population</a> (const std::size_t initial_pop_size, const int model_start_time)</td></tr>
+<tr class="memdesc:a4a00e3af979004ac2f55ea5c73799dff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the virtual population to an initial size, with only new individuals.  <a href="classhgps_1_1RuntimeContext.html#a4a00e3af979004ac2f55ea5c73799dff">More...</a><br /></td></tr>
 <tr class="separator:a4a00e3af979004ac2f55ea5c73799dff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0b304648b1a5fa47ebf4dfe348cfaa7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7">publish</a> (std::unique_ptr&lt; <a class="el" href="structhgps_1_1EventMessage.html">EventMessage</a> &gt; message) const noexcept</td></tr>
+<tr class="memdesc:ac0b304648b1a5fa47ebf4dfe348cfaa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Publishes a polymorphic new message to the outside world synchronously.  <a href="classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7">More...</a><br /></td></tr>
 <tr class="separator:ac0b304648b1a5fa47ebf4dfe348cfaa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51dab7bdff9cbf58ff18d563ccd6fad6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RuntimeContext.html#a51dab7bdff9cbf58ff18d563ccd6fad6">publish_async</a> (std::unique_ptr&lt; <a class="el" href="structhgps_1_1EventMessage.html">EventMessage</a> &gt; message) const noexcept</td></tr>
+<tr class="memdesc:a51dab7bdff9cbf58ff18d563ccd6fad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Publishes a polymorphic new message to the outside world asynchronously.  <a href="classhgps_1_1RuntimeContext.html#a51dab7bdff9cbf58ff18d563ccd6fad6">More...</a><br /></td></tr>
 <tr class="separator:a51dab7bdff9cbf58ff18d563ccd6fad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> runtime context data type. </p>
+<p>The context holds the simulation runtime information, including the virtual population, and expose to all modules via the API calls. Only one context instance exists per simulation instance for internal use only by the engine algorithm. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6dece3c3f093de65bbafe0113abfa5bd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6dece3c3f093de65bbafe0113abfa5bd">&#9670;&nbsp;</a></span>RuntimeContext() <span class="overload">[1/2]</span></h2>
 
@@ -188,6 +212,15 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1RuntimeContext.html" title="Defines the Simulation runtime context data type.">RuntimeContext</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bus</td><td>The message bus instance for communication with the outside world </td></tr>
+    <tr><td class="paramname">definition</td><td>The simulation experiment definition. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -213,6 +246,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a read-only reference to the population age range constraints. </p>
+<dl class="section return"><dt>Returns</dt><dd>Allowed age range </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -243,6 +279,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the experiment current run number. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current run number </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -274,6 +313,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a read-only reference to the select diseases information. </p>
+<dl class="section return"><dt>Returns</dt><dd>Selected diseases </dd></dl>
+
 </div>
 </div>
 <a id="a4b8e36f0fcde01c0ae67a7c5dbd32cff"></a>
@@ -299,6 +341,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the simulation identifier for outside world messages. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> identifier </dd></dl>
+
 </div>
 </div>
 <a id="a6b4e9897cf7892cafa62def6cb5cdfcf"></a>
@@ -323,6 +368,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a read-only reference to the hierarchical risk factors mapping. </p>
+<dl class="section return"><dt>Returns</dt><dd>Risk factor mapping </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -353,6 +401,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a reference to the runtime metrics container. </p>
+<dl class="section return"><dt>Returns</dt><dd>Runtime metrics </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -383,6 +434,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a reference to the virtual population container. </p>
+<dl class="section return"><dt>Returns</dt><dd>Virtual population </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -414,6 +468,14 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Publishes a polymorphic new message to the outside world synchronously. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to publish </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -446,6 +508,14 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Publishes a polymorphic new message to the outside world asynchronously. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to publish </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a437e1ab725b8f8ab71eb04222173eda3"></a>
@@ -470,6 +540,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a reference to the engine random number generator. </p>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="classhgps_1_1Random.html" title="General purpose Random number generator algorithms.">Random</a> number generator </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -504,6 +577,15 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>Resets the virtual population to an initial size, with only new individuals. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">initial_pop_size</td><td>Initial population size </td></tr>
+    <tr><td class="paramname">model_start_time</td><td>Experiment start time </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a188cf9cf3d8ad05b7e1b4c46ff0dfe7e"></a>
@@ -528,6 +610,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a reference to the simulation experiment scenario. </p>
+<dl class="section return"><dt>Returns</dt><dd>Experiment scenario </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -560,6 +645,14 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Sets the current simulation run number. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">run_number</td><td>The new run number </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a25badead30720b70f16be9776a13cbfa"></a>
@@ -585,6 +678,14 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Sets the current simulation time value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_now</td><td>The new simulation time </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -615,6 +716,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the experiment start time. </p>
+<dl class="section return"><dt>Returns</dt><dd>Experiment start time </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -646,6 +750,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the data synchronisation timeout in milliseconds. </p>
+<dl class="section return"><dt>Returns</dt><dd>Timeout in milliseconds </dd></dl>
+
 </div>
 </div>
 <a id="a5eb9de9f095d934ababb9119d506b781"></a>
@@ -670,6 +777,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the current simulation time. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current simulation time </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

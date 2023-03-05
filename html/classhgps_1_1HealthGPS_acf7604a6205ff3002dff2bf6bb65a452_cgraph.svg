@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1SimulationModuleFactory.html#a0071993f6ae47f0ff5e6dbee91f4a819" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1SimulationModuleFactory.html#a0071993f6ae47f0ff5e6dbee91f4a819" target="_top" xlink:title="Create a polymorphic SimulationModule instance.">
 <polygon fill="none" stroke="black" points="191,-49.5 191,-79.5 361,-79.5 361,-49.5 191,-49.5"/>
 <text text-anchor="start" x="199" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationModuleFactory</text>
 <text text-anchor="middle" x="276" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::create</text>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" target="_top" xlink:title="Gets a read&#45;only reference to the model inputs definition.">
 <polygon fill="none" stroke="black" points="203,-0.5 203,-30.5 349,-30.5 349,-0.5 203,-0.5"/>
 <text text-anchor="start" x="211" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="276" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::inputs</text>

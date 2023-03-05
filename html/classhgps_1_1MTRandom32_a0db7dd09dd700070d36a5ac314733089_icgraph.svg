@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Sets the current state of the generator engine.">
 <polygon fill="#bfbfbf" stroke="black" points="223,-0.5 223,-19.5 366,-19.5 366,-0.5 223,-0.5"/>
 <text text-anchor="middle" x="294.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MTRandom32::seed</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1MTRandom32.html#a1012fab7afb51086dacfcf36959db948" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1MTRandom32.html#a1012fab7afb51086dacfcf36959db948" target="_top" xlink:title="Initialise a new instance of the MTRandom32 class.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-19.5 187,-19.5 187,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="93.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MTRandom32::MTRandom32</text>
 </a>

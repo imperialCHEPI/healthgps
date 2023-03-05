@@ -94,51 +94,91 @@ $(document).ready(function(){initNavTree('classhgps_1_1Map2d.html',''); initResi
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the two-dimensional map (lookup table) data type.  
+ <a href="classhgps_1_1Map2d.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="map2d_8h_source.html">map2d.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:a0010cac64db0fdae7b6de30f98aa43d7"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a0010cac64db0fdae7b6de30f98aa43d7">IteratorType</a> = typename std::map&lt; TROW, std::map&lt; TCOL, TCell &gt; &gt;::iterator</td></tr>
+<tr class="memdesc:a0010cac64db0fdae7b6de30f98aa43d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Map row iterator.  <a href="classhgps_1_1Map2d.html#a0010cac64db0fdae7b6de30f98aa43d7">More...</a><br /></td></tr>
 <tr class="separator:a0010cac64db0fdae7b6de30f98aa43d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e99aa3e63fc2ba8a0555d298a54fe06"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a> = typename std::map&lt; TROW, std::map&lt; TCOL, TCell &gt; &gt;::const_iterator</td></tr>
+<tr class="memdesc:a5e99aa3e63fc2ba8a0555d298a54fe06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only map iterator.  <a href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">More...</a><br /></td></tr>
 <tr class="separator:a5e99aa3e63fc2ba8a0555d298a54fe06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a1677a1030c1f5c84949a3a9382b0b002"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a1677a1030c1f5c84949a3a9382b0b002">Map2d</a> ()=default</td></tr>
+<tr class="memdesc:a1677a1030c1f5c84949a3a9382b0b002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Map2d.html" title="Defines the two-dimensional map (lookup table) data type.">Map2d</a> class.  <a href="classhgps_1_1Map2d.html#a1677a1030c1f5c84949a3a9382b0b002">More...</a><br /></td></tr>
 <tr class="separator:a1677a1030c1f5c84949a3a9382b0b002"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60f92ae8fd9479ee1b49404388faadec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a60f92ae8fd9479ee1b49404388faadec">Map2d</a> (std::map&lt; TROW, std::map&lt; TCOL, TCell &gt;&gt; &amp;&amp;data) noexcept</td></tr>
+<tr class="memdesc:a60f92ae8fd9479ee1b49404388faadec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Map2d.html" title="Defines the two-dimensional map (lookup table) data type.">Map2d</a> class.  <a href="classhgps_1_1Map2d.html#a60f92ae8fd9479ee1b49404388faadec">More...</a><br /></td></tr>
 <tr class="separator:a60f92ae8fd9479ee1b49404388faadec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b68e83aac82c33d40f7b039fa20a89d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a1b68e83aac82c33d40f7b039fa20a89d">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:a1b68e83aac82c33d40f7b039fa20a89d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the container is empty.  <a href="classhgps_1_1Map2d.html#a1b68e83aac82c33d40f7b039fa20a89d">More...</a><br /></td></tr>
 <tr class="separator:a1b68e83aac82c33d40f7b039fa20a89d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a007e7cb3ff4ff5edbdf25c7d5021a559"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a007e7cb3ff4ff5edbdf25c7d5021a559">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a007e7cb3ff4ff5edbdf25c7d5021a559"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the total size of the container dataset.  <a href="classhgps_1_1Map2d.html#a007e7cb3ff4ff5edbdf25c7d5021a559">More...</a><br /></td></tr>
 <tr class="separator:a007e7cb3ff4ff5edbdf25c7d5021a559"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b27abcf5782c049aca2846b11ba6dc3"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a7b27abcf5782c049aca2846b11ba6dc3">rows</a> () const noexcept</td></tr>
+<tr class="memdesc:a7b27abcf5782c049aca2846b11ba6dc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of rows.  <a href="classhgps_1_1Map2d.html#a7b27abcf5782c049aca2846b11ba6dc3">More...</a><br /></td></tr>
 <tr class="separator:a7b27abcf5782c049aca2846b11ba6dc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5025bb26f111b321db9ba349abd9be0"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#ab5025bb26f111b321db9ba349abd9be0">columns</a> () const noexcept</td></tr>
+<tr class="memdesc:ab5025bb26f111b321db9ba349abd9be0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of columns.  <a href="classhgps_1_1Map2d.html#ab5025bb26f111b321db9ba349abd9be0">More...</a><br /></td></tr>
 <tr class="separator:ab5025bb26f111b321db9ba349abd9be0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1799b0834331940a98d7d49699f7a7fc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a1799b0834331940a98d7d49699f7a7fc">contains</a> (const TROW &amp;row_key) const</td></tr>
+<tr class="memdesc:a1799b0834331940a98d7d49699f7a7fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether the container contains a row.  <a href="classhgps_1_1Map2d.html#a1799b0834331940a98d7d49699f7a7fc">More...</a><br /></td></tr>
 <tr class="separator:a1799b0834331940a98d7d49699f7a7fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30b4f03647069fe127995bb89699e080"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a30b4f03647069fe127995bb89699e080">contains</a> (const TROW &amp;row_key, const TCOL &amp;col_key) const</td></tr>
+<tr class="memdesc:a30b4f03647069fe127995bb89699e080"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines whether the container contains a value.  <a href="classhgps_1_1Map2d.html#a30b4f03647069fe127995bb89699e080">More...</a><br /></td></tr>
 <tr class="separator:a30b4f03647069fe127995bb89699e080"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7afe65d3f9e6bfb803a9b252fb091270"><td class="memItemLeft" align="right" valign="top">std::map&lt; TCOL, TCell &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a7afe65d3f9e6bfb803a9b252fb091270">row</a> (const TROW &amp;row_key)</td></tr>
+<tr class="memdesc:a7afe65d3f9e6bfb803a9b252fb091270"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a row dataset.  <a href="classhgps_1_1Map2d.html#a7afe65d3f9e6bfb803a9b252fb091270">More...</a><br /></td></tr>
 <tr class="separator:a7afe65d3f9e6bfb803a9b252fb091270"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a178aaf790219e62bd83d7bfe12a4d63b"><td class="memItemLeft" align="right" valign="top">const std::map&lt; TCOL, TCell &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a178aaf790219e62bd83d7bfe12a4d63b">row</a> (const TROW &amp;row_key) const</td></tr>
+<tr class="memdesc:a178aaf790219e62bd83d7bfe12a4d63b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-row dataset.  <a href="classhgps_1_1Map2d.html#a178aaf790219e62bd83d7bfe12a4d63b">More...</a><br /></td></tr>
 <tr class="separator:a178aaf790219e62bd83d7bfe12a4d63b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c36750ac7efb31004bfc11494692000"><td class="memItemLeft" align="right" valign="top">TCell &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a2c36750ac7efb31004bfc11494692000">at</a> (const TROW &amp;row_key, const TCOL &amp;col_key)</td></tr>
+<tr class="memdesc:a2c36750ac7efb31004bfc11494692000"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a value at a cell by row and column with bounds checking.  <a href="classhgps_1_1Map2d.html#a2c36750ac7efb31004bfc11494692000">More...</a><br /></td></tr>
 <tr class="separator:a2c36750ac7efb31004bfc11494692000"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac25fd91630947eeb5c68fed5d9d85b2c"><td class="memItemLeft" align="right" valign="top">const TCell &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#ac25fd91630947eeb5c68fed5d9d85b2c">at</a> (const TROW &amp;row_key, const TCOL &amp;col_key) const</td></tr>
+<tr class="memdesc:ac25fd91630947eeb5c68fed5d9d85b2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only value at a cell by row and column with bounds checking.  <a href="classhgps_1_1Map2d.html#ac25fd91630947eeb5c68fed5d9d85b2c">More...</a><br /></td></tr>
 <tr class="separator:ac25fd91630947eeb5c68fed5d9d85b2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26e49d28144b7fd6f9427eaa5c4a6794"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Map2d.html#a0010cac64db0fdae7b6de30f98aa43d7">IteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a26e49d28144b7fd6f9427eaa5c4a6794">begin</a> () noexcept</td></tr>
+<tr class="memdesc:a26e49d28144b7fd6f9427eaa5c4a6794"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an iterator to the beginning of the map.  <a href="classhgps_1_1Map2d.html#a26e49d28144b7fd6f9427eaa5c4a6794">More...</a><br /></td></tr>
 <tr class="separator:a26e49d28144b7fd6f9427eaa5c4a6794"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb93419c9cadfac73bb198554b876118"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Map2d.html#a0010cac64db0fdae7b6de30f98aa43d7">IteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#aeb93419c9cadfac73bb198554b876118">end</a> () noexcept</td></tr>
+<tr class="memdesc:aeb93419c9cadfac73bb198554b876118"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an iterator to the element following the element of the map.  <a href="classhgps_1_1Map2d.html#aeb93419c9cadfac73bb198554b876118">More...</a><br /></td></tr>
 <tr class="separator:aeb93419c9cadfac73bb198554b876118"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ed4ed8b45ce5be8274f37975ae1c1b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a9ed4ed8b45ce5be8274f37975ae1c1b9">begin</a> () const noexcept</td></tr>
+<tr class="memdesc:a9ed4ed8b45ce5be8274f37975ae1c1b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the beginning of the map.  <a href="classhgps_1_1Map2d.html#a9ed4ed8b45ce5be8274f37975ae1c1b9">More...</a><br /></td></tr>
+<tr class="separator:a9ed4ed8b45ce5be8274f37975ae1c1b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4acb6fbc8a7b31f37d91374869efcaaf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a4acb6fbc8a7b31f37d91374869efcaaf">end</a> () const noexcept</td></tr>
+<tr class="memdesc:a4acb6fbc8a7b31f37d91374869efcaaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the element following the element of the map.  <a href="classhgps_1_1Map2d.html#a4acb6fbc8a7b31f37d91374869efcaaf">More...</a><br /></td></tr>
+<tr class="separator:a4acb6fbc8a7b31f37d91374869efcaaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ff9a8bdc656c0c8789eda3418676a0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#a5ff9a8bdc656c0c8789eda3418676a0c">cbegin</a> () const noexcept</td></tr>
+<tr class="memdesc:a5ff9a8bdc656c0c8789eda3418676a0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the beginning of the map.  <a href="classhgps_1_1Map2d.html#a5ff9a8bdc656c0c8789eda3418676a0c">More...</a><br /></td></tr>
 <tr class="separator:a5ff9a8bdc656c0c8789eda3418676a0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8d632c20899756f0e34145fefde38dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Map2d.html#ab8d632c20899756f0e34145fefde38dd">cend</a> () const noexcept</td></tr>
+<tr class="memdesc:ab8d632c20899756f0e34145fefde38dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the element following the element of the map.  <a href="classhgps_1_1Map2d.html#ab8d632c20899756f0e34145fefde38dd">More...</a><br /></td></tr>
 <tr class="separator:ab8d632c20899756f0e34145fefde38dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;class TROW, class TCOL, class TCell&gt;<br />
+class hgps::Map2d&lt; TROW, TCOL, TCell &gt;</h3>
+
+<p>Defines the two-dimensional map (lookup table) data type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">TROW</td><td>Rows date type </td></tr>
+    <tr><td class="paramname">TCOL</td><td>Columns data type </td></tr>
+    <tr><td class="paramname">TCell</td><td>Cell value data type </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a5e99aa3e63fc2ba8a0555d298a54fe06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e99aa3e63fc2ba8a0555d298a54fe06">&#9670;&nbsp;</a></span>ConstIteratorType</h2>
 
@@ -152,6 +192,8 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Read-only map iterator. </p>
 
 </div>
 </div>
@@ -168,6 +210,8 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Map row iterator. </p>
 
 </div>
 </div>
@@ -197,6 +241,8 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Map2d.html" title="Defines the two-dimensional map (lookup table) data type.">Map2d</a> class. </p>
+
 </div>
 </div>
 <a id="a60f92ae8fd9479ee1b49404388faadec"></a>
@@ -224,6 +270,14 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Map2d.html" title="Defines the two-dimensional map (lookup table) data type.">Map2d</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>The lookup table data </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -264,6 +318,16 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a value at a cell by row and column with bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row_key</td><td>The row identifier </td></tr>
+    <tr><td class="paramname">col_key</td><td>The column identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The cell value </dd></dl>
+
 </div>
 </div>
 <a id="ac25fd91630947eeb5c68fed5d9d85b2c"></a>
@@ -302,10 +366,50 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a read-only value at a cell by row and column with bounds checking. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row_key</td><td>The row identifier </td></tr>
+    <tr><td class="paramname">col_key</td><td>The column identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The read-only cell value </dd></dl>
+
+</div>
+</div>
+<a id="a9ed4ed8b45ce5be8274f37975ae1c1b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ed4ed8b45ce5be8274f37975ae1c1b9">&#9670;&nbsp;</a></span>begin() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class TROW , class TCOL , class TCell &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a> <a class="el" href="classhgps_1_1Map2d.html">hgps::Map2d</a>&lt; TROW, TCOL, TCell &gt;::begin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets an read-only iterator to the beginning of the map. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first element </dd></dl>
+
 </div>
 </div>
 <a id="a26e49d28144b7fd6f9427eaa5c4a6794"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26e49d28144b7fd6f9427eaa5c4a6794">&#9670;&nbsp;</a></span>begin()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a26e49d28144b7fd6f9427eaa5c4a6794">&#9670;&nbsp;</a></span>begin() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -328,6 +432,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets an iterator to the beginning of the map. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first element </dd></dl>
 
 </div>
 </div>
@@ -356,6 +463,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an read-only iterator to the beginning of the map. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first element </dd></dl>
+
 </div>
 </div>
 <a id="ab8d632c20899756f0e34145fefde38dd"></a>
@@ -383,6 +493,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an read-only iterator to the element following the element of the map. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last element. </dd></dl>
+
 </div>
 </div>
 <a id="ab5025bb26f111b321db9ba349abd9be0"></a>
@@ -409,6 +522,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of columns. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of columns </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -442,6 +558,15 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determines whether the container contains a row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row_key</td><td>The row identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the contains the row; otherwise, false </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -486,6 +611,16 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Determines whether the container contains a value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row_key</td><td>The row identifier </td></tr>
+    <tr><td class="paramname">col_key</td><td>The column identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the contains the row; otherwise, false </dd></dl>
+
 </div>
 </div>
 <a id="a1b68e83aac82c33d40f7b039fa20a89d"></a>
@@ -512,6 +647,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether the container is empty. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the container is empty; otherwise, false. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -520,8 +658,38 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="a4acb6fbc8a7b31f37d91374869efcaaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4acb6fbc8a7b31f37d91374869efcaaf">&#9670;&nbsp;</a></span>end() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class TROW , class TCOL , class TCell &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classhgps_1_1Map2d.html#a5e99aa3e63fc2ba8a0555d298a54fe06">ConstIteratorType</a> <a class="el" href="classhgps_1_1Map2d.html">hgps::Map2d</a>&lt; TROW, TCOL, TCell &gt;::end </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets an read-only iterator to the element following the element of the map. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last element. </dd></dl>
+
+</div>
+</div>
 <a id="aeb93419c9cadfac73bb198554b876118"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb93419c9cadfac73bb198554b876118">&#9670;&nbsp;</a></span>end()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb93419c9cadfac73bb198554b876118">&#9670;&nbsp;</a></span>end() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -544,6 +712,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets an iterator to the element following the element of the map. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last element. </dd></dl>
 
 </div>
 </div>
@@ -573,6 +744,15 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a row dataset. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row_key</td><td>The row identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Row dataset </dd></dl>
+
 </div>
 </div>
 <a id="a178aaf790219e62bd83d7bfe12a4d63b"></a>
@@ -601,6 +781,15 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a read-row dataset. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">row_key</td><td>The row identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Row dataset </dd></dl>
+
 </div>
 </div>
 <a id="a7b27abcf5782c049aca2846b11ba6dc3"></a>
@@ -627,6 +816,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the number of rows. </p>
+<dl class="section return"><dt>Returns</dt><dd>Number of rows </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -659,6 +851,9 @@ template&lt;class TROW , class TCOL , class TCell &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the total size of the container dataset. </p>
+<dl class="section return"><dt>Returns</dt><dd>Total size </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

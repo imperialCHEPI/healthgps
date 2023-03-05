@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" target="_top" xlink:title="Advances the engine&#39;s state by a specified amount.">
 <polygon fill="none" stroke="black" points="159,-0.5 159,-19.5 314,-19.5 314,-0.5 159,-0.5"/>
 <text text-anchor="middle" x="236.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MTRandom32::discard</text>
 </a>

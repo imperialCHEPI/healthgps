@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('classhgps_1_1RandomBitGenerator.html',
 </div><!--header-->
 <div class="contents">
 
-<p><a class="el" href="classhgps_1_1Random.html" title="General purpose random number interface.">Random</a> number generator algorithms interface.  
+<p>Pseudo-random number generator algorithm interface.  
  <a href="classhgps_1_1RandomBitGenerator.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="randombit__generator_8h_source.html">randombit_generator.h</a>&gt;</code></p>
@@ -113,25 +113,32 @@ Public Types</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:abab593bac0bb28a5ae6da405224714ce"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#abab593bac0bb28a5ae6da405224714ce">~RandomBitGenerator</a> ()=default</td></tr>
+<tr class="memdesc:abab593bac0bb28a5ae6da405224714ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1RandomBitGenerator.html" title="Pseudo-random number generator algorithm interface.">RandomBitGenerator</a> instance.  <a href="classhgps_1_1RandomBitGenerator.html#abab593bac0bb28a5ae6da405224714ce">More...</a><br /></td></tr>
 <tr class="separator:abab593bac0bb28a5ae6da405224714ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b36210ef71c38d4eeffc166a67a2f9b"><td class="memItemLeft" align="right" valign="top">virtual unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#a8b36210ef71c38d4eeffc166a67a2f9b">operator()</a> ()=0</td></tr>
+<tr class="memdesc:a8b36210ef71c38d4eeffc166a67a2f9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates the next random number.  <a href="classhgps_1_1RandomBitGenerator.html#a8b36210ef71c38d4eeffc166a67a2f9b">More...</a><br /></td></tr>
 <tr class="separator:a8b36210ef71c38d4eeffc166a67a2f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac58717fa118fcd760ed04bed995c4d63"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#ac58717fa118fcd760ed04bed995c4d63">seed</a> (const unsigned int seed)=0</td></tr>
+<tr class="memdesc:ac58717fa118fcd760ed04bed995c4d63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the current state of the generator engine.  <a href="classhgps_1_1RandomBitGenerator.html#ac58717fa118fcd760ed04bed995c4d63">More...</a><br /></td></tr>
 <tr class="separator:ac58717fa118fcd760ed04bed995c4d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a994338e838c111c37d1204d978e15126"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#a994338e838c111c37d1204d978e15126">discard</a> (const unsigned long long skip)=0</td></tr>
+<tr class="memdesc:a994338e838c111c37d1204d978e15126"><td class="mdescLeft">&#160;</td><td class="mdescRight">Advances the engine's state by a specified amount.  <a href="classhgps_1_1RandomBitGenerator.html#a994338e838c111c37d1204d978e15126">More...</a><br /></td></tr>
 <tr class="separator:a994338e838c111c37d1204d978e15126"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3cfe735fdaf4882d746e6d75edf6a76"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#af3cfe735fdaf4882d746e6d75edf6a76">next_double</a> () noexcept=0</td></tr>
+<tr class="memdesc:af3cfe735fdaf4882d746e6d75edf6a76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random floating point number in range [0,1)  <a href="classhgps_1_1RandomBitGenerator.html#af3cfe735fdaf4882d746e6d75edf6a76">More...</a><br /></td></tr>
 <tr class="separator:af3cfe735fdaf4882d746e6d75edf6a76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a19f99f3eef42d57e07d7aeac4c1c4099"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classhgps_1_1RandomBitGenerator.html#ab5a2319dfbd85d34114e44fe3e4c595a">result_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#a19f99f3eef42d57e07d7aeac4c1c4099">min</a> ()</td></tr>
+<tr class="memdesc:a19f99f3eef42d57e07d7aeac4c1c4099"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the smallest possible value in the output range.  <a href="classhgps_1_1RandomBitGenerator.html#a19f99f3eef42d57e07d7aeac4c1c4099">More...</a><br /></td></tr>
 <tr class="separator:a19f99f3eef42d57e07d7aeac4c1c4099"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8515f9b4c463017c66907a5653817d2e"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="classhgps_1_1RandomBitGenerator.html#ab5a2319dfbd85d34114e44fe3e4c595a">result_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RandomBitGenerator.html#a8515f9b4c463017c66907a5653817d2e">max</a> ()</td></tr>
+<tr class="memdesc:a8515f9b4c463017c66907a5653817d2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the largest possible value in the output range.  <a href="classhgps_1_1RandomBitGenerator.html#a8515f9b4c463017c66907a5653817d2e">More...</a><br /></td></tr>
 <tr class="separator:a8515f9b4c463017c66907a5653817d2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classhgps_1_1Random.html" title="General purpose random number interface.">Random</a> number generator algorithms interface. </p>
+<div class="textblock"><p>Pseudo-random number generator algorithm interface. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ab5a2319dfbd85d34114e44fe3e4c595a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab5a2319dfbd85d34114e44fe3e4c595a">&#9670;&nbsp;</a></span>result_type</h2>
@@ -171,6 +178,8 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Destroys a <a class="el" href="classhgps_1_1RandomBitGenerator.html" title="Pseudo-random number generator algorithm interface.">RandomBitGenerator</a> instance. </p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -197,6 +206,14 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Advances the engine's state by a specified amount. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">skip</td><td>The number of times to advance the state </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d">hgps::MTRandom32</a>.</p>
 
@@ -225,6 +242,9 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the largest possible value in the output range. </p>
+<dl class="section return"><dt>Returns</dt><dd>The maximum potentially generated value. </dd></dl>
+
 </div>
 </div>
 <a id="a19f99f3eef42d57e07d7aeac4c1c4099"></a>
@@ -250,6 +270,9 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the smallest possible value in the output range. </p>
+<dl class="section return"><dt>Returns</dt><dd>The minimum potentially generated value. </dd></dl>
+
 </div>
 </div>
 <a id="af3cfe735fdaf4882d746e6d75edf6a76"></a>
@@ -274,6 +297,9 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Generates a random floating point number in range [0,1) </p>
+<dl class="section return"><dt>Returns</dt><dd>A floating point value in range [0,1). </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1MTRandom32.html#adf218b98f7add7044850b014d162681a">hgps::MTRandom32</a>.</p>
 
@@ -302,6 +328,9 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Generates the next random number. </p>
+<dl class="section return"><dt>Returns</dt><dd>A pseudo-random number value in [<code><a class="el" href="classhgps_1_1RandomBitGenerator.html#a19f99f3eef42d57e07d7aeac4c1c4099" title="Gets the smallest possible value in the output range.">min()</a></code>, <code><a class="el" href="classhgps_1_1RandomBitGenerator.html#a8515f9b4c463017c66907a5653817d2e" title="Gets the largest possible value in the output range.">max()</a></code>] </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1MTRandom32.html#a91390476259a97f9af5bd3ff1934425f">hgps::MTRandom32</a>.</p>
 
 </div>
@@ -329,6 +358,14 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Sets the current state of the generator engine. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">seed</td><td>The value to initialise the internal state </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1MTRandom32.html#a0db7dd09dd700070d36a5ac314733089">hgps::MTRandom32</a>.</p>
 <div class="dynheader">

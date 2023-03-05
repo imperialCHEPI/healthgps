@@ -6,6 +6,5 @@ var classhgps_1_1PhysicalActivityScenario =
     [ "apply", "classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647", null ],
     [ "channel", "classhgps_1_1PhysicalActivityScenario.html#a5c8f178bb4f04fb823a56dfad6b74da1", null ],
     [ "clear", "classhgps_1_1PhysicalActivityScenario.html#a77ba6e0b37ac64941d7fe1e47e360b9d", null ],
-    [ "impacts", "classhgps_1_1PhysicalActivityScenario.html#aed974811b6aad782127b59cc598a640b", null ],
-    [ "type", "classhgps_1_1PhysicalActivityScenario.html#af1d00fb333d5061d29f263d7f7bd2464", null ]
+    [ "impacts", "classhgps_1_1PhysicalActivityScenario.html#aed974811b6aad782127b59cc598a640b", null ]
 ];

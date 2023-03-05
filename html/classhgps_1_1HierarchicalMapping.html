@@ -94,13 +94,18 @@ $(document).ready(function(){initNavTree('classhgps_1_1HierarchicalMapping.html'
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the hierarchical model mapping data type.  
+ <a href="classhgps_1_1HierarchicalMapping.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="mapping_8h_source.html">mapping.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:a2bb8805579cb5dd67cf6d11beddb1367"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a2bb8805579cb5dd67cf6d11beddb1367">IteratorType</a> = std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt;::iterator</td></tr>
+<tr class="memdesc:a2bb8805579cb5dd67cf6d11beddb1367"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hierarchical mappings iterator.  <a href="classhgps_1_1HierarchicalMapping.html#a2bb8805579cb5dd67cf6d11beddb1367">More...</a><br /></td></tr>
 <tr class="separator:a2bb8805579cb5dd67cf6d11beddb1367"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41412c6034e86b6d909e0f024b9712d7"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a41412c6034e86b6d909e0f024b9712d7">ConstIteratorType</a> = std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt;::const_iterator</td></tr>
+<tr class="memdesc:a41412c6034e86b6d909e0f024b9712d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">read-only hierarchical mappings iterator  <a href="classhgps_1_1HierarchicalMapping.html#a41412c6034e86b6d909e0f024b9712d7">More...</a><br /></td></tr>
 <tr class="separator:a41412c6034e86b6d909e0f024b9712d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -108,35 +113,51 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae6bde357a736ebcbdcb0eca294548c7a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#ae6bde357a736ebcbdcb0eca294548c7a">HierarchicalMapping</a> ()=delete</td></tr>
 <tr class="separator:ae6bde357a736ebcbdcb0eca294548c7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adce24531a4c27e3e8c38352971d14d07"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#adce24531a4c27e3e8c38352971d14d07">HierarchicalMapping</a> (std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt; &amp;&amp;mapping)</td></tr>
+<tr class="memdesc:adce24531a4c27e3e8c38352971d14d07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1HierarchicalMapping.html" title="Defines the hierarchical model mapping data type.">HierarchicalMapping</a> class.  <a href="classhgps_1_1HierarchicalMapping.html#adce24531a4c27e3e8c38352971d14d07">More...</a><br /></td></tr>
 <tr class="separator:adce24531a4c27e3e8c38352971d14d07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f0d054ec3dccf82d62ae834a0db32cb"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a5f0d054ec3dccf82d62ae834a0db32cb">entries</a> () const noexcept</td></tr>
+<tr class="memdesc:a5f0d054ec3dccf82d62ae834a0db32cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the collection of mapping entries.  <a href="classhgps_1_1HierarchicalMapping.html#a5f0d054ec3dccf82d62ae834a0db32cb">More...</a><br /></td></tr>
 <tr class="separator:a5f0d054ec3dccf82d62ae834a0db32cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a62fce052339229fcbcd60ee3d0db38"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a3a62fce052339229fcbcd60ee3d0db38">entries_without_dynamic</a> () const noexcept</td></tr>
+<tr class="memdesc:a3a62fce052339229fcbcd60ee3d0db38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the collection of mapping entries without the dynamic factor.  <a href="classhgps_1_1HierarchicalMapping.html#a3a62fce052339229fcbcd60ee3d0db38">More...</a><br /></td></tr>
 <tr class="separator:a3a62fce052339229fcbcd60ee3d0db38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6a60908ace47f76226acc16bb1304ea"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#aa6a60908ace47f76226acc16bb1304ea">size</a> () const noexcept</td></tr>
+<tr class="memdesc:aa6a60908ace47f76226acc16bb1304ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the size of the mappings collection.  <a href="classhgps_1_1HierarchicalMapping.html#aa6a60908ace47f76226acc16bb1304ea">More...</a><br /></td></tr>
 <tr class="separator:aa6a60908ace47f76226acc16bb1304ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fba44dd0dc1f2550d37ea58afc2c8cc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a9fba44dd0dc1f2550d37ea58afc2c8cc">max_level</a> () const noexcept</td></tr>
+<tr class="memdesc:a9fba44dd0dc1f2550d37ea58afc2c8cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the maximum hierarchical level.  <a href="classhgps_1_1HierarchicalMapping.html#a9fba44dd0dc1f2550d37ea58afc2c8cc">More...</a><br /></td></tr>
 <tr class="separator:a9fba44dd0dc1f2550d37ea58afc2c8cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcaa1ade72e80b4c3a5d0e3fea0e78d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#afcaa1ade72e80b4c3a5d0e3fea0e78d1">at</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;key) const</td></tr>
+<tr class="memdesc:afcaa1ade72e80b4c3a5d0e3fea0e78d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a mapping entry by identifier.  <a href="classhgps_1_1HierarchicalMapping.html#afcaa1ade72e80b4c3a5d0e3fea0e78d1">More...</a><br /></td></tr>
 <tr class="separator:afcaa1ade72e80b4c3a5d0e3fea0e78d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3511d8f0973d08228fdc0b98aaa4388"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#ae3511d8f0973d08228fdc0b98aaa4388">at_level</a> (int level) const noexcept</td></tr>
+<tr class="memdesc:ae3511d8f0973d08228fdc0b98aaa4388"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the mapping entries at a given hierarchical level.  <a href="classhgps_1_1HierarchicalMapping.html#ae3511d8f0973d08228fdc0b98aaa4388">More...</a><br /></td></tr>
 <tr class="separator:ae3511d8f0973d08228fdc0b98aaa4388"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9773bbbb829cd02f3901ea6d9726adee"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="classhgps_1_1MappingEntry.html">MappingEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a9773bbbb829cd02f3901ea6d9726adee">at_level_without_dynamic</a> (int level) const noexcept</td></tr>
+<tr class="memdesc:a9773bbbb829cd02f3901ea6d9726adee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the mapping entries at a given hierarchical level without the dynamic factor.  <a href="classhgps_1_1HierarchicalMapping.html#a9773bbbb829cd02f3901ea6d9726adee">More...</a><br /></td></tr>
 <tr class="separator:a9773bbbb829cd02f3901ea6d9726adee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42521a1ffb58c99f50cc027a01dd72b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a2bb8805579cb5dd67cf6d11beddb1367">IteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a42521a1ffb58c99f50cc027a01dd72b6">begin</a> () noexcept</td></tr>
+<tr class="memdesc:a42521a1ffb58c99f50cc027a01dd72b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an iterator to the beginning of the mappings.  <a href="classhgps_1_1HierarchicalMapping.html#a42521a1ffb58c99f50cc027a01dd72b6">More...</a><br /></td></tr>
 <tr class="separator:a42521a1ffb58c99f50cc027a01dd72b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a285df73129a0c108a8cce8fc3e0dc583"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a2bb8805579cb5dd67cf6d11beddb1367">IteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a285df73129a0c108a8cce8fc3e0dc583">end</a> () noexcept</td></tr>
+<tr class="memdesc:a285df73129a0c108a8cce8fc3e0dc583"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an iterator to the element following the last mapping.  <a href="classhgps_1_1HierarchicalMapping.html#a285df73129a0c108a8cce8fc3e0dc583">More...</a><br /></td></tr>
 <tr class="separator:a285df73129a0c108a8cce8fc3e0dc583"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad55d54d4d41668e04fd17ae60b0e6f3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a41412c6034e86b6d909e0f024b9712d7">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#ad55d54d4d41668e04fd17ae60b0e6f3a">begin</a> () const noexcept</td></tr>
+<tr class="memdesc:ad55d54d4d41668e04fd17ae60b0e6f3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the beginning of the mappings.  <a href="classhgps_1_1HierarchicalMapping.html#ad55d54d4d41668e04fd17ae60b0e6f3a">More...</a><br /></td></tr>
 <tr class="separator:ad55d54d4d41668e04fd17ae60b0e6f3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3439d86c879883ac7a0ec9c64e77859b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a41412c6034e86b6d909e0f024b9712d7">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a3439d86c879883ac7a0ec9c64e77859b">end</a> () const noexcept</td></tr>
+<tr class="memdesc:a3439d86c879883ac7a0ec9c64e77859b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only iterator to the element following the last mapping.  <a href="classhgps_1_1HierarchicalMapping.html#a3439d86c879883ac7a0ec9c64e77859b">More...</a><br /></td></tr>
 <tr class="separator:a3439d86c879883ac7a0ec9c64e77859b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acebf3e7fef6b159b792cc56b999bbe46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a41412c6034e86b6d909e0f024b9712d7">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#acebf3e7fef6b159b792cc56b999bbe46">cbegin</a> () const noexcept</td></tr>
+<tr class="memdesc:acebf3e7fef6b159b792cc56b999bbe46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets an read-only iterator to the beginning of the mappings.  <a href="classhgps_1_1HierarchicalMapping.html#acebf3e7fef6b159b792cc56b999bbe46">More...</a><br /></td></tr>
 <tr class="separator:acebf3e7fef6b159b792cc56b999bbe46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29922c2914d593c06b03f0f9092fdd4c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a41412c6034e86b6d909e0f024b9712d7">ConstIteratorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalMapping.html#a29922c2914d593c06b03f0f9092fdd4c">cend</a> () const noexcept</td></tr>
+<tr class="memdesc:a29922c2914d593c06b03f0f9092fdd4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a read-only iterator to the element following the last mapping.  <a href="classhgps_1_1HierarchicalMapping.html#a29922c2914d593c06b03f0f9092fdd4c">More...</a><br /></td></tr>
 <tr class="separator:a29922c2914d593c06b03f0f9092fdd4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the hierarchical model mapping data type. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a41412c6034e86b6d909e0f024b9712d7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a41412c6034e86b6d909e0f024b9712d7">&#9670;&nbsp;</a></span>ConstIteratorType</h2>
 
@@ -148,6 +169,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>read-only hierarchical mappings iterator </p>
 
 </div>
 </div>
@@ -162,6 +185,8 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Hierarchical mappings iterator. </p>
 
 </div>
 </div>
@@ -207,6 +232,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1HierarchicalMapping.html" title="Defines the hierarchical model mapping data type.">HierarchicalMapping</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mapping</td><td>The collection of mapping entries </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -225,6 +258,21 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets a mapping entry by identifier. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td>The factor unique identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The factor mapping definition </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for identifier not found in the mappings collection. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -252,6 +300,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the mapping entries at a given hierarchical level. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>The hierarchical level </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The collection of mappings </dd></dl>
+
 </div>
 </div>
 <a id="a9773bbbb829cd02f3901ea6d9726adee"></a>
@@ -277,6 +334,15 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the mapping entries at a given hierarchical level without the dynamic factor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>The hierarchical level </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The collection of mappings without the dynamic factor </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -308,6 +374,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an read-only iterator to the beginning of the mappings. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first mapping </dd></dl>
+
 </div>
 </div>
 <a id="a42521a1ffb58c99f50cc027a01dd72b6"></a>
@@ -332,6 +401,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets an iterator to the beginning of the mappings. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first mapping </dd></dl>
 
 </div>
 </div>
@@ -358,6 +430,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets an read-only iterator to the beginning of the mappings. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the first mapping </dd></dl>
+
 </div>
 </div>
 <a id="a29922c2914d593c06b03f0f9092fdd4c"></a>
@@ -382,6 +457,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a read-only iterator to the element following the last mapping. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last mapping </dd></dl>
 
 </div>
 </div>
@@ -408,6 +486,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a read-only iterator to the element following the last mapping. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last mapping </dd></dl>
+
 </div>
 </div>
 <a id="a285df73129a0c108a8cce8fc3e0dc583"></a>
@@ -432,6 +513,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets an iterator to the element following the last mapping. </p>
+<dl class="section return"><dt>Returns</dt><dd>Iterator to the element following the last mapping </dd></dl>
 
 </div>
 </div>
@@ -458,6 +542,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the collection of mapping entries. </p>
+<dl class="section return"><dt>Returns</dt><dd>The mapping entries </dd></dl>
+
 </div>
 </div>
 <a id="a3a62fce052339229fcbcd60ee3d0db38"></a>
@@ -482,6 +569,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the collection of mapping entries without the dynamic factor. </p>
+<dl class="section return"><dt>Returns</dt><dd>The mapping entries without dynamic factor </dd></dl>
 
 </div>
 </div>
@@ -508,6 +598,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the maximum hierarchical level. </p>
+<dl class="section return"><dt>Returns</dt><dd>Maximum hierarchy level </dd></dl>
+
 </div>
 </div>
 <a id="aa6a60908ace47f76226acc16bb1304ea"></a>
@@ -532,6 +625,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the size of the mappings collection. </p>
+<dl class="section return"><dt>Returns</dt><dd>The mappings collection size </dd></dl>
 
 </div>
 </div>

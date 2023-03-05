@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the default production instance builders for full hierarchical regression models.">
 <polygon fill="#bfbfbf" stroke="black" points="434,-0.5 434,-30.5 598,-30.5 598,-0.5 434,-0.5"/>
 <text text-anchor="start" x="442" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::get_default_hierarchical</text>
 <text text-anchor="middle" x="516" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model_registry</text>

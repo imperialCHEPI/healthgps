@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the simulation run information.">
 <polygon fill="#bfbfbf" stroke="black" points="423,-6 423,-25 545,-25 545,-6 423,-6"/>
 <text text-anchor="middle" x="484" y="-13" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::run</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="271,-0.5 271,-30.5 387,-30.5 387,-0.5 271,-0.5"/>
 <text text-anchor="start" x="279" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="329" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>

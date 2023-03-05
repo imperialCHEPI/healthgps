@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1RuntimeContext.html#a143ba237af957e455b95b6dd01e463c0" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1RuntimeContext.html#a143ba237af957e455b95b6dd01e463c0" target="_top" xlink:title="Gets a read&#45;only reference to the population age range constraints.">
 <polygon fill="none" stroke="black" points="159,-49.5 159,-79.5 284,-79.5 284,-49.5 159,-49.5"/>
 <text text-anchor="start" x="167" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="221.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::age_range</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" target="_top" xlink:title="Gets a reference to the virtual population container.">
 <polygon fill="none" stroke="black" points="159,-0.5 159,-30.5 284,-30.5 284,-0.5 159,-0.5"/>
 <text text-anchor="start" x="167" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="221.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::population</text>

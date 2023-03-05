@@ -1,5 +1,5 @@
 <map id="hgps::ModelRunner::run" name="hgps::ModelRunner::run">
 <area shape="rect" id="node1" title="Run an experiment for baseline and intervention scenarios." alt="" coords="5,5,181,32"/>
-<area shape="rect" id="node2" href="$namespacehgps.html#ab2b14b7c8375878fec0c34135c0d7845" title=" " alt="" coords="453,5,597,32"/>
+<area shape="rect" id="node2" href="$namespacehgps.html#ab2b14b7c8375878fec0c34135c0d7845" title="Makes a finally instance." alt="" coords="453,5,597,32"/>
 <area shape="rect" id="node3" href="$classhgps_1_1ModelRunner.html#a7cff7c405b8ceaeadcbe2091e1f88375" title="Run an experiment for baseline scenario only." alt="" coords="229,31,405,57"/>
 </map>

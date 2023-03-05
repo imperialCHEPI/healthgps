@@ -8,5 +8,5 @@ var classhgps_1_1EventSubscriberHandler =
     [ "id", "classhgps_1_1EventSubscriberHandler.html#a77ba9804f56b8c65938e8e6499daed43", null ],
     [ "operator=", "classhgps_1_1EventSubscriberHandler.html#a3a4053e5e7cba4666aebba4e858830bb", null ],
     [ "operator=", "classhgps_1_1EventSubscriberHandler.html#a92f7c01dca25d8e5fd53d2b4ccedb4d5", null ],
-    [ "unregister", "classhgps_1_1EventSubscriberHandler.html#a48ec449957b6970b27995994c52738d1", null ]
+    [ "unsubscribe", "classhgps_1_1EventSubscriberHandler.html#accbcbfa91eee02a94c440162c5490ccd", null ]
 ];

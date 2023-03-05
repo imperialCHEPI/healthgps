@@ -1,11 +1,11 @@
 <map id="hgps::HealthGPS::update" name="hgps::HealthGPS::update">
 <area shape="rect" id="node1" title="Called to assign a new state to the model at current time." alt="" coords="5,195,188,222"/>
-<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" title=" " alt="" coords="241,5,407,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a0e888d326a217dcf378f1cb29eecf3b0" title=" " alt="" coords="241,71,407,112"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" title="Gets the experiment current run number." alt="" coords="241,5,407,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a0e888d326a217dcf378f1cb29eecf3b0" title="Gets a reference to the runtime metrics container." alt="" coords="241,71,407,112"/>
 <area shape="rect" id="node4" href="$classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" title="Gets the simulation name." alt="" coords="236,137,412,163"/>
-<area shape="rect" id="node6" href="$classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7" title=" " alt="" coords="241,188,407,229"/>
-<area shape="rect" id="node7" href="$classhgps_1_1RuntimeMetric.html#aa6633f66ca339f310d7e52292447005c" title=" " alt="" coords="245,253,403,295"/>
-<area shape="rect" id="node8" href="$classhgps_1_1RuntimeContext.html#a25badead30720b70f16be9776a13cbfa" title=" " alt="" coords="241,319,407,360"/>
-<area shape="rect" id="node9" href="$classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" title=" " alt="" coords="241,384,407,425"/>
-<area shape="rect" id="node5" href="$structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" title=" " alt="" coords="460,129,655,171"/>
+<area shape="rect" id="node6" href="$classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7" title="Publishes a polymorphic new message to the outside world synchronously." alt="" coords="241,188,407,229"/>
+<area shape="rect" id="node7" href="$classhgps_1_1RuntimeMetric.html#aa6633f66ca339f310d7e52292447005c" title="Resets the values of all metrics in the container to zero." alt="" coords="245,253,403,295"/>
+<area shape="rect" id="node8" href="$classhgps_1_1RuntimeContext.html#a25badead30720b70f16be9776a13cbfa" title="Sets the current simulation time value." alt="" coords="241,319,407,360"/>
+<area shape="rect" id="node9" href="$classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" title="Gets the current simulation time." alt="" coords="241,384,407,425"/>
+<area shape="rect" id="node5" href="$structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" title="Gets the simulation scenario identifier." alt="" coords="460,129,655,171"/>
 </map>

@@ -1,4 +1,4 @@
 <map id="hgps::core::DataTableColumnVisitor" name="hgps::core::DataTableColumnVisitor">
 <area shape="rect" id="node1" title="DataTable column visitor interface." alt="" coords="5,5,217,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1UnivariateVisitor.html" title=" " alt="" coords="26,95,197,121"/>
+<area shape="rect" id="node2" href="$classhgps_1_1UnivariateVisitor.html" title="Implements an core::UnivariateSummary visitor for core::DataTable columns." alt="" coords="26,95,197,121"/>
 </map>

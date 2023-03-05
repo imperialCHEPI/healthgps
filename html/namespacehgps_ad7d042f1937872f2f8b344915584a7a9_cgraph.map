@@ -1,11 +1,11 @@
 <map id="hgps::build_population_module" name="hgps::build_population_module">
-<area shape="rect" id="node1" title=" " alt="" coords="5,217,175,258"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" title=" " alt="" coords="242,5,413,32"/>
+<area shape="rect" id="node1" title="Builds a new instance of the PopulationModule using the given data infrastructure." alt="" coords="5,217,175,258"/>
+<area shape="rect" id="node2" href="$classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" title="Gets the experiment target country information." alt="" coords="242,5,413,32"/>
 <area shape="rect" id="node3" href="$classhgps_1_1core_1_1Datastore.html#a478f1c3eca4cd2166eb77d7d6488a569" title="Gets the population birth indicators for a country filtered by time." alt="" coords="247,57,408,98"/>
 <area shape="rect" id="node4" href="$classhgps_1_1core_1_1Datastore.html#a80544f7a15b4d8069e6013ad7df22c01" title="Gets the population mortality trend for a country filtered by time." alt="" coords="247,122,408,163"/>
 <area shape="rect" id="node5" href="$classhgps_1_1core_1_1Datastore.html#a18209be1995680018625c2276ad68853" title="Gets the population growth trend for a country filtered by time." alt="" coords="247,187,408,229"/>
-<area shape="rect" id="node6" href="$classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b" title=" " alt="" coords="229,253,425,280"/>
-<area shape="rect" id="node7" href="$classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3" title=" " alt="" coords="230,304,425,331"/>
-<area shape="rect" id="node8" href="$classhgps_1_1ModelInput.html#a4e4bfd49abcbe8999f611d2235fcef4e" title=" " alt="" coords="223,355,432,381"/>
-<area shape="rect" id="node9" href="$classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" title=" " alt="" coords="224,405,431,432"/>
+<area shape="rect" id="node6" href="$classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b" title="Gets a reference to the back&#45;end storage instance." alt="" coords="229,253,425,280"/>
+<area shape="rect" id="node7" href="$classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3" title="Gets the simulation experiment settings definition." alt="" coords="230,304,425,331"/>
+<area shape="rect" id="node8" href="$classhgps_1_1ModelInput.html#a4e4bfd49abcbe8999f611d2235fcef4e" title="Gets the experiment start time." alt="" coords="223,355,432,381"/>
+<area shape="rect" id="node9" href="$classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" title="Gets the experiment stop time." alt="" coords="224,405,431,432"/>
 </map>

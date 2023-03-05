@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1PopulationModule.html',''
 </div><!--header-->
 <div class="contents">
 
+<p>Implements the population demographic module data type.  
+ <a href="classhgps_1_1PopulationModule.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="demographic_8h_source.html">demographic.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::PopulationModule:</div>
@@ -110,6 +113,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac147a1bef3d0f565fb1d88a15dd93f80"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1PopulationModule.html#ac147a1bef3d0f565fb1d88a15dd93f80">PopulationModule</a> ()=delete</td></tr>
 <tr class="separator:ac147a1bef3d0f565fb1d88a15dd93f80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5a094dd2a3e5ff5c72026c018467993"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1PopulationModule.html#ab5a094dd2a3e5ff5c72026c018467993">PopulationModule</a> (std::map&lt; int, std::map&lt; int, <a class="el" href="structhgps_1_1PopulationRecord.html">PopulationRecord</a> &gt;&gt; &amp;&amp;pop_data, <a class="el" href="classhgps_1_1LifeTable.html">LifeTable</a> &amp;&amp;life_table)</td></tr>
+<tr class="memdesc:ab5a094dd2a3e5ff5c72026c018467993"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="classhgps_1_1PopulationModule.html" title="Implements the population demographic module data type.">PopulationModule</a> class.  <a href="classhgps_1_1PopulationModule.html#ab5a094dd2a3e5ff5c72026c018467993">More...</a><br /></td></tr>
 <tr class="separator:ab5a094dd2a3e5ff5c72026c018467993"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40eff4c9545bbe43ba01398a60d95be3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#a83afa32bfd6200f17a92e853e9585936">SimulationModuleType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1PopulationModule.html#a40eff4c9545bbe43ba01398a60d95be3">type</a> () const noexcept override</td></tr>
 <tr class="memdesc:a40eff4c9545bbe43ba01398a60d95be3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the module type identifier.  <a href="classhgps_1_1PopulationModule.html#a40eff4c9545bbe43ba01398a60d95be3">More...</a><br /></td></tr>
@@ -131,9 +135,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aee3e42276edae4477f41ca360b090323"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classhgps_1_1SimulationModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classhgps_1_1SimulationModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classhgps_1_1SimulationModule.html">hgps::SimulationModule</a></td></tr>
 <tr class="memitem:a1ac9dd186584e0d7a249537c3e088095 inherit pub_methods_classhgps_1_1SimulationModule"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModule.html#a1ac9dd186584e0d7a249537c3e088095">~SimulationModule</a> ()=default</td></tr>
+<tr class="memdesc:a1ac9dd186584e0d7a249537c3e088095 inherit pub_methods_classhgps_1_1SimulationModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> instance.  <a href="classhgps_1_1SimulationModule.html#a1ac9dd186584e0d7a249537c3e088095">More...</a><br /></td></tr>
 <tr class="separator:a1ac9dd186584e0d7a249537c3e088095 inherit pub_methods_classhgps_1_1SimulationModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implements the population demographic module data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac147a1bef3d0f565fb1d88a15dd93f80"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac147a1bef3d0f565fb1d88a15dd93f80">&#9670;&nbsp;</a></span>PopulationModule() <span class="overload">[1/2]</span></h2>
 
@@ -184,6 +191,15 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Initialise a new instance of the <a class="el" href="classhgps_1_1PopulationModule.html" title="Implements the population demographic module data type.">PopulationModule</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pop_data</td><td><a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> demographic trends table with year and age lookup </td></tr>
+    <tr><td class="paramname">life_table</td><td><a class="el" href="classhgps_1_1Population.html" title="Defines the virtual population data type.">Population</a> life trends table with births and deaths </td></tr>
+  </table>
+  </dd>
+</dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">

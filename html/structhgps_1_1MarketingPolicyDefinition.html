@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('structhgps_1_1MarketingPolicyDefinitio
 </div><!--header-->
 <div class="contents">
 
+<p>Marketing intervention definition data type.  
+ <a href="structhgps_1_1MarketingPolicyDefinition.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="marketing__scenario_8h_source.html">marketing_scenario.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for hgps::MarketingPolicyDefinition:</div>
@@ -106,16 +109,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a28b4157f3820feb84fa2acb5736418dc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1MarketingPolicyDefinition.html#a28b4157f3820feb84fa2acb5736418dc">MarketingPolicyDefinition</a> ()=delete</td></tr>
 <tr class="separator:a28b4157f3820feb84fa2acb5736418dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5da0379149be7e9fb251a62c4d6bba23"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1MarketingPolicyDefinition.html#a5da0379149be7e9fb251a62c4d6bba23">MarketingPolicyDefinition</a> (const <a class="el" href="structhgps_1_1PolicyInterval.html">PolicyInterval</a> &amp;period, const std::vector&lt; <a class="el" href="structhgps_1_1PolicyImpact.html">PolicyImpact</a> &gt; &amp;sorted_impacts)</td></tr>
+<tr class="memdesc:a5da0379149be7e9fb251a62c4d6bba23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="structhgps_1_1MarketingPolicyDefinition.html" title="Marketing intervention definition data type.">MarketingPolicyDefinition</a> structure.  <a href="structhgps_1_1MarketingPolicyDefinition.html#a5da0379149be7e9fb251a62c4d6bba23">More...</a><br /></td></tr>
 <tr class="separator:a5da0379149be7e9fb251a62c4d6bba23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a4dec0ee1c5ed56eb6c1cb52dd8c77b7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhgps_1_1PolicyInterval.html">PolicyInterval</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1MarketingPolicyDefinition.html#a4dec0ee1c5ed56eb6c1cb52dd8c77b7a">active_period</a></td></tr>
+<tr class="memdesc:a4dec0ee1c5ed56eb6c1cb52dd8c77b7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intervention active period.  <a href="structhgps_1_1MarketingPolicyDefinition.html#a4dec0ee1c5ed56eb6c1cb52dd8c77b7a">More...</a><br /></td></tr>
 <tr class="separator:a4dec0ee1c5ed56eb6c1cb52dd8c77b7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf46196089b02946104d0109efb18061"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structhgps_1_1PolicyImpact.html">PolicyImpact</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1MarketingPolicyDefinition.html#aaf46196089b02946104d0109efb18061">impacts</a></td></tr>
+<tr class="memdesc:aaf46196089b02946104d0109efb18061"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intervention impacts on risk factors.  <a href="structhgps_1_1MarketingPolicyDefinition.html#aaf46196089b02946104d0109efb18061">More...</a><br /></td></tr>
 <tr class="separator:aaf46196089b02946104d0109efb18061"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Marketing intervention definition data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a28b4157f3820feb84fa2acb5736418dc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a28b4157f3820feb84fa2acb5736418dc">&#9670;&nbsp;</a></span>MarketingPolicyDefinition() <span class="overload">[1/2]</span></h2>
 
@@ -175,6 +183,15 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialise a new instance of the <a class="el" href="structhgps_1_1MarketingPolicyDefinition.html" title="Marketing intervention definition data type.">MarketingPolicyDefinition</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">period</td><td>The implementation period </td></tr>
+    <tr><td class="paramname">sorted_impacts</td><td>The impacts on risk factors </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -190,6 +207,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Intervention active period. </p>
+
 </div>
 </div>
 <a id="aaf46196089b02946104d0109efb18061"></a>
@@ -203,6 +222,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Intervention impacts on risk factors. </p>
 
 </div>
 </div>

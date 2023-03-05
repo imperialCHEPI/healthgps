@@ -1,4 +1,4 @@
 <map id="hgps::MappingEntry::is_entity" name="hgps::MappingEntry::is_entity">
-<area shape="rect" id="node1" title=" " alt="" coords="204,5,355,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23" title=" " alt="" coords="5,5,156,47"/>
+<area shape="rect" id="node1" title="Determine whether this factor has an associated Person property, e.g. age." alt="" coords="204,5,355,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23" title="Gets the factor&#39;s associated Person property identifier." alt="" coords="5,5,156,47"/>
 </map>

@@ -102,15 +102,19 @@ $(document).ready(function(){initNavTree('structhgps_1_1PolicyInterval.html','')
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a037947a83581daadca68886ca23e8c09"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">PolicyInterval</a> (int start_at_time, std::optional&lt; int &gt; finish_at_time=std::nullopt)</td></tr>
+<tr class="memdesc:a037947a83581daadca68886ca23e8c09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="structhgps_1_1PolicyInterval.html" title="Defines the policy active interval.">PolicyInterval</a> structure.  <a href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">More...</a><br /></td></tr>
 <tr class="separator:a037947a83581daadca68886ca23e8c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a920ea4c319e42738ede74c2c5fd3f307"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">contains</a> (const int &amp;time) const noexcept</td></tr>
+<tr class="memdesc:a920ea4c319e42738ede74c2c5fd3f307"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether this interval contains a given time.  <a href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">More...</a><br /></td></tr>
 <tr class="separator:a920ea4c319e42738ede74c2c5fd3f307"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:aa55face98fcd876609f147e342ad6e32"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyInterval.html#aa55face98fcd876609f147e342ad6e32">start_time</a> {}</td></tr>
+<tr class="memdesc:aa55face98fcd876609f147e342ad6e32"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intervention start time.  <a href="structhgps_1_1PolicyInterval.html#aa55face98fcd876609f147e342ad6e32">More...</a><br /></td></tr>
 <tr class="separator:aa55face98fcd876609f147e342ad6e32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74513ff2bc12878aeb20923b4f3dd9b0"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structhgps_1_1PolicyInterval.html#a74513ff2bc12878aeb20923b4f3dd9b0">finish_time</a> {}</td></tr>
+<tr class="memdesc:a74513ff2bc12878aeb20923b4f3dd9b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The intervention finish time, if given, or no upper bound.  <a href="structhgps_1_1PolicyInterval.html#a74513ff2bc12878aeb20923b4f3dd9b0">More...</a><br /></td></tr>
 <tr class="separator:a74513ff2bc12878aeb20923b4f3dd9b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -150,6 +154,21 @@ Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Initialise a new instance of the <a class="el" href="structhgps_1_1PolicyInterval.html" title="Defines the policy active interval.">PolicyInterval</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_at_time</td><td>Intervention start time, inclusive </td></tr>
+    <tr><td class="paramname">finish_at_time</td><td>Intervention finish time, or no upper bound </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>for policy with negative start time or finishing before start time </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -176,6 +195,15 @@ Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether this interval contains a given time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time</td><td>The time to check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the time is in the interval range; otherwise, false. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -197,6 +225,8 @@ Here is the caller graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
+<p>The intervention finish time, if given, or no upper bound. </p>
+
 </div>
 </div>
 <a id="aa55face98fcd876609f147e342ad6e32"></a>
@@ -210,6 +240,8 @@ Here is the caller graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>The intervention start time. </p>
 
 </div>
 </div>

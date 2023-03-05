@@ -1,4 +1,4 @@
 <map id="hgps::CachedRepository" name="hgps::CachedRepository">
-<area shape="rect" id="node1" title=" " alt="" coords="5,80,184,107"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Repository.html" title=" " alt="" coords="29,5,160,32"/>
+<area shape="rect" id="node1" title="Implements the cached data repository for input datasets and back&#45;end storage." alt="" coords="5,80,184,107"/>
+<area shape="rect" id="node2" href="$classhgps_1_1Repository.html" title="Define the data repository interface for input datasets and back&#45;end storage." alt="" coords="29,5,160,32"/>
 </map>

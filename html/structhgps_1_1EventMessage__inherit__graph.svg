@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Event message interface.">
+<g id="a_node1"><a xlink:title="Simulation event messages interface.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-57.5 0,-76.5 117,-76.5 117,-57.5 0,-57.5"/>
 <text text-anchor="middle" x="58.5" y="-64.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventMessage</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1ErrorEventMessage.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1ErrorEventMessage.html" target="_top" xlink:title="Implements the simulation error event message data type.">
 <polygon fill="none" stroke="black" points="159,-114.5 159,-133.5 299,-133.5 299,-114.5 159,-114.5"/>
 <text text-anchor="middle" x="229" y="-121.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ErrorEventMessage</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1InfoEventMessage.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1InfoEventMessage.html" target="_top" xlink:title="Implements the simulation information event message data type.">
 <polygon fill="none" stroke="black" points="161,-76.5 161,-95.5 297,-95.5 297,-76.5 161,-76.5"/>
 <text text-anchor="middle" x="229" y="-83.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::InfoEventMessage</text>
 </a>
@@ -50,7 +50,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1ResultEventMessage.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1ResultEventMessage.html" target="_top" xlink:title="Implements the simulation results event message data type.">
 <polygon fill="none" stroke="black" points="155,-38.5 155,-57.5 303,-57.5 303,-38.5 155,-38.5"/>
 <text text-anchor="middle" x="229" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultEventMessage</text>
 </a>
@@ -65,7 +65,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="structhgps_1_1RunnerEventMessage.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="structhgps_1_1RunnerEventMessage.html" target="_top" xlink:title="Implements the simulation executive event message data type.">
 <polygon fill="none" stroke="black" points="153,-0.5 153,-19.5 305,-19.5 305,-0.5 153,-0.5"/>
 <text text-anchor="middle" x="229" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RunnerEventMessage</text>
 </a>

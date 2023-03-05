@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1SimulationDefinition.html#a3d1a883a3a4b1c96fe90cb22b7dd9230" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1SimulationDefinition.html#a3d1a883a3a4b1c96fe90cb22b7dd9230" target="_top" xlink:title="Gets a reference to the simulation scenario instance.">
 <polygon fill="none" stroke="black" points="162,-39 162,-69 308,-69 308,-39 162,-39"/>
 <text text-anchor="start" x="170" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="235" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::scenario</text>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1Scenario.html#aa3dadbd9858a6668a9fdbbfc2a83d978" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1Scenario.html#aa3dadbd9858a6668a9fdbbfc2a83d978" target="_top" xlink:title="Gets the scenario type identifier.">
 <polygon fill="none" stroke="black" points="177,-0.5 177,-19.5 293,-19.5 293,-0.5 177,-0.5"/>
 <text text-anchor="middle" x="235" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Scenario::type</text>
 </a>

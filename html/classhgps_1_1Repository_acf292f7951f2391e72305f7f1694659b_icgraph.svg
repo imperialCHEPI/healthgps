@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a reference to the back&#45;end storage instance.">
 <polygon fill="#bfbfbf" stroke="black" points="434,-30 434,-49 581,-49 581,-30 434,-30"/>
 <text text-anchor="middle" x="507.5" y="-37" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::manager</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="276.5,-49.5 276.5,-79.5 392.5,-79.5 392.5,-49.5 276.5,-49.5"/>
 <text text-anchor="start" x="284.5" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="334.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -36,7 +36,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" target="_top" xlink:title="Builds a new instance of the PopulationModule using the given data infrastructure.">
 <polygon fill="none" stroke="black" points="271,-0.5 271,-30.5 398,-30.5 398,-0.5 271,-0.5"/>
 <text text-anchor="start" x="279" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_population</text>
 <text text-anchor="middle" x="334.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>

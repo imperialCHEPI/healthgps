@@ -328,7 +328,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574" target="_top" xlink:title="Gets the factor name.">
 <polygon fill="none" stroke="black" points="286,-868.5 286,-898.5 399,-898.5 399,-868.5 286,-868.5"/>
 <text text-anchor="start" x="294" y="-886.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MappingEntry</text>
 <text text-anchor="middle" x="342.5" y="-875.5" font-family="Helvetica,sans-Serif" font-size="10.00">::name</text>
@@ -344,7 +344,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" target="_top" xlink:title="Advances the engine&#39;s state by a specified amount.">
 <polygon fill="none" stroke="black" points="456,-956 456,-975 611,-975 611,-956 456,-956"/>
 <text text-anchor="middle" x="533.5" y="-963" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MTRandom32::discard</text>
 </a>
@@ -375,7 +375,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" target="_top" xlink:title="Gets the user custom seed to initialise the pseudo&#45;number generator.">
 <polygon fill="none" stroke="black" points="468.5,-1120 468.5,-1139 598.5,-1139 598.5,-1120 468.5,-1120"/>
 <text text-anchor="middle" x="533.5" y="-1127" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::seed</text>
 </a>
@@ -427,7 +427,7 @@
 <!-- Node20 -->
 <g id="node20" class="node">
 <title>Node20</title>
-<g id="a_node20"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title=" ">
+<g id="a_node20"><a xlink:href="namespacehgps.html#a00f39dc81f9c78a17b520811df508289" target="_top" xlink:title="Builds a new instance of the AnalysisModule using the given data infrastructure.">
 <polygon fill="none" stroke="red" points="284.5,-147.5 284.5,-177.5 400.5,-177.5 400.5,-147.5 284.5,-147.5"/>
 <text text-anchor="start" x="292.5" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_analysis</text>
 <text text-anchor="middle" x="342.5" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -443,7 +443,7 @@
 <!-- Node29 -->
 <g id="node24" class="node">
 <title>Node29</title>
-<g id="a_node24"><a xlink:href="namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" target="_top" xlink:title="Builds a new instance of the DiseaseModule using the given data infrastructure.">
 <polygon fill="none" stroke="red" points="286,-98.5 286,-128.5 399,-128.5 399,-98.5 286,-98.5"/>
 <text text-anchor="start" x="294" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_disease</text>
 <text text-anchor="middle" x="342.5" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -459,7 +459,7 @@
 <!-- Node34 -->
 <g id="node25" class="node">
 <title>Node34</title>
-<g id="a_node25"><a xlink:href="namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" target="_top" xlink:title=" ">
+<g id="a_node25"><a xlink:href="namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" target="_top" xlink:title="Builds a new instance of the PopulationModule using the given data infrastructure.">
 <polygon fill="none" stroke="red" points="279,-294.5 279,-324.5 406,-324.5 406,-294.5 279,-294.5"/>
 <text text-anchor="start" x="287" y="-312.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::build_population</text>
 <text text-anchor="middle" x="342.5" y="-301.5" font-family="Helvetica,sans-Serif" font-size="10.00">_module</text>
@@ -507,7 +507,7 @@
 <!-- Node21 -->
 <g id="node21" class="node">
 <title>Node21</title>
-<g id="a_node21"><a xlink:href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" target="_top" xlink:title=" ">
+<g id="a_node21"><a xlink:href="classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" target="_top" xlink:title="The experiment population age range constraint.">
 <polygon fill="none" stroke="black" points="478.5,-54.5 478.5,-84.5 588.5,-84.5 588.5,-54.5 478.5,-54.5"/>
 <text text-anchor="start" x="486.5" y="-72.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Settings::age</text>
 <text text-anchor="middle" x="533.5" y="-61.5" font-family="Helvetica,sans-Serif" font-size="10.00">_range</text>
@@ -523,7 +523,7 @@
 <!-- Node22 -->
 <g id="node22" class="node">
 <title>Node22</title>
-<g id="a_node22"><a xlink:href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" target="_top" xlink:title=" ">
+<g id="a_node22"><a xlink:href="classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" target="_top" xlink:title="Gets the experiment target country information.">
 <polygon fill="none" stroke="black" points="469.5,-153 469.5,-172 597.5,-172 597.5,-153 469.5,-153"/>
 <text text-anchor="middle" x="533.5" y="-160" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Settings::country</text>
 </a>
@@ -814,7 +814,7 @@
 <!-- Node74 -->
 <g id="node47" class="node">
 <title>Node74</title>
-<g id="a_node47"><a xlink:href="classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" target="_top" xlink:title=" ">
+<g id="a_node47"><a xlink:href="classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" target="_top" xlink:title="Register a user provided baseline risk factors adjustments dataset.">
 <polygon fill="none" stroke="black" points="450,-410 450,-451 617,-451 617,-410 450,-410"/>
 <text text-anchor="start" x="458" y="-439" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::CachedRepository</text>
 <text text-anchor="start" x="458" y="-428" font-family="Helvetica,sans-Serif" font-size="10.00">::register_baseline_adjustment</text>
@@ -831,7 +831,7 @@
 <!-- Node75 -->
 <g id="node48" class="node">
 <title>Node75</title>
-<g id="a_node48"><a xlink:href="classhgps_1_1CachedRepository.html#a1dfd738feecb0a9ffc366f462155fd82" target="_top" xlink:title=" ">
+<g id="a_node48"><a xlink:href="classhgps_1_1CachedRepository.html#a1dfd738feecb0a9ffc366f462155fd82" target="_top" xlink:title="Register a user provided full hierarchical linear model definition.">
 <polygon fill="none" stroke="black" points="466.5,-350 466.5,-391 600.5,-391 600.5,-350 466.5,-350"/>
 <text text-anchor="start" x="474.5" y="-379" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::CachedRepository</text>
 <text text-anchor="start" x="474.5" y="-368" font-family="Helvetica,sans-Serif" font-size="10.00">::register_linear_model</text>
@@ -848,7 +848,7 @@
 <!-- Node76 -->
 <g id="node49" class="node">
 <title>Node76</title>
-<g id="a_node49"><a xlink:href="classhgps_1_1CachedRepository.html#a1424cbd34a6f00fdb9e4237495e18b18" target="_top" xlink:title=" ">
+<g id="a_node49"><a xlink:href="classhgps_1_1CachedRepository.html#a1424cbd34a6f00fdb9e4237495e18b18" target="_top" xlink:title="Register a user provided lite hierarchical linear model definition.">
 <polygon fill="none" stroke="black" points="466.5,-290 466.5,-331 600.5,-331 600.5,-290 466.5,-290"/>
 <text text-anchor="start" x="474.5" y="-319" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::CachedRepository</text>
 <text text-anchor="start" x="474.5" y="-308" font-family="Helvetica,sans-Serif" font-size="10.00">::register_lite_linear</text>

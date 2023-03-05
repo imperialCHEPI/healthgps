@@ -1,6 +1,6 @@
 <map id="hgps::DiseaseHostModule" name="hgps::DiseaseHostModule">
 <area shape="rect" id="node1" title="Generic disease module interface to host multiple disease models." alt="" coords="5,155,196,181"/>
-<area shape="rect" id="node4" href="$classhgps_1_1DiseaseModule.html" title=" " alt="" coords="20,229,181,256"/>
+<area shape="rect" id="node4" href="$classhgps_1_1DiseaseModule.html" title="Defines the disease module container to hold disease models." alt="" coords="20,229,181,256"/>
 <area shape="rect" id="node2" href="$classhgps_1_1UpdatableModule.html" title="Generic disease module interface to host multiple diseases model." alt="" coords="13,80,189,107"/>
 <area shape="rect" id="node3" href="$classhgps_1_1SimulationModule.html" title="Simulation modules interface." alt="" coords="11,5,190,32"/>
 </map>

@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1EnergyBalanceHierarchical
 </div><!--header-->
 <div class="contents">
 
+<p>Implements the dynamic hierarchical linear model (energy balance) type.  
+ <a href="classhgps_1_1EnergyBalanceHierarchicalModel.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="energy__balance__model_8h_source.html">energy_balance_model.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::EnergyBalanceHierarchicalModel:</div>
@@ -110,6 +113,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a42fa33e6d4cf192081e1d9b337dcba65"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html#a42fa33e6d4cf192081e1d9b337dcba65">EnergyBalanceHierarchicalModel</a> ()=delete</td></tr>
 <tr class="separator:a42fa33e6d4cf192081e1d9b337dcba65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6eada7ad2abb587459a416d1c1ecd04a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html#a6eada7ad2abb587459a416d1c1ecd04a">EnergyBalanceHierarchicalModel</a> (<a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html">LiteHierarchicalModelDefinition</a> &amp;definition)</td></tr>
+<tr class="memdesc:a6eada7ad2abb587459a416d1c1ecd04a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html" title="Implements the dynamic hierarchical linear model (energy balance) type.">EnergyBalanceHierarchicalModel</a> class.  <a href="classhgps_1_1EnergyBalanceHierarchicalModel.html#a6eada7ad2abb587459a416d1c1ecd04a">More...</a><br /></td></tr>
 <tr class="separator:a6eada7ad2abb587459a416d1c1ecd04a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01249ce5f6a7ca8078f7b97ec12b2c8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html#a01249ce5f6a7ca8078f7b97ec12b2c8a">type</a> () const noexcept override</td></tr>
 <tr class="memdesc:a01249ce5f6a7ca8078f7b97ec12b2c8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the model type identifier.  <a href="classhgps_1_1EnergyBalanceHierarchicalModel.html#a01249ce5f6a7ca8078f7b97ec12b2c8a">More...</a><br /></td></tr>
@@ -125,9 +129,13 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3b51c4a34acc3382b17d6c251884e619"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classhgps_1_1HierarchicalLinearModel"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classhgps_1_1HierarchicalLinearModel')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classhgps_1_1HierarchicalLinearModel.html">hgps::HierarchicalLinearModel</a></td></tr>
 <tr class="memitem:a84ec9960216c32a12cdc74708de80557 inherit pub_methods_classhgps_1_1HierarchicalLinearModel"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1HierarchicalLinearModel.html#a84ec9960216c32a12cdc74708de80557">~HierarchicalLinearModel</a> ()=default</td></tr>
+<tr class="memdesc:a84ec9960216c32a12cdc74708de80557 inherit pub_methods_classhgps_1_1HierarchicalLinearModel"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1HierarchicalLinearModel.html" title="Hierarchical linear model interface.">HierarchicalLinearModel</a> instance.  <a href="classhgps_1_1HierarchicalLinearModel.html#a84ec9960216c32a12cdc74708de80557">More...</a><br /></td></tr>
 <tr class="separator:a84ec9960216c32a12cdc74708de80557 inherit pub_methods_classhgps_1_1HierarchicalLinearModel"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implements the dynamic hierarchical linear model (energy balance) type. </p>
+<p>The dynamic model is used to advance the virtual population over time. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a42fa33e6d4cf192081e1d9b337dcba65"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a42fa33e6d4cf192081e1d9b337dcba65">&#9670;&nbsp;</a></span>EnergyBalanceHierarchicalModel() <span class="overload">[1/2]</span></h2>
 
@@ -169,6 +177,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html" title="Implements the dynamic hierarchical linear model (energy balance) type.">EnergyBalanceHierarchicalModel</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">definition</td><td>The model definition instance </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -200,6 +216,12 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">context</td><td>The simulation run-time context </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::logic_error</td><td>the dynamic model does not generate risk factors. </td></tr>
   </table>
   </dd>
 </dl>

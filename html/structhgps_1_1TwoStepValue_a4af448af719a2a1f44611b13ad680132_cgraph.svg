@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Creates a new instance from this contents.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-24.5 0,-54.5 113,-54.5 113,-24.5 0,-24.5"/>
 <text text-anchor="start" x="8" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::TwoStepValue</text>
 <text text-anchor="middle" x="56.5" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">::clone</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1TwoStepValue.html#ad3831951728fc04604a7a22298b47e24" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1TwoStepValue.html#ad3831951728fc04604a7a22298b47e24" target="_top" xlink:title="Gets the previous value.">
 <polygon fill="none" stroke="black" points="149,-49.5 149,-79.5 262,-79.5 262,-49.5 149,-49.5"/>
 <text text-anchor="start" x="157" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::TwoStepValue</text>
 <text text-anchor="middle" x="205.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::old_value</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1TwoStepValue.html#a5b75e5bf206eb1568eb899af2a37362f" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1TwoStepValue.html#a5b75e5bf206eb1568eb899af2a37362f" target="_top" xlink:title="Gets the current value.">
 <polygon fill="none" stroke="black" points="149,-0.5 149,-30.5 262,-30.5 262,-0.5 149,-0.5"/>
 <text text-anchor="start" x="157" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::TwoStepValue</text>
 <text text-anchor="middle" x="205.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::value</text>

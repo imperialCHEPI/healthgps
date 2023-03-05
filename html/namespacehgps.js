@@ -202,10 +202,11 @@ var namespacehgps =
     [ "operator>", "namespacehgps.html#a29a13330f3ff2e03901be85a54d11aeb", null ],
     [ "parse_fiscal_impact_type", "namespacehgps.html#adf9e6a1bb7098d2f9a2fd6c49d575fe1", null ],
     [ "weight_category_to_string", "namespacehgps.html#a556be039a522e5c5c7d3d86d81d7b972", null ],
-    [ "CHILD_EFFECT", "namespacehgps.html#a94b6feef3ad0120e2495bd089cb2a232", null ],
     [ "DALY_UNITS", "namespacehgps.html#a59b5b82ef39ccaee2cc0e8af8a770554", null ],
-    [ "FORMER", "namespacehgps.html#a93cdb308bc88947518c2a85d0cf3a802", null ],
+    [ "FOP_NO_EFFECT", "namespacehgps.html#a8fb28060609101e93dcb096eb68ccfb3", null ],
     [ "InterceptKey", "namespacehgps.html#afa44429805266379f88b975fe9945814", null ],
-    [ "NEVER", "namespacehgps.html#af0007725162f634f9e26fe882a7fa95a", null ],
-    [ "NO_EFFECT", "namespacehgps.html#a74618e2d4a8894df47a9d043d8abb17f", null ]
+    [ "MARKETING_FORMER", "namespacehgps.html#ad3efc1c33286bb05fcaf6872bc2f7035", null ],
+    [ "MARKETING_NEVER", "namespacehgps.html#a33fc239261aa24ae6b9dd261f75ce4d1", null ],
+    [ "PA_CHILD_EFFECT", "namespacehgps.html#ab24327998275a58b5a265a64a87d7571", null ],
+    [ "PA_NO_EFFECT", "namespacehgps.html#a996be84890d28b5b02683c0f04669836", null ]
 ];

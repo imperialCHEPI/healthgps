@@ -11,7 +11,7 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="classhgps_1_1Repository.html" target="_top" xlink:title=" ">
+<g id="a_node1"><a xlink:href="classhgps_1_1Repository.html" target="_top" xlink:title="Define the data repository interface for input datasets and back&#45;end storage.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-19.5 98,-19.5 98,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="49" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node1 -->
 <g id="node2" class="node">
 <title>Node1</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1CachedRepository.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1CachedRepository.html" target="_top" xlink:title="Implements the cached data repository for input datasets and back&#45;end storage.">
 <polygon fill="none" stroke="black" points="134,-0.5 134,-19.5 268,-19.5 268,-0.5 134,-0.5"/>
 <text text-anchor="middle" x="201" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::CachedRepository</text>
 </a>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Determine whether the MLS definition is empty.">
 <polygon fill="#bfbfbf" stroke="black" points="170,-0.5 170,-30.5 283,-30.5 283,-0.5 170,-0.5"/>
 <text text-anchor="start" x="178" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::LmsDefinition</text>
 <text text-anchor="middle" x="226.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::empty</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1CachedRepository.html#a7b70461d2dc452446970642e1409e9b1" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1CachedRepository.html#a7b70461d2dc452446970642e1409e9b1" target="_top" xlink:title="Gets the LMS (lambda&#45;mu&#45;sigma) definition.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 134,-30.5 134,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::CachedRepository</text>
 <text text-anchor="middle" x="67" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::get_lms_definition</text>

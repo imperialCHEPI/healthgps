@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1UnivariateVisitor.html','
 </div><!--header-->
 <div class="contents">
 
+<p>Implements an <a class="el" href="classhgps_1_1core_1_1UnivariateSummary.html" title="Defines an univariate statistical summary data type.">core::UnivariateSummary</a> visitor for <a class="el" href="classhgps_1_1core_1_1DataTable.html" title="Defines a Datatable for in memory data class.">core::DataTable</a> columns.  
+ <a href="classhgps_1_1UnivariateVisitor.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="univariate__visitor_8h_source.html">univariate_visitor.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::UnivariateVisitor:</div>
@@ -108,6 +111,7 @@ Collaboration diagram for hgps::UnivariateVisitor:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a699e3c09b4d13a2828c8b958ef0ba5bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1core_1_1UnivariateSummary.html">core::UnivariateSummary</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1UnivariateVisitor.html#a699e3c09b4d13a2828c8b958ef0ba5bf">get_summary</a> ()</td></tr>
+<tr class="memdesc:a699e3c09b4d13a2828c8b958ef0ba5bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the resulting <a class="el" href="classhgps_1_1core_1_1UnivariateSummary.html" title="Defines an univariate statistical summary data type.">core::UnivariateSummary</a> instance.  <a href="classhgps_1_1UnivariateVisitor.html#a699e3c09b4d13a2828c8b958ef0ba5bf">More...</a><br /></td></tr>
 <tr class="separator:a699e3c09b4d13a2828c8b958ef0ba5bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc1e4dc5cafdbcf2ff2b8c4a10d8950f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1UnivariateVisitor.html#abc1e4dc5cafdbcf2ff2b8c4a10d8950f">visit</a> (const <a class="el" href="classhgps_1_1core_1_1StringDataTableColumn.html">core::StringDataTableColumn</a> &amp;column) override</td></tr>
 <tr class="memdesc:abc1e4dc5cafdbcf2ff2b8c4a10d8950f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Visits a column of StringDataTableColumn type.  <a href="classhgps_1_1UnivariateVisitor.html#abc1e4dc5cafdbcf2ff2b8c4a10d8950f">More...</a><br /></td></tr>
@@ -137,7 +141,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a86231e0c9489ca3d4ce0b7b886419d09 inherit pub_methods_classhgps_1_1core_1_1DataTableColumnVisitor"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1core_1_1DataTableColumnVisitor.html" title="DataTable column visitor interface.">DataTableColumnVisitor</a> instance.  <a href="classhgps_1_1core_1_1DataTableColumnVisitor.html#a86231e0c9489ca3d4ce0b7b886419d09">More...</a><br /></td></tr>
 <tr class="separator:a86231e0c9489ca3d4ce0b7b886419d09 inherit pub_methods_classhgps_1_1core_1_1DataTableColumnVisitor"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Implements an <a class="el" href="classhgps_1_1core_1_1UnivariateSummary.html" title="Defines an univariate statistical summary data type.">core::UnivariateSummary</a> visitor for <a class="el" href="classhgps_1_1core_1_1DataTable.html" title="Defines a Datatable for in memory data class.">core::DataTable</a> columns. </p>
+<p>Creates univariate statistical summaries for <a class="el" href="classhgps_1_1core_1_1DataTable.html" title="Defines a Datatable for in memory data class.">core::DataTable</a> columns of different data types. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a699e3c09b4d13a2828c8b958ef0ba5bf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a699e3c09b4d13a2828c8b958ef0ba5bf">&#9670;&nbsp;</a></span>get_summary()</h2>
 
@@ -152,6 +159,9 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets the resulting <a class="el" href="classhgps_1_1core_1_1UnivariateSummary.html" title="Defines an univariate statistical summary data type.">core::UnivariateSummary</a> instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>The univariate summary for visited column </dd></dl>
 
 </div>
 </div>
@@ -306,6 +316,12 @@ Here is the call graph for this function:</div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">column</td><td>The column instance </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>for unsupported summary for column type string. </td></tr>
   </table>
   </dd>
 </dl>

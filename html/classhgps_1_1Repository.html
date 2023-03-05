@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1Repository.html',''); ini
 </div><!--header-->
 <div class="contents">
 
+<p>Define the data repository interface for input datasets and back-end storage.  
+ <a href="classhgps_1_1Repository.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="repository_8h_source.html">repository.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::Repository:</div>
@@ -103,6 +106,7 @@ Inheritance diagram for hgps::Repository:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aeadadd1c2da82d7d82696c7a1daeb275"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#aeadadd1c2da82d7d82696c7a1daeb275">Repository</a> ()=default</td></tr>
+<tr class="memdesc:aeadadd1c2da82d7d82696c7a1daeb275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Repository.html" title="Define the data repository interface for input datasets and back-end storage.">Repository</a> class.  <a href="classhgps_1_1Repository.html#aeadadd1c2da82d7d82696c7a1daeb275">More...</a><br /></td></tr>
 <tr class="separator:aeadadd1c2da82d7d82696c7a1daeb275"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0ca52e077c3d75fa7c65b1c6bfd7d81"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#ab0ca52e077c3d75fa7c65b1c6bfd7d81">Repository</a> (<a class="el" href="classhgps_1_1Repository.html">Repository</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:ab0ca52e077c3d75fa7c65b1c6bfd7d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -113,25 +117,36 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a362256f00a8de1b70fac76b21cb706fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Repository.html">Repository</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a362256f00a8de1b70fac76b21cb706fd">operator=</a> (const <a class="el" href="classhgps_1_1Repository.html">Repository</a> &amp;)=delete</td></tr>
 <tr class="separator:a362256f00a8de1b70fac76b21cb706fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48ce63d9ac87de4531e9f4c03ae84429"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a48ce63d9ac87de4531e9f4c03ae84429">~Repository</a> ()=default</td></tr>
+<tr class="memdesc:a48ce63d9ac87de4531e9f4c03ae84429"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1Repository.html" title="Define the data repository interface for input datasets and back-end storage.">Repository</a> instance.  <a href="classhgps_1_1Repository.html#a48ce63d9ac87de4531e9f4c03ae84429">More...</a><br /></td></tr>
 <tr class="separator:a48ce63d9ac87de4531e9f4c03ae84429"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf292f7951f2391e72305f7f1694659b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1core_1_1Datastore.html">core::Datastore</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b">manager</a> () noexcept=0</td></tr>
+<tr class="memdesc:acf292f7951f2391e72305f7f1694659b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the back-end storage instance.  <a href="classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b">More...</a><br /></td></tr>
 <tr class="separator:acf292f7951f2391e72305f7f1694659b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a966ee2b3fe25f392fc0ab670a7c27d48"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html">HierarchicalLinearModelDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48">get_linear_model_definition</a> (const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;model_type)=0</td></tr>
+<tr class="memdesc:a966ee2b3fe25f392fc0ab670a7c27d48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user provided hierarchical linear model definition.  <a href="classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48">More...</a><br /></td></tr>
 <tr class="separator:a966ee2b3fe25f392fc0ab670a7c27d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0da5ff4b083b21f55709e410b5f72f39"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html">LiteHierarchicalModelDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39">get_lite_linear_model_definition</a> (const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;model_type)=0</td></tr>
+<tr class="memdesc:a0da5ff4b083b21f55709e410b5f72f39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user provided lite hierarchical linear model definition.  <a href="classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39">More...</a><br /></td></tr>
 <tr class="separator:a0da5ff4b083b21f55709e410b5f72f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42dfd811aa4396e140a126b50d3e5c74"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1BaselineAdjustment.html">BaselineAdjustment</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74">get_baseline_adjustment_definition</a> ()=0</td></tr>
+<tr class="memdesc:a42dfd811aa4396e140a126b50d3e5c74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user provided baseline risk factors adjustment dataset.  <a href="classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74">More...</a><br /></td></tr>
 <tr class="separator:a42dfd811aa4396e140a126b50d3e5c74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa74ef970db5953265c505770db643170"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#aa74ef970db5953265c505770db643170">get_diseases</a> ()=0</td></tr>
+<tr class="memdesc:aa74ef970db5953265c505770db643170"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the collection of all diseases available in the back-end storage.  <a href="classhgps_1_1Repository.html#aa74ef970db5953265c505770db643170">More...</a><br /></td></tr>
 <tr class="separator:aa74ef970db5953265c505770db643170"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a115c0ff9257b20dd7555132acb2619"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a5a115c0ff9257b20dd7555132acb2619">get_disease_info</a> (std::string code)=0</td></tr>
-<tr class="separator:a5a115c0ff9257b20dd7555132acb2619"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad11b424670ef4e0c3d93e999d86efa58"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#ad11b424670ef4e0c3d93e999d86efa58">get_disease_info</a> (<a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> code)=0</td></tr>
+<tr class="memdesc:ad11b424670ef4e0c3d93e999d86efa58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a disease information by identifier.  <a href="classhgps_1_1Repository.html#ad11b424670ef4e0c3d93e999d86efa58">More...</a><br /></td></tr>
+<tr class="separator:ad11b424670ef4e0c3d93e999d86efa58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a128ca9476585aa8ccae799158099a207"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a128ca9476585aa8ccae799158099a207">get_disease_definition</a> (const <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &amp;info, const <a class="el" href="classhgps_1_1ModelInput.html">ModelInput</a> &amp;config)=0</td></tr>
+<tr class="memdesc:a128ca9476585aa8ccae799158099a207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a disease complete definition.  <a href="classhgps_1_1Repository.html#a128ca9476585aa8ccae799158099a207">More...</a><br /></td></tr>
 <tr class="separator:a128ca9476585aa8ccae799158099a207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a480bc36a0f3c2ec07daabf862c0b0667"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1LmsDefinition.html">LmsDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667">get_lms_definition</a> ()=0</td></tr>
+<tr class="memdesc:a480bc36a0f3c2ec07daabf862c0b0667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the LMS (lambda-mu-sigma) definition.  <a href="classhgps_1_1Repository.html#a480bc36a0f3c2ec07daabf862c0b0667">More...</a><br /></td></tr>
 <tr class="separator:a480bc36a0f3c2ec07daabf862c0b0667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Define the data repository interface for input datasets and back-end storage. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aeadadd1c2da82d7d82696c7a1daeb275"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeadadd1c2da82d7d82696c7a1daeb275">&#9670;&nbsp;</a></span>Repository() <span class="overload">[1/3]</span></h2>
 
@@ -154,6 +169,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Repository.html" title="Define the data repository interface for input datasets and back-end storage.">Repository</a> class. </p>
 
 </div>
 </div>
@@ -232,6 +249,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Destroys a <a class="el" href="classhgps_1_1Repository.html" title="Define the data repository interface for input datasets and back-end storage.">Repository</a> instance. </p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -257,6 +276,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the user provided baseline risk factors adjustment dataset. </p>
+<dl class="section return"><dt>Returns</dt><dd>Baseline risk factors adjustments </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a8b141e296df99df2d3d33f13222af67f">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
@@ -301,6 +323,22 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets a disease complete definition. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">info</td><td>The disease information </td></tr>
+    <tr><td class="paramname">config</td><td>The user inputs instance </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease definition </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>for failure to load disease definition. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#ab7ed3831cc4d3e96ece4ee3c94b4f58d">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -310,8 +348,8 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="a5a115c0ff9257b20dd7555132acb2619"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a115c0ff9257b20dd7555132acb2619">&#9670;&nbsp;</a></span>get_disease_info()</h2>
+<a id="ad11b424670ef4e0c3d93e999d86efa58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad11b424670ef4e0c3d93e999d86efa58">&#9670;&nbsp;</a></span>get_disease_info()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -322,7 +360,7 @@ Here is the caller graph for this function:</div>
         <tr>
           <td class="memname">virtual std::optional&lt;<a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a>&gt; hgps::Repository::get_disease_info </td>
           <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
+          <td class="paramtype"><a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>&#160;</td>
           <td class="paramname"><em>code</em></td><td>)</td>
           <td></td>
         </tr>
@@ -334,11 +372,20 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#aff3045b1e8880931a9ffec8f0147c05c">hgps::CachedRepository</a>.</p>
+<p>Gets a disease information by identifier. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">code</td><td>The disease identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structhgps_1_1Disease.html" title="Defines the disease history data type.">Disease</a> information, if found; otherwise, empty </dd></dl>
+
+<p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a468350e697808e571187fb0c3d6e726f">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a5a115c0ff9257b20dd7555132acb2619_icgraph.svg" width="730" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_ad11b424670ef4e0c3d93e999d86efa58_icgraph.svg" width="730" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -365,6 +412,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the collection of all diseases available in the back-end storage. </p>
+<dl class="section return"><dt>Returns</dt><dd>Collection of diseases information </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#aa8bf88aea28b9f4b76776c6b4c0d87d9">hgps::CachedRepository</a>.</p>
 
@@ -393,6 +443,15 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the user provided hierarchical linear model definition. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">model_type</td><td>Hierarchical linear model type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The model definition </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#acc12f117f1e5b571d8b876eb14a2344a">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
@@ -427,6 +486,15 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the user provided lite hierarchical linear model definition. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">model_type</td><td>Hierarchical linear model type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The lite model definition </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a944cc0e80465c1cf038bcf22021deb83">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -459,6 +527,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the LMS (lambda-mu-sigma) definition. </p>
+<dl class="section return"><dt>Returns</dt><dd>The LMS definition </dd></dl>
+
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a7b70461d2dc452446970642e1409e9b1">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
@@ -490,6 +561,10 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets a reference to the back-end storage instance. </p>
+<dl class="section return"><dt>Returns</dt><dd>The back-end data storage <br  />
+ </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a43c5848339f059443370b4a0e228dadd">hgps::CachedRepository</a>.</p>
 <div class="dynheader">

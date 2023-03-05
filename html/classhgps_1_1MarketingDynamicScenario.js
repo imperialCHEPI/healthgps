@@ -7,6 +7,5 @@ var classhgps_1_1MarketingDynamicScenario =
     [ "channel", "classhgps_1_1MarketingDynamicScenario.html#abf75d74dcb9dac3f6381db3f07bf9253", null ],
     [ "clear", "classhgps_1_1MarketingDynamicScenario.html#aee09a9dca27a4c73e95e2493b465af43", null ],
     [ "dynamic", "classhgps_1_1MarketingDynamicScenario.html#a0d3056823b8c6d2f1188cace15d56495", null ],
-    [ "impacts", "classhgps_1_1MarketingDynamicScenario.html#ae1fc61d3826b19c0a5c8e48a9e83381b", null ],
-    [ "type", "classhgps_1_1MarketingDynamicScenario.html#aca032a31d691dde79fdc8436d8b024b7", null ]
+    [ "impacts", "classhgps_1_1MarketingDynamicScenario.html#ae1fc61d3826b19c0a5c8e48a9e83381b", null ]
 ];

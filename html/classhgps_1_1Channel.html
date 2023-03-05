@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1Channel.html',''); initRe
 </div><!--header-->
 <div class="contents">
 
+<p>Thread-safe communication channel data type.  
+ <a href="classhgps_1_1Channel.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="channel_8h_source.html">channel.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
@@ -105,8 +108,9 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abe0a77d397cdafdfb4ca13941ac3e200"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#abe0a77d397cdafdfb4ca13941ac3e200">Channel</a> (const <a class="el" href="classhgps_1_1Channel.html#acadd4e5d18ba30fdf66d88abdad48ad6">size_type</a> capacity=0)</td></tr>
-<tr class="separator:abe0a77d397cdafdfb4ca13941ac3e200"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d6db6df0b211680ad689384a44fbeed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a9d6db6df0b211680ad689384a44fbeed">Channel</a> (<a class="el" href="classhgps_1_1Channel.html#acadd4e5d18ba30fdf66d88abdad48ad6">size_type</a> capacity=0)</td></tr>
+<tr class="memdesc:a9d6db6df0b211680ad689384a44fbeed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Channel.html" title="Thread-safe communication channel data type.">Channel</a> class.  <a href="classhgps_1_1Channel.html#a9d6db6df0b211680ad689384a44fbeed">More...</a><br /></td></tr>
+<tr class="separator:a9d6db6df0b211680ad689384a44fbeed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b877371f941f27dd8959f011f360156"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a4b877371f941f27dd8959f011f360156">Channel</a> (const <a class="el" href="classhgps_1_1Channel.html">Channel</a> &amp;)=delete</td></tr>
 <tr class="separator:a4b877371f941f27dd8959f011f360156"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba42e1b6ffe71ec4eaef561726ecb1f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Channel.html">Channel</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#aba42e1b6ffe71ec4eaef561726ecb1f5">operator=</a> (const <a class="el" href="classhgps_1_1Channel.html">Channel</a> &amp;)=delete</td></tr>
@@ -116,23 +120,44 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a12f64fde940eb28122d1c581c08de0f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Channel.html">Channel</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a12f64fde940eb28122d1c581c08de0f5">operator=</a> (<a class="el" href="classhgps_1_1Channel.html">Channel</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:a12f64fde940eb28122d1c581c08de0f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ddeec95046aeacec4b82ed8ce1c2e67"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a3ddeec95046aeacec4b82ed8ce1c2e67">~Channel</a> ()=default</td></tr>
+<tr class="memdesc:a3ddeec95046aeacec4b82ed8ce1c2e67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1Channel.html" title="Thread-safe communication channel data type.">Channel</a> instance.  <a href="classhgps_1_1Channel.html#a3ddeec95046aeacec4b82ed8ce1c2e67">More...</a><br /></td></tr>
 <tr class="separator:a3ddeec95046aeacec4b82ed8ce1c2e67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afae9cca1a3634f26657de1798d34e462"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#afae9cca1a3634f26657de1798d34e462">send</a> (const <a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &amp;t)</td></tr>
-<tr class="separator:afae9cca1a3634f26657de1798d34e462"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac72f623bd7dc97f7bb00dd17f1e6a892"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#ac72f623bd7dc97f7bb00dd17f1e6a892">send</a> (<a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &amp;&amp;t)</td></tr>
-<tr class="separator:ac72f623bd7dc97f7bb00dd17f1e6a892"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0bb8b3760ca9e4a8aac6e5eae408aa0"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#ae0bb8b3760ca9e4a8aac6e5eae408aa0">try_receive</a> (const int timeout_millis=0)</td></tr>
-<tr class="separator:ae0bb8b3760ca9e4a8aac6e5eae408aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa520782301c3da49a80a6d004c7a8fe0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#aa520782301c3da49a80a6d004c7a8fe0">send</a> (const <a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &amp;message)</td></tr>
+<tr class="memdesc:aa520782301c3da49a80a6d004c7a8fe0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a new message through the channel by reference.  <a href="classhgps_1_1Channel.html#aa520782301c3da49a80a6d004c7a8fe0">More...</a><br /></td></tr>
+<tr class="separator:aa520782301c3da49a80a6d004c7a8fe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86f0479988032e2e11e2608cdcc1a7b2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a86f0479988032e2e11e2608cdcc1a7b2">send</a> (<a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &amp;&amp;message)</td></tr>
+<tr class="memdesc:a86f0479988032e2e11e2608cdcc1a7b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a new message through the channel.  <a href="classhgps_1_1Channel.html#a86f0479988032e2e11e2608cdcc1a7b2">More...</a><br /></td></tr>
+<tr class="separator:a86f0479988032e2e11e2608cdcc1a7b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac6733167c16768694bb2de8e6f7e4d0"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#aac6733167c16768694bb2de8e6f7e4d0">try_receive</a> (int timeout_millis=0)</td></tr>
+<tr class="memdesc:aac6733167c16768694bb2de8e6f7e4d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to receive a message from the channel.  <a href="classhgps_1_1Channel.html#aac6733167c16768694bb2de8e6f7e4d0">More...</a><br /></td></tr>
+<tr class="separator:aac6733167c16768694bb2de8e6f7e4d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91d85aef8fc9684df11639b896711b34"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classhgps_1_1Channel.html#acadd4e5d18ba30fdf66d88abdad48ad6">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a91d85aef8fc9684df11639b896711b34">size</a> () const noexcept</td></tr>
+<tr class="memdesc:a91d85aef8fc9684df11639b896711b34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current channel size, number of messages.  <a href="classhgps_1_1Channel.html#a91d85aef8fc9684df11639b896711b34">More...</a><br /></td></tr>
 <tr class="separator:a91d85aef8fc9684df11639b896711b34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4963dc7f452e2433cc4c47dfad51dbc"><td class="memItemLeft" align="right" valign="top">constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#ae4963dc7f452e2433cc4c47dfad51dbc">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:ae4963dc7f452e2433cc4c47dfad51dbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the channel is empty.  <a href="classhgps_1_1Channel.html#ae4963dc7f452e2433cc4c47dfad51dbc">More...</a><br /></td></tr>
 <tr class="separator:ae4963dc7f452e2433cc4c47dfad51dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36fb0805381f8dd7e6cb065d437e2056"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#a36fb0805381f8dd7e6cb065d437e2056">close</a> () noexcept</td></tr>
+<tr class="memdesc:a36fb0805381f8dd7e6cb065d437e2056"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close the channel, no new messages are accepted.  <a href="classhgps_1_1Channel.html#a36fb0805381f8dd7e6cb065d437e2056">More...</a><br /></td></tr>
 <tr class="separator:a36fb0805381f8dd7e6cb065d437e2056"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae57d1464f26a768f85e701bc0bd49ac6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Channel.html#ae57d1464f26a768f85e701bc0bd49ac6">closed</a> () const noexcept</td></tr>
+<tr class="memdesc:ae57d1464f26a768f85e701bc0bd49ac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the channel is closed.  <a href="classhgps_1_1Channel.html#ae57d1464f26a768f85e701bc0bd49ac6">More...</a><br /></td></tr>
 <tr class="separator:ae57d1464f26a768f85e701bc0bd49ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Typedef Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename T&gt;<br />
+class hgps::Channel&lt; T &gt;</h3>
+
+<p>Thread-safe communication channel data type. </p>
+<p>This channel has been designed specific to enable in-memory communication from the baseline to the intervention scenarios simulations. This is a hard modelling requirement, non-memory communication such as data streaming might offer more scalable alternative, including the option of running a single baseline and multiple interventions in parallel.</p>
+<dl class="section note"><dt>Note</dt><dd>Messages in the channel are kept in a FIFO queue to guarantee receive order for the intervention algorithm.</dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The channel data type </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="acadd4e5d18ba30fdf66d88abdad48ad6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acadd4e5d18ba30fdf66d88abdad48ad6">&#9670;&nbsp;</a></span>size_type</h2>
 
@@ -166,8 +191,8 @@ template&lt;typename T &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="abe0a77d397cdafdfb4ca13941ac3e200"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe0a77d397cdafdfb4ca13941ac3e200">&#9670;&nbsp;</a></span>Channel() <span class="overload">[1/3]</span></h2>
+<a id="a9d6db6df0b211680ad689384a44fbeed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d6db6df0b211680ad689384a44fbeed">&#9670;&nbsp;</a></span>Channel() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -180,7 +205,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classhgps_1_1Channel.html">hgps::Channel</a>&lt; T &gt;::<a class="el" href="classhgps_1_1Channel.html">Channel</a> </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classhgps_1_1Channel.html#acadd4e5d18ba30fdf66d88abdad48ad6">size_type</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classhgps_1_1Channel.html#acadd4e5d18ba30fdf66d88abdad48ad6">size_type</a>&#160;</td>
           <td class="paramname"><em>capacity</em> = <code>0</code></td><td>)</td>
           <td></td>
         </tr>
@@ -191,6 +216,14 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Channel.html" title="Thread-safe communication channel data type.">Channel</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">capacity</td><td>The channel capacity, if fixed; otherwise, unlimited </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -275,6 +308,8 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Destroys a <a class="el" href="classhgps_1_1Channel.html" title="Thread-safe communication channel data type.">Channel</a> instance. </p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -303,6 +338,8 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Close the channel, no new messages are accepted. </p>
+
 </div>
 </div>
 <a id="ae57d1464f26a768f85e701bc0bd49ac6"></a>
@@ -329,6 +366,9 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether the channel is closed. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the channel is closed; otherwise, false. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -361,6 +401,9 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether the channel is empty. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if there are no messages; otherwise, false. </dd></dl>
 
 </div>
 </div>
@@ -420,8 +463,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="afae9cca1a3634f26657de1798d34e462"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afae9cca1a3634f26657de1798d34e462">&#9670;&nbsp;</a></span>send() <span class="overload">[1/2]</span></h2>
+<a id="aa520782301c3da49a80a6d004c7a8fe0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa520782301c3da49a80a6d004c7a8fe0">&#9670;&nbsp;</a></span>send() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -435,7 +478,7 @@ template&lt;typename T &gt; </div>
           <td class="memname">bool <a class="el" href="classhgps_1_1Channel.html">hgps::Channel</a>&lt; T &gt;::send </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &amp;&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -446,10 +489,19 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Sends a new message through the channel by reference. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to send </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, the operation succeeded; otherwise false </dd></dl>
+
 </div>
 </div>
-<a id="ac72f623bd7dc97f7bb00dd17f1e6a892"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac72f623bd7dc97f7bb00dd17f1e6a892">&#9670;&nbsp;</a></span>send() <span class="overload">[2/2]</span></h2>
+<a id="a86f0479988032e2e11e2608cdcc1a7b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86f0479988032e2e11e2608cdcc1a7b2">&#9670;&nbsp;</a></span>send() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -463,7 +515,7 @@ template&lt;typename T &gt; </div>
           <td class="memname">bool <a class="el" href="classhgps_1_1Channel.html">hgps::Channel</a>&lt; T &gt;::send </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a> &amp;&amp;&#160;</td>
-          <td class="paramname"><em>t</em></td><td>)</td>
+          <td class="paramname"><em>message</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -473,6 +525,15 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Sends a new message through the channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">message</td><td>The message instance to send </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, the operation succeeded; otherwise false </dd></dl>
 
 </div>
 </div>
@@ -501,10 +562,13 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the current channel size, number of messages. </p>
+<dl class="section return"><dt>Returns</dt><dd>The channel size </dd></dl>
+
 </div>
 </div>
-<a id="ae0bb8b3760ca9e4a8aac6e5eae408aa0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0bb8b3760ca9e4a8aac6e5eae408aa0">&#9670;&nbsp;</a></span>try_receive()</h2>
+<a id="aac6733167c16768694bb2de8e6f7e4d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac6733167c16768694bb2de8e6f7e4d0">&#9670;&nbsp;</a></span>try_receive()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +581,7 @@ template&lt;typename T &gt; </div>
         <tr>
           <td class="memname">std::optional&lt;<a class="el" href="classhgps_1_1Channel.html#acef80cceb510e3e9d33833dd92d15b0b">value_type</a>&gt; <a class="el" href="classhgps_1_1Channel.html">hgps::Channel</a>&lt; T &gt;::try_receive </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>timeout_millis</em> = <code>0</code></td><td>)</td>
           <td></td>
         </tr>
@@ -528,10 +592,19 @@ template&lt;typename T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Try to receive a message from the channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timeout_millis</td><td>Max wait timeout, or zero for infinity </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The received message, if arrived; otherwise empty. </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Channel_ae0bb8b3760ca9e4a8aac6e5eae408aa0_cgraph.svg" width="363" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Channel_aac6733167c16768694bb2de8e6f7e4d0_cgraph.svg" width="363" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

@@ -4,9 +4,9 @@
 <area shape="rect" id="node3" href="$namespacehost.html#a4b5ca710f860350ad9e1d5b97fd7709c" title="Loads baseline adjustments information from a file." alt="" coords="281,62,429,103"/>
 <area shape="rect" id="node6" href="$namespacehost.html#a863b7fcd46376d19914cb6635cd20764" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="515,152,664,194"/>
 <area shape="rect" id="node8" href="$namespacehost.html#ad40efaaa78e97a0fdf3b2bce14d5aca8" title="Loads the full hierarchical linear regression model definition from a JSON file." alt="" coords="275,179,435,220"/>
-<area shape="rect" id="node9" href="$classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" title=" " alt="" coords="244,245,467,301"/>
-<area shape="rect" id="node10" href="$classhgps_1_1CachedRepository.html#a1dfd738feecb0a9ffc366f462155fd82" title=" " alt="" coords="266,325,445,381"/>
-<area shape="rect" id="node11" href="$classhgps_1_1CachedRepository.html#a1424cbd34a6f00fdb9e4237495e18b18" title=" " alt="" coords="266,405,445,461"/>
+<area shape="rect" id="node9" href="$classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" title="Register a user provided baseline risk factors adjustments dataset." alt="" coords="244,245,467,301"/>
+<area shape="rect" id="node10" href="$classhgps_1_1CachedRepository.html#a1dfd738feecb0a9ffc366f462155fd82" title="Register a user provided full hierarchical linear model definition." alt="" coords="266,325,445,381"/>
+<area shape="rect" id="node11" href="$classhgps_1_1CachedRepository.html#a1424cbd34a6f00fdb9e4237495e18b18" title="Register a user provided lite hierarchical linear model definition." alt="" coords="266,405,445,461"/>
 <area shape="rect" id="node4" href="$namespacehost.html#ae3e061207e4dd21d8c9e59710356c614" title="Loads the contents of baseline adjustments file into a table." alt="" coords="515,87,663,128"/>
 <area shape="rect" id="node5" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="738,102,891,129"/>
 <area shape="rect" id="node7" href="$namespacehgps_1_1core.html#a0a76cde29c0d40bf22469920121f2745" title="Splits a string into substrings based on specified delimiting characters." alt="" coords="730,160,899,186"/>

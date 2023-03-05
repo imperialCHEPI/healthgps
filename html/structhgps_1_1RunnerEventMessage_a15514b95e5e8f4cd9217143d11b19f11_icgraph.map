@@ -1,4 +1,4 @@
 <map id="hgps::RunnerEventMessage::to_string" name="hgps::RunnerEventMessage::to_string">
-<area shape="rect" id="node1" title=" " alt="" coords="199,5,401,47"/>
+<area shape="rect" id="node1" title="Create a string representation of this instance." alt="" coords="199,5,401,47"/>
 <area shape="rect" id="node2" href="$classhost_1_1EventMonitor.html#a63f197d878980d940542718b885c2d61" title="Visits a hgps::RunnerEventMessage message type." alt="" coords="5,5,151,47"/>
 </map>

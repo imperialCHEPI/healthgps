@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1EventSubscriber.html','')
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the event subscriber interface type.  
+ <a href="classhgps_1_1EventSubscriber.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="event__aggregator_8h_source.html">event_aggregator.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::EventSubscriber:</div>
@@ -103,6 +106,7 @@ Inheritance diagram for hgps::EventSubscriber:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a52021d320eec2210da40bd3c2ca14f2a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#a52021d320eec2210da40bd3c2ca14f2a">EventSubscriber</a> ()=default</td></tr>
+<tr class="memdesc:a52021d320eec2210da40bd3c2ca14f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1EventSubscriber.html" title="Defines the event subscriber interface type.">EventSubscriber</a> class.  <a href="classhgps_1_1EventSubscriber.html#a52021d320eec2210da40bd3c2ca14f2a">More...</a><br /></td></tr>
 <tr class="separator:a52021d320eec2210da40bd3c2ca14f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3368128833df14fd34cc672d7169d6a1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#a3368128833df14fd34cc672d7169d6a1">EventSubscriber</a> (const <a class="el" href="classhgps_1_1EventSubscriber.html">EventSubscriber</a> &amp;)=delete</td></tr>
 <tr class="separator:a3368128833df14fd34cc672d7169d6a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -113,13 +117,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab099b48fa3ca87b2b3e0f2cb21e3acd6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1EventSubscriber.html">EventSubscriber</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#ab099b48fa3ca87b2b3e0f2cb21e3acd6">operator=</a> (<a class="el" href="classhgps_1_1EventSubscriber.html">EventSubscriber</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:ab099b48fa3ca87b2b3e0f2cb21e3acd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ad7e149f2d9ce7d174faa81a06b18e1"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#a8ad7e149f2d9ce7d174faa81a06b18e1">~EventSubscriber</a> ()=default</td></tr>
+<tr class="memdesc:a8ad7e149f2d9ce7d174faa81a06b18e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1EventSubscriber.html" title="Defines the event subscriber interface type.">EventSubscriber</a> instance.  <a href="classhgps_1_1EventSubscriber.html#a8ad7e149f2d9ce7d174faa81a06b18e1">More...</a><br /></td></tr>
 <tr class="separator:a8ad7e149f2d9ce7d174faa81a06b18e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03abd844c6ebb4b8d1dd2679ac9d0c27"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#a03abd844c6ebb4b8d1dd2679ac9d0c27">unregister</a> () const =0</td></tr>
-<tr class="separator:a03abd844c6ebb4b8d1dd2679ac9d0c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc8f05f281eed0190d879012161be158"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#adc8f05f281eed0190d879012161be158">unsubscribe</a> () const =0</td></tr>
+<tr class="memdesc:adc8f05f281eed0190d879012161be158"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsubscribes from the event.  <a href="classhgps_1_1EventSubscriber.html#adc8f05f281eed0190d879012161be158">More...</a><br /></td></tr>
+<tr class="separator:adc8f05f281eed0190d879012161be158"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2c5a56bc02d880da0713c1467e0b4f0"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="structhgps_1_1EventHandlerIdentifier.html">EventHandlerIdentifier</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1EventSubscriber.html#aa2c5a56bc02d880da0713c1467e0b4f0">id</a> () const noexcept=0</td></tr>
+<tr class="memdesc:aa2c5a56bc02d880da0713c1467e0b4f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the subscriber unique identifier.  <a href="classhgps_1_1EventSubscriber.html#aa2c5a56bc02d880da0713c1467e0b4f0">More...</a><br /></td></tr>
 <tr class="separator:aa2c5a56bc02d880da0713c1467e0b4f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the event subscriber interface type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a52021d320eec2210da40bd3c2ca14f2a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a52021d320eec2210da40bd3c2ca14f2a">&#9670;&nbsp;</a></span>EventSubscriber() <span class="overload">[1/3]</span></h2>
 
@@ -142,6 +151,8 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1EventSubscriber.html" title="Defines the event subscriber interface type.">EventSubscriber</a> class. </p>
 
 </div>
 </div>
@@ -220,6 +231,8 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Destroys a <a class="el" href="classhgps_1_1EventSubscriber.html" title="Defines the event subscriber interface type.">EventSubscriber</a> instance. </p>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -245,6 +258,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the subscriber unique identifier. </p>
+<dl class="section return"><dt>Returns</dt><dd>The event handler identifier </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1EventSubscriberHandler.html#a77ba9804f56b8c65938e8e6499daed43">hgps::EventSubscriberHandler</a>.</p>
 <div class="dynheader">
@@ -307,8 +323,8 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="a03abd844c6ebb4b8d1dd2679ac9d0c27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03abd844c6ebb4b8d1dd2679ac9d0c27">&#9670;&nbsp;</a></span>unregister()</h2>
+<a id="adc8f05f281eed0190d879012161be158"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc8f05f281eed0190d879012161be158">&#9670;&nbsp;</a></span>unsubscribe()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -317,7 +333,7 @@ Here is the caller graph for this function:</div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void hgps::EventSubscriber::unregister </td>
+          <td class="memname">virtual void hgps::EventSubscriber::unsubscribe </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -330,7 +346,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classhgps_1_1EventSubscriberHandler.html#a48ec449957b6970b27995994c52738d1">hgps::EventSubscriberHandler</a>.</p>
+<p>Unsubscribes from the event. </p>
+
+<p>Implemented in <a class="el" href="classhgps_1_1EventSubscriberHandler.html#accbcbfa91eee02a94c440162c5490ccd">hgps::EventSubscriberHandler</a>.</p>
 
 </div>
 </div>

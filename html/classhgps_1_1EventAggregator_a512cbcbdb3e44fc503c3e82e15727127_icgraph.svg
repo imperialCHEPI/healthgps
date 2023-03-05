@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Unsubscribes from an event notification.">
 <polygon fill="#bfbfbf" stroke="black" points="398,-0.5 398,-30.5 526,-30.5 526,-0.5 398,-0.5"/>
 <text text-anchor="start" x="406" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventAggregator</text>
 <text text-anchor="middle" x="462" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::unsubscribe</text>
@@ -21,10 +21,10 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1EventSubscriberHandler.html#a48ec449957b6970b27995994c52738d1" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1EventSubscriberHandler.html#accbcbfa91eee02a94c440162c5490ccd" target="_top" xlink:title="Unsubscribes from the event.">
 <polygon fill="none" stroke="black" points="199,-0.5 199,-30.5 362,-30.5 362,-0.5 199,-0.5"/>
 <text text-anchor="start" x="207" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventSubscriberHandler</text>
-<text text-anchor="middle" x="280.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::unregister</text>
+<text text-anchor="middle" x="280.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::unsubscribe</text>
 </a>
 </g>
 </g>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1EventSubscriberHandler.html#af5731f07acbab064443c3450339ecc11" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1EventSubscriberHandler.html#af5731f07acbab064443c3450339ecc11" target="_top" xlink:title="Destroys a EventSubscriberHandler instance.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 163,-30.5 163,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventSubscriberHandler</text>
 <text text-anchor="middle" x="81.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::~EventSubscriberHandler</text>

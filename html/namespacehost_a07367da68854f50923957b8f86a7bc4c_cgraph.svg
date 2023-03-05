@@ -37,7 +37,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" target="_top" xlink:title="Gets the user custom seed to initialise the pseudo&#45;number generator.">
 <polygon fill="none" stroke="black" points="149,-0.5 149,-19.5 279,-19.5 279,-0.5 149,-0.5"/>
 <text text-anchor="middle" x="214" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::seed</text>
 </a>

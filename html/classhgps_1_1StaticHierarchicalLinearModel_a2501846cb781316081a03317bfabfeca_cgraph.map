@@ -1,6 +1,6 @@
 <map id="hgps::StaticHierarchicalLinearModel::update_risk_factors" name="hgps::StaticHierarchicalLinearModel::update_risk_factors">
 <area shape="rect" id="node1" title="Update risk factors for population." alt="" coords="5,63,192,119"/>
-<area shape="rect" id="node2" href="$classhgps_1_1HierarchicalMapping.html#a9773bbbb829cd02f3901ea6d9726adee" title=" " alt="" coords="240,5,441,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a6b4e9897cf7892cafa62def6cb5cdfcf" title=" " alt="" coords="257,71,424,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title=" " alt="" coords="257,136,424,177"/>
+<area shape="rect" id="node2" href="$classhgps_1_1HierarchicalMapping.html#a9773bbbb829cd02f3901ea6d9726adee" title="Gets the mapping entries at a given hierarchical level without the dynamic factor." alt="" coords="240,5,441,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a6b4e9897cf7892cafa62def6cb5cdfcf" title="Gets a read&#45;only reference to the hierarchical risk factors mapping." alt="" coords="257,71,424,112"/>
+<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="257,136,424,177"/>
 </map>

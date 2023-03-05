@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1LifeTable.html',''); init
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the population life table data type.  
+ <a href="classhgps_1_1LifeTable.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="life__table_8h_source.html">life_table.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,25 +103,36 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8fa59604ff8a17b71039006d5bfe7022"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a8fa59604ff8a17b71039006d5bfe7022">LifeTable</a> ()=delete</td></tr>
 <tr class="separator:a8fa59604ff8a17b71039006d5bfe7022"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85174f1a1b457b61b5952ae9137da98d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a85174f1a1b457b61b5952ae9137da98d">LifeTable</a> (std::map&lt; int, <a class="el" href="structhgps_1_1Birth.html">Birth</a> &gt; &amp;&amp;births, std::map&lt; int, std::map&lt; int, <a class="el" href="namespacehgps.html#a172fa7bfb9bc1612779c7ecdfefe6052">Mortality</a> &gt;&gt; &amp;&amp;deaths)</td></tr>
+<tr class="memdesc:a85174f1a1b457b61b5952ae9137da98d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> structure.  <a href="classhgps_1_1LifeTable.html#a85174f1a1b457b61b5952ae9137da98d">More...</a><br /></td></tr>
 <tr class="separator:a85174f1a1b457b61b5952ae9137da98d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af536e7961037007abeeeb1c424dd0d03"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1Birth.html">Birth</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#af536e7961037007abeeeb1c424dd0d03">get_births_at</a> (const int time_year) const</td></tr>
-<tr class="separator:af536e7961037007abeeeb1c424dd0d03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0129499adad689e44ea82ce82e9dcf04"><td class="memItemLeft" align="right" valign="top">const std::map&lt; int, <a class="el" href="namespacehgps.html#a172fa7bfb9bc1612779c7ecdfefe6052">Mortality</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a0129499adad689e44ea82ce82e9dcf04">get_mortalities_at</a> (const int time_year) const</td></tr>
-<tr class="separator:a0129499adad689e44ea82ce82e9dcf04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a0d53a8cc9421b8e1ced9abff4e6679"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a5a0d53a8cc9421b8e1ced9abff4e6679">get_total_deaths_at</a> (const int time_year) const</td></tr>
-<tr class="separator:a5a0d53a8cc9421b8e1ced9abff4e6679"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad98cf263a5bdba25a7224b927da89716"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#ad98cf263a5bdba25a7224b927da89716">contains_age</a> (const int age) const noexcept</td></tr>
-<tr class="separator:ad98cf263a5bdba25a7224b927da89716"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29b94bc51fc693a9b7905cd6a3176014"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a29b94bc51fc693a9b7905cd6a3176014">contains_time</a> (const int time_year) const noexcept</td></tr>
-<tr class="separator:a29b94bc51fc693a9b7905cd6a3176014"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2513a126c2846fa4b2a9a27076d17a3f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1Birth.html">Birth</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a2513a126c2846fa4b2a9a27076d17a3f">get_births_at</a> (int time_year) const</td></tr>
+<tr class="memdesc:a2513a126c2846fa4b2a9a27076d17a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the <a class="el" href="structhgps_1_1Birth.html" title="Define the birth data type.">Birth</a> indicators at a given time.  <a href="classhgps_1_1LifeTable.html#a2513a126c2846fa4b2a9a27076d17a3f">More...</a><br /></td></tr>
+<tr class="separator:a2513a126c2846fa4b2a9a27076d17a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad200f6ee9182041b0112d9bd15b858dd"><td class="memItemLeft" align="right" valign="top">const std::map&lt; int, <a class="el" href="namespacehgps.html#a172fa7bfb9bc1612779c7ecdfefe6052">Mortality</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#ad200f6ee9182041b0112d9bd15b858dd">get_mortalities_at</a> (int time_year) const</td></tr>
+<tr class="memdesc:ad200f6ee9182041b0112d9bd15b858dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the Mortality indicators at a given time.  <a href="classhgps_1_1LifeTable.html#ad200f6ee9182041b0112d9bd15b858dd">More...</a><br /></td></tr>
+<tr class="separator:ad200f6ee9182041b0112d9bd15b858dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6968286d5c7ce3630e6a9151aff5ed8"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#af6968286d5c7ce3630e6a9151aff5ed8">get_total_deaths_at</a> (int time_year) const</td></tr>
+<tr class="memdesc:af6968286d5c7ce3630e6a9151aff5ed8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the total number of deaths at a given time.  <a href="classhgps_1_1LifeTable.html#af6968286d5c7ce3630e6a9151aff5ed8">More...</a><br /></td></tr>
+<tr class="separator:af6968286d5c7ce3630e6a9151aff5ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dbc01952e6a7c6a1fd91028d18fd06f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a5dbc01952e6a7c6a1fd91028d18fd06f">contains_age</a> (int age) const noexcept</td></tr>
+<tr class="memdesc:a5dbc01952e6a7c6a1fd91028d18fd06f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data contains a given age.  <a href="classhgps_1_1LifeTable.html#a5dbc01952e6a7c6a1fd91028d18fd06f">More...</a><br /></td></tr>
+<tr class="separator:a5dbc01952e6a7c6a1fd91028d18fd06f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a783938014ce5fed27eb393999934d5b2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a783938014ce5fed27eb393999934d5b2">contains_time</a> (int time_year) const noexcept</td></tr>
+<tr class="memdesc:a783938014ce5fed27eb393999934d5b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data contains a given time.  <a href="classhgps_1_1LifeTable.html#a783938014ce5fed27eb393999934d5b2">More...</a><br /></td></tr>
+<tr class="separator:a783938014ce5fed27eb393999934d5b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1eeedafec56d98b192b4b4af0dcd19d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#aa1eeedafec56d98b192b4b4af0dcd19d">time_limits</a> () const noexcept</td></tr>
+<tr class="memdesc:aa1eeedafec56d98b192b4b4af0dcd19d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data time limits.  <a href="classhgps_1_1LifeTable.html#aa1eeedafec56d98b192b4b4af0dcd19d">More...</a><br /></td></tr>
 <tr class="separator:aa1eeedafec56d98b192b4b4af0dcd19d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a5874b9d68337c799d05f12f6a9f7d8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a3a5874b9d68337c799d05f12f6a9f7d8">age_limits</a> () const noexcept</td></tr>
+<tr class="memdesc:a3a5874b9d68337c799d05f12f6a9f7d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data age limits.  <a href="classhgps_1_1LifeTable.html#a3a5874b9d68337c799d05f12f6a9f7d8">More...</a><br /></td></tr>
 <tr class="separator:a3a5874b9d68337c799d05f12f6a9f7d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c892da22073f72a3cd9981e1e61cae0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LifeTable.html#a4c892da22073f72a3cd9981e1e61cae0">empty</a> () const noexcept</td></tr>
+<tr class="memdesc:a4c892da22073f72a3cd9981e1e61cae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine whether the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data is empty.  <a href="classhgps_1_1LifeTable.html#a4c892da22073f72a3cd9981e1e61cae0">More...</a><br /></td></tr>
 <tr class="separator:a4c892da22073f72a3cd9981e1e61cae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the population life table data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a8fa59604ff8a17b71039006d5bfe7022"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8fa59604ff8a17b71039006d5bfe7022">&#9670;&nbsp;</a></span>LifeTable() <span class="overload">[1/2]</span></h2>
 
@@ -170,6 +184,15 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> structure. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">births</td><td>Number of births per year </td></tr>
+    <tr><td class="paramname">deaths</td><td>Number of deaths per year and age </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -195,6 +218,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data age limits. </p>
+<dl class="section return"><dt>Returns</dt><dd>Data age limits </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -203,8 +229,8 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="ad98cf263a5bdba25a7224b927da89716"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad98cf263a5bdba25a7224b927da89716">&#9670;&nbsp;</a></span>contains_age()</h2>
+<a id="a5dbc01952e6a7c6a1fd91028d18fd06f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5dbc01952e6a7c6a1fd91028d18fd06f">&#9670;&nbsp;</a></span>contains_age()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -215,7 +241,7 @@ Here is the caller graph for this function:</div>
         <tr>
           <td class="memname">bool hgps::LifeTable::contains_age </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>age</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -227,10 +253,19 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Determine whether the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data contains a given age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>The age to check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data contains the age; otherwise, false. </dd></dl>
+
 </div>
 </div>
-<a id="a29b94bc51fc693a9b7905cd6a3176014"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a29b94bc51fc693a9b7905cd6a3176014">&#9670;&nbsp;</a></span>contains_time()</h2>
+<a id="a783938014ce5fed27eb393999934d5b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a783938014ce5fed27eb393999934d5b2">&#9670;&nbsp;</a></span>contains_time()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -241,7 +276,7 @@ Here is the caller graph for this function:</div>
         <tr>
           <td class="memname">bool hgps::LifeTable::contains_time </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>time_year</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -252,6 +287,15 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data contains a given time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_year</td><td>The time to check </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true, if the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data contains the time; otherwise, false. </dd></dl>
 
 </div>
 </div>
@@ -277,6 +321,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Determine whether the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data is empty. </p>
+<dl class="section return"><dt>Returns</dt><dd>true, if the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data is empty; otherwise, false. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -285,8 +332,8 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
-<a id="af536e7961037007abeeeb1c424dd0d03"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af536e7961037007abeeeb1c424dd0d03">&#9670;&nbsp;</a></span>get_births_at()</h2>
+<a id="a2513a126c2846fa4b2a9a27076d17a3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2513a126c2846fa4b2a9a27076d17a3f">&#9670;&nbsp;</a></span>get_births_at()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -294,17 +341,26 @@ Here is the caller graph for this function:</div>
         <tr>
           <td class="memname">const <a class="el" href="structhgps_1_1Birth.html">Birth</a> &amp; hgps::LifeTable::get_births_at </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>time_year</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Gets the <a class="el" href="structhgps_1_1Birth.html" title="Define the birth data type.">Birth</a> indicators at a given time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_year</td><td>Time of births </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="structhgps_1_1Birth.html" title="Define the birth data type.">Birth</a> indicator </dd></dl>
+
 </div>
 </div>
-<a id="a0129499adad689e44ea82ce82e9dcf04"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0129499adad689e44ea82ce82e9dcf04">&#9670;&nbsp;</a></span>get_mortalities_at()</h2>
+<a id="ad200f6ee9182041b0112d9bd15b858dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad200f6ee9182041b0112d9bd15b858dd">&#9670;&nbsp;</a></span>get_mortalities_at()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,22 +368,31 @@ Here is the caller graph for this function:</div>
         <tr>
           <td class="memname">const std::map&lt; int, <a class="el" href="namespacehgps.html#a172fa7bfb9bc1612779c7ecdfefe6052">Mortality</a> &gt; &amp; hgps::LifeTable::get_mortalities_at </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>time_year</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets the Mortality indicators at a given time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_year</td><td>Time of mortality </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The age associate Mortality indicators </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1LifeTable_a0129499adad689e44ea82ce82e9dcf04_icgraph.svg" width="355" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1LifeTable_ad200f6ee9182041b0112d9bd15b858dd_icgraph.svg" width="355" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
 </div>
-<a id="a5a0d53a8cc9421b8e1ced9abff4e6679"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a0d53a8cc9421b8e1ced9abff4e6679">&#9670;&nbsp;</a></span>get_total_deaths_at()</h2>
+<a id="af6968286d5c7ce3630e6a9151aff5ed8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6968286d5c7ce3630e6a9151aff5ed8">&#9670;&nbsp;</a></span>get_total_deaths_at()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -335,16 +400,25 @@ Here is the caller graph for this function:</div>
         <tr>
           <td class="memname">double hgps::LifeTable::get_total_deaths_at </td>
           <td>(</td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>time_year</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets the total number of deaths at a given time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_year</td><td>Time of deaths </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Total number of deaths </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1LifeTable_a5a0d53a8cc9421b8e1ced9abff4e6679_cgraph.svg" width="355" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1LifeTable_af6968286d5c7ce3630e6a9151aff5ed8_cgraph.svg" width="355" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -371,6 +445,9 @@ Here is the call graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the <a class="el" href="classhgps_1_1LifeTable.html" title="Defines the population life table data type.">LifeTable</a> data time limits. </p>
+<dl class="section return"><dt>Returns</dt><dd>Data time limits </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">

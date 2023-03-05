@@ -1,4 +1,4 @@
 <map id="hgps::Population::size" name="hgps::Population::size">
-<area shape="rect" id="node1" title=" " alt="" coords="232,13,396,39"/>
+<area shape="rect" id="node1" title="Gets the current size of the population." alt="" coords="232,13,396,39"/>
 <area shape="rect" id="node2" href="$classhgps_1_1PopulationModule.html#a2fa854bc1b6185fa06418677bf0c2ab8" title="Initialises the virtual population." alt="" coords="5,5,184,47"/>
 </map>

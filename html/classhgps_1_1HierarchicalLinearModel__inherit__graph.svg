@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1EnergyBalanceHierarchicalModel.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1EnergyBalanceHierarchicalModel.html" target="_top" xlink:title="Implements the dynamic hierarchical linear model (energy balance) type.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 177,-30.5 177,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EnergyBalanceHierarchical</text>
 <text text-anchor="middle" x="88.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">Model</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1StaticHierarchicalLinearModel.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1StaticHierarchicalLinearModel.html" target="_top" xlink:title="Implements the static hierarchical linear model type.">
 <polygon fill="none" stroke="black" points="195.5,-0.5 195.5,-30.5 327.5,-30.5 327.5,-0.5 195.5,-0.5"/>
 <text text-anchor="start" x="203.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::StaticHierarchical</text>
 <text text-anchor="middle" x="261.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">LinearModel</text>

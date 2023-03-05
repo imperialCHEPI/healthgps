@@ -93,12 +93,16 @@ $(document).ready(function(){initNavTree('classhgps_1_1Finally.html',''); initRe
 </div><!--header-->
 <div class="contents">
 
+<p>Define a scoped reset state data type.  
+ <a href="classhgps_1_1Finally.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="finally_8h_source.html">finally.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a2a1a2fe1bcd7fff379172319336ba4ab"><td class="memTemplParams" colspan="2">template&lt;typename Func &gt; </td></tr>
 <tr class="memitem:a2a1a2fe1bcd7fff379172319336ba4ab"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classhgps_1_1Finally.html#a2a1a2fe1bcd7fff379172319336ba4ab">Finally</a> (Func &amp;&amp;func)</td></tr>
+<tr class="memdesc:a2a1a2fe1bcd7fff379172319336ba4ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1Finally.html" title="Define a scoped reset state data type.">Finally</a> class.  <a href="classhgps_1_1Finally.html#a2a1a2fe1bcd7fff379172319336ba4ab">More...</a><br /></td></tr>
 <tr class="separator:a2a1a2fe1bcd7fff379172319336ba4ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51c196fc8807af5fbfbbeb25817cd328"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Finally.html#a51c196fc8807af5fbfbbeb25817cd328">Finally</a> (const <a class="el" href="classhgps_1_1Finally.html">Finally</a> &amp;)=delete</td></tr>
 <tr class="separator:a51c196fc8807af5fbfbbeb25817cd328"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,9 +113,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa398bbe95ebe92efefc034f7f9ffbf65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classhgps_1_1Finally.html">Finally</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Finally.html#aa398bbe95ebe92efefc034f7f9ffbf65">operator=</a> (<a class="el" href="classhgps_1_1Finally.html">Finally</a> &amp;&amp;)=delete</td></tr>
 <tr class="separator:aa398bbe95ebe92efefc034f7f9ffbf65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9c9041afcdb35254a82f820dc0c6695"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Finally.html#ab9c9041afcdb35254a82f820dc0c6695">~Finally</a> ()</td></tr>
+<tr class="memdesc:ab9c9041afcdb35254a82f820dc0c6695"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1Finally.html" title="Define a scoped reset state data type.">Finally</a> instance.  <a href="classhgps_1_1Finally.html#ab9c9041afcdb35254a82f820dc0c6695">More...</a><br /></td></tr>
 <tr class="separator:ab9c9041afcdb35254a82f820dc0c6695"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><h3>template&lt;typename F&gt;<br />
+class hgps::Finally&lt; F &gt;</h3>
+
+<p>Define a scoped reset state data type. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">F</td><td>The function to reset </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2a1a2fe1bcd7fff379172319336ba4ab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2a1a2fe1bcd7fff379172319336ba4ab">&#9670;&nbsp;</a></span>Finally() <span class="overload">[1/3]</span></h2>
 
@@ -139,6 +155,20 @@ template&lt;typename Func &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1Finally.html" title="Define a scoped reset state data type.">Finally</a> class. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Func</td><td>Functor type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">func</td><td>The functor instance </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -222,6 +252,8 @@ template&lt;typename F &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destroys a <a class="el" href="classhgps_1_1Finally.html" title="Define a scoped reset state data type.">Finally</a> instance. </p>
 
 </div>
 </div>

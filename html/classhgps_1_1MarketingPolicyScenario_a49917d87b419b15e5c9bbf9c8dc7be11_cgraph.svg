@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-17 0,-47 166,-47 166,-17 0,-17"/>
 <text text-anchor="start" x="8" y="-35" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MarketingPolicyScenario</text>
 <text text-anchor="middle" x="83" y="-24" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" target="_top" xlink:title="Determine whether this interval contains a given time.">
 <polygon fill="none" stroke="black" points="202,-39 202,-69 315,-69 315,-39 202,-39"/>
 <text text-anchor="start" x="210" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::PolicyInterval</text>
 <text text-anchor="middle" x="258.5" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::contains</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" target="_top" xlink:title="Gets this instance unique identifier.">
 <polygon fill="none" stroke="black" points="211.5,-0.5 211.5,-19.5 305.5,-19.5 305.5,-0.5 211.5,-0.5"/>
 <text text-anchor="middle" x="258.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::id</text>
 </a>

@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1DefaultDiseaseModel.html'
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the standard diseases (non-cancer) model data type.  
+ <a href="classhgps_1_1DefaultDiseaseModel.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="default__disease__model_8h_source.html">default_disease_model.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::DefaultDiseaseModel:</div>
@@ -110,6 +113,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa33194e8094c3206a7469dc9da432eae"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DefaultDiseaseModel.html#aa33194e8094c3206a7469dc9da432eae">DefaultDiseaseModel</a> ()=delete</td></tr>
 <tr class="separator:aa33194e8094c3206a7469dc9da432eae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae889925675f96875fc3b96eeecbc77c1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DefaultDiseaseModel.html#ae889925675f96875fc3b96eeecbc77c1">DefaultDiseaseModel</a> (<a class="el" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a> &amp;definition, <a class="el" href="classhgps_1_1WeightModel.html">WeightModel</a> &amp;&amp;classifier, const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;age_range)</td></tr>
+<tr class="memdesc:ae889925675f96875fc3b96eeecbc77c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="classhgps_1_1DefaultDiseaseModel.html" title="Defines the standard diseases (non-cancer) model data type.">DefaultDiseaseModel</a> class.  <a href="classhgps_1_1DefaultDiseaseModel.html#ae889925675f96875fc3b96eeecbc77c1">More...</a><br /></td></tr>
 <tr class="separator:ae889925675f96875fc3b96eeecbc77c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af071fe71741eef1fc23a2d04074b95a2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">core::DiseaseGroup</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DefaultDiseaseModel.html#af071fe71741eef1fc23a2d04074b95a2">group</a> () const noexcept override</td></tr>
 <tr class="memdesc:af071fe71741eef1fc23a2d04074b95a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the disease group.  <a href="classhgps_1_1DefaultDiseaseModel.html#af071fe71741eef1fc23a2d04074b95a2">More...</a><br /></td></tr>
@@ -131,9 +135,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a28a1f62158ed2ad7ea5c2747ead171b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classhgps_1_1DiseaseModel"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classhgps_1_1DiseaseModel')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classhgps_1_1DiseaseModel.html">hgps::DiseaseModel</a></td></tr>
 <tr class="memitem:aef79fada04b6c624cb1a07e49b66a7f8 inherit pub_methods_classhgps_1_1DiseaseModel"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModel.html#aef79fada04b6c624cb1a07e49b66a7f8">~DiseaseModel</a> ()=default</td></tr>
+<tr class="memdesc:aef79fada04b6c624cb1a07e49b66a7f8 inherit pub_methods_classhgps_1_1DiseaseModel"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1DiseaseModel.html" title="Diseases model interface.">DiseaseModel</a> instance.  <a href="classhgps_1_1DiseaseModel.html#aef79fada04b6c624cb1a07e49b66a7f8">More...</a><br /></td></tr>
 <tr class="separator:aef79fada04b6c624cb1a07e49b66a7f8 inherit pub_methods_classhgps_1_1DiseaseModel"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the standard diseases (non-cancer) model data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa33194e8094c3206a7469dc9da432eae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa33194e8094c3206a7469dc9da432eae">&#9670;&nbsp;</a></span>DefaultDiseaseModel() <span class="overload">[1/2]</span></h2>
 
@@ -190,6 +197,16 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Initialise a new instance of the <a class="el" href="classhgps_1_1DefaultDiseaseModel.html" title="Defines the standard diseases (non-cancer) model data type.">DefaultDiseaseModel</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">definition</td><td>The disease definition instance </td></tr>
+    <tr><td class="paramname">classifier</td><td>The body weight classification model instance </td></tr>
+    <tr><td class="paramname">age_range</td><td>The valid age range for model dataset </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Health GPS scripted intervention policy scenario interface.">
+<g id="a_node1"><a xlink:title="Health&#45;GPS scripted intervention policy scenario interface.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-19.5 147,-19.5 147,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="73.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::InterventionScenario</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Scenario.html" target="_top" xlink:title="Health GPS simulation scenario interface.">
+<g id="a_node2"><a xlink:href="classhgps_1_1Scenario.html" target="_top" xlink:title="Health&#45;GPS simulation scenario interface.">
 <polygon fill="none" stroke="black" points="29.5,-56.5 29.5,-75.5 117.5,-75.5 117.5,-56.5 29.5,-56.5"/>
 <text text-anchor="middle" x="73.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Scenario</text>
 </a>

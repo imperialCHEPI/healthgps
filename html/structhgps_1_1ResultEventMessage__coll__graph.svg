@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements the simulation results event message data type.">
 <polygon fill="#bfbfbf" stroke="black" points="81.5,-0.5 81.5,-19.5 229.5,-19.5 229.5,-0.5 81.5,-0.5"/>
 <text text-anchor="middle" x="155.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultEventMessage</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1EventMessage.html" target="_top" xlink:title="Event message interface.">
+<g id="a_node2"><a xlink:href="structhgps_1_1EventMessage.html" target="_top" xlink:title="Simulation event messages interface.">
 <polygon fill="none" stroke="black" points="81,-67.5 81,-86.5 198,-86.5 198,-67.5 81,-67.5"/>
 <text text-anchor="middle" x="139.5" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::EventMessage</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1ModelResult.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1ModelResult.html" target="_top" xlink:title="Defines the model results data type.">
 <polygon fill="none" stroke="black" points="216,-67.5 216,-86.5 323,-86.5 323,-67.5 216,-67.5"/>
 <text text-anchor="middle" x="269.5" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelResult</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1ResultByGender.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1ResultByGender.html" target="_top" xlink:title="Defines the measure by gender result data type.">
 <polygon fill="none" stroke="black" points="0,-140 0,-159 125,-159 125,-140 0,-140"/>
 <text text-anchor="middle" x="62.5" y="-147" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultByGender</text>
 </a>
@@ -84,7 +84,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="structhgps_1_1DALYsIndicator.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="structhgps_1_1DALYsIndicator.html" target="_top" xlink:title="Defines the DALYs indicator result data type.">
 <polygon fill="none" stroke="black" points="278,-140 278,-159 397,-159 397,-140 278,-140"/>
 <text text-anchor="middle" x="337.5" y="-147" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DALYsIndicator</text>
 </a>
@@ -100,7 +100,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classhgps_1_1DataSeries.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="classhgps_1_1DataSeries.html" target="_top" xlink:title="Defines the Simulation results container for time series data.">
 <polygon fill="none" stroke="black" points="415,-140 415,-159 514,-159 514,-140 415,-140"/>
 <text text-anchor="middle" x="464.5" y="-147" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DataSeries</text>
 </a>

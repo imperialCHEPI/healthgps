@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Register a user provided full hierarchical linear model definition.">
 <polygon fill="#bfbfbf" stroke="black" points="256,-0.5 256,-41.5 390,-41.5 390,-0.5 256,-0.5"/>
 <text text-anchor="start" x="264" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::CachedRepository</text>
 <text text-anchor="start" x="264" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">::register_linear_model</text>

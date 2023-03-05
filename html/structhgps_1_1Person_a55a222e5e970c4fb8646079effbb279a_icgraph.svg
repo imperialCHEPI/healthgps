@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets this instance unique identifier.">
 <polygon fill="#bfbfbf" stroke="black" points="216,-104 216,-123 310,-123 310,-104 216,-104"/>
 <text text-anchor="middle" x="263" y="-111" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::id</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="17.5,-196.5 17.5,-226.5 162.5,-226.5 162.5,-196.5 17.5,-196.5"/>
 <text text-anchor="start" x="25.5" y="-214.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FiscalPolicyScenario</text>
 <text text-anchor="middle" x="90" y="-203.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="12.5,-147.5 12.5,-177.5 167.5,-177.5 167.5,-147.5 12.5,-147.5"/>
 <text text-anchor="start" x="20.5" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FoodLabellingScenario</text>
 <text text-anchor="middle" x="90" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -52,7 +52,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1MarketingDynamicScenario.html#a84574c7750050d6d3b1b0c91276df416" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1MarketingDynamicScenario.html#a84574c7750050d6d3b1b0c91276df416" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="0,-98.5 0,-128.5 180,-128.5 180,-98.5 0,-98.5"/>
 <text text-anchor="start" x="8" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MarketingDynamicScenario</text>
 <text text-anchor="middle" x="90" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -68,7 +68,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1MarketingPolicyScenario.html#a49917d87b419b15e5c9bbf9c8dc7be11" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1MarketingPolicyScenario.html#a49917d87b419b15e5c9bbf9c8dc7be11" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="7,-49.5 7,-79.5 173,-79.5 173,-49.5 7,-49.5"/>
 <text text-anchor="start" x="15" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MarketingPolicyScenario</text>
 <text text-anchor="middle" x="90" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -84,7 +84,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="7,-0.5 7,-30.5 173,-30.5 173,-0.5 7,-0.5"/>
 <text text-anchor="start" x="15" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::PhysicalActivityScenario</text>
 <text text-anchor="middle" x="90" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>

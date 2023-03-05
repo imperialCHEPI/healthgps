@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1RuntimeContext.html#a1a283e5db3f10c4296241cc957122c87" target="_top" xlink:title="Gets the experiment current run number.">
 <polygon fill="none" stroke="black" points="158.5,-137.5 158.5,-167.5 283.5,-167.5 283.5,-137.5 158.5,-137.5"/>
 <text text-anchor="start" x="166.5" y="-155.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="221" y="-144.5" font-family="Helvetica,sans-Serif" font-size="10.00">::current_run</text>
@@ -51,7 +51,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1RuntimeContext.html#ac0b304648b1a5fa47ebf4dfe348cfaa7" target="_top" xlink:title="Publishes a polymorphic new message to the outside world synchronously.">
 <polygon fill="none" stroke="black" points="158.5,-49.5 158.5,-79.5 283.5,-79.5 283.5,-49.5 158.5,-49.5"/>
 <text text-anchor="start" x="166.5" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="221" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::publish</text>
@@ -67,7 +67,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" target="_top" xlink:title="Gets the current simulation time.">
 <polygon fill="none" stroke="black" points="158.5,-0.5 158.5,-30.5 283.5,-30.5 283.5,-0.5 158.5,-0.5"/>
 <text text-anchor="start" x="166.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="221" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::time_now</text>
@@ -83,7 +83,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title="Gets the simulation scenario identifier.">
 <polygon fill="none" stroke="black" points="323,-93.5 323,-123.5 469,-123.5 469,-93.5 323,-93.5"/>
 <text text-anchor="start" x="331" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="396" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">::identifier</text>

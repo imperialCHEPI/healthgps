@@ -1,6 +1,6 @@
 <map id="hgps::PopulationModule::initialise_population" name="hgps::PopulationModule::initialise_population">
 <area shape="rect" id="node1" title="Initialises the virtual population." alt="" coords="5,64,184,105"/>
-<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title=" " alt="" coords="232,5,399,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1Population.html#a2a50b857e80ad7e19ae60ad2c98cb00a" title=" " alt="" coords="233,71,397,98"/>
-<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#ae9ea928aa7ad5ddd4ed45ab0e641fc0f" title=" " alt="" coords="232,123,399,164"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="232,5,399,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1Population.html#a2a50b857e80ad7e19ae60ad2c98cb00a" title="Gets the current size of the population." alt="" coords="233,71,397,98"/>
+<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#ae9ea928aa7ad5ddd4ed45ab0e641fc0f" title="Gets the experiment start time." alt="" coords="232,123,399,164"/>
 </map>

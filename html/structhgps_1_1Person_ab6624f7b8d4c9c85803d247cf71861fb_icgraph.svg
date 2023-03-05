@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a value indicating whether a Person is current active in the population.">
 <polygon fill="#bfbfbf" stroke="black" points="165,-19.5 165,-38.5 293,-38.5 293,-19.5 165,-19.5"/>
 <text text-anchor="middle" x="229" y="-26.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::is_active</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1Person.html#aedb677d26660b3bb0da666a07af557cf" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1Person.html#aedb677d26660b3bb0da666a07af557cf" target="_top" xlink:title="Mark this instance as dead.">
 <polygon fill="none" stroke="black" points="14.5,-38.5 14.5,-57.5 114.5,-57.5 114.5,-38.5 14.5,-38.5"/>
 <text text-anchor="middle" x="64.5" y="-45.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::die</text>
 </a>
@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1Person.html#a7140acdf752f1aae776a573dca87947a" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1Person.html#a7140acdf752f1aae776a573dca87947a" target="_top" xlink:title="Emigrate this instance from the virtual population.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-19.5 129,-19.5 129,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="64.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::emigrate</text>
 </a>

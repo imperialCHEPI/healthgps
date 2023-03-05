@@ -51,7 +51,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1DataSeries.html#a3d3e52a0ea2ac6686e28ec69b462266d" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1DataSeries.html#a3d3e52a0ea2ac6686e28ec69b462266d" target="_top" xlink:title="Adds a new channel to the collection.">
 <polygon fill="none" stroke="black" points="430.5,-333.5 430.5,-363.5 553.5,-363.5 553.5,-333.5 430.5,-333.5"/>
 <text text-anchor="start" x="438.5" y="-351.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DataSeries::add</text>
 <text text-anchor="middle" x="492" y="-340.5" font-family="Helvetica,sans-Serif" font-size="10.00">_channel</text>
@@ -199,7 +199,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1DataSeries.html#a9a68223a9bf99c87e1d09ab495e61c59" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1DataSeries.html#a9a68223a9bf99c87e1d09ab495e61c59" target="_top" xlink:title="Adds multiple channels to the collection.">
 <polygon fill="none" stroke="black" points="256,-330.5 256,-360.5 379,-360.5 379,-330.5 256,-330.5"/>
 <text text-anchor="start" x="264" y="-348.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DataSeries::add</text>
 <text text-anchor="middle" x="317.5" y="-337.5" font-family="Helvetica,sans-Serif" font-size="10.00">_channels</text>

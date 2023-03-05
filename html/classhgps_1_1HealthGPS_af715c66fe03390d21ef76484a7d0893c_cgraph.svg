@@ -35,7 +35,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title="Gets the simulation scenario identifier.">
 <polygon fill="none" stroke="black" points="356,-0.5 356,-30.5 502,-30.5 502,-0.5 356,-0.5"/>
 <text text-anchor="start" x="364" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="429" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::identifier</text>

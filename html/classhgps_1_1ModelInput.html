@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1ModelInput.html',''); ini
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> model inputs data type.  
+ <a href="classhgps_1_1ModelInput.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="modelinput_8h_source.html">modelinput.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -100,29 +103,42 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a345eb3a7ae33255b9cb5218c61413165"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a345eb3a7ae33255b9cb5218c61413165">ModelInput</a> ()=delete</td></tr>
 <tr class="separator:a345eb3a7ae33255b9cb5218c61413165"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39923f8d7fe08ce22e42d949b7dc246d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a39923f8d7fe08ce22e42d949b7dc246d">ModelInput</a> (<a class="el" href="classhgps_1_1core_1_1DataTable.html">core::DataTable</a> &amp;<a class="el" href="classhgps_1_1ModelInput.html#a85591cfbc5238e489f6d81c2085de996">data</a>, const <a class="el" href="classhgps_1_1Settings.html">Settings</a> &amp;<a class="el" href="classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3">settings</a>, const <a class="el" href="structhgps_1_1RunInfo.html">RunInfo</a> &amp;run_info, const <a class="el" href="structhgps_1_1SESDefinition.html">SESDefinition</a> &amp;ses_info, const <a class="el" href="classhgps_1_1HierarchicalMapping.html">HierarchicalMapping</a> &amp;<a class="el" href="classhgps_1_1ModelInput.html#a2841ddb25b2d15d5908b926a94cc4765">risk_mapping</a>, const std::vector&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &gt; &amp;<a class="el" href="classhgps_1_1ModelInput.html#afdc4b35087c18875cb546dd0c653fe0a">diseases</a>)</td></tr>
+<tr class="memdesc:a39923f8d7fe08ce22e42d949b7dc246d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a new instance of the <a class="el" href="classhgps_1_1ModelInput.html" title="Defines the Simulation model inputs data type.">ModelInput</a> class.  <a href="classhgps_1_1ModelInput.html#a39923f8d7fe08ce22e42d949b7dc246d">More...</a><br /></td></tr>
 <tr class="separator:a39923f8d7fe08ce22e42d949b7dc246d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf1b179fa0b7c3d06dd928584efd8fd3"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhgps_1_1Settings.html">Settings</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3">settings</a> () const noexcept</td></tr>
+<tr class="memdesc:acf1b179fa0b7c3d06dd928584efd8fd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation experiment settings definition.  <a href="classhgps_1_1ModelInput.html#acf1b179fa0b7c3d06dd928584efd8fd3">More...</a><br /></td></tr>
 <tr class="separator:acf1b179fa0b7c3d06dd928584efd8fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85591cfbc5238e489f6d81c2085de996"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhgps_1_1core_1_1DataTable.html">core::DataTable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a85591cfbc5238e489f6d81c2085de996">data</a> () const noexcept</td></tr>
+<tr class="memdesc:a85591cfbc5238e489f6d81c2085de996"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the risk factors model dataset.  <a href="classhgps_1_1ModelInput.html#a85591cfbc5238e489f6d81c2085de996">More...</a><br /></td></tr>
 <tr class="separator:a85591cfbc5238e489f6d81c2085de996"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e4bfd49abcbe8999f611d2235fcef4e"><td class="memItemLeft" align="right" valign="top">const unsigned int &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a4e4bfd49abcbe8999f611d2235fcef4e">start_time</a> () const noexcept</td></tr>
+<tr class="memdesc:a4e4bfd49abcbe8999f611d2235fcef4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the experiment start time.  <a href="classhgps_1_1ModelInput.html#a4e4bfd49abcbe8999f611d2235fcef4e">More...</a><br /></td></tr>
 <tr class="separator:a4e4bfd49abcbe8999f611d2235fcef4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a045b359f9876d85a9dadf8afd6c677c8"><td class="memItemLeft" align="right" valign="top">const unsigned int &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8">stop_time</a> () const noexcept</td></tr>
+<tr class="memdesc:a045b359f9876d85a9dadf8afd6c677c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the experiment stop time.  <a href="classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8">More...</a><br /></td></tr>
 <tr class="separator:a045b359f9876d85a9dadf8afd6c677c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab49c194e52300878d288931f269b6114"><td class="memItemLeft" align="right" valign="top">const unsigned int &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#ab49c194e52300878d288931f269b6114">sync_timeout_ms</a> () const noexcept</td></tr>
+<tr class="memdesc:ab49c194e52300878d288931f269b6114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the scenarios data synchronisation timeout (milliseconds)  <a href="classhgps_1_1ModelInput.html#ab49c194e52300878d288931f269b6114">More...</a><br /></td></tr>
 <tr class="separator:ab49c194e52300878d288931f269b6114"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5035a15c52467ce060d8f4d5ed21116b"><td class="memItemLeft" align="right" valign="top">const std::optional&lt; unsigned int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b">seed</a> () const noexcept</td></tr>
+<tr class="memdesc:a5035a15c52467ce060d8f4d5ed21116b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user custom seed to initialise the pseudo-number generator.  <a href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b">More...</a><br /></td></tr>
 <tr class="separator:a5035a15c52467ce060d8f4d5ed21116b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd88dd970c41908601acde18d5d69b8e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1RunInfo.html">RunInfo</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#abd88dd970c41908601acde18d5d69b8e">run</a> () const noexcept</td></tr>
+<tr class="memdesc:abd88dd970c41908601acde18d5d69b8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the simulation run information.  <a href="classhgps_1_1ModelInput.html#abd88dd970c41908601acde18d5d69b8e">More...</a><br /></td></tr>
 <tr class="separator:abd88dd970c41908601acde18d5d69b8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63aa938279daec0fa272d867c257f5ae"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1SESDefinition.html">SESDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a63aa938279daec0fa272d867c257f5ae">ses_definition</a> () const noexcept</td></tr>
+<tr class="memdesc:a63aa938279daec0fa272d867c257f5ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the Socio-economic status (SES) model information.  <a href="classhgps_1_1ModelInput.html#a63aa938279daec0fa272d867c257f5ae">More...</a><br /></td></tr>
 <tr class="separator:a63aa938279daec0fa272d867c257f5ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2841ddb25b2d15d5908b926a94cc4765"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classhgps_1_1HierarchicalMapping.html">HierarchicalMapping</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#a2841ddb25b2d15d5908b926a94cc4765">risk_mapping</a> () const noexcept</td></tr>
+<tr class="memdesc:a2841ddb25b2d15d5908b926a94cc4765"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the Hierarchical risk factors model mappings definition.  <a href="classhgps_1_1ModelInput.html#a2841ddb25b2d15d5908b926a94cc4765">More...</a><br /></td></tr>
 <tr class="separator:a2841ddb25b2d15d5908b926a94cc4765"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdc4b35087c18875cb546dd0c653fe0a"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="structhgps_1_1core_1_1DiseaseInfo.html">core::DiseaseInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1ModelInput.html#afdc4b35087c18875cb546dd0c653fe0a">diseases</a> () const noexcept</td></tr>
+<tr class="memdesc:afdc4b35087c18875cb546dd0c653fe0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the collection of diseases to include in experiment.  <a href="classhgps_1_1ModelInput.html#afdc4b35087c18875cb546dd0c653fe0a">More...</a><br /></td></tr>
 <tr class="separator:afdc4b35087c18875cb546dd0c653fe0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the <a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> model inputs data type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a345eb3a7ae33255b9cb5218c61413165"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a345eb3a7ae33255b9cb5218c61413165">&#9670;&nbsp;</a></span>ModelInput() <span class="overload">[1/2]</span></h2>
 
@@ -198,6 +214,19 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialise a new instance of the <a class="el" href="classhgps_1_1ModelInput.html" title="Defines the Simulation model inputs data type.">ModelInput</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">data</td><td>The risk factors fitted dataset </td></tr>
+    <tr><td class="paramname">settings</td><td>Experiment settings definition </td></tr>
+    <tr><td class="paramname">run_info</td><td><a class="el" href="classhgps_1_1Simulation.html" title="Defines the simulation class interface.">Simulation</a> run information </td></tr>
+    <tr><td class="paramname">ses_info</td><td>Socio-economic status (SES) model information </td></tr>
+    <tr><td class="paramname">risk_mapping</td><td>Hierarchical risk factors model mappings </td></tr>
+    <tr><td class="paramname">diseases</td><td>Selected diseases to include in experiment </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -224,6 +253,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the risk factors model dataset. </p>
+<dl class="section return"><dt>Returns</dt><dd>Risk factors dataset </dd></dl>
+
 </div>
 </div>
 <a id="afdc4b35087c18875cb546dd0c653fe0a"></a>
@@ -248,6 +280,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the collection of diseases to include in experiment. </p>
+<dl class="section return"><dt>Returns</dt><dd>Diseases to include in experiment </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -279,6 +314,9 @@ Here is the caller graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
+<p>Gets the Hierarchical risk factors model mappings definition. </p>
+<dl class="section return"><dt>Returns</dt><dd>Risk factors model mappings </dd></dl>
+
 </div>
 </div>
 <a id="abd88dd970c41908601acde18d5d69b8e"></a>
@@ -303,6 +341,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the simulation run information. </p>
+<dl class="section return"><dt>Returns</dt><dd>simulation run information </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -333,6 +374,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the user custom seed to initialise the pseudo-number generator. </p>
+<dl class="section return"><dt>Returns</dt><dd>User custom seed value, if provide; otherwise empty. </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -363,6 +407,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the Socio-economic status (SES) model information. </p>
+<dl class="section return"><dt>Returns</dt><dd>SES model information </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -393,6 +440,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the simulation experiment settings definition. </p>
+<dl class="section return"><dt>Returns</dt><dd>Experiment settings definition </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -423,6 +473,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the experiment start time. </p>
+<dl class="section return"><dt>Returns</dt><dd>Experiment start time </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -453,6 +506,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the experiment stop time. </p>
+<dl class="section return"><dt>Returns</dt><dd>Experiment stop time </dd></dl>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -483,6 +539,9 @@ Here is the caller graph for this function:</div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Gets the scenarios data synchronisation timeout (milliseconds) </p>
+<dl class="section return"><dt>Returns</dt><dd>Scenarios synchronisation timeout </dd></dl>
 
 </div>
 </div>

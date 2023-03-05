@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74" target="_top" xlink:title="Gets the user provided baseline risk factors adjustment dataset.">
 <polygon fill="none" stroke="black" points="183,-197 183,-238 307,-238 307,-197 183,-197"/>
 <text text-anchor="start" x="191" y="-226" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::get</text>
 <text text-anchor="start" x="191" y="-215" font-family="Helvetica,sans-Serif" font-size="10.00">_baseline_adjustment</text>
@@ -38,7 +38,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="namespacehgps.html#ae9b174775b16879867eaefdd09019019" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="namespacehgps.html#ae9b174775b16879867eaefdd09019019" target="_top" xlink:title="Gets the default production instance builders for full hierarchical regression models.">
 <polygon fill="none" stroke="black" points="163,-147.5 163,-177.5 327,-177.5 327,-147.5 163,-147.5"/>
 <text text-anchor="start" x="171" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::get_default_hierarchical</text>
 <text text-anchor="middle" x="245" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">_model_registry</text>
@@ -54,7 +54,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="namespacehgps.html#ab6f6184e7acdf4d238a0928c66ee9953" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="namespacehgps.html#ab6f6184e7acdf4d238a0928c66ee9953" target="_top" xlink:title="Gets the default production instance builders for lite hierarchical regression models.">
 <polygon fill="none" stroke="black" points="166,-98.5 166,-128.5 324,-128.5 324,-98.5 166,-98.5"/>
 <text text-anchor="start" x="174" y="-116.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::get_default_lite</text>
 <text text-anchor="middle" x="245" y="-105.5" font-family="Helvetica,sans-Serif" font-size="10.00">_hierarchical_model_registry</text>
@@ -70,7 +70,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48" target="_top" xlink:title="Gets the user provided hierarchical linear model definition.">
 <polygon fill="none" stroke="black" points="176.5,-49.5 176.5,-79.5 313.5,-79.5 313.5,-49.5 176.5,-49.5"/>
 <text text-anchor="start" x="184.5" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::get</text>
 <text text-anchor="middle" x="245" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">_linear_model_definition</text>
@@ -86,7 +86,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39" target="_top" xlink:title="Gets the user provided lite hierarchical linear model definition.">
 <polygon fill="none" stroke="black" points="166,-0.5 166,-30.5 324,-30.5 324,-0.5 166,-0.5"/>
 <text text-anchor="start" x="174" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Repository::get</text>
 <text text-anchor="middle" x="245" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_lite_linear_model_definition</text>

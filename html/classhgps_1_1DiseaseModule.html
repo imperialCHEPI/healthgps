@@ -93,6 +93,9 @@ $(document).ready(function(){initNavTree('classhgps_1_1DiseaseModule.html',''); 
 </div><!--header-->
 <div class="contents">
 
+<p>Defines the disease module container to hold disease models.  
+ <a href="classhgps_1_1DiseaseModule.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="HealthGPS_2disease_8h_source.html">disease.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for hgps::DiseaseModule:</div>
@@ -110,6 +113,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a078afdd1f2db59d7c5438e6bba5b21c5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a078afdd1f2db59d7c5438e6bba5b21c5">DiseaseModule</a> ()=delete</td></tr>
 <tr class="separator:a078afdd1f2db59d7c5438e6bba5b21c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9058aead53030ed8b4bd6656f0e42726"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a9058aead53030ed8b4bd6656f0e42726">DiseaseModule</a> (std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt;&gt; &amp;&amp;models)</td></tr>
+<tr class="memdesc:a9058aead53030ed8b4bd6656f0e42726"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1DiseaseModule.html" title="Defines the disease module container to hold disease models.">DiseaseModule</a> class.  <a href="classhgps_1_1DiseaseModule.html#a9058aead53030ed8b4bd6656f0e42726">More...</a><br /></td></tr>
 <tr class="separator:a9058aead53030ed8b4bd6656f0e42726"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c6743a4654668f83b46e76235d4b602"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacehgps.html#a83afa32bfd6200f17a92e853e9585936">SimulationModuleType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a4c6743a4654668f83b46e76235d4b602">type</a> () const noexcept override</td></tr>
 <tr class="memdesc:a4c6743a4654668f83b46e76235d4b602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the module type identifier.  <a href="classhgps_1_1DiseaseModule.html#a4c6743a4654668f83b46e76235d4b602">More...</a><br /></td></tr>
@@ -120,13 +124,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a48080291ffdeddc1f38048bed2b665aa"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a48080291ffdeddc1f38048bed2b665aa">size</a> () const noexcept override</td></tr>
 <tr class="memdesc:a48080291ffdeddc1f38048bed2b665aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the number of diseases model hosted.  <a href="classhgps_1_1DiseaseModule.html#a48080291ffdeddc1f38048bed2b665aa">More...</a><br /></td></tr>
 <tr class="separator:a48080291ffdeddc1f38048bed2b665aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36d619034662157d4ae2905cb3083af9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a36d619034662157d4ae2905cb3083af9">contains</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;disease_core) const noexcept override</td></tr>
-<tr class="memdesc:a36d619034662157d4ae2905cb3083af9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether the host contains an disease identified by code.  <a href="classhgps_1_1DiseaseModule.html#a36d619034662157d4ae2905cb3083af9">More...</a><br /></td></tr>
-<tr class="separator:a36d619034662157d4ae2905cb3083af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cd92ad464056f581e7fbb72176b35ac"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a0cd92ad464056f581e7fbb72176b35ac">operator[]</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;disease_core)</td></tr>
-<tr class="separator:a0cd92ad464056f581e7fbb72176b35ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c832f46174283ba34ca5409216f387a"><td class="memItemLeft" align="right" valign="top">const std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a2c832f46174283ba34ca5409216f387a">operator[]</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;disease_code) const</td></tr>
-<tr class="separator:a2c832f46174283ba34ca5409216f387a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad103faba914ee4cc36ffa4bdb5cb0af1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#ad103faba914ee4cc36ffa4bdb5cb0af1">contains</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;disease_id) const noexcept override</td></tr>
+<tr class="memdesc:ad103faba914ee4cc36ffa4bdb5cb0af1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates whether the host contains an disease identified by code.  <a href="classhgps_1_1DiseaseModule.html#ad103faba914ee4cc36ffa4bdb5cb0af1">More...</a><br /></td></tr>
+<tr class="separator:ad103faba914ee4cc36ffa4bdb5cb0af1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9772333a41d630e59c4c3e973045c532"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a9772333a41d630e59c4c3e973045c532">operator[]</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;disease_id)</td></tr>
+<tr class="memdesc:a9772333a41d630e59c4c3e973045c532"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the model for a given disease.  <a href="classhgps_1_1DiseaseModule.html#a9772333a41d630e59c4c3e973045c532">More...</a><br /></td></tr>
+<tr class="separator:a9772333a41d630e59c4c3e973045c532"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa840c96d7ac03740c6d26aac644fa04"><td class="memItemLeft" align="right" valign="top">const std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#afa840c96d7ac03740c6d26aac644fa04">operator[]</a> (const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;disease_id) const</td></tr>
+<tr class="memdesc:afa840c96d7ac03740c6d26aac644fa04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the model for a given disease.  <a href="classhgps_1_1DiseaseModule.html#afa840c96d7ac03740c6d26aac644fa04">More...</a><br /></td></tr>
+<tr class="separator:afa840c96d7ac03740c6d26aac644fa04"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f08e92020491cf2e4cbcc51e74e8e1a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1DiseaseModule.html#a8f08e92020491cf2e4cbcc51e74e8e1a">initialise_population</a> (<a class="el" href="classhgps_1_1RuntimeContext.html">RuntimeContext</a> &amp;context) override</td></tr>
 <tr class="memdesc:a8f08e92020491cf2e4cbcc51e74e8e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the virtual population.  <a href="classhgps_1_1DiseaseModule.html#a8f08e92020491cf2e4cbcc51e74e8e1a">More...</a><br /></td></tr>
 <tr class="separator:a8f08e92020491cf2e4cbcc51e74e8e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -138,9 +144,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a24b7d4a5a9b501e61f9d512b49696b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classhgps_1_1SimulationModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classhgps_1_1SimulationModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classhgps_1_1SimulationModule.html">hgps::SimulationModule</a></td></tr>
 <tr class="memitem:a1ac9dd186584e0d7a249537c3e088095 inherit pub_methods_classhgps_1_1SimulationModule"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1SimulationModule.html#a1ac9dd186584e0d7a249537c3e088095">~SimulationModule</a> ()=default</td></tr>
+<tr class="memdesc:a1ac9dd186584e0d7a249537c3e088095 inherit pub_methods_classhgps_1_1SimulationModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1SimulationModule.html" title="Simulation modules interface.">SimulationModule</a> instance.  <a href="classhgps_1_1SimulationModule.html#a1ac9dd186584e0d7a249537c3e088095">More...</a><br /></td></tr>
 <tr class="separator:a1ac9dd186584e0d7a249537c3e088095 inherit pub_methods_classhgps_1_1SimulationModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines the disease module container to hold disease models. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a078afdd1f2db59d7c5438e6bba5b21c5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a078afdd1f2db59d7c5438e6bba5b21c5">&#9670;&nbsp;</a></span>DiseaseModule() <span class="overload">[1/2]</span></h2>
 
@@ -182,11 +191,19 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialises a new instance of the <a class="el" href="classhgps_1_1DiseaseModule.html" title="Defines the disease module container to hold disease models.">DiseaseModule</a> class. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">models</td><td>Collection of disease model instances </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a36d619034662157d4ae2905cb3083af9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36d619034662157d4ae2905cb3083af9">&#9670;&nbsp;</a></span>contains()</h2>
+<a id="ad103faba914ee4cc36ffa4bdb5cb0af1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad103faba914ee4cc36ffa4bdb5cb0af1">&#9670;&nbsp;</a></span>contains()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -198,7 +215,7 @@ Public Member Functions</h2></td></tr>
           <td class="memname">bool hgps::DiseaseModule::contains </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;&#160;</td>
-          <td class="paramname"><em>disease_code</em></td><td>)</td>
+          <td class="paramname"><em>disease_id</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
@@ -212,13 +229,13 @@ Public Member Functions</h2></td></tr>
 <p>Indicates whether the host contains an disease identified by code. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">disease_code</td><td>The disease unique identification code </td></tr>
+    <tr><td class="paramname">disease_id</td><td>The disease unique identifier </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the disease is found, otherwise false. </dd></dl>
 
-<p>Implements <a class="el" href="classhgps_1_1DiseaseHostModule.html#ab1b3bb12f3334905ccb579ada16bb015">hgps::DiseaseHostModule</a>.</p>
+<p>Implements <a class="el" href="classhgps_1_1DiseaseHostModule.html#af9946bde906ff77b553d38f7567a2cd7">hgps::DiseaseHostModule</a>.</p>
 
 </div>
 </div>
@@ -235,7 +252,7 @@ Public Member Functions</h2></td></tr>
           <td class="memname">double hgps::DiseaseModule::get_excess_mortality </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;&#160;</td>
-          <td class="paramname"><em>disease_code</em>, </td>
+          <td class="paramname"><em>disease_id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -259,14 +276,14 @@ Public Member Functions</h2></td></tr>
 <p>Gets the mortality rate associated with a disease for an individual. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">disease_code</td><td>The disease unique identification code </td></tr>
+    <tr><td class="paramname">disease_id</td><td>The disease unique identifier </td></tr>
     <tr><td class="paramname">entity</td><td>The entity associated with the mortality value </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the mortality rate value, if found, otherwise zero. </dd></dl>
 
-<p>Implements <a class="el" href="classhgps_1_1DiseaseHostModule.html#ae7ad54d9d7f4f9e9cea341ecdd264034">hgps::DiseaseHostModule</a>.</p>
+<p>Implements <a class="el" href="classhgps_1_1DiseaseHostModule.html#a8c6fc9db1e733578a5bb197862665340">hgps::DiseaseHostModule</a>.</p>
 
 </div>
 </div>
@@ -336,26 +353,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2c832f46174283ba34ca5409216f387a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c832f46174283ba34ca5409216f387a">&#9670;&nbsp;</a></span>operator[]() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp; hgps::DiseaseModule::operator[] </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;&#160;</td>
-          <td class="paramname"><em>disease_code</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0cd92ad464056f581e7fbb72176b35ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cd92ad464056f581e7fbb72176b35ac">&#9670;&nbsp;</a></span>operator[]() <span class="overload">[2/2]</span></h2>
+<a id="a9772333a41d630e59c4c3e973045c532"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9772333a41d630e59c4c3e973045c532">&#9670;&nbsp;</a></span>operator[]() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -364,11 +363,59 @@ Public Member Functions</h2></td></tr>
           <td class="memname">std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp; hgps::DiseaseModule::operator[] </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;&#160;</td>
-          <td class="paramname"><em>disease_core</em></td><td>)</td>
+          <td class="paramname"><em>disease_id</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Gets the model for a given disease. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">disease_id</td><td>The disease identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease model instance </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>if the module does not have a model for the specified disease. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="afa840c96d7ac03740c6d26aac644fa04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa840c96d7ac03740c6d26aac644fa04">&#9670;&nbsp;</a></span>operator[]() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt; &amp; hgps::DiseaseModule::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &amp;&#160;</td>
+          <td class="paramname"><em>disease_id</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the model for a given disease. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">disease_id</td><td>The disease identifier </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease model instance </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::out_of_range</td><td>if the module does not have a model for the specified disease. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

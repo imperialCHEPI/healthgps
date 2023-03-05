@@ -1,5 +1,5 @@
 <map id="hgps::CachedRepository::get_lms_definition" name="hgps::CachedRepository::get_lms_definition">
-<area shape="rect" id="node1" title=" " alt="" coords="5,39,184,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1LmsDefinition.html#a921207e6e240c4ac3044ebeb2f4363d0" title=" " alt="" coords="259,5,409,47"/>
+<area shape="rect" id="node1" title="Gets the LMS (lambda&#45;mu&#45;sigma) definition." alt="" coords="5,39,184,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1LmsDefinition.html#a921207e6e240c4ac3044ebeb2f4363d0" title="Determine whether the MLS definition is empty." alt="" coords="259,5,409,47"/>
 <area shape="rect" id="node3" href="$classhgps_1_1detail_1_1StoreConverter.html#a2971c9495270b17cb95b3eb88b8dd352" title=" " alt="" coords="232,71,436,112"/>
 </map>

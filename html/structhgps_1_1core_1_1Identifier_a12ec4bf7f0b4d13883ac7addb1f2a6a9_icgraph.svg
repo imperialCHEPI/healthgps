@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1DiseaseTable.html#a3db30c05a65e430acf14b5c2c332d9c2" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1DiseaseTable.html#a3db30c05a65e430acf14b5c2c332d9c2" target="_top" xlink:title="Initialise a new instance of the DiseaseTable class.">
 <polygon fill="none" stroke="black" points="150.5,-49.5 150.5,-79.5 260.5,-79.5 260.5,-49.5 150.5,-49.5"/>
 <text text-anchor="start" x="158.5" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::DiseaseTable</text>
 <text text-anchor="middle" x="205.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">::DiseaseTable</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1MappingEntry.html#a09cdddeb8893a92310b268ab19ba8409" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1MappingEntry.html#a09cdddeb8893a92310b268ab19ba8409" target="_top" xlink:title="Determine whether this factor has an associated Person property, e.g. age.">
 <polygon fill="none" stroke="black" points="149,-0.5 149,-30.5 262,-30.5 262,-0.5 149,-0.5"/>
 <text text-anchor="start" x="157" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MappingEntry</text>
 <text text-anchor="middle" x="205.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::is_entity</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1MappingEntry.html#a88fd784ddd5bea7863654bc5d45b3f23" target="_top" xlink:title="Gets the factor&#39;s associated Person property identifier.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 113,-30.5 113,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MappingEntry</text>
 <text text-anchor="middle" x="56.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::entity_key</text>

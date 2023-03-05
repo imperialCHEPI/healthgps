@@ -1,4 +1,4 @@
 <map id="hgps::Map2d::empty" name="hgps::Map2d::empty">
-<area shape="rect" id="node1" title=" " alt="" coords="245,13,400,39"/>
-<area shape="rect" id="node2" href="$structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341" title=" " alt="" coords="5,5,197,47"/>
+<area shape="rect" id="node1" title="Determine whether the container is empty." alt="" coords="245,13,400,39"/>
+<area shape="rect" id="node2" href="$structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341" title="Initialises a new instance of the BaselineAdjustment structure." alt="" coords="5,5,197,47"/>
 </map>

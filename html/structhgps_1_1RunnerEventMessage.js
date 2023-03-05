@@ -8,6 +8,6 @@ var structhgps_1_1RunnerEventMessage =
     [ "accept", "structhgps_1_1RunnerEventMessage.html#ad9b0042cabe3f2fb671338f65d84ebfa", null ],
     [ "id", "structhgps_1_1RunnerEventMessage.html#a63d6416d4536f6e1364c6cc4653ba872", null ],
     [ "to_string", "structhgps_1_1RunnerEventMessage.html#a15514b95e5e8f4cd9217143d11b19f11", null ],
-    [ "action", "structhgps_1_1RunnerEventMessage.html#a1f471078aef65739ec31a4ca2f41cae2", null ],
-    [ "elapsed_ms", "structhgps_1_1RunnerEventMessage.html#aa64b9b1b375ab56dd26128eb6a3d3bfb", null ]
+    [ "action", "structhgps_1_1RunnerEventMessage.html#aad4b2992416e3e54361b4b35d2900d61", null ],
+    [ "elapsed_ms", "structhgps_1_1RunnerEventMessage.html#aab37d45c6e41f78e8de5c1edd5ca16c3", null ]
 ];

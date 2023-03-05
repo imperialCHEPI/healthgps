@@ -1,4 +1,4 @@
 <map id="hgps::MTRandom32::MTRandom32" name="hgps::MTRandom32::MTRandom32">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,255,32"/>
-<area shape="rect" id="node2" href="$classhgps_1_1MTRandom32.html#a0db7dd09dd700070d36a5ac314733089" title=" " alt="" coords="303,5,493,32"/>
+<area shape="rect" id="node1" title="Initialise a new instance of the MTRandom32 class." alt="" coords="5,5,255,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1MTRandom32.html#a0db7dd09dd700070d36a5ac314733089" title="Sets the current state of the generator engine." alt="" coords="303,5,493,32"/>
 </map>

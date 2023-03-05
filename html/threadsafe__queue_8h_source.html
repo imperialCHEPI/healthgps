@@ -95,64 +95,65 @@ $(document).ready(function(){initNavTree('threadsafe__queue_8h_source.html','');
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &lt;optional&gt;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehgps.html">hgps</a> {</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html">    8</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue</a> {</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a1b2bb1b520d3d254b20718823a4b3fcc">   10</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a1b2bb1b520d3d254b20718823a4b3fcc">ThreadsafeQueue</a>() = <span class="keywordflow">default</span>;</div>
-<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a7f7694b9cf63ca126799b8d4df3c6b5c">   11</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a7f7694b9cf63ca126799b8d4df3c6b5c">ThreadsafeQueue</a>(<span class="keyword">const</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue&lt;T&gt;</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00012"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a0203a435f22ac2fd68bbbb046d8acc25">   12</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue</a>&amp; <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a0203a435f22ac2fd68bbbb046d8acc25">operator=</a>(<span class="keyword">const</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue&lt;T&gt;</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#afd1bf2dee6d492b484218ae641cd20e6">   14</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html#afd1bf2dee6d492b484218ae641cd20e6">ThreadsafeQueue</a>(<a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue&lt;T&gt;</a>&amp;&amp; other) {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;            queue_ = std::move(other.queue_);</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;        }</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#ad061c17e11f57090629f4887e73dea91">   19</a></span>&#160;        <span class="keyword">virtual</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html#ad061c17e11f57090629f4887e73dea91">~ThreadsafeQueue</a>() { }</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a055b4aa1594495dbabbccb74f4755c14">   21</a></span>&#160;        std::size_t <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a055b4aa1594495dbabbccb74f4755c14">size</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;            <span class="keywordflow">return</span> queue_.size();</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        }</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#af6b90f1d47c7f5f90767284c43630552">   26</a></span>&#160;        std::optional&lt;T&gt; <a class="code" href="classhgps_1_1ThreadsafeQueue.html#af6b90f1d47c7f5f90767284c43630552">pop</a>() {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            <span class="keywordflow">if</span> (queue_.empty()) {</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                <span class="keywordflow">return</span> {};</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;            }</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            T tmp = std::move(queue_.front());</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;            queue_.pop();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;            <span class="keywordflow">return</span> tmp;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#aa6072b9f6540d6cb74d5011061dc34fe">   37</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html#aa6072b9f6540d6cb74d5011061dc34fe">push</a>(T&amp;&amp; item) {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            do_push(std::move(item));</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a7f4e0c51e47ec42e2e87c13e71b90704">   41</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a7f4e0c51e47ec42e2e87c13e71b90704">push</a>(<span class="keyword">const</span> T&amp; item) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;            do_push(item);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        std::queue&lt;T&gt; queue_;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">mutable</span> std::mutex mutex_;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordtype">void</span> do_push(<span class="keyword">auto</span>&amp;&amp; item) {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            queue_.push(std::forward&lt;decltype(item)&gt;(item));</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html">   10</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue</a> {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a1b2bb1b520d3d254b20718823a4b3fcc">   13</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a1b2bb1b520d3d254b20718823a4b3fcc">ThreadsafeQueue</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
+<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a7f7694b9cf63ca126799b8d4df3c6b5c">   15</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a7f7694b9cf63ca126799b8d4df3c6b5c">ThreadsafeQueue</a>(<span class="keyword">const</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue&lt;T&gt;</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a0203a435f22ac2fd68bbbb046d8acc25">   16</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue</a>&amp; <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a0203a435f22ac2fd68bbbb046d8acc25">operator=</a>(<span class="keyword">const</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue&lt;T&gt;</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#afd1bf2dee6d492b484218ae641cd20e6">   20</a></span>&#160;        <a class="code" href="classhgps_1_1ThreadsafeQueue.html#afd1bf2dee6d492b484218ae641cd20e6">ThreadsafeQueue</a>(<a class="code" href="classhgps_1_1ThreadsafeQueue.html">ThreadsafeQueue&lt;T&gt;</a>&amp;&amp; other) {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;            queue_ = std::move(other.queue_);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;        }</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#ad061c17e11f57090629f4887e73dea91">   26</a></span>&#160;        <span class="keyword">virtual</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html#ad061c17e11f57090629f4887e73dea91">~ThreadsafeQueue</a>() { }</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a055b4aa1594495dbabbccb74f4755c14">   30</a></span>&#160;        std::size_t <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a055b4aa1594495dbabbccb74f4755c14">size</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            <span class="keywordflow">return</span> queue_.size();</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        }</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#af6b90f1d47c7f5f90767284c43630552">   37</a></span>&#160;        std::optional&lt;T&gt; <a class="code" href="classhgps_1_1ThreadsafeQueue.html#af6b90f1d47c7f5f90767284c43630552">pop</a>() {</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            <span class="keywordflow">if</span> (queue_.empty()) {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                <span class="keywordflow">return</span> {};</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;            T tmp = std::move(queue_.front());</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;            queue_.pop();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordflow">return</span> tmp;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#aa6072b9f6540d6cb74d5011061dc34fe">   50</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html#aa6072b9f6540d6cb74d5011061dc34fe">push</a>(T&amp;&amp; item) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            do_push(std::move(item));</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    };</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;}</div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html">hgps::ThreadsafeQueue</a></div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:8</div></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classhgps_1_1ThreadsafeQueue.html#a7f4e0c51e47ec42e2e87c13e71b90704">   56</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classhgps_1_1ThreadsafeQueue.html#a7f4e0c51e47ec42e2e87c13e71b90704">push</a>(<span class="keyword">const</span> T&amp; item) {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            do_push(item);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        std::queue&lt;T&gt; queue_;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keyword">mutable</span> std::mutex mutex_;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordtype">void</span> do_push(<span class="keyword">auto</span>&amp;&amp; item) {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            std::unique_lock&lt;std::mutex&gt; lck(mutex_);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            queue_.push(std::forward&lt;decltype(item)&gt;(item));</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    };</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;}</div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html">hgps::ThreadsafeQueue</a></div><div class="ttdoc">Defines a thread-safe queue data structure.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:10</div></div>
 <div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a0203a435f22ac2fd68bbbb046d8acc25"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a0203a435f22ac2fd68bbbb046d8acc25">hgps::ThreadsafeQueue::operator=</a></div><div class="ttdeci">ThreadsafeQueue &amp; operator=(const ThreadsafeQueue&lt; T &gt; &amp;)=delete</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a055b4aa1594495dbabbccb74f4755c14"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a055b4aa1594495dbabbccb74f4755c14">hgps::ThreadsafeQueue::size</a></div><div class="ttdeci">std::size_t size() const</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:21</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a1b2bb1b520d3d254b20718823a4b3fcc"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a1b2bb1b520d3d254b20718823a4b3fcc">hgps::ThreadsafeQueue::ThreadsafeQueue</a></div><div class="ttdeci">ThreadsafeQueue()=default</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a7f4e0c51e47ec42e2e87c13e71b90704"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a7f4e0c51e47ec42e2e87c13e71b90704">hgps::ThreadsafeQueue::push</a></div><div class="ttdeci">void push(const T &amp;item)</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:41</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a055b4aa1594495dbabbccb74f4755c14"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a055b4aa1594495dbabbccb74f4755c14">hgps::ThreadsafeQueue::size</a></div><div class="ttdeci">std::size_t size() const</div><div class="ttdoc">Gets the number of elements in the underlying container.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:30</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a1b2bb1b520d3d254b20718823a4b3fcc"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a1b2bb1b520d3d254b20718823a4b3fcc">hgps::ThreadsafeQueue::ThreadsafeQueue</a></div><div class="ttdeci">ThreadsafeQueue()=default</div><div class="ttdoc">Initialise a new instance of the ThreadsafeQueue class.</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a7f4e0c51e47ec42e2e87c13e71b90704"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a7f4e0c51e47ec42e2e87c13e71b90704">hgps::ThreadsafeQueue::push</a></div><div class="ttdeci">void push(const T &amp;item)</div><div class="ttdoc">Pushes the given element value to the end of the queue.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:56</div></div>
 <div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_a7f7694b9cf63ca126799b8d4df3c6b5c"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#a7f7694b9cf63ca126799b8d4df3c6b5c">hgps::ThreadsafeQueue::ThreadsafeQueue</a></div><div class="ttdeci">ThreadsafeQueue(const ThreadsafeQueue&lt; T &gt; &amp;)=delete</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_aa6072b9f6540d6cb74d5011061dc34fe"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#aa6072b9f6540d6cb74d5011061dc34fe">hgps::ThreadsafeQueue::push</a></div><div class="ttdeci">void push(T &amp;&amp;item)</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:37</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_ad061c17e11f57090629f4887e73dea91"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#ad061c17e11f57090629f4887e73dea91">hgps::ThreadsafeQueue::~ThreadsafeQueue</a></div><div class="ttdeci">virtual ~ThreadsafeQueue()</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:19</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_af6b90f1d47c7f5f90767284c43630552"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#af6b90f1d47c7f5f90767284c43630552">hgps::ThreadsafeQueue::pop</a></div><div class="ttdeci">std::optional&lt; T &gt; pop()</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:26</div></div>
-<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_afd1bf2dee6d492b484218ae641cd20e6"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#afd1bf2dee6d492b484218ae641cd20e6">hgps::ThreadsafeQueue::ThreadsafeQueue</a></div><div class="ttdeci">ThreadsafeQueue(ThreadsafeQueue&lt; T &gt; &amp;&amp;other)</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:14</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_aa6072b9f6540d6cb74d5011061dc34fe"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#aa6072b9f6540d6cb74d5011061dc34fe">hgps::ThreadsafeQueue::push</a></div><div class="ttdeci">void push(T &amp;&amp;item)</div><div class="ttdoc">Pushes the given element value to the end of the queue.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:50</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_ad061c17e11f57090629f4887e73dea91"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#ad061c17e11f57090629f4887e73dea91">hgps::ThreadsafeQueue::~ThreadsafeQueue</a></div><div class="ttdeci">virtual ~ThreadsafeQueue()</div><div class="ttdoc">Destroys a ThreadsafeQueue instance.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:26</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_af6b90f1d47c7f5f90767284c43630552"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#af6b90f1d47c7f5f90767284c43630552">hgps::ThreadsafeQueue::pop</a></div><div class="ttdeci">std::optional&lt; T &gt; pop()</div><div class="ttdoc">Removes an element from the front of the queue.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:37</div></div>
+<div class="ttc" id="aclasshgps_1_1ThreadsafeQueue_html_afd1bf2dee6d492b484218ae641cd20e6"><div class="ttname"><a href="classhgps_1_1ThreadsafeQueue.html#afd1bf2dee6d492b484218ae641cd20e6">hgps::ThreadsafeQueue::ThreadsafeQueue</a></div><div class="ttdeci">ThreadsafeQueue(ThreadsafeQueue&lt; T &gt; &amp;&amp;other)</div><div class="ttdoc">Move-constructs the underlying container using move semantics.</div><div class="ttdef"><b>Definition:</b> threadsafe_queue.h:20</div></div>
 <div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:9</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

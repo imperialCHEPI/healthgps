@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets the total value for males and females.">
 <polygon fill="#bfbfbf" stroke="black" points="345,-24.5 345,-54.5 459,-54.5 459,-24.5 345,-24.5"/>
 <text text-anchor="start" x="353" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::GenderValue::</text>
 <text text-anchor="middle" x="402" y="-31.5" font-family="Helvetica,sans-Serif" font-size="10.00">total</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1ModelResult.html#a6bd1ad7de7e448d80924d817b3f15b91" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1ModelResult.html#a6bd1ad7de7e448d80924d817b3f15b91" target="_top" xlink:title="Gets the number of recycled population slots due to deaths and emigration.">
 <polygon fill="none" stroke="black" points="184,-49.5 184,-79.5 309,-79.5 309,-49.5 184,-49.5"/>
 <text text-anchor="start" x="192" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelResult::</text>
 <text text-anchor="middle" x="246.5" y="-56.5" font-family="Helvetica,sans-Serif" font-size="10.00">number_of_recyclable</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1ModelResult.html#a2ec8799b43b43fcf85456e3e59085523" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1ModelResult.html#a2ec8799b43b43fcf85456e3e59085523" target="_top" xlink:title="Gets a string representation of this instance.">
 <polygon fill="none" stroke="black" points="190,-0.5 190,-30.5 303,-30.5 303,-0.5 190,-0.5"/>
 <text text-anchor="start" x="198" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelResult::</text>
 <text text-anchor="middle" x="246.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">to_string</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1ResultEventMessage.html#a9777d45b943b6c40a48583b609456936" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1ResultEventMessage.html#a9777d45b943b6c40a48583b609456936" target="_top" xlink:title="Create a string representation of this instance.">
 <polygon fill="none" stroke="black" points="0,-0.5 0,-30.5 148,-30.5 148,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ResultEventMessage</text>
 <text text-anchor="middle" x="74" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">::to_string</text>

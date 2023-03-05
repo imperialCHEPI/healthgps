@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" target="_top" xlink:title="Gets a read&#45;only reference to the model inputs definition.">
 <polygon fill="none" stroke="black" points="192.5,-203 192.5,-233 338.5,-233 338.5,-203 192.5,-203"/>
 <text text-anchor="start" x="200.5" y="-221" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="265.5" y="-210" font-family="Helvetica,sans-Serif" font-size="10.00">::inputs</text>
@@ -51,7 +51,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="structhgps_1_1SimulationDefinition.html#a735106fc3ad7c814aa94b7d7aa40b8e5" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="structhgps_1_1SimulationDefinition.html#a735106fc3ad7c814aa94b7d7aa40b8e5" target="_top" xlink:title="Gets a reference to the pseudo&#45;random number generator instance.">
 <polygon fill="none" stroke="black" points="182,-126.5 182,-145.5 349,-145.5 349,-126.5 182,-126.5"/>
 <text text-anchor="middle" x="265.5" y="-133.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition::rnd</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" target="_top" xlink:title="Gets the user custom seed to initialise the pseudo&#45;number generator.">
 <polygon fill="none" stroke="black" points="200.5,-88.5 200.5,-107.5 330.5,-107.5 330.5,-88.5 200.5,-88.5"/>
 <text text-anchor="middle" x="265.5" y="-95.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::seed</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classhgps_1_1RandomBitGenerator.html#ac58717fa118fcd760ed04bed995c4d63" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="classhgps_1_1RandomBitGenerator.html#ac58717fa118fcd760ed04bed995c4d63" target="_top" xlink:title="Sets the current state of the generator engine.">
 <polygon fill="none" stroke="black" points="191,-39 191,-69 340,-69 340,-39 191,-39"/>
 <text text-anchor="start" x="199" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RandomBitGenerator</text>
 <text text-anchor="middle" x="265.5" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::seed</text>
@@ -97,7 +97,7 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" target="_top" xlink:title=" ">
+<g id="a_node8"><a xlink:href="classhgps_1_1ModelInput.html#a045b359f9876d85a9dadf8afd6c677c8" target="_top" xlink:title="Gets the experiment stop time.">
 <polygon fill="none" stroke="black" points="188,-0.5 188,-19.5 343,-19.5 343,-0.5 188,-0.5"/>
 <text text-anchor="middle" x="265.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::ModelInput::stop_time</text>
 </a>
@@ -112,7 +112,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" target="_top" xlink:title="Gets the simulation scenario identifier.">
 <polygon fill="none" stroke="black" points="385,-159 385,-189 531,-189 531,-159 385,-159"/>
 <text text-anchor="start" x="393" y="-177" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::SimulationDefinition</text>
 <text text-anchor="middle" x="458" y="-166" font-family="Helvetica,sans-Serif" font-size="10.00">::identifier</text>

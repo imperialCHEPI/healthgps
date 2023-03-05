@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Generates a random floating point number in range [0,1)">
 <polygon fill="#bfbfbf" stroke="black" points="216,-122.5 216,-152.5 330,-152.5 330,-122.5 216,-122.5"/>
 <text text-anchor="start" x="224" y="-140.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Random::next</text>
 <text text-anchor="middle" x="273" y="-129.5" font-family="Helvetica,sans-Serif" font-size="10.00">_double</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="12.5,-245.5 12.5,-275.5 167.5,-275.5 167.5,-245.5 12.5,-245.5"/>
 <text text-anchor="start" x="20.5" y="-263.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FoodLabellingScenario</text>
 <text text-anchor="middle" x="90" y="-252.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="classhgps_1_1MarketingDynamicScenario.html#a84574c7750050d6d3b1b0c91276df416" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="classhgps_1_1MarketingDynamicScenario.html#a84574c7750050d6d3b1b0c91276df416" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="0,-196.5 0,-226.5 180,-226.5 180,-196.5 0,-196.5"/>
 <text text-anchor="start" x="8" y="-214.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::MarketingDynamicScenario</text>
 <text text-anchor="middle" x="90" y="-203.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647" target="_top" xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="none" stroke="black" points="7,-147.5 7,-177.5 173,-177.5 173,-147.5 7,-147.5"/>
 <text text-anchor="start" x="15" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::PhysicalActivityScenario</text>
 <text text-anchor="middle" x="90" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -101,7 +101,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classhgps_1_1Random.html#ad27457392d0893a9f7f01efea5bc6478" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="classhgps_1_1Random.html#ad27457392d0893a9f7f01efea5bc6478" target="_top" xlink:title="Samples a random value from an empirical distribution.">
 <polygon fill="none" stroke="black" points="33,-0.5 33,-30.5 147,-30.5 147,-0.5 33,-0.5"/>
 <text text-anchor="start" x="41" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Random::next</text>
 <text text-anchor="middle" x="90" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_empirical_discrete</text>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Gets a reference to the virtual population container.">
 <polygon fill="#bfbfbf" stroke="black" points="411,-330 411,-360 536,-360 536,-330 411,-330"/>
 <text text-anchor="start" x="419" y="-348" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RuntimeContext</text>
 <text text-anchor="middle" x="473.5" y="-337" font-family="Helvetica,sans-Serif" font-size="10.00">::population</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e" target="_top" xlink:title="Applies the baseline adjustments to the population risk factor values.">
 <polygon fill="none" stroke="black" points="210.5,-650 210.5,-680 362.5,-680 362.5,-650 210.5,-650"/>
 <text text-anchor="start" x="218.5" y="-668" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::RiskfactorAdjustment</text>
 <text text-anchor="middle" x="286.5" y="-657" font-family="Helvetica,sans-Serif" font-size="10.00">Model::Apply</text>

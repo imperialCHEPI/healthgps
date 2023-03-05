@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Applies this Scenario to the Person instance.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-39 0,-69 145,-69 145,-39 0,-39"/>
 <text text-anchor="start" x="8" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::FiscalPolicyScenario</text>
 <text text-anchor="middle" x="72.5" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">::apply</text>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" target="_top" xlink:title="Determine whether this interval contains a given time.">
 <polygon fill="none" stroke="black" points="186.5,-88 186.5,-118 299.5,-118 299.5,-88 186.5,-88"/>
 <text text-anchor="start" x="194.5" y="-106" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::PolicyInterval</text>
 <text text-anchor="middle" x="243" y="-95" font-family="Helvetica,sans-Serif" font-size="10.00">::contains</text>
@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structhgps_1_1Person.html#a92f21cc2d5ecbad13d2f75d766cf15e4" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="structhgps_1_1Person.html#a92f21cc2d5ecbad13d2f75d766cf15e4" target="_top" xlink:title="Gets a risk factor current value.">
 <polygon fill="none" stroke="black" points="181,-39 181,-69 305,-69 305,-39 181,-39"/>
 <text text-anchor="start" x="189" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::get_risk</text>
 <text text-anchor="middle" x="243" y="-46" font-family="Helvetica,sans-Serif" font-size="10.00">_factor_value</text>
@@ -53,7 +53,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="structhgps_1_1Person.html#a55a222e5e970c4fb8646079effbb279a" target="_top" xlink:title="Gets this instance unique identifier.">
 <polygon fill="none" stroke="black" points="196,-0.5 196,-19.5 290,-19.5 290,-0.5 196,-0.5"/>
 <text text-anchor="middle" x="243" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::Person::id</text>
 </a>

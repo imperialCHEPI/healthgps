@@ -1,4 +1,4 @@
 <map id="hgps::InfoEventMessage::accept" name="hgps::InfoEventMessage::accept">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,187,47"/>
+<area shape="rect" id="node1" title="Double dispatch the message using a visitor implementation." alt="" coords="5,5,187,47"/>
 <area shape="rect" id="node2" href="$classhgps_1_1EventMessageVisitor.html#a0245c8fd61cd9f8e6846e530fb3fc5d1" title="Visits a hgps::RunnerEventMessage message type." alt="" coords="235,5,433,47"/>
 </map>
