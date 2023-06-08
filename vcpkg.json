@@ -11,5 +11,5 @@
     "gtest",
     "benchmark"
   ],
-  "builtin-baseline": "501db0f17ef6df184fcdbfbe0f87cde2313b6ab1"
+  "builtin-baseline": "1e334d770ac71a89d1c36d51019e60dd08b68f76"
 }
