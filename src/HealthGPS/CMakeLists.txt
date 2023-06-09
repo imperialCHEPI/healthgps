@@ -26,6 +26,8 @@ target_sources(HealthGPS
 		"disease_table.h"
 		"energy_balance_model.cpp"
 		"energy_balance_model.h"
+		"energy_balance_model_new.cpp"
+		"energy_balance_model_new.h"
 		"error_message.cpp"
 		"error_message.h"
 		"event_bus.cpp"
