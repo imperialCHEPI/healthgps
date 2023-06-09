@@ -78,6 +78,8 @@ target_sources(HealthGPS
 		"result_message.h"
 		"riskfactor.cpp"
 		"riskfactor.h"
+		"riskfactornew.cpp"
+		"riskfactornew.h"
 		"riskfactor_adjustment.cpp"
 		"riskfactor_adjustment.h"
 		"riskfactor_adjustment_types.h"
