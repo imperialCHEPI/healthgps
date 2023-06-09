@@ -123,7 +123,7 @@ namespace host
 		return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels) };
 	}
 
-	LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename)
+	LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(std::string model_filename)
 	{
 		using namespace detail;
 
@@ -227,7 +227,7 @@ namespace host
 			}
 			else if (core::case_insensitive::equals(model.first, "dynamic")) {
 				model_type = HierarchicalModelType::Dynamic;
-				auto model_definition = load_dynamic_risk_model_info(model.second);
+				auto model_definition = load_dynamic_risk_model_definition(model.second);
 				repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
 			}
 			else {
