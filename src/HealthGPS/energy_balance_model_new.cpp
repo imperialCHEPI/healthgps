@@ -5,7 +5,7 @@
 namespace hgps {
 
 	EnergyBalanceHierarchicalModelNew::EnergyBalanceHierarchicalModelNew(
-		LiteHierarchicalModelDefinition& definition)
+		EnergyBalanceModelDefinition& definition)
 		: definition_{ definition } {}
 
 	HierarchicalModelType EnergyBalanceHierarchicalModelNew::type() const noexcept {

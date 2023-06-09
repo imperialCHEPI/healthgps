@@ -14,7 +14,7 @@ namespace hgps {
 
 		/// @brief Initialises a new instance of the EnergyBalanceHierarchicalModelNew class
 		/// @param definition The model definition instance
-		EnergyBalanceHierarchicalModelNew(LiteHierarchicalModelDefinition& definition);
+		EnergyBalanceHierarchicalModelNew(EnergyBalanceModelDefinition& definition);
 
 		HierarchicalModelType type() const noexcept override;
 
@@ -27,7 +27,7 @@ namespace hgps {
 		void update_risk_factors(RuntimeContext& context) override;
 
 	private:
-		std::reference_wrapper<LiteHierarchicalModelDefinition> definition_;
+		std::reference_wrapper<EnergyBalanceModelDefinition> definition_;
 		std::string name_{ "Dynamic" };
 
 		void update_risk_factors_exposure(RuntimeContext& context, Person& entity,

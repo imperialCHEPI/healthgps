@@ -172,4 +172,60 @@ namespace hgps {
 		std::map<core::Identifier, core::Identifier> variables_;
 		double boundary_percentage_;
 	};
+
+	/// @brief Defines the energy balance model data type
+	class EnergyBalanceModelDefinition final {
+	public:
+		EnergyBalanceModelDefinition() = delete;
+
+		/// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
+		/// @param equations The linear regression equations
+		/// @param variables The factors delta variables mapping
+		/// @param boundary_percentage The boundary percentage to sample
+		/// @throws std::invalid_argument for empty model equations definition
+		EnergyBalanceModelDefinition(
+			std::map<core::IntegerInterval, AgeGroupGenderEquation>&& equations,
+			std::map<core::Identifier, core::Identifier>&& variables, const double boundary_percentage = 0.05)
+			: equations_{ std::move(equations) }, variables_{ std::move(variables) }
+			, boundary_percentage_{ boundary_percentage } {
+
+			if (equations_.empty()) {
+				throw std::invalid_argument("The model equations definition must not be empty");
+			}
+		}
+
+		/// @brief Gets the model factors' delta variables mapping
+		/// @return Delta variables mapping
+		const std::map<core::Identifier, core::Identifier>& variables() const noexcept {
+			return variables_;
+		}
+
+		/// @brief Gets the linear regression equations for a given age
+		/// @param age The target age
+		/// @return The model equations
+		const AgeGroupGenderEquation& at(const int& age) const {
+			for (auto& entry : equations_) {
+				if (entry.first.contains(age)) {
+					return entry.second;
+				}
+			}
+
+			if (age < equations_.begin()->first.lower()) {
+				return equations_.begin()->second;
+			}
+
+			return equations_.rbegin()->second;
+		}
+
+		/// @brief Gets the boundary percentage to sample
+		/// @return Boundary percentage value
+		const double& boundary_percentage() const {
+			return boundary_percentage_;
+		}
+
+	private:
+		std::map<core::IntegerInterval, AgeGroupGenderEquation> equations_;
+		std::map<core::Identifier, core::Identifier> variables_;
+		double boundary_percentage_;
+	};
 }
