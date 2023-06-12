@@ -17,10 +17,10 @@ jobs:
     env:
       VCPKG_ROOT: 'vcpkg'
       VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
-      DEBUG_PRESET: 'x64-debug'
+      DEBUG_PRESET: 'windows-debug'
       DEBUG_BUILD_PRESET: 'debug-build-windows'
       DEBUG_TEST_PRESET: 'core-test-windows'
-      RELEASE_PRESET: 'x64-release'
+      RELEASE_PRESET: 'windows-release'
       RELEASE_BUILD_PRESET: 'release-build-windows'
 
     steps:
