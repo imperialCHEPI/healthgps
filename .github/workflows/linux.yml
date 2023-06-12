@@ -47,7 +47,6 @@ jobs:
       run: |
         git clone https://github.com/Microsoft/vcpkg.git
         cd vcpkg
-        git checkout --force 2023.01.09
         ./bootstrap-vcpkg.sh -disableMetrics
 
     - name: Tool Check
