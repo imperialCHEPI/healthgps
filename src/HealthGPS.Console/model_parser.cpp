@@ -220,20 +220,58 @@ namespace host
 		MEASURE_FUNCTION();
 		for (auto& model : info.risk_factor_models) {
 			HierarchicalModelType model_type;
-			if (core::case_insensitive::equals(model.first, "static")) {
-				model_type = HierarchicalModelType::Static;
-				auto model_definition = load_static_risk_model_definition(model.second);
-				repository.register_linear_model_definition(model_type, std::move(model_definition));
-			}
-			else if (core::case_insensitive::equals(model.first, "dynamic")) {
-				model_type = HierarchicalModelType::Dynamic;
-				auto model_definition = load_dynamic_risk_model_definition(model.second);
-				repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+			std::string model_filename = model.second;
+			std::ifstream ifs(model_filename, std::ifstream::in);
+
+			if (ifs) {
+				try {
+					// Get this model's name.
+					auto parsed_json = json::parse(ifs);
+					std::string model_name = core::to_lower(parsed_json["ModelName"].get<std::string>());
+
+					if (core::case_insensitive::equals(model.first, "static")) {
+						// Load this static model with the appropriate loader.
+						model_type = HierarchicalModelType::Static;
+						if (core::case_insensitive::equals(model_name, "hlm")) {
+							auto model_definition = load_static_risk_model_definition(model.second);
+							repository.register_linear_model_definition(model_type, std::move(model_definition));
+						}
+						else {
+							fmt::print(fg(fmt::color::red),
+							"Static model name '{}' is not recognised.\n",
+							model_name);
+						}
+					}
+					else if (core::case_insensitive::equals(model.first, "dynamic")) {
+						// Load this dynamic model with the appropriate loader.
+						model_type = HierarchicalModelType::Dynamic;
+						if (core::case_insensitive::equals(model_name, "ebhlm")) {
+							auto model_definition = load_dynamic_risk_model_definition(model.second);
+							repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+						}
+						else {
+							fmt::print(fg(fmt::color::red),
+							"Dynamic model name '{}' is not recognised.\n",
+							model_name);
+						}
+					}
+					else {
+						fmt::print(fg(fmt::color::red), "Unknown model type: {}.\n", model.first);
+						continue;
+					}
+				}
+				catch (const std::exception& ex) {
+					fmt::print(fg(fmt::color::red),
+					"Failed to parse model file: {}. {}\n",
+					model_filename, ex.what());
+				}
 			}
 			else {
-				fmt::print(fg(fmt::color::red), "Unknown hierarchical model type: {}.\n", model.first);
-				continue;
+				fmt::print(fg(fmt::color::red),
+				"Model file: {} not found.\n", model_filename);
 			}
+
+			ifs.close();
 		}
 
 		auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
