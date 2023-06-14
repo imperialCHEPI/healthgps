@@ -70,7 +70,7 @@ Finally, open the `healthgps` folder in Visual Studio and build. The first build
 cmake --list-presets=all
 
 # Windows
-cmake --preset='x64-release'
+cmake --preset='windows-release'
 cmake --build --preset='release-build-windows' --target install --config Release
 
 # Linux
@@ -84,7 +84,7 @@ The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/
 To run the unit tests:
 ```cmd
 # Windows
-cmake --preset='x64-debug'
+cmake --preset='windows-debug'
 cmake --build --preset='debug-build-windows'
 ctest --preset='core-test-windows'
 
