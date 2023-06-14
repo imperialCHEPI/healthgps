@@ -183,6 +183,33 @@ namespace host
 			std::move(equations), std::move(variables), percentage };
 	}
 
+	EnergyBalanceModelDefinition load_newebm_risk_model_definition(host::poco::json opt)
+	{
+		MEASURE_FUNCTION();
+		std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_coefficients;
+		auto nutrients = opt["Nutrients"].get<std::vector<std::string>>();
+
+		for (auto &food : opt["Foods"]) {
+			auto food_name = food["Name"].get<std::string>();
+			auto food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
+			auto food_ident = core::Identifier{food_name};
+
+			for (std::string &nutrient_name : nutrients) {
+				auto nutrient_ident = core::Identifier{nutrient_name};
+
+				try {
+					double val = food_nutrients.at(nutrient_name);
+					nutrient_coefficients[food_ident][nutrient_ident] = val;
+				}
+				catch (const std::out_of_range &oor) {
+					nutrient_coefficients[food_ident][nutrient_ident] = 0.0;
+				}
+			}
+		}
+
+		return EnergyBalanceModelDefinition(std::move(nutrient_coefficients));
+	}
+
 	void register_risk_factor_model_definitions(CachedRepository& repository,
 		const ModellingInfo& info, const SettingsInfo& settings)
 	{
@@ -217,6 +244,10 @@ namespace host
 						if (core::case_insensitive::equals(model_name, "ebhlm")) {
 							auto model_definition = load_dynamic_risk_model_definition(parsed_json);
 							repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+						}
+						else if (core::case_insensitive::equals(model_name, "newebm")) {
+							auto model_definition = load_newebm_risk_model_definition(parsed_json);
+							// TODO: repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
 						}
 						else {
 							fmt::print(fg(fmt::color::red),
