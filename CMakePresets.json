@@ -14,11 +14,10 @@
     {
       "name": "linux-debug",
       "displayName": "Linux Debug",
-      "description": "Build on Linux with g++ (debug).",
+      "description": "Build on Linux (debug).",
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_TOOLCHAIN_FILE": {
           "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
           "type": "FILEPATH"
@@ -32,7 +31,7 @@
     {
       "name": "linux-release",
       "displayName": "Linux Release",
-      "description": "Build on Linux with g++ (release).",
+      "description": "Build on Linux (release).",
       "inherits": "linux-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
