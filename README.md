@@ -1,5 +1,4 @@
-![windows](https://github.com/imperialCHEPI/healthgps/actions/workflows/windows.yml/badge.svg)
-![Linux](https://github.com/imperialCHEPI/healthgps/actions/workflows/linux.yml/badge.svg)
+[![CI](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml/badge.svg)](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
 
