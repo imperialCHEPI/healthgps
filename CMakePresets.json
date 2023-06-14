@@ -14,7 +14,7 @@
     {
       "name": "linux-debug",
       "displayName": "Linux Debug",
-      "description": "Target the Windows Subsystem for Linux (WSL).",
+      "description": "Build on Linux with g++ (debug).",
       "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
@@ -32,7 +32,7 @@
     {
       "name": "linux-release",
       "displayName": "Linux Release",
-      "description": "Sets the Windows build type to release",
+      "description": "Build on Linux with g++ (release).",
       "inherits": "linux-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
@@ -40,8 +40,8 @@
     },
     {
       "name": "windows-debug",
-      "displayName": "Windows x64 Debug",
-      "description": "Target Windows with the Visual Studio development environment.",
+      "displayName": "Windows Debug",
+      "description": "Build on Windows with Visual Studio (debug).",
       "inherits": "base",
       "architecture": {
         "value": "x64",
@@ -59,8 +59,8 @@
     },
     {
       "name": "windows-release",
-      "displayName": "Windows x64 Release",
-      "description": "Sets the Windows build type to release",
+      "displayName": "Windows Release",
+      "description": "Build on Windows with Visual Studio (release).",
       "inherits": "windows-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
