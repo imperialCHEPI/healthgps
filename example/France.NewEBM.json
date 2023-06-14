@@ -16,36 +16,24 @@
 		{
 			"Name": "FoodCarbs",
 			"Nutrients": {
-				"Carbs": 1.0,
-				"Fat": 0.0,
-				"Protein": 0.0,
-				"Sodium": 0.0
+				"Carbs": 1.0
 			}
 		},
 		{
 			"Name": "FoodFat",
 			"Nutrients": {
-				"Carbs": 0.0,
-				"Fat": 1.0,
-				"Protein": 0.0,
-				"Sodium": 0.0
+				"Fat": 1.0
 			}
 		},
 		{
 			"Name": "FoodProtein",
 			"Nutrients": {
-				"Carbs": 0.0,
-				"Fat": 0.0,
-				"Protein": 1.0,
-				"Sodium": 0.0
+				"Protein": 1.0
 			}
 		},
 		{
 			"Name": "FoodSodium",
 			"Nutrients": {
-				"Carbs": 0.0,
-				"Fat": 0.0,
-				"Protein": 0.0,
 				"Sodium": 1.0
 			}
 		}
