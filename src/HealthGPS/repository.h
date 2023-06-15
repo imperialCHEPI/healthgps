@@ -92,6 +92,14 @@ namespace hgps {
 			const HierarchicalModelType& model_type,
 			LiteHierarchicalModelDefinition&& definition);
 
+		/// @brief Register a user provided energy balance model definition
+		/// @param model_type The energy balance model type
+		/// @param definition The energy balance model definition instance
+		/// @return true, if the operation succeed; otherwise, false.
+		bool register_energy_balance_model_definition(
+			const HierarchicalModelType& model_type,
+			EnergyBalanceModelDefinition&& definition);
+
 		/// @brief Register a user provided baseline risk factors adjustments dataset
 		/// @param definition The baseline risk factors adjustments dataset
 		/// @return true, if the operation succeed; otherwise, false.
@@ -123,6 +131,7 @@ namespace hgps {
 		std::reference_wrapper<core::Datastore> data_manager_;
 		std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
+		std::map<HierarchicalModelType, EnergyBalanceModelDefinition> energy_balance_model_definition_;
 		BaselineAdjustment baseline_adjustments_;
 		std::vector<core::DiseaseInfo> diseases_info_;
 		std::map<core::Identifier, DiseaseDefinition> diseases_;

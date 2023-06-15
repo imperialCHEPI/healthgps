@@ -33,6 +33,17 @@ namespace hgps {
 		return success.second;
 	}
 
+	bool CachedRepository::register_energy_balance_model_definition(
+		const HierarchicalModelType& model_type, EnergyBalanceModelDefinition&& definition) {
+		std::unique_lock<std::mutex> lock(mutex_);
+		if (energy_balance_model_definition_.contains(model_type)) {
+			energy_balance_model_definition_.erase(model_type);
+		}
+
+		auto success = energy_balance_model_definition_.emplace(model_type, std::move(definition));
+		return success.second;
+	}
+
 	bool CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment&& definition) {
 		std::unique_lock<std::mutex> lock(mutex_);
 		baseline_adjustments_ = std::move(definition);

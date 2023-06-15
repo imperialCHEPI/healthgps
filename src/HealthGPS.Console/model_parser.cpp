@@ -247,7 +247,7 @@ namespace host
 						}
 						else if (core::case_insensitive::equals(model_name, "newebm")) {
 							auto model_definition = load_newebm_risk_model_definition(parsed_json);
-							// TODO: repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+							repository.register_energy_balance_model_definition(model_type, std::move(model_definition));
 						}
 						else {
 							fmt::print(fg(fmt::color::red),
