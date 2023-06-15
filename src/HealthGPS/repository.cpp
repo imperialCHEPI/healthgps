@@ -68,6 +68,13 @@ namespace hgps {
 		return lite_model_definiton_.at(model_type);
 	}
 
+	EnergyBalanceModelDefinition& CachedRepository::get_energy_balance_model_definition(
+		const HierarchicalModelType& model_type) {
+
+		std::scoped_lock<std::mutex> lock(mutex_);
+		return energy_balance_model_definition_.at(model_type);
+	}
+
 	BaselineAdjustment& CachedRepository::get_baseline_adjustment_definition()
 	{
 		std::scoped_lock<std::mutex> lock(mutex_);

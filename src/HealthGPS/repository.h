@@ -39,6 +39,12 @@ namespace hgps {
 		virtual LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
 			const HierarchicalModelType& model_type) = 0;
 
+		/// @brief Gets the user provided energy balance model definition
+		/// @param model_type Energy balance model type
+		/// @return The energy balance model definition
+		virtual EnergyBalanceModelDefinition& get_energy_balance_model_definition(
+			const HierarchicalModelType& model_type) = 0;
+
 		/// @brief Gets the user provided baseline risk factors adjustment dataset
 		/// @return Baseline risk factors adjustments
 		virtual BaselineAdjustment& get_baseline_adjustment_definition() = 0;
@@ -111,6 +117,9 @@ namespace hgps {
 			const HierarchicalModelType& model_type) override;
 
 		LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
+			const HierarchicalModelType& model_type) override;
+
+		EnergyBalanceModelDefinition& get_energy_balance_model_definition(
 			const HierarchicalModelType& model_type) override;
 
 		BaselineAdjustment& get_baseline_adjustment_definition() override;
