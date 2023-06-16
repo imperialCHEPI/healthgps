@@ -45,7 +45,7 @@ namespace hgps {
 	std::map<HierarchicalModelType, detail::EnergyBalanceModelBuilder> get_default_energy_balance_model_registry() {
 		auto registry = std::map<HierarchicalModelType, detail::EnergyBalanceModelBuilder>{
 			{HierarchicalModelType::Dynamic, [](EnergyBalanceModelDefinition& definition) {
-				return std::make_unique<EnergyBalanceHierarchicalModelNew>(definition); }},
+				return std::make_unique<EnergyBalanceModel>(definition); }},
 		};
 
 		return registry;
