@@ -12,6 +12,10 @@ namespace hgps {
 		/// @brief Defines the lite hierarchical model builder equation
 		using LiteHierarchicalModelBuilder = std::function<std::unique_ptr<HierarchicalLinearModel>(
 			LiteHierarchicalModelDefinition& definition)>;
+
+		/// @brief Defines the energy balance model builder equation
+		using EnergyBalanceModelBuilder = std::function<std::unique_ptr<HierarchicalLinearModel>(
+			EnergyBalanceModelDefinition& definition)>;
 	}
 
 	/// @brief Gets the default production instance builders for full hierarchical regression models
@@ -31,6 +35,17 @@ namespace hgps {
 		auto registry = std::map<HierarchicalModelType, detail::LiteHierarchicalModelBuilder>{
 			{HierarchicalModelType::Dynamic, [](LiteHierarchicalModelDefinition& definition) {
 				return std::make_unique<EnergyBalanceHierarchicalModel>(definition); }},
+		};
+
+		return registry;
+	}
+
+	/// @brief Gets the default production instance builders for energy balance models
+	/// @return The energy balance models builder functions registry
+	std::map<HierarchicalModelType, detail::EnergyBalanceModelBuilder> get_default_energy_balance_model_registry() {
+		auto registry = std::map<HierarchicalModelType, detail::EnergyBalanceModelBuilder>{
+			{HierarchicalModelType::Dynamic, [](EnergyBalanceModelDefinition& definition) {
+				return std::make_unique<EnergyBalanceHierarchicalModelNew>(definition); }},
 		};
 
 		return registry;
