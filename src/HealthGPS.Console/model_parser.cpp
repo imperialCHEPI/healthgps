@@ -200,8 +200,7 @@ namespace host
 
 		// Save food -> nutrient equations.
 		for (const auto &food : opt["Foods"]) {
-			auto food_str = food["Name"].get<std::string>();
-			auto food_ident = core::Identifier{food_str};
+			auto food_ident = core::Identifier{food["Name"].get<std::string>()};
 			auto food_nutrient_strings = food["Nutrients"].get<std::map<std::string, double>>();
 
 			for (const std::string &nutrient_str : nutrient_strings) {
