@@ -60,11 +60,11 @@ namespace host
 		model_info.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
 		model_info.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
 
-		for (auto& model_item : model_info.models) {
+		for (const auto &model_item : model_info.models) {
 			auto& at = model_item.second;
 
 			std::unordered_map<core::Identifier, Coefficient> coeffs;
-			for (auto& pair : at.coefficients) {
+			for (const auto &pair : at.coefficients) {
 				coeffs.emplace(core::Identifier(pair.first), Coefficient{
 						.value = pair.second.value,
 						.pvalue = pair.second.pvalue,
@@ -80,11 +80,11 @@ namespace host
 				});
 		}
 
-		for (auto& level_item : model_info.levels) {
+		for (auto &level_item : model_info.levels) {
 			auto& at = level_item.second;
 			std::unordered_map<core::Identifier, int> col_names;
 			auto variables_count = static_cast<int>(at.variables.size());
-			for (auto i = 0; i < variables_count; i++) {
+			for (int i = 0; i < variables_count; i++) {
 				col_names.emplace(core::Identifier{ at.variables[i] }, i);
 			}
 
@@ -129,32 +129,32 @@ namespace host
 		}
 
 		info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
-		for (auto& it : opt["Equations"].items()) {
+		for (const auto &it : opt["Equations"].items()) {
 			auto& age_key = it.key();
 			info.equations.emplace(age_key, std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
 
-			for (auto& sit : it.value().items()) {
+			for (const auto &sit : it.value().items()) {
 				auto gender_key = sit.key();
 				auto gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
 				info.equations.at(age_key).emplace(gender_key, gender_funcs);
 			}
 		}
 
-		for (auto& item : info.variables) {
+		for (const auto &item : info.variables) {
 			variables.emplace(core::Identifier{ item.name }, core::Identifier{ item.factor });
 		}
 
-		for (auto& age_grp : info.equations) {
+		for (const auto &age_grp : info.equations) {
 			auto limits = core::split_string(age_grp.first, "-");
 			auto age_key = core::IntegerInterval(std::stoi(limits[0].data()), std::stoi(limits[1].data()));
 			auto age_equations = AgeGroupGenderEquation{ .age_group = age_key };
-			for (auto& gender : age_grp.second) {
+			for (const auto &gender : age_grp.second) {
 
 				if (core::case_insensitive::equals("male", gender.first)) {
-					for (auto& func : gender.second) {
+					for (const auto &func : gender.second) {
 						auto function = FactorDynamicEquation{ .name = func.name };
 						function.residuals_standard_deviation = func.residuals_standard_deviation;
-						for (auto& coeff : func.coefficients) {
+						for (const auto &coeff : func.coefficients) {
 							function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
 						}
 
@@ -162,10 +162,10 @@ namespace host
 					}
 				}
 				else if (core::case_insensitive::equals("female", gender.first)) {
-					for (auto& func : gender.second) {
+					for (const auto &func : gender.second) {
 						auto function = FactorDynamicEquation{ .name = func.name };
 						function.residuals_standard_deviation = func.residuals_standard_deviation;
-						for (auto& coeff : func.coefficients) {
+						for (const auto &coeff : func.coefficients) {
 							function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
 						}
 
@@ -289,8 +289,8 @@ namespace host
 		auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
 		auto age_range = core::IntegerInterval(settings.age_range.front(), settings.age_range.back());
 		auto max_age = static_cast<std::size_t>(age_range.upper());
-		for (auto& table : adjustment.values) {
-			for (auto& item : table.second) {
+		for (const auto &table : adjustment.values) {
+			for (const auto &item : table.second) {
 				if (item.second.size() <= max_age) {
 					fmt::print(fg(fmt::color::red), "Baseline adjustment files data must cover age range: [{}].\n",
 						age_range.to_string());
