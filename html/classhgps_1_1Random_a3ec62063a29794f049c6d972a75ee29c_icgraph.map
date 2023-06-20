@@ -1,9 +1,0 @@
-<map id="hgps::Random::next_double" name="hgps::Random::next_double">
-<area shape="rect" id="node1" title="Generates a random floating point number in range [0,1)" alt="" coords="293,169,445,211"/>
-<area shape="rect" id="node2" href="$classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff" title="Applies this Scenario to the Person instance." alt="" coords="22,5,229,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1MarketingDynamicScenario.html#a84574c7750050d6d3b1b0c91276df416" title="Applies this Scenario to the Person instance." alt="" coords="5,71,245,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647" title="Applies this Scenario to the Person instance." alt="" coords="15,136,236,177"/>
-<area shape="rect" id="node5" href="$classhgps_1_1DefaultCancerModel.html#a59790779c6af498fed3df81b168cd504" title="Initialises the population disease status." alt="" coords="28,201,223,243"/>
-<area shape="rect" id="node6" href="$classhgps_1_1DefaultDiseaseModel.html#a2b8381459ae01f7ebf9b6023f1ad38db" title="Initialises the population disease status." alt="" coords="25,267,226,308"/>
-<area shape="rect" id="node7" href="$classhgps_1_1Random.html#ad27457392d0893a9f7f01efea5bc6478" title="Samples a random value from an empirical distribution." alt="" coords="49,332,201,373"/>
-</map>

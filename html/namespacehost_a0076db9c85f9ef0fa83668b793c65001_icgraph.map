@@ -1,5 +1,0 @@
-<map id="host::create_baseline_scenario" name="host::create_baseline_scenario">
-<area shape="rect" id="node1" title="Creates the baseline scenario instance." alt="" coords="317,5,479,47"/>
-<area shape="rect" id="node2" href="$namespacehost.html#ac879cb2a1396ff08368fa3e144d91523" title="Creates the baseline simulation engine instance." alt="" coords="108,5,269,47"/>
-<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
-</map>

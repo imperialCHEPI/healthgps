@@ -1,5 +1,0 @@
-<map id="hgps::Person::is_active" name="hgps::Person::is_active">
-<area shape="rect" id="node1" title="Gets a value indicating whether a Person is current active in the population." alt="" coords="225,31,396,57"/>
-<area shape="rect" id="node2" href="$structhgps_1_1Person.html#aedb677d26660b3bb0da666a07af557cf" title="Mark this instance as dead." alt="" coords="25,5,158,32"/>
-<area shape="rect" id="node3" href="$structhgps_1_1Person.html#a7140acdf752f1aae776a573dca87947a" title="Emigrate this instance from the virtual population." alt="" coords="5,56,177,83"/>
-</map>

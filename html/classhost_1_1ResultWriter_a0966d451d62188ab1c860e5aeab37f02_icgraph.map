@@ -1,4 +1,0 @@
-<map id="host::ResultWriter::write" name="host::ResultWriter::write">
-<area shape="rect" id="node1" title="Writes the hgps::ResultEventMessage contents to a stream." alt="" coords="199,5,337,47"/>
-<area shape="rect" id="node2" href="$classhost_1_1EventMonitor.html#aafe37c03f93b750ef7e62ceab2c0de1d" title="Visits a hgps::ResultEventMessage message type." alt="" coords="5,5,151,47"/>
-</map>

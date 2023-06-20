@@ -1,4 +1,0 @@
-<map id="host::EventMonitor::EventMonitor" name="host::EventMonitor::EventMonitor">
-<area shape="rect" id="node1" title="Initialises a new instance of the host::EventMonitor class." alt="" coords="5,5,151,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1EventAggregator.html#a07aacb3118b65a64d52f89c642832f06" title="Subscribes a handler function to an event type identifier." alt="" coords="199,5,369,47"/>
-</map>

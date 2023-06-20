@@ -1,7 +1,0 @@
-<map id="hgps::Repository::get_lms_definition" name="hgps::Repository::get_lms_definition">
-<area shape="rect" id="node1" title="Gets the LMS (lambda&#45;mu&#45;sigma) definition." alt="" coords="569,39,728,80"/>
-<area shape="rect" id="node2" href="$namespacehgps.html#a00f39dc81f9c78a17b520811df508289" title="Builds a new instance of the AnalysisModule using the given data infrastructure." alt="" coords="367,5,521,47"/>
-<area shape="rect" id="node5" href="$namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" title="Builds a new instance of the DiseaseModule using the given data infrastructure." alt="" coords="369,71,519,112"/>
-<area shape="rect" id="node3" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,39,319,80"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,46,60,73"/>
-</map>

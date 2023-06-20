@@ -1,4 +1,0 @@
-<map id="host::EventMonitor::stop" name="host::EventMonitor::stop">
-<area shape="rect" id="node1" title="Stops the monitor, no new messages are processed after stop." alt="" coords="199,5,344,47"/>
-<area shape="rect" id="node2" href="$classhost_1_1EventMonitor.html#ae335e7bbfbb39cbffcc46019eefaa7d7" title="Destroys a host::EventMonitor instance." alt="" coords="5,5,151,47"/>
-</map>

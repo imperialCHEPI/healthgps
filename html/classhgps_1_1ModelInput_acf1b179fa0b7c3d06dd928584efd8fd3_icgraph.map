@@ -1,8 +1,0 @@
-<map id="hgps::ModelInput::settings" name="hgps::ModelInput::settings">
-<area shape="rect" id="node1" title="Gets the simulation experiment settings definition." alt="" coords="584,78,779,105"/>
-<area shape="rect" id="node2" href="$namespacehgps.html#a00f39dc81f9c78a17b520811df508289" title="Builds a new instance of the AnalysisModule using the given data infrastructure." alt="" coords="374,5,529,47"/>
-<area shape="rect" id="node5" href="$namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" title="Builds a new instance of the DiseaseModule using the given data infrastructure." alt="" coords="376,71,527,112"/>
-<area shape="rect" id="node6" href="$namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" title="Builds a new instance of the PopulationModule using the given data infrastructure." alt="" coords="367,136,536,177"/>
-<area shape="rect" id="node3" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,71,319,112"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,78,60,105"/>
-</map>

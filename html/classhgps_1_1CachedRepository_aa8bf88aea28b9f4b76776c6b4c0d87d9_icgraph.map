@@ -1,4 +1,0 @@
-<map id="hgps::CachedRepository::get_diseases" name="hgps::CachedRepository::get_diseases">
-<area shape="rect" id="node1" title="Gets the collection of all diseases available in the back&#45;end storage." alt="" coords="232,5,411,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1CachedRepository.html#a468350e697808e571187fb0c3d6e726f" title="Gets a disease information by identifier." alt="" coords="5,5,184,47"/>
-</map>

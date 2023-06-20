@@ -1,4 +1,0 @@
-<map id="hgps::core::DataTable::to_string" name="hgps::core::DataTable::to_string">
-<area shape="rect" id="node1" title="Creates a string representation of the DataTable structure." alt="" coords="152,5,315,47"/>
-<area shape="rect" id="node2" href="$datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4" title="Output streams operator for DataTable type." alt="" coords="5,13,104,39"/>
-</map>

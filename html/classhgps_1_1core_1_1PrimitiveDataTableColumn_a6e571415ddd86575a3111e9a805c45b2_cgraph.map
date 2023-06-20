@@ -1,5 +1,0 @@
-<map id="hgps::core::PrimitiveDataTableColumn::value_safe" name="hgps::core::PrimitiveDataTableColumn::value_safe">
-<area shape="rect" id="node1" title="Gets the column value at a given index." alt="" coords="5,5,192,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aabf60a23ea7dbd86649a581a79db8fba" title="Determine whether a column value is not null." alt="" coords="240,5,427,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a98ef8047c67a1b9ea3f2c3e0623ed582" title="The size of the column data, number of rows." alt="" coords="475,5,661,47"/>
-</map>

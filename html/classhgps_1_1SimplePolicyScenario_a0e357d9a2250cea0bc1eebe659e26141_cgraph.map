@@ -1,4 +1,0 @@
-<map id="hgps::SimplePolicyScenario::apply" name="hgps::SimplePolicyScenario::apply">
-<area shape="rect" id="node1" title="Applies this Scenario to the Person instance." alt="" coords="5,5,207,47"/>
-<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307" title="Determine whether this interval contains a given time." alt="" coords="255,5,405,47"/>
-</map>

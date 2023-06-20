@@ -1,5 +1,0 @@
-<map id="hgps::HealthGPS::HealthGPS" name="hgps::HealthGPS::HealthGPS">
-<area shape="rect" id="node1" title="Initialises a new instance of the HealthGPS class." alt="" coords="5,46,212,73"/>
-<area shape="rect" id="node2" href="$classhgps_1_1SimulationModuleFactory.html#a0071993f6ae47f0ff5e6dbee91f4a819" title="Create a polymorphic SimulationModule instance." alt="" coords="260,5,487,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1SimulationDefinition.html#a6744348b0f2deec4ce75b7c08968c127" title="Gets a read&#45;only reference to the model inputs definition." alt="" coords="276,71,471,112"/>
-</map>

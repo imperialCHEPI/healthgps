@@ -1,4 +1,0 @@
-<map id="hgps::MTRandom32::seed" name="hgps::MTRandom32::seed">
-<area shape="rect" id="node1" title="Sets the current state of the generator engine." alt="" coords="303,5,493,32"/>
-<area shape="rect" id="node2" href="$classhgps_1_1MTRandom32.html#a1012fab7afb51086dacfcf36959db948" title="Initialise a new instance of the MTRandom32 class." alt="" coords="5,5,255,32"/>
-</map>

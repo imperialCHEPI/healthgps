@@ -1,4 +1,0 @@
-<map id="host::print_app_title" name="host::print_app_title">
-<area shape="rect" id="node1" title="Prints application start&#45;up messages." alt="" coords="5,5,157,32"/>
-<area shape="rect" id="node2" href="$namespacehost.html#aa8bb9c9e48b85a5423caf60b7dd1af2f" title="Get a string representation of current system time." alt="" coords="205,5,380,32"/>
-</map>

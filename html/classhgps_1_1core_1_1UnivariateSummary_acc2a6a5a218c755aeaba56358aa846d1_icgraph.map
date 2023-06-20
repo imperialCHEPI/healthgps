@@ -1,5 +1,0 @@
-<map id="hgps::core::UnivariateSummary::append" name="hgps::core::UnivariateSummary::append">
-<area shape="rect" id="node1" title="Append a new data point to the summary." alt="" coords="281,39,509,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#a80e81c6f813f98ef90fb8e4935f44d6d" title="Initialises a new instance of the UnivariateSummary class." alt="" coords="5,5,233,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1UnivariateVisitor.html#a6f2f70efdc94b776beea162666eba1f9" title="Visits a column of FloatDataTableColumn type." alt="" coords="34,71,205,112"/>
-</map>

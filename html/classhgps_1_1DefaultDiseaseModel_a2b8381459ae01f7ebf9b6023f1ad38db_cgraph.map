@@ -1,8 +1,0 @@
-<map id="hgps::DefaultDiseaseModel::initialise_disease_status" name="hgps::DefaultDiseaseModel::initialise_disease_status">
-<area shape="rect" id="node1" title="Initialises the population disease status." alt="" coords="5,136,207,177"/>
-<area shape="rect" id="node2" href="$classhgps_1_1DefaultDiseaseModel.html#adbd6b97a672469be6982d3af348c514f" title="Gets the model disease type unique identifier." alt="" coords="255,5,456,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1Random.html#a3ec62063a29794f049c6d972a75ee29c" title="Generates a random floating point number in range [0,1)" alt="" coords="279,71,431,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="272,136,439,177"/>
-<area shape="rect" id="node5" href="$classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3" title="Gets a reference to the engine random number generator." alt="" coords="272,201,439,243"/>
-<area shape="rect" id="node6" href="$classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" title="Gets the current simulation time." alt="" coords="272,267,439,308"/>
-</map>

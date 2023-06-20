@@ -1,5 +1,0 @@
-<map id="hgps::RuntimeContext::set_current_time" name="hgps::RuntimeContext::set_current_time">
-<area shape="rect" id="node1" title="Sets the current simulation time value." alt="" coords="236,23,403,65"/>
-<area shape="rect" id="node2" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="17,5,176,32"/>
-<area shape="rect" id="node3" href="$classhgps_1_1HealthGPS.html#af36af9f5aacf623d283f72e9a7b2c411" title="Called to assign a new state to the model at current time." alt="" coords="5,56,188,83"/>
-</map>

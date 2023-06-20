@@ -1,5 +1,0 @@
-<map id="hgps::SESNoiseModule" name="hgps::SESNoiseModule">
-<area shape="rect" id="node1" title="Implements the socio&#45;economic status (SES) module." alt="" coords="9,155,180,181"/>
-<area shape="rect" id="node2" href="$classhgps_1_1UpdatableModule.html" title="Generic disease module interface to host multiple diseases model." alt="" coords="7,80,183,107"/>
-<area shape="rect" id="node3" href="$classhgps_1_1SimulationModule.html" title="Simulation modules interface." alt="" coords="5,5,184,32"/>
-</map>

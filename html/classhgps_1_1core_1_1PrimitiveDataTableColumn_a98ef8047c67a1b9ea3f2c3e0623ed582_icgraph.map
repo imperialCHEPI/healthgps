@@ -1,8 +1,0 @@
-<map id="hgps::core::PrimitiveDataTableColumn::size" name="hgps::core::PrimitiveDataTableColumn::size">
-<area shape="rect" id="node1" title="The size of the column data, number of rows." alt="" coords="475,71,661,112"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aa5126870cfcb17847f77fcfe30f1a37e" title="Gets the iterator element following the last element of the column." alt="" coords="240,5,427,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a2611bd155afb6b2c802850f80bc0b438" title="Determine whether a column value is null." alt="" coords="240,71,427,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#aabf60a23ea7dbd86649a581a79db8fba" title="Determine whether a column value is not null." alt="" coords="240,136,427,177"/>
-<area shape="rect" id="node5" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a3f6c98d0500418b4a2a89095e8d1af57" title="Gets the column value at a given index." alt="" coords="5,103,192,144"/>
-<area shape="rect" id="node6" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a6e571415ddd86575a3111e9a805c45b2" title="Gets the column value at a given index." alt="" coords="5,168,192,209"/>
-</map>

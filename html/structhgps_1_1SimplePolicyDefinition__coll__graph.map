@@ -1,4 +1,0 @@
-<map id="hgps::SimplePolicyDefinition" name="hgps::SimplePolicyDefinition">
-<area shape="rect" id="node1" title="Simple intervention policy definition data type." alt="" coords="5,95,213,121"/>
-<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html" title="Defines the policy active interval." alt="" coords="34,5,185,32"/>
-</map>

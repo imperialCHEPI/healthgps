@@ -1,4 +1,0 @@
-<map id="hgps::data::DataManager::get_diseases" name="hgps::data::DataManager::get_diseases">
-<area shape="rect" id="node1" title="Gets the collection of diseases information in the store." alt="" coords="5,5,192,47"/>
-<area shape="rect" id="node2" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="240,5,445,47"/>
-</map>

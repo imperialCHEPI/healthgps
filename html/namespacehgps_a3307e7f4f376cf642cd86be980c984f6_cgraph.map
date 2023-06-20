@@ -1,6 +1,0 @@
-<map id="hgps::create_age_gender_table" name="hgps::create_age_gender_table">
-<area shape="rect" id="node1" title="Creates an instance of the age and gender lookup table." alt="" coords="5,71,191,112"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1Interval.html#a668fd071ff56c0019147b8763cf747b9" title="Gets the interval length." alt="" coords="239,5,385,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1core_1_1Interval.html#ae9995123ed22bb10f9b39a03bd573159" title="Gets the interval lower bound." alt="" coords="239,71,385,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1core_1_1Interval.html#a2cdf9a6b543eaae1a0010212fcb3e20c" title="Gets the interval upper bound." alt="" coords="239,136,385,177"/>
-</map>

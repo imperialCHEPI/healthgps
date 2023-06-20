@@ -1,6 +1,0 @@
-<map id="hgps::GenderValue::total" name="hgps::GenderValue::total">
-<area shape="rect" id="node1" title="Gets the total value for males and females." alt="" coords="465,39,617,80"/>
-<area shape="rect" id="node2" href="$structhgps_1_1ModelResult.html#a6bd1ad7de7e448d80924d817b3f15b91" title="Gets the number of recycled population slots due to deaths and emigration." alt="" coords="251,5,417,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1ModelResult.html#a2ec8799b43b43fcf85456e3e59085523" title="Gets a string representation of this instance." alt="" coords="259,71,409,112"/>
-<area shape="rect" id="node4" href="$structhgps_1_1ResultEventMessage.html#a9777d45b943b6c40a48583b609456936" title="Create a string representation of this instance." alt="" coords="5,71,203,112"/>
-</map>

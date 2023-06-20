@@ -1,5 +1,0 @@
-<map id="hgps::core::case_insensitive::contains" name="hgps::core::case_insensitive::contains">
-<area shape="rect" id="node1" title="Checks whether a specified substring occurs within a ASCII string." alt="" coords="429,5,635,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1DataSeries.html#a3d3e52a0ea2ac6686e28ec69b462266d" title="Adds a new channel to the collection." alt="" coords="217,5,381,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1DataSeries.html#a9a68223a9bf99c87e1d09ab495e61c59" title="Adds multiple channels to the collection." alt="" coords="5,5,169,47"/>
-</map>

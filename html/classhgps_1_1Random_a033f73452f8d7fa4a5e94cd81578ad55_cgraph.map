@@ -1,4 +1,0 @@
-<map id="hgps::Random::next_empirical_discrete" name="hgps::Random::next_empirical_discrete">
-<area shape="rect" id="node1" title="Samples a random value from an empirical distribution." alt="" coords="5,5,157,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Random.html#a3ec62063a29794f049c6d972a75ee29c" title="Generates a random floating point number in range [0,1)" alt="" coords="205,5,357,47"/>
-</map>

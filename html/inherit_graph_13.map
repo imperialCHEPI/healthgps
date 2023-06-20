@@ -1,4 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classhgps_1_1core_1_1Datastore.html" title="Defines the Health&#45;GPS back&#45;end data store interface for all implementations." alt="" coords="5,5,167,32"/>
-<area shape="rect" id="node2" href="$classhgps_1_1data_1_1DataManager.html" title="Implements Health&#45;GPS back&#45;end data store interface using a file&#45;based storage." alt="" coords="215,5,401,32"/>
-</map>

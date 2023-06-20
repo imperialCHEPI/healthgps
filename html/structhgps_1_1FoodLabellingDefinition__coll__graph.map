@@ -1,9 +1,0 @@
-<map id="hgps::FoodLabellingDefinition" name="hgps::FoodLabellingDefinition">
-<area shape="rect" id="node1" title="Food labelling intervention definition data type." alt="" coords="656,79,871,105"/>
-<area shape="rect" id="node2" href="$structhgps_1_1PolicyCoverage.html" title="Define the policy population coverage data type." alt="" coords="281,5,443,32"/>
-<area shape="rect" id="node3" href="$structhgps_1_1PolicyInterval.html" title="Defines the policy active interval." alt="" coords="287,56,437,83"/>
-<area shape="rect" id="node4" href="$structhgps_1_1TransferCoefficient.html" title="Define the transfer coefficient data type." alt="" coords="271,107,453,133"/>
-<area shape="rect" id="node5" href="$structhgps_1_1GenderValue.html" title=" " alt="" coords="5,98,160,139"/>
-<area shape="rect" id="node6" href="$structhgps_1_1AdjustmentFactor.html" title="Defined the risk factor adjustment data type." alt="" coords="275,161,449,188"/>
-<area shape="rect" id="node7" href="$structhgps_1_1core_1_1Identifier.html" title="Entity unique identifier data type." alt="" coords="5,164,160,191"/>
-</map>

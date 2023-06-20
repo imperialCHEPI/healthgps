@@ -1,4 +1,0 @@
-<map id="hgps::LifeTable::get_total_deaths_at" name="hgps::LifeTable::get_total_deaths_at">
-<area shape="rect" id="node1" title="Gets the total number of deaths at a given time." alt="" coords="5,5,153,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1LifeTable.html#ad200f6ee9182041b0112d9bd15b858dd" title="Gets the Mortality indicators at a given time." alt="" coords="201,5,349,47"/>
-</map>

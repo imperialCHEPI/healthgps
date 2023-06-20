@@ -1,6 +1,0 @@
-<map id="hgps::RuntimeContext::age_range" name="hgps::RuntimeContext::age_range">
-<area shape="rect" id="node1" title="Gets a read&#45;only reference to the population age range constraints." alt="" coords="288,71,455,112"/>
-<area shape="rect" id="node2" href="$classhgps_1_1DefaultCancerModel.html#aec3e6ee1bc0d3dc97761638df893b82b" title="Initialises the average relative risks once all diseases status were initialised." alt="" coords="5,5,240,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1DefaultDiseaseModel.html#a31040870542eb041053bb70d14e4afc4" title="Initialises the average relative risks once all diseases status were initialised." alt="" coords="5,71,240,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1AnalysisModule.html#ad8a0a99804d6d01a1ed39c3e4f080999" title="Initialises the virtual population." alt="" coords="41,136,205,177"/>
-</map>

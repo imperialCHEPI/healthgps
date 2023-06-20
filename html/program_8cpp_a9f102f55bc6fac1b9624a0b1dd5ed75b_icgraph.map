@@ -1,4 +1,0 @@
-<map id="exit_application" name="exit_application">
-<area shape="rect" id="node1" title="Prints application exit message." alt="" coords="108,5,235,32"/>
-<area shape="rect" id="node2" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,5,60,32"/>
-</map>

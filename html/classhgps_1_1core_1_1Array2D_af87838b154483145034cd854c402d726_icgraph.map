@@ -1,5 +1,0 @@
-<map id="hgps::core::Array2D::columns" name="hgps::core::Array2D::columns">
-<area shape="rect" id="node1" title="Gets the number of coluns in the array." alt="" coords="243,39,393,80"/>
-<area shape="rect" id="node2" href="$classhgps_1_1RelativeRiskLookup.html#af0a6ff699396be055d3b790e80d17127" title="Gets the number of columns lookup breakpoints." alt="" coords="5,5,195,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1RelativeRiskLookup.html#ae807e285da2387e3b44ea68372b3f34c" title="Initialises a new instance of the RelativeRiskLookup class." alt="" coords="5,71,195,112"/>
-</map>

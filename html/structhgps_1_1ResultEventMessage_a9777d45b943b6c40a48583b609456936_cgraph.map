@@ -1,5 +1,0 @@
-<map id="hgps::ResultEventMessage::to_string" name="hgps::ResultEventMessage::to_string">
-<area shape="rect" id="node1" title="Create a string representation of this instance." alt="" coords="5,5,203,47"/>
-<area shape="rect" id="node2" href="$structhgps_1_1ModelResult.html#a2ec8799b43b43fcf85456e3e59085523" title="Gets a string representation of this instance." alt="" coords="251,5,401,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1GenderValue.html#aa66ed72b88ed172d41392452725f06e6" title="Gets the total value for males and females." alt="" coords="449,5,601,47"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="hgps::PhysicalActivityScenario" name="hgps::PhysicalActivityScenario">
-<area shape="rect" id="node1" title="Implements the physical activity regulation intervention scenario." alt="" coords="5,155,227,181"/>
-<area shape="rect" id="node2" href="$classhgps_1_1InterventionScenario.html" title="Health&#45;GPS scripted intervention policy scenario interface." alt="" coords="18,80,214,107"/>
-<area shape="rect" id="node3" href="$classhgps_1_1Scenario.html" title="Health&#45;GPS simulation scenario interface." alt="" coords="57,5,175,32"/>
-</map>

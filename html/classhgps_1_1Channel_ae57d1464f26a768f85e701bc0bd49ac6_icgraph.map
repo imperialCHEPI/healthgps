@@ -1,4 +1,0 @@
-<map id="hgps::Channel::closed" name="hgps::Channel::closed">
-<area shape="rect" id="node1" title="Determine whether the channel is closed." alt="" coords="193,13,357,39"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Channel.html#aac6733167c16768694bb2de8e6f7e4d0" title="Try to receive a message from the channel." alt="" coords="5,5,145,47"/>
-</map>

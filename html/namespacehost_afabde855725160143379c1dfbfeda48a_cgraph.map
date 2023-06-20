@@ -1,6 +1,0 @@
-<map id="host::create_intervention_simulation" name="host::create_intervention_simulation">
-<area shape="rect" id="node1" title="Creates the intervention simulation engine instance." alt="" coords="5,5,191,47"/>
-<area shape="rect" id="node2" href="$namespacehost.html#a4552f895418d563b0dac59718d48b4d8" title="Creates the intervention scenario instance." alt="" coords="239,5,424,47"/>
-<area shape="rect" id="node3" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="659,5,864,47"/>
-<area shape="rect" id="node4" href="$namespacehgps.html#adf9e6a1bb7098d2f9a2fd6c49d575fe1" title=" " alt="" coords="472,35,611,76"/>
-</map>

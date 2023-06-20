@@ -1,4 +1,0 @@
-<map id="hgps::core::PrimitiveDataTableColumn::is_valid" name="hgps::core::PrimitiveDataTableColumn::is_valid">
-<area shape="rect" id="node1" title="Determine whether a column value is not null." alt="" coords="5,5,192,47"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1PrimitiveDataTableColumn.html#a98ef8047c67a1b9ea3f2c3e0623ed582" title="The size of the column data, number of rows." alt="" coords="240,5,427,47"/>
-</map>

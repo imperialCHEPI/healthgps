@@ -1,4 +1,0 @@
-<map id="hgps::ErrorEventMessage" name="hgps::ErrorEventMessage">
-<area shape="rect" id="node1" title="Implements the simulation error event message data type." alt="" coords="5,80,192,107"/>
-<area shape="rect" id="node2" href="$structhgps_1_1EventMessage.html" title="Simulation event messages interface." alt="" coords="21,5,177,32"/>
-</map>

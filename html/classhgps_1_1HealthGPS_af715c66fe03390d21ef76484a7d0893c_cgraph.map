@@ -1,5 +1,0 @@
-<map id="hgps::HealthGPS::terminate" name="hgps::HealthGPS::terminate">
-<area shape="rect" id="node1" title="Terminates the simulation experiment." alt="" coords="5,13,208,39"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Simulation.html#a405fa37a049c3a5e1ee9f16c8c8e2a80" title="Gets the simulation name." alt="" coords="256,13,432,39"/>
-<area shape="rect" id="node3" href="$structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" title="Gets the simulation scenario identifier." alt="" coords="480,5,675,47"/>
-</map>

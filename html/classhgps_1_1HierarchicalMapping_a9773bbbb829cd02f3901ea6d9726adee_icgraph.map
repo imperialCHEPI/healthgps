@@ -1,5 +1,0 @@
-<map id="hgps::HierarchicalMapping::at_level_without_dynamic" name="hgps::HierarchicalMapping::at_level_without_dynamic">
-<area shape="rect" id="node1" title="Gets the mapping entries at a given hierarchical level without the dynamic factor." alt="" coords="240,53,441,94"/>
-<area shape="rect" id="node2" href="$classhgps_1_1StaticHierarchicalLinearModel.html#aed69f3d22a37908a2e350b73f4b3dfd0" title="Generates the initial risk factors for a population and newborns." alt="" coords="11,5,187,61"/>
-<area shape="rect" id="node3" href="$classhgps_1_1StaticHierarchicalLinearModel.html#a2501846cb781316081a03317bfabfeca" title="Update risk factors for population." alt="" coords="5,85,192,141"/>
-</map>

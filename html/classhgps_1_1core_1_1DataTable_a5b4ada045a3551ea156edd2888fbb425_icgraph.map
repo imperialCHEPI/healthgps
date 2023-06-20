@@ -1,9 +1,0 @@
-<map id="hgps::core::DataTable::num_columns" name="hgps::core::DataTable::num_columns">
-<area shape="rect" id="node1" title="Gets the number of columns." alt="" coords="764,35,927,76"/>
-<area shape="rect" id="node2" href="$classhgps_1_1core_1_1DataTable.html#ae022bf3052be4728cce521ca87a54865" title="Adds a new column to the table." alt="" coords="311,13,505,39"/>
-<area shape="rect" id="node5" href="$classhgps_1_1core_1_1DataTable.html#aea4b85552bb60b81746a68bdcf95e059" title="Gets the column at a given index." alt="" coords="553,35,716,76"/>
-<area shape="rect" id="node6" href="$classhgps_1_1core_1_1DataTable.html#ac538073abf34df84a75f0ddbceba36a4" title="Creates a string representation of the DataTable structure." alt="" coords="553,100,716,141"/>
-<area shape="rect" id="node3" href="$namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa" title="Populates a datatable with the input data file contents." alt="" coords="108,5,263,47"/>
-<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
-<area shape="rect" id="node7" href="$datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4" title="Output streams operator for DataTable type." alt="" coords="359,107,457,134"/>
-</map>
