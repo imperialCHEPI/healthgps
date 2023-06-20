@@ -195,8 +195,7 @@ namespace host
 		// Save nutrient identities.
 		auto nutrient_strings = opt["Nutrients"].get<std::vector<std::string>>();
 		for (const std::string &nutrient_str : nutrient_strings) {
-			auto nutrient_ident = core::Identifier(nutrient_str);
-			nutrient_list.push_back(nutrient_ident);
+			nutrient_list.emplace_back(nutrient_str);
 		}
 
 		// Save food -> nutrient equations.
