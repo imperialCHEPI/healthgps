@@ -85,7 +85,7 @@ namespace hgps {
 		/// @brief Register a user provided full hierarchical linear model definition
 		/// @param model_type The hierarchical model type
 		/// @param definition The hierarchical model definition instance
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_linear_model_definition(
 			const HierarchicalModelType& model_type,
 			HierarchicalLinearModelDefinition&& definition);
@@ -93,7 +93,7 @@ namespace hgps {
 		/// @brief Register a user provided lite hierarchical linear model definition
 		/// @param model_type The hierarchical model type
 		/// @param definition The lite hierarchical model definition instance
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_lite_linear_model_definition(
 			const HierarchicalModelType& model_type,
 			LiteHierarchicalModelDefinition&& definition);
@@ -101,14 +101,14 @@ namespace hgps {
 		/// @brief Register a user provided energy balance model definition
 		/// @param model_type The energy balance model type
 		/// @param definition The energy balance model definition instance
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_energy_balance_model_definition(
 			const HierarchicalModelType& model_type,
 			EnergyBalanceModelDefinition&& definition);
 
 		/// @brief Register a user provided baseline risk factors adjustments dataset
 		/// @param definition The baseline risk factors adjustments dataset
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_baseline_adjustment_definition(BaselineAdjustment&& definition);
 
 		core::Datastore& manager() noexcept override;
