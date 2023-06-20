@@ -224,7 +224,7 @@ namespace host
 		MEASURE_FUNCTION();
 		for (auto& model : info.risk_factor_models) {
 			HierarchicalModelType model_type;
-			std::string model_filename = model.second;
+			const auto &model_filename = model.second;
 			std::ifstream ifs(model_filename, std::ifstream::in);
 
 			if (ifs) {
