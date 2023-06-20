@@ -134,8 +134,8 @@ namespace host
 			info.equations.emplace(age_key, std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
 
 			for (const auto &sit : it.value().items()) {
-				auto gender_key = sit.key();
-				auto gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
+				const auto &gender_key = sit.key();
+				const auto &gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
 				info.equations.at(age_key).emplace(gender_key, gender_funcs);
 			}
 		}
