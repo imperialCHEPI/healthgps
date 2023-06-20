@@ -182,23 +182,35 @@ namespace hgps {
 		/// @param nutrient_coefficients The food group -> nutrient weights
 		/// @throws std::invalid_argument if nutrient coefficients map is empty
 		EnergyBalanceModelDefinition(
-			std::map<core::Identifier, std::map<core::Identifier, double>>&& nutrient_coefficients)
-			: nutrient_coefficients_{ std::move(nutrient_coefficients) } {
+			std::vector<core::Identifier> &&nutrient_list,
+			std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations) :
+			nutrient_list_{ std::move(nutrient_list) },
+			nutrient_equations_{ std::move(nutrient_equations) } {
 
-			if (nutrient_coefficients_.empty()) {
-				throw std::invalid_argument("The model equations definition must not be empty");
+			if (nutrient_list_.empty()) {
+				throw std::invalid_argument("Nutrient list is empty");
+			}
+
+			if (nutrient_equations_.empty()) {
+				throw std::invalid_argument("Nutrient equation mapping is empty");
 			}
 		}
 
-		/// @brief Gets the nutrients weights for a given food group
-		/// @param food_group The food group to find nutrient weights for
-		/// @return Nutrient coefficients for this food group
-		const std::map<core::Identifier, double> &get_food_coefficients(
-			core::Identifier food_group) const noexcept {
-			return nutrient_coefficients_.at(food_group);
+		/// @brief Gets the list of nutrients used in the model
+		/// @return A vector of nutrient identities
+		const std::vector<core::Identifier> &nutrient_list() const noexcept {
+			return nutrient_list_;
+		}
+
+		/// @brief Gets the nutrient coefficients for each food group
+		/// @return A map of nutrient coefficients for each food group
+		const std::map<core::Identifier,
+		std::map<core::Identifier, double>> &nutrient_equations() const noexcept {
+			return nutrient_equations_;
 		}
 
 	private:
-		std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_coefficients_;
+		std::vector<core::Identifier> nutrient_list_;
+		std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
 	};
 }

@@ -14,25 +14,25 @@
 	],
 	"Foods": [
 		{
-			"Name": "FoodCarbs",
+			"Name": "Carbs",
 			"Nutrients": {
 				"Carbs": 1.0
 			}
 		},
 		{
-			"Name": "FoodFat",
+			"Name": "Fat",
 			"Nutrients": {
 				"Fat": 1.0
 			}
 		},
 		{
-			"Name": "FoodProtein",
+			"Name": "Protein",
 			"Nutrients": {
 				"Protein": 1.0
 			}
 		},
 		{
-			"Name": "FoodSodium",
+			"Name": "Sodium",
 			"Nutrients": {
 				"Sodium": 1.0
 			}

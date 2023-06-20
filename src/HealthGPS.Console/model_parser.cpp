@@ -186,28 +186,37 @@ namespace host
 	EnergyBalanceModelDefinition load_newebm_risk_model_definition(host::poco::json opt)
 	{
 		MEASURE_FUNCTION();
-		std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_coefficients;
-		auto nutrients = opt["Nutrients"].get<std::vector<std::string>>();
+		std::vector<core::Identifier> nutrient_list;
+		std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
 
-		for (auto &food : opt["Foods"]) {
-			auto food_name = food["Name"].get<std::string>();
-			auto food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
-			auto food_ident = core::Identifier{food_name};
+		// Save nutrient identities.
+		auto nutrient_strings = opt["Nutrients"].get<std::vector<std::string>>();
+		for (const std::string &nutrient_str : nutrient_strings) {
+			auto nutrient_ident = core::Identifier(nutrient_str);
+			nutrient_list.push_back(nutrient_ident);
+		}
 
-			for (std::string &nutrient_name : nutrients) {
-				auto nutrient_ident = core::Identifier{nutrient_name};
+		// Save food -> nutrient equations.
+		for (const auto &food : opt["Foods"]) {
+			auto food_str = food["Name"].get<std::string>();
+			auto food_ident = core::Identifier{food_str};
+			auto food_nutrient_strings = food["Nutrients"].get<std::map<std::string, double>>();
+
+			for (const std::string &nutrient_str : nutrient_strings) {
+				auto nutrient_ident = core::Identifier(nutrient_str);
 
 				try {
-					double val = food_nutrients.at(nutrient_name);
-					nutrient_coefficients[food_ident][nutrient_ident] = val;
+					double val = food_nutrient_strings.at(nutrient_str);
+					nutrient_equations[food_ident][nutrient_ident] = val;
 				}
 				catch (const std::out_of_range &oor) {
-					nutrient_coefficients[food_ident][nutrient_ident] = 0.0;
+					//nutrient_equations[food_ident][nutrient_ident] = 0.0;
 				}
 			}
 		}
 
-		return EnergyBalanceModelDefinition(std::move(nutrient_coefficients));
+		return EnergyBalanceModelDefinition(
+			std::move(nutrient_list), std::move(nutrient_equations));
 	}
 
 	void register_risk_factor_model_definitions(CachedRepository& repository,

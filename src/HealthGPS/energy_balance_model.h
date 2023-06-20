@@ -29,5 +29,8 @@ namespace hgps {
 	private:
 		std::reference_wrapper<EnergyBalanceModelDefinition> definition_;
 		std::string name_{ "Dynamic" };
+
+		std::map<core::Identifier, double> get_current_risk_factors(
+			const HierarchicalMapping& mapping, Person& entity, int time_year) const;
 	};
 }
