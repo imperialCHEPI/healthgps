@@ -10,6 +10,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  qa:
+    name: Run pre-commit hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pre-commit/action@v3.0.0
+
   build:
     name: Build and test
     runs-on: ${{ matrix.os }}
