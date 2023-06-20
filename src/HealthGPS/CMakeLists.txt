@@ -115,7 +115,6 @@ target_sources(HealthGPS
 		"gender_table.h"
 		"gender_value.h"
 		"hierarchical_model.h"
-		"hierarchical_model_registry.h"
 		"hierarchical_model_types.h"
 		"interfaces.h"
 		"intervention_scenario.h"

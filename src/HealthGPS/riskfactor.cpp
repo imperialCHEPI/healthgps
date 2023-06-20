@@ -1,5 +1,4 @@
 #include "riskfactor.h"
-#include "hierarchical_model_registry.h"
 
 namespace hgps {
 
