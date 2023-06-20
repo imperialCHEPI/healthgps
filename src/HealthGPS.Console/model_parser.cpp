@@ -74,7 +74,7 @@ namespace host
 			}
 
 			models.emplace(core::Identifier(model_item.first), LinearModel{
-				.coefficients = coeffs,
+				.coefficients = std::move(coeffs),
 				.residuals_standard_deviation = at.residuals_standard_deviation,
 				.rsquared = at.rsquared
 				});
@@ -89,7 +89,7 @@ namespace host
 			}
 
 			levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
-				.variables = col_names,
+				.variables = std::move(col_names),
 				.transition = core::DoubleArray2D(
 					at.transition.rows, at.transition.cols, at.transition.data),
 
