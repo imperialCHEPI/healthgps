@@ -207,12 +207,9 @@ namespace host
 			for (const std::string &nutrient_str : nutrient_strings) {
 				auto nutrient_ident = core::Identifier(nutrient_str);
 
-				try {
+				if (food_nutrient_strings.contains(nutrient_str)) {
 					double val = food_nutrient_strings.at(nutrient_str);
 					nutrient_equations[food_ident][nutrient_ident] = val;
-				}
-				catch (const std::out_of_range &oor) {
-					continue;
 				}
 			}
 		}
