@@ -47,7 +47,8 @@ namespace host
 		}
 	}
 
-	HierarchicalLinearModelDefinition load_static_risk_model_definition(host::poco::json opt)
+	HierarchicalLinearModelDefinition load_static_risk_model_definition(
+		const host::poco::json &opt)
 	{
 		using namespace detail;
 
@@ -108,7 +109,8 @@ namespace host
 		return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels) };
 	}
 
-	LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(host::poco::json opt)
+	LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(
+		const host::poco::json &opt)
 	{
 		using namespace detail;
 
@@ -183,7 +185,8 @@ namespace host
 			std::move(equations), std::move(variables), percentage };
 	}
 
-	EnergyBalanceModelDefinition load_newebm_risk_model_definition(host::poco::json opt)
+	EnergyBalanceModelDefinition load_newebm_risk_model_definition(
+		const host::poco::json &opt)
 	{
 		MEASURE_FUNCTION();
 		std::vector<core::Identifier> nutrient_list;
