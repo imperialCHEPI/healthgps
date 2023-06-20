@@ -210,7 +210,7 @@ namespace host
 					nutrient_equations[food_ident][nutrient_ident] = val;
 				}
 				catch (const std::out_of_range &oor) {
-					//nutrient_equations[food_ident][nutrient_ident] = 0.0;
+					continue;
 				}
 			}
 		}
