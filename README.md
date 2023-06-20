@@ -1,5 +1,4 @@
-![windows](https://github.com/imperialCHEPI/healthgps/actions/workflows/windows.yml/badge.svg)
-![Linux](https://github.com/imperialCHEPI/healthgps/actions/workflows/linux.yml/badge.svg)
+[![CI](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml/badge.svg)](https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/imperialCHEPI/healthgps)
 
@@ -70,7 +69,7 @@ Finally, open the `healthgps` folder in Visual Studio and build. The first build
 cmake --list-presets=all
 
 # Windows
-cmake --preset='x64-release'
+cmake --preset='windows-release'
 cmake --build --preset='release-build-windows' --target install --config Release
 
 # Linux
@@ -84,7 +83,7 @@ The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/
 To run the unit tests:
 ```cmd
 # Windows
-cmake --preset='x64-debug'
+cmake --preset='windows-debug'
 cmake --build --preset='debug-build-windows'
 ctest --preset='core-test-windows'
 
@@ -94,8 +93,24 @@ cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
 
-All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also declare *build presets* to be used via the CMake command line arguments.
+All available options are defined using CMake *presets* in the `CMakePresets.json` file,
+which also declare *build presets* to be used via the CMake command line arguments.
 
+### Optional: Running `pre-commit` hooks
+
+It is recommended that developers install [`pre-commit`](https://pre-commit.com/) to
+make use of [the hooks](./.pre-commit-config.yaml) we have installed for this
+repository. (Note that this step is only for Health-GPS developers, not end users!)
+
+Once you have [installed `pre-commit`](https://pre-commit.com/#installation), you should
+install the hooks into your local clone of the Health-GPS repository, like so:
+
+```cmd
+> pre-commit install
+```
+
+Now, every time attempt to make a git commit, your changes will be checked against the
+`pre-commit` hooks.
 
 # License
 

@@ -135,7 +135,7 @@ namespace host
 
 			cmd.success = cmd.exit_code == EXIT_SUCCESS;
 		}
-		catch (const cxxopts::OptionException& ex) {
+		catch (const cxxopts::exceptions::exception& ex) {
 			fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}.\n", ex.what());
 			fmt::print("\n{}\n", options.help());
 			cmd.success = false;
