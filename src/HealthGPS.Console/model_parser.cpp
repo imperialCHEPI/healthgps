@@ -278,8 +278,6 @@ namespace host
 				fmt::print(fg(fmt::color::red),
 				"Model file: {} not found.\n", model_filename);
 			}
-
-			ifs.close();
 		}
 
 		auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
