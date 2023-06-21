@@ -1,0 +1,4 @@
+<map id="hgps::Person::emigrate" name="hgps::Person::emigrate">
+<area shape="rect" id="node1" title="Emigrate this instance from the virtual population." alt="" coords="5,5,177,32"/>
+<area shape="rect" id="node2" href="$structhgps_1_1Person.html#ab6624f7b8d4c9c85803d247cf71861fb" title="Gets a value indicating whether a Person is current active in the population." alt="" coords="225,5,396,32"/>
+</map>

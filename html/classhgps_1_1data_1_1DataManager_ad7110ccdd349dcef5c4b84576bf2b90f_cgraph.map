@@ -1,0 +1,5 @@
+<map id="hgps::data::DataManager::get_country" name="hgps::data::DataManager::get_country">
+<area shape="rect" id="node1" title="Gets a single country by the alpha code." alt="" coords="5,39,192,80"/>
+<area shape="rect" id="node2" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="240,5,445,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1data_1_1DataManager.html#abc42fa2dd5e12e64a82848a0b31b2826" title="Gets the full collection of countries in the store." alt="" coords="249,71,436,112"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="hgps::DefaultEventBus::unsubscribe" name="hgps::DefaultEventBus::unsubscribe">
+<area shape="rect" id="node1" title="Unsubscribes from an event notification." alt="" coords="5,5,176,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1EventSubscriber.html#aa2c5a56bc02d880da0713c1467e0b4f0" title="Gets the subscriber unique identifier." alt="" coords="224,13,411,39"/>
+</map>

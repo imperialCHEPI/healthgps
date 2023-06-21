@@ -1,0 +1,4 @@
+<map id="host::create_job_seed" name="host::create_job_seed">
+<area shape="rect" id="node1" title="Creates the experiment random number generator seed." alt="" coords="5,5,169,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" title="Advances the engine&#39;s state by a specified amount." alt="" coords="217,5,424,32"/>
+</map>

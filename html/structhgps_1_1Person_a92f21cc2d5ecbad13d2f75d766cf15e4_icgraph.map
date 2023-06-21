@@ -1,0 +1,5 @@
+<map id="hgps::Person::get_risk_factor_value" name="hgps::Person::get_risk_factor_value">
+<area shape="rect" id="node1" title="Gets a risk factor current value." alt="" coords="247,39,412,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725" title="Applies this Scenario to the Person instance." alt="" coords="5,5,199,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1LmsModel.html#a17767cf2f6a8938dfee670369d73e9ad" title="Classify a person weight according with the predefined categories." alt="" coords="9,71,195,112"/>
+</map>

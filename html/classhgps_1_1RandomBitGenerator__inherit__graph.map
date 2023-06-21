@@ -1,0 +1,4 @@
+<map id="hgps::RandomBitGenerator" name="hgps::RandomBitGenerator">
+<area shape="rect" id="node1" title="Pseudo&#45;random number generator algorithm interface." alt="" coords="5,5,204,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1MTRandom32.html" title="Mersenne Twister random number generator algorithm." alt="" coords="29,80,180,107"/>
+</map>

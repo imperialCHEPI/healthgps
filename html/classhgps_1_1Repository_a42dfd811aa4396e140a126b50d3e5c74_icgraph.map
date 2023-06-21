@@ -1,0 +1,6 @@
+<map id="hgps::Repository::get_baseline_adjustment_definition" name="hgps::Repository::get_baseline_adjustment_definition">
+<area shape="rect" id="node1" title="Gets the user provided baseline risk factors adjustment dataset." alt="" coords="584,5,749,61"/>
+<area shape="rect" id="node2" href="$namespacehgps.html#ae0fac74fbde1e5a2c58bf7ce7f866f80" title=" " alt="" coords="367,13,536,54"/>
+<area shape="rect" id="node3" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,13,319,54"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,20,60,47"/>
+</map>

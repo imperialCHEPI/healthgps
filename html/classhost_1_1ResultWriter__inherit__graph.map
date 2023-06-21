@@ -1,0 +1,4 @@
+<map id="host::ResultWriter" name="host::ResultWriter">
+<area shape="rect" id="node1" title="Defines the Health&#45;GPS results message writer interface." alt="" coords="17,5,156,32"/>
+<area shape="rect" id="node2" href="$classhost_1_1ResultFileWriter.html" title="Defines the results message file stream writer class." alt="" coords="5,80,168,107"/>
+</map>

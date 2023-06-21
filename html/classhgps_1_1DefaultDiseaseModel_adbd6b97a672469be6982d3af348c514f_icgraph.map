@@ -1,0 +1,4 @@
+<map id="hgps::DefaultDiseaseModel::disease_type" name="hgps::DefaultDiseaseModel::disease_type">
+<area shape="rect" id="node1" title="Gets the model disease type unique identifier." alt="" coords="255,5,456,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1DefaultDiseaseModel.html#a2b8381459ae01f7ebf9b6023f1ad38db" title="Initialises the population disease status." alt="" coords="5,5,207,47"/>
+</map>

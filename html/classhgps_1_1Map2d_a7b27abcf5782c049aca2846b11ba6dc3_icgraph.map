@@ -1,0 +1,5 @@
+<map id="hgps::Map2d::rows" name="hgps::Map2d::rows">
+<area shape="rect" id="node1" title="Gets the number of rows." alt="" coords="245,42,389,69"/>
+<area shape="rect" id="node2" href="$structhgps_1_1BaselineAdjustment.html#aa9272f6e19861742aa7e73e80e36a341" title="Initialises a new instance of the BaselineAdjustment structure." alt="" coords="5,5,197,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1Map2d.html#a007e7cb3ff4ff5edbdf25c7d5021a559" title="Gets the total size of the container dataset." alt="" coords="32,71,171,98"/>
+</map>

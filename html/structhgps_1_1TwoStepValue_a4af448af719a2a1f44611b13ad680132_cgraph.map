@@ -1,0 +1,5 @@
+<map id="hgps::TwoStepValue::clone" name="hgps::TwoStepValue::clone">
+<area shape="rect" id="node1" title="Creates a new instance from this contents." alt="" coords="5,39,156,80"/>
+<area shape="rect" id="node2" href="$structhgps_1_1TwoStepValue.html#ad3831951728fc04604a7a22298b47e24" title="Gets the previous value." alt="" coords="204,5,355,47"/>
+<area shape="rect" id="node3" href="$structhgps_1_1TwoStepValue.html#a5b75e5bf206eb1568eb899af2a37362f" title="Gets the current value." alt="" coords="204,71,355,112"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="hgps::Population::initial_size" name="hgps::Population::initial_size">
+<area shape="rect" id="node1" title="Gets the initial size of the population." alt="" coords="212,5,420,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="5,5,164,32"/>
+</map>

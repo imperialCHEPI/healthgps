@@ -1,0 +1,4 @@
+<map id="hgps::LmsModel::classify_weight" name="hgps::LmsModel::classify_weight">
+<area shape="rect" id="node1" title="Classify a person weight according with the predefined categories." alt="" coords="5,5,191,47"/>
+<area shape="rect" id="node2" href="$structhgps_1_1Person.html#a92f21cc2d5ecbad13d2f75d766cf15e4" title="Gets a risk factor current value." alt="" coords="239,5,404,47"/>
+</map>

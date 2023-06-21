@@ -1,0 +1,6 @@
+<map id="hgps::get_default_disease_model_registry" name="hgps::get_default_disease_model_registry">
+<area shape="rect" id="node1" title="Create the default disease model builder registry for disease group." alt="" coords="565,5,757,47"/>
+<area shape="rect" id="node2" href="$namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" title="Builds a new instance of the DiseaseModule using the given data infrastructure." alt="" coords="367,5,517,47"/>
+<area shape="rect" id="node3" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,5,319,47"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

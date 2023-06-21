@@ -1,0 +1,6 @@
+<map id="hgps::core::DiseaseEntity" name="hgps::core::DiseaseEntity">
+<area shape="rect" id="node1" title="Disease full definition data structure." alt="" coords="138,184,325,211"/>
+<area shape="rect" id="node2" href="$structhgps_1_1core_1_1DiseaseInfo.html" title="Disease information structure." alt="" coords="5,95,180,121"/>
+<area shape="rect" id="node3" href="$structhgps_1_1core_1_1Identifier.html" title="Entity unique identifier data type." alt="" coords="15,5,170,32"/>
+<area shape="rect" id="node4" href="$structhgps_1_1core_1_1Country.html" title="Country ISO&#45;3166 definition data structure." alt="" coords="204,95,352,121"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="hgps::core::trim" name="hgps::core::trim">
+<area shape="rect" id="node1" title="Trim leading and trailing occurrences of white&#45;space characters from string." alt="" coords="497,13,621,39"/>
+<area shape="rect" id="node2" href="$namespacehost_1_1detail.html#a175fabf9aa46f5c7d47f52a6d5cd2505" title=" " alt="" coords="311,5,449,47"/>
+<area shape="rect" id="node3" href="$namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa" title="Populates a datatable with the input data file contents." alt="" coords="108,5,263,47"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

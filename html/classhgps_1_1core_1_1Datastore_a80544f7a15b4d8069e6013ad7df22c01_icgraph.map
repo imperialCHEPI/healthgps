@@ -1,0 +1,6 @@
+<map id="hgps::core::Datastore::get_mortality" name="hgps::core::Datastore::get_mortality">
+<area shape="rect" id="node1" title="Gets the population mortality trend for a country filtered by time." alt="" coords="584,5,745,47"/>
+<area shape="rect" id="node2" href="$namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" title="Builds a new instance of the PopulationModule using the given data infrastructure." alt="" coords="367,5,536,47"/>
+<area shape="rect" id="node3" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,5,319,47"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

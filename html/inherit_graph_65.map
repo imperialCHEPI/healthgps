@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classhgps_1_1HierarchicalLinearModel.html" title="Hierarchical linear model interface." alt="" coords="5,39,184,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1EnergyBalanceHierarchicalModel.html" title="Implements the dynamic hierarchical linear model (energy balance) type." alt="" coords="232,5,468,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1StaticHierarchicalLinearModel.html" title="Implements the static hierarchical linear model type." alt="" coords="262,71,438,112"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="host::load_baseline_adjustments" name="host::load_baseline_adjustments">
+<area shape="rect" id="node1" title="Loads baseline adjustments information from a file." alt="" coords="5,35,153,76"/>
+<area shape="rect" id="node2" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="397,5,603,47"/>
+<area shape="rect" id="node3" href="$namespacehost.html#ae3e061207e4dd21d8c9e59710356c614" title="Loads the contents of baseline adjustments file into a table." alt="" coords="201,64,349,105"/>
+<area shape="rect" id="node4" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="423,71,577,98"/>
+</map>

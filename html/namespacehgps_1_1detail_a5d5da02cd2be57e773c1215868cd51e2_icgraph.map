@@ -1,0 +1,5 @@
+<map id="hgps::detail::model_action_str" name="hgps::detail::model_action_str">
+<area shape="rect" id="node1" title="Converts enumeration to string, not pretty but no support in C++." alt="" coords="428,5,575,47"/>
+<area shape="rect" id="node2" href="$structhgps_1_1InfoEventMessage.html#adb811cc32ac4ff0215d478cf55386106" title="Create a string representation of this instance." alt="" coords="199,5,380,47"/>
+<area shape="rect" id="node3" href="$classhost_1_1EventMonitor.html#ac3f9b662a14a8033eaf1a9cb35285a1f" title="Visits a hgps::InfoEventMessage message type." alt="" coords="5,5,151,47"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="hgps::DiseaseTable::info" name="hgps::DiseaseTable::info">
+<area shape="rect" id="node1" title="Gets the disease information." alt="" coords="229,39,376,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1DiseaseTable.html#a3db30c05a65e430acf14b5c2c332d9c2" title="Initialise a new instance of the DiseaseTable class." alt="" coords="20,5,167,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1DiseaseDefinition.html#a67d021e7e2de9ce3cbcdda1660167d67" title="Gets the disease unique identifier." alt="" coords="5,71,181,112"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="hgps::core::DataTable::num_rows" name="hgps::core::DataTable::num_rows">
+<area shape="rect" id="node1" title="Gets the number of rows." alt="" coords="363,5,525,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1DataTable.html#ac538073abf34df84a75f0ddbceba36a4" title="Creates a string representation of the DataTable structure." alt="" coords="152,5,315,47"/>
+<area shape="rect" id="node3" href="$datatable_8cpp.html#a5729aff4cd21f2767713c38c51bd3af4" title="Output streams operator for DataTable type." alt="" coords="5,13,104,39"/>
+</map>

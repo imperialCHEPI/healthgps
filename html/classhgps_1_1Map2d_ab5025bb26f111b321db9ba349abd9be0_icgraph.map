@@ -1,0 +1,4 @@
+<map id="hgps::Map2d::columns" name="hgps::Map2d::columns">
+<area shape="rect" id="node1" title="Gets the number of columns." alt="" coords="192,5,360,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1Map2d.html#a007e7cb3ff4ff5edbdf25c7d5021a559" title="Gets the total size of the container dataset." alt="" coords="5,5,144,32"/>
+</map>

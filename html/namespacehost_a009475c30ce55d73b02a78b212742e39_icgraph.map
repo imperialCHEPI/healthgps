@@ -1,0 +1,5 @@
+<map id="host::create_output_file_name" name="host::create_output_file_name">
+<area shape="rect" id="node1" title="Creates the full output file name from user input configuration." alt="" coords="307,5,455,47"/>
+<area shape="rect" id="node2" href="$namespacehost.html#a07367da68854f50923957b8f86a7bc4c" title="Creates the simulation results file logger instance." alt="" coords="108,5,259,47"/>
+<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

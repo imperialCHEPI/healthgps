@@ -1,0 +1,4 @@
+<map id="exit_application" name="exit_application">
+<area shape="rect" id="node1" title="Prints application exit message." alt="" coords="5,5,132,32"/>
+<area shape="rect" id="node2" href="$namespacehost.html#aa8bb9c9e48b85a5423caf60b7dd1af2f" title="Get a string representation of current system time." alt="" coords="180,5,355,32"/>
+</map>

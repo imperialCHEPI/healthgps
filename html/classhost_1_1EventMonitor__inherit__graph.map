@@ -1,0 +1,4 @@
+<map id="host::EventMonitor" name="host::EventMonitor">
+<area shape="rect" id="node1" title="Defined the event monitor class used for processing Health&#45;GPS event messages." alt="" coords="32,80,177,107"/>
+<area shape="rect" id="node2" href="$classhgps_1_1EventMessageVisitor.html" title="Event message types visitor interface (double dispatcher)" alt="" coords="5,5,204,32"/>
+</map>

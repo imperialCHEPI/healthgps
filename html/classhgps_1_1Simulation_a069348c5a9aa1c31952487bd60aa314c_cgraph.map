@@ -1,0 +1,5 @@
+<map id="hgps::Simulation::type" name="hgps::Simulation::type">
+<area shape="rect" id="node1" title="Gets the simulation type." alt="" coords="5,42,173,69"/>
+<area shape="rect" id="node2" href="$structhgps_1_1SimulationDefinition.html#a3d1a883a3a4b1c96fe90cb22b7dd9230" title="Gets a reference to the simulation scenario instance." alt="" coords="221,5,416,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1Scenario.html#aa3dadbd9858a6668a9fdbbfc2a83d978" title="Gets the scenario type identifier." alt="" coords="241,71,396,98"/>
+</map>

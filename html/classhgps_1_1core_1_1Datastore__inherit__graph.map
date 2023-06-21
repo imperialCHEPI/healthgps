@@ -1,0 +1,4 @@
+<map id="hgps::core::Datastore" name="hgps::core::Datastore">
+<area shape="rect" id="node1" title="Defines the Health&#45;GPS back&#45;end data store interface for all implementations." alt="" coords="18,5,179,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1data_1_1DataManager.html" title="Implements Health&#45;GPS back&#45;end data store interface using a file&#45;based storage." alt="" coords="5,80,192,107"/>
+</map>
