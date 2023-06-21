@@ -125,7 +125,8 @@ namespace host
 			percentage = info.percentage;
 		}
 		else {
-			fmt::print(fg(fmt::color::red), "Boundary percentage outside range (0, 1): {}.\n", info.percentage);
+			throw std::invalid_argument(fmt::format(
+				"Boundary percentage outside range (0, 1): {}", info.percentage));
 		}
 
 		info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
@@ -173,8 +174,8 @@ namespace host
 					}
 				}
 				else {
-					fmt::print(fg(fmt::color::red),
-						"Unknown model gender type: {}.\n", gender.first);
+					throw std::invalid_argument(fmt::format(
+						"Unknown model gender type: {}", gender.first));
 				}
 			}
 
