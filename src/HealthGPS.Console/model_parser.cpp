@@ -47,83 +47,70 @@ namespace host
 		}
 	}
 
-	HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string model_filename)
+	HierarchicalLinearModelDefinition load_static_risk_model_definition(
+		const host::poco::json &opt)
 	{
 		using namespace detail;
 
 		MEASURE_FUNCTION();
 		std::map<int, HierarchicalLevel> levels;
 		std::unordered_map<core::Identifier, LinearModel> models;
-		std::ifstream ifs(model_filename, std::ifstream::in);
-		if (ifs) {
-			try {
-				auto opt = json::parse(ifs);
-				HierarchicalModelInfo model_info;
-				model_info.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
-				model_info.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
 
-				for (auto& model_item : model_info.models) {
-					auto& at = model_item.second;
+		HierarchicalModelInfo model_info;
+		model_info.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
+		model_info.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
 
-					std::unordered_map<core::Identifier, Coefficient> coeffs;
-					for (auto& pair : at.coefficients) {
-						coeffs.emplace(core::Identifier(pair.first), Coefficient{
-								.value = pair.second.value,
-								.pvalue = pair.second.pvalue,
-								.tvalue = pair.second.tvalue,
-								.std_error = pair.second.std_error
-							});
-					}
+		for (const auto &model_item : model_info.models) {
+			auto& at = model_item.second;
 
-					models.emplace(core::Identifier(model_item.first), LinearModel{
-						.coefficients = coeffs,
-						.residuals_standard_deviation = at.residuals_standard_deviation,
-						.rsquared = at.rsquared
-						});
-				}
-
-				for (auto& level_item : model_info.levels) {
-					auto& at = level_item.second;
-					std::unordered_map<core::Identifier, int> col_names;
-					auto variables_count = static_cast<int>(at.variables.size());
-					for (auto i = 0; i < variables_count; i++) {
-						col_names.emplace(core::Identifier{ at.variables[i] }, i);
-					}
-
-					levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
-						.variables = col_names,
-						.transition = core::DoubleArray2D(
-							at.transition.rows, at.transition.cols, at.transition.data),
-
-						.inverse_transition = core::DoubleArray2D(at.inverse_transition.rows,
-							at.inverse_transition.cols, at.inverse_transition.data),
-
-						.residual_distribution = core::DoubleArray2D(at.residual_distribution.rows,
-							at.residual_distribution.cols, at.residual_distribution.data),
-
-						.correlation = core::DoubleArray2D(at.correlation.rows,
-							at.correlation.cols, at.correlation.data),
-
-						.variances = at.variances
-						});
-				}
+			std::unordered_map<core::Identifier, Coefficient> coeffs;
+			for (const auto &pair : at.coefficients) {
+				coeffs.emplace(core::Identifier(pair.first), Coefficient{
+						.value = pair.second.value,
+						.pvalue = pair.second.pvalue,
+						.tvalue = pair.second.tvalue,
+						.std_error = pair.second.std_error
+					});
 			}
-			catch (const std::exception& ex) {
-				fmt::print(fg(fmt::color::red),
-					"Failed to parse model: {:<7}, file: {}. {}\n",
-					"static", model_filename, ex.what());
-			}
-		}
-		else {
-			fmt::print(fg(fmt::color::red),
-				"Model: {:<7}, file: {} not found.\n", "static", model_filename);
+
+			models.emplace(core::Identifier(model_item.first), LinearModel{
+				.coefficients = std::move(coeffs),
+				.residuals_standard_deviation = at.residuals_standard_deviation,
+				.rsquared = at.rsquared
+				});
 		}
 
-		ifs.close();
+		for (auto &level_item : model_info.levels) {
+			auto& at = level_item.second;
+			std::unordered_map<core::Identifier, int> col_names;
+			auto variables_count = static_cast<int>(at.variables.size());
+			for (int i = 0; i < variables_count; i++) {
+				col_names.emplace(core::Identifier{ at.variables[i] }, i);
+			}
+
+			levels.emplace(std::stoi(level_item.first), HierarchicalLevel{
+				.variables = std::move(col_names),
+				.transition = core::DoubleArray2D(
+					at.transition.rows, at.transition.cols, at.transition.data),
+
+				.inverse_transition = core::DoubleArray2D(at.inverse_transition.rows,
+					at.inverse_transition.cols, at.inverse_transition.data),
+
+				.residual_distribution = core::DoubleArray2D(at.residual_distribution.rows,
+					at.residual_distribution.cols, at.residual_distribution.data),
+
+				.correlation = core::DoubleArray2D(at.correlation.rows,
+					at.correlation.cols, at.correlation.data),
+
+				.variances = at.variances
+				});
+		}
+
 		return HierarchicalLinearModelDefinition{ std::move(models), std::move(levels) };
 	}
 
-	LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename)
+	LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(
+		const host::poco::json &opt)
 	{
 		using namespace detail;
 
@@ -132,86 +119,103 @@ namespace host
 		std::map<core::Identifier, core::Identifier> variables;
 		std::map<core::IntegerInterval, AgeGroupGenderEquation> equations;
 
-		std::ifstream ifs(model_filename, std::ifstream::in);
-		if (ifs) {
-			try {
-				auto opt = json::parse(ifs);
-				auto info = LiteHierarchicalModelInfo{};
-				opt["BoundaryPercentage"].get_to(info.percentage);
-				if (info.percentage > 0.0 && info.percentage < 1.0) {
-					percentage = info.percentage;
-				}
-				else {
-					fmt::print(fg(fmt::color::red), "Boundary percentage outside range (0, 1): {}.\n", info.percentage);
-				}
-
-				info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
-				for (auto& it : opt["Equations"].items()) {
-					auto& age_key = it.key();
-					info.equations.emplace(age_key, std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
-
-					for (auto& sit : it.value().items()) {
-						auto gender_key = sit.key();
-						auto gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
-						info.equations.at(age_key).emplace(gender_key, gender_funcs);
-					}
-				}
-
-				for (auto& item : info.variables) {
-					variables.emplace(core::Identifier{ item.name }, core::Identifier{ item.factor });
-				}
-
-				for (auto& age_grp : info.equations) {
-					auto limits = core::split_string(age_grp.first, "-");
-					auto age_key = core::IntegerInterval(std::stoi(limits[0].data()), std::stoi(limits[1].data()));
-					auto age_equations = AgeGroupGenderEquation{ .age_group = age_key };
-					for (auto& gender : age_grp.second) {
-
-						if (core::case_insensitive::equals("male", gender.first)) {
-							for (auto& func : gender.second) {
-								auto function = FactorDynamicEquation{ .name = func.name };
-								function.residuals_standard_deviation = func.residuals_standard_deviation;
-								for (auto& coeff : func.coefficients) {
-									function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
-								}
-
-								age_equations.male.emplace(core::to_lower(func.name), function);
-							}
-						}
-						else if (core::case_insensitive::equals("female", gender.first)) {
-							for (auto& func : gender.second) {
-								auto function = FactorDynamicEquation{ .name = func.name };
-								function.residuals_standard_deviation = func.residuals_standard_deviation;
-								for (auto& coeff : func.coefficients) {
-									function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
-								}
-
-								age_equations.female.emplace(core::to_lower(func.name), function);
-							}
-						}
-						else {
-							fmt::print(fg(fmt::color::red),
-								"Unknown model gender type: {}.\n", gender.first);
-						}
-					}
-
-					equations.emplace(age_key, std::move(age_equations));
-				}
-			}
-			catch (const std::exception& ex) {
-				fmt::print(fg(fmt::color::red),
-					"Failed to parse model: {:<7}, file: {}. {}\n",
-					"static", model_filename, ex.what());
-			}
+		auto info = LiteHierarchicalModelInfo{};
+		opt["BoundaryPercentage"].get_to(info.percentage);
+		if (info.percentage > 0.0 && info.percentage < 1.0) {
+			percentage = info.percentage;
 		}
 		else {
-			fmt::print(fg(fmt::color::red),
-				"Model: {:<7}, file: {} not found.\n", "dynamic", model_filename);
+			throw std::invalid_argument(fmt::format(
+				"Boundary percentage outside range (0, 1): {}", info.percentage));
 		}
 
-		ifs.close();
+		info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
+		for (const auto &it : opt["Equations"].items()) {
+			auto& age_key = it.key();
+			info.equations.emplace(age_key, std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
+
+			for (const auto &sit : it.value().items()) {
+				const auto &gender_key = sit.key();
+				const auto &gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
+				info.equations.at(age_key).emplace(gender_key, gender_funcs);
+			}
+		}
+
+		for (const auto &item : info.variables) {
+			variables.emplace(core::Identifier{ item.name }, core::Identifier{ item.factor });
+		}
+
+		for (const auto &age_grp : info.equations) {
+			auto limits = core::split_string(age_grp.first, "-");
+			auto age_key = core::IntegerInterval(std::stoi(limits[0].data()), std::stoi(limits[1].data()));
+			auto age_equations = AgeGroupGenderEquation{ .age_group = age_key };
+			for (const auto &gender : age_grp.second) {
+
+				if (core::case_insensitive::equals("male", gender.first)) {
+					for (const auto &func : gender.second) {
+						auto function = FactorDynamicEquation{ .name = func.name };
+						function.residuals_standard_deviation = func.residuals_standard_deviation;
+						for (const auto &coeff : func.coefficients) {
+							function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
+						}
+
+						age_equations.male.emplace(core::to_lower(func.name), function);
+					}
+				}
+				else if (core::case_insensitive::equals("female", gender.first)) {
+					for (const auto &func : gender.second) {
+						auto function = FactorDynamicEquation{ .name = func.name };
+						function.residuals_standard_deviation = func.residuals_standard_deviation;
+						for (const auto &coeff : func.coefficients) {
+							function.coefficients.emplace(core::to_lower(coeff.first), coeff.second);
+						}
+
+						age_equations.female.emplace(core::to_lower(func.name), function);
+					}
+				}
+				else {
+					throw std::invalid_argument(fmt::format(
+						"Unknown model gender type: {}", gender.first));
+				}
+			}
+
+			equations.emplace(age_key, std::move(age_equations));
+		}
+
 		return LiteHierarchicalModelDefinition{
 			std::move(equations), std::move(variables), percentage };
+	}
+
+	EnergyBalanceModelDefinition load_newebm_risk_model_definition(
+		const host::poco::json &opt)
+	{
+		MEASURE_FUNCTION();
+		std::vector<core::Identifier> nutrient_list;
+		std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
+
+		// Save nutrient identities.
+		auto nutrient_strings = opt["Nutrients"].get<std::vector<std::string>>();
+		for (const std::string &nutrient_str : nutrient_strings) {
+			nutrient_list.emplace_back(nutrient_str);
+		}
+
+		// Save food -> nutrient equations.
+		for (const auto &food : opt["Foods"]) {
+			auto food_ident = core::Identifier{food["Name"].get<std::string>()};
+			auto food_nutrient_strings = food["Nutrients"].get<std::map<std::string, double>>();
+
+			for (const std::string &nutrient_str : nutrient_strings) {
+				auto nutrient_ident = core::Identifier(nutrient_str);
+
+				if (food_nutrient_strings.contains(nutrient_str)) {
+					double val = food_nutrient_strings.at(nutrient_str);
+					nutrient_equations[food_ident][nutrient_ident] = val;
+				}
+			}
+		}
+
+		return EnergyBalanceModelDefinition(
+			std::move(nutrient_list), std::move(nutrient_equations));
 	}
 
 	void register_risk_factor_model_definitions(CachedRepository& repository,
@@ -220,27 +224,57 @@ namespace host
 		MEASURE_FUNCTION();
 		for (auto& model : info.risk_factor_models) {
 			HierarchicalModelType model_type;
+			const auto &model_filename = model.second;
+			std::ifstream ifs(model_filename, std::ifstream::in);
+
+			if (!ifs.good()) {
+				throw std::invalid_argument(fmt::format(
+					"Model file: {} not found", model_filename));
+			}
+
+			// Get this model's name.
+			host::poco::json parsed_json = json::parse(ifs);
+			std::string model_name = core::to_lower(parsed_json["ModelName"].get<std::string>());
+
 			if (core::case_insensitive::equals(model.first, "static")) {
+				// Load this static model with the appropriate loader.
 				model_type = HierarchicalModelType::Static;
-				auto model_definition = load_static_risk_model_definition(model.second);
-				repository.register_linear_model_definition(model_type, std::move(model_definition));
+				if (core::case_insensitive::equals(model_name, "hlm")) {
+					auto model_definition = load_static_risk_model_definition(parsed_json);
+					repository.register_linear_model_definition(model_type, std::move(model_definition));
+				}
+				else {
+					fmt::print(fg(fmt::color::red),
+					"Static model name '{}' is not recognised.\n", model_name);
+				}
 			}
 			else if (core::case_insensitive::equals(model.first, "dynamic")) {
+				// Load this dynamic model with the appropriate loader.
 				model_type = HierarchicalModelType::Dynamic;
-				auto model_definition = load_dynamic_risk_model_info(model.second);
-				repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+				if (core::case_insensitive::equals(model_name, "ebhlm")) {
+					auto model_definition = load_dynamic_risk_model_definition(parsed_json);
+					repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+				}
+				else if (core::case_insensitive::equals(model_name, "newebm")) {
+					auto model_definition = load_newebm_risk_model_definition(parsed_json);
+					repository.register_energy_balance_model_definition(model_type, std::move(model_definition));
+				}
+				else {
+					fmt::print(fg(fmt::color::red),
+					"Dynamic model name '{}' is not recognised.\n", model_name);
+				}
 			}
 			else {
-				fmt::print(fg(fmt::color::red), "Unknown hierarchical model type: {}.\n", model.first);
-				continue;
+				throw std::invalid_argument(fmt::format(
+					"Unknown model type: {}", model.first));
 			}
 		}
 
 		auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
 		auto age_range = core::IntegerInterval(settings.age_range.front(), settings.age_range.back());
 		auto max_age = static_cast<std::size_t>(age_range.upper());
-		for (auto& table : adjustment.values) {
-			for (auto& item : table.second) {
+		for (const auto &table : adjustment.values) {
+			for (const auto &item : table.second) {
 				if (item.second.size() <= max_age) {
 					fmt::print(fg(fmt::color::red), "Baseline adjustment files data must cover age range: [{}].\n",
 						age_range.to_string());

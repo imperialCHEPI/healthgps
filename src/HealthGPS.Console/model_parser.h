@@ -4,6 +4,7 @@
 #include "HealthGPS/riskfactor_adjustment_types.h"
 
 #include "options.h"
+#include "jsonparser.h"
 
 namespace host
 {
@@ -15,12 +16,20 @@ namespace host
 	/// @brief Loads the full hierarchical linear regression model definition from a JSON file
 	/// @param model_filename The model definition file full name
 	/// @return An instance of the hgps::HierarchicalLinearModelDefinition type
-	hgps::HierarchicalLinearModelDefinition load_static_risk_model_definition(std::string model_filename);
+	hgps::HierarchicalLinearModelDefinition load_static_risk_model_definition(
+		const host::poco::json &opt);
 
 	/// @brief Loads the lite hierarchical linear regression model definition from a JSON file
 	/// @param model_filename The model definition file full name
 	/// @return An instance of the hgps::LiteHierarchicalModelDefinition type
-	hgps::LiteHierarchicalModelDefinition load_dynamic_risk_model_info(std::string model_filename);
+	hgps::LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(
+		const host::poco::json &opt);
+
+	/// @brief Loads the new energy balance model definition from a JSON file
+	/// @param model_filename The model definition file full name
+	/// @return An instance of the hgps::LiteHierarchicalModelDefinition type
+	hgps::EnergyBalanceModelDefinition load_newebm_risk_model_definition(
+		const host::poco::json &opt);
 
 	/// @brief Registers a risk factor model definition with the repository
 	/// @param repository The repository instance to register

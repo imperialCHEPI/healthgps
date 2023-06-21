@@ -39,6 +39,12 @@ namespace hgps {
 		virtual LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
 			const HierarchicalModelType& model_type) = 0;
 
+		/// @brief Gets the user provided energy balance model definition
+		/// @param model_type Energy balance model type
+		/// @return The energy balance model definition
+		virtual EnergyBalanceModelDefinition& get_energy_balance_model_definition(
+			const HierarchicalModelType& model_type) = 0;
+
 		/// @brief Gets the user provided baseline risk factors adjustment dataset
 		/// @return Baseline risk factors adjustments
 		virtual BaselineAdjustment& get_baseline_adjustment_definition() = 0;
@@ -79,7 +85,7 @@ namespace hgps {
 		/// @brief Register a user provided full hierarchical linear model definition
 		/// @param model_type The hierarchical model type
 		/// @param definition The hierarchical model definition instance
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_linear_model_definition(
 			const HierarchicalModelType& model_type,
 			HierarchicalLinearModelDefinition&& definition);
@@ -87,14 +93,22 @@ namespace hgps {
 		/// @brief Register a user provided lite hierarchical linear model definition
 		/// @param model_type The hierarchical model type
 		/// @param definition The lite hierarchical model definition instance
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_lite_linear_model_definition(
 			const HierarchicalModelType& model_type,
 			LiteHierarchicalModelDefinition&& definition);
 
+		/// @brief Register a user provided energy balance model definition
+		/// @param model_type The energy balance model type
+		/// @param definition The energy balance model definition instance
+		/// @return true, if the operation succeeds; otherwise, false.
+		bool register_energy_balance_model_definition(
+			const HierarchicalModelType& model_type,
+			EnergyBalanceModelDefinition&& definition);
+
 		/// @brief Register a user provided baseline risk factors adjustments dataset
 		/// @param definition The baseline risk factors adjustments dataset
-		/// @return true, if the operation succeed; otherwise, false.
+		/// @return true, if the operation succeeds; otherwise, false.
 		bool register_baseline_adjustment_definition(BaselineAdjustment&& definition);
 
 		core::Datastore& manager() noexcept override;
@@ -103,6 +117,9 @@ namespace hgps {
 			const HierarchicalModelType& model_type) override;
 
 		LiteHierarchicalModelDefinition& get_lite_linear_model_definition(
+			const HierarchicalModelType& model_type) override;
+
+		EnergyBalanceModelDefinition& get_energy_balance_model_definition(
 			const HierarchicalModelType& model_type) override;
 
 		BaselineAdjustment& get_baseline_adjustment_definition() override;
@@ -123,6 +140,7 @@ namespace hgps {
 		std::reference_wrapper<core::Datastore> data_manager_;
 		std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
 		std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
+		std::map<HierarchicalModelType, EnergyBalanceModelDefinition> energy_balance_model_definition_;
 		BaselineAdjustment baseline_adjustments_;
 		std::vector<core::DiseaseInfo> diseases_info_;
 		std::map<core::Identifier, DiseaseDefinition> diseases_;

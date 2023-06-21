@@ -11,8 +11,6 @@ namespace hgps {
 	/// the model uses principal component analysis for residual normalisation.
 	class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
 	public:
-		StaticHierarchicalLinearModel() = delete;
-
 		/// @brief Initialises a new instance of the StaticHierarchicalLinearModel class
 		/// @param definition The model definition instance
 		StaticHierarchicalLinearModel(HierarchicalLinearModelDefinition& definition);

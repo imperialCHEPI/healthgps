@@ -1,5 +1,4 @@
 #include "riskfactor.h"
-#include "hierarchical_model_registry.h"
 
 namespace hgps {
 
@@ -70,28 +69,30 @@ namespace hgps {
 
 	std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository& repository, [[maybe_unused]] const ModelInput& config)
 	{
-		// Both model types are required, and must be registered
-		auto full_registry = get_default_hierarchical_model_registry();
-		auto lite_registry = get_default_lite_hierarchical_model_registry();
 
 		auto models = std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
-		if (full_registry.contains(HierarchicalModelType::Static)) {
-			models.emplace(HierarchicalModelType::Static, full_registry.at(HierarchicalModelType::Static)(
-				repository.get_linear_model_definition(HierarchicalModelType::Static)));
-		}
-		else {
-			models.emplace(HierarchicalModelType::Static, lite_registry.at(HierarchicalModelType::Static)(
-				repository.get_lite_linear_model_definition(HierarchicalModelType::Static)));
-		}
 
-		// Creates dynamic, must be in one of the registries
-		if (full_registry.contains(HierarchicalModelType::Dynamic)) {
-			models.emplace(HierarchicalModelType::Dynamic, full_registry.at(HierarchicalModelType::Dynamic)(
-				repository.get_linear_model_definition(HierarchicalModelType::Dynamic)));
+		// Static (initialisation) model
+		auto &static_definition = repository.get_linear_model_definition(HierarchicalModelType::Static);
+		auto static_builder = [](HierarchicalLinearModelDefinition& static_definition) {
+			return std::make_unique<StaticHierarchicalLinearModel>(static_definition);
+		};
+		models.emplace(HierarchicalModelType::Static, static_builder(static_definition));
+
+		// Dynamic (update) model
+		try {
+			auto &dynamic_definition = repository.get_lite_linear_model_definition(HierarchicalModelType::Dynamic);
+			auto dynamic_builder = [](LiteHierarchicalModelDefinition& dynamic_definition) {
+				return std::make_unique<EnergyBalanceHierarchicalModel>(dynamic_definition);
+			};
+			models.emplace(HierarchicalModelType::Dynamic, dynamic_builder(dynamic_definition));
 		}
-		else {
-			models.emplace(HierarchicalModelType::Dynamic, lite_registry.at(HierarchicalModelType::Dynamic)(
-				repository.get_lite_linear_model_definition(HierarchicalModelType::Dynamic)));
+		catch (const std::out_of_range &oor) {
+			auto &dynamic_definition = repository.get_energy_balance_model_definition(HierarchicalModelType::Dynamic);
+			auto dynamic_builder = [](EnergyBalanceModelDefinition& dynamic_definition) {
+				return std::make_unique<EnergyBalanceModel>(dynamic_definition);
+			};
+			models.emplace(HierarchicalModelType::Dynamic, dynamic_builder(dynamic_definition));
 		}
 
 		auto adjustment_model = RiskfactorAdjustmentModel{ repository.get_baseline_adjustment_definition()};
