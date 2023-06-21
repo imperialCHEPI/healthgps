@@ -226,56 +226,54 @@ namespace host
 			const auto &model_filename = model.second;
 			std::ifstream ifs(model_filename, std::ifstream::in);
 
-			if (ifs) {
-				try {
-					// Get this model's name.
-					host::poco::json parsed_json = json::parse(ifs);
-					std::string model_name = core::to_lower(parsed_json["ModelName"].get<std::string>());
+			if (!ifs.good()) {
+				throw std::invalid_argument(fmt::format(
+					"Model file: {} not found.\n", model_filename));
+			}
 
-					if (core::case_insensitive::equals(model.first, "static")) {
-						// Load this static model with the appropriate loader.
-						model_type = HierarchicalModelType::Static;
-						if (core::case_insensitive::equals(model_name, "hlm")) {
-							auto model_definition = load_static_risk_model_definition(parsed_json);
-							repository.register_linear_model_definition(model_type, std::move(model_definition));
-						}
-						else {
-							fmt::print(fg(fmt::color::red),
-							"Static model name '{}' is not recognised.\n",
-							model_name);
-						}
-					}
-					else if (core::case_insensitive::equals(model.first, "dynamic")) {
-						// Load this dynamic model with the appropriate loader.
-						model_type = HierarchicalModelType::Dynamic;
-						if (core::case_insensitive::equals(model_name, "ebhlm")) {
-							auto model_definition = load_dynamic_risk_model_definition(parsed_json);
-							repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
-						}
-						else if (core::case_insensitive::equals(model_name, "newebm")) {
-							auto model_definition = load_newebm_risk_model_definition(parsed_json);
-							repository.register_energy_balance_model_definition(model_type, std::move(model_definition));
-						}
-						else {
-							fmt::print(fg(fmt::color::red),
-							"Dynamic model name '{}' is not recognised.\n",
-							model_name);
-						}
+			try {
+				// Get this model's name.
+				host::poco::json parsed_json = json::parse(ifs);
+				std::string model_name = core::to_lower(parsed_json["ModelName"].get<std::string>());
+
+				if (core::case_insensitive::equals(model.first, "static")) {
+					// Load this static model with the appropriate loader.
+					model_type = HierarchicalModelType::Static;
+					if (core::case_insensitive::equals(model_name, "hlm")) {
+						auto model_definition = load_static_risk_model_definition(parsed_json);
+						repository.register_linear_model_definition(model_type, std::move(model_definition));
 					}
 					else {
-						fmt::print(fg(fmt::color::red), "Unknown model type: {}.\n", model.first);
-						continue;
+						fmt::print(fg(fmt::color::red),
+						"Static model name '{}' is not recognised.\n",
+						model_name);
 					}
 				}
-				catch (const std::exception& ex) {
-					fmt::print(fg(fmt::color::red),
-					"Failed to parse model file: {}. {}\n",
-					model_filename, ex.what());
+				else if (core::case_insensitive::equals(model.first, "dynamic")) {
+					// Load this dynamic model with the appropriate loader.
+					model_type = HierarchicalModelType::Dynamic;
+					if (core::case_insensitive::equals(model_name, "ebhlm")) {
+						auto model_definition = load_dynamic_risk_model_definition(parsed_json);
+						repository.register_lite_linear_model_definition(model_type, std::move(model_definition));
+					}
+					else if (core::case_insensitive::equals(model_name, "newebm")) {
+						auto model_definition = load_newebm_risk_model_definition(parsed_json);
+						repository.register_energy_balance_model_definition(model_type, std::move(model_definition));
+					}
+					else {
+						fmt::print(fg(fmt::color::red),
+						"Dynamic model name '{}' is not recognised.\n", model_name);
+					}
+				}
+				else {
+					fmt::print(fg(fmt::color::red), "Unknown model type: {}.\n", model.first);
+					continue;
 				}
 			}
-			else {
+			catch (const std::exception& ex) {
 				fmt::print(fg(fmt::color::red),
-				"Model file: {} not found.\n", model_filename);
+				"Failed to parse model file: {}. {}\n",
+				model_filename, ex.what());
 			}
 		}
 
