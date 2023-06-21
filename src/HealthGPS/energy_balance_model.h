@@ -10,8 +10,6 @@ namespace hgps {
 	/// @details The dynamic model is used to advance the virtual population over time.
 	class EnergyBalanceModel final : public HierarchicalLinearModel {
 	public:
-		EnergyBalanceModel() = delete;
-
 		/// @brief Initialises a new instance of the EnergyBalanceModel class
 		/// @param definition The model definition instance
 		EnergyBalanceModel(EnergyBalanceModelDefinition& definition);
