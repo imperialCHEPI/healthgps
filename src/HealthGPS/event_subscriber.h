@@ -3,31 +3,31 @@
 
 namespace hgps {
 
-	/// @brief Implements the event subscriber handler data type
-	class EventSubscriberHandler final: public EventSubscriber {
-    public:
-        EventSubscriberHandler() = delete;
+/// @brief Implements the event subscriber handler data type
+class EventSubscriberHandler final : public EventSubscriber {
+  public:
+    EventSubscriberHandler() = delete;
 
-        /// @brief Initialise a new instance of the EventSubscriberHandler class
-        /// @param id The event handler identifier
-        /// @param hub The event aggregator instance to subscribe
-        /// @throws std::invalid_argument for null event aggregator hub argument
-        EventSubscriberHandler(EventHandlerIdentifier id, EventAggregator* hub);
-        
-        EventSubscriberHandler(const EventSubscriberHandler& other) = delete;
-        EventSubscriberHandler& operator=(const EventSubscriberHandler& other) = delete;
-        EventSubscriberHandler(EventSubscriberHandler&& other) = delete;
-        EventSubscriberHandler& operator=(EventSubscriberHandler&& other) = delete;
+    /// @brief Initialise a new instance of the EventSubscriberHandler class
+    /// @param id The event handler identifier
+    /// @param hub The event aggregator instance to subscribe
+    /// @throws std::invalid_argument for null event aggregator hub argument
+    EventSubscriberHandler(EventHandlerIdentifier id, EventAggregator *hub);
 
-        /// @brief Destroys a EventSubscriberHandler instance
-        ~EventSubscriberHandler();
+    EventSubscriberHandler(const EventSubscriberHandler &other) = delete;
+    EventSubscriberHandler &operator=(const EventSubscriberHandler &other) = delete;
+    EventSubscriberHandler(EventSubscriberHandler &&other) = delete;
+    EventSubscriberHandler &operator=(EventSubscriberHandler &&other) = delete;
 
-        void unsubscribe() const override;
+    /// @brief Destroys a EventSubscriberHandler instance
+    ~EventSubscriberHandler();
 
-        [[nodiscard]] const EventHandlerIdentifier id() const noexcept override;
+    void unsubscribe() const override;
 
-    private:
-        EventHandlerIdentifier identifier_;
-        EventAggregator* event_hub_;
-	};
-}
+    [[nodiscard]] const EventHandlerIdentifier id() const noexcept override;
+
+  private:
+    EventHandlerIdentifier identifier_;
+    EventAggregator *event_hub_;
+};
+} // namespace hgps

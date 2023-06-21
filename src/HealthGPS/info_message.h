@@ -3,57 +3,57 @@
 
 namespace hgps {
 
-	/// @brief Enumerates simulation model actions
-	enum class ModelAction 
-	{
-		/// @brief Simulation has started, time = start
-		start,
+/// @brief Enumerates simulation model actions
+enum class ModelAction {
+    /// @brief Simulation has started, time = start
+    start,
 
-		/// @brief Simulation time has updated, time = time + 1
-		update,
+    /// @brief Simulation time has updated, time = time + 1
+    update,
 
-		/// @brief Simulation has stopped, time = end
-		stop
-	};
+    /// @brief Simulation has stopped, time = end
+    stop
+};
 
-	/// @brief Implements the simulation information event message data type
-	struct InfoEventMessage final : public EventMessage {
+/// @brief Implements the simulation information event message data type
+struct InfoEventMessage final : public EventMessage {
 
-		InfoEventMessage() = delete;
+    InfoEventMessage() = delete;
 
-		/// @brief Initialises a new instance of the ErrorEventMessage structure.
-		/// @param sender The sender identifier
-		/// @param action Source action identification
-		/// @param run Current simulation run number
-		/// @param time Current simulation time
-		InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time) noexcept;
-		
-		/// @brief Initialises a new instance of the ErrorEventMessage structure.
-		/// @param sender The sender identifier
-		/// @param action Source action identification
-		/// @param run Current simulation run number
-		/// @param time Current simulation time
-		/// @param msg The notification message
-		InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time, std::string msg) noexcept;
+    /// @brief Initialises a new instance of the ErrorEventMessage structure.
+    /// @param sender The sender identifier
+    /// @param action Source action identification
+    /// @param run Current simulation run number
+    /// @param time Current simulation time
+    InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time) noexcept;
 
-		/// @brief Gets the source action value
-		const ModelAction model_action{};
+    /// @brief Initialises a new instance of the ErrorEventMessage structure.
+    /// @param sender The sender identifier
+    /// @param action Source action identification
+    /// @param run Current simulation run number
+    /// @param time Current simulation time
+    /// @param msg The notification message
+    InfoEventMessage(std::string sender, ModelAction action, unsigned int run, int time,
+                     std::string msg) noexcept;
 
-		/// @brief Gets the associated Simulation time
-		const int model_time{};
+    /// @brief Gets the source action value
+    const ModelAction model_action{};
 
-		/// @brief Gets the notification message
-		const std::string message;
+    /// @brief Gets the associated Simulation time
+    const int model_time{};
 
-		int id() const noexcept override;
+    /// @brief Gets the notification message
+    const std::string message;
 
-		std::string to_string() const  override;
+    int id() const noexcept override;
 
-		void accept(EventMessageVisitor& visitor) const override;
-	};
+    std::string to_string() const override;
 
-	namespace detail {
-		/// @brief Converts enumeration to string, not pretty but no support in C++
-		const std::string model_action_str(const ModelAction action);
-	}
-}
+    void accept(EventMessageVisitor &visitor) const override;
+};
+
+namespace detail {
+/// @brief Converts enumeration to string, not pretty but no support in C++
+const std::string model_action_str(const ModelAction action);
+} // namespace detail
+} // namespace hgps

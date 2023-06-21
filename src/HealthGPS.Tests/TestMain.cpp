@@ -1,21 +1,21 @@
-#include "pch.h"
 #include "data_config.h"
+#include "pch.h"
 
 #include <cxxopts.hpp>
-#include <iostream>
 #include <filesystem>
+#include <iostream>
 
-cxxopts::Options create_options()
-{
-    cxxopts::Options options("HealthGPS.Test", "Health-GPS microsimulation for policy options test.");
-    options.add_options()
-        ("s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())
-        ("help", "Help about this test application.");
+cxxopts::Options create_options() {
+    cxxopts::Options options("HealthGPS.Test",
+                             "Health-GPS microsimulation for policy options test.");
+    options.add_options()("s,storage", "Path to root folder of the data storage.",
+                          cxxopts::value<std::string>())("help",
+                                                         "Help about this test application.");
 
     return options;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
     std::cout << "\nInitialising with a custom GTest main function.\n\n";
@@ -26,16 +26,12 @@ int main(int argc, char** argv) {
     if (result.count("help")) {
         std::cout << options.help() << std::endl;
         return EXIT_SUCCESS;
-    }
-    else if (result.count("storage"))
-    {
-        storage_path = std::filesystem::path{ result["storage"].as<std::string>() };
+    } else if (result.count("storage")) {
+        storage_path = std::filesystem::path{result["storage"].as<std::string>()};
         if (storage_path.is_relative()) {
             storage_path = std::filesystem::absolute(storage_path);
         }
-    }
-    else
-    {
+    } else {
         storage_path = default_datastore_path();
         std::cout << "Using default test data store ...\n\n";
     }
@@ -45,8 +41,7 @@ int main(int argc, char** argv) {
     if (std::filesystem::exists(storage_path)) {
         std::cout << "Test data store: " << storage_path.string() << "\n\n";
         test_datastore_path = storage_path.string();
-    }
-    else {
+    } else {
         std::cerr << "Test data store: " << storage_path.string() << " *** not found ***.\n\n";
     }
 

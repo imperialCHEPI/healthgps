@@ -1,68 +1,63 @@
 #pragma once
-#include <benchmark/benchmark.h>
 #include "HealthGPS.Core/identifier.h"
+#include <benchmark/benchmark.h>
 
-#include <string>
-#include <ostream>
 #include <algorithm>
+#include <ostream>
+#include <string>
 
 using namespace hgps::core;
 
-struct IdentifierEx final
-{
+struct IdentifierEx final {
     constexpr IdentifierEx() = default;
-    IdentifierEx(const char* const value)
-        : IdentifierEx{ std::string(value) } {}
+    IdentifierEx(const char *const value) : IdentifierEx{std::string(value)} {}
 
-    IdentifierEx(std::string value)
-        : value_{ std::move(value) } {}
+    IdentifierEx(std::string value) : value_{std::move(value)} {}
 
-    std::string to_string() const noexcept {
-        return value_;
-    }
+    std::string to_string() const noexcept { return value_; }
 
-    auto operator<=>(const IdentifierEx& rhs) const noexcept = default;
+    auto operator<=>(const IdentifierEx &rhs) const noexcept = default;
 
-    friend std::ostream& operator<<(std::ostream& os, const IdentifierEx& identifier) {
+    friend std::ostream &operator<<(std::ostream &os, const IdentifierEx &identifier) {
         os << identifier.to_string();
         return os;
     }
 
-private:
+  private:
     std::string value_{};
 };
 
-const auto source_id = Identifier{ "energy" };
-const auto target_id = Identifier{ "energy_zone" };
-const auto same_id = Identifier{ "energy" };
+const auto source_id = Identifier{"energy"};
+const auto target_id = Identifier{"energy_zone"};
+const auto same_id = Identifier{"energy"};
 
-const auto source_ex = IdentifierEx{ "energy" };
-const auto target_ex = IdentifierEx{ "energy_zone" };
-const auto same_ex = IdentifierEx{ "energy" };
+const auto source_ex = IdentifierEx{"energy"};
+const auto target_ex = IdentifierEx{"energy_zone"};
+const auto same_ex = IdentifierEx{"energy"};
 
-static void identifier_equality(benchmark::State& state, const Identifier& lhs, const Identifier& rhs)
-{
+static void identifier_equality(benchmark::State &state, const Identifier &lhs,
+                                const Identifier &rhs) {
     for (auto _ : state) {
         benchmark::DoNotOptimize(lhs == rhs);
     }
 }
 
-static void identifier_compare(benchmark::State& state, const Identifier& lhs, const Identifier& rhs)
-{
+static void identifier_compare(benchmark::State &state, const Identifier &lhs,
+                               const Identifier &rhs) {
     for (auto _ : state) {
         benchmark::DoNotOptimize(lhs < rhs);
     }
 }
 
-static void identifier_ex_equality(benchmark::State& state, const IdentifierEx& lhs, const IdentifierEx& rhs)
-{
+static void identifier_ex_equality(benchmark::State &state, const IdentifierEx &lhs,
+                                   const IdentifierEx &rhs) {
     for (auto _ : state) {
         benchmark::DoNotOptimize(lhs == rhs);
     }
 }
 
-static void identifier_ex_compare(benchmark::State& state, const IdentifierEx& lhs, const IdentifierEx& rhs)
-{
+static void identifier_ex_compare(benchmark::State &state, const IdentifierEx &lhs,
+                                  const IdentifierEx &rhs) {
     for (auto _ : state) {
         benchmark::DoNotOptimize(lhs < rhs);
     }
