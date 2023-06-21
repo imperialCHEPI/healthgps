@@ -1,0 +1,6 @@
+<map id="hgps::DynamicInterventionScenario" name="hgps::DynamicInterventionScenario">
+<area shape="rect" id="node1" title="Health&#45;GPS dynamic intervention policy scenario interface." alt="" coords="26,155,225,196"/>
+<area shape="rect" id="node4" href="$classhgps_1_1MarketingDynamicScenario.html" title="Implements the dynamic marketing regulation intervention scenario." alt="" coords="5,244,245,271"/>
+<area shape="rect" id="node2" href="$classhgps_1_1InterventionScenario.html" title="Health&#45;GPS scripted intervention policy scenario interface." alt="" coords="27,80,223,107"/>
+<area shape="rect" id="node3" href="$classhgps_1_1Scenario.html" title="Health&#45;GPS simulation scenario interface." alt="" coords="67,5,184,32"/>
+</map>

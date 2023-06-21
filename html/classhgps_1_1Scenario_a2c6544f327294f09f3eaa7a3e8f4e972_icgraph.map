@@ -1,0 +1,4 @@
+<map id="hgps::Scenario::clear" name="hgps::Scenario::clear">
+<area shape="rect" id="node1" title="Clear the scenario log book data." alt="" coords="212,5,369,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="5,5,164,32"/>
+</map>

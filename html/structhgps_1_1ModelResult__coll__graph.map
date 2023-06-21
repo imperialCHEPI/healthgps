@@ -1,0 +1,7 @@
+<map id="hgps::ModelResult" name="hgps::ModelResult">
+<area shape="rect" id="node1" title="Defines the model results data type." alt="" coords="293,109,436,136"/>
+<area shape="rect" id="node2" href="$structhgps_1_1ResultByGender.html" title="Defines the measure by gender result data type." alt="" coords="5,13,172,39"/>
+<area shape="rect" id="node3" href="$structhgps_1_1GenderValue.html" title=" " alt="" coords="197,5,351,47"/>
+<area shape="rect" id="node4" href="$structhgps_1_1DALYsIndicator.html" title="Defines the DALYs indicator result data type." alt="" coords="376,13,535,39"/>
+<area shape="rect" id="node5" href="$classhgps_1_1DataSeries.html" title="Defines the Simulation results container for time series data." alt="" coords="559,13,691,39"/>
+</map>

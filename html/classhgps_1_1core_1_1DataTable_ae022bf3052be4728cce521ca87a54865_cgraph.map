@@ -1,0 +1,8 @@
+<map id="hgps::core::DataTable::add" name="hgps::core::DataTable::add">
+<area shape="rect" id="node1" title="Adds a new column to the table." alt="" coords="5,130,200,157"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1DataTable.html#aea4b85552bb60b81746a68bdcf95e059" title="Gets the column at a given index." alt="" coords="273,5,435,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1DataTable.html#a5b4ada045a3551ea156edd2888fbb425" title="Gets the number of columns." alt="" coords="508,35,671,76"/>
+<area shape="rect" id="node4" href="$classhgps_1_1core_1_1DataTableColumn.html#aead9fbd8096b197bd3c1889f09af21d8" title="Gets the column name identifier." alt="" coords="248,123,460,164"/>
+<area shape="rect" id="node5" href="$classhgps_1_1core_1_1DataTableColumn.html#a6e7f8368bb2d10e1cf9679af121e19fb" title="The size of the column data, number of rows." alt="" coords="248,188,460,229"/>
+<area shape="rect" id="node6" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="277,254,431,281"/>
+</map>

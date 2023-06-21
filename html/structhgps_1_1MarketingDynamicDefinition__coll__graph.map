@@ -1,0 +1,5 @@
+<map id="hgps::MarketingDynamicDefinition" name="hgps::MarketingDynamicDefinition">
+<area shape="rect" id="node1" title="Dynamic marketing intervention definition data type." alt="" coords="47,95,293,121"/>
+<area shape="rect" id="node2" href="$structhgps_1_1PolicyInterval.html" title="Defines the policy active interval." alt="" coords="5,5,156,32"/>
+<area shape="rect" id="node3" href="$structhgps_1_1PolicyDynamic.html" title="Defines the policy dynamic parameters." alt="" coords="180,5,339,32"/>
+</map>

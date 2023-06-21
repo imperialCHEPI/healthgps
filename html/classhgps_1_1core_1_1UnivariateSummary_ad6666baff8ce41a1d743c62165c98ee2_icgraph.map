@@ -1,0 +1,5 @@
+<map id="hgps::core::UnivariateSummary::count_null" name="hgps::core::UnivariateSummary::count_null">
+<area shape="rect" id="node1" title="Gets the number of null data points, not included in the summary." alt="" coords="557,35,785,76"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1UnivariateSummary.html#a728329f04594446f26ab3c3cdab552ec" title="Gets the total number of data points." alt="" coords="281,5,509,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1core_1_1UnivariateSummary.html#a6495055dfccf8ab34cb6ac87bf343772" title="Convert this instance to a string representation." alt="" coords="5,35,233,76"/>
+</map>

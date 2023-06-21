@@ -1,0 +1,5 @@
+<map id="hgps::core::Datastore::get_diseases" name="hgps::core::Datastore::get_diseases">
+<area shape="rect" id="node1" title="Gets the collection of diseases information in the store." alt="" coords="331,5,492,47"/>
+<area shape="rect" id="node2" href="$namespacehost.html#a7f97a3006678c2e01ad9ebd10c11fe60" title="Gets the collection of diseases that matches the selected input list." alt="" coords="108,13,283,39"/>
+<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

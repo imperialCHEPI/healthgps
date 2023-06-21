@@ -1,0 +1,5 @@
+<map id="hgps::DiseaseTable::size" name="hgps::DiseaseTable::size">
+<area shape="rect" id="node1" title="Gets the total size of the table, number of measure cells." alt="" coords="5,39,152,80"/>
+<area shape="rect" id="node2" href="$classhgps_1_1DiseaseTable.html#a539b7ec4633a9b9e3b24796e0bdf255a" title="Gets the number of columns, gender." alt="" coords="200,5,347,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1DiseaseTable.html#a7cb0b6c39bab1ca92b1f39b0887830c5" title="Gets the number of rows, age." alt="" coords="200,71,347,112"/>
+</map>

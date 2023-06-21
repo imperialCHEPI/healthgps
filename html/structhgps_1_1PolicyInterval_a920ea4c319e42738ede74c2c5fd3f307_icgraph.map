@@ -1,0 +1,9 @@
+<map id="hgps::PolicyInterval::contains" name="hgps::PolicyInterval::contains">
+<area shape="rect" id="node1" title="Determine whether this interval contains a given time." alt="" coords="293,169,444,211"/>
+<area shape="rect" id="node2" href="$classhgps_1_1FiscalPolicyScenario.html#ad46cec8a3763896461c735fc8afcf725" title="Applies this Scenario to the Person instance." alt="" coords="29,5,222,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1FoodLabellingScenario.html#aa834940afe9a25e18be90b058767feff" title="Applies this Scenario to the Person instance." alt="" coords="22,71,229,112"/>
+<area shape="rect" id="node4" href="$classhgps_1_1MarketingDynamicScenario.html#a84574c7750050d6d3b1b0c91276df416" title="Applies this Scenario to the Person instance." alt="" coords="5,136,245,177"/>
+<area shape="rect" id="node5" href="$classhgps_1_1MarketingPolicyScenario.html#a49917d87b419b15e5c9bbf9c8dc7be11" title="Applies this Scenario to the Person instance." alt="" coords="15,201,236,243"/>
+<area shape="rect" id="node6" href="$classhgps_1_1PhysicalActivityScenario.html#ac34bbccd8ce8326f998e897313898647" title="Applies this Scenario to the Person instance." alt="" coords="15,267,236,308"/>
+<area shape="rect" id="node7" href="$classhgps_1_1SimplePolicyScenario.html#a0e357d9a2250cea0bc1eebe659e26141" title="Applies this Scenario to the Person instance." alt="" coords="25,332,226,373"/>
+</map>

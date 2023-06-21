@@ -1,0 +1,6 @@
+<map id="hgps::core::DataTableColumn::name" name="hgps::core::DataTableColumn::name">
+<area shape="rect" id="node1" title="Gets the column name identifier." alt="" coords="553,5,765,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1DataTable.html#ae022bf3052be4728cce521ca87a54865" title="Adds a new column to the table." alt="" coords="311,13,505,39"/>
+<area shape="rect" id="node3" href="$namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa" title="Populates a datatable with the input data file contents." alt="" coords="108,5,263,47"/>
+<area shape="rect" id="node4" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

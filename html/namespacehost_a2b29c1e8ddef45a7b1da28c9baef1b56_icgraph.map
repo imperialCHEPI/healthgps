@@ -1,0 +1,5 @@
+<map id="host::create_output_folder" name="host::create_output_folder">
+<area shape="rect" id="node1" title="Creates the configuration output folder for result files." alt="" coords="335,5,483,47"/>
+<area shape="rect" id="node2" href="$namespacehost.html#af79a5d1675d5305364c34cc2f44541e7" title="Loads the input configuration file, *.json, information." alt="" coords="108,13,287,39"/>
+<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
+</map>

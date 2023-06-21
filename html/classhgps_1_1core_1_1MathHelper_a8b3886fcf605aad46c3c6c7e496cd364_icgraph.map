@@ -1,0 +1,4 @@
+<map id="hgps::core::MathHelper::machine_precision" name="hgps::core::MathHelper::machine_precision">
+<area shape="rect" id="node1" title="Gets the largest positive value which, when added to 1.0, yields 0." alt="" coords="268,5,441,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1MathHelper.html#a82d069632cb503d26445d8909c5263c6" title="Gets the typical meaningful precision for numerical calculations." alt="" coords="5,5,220,47"/>
+</map>

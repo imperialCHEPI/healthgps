@@ -1,0 +1,5 @@
+<map id="hgps::RiskFactorModule::apply_baseline_adjustments" name="hgps::RiskFactorModule::apply_baseline_adjustments">
+<area shape="rect" id="node1" title="Apply baseline risk factor adjustments to population." alt="" coords="5,5,221,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e" title="Applies the baseline adjustments to the population risk factor values." alt="" coords="269,5,472,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="520,5,687,47"/>
+</map>

@@ -1,0 +1,52 @@
+<map id="HealthGPS/hierarchical_model_static.h" name="HealthGPS/hierarchical_model_static.h">
+<area shape="rect" id="node1" title=" " alt="" coords="1524,5,1695,47"/>
+<area shape="rect" id="node2" href="$hierarchical__model__types_8h.html" title=" " alt="" coords="540,95,687,136"/>
+<area shape="rect" id="node17" title=" " alt="" coords="2482,632,2569,659"/>
+<area shape="rect" id="node3" href="$interfaces_8h.html" title=" " alt="" coords="996,184,1095,211"/>
+<area shape="rect" id="node49" href="$mapping_8h.html" title=" " alt="" coords="1776,408,1867,435"/>
+<area shape="rect" id="node50" href="$gender__value_8h.html" title=" " alt="" coords="5,259,128,285"/>
+<area shape="rect" id="node4" href="$randombit__generator_8h.html" title=" " alt="" coords="417,408,588,435"/>
+<area shape="rect" id="node7" href="$HealthGPS_8Core_2api_8h.html" title=" " alt="" coords="1285,259,1446,285"/>
+<area shape="rect" id="node24" title=" " alt="" coords="2351,557,2401,584"/>
+<area shape="rect" id="node32" title=" " alt="" coords="1023,483,1100,509"/>
+<area shape="rect" id="node5" title=" " alt="" coords="473,483,532,509"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1529,557,1591,584"/>
+<area shape="rect" id="node8" href="$version_8h.html" title=" " alt="" coords="2904,333,2987,360"/>
+<area shape="rect" id="node10" href="$datastore_8h.html" title=" " alt="" coords="1993,333,2089,360"/>
+<area shape="rect" id="node12" href="$interval_8h.html" title=" " alt="" coords="2085,408,2169,435"/>
+<area shape="rect" id="node19" href="$HealthGPS_8Core_2poco_8h.html" title=" " alt="" coords="2471,408,2537,435"/>
+<area shape="rect" id="node25" href="$identifier_8h.html" title=" " alt="" coords="2185,557,2276,584"/>
+<area shape="rect" id="node30" href="$visitor_8h.html" title=" " alt="" coords="607,557,681,584"/>
+<area shape="rect" id="node31" href="$datatable_8h.html" title=" " alt="" coords="839,408,935,435"/>
+<area shape="rect" id="node39" href="$column__numeric_8h.html" title=" " alt="" coords="1083,333,1226,360"/>
+<area shape="rect" id="node41" href="$column__iterator_8h.html" title=" " alt="" coords="73,483,209,509"/>
+<area shape="rect" id="node43" href="$column__builder_8h.html" title=" " alt="" coords="1092,408,1225,435"/>
+<area shape="rect" id="node45" href="$array2d_8h.html" title=" " alt="" coords="1509,408,1593,435"/>
+<area shape="rect" id="node48" href="$univariate__summary_8h.html" title=" " alt="" coords="1266,408,1433,435"/>
+<area shape="rect" id="node9" title=" " alt="" coords="2300,632,2359,659"/>
+<area shape="rect" id="node11" title=" " alt="" coords="924,483,999,509"/>
+<area shape="rect" id="node13" href="$forward__type_8h.html" title=" " alt="" coords="1681,632,1801,659"/>
+<area shape="rect" id="node16" href="$string__util_8h.html" title=" " alt="" coords="2476,557,2575,584"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1901,483,2006,509"/>
+<area shape="rect" id="node14" title=" " alt="" coords="921,707,1013,733"/>
+<area shape="rect" id="node15" title=" " alt="" coords="1708,707,1775,733"/>
+<area shape="rect" id="node20" href="$country_8h.html" title=" " alt="" coords="2599,557,2681,584"/>
+<area shape="rect" id="node21" href="$population__item_8h.html" title=" " alt="" coords="2658,483,2798,509"/>
+<area shape="rect" id="node23" href="$HealthGPS_8Core_2disease_8h.html" title=" " alt="" coords="2397,483,2481,509"/>
+<area shape="rect" id="node27" href="$analysis_8h.html" title=" " alt="" coords="2183,483,2271,509"/>
+<area shape="rect" id="node28" href="$indicator_8h.html" title=" " alt="" coords="2705,557,2796,584"/>
+<area shape="rect" id="node29" href="$mortality_8h.html" title=" " alt="" coords="2874,483,2966,509"/>
+<area shape="rect" id="node22" title=" " alt="" coords="2857,557,2911,584"/>
+<area shape="rect" id="node26" title=" " alt="" coords="531,632,607,659"/>
+<area shape="rect" id="node33" title=" " alt="" coords="385,483,449,509"/>
+<area shape="rect" id="node34" title=" " alt="" coords="1287,483,1411,509"/>
+<area shape="rect" id="node35" title=" " alt="" coords="764,483,849,509"/>
+<area shape="rect" id="node36" href="$column_8h.html" title=" " alt="" coords="607,483,689,509"/>
+<area shape="rect" id="node37" title=" " alt="" coords="806,557,853,584"/>
+<area shape="rect" id="node38" title=" " alt="" coords="706,557,782,584"/>
+<area shape="rect" id="node40" href="$column__primitive_8h.html" title=" " alt="" coords="659,408,807,435"/>
+<area shape="rect" id="node42" title=" " alt="" coords="106,557,177,584"/>
+<area shape="rect" id="node44" title=" " alt="" coords="1125,483,1211,509"/>
+<area shape="rect" id="node46" title=" " alt="" coords="1738,483,1825,509"/>
+<area shape="rect" id="node47" title=" " alt="" coords="1639,483,1713,509"/>
+</map>

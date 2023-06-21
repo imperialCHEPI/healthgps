@@ -1,0 +1,4 @@
+<map id="hgps::Random::next_int" name="hgps::Random::next_int">
+<area shape="rect" id="node1" title="Generates the next random integer in sequence in range [min(), max_value)" alt="" coords="5,5,181,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1Random.html#abf15ed151d33acc11dbdd138b497b1b0" title="Generates the next random integer in the sequence." alt="" coords="229,5,405,32"/>
+</map>

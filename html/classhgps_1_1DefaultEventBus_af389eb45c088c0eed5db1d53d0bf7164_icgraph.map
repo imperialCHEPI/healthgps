@@ -1,0 +1,4 @@
+<map id="hgps::DefaultEventBus::publish" name="hgps::DefaultEventBus::publish">
+<area shape="rect" id="node1" title="Publishes a message to all subscribers synchronous." alt="" coords="224,5,395,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1DefaultEventBus.html#a4ea312a2bc9bdf9210ca7513432a95b2" title="Publishes a message to all subscribers asynchronous." alt="" coords="5,5,176,47"/>
+</map>

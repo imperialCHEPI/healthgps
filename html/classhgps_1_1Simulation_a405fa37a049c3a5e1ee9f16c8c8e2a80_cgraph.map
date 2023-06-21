@@ -1,0 +1,4 @@
+<map id="hgps::Simulation::name" name="hgps::Simulation::name">
+<area shape="rect" id="node1" title="Gets the simulation name." alt="" coords="5,13,181,39"/>
+<area shape="rect" id="node2" href="$structhgps_1_1SimulationDefinition.html#af3cfaccd2244487a2002ae4fd2f0fdf7" title="Gets the simulation scenario identifier." alt="" coords="229,5,424,47"/>
+</map>

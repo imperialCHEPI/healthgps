@@ -1,0 +1,4 @@
+<map id="hgps::ModelRunner::cancel" name="hgps::ModelRunner::cancel">
+<area shape="rect" id="node1" title="Cancel a running experiment." alt="" coords="5,5,160,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1ModelRunner.html#ae8686193d1609fb0d77989144d50e04a" title="Gets a value indicating whether an experiment is current running." alt="" coords="208,5,363,47"/>
+</map>

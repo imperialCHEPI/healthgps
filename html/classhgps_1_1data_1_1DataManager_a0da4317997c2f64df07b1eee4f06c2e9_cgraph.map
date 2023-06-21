@@ -1,0 +1,4 @@
+<map id="hgps::data::DataManager::get_disease" name="hgps::data::DataManager::get_disease">
+<area shape="rect" id="node1" title="Gets a disease full definition by identifier for a country." alt="" coords="5,5,192,47"/>
+<area shape="rect" id="node2" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="240,13,393,39"/>
+</map>

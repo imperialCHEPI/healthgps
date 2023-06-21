@@ -1,0 +1,4 @@
+<map id="hgps::core::DoubleDataTableColumn::accept" name="hgps::core::DoubleDataTableColumn::accept">
+<area shape="rect" id="node1" title="Double dispatch the column using a visitor implementation." alt="" coords="5,5,213,47"/>
+<area shape="rect" id="node2" href="$classhgps_1_1core_1_1DataTableColumnVisitor.html#a19c5279083aa76dc4c0ab2b87ab0b8ae" title="Visits a column of StringDataTableColumn type." alt="" coords="261,5,473,47"/>
+</map>
