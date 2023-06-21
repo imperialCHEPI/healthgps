@@ -228,7 +228,7 @@ namespace host
 
 			if (!ifs.good()) {
 				throw std::invalid_argument(fmt::format(
-					"Model file: {} not found.\n", model_filename));
+					"Model file: {} not found", model_filename));
 			}
 
 			try {
@@ -245,8 +245,7 @@ namespace host
 					}
 					else {
 						fmt::print(fg(fmt::color::red),
-						"Static model name '{}' is not recognised.\n",
-						model_name);
+						"Static model name '{}' is not recognised.\n", model_name);
 					}
 				}
 				else if (core::case_insensitive::equals(model.first, "dynamic")) {
@@ -266,14 +265,13 @@ namespace host
 					}
 				}
 				else {
-					fmt::print(fg(fmt::color::red), "Unknown model type: {}.\n", model.first);
-					continue;
+					throw std::invalid_argument(fmt::format(
+						"Unknown model type: {}", model.first));
 				}
 			}
 			catch (const std::exception& ex) {
 				fmt::print(fg(fmt::color::red),
-				"Failed to parse model file: {}. {}\n",
-				model_filename, ex.what());
+				"Failed to parse model file: {}. {}\n", model_filename, ex.what());
 			}
 		}
 
