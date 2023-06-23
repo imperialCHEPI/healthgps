@@ -1,5 +1,4 @@
 #pragma once
-#include "HealthGPS/hierarchical_model_types.h"
 #include "HealthGPS/repository.h"
 #include "HealthGPS/riskfactor_adjustment_types.h"
 
