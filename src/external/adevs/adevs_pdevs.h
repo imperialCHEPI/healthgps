@@ -1,11 +1,10 @@
 #ifndef _adevs_hier_h_
 #define _adevs_hier_h_
 #include "adevs_base.h"
-#include <set>
 #include <map>
+#include <set>
 
-namespace adevs
-{
+namespace adevs {
 
 template <typename DataType, typename TimeType> class Network;
 
@@ -18,461 +17,401 @@ template <typename DataType, typename TimeType> class Network;
  * instead. If using the update methods, then sending a
  * message to the parent is the way to generate input for
  * other components belonging to that parent. */
-template <typename DataType,typename TimeType=Time>
-class Devs:
-	public Model<DataType,TimeType>
-{
-	public:
-		Devs():Model<DataType,TimeType>(),m_parent(NULL){}
-		/** 
-		 * \brief Get the parent of this model.
-		 * 
-		 * Messages sent to the parent will be redirected
-		 * redirected via its route method.
-		 * @return The parent of this model.
-		 */
-		Network<DataType,TimeType>* parent() const { return m_parent; }
-		/// Add this model and any submodels to the simulation
-		virtual void add(SimEnv<DataType,TimeType>* env) = 0;
-		virtual ~Devs(){}
-	private:
-		Network<DataType,TimeType>* m_parent;
-		friend class Network<DataType,TimeType>;
+template <typename DataType, typename TimeType = Time>
+class Devs : public Model<DataType, TimeType> {
+  public:
+    Devs() : Model<DataType, TimeType>(), m_parent(NULL) {}
+    /**
+     * \brief Get the parent of this model.
+     *
+     * Messages sent to the parent will be redirected
+     * redirected via its route method.
+     * @return The parent of this model.
+     */
+    Network<DataType, TimeType> *parent() const { return m_parent; }
+    /// Add this model and any submodels to the simulation
+    virtual void add(SimEnv<DataType, TimeType> *env) = 0;
+    virtual ~Devs() {}
+
+  private:
+    Network<DataType, TimeType> *m_parent;
+    friend class Network<DataType, TimeType>;
 };
 
- /**
-  * \brief This class offers the standard PDEVS interface for an atomic model.
-  *
-  * The time advance method ta() returns the lifetime of the current state.
-  * Given state q at time now, the state will still be q at q+ta() and
-  * a new state will be assigned via delta_int(), delta_ext(), or delta_conf()
-  * at time (now+ta())+adevs_epsilon()). The output for state q will occur at
-  * time t+ta() and be delivered to other models at (t+ta())+adevs_epsilon().
-  */
-template <typename DataType, typename TimeType=Time>
-class Atomic:
-	public Devs<DataType,TimeType>
-{
-	public:
-		Atomic():Devs<DataType,TimeType>(){}
-		/// Internal transition function
-		virtual void delta_int() = 0;
-		/// External transition function
-		virtual void delta_ext(TimeType e, std::vector<DataType>& x) = 0;
-		/// Confluent transition function
-		virtual void delta_conf(std::vector<DataType>& x) = 0;
-		/// Time advance function
-		virtual TimeType ta() = 0;
-		/**
-		 * \brief Output function.
-		 *
-		 * Data to be delivered to other models must be
-		 * inserted into the supplied vector.
-		 * @param y A vector to be filled with data for other models
-		 */
-		virtual void output_func(std::vector<DataType>& y) = 0;
-		/// Schedules the first output event. Do not override this method.
-		TimeType init(SimEnv<DataType,TimeType>* env);
-		/// Implements the internal transition and output function.
-		/// Do not override.
-		TimeType update(SimEnv<DataType,TimeType>* env);
-		/// Implements the external and confluent transitions. Do not override.
-		TimeType update(
-				SimEnv<DataType,TimeType>* env, std::vector<DataType>& x);
-		/// No op fini
-		void fini(TimeType){}
-		/// Adds this model to the simulation context
-		void add(SimEnv<DataType,TimeType>* env) { env->add(this); }
-	private:
-		TimeType schedule_internal_events(SimEnv<DataType,TimeType>* env);
-		void transmit_output(SimEnv<DataType,TimeType>* env);
-		std::vector<DataType> y;
-		enum Mode { STATE_CHANGE, OUTPUT, PASSIVE };
-		Mode mode;
-		TimeType tL, tN;
+/**
+ * \brief This class offers the standard PDEVS interface for an atomic model.
+ *
+ * The time advance method ta() returns the lifetime of the current state.
+ * Given state q at time now, the state will still be q at q+ta() and
+ * a new state will be assigned via delta_int(), delta_ext(), or delta_conf()
+ * at time (now+ta())+adevs_epsilon()). The output for state q will occur at
+ * time t+ta() and be delivered to other models at (t+ta())+adevs_epsilon().
+ */
+template <typename DataType, typename TimeType = Time>
+class Atomic : public Devs<DataType, TimeType> {
+  public:
+    Atomic() : Devs<DataType, TimeType>() {}
+    /// Internal transition function
+    virtual void delta_int() = 0;
+    /// External transition function
+    virtual void delta_ext(TimeType e, std::vector<DataType> &x) = 0;
+    /// Confluent transition function
+    virtual void delta_conf(std::vector<DataType> &x) = 0;
+    /// Time advance function
+    virtual TimeType ta() = 0;
+    /**
+     * \brief Output function.
+     *
+     * Data to be delivered to other models must be
+     * inserted into the supplied vector.
+     * @param y A vector to be filled with data for other models
+     */
+    virtual void output_func(std::vector<DataType> &y) = 0;
+    /// Schedules the first output event. Do not override this method.
+    TimeType init(SimEnv<DataType, TimeType> *env);
+    /// Implements the internal transition and output function.
+    /// Do not override.
+    TimeType update(SimEnv<DataType, TimeType> *env);
+    /// Implements the external and confluent transitions. Do not override.
+    TimeType update(SimEnv<DataType, TimeType> *env, std::vector<DataType> &x);
+    /// No op fini
+    void fini(TimeType) {}
+    /// Adds this model to the simulation context
+    void add(SimEnv<DataType, TimeType> *env) { env->add(this); }
+
+  private:
+    TimeType schedule_internal_events(SimEnv<DataType, TimeType> *env);
+    void transmit_output(SimEnv<DataType, TimeType> *env);
+    std::vector<DataType> y;
+    enum Mode { STATE_CHANGE, OUTPUT, PASSIVE };
+    Mode mode;
+    TimeType tL, tN;
 };
 
 template <typename DataType, typename TimeType>
-TimeType Atomic<DataType,TimeType>::init(
-		SimEnv<DataType,TimeType>* env)
-{
-	tL = env->now();
-	return (tN = schedule_internal_events(env));
+TimeType Atomic<DataType, TimeType>::init(SimEnv<DataType, TimeType> *env) {
+    tL = env->now();
+    return (tN = schedule_internal_events(env));
 }
 
 template <typename DataType, typename TimeType>
-TimeType Atomic<DataType,TimeType>::update(
-		SimEnv<DataType,TimeType>* env)
-{
-	assert(mode != PASSIVE);
-	// Assign the state caused by the interal event 
-	if (mode == STATE_CHANGE)
-	{
-		delta_int();
-		tL = env->now();
-		tN = schedule_internal_events(env);
-	}
-	// Otherwise generate output for this event and
-	// then schedule the change of state
-	else // (mode == OUTPUT)
-	{
-		transmit_output(env);
-		mode = STATE_CHANGE;
-		tN = env->now() + adevs_epsilon<TimeType>();
-	}
-	return tN;
+TimeType Atomic<DataType, TimeType>::update(SimEnv<DataType, TimeType> *env) {
+    assert(mode != PASSIVE);
+    // Assign the state caused by the interal event
+    if (mode == STATE_CHANGE) {
+        delta_int();
+        tL = env->now();
+        tN = schedule_internal_events(env);
+    }
+    // Otherwise generate output for this event and
+    // then schedule the change of state
+    else // (mode == OUTPUT)
+    {
+        transmit_output(env);
+        mode = STATE_CHANGE;
+        tN = env->now() + adevs_epsilon<TimeType>();
+    }
+    return tN;
 }
 
 template <typename DataType, typename TimeType>
-TimeType Atomic<DataType,TimeType>::update(
-		SimEnv<DataType,TimeType>* env, std::vector<DataType>& x)
-{
-	// External event
-	if (env->now() < tN || (env->now() == tN && mode != STATE_CHANGE))
-	{
-		delta_ext(env->now()-tL,x);
-		tL = env->now();
-		tN = schedule_internal_events(env);
-	}
-	// Confluent event
-	else
-	{
-		delta_conf(x);
-		tL = env->now();
-		tN = schedule_internal_events(env);
-	}
-	return tN;
+TimeType Atomic<DataType, TimeType>::update(SimEnv<DataType, TimeType> *env,
+                                            std::vector<DataType> &x) {
+    // External event
+    if (env->now() < tN || (env->now() == tN && mode != STATE_CHANGE)) {
+        delta_ext(env->now() - tL, x);
+        tL = env->now();
+        tN = schedule_internal_events(env);
+    }
+    // Confluent event
+    else {
+        delta_conf(x);
+        tL = env->now();
+        tN = schedule_internal_events(env);
+    }
+    return tN;
 }
 
 template <typename DataType, typename TimeType>
-TimeType Atomic<DataType,TimeType>::schedule_internal_events(
-		SimEnv<DataType,TimeType>* env)
-{
-	// Get the time of the next event
-	TimeType h = ta();
-	// If this is for the next instant then send
-	// output generated by the initial state and
-	// the next state will be assigned at that
-	// time
-	if (h == adevs_zero<TimeType>())
-	{
-		transmit_output(env);
-		mode = STATE_CHANGE;
-		return env->now() + adevs_epsilon<TimeType>();
-	}
-	// Otherwise if h < inf() schedule an event
-	// immediately prior to the new state to
-	// generate that output
-	if (h < adevs_inf<TimeType>())
-	{
-		mode = OUTPUT;
-		return env->now()+h;
-	}
-	// Otherwise we are passive
-	mode = PASSIVE;
-	return h;
+TimeType Atomic<DataType, TimeType>::schedule_internal_events(SimEnv<DataType, TimeType> *env) {
+    // Get the time of the next event
+    TimeType h = ta();
+    // If this is for the next instant then send
+    // output generated by the initial state and
+    // the next state will be assigned at that
+    // time
+    if (h == adevs_zero<TimeType>()) {
+        transmit_output(env);
+        mode = STATE_CHANGE;
+        return env->now() + adevs_epsilon<TimeType>();
+    }
+    // Otherwise if h < inf() schedule an event
+    // immediately prior to the new state to
+    // generate that output
+    if (h < adevs_inf<TimeType>()) {
+        mode = OUTPUT;
+        return env->now() + h;
+    }
+    // Otherwise we are passive
+    mode = PASSIVE;
+    return h;
 }
 
 template <typename DataType, typename TimeType>
-void Atomic<DataType,TimeType>::transmit_output(SimEnv<DataType,TimeType>* env)
-{
-	output_func(y);
-	for (unsigned i = 0; i < y.size() && this->parent() != NULL; i++)
-		env->send(this,this->parent(),y[i]);
-	y.clear();
+void Atomic<DataType, TimeType>::transmit_output(SimEnv<DataType, TimeType> *env) {
+    output_func(y);
+    for (unsigned i = 0; i < y.size() && this->parent() != NULL; i++)
+        env->send(this, this->parent(), y[i]);
+    y.clear();
 }
 
 /**
  * \brief This is a Parallel DEVS network model.
  *
- * A network structure is realized by implementing the route method. 
- * A Network may exhibit its own behavior if you supply 
+ * A network structure is realized by implementing the route method.
+ * A Network may exhibit its own behavior if you supply
  * update() methods different from the noop defaults.
  */
-template <typename DataType, typename TimeType=Time>
-class Network:
-	public Devs<DataType,TimeType>
-{
-	public:
-		Network():Devs<DataType,TimeType>(),routing(false){}
-		/**
-		 * \brief Set the parent of a model to be this Network.
-		 * @param model The model that is to become this object's child.
-		 */
-		void assign_parent(Devs<DataType,TimeType>* model) {
-			model->m_parent = this;
-		}
-		/**
-		 * \brief Provide a destination list for a message.
-		 *
-		 * If the route list contains this model, then
-		 * the message is an output from the network. If the
-		 * source argument is this model, then the message
-		 * is an input to the network.
-		 * @param src The origin of the message
-		 * @param data The message itself
-		 * @param msgs A list to be filled with (model,data) pairs
-		 * indicating which models will receive what data.
-		 */
-		virtual void route(
-			Model<DataType,TimeType>* src, DataType data,
-			std::vector<std::pair<Model<DataType,TimeType>*,DataType> >& msgs) = 0;
-		/// Destructor
-		virtual ~Network(){}
-		/// No op update
-		TimeType update(SimEnv<DataType,TimeType>*) { return adevs_inf<TimeType>(); }
-		/// No op update
-		TimeType update(SimEnv<DataType,TimeType>*, std::vector<DataType>&) {
-			return adevs_inf<TimeType>();
-		}
-		/// No op init
-		TimeType init(SimEnv<DataType,TimeType>*) { return adevs_inf<TimeType>(); }
-		/// No op fini
-		void fini(TimeType){}
-		/// Relay uses the route method to redirect messages. Do not override.
-		std::pair<Model<DataType,TimeType>*,DataType> relay(
-				Model<DataType,TimeType>* src, DataType x);
-	private:
-		std::vector<std::pair<Model<DataType,TimeType>*,DataType> > msgs;
-		unsigned pos;
-		bool routing;
+template <typename DataType, typename TimeType = Time>
+class Network : public Devs<DataType, TimeType> {
+  public:
+    Network() : Devs<DataType, TimeType>(), routing(false) {}
+    /**
+     * \brief Set the parent of a model to be this Network.
+     * @param model The model that is to become this object's child.
+     */
+    void assign_parent(Devs<DataType, TimeType> *model) { model->m_parent = this; }
+    /**
+     * \brief Provide a destination list for a message.
+     *
+     * If the route list contains this model, then
+     * the message is an output from the network. If the
+     * source argument is this model, then the message
+     * is an input to the network.
+     * @param src The origin of the message
+     * @param data The message itself
+     * @param msgs A list to be filled with (model,data) pairs
+     * indicating which models will receive what data.
+     */
+    virtual void route(Model<DataType, TimeType> *src, DataType data,
+                       std::vector<std::pair<Model<DataType, TimeType> *, DataType>> &msgs) = 0;
+    /// Destructor
+    virtual ~Network() {}
+    /// No op update
+    TimeType update(SimEnv<DataType, TimeType> *) { return adevs_inf<TimeType>(); }
+    /// No op update
+    TimeType update(SimEnv<DataType, TimeType> *, std::vector<DataType> &) {
+        return adevs_inf<TimeType>();
+    }
+    /// No op init
+    TimeType init(SimEnv<DataType, TimeType> *) { return adevs_inf<TimeType>(); }
+    /// No op fini
+    void fini(TimeType) {}
+    /// Relay uses the route method to redirect messages. Do not override.
+    std::pair<Model<DataType, TimeType> *, DataType> relay(Model<DataType, TimeType> *src,
+                                                           DataType x);
+
+  private:
+    std::vector<std::pair<Model<DataType, TimeType> *, DataType>> msgs;
+    unsigned pos;
+    bool routing;
 };
 
 template <typename DataType, typename TimeType>
-std::pair<Model<DataType,TimeType>*,DataType>
-Network<DataType,TimeType>::relay(Model<DataType,TimeType>* src, DataType x)
-{
-	if (!routing)
-	{
-		// If the source is our parent, route it to our children
-		if (src == this->parent() || src == NULL)
-			route(this,x,msgs);
-		// The source is us or a child of the network
-		else
-			route(src,x,msgs);
-		routing = true;
-		pos = 0;
-	}
-	while (pos < msgs.size())
-	{
-		// This is a message to child of the network
-		if (msgs[pos].first != this)
-		{
-			return msgs[pos++];
-		}
-		// Output from the network goes to its parent to be routed
-		if (this->parent() != NULL)
-		{
-			msgs[pos].first = this->parent();
-			return msgs[pos++];
-		}
-		pos++;
-	}
-	msgs.clear();
-	routing = false;
-	return std::pair<Model<DataType,TimeType>*,DataType>(NULL,x);
+std::pair<Model<DataType, TimeType> *, DataType>
+Network<DataType, TimeType>::relay(Model<DataType, TimeType> *src, DataType x) {
+    if (!routing) {
+        // If the source is our parent, route it to our children
+        if (src == this->parent() || src == NULL)
+            route(this, x, msgs);
+        // The source is us or a child of the network
+        else
+            route(src, x, msgs);
+        routing = true;
+        pos = 0;
+    }
+    while (pos < msgs.size()) {
+        // This is a message to child of the network
+        if (msgs[pos].first != this) {
+            return msgs[pos++];
+        }
+        // Output from the network goes to its parent to be routed
+        if (this->parent() != NULL) {
+            msgs[pos].first = this->parent();
+            return msgs[pos++];
+        }
+        pos++;
+    }
+    msgs.clear();
+    routing = false;
+    return std::pair<Model<DataType, TimeType> *, DataType>(NULL, x);
 }
 
 /// Data type for a Digraph model
-template <typename DataType>
-struct port_value
-{
-	/// Port on which the data is sent or arriving
-	int port;
-	/// The message data
-	DataType value;
-	port_value(){}
-	/// Assigns initial values to port and value
-	port_value(int port, DataType value):
-		port(port),value(value){}
+template <typename DataType> struct port_value {
+    /// Port on which the data is sent or arriving
+    int port;
+    /// The message data
+    DataType value;
+    port_value() {}
+    /// Assigns initial values to port and value
+    port_value(int port, DataType value) : port(port), value(value) {}
 };
 
 /// A typical digraph network model with port value pairs for input and output.
-template <typename DataType, typename TimeType=Time>
-class Digraph:
-	public Network<port_value<DataType>,TimeType>
-{
-	public:
-		Digraph():Network<port_value<DataType>,TimeType>(){}
-		~Digraph();
-		/**
-		 * \brief Add this model and its submodels to the simulation
-		 * context. You must couple your models first, then add them
-		 * to the simulator.
-		 */
-		void add(SimEnv<port_value<DataType>,TimeType>* env);
-		/**
-		 * \brief Create a link in the network.
-		 *
-		 * Connect the src_port of the src model to the dst_port of the
-		 * dst model. Output produced by the source on the source port
-		 * will be delivered destination on its destination port.
-		 */
-		void couple(Devs<port_value<DataType>,TimeType>* src, int src_port,
-			Devs<port_value<DataType>,TimeType>* dst, int dst_port);
-		/// The network's route method. Do not override.
-		void route(
-			Model<port_value<DataType>,TimeType>* src, port_value<DataType> data,
-			std::vector<std::pair<Model<port_value<DataType>,TimeType>*,
-				port_value<DataType> > >& msgs);
-	private:
-		std::set<Devs<port_value<DataType>,TimeType>* > models;
-		std::map<std::pair<Model<port_value<DataType>,TimeType>*,int>,
-			std::vector<std::pair<Model<port_value<DataType>,TimeType>*,int> > > graph;
+template <typename DataType, typename TimeType = Time>
+class Digraph : public Network<port_value<DataType>, TimeType> {
+  public:
+    Digraph() : Network<port_value<DataType>, TimeType>() {}
+    ~Digraph();
+    /**
+     * \brief Add this model and its submodels to the simulation
+     * context. You must couple your models first, then add them
+     * to the simulator.
+     */
+    void add(SimEnv<port_value<DataType>, TimeType> *env);
+    /**
+     * \brief Create a link in the network.
+     *
+     * Connect the src_port of the src model to the dst_port of the
+     * dst model. Output produced by the source on the source port
+     * will be delivered destination on its destination port.
+     */
+    void couple(Devs<port_value<DataType>, TimeType> *src, int src_port,
+                Devs<port_value<DataType>, TimeType> *dst, int dst_port);
+    /// The network's route method. Do not override.
+    void route(Model<port_value<DataType>, TimeType> *src, port_value<DataType> data,
+               std::vector<std::pair<Model<port_value<DataType>, TimeType> *, port_value<DataType>>>
+                   &msgs);
+
+  private:
+    std::set<Devs<port_value<DataType>, TimeType> *> models;
+    std::map<std::pair<Model<port_value<DataType>, TimeType> *, int>,
+             std::vector<std::pair<Model<port_value<DataType>, TimeType> *, int>>>
+        graph;
 };
 
-template <typename DataType, typename TimeType>
-Digraph<DataType,TimeType>::~Digraph()
-{
-	typename std::set<Devs<port_value<DataType>,TimeType>* >::iterator iter =
-		models.begin();
-	for (; iter != models.end(); iter++)
-		if (*iter != this)
-			delete *iter;
+template <typename DataType, typename TimeType> Digraph<DataType, TimeType>::~Digraph() {
+    typename std::set<Devs<port_value<DataType>, TimeType> *>::iterator iter = models.begin();
+    for (; iter != models.end(); iter++)
+        if (*iter != this)
+            delete *iter;
 }
 
 template <typename DataType, typename TimeType>
-void Digraph<DataType,TimeType>::add(
-		SimEnv<port_value<DataType>,TimeType>* env)
-{
-	typename std::set<Devs<port_value<DataType>,TimeType>* >::iterator iter =
-		models.begin();
-	for (; iter != models.end(); iter++)
-	{
-		if (*iter != this)
-		{
-			this->assign_parent(*iter);
-			(*iter)->add(env);
-		}
-	}
+void Digraph<DataType, TimeType>::add(SimEnv<port_value<DataType>, TimeType> *env) {
+    typename std::set<Devs<port_value<DataType>, TimeType> *>::iterator iter = models.begin();
+    for (; iter != models.end(); iter++) {
+        if (*iter != this) {
+            this->assign_parent(*iter);
+            (*iter)->add(env);
+        }
+    }
 }
 
 template <typename DataType, typename TimeType>
-void Digraph<DataType,TimeType>::couple(
-	Devs<port_value<DataType>,TimeType>* src, int src_port,
-	Devs<port_value<DataType>,TimeType>* dst, int dst_port)
-{
-	models.insert(src);
-	models.insert(dst);
-	std::pair<Model<port_value<DataType>,TimeType>*,int> a(src,src_port);
-	std::pair<Model<port_value<DataType>,TimeType>*,int> b(dst,dst_port);
-	graph[a].push_back(b);
+void Digraph<DataType, TimeType>::couple(Devs<port_value<DataType>, TimeType> *src, int src_port,
+                                         Devs<port_value<DataType>, TimeType> *dst, int dst_port) {
+    models.insert(src);
+    models.insert(dst);
+    std::pair<Model<port_value<DataType>, TimeType> *, int> a(src, src_port);
+    std::pair<Model<port_value<DataType>, TimeType> *, int> b(dst, dst_port);
+    graph[a].push_back(b);
 }
 
 template <typename DataType, typename TimeType>
-void Digraph<DataType,TimeType>::route(
-	Model<port_value<DataType>,TimeType>* src, port_value<DataType> data,
-	std::vector<std::pair<Model<port_value<DataType>,TimeType>*,
-	port_value<DataType> > >& msgs)
-{
-	std::pair<Model<port_value<DataType>,TimeType>*,int> a(src,data.port);
-	typename std::map<std::pair<Model<port_value<DataType>,TimeType>*,int>,
-		std::vector<std::pair<Model<port_value<DataType>,TimeType>*,int> > >::const_iterator
-			iter = graph.find(a); 
-	if (iter != graph.end())
-	{
-		const std::vector<std::pair<Model<port_value<DataType>,TimeType>*,int> >&
-			link = (*iter).second;
-		for (unsigned i = 0; i < link.size(); i++)
-		{
-			data.port = link[i].second;
-			msgs.push_back(
-				std::pair<Model<port_value<DataType>,TimeType>*,port_value<DataType> >(
-					link[i].first,data));
-		}
-	}
+void Digraph<DataType, TimeType>::route(
+    Model<port_value<DataType>, TimeType> *src, port_value<DataType> data,
+    std::vector<std::pair<Model<port_value<DataType>, TimeType> *, port_value<DataType>>> &msgs) {
+    std::pair<Model<port_value<DataType>, TimeType> *, int> a(src, data.port);
+    typename std::map<
+        std::pair<Model<port_value<DataType>, TimeType> *, int>,
+        std::vector<std::pair<Model<port_value<DataType>, TimeType> *, int>>>::const_iterator iter =
+        graph.find(a);
+    if (iter != graph.end()) {
+        const std::vector<std::pair<Model<port_value<DataType>, TimeType> *, int>> &link =
+            (*iter).second;
+        for (unsigned i = 0; i < link.size(); i++) {
+            data.port = link[i].second;
+            msgs.push_back(std::pair<Model<port_value<DataType>, TimeType> *, port_value<DataType>>(
+                link[i].first, data));
+        }
+    }
 }
 
 /**
- * \brief A simple graph model. 
+ * \brief A simple graph model.
  *
  * This is like the Digraph class, but without ports.
  */
-template <typename DataType, typename TimeType=Time>
-class SimpleDigraph:
-	public Network<DataType,TimeType>
-{
-	public:
-		SimpleDigraph():Network<DataType,TimeType>(){}
-		~SimpleDigraph();
-		/**
-		 * \brief Add this model and its submodels to the simulation
-		 * context. You must couple your models first, then add them
-		 * to the simulator.
-		 */
-		void add(SimEnv<DataType,TimeType>* env);
-		/**
-		 * \brief Create a link in the network.
-		 *
-		 * Connect the src model to the dst model.
-		 */
-		void couple(Devs<DataType,TimeType>* src, Devs<DataType,TimeType>* dst);
-		/// The network's route method. Do not override.
-		void route(
-			Model<DataType,TimeType>* src, DataType data,
-			std::vector<std::pair<Model<DataType,TimeType>*,DataType> >& msgs);
-	private:
-		std::set<Devs<DataType,TimeType>* > models;
-		std::map<Model<DataType,TimeType>*,
-			std::vector<Model<DataType,TimeType>* > > graph;
+template <typename DataType, typename TimeType = Time>
+class SimpleDigraph : public Network<DataType, TimeType> {
+  public:
+    SimpleDigraph() : Network<DataType, TimeType>() {}
+    ~SimpleDigraph();
+    /**
+     * \brief Add this model and its submodels to the simulation
+     * context. You must couple your models first, then add them
+     * to the simulator.
+     */
+    void add(SimEnv<DataType, TimeType> *env);
+    /**
+     * \brief Create a link in the network.
+     *
+     * Connect the src model to the dst model.
+     */
+    void couple(Devs<DataType, TimeType> *src, Devs<DataType, TimeType> *dst);
+    /// The network's route method. Do not override.
+    void route(Model<DataType, TimeType> *src, DataType data,
+               std::vector<std::pair<Model<DataType, TimeType> *, DataType>> &msgs);
+
+  private:
+    std::set<Devs<DataType, TimeType> *> models;
+    std::map<Model<DataType, TimeType> *, std::vector<Model<DataType, TimeType> *>> graph;
 };
 
 template <typename DataType, typename TimeType>
-SimpleDigraph<DataType,TimeType>::~SimpleDigraph()
-{
-	typename std::set<Devs<DataType,TimeType>* >::iterator iter =
-		models.begin();
-	for (; iter != models.end(); iter++)
-		if (*iter != this)
-			delete *iter;
+SimpleDigraph<DataType, TimeType>::~SimpleDigraph() {
+    typename std::set<Devs<DataType, TimeType> *>::iterator iter = models.begin();
+    for (; iter != models.end(); iter++)
+        if (*iter != this)
+            delete *iter;
 }
 
 template <typename DataType, typename TimeType>
-void SimpleDigraph<DataType,TimeType>::add(SimEnv<DataType,TimeType>* env)
-{
-	typename std::set<Devs<DataType,TimeType>* >::iterator iter =
-		models.begin();
-	for (; iter != models.end(); iter++)
-	{
-		if (*iter != this)
-		{
-			this->assign_parent(*iter);
-			(*iter)->add(env);
-		}
-	}
+void SimpleDigraph<DataType, TimeType>::add(SimEnv<DataType, TimeType> *env) {
+    typename std::set<Devs<DataType, TimeType> *>::iterator iter = models.begin();
+    for (; iter != models.end(); iter++) {
+        if (*iter != this) {
+            this->assign_parent(*iter);
+            (*iter)->add(env);
+        }
+    }
 }
 
 template <typename DataType, typename TimeType>
-void SimpleDigraph<DataType,TimeType>::couple(
-	Devs<DataType,TimeType>* src, Devs<DataType,TimeType>* dst)
-{
-	models.insert(src);
-	models.insert(dst);
-	graph[src].push_back(dst);
+void SimpleDigraph<DataType, TimeType>::couple(Devs<DataType, TimeType> *src,
+                                               Devs<DataType, TimeType> *dst) {
+    models.insert(src);
+    models.insert(dst);
+    graph[src].push_back(dst);
 }
 
 template <typename DataType, typename TimeType>
-void SimpleDigraph<DataType,TimeType>::route(
-	Model<DataType,TimeType>* src, DataType data,
-	std::vector<std::pair<Model<DataType,TimeType>*,
-	DataType> >& msgs)
-{
-	typename std::map<Model<DataType,TimeType>*,
-		std::vector<Model<DataType,TimeType>* > >::const_iterator
-			iter = graph.find(src); 
-	if (iter != graph.end())
-	{
-		const std::vector<Model<DataType,TimeType>*>& link =
-			(*iter).second;
-		for (unsigned i = 0; i < link.size(); i++)
-		{
-			msgs.push_back(
-				std::pair<Model<DataType,TimeType>*,DataType >(
-					link[i],data));
-		}
-	}
+void SimpleDigraph<DataType, TimeType>::route(
+    Model<DataType, TimeType> *src, DataType data,
+    std::vector<std::pair<Model<DataType, TimeType> *, DataType>> &msgs) {
+    typename std::map<Model<DataType, TimeType> *,
+                      std::vector<Model<DataType, TimeType> *>>::const_iterator iter =
+        graph.find(src);
+    if (iter != graph.end()) {
+        const std::vector<Model<DataType, TimeType> *> &link = (*iter).second;
+        for (unsigned i = 0; i < link.size(); i++) {
+            msgs.push_back(std::pair<Model<DataType, TimeType> *, DataType>(link[i], data));
+        }
+    }
 }
 
-}; // end of namespace
+}; // namespace adevs
 
 #endif

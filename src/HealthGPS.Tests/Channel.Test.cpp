@@ -3,8 +3,7 @@
 #include "HealthGPS/channel.h"
 #include <thread>
 
-TEST(ChannelTest, DefaultConstruction)
-{
+TEST(ChannelTest, DefaultConstruction) {
     using namespace hgps;
 
     auto channel = Channel<int>{};
@@ -13,8 +12,7 @@ TEST(ChannelTest, DefaultConstruction)
     ASSERT_FALSE(channel.closed());
 }
 
-TEST(ChannelTest, SendAndReceive)
-{
+TEST(ChannelTest, SendAndReceive) {
     using namespace hgps;
 
     auto channel = Channel<int>{};
@@ -34,8 +32,7 @@ TEST(ChannelTest, SendAndReceive)
     ASSERT_EQ(7, out.value());
 }
 
-TEST(ChannelTest, ReceiveTimeout)
-{
+TEST(ChannelTest, ReceiveTimeout) {
     using namespace hgps;
 
     auto timeout = 10;
@@ -54,15 +51,14 @@ TEST(ChannelTest, ReceiveTimeout)
     ASSERT_FALSE(out.has_value());
 }
 
-TEST(ChannelTest, SendByMoveAndReceive)
-{
+TEST(ChannelTest, SendByMoveAndReceive) {
     using namespace hgps;
 
     auto channel = Channel<std::string>{};
 
-    auto fox = std::string{ "fox" };
+    auto fox = std::string{"fox"};
     channel.send(std::move(fox));
-    channel.send(std::string{ "dog" });
+    channel.send(std::string{"dog"});
 
     auto out = channel.try_receive();
     ASSERT_TRUE(out.has_value());
@@ -73,8 +69,7 @@ TEST(ChannelTest, SendByMoveAndReceive)
     ASSERT_EQ("dog", out.value());
 }
 
-TEST(ChannelTest, ClosedWontSend)
-{
+TEST(ChannelTest, ClosedWontSend) {
     using namespace hgps;
 
     auto channel = Channel<int>{};
@@ -85,8 +80,7 @@ TEST(ChannelTest, ClosedWontSend)
     ASSERT_FALSE(channel.send(5));
 }
 
-TEST(ChannelTest, ClosedWillReceive)
-{
+TEST(ChannelTest, ClosedWillReceive) {
     using namespace hgps;
 
     auto channel = Channel<int>{};
@@ -103,22 +97,21 @@ TEST(ChannelTest, ClosedWillReceive)
     ASSERT_TRUE(channel.empty());
 }
 
-TEST(ChannelTest, ProducerConsummer)
-{
+TEST(ChannelTest, ProducerConsummer) {
     using namespace hgps;
 
     auto channel = Channel<int>{10};
     std::vector<int> result;
 
-    auto producer = std::thread{ [&channel]() {
+    auto producer = std::thread{[&channel]() {
         for (auto i = 0; i < 10; ++i) {
             channel.send({i});
         }
 
         channel.close();
-    } };
+    }};
 
-    auto consumer = std::thread{ [&channel, &result]() {
+    auto consumer = std::thread{[&channel, &result]() {
         for (;;) {
             while (channel.empty() && !channel.closed()) {
                 // busy wait
@@ -127,28 +120,26 @@ TEST(ChannelTest, ProducerConsummer)
             auto element = channel.try_receive();
             if (element.has_value()) {
                 result.push_back(*element);
-            }
-            else {
+            } else {
                 break;
             }
         }
-    } };
+    }};
 
     producer.join();
     consumer.join();
 
-    ASSERT_EQ(std::vector<int>({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }), result);
+    ASSERT_EQ(std::vector<int>({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), result);
     ASSERT_TRUE(channel.closed());
 }
 
-TEST(ChannelTest, ConsummerProducer)
-{
+TEST(ChannelTest, ConsummerProducer) {
     using namespace hgps;
 
-    auto channel = Channel<int>{ 10 };
+    auto channel = Channel<int>{10};
     std::vector<int> result;
 
-    auto consumer = std::thread{ [&channel, &result]() {
+    auto consumer = std::thread{[&channel, &result]() {
         for (;;) {
             while (channel.empty() && !channel.closed()) {
                 // busy wait
@@ -157,31 +148,29 @@ TEST(ChannelTest, ConsummerProducer)
             auto element = channel.try_receive();
             if (element.has_value()) {
                 result.push_back(*element);
-            }
-            else {
+            } else {
                 break;
             }
         }
-    } };
-    
+    }};
+
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    auto producer = std::thread{ [&channel]() {
+    auto producer = std::thread{[&channel]() {
         for (auto i = 0; i < 10; ++i) {
             channel.send({i});
         }
 
         channel.close();
-    } };
+    }};
 
     consumer.join();
     producer.join();
 
-    ASSERT_EQ(std::vector<int>({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }), result);
+    ASSERT_EQ(std::vector<int>({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}), result);
     ASSERT_TRUE(channel.closed());
 }
 
-TEST(ChannelTest, MultipleConsumers)
-{
+TEST(ChannelTest, MultipleConsumers) {
     using namespace hgps;
 
     const int numbers = 100;
@@ -192,7 +181,7 @@ TEST(ChannelTest, MultipleConsumers)
 
     std::mutex mtx_read;
     std::condition_variable cond_read;
-    bool wait_to_read{ true };
+    bool wait_to_read{true};
     std::atomic<int> count_reads{};
     std::atomic<int> sum_of_reads{};
 
@@ -203,7 +192,7 @@ TEST(ChannelTest, MultipleConsumers)
 
     // Consume
     auto consumer = [&] {
-        std::unique_lock<std::mutex> lock{ mtx_read };
+        std::unique_lock<std::mutex> lock{mtx_read};
         cond_read.wait(lock, [&wait_to_read] { return !wait_to_read; });
 
         while (count_reads <= numbers) {
@@ -219,11 +208,11 @@ TEST(ChannelTest, MultipleConsumers)
     // Create multiple consumers
     std::vector<std::jthread> threads;
     for (auto i = 0; i < number_of_consumers; ++i) {
-        threads.emplace_back(std::jthread{ consumer });
+        threads.emplace_back(std::jthread{consumer});
     }
 
     // Producer
-    auto producer = std::jthread{ [&]() {
+    auto producer = std::jthread{[&]() {
         wait_to_read = false;
         cond_read.notify_all();
         for (auto i = 0; i <= numbers; ++i) {
@@ -231,18 +220,17 @@ TEST(ChannelTest, MultipleConsumers)
         }
 
         channel.close();
-    } };
+    }};
 
     // Wait until all items have been read
-    std::unique_lock<std::mutex> lock{ mtx_wait };
+    std::unique_lock<std::mutex> lock{mtx_wait};
     cond_wait.wait(lock, [&wait_counter]() {
         auto items = wait_counter.load();
         return items == 0;
-        });
+    });
 
     producer.join();
-    std::for_each(threads.begin(), threads.end(),
-        [](std::jthread& thread) { thread.join(); });
+    std::for_each(threads.begin(), threads.end(), [](std::jthread &thread) { thread.join(); });
 
     ASSERT_EQ(expected, sum_of_reads);
 }
