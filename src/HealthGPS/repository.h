@@ -2,7 +2,7 @@
 #include "disease_definition.h"
 #include "energy_balance_hierarchical_model.h"
 #include "energy_balance_model.h"
-#include "hierarchical_model_types.h"
+#include "hierarchical_model_static.h"
 #include "interfaces.h"
 #include "lms_definition.h"
 #include "modelinput.h"

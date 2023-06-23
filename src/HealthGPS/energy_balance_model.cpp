@@ -1,6 +1,5 @@
 #include "energy_balance_model.h"
 #include "runtime_context.h"
-#include <iostream>
 
 namespace hgps {
 

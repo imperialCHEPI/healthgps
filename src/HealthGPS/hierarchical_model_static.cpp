@@ -1,10 +1,31 @@
 #include "hierarchical_model_static.h"
-#include "gender_table.h"
 #include "runtime_context.h"
 
-#include "HealthGPS.Core/string_util.h"
-
 namespace hgps {
+
+HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
+    std::unordered_map<core::Identifier, LinearModel> &&linear_models,
+    std::map<int, HierarchicalLevel> &&model_levels)
+    : models_{std::move(linear_models)}, levels_{std::move(model_levels)} {
+    if (models_.empty()) {
+        throw std::invalid_argument(
+            "The hierarchical model equations definition must not be empty");
+    }
+
+    if (levels_.empty()) {
+        throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+    }
+}
+
+const std::unordered_map<core::Identifier, LinearModel> &
+HierarchicalLinearModelDefinition::models() const noexcept {
+    return models_;
+}
+
+const std::map<int, HierarchicalLevel> &HierarchicalLinearModelDefinition::levels() const noexcept {
+    return levels_;
+}
+
 StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     HierarchicalLinearModelDefinition &definition)
     : definition_{definition} {}
@@ -111,4 +132,5 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
         entity.risk_factors[factor.key()] = factor.get_bounded_value(total_value);
     }
 }
+
 } // namespace hgps
