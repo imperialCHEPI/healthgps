@@ -172,42 +172,4 @@ class LiteHierarchicalModelDefinition final {
     double boundary_percentage_;
 };
 
-/// @brief Defines the energy balance model data type
-class EnergyBalanceModelDefinition final {
-  public:
-    EnergyBalanceModelDefinition() = delete;
-
-    /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
-    /// @param nutrient_coefficients The food group -> nutrient weights
-    /// @throws std::invalid_argument if nutrient coefficients map is empty
-    EnergyBalanceModelDefinition(
-        std::vector<core::Identifier> &&nutrient_list,
-        std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations)
-        : nutrient_list_{std::move(nutrient_list)},
-          nutrient_equations_{std::move(nutrient_equations)} {
-
-        if (nutrient_list_.empty()) {
-            throw std::invalid_argument("Nutrient list is empty");
-        }
-
-        if (nutrient_equations_.empty()) {
-            throw std::invalid_argument("Nutrient equation mapping is empty");
-        }
-    }
-
-    /// @brief Gets the list of nutrients used in the model
-    /// @return A vector of nutrient identities
-    const std::vector<core::Identifier> &nutrient_list() const noexcept { return nutrient_list_; }
-
-    /// @brief Gets the nutrient coefficients for each food group
-    /// @return A map of nutrient coefficients for each food group
-    const std::map<core::Identifier, std::map<core::Identifier, double>> &
-    nutrient_equations() const noexcept {
-        return nutrient_equations_;
-    }
-
-  private:
-    std::vector<core::Identifier> nutrient_list_;
-    std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
-};
 } // namespace hgps

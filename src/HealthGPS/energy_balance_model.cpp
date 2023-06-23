@@ -4,6 +4,29 @@
 
 namespace hgps {
 
+EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
+    std::vector<core::Identifier> &&nutrient_list,
+    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations)
+    : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)} {
+
+    if (nutrient_list_.empty()) {
+        throw std::invalid_argument("Nutrient list is empty");
+    }
+
+    if (nutrient_equations_.empty()) {
+        throw std::invalid_argument("Nutrient equation mapping is empty");
+    }
+}
+
+const std::vector<core::Identifier> &EnergyBalanceModelDefinition::nutrient_list() const noexcept {
+    return nutrient_list_;
+}
+
+const std::map<core::Identifier, std::map<core::Identifier, double>> &
+EnergyBalanceModelDefinition::nutrient_equations() const noexcept {
+    return nutrient_equations_;
+}
+
 EnergyBalanceModel::EnergyBalanceModel(EnergyBalanceModelDefinition &definition)
     : definition_{definition} {}
 
