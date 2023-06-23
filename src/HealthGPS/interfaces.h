@@ -156,6 +156,16 @@ class HierarchicalLinearModel {
     virtual void update_risk_factors(RuntimeContext &context) = 0;
 };
 
+/// @brief Risk factor model definition interface
+class RiskFactorModelDefinition {
+  public:
+    /// @brief Destroys a RiskFactorModelDefinition instance
+    virtual ~RiskFactorModelDefinition() = default;
+
+    /// @brief Creates a new risk factor model from this definition
+    virtual HierarchicalLinearModel create_model() const = 0;
+};
+
 /// @brief Diseases model interface
 class DiseaseModel {
   public:
