@@ -4,6 +4,40 @@
 
 namespace hgps {
 
+LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
+    std::map<core::IntegerInterval, AgeGroupGenderEquation> &&equations,
+    std::map<core::Identifier, core::Identifier> &&variables, const double boundary_percentage)
+    : equations_{std::move(equations)}, variables_{std::move(variables)},
+      boundary_percentage_{boundary_percentage} {
+
+    if (equations_.empty()) {
+        throw std::invalid_argument("The model equations definition must not be empty");
+    }
+}
+
+const std::map<core::Identifier, core::Identifier> &
+LiteHierarchicalModelDefinition::variables() const noexcept {
+    return variables_;
+}
+
+const AgeGroupGenderEquation &LiteHierarchicalModelDefinition::at(const int &age) const {
+    for (auto &entry : equations_) {
+        if (entry.first.contains(age)) {
+            return entry.second;
+        }
+    }
+
+    if (age < equations_.begin()->first.lower()) {
+        return equations_.begin()->second;
+    }
+
+    return equations_.rbegin()->second;
+}
+
+const double &LiteHierarchicalModelDefinition::boundary_percentage() const {
+    return boundary_percentage_;
+}
+
 EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
     LiteHierarchicalModelDefinition &definition)
     : definition_{definition} {}
@@ -105,4 +139,5 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
     auto cap = percentage * boundary;
     return std::min(std::max(candidate, -cap), +cap);
 }
+
 } // namespace hgps
