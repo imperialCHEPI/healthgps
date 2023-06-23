@@ -80,7 +80,7 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
     } catch (const std::out_of_range &oor) {
         auto &dynamic_definition =
             repository.get_energy_balance_model_definition(HierarchicalModelType::Dynamic);
-        auto dynamic_model = std::make_unique<EnergyBalanceModel>(dynamic_definition);
+        auto dynamic_model = dynamic_definition.create_model();
         models.emplace(HierarchicalModelType::Dynamic, std::move(dynamic_model));
     }
 

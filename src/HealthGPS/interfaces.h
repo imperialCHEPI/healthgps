@@ -163,7 +163,7 @@ class RiskFactorModelDefinition {
     virtual ~RiskFactorModelDefinition() = default;
 
     /// @brief Creates a new risk factor model from this definition
-    virtual HierarchicalLinearModel create_model() const = 0;
+    virtual std::unique_ptr<HierarchicalLinearModel> create_model() const = 0;
 };
 
 /// @brief Diseases model interface

@@ -3,37 +3,16 @@
 
 namespace hgps {
 
-EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
-    std::vector<core::Identifier> &&nutrient_list,
-    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations)
-    : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)} {
-
-    if (nutrient_list_.empty()) {
-        throw std::invalid_argument("Nutrient list is empty");
-    }
-
-    if (nutrient_equations_.empty()) {
-        throw std::invalid_argument("Nutrient equation mapping is empty");
-    }
-}
-
-const std::vector<core::Identifier> &EnergyBalanceModelDefinition::nutrient_list() const noexcept {
-    return nutrient_list_;
-}
-
-const std::map<core::Identifier, std::map<core::Identifier, double>> &
-EnergyBalanceModelDefinition::nutrient_equations() const noexcept {
-    return nutrient_equations_;
-}
-
-EnergyBalanceModel::EnergyBalanceModel(EnergyBalanceModelDefinition &definition)
-    : definition_{definition} {}
+EnergyBalanceModel::EnergyBalanceModel(
+    const std::vector<core::Identifier> &nutrient_list,
+    const std::map<core::Identifier, std::map<core::Identifier, double>> &nutrient_equations)
+    : nutrient_list_{nutrient_list}, nutrient_equations_{nutrient_equations} {}
 
 HierarchicalModelType EnergyBalanceModel::type() const noexcept {
     return HierarchicalModelType::Dynamic;
 }
 
-const std::string &EnergyBalanceModel::name() const noexcept { return name_; }
+const std::string &EnergyBalanceModel::name() const noexcept { return "Dynamic"; }
 
 void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
     throw std::logic_error("EnergyBalanceModel::generate_risk_factors not yet implemented.");
@@ -57,8 +36,8 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
         }
 
         // Compute nutrients from food groups.
-        auto nutrient_list = definition_.get().nutrient_list();
-        auto nutrient_equations = definition_.get().nutrient_equations();
+        auto nutrient_list = nutrient_list_.get();
+        auto nutrient_equations = nutrient_equations_.get();
 
         // Initialise nutrients to zero.
         std::unordered_map<core::Identifier, double> nutrient_values;
@@ -96,4 +75,23 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 
     return entity_risk_factors;
 }
+
+EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
+    std::vector<core::Identifier> &&nutrient_list,
+    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations)
+    : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)} {
+
+    if (nutrient_list_.empty()) {
+        throw std::invalid_argument("Nutrient list is empty");
+    }
+
+    if (nutrient_equations_.empty()) {
+        throw std::invalid_argument("Nutrient equation mapping is empty");
+    }
+}
+
+std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
+    return std::make_unique<EnergyBalanceModel>(nutrient_list_, nutrient_equations_);
+}
+
 } // namespace hgps
