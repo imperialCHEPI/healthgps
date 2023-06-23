@@ -2,6 +2,9 @@
 #include "HealthGPS.Core/forward_type.h"
 #include "weight_category.h"
 
+#include <map>
+#include <stdexcept>
+
 namespace hgps {
 
 /// @brief Defines the LMS (lambda-mu-sigma) parameters record data type
