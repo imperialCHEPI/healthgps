@@ -33,17 +33,57 @@
             "function_parameters": [0.0, 1.0]
         },
         "risk_factors": [
-            {"name":"Gender",   "level":0, "proxy":"gender", "range":[0,1]},
-            {"name":"Age",      "level":0, "proxy":"age",    "range":[1,87]},
-            {"name":"Age2",     "level":0, "proxy":"",       "range":[1,7569]},
-            {"name":"Age3",     "level":0, "proxy":"",       "range":[1,658503]},
-            {"name":"SES",      "level":0, "proxy":"ses",    "range":[-2.316299,2.296689]},
-            {"name":"Sodium",   "level":1, "proxy":"",       "range":[1.127384,8.656519]},
-            {"name":"Protein",  "level":1, "proxy":"",       "range":[43.50682,238.4145]},
-            {"name":"Fat",      "level":1, "proxy":"",       "range":[45.04756,382.664098658922]},
-            {"name":"PA",       "level":2, "proxy":"",       "range":[22.22314,9765.512]},
-            {"name":"Energy",   "level":2, "proxy":"",       "range":[1326.14051277588,7522.496]},
-            {"name":"BMI",      "level":3, "proxy":"",       "range":[13.88,39.48983]}
+            {
+                "name": "Gender",
+                "level": 0,
+                "proxy": "gender",
+                "range": [0, 1]
+            },
+            { "name": "Age", "level": 0, "proxy": "age", "range": [1, 87] },
+            { "name": "Age2", "level": 0, "proxy": "", "range": [1, 7569] },
+            { "name": "Age3", "level": 0, "proxy": "", "range": [1, 658503] },
+            {
+                "name": "SES",
+                "level": 0,
+                "proxy": "ses",
+                "range": [-2.316299, 2.296689]
+            },
+            {
+                "name": "Sodium",
+                "level": 1,
+                "proxy": "",
+                "range": [1.127384, 8.656519]
+            },
+            {
+                "name": "Protein",
+                "level": 1,
+                "proxy": "",
+                "range": [43.50682, 238.4145]
+            },
+            {
+                "name": "Fat",
+                "level": 1,
+                "proxy": "",
+                "range": [45.04756, 382.664098658922]
+            },
+            {
+                "name": "PA",
+                "level": 2,
+                "proxy": "",
+                "range": [22.22314, 9765.512]
+            },
+            {
+                "name": "Energy",
+                "level": 2,
+                "proxy": "",
+                "range": [1326.14051277588, 7522.496]
+            },
+            {
+                "name": "BMI",
+                "level": 3,
+                "proxy": "",
+                "range": [13.88, 39.48983]
+            }
         ],
         "dynamic_risk_factor": "",
         "risk_factor_models": {
@@ -55,8 +95,8 @@
             "delimiter": ",",
             "encoding": "UTF8",
             "file_names": {
-                "factorsmean_male":"France.FactorsMean.Male.csv",
-                "factorsmean_female":"France.FactorsMean.Female.csv"
+                "factorsmean_male": "France.FactorsMean.Male.csv",
+                "factorsmean_female": "France.FactorsMean.Female.csv"
             }
         }
     },
@@ -66,7 +106,14 @@
         "stop_time": 2050,
         "trial_runs": 1,
         "sync_timeout_ms": 15000,
-        "diseases": ["alzheimer","asthma","colorectalcancer","diabetes","lowbackpain","osteoarthritisknee"],
+        "diseases": [
+            "alzheimer",
+            "asthma",
+            "colorectalcancer",
+            "diabetes",
+            "lowbackpain",
+            "osteoarthritisknee"
+        ],
         "interventions": {
             "active_type_id": null,
             "types": {
@@ -77,7 +124,12 @@
                     },
                     "impact_type": "absolute",
                     "impacts": [
-                        {"risk_factor":"BMI", "impact_value":-1.0, "from_age":0, "to_age":null}
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -1.0,
+                            "from_age": 0,
+                            "to_age": null
+                        }
                     ]
                 },
                 "marketing": {
@@ -86,9 +138,24 @@
                         "finish_time": 2050
                     },
                     "impacts": [
-                        {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
-                        {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
-                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.12,
+                            "from_age": 5,
+                            "to_age": 12
+                        },
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.31,
+                            "from_age": 13,
+                            "to_age": 18
+                        },
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.16,
+                            "from_age": 19,
+                            "to_age": null
+                        }
                     ]
                 },
                 "dynamic_marketing": {
@@ -96,11 +163,26 @@
                         "start_time": 2022,
                         "finish_time": 2050
                     },
-                    "dynamics":[0.15, 0.0, 0.0], 
+                    "dynamics": [0.15, 0.0, 0.0],
                     "impacts": [
-                        {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
-                        {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
-                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":19, "to_age":null}
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.12,
+                            "from_age": 5,
+                            "to_age": 12
+                        },
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.31,
+                            "from_age": 13,
+                            "to_age": 18
+                        },
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.16,
+                            "from_age": 19,
+                            "to_age": null
+                        }
                     ]
                 },
                 "food_labelling": {
@@ -109,14 +191,17 @@
                         "finish_time": 2050
                     },
                     "coefficients": [0.012, 0.013, 0.014, 0.016],
-                    "coverage_rates": [0.26, 0.70],
+                    "coverage_rates": [0.26, 0.7],
                     "coverage_cutoff_time": 4,
                     "child_cutoff_age": 18,
-                    "adjustments": [
-                        {"risk_factor":"Energy", "value": 0.55}
-                    ],
+                    "adjustments": [{ "risk_factor": "Energy", "value": 0.55 }],
                     "impacts": [
-                        {"risk_factor":"BMI", "impact_value":-0.0103, "from_age":1,  "to_age":null}
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.0103,
+                            "from_age": 1,
+                            "to_age": null
+                        }
                     ]
                 },
                 "physical_activity": {
@@ -124,10 +209,20 @@
                         "start_time": 2022,
                         "finish_time": 2050
                     },
-                    "coverage_rates": [0.90],
+                    "coverage_rates": [0.9],
                     "impacts": [
-                        {"risk_factor":"BMI", "impact_value":-0.16, "from_age":6,  "to_age":15},
-                        {"risk_factor":"BMI", "impact_value":-0.08, "from_age":16,  "to_age":null}
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.16,
+                            "from_age": 6,
+                            "to_age": 15
+                        },
+                        {
+                            "risk_factor": "BMI",
+                            "impact_value": -0.08,
+                            "from_age": 16,
+                            "to_age": null
+                        }
                     ]
                 },
                 "fiscal": {
@@ -137,9 +232,24 @@
                     },
                     "impact_type": "optimist",
                     "impacts": [
-                        {"risk_factor":"Energy", "impact_value":-0.01742, "from_age":5,  "to_age":9},
-                        {"risk_factor":"Energy", "impact_value":-0.01812, "from_age":10, "to_age":17},
-                        {"risk_factor":"Energy", "impact_value":-0.00563, "from_age":18, "to_age":null}
+                        {
+                            "risk_factor": "Energy",
+                            "impact_value": -0.01742,
+                            "from_age": 5,
+                            "to_age": 9
+                        },
+                        {
+                            "risk_factor": "Energy",
+                            "impact_value": -0.01812,
+                            "from_age": 10,
+                            "to_age": 17
+                        },
+                        {
+                            "risk_factor": "Energy",
+                            "impact_value": -0.00563,
+                            "from_age": 18,
+                            "to_age": null
+                        }
                     ]
                 }
             }
