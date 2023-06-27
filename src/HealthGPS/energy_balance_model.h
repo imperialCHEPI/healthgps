@@ -53,8 +53,8 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     std::unique_ptr<HierarchicalLinearModel> create_model() const override;
 
   private:
-    const std::vector<core::Identifier> nutrient_list_;
-    const std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
+    std::vector<core::Identifier> nutrient_list_;
+    std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
 };
 
 } // namespace hgps
