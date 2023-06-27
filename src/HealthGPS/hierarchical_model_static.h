@@ -55,10 +55,10 @@ struct HierarchicalLevel {
 };
 
 /// @brief Defines the full hierarchical linear model data type
+///
+/// @details The static model is used to initialise the virtual population.
 class HierarchicalLinearModelDefinition final {
   public:
-    HierarchicalLinearModelDefinition() = delete;
-
     /// @brief Initialises a new instance of the HierarchicalLinearModelDefinition class
     /// @param linear_models The linear regression models equations
     /// @param model_levels The hierarchical model levels definition

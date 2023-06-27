@@ -40,8 +40,6 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
 /// @brief Implements the energy balance model data type
 class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
   public:
-    EnergyBalanceModelDefinition() = delete;
-
     /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
     /// @param nutrient_coefficients The food group -> nutrient weights
     /// @param nutrient_equations The nutrient equations for each food group
