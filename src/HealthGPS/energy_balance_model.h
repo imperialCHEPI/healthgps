@@ -37,15 +37,13 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
                                                                 int time_year) const;
 };
 
-/// @brief Implements the energy balance model data type
-///
-/// @details The dynamic model is used to advance the virtual population over time.
+/// @brief Defines the energy balance model data type
 class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
     /// @param nutrient_coefficients The food group -> nutrient weights
     /// @param nutrient_equations The nutrient equations for each food group
-    /// @throws std::invalid_argument if nutrient coefficients map is empty
+    /// @throws std::invalid_argument for empty arguments
     EnergyBalanceModelDefinition(
         std::vector<core::Identifier> &&nutrient_list,
         std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations);

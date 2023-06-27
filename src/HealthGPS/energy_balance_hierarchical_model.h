@@ -78,8 +78,6 @@ class EnergyBalanceHierarchicalModel final : public HierarchicalLinearModel {
 /// @brief Defines the lite hierarchical linear model data type
 class LiteHierarchicalModelDefinition final : public RiskFactorModelDefinition {
   public:
-    LiteHierarchicalModelDefinition() = delete;
-
     /// @brief Initialises a new instance of the LiteHierarchicalModelDefinition class
     /// @param equations The linear regression equations
     /// @param variables The factors delta variables mapping
