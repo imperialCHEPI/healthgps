@@ -38,6 +38,8 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
 };
 
 /// @brief Implements the energy balance model data type
+///
+/// @details The dynamic model is used to advance the virtual population over time.
 class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
