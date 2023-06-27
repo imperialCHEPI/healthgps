@@ -19,7 +19,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
 
     HierarchicalModelType type() const noexcept override;
 
-    const std::string &name() const noexcept override;
+    const std::string name() const noexcept override;
 
     /// @copydoc HierarchicalLinearModel::generate_risk_factors
     /// @throws std::logic_error the dynamic model does not generate risk factors.

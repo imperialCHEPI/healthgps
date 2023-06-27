@@ -34,7 +34,7 @@ HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
     return HierarchicalModelType::Static;
 }
 
-const std::string &StaticHierarchicalLinearModel::name() const noexcept { return name_; }
+const std::string StaticHierarchicalLinearModel::name() const noexcept { return "Static"; }
 
 void StaticHierarchicalLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::vector<MappingEntry> level_factors;
