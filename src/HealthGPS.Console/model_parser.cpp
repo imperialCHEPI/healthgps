@@ -215,8 +215,10 @@ load_newebm_risk_model_definition(const host::poco::json &opt) {
 void register_risk_factor_model_definitions(CachedRepository &repository, const ModellingInfo &info,
                                             const SettingsInfo &settings) {
     MEASURE_FUNCTION();
+    HierarchicalModelType model_type;
+    std::shared_ptr<RiskFactorModelDefinition> model_definition;
+
     for (auto &model : info.risk_factor_models) {
-        HierarchicalModelType model_type;
         const auto &model_filename = model.second;
         std::ifstream ifs(model_filename, std::ifstream::in);
 
@@ -232,9 +234,7 @@ void register_risk_factor_model_definitions(CachedRepository &repository, const 
             // Load this static model with the appropriate loader.
             model_type = HierarchicalModelType::Static;
             if (core::case_insensitive::equals(model_name, "hlm")) {
-                auto model_definition = load_static_risk_model_definition(parsed_json);
-                repository.register_linear_model_definition(model_type,
-                                                            std::move(model_definition));
+                model_definition = load_static_risk_model_definition(parsed_json);
             } else {
                 fmt::print(fg(fmt::color::red), "Static model name '{}' is not recognised.\n",
                            model_name);
@@ -243,13 +243,9 @@ void register_risk_factor_model_definitions(CachedRepository &repository, const 
             // Load this dynamic model with the appropriate loader.
             model_type = HierarchicalModelType::Dynamic;
             if (core::case_insensitive::equals(model_name, "ebhlm")) {
-                auto model_definition = load_dynamic_risk_model_definition(parsed_json);
-                repository.register_lite_linear_model_definition(model_type,
-                                                                 std::move(model_definition));
+                model_definition = load_dynamic_risk_model_definition(parsed_json);
             } else if (core::case_insensitive::equals(model_name, "newebm")) {
-                auto model_definition = load_newebm_risk_model_definition(parsed_json);
-                repository.register_energy_balance_model_definition(model_type,
-                                                                    std::move(model_definition));
+                model_definition = load_newebm_risk_model_definition(parsed_json);
             } else {
                 fmt::print(fg(fmt::color::red), "Dynamic model name '{}' is not recognised.\n",
                            model_name);
@@ -257,6 +253,8 @@ void register_risk_factor_model_definitions(CachedRepository &repository, const 
         } else {
             throw std::invalid_argument(fmt::format("Unknown model type: {}", model.first));
         }
+
+        repository.register_risk_factor_model_definition(model_type, model_definition);
     }
 
     auto adjustment = load_baseline_adjustments(info.baseline_adjustment);

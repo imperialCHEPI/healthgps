@@ -67,22 +67,16 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
     auto models = std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
 
     // Static (initialisation) model
-    auto static_definition = repository.get_linear_model_definition(HierarchicalModelType::Static);
+    auto static_definition =
+        repository.get_risk_factor_model_definition(HierarchicalModelType::Static);
     auto static_model = static_definition->create_model();
     models.emplace(HierarchicalModelType::Static, std::move(static_model));
 
     // Dynamic (update) model
-    try {
-        auto dynamic_definition =
-            repository.get_lite_linear_model_definition(HierarchicalModelType::Dynamic);
-        auto dynamic_model = dynamic_definition->create_model();
-        models.emplace(HierarchicalModelType::Dynamic, std::move(dynamic_model));
-    } catch (const std::out_of_range &oor) {
-        auto dynamic_definition =
-            repository.get_energy_balance_model_definition(HierarchicalModelType::Dynamic);
-        auto dynamic_model = dynamic_definition->create_model();
-        models.emplace(HierarchicalModelType::Dynamic, std::move(dynamic_model));
-    }
+    auto dynamic_definition =
+        repository.get_risk_factor_model_definition(HierarchicalModelType::Dynamic);
+    auto dynamic_model = dynamic_definition->create_model();
+    models.emplace(HierarchicalModelType::Dynamic, std::move(dynamic_model));
 
     auto adjustment_model =
         RiskfactorAdjustmentModel{repository.get_baseline_adjustment_definition()};
