@@ -1,15 +1,15 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
-  "name": "cpp20-study",
-  "version": "0.1.0",
-  "dependencies": [
-    "fmt",
-    "cxxopts",
-    "nlohmann-json",
-    "rapidcsv",
-    "crossguid",
-    "gtest",
-    "benchmark"
-  ],
-  "builtin-baseline": "1e334d770ac71a89d1c36d51019e60dd08b68f76"
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "cpp20-study",
+    "version": "0.1.0",
+    "dependencies": [
+        "fmt",
+        "cxxopts",
+        "nlohmann-json",
+        "rapidcsv",
+        "crossguid",
+        "gtest",
+        "benchmark"
+    ],
+    "builtin-baseline": "1e334d770ac71a89d1c36d51019e60dd08b68f76"
 }

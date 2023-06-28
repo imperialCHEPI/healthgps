@@ -1,61 +1,53 @@
 {
-	"ModelName": "NewEBM",
-	"Country": {
-		"Code": 250,
-		"Name": "France",
-		"Alpha2": "FR",
-		"Alpha3": "FRA"
-	},
-	"Nutrients": [
-		"Carbs",
-		"Fat",
-		"Protein",
-		"Sodium"
-	],
-	"Foods": [
-		{
-			"Name": "Carbs",
-			"Nutrients": {
-				"Carbs": 1.0
-			}
-		},
-		{
-			"Name": "Fat",
-			"Nutrients": {
-				"Fat": 1.0
-			}
-		},
-		{
-			"Name": "Protein",
-			"Nutrients": {
-				"Protein": 1.0
-			}
-		},
-		{
-			"Name": "Sodium",
-			"Nutrients": {
-				"Sodium": 1.0
-			}
-		}
-	],
-	"Variables": [
-		{
-			"COMMENT": "do we even need a section for variables?",
-			"Name": "dFat",
-			"Level": 2,
-			"Factor": "fat"
-		}
-	],
-	"RiskFactors": [
-		{
-			"COMMENT": "do we even need to list risk factors here?",
-			"Name": "BMI",
-			"Level": 3,
-			"Proxy": "",
-			"Range": [
-				13.88,
-				39.48983
-			]
-		}
-	]
+    "ModelName": "NewEBM",
+    "Country": {
+        "Code": 250,
+        "Name": "France",
+        "Alpha2": "FR",
+        "Alpha3": "FRA"
+    },
+    "Nutrients": ["Carbs", "Fat", "Protein", "Sodium"],
+    "Foods": [
+        {
+            "Name": "Carbs",
+            "Nutrients": {
+                "Carbs": 1.0
+            }
+        },
+        {
+            "Name": "Fat",
+            "Nutrients": {
+                "Fat": 1.0
+            }
+        },
+        {
+            "Name": "Protein",
+            "Nutrients": {
+                "Protein": 1.0
+            }
+        },
+        {
+            "Name": "Sodium",
+            "Nutrients": {
+                "Sodium": 1.0
+            }
+        }
+    ],
+    "Variables": [
+        {
+            "COMMENT": "do we even need a section for variables?",
+            "Name": "dFat",
+            "Level": 2,
+            "Factor": "fat"
+        }
+    ],
+    "RiskFactors": [
+        {
+            "COMMENT": "do we even need to list risk factors here?",
+            "Name": "BMI",
+            "Level": 3,
+            "Proxy": "",
+            "Range": [13.88, 39.48983]
+        }
+    ]
 }
