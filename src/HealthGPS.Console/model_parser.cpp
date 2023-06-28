@@ -44,7 +44,8 @@ BaselineAdjustment load_baseline_adjustments(const BaselineInfo &info) {
     }
 }
 
-HierarchicalLinearModelDefinition load_static_risk_model_definition(const host::poco::json &opt) {
+std::shared_ptr<HierarchicalLinearModelDefinition>
+load_static_risk_model_definition(const host::poco::json &opt) {
     using namespace detail;
 
     MEASURE_FUNCTION();
@@ -101,10 +102,12 @@ HierarchicalLinearModelDefinition load_static_risk_model_definition(const host::
                               .variances = at.variances});
     }
 
-    return HierarchicalLinearModelDefinition{std::move(models), std::move(levels)};
+    return std::make_shared<HierarchicalLinearModelDefinition>(std::move(models),
+                                                               std::move(levels));
 }
 
-LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(const host::poco::json &opt) {
+std::shared_ptr<LiteHierarchicalModelDefinition>
+load_dynamic_risk_model_definition(const host::poco::json &opt) {
     using namespace detail;
 
     MEASURE_FUNCTION();
@@ -174,10 +177,12 @@ LiteHierarchicalModelDefinition load_dynamic_risk_model_definition(const host::p
         equations.emplace(age_key, std::move(age_equations));
     }
 
-    return LiteHierarchicalModelDefinition{std::move(equations), std::move(variables), percentage};
+    return std::make_shared<LiteHierarchicalModelDefinition>(std::move(equations),
+                                                             std::move(variables), percentage);
 }
 
-EnergyBalanceModelDefinition load_newebm_risk_model_definition(const host::poco::json &opt) {
+std::shared_ptr<EnergyBalanceModelDefinition>
+load_newebm_risk_model_definition(const host::poco::json &opt) {
     MEASURE_FUNCTION();
     std::vector<core::Identifier> nutrient_list;
     std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
@@ -203,7 +208,8 @@ EnergyBalanceModelDefinition load_newebm_risk_model_definition(const host::poco:
         }
     }
 
-    return EnergyBalanceModelDefinition(std::move(nutrient_list), std::move(nutrient_equations));
+    return std::make_shared<EnergyBalanceModelDefinition>(std::move(nutrient_list),
+                                                          std::move(nutrient_equations));
 }
 
 void register_risk_factor_model_definitions(CachedRepository &repository, const ModellingInfo &info,
