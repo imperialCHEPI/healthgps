@@ -107,17 +107,8 @@ class CachedRepository final : public Repository {
   private:
     std::mutex mutex_;
     std::reference_wrapper<core::Datastore> data_manager_;
-
-    std::map<HierarchicalModelType, std::shared_ptr<HierarchicalLinearModelDefinition>>
-        model_definiton_;
-    std::map<HierarchicalModelType, std::shared_ptr<LiteHierarchicalModelDefinition>>
-        lite_model_definiton_;
-    std::map<HierarchicalModelType, std::shared_ptr<EnergyBalanceModelDefinition>>
-        energy_balance_model_definition_;
-
     std::map<HierarchicalModelType, std::shared_ptr<RiskFactorModelDefinition>>
         rf_model_definition_;
-
     BaselineAdjustment baseline_adjustments_;
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;

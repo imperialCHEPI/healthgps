@@ -7,8 +7,8 @@
 namespace hgps {
 
 CachedRepository::CachedRepository(core::Datastore &manager)
-    : mutex_{}, data_manager_{manager}, model_definiton_{}, lite_model_definiton_{},
-      baseline_adjustments_{}, diseases_info_{}, diseases_{}, lms_parameters_{} {}
+    : mutex_{}, data_manager_{manager}, rf_model_definition_{}, baseline_adjustments_{},
+      diseases_info_{}, diseases_{}, lms_parameters_{} {}
 
 bool CachedRepository::register_risk_factor_model_definition(
     const HierarchicalModelType &model_type,
@@ -94,8 +94,7 @@ LmsDefinition &CachedRepository::get_lms_definition() {
 
 void CachedRepository::clear_cache() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    model_definiton_.clear();
-    lite_model_definiton_.clear();
+    rf_model_definition_.clear();
     diseases_info_.clear();
     diseases_.clear();
 }
