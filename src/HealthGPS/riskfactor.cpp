@@ -68,7 +68,7 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
 
     // Static (initialisation) model
     auto &static_definition = repository.get_linear_model_definition(HierarchicalModelType::Static);
-    auto static_model = std::make_unique<StaticHierarchicalLinearModel>(static_definition);
+    auto static_model = static_definition.create_model();
     models.emplace(HierarchicalModelType::Static, std::move(static_model));
 
     // Dynamic (update) model
