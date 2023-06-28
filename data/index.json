@@ -43,7 +43,7 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "description":"Diseases indicators, measures and relative risk factors.",
+        "description": "Diseases indicators, measures and relative risk factors.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
@@ -53,41 +53,49 @@
         "disease": {
             "path": "{DISEASE_TYPE}",
             "file_name": "D{COUNTRY_CODE}.csv",
-            "relative_risk":{
+            "relative_risk": {
                 "path": "relative_risk",
-                "to_disease":{
-                    "path":"disease",
+                "to_disease": {
+                    "path": "disease",
                     "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
                     "default_value": 1.0
                 },
-                "to_risk_factor":{
-                    "path":"risk_factor",
+                "to_risk_factor": {
+                    "path": "risk_factor",
                     "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
                 }
             },
-            "parameters":{
-                "path":"P{COUNTRY_CODE}",
-                "files":{
+            "parameters": {
+                "path": "P{COUNTRY_CODE}",
+                "files": {
                     "distribution": "prevalence_distribution.csv",
                     "survival_rate": "survival_rate_parameters.csv",
                     "death_weight": "death_weights.csv"
                 }
             }
         },
-        "registry":[
-            {"group": "other", "id": "alzheimer","name":"Alzheimer"},
-            {"group": "other", "id": "asthma", "name": "Asthma"},
-            {"group": "other", "id": "diabetes", "name": "Diabetes mellitus"},
-            {"group": "other", "id": "lowbackpain", "name": "Low back pain"},
-            {"group": "other", "id": "osteoarthritisknee","name": "Osteoarthritis Of The Knee"},
-            {"group": "cancer","id": "colorectalcancer", "name": "Colorectal  cancer"}
+        "registry": [
+            { "group": "other", "id": "alzheimer", "name": "Alzheimer" },
+            { "group": "other", "id": "asthma", "name": "Asthma" },
+            { "group": "other", "id": "diabetes", "name": "Diabetes mellitus" },
+            { "group": "other", "id": "lowbackpain", "name": "Low back pain" },
+            {
+                "group": "other",
+                "id": "osteoarthritisknee",
+                "name": "Osteoarthritis Of The Knee"
+            },
+            {
+                "group": "cancer",
+                "id": "colorectalcancer",
+                "name": "Colorectal  cancer"
+            }
         ]
     },
-    "analysis":{
+    "analysis": {
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "description":"Observed burden of disease measures and disability weigths.",
+        "description": "Observed burden of disease measures and disability weigths.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
@@ -95,9 +103,9 @@
         "age_limits": [1, 100],
         "time_year": 2019,
         "disability_file_name": "disability_weights.csv",
-        "lms_file_name":"lms_parameters.csv",
+        "lms_file_name": "lms_parameters.csv",
         "cost_of_disease": {
-            "path":"cost",
+            "path": "cost",
             "file_name": "BoD{COUNTRY_CODE}.csv"
         }
     }

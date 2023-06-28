@@ -2,10 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   release:
     types: [published]
-    branches: [ main ]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, windows-2022 ]
+        os: [ubuntu-22.04, windows-2022]
         include:
           - os: ubuntu-22.04
             platform: linux
@@ -31,70 +31,70 @@ jobs:
             platform: windows
 
     env:
-      VCPKG_ROOT: 'vcpkg'
-      VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+      VCPKG_ROOT: "vcpkg"
+      VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up MSVC (Windows)
-      if: matrix.os == 'windows-2022'
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
+      - name: Set up MSVC (Windows)
+        if: matrix.os == 'windows-2022'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
           arch: x64
 
-    - name: Install dependencies (Linux)
-      if: matrix.os == 'ubuntu-22.04'
-      run: |
-        sudo apt update
-        sudo apt upgrade -y
-        sudo apt install --no-install-recommends build-essential libtbb-dev ninja-build doxygen graphviz
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install --no-install-recommends build-essential libtbb-dev ninja-build doxygen graphviz
 
-    - name: Install VCPKG
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        ./bootstrap-vcpkg.sh -disableMetrics
+      - name: Install VCPKG
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          ./bootstrap-vcpkg.sh -disableMetrics
 
-    - name: Build HealthGPS (debug)
-      run: |
-        cmake --preset=${{ matrix.platform }}-debug -DBUILD_BENCHMARKS=ON
-        cmake --build --preset=debug-build-${{ matrix.platform }} --target=install 
+      - name: Build HealthGPS (debug)
+        run: |
+          cmake --preset=${{ matrix.platform }}-debug -DBUILD_BENCHMARKS=ON
+          cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
 
-    - name: Build HealthGPS (release)
-      run: |
-        cmake --preset=${{ matrix.platform }}-release -DBUILD_BENCHMARKS=ON
-        cmake --build --preset=release-build-${{ matrix.platform }} --target=install 
+      - name: Build HealthGPS (release)
+        run: |
+          cmake --preset=${{ matrix.platform }}-release -DBUILD_BENCHMARKS=ON
+          cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: health-gps-${{ matrix.platform }}
-        path: |
-          ${{ github.workspace }}/out/install/${{ matrix.platform }}-*/*
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: health-gps-${{ matrix.platform }}
+          path: |
+            ${{ github.workspace }}/out/install/${{ matrix.platform }}-*/*
 
-    - name: Run tests
-      run: ctest --preset=core-test-${{ matrix.platform }}
+      - name: Run tests
+        run: ctest --preset=core-test-${{ matrix.platform }}
 
-    - name: Zip output folder
-      if: startsWith(github.ref, 'refs/tags/')
-      working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
-      run: |
-        mkdir ${{github.workspace}}/artifact
-        7z a -tzip ${{github.workspace}}/artifact/health_gps_${{ matrix.platform }}.zip *.dll *.Console*
+      - name: Zip output folder
+        if: startsWith(github.ref, 'refs/tags/')
+        working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
+        run: |
+          mkdir ${{github.workspace}}/artifact
+          7z a -tzip ${{github.workspace}}/artifact/health_gps_${{ matrix.platform }}.zip *.dll *.Console*
 
-    - name: Upload release artifacts
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: softprops/action-gh-release@v1
-      with:
+      - name: Upload release artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
           files: artifact/health_gps_${{ matrix.platform }}.zip
 
-    - name: Doxygen release API deploy
-      if: matrix.platform == 'linux' && startsWith(github.ref, 'refs/tags/')
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/html
-        destination_dir: html
-        enable_jekyll: true
-        commit_message: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
+      - name: Doxygen release API deploy
+        if: matrix.platform == 'linux' && startsWith(github.ref, 'refs/tags/')
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{github.workspace}}/out/build/${{env.RELEASE_PRESET}}/src/html
+          destination_dir: html
+          enable_jekyll: true
+          commit_message: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
