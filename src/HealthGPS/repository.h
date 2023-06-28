@@ -29,24 +29,6 @@ class Repository {
     /// @return The back-end data storage
     virtual core::Datastore &manager() noexcept = 0;
 
-    /// @brief Gets the user provided hierarchical linear model definition
-    /// @param model_type Hierarchical linear model type
-    /// @return The model definition
-    virtual std::shared_ptr<HierarchicalLinearModelDefinition>
-    get_linear_model_definition(const HierarchicalModelType &model_type) = 0;
-
-    /// @brief Gets the user provided lite hierarchical linear model definition
-    /// @param model_type Hierarchical linear model type
-    /// @return The lite model definition
-    virtual std::shared_ptr<LiteHierarchicalModelDefinition>
-    get_lite_linear_model_definition(const HierarchicalModelType &model_type) = 0;
-
-    /// @brief Gets the user provided energy balance model definition
-    /// @param model_type Energy balance model type
-    /// @return The energy balance model definition
-    virtual std::shared_ptr<EnergyBalanceModelDefinition>
-    get_energy_balance_model_definition(const HierarchicalModelType &model_type) = 0;
-
     /// @brief Gets a user-provided risk factor model definition
     /// @param model_type Static or Dynamic
     /// @return The risk factor model definition
@@ -86,33 +68,10 @@ class Repository {
 class CachedRepository final : public Repository {
   public:
     CachedRepository() = delete;
+
     /// @brief Initialises a new instance of the CachedRepository class.
     /// @param manager Back-end storage instance
     CachedRepository(core::Datastore &manager);
-
-    /// @brief Register a user provided full hierarchical linear model definition
-    /// @param model_type The hierarchical model type
-    /// @param definition The hierarchical model definition instance
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool
-    register_linear_model_definition(const HierarchicalModelType &model_type,
-                                     std::shared_ptr<HierarchicalLinearModelDefinition> definition);
-
-    /// @brief Register a user provided lite hierarchical linear model definition
-    /// @param model_type The hierarchical model type
-    /// @param definition The lite hierarchical model definition instance
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool register_lite_linear_model_definition(
-        const HierarchicalModelType &model_type,
-        std::shared_ptr<LiteHierarchicalModelDefinition> definition);
-
-    /// @brief Register a user provided energy balance model definition
-    /// @param model_type The energy balance model type
-    /// @param definition The energy balance model definition instance
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool register_energy_balance_model_definition(
-        const HierarchicalModelType &model_type,
-        std::shared_ptr<EnergyBalanceModelDefinition> definition);
 
     /// @brief Register a user provided risk factor model definition
     /// @param model_type Static or Dynamic
@@ -128,15 +87,6 @@ class CachedRepository final : public Repository {
     bool register_baseline_adjustment_definition(BaselineAdjustment &&definition);
 
     core::Datastore &manager() noexcept override;
-
-    std::shared_ptr<HierarchicalLinearModelDefinition>
-    get_linear_model_definition(const HierarchicalModelType &model_type) override;
-
-    std::shared_ptr<LiteHierarchicalModelDefinition>
-    get_lite_linear_model_definition(const HierarchicalModelType &model_type) override;
-
-    std::shared_ptr<EnergyBalanceModelDefinition>
-    get_energy_balance_model_definition(const HierarchicalModelType &model_type) override;
 
     std::shared_ptr<RiskFactorModelDefinition>
     get_risk_factor_model_definition(const HierarchicalModelType &model_type) override;
