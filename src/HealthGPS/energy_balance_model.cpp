@@ -49,8 +49,8 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
         // Compute nutrient values from foods.
         for (const auto &equation : nutrient_equations) {
-            const core::Identifier &food_name = equation.first;
-            double food_value = current_risk_factors[food_name];
+            const core::Identifier &food_key = equation.first;
+            double food_value = current_risk_factors.at(food_key);
 
             for (const auto &coefficient : equation.second) {
                 double delta_nutrient = food_value * coefficient.second;
