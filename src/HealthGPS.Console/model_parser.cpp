@@ -254,7 +254,7 @@ void register_risk_factor_model_definitions(CachedRepository &repository, const 
             throw std::invalid_argument(fmt::format("Unknown model type: {}", model.first));
         }
 
-        repository.register_risk_factor_model_definition(model_type, model_definition);
+        repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
 
     auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
