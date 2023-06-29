@@ -47,7 +47,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
 }
 
 const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
-    auto &all_eqns = equations_.get();
+    const auto &all_eqns = equations_.get();
     for (auto &entry : all_eqns) {
         if (entry.first.contains(age)) {
             return entry.second;
