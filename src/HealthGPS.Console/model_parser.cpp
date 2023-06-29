@@ -186,6 +186,7 @@ load_newebm_risk_model_definition(const host::poco::json &opt) {
     MEASURE_FUNCTION();
     std::vector<core::Identifier> nutrient_list;
     std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
+    std::unordered_map<core::Gender, std::vector<double>> age_mean_height;
 
     // Save nutrient identities.
     auto nutrient_strings = opt["Nutrients"].get<std::vector<std::string>>();
@@ -208,8 +209,13 @@ load_newebm_risk_model_definition(const host::poco::json &opt) {
         }
     }
 
-    return std::make_shared<EnergyBalanceModelDefinition>(std::move(nutrient_list),
-                                                          std::move(nutrient_equations));
+    auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
+    age_mean_height.emplace(core::Gender::male, std::move(male_height));
+    auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
+    age_mean_height.emplace(core::Gender::female, std::move(female_height));
+
+    return std::make_shared<EnergyBalanceModelDefinition>(
+        std::move(nutrient_list), std::move(nutrient_equations), std::move(age_mean_height));
 }
 
 void register_risk_factor_model_definitions(CachedRepository &repository, const ModellingInfo &info,

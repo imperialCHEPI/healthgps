@@ -5,8 +5,10 @@ namespace hgps {
 
 EnergyBalanceModel::EnergyBalanceModel(
     const std::vector<core::Identifier> &nutrient_list,
-    const std::map<core::Identifier, std::map<core::Identifier, double>> &nutrient_equations)
-    : nutrient_list_{nutrient_list}, nutrient_equations_{nutrient_equations} {}
+    const std::map<core::Identifier, std::map<core::Identifier, double>> &nutrient_equations,
+    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
+    : nutrient_list_{nutrient_list}, nutrient_equations_{nutrient_equations},
+      age_mean_height_{age_mean_height} {}
 
 HierarchicalModelType EnergyBalanceModel::type() const noexcept {
     return HierarchicalModelType::Dynamic;
@@ -78,8 +80,10 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     std::vector<core::Identifier> &&nutrient_list,
-    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations)
-    : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)} {
+    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations,
+    std::unordered_map<core::Gender, std::vector<double>> &&age_mean_height)
+    : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)},
+      age_mean_height_{std::move(age_mean_height)} {
 
     if (nutrient_list_.empty()) {
         throw std::invalid_argument("Nutrient list is empty");
@@ -88,10 +92,15 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     if (nutrient_equations_.empty()) {
         throw std::invalid_argument("Nutrient equation mapping is empty");
     }
+
+    if (age_mean_height_.empty()) {
+        throw std::invalid_argument("Gender mean height mapping is empty");
+    }
 }
 
 std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
-    return std::make_unique<EnergyBalanceModel>(nutrient_list_, nutrient_equations_);
+    return std::make_unique<EnergyBalanceModel>(nutrient_list_, nutrient_equations_,
+                                                age_mean_height_);
 }
 
 } // namespace hgps
