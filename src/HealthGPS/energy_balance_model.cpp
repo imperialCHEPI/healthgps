@@ -42,7 +42,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
         auto &nutrient_equations = nutrient_equations_.get();
         // TODO: auto &age_mean_height = age_mean_height_.get();
 
-        // TODO: double energy_intake = 0.0;
+        double energy_intake = 0.0;
         std::unordered_map<core::Identifier, double> nutrient_intakes;
 
         // Initialise nutrients to zero.
@@ -62,7 +62,13 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             }
         }
 
-        // TODO: model after input stage
+        // Compute energy intake from nutrient intakes.
+        for (const auto &coefficient : energy_equation) {
+            double delta_energy = nutrient_intakes[coefficient.first] * coefficient.second;
+            energy_intake += delta_energy;
+        }
+
+        // TODO: model after energy intake stage
     }
 }
 
