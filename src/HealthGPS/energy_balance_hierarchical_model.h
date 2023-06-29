@@ -84,8 +84,8 @@ class LiteHierarchicalModelDefinition final : public RiskFactorModelDefinition {
     /// @param boundary_percentage The boundary percentage to sample
     /// @throws std::invalid_argument for empty model equations definition
     LiteHierarchicalModelDefinition(
-        std::map<core::IntegerInterval, AgeGroupGenderEquation> &&equations,
-        std::map<core::Identifier, core::Identifier> &&variables,
+        std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
+        std::map<core::Identifier, core::Identifier> variables,
         const double boundary_percentage = 0.05);
 
     /// @brief Construct a new EnergyBalanceHierarchicalModel from this definition

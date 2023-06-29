@@ -121,8 +121,8 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
 }
 
 LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
-    std::map<core::IntegerInterval, AgeGroupGenderEquation> &&equations,
-    std::map<core::Identifier, core::Identifier> &&variables, const double boundary_percentage)
+    std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
+    std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
     : equations_{std::move(equations)}, variables_{std::move(variables)},
       boundary_percentage_{boundary_percentage} {
 

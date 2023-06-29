@@ -90,8 +90,8 @@ class HierarchicalLinearModelDefinition final : public RiskFactorModelDefinition
     /// @param model_levels The hierarchical model levels definition
     /// @throws std::invalid_argument for empty arguments
     HierarchicalLinearModelDefinition(
-        std::unordered_map<core::Identifier, LinearModel> &&linear_models,
-        std::map<int, HierarchicalLevel> &&model_levels);
+        std::unordered_map<core::Identifier, LinearModel> linear_models,
+        std::map<int, HierarchicalLevel> model_levels);
 
     /// @brief Construct a new StaticHierarchicalLinearModel from this definition
     /// @return A unique pointer to the new StaticHierarchicalLinearModel instance
