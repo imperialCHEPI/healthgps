@@ -36,8 +36,8 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
         }
 
         // Compute nutrients from food groups.
-        auto nutrient_list = nutrient_list_.get();
-        auto nutrient_equations = nutrient_equations_.get();
+        const auto &nutrient_list = nutrient_list_.get();
+        const auto &nutrient_equations = nutrient_equations_.get();
 
         // Initialise nutrients to zero.
         std::unordered_map<core::Identifier, double> nutrient_values;
