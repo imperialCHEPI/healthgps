@@ -45,8 +45,8 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     /// @param nutrient_equations The nutrient equations for each food group
     /// @throws std::invalid_argument for empty arguments
     EnergyBalanceModelDefinition(
-        std::vector<core::Identifier> &&nutrient_list,
-        std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations);
+        std::vector<core::Identifier> nutrient_list,
+        std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations);
 
     /// @brief Construct a new EnergyBalanceModel from this definition
     /// @return A unique pointer to the new EnergyBalanceModel instance
