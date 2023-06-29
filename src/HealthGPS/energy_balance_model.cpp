@@ -5,7 +5,8 @@ namespace hgps {
 
 EnergyBalanceModel::EnergyBalanceModel(
     const std::vector<core::Identifier> &nutrient_list,
-    const std::map<core::Identifier, std::map<core::Identifier, double>> &nutrient_equations,
+    const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
+        &nutrient_equations,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : nutrient_list_{nutrient_list}, nutrient_equations_{nutrient_equations},
       age_mean_height_{age_mean_height} {}
@@ -80,7 +81,7 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     std::vector<core::Identifier> &&nutrient_list,
-    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations,
+    std::unordered_map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations,
     std::unordered_map<core::Gender, std::vector<double>> &&age_mean_height)
     : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)},
       age_mean_height_{std::move(age_mean_height)} {

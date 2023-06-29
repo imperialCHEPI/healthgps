@@ -185,7 +185,7 @@ std::shared_ptr<EnergyBalanceModelDefinition>
 load_newebm_risk_model_definition(const host::poco::json &opt) {
     MEASURE_FUNCTION();
     std::vector<core::Identifier> nutrient_list;
-    std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
+    std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height;
 
     // Save nutrient identities.
