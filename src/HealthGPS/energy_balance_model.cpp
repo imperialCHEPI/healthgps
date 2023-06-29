@@ -77,8 +77,8 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
-    std::vector<core::Identifier> &&nutrient_list,
-    std::map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations)
+    std::vector<core::Identifier> nutrient_list,
+    std::map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations)
     : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)} {
 
     if (nutrient_list_.empty()) {
