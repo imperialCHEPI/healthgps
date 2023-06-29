@@ -47,7 +47,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
 }
 
 const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
-    auto &all_eqns = equations_.get();
+    const auto &all_eqns = equations_.get();
     for (auto &entry : all_eqns) {
         if (entry.first.contains(age)) {
             return entry.second;
@@ -121,8 +121,8 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
 }
 
 LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
-    std::map<core::IntegerInterval, AgeGroupGenderEquation> &&equations,
-    std::map<core::Identifier, core::Identifier> &&variables, const double boundary_percentage)
+    std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
+    std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
     : equations_{std::move(equations)}, variables_{std::move(variables)},
       boundary_percentage_{boundary_percentage} {
 

@@ -52,10 +52,9 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
     EnergyBalanceModelDefinition(
-        std::unordered_map<core::Identifier, double> &&energy_equation,
-        std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
-            &&nutrient_equations,
-        std::unordered_map<core::Gender, std::vector<double>> &&age_mean_height);
+        std::unordered_map<core::Identifier, double> energy_equation,
+        std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
+        std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
     /// @brief Construct a new EnergyBalanceModel from this definition
     /// @return A unique pointer to the new EnergyBalanceModel instance

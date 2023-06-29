@@ -38,9 +38,9 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             current_risk_factors.at(age_key) = model_age;
         }
 
-        auto &energy_equation = energy_equation_.get();
-        auto &nutrient_equations = nutrient_equations_.get();
-        // TODO: auto &age_mean_height = age_mean_height_.get();
+        const auto &energy_equation = energy_equation_.get();
+        const auto &nutrient_equations = nutrient_equations_.get();
+        // TODO: const auto &age_mean_height = age_mean_height_.get();
 
         double energy_intake = 0.0;
         std::unordered_map<core::Identifier, double> nutrient_intakes;
@@ -89,9 +89,9 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
-    std::unordered_map<core::Identifier, double> &&energy_equation,
-    std::unordered_map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations,
-    std::unordered_map<core::Gender, std::vector<double>> &&age_mean_height)
+    std::unordered_map<core::Identifier, double> energy_equation,
+    std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
+    std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
     : energy_equation_{std::move(energy_equation)},
       nutrient_equations_{std::move(nutrient_equations)},
       age_mean_height_{std::move(age_mean_height)} {
