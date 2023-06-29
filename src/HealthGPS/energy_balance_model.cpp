@@ -4,11 +4,11 @@
 namespace hgps {
 
 EnergyBalanceModel::EnergyBalanceModel(
-    const std::vector<core::Identifier> &nutrient_list,
+    const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
-    : nutrient_list_{nutrient_list}, nutrient_equations_{nutrient_equations},
+    : energy_equation_{energy_equation}, nutrient_equations_{nutrient_equations},
       age_mean_height_{age_mean_height} {}
 
 HierarchicalModelType EnergyBalanceModel::type() const noexcept {
@@ -38,24 +38,25 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             current_risk_factors.at(age_key) = model_age;
         }
 
-        // Compute nutrients from food groups.
-        auto nutrient_list = nutrient_list_.get();
-        auto nutrient_equations = nutrient_equations_.get();
+        auto &energy_equation = energy_equation_.get();
+        auto &nutrient_equations = nutrient_equations_.get();
+        // TODO: auto &age_mean_height = age_mean_height_.get();
+
+        // TODO: double energy_intake = 0.0;
+        std::unordered_map<core::Identifier, double> nutrient_intakes;
 
         // Initialise nutrients to zero.
-        std::unordered_map<core::Identifier, double> nutrient_values;
-        for (const core::Identifier &nutrient_name : nutrient_list) {
-            nutrient_values[nutrient_name] = 0.0;
+        for (const auto &coefficient : energy_equation) {
+            nutrient_intakes[coefficient.first] = 0.0;
         }
 
-        // Compute nutrient values from foods.
+        // Compute nutrient intakes from food intakes.
         for (const auto &equation : nutrient_equations) {
-            const core::Identifier &food_key = equation.first;
-            double food_value = current_risk_factors.at(food_key);
+            double food_intake = current_risk_factors.at(equation.first);
 
             for (const auto &coefficient : equation.second) {
-                double delta_nutrient = food_value * coefficient.second;
-                nutrient_values[coefficient.first] += delta_nutrient;
+                double delta_nutrient = food_intake * coefficient.second;
+                nutrient_intakes[coefficient.first] += delta_nutrient;
             }
         }
 
@@ -80,14 +81,15 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
-    std::vector<core::Identifier> &&nutrient_list,
+    std::unordered_map<core::Identifier, double> &&energy_equation,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> &&nutrient_equations,
     std::unordered_map<core::Gender, std::vector<double>> &&age_mean_height)
-    : nutrient_list_{std::move(nutrient_list)}, nutrient_equations_{std::move(nutrient_equations)},
+    : energy_equation_{std::move(energy_equation)},
+      nutrient_equations_{std::move(nutrient_equations)},
       age_mean_height_{std::move(age_mean_height)} {
 
-    if (nutrient_list_.empty()) {
-        throw std::invalid_argument("Nutrient list is empty");
+    if (energy_equation_.empty()) {
+        throw std::invalid_argument("Energy equation mapping is empty");
     }
 
     if (nutrient_equations_.empty()) {
@@ -100,7 +102,7 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
 }
 
 std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
-    return std::make_unique<EnergyBalanceModel>(nutrient_list_, nutrient_equations_,
+    return std::make_unique<EnergyBalanceModel>(energy_equation_, nutrient_equations_,
                                                 age_mean_height_);
 }
 

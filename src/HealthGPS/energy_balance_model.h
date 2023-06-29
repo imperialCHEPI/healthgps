@@ -11,11 +11,11 @@ namespace hgps {
 class EnergyBalanceModel final : public HierarchicalLinearModel {
   public:
     /// @brief Initialises a new instance of the EnergyBalanceModel class
-    /// @param nutrient_list The list of nutrients
+    /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     EnergyBalanceModel(
-        const std::vector<core::Identifier> &nutrient_list,
+        const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
@@ -31,7 +31,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
-    std::reference_wrapper<const std::vector<core::Identifier>> nutrient_list_;
+    std::reference_wrapper<const std::unordered_map<core::Identifier, double>> energy_equation_;
     std::reference_wrapper<
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>>
         nutrient_equations_;
@@ -47,12 +47,12 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
 class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
-    /// @param nutrient_list The list of nutrients
+    /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
     EnergyBalanceModelDefinition(
-        std::vector<core::Identifier> &&nutrient_list,
+        std::unordered_map<core::Identifier, double> &&energy_equation,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &&nutrient_equations,
         std::unordered_map<core::Gender, std::vector<double>> &&age_mean_height);
@@ -62,7 +62,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     std::unique_ptr<HierarchicalLinearModel> create_model() const override;
 
   private:
-    std::vector<core::Identifier> nutrient_list_;
+    std::unordered_map<core::Identifier, double> energy_equation_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
 };

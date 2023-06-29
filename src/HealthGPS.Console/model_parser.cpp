@@ -184,38 +184,43 @@ load_dynamic_risk_model_definition(const host::poco::json &opt) {
 std::shared_ptr<EnergyBalanceModelDefinition>
 load_newebm_risk_model_definition(const host::poco::json &opt) {
     MEASURE_FUNCTION();
-    std::vector<core::Identifier> nutrient_list;
+    std::unordered_map<core::Identifier, double> energy_equation;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height;
 
-    // Save nutrient identities.
-    auto nutrient_strings = opt["Nutrients"].get<std::vector<std::string>>();
-    for (const std::string &nutrient_str : nutrient_strings) {
-        nutrient_list.emplace_back(nutrient_str);
+    // Save nutrient -> energy equation.
+    for (const auto &nutrient : opt["Nutrients"]) {
+        auto nutrient_str = nutrient["Name"].get<std::string>();
+        auto nutrient_key = core::Identifier{nutrient_str};
+        auto nutrient_energy = nutrient["Energy"].get<double>();
+        energy_equation[nutrient_key] = nutrient_energy;
     }
 
     // Save food -> nutrient equations.
     for (const auto &food : opt["Foods"]) {
-        auto food_ident = core::Identifier{food["Name"].get<std::string>()};
-        auto food_nutrient_strings = food["Nutrients"].get<std::map<std::string, double>>();
+        auto food_str = food["Name"].get<std::string>();
+        auto food_key = core::Identifier{food_str};
+        auto food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
 
-        for (const std::string &nutrient_str : nutrient_strings) {
-            auto nutrient_ident = core::Identifier(nutrient_str);
+        for (const auto &nutrient : opt["Nutrients"]) {
+            auto nutrient_str = nutrient["Name"].get<std::string>();
+            auto nutrient_key = core::Identifier{nutrient_str};
 
-            if (food_nutrient_strings.contains(nutrient_str)) {
-                double val = food_nutrient_strings.at(nutrient_str);
-                nutrient_equations[food_ident][nutrient_ident] = val;
+            if (food_nutrients.contains(nutrient_str)) {
+                double val = food_nutrients.at(nutrient_str);
+                nutrient_equations[food_key][nutrient_key] = val;
             }
         }
     }
 
+    // Save M/F average heights for age.
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     age_mean_height.emplace(core::Gender::male, std::move(male_height));
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
     age_mean_height.emplace(core::Gender::female, std::move(female_height));
 
     return std::make_shared<EnergyBalanceModelDefinition>(
-        std::move(nutrient_list), std::move(nutrient_equations), std::move(age_mean_height));
+        std::move(energy_equation), std::move(nutrient_equations), std::move(age_mean_height));
 }
 
 void register_risk_factor_model_definitions(CachedRepository &repository, const ModellingInfo &info,

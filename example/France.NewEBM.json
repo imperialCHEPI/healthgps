@@ -6,7 +6,24 @@
         "Alpha2": "FR",
         "Alpha3": "FRA"
     },
-    "Nutrients": ["Carbs", "Fat", "Protein", "Sodium"],
+    "Nutrients": [
+        {
+            "Name": "Carbs",
+            "Energy": 4.0
+        },
+        {
+            "Name": "Fat",
+            "Energy": 9.0
+        },
+        {
+            "Name": "Protein",
+            "Energy": 4.0
+        },
+        {
+            "Name": "Sodium",
+            "Energy": 0.0
+        }
+    ],
     "Foods": [
         {
             "Name": "Carbs",
