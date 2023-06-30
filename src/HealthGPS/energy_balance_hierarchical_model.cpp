@@ -56,18 +56,18 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
 }
 
 const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
-    const auto &all_eqns = equations_;
-    for (auto &entry : all_eqns) {
+    for (auto &entry : equations_) {
         if (entry.first.contains(age)) {
+            // If there is an equation for the age, return it.
             return entry.second;
         }
     }
-
-    if (age < all_eqns.begin()->first.lower()) {
-        return all_eqns.begin()->second;
+    if (age < equations_.begin()->first.lower()) {
+        // Else if the age is below the first equation, return the first equation.
+        return equations_.begin()->second;
     }
-
-    return all_eqns.rbegin()->second;
+    // Else if the age is above the last equation, return the last equation.
+    return equations_.rbegin()->second;
 }
 
 void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
