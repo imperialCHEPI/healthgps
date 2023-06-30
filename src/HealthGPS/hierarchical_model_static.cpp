@@ -8,12 +8,12 @@ StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     const std::map<int, HierarchicalLevel> &levels)
     : models_{models}, levels_{levels} {
 
-    if (models_.get().empty()) {
+    if (models_.empty()) {
         throw std::invalid_argument(
             "The hierarchical model equations definition must not be empty");
     }
 
-    if (levels_.get().empty()) {
+    if (levels_.empty()) {
         throw std::invalid_argument("The hierarchical model levels definition must not be empty");
     }
 }
@@ -66,7 +66,7 @@ void StaticHierarchicalLinearModel::update_risk_factors(RuntimeContext &context)
 void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context, Person &entity,
                                                         int level,
                                                         std::vector<MappingEntry> &level_factors) {
-    const auto &level_info = levels_.get().at(level);
+    const auto &level_info = levels_.at(level);
 
     // Residual Risk Factors Random Sampling
     auto residual_risk_factors = std::map<core::Identifier, double>();
@@ -106,7 +106,7 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
     auto determ_comp_factors = std::map<core::Identifier, double>();
     for (const auto &factor : level_factors) {
         auto sum = 0.0;
-        for (const auto &coeff : models_.get().at(factor.key()).coefficients) {
+        for (const auto &coeff : models_.at(factor.key()).coefficients) {
             sum += coeff.second.value * determ_risk_factors[coeff.first];
         }
 

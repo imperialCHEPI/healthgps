@@ -75,8 +75,8 @@ class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
-    std::reference_wrapper<const std::unordered_map<core::Identifier, LinearModel>> models_;
-    std::reference_wrapper<const std::map<int, HierarchicalLevel>> levels_;
+    const std::unordered_map<core::Identifier, LinearModel> &models_;
+    const std::map<int, HierarchicalLevel> &levels_;
 
     void generate_for_entity(RuntimeContext &context, Person &entity, int level,
                              std::vector<MappingEntry> &level_factors);

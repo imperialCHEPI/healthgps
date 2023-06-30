@@ -8,11 +8,11 @@ EnergyBalanceModel::EnergyBalanceModel(
     const std::map<core::Identifier, std::map<core::Identifier, double>> &nutrient_equations)
     : nutrient_list_{nutrient_list}, nutrient_equations_{nutrient_equations} {
 
-    if (nutrient_list_.get().empty()) {
+    if (nutrient_list_.empty()) {
         throw std::invalid_argument("Nutrient list is empty");
     }
 
-    if (nutrient_equations_.get().empty()) {
+    if (nutrient_equations_.empty()) {
         throw std::invalid_argument("Nutrient equation mapping is empty");
     }
 }
@@ -44,18 +44,14 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             current_risk_factors.at(age_key) = model_age;
         }
 
-        // Compute nutrients from food groups.
-        const auto &nutrient_list = nutrient_list_.get();
-        const auto &nutrient_equations = nutrient_equations_.get();
-
         // Initialise nutrients to zero.
         std::unordered_map<core::Identifier, double> nutrient_values;
-        for (const core::Identifier &nutrient_name : nutrient_list) {
+        for (const core::Identifier &nutrient_name : nutrient_list_) {
             nutrient_values[nutrient_name] = 0.0;
         }
 
         // Compute nutrient values from foods.
-        for (const auto &equation : nutrient_equations) {
+        for (const auto &equation : nutrient_equations_) {
             const core::Identifier &food_name = equation.first;
             double food_value = current_risk_factors[food_name];
 

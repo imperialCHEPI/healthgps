@@ -8,11 +8,11 @@ EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
     : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
 
-    if (equations_.get().empty()) {
+    if (equations_.empty()) {
         throw std::invalid_argument("The model equations definition must not be empty");
     }
 
-    if (variables_.get().empty()) {
+    if (variables_.empty()) {
         throw std::invalid_argument("The model variables definition must not be empty");
     }
 }
@@ -56,18 +56,17 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
 }
 
 const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
-    const auto &all_eqns = equations_.get();
-    for (auto &entry : all_eqns) {
+    for (auto &entry : equations_) {
         if (entry.first.contains(age)) {
             return entry.second;
         }
     }
 
-    if (age < all_eqns.begin()->first.lower()) {
-        return all_eqns.begin()->second;
+    if (age < equations_.begin()->first.lower()) {
+        return equations_.begin()->second;
     }
 
-    return all_eqns.rbegin()->second;
+    return equations_.rbegin()->second;
 }
 
 void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
@@ -86,7 +85,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
                 if (current_risk_factors.contains(coeff.first)) {
                     delta_factor += coeff.second * current_risk_factors.at(coeff.first);
                 } else {
-                    auto &factor_key = variables_.get().at(coeff.first);
+                    auto &factor_key = variables_.at(coeff.first);
                     delta_factor += coeff.second * delta_comp_factors.at(factor_key);
                 }
             }
