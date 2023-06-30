@@ -31,12 +31,10 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
-    std::reference_wrapper<const std::unordered_map<core::Identifier, double>> energy_equation_;
-    std::reference_wrapper<
-        const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>>
-        nutrient_equations_;
-    std::reference_wrapper<const std::unordered_map<core::Gender, std::vector<double>>>
-        age_mean_height_;
+    const std::unordered_map<core::Identifier, double> &energy_equation_;
+    const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
+        &nutrient_equations_;
+    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
     std::map<core::Identifier, double> get_current_risk_factors(const HierarchicalMapping &mapping,
                                                                 Person &entity,

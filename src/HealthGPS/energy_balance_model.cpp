@@ -11,15 +11,15 @@ EnergyBalanceModel::EnergyBalanceModel(
     : energy_equation_{energy_equation}, nutrient_equations_{nutrient_equations},
       age_mean_height_{age_mean_height} {
 
-    if (energy_equation_.get().empty()) {
+    if (energy_equation_.empty()) {
         throw std::invalid_argument("Energy equation mapping is empty");
     }
 
-    if (nutrient_equations_.get().empty()) {
+    if (nutrient_equations_.empty()) {
         throw std::invalid_argument("Nutrient equation mapping is empty");
     }
 
-    if (age_mean_height_.get().empty()) {
+    if (age_mean_height_.empty()) {
         throw std::invalid_argument("Age mean height mapping is empty");
     }
 }
@@ -51,20 +51,16 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             current_risk_factors.at(age_key) = model_age;
         }
 
-        const auto &energy_equation = energy_equation_.get();
-        const auto &nutrient_equations = nutrient_equations_.get();
-        // TODO: const auto &age_mean_height = age_mean_height_.get();
-
         double energy_intake = 0.0;
         std::unordered_map<core::Identifier, double> nutrient_intakes;
 
         // Initialise nutrients to zero.
-        for (const auto &coefficient : energy_equation) {
+        for (const auto &coefficient : energy_equation_) {
             nutrient_intakes[coefficient.first] = 0.0;
         }
 
         // Compute nutrient intakes from food intakes.
-        for (const auto &equation : nutrient_equations) {
+        for (const auto &equation : nutrient_equations_) {
             // TODO: until carbs is added to risk factors (should use at, not [])
             // double food_intake = current_risk_factors.at(equation.first);
             double food_intake = current_risk_factors[equation.first];
@@ -76,7 +72,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
         }
 
         // Compute energy intake from nutrient intakes.
-        for (const auto &coefficient : energy_equation) {
+        for (const auto &coefficient : energy_equation_) {
             double delta_energy = nutrient_intakes[coefficient.first] * coefficient.second;
             energy_intake += delta_energy;
         }
