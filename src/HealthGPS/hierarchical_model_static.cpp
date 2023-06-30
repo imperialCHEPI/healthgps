@@ -6,13 +6,23 @@ namespace hgps {
 StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     const std::unordered_map<core::Identifier, LinearModel> &models,
     const std::map<int, HierarchicalLevel> &levels)
-    : models_{models}, levels_{levels} {}
+    : models_{models}, levels_{levels} {
+
+    if (models_.get().empty()) {
+        throw std::invalid_argument(
+            "The hierarchical model equations definition must not be empty");
+    }
+
+    if (levels_.get().empty()) {
+        throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+    }
+}
 
 HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
     return HierarchicalModelType::Static;
 }
 
-const std::string StaticHierarchicalLinearModel::name() const noexcept { return "Static"; }
+std::string StaticHierarchicalLinearModel::name() const noexcept { return "Static"; }
 
 void StaticHierarchicalLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::vector<MappingEntry> level_factors;
@@ -113,7 +123,7 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
 HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
     std::unordered_map<core::Identifier, LinearModel> linear_models,
     std::map<int, HierarchicalLevel> model_levels)
-    : models_{std::move(linear_models)}, levels_{std::move(model_levels)} {
+    : models_{linear_models}, levels_{model_levels} {
 
     if (models_.empty()) {
         throw std::invalid_argument(

@@ -6,13 +6,22 @@ namespace hgps {
 EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
-    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {}
+    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
+
+    if (equations_.get().empty()) {
+        throw std::invalid_argument("The model equations definition must not be empty");
+    }
+
+    if (variables_.get().empty()) {
+        throw std::invalid_argument("The model variables definition must not be empty");
+    }
+}
 
 HierarchicalModelType EnergyBalanceHierarchicalModel::type() const noexcept {
     return HierarchicalModelType::Dynamic;
 }
 
-const std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dynamic"; }
+std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dynamic"; }
 
 void EnergyBalanceHierarchicalModel::generate_risk_factors(
     [[maybe_unused]] RuntimeContext &context) {
@@ -123,11 +132,14 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
 LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
-    : equations_{std::move(equations)}, variables_{std::move(variables)},
-      boundary_percentage_{boundary_percentage} {
+    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
         throw std::invalid_argument("The model equations definition must not be empty");
+    }
+
+    if (variables_.empty()) {
+        throw std::invalid_argument("The model variables definition must not be empty");
     }
 }
 

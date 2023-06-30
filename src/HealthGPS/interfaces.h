@@ -145,7 +145,7 @@ class HierarchicalLinearModel {
 
     /// @brief Gets the model name
     /// @return The human-readable model name
-    virtual const std::string name() const noexcept = 0;
+    virtual std::string name() const noexcept = 0;
 
     /// @brief Generates the initial risk factors for a population and newborns
     /// @param context The simulation run-time context

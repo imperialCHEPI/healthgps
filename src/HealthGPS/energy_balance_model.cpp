@@ -9,13 +9,26 @@ EnergyBalanceModel::EnergyBalanceModel(
         &nutrient_equations,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_equations_{nutrient_equations},
-      age_mean_height_{age_mean_height} {}
+      age_mean_height_{age_mean_height} {
+
+    if (energy_equation_.get().empty()) {
+        throw std::invalid_argument("Energy equation mapping is empty");
+    }
+
+    if (nutrient_equations_.get().empty()) {
+        throw std::invalid_argument("Nutrient equation mapping is empty");
+    }
+
+    if (age_mean_height_.get().empty()) {
+        throw std::invalid_argument("Age mean height mapping is empty");
+    }
+}
 
 HierarchicalModelType EnergyBalanceModel::type() const noexcept {
     return HierarchicalModelType::Dynamic;
 }
 
-const std::string EnergyBalanceModel::name() const noexcept { return "Dynamic"; }
+std::string EnergyBalanceModel::name() const noexcept { return "Dynamic"; }
 
 void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
     throw std::logic_error("EnergyBalanceModel::generate_risk_factors not yet implemented.");
@@ -92,9 +105,8 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
-    : energy_equation_{std::move(energy_equation)},
-      nutrient_equations_{std::move(nutrient_equations)},
-      age_mean_height_{std::move(age_mean_height)} {
+    : energy_equation_{energy_equation}, nutrient_equations_{nutrient_equations},
+      age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
         throw std::invalid_argument("Energy equation mapping is empty");
@@ -105,7 +117,7 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     }
 
     if (age_mean_height_.empty()) {
-        throw std::invalid_argument("Gender mean height mapping is empty");
+        throw std::invalid_argument("Age mean height mapping is empty");
     }
 }
 

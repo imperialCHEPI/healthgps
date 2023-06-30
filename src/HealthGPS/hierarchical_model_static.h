@@ -26,7 +26,7 @@ struct LinearModel {
     std::unordered_map<core::Identifier, Coefficient> coefficients;
 
     /// @brief The residuals standard deviation value
-    double residuals_standard_deviation;
+    double residuals_standard_deviation{};
 
     /// @brief The R squared value
     double rsquared{};
@@ -68,7 +68,7 @@ class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
 
     HierarchicalModelType type() const noexcept override;
 
-    const std::string name() const noexcept override;
+    std::string name() const noexcept override;
 
     void generate_risk_factors(RuntimeContext &context) override;
 
