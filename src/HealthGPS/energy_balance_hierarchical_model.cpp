@@ -46,11 +46,11 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
             current_risk_factors.at(age_key) = model_age;
         }
 
-        auto &eqns = equations_at(model_age);
+        auto &equations = equations_at(model_age);
         if (entity.gender == core::Gender::male) {
-            update_risk_factors_exposure(context, entity, current_risk_factors, eqns.male);
+            update_risk_factors_exposure(context, entity, current_risk_factors, equations.male);
         } else {
-            update_risk_factors_exposure(context, entity, current_risk_factors, eqns.female);
+            update_risk_factors_exposure(context, entity, current_risk_factors, equations.female);
         }
     }
 }
