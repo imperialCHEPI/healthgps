@@ -68,7 +68,7 @@ class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
 
     HierarchicalModelType type() const noexcept override;
 
-    const std::string name() const noexcept override;
+    std::string name() const noexcept override;
 
     void generate_risk_factors(RuntimeContext &context) override;
 

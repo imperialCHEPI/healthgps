@@ -12,7 +12,7 @@ HierarchicalModelType EnergyBalanceHierarchicalModel::type() const noexcept {
     return HierarchicalModelType::Dynamic;
 }
 
-const std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dynamic"; }
+std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dynamic"; }
 
 void EnergyBalanceHierarchicalModel::generate_risk_factors(
     [[maybe_unused]] RuntimeContext &context) {
