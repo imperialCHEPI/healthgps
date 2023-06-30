@@ -26,7 +26,7 @@ struct LinearModel {
     std::unordered_map<core::Identifier, Coefficient> coefficients;
 
     /// @brief The residuals standard deviation value
-    double residuals_standard_deviation;
+    double residuals_standard_deviation{};
 
     /// @brief The R squared value
     double rsquared{};
