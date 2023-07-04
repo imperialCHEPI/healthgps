@@ -1,19 +1,28 @@
 #include "hierarchical_model_static.h"
-#include "gender_table.h"
 #include "runtime_context.h"
 
-#include "HealthGPS.Core/string_util.h"
-
 namespace hgps {
+
 StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
-    HierarchicalLinearModelDefinition &definition)
-    : definition_{definition} {}
+    const std::unordered_map<core::Identifier, LinearModel> &models,
+    const std::map<int, HierarchicalLevel> &levels)
+    : models_{models}, levels_{levels} {
+
+    if (models_.empty()) {
+        throw std::invalid_argument(
+            "The hierarchical model equations definition must not be empty");
+    }
+
+    if (levels_.empty()) {
+        throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+    }
+}
 
 HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
     return HierarchicalModelType::Static;
 }
 
-const std::string &StaticHierarchicalLinearModel::name() const noexcept { return name_; }
+std::string StaticHierarchicalLinearModel::name() const noexcept { return "Static"; }
 
 void StaticHierarchicalLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::vector<MappingEntry> level_factors;
@@ -57,8 +66,7 @@ void StaticHierarchicalLinearModel::update_risk_factors(RuntimeContext &context)
 void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context, Person &entity,
                                                         int level,
                                                         std::vector<MappingEntry> &level_factors) {
-    auto &definition = definition_.get();
-    const auto &level_info = definition.levels().at(level);
+    const auto &level_info = levels_.at(level);
 
     // Residual Risk Factors Random Sampling
     auto residual_risk_factors = std::map<core::Identifier, double>();
@@ -98,7 +106,7 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
     auto determ_comp_factors = std::map<core::Identifier, double>();
     for (const auto &factor : level_factors) {
         auto sum = 0.0;
-        for (const auto &coeff : definition.models().at(factor.key()).coefficients) {
+        for (const auto &coeff : models_.at(factor.key()).coefficients) {
             sum += coeff.second.value * determ_risk_factors[coeff.first];
         }
 
@@ -111,4 +119,24 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
         entity.risk_factors[factor.key()] = factor.get_bounded_value(total_value);
     }
 }
+
+HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
+    std::unordered_map<core::Identifier, LinearModel> linear_models,
+    std::map<int, HierarchicalLevel> model_levels)
+    : models_{linear_models}, levels_{model_levels} {
+
+    if (models_.empty()) {
+        throw std::invalid_argument(
+            "The hierarchical model equations definition must not be empty");
+    }
+
+    if (levels_.empty()) {
+        throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+    }
+}
+
+std::unique_ptr<HierarchicalLinearModel> HierarchicalLinearModelDefinition::create_model() const {
+    return std::make_unique<StaticHierarchicalLinearModel>(models_, levels_);
+}
+
 } // namespace hgps

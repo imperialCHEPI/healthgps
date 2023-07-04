@@ -1,18 +1,27 @@
 #include "energy_balance_hierarchical_model.h"
 #include "runtime_context.h"
-#include <iostream>
 
 namespace hgps {
 
 EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
-    LiteHierarchicalModelDefinition &definition)
-    : definition_{definition} {}
+    const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
+    const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
+    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
+
+    if (equations_.empty()) {
+        throw std::invalid_argument("The model equations definition must not be empty");
+    }
+
+    if (variables_.empty()) {
+        throw std::invalid_argument("The model variables definition must not be empty");
+    }
+}
 
 HierarchicalModelType EnergyBalanceHierarchicalModel::type() const noexcept {
     return HierarchicalModelType::Dynamic;
 }
 
-const std::string &EnergyBalanceHierarchicalModel::name() const noexcept { return name_; }
+std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dynamic"; }
 
 void EnergyBalanceHierarchicalModel::generate_risk_factors(
     [[maybe_unused]] RuntimeContext &context) {
@@ -37,13 +46,27 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
             current_risk_factors.at(age_key) = model_age;
         }
 
-        auto &equations = definition_.get().at(model_age);
+        auto &equations = equations_at(model_age);
         if (entity.gender == core::Gender::male) {
             update_risk_factors_exposure(context, entity, current_risk_factors, equations.male);
         } else {
             update_risk_factors_exposure(context, entity, current_risk_factors, equations.female);
         }
     }
+}
+
+const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
+    for (auto &entry : equations_) {
+        if (entry.first.contains(age)) {
+            return entry.second;
+        }
+    }
+
+    if (age < equations_.begin()->first.lower()) {
+        return equations_.begin()->second;
+    }
+
+    return equations_.rbegin()->second;
 }
 
 void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
@@ -62,7 +85,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
                 if (current_risk_factors.contains(coeff.first)) {
                     delta_factor += coeff.second * current_risk_factors.at(coeff.first);
                 } else {
-                    auto &factor_key = definition_.get().variables().at(coeff.first);
+                    auto &factor_key = variables_.at(coeff.first);
                     delta_factor += coeff.second * delta_comp_factors.at(factor_key);
                 }
             }
@@ -101,8 +124,27 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
                                                                    double standard_deviation,
                                                                    double boundary) const {
     auto candidate = random.next_normal(mean, standard_deviation);
-    auto percentage = definition_.get().boundary_percentage();
-    auto cap = percentage * boundary;
+    auto cap = boundary_percentage_ * boundary;
     return std::min(std::max(candidate, -cap), +cap);
 }
+
+LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
+    std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
+    std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
+    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
+
+    if (equations_.empty()) {
+        throw std::invalid_argument("The model equations definition must not be empty");
+    }
+
+    if (variables_.empty()) {
+        throw std::invalid_argument("The model variables definition must not be empty");
+    }
+}
+
+std::unique_ptr<HierarchicalLinearModel> LiteHierarchicalModelDefinition::create_model() const {
+    return std::make_unique<EnergyBalanceHierarchicalModel>(equations_, variables_,
+                                                            boundary_percentage_);
+}
+
 } // namespace hgps

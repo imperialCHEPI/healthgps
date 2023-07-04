@@ -7,40 +7,20 @@
 namespace hgps {
 
 CachedRepository::CachedRepository(core::Datastore &manager)
-    : mutex_{}, data_manager_{manager}, model_definiton_{}, lite_model_definiton_{},
-      baseline_adjustments_{}, diseases_info_{}, diseases_{}, lms_parameters_{} {}
+    : mutex_{}, data_manager_{manager}, rf_model_definition_{}, baseline_adjustments_{},
+      diseases_info_{}, diseases_{}, lms_parameters_{} {}
 
-bool CachedRepository::register_linear_model_definition(
-    const HierarchicalModelType &model_type, HierarchicalLinearModelDefinition &&definition) {
+bool CachedRepository::register_risk_factor_model_definition(
+    const HierarchicalModelType &model_type,
+    std::shared_ptr<RiskFactorModelDefinition> definition) {
     std::unique_lock<std::mutex> lock(mutex_);
-    if (model_definiton_.contains(model_type)) {
-        model_definiton_.erase(model_type);
+
+    if (rf_model_definition_.contains(model_type)) {
+        rf_model_definition_.erase(model_type);
     }
 
-    auto success = model_definiton_.emplace(model_type, std::move(definition));
-    return success.second;
-}
-
-bool CachedRepository::register_lite_linear_model_definition(
-    const HierarchicalModelType &model_type, LiteHierarchicalModelDefinition &&definition) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (lite_model_definiton_.contains(model_type)) {
-        lite_model_definiton_.erase(model_type);
-    }
-
-    auto success = lite_model_definiton_.emplace(model_type, std::move(definition));
-    return success.second;
-}
-
-bool CachedRepository::register_energy_balance_model_definition(
-    const HierarchicalModelType &model_type, EnergyBalanceModelDefinition &&definition) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (energy_balance_model_definition_.contains(model_type)) {
-        energy_balance_model_definition_.erase(model_type);
-    }
-
-    auto success = energy_balance_model_definition_.emplace(model_type, std::move(definition));
-    return success.second;
+    auto result = rf_model_definition_.emplace(model_type, std::move(definition));
+    return result.second;
 }
 
 bool CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment &&definition) {
@@ -51,25 +31,10 @@ bool CachedRepository::register_baseline_adjustment_definition(BaselineAdjustmen
 
 core::Datastore &CachedRepository::manager() noexcept { return data_manager_; }
 
-HierarchicalLinearModelDefinition &
-CachedRepository::get_linear_model_definition(const HierarchicalModelType &model_type) {
-
+std::shared_ptr<RiskFactorModelDefinition>
+CachedRepository::get_risk_factor_model_definition(const HierarchicalModelType &model_type) {
     std::scoped_lock<std::mutex> lock(mutex_);
-    return model_definiton_.at(model_type);
-}
-
-LiteHierarchicalModelDefinition &
-CachedRepository::get_lite_linear_model_definition(const HierarchicalModelType &model_type) {
-
-    std::scoped_lock<std::mutex> lock(mutex_);
-    return lite_model_definiton_.at(model_type);
-}
-
-EnergyBalanceModelDefinition &
-CachedRepository::get_energy_balance_model_definition(const HierarchicalModelType &model_type) {
-
-    std::scoped_lock<std::mutex> lock(mutex_);
-    return energy_balance_model_definition_.at(model_type);
+    return rf_model_definition_.at(model_type);
 }
 
 BaselineAdjustment &CachedRepository::get_baseline_adjustment_definition() {
@@ -129,8 +94,7 @@ LmsDefinition &CachedRepository::get_lms_definition() {
 
 void CachedRepository::clear_cache() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    model_definiton_.clear();
-    lite_model_definiton_.clear();
+    rf_model_definition_.clear();
     diseases_info_.clear();
     diseases_.clear();
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include "HealthGPS/hierarchical_model_types.h"
 #include "HealthGPS/repository.h"
 #include "HealthGPS/riskfactor_adjustment_types.h"
 
@@ -15,19 +14,20 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
 /// @brief Loads the full hierarchical linear regression model definition from a JSON file
 /// @param model_filename The model definition file full name
 /// @return An instance of the hgps::HierarchicalLinearModelDefinition type
-hgps::HierarchicalLinearModelDefinition
+std::shared_ptr<hgps::HierarchicalLinearModelDefinition>
 load_static_risk_model_definition(const host::poco::json &opt);
 
 /// @brief Loads the lite hierarchical linear regression model definition from a JSON file
 /// @param model_filename The model definition file full name
 /// @return An instance of the hgps::LiteHierarchicalModelDefinition type
-hgps::LiteHierarchicalModelDefinition
+std::shared_ptr<hgps::LiteHierarchicalModelDefinition>
 load_dynamic_risk_model_definition(const host::poco::json &opt);
 
 /// @brief Loads the new energy balance model definition from a JSON file
 /// @param model_filename The model definition file full name
 /// @return An instance of the hgps::LiteHierarchicalModelDefinition type
-hgps::EnergyBalanceModelDefinition load_newebm_risk_model_definition(const host::poco::json &opt);
+std::shared_ptr<hgps::EnergyBalanceModelDefinition>
+load_newebm_risk_model_definition(const host::poco::json &opt);
 
 /// @brief Registers a risk factor model definition with the repository
 /// @param repository The repository instance to register

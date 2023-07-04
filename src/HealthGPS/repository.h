@@ -1,6 +1,8 @@
 #pragma once
 #include "disease_definition.h"
-#include "hierarchical_model_types.h"
+#include "energy_balance_hierarchical_model.h"
+#include "energy_balance_model.h"
+#include "hierarchical_model_static.h"
 #include "interfaces.h"
 #include "lms_definition.h"
 #include "modelinput.h"
@@ -27,23 +29,11 @@ class Repository {
     /// @return The back-end data storage
     virtual core::Datastore &manager() noexcept = 0;
 
-    /// @brief Gets the user provided hierarchical linear model definition
-    /// @param model_type Hierarchical linear model type
-    /// @return The model definition
-    virtual HierarchicalLinearModelDefinition &
-    get_linear_model_definition(const HierarchicalModelType &model_type) = 0;
-
-    /// @brief Gets the user provided lite hierarchical linear model definition
-    /// @param model_type Hierarchical linear model type
-    /// @return The lite model definition
-    virtual LiteHierarchicalModelDefinition &
-    get_lite_linear_model_definition(const HierarchicalModelType &model_type) = 0;
-
-    /// @brief Gets the user provided energy balance model definition
-    /// @param model_type Energy balance model type
-    /// @return The energy balance model definition
-    virtual EnergyBalanceModelDefinition &
-    get_energy_balance_model_definition(const HierarchicalModelType &model_type) = 0;
+    /// @brief Gets a user-provided risk factor model definition
+    /// @param model_type Static or Dynamic
+    /// @return The risk factor model definition
+    virtual std::shared_ptr<RiskFactorModelDefinition>
+    get_risk_factor_model_definition(const HierarchicalModelType &model_type) = 0;
 
     /// @brief Gets the user provided baseline risk factors adjustment dataset
     /// @return Baseline risk factors adjustments
@@ -78,30 +68,18 @@ class Repository {
 class CachedRepository final : public Repository {
   public:
     CachedRepository() = delete;
+
     /// @brief Initialises a new instance of the CachedRepository class.
     /// @param manager Back-end storage instance
     CachedRepository(core::Datastore &manager);
 
-    /// @brief Register a user provided full hierarchical linear model definition
-    /// @param model_type The hierarchical model type
-    /// @param definition The hierarchical model definition instance
+    /// @brief Register a user provided risk factor model definition
+    /// @param model_type Static or Dynamic
+    /// @param definition The risk factor model definition instance
     /// @return true, if the operation succeeds; otherwise, false.
-    bool register_linear_model_definition(const HierarchicalModelType &model_type,
-                                          HierarchicalLinearModelDefinition &&definition);
-
-    /// @brief Register a user provided lite hierarchical linear model definition
-    /// @param model_type The hierarchical model type
-    /// @param definition The lite hierarchical model definition instance
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool register_lite_linear_model_definition(const HierarchicalModelType &model_type,
-                                               LiteHierarchicalModelDefinition &&definition);
-
-    /// @brief Register a user provided energy balance model definition
-    /// @param model_type The energy balance model type
-    /// @param definition The energy balance model definition instance
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool register_energy_balance_model_definition(const HierarchicalModelType &model_type,
-                                                  EnergyBalanceModelDefinition &&definition);
+    bool
+    register_risk_factor_model_definition(const HierarchicalModelType &model_type,
+                                          std::shared_ptr<RiskFactorModelDefinition> definition);
 
     /// @brief Register a user provided baseline risk factors adjustments dataset
     /// @param definition The baseline risk factors adjustments dataset
@@ -110,14 +88,8 @@ class CachedRepository final : public Repository {
 
     core::Datastore &manager() noexcept override;
 
-    HierarchicalLinearModelDefinition &
-    get_linear_model_definition(const HierarchicalModelType &model_type) override;
-
-    LiteHierarchicalModelDefinition &
-    get_lite_linear_model_definition(const HierarchicalModelType &model_type) override;
-
-    EnergyBalanceModelDefinition &
-    get_energy_balance_model_definition(const HierarchicalModelType &model_type) override;
+    std::shared_ptr<RiskFactorModelDefinition>
+    get_risk_factor_model_definition(const HierarchicalModelType &model_type) override;
 
     BaselineAdjustment &get_baseline_adjustment_definition() override;
 
@@ -135,9 +107,8 @@ class CachedRepository final : public Repository {
   private:
     std::mutex mutex_;
     std::reference_wrapper<core::Datastore> data_manager_;
-    std::map<HierarchicalModelType, HierarchicalLinearModelDefinition> model_definiton_;
-    std::map<HierarchicalModelType, LiteHierarchicalModelDefinition> lite_model_definiton_;
-    std::map<HierarchicalModelType, EnergyBalanceModelDefinition> energy_balance_model_definition_;
+    std::map<HierarchicalModelType, std::shared_ptr<RiskFactorModelDefinition>>
+        rf_model_definition_;
     BaselineAdjustment baseline_adjustments_;
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;

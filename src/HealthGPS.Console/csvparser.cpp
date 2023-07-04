@@ -4,7 +4,6 @@
 #include "HealthGPS.Core/scoped_timer.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS/gender_value.h"
-#include "HealthGPS/hierarchical_model_types.h"
 
 #include <fmt/color.h>
 
