@@ -24,7 +24,7 @@ bool Identifier::is_empty() const noexcept { return value_.empty(); }
 
 std::size_t Identifier::size() const noexcept { return value_.size(); }
 
-std::string Identifier::to_string() const noexcept { return value_; }
+const std::string &Identifier::to_string() const noexcept { return value_; }
 
 std::size_t Identifier::hash() const noexcept { return hash_code_; }
 
@@ -55,4 +55,7 @@ std::ostream &operator<<(std::ostream &stream, const Identifier &identifier) {
     stream << identifier.to_string();
     return stream;
 }
+
+void from_json(const nlohmann::json &j, Identifier &id) { id = Identifier{j.get<std::string>()}; }
+
 } // namespace hgps::core

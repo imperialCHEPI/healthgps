@@ -190,24 +190,21 @@ load_newebm_risk_model_definition(const host::poco::json &opt) {
 
     // Save nutrient -> energy equation.
     for (const auto &nutrient : opt["Nutrients"]) {
-        auto nutrient_str = nutrient["Name"].get<std::string>();
-        auto nutrient_key = core::Identifier{nutrient_str};
+        auto nutrient_key = nutrient["Name"].get<core::Identifier>();
         auto nutrient_energy = nutrient["Energy"].get<double>();
         energy_equation[nutrient_key] = nutrient_energy;
     }
 
     // Save food -> nutrient equations.
     for (const auto &food : opt["Foods"]) {
-        auto food_str = food["Name"].get<std::string>();
-        auto food_key = core::Identifier{food_str};
+        auto food_key = food["Name"].get<core::Identifier>();
         auto food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
 
         for (const auto &nutrient : opt["Nutrients"]) {
-            auto nutrient_str = nutrient["Name"].get<std::string>();
-            auto nutrient_key = core::Identifier{nutrient_str};
+            auto nutrient_key = nutrient["Name"].get<core::Identifier>();
 
-            if (food_nutrients.contains(nutrient_str)) {
-                double val = food_nutrients.at(nutrient_str);
+            if (food_nutrients.contains(nutrient_key.to_string())) {
+                double val = food_nutrients.at(nutrient_key.to_string());
                 nutrient_equations[food_key][nutrient_key] = val;
             }
         }
