@@ -101,8 +101,9 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
-    : energy_equation_{energy_equation}, nutrient_equations_{nutrient_equations},
-      age_mean_height_{age_mean_height} {
+    : energy_equation_{std::move(energy_equation)},
+      nutrient_equations_{std::move(nutrient_equations)},
+      age_mean_height_{std::move(age_mean_height)} {
 
     if (energy_equation_.empty()) {
         throw std::invalid_argument("Energy equation mapping is empty");

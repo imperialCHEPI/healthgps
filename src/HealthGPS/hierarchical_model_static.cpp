@@ -123,7 +123,7 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
 HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
     std::unordered_map<core::Identifier, LinearModel> linear_models,
     std::map<int, HierarchicalLevel> model_levels)
-    : models_{linear_models}, levels_{model_levels} {
+    : models_{std::move(linear_models)}, levels_{std::move(model_levels)} {
 
     if (models_.empty()) {
         throw std::invalid_argument(
