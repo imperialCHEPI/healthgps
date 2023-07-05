@@ -190,14 +190,14 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
         nutrient_equations;
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
-    // Save nutrient -> energy equation.
+    // Load nutrient -> energy equation.
     for (const auto &nutrient : opt["Nutrients"]) {
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
         auto nutrient_energy = nutrient["Energy"].get<double>();
         energy_equation[nutrient_key] = nutrient_energy;
     }
 
-    // Save food -> nutrient equations.
+    // Load food -> nutrient equations.
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
         auto food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
@@ -212,10 +212,17 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
         }
     }
 
-    // Save M/F average heights for age.
+    // Load M/F average heights for age.
+    unsigned int max_age = settings.age_range.back();
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
-    age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
+    if (male_height.size() <= max_age) {
+        throw std::invalid_argument("AgeMeanHeight (Male) does not cover complete age range");
+    }
+    if (female_height.size() <= max_age) {
+        throw std::invalid_argument("AgeMeanHeight (Female) does not cover complete age range");
+    }
+    age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
     return std::make_shared<hgps::EnergyBalanceModelDefinition>(
