@@ -1,52 +1,52 @@
 <map id="HealthGPS.Console/model_parser.cpp" name="HealthGPS.Console/model_parser.cpp">
-<area shape="rect" id="node1" title=" " alt="" coords="1737,5,1929,47"/>
-<area shape="rect" id="node2" href="$model__parser_8h.html" title=" " alt="" coords="1599,102,1721,129"/>
-<area shape="rect" id="node38" href="$jsonparser_8h.html" title=" " alt="" coords="193,348,295,375"/>
-<area shape="rect" id="node44" href="$csvparser_8h.html" title=" " alt="" coords="651,184,747,211"/>
-<area shape="rect" id="node45" href="$scoped__timer_8h.html" title=" " alt="" coords="1746,95,1921,136"/>
-<area shape="rect" id="node48" title=" " alt="" coords="1945,102,2037,129"/>
-<area shape="rect" id="node49" title=" " alt="" coords="2061,102,2150,129"/>
-<area shape="rect" id="node50" title=" " alt="" coords="2174,102,2247,129"/>
-<area shape="rect" id="node3" href="$repository_8h.html" title=" " alt="" coords="1775,184,1945,211"/>
-<area shape="rect" id="node36" href="$riskfactor__adjustment__types_8h.html" title=" " alt="" coords="2544,423,2709,464"/>
-<area shape="rect" id="node39" href="$options_8h.html" title=" " alt="" coords="92,430,175,457"/>
-<area shape="rect" id="node4" href="$disease__definition_8h.html" title=" " alt="" coords="2245,348,2397,375"/>
-<area shape="rect" id="node15" title=" " alt="" coords="2033,587,2119,613"/>
-<area shape="rect" id="node16" href="$energy__balance__hierarchical__model_8h.html" title=" " alt="" coords="1963,259,2171,300"/>
-<area shape="rect" id="node17" href="$interfaces_8h.html" title=" " alt="" coords="1848,348,1947,375"/>
-<area shape="rect" id="node24" title=" " alt="" coords="587,587,661,613"/>
-<area shape="rect" id="node26" title=" " alt="" coords="283,587,347,613"/>
-<area shape="rect" id="node32" href="$energy__balance__model_8h.html" title=" " alt="" coords="1702,266,1887,293"/>
-<area shape="rect" id="node33" href="$hierarchical__model__static_8h.html" title=" " alt="" coords="1531,259,1677,300"/>
-<area shape="rect" id="node34" href="$lms__definition_8h.html" title=" " alt="" coords="2701,512,2827,539"/>
-<area shape="rect" id="node35" href="$modelinput_8h.html" title=" " alt="" coords="1507,348,1615,375"/>
-<area shape="rect" id="node5" href="$HealthGPS_8Core_2poco_8h.html" title=" " alt="" coords="2146,587,2318,613"/>
-<area shape="rect" id="node6" href="$disease__table_8h.html" title=" " alt="" coords="2297,512,2421,539"/>
-<area shape="rect" id="node10" href="$gender__value_8h.html" title=" " alt="" coords="2397,430,2520,457"/>
-<area shape="rect" id="node11" href="$relative__risk_8h.html" title=" " alt="" coords="2005,430,2120,457"/>
-<area shape="rect" id="node7" title=" " alt="" coords="2459,587,2509,613"/>
-<area shape="rect" id="node8" title=" " alt="" coords="1609,587,1668,613"/>
-<area shape="rect" id="node9" href="$forward__type_8h.html" title=" " alt="" coords="1748,661,1868,688"/>
-<area shape="rect" id="node12" href="$array2d_8h.html" title=" " alt="" coords="1713,512,1903,539"/>
-<area shape="rect" id="node14" href="$identifier_8h.html" title=" " alt="" coords="2029,512,2120,539"/>
-<area shape="rect" id="node13" title=" " alt="" coords="1293,587,1355,613"/>
-<area shape="rect" id="node31" href="$mapping_8h.html" title=" " alt="" coords="1663,430,1753,457"/>
-<area shape="rect" id="node18" href="$HealthGPS_8Core_2api_8h.html" title=" " alt="" coords="987,430,1149,457"/>
-<area shape="rect" id="node19" href="$column__builder_8h.html" title=" " alt="" coords="1083,512,1216,539"/>
-<area shape="rect" id="node20" href="$column__iterator_8h.html" title=" " alt="" coords="755,512,891,539"/>
-<area shape="rect" id="node21" href="$column__numeric_8h.html" title=" " alt="" coords="915,512,1058,539"/>
-<area shape="rect" id="node22" href="$datastore_8h.html" title=" " alt="" coords="493,512,589,539"/>
-<area shape="rect" id="node23" href="$interval_8h.html" title=" " alt="" coords="371,587,562,613"/>
-<area shape="rect" id="node25" href="$datatable_8h.html" title=" " alt="" coords="373,512,469,539"/>
-<area shape="rect" id="node28" href="$univariate__summary_8h.html" title=" " alt="" coords="1241,512,1407,539"/>
-<area shape="rect" id="node29" href="$version_8h.html" title=" " alt="" coords="1432,512,1515,539"/>
-<area shape="rect" id="node30" href="$visitor_8h.html" title=" " alt="" coords="184,587,259,613"/>
-<area shape="rect" id="node27" title=" " alt="" coords="686,587,810,613"/>
-<area shape="rect" id="node37" href="$map2d_8h.html" title=" " alt="" coords="2598,512,2677,539"/>
-<area shape="rect" id="node42" href="$riskmodel_8h.html" title=" " alt="" coords="1589,512,1688,539"/>
-<area shape="rect" id="node43" title=" " alt="" coords="199,430,345,457"/>
-<area shape="rect" id="node40" href="$HealthGPS_8Console_2poco_8h.html" title=" " alt="" coords="665,512,730,539"/>
-<area shape="rect" id="node41" title=" " alt="" coords="5,512,96,539"/>
-<area shape="rect" id="node46" title=" " alt="" coords="2523,184,2589,211"/>
-<area shape="rect" id="node47" title=" " alt="" coords="2613,184,2693,211"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2076,5,2268,47"/>
+<area shape="rect" id="node2" href="$model__parser_8h.html" title=" " alt="" coords="1884,102,2007,129"/>
+<area shape="rect" id="node41" href="$csvparser_8h.html" title=" " alt="" coords="80,184,176,211"/>
+<area shape="rect" id="node42" href="$jsonparser_8h.html" title=" " alt="" coords="2371,348,2472,375"/>
+<area shape="rect" id="node45" href="$scoped__timer_8h.html" title=" " alt="" coords="2085,95,2259,136"/>
+<area shape="rect" id="node48" title=" " alt="" coords="2283,102,2373,129"/>
+<area shape="rect" id="node49" title=" " alt="" coords="2397,102,2489,129"/>
+<area shape="rect" id="node50" title=" " alt="" coords="2513,102,2586,129"/>
+<area shape="rect" id="node3" href="$repository_8h.html" title=" " alt="" coords="719,184,889,211"/>
+<area shape="rect" id="node29" href="$hierarchical__model__types_8h.html" title=" " alt="" coords="1368,259,1515,300"/>
+<area shape="rect" id="node32" href="$riskfactor__adjustment__types_8h.html" title=" " alt="" coords="1872,423,2037,464"/>
+<area shape="rect" id="node38" href="$options_8h.html" title=" " alt="" coords="2272,430,2355,457"/>
+<area shape="rect" id="node4" href="$interfaces_8h.html" title=" " alt="" coords="1392,348,1491,375"/>
+<area shape="rect" id="node11" title=" " alt="" coords="1144,587,1219,613"/>
+<area shape="rect" id="node15" title=" " alt="" coords="877,736,963,763"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1056,587,1120,613"/>
+<area shape="rect" id="node34" href="$modelinput_8h.html" title=" " alt="" coords="1143,430,1251,457"/>
+<area shape="rect" id="node36" href="$disease__definition_8h.html" title=" " alt="" coords="376,266,528,293"/>
+<area shape="rect" id="node37" href="$lms__definition_8h.html" title=" " alt="" coords="150,266,277,293"/>
+<area shape="rect" id="node5" href="$randombit__generator_8h.html" title=" " alt="" coords="1547,430,1717,457"/>
+<area shape="rect" id="node7" href="$HealthGPS_8Core_2api_8h.html" title=" " alt="" coords="951,430,1113,457"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1373,587,1451,613"/>
+<area shape="rect" id="node28" title=" " alt="" coords="2211,587,2261,613"/>
+<area shape="rect" id="node6" title=" " alt="" coords="1525,587,1587,613"/>
+<area shape="rect" id="node8" href="$version_8h.html" title=" " alt="" coords="1761,661,1844,688"/>
+<area shape="rect" id="node10" href="$datastore_8h.html" title=" " alt="" coords="408,512,504,539"/>
+<area shape="rect" id="node12" href="$interval_8h.html" title=" " alt="" coords="414,587,498,613"/>
+<area shape="rect" id="node16" href="$HealthGPS_8Core_2poco_8h.html" title=" " alt="" coords="165,587,230,613"/>
+<area shape="rect" id="node17" href="$visitor_8h.html" title=" " alt="" coords="957,587,1032,613"/>
+<area shape="rect" id="node18" href="$datatable_8h.html" title=" " alt="" coords="1308,512,1404,539"/>
+<area shape="rect" id="node22" href="$column__numeric_8h.html" title=" " alt="" coords="579,512,722,539"/>
+<area shape="rect" id="node23" href="$column__builder_8h.html" title=" " alt="" coords="1479,512,1612,539"/>
+<area shape="rect" id="node24" href="$column__iterator_8h.html" title=" " alt="" coords="747,512,883,539"/>
+<area shape="rect" id="node25" href="$array2d_8h.html" title=" " alt="" coords="1199,512,1283,539"/>
+<area shape="rect" id="node26" href="$univariate__summary_8h.html" title=" " alt="" coords="1009,512,1175,539"/>
+<area shape="rect" id="node27" href="$identifier_8h.html" title=" " alt="" coords="1675,587,1765,613"/>
+<area shape="rect" id="node9" title=" " alt="" coords="1773,736,1832,763"/>
+<area shape="rect" id="node13" href="$forward__type_8h.html" title=" " alt="" coords="1045,661,1165,688"/>
+<area shape="rect" id="node14" href="$string__util_8h.html" title=" " alt="" coords="871,661,969,688"/>
+<area shape="rect" id="node21" title=" " alt="" coords="1923,587,2047,613"/>
+<area shape="rect" id="node30" href="$mapping_8h.html" title=" " alt="" coords="1839,512,1929,539"/>
+<area shape="rect" id="node31" href="$gender__value_8h.html" title=" " alt="" coords="405,348,528,375"/>
+<area shape="rect" id="node33" href="$map2d_8h.html" title=" " alt="" coords="2197,512,2275,539"/>
+<area shape="rect" id="node35" href="$settings_8h.html" title=" " alt="" coords="195,512,282,539"/>
+<area shape="rect" id="node39" href="$HealthGPS_8Console_2poco_8h.html" title=" " alt="" coords="2055,512,2121,539"/>
+<area shape="rect" id="node40" title=" " alt="" coords="2351,512,2441,539"/>
+<area shape="rect" id="node43" href="$riskmodel_8h.html" title=" " alt="" coords="2516,512,2615,539"/>
+<area shape="rect" id="node44" title=" " alt="" coords="2567,430,2713,457"/>
+<area shape="rect" id="node46" title=" " alt="" coords="2111,184,2177,211"/>
+<area shape="rect" id="node47" title=" " alt="" coords="2201,184,2281,211"/>
 </map>

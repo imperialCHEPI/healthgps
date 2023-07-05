@@ -6,7 +6,6 @@ var interfaces_8h =
     [ "RiskFactorHostModule", "classhgps_1_1RiskFactorHostModule.html", "classhgps_1_1RiskFactorHostModule" ],
     [ "DemographicModule", "classhgps_1_1DemographicModule.html", "classhgps_1_1DemographicModule" ],
     [ "HierarchicalLinearModel", "classhgps_1_1HierarchicalLinearModel.html", "classhgps_1_1HierarchicalLinearModel" ],
-    [ "RiskFactorModelDefinition", "classhgps_1_1RiskFactorModelDefinition.html", "classhgps_1_1RiskFactorModelDefinition" ],
     [ "DiseaseModel", "classhgps_1_1DiseaseModel.html", "classhgps_1_1DiseaseModel" ],
     [ "case_insensitive_map", "interfaces_8h.html#a97c2a243c9d80d5cbe4f69ccd178695b", null ],
     [ "HierarchicalModelType", "interfaces_8h.html#a16ed54c31953b6b860ee10d7d112eb60", [

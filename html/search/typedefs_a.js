@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parameterlookup_1978',['ParameterLookup',['../namespacehgps.html#a267e5a1d977991b44293c606bcfc81e0',1,'hgps']]]
+  ['netimmigrationmessage_1980',['NetImmigrationMessage',['../namespacehgps.html#ad8d1d0f096437fd372f043aae6d0f1e1',1,'hgps']]]
 ];

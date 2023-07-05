@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classhgps_1_1RiskfactorAdjustmentModel.html" title="Defines the baseline risk factors adjustment model." alt="" coords="5,5,208,47"/>
+<area shape="rect" id="node1" href="$classhgps_1_1Repository.html" title="Define the data repository interface for input datasets and back&#45;end storage." alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1CachedRepository.html" title="Implements the cached data repository for input datasets and back&#45;end storage." alt="" coords="184,5,363,32"/>
 </map>

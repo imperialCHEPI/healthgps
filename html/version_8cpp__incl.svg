@@ -12,8 +12,8 @@
 <g id="node1" class="node">
 <title>Node1</title>
 <g id="a_node1"><a xlink:title=" ">
-<polygon fill="#bfbfbf" stroke="black" points="19.5,-112.5 19.5,-131.5 172.5,-131.5 172.5,-112.5 19.5,-112.5"/>
-<text text-anchor="middle" x="96" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">HealthGPS.Core/version.cpp</text>
+<polygon fill="#bfbfbf" stroke="black" points="31.5,-112.5 31.5,-131.5 184.5,-131.5 184.5,-112.5 31.5,-112.5"/>
+<text text-anchor="middle" x="108" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">HealthGPS.Core/version.cpp</text>
 </a>
 </g>
 </g>
@@ -29,38 +29,38 @@
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
 <title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M85.56,-112.32C75.85,-104.26 61.18,-92.08 49.5,-82.37"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="51.56,-79.53 41.63,-75.83 47.09,-84.92 51.56,-79.53"/>
+<path fill="none" stroke="midnightblue" d="M95.63,-112.32C83.84,-104.06 65.87,-91.45 51.86,-81.63"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="53.54,-78.53 43.34,-75.65 49.52,-84.26 53.54,-78.53"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
 <g id="a_node4"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="80,-56.5 80,-75.5 112,-75.5 112,-56.5 80,-56.5"/>
-<text text-anchor="middle" x="96" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">set</text>
+<polygon fill="none" stroke="#bfbfbf" points="80,-56.5 80,-75.5 136,-75.5 136,-56.5 80,-56.5"/>
+<text text-anchor="middle" x="108" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">sstream</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node4 -->
 <g id="edge3" class="edge">
 <title>Node1&#45;&gt;Node4</title>
-<path fill="none" stroke="midnightblue" d="M96,-112.08C96,-105.01 96,-94.86 96,-85.99"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="99.5,-85.75 96,-75.75 92.5,-85.75 99.5,-85.75"/>
+<path fill="none" stroke="midnightblue" d="M108,-112.08C108,-105.01 108,-94.86 108,-85.99"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="111.5,-85.75 108,-75.75 104.5,-85.75 111.5,-85.75"/>
 </g>
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
 <g id="a_node5"><a xlink:title=" ">
-<polygon fill="none" stroke="#bfbfbf" points="130,-56.5 130,-75.5 186,-75.5 186,-56.5 130,-56.5"/>
-<text text-anchor="middle" x="158" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">sstream</text>
+<polygon fill="none" stroke="#bfbfbf" points="154,-56.5 154,-75.5 186,-75.5 186,-56.5 154,-56.5"/>
+<text text-anchor="middle" x="170" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">set</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node5 -->
 <g id="edge4" class="edge">
 <title>Node1&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M105.96,-112.32C115.13,-104.34 128.94,-92.31 140.03,-82.65"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="142.62,-85.04 147.86,-75.83 138.02,-79.76 142.62,-85.04"/>
+<path fill="none" stroke="midnightblue" d="M117.96,-112.32C127.13,-104.34 140.94,-92.31 152.03,-82.65"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="154.62,-85.04 159.86,-75.83 150.02,-79.76 154.62,-85.04"/>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">

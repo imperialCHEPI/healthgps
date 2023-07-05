@@ -1,5 +1,5 @@
 <map id="hgps::RuntimeContext::population" name="hgps::RuntimeContext::population">
-<area shape="rect" id="node1" title="Gets a reference to the virtual population container." alt="" coords="553,464,720,505"/>
+<area shape="rect" id="node1" title="Gets a reference to the virtual population container." alt="" coords="553,432,720,473"/>
 <area shape="rect" id="node2" href="$classhgps_1_1RiskfactorAdjustmentModel.html#a1cfc148566739100cb533e439fbdd00e" title="Applies the baseline adjustments to the population risk factor values." alt="" coords="286,5,489,47"/>
 <area shape="rect" id="node4" href="$classhgps_1_1StaticHierarchicalLinearModel.html#aed69f3d22a37908a2e350b73f4b3dfd0" title="Generates the initial risk factors for a population and newborns." alt="" coords="299,71,475,127"/>
 <area shape="rect" id="node5" href="$classhgps_1_1HealthGPS.html#a2c23ed4aa847824887750396e4f28637" title="Called when the model is added to the simulation executive." alt="" coords="308,151,467,178"/>
@@ -13,7 +13,6 @@
 <area shape="rect" id="node13" href="$classhgps_1_1SESNoiseModule.html#ad24d0002d518f941159a9873fe918c44" title="Updates the virtual population status." alt="" coords="302,660,473,701"/>
 <area shape="rect" id="node14" href="$classhgps_1_1PopulationModule.html#aee3e42276edae4477f41ca360b090323" title="Updates the virtual population status." alt="" coords="298,725,477,767"/>
 <area shape="rect" id="node15" href="$classhgps_1_1EnergyBalanceHierarchicalModel.html#a3b51c4a34acc3382b17d6c251884e619" title="Update risk factors for population." alt="" coords="269,791,505,832"/>
-<area shape="rect" id="node16" href="$classhgps_1_1EnergyBalanceModel.html#a743f2688d620e2a99efabd6be724c6ec" title="Update risk factors for population." alt="" coords="288,856,487,897"/>
-<area shape="rect" id="node17" href="$classhgps_1_1StaticHierarchicalLinearModel.html#a2501846cb781316081a03317bfabfeca" title="Update risk factors for population." alt="" coords="294,922,481,978"/>
+<area shape="rect" id="node16" href="$classhgps_1_1StaticHierarchicalLinearModel.html#a2501846cb781316081a03317bfabfeca" title="Update risk factors for population." alt="" coords="294,857,481,913"/>
 <area shape="rect" id="node3" href="$classhgps_1_1RiskFactorModule.html#a84146832e73a95c800de619eafceeabc" title="Apply baseline risk factor adjustments to population." alt="" coords="5,5,221,47"/>
 </map>

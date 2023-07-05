@@ -1,5 +1,8 @@
 <map id="hgps::build_risk_factor_module" name="hgps::build_risk_factor_module">
-<area shape="rect" id="node1" title=" " alt="" coords="5,50,175,91"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74" title="Gets the user provided baseline risk factors adjustment dataset." alt="" coords="247,5,413,61"/>
-<area shape="rect" id="node3" href="$classhgps_1_1Repository.html#a092ba56e5003ed476a9f556e9df224bf" title="Gets a user&#45;provided risk factor model definition." alt="" coords="223,86,437,127"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,151,175,193"/>
+<area shape="rect" id="node2" href="$classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74" title="Gets the user provided baseline risk factors adjustment dataset." alt="" coords="249,5,415,61"/>
+<area shape="rect" id="node3" href="$namespacehgps.html#ae9b174775b16879867eaefdd09019019" title="Gets the default production instance builders for full hierarchical regression models." alt="" coords="223,86,441,127"/>
+<area shape="rect" id="node4" href="$namespacehgps.html#ab6f6184e7acdf4d238a0928c66ee9953" title="Gets the default production instance builders for lite hierarchical regression models." alt="" coords="227,151,437,193"/>
+<area shape="rect" id="node5" href="$classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48" title="Gets the user provided hierarchical linear model definition." alt="" coords="241,217,423,258"/>
+<area shape="rect" id="node6" href="$classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39" title="Gets the user provided lite hierarchical linear model definition." alt="" coords="227,282,437,323"/>
 </map>

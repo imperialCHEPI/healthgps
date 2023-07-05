@@ -1,4 +1,0 @@
-<map id="hgps::EnergyBalanceModelDefinition" name="hgps::EnergyBalanceModelDefinition">
-<area shape="rect" id="node1" title="Defines the energy balance model data type." alt="" coords="21,80,220,121"/>
-<area shape="rect" id="node2" href="$classhgps_1_1RiskFactorModelDefinition.html" title="Risk factor model definition interface." alt="" coords="5,5,236,32"/>
-</map>

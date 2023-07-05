@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="namespacehgps_1_1core.html#a4143873780a689fc6231fde9b8af5532" target="_top" xlink:title="Run a given function asynchronous.">
+<g id="a_node3"><a xlink:href="namespacehgps_1_1core.html#a46c52a5e953821a3c37786635acfd9b5" target="_top" xlink:title="Run a given function asynchronous.">
 <polygon fill="none" stroke="black" points="167,-0.5 167,-19.5 289,-19.5 289,-0.5 167,-0.5"/>
 <text text-anchor="middle" x="228" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::core::run_async</text>
 </a>

@@ -40,17 +40,9 @@ var dir_dab824df37ba02169fac86e6f23b00e7 =
       [ "DiseaseMeasure", "classhgps_1_1DiseaseMeasure.html", "classhgps_1_1DiseaseMeasure" ],
       [ "DiseaseTable", "classhgps_1_1DiseaseTable.html", "classhgps_1_1DiseaseTable" ]
     ] ],
-    [ "energy_balance_hierarchical_model.cpp", "energy__balance__hierarchical__model_8cpp.html", null ],
-    [ "energy_balance_hierarchical_model.h", "energy__balance__hierarchical__model_8h.html", [
-      [ "FactorDynamicEquation", "structhgps_1_1FactorDynamicEquation.html", "structhgps_1_1FactorDynamicEquation" ],
-      [ "AgeGroupGenderEquation", "structhgps_1_1AgeGroupGenderEquation.html", "structhgps_1_1AgeGroupGenderEquation" ],
-      [ "EnergyBalanceHierarchicalModel", "classhgps_1_1EnergyBalanceHierarchicalModel.html", "classhgps_1_1EnergyBalanceHierarchicalModel" ],
-      [ "LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html", "classhgps_1_1LiteHierarchicalModelDefinition" ]
-    ] ],
     [ "energy_balance_model.cpp", "energy__balance__model_8cpp.html", null ],
     [ "energy_balance_model.h", "energy__balance__model_8h.html", [
-      [ "EnergyBalanceModel", "classhgps_1_1EnergyBalanceModel.html", "classhgps_1_1EnergyBalanceModel" ],
-      [ "EnergyBalanceModelDefinition", "classhgps_1_1EnergyBalanceModelDefinition.html", "classhgps_1_1EnergyBalanceModelDefinition" ]
+      [ "EnergyBalanceHierarchicalModel", "classhgps_1_1EnergyBalanceHierarchicalModel.html", "classhgps_1_1EnergyBalanceHierarchicalModel" ]
     ] ],
     [ "error_message.cpp", "error__message_8cpp.html", null ],
     [ "error_message.h", "error__message_8h.html", [
@@ -91,13 +83,19 @@ var dir_dab824df37ba02169fac86e6f23b00e7 =
       [ "HealthGPS", "classhgps_1_1HealthGPS.html", "classhgps_1_1HealthGPS" ]
     ] ],
     [ "hierarchical_model.h", "hierarchical__model_8h.html", null ],
+    [ "hierarchical_model_registry.h", "hierarchical__model__registry_8h.html", "hierarchical__model__registry_8h" ],
     [ "hierarchical_model_static.cpp", "hierarchical__model__static_8cpp.html", null ],
     [ "hierarchical_model_static.h", "hierarchical__model__static_8h.html", [
+      [ "StaticHierarchicalLinearModel", "classhgps_1_1StaticHierarchicalLinearModel.html", "classhgps_1_1StaticHierarchicalLinearModel" ]
+    ] ],
+    [ "hierarchical_model_types.h", "hierarchical__model__types_8h.html", [
       [ "Coefficient", "structhgps_1_1Coefficient.html", "structhgps_1_1Coefficient" ],
       [ "LinearModel", "structhgps_1_1LinearModel.html", "structhgps_1_1LinearModel" ],
       [ "HierarchicalLevel", "structhgps_1_1HierarchicalLevel.html", "structhgps_1_1HierarchicalLevel" ],
-      [ "StaticHierarchicalLinearModel", "classhgps_1_1StaticHierarchicalLinearModel.html", "classhgps_1_1StaticHierarchicalLinearModel" ],
-      [ "HierarchicalLinearModelDefinition", "classhgps_1_1HierarchicalLinearModelDefinition.html", "classhgps_1_1HierarchicalLinearModelDefinition" ]
+      [ "HierarchicalLinearModelDefinition", "classhgps_1_1HierarchicalLinearModelDefinition.html", "classhgps_1_1HierarchicalLinearModelDefinition" ],
+      [ "FactorDynamicEquation", "structhgps_1_1FactorDynamicEquation.html", "structhgps_1_1FactorDynamicEquation" ],
+      [ "AgeGroupGenderEquation", "structhgps_1_1AgeGroupGenderEquation.html", "structhgps_1_1AgeGroupGenderEquation" ],
+      [ "LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html", "classhgps_1_1LiteHierarchicalModelDefinition" ]
     ] ],
     [ "info_message.cpp", "info__message_8cpp.html", "info__message_8cpp" ],
     [ "info_message.h", "info__message_8h.html", "info__message_8h" ],

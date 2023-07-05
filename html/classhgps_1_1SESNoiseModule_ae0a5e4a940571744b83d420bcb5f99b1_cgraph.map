@@ -1,6 +1,6 @@
 <map id="hgps::SESNoiseModule::initialise_population" name="hgps::SESNoiseModule::initialise_population">
-<area shape="rect" id="node1" title="Initialises the virtual population." alt="" coords="5,71,176,112"/>
-<area shape="rect" id="node2" href="$classhgps_1_1Random.html#a9c026da3d83e79853e86b97381a6f772" title="Generates the next random number from a standard normal distribution." alt="" coords="231,5,383,47"/>
-<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="224,71,391,112"/>
-<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3" title="Gets a reference to the engine random number generator." alt="" coords="224,136,391,177"/>
+<area shape="rect" id="node1" title="Initialises the virtual population." alt="" coords="5,95,176,136"/>
+<area shape="rect" id="node2" href="$classhgps_1_1Random.html#a9c026da3d83e79853e86b97381a6f772" title="Generates the next random number from a standard normal distribution." alt="" coords="231,29,383,71"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="224,95,391,136"/>
+<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a437e1ab725b8f8ab71eb04222173eda3" title="Gets a reference to the engine random number generator." alt="" coords="224,160,391,201"/>
 </map>

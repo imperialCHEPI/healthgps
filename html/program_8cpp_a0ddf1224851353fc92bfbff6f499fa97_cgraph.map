@@ -1,52 +1,52 @@
 <map id="main" name="main">
-<area shape="rect" id="node1" title="Health&#45;GPS host application entry point." alt="" coords="5,994,60,1021"/>
-<area shape="rect" id="node2" href="$namespacehost.html#ac879cb2a1396ff08368fa3e144d91523" title="Creates the baseline simulation engine instance." alt="" coords="133,5,294,47"/>
-<area shape="rect" id="node4" href="$namespacehost.html#afabde855725160143379c1dfbfeda48a" title="Creates the intervention simulation engine instance." alt="" coords="121,511,306,552"/>
-<area shape="rect" id="node8" href="$namespacehost.html#a582511be039f0908f942b738900378bb" title=" " alt="" coords="140,269,287,311"/>
-<area shape="rect" id="node12" href="$namespacehost.html#a137d2ec61b9bbd9551181fd63315107b" title="Creates the command&#45;line interface (CLI) options." alt="" coords="136,1019,291,1046"/>
-<area shape="rect" id="node13" href="$namespacehost.html#a07367da68854f50923957b8f86a7bc4c" title="Creates the simulation results file logger instance." alt="" coords="387,123,537,164"/>
-<area shape="rect" id="node17" href="$program_8cpp.html#a9f102f55bc6fac1b9624a0b1dd5ed75b" title="Prints application exit message." alt="" coords="150,1070,277,1097"/>
-<area shape="rect" id="node19" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,1365,319,1407"/>
-<area shape="rect" id="node28" href="$namespacehost.html#a7f97a3006678c2e01ad9ebd10c11fe60" title="Gets the collection of diseases that matches the selected input list." alt="" coords="126,1431,301,1458"/>
-<area shape="rect" id="node31" href="$namespacehost.html#af79a5d1675d5305364c34cc2f44541e7" title="Loads the input configuration file, *.json, information." alt="" coords="627,39,806,66"/>
-<area shape="rect" id="node34" href="$namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa" title="Populates a datatable with the input data file contents." alt="" coords="385,673,539,715"/>
-<area shape="rect" id="node41" href="$namespacehost.html#a8b37d0d8186afa10f3be23b3e2212fea" title="Parses the command&#45;line interface (CLI) arguments." alt="" coords="128,1482,299,1509"/>
-<area shape="rect" id="node42" href="$namespacehost.html#a12058357ad619fbbc8a83c94ac848675" title="Prints application start&#45;up messages." alt="" coords="137,1121,289,1147"/>
-<area shape="rect" id="node43" href="$namespacehost.html#af872a17121b8dc250c7397fb6af921cf" title="Registers a risk factor model definition with the repository." alt="" coords="367,1055,557,1096"/>
-<area shape="rect" id="node50" href="$namespacehgps_1_1core.html#a4143873780a689fc6231fde9b8af5532" title="Run a given function asynchronous." alt="" coords="132,1533,295,1559"/>
-<area shape="rect" id="node3" href="$namespacehost.html#a0076db9c85f9ef0fa83668b793c65001" title="Creates the baseline scenario instance." alt="" coords="381,5,543,47"/>
-<area shape="rect" id="node5" href="$namespacehost.html#a4552f895418d563b0dac59718d48b4d8" title="Creates the intervention scenario instance." alt="" coords="369,360,555,401"/>
-<area shape="rect" id="node6" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="876,360,1081,401"/>
-<area shape="rect" id="node7" href="$namespacehgps.html#adf9e6a1bb7098d2f9a2fd6c49d575fe1" title=" " alt="" coords="647,360,786,401"/>
-<area shape="rect" id="node9" href="$namespacehost.html#a5e2e0a1a89f429fc1ccff6b778805017" title="Creates the experiment random number generator seed." alt="" coords="380,189,544,215"/>
-<area shape="rect" id="node11" href="$classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574" title="Gets the factor name." alt="" coords="387,240,537,281"/>
-<area shape="rect" id="node10" href="$classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" title="Advances the engine&#39;s state by a specified amount." alt="" coords="613,207,820,234"/>
-<area shape="rect" id="node14" href="$namespacehost.html#a009475c30ce55d73b02a78b212742e39" title="Creates the full output file name from user input configuration." alt="" coords="643,91,791,132"/>
-<area shape="rect" id="node16" href="$classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" title="Gets the user custom seed to initialise the pseudo&#45;number generator." alt="" coords="630,157,803,183"/>
-<area shape="rect" id="node15" href="$namespacehost.html#a28bd43468b642f3cd557816c6d10de4a" title="Expand environment variables in path to respective values." alt="" coords="881,91,1077,132"/>
-<area shape="rect" id="node18" href="$namespacehost.html#aa8bb9c9e48b85a5423caf60b7dd1af2f" title="Get a string representation of current system time." alt="" coords="375,1121,549,1147"/>
-<area shape="rect" id="node20" href="$namespacehgps.html#a00f39dc81f9c78a17b520811df508289" title="Builds a new instance of the AnalysisModule using the given data infrastructure." alt="" coords="385,1431,539,1472"/>
-<area shape="rect" id="node24" href="$namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" title="Builds a new instance of the DiseaseModule using the given data infrastructure." alt="" coords="387,1365,537,1407"/>
-<area shape="rect" id="node25" href="$namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" title="Builds a new instance of the PopulationModule using the given data infrastructure." alt="" coords="377,1496,547,1537"/>
-<area shape="rect" id="node26" href="$namespacehgps.html#ae0fac74fbde1e5a2c58bf7ce7f866f80" title=" " alt="" coords="377,1561,547,1603"/>
-<area shape="rect" id="node27" href="$namespacehgps.html#a5e12849e2055f3e1f5ffdaf234380e16" title=" " alt="" coords="380,1300,544,1341"/>
-<area shape="rect" id="node21" href="$classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" title="The experiment population age range constraint." alt="" coords="643,1431,790,1472"/>
-<area shape="rect" id="node22" href="$classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" title="Gets the experiment target country information." alt="" coords="631,1562,802,1589"/>
-<area shape="rect" id="node23" href="$classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f" title="Gets the Burden of Diseases (BoD) analysis dataset for a country." alt="" coords="632,1496,801,1537"/>
-<area shape="rect" id="node29" href="$classhgps_1_1core_1_1Datastore.html#a3e9c261f4185d034ba4398e0e0d6ac8c" title="Gets a single disease information by identifier." alt="" coords="381,1692,543,1733"/>
-<area shape="rect" id="node30" href="$classhgps_1_1core_1_1Datastore.html#afb377ccc2f5b2f34aa4709ca984c1bc9" title="Gets the collection of diseases information in the store." alt="" coords="381,1627,543,1668"/>
-<area shape="rect" id="node32" href="$namespacehost.html#a2b29c1e8ddef45a7b1da28c9baef1b56" title="Creates the configuration output folder for result files." alt="" coords="905,25,1053,67"/>
-<area shape="rect" id="node33" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="902,855,1055,882"/>
-<area shape="rect" id="node35" href="$classhgps_1_1core_1_1DataTable.html#ae022bf3052be4728cce521ca87a54865" title="Adds a new column to the table." alt="" coords="619,805,814,831"/>
-<area shape="rect" id="node36" href="$classhgps_1_1core_1_1PrimitiveDataTableColumnBuilder.html#a1f9ff5d8eef6a17c0f6b7c92a519872e" title="Builds the column with current data." alt="" coords="621,608,813,649"/>
-<area shape="rect" id="node37" href="$namespacehost_1_1detail.html#a918cca25f7d11e0008f7aa8e428c5b8c" title=" " alt="" coords="647,673,786,715"/>
-<area shape="rect" id="node38" href="$namespacehost_1_1detail.html#a2ecb10006bc4e39991b2029cd8e188a9" title=" " alt="" coords="647,739,786,780"/>
-<area shape="rect" id="node39" href="$namespacehost_1_1detail.html#a37790aeb69b717077251401e27f63273" title=" " alt="" coords="647,425,786,467"/>
-<area shape="rect" id="node40" href="$namespacehost_1_1detail.html#a175fabf9aa46f5c7d47f52a6d5cd2505" title=" " alt="" coords="647,491,786,532"/>
-<area shape="rect" id="node44" href="$namespacehost.html#a4b5ca710f860350ad9e1d5b97fd7709c" title="Loads baseline adjustments information from a file." alt="" coords="643,957,791,999"/>
-<area shape="rect" id="node45" href="$namespacehost.html#a7eec8ba4859ddfc96413217e3939b0c2" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="632,1023,801,1064"/>
-<area shape="rect" id="node46" href="$namespacehost.html#ac903f23faea1e73e5c28aecc3807e180" title="Loads the new energy balance model definition from a JSON file." alt="" coords="627,1088,807,1129"/>
-<area shape="rect" id="node47" href="$namespacehost.html#aa5c14c76fdc8d41e26a1c5ee5f86f4ab" title="Loads the full hierarchical linear regression model definition from a JSON file." alt="" coords="637,1153,797,1195"/>
-<area shape="rect" id="node48" href="$classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" title="Register a user provided baseline risk factors adjustments dataset." alt="" coords="605,1270,828,1326"/>
-<area shape="rect" id="node49" href="$classhgps_1_1CachedRepository.html#a5e374c0c1161939e26eac27a09be37e1" title="Register a user provided risk factor model definition." alt="" coords="627,1350,806,1406"/>
+<area shape="rect" id="node1" title="Health&#45;GPS host application entry point." alt="" coords="5,935,60,962"/>
+<area shape="rect" id="node2" href="$namespacehost.html#ac879cb2a1396ff08368fa3e144d91523" title="Creates the baseline simulation engine instance." alt="" coords="133,31,294,72"/>
+<area shape="rect" id="node4" href="$namespacehost.html#afabde855725160143379c1dfbfeda48a" title="Creates the intervention simulation engine instance." alt="" coords="121,275,306,316"/>
+<area shape="rect" id="node8" href="$namespacehost.html#a582511be039f0908f942b738900378bb" title=" " alt="" coords="140,367,287,408"/>
+<area shape="rect" id="node12" href="$namespacehost.html#a137d2ec61b9bbd9551181fd63315107b" title="Creates the command&#45;line interface (CLI) options." alt="" coords="136,961,291,987"/>
+<area shape="rect" id="node13" href="$namespacehost.html#a07367da68854f50923957b8f86a7bc4c" title="Creates the simulation results file logger instance." alt="" coords="387,85,537,127"/>
+<area shape="rect" id="node17" href="$program_8cpp.html#a9f102f55bc6fac1b9624a0b1dd5ed75b" title="Prints application exit message." alt="" coords="150,1011,277,1038"/>
+<area shape="rect" id="node19" href="$namespacehgps.html#aef8e3dcb57d8eabeb75baa00c53f6b98" title="Create the default simulation modules factory for production usage." alt="" coords="108,1223,319,1264"/>
+<area shape="rect" id="node28" href="$namespacehost.html#a7f97a3006678c2e01ad9ebd10c11fe60" title="Gets the collection of diseases that matches the selected input list." alt="" coords="126,1289,301,1315"/>
+<area shape="rect" id="node31" href="$namespacehost.html#af79a5d1675d5305364c34cc2f44541e7" title="Loads the input configuration file, *.json, information." alt="" coords="627,122,806,149"/>
+<area shape="rect" id="node34" href="$namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa" title="Populates a datatable with the input data file contents." alt="" coords="385,640,539,681"/>
+<area shape="rect" id="node41" href="$namespacehost.html#a8b37d0d8186afa10f3be23b3e2212fea" title="Parses the command&#45;line interface (CLI) arguments." alt="" coords="128,1339,299,1366"/>
+<area shape="rect" id="node42" href="$namespacehost.html#a12058357ad619fbbc8a83c94ac848675" title="Prints application start&#45;up messages." alt="" coords="137,1062,289,1089"/>
+<area shape="rect" id="node43" href="$namespacehost.html#af872a17121b8dc250c7397fb6af921cf" title="Registers a risk factor model definition with the repository." alt="" coords="367,996,557,1037"/>
+<area shape="rect" id="node50" href="$namespacehgps_1_1core.html#a46c52a5e953821a3c37786635acfd9b5" title="Run a given function asynchronous." alt="" coords="132,1390,295,1417"/>
+<area shape="rect" id="node3" href="$namespacehost.html#a0076db9c85f9ef0fa83668b793c65001" title="Creates the baseline scenario instance." alt="" coords="381,20,543,61"/>
+<area shape="rect" id="node5" href="$namespacehost.html#a4552f895418d563b0dac59718d48b4d8" title="Creates the intervention scenario instance." alt="" coords="369,224,555,265"/>
+<area shape="rect" id="node6" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="876,333,1081,375"/>
+<area shape="rect" id="node7" href="$namespacehgps.html#adf9e6a1bb7098d2f9a2fd6c49d575fe1" title=" " alt="" coords="647,173,786,215"/>
+<area shape="rect" id="node9" href="$namespacehost.html#a5e2e0a1a89f429fc1ccff6b778805017" title="Creates the experiment random number generator seed." alt="" coords="380,290,544,317"/>
+<area shape="rect" id="node11" href="$classhgps_1_1MappingEntry.html#a6ff2875b44ef1295f6a9171b76e2f574" title="Gets the factor name." alt="" coords="387,392,537,433"/>
+<area shape="rect" id="node10" href="$classhgps_1_1MTRandom32.html#acde91ac098b35fc0ab4f1f5c764b074d" title="Advances the engine&#39;s state by a specified amount." alt="" coords="613,290,820,317"/>
+<area shape="rect" id="node14" href="$namespacehost.html#a009475c30ce55d73b02a78b212742e39" title="Creates the full output file name from user input configuration." alt="" coords="643,5,791,47"/>
+<area shape="rect" id="node16" href="$classhgps_1_1ModelInput.html#a5035a15c52467ce060d8f4d5ed21116b" title="Gets the user custom seed to initialise the pseudo&#45;number generator." alt="" coords="630,71,803,98"/>
+<area shape="rect" id="node15" href="$namespacehost.html#a28bd43468b642f3cd557816c6d10de4a" title="Expand environment variables in path to respective values." alt="" coords="881,28,1077,69"/>
+<area shape="rect" id="node18" href="$namespacehost.html#aa8bb9c9e48b85a5423caf60b7dd1af2f" title="Get a string representation of current system time." alt="" coords="375,1062,549,1089"/>
+<area shape="rect" id="node20" href="$namespacehgps.html#a00f39dc81f9c78a17b520811df508289" title="Builds a new instance of the AnalysisModule using the given data infrastructure." alt="" coords="385,1353,539,1395"/>
+<area shape="rect" id="node24" href="$namespacehgps.html#a1dfc6cbd78a8f76582f05e63bcd8d3a6" title="Builds a new instance of the DiseaseModule using the given data infrastructure." alt="" coords="387,1419,537,1460"/>
+<area shape="rect" id="node25" href="$namespacehgps.html#ad7d042f1937872f2f8b344915584a7a9" title="Builds a new instance of the PopulationModule using the given data infrastructure." alt="" coords="377,1157,547,1199"/>
+<area shape="rect" id="node26" href="$namespacehgps.html#ae0fac74fbde1e5a2c58bf7ce7f866f80" title=" " alt="" coords="377,1223,547,1264"/>
+<area shape="rect" id="node27" href="$namespacehgps.html#a5e12849e2055f3e1f5ffdaf234380e16" title=" " alt="" coords="380,1288,544,1329"/>
+<area shape="rect" id="node21" href="$classhgps_1_1Settings.html#a317e5711c6337e4ed6644edf7849988e" title="The experiment population age range constraint." alt="" coords="643,1477,790,1519"/>
+<area shape="rect" id="node22" href="$classhgps_1_1Settings.html#a4538c7a82ccecddb077b8283bb7735f7" title="Gets the experiment target country information." alt="" coords="631,1361,802,1387"/>
+<area shape="rect" id="node23" href="$classhgps_1_1core_1_1Datastore.html#ac22a342da438569f5b97c5c0540e628f" title="Gets the Burden of Diseases (BoD) analysis dataset for a country." alt="" coords="632,1412,801,1453"/>
+<area shape="rect" id="node29" href="$classhgps_1_1core_1_1Datastore.html#a3e9c261f4185d034ba4398e0e0d6ac8c" title="Gets a single disease information by identifier." alt="" coords="381,1484,543,1525"/>
+<area shape="rect" id="node30" href="$classhgps_1_1core_1_1Datastore.html#afb377ccc2f5b2f34aa4709ca984c1bc9" title="Gets the collection of diseases information in the store." alt="" coords="381,1549,543,1591"/>
+<area shape="rect" id="node32" href="$namespacehost.html#a2b29c1e8ddef45a7b1da28c9baef1b56" title="Creates the configuration output folder for result files." alt="" coords="905,115,1053,156"/>
+<area shape="rect" id="node33" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="902,862,1055,889"/>
+<area shape="rect" id="node35" href="$classhgps_1_1core_1_1DataTable.html#ae022bf3052be4728cce521ca87a54865" title="Adds a new column to the table." alt="" coords="619,887,814,914"/>
+<area shape="rect" id="node36" href="$classhgps_1_1core_1_1PrimitiveDataTableColumnBuilder.html#a1f9ff5d8eef6a17c0f6b7c92a519872e" title="Builds the column with current data." alt="" coords="621,509,813,551"/>
+<area shape="rect" id="node37" href="$namespacehost_1_1detail.html#a918cca25f7d11e0008f7aa8e428c5b8c" title=" " alt="" coords="647,575,786,616"/>
+<area shape="rect" id="node38" href="$namespacehost_1_1detail.html#a2ecb10006bc4e39991b2029cd8e188a9" title=" " alt="" coords="647,640,786,681"/>
+<area shape="rect" id="node39" href="$namespacehost_1_1detail.html#a37790aeb69b717077251401e27f63273" title=" " alt="" coords="647,705,786,747"/>
+<area shape="rect" id="node40" href="$namespacehost_1_1detail.html#a175fabf9aa46f5c7d47f52a6d5cd2505" title=" " alt="" coords="647,392,786,433"/>
+<area shape="rect" id="node44" href="$namespacehost.html#a4b5ca710f860350ad9e1d5b97fd7709c" title="Loads baseline adjustments information from a file." alt="" coords="643,771,791,812"/>
+<area shape="rect" id="node45" href="$namespacehost.html#a863b7fcd46376d19914cb6635cd20764" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="642,1295,791,1336"/>
+<area shape="rect" id="node46" href="$namespacehost.html#ad40efaaa78e97a0fdf3b2bce14d5aca8" title="Loads the full hierarchical linear regression model definition from a JSON file." alt="" coords="637,1229,797,1271"/>
+<area shape="rect" id="node47" href="$classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" title="Register a user provided baseline risk factors adjustments dataset." alt="" coords="605,989,828,1045"/>
+<area shape="rect" id="node48" href="$classhgps_1_1CachedRepository.html#a1dfd738feecb0a9ffc366f462155fd82" title="Register a user provided full hierarchical linear model definition." alt="" coords="627,1069,806,1125"/>
+<area shape="rect" id="node49" href="$classhgps_1_1CachedRepository.html#a1424cbd34a6f00fdb9e4237495e18b18" title="Register a user provided lite hierarchical linear model definition." alt="" coords="627,1149,806,1205"/>
 </map>

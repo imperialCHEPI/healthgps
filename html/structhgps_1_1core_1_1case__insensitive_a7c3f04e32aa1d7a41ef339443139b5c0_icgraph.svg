@@ -196,17 +196,17 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="namespacehost.html#a7eec8ba4859ddfc96413217e3939b0c2" target="_top" xlink:title="Loads the lite hierarchical linear regression model definition from a JSON file.">
-<polygon fill="none" stroke="black" points="269,-213.5 269,-243.5 396,-243.5 396,-213.5 269,-213.5"/>
-<text text-anchor="start" x="277" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">host::load_dynamic</text>
-<text text-anchor="middle" x="332.5" y="-220.5" font-family="Helvetica,sans-Serif" font-size="10.00">_risk_model_definition</text>
+<g id="a_node16"><a xlink:href="namespacehost.html#a863b7fcd46376d19914cb6635cd20764" target="_top" xlink:title="Loads the lite hierarchical linear regression model definition from a JSON file.">
+<polygon fill="none" stroke="black" points="276.5,-213.5 276.5,-243.5 388.5,-243.5 388.5,-213.5 276.5,-213.5"/>
+<text text-anchor="start" x="284.5" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00">host::load_dynamic</text>
+<text text-anchor="middle" x="332.5" y="-220.5" font-family="Helvetica,sans-Serif" font-size="10.00">_risk_model_info</text>
 </a>
 </g>
 </g>
 <!-- Node1&#45;&gt;Node16 -->
 <g id="edge21" class="edge">
 <title>Node1&#45;&gt;Node16</title>
-<path fill="none" stroke="midnightblue" d="M678.26,-296.07C656.54,-283.11 626.59,-267.2 598,-258.5 531.02,-238.12 450.68,-231.35 396.25,-229.23"/>
+<path fill="none" stroke="midnightblue" d="M678.26,-296.07C656.54,-283.11 626.59,-267.2 598,-258.5 527.81,-237.14 442.96,-230.74 388.62,-228.95"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="676.68,-299.21 687.04,-301.42 680.32,-293.23 676.68,-299.21"/>
 </g>
 <!-- Node17 -->
@@ -349,8 +349,8 @@
 <!-- Node16&#45;&gt;Node12 -->
 <g id="edge22" class="edge">
 <title>Node16&#45;&gt;Node12</title>
-<path fill="none" stroke="midnightblue" d="M258.76,-237.29C246.01,-238.83 232.75,-240.44 220.06,-241.97"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="259.36,-240.75 268.87,-236.07 258.52,-233.8 259.36,-240.75"/>
+<path fill="none" stroke="midnightblue" d="M266.25,-236.39C251.32,-238.19 235.39,-240.12 220.24,-241.95"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="266.89,-239.84 276.4,-235.16 266.05,-232.89 266.89,-239.84"/>
 </g>
 <!-- Node17&#45;&gt;Node2 -->
 <g id="edge24" class="edge">

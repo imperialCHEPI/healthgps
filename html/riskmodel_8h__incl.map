@@ -1,7 +1,7 @@
 <map id="HealthGPS.Console/riskmodel.h" name="HealthGPS.Console/riskmodel.h">
-<area shape="rect" id="node1" title=" " alt="" coords="53,5,281,32"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,80,56,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="80,80,139,107"/>
-<area shape="rect" id="node4" title=" " alt="" coords="163,80,287,107"/>
-<area shape="rect" id="node5" title=" " alt="" coords="311,80,374,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="65,5,293,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,80,64,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="89,80,151,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="175,80,299,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="324,80,375,107"/>
 </map>

@@ -32,9 +32,8 @@ var namespacehost =
     [ "load_baseline_from_csv", "namespacehost.html#ae3e061207e4dd21d8c9e59710356c614", null ],
     [ "load_configuration", "namespacehost.html#af79a5d1675d5305364c34cc2f44541e7", null ],
     [ "load_datatable_from_csv", "namespacehost.html#a186b46487783fb34e9ac1ce3d52778aa", null ],
-    [ "load_dynamic_risk_model_definition", "namespacehost.html#a7eec8ba4859ddfc96413217e3939b0c2", null ],
-    [ "load_newebm_risk_model_definition", "namespacehost.html#ac903f23faea1e73e5c28aecc3807e180", null ],
-    [ "load_static_risk_model_definition", "namespacehost.html#aa5c14c76fdc8d41e26a1c5ee5f86f4ab", null ],
+    [ "load_dynamic_risk_model_info", "namespacehost.html#a863b7fcd46376d19914cb6635cd20764", null ],
+    [ "load_static_risk_model_definition", "namespacehost.html#ad40efaaa78e97a0fdf3b2bce14d5aca8", null ],
     [ "parse_arguments", "namespacehost.html#a8b37d0d8186afa10f3be23b3e2212fea", null ],
     [ "print_app_title", "namespacehost.html#a12058357ad619fbbc8a83c94ac848675", null ],
     [ "register_risk_factor_model_definitions", "namespacehost.html#af872a17121b8dc250c7397fb6af921cf", null ]

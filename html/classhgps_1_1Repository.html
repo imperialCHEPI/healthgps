@@ -100,8 +100,7 @@ $(document).ready(function(){initNavTree('classhgps_1_1Repository.html',''); ini
 <div class="dynheader">
 Inheritance diagram for hgps::Repository:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository__inherit__graph.svg" width="190" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository__inherit__graph.svg" width="190" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -123,9 +122,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acf292f7951f2391e72305f7f1694659b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1core_1_1Datastore.html">core::Datastore</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b">manager</a> () noexcept=0</td></tr>
 <tr class="memdesc:acf292f7951f2391e72305f7f1694659b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a reference to the back-end storage instance.  <a href="classhgps_1_1Repository.html#acf292f7951f2391e72305f7f1694659b">More...</a><br /></td></tr>
 <tr class="separator:acf292f7951f2391e72305f7f1694659b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a092ba56e5003ed476a9f556e9df224bf"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="classhgps_1_1RiskFactorModelDefinition.html">RiskFactorModelDefinition</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a092ba56e5003ed476a9f556e9df224bf">get_risk_factor_model_definition</a> (const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;model_type)=0</td></tr>
-<tr class="memdesc:a092ba56e5003ed476a9f556e9df224bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a user-provided risk factor model definition.  <a href="classhgps_1_1Repository.html#a092ba56e5003ed476a9f556e9df224bf">More...</a><br /></td></tr>
-<tr class="separator:a092ba56e5003ed476a9f556e9df224bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a966ee2b3fe25f392fc0ab670a7c27d48"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html">HierarchicalLinearModelDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48">get_linear_model_definition</a> (const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;model_type)=0</td></tr>
+<tr class="memdesc:a966ee2b3fe25f392fc0ab670a7c27d48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user provided hierarchical linear model definition.  <a href="classhgps_1_1Repository.html#a966ee2b3fe25f392fc0ab670a7c27d48">More...</a><br /></td></tr>
+<tr class="separator:a966ee2b3fe25f392fc0ab670a7c27d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0da5ff4b083b21f55709e410b5f72f39"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html">LiteHierarchicalModelDefinition</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39">get_lite_linear_model_definition</a> (const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;model_type)=0</td></tr>
+<tr class="memdesc:a0da5ff4b083b21f55709e410b5f72f39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user provided lite hierarchical linear model definition.  <a href="classhgps_1_1Repository.html#a0da5ff4b083b21f55709e410b5f72f39">More...</a><br /></td></tr>
+<tr class="separator:a0da5ff4b083b21f55709e410b5f72f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42dfd811aa4396e140a126b50d3e5c74"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structhgps_1_1BaselineAdjustment.html">BaselineAdjustment</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74">get_baseline_adjustment_definition</a> ()=0</td></tr>
 <tr class="memdesc:a42dfd811aa4396e140a126b50d3e5c74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the user provided baseline risk factors adjustment dataset.  <a href="classhgps_1_1Repository.html#a42dfd811aa4396e140a126b50d3e5c74">More...</a><br /></td></tr>
 <tr class="separator:a42dfd811aa4396e140a126b50d3e5c74"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -282,8 +284,7 @@ Public Member Functions</h2></td></tr>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a42dfd811aa4396e140a126b50d3e5c74_icgraph.svg" width="755" height="67"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a42dfd811aa4396e140a126b50d3e5c74_icgraph.svg" width="755" height="67"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -342,8 +343,7 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a128ca9476585aa8ccae799158099a207_icgraph.svg" width="730" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a128ca9476585aa8ccae799158099a207_icgraph.svg" width="730" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -385,8 +385,7 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_ad11b424670ef4e0c3d93e999d86efa58_icgraph.svg" width="730" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_ad11b424670ef4e0c3d93e999d86efa58_icgraph.svg" width="730" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -421,6 +420,90 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="a966ee2b3fe25f392fc0ab670a7c27d48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a966ee2b3fe25f392fc0ab670a7c27d48">&#9670;&nbsp;</a></span>get_linear_model_definition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html">HierarchicalLinearModelDefinition</a>&amp; hgps::Repository::get_linear_model_definition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;&#160;</td>
+          <td class="paramname"><em>model_type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the user provided hierarchical linear model definition. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">model_type</td><td>Hierarchical linear model type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The model definition </dd></dl>
+
+<p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#acc12f117f1e5b571d8b876eb14a2344a">hgps::CachedRepository</a>.</p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a966ee2b3fe25f392fc0ab670a7c27d48_icgraph.svg" width="772" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
+</div>
+</div>
+<a id="a0da5ff4b083b21f55709e410b5f72f39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0da5ff4b083b21f55709e410b5f72f39">&#9670;&nbsp;</a></span>get_lite_linear_model_definition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html">LiteHierarchicalModelDefinition</a>&amp; hgps::Repository::get_lite_linear_model_definition </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;&#160;</td>
+          <td class="paramname"><em>model_type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the user provided lite hierarchical linear model definition. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">model_type</td><td>Hierarchical linear model type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The lite model definition </dd></dl>
+
+<p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a944cc0e80465c1cf038bcf22021deb83">hgps::CachedRepository</a>.</p>
+<div class="dynheader">
+Here is the caller graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a0da5ff4b083b21f55709e410b5f72f39_icgraph.svg" width="800" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+</div>
+
+</div>
+</div>
 <a id="a480bc36a0f3c2ec07daabf862c0b0667"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a480bc36a0f3c2ec07daabf862c0b0667">&#9670;&nbsp;</a></span>get_lms_definition()</h2>
 
@@ -451,51 +534,7 @@ Here is the caller graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a480bc36a0f3c2ec07daabf862c0b0667_icgraph.svg" width="734" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-</div>
-
-</div>
-</div>
-<a id="a092ba56e5003ed476a9f556e9df224bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a092ba56e5003ed476a9f556e9df224bf">&#9670;&nbsp;</a></span>get_risk_factor_model_definition()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::shared_ptr&lt;<a class="el" href="classhgps_1_1RiskFactorModelDefinition.html">RiskFactorModelDefinition</a>&gt; hgps::Repository::get_risk_factor_model_definition </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="namespacehgps.html#a16ed54c31953b6b860ee10d7d112eb60">HierarchicalModelType</a> &amp;&#160;</td>
-          <td class="paramname"><em>model_type</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets a user-provided risk factor model definition. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">model_type</td><td>Static or Dynamic </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The risk factor model definition </dd></dl>
-
-<p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#af181014f5eec27331ef25d2d77b3dacc">hgps::CachedRepository</a>.</p>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a092ba56e5003ed476a9f556e9df224bf_icgraph.svg" width="804" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_a480bc36a0f3c2ec07daabf862c0b0667_icgraph.svg" width="734" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -524,14 +563,14 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Gets a reference to the back-end storage instance. </p>
-<dl class="section return"><dt>Returns</dt><dd>The back-end data storage </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The back-end data storage <br  />
+ </dd></dl>
 
 <p>Implemented in <a class="el" href="classhgps_1_1CachedRepository.html#a43c5848339f059443370b4a0e228dadd">hgps::CachedRepository</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_acf292f7951f2391e72305f7f1694659b_icgraph.svg" width="786" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1Repository_acf292f7951f2391e72305f7f1694659b_icgraph.svg" width="786" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

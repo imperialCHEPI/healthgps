@@ -20,10 +20,10 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="namespacehost.html#a7eec8ba4859ddfc96413217e3939b0c2" target="_top" xlink:title="Loads the lite hierarchical linear regression model definition from a JSON file.">
-<polygon fill="none" stroke="black" points="262.5,-147.5 262.5,-177.5 389.5,-177.5 389.5,-147.5 262.5,-147.5"/>
-<text text-anchor="start" x="270.5" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">host::load_dynamic</text>
-<text text-anchor="middle" x="326" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">_risk_model_definition</text>
+<g id="a_node2"><a xlink:href="namespacehost.html#a863b7fcd46376d19914cb6635cd20764" target="_top" xlink:title="Loads the lite hierarchical linear regression model definition from a JSON file.">
+<polygon fill="none" stroke="black" points="270,-147.5 270,-177.5 382,-177.5 382,-147.5 270,-147.5"/>
+<text text-anchor="start" x="278" y="-165.5" font-family="Helvetica,sans-Serif" font-size="10.00">host::load_dynamic</text>
+<text text-anchor="middle" x="326" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00">_risk_model_info</text>
 </a>
 </g>
 </g>
@@ -94,8 +94,8 @@
 <!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
 <title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M251.82,-162.5C241.38,-162.5 230.66,-162.5 220.27,-162.5"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="252.14,-166 262.14,-162.5 252.14,-159 252.14,-166"/>
+<path fill="none" stroke="midnightblue" d="M259.77,-162.5C246.85,-162.5 233.24,-162.5 220.16,-162.5"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="259.95,-166 269.95,-162.5 259.95,-159 259.95,-166"/>
 </g>
 <!-- Node4 -->
 <g id="node4" class="node">

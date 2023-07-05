@@ -37,7 +37,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="namespacehgps.html#a20153bbb4e880fe305ea55ef8b575739" target="_top" xlink:title="Creates an instance of the gender lookup table for integer rows breakpoints value.">
+<g id="a_node3"><a xlink:href="namespacehgps.html#a21caec02e6321c6a5ea6217d55f713d6" target="_top" xlink:title="Creates an instance of the gender lookup table for integer rows breakpoints value.">
 <polygon fill="none" stroke="black" points="11.5,-0.5 11.5,-30.5 127.5,-30.5 127.5,-0.5 11.5,-0.5"/>
 <text text-anchor="start" x="19.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">hgps::create_integer</text>
 <text text-anchor="middle" x="69.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">_gender_table</text>

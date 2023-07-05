@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classhgps_1_1RelativeRiskLookup.html" title="Defines the relative risk factors lookup data type." alt="" coords="5,5,195,32"/>
+<area shape="rect" id="node1" href="$classhgps_1_1RandomBitGenerator.html" title="Pseudo&#45;random number generator algorithm interface." alt="" coords="5,5,204,32"/>
+<area shape="rect" id="node2" href="$classhgps_1_1MTRandom32.html" title="Mersenne Twister random number generator algorithm." alt="" coords="252,5,403,32"/>
 </map>

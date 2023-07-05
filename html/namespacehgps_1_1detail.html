@@ -108,9 +108,15 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:aa03c668091586913103c4bc334492a57"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehgps_1_1detail.html#aa03c668091586913103c4bc334492a57">DiseaseModelBuilder</a> = std::function&lt; std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt;(<a class="el" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a> &amp;definition, <a class="el" href="classhgps_1_1WeightModel.html">WeightModel</a> &amp;&amp;classifier, const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;age_range)&gt;</td></tr>
-<tr class="memdesc:aa03c668091586913103c4bc334492a57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the disease model builder function signature and required parameters type.  <a href="namespacehgps_1_1detail.html#aa03c668091586913103c4bc334492a57">More...</a><br /></td></tr>
-<tr class="separator:aa03c668091586913103c4bc334492a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad17d1eeaa9b3ed452fe8d951d0ef3474"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehgps_1_1detail.html#ad17d1eeaa9b3ed452fe8d951d0ef3474">DiseaseModelBuilder</a> = std::function&lt; std::shared_ptr&lt; <a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a> &gt;(<a class="el" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a> &amp;definition, <a class="el" href="classhgps_1_1WeightModel.html">WeightModel</a> &amp;&amp;classifier, const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;age_range)&gt;</td></tr>
+<tr class="memdesc:ad17d1eeaa9b3ed452fe8d951d0ef3474"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the disease model builder function signature and required parameters type.  <a href="namespacehgps_1_1detail.html#ad17d1eeaa9b3ed452fe8d951d0ef3474">More...</a><br /></td></tr>
+<tr class="separator:ad17d1eeaa9b3ed452fe8d951d0ef3474"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8460f214815c7385e973fc2600d2cc1"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehgps_1_1detail.html#aa8460f214815c7385e973fc2600d2cc1">HierarchicalModelBuilder</a> = std::function&lt; std::unique_ptr&lt; <a class="el" href="classhgps_1_1HierarchicalLinearModel.html">HierarchicalLinearModel</a> &gt;(<a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html">HierarchicalLinearModelDefinition</a> &amp;definition)&gt;</td></tr>
+<tr class="memdesc:aa8460f214815c7385e973fc2600d2cc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the full hierarchical model builder equation.  <a href="namespacehgps_1_1detail.html#aa8460f214815c7385e973fc2600d2cc1">More...</a><br /></td></tr>
+<tr class="separator:aa8460f214815c7385e973fc2600d2cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5521891ae66502926878b59dca458730"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacehgps_1_1detail.html#a5521891ae66502926878b59dca458730">LiteHierarchicalModelBuilder</a> = std::function&lt; std::unique_ptr&lt; <a class="el" href="classhgps_1_1HierarchicalLinearModel.html">HierarchicalLinearModel</a> &gt;(<a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html">LiteHierarchicalModelDefinition</a> &amp;definition)&gt;</td></tr>
+<tr class="memdesc:a5521891ae66502926878b59dca458730"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the lite hierarchical model builder equation.  <a href="namespacehgps_1_1detail.html#a5521891ae66502926878b59dca458730">More...</a><br /></td></tr>
+<tr class="separator:a5521891ae66502926878b59dca458730"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -124,19 +130,51 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Internal details namespace for private data types and functions. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="aa03c668091586913103c4bc334492a57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa03c668091586913103c4bc334492a57">&#9670;&nbsp;</a></span>DiseaseModelBuilder</h2>
+<a id="ad17d1eeaa9b3ed452fe8d951d0ef3474"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad17d1eeaa9b3ed452fe8d951d0ef3474">&#9670;&nbsp;</a></span>DiseaseModelBuilder</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="namespacehgps_1_1detail.html#aa03c668091586913103c4bc334492a57">hgps::detail::DiseaseModelBuilder</a> = typedef std::function&lt;std::shared_ptr&lt;<a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a>&gt;( <a class="el" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a> &amp;definition, <a class="el" href="classhgps_1_1WeightModel.html">WeightModel</a> &amp;&amp;classifier, const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a> &amp;age_range)&gt;</td>
+          <td class="memname">using <a class="el" href="namespacehgps_1_1detail.html#ad17d1eeaa9b3ed452fe8d951d0ef3474">hgps::detail::DiseaseModelBuilder</a> = typedef std::function&lt;std::shared_ptr&lt;<a class="el" href="classhgps_1_1DiseaseModel.html">DiseaseModel</a>&gt;( <a class="el" href="classhgps_1_1DiseaseDefinition.html">DiseaseDefinition</a>&amp; definition, <a class="el" href="classhgps_1_1WeightModel.html">WeightModel</a>&amp;&amp; classifier, const <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a>&amp; age_range)&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Defines the disease model builder function signature and required parameters type. </p>
+
+</div>
+</div>
+<a id="aa8460f214815c7385e973fc2600d2cc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8460f214815c7385e973fc2600d2cc1">&#9670;&nbsp;</a></span>HierarchicalModelBuilder</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacehgps_1_1detail.html#aa8460f214815c7385e973fc2600d2cc1">hgps::detail::HierarchicalModelBuilder</a> = typedef std::function&lt;std::unique_ptr&lt;<a class="el" href="classhgps_1_1HierarchicalLinearModel.html">HierarchicalLinearModel</a>&gt;( <a class="el" href="classhgps_1_1HierarchicalLinearModelDefinition.html">HierarchicalLinearModelDefinition</a>&amp; definition)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Defines the full hierarchical model builder equation. </p>
+
+</div>
+</div>
+<a id="a5521891ae66502926878b59dca458730"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5521891ae66502926878b59dca458730">&#9670;&nbsp;</a></span>LiteHierarchicalModelBuilder</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespacehgps_1_1detail.html#a5521891ae66502926878b59dca458730">hgps::detail::LiteHierarchicalModelBuilder</a> = typedef std::function&lt;std::unique_ptr&lt;<a class="el" href="classhgps_1_1HierarchicalLinearModel.html">HierarchicalLinearModel</a>&gt;( <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html">LiteHierarchicalModelDefinition</a>&amp; definition)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Defines the lite hierarchical model builder equation. </p>
 
 </div>
 </div>
@@ -164,12 +202,12 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The disease relative risk instance </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The disease relative risk instance <br  />
+ </dd></dl>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespacehgps_1_1detail_a7919ba23ba1ff6b87eada303f679277a_cgraph.svg" width="915" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespacehgps_1_1detail_a7919ba23ba1ff6b87eada303f679277a_cgraph.svg" width="915" height="118"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -194,8 +232,7 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespacehgps_1_1detail_a5d5da02cd2be57e773c1215868cd51e2_icgraph.svg" width="580" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespacehgps_1_1detail_a5d5da02cd2be57e773c1215868cd51e2_icgraph.svg" width="580" height="52"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
