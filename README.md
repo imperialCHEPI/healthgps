@@ -128,21 +128,21 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 
 ### Libraries
 
-| Name  | License |
-|:---   |:---     |
-| [Adevs](https://sourceforge.net/projects/adevs)                            | BSD 3-Clause |
-| [crossguid](https://github.com/graeme-hill/crossguid)                      | MIT          |
-| [cxxopts](https://github.com/jarro2783/cxxopts)                            | MIT          |
-| [fmt](https://github.com/fmtlib/fmt)                                       | MIT          |
-| [nlohmann-json](https://github.com/nlohmann/json)                          | MIT          |
-| [rapidcsv](https://github.com/d99kris/rapidcsv)                            | BSD 3-Clause |
-| *Experimental* ||
-| [arrow](https://github.com/apache/arrow)                                   | Apache-2.0   |
+| Name                                                  | License      |
+|:------------------------------------------------------|:-------------|
+| [Adevs](https://sourceforge.net/projects/adevs)       | BSD 3-Clause |
+| [crossguid](https://github.com/graeme-hill/crossguid) | MIT          |
+| [cxxopts](https://github.com/jarro2783/cxxopts)       | MIT          |
+| [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
+| [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
+| [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
+| *Experimental*                                        |              |
+| [arrow](https://github.com/apache/arrow)              | Apache-2.0   |
 
 ### Tools and Frameworks
 
-| Name  | License |
-|:---   |:---     |
-| [vcpkg](https://github.com/microsoft/vcpkg)          | MIT          |
-| [googletest](https://github.com/google/googletest)   | BSD 3-Clause |
-| [benchmark](https://github.com/google/benchmark)     | Apache-2.0   |
+| Name                                               | License      |
+|:---------------------------------------------------|:-------------|
+| [vcpkg](https://github.com/microsoft/vcpkg)        | MIT          |
+| [googletest](https://github.com/google/googletest) | BSD 3-Clause |
+| [benchmark](https://github.com/google/benchmark)   | Apache-2.0   |
