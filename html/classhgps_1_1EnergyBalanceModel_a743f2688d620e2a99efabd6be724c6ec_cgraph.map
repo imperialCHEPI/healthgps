@@ -1,0 +1,6 @@
+<map id="hgps::EnergyBalanceModel::update_risk_factors" name="hgps::EnergyBalanceModel::update_risk_factors">
+<area shape="rect" id="node1" title="Update risk factors for population." alt="" coords="5,71,204,112"/>
+<area shape="rect" id="node2" href="$classhgps_1_1RuntimeContext.html#a6b4e9897cf7892cafa62def6cb5cdfcf" title="Gets a read&#45;only reference to the hierarchical risk factors mapping." alt="" coords="252,5,419,47"/>
+<area shape="rect" id="node3" href="$classhgps_1_1RuntimeContext.html#a346d7fdd33294a4836c708b1073df653" title="Gets a reference to the virtual population container." alt="" coords="252,71,419,112"/>
+<area shape="rect" id="node4" href="$classhgps_1_1RuntimeContext.html#a5eb9de9f095d934ababb9119d506b781" title="Gets the current simulation time." alt="" coords="252,136,419,177"/>
+</map>

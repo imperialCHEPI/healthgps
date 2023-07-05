@@ -1,8 +1,5 @@
 var NAVTREEINDEX8 =
 {
-"structhgps_1_1core_1_1DiseaseAnalysisEntity.html#abd68cc983f48632759f1e0c740db39d0":[6,0,0,0,2,1],
-"structhgps_1_1core_1_1DiseaseAnalysisEntity.html#af8d40117b1cbfb65ae1703371ac705d6":[6,0,0,0,2,2],
-"structhgps_1_1core_1_1DiseaseEntity.html":[6,0,0,0,18],
 "structhgps_1_1core_1_1DiseaseEntity.html#aa61e1c6ca7fea3a3d494654af4620544":[6,0,0,0,18,0],
 "structhgps_1_1core_1_1DiseaseEntity.html#ab59d0b0bff88a9edb75fe5b70dc6c4dd":[6,0,0,0,18,1],
 "structhgps_1_1core_1_1DiseaseEntity.html#ac780d2c0065083bdcd062c8d239fdacb":[6,0,0,0,18,4],
@@ -211,7 +208,7 @@ var NAVTREEINDEX8 =
 "sync__message_8h.html":[7,0,0,114],
 "sync__message_8h_source.html":[7,0,0,114],
 "thread__util_8h.html":[7,0,2,27],
-"thread__util_8h.html#a46c52a5e953821a3c37786635acfd9b5":[7,0,2,27,2],
+"thread__util_8h.html#a4143873780a689fc6231fde9b8af5532":[7,0,2,27,2],
 "thread__util_8h.html#a7f89b08ae3f9edbb57adaafce8bd9114":[7,0,2,27,0],
 "thread__util_8h.html#a897d3dcceac68fd6af5fc22235df8e19":[7,0,2,27,3],
 "thread__util_8h.html#ae6eacd437c5d1c6764e6c728a12d0de3":[7,0,2,27,1],

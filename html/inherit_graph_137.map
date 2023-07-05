@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structhost_1_1poco_1_1VariableInfo.html" title=" " alt="" coords="5,5,180,32"/>
+<area shape="rect" id="node1" href="$classhost_1_1ResultWriter.html" title="Defines the Health&#45;GPS results message writer interface." alt="" coords="5,5,144,32"/>
+<area shape="rect" id="node2" href="$classhost_1_1ResultFileWriter.html" title="Defines the results message file stream writer class." alt="" coords="192,5,355,32"/>
 </map>

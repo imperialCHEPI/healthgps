@@ -97,9 +97,9 @@ var hierarchy =
     [ "host::poco::HierarchicalLevelInfo", "structhost_1_1poco_1_1HierarchicalLevelInfo.html", null ],
     [ "hgps::HierarchicalLinearModel", "classhgps_1_1HierarchicalLinearModel.html", [
       [ "hgps::EnergyBalanceHierarchicalModel", "classhgps_1_1EnergyBalanceHierarchicalModel.html", null ],
+      [ "hgps::EnergyBalanceModel", "classhgps_1_1EnergyBalanceModel.html", null ],
       [ "hgps::StaticHierarchicalLinearModel", "classhgps_1_1StaticHierarchicalLinearModel.html", null ]
     ] ],
-    [ "hgps::HierarchicalLinearModelDefinition", "classhgps_1_1HierarchicalLinearModelDefinition.html", null ],
     [ "hgps::HierarchicalMapping", "classhgps_1_1HierarchicalMapping.html", null ],
     [ "host::poco::HierarchicalModelInfo", "structhost_1_1poco_1_1HierarchicalModelInfo.html", null ],
     [ "hgps::core::Identifier", "structhgps_1_1core_1_1Identifier.html", null ],
@@ -109,7 +109,6 @@ var hierarchy =
     [ "hgps::LifeTable", "classhgps_1_1LifeTable.html", null ],
     [ "hgps::LinearModel", "structhgps_1_1LinearModel.html", null ],
     [ "host::poco::LinearModelInfo", "structhost_1_1poco_1_1LinearModelInfo.html", null ],
-    [ "hgps::LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html", null ],
     [ "host::poco::LiteHierarchicalModelInfo", "structhost_1_1poco_1_1LiteHierarchicalModelInfo.html", null ],
     [ "hgps::core::LmsDataRow", "structhgps_1_1core_1_1LmsDataRow.html", null ],
     [ "hgps::LmsDefinition", "classhgps_1_1LmsDefinition.html", null ],
@@ -166,6 +165,11 @@ var hierarchy =
     ] ],
     [ "hgps::RiskfactorAdjustmentModel", "classhgps_1_1RiskfactorAdjustmentModel.html", null ],
     [ "host::poco::RiskFactorInfo", "structhost_1_1poco_1_1RiskFactorInfo.html", null ],
+    [ "hgps::RiskFactorModelDefinition", "classhgps_1_1RiskFactorModelDefinition.html", [
+      [ "hgps::EnergyBalanceModelDefinition", "classhgps_1_1EnergyBalanceModelDefinition.html", null ],
+      [ "hgps::HierarchicalLinearModelDefinition", "classhgps_1_1HierarchicalLinearModelDefinition.html", null ],
+      [ "hgps::LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html", null ]
+    ] ],
     [ "hgps::RunInfo", "structhgps_1_1RunInfo.html", null ],
     [ "hgps::RuntimeContext", "classhgps_1_1RuntimeContext.html", null ],
     [ "hgps::RuntimeMetric", "classhgps_1_1RuntimeMetric.html", null ],

@@ -1,8 +1,5 @@
 var classhgps_1_1LiteHierarchicalModelDefinition =
 [
-    [ "LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html#a8f5c9855c2477e25559395e2fadcc03d", null ],
-    [ "LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html#adb8b25a47cf37b3319220fd7b77e5e82", null ],
-    [ "at", "classhgps_1_1LiteHierarchicalModelDefinition.html#a1e0422017ba2e5e4d4f44841dda881fd", null ],
-    [ "boundary_percentage", "classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173", null ],
-    [ "variables", "classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192", null ]
+    [ "LiteHierarchicalModelDefinition", "classhgps_1_1LiteHierarchicalModelDefinition.html#a82f2d287537ff21aad3bfb3733c766e4", null ],
+    [ "create_model", "classhgps_1_1LiteHierarchicalModelDefinition.html#afe0890f8b6b7a2ce45cc860dbac7f9cf", null ]
 ];

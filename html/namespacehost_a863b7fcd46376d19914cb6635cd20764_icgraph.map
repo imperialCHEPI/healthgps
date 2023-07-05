@@ -1,5 +1,0 @@
-<map id="host::load_dynamic_risk_model_info" name="host::load_dynamic_risk_model_info">
-<area shape="rect" id="node1" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="347,5,496,47"/>
-<area shape="rect" id="node2" href="$namespacehost.html#af872a17121b8dc250c7397fb6af921cf" title="Registers a risk factor model definition with the repository." alt="" coords="108,5,299,47"/>
-<area shape="rect" id="node3" href="$program_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97" title="Health&#45;GPS host application entry point." alt="" coords="5,13,60,39"/>
-</map>

@@ -90,70 +90,69 @@ $(document).ready(function(){initNavTree('forward__type_8h_source.html',''); ini
 </div><!--header-->
 <div class="contents">
 <a href="forward__type_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#pragma once</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="preprocessor">#include &lt;type_traits&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160; </div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// forward type declaration</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehgps_1_1core.html">hgps::core</a> {</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3">    9</a></span>&#160;    <span class="keyword">enum class</span> <a class="code" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3">VerboseMode</a> : uint8_t</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    {</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>,</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3a2c7aea4237e25b4f8ee3b0bf77d6fed0">verbose</a></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    };</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">   19</a></span>&#160;    <span class="keyword">enum class</span> <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">Gender</a> : uint8_t {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a">unknown</a>,</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa07cf4f8f5d8b76282917320715dda2ad">male</a>,</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa273b9ae535de53399c86a9b83148a8ed">female</a></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    };</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">   31</a></span>&#160;    <span class="keyword">enum class</span> <a class="code" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">DiseaseGroup</a> : uint8_t {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176a795f3202b17cb6bc3d4b771d8c6c9eaf">other</a>,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <a class="code" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176aa99dca5593185c498b63a5eed917bd4f">cancer</a></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    };</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#a376e918de1b806c7ee2fd2ab0e1f7086">   41</a></span>&#160;    concept <a class="code" href="namespacehgps_1_1core.html#a376e918de1b806c7ee2fd2ab0e1f7086">Numerical</a> = std::is_arithmetic_v&lt;T&gt;;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html">   44</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html">LookupGenderValue</a> {</div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html#a52c401296ea9294d108a7486c1cd3dc2">   46</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html#a52c401296ea9294d108a7486c1cd3dc2">value</a>{};</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html#acf2b83ee4909a0ef220afa9ea77b7244">   49</a></span>&#160;        <span class="keywordtype">double</span> <a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html#acf2b83ee4909a0ef220afa9ea77b7244">male</a>{};</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html#a63766751e11ca849c2145d44a122a69b">   52</a></span>&#160;        <span class="keywordtype">double</span> <a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html#a63766751e11ca849c2145d44a122a69b">female</a>{};</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    };</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">class </span>DataTable;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">class </span>DataTableColumn;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">class </span>StringDataTableColumn;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">class </span>FloatDataTableColumn;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">class </span>DoubleDataTableColumn;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">class </span>IntegerDataTableColumn;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">class </span>DataTableColumnVisitor;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3">    9</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3">VerboseMode</a> : uint8_t {</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>,</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3a2c7aea4237e25b4f8ee3b0bf77d6fed0">verbose</a></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;};</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">   18</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">Gender</a> : uint8_t {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a">unknown</a>,</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa07cf4f8f5d8b76282917320715dda2ad">male</a>,</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa273b9ae535de53399c86a9b83148a8ed">female</a></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;};</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">   30</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">DiseaseGroup</a> : uint8_t {</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176a795f3202b17cb6bc3d4b771d8c6c9eaf">other</a>,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176aa99dca5593185c498b63a5eed917bd4f">cancer</a></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="namespacehgps_1_1core.html#a376e918de1b806c7ee2fd2ab0e1f7086">   40</a></span>&#160;concept <a class="code" href="namespacehgps_1_1core.html#a376e918de1b806c7ee2fd2ab0e1f7086">Numerical</a> = std::is_arithmetic_v&lt;T&gt;;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html">   43</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html">LookupGenderValue</a> {</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html#a52c401296ea9294d108a7486c1cd3dc2">   45</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html#a52c401296ea9294d108a7486c1cd3dc2">value</a>{};</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html#acf2b83ee4909a0ef220afa9ea77b7244">   48</a></span>&#160;    <span class="keywordtype">double</span> <a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html#acf2b83ee4909a0ef220afa9ea77b7244">male</a>{};</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="structhgps_1_1core_1_1LookupGenderValue.html#a63766751e11ca849c2145d44a122a69b">   51</a></span>&#160;    <span class="keywordtype">double</span> <a class="code" href="structhgps_1_1core_1_1LookupGenderValue.html#a63766751e11ca849c2145d44a122a69b">female</a>{};</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;};</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">class </span>DataTable;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">class </span>DataTableColumn;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">class </span>StringDataTableColumn;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">class </span>FloatDataTableColumn;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">class </span>DoubleDataTableColumn;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">class </span>IntegerDataTableColumn;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">class </span>DataTableColumnVisitor;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;} <span class="comment">// namespace hgps::core</span></div>
 <div class="ttc" id="anamespacehgps_1_1core_html"><div class="ttname"><a href="namespacehgps_1_1core.html">hgps::core</a></div><div class="ttdoc">Top-level namespace for Health-GPS Core C++ API.</div><div class="ttdef"><b>Definition:</b> analysis.h:7</div></div>
-<div class="ttc" id="anamespacehgps_1_1core_html_a376e918de1b806c7ee2fd2ab0e1f7086"><div class="ttname"><a href="namespacehgps_1_1core.html#a376e918de1b806c7ee2fd2ab0e1f7086">hgps::core::Numerical</a></div><div class="ttdeci">concept Numerical</div><div class="ttdoc">C++20 concept for numeric columns types.</div><div class="ttdef"><b>Definition:</b> forward_type.h:41</div></div>
-<div class="ttc" id="anamespacehgps_1_1core_html_a408868094d8a2eaf185df41a52acb4e3"><div class="ttname"><a href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3">hgps::core::VerboseMode</a></div><div class="ttdeci">VerboseMode</div><div class="ttdoc">Verbosity mode enumeration.</div><div class="ttdef"><b>Definition:</b> forward_type.h:10</div></div>
+<div class="ttc" id="anamespacehgps_1_1core_html_a376e918de1b806c7ee2fd2ab0e1f7086"><div class="ttname"><a href="namespacehgps_1_1core.html#a376e918de1b806c7ee2fd2ab0e1f7086">hgps::core::Numerical</a></div><div class="ttdeci">concept Numerical</div><div class="ttdoc">C++20 concept for numeric columns types.</div><div class="ttdef"><b>Definition:</b> forward_type.h:40</div></div>
+<div class="ttc" id="anamespacehgps_1_1core_html_a408868094d8a2eaf185df41a52acb4e3"><div class="ttname"><a href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3">hgps::core::VerboseMode</a></div><div class="ttdeci">VerboseMode</div><div class="ttdoc">Verbosity mode enumeration.</div><div class="ttdef"><b>Definition:</b> forward_type.h:9</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_a408868094d8a2eaf185df41a52acb4e3a2c7aea4237e25b4f8ee3b0bf77d6fed0"><div class="ttname"><a href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3a2c7aea4237e25b4f8ee3b0bf77d6fed0">hgps::core::VerboseMode::verbose</a></div><div class="ttdeci">@ verbose</div><div class="ttdoc">Print more information about actions, including warning.</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_a408868094d8a2eaf185df41a52acb4e3a334c4a4c42fdb79d7ebc3e73b517e6f8"><div class="ttname"><a href="namespacehgps_1_1core.html#a408868094d8a2eaf185df41a52acb4e3a334c4a4c42fdb79d7ebc3e73b517e6f8">hgps::core::VerboseMode::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">only report errors</div></div>
-<div class="ttc" id="anamespacehgps_1_1core_html_aa2ade1bd9713197e55b2fb7291bfc176"><div class="ttname"><a href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">hgps::core::DiseaseGroup</a></div><div class="ttdeci">DiseaseGroup</div><div class="ttdoc">Enumerates supported diseases types.</div><div class="ttdef"><b>Definition:</b> forward_type.h:31</div></div>
+<div class="ttc" id="anamespacehgps_1_1core_html_aa2ade1bd9713197e55b2fb7291bfc176"><div class="ttname"><a href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176">hgps::core::DiseaseGroup</a></div><div class="ttdeci">DiseaseGroup</div><div class="ttdoc">Enumerates supported diseases types.</div><div class="ttdef"><b>Definition:</b> forward_type.h:30</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aa2ade1bd9713197e55b2fb7291bfc176a795f3202b17cb6bc3d4b771d8c6c9eaf"><div class="ttname"><a href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176a795f3202b17cb6bc3d4b771d8c6c9eaf">hgps::core::DiseaseGroup::other</a></div><div class="ttdeci">@ other</div><div class="ttdoc">Common diseases excluding cancers.</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aa2ade1bd9713197e55b2fb7291bfc176aa99dca5593185c498b63a5eed917bd4f"><div class="ttname"><a href="namespacehgps_1_1core.html#aa2ade1bd9713197e55b2fb7291bfc176aa99dca5593185c498b63a5eed917bd4f">hgps::core::DiseaseGroup::cancer</a></div><div class="ttdeci">@ cancer</div><div class="ttdoc">Cancer disease.</div></div>
-<div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81a"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">hgps::core::Gender</a></div><div class="ttdeci">Gender</div><div class="ttdoc">Enumerates gender types.</div><div class="ttdef"><b>Definition:</b> forward_type.h:19</div></div>
+<div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81a"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81a">hgps::core::Gender</a></div><div class="ttdeci">Gender</div><div class="ttdoc">Enumerates gender types.</div><div class="ttdef"><b>Definition:</b> forward_type.h:18</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81aa07cf4f8f5d8b76282917320715dda2ad"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa07cf4f8f5d8b76282917320715dda2ad">hgps::core::Gender::male</a></div><div class="ttdeci">@ male</div><div class="ttdoc">Male.</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81aa273b9ae535de53399c86a9b83148a8ed"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aa273b9ae535de53399c86a9b83148a8ed">hgps::core::Gender::female</a></div><div class="ttdeci">@ female</div><div class="ttdoc">Female.</div></div>
 <div class="ttc" id="anamespacehgps_1_1core_html_aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a"><div class="ttname"><a href="namespacehgps_1_1core.html#aad34b94109d2be3ff86bc824d1bfe81aaad921d60486366258809553a3db49a4a">hgps::core::Gender::unknown</a></div><div class="ttdeci">@ unknown</div><div class="ttdoc">Unknown gender.</div></div>
-<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html">hgps::core::LookupGenderValue</a></div><div class="ttdoc">Lookup table entry for gender values.</div><div class="ttdef"><b>Definition:</b> forward_type.h:44</div></div>
-<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html_a52c401296ea9294d108a7486c1cd3dc2"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html#a52c401296ea9294d108a7486c1cd3dc2">hgps::core::LookupGenderValue::value</a></div><div class="ttdeci">int value</div><div class="ttdoc">Lookup value.</div><div class="ttdef"><b>Definition:</b> forward_type.h:46</div></div>
-<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html_a63766751e11ca849c2145d44a122a69b"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html#a63766751e11ca849c2145d44a122a69b">hgps::core::LookupGenderValue::female</a></div><div class="ttdeci">double female</div><div class="ttdoc">The females value.</div><div class="ttdef"><b>Definition:</b> forward_type.h:52</div></div>
-<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html_acf2b83ee4909a0ef220afa9ea77b7244"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html#acf2b83ee4909a0ef220afa9ea77b7244">hgps::core::LookupGenderValue::male</a></div><div class="ttdeci">double male</div><div class="ttdoc">The males value.</div><div class="ttdef"><b>Definition:</b> forward_type.h:49</div></div>
+<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html">hgps::core::LookupGenderValue</a></div><div class="ttdoc">Lookup table entry for gender values.</div><div class="ttdef"><b>Definition:</b> forward_type.h:43</div></div>
+<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html_a52c401296ea9294d108a7486c1cd3dc2"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html#a52c401296ea9294d108a7486c1cd3dc2">hgps::core::LookupGenderValue::value</a></div><div class="ttdeci">int value</div><div class="ttdoc">Lookup value.</div><div class="ttdef"><b>Definition:</b> forward_type.h:45</div></div>
+<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html_a63766751e11ca849c2145d44a122a69b"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html#a63766751e11ca849c2145d44a122a69b">hgps::core::LookupGenderValue::female</a></div><div class="ttdeci">double female</div><div class="ttdoc">The females value.</div><div class="ttdef"><b>Definition:</b> forward_type.h:51</div></div>
+<div class="ttc" id="astructhgps_1_1core_1_1LookupGenderValue_html_acf2b83ee4909a0ef220afa9ea77b7244"><div class="ttname"><a href="structhgps_1_1core_1_1LookupGenderValue.html#acf2b83ee4909a0ef220afa9ea77b7244">hgps::core::LookupGenderValue::male</a></div><div class="ttdeci">double male</div><div class="ttdoc">The males value.</div><div class="ttdef"><b>Definition:</b> forward_type.h:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

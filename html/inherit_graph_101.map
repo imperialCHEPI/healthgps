@@ -1,3 +1,12 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classhgps_1_1RuntimeMetric.html" title="Defines the Simulation run&#45;time metrics container data type." alt="" coords="5,5,163,32"/>
+<area shape="rect" id="node1" href="$classhgps_1_1Scenario.html" title="Health&#45;GPS simulation scenario interface." alt="" coords="5,122,123,149"/>
+<area shape="rect" id="node2" href="$classhgps_1_1BaselineScenario.html" title="Defines the baseline scenario data type." alt="" coords="182,97,355,123"/>
+<area shape="rect" id="node3" href="$classhgps_1_1InterventionScenario.html" title="Health&#45;GPS scripted intervention policy scenario interface." alt="" coords="171,147,367,174"/>
+<area shape="rect" id="node4" href="$classhgps_1_1DynamicInterventionScenario.html" title="Health&#45;GPS dynamic intervention policy scenario interface." alt="" coords="426,5,625,47"/>
+<area shape="rect" id="node6" href="$classhgps_1_1FiscalPolicyScenario.html" title="Implements the fiscal policy intervention scenario." alt="" coords="429,71,622,98"/>
+<area shape="rect" id="node7" href="$classhgps_1_1FoodLabellingScenario.html" title="Implements the food labelling intervention scenario." alt="" coords="422,122,629,149"/>
+<area shape="rect" id="node8" href="$classhgps_1_1MarketingPolicyScenario.html" title="Implements the marketing regulation intervention scenario." alt="" coords="415,173,636,199"/>
+<area shape="rect" id="node9" href="$classhgps_1_1PhysicalActivityScenario.html" title="Implements the physical activity regulation intervention scenario." alt="" coords="415,223,636,250"/>
+<area shape="rect" id="node10" href="$classhgps_1_1SimplePolicyScenario.html" title="Defines the simple development intervention scenario." alt="" coords="425,274,626,301"/>
+<area shape="rect" id="node5" href="$classhgps_1_1MarketingDynamicScenario.html" title="Implements the dynamic marketing regulation intervention scenario." alt="" coords="684,13,924,39"/>
 </map>

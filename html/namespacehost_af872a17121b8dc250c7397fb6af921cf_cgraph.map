@@ -1,13 +1,13 @@
 <map id="host::register_risk_factor_model_definitions" name="host::register_risk_factor_model_definitions">
-<area shape="rect" id="node1" title="Registers a risk factor model definition with the repository." alt="" coords="5,179,196,220"/>
-<area shape="rect" id="node2" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="712,32,917,74"/>
-<area shape="rect" id="node3" href="$namespacehost.html#a4b5ca710f860350ad9e1d5b97fd7709c" title="Loads baseline adjustments information from a file." alt="" coords="281,62,429,103"/>
-<area shape="rect" id="node6" href="$namespacehost.html#a863b7fcd46376d19914cb6635cd20764" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="515,152,664,194"/>
-<area shape="rect" id="node8" href="$namespacehost.html#ad40efaaa78e97a0fdf3b2bce14d5aca8" title="Loads the full hierarchical linear regression model definition from a JSON file." alt="" coords="275,179,435,220"/>
-<area shape="rect" id="node9" href="$classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" title="Register a user provided baseline risk factors adjustments dataset." alt="" coords="244,245,467,301"/>
-<area shape="rect" id="node10" href="$classhgps_1_1CachedRepository.html#a1dfd738feecb0a9ffc366f462155fd82" title="Register a user provided full hierarchical linear model definition." alt="" coords="266,325,445,381"/>
-<area shape="rect" id="node11" href="$classhgps_1_1CachedRepository.html#a1424cbd34a6f00fdb9e4237495e18b18" title="Register a user provided lite hierarchical linear model definition." alt="" coords="266,405,445,461"/>
-<area shape="rect" id="node4" href="$namespacehost.html#ae3e061207e4dd21d8c9e59710356c614" title="Loads the contents of baseline adjustments file into a table." alt="" coords="515,87,663,128"/>
-<area shape="rect" id="node5" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="738,102,891,129"/>
-<area shape="rect" id="node7" href="$namespacehgps_1_1core.html#a0a76cde29c0d40bf22469920121f2745" title="Splits a string into substrings based on specified delimiting characters." alt="" coords="730,160,899,186"/>
+<area shape="rect" id="node1" title="Registers a risk factor model definition with the repository." alt="" coords="5,226,196,268"/>
+<area shape="rect" id="node2" href="$structhgps_1_1core_1_1case__insensitive.html#a7c3f04e32aa1d7a41ef339443139b5c0" title="Compare two case&#45;insensitive ASCII string for equality." alt="" coords="732,44,937,85"/>
+<area shape="rect" id="node3" href="$namespacehost.html#a4b5ca710f860350ad9e1d5b97fd7709c" title="Loads baseline adjustments information from a file." alt="" coords="281,73,429,114"/>
+<area shape="rect" id="node5" href="$namespacehgps_1_1core.html#a502537e3fe210afb2531f156977eb2f6" title="Converts the given ASCII string to lower&#45;case." alt="" coords="758,143,911,170"/>
+<area shape="rect" id="node6" href="$namespacehost.html#a7eec8ba4859ddfc96413217e3939b0c2" title="Loads the lite hierarchical linear regression model definition from a JSON file." alt="" coords="515,138,684,180"/>
+<area shape="rect" id="node8" href="$namespacehost.html#ac903f23faea1e73e5c28aecc3807e180" title="Loads the new energy balance model definition from a JSON file." alt="" coords="265,256,445,297"/>
+<area shape="rect" id="node9" href="$namespacehost.html#aa5c14c76fdc8d41e26a1c5ee5f86f4ab" title="Loads the full hierarchical linear regression model definition from a JSON file." alt="" coords="275,321,435,362"/>
+<area shape="rect" id="node10" href="$classhgps_1_1CachedRepository.html#a72b653923d8e137e0b0cbb81cb940557" title="Register a user provided baseline risk factors adjustments dataset." alt="" coords="244,387,467,443"/>
+<area shape="rect" id="node11" href="$classhgps_1_1CachedRepository.html#a5e374c0c1161939e26eac27a09be37e1" title="Register a user provided risk factor model definition." alt="" coords="266,467,445,523"/>
+<area shape="rect" id="node4" href="$namespacehost.html#ae3e061207e4dd21d8c9e59710356c614" title="Loads the contents of baseline adjustments file into a table." alt="" coords="525,73,673,114"/>
+<area shape="rect" id="node7" href="$namespacehgps_1_1core.html#a0a76cde29c0d40bf22469920121f2745" title="Splits a string into substrings based on specified delimiting characters." alt="" coords="750,194,919,220"/>
 </map>

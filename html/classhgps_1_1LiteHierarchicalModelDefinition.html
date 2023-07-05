@@ -96,72 +96,52 @@ $(document).ready(function(){initNavTree('classhgps_1_1LiteHierarchicalModelDefi
 <p>Defines the lite hierarchical linear model data type.  
  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="hierarchical__model__types_8h_source.html">hierarchical_model_types.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="energy__balance__hierarchical__model_8h_source.html">energy_balance_hierarchical_model.h</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for hgps::LiteHierarchicalModelDefinition:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1LiteHierarchicalModelDefinition__inherit__graph.svg" width="242" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
+Collaboration diagram for hgps::LiteHierarchicalModelDefinition:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="classhgps_1_1LiteHierarchicalModelDefinition__coll__graph.svg" width="242" height="127"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8f5c9855c2477e25559395e2fadcc03d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a8f5c9855c2477e25559395e2fadcc03d">LiteHierarchicalModelDefinition</a> ()=delete</td></tr>
-<tr class="separator:a8f5c9855c2477e25559395e2fadcc03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb8b25a47cf37b3319220fd7b77e5e82"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#adb8b25a47cf37b3319220fd7b77e5e82">LiteHierarchicalModelDefinition</a> (std::map&lt; <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a>, <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &gt; &amp;&amp;equations, std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt; &amp;&amp;<a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192">variables</a>, const double <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173">boundary_percentage</a>=0.05)</td></tr>
-<tr class="memdesc:adb8b25a47cf37b3319220fd7b77e5e82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html" title="Defines the lite hierarchical linear model data type.">LiteHierarchicalModelDefinition</a> class.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#adb8b25a47cf37b3319220fd7b77e5e82">More...</a><br /></td></tr>
-<tr class="separator:adb8b25a47cf37b3319220fd7b77e5e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2bfc2be77000d5ed68aa02b7d0d1192"><td class="memItemLeft" align="right" valign="top">const std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192">variables</a> () const noexcept</td></tr>
-<tr class="memdesc:ad2bfc2be77000d5ed68aa02b7d0d1192"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the model factors' delta variables mapping.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#ad2bfc2be77000d5ed68aa02b7d0d1192">More...</a><br /></td></tr>
-<tr class="separator:ad2bfc2be77000d5ed68aa02b7d0d1192"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e0422017ba2e5e4d4f44841dda881fd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a1e0422017ba2e5e4d4f44841dda881fd">at</a> (const int &amp;age) const</td></tr>
-<tr class="memdesc:a1e0422017ba2e5e4d4f44841dda881fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the linear regression equations for a given age.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#a1e0422017ba2e5e4d4f44841dda881fd">More...</a><br /></td></tr>
-<tr class="separator:a1e0422017ba2e5e4d4f44841dda881fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a5b34bc27829c71deb2e1da073be173"><td class="memItemLeft" align="right" valign="top">const double &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173">boundary_percentage</a> () const</td></tr>
-<tr class="memdesc:a6a5b34bc27829c71deb2e1da073be173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the boundary percentage to sample.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#a6a5b34bc27829c71deb2e1da073be173">More...</a><br /></td></tr>
-<tr class="separator:a6a5b34bc27829c71deb2e1da073be173"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82f2d287537ff21aad3bfb3733c766e4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#a82f2d287537ff21aad3bfb3733c766e4">LiteHierarchicalModelDefinition</a> (std::map&lt; <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a>, <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &gt; equations, std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt; variables, const double boundary_percentage=0.05)</td></tr>
+<tr class="memdesc:a82f2d287537ff21aad3bfb3733c766e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises a new instance of the <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html" title="Defines the lite hierarchical linear model data type.">LiteHierarchicalModelDefinition</a> class.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#a82f2d287537ff21aad3bfb3733c766e4">More...</a><br /></td></tr>
+<tr class="separator:a82f2d287537ff21aad3bfb3733c766e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe0890f8b6b7a2ce45cc860dbac7f9cf"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classhgps_1_1HierarchicalLinearModel.html">HierarchicalLinearModel</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html#afe0890f8b6b7a2ce45cc860dbac7f9cf">create_model</a> () const override</td></tr>
+<tr class="memdesc:afe0890f8b6b7a2ce45cc860dbac7f9cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html" title="Implements the dynamic hierarchical linear model (energy balance) type.">EnergyBalanceHierarchicalModel</a> from this definition.  <a href="classhgps_1_1LiteHierarchicalModelDefinition.html#afe0890f8b6b7a2ce45cc860dbac7f9cf">More...</a><br /></td></tr>
+<tr class="separator:afe0890f8b6b7a2ce45cc860dbac7f9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classhgps_1_1RiskFactorModelDefinition"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classhgps_1_1RiskFactorModelDefinition')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classhgps_1_1RiskFactorModelDefinition.html">hgps::RiskFactorModelDefinition</a></td></tr>
+<tr class="memitem:a8632c5d7caa67d848993281b35d51b66 inherit pub_methods_classhgps_1_1RiskFactorModelDefinition"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classhgps_1_1RiskFactorModelDefinition.html#a8632c5d7caa67d848993281b35d51b66">~RiskFactorModelDefinition</a> ()=default</td></tr>
+<tr class="memdesc:a8632c5d7caa67d848993281b35d51b66 inherit pub_methods_classhgps_1_1RiskFactorModelDefinition"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys a <a class="el" href="classhgps_1_1RiskFactorModelDefinition.html" title="Risk factor model definition interface.">RiskFactorModelDefinition</a> instance.  <a href="classhgps_1_1RiskFactorModelDefinition.html#a8632c5d7caa67d848993281b35d51b66">More...</a><br /></td></tr>
+<tr class="separator:a8632c5d7caa67d848993281b35d51b66 inherit pub_methods_classhgps_1_1RiskFactorModelDefinition"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Defines the lite hierarchical linear model data type. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a8f5c9855c2477e25559395e2fadcc03d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f5c9855c2477e25559395e2fadcc03d">&#9670;&nbsp;</a></span>LiteHierarchicalModelDefinition() <span class="overload">[1/2]</span></h2>
+<a id="a82f2d287537ff21aad3bfb3733c766e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82f2d287537ff21aad3bfb3733c766e4">&#9670;&nbsp;</a></span>LiteHierarchicalModelDefinition()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">hgps::LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="adb8b25a47cf37b3319220fd7b77e5e82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb8b25a47cf37b3319220fd7b77e5e82">&#9670;&nbsp;</a></span>LiteHierarchicalModelDefinition() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">hgps::LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a>, <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramtype">std::map&lt; <a class="el" href="namespacehgps_1_1core.html#a8ab1bfc2be0b48235269c436f17bb549">core::IntegerInterval</a>, <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a> &gt;&#160;</td>
           <td class="paramname"><em>equations</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramtype">std::map&lt; <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> &gt;&#160;</td>
           <td class="paramname"><em>variables</em>, </td>
         </tr>
         <tr>
@@ -176,11 +156,6 @@ Public Member Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Initialises a new instance of the <a class="el" href="classhgps_1_1LiteHierarchicalModelDefinition.html" title="Defines the lite hierarchical linear model data type.">LiteHierarchicalModelDefinition</a> class. </p>
@@ -202,8 +177,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1e0422017ba2e5e4d4f44841dda881fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e0422017ba2e5e4d4f44841dda881fd">&#9670;&nbsp;</a></span>at()</h2>
+<a id="afe0890f8b6b7a2ce45cc860dbac7f9cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe0890f8b6b7a2ce45cc860dbac7f9cf">&#9670;&nbsp;</a></span>create_model()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -212,42 +187,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="structhgps_1_1AgeGroupGenderEquation.html">AgeGroupGenderEquation</a>&amp; hgps::LiteHierarchicalModelDefinition::at </td>
-          <td>(</td>
-          <td class="paramtype">const int &amp;&#160;</td>
-          <td class="paramname"><em>age</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets the linear regression equations for a given age. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">age</td><td>The target age </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The model equations </dd></dl>
-
-</div>
-</div>
-<a id="a6a5b34bc27829c71deb2e1da073be173"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a5b34bc27829c71deb2e1da073be173">&#9670;&nbsp;</a></span>boundary_percentage()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const double&amp; hgps::LiteHierarchicalModelDefinition::boundary_percentage </td>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="classhgps_1_1HierarchicalLinearModel.html">HierarchicalLinearModel</a> &gt; hgps::LiteHierarchicalModelDefinition::create_model </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -255,46 +195,21 @@ Public Member Functions</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Gets the boundary percentage to sample. </p>
-<dl class="section return"><dt>Returns</dt><dd>Boundary percentage value </dd></dl>
+<p>Construct a new <a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html" title="Implements the dynamic hierarchical linear model (energy balance) type.">EnergyBalanceHierarchicalModel</a> from this definition. </p>
+<dl class="section return"><dt>Returns</dt><dd>A unique pointer to the new <a class="el" href="classhgps_1_1EnergyBalanceHierarchicalModel.html" title="Implements the dynamic hierarchical linear model (energy balance) type.">EnergyBalanceHierarchicalModel</a> instance </dd></dl>
+
+<p>Implements <a class="el" href="classhgps_1_1RiskFactorModelDefinition.html#a73c241bf20eb7118249470d9f0565f0f">hgps::RiskFactorModelDefinition</a>.</p>
 
 </div>
 </div>
-<a id="ad2bfc2be77000d5ed68aa02b7d0d1192"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2bfc2be77000d5ed68aa02b7d0d1192">&#9670;&nbsp;</a></span>variables()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::map&lt;<a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>, <a class="el" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a>&gt;&amp; hgps::LiteHierarchicalModelDefinition::variables </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Gets the model factors' delta variables mapping. </p>
-<dl class="section return"><dt>Returns</dt><dd>Delta variables mapping </dd></dl>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li>HealthGPS/<a class="el" href="hierarchical__model__types_8h_source.html">hierarchical_model_types.h</a></li>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>HealthGPS/<a class="el" href="energy__balance__hierarchical__model_8h_source.html">energy_balance_hierarchical_model.h</a></li>
+<li>HealthGPS/<a class="el" href="energy__balance__hierarchical__model_8cpp.html">energy_balance_hierarchical_model.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

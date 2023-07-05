@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="title">Health-GPS Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__home_runner_work_healthgps_healthgps_README"></a> <img src="https://github.com/imperialCHEPI/healthgps/actions/workflows/windows.yml/badge.svg" alt="windows" style="pointer-events: none;" class="inline"/> <img src="https://github.com/imperialCHEPI/healthgps/actions/workflows/linux.yml/badge.svg" alt="Linux" style="pointer-events: none;" class="inline"/> <img src="https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases" alt="GitHub release (latest by date including pre-releases)" class="inline"/> <img src="https://img.shields.io/github/license/imperialCHEPI/healthgps" alt="GitHub" class="inline"/></p>
+<div class="textblock"><p><a class="anchor" id="md__home_runner_work_healthgps_healthgps_README"></a> <a href="https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml"><img src="https://github.com/imperialCHEPI/healthgps/actions/workflows/ci.yml/badge.svg" alt="CI" style="pointer-events: none;" class="inline"/></a> <img src="https://img.shields.io/github/v/release/imperialCHEPI/healthgps?include_prereleases" alt="GitHub release (latest by date including pre-releases)" class="inline"/> <img src="https://img.shields.io/github/license/imperialCHEPI/healthgps" alt="GitHub" class="inline"/></p>
 <h1><a class="anchor" id="autotoc_md0"></a>
 Global Health Policy Simulation model (Health-GPS)</h1>
 <p>| <a href="#quick-start">Quick Start</a> | <a href="#development-tools">Development Tools</a> | <a href="#license">License</a> | <a href="#third-party-components">Third-party Components</a> |</p>
@@ -149,7 +149,7 @@ CMake Build</h3>
 <div class="fragment"><div class="line">cmake --list-presets=all</div>
 <div class="line"> </div>
 <div class="line"># Windows</div>
-<div class="line">cmake --preset=&#39;x64-release&#39;</div>
+<div class="line">cmake --preset=&#39;windows-release&#39;</div>
 <div class="line">cmake --build --preset=&#39;release-build-windows&#39; --target install --config Release</div>
 <div class="line"> </div>
 <div class="line"># Linux</div>
@@ -160,7 +160,7 @@ CMake Build</h3>
 </blockquote>
 <p>The <code>HealthGPS</code> binaries will now be inside the <code>healthgps/out/install/[preset]/bin</code> directory.</p>
 <p>To run the unit tests: </p><div class="fragment"><div class="line"># Windows</div>
-<div class="line">cmake --preset=&#39;x64-debug&#39;</div>
+<div class="line">cmake --preset=&#39;windows-debug&#39;</div>
 <div class="line">cmake --build --preset=&#39;debug-build-windows&#39;</div>
 <div class="line">ctest --preset=&#39;core-test-windows&#39;</div>
 <div class="line"> </div>
@@ -169,12 +169,18 @@ CMake Build</h3>
 <div class="line">cmake --build --preset=&#39;debug-build-linux&#39;</div>
 <div class="line">ctest --preset=&#39;core-test-linux&#39;</div>
 </div><!-- fragment --><p>All available options are defined using CMake <em>presets</em> in the <code>CMakePresets.json</code> file, which also declare <em>build presets</em> to be used via the CMake command line arguments.</p>
-<h1><a class="anchor" id="autotoc_md6"></a>
+<h3><a class="anchor" id="autotoc_md6"></a>
+Optional: Running &lt;tt&gt;pre-commit&lt;/tt&gt; hooks</h3>
+<p>It is recommended that developers install <a href="https://pre-commit.com/"><code>pre-commit</code></a> to make use of <a href="./.pre-commit-config.yaml">the hooks</a> we have installed for this repository. (Note that this step is only for Health-GPS developers, not end users!)</p>
+<p>Once you have <a href="https://pre-commit.com/#installation">installed <code>pre-commit</code></a>, you should install the hooks into your local clone of the Health-GPS repository, like so:</p>
+<div class="fragment"><div class="line">&gt; pre-commit install</div>
+</div><!-- fragment --><p>Now, every time attempt to make a git commit, your changes will be checked against the <code>pre-commit</code> hooks.</p>
+<h1><a class="anchor" id="autotoc_md7"></a>
 License</h1>
 <p>The code in this repository is licensed under the BSD 3-Clause license.</p>
-<h1><a class="anchor" id="autotoc_md7"></a>
+<h1><a class="anchor" id="autotoc_md8"></a>
 Third-party components</h1>
-<h2><a class="anchor" id="autotoc_md8"></a>
+<h2><a class="anchor" id="autotoc_md9"></a>
 Libraries</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -196,7 +202,7 @@ Libraries</h2>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyLeft"><a href="https://github.com/apache/arrow">arrow</a>   </td><td class="markdownTableBodyLeft">Apache-2.0   </td></tr>
 </table>
-<h2><a class="anchor" id="autotoc_md9"></a>
+<h2><a class="anchor" id="autotoc_md10"></a>
 Tools and Frameworks</h2>
 <table class="markdownTable">
 <tr class="markdownTableHead">

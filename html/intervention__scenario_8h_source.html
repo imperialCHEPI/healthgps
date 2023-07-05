@@ -97,117 +97,119 @@ $(document).ready(function(){initNavTree('intervention__scenario_8h_source.html'
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160; </div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacehgps.html">hgps</a> {</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    <span class="keyword">struct </span>PolicyImpact;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keyword">struct </span>PolicyInterval;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    <span class="keyword">struct </span>PolicyDynamic;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="keyword">struct </span>PolicyImpact;</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">struct </span>PolicyInterval;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">struct </span>PolicyDynamic;</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html">   19</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classhgps_1_1InterventionScenario.html">InterventionScenario</a> : <span class="keyword">public</span> <a class="code" href="classhgps_1_1Scenario.html">Scenario</a> {</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#aa02d2fabdc21034fc2873bad00366e31">   23</a></span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="structhgps_1_1PolicyInterval.html">PolicyInterval</a>&amp; <a class="code" href="classhgps_1_1InterventionScenario.html#aa02d2fabdc21034fc2873bad00366e31">active_period</a>()  const noexcept = 0;</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhgps_1_1InterventionScenario.html">InterventionScenario</a> : <span class="keyword">public</span> <a class="code" href="classhgps_1_1Scenario.html">Scenario</a> {</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#aa02d2fabdc21034fc2873bad00366e31">   23</a></span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="structhgps_1_1PolicyInterval.html">PolicyInterval</a> &amp;<a class="code" href="classhgps_1_1InterventionScenario.html#aa02d2fabdc21034fc2873bad00366e31">active_period</a>() const noexcept = 0;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#aa59df4336bee32f314f8ad27a269df11">   27</a></span>&#160;        virtual const <a class="code" href="namespacestd.html">std</a>::vector&lt;<a class="code" href="structhgps_1_1PolicyImpact.html">PolicyImpact</a>&gt;&amp; <a class="code" href="classhgps_1_1InterventionScenario.html#aa59df4336bee32f314f8ad27a269df11">impacts</a>() const noexcept = 0;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#aa59df4336bee32f314f8ad27a269df11">   27</a></span>&#160;    virtual const <a class="code" href="namespacestd.html">std</a>::vector&lt;<a class="code" href="structhgps_1_1PolicyImpact.html">PolicyImpact</a>&gt; &amp;<a class="code" href="classhgps_1_1InterventionScenario.html#aa59df4336bee32f314f8ad27a269df11">impacts</a>() const noexcept = 0;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#a53fde6647ff9dc352a9959ecd4d1c6be">   29</a></span>&#160;        <a class="code" href="namespacehgps.html#ada2628493fd19805edb6367898c6967b">ScenarioType</a> <a class="code" href="classhgps_1_1InterventionScenario.html#a53fde6647ff9dc352a9959ecd4d1c6be">type</a>() const noexcept<span class="keyword"> override </span>{ <span class="keywordflow">return</span> <a class="code" href="namespacehgps.html#ada2628493fd19805edb6367898c6967bafb93f4185aea5b548f0fe812e90678c4">ScenarioType::intervention</a>; }</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#a53fde6647ff9dc352a9959ecd4d1c6be">   29</a></span>&#160;    <a class="code" href="namespacehgps.html#ada2628493fd19805edb6367898c6967b">ScenarioType</a> <a class="code" href="classhgps_1_1InterventionScenario.html#a53fde6647ff9dc352a9959ecd4d1c6be">type</a>() const noexcept<span class="keyword"> override </span>{ <span class="keywordflow">return</span> <a class="code" href="namespacehgps.html#ada2628493fd19805edb6367898c6967bafb93f4185aea5b548f0fe812e90678c4">ScenarioType::intervention</a>; }</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#a7174c570b7d3c4470cb807a98412243f">   31</a></span>&#160;        <span class="keyword">const</span> std::string&amp; <a class="code" href="classhgps_1_1InterventionScenario.html#a7174c570b7d3c4470cb807a98412243f">name</a>() const noexcept<span class="keyword"> override </span>{ <span class="keywordflow">return</span> name_; }</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="classhgps_1_1InterventionScenario.html#a7174c570b7d3c4470cb807a98412243f">   31</a></span>&#160;    <span class="keyword">const</span> std::string &amp;<a class="code" href="classhgps_1_1InterventionScenario.html#a7174c570b7d3c4470cb807a98412243f">name</a>() const noexcept<span class="keyword"> override </span>{ <span class="keywordflow">return</span> name_; }</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        std::string name_{<span class="stringliteral">&quot;Intervention&quot;</span>};</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    };</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    std::string name_{<span class="stringliteral">&quot;Intervention&quot;</span>};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classhgps_1_1DynamicInterventionScenario.html">   41</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classhgps_1_1DynamicInterventionScenario.html">DynamicInterventionScenario</a> : <span class="keyword">public</span> <a class="code" href="classhgps_1_1InterventionScenario.html">InterventionScenario</a> {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classhgps_1_1DynamicInterventionScenario.html#a67edf918764042a9e7e13b8d424c728a">   45</a></span>&#160;        <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="structhgps_1_1PolicyDynamic.html">PolicyDynamic</a>&amp; <a class="code" href="classhgps_1_1DynamicInterventionScenario.html#a67edf918764042a9e7e13b8d424c728a">dynamic</a>()  const noexcept = 0;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    };</div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="classhgps_1_1DynamicInterventionScenario.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classhgps_1_1DynamicInterventionScenario.html">DynamicInterventionScenario</a> : <span class="keyword">public</span> <a class="code" href="classhgps_1_1InterventionScenario.html">InterventionScenario</a> {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="classhgps_1_1DynamicInterventionScenario.html#a67edf918764042a9e7e13b8d424c728a">   45</a></span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="structhgps_1_1PolicyDynamic.html">PolicyDynamic</a> &amp;<a class="code" href="classhgps_1_1DynamicInterventionScenario.html#a67edf918764042a9e7e13b8d424c728a">dynamic</a>() const noexcept = 0;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;};</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html">   49</a></span>&#160;    struct <a class="code" href="structhgps_1_1PolicyImpact.html">PolicyImpact</a> {</div>
-<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a6dc8840580eeda61190a06db51475799">   50</a></span>&#160;        <a class="code" href="structhgps_1_1PolicyImpact.html#a6dc8840580eeda61190a06db51475799">PolicyImpact</a>() = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html">   49</a></span>&#160;struct <a class="code" href="structhgps_1_1PolicyImpact.html">PolicyImpact</a> {</div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a6dc8840580eeda61190a06db51475799">   50</a></span>&#160;    <a class="code" href="structhgps_1_1PolicyImpact.html#a6dc8840580eeda61190a06db51475799">PolicyImpact</a>() = <span class="keyword">delete</span>;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">   58</a></span>&#160;        <a class="code" href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">PolicyImpact</a>(<a class="code" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> risk_factor_key, <span class="keywordtype">double</span> policy_impact, </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;            <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> start_age, std::optional&lt;unsigned int&gt; end_age = std::nullopt)</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            : risk_factor{ <a class="code" href="namespacestd.html">std</a>::move(risk_factor_key) }, value{policy_impact},</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            from_age{ start_age }, to_age{ end_age } {</div>
+<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">   58</a></span>&#160;    <a class="code" href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">PolicyImpact</a>(<a class="code" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> risk_factor_key, <span class="keywordtype">double</span> policy_impact, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> start_age,</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                 std::optional&lt;unsigned int&gt; end_age = std::nullopt)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        : risk_factor{<a class="code" href="namespacestd.html">std</a>::move(risk_factor_key)}, value{policy_impact}, from_age{start_age},</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;          to_age{end_age} {</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            <span class="keywordflow">if</span> (end_age.has_value() &amp;&amp; start_age &gt; end_age.value()) {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Impact end age must be equal or greater than the start age.&quot;</span>);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        }</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <span class="keywordflow">if</span> (end_age.has_value() &amp;&amp; start_age &gt; end_age.value()) {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Impact end age must be equal or greater than the start age.&quot;</span>);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#aff172e759cfadfcd73e48dca63311d86">   69</a></span>&#160;        <a class="code" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> risk_factor{};</div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#aff172e759cfadfcd73e48dca63311d86">   69</a></span>&#160;    <a class="code" href="structhgps_1_1core_1_1Identifier.html">core::Identifier</a> risk_factor{};</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a533887c0e59c5c000eb7c3eabe03cb24">   72</a></span>&#160;        <span class="keywordtype">double</span> value{};</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a533887c0e59c5c000eb7c3eabe03cb24">   72</a></span>&#160;    <span class="keywordtype">double</span> value{};</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a8bbc42599fe0f190af883eac9496b642">   75</a></span>&#160;        <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> from_age{};</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a8bbc42599fe0f190af883eac9496b642">   75</a></span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> from_age{};</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a15d8af80b9c65e849643e4ddb10b6e0f">   78</a></span>&#160;        std::optional&lt;unsigned int&gt; to_age{};</div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a15d8af80b9c65e849643e4ddb10b6e0f">   78</a></span>&#160;    std::optional&lt;unsigned int&gt; to_age{};</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a89b2def3d9b103ff0d547cb4822ad328">   83</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="structhgps_1_1PolicyImpact.html#a89b2def3d9b103ff0d547cb4822ad328">contains</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>&amp; age) <span class="keyword">const</span> noexcept {</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            <span class="keywordflow">if</span> (age &lt; from_age) {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;            }</div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyImpact.html#a89b2def3d9b103ff0d547cb4822ad328">   83</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="structhgps_1_1PolicyImpact.html#a89b2def3d9b103ff0d547cb4822ad328">contains</a>(<span class="keyword">const</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> &amp;age) <span class="keyword">const</span> noexcept {</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">if</span> (age &lt; from_age) {</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        }</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;            <span class="keywordflow">if</span> (to_age.has_value()) {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;                <span class="keywordflow">return</span> age &lt;= to_age.value();</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            }</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordflow">if</span> (to_age.has_value()) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            <span class="keywordflow">return</span> age &lt;= to_age.value();</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    };</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;};</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html">   97</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structhgps_1_1PolicyInterval.html">PolicyInterval</a> {</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html">   97</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structhgps_1_1PolicyInterval.html">PolicyInterval</a> {</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">  103</a></span>&#160;        <a class="code" href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">PolicyInterval</a>(<span class="keywordtype">int</span> start_at_time, std::optional&lt;int&gt; finish_at_time = std::nullopt)</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            : start_time{ start_at_time }, finish_time{ finish_at_time } {</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            <span class="keywordflow">if</span> (start_at_time &lt; 0) {</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;                <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Policy start time must not be negative.&quot;</span>);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            }</div>
+<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">  103</a></span>&#160;    <a class="code" href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">PolicyInterval</a>(<span class="keywordtype">int</span> start_at_time, std::optional&lt;int&gt; finish_at_time = std::nullopt)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        : start_time{start_at_time}, finish_time{finish_at_time} {</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="keywordflow">if</span> (start_at_time &lt; 0) {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Policy start time must not be negative.&quot;</span>);</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        }</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            <span class="keywordflow">if</span> (finish_at_time.has_value() &amp;&amp; start_at_time &gt; finish_at_time.value()) {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Policy finish time must be equal or greater than the start time.&quot;</span>);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            }</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">if</span> (finish_at_time.has_value() &amp;&amp; start_at_time &gt; finish_at_time.value()) {</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            <span class="keywordflow">throw</span> std::out_of_range(</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                <span class="stringliteral">&quot;Policy finish time must be equal or greater than the start time.&quot;</span>);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        }</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#aa55face98fcd876609f147e342ad6e32">  115</a></span>&#160;        <span class="keywordtype">int</span> start_time{};</div>
-<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#a74513ff2bc12878aeb20923b4f3dd9b0">  117</a></span>&#160;        std::optional&lt;int&gt; finish_time{};</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">  122</a></span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">contains</a>(<span class="keyword">const</span> <span class="keywordtype">int</span>&amp; time) <span class="keyword">const</span> noexcept {</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;            <span class="keywordflow">if</span> (time &lt; start_time) {</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">if</span> (finish_time.has_value()) {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;                <span class="keywordflow">return</span> time &lt;= finish_time.value();</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            }</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        }</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    };</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html">  136</a></span>&#160;    <span class="keyword">struct </span><a class="code" href="structhgps_1_1PolicyDynamic.html">PolicyDynamic</a></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    {</div>
-<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">  142</a></span>&#160;        <a class="code" href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">PolicyDynamic</a>(<span class="keyword">const</span> std::vector&lt;double&gt;&amp; parameters) {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keywordflow">if</span> (parameters.size() != <span class="keywordtype">size_t</span>{ 3 }) {</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;                <span class="keywordflow">throw</span> std::invalid_argument(<span class="stringliteral">&quot;The vector of dynamic arguments must have size = 3 [alpha, beta, gamma]&quot;</span>);</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            }</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; p : parameters) {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                <span class="keywordflow">if</span> (0.0 &gt; p || p &gt; 1.0) {</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                    <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Dynamic argument: &quot;</span> + std::to_string(p) + <span class="stringliteral">&quot;, outside range [0.0, 1.0]&quot;</span>);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;            }</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            alpha = parameters.at(0);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;            beta = parameters.at(1);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;            gamma = parameters.at(2);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        }</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#ae217a73fe64e328c1eccd28f7fcf0aa8">  159</a></span>&#160;        <span class="keywordtype">double</span> alpha{ 1.0 };</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#ace4764c047907b3dc8a582a4b33eca83">  162</a></span>&#160;        <span class="keywordtype">double</span> beta{ 0.0 };</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#aa1120ba2c39b46265a12c4cad37a97e1">  165</a></span>&#160;        <span class="keywordtype">double</span> gamma{ 0.0 };</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    };</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    }</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#aa55face98fcd876609f147e342ad6e32">  116</a></span>&#160;    <span class="keywordtype">int</span> start_time{};</div>
+<div class="line"><a name="l00118"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#a74513ff2bc12878aeb20923b4f3dd9b0">  118</a></span>&#160;    std::optional&lt;int&gt; finish_time{};</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">  123</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">contains</a>(<span class="keyword">const</span> <span class="keywordtype">int</span> &amp;time) <span class="keyword">const</span> noexcept {</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">if</span> (time &lt; start_time) {</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        }</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <span class="keywordflow">if</span> (finish_time.has_value()) {</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            <span class="keywordflow">return</span> time &lt;= finish_time.value();</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        }</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;};</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00137"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html">  137</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structhgps_1_1PolicyDynamic.html">PolicyDynamic</a> {</div>
+<div class="line"><a name="l00142"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">  142</a></span>&#160;    <a class="code" href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">PolicyDynamic</a>(<span class="keyword">const</span> std::vector&lt;double&gt; &amp;parameters) {</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="keywordflow">if</span> (parameters.size() != <span class="keywordtype">size_t</span>{3}) {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            <span class="keywordflow">throw</span> std::invalid_argument(</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                <span class="stringliteral">&quot;The vector of dynamic arguments must have size = 3 [alpha, beta, gamma]&quot;</span>);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span> &amp;p : parameters) {</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            <span class="keywordflow">if</span> (0.0 &gt; p || p &gt; 1.0) {</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                <span class="keywordflow">throw</span> std::out_of_range(<span class="stringliteral">&quot;Dynamic argument: &quot;</span> + std::to_string(p) +</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;                                        <span class="stringliteral">&quot;, outside range [0.0, 1.0]&quot;</span>);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            }</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        }</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        alpha = parameters.at(0);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        beta = parameters.at(1);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        gamma = parameters.at(2);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#ae217a73fe64e328c1eccd28f7fcf0aa8">  161</a></span>&#160;    <span class="keywordtype">double</span> alpha{1.0};</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#ace4764c047907b3dc8a582a4b33eca83">  164</a></span>&#160;    <span class="keywordtype">double</span> beta{0.0};</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00167"></a><span class="lineno"><a class="line" href="structhgps_1_1PolicyDynamic.html#aa1120ba2c39b46265a12c4cad37a97e1">  167</a></span>&#160;    <span class="keywordtype">double</span> gamma{0.0};</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;};</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;} <span class="comment">// namespace hgps</span></div>
 <div class="ttc" id="aclasshgps_1_1DynamicInterventionScenario_html"><div class="ttname"><a href="classhgps_1_1DynamicInterventionScenario.html">hgps::DynamicInterventionScenario</a></div><div class="ttdoc">Health-GPS dynamic intervention policy scenario interface.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:41</div></div>
 <div class="ttc" id="aclasshgps_1_1DynamicInterventionScenario_html_a67edf918764042a9e7e13b8d424c728a"><div class="ttname"><a href="classhgps_1_1DynamicInterventionScenario.html#a67edf918764042a9e7e13b8d424c728a">hgps::DynamicInterventionScenario::dynamic</a></div><div class="ttdeci">virtual const PolicyDynamic &amp; dynamic() const noexcept=0</div><div class="ttdoc">Gets the System Dynamic model parameters.</div></div>
 <div class="ttc" id="aclasshgps_1_1InterventionScenario_html"><div class="ttname"><a href="classhgps_1_1InterventionScenario.html">hgps::InterventionScenario</a></div><div class="ttdoc">Health-GPS scripted intervention policy scenario interface.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:19</div></div>
@@ -215,11 +217,11 @@ $(document).ready(function(){initNavTree('intervention__scenario_8h_source.html'
 <div class="ttc" id="aclasshgps_1_1InterventionScenario_html_a7174c570b7d3c4470cb807a98412243f"><div class="ttname"><a href="classhgps_1_1InterventionScenario.html#a7174c570b7d3c4470cb807a98412243f">hgps::InterventionScenario::name</a></div><div class="ttdeci">const std::string &amp; name() const noexcept override</div><div class="ttdoc">Gets the scenario type name.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:31</div></div>
 <div class="ttc" id="aclasshgps_1_1InterventionScenario_html_aa02d2fabdc21034fc2873bad00366e31"><div class="ttname"><a href="classhgps_1_1InterventionScenario.html#aa02d2fabdc21034fc2873bad00366e31">hgps::InterventionScenario::active_period</a></div><div class="ttdeci">virtual const PolicyInterval &amp; active_period() const noexcept=0</div><div class="ttdoc">Gets the intervention active period.</div></div>
 <div class="ttc" id="aclasshgps_1_1InterventionScenario_html_aa59df4336bee32f314f8ad27a269df11"><div class="ttname"><a href="classhgps_1_1InterventionScenario.html#aa59df4336bee32f314f8ad27a269df11">hgps::InterventionScenario::impacts</a></div><div class="ttdeci">virtual const std::vector&lt; PolicyImpact &gt; &amp; impacts() const noexcept=0</div><div class="ttdoc">Gets the intervention impacts by risk factor and age range.</div></div>
-<div class="ttc" id="aclasshgps_1_1Scenario_html"><div class="ttname"><a href="classhgps_1_1Scenario.html">hgps::Scenario</a></div><div class="ttdoc">Health-GPS simulation scenario interface.</div><div class="ttdef"><b>Definition:</b> scenario.h:31</div></div>
-<div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:9</div></div>
-<div class="ttc" id="anamespacehgps_html_ada2628493fd19805edb6367898c6967b"><div class="ttname"><a href="namespacehgps.html#ada2628493fd19805edb6367898c6967b">hgps::ScenarioType</a></div><div class="ttdeci">ScenarioType</div><div class="ttdoc">Health GPS policy scenario types enumeration.</div><div class="ttdef"><b>Definition:</b> scenario.h:18</div></div>
+<div class="ttc" id="aclasshgps_1_1Scenario_html"><div class="ttname"><a href="classhgps_1_1Scenario.html">hgps::Scenario</a></div><div class="ttdoc">Health-GPS simulation scenario interface.</div><div class="ttdef"><b>Definition:</b> scenario.h:30</div></div>
+<div class="ttc" id="anamespacehgps_html"><div class="ttname"><a href="namespacehgps.html">hgps</a></div><div class="ttdoc">Top-level namespace for Health-GPS C++ API.</div><div class="ttdef"><b>Definition:</b> analysis_definition.h:8</div></div>
+<div class="ttc" id="anamespacehgps_html_ada2628493fd19805edb6367898c6967b"><div class="ttname"><a href="namespacehgps.html#ada2628493fd19805edb6367898c6967b">hgps::ScenarioType</a></div><div class="ttdeci">ScenarioType</div><div class="ttdoc">Health GPS policy scenario types enumeration.</div><div class="ttdef"><b>Definition:</b> scenario.h:17</div></div>
 <div class="ttc" id="anamespacehgps_html_ada2628493fd19805edb6367898c6967bafb93f4185aea5b548f0fe812e90678c4"><div class="ttname"><a href="namespacehgps.html#ada2628493fd19805edb6367898c6967bafb93f4185aea5b548f0fe812e90678c4">hgps::ScenarioType::intervention</a></div><div class="ttdeci">@ intervention</div><div class="ttdoc">Intervention scenario.</div></div>
-<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> column_iterator.h:97</div></div>
+<div class="ttc" id="anamespacestd_html"><div class="ttname"><a href="namespacestd.html">std</a></div><div class="ttdoc">Global namespace.</div><div class="ttdef"><b>Definition:</b> column_iterator.h:123</div></div>
 <div class="ttc" id="ascenario_8h_html"><div class="ttname"><a href="scenario_8h.html">scenario.h</a></div></div>
 <div class="ttc" id="astructhgps_1_1PolicyDynamic_html"><div class="ttname"><a href="structhgps_1_1PolicyDynamic.html">hgps::PolicyDynamic</a></div><div class="ttdoc">Defines the policy dynamic parameters.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:137</div></div>
 <div class="ttc" id="astructhgps_1_1PolicyDynamic_html_a525d014a7245287176035390f5df87e0"><div class="ttname"><a href="structhgps_1_1PolicyDynamic.html#a525d014a7245287176035390f5df87e0">hgps::PolicyDynamic::PolicyDynamic</a></div><div class="ttdeci">PolicyDynamic(const std::vector&lt; double &gt; &amp;parameters)</div><div class="ttdoc">Initialises a new instance of the PolicyDynamic structure.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:142</div></div>
@@ -229,8 +231,8 @@ $(document).ready(function(){initNavTree('intervention__scenario_8h_source.html'
 <div class="ttc" id="astructhgps_1_1PolicyImpact_html_a97aac49f043534e6926d101f42e33bb6"><div class="ttname"><a href="structhgps_1_1PolicyImpact.html#a97aac49f043534e6926d101f42e33bb6">hgps::PolicyImpact::PolicyImpact</a></div><div class="ttdeci">PolicyImpact(core::Identifier risk_factor_key, double policy_impact, unsigned int start_age, std::optional&lt; unsigned int &gt; end_age=std::nullopt)</div><div class="ttdoc">Initialise a new instance of the PolicyImpact structure.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:58</div></div>
 <div class="ttc" id="astructhgps_1_1PolicyInterval_html"><div class="ttname"><a href="structhgps_1_1PolicyInterval.html">hgps::PolicyInterval</a></div><div class="ttdoc">Defines the policy active interval.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:97</div></div>
 <div class="ttc" id="astructhgps_1_1PolicyInterval_html_a037947a83581daadca68886ca23e8c09"><div class="ttname"><a href="structhgps_1_1PolicyInterval.html#a037947a83581daadca68886ca23e8c09">hgps::PolicyInterval::PolicyInterval</a></div><div class="ttdeci">PolicyInterval(int start_at_time, std::optional&lt; int &gt; finish_at_time=std::nullopt)</div><div class="ttdoc">Initialise a new instance of the PolicyInterval structure.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:103</div></div>
-<div class="ttc" id="astructhgps_1_1PolicyInterval_html_a920ea4c319e42738ede74c2c5fd3f307"><div class="ttname"><a href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">hgps::PolicyInterval::contains</a></div><div class="ttdeci">bool contains(const int &amp;time) const noexcept</div><div class="ttdoc">Determine whether this interval contains a given time.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:122</div></div>
-<div class="ttc" id="astructhgps_1_1core_1_1Identifier_html"><div class="ttname"><a href="structhgps_1_1core_1_1Identifier.html">hgps::core::Identifier</a></div><div class="ttdoc">Entity unique identifier data type.</div><div class="ttdef"><b>Definition:</b> identifier.h:16</div></div>
+<div class="ttc" id="astructhgps_1_1PolicyInterval_html_a920ea4c319e42738ede74c2c5fd3f307"><div class="ttname"><a href="structhgps_1_1PolicyInterval.html#a920ea4c319e42738ede74c2c5fd3f307">hgps::PolicyInterval::contains</a></div><div class="ttdeci">bool contains(const int &amp;time) const noexcept</div><div class="ttdoc">Determine whether this interval contains a given time.</div><div class="ttdef"><b>Definition:</b> intervention_scenario.h:123</div></div>
+<div class="ttc" id="astructhgps_1_1core_1_1Identifier_html"><div class="ttname"><a href="structhgps_1_1core_1_1Identifier.html">hgps::core::Identifier</a></div><div class="ttdoc">Entity unique identifier data type.</div><div class="ttdef"><b>Definition:</b> identifier.h:15</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

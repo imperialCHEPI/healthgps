@@ -1,9 +1,9 @@
 <map id="HealthGPS/data_series.h" name="HealthGPS/data_series.h">
-<area shape="rect" id="node1" title=" " alt="" coords="197,5,380,32"/>
-<area shape="rect" id="node2" href="$forward__type_8h.html" title=" " alt="" coords="14,80,193,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="217,87,275,114"/>
-<area shape="rect" id="node6" title=" " alt="" coords="300,87,363,114"/>
-<area shape="rect" id="node7" title=" " alt="" coords="387,87,438,114"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,169,97,196"/>
-<area shape="rect" id="node4" title=" " alt="" coords="122,169,189,196"/>
+<area shape="rect" id="node1" title=" " alt="" coords="181,5,363,32"/>
+<area shape="rect" id="node2" href="$forward__type_8h.html" title=" " alt="" coords="5,80,184,121"/>
+<area shape="rect" id="node5" title=" " alt="" coords="208,87,259,114"/>
+<area shape="rect" id="node6" title=" " alt="" coords="283,87,341,114"/>
+<area shape="rect" id="node7" title=" " alt="" coords="366,87,429,114"/>
+<area shape="rect" id="node3" title=" " alt="" coords="9,169,76,196"/>
+<area shape="rect" id="node4" title=" " alt="" coords="101,169,193,196"/>
 </map>
