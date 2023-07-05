@@ -58,4 +58,10 @@ std::ostream &operator<<(std::ostream &stream, const Identifier &identifier) {
 
 void from_json(const nlohmann::json &j, Identifier &id) { id = Identifier{j.get<std::string>()}; }
 
+void from_json(const nlohmann::json &j, std::map<Identifier, double> &map) {
+    for (auto &[key, value] : j.items()) {
+        map.emplace(Identifier{key}, value.get<double>());
+    }
+}
+
 } // namespace hgps::core

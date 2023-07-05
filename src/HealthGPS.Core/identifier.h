@@ -85,6 +85,8 @@ struct Identifier final {
 
 void from_json(const nlohmann::json &j, Identifier &id);
 
+void from_json(const nlohmann::json &j, std::map<Identifier, double> &map);
+
 } // namespace hgps::core
 
 namespace std {

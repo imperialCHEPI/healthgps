@@ -200,7 +200,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     // Load food -> nutrient equations.
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
-        auto food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
+        auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
         for (const auto &nutrient : opt["Nutrients"]) {
             auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
