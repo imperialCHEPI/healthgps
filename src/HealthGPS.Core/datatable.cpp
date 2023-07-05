@@ -36,7 +36,7 @@ void DataTable::add(std::unique_ptr<DataTableColumn> column) {
 
 const DataTableColumn &DataTable::column(std::size_t index) const { return *columns_.at(index); }
 
-const DataTableColumn &DataTable::column(std::string name) const {
+const DataTableColumn &DataTable::column(const std::string &name) const {
     auto lower_name = to_lower(name);
     auto found = index_.find(lower_name);
     if (found != index_.end()) {
@@ -44,7 +44,6 @@ const DataTableColumn &DataTable::column(std::string name) const {
     }
 
     throw std::out_of_range(fmt::format("Column name: {} not found.", name));
-    return *columns_.at(found->second);
 }
 
 std::string DataTable::to_string() const noexcept {
