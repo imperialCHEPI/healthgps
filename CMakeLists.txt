@@ -8,6 +8,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(NOT DEFINED CATCH_EXCEPTIONS)
+    # By default, catch all exceptions for release builds only
+    string(REGEX MATCH "Rel" RELEASE_MATCH "${CMAKE_BUILD_TYPE}")
+    if(NOT RELEASE_MATCH STREQUAL "")
+        set(CATCH_EXCEPTIONS TRUE)
+    endif()
+endif()
+
+# Catch uncaught exceptions in main()
+if(CATCH_EXCEPTIONS)
+    add_definitions(-DCATCH_EXCEPTIONS)
+endif()
+
 project(Health-GPS
         VERSION 1.2.2.0
         DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"

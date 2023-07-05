@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
         core::run_async(load_datatable_from_csv, std::ref(input_table), config.file.name,
                         config.file.columns, config.file.delimiter);
 
-#ifdef NDEBUG
+#ifdef CATCH_EXCEPTIONS
     try {
 #endif
         // Create back-end data store, cached data repository wrapper
@@ -159,14 +159,14 @@ int main(int argc, char *argv[]) {
         fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
         event_monitor.stop();
 
-#ifdef NDEBUG
+#ifdef CATCH_EXCEPTIONS
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nFailed with message: {}.\n\n", ex.what());
 
         // Rethrow exception so it can be handled by OS's default handler
         throw;
     }
-#endif // NDEBUG
+#endif // CATCH_EXCEPTIONS
 
     return exit_application(EXIT_SUCCESS);
 }
