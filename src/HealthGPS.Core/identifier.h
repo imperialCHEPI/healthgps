@@ -3,6 +3,8 @@
 #include <ostream>
 #include <string>
 
+#include "nlohmann/json.hpp"
+
 namespace hgps::core {
 
 /// @brief Entity unique identifier data type
@@ -38,7 +40,7 @@ struct Identifier final {
 
     /// @brief Convert the identifier to a string representation
     /// @return The equivalent string representation
-    std::string to_string() const noexcept;
+    const std::string &to_string() const noexcept;
 
     /// @brief Gets the identifier hash code value
     /// @return The hash code value
@@ -80,6 +82,11 @@ struct Identifier final {
 
     void validate_identifeir() const;
 };
+
+void from_json(const nlohmann::json &j, Identifier &id);
+
+void from_json(const nlohmann::json &j, std::map<Identifier, double> &map);
+
 } // namespace hgps::core
 
 namespace std {
@@ -88,4 +95,5 @@ namespace std {
 template <> struct hash<hgps::core::Identifier> {
     size_t operator()(const hgps::core::Identifier &id) const noexcept { return id.hash(); }
 };
+
 } // namespace std

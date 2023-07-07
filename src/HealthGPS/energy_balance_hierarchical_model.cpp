@@ -58,14 +58,15 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
 const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
     for (auto &entry : equations_) {
         if (entry.first.contains(age)) {
+            // If there is an equation for the age, return it.
             return entry.second;
         }
     }
-
     if (age < equations_.begin()->first.lower()) {
+        // Else if the age is below the first equation, return the first equation.
         return equations_.begin()->second;
     }
-
+    // Else if the age is above the last equation, return the last equation.
     return equations_.rbegin()->second;
 }
 
@@ -131,7 +132,8 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
 LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
-    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
+    : equations_{std::move(equations)}, variables_{std::move(variables)},
+      boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
         throw std::invalid_argument("The model equations definition must not be empty");
