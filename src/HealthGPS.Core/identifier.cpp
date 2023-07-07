@@ -60,7 +60,7 @@ void from_json(const nlohmann::json &j, Identifier &id) { id = Identifier{j.get<
 
 void from_json(const nlohmann::json &j, std::map<Identifier, double> &map) {
     for (auto &[key, value] : j.items()) {
-        map.emplace(Identifier{key}, value.get<double>());
+        map.emplace(key, value.get<double>());
     }
 }
 
