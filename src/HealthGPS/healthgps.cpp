@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 
 namespace hgps {
 HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
@@ -331,8 +332,13 @@ std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summ
     auto summary = std::map<std::string, core::UnivariateSummary>();
     auto &input_data = definition_.inputs().data();
     for (const auto &entry : context_.mapping()) {
-        input_data.column(entry.name()).accept(visitor);
-        summary.emplace(entry.name(), visitor.get_summary());
+        try {
+            input_data.column(entry.name()).accept(visitor);
+            summary.emplace(entry.name(), visitor.get_summary());
+        } catch (const std::out_of_range &oor) {
+            // HACK: ignore missing columns
+            continue;
+        }
     }
 
     return summary;
@@ -385,4 +391,5 @@ void hgps::HealthGPS::print_initial_population_statistics() {
     ss << fmt::format("|{:_<{}}|\n\n", '_', width);
     std::cout << ss.str();
 }
+
 } // namespace hgps
