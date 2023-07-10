@@ -56,7 +56,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
         // Initialise nutrients to zero.
         for (const auto &coefficient : energy_equation_) {
-            nutrient_intakes.at(coefficient.first) = 0.0;
+            nutrient_intakes[coefficient.first] = 0.0;
         }
 
         // Compute nutrient intakes from food intakes.
