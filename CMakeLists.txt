@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.20)
 
 option(BUILD_BENCHMARKS "Build benchmark application" OFF)
 option(BUILD_DOC "Build API documentation" ON)
+option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
 
 # minimum default standard
 set(CMAKE_CXX_STANDARD 20)
@@ -37,9 +38,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Enable compiler warnings and standard conformance
 message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 if(MSVC)
-    add_compile_options(/W4 /permissive-) # /WX 
+    add_compile_options(/W4 /permissive-)
+
+    if(WARNINGS_AS_ERRORS)
+        add_compile_options(/WX)
+    endif()
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic) # -Werror -march=native
+    add_compile_options(-Wall -Wextra -Wpedantic)
+
+    if(WARNINGS_AS_ERRORS)
+        add_compile_options(-Werror)
+    endif()
 endif()
 
 include(CTest)
