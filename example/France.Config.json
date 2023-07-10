@@ -49,6 +49,12 @@
                 "range": [-2.316299, 2.296689]
             },
             {
+                "name": "Carbohydrate",
+                "level": 0,
+                "proxy": "",
+                "range": [40.0, 400.0]
+            },
+            {
                 "name": "Sodium",
                 "level": 1,
                 "proxy": "",
