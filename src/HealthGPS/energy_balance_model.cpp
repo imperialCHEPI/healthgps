@@ -56,24 +56,22 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
         // Initialise nutrients to zero.
         for (const auto &coefficient : energy_equation_) {
-            nutrient_intakes[coefficient.first] = 0.0;
+            nutrient_intakes.at(coefficient.first) = 0.0;
         }
 
         // Compute nutrient intakes from food intakes.
         for (const auto &equation : nutrient_equations_) {
-            // TODO: until carbs is added to risk factors (should use at, not [])
-            // double food_intake = current_risk_factors.at(equation.first);
-            double food_intake = current_risk_factors[equation.first];
+            double food_intake = current_risk_factors.at(equation.first);
 
             for (const auto &coefficient : equation.second) {
                 double delta_nutrient = food_intake * coefficient.second;
-                nutrient_intakes[coefficient.first] += delta_nutrient;
+                nutrient_intakes.at(coefficient.first) += delta_nutrient;
             }
         }
 
         // Compute energy intake from nutrient intakes.
         for (const auto &coefficient : energy_equation_) {
-            double delta_energy = nutrient_intakes[coefficient.first] * coefficient.second;
+            double delta_energy = nutrient_intakes.at(coefficient.first) * coefficient.second;
             energy_intake += delta_energy;
         }
 
