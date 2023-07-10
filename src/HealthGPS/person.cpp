@@ -11,6 +11,9 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {core::Identifier{"age2"}, [](const Person &p) { return pow(p.age, 2); }},
     {core::Identifier{"age3"}, [](const Person &p) { return pow(p.age, 3); }},
     {core::Identifier{"ses"}, [](const Person &p) { return p.ses; }},
+
+    // HACK: ew, gross... allows us to mock nutrients we don't have data for yet
+    {core::Identifier{"carbohydrate"}, [](const Person &) { return 0.5; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}
