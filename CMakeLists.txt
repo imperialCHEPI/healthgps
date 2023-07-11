@@ -1,6 +1,5 @@
 cmake_minimum_required (VERSION 3.20)
 
-option(BUILD_BENCHMARKS "Build benchmark application" OFF)
 option(BUILD_DOC "Build API documentation" ON)
 option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
 

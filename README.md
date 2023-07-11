@@ -83,7 +83,6 @@ cmake --build --preset='release-build-windows' --target install --config Release
 # Linux
 cmake --preset='linux-release'
 cmake --build --preset='release-build-linux' --target install --config Release
-> To build the `Benchmark` application, add `-DBUILD_BENCHMARKS=ON` to the CMake configuration command (first for each OS).
 
 The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/bin` directory.
 

@@ -59,12 +59,12 @@ jobs:
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: Build HealthGPS (debug)
         run: |
-          cmake --preset=${{ matrix.platform }}-debug -DBUILD_BENCHMARKS=ON -DWARNINGS_AS_ERRORS=ON
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
           cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
 
       - name: Build HealthGPS (release)
         run: |
-          cmake --preset=${{ matrix.platform }}-release -DBUILD_BENCHMARKS=ON -DWARNINGS_AS_ERRORS=ON
+          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
           cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
       - name: Upload artifacts
