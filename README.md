@@ -83,7 +83,6 @@ cmake --build --preset='release-build-windows' --target install --config Release
 # Linux
 cmake --preset='linux-release'
 cmake --build --preset='release-build-linux' --target install --config Release
-> To build the `Benchmark` application, add `-DBUILD_BENCHMARKS=ON` to the CMake configuration command (first for each OS).
 
 The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/bin` directory.
 
@@ -122,7 +121,7 @@ Now, every time attempt to make a git commit, your changes will be checked again
 
 ## License
 
-The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) license.
+The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) license.
 
 ## Third-party components
 
@@ -136,8 +135,6 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 | [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
-| *Experimental*                                        |              |
-| [arrow](https://github.com/apache/arrow)              | Apache-2.0   |
 
 ### Tools and Frameworks
 
@@ -145,4 +142,3 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 |:---------------------------------------------------|:-------------|
 | [vcpkg](https://github.com/microsoft/vcpkg)        | MIT          |
 | [googletest](https://github.com/google/googletest) | BSD 3-Clause |
-| [benchmark](https://github.com/google/benchmark)   | Apache-2.0   |

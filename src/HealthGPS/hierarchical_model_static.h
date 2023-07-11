@@ -61,8 +61,8 @@ struct HierarchicalLevel {
 class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
   public:
     /// @brief Initialises a new instance of the StaticHierarchicalLinearModel class
-    /// @param linear_models The linear regression models equations
-    /// @param model_levels The hierarchical model levels definition
+    /// @param models The model equations
+    /// @param levels The hierarchical model level definition
     StaticHierarchicalLinearModel(const std::unordered_map<core::Identifier, LinearModel> &models,
                                   const std::map<int, HierarchicalLevel> &levels);
 
