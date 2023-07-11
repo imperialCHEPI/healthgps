@@ -10,7 +10,7 @@ CachedRepository::CachedRepository(core::Datastore &manager)
     : mutex_{}, data_manager_{manager}, rf_model_definition_{}, baseline_adjustments_{},
       diseases_info_{}, diseases_{}, lms_parameters_{} {}
 
-bool CachedRepository::register_risk_factor_model_definition(
+void CachedRepository::register_risk_factor_model_definition(
     const HierarchicalModelType &model_type,
     std::shared_ptr<RiskFactorModelDefinition> definition) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -19,14 +19,12 @@ bool CachedRepository::register_risk_factor_model_definition(
         rf_model_definition_.erase(model_type);
     }
 
-    auto result = rf_model_definition_.emplace(model_type, std::move(definition));
-    return result.second;
+    rf_model_definition_.emplace(model_type, std::move(definition));
 }
 
-bool CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment &&definition) {
+void CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment &&definition) {
     std::unique_lock<std::mutex> lock(mutex_);
     baseline_adjustments_ = std::move(definition);
-    return true;
 }
 
 core::Datastore &CachedRepository::manager() noexcept { return data_manager_; }

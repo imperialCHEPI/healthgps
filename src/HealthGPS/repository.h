@@ -76,15 +76,13 @@ class CachedRepository final : public Repository {
     /// @brief Register a user provided risk factor model definition
     /// @param model_type Static or Dynamic
     /// @param definition The risk factor model definition instance
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool
+    void
     register_risk_factor_model_definition(const HierarchicalModelType &model_type,
                                           std::shared_ptr<RiskFactorModelDefinition> definition);
 
     /// @brief Register a user provided baseline risk factors adjustments dataset
     /// @param definition The baseline risk factors adjustments dataset
-    /// @return true, if the operation succeeds; otherwise, false.
-    bool register_baseline_adjustment_definition(BaselineAdjustment &&definition);
+    void register_baseline_adjustment_definition(BaselineAdjustment &&definition);
 
     core::Datastore &manager() noexcept override;
 
