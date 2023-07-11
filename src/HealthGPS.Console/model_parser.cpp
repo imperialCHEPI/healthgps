@@ -43,7 +43,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
     }
 }
 
-std::shared_ptr<hgps::HierarchicalLinearModelDefinition>
+std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
 load_static_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     std::map<int, hgps::HierarchicalLevel> levels;
@@ -102,11 +102,11 @@ load_static_risk_model_definition(const poco::json &opt) {
                 .variances = at.variances});
     }
 
-    return std::make_shared<hgps::HierarchicalLinearModelDefinition>(std::move(models),
+    return std::make_unique<hgps::HierarchicalLinearModelDefinition>(std::move(models),
                                                                      std::move(levels));
 }
 
-std::shared_ptr<hgps::LiteHierarchicalModelDefinition>
+std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
 load_dynamic_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     auto percentage = 0.05;
@@ -178,11 +178,11 @@ load_dynamic_risk_model_definition(const poco::json &opt) {
         equations.emplace(age_key, std::move(age_equations));
     }
 
-    return std::make_shared<hgps::LiteHierarchicalModelDefinition>(
+    return std::make_unique<hgps::LiteHierarchicalModelDefinition>(
         std::move(equations), std::move(variables), percentage);
 }
 
-std::shared_ptr<hgps::EnergyBalanceModelDefinition>
+std::unique_ptr<hgps::EnergyBalanceModelDefinition>
 load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInfo &settings) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
@@ -225,7 +225,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
-    return std::make_shared<hgps::EnergyBalanceModelDefinition>(
+    return std::make_unique<hgps::EnergyBalanceModelDefinition>(
         std::move(energy_equation), std::move(nutrient_equations), std::move(age_mean_height));
 }
 
@@ -234,7 +234,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                                             const poco::SettingsInfo &settings) {
     MEASURE_FUNCTION();
     hgps::HierarchicalModelType model_type;
-    std::shared_ptr<hgps::RiskFactorModelDefinition> model_definition;
+    std::unique_ptr<hgps::RiskFactorModelDefinition> model_definition;
 
     for (auto &model : info.risk_factor_models) {
         const auto &model_filename = model.second;
