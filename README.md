@@ -121,7 +121,7 @@ Now, every time attempt to make a git commit, your changes will be checked again
 
 ## License
 
-The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) license.
+The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) license.
 
 ## Third-party components
 
