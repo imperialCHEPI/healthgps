@@ -82,7 +82,7 @@ class CachedRepository final : public Repository {
 
     /// @brief Register a user provided baseline risk factors adjustments dataset
     /// @param definition The baseline risk factors adjustments dataset
-    void register_baseline_adjustment_definition(BaselineAdjustment &&definition);
+    void register_baseline_adjustment_definition(BaselineAdjustment definition);
 
     core::Datastore &manager() noexcept override;
 

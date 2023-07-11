@@ -22,7 +22,7 @@ void CachedRepository::register_risk_factor_model_definition(
     rf_model_definition_.emplace(model_type, std::move(definition));
 }
 
-void CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment &&definition) {
+void CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment definition) {
     std::unique_lock<std::mutex> lock(mutex_);
     baseline_adjustments_ = std::move(definition);
 }
