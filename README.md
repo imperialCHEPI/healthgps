@@ -144,4 +144,3 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 |:---------------------------------------------------|:-------------|
 | [vcpkg](https://github.com/microsoft/vcpkg)        | MIT          |
 | [googletest](https://github.com/google/googletest) | BSD 3-Clause |
-| [benchmark](https://github.com/google/benchmark)   | Apache-2.0   |
