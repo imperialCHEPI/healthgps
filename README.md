@@ -135,8 +135,6 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.md) lic
 | [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
-| *Experimental*                                        |              |
-| [arrow](https://github.com/apache/arrow)              | Apache-2.0   |
 
 ### Tools and Frameworks
 
