@@ -34,15 +34,9 @@ void DataTable::add(std::unique_ptr<DataTableColumn> column) {
     columns_.push_back(std::move(column));
 }
 
-const DataTableColumn &DataTable::column(std::size_t index) const {
-    if (index < num_columns()) {
-        return *columns_.at(index);
-    }
+const DataTableColumn &DataTable::column(std::size_t index) const { return *columns_.at(index); }
 
-    throw std::out_of_range("Column index outside the range.");
-}
-
-const DataTableColumn &DataTable::column(std::string name) const {
+const DataTableColumn &DataTable::column(const std::string &name) const {
     auto lower_name = to_lower(name);
     auto found = index_.find(lower_name);
     if (found != index_.end()) {
