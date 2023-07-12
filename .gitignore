@@ -412,3 +412,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Compile commands for clangd language server
+compile_commands.json
