@@ -10,15 +10,10 @@ if (BUILD_TESTING)
 	add_subdirectory (HealthGPS.Tests)
 endif()
 
-if (BUILD_BENCHMARKS)
-	message(STATUS "Building Benchmarks ...")
-	add_subdirectory (HealthGPS.Benchmarks)
-endif()
-
 if (BUILD_DOC AND CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
     message(STATUS "Doxygen build folder: ${CMAKE_CURRENT_BINARY_DIR}")
 	set(DOXYGEN_FILE_PATTERNS *.h *.cpp *.md)
-	set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*" "*/HealthGPS.Tests/*" "*/HealthGPS.Benchmarks/*")
+	set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*" "*/HealthGPS.Tests/*")
     enable_doxygen("awesome-sidebar")
 endif()
 

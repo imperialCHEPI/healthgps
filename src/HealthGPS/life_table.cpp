@@ -31,18 +31,10 @@ LifeTable::LifeTable(std::map<int, Birth> &&births,
 }
 
 const Birth &LifeTable::get_births_at(const int time_year) const {
-    if (!birth_table_.contains(time_year)) {
-        throw std::out_of_range(fmt::format("The year must not be outside of the data limits."));
-    }
-
     return birth_table_.at(time_year);
 }
 
 const std::map<int, Mortality> &LifeTable::get_mortalities_at(const int time_year) const {
-    if (!death_table_.contains(time_year)) {
-        throw std::out_of_range(fmt::format("The year must not be outside of the data limits."));
-    }
-
     return death_table_.at(time_year);
 }
 

@@ -64,7 +64,8 @@ else()
         GTest::gtest)
 endif()
 
-gtest_discover_tests(HealthGPS.Tests)
+# We use a long discovery timeout because this can take a while on CI systems
+gtest_discover_tests(HealthGPS.Tests DISCOVERY_TIMEOUT 30)
 
 install(TARGETS HealthGPS.Tests DESTINATION "")
 if(WIN32)

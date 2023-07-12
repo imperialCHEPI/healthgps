@@ -56,14 +56,16 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
 
+      - uses: ammaraskar/gcc-problem-matcher@master
       - name: Build HealthGPS (debug)
         run: |
-          cmake --preset=${{ matrix.platform }}-debug -DBUILD_BENCHMARKS=ON
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
           cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
 
       - name: Build HealthGPS (release)
+        if: "!cancelled()" # Run this step, even if the previous one fails
         run: |
-          cmake --preset=${{ matrix.platform }}-release -DBUILD_BENCHMARKS=ON
+          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
           cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
       - name: Upload artifacts

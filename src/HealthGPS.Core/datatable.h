@@ -45,7 +45,7 @@ class DataTable {
     /// @param name The column name
     /// @return The column instance
     /// @throws std::out_of_range for column name not found.
-    const DataTableColumn &column(std::string name) const;
+    const DataTableColumn &column(const std::string &name) const;
 
     /// @brief Gets the iterator to the first column of the table.
     /// @return An iterator to the beginning
