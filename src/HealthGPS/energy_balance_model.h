@@ -36,6 +36,8 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
         &nutrient_equations_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
+    void get_steady_state(Person &entity, double offset = 0.0);
+
     std::map<core::Identifier, double> get_current_risk_factors(const HierarchicalMapping &mapping,
                                                                 Person &entity,
                                                                 int time_year) const;
