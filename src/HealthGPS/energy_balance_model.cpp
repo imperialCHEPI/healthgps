@@ -81,15 +81,14 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
 void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     // TODO: DUMMY VALUES: Model state variables.
-    const double CI_0 = 0.0;  // Initial carbohydrate intake.
-    const double CI = 0.0;    // New carbohydrate intake.
-    const double F_0 = 0.1;   // Initial body fat.h
-    const double L_0 = 0.1;   // Initial lean tissue.
-    const double EI_0 = 0.0;  // Initial energy intake.
-    const double EI = 0.0;    // New energy intake.
-    const double ECF_0 = 0.2; // Initial extracellular fluid.
-    const double K = 0.0;     // Model intercept value.
-    const double AT = 0.0;    // Adaptive thermogenesis.
+    const double CI_0 = 0.0;  // TODO: Initial carbohydrate intake.
+    const double CI = 0.0;    // TODO: New carbohydrate intake.
+    const double F_0 = 0.1;   // TODO: Initial body fat.h
+    const double L_0 = 0.1;   // TODO: Initial lean tissue.
+    const double EI_0 = 0.0;  // TODO: Initial energy intake.
+    const double EI = 0.0;    // TODO: New energy intake.
+    const double ECF_0 = 0.2; // TODO: Initial extracellular fluid.
+    const double K = 0.0;     // TODO: Model intercept value.
 
     // Model parameters.
     const double rho_F = 39.5e3; // Energy content of body fat (kJ/kg).
@@ -122,6 +121,10 @@ void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     const double delta_EI = EI - EI_0;
     const double delta_0 = 0.0; // TODO: profile.GetPhysicalActivityDelta();
 
+    // Thermic effect of food and adaptive thermogenesis equations.
+    const double TEF = beta_TEF * delta_EI;
+    const double AT = beta_AT * delta_EI;
+
     // First equation ax + by = e.
     const double a1 = p * rho_F;
     const double b1 = -(1.0 - p) * rho_L;
@@ -130,10 +133,9 @@ void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     // Second equation cx + dy = f.
     const double a2 = gamma_F + delta_0;
     const double b2 = gamma_L + delta_0;
-    const double c2 =
-        EI - K - offset - beta_TEF * delta_EI - beta_AT * delta_EI - delta_0 * (G + W + ECF);
+    const double c2 = EI - offset - K - TEF - AT - delta_0 * (G + W + ECF);
 
-    // Steady state fat and lean equations.
+    // Body fat and lean tissue steady state equations.
     const double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
     const double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
@@ -141,15 +143,16 @@ void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     const double tau = rho_L * rho_F * (1.0 + x) /
                        ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
 
-    const double targetDate = 365.0; // 1 year
-    const double F = steady_F + (F_0 - steady_F) * exp(-targetDate * 1.0 / tau);
-    const double L = steady_L + (L_0 - steady_L) * exp(-targetDate * 1.0 / tau);
+    // Body fat and lean tissue equations.
+    const double F = steady_F + (F_0 - steady_F) * exp(-365.0 / tau);
+    const double L = steady_L + (L_0 - steady_L) * exp(-365.0 / tau);
 
+    // Body weight equation.
     const double BW = F + L + G + W + ECF;
 
-    const double EE = (K + offset + gamma_F * F + gamma_L * L + delta_0 * BW + beta_TEF * delta_EI +
-                       AT + EI * x) /
-                      (1 + x);
+    // Energy expenditure equation.
+    const double EE =
+        (offset + K + gamma_F * F + gamma_L * L + delta_0 * BW + TEF + AT + EI * x) / (1.0 + x);
 
     // TODO: return
 }
