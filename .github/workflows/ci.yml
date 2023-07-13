@@ -70,10 +70,10 @@ jobs:
           # Use environment variable to tell CMake to compile with this version of gcc
           echo CXX=g++-$LATEST_GCC_VERSION >> "$GITHUB_ENV"
 
-      - name: Install clang (Linux)
+      - name: Install clang and clang-tidy (Linux)
         if: matrix.platform == 'linux' && matrix.compiler == 'clang'
         run: |
-          sudo apt install --no-install-recommends clang
+          sudo apt install --no-install-recommends clang clang-tidy python3
 
           # Use environment variable to tell CMake to compile with clang
           echo CXX=clang++ >> "$GITHUB_ENV"
@@ -106,6 +106,10 @@ jobs:
 
       - name: Run tests
         run: ctest --preset=core-test-${{ matrix.platform }}
+
+      - name: Run clang-tidy
+        if: matrix.platform == 'linux' && matrix.compiler == 'clang' && !cancelled()
+        run: ./run-clang-tidy.py -p out/build/linux-debug
 
       - name: Zip output folder
         if: startsWith(github.ref, 'refs/tags/') && (matrix.platform != 'linux' || matrix.compiler == 'gcc-default')
