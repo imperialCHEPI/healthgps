@@ -30,7 +30,7 @@ jobs:
             is_main: true
           - platform: macos-x86
             os: macos-12
-            compiler: clang
+            compiler: gcc
             is_main: true
 
     env:
@@ -73,7 +73,11 @@ jobs:
 
       - name: Install dependencies (macOS)
         if: startsWith(matrix.platform, 'macos')
-        run: brew install ninja
+        run: |
+          brew install ninja
+
+          # Build using gcc as Apple clang doesn't support parallel algorithms
+          echo CXX=g++-12 >> "$GITHUB_ENV"
 
       - name: Install VCPKG
         run: |
