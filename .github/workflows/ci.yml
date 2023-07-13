@@ -28,6 +28,10 @@ jobs:
             os: windows-2022
             compiler: msvc
             is_main: true
+          - platform: macos-x86
+            os: macos-12
+            compiler: clang
+            is_main: true
 
     env:
       VCPKG_ROOT: vcpkg
@@ -66,6 +70,10 @@ jobs:
           script: |
             core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
             core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Install dependencies (macOS)
+        if: startsWith(matrix.platform, 'macos')
+        run: brew install ninja
 
       - name: Install VCPKG
         run: |
