@@ -72,6 +72,29 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "macos-x86-debug",
+            "displayName": "macOS Debug (x86 architecture)",
+            "description": "Build on macOS (debug; x86 architecture).",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                    "type": "FILEPATH"
+                },
+                "CMAKE_OSX_ARCHITECTURES": "x86_64"
+            }
+        },
+        {
+            "name": "macos-x86-release",
+            "displayName": "macOS Release (x86 architecture)",
+            "description": "Build on macOS (release; x86 architecture).",
+            "inherits": "macos-x86-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
         }
     ],
     "buildPresets": [
@@ -82,22 +105,34 @@
             "description": "Linux debug build"
         },
         {
-            "name": "debug-build-windows",
-            "displayName": "Default",
-            "configurePreset": "windows-debug",
-            "description": "Vanilla build"
-        },
-        {
             "name": "release-build-linux",
             "displayName": "Release",
             "configurePreset": "linux-release",
             "description": "Linux release build"
         },
         {
+            "name": "debug-build-windows",
+            "displayName": "Default",
+            "configurePreset": "windows-debug",
+            "description": "Windows debug build"
+        },
+        {
             "name": "release-build-windows",
             "displayName": "Release",
             "configurePreset": "windows-release",
             "description": "Windows release build"
+        },
+        {
+            "name": "debug-build-macos-x86",
+            "displayName": "Default",
+            "configurePreset": "macos-x86-debug",
+            "description": "macOS debug build (x86 architecture)"
+        },
+        {
+            "name": "release-build-macos-x86",
+            "displayName": "Release",
+            "configurePreset": "macos-x86-release",
+            "description": "macOS release build (x86 architecture)"
         }
     ],
     "testPresets": [
@@ -113,6 +148,11 @@
             "name": "core-test-windows",
             "inherits": "core-test-linux",
             "configurePreset": "windows-debug"
+        },
+        {
+            "name": "core-test-macos-x86",
+            "inherits": "core-test-linux",
+            "configurePreset": "macos-x86-debug"
         }
     ]
 }
