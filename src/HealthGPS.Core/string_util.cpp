@@ -1,5 +1,6 @@
 #include "string_util.h"
 #include <algorithm>
+#include <vector>
 
 namespace hgps::core {
 
