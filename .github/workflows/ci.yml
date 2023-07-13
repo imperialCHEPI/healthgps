@@ -40,6 +40,10 @@ jobs:
             os: windows-2022
             compiler: msvc
             is_main: true
+          - platform: macos-x86
+            os: macos-12
+            compiler: clang
+            is_main: true
 
     env:
       VCPKG_ROOT: "vcpkg"
@@ -81,6 +85,10 @@ jobs:
 
           # Use environment variable to tell CMake to compile with clang
           echo CXX=clang++ >> "$GITHUB_ENV"
+
+      - name: Install dependencies (macOS)
+        if: startsWith(matrix.platform, 'macos')
+        run: brew install ninja
 
       - name: Install VCPKG
         run: |
