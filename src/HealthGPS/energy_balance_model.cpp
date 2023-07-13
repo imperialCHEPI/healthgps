@@ -45,12 +45,6 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
         auto current_risk_factors =
             get_current_risk_factors(context.mapping(), entity, context.time_now());
 
-        // Model calibrated on previous year's age
-        auto model_age = static_cast<int>(entity.age - 1);
-        if (current_risk_factors.at(age_key) > model_age) {
-            current_risk_factors.at(age_key) = model_age;
-        }
-
         double energy_intake = 0.0;
         std::unordered_map<core::Identifier, double> nutrient_intakes;
 
@@ -80,15 +74,19 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 }
 
 void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
-    // TODO: DUMMY VALUES: Model state variables.
+    // TODO: Model initial state.
+    const unsigned int &age = entity.age;
+    const core::Gender &sex = entity.gender;
+    const double G_0 = 0.5;   // Initial glycogen.
     const double CI_0 = 0.0;  // TODO: Initial carbohydrate intake.
-    const double CI = 0.0;    // TODO: New carbohydrate intake.
-    const double F_0 = 0.1;   // TODO: Initial body fat.h
+    const double F_0 = 0.1;   // TODO: Initial body fat.
     const double L_0 = 0.1;   // TODO: Initial lean tissue.
     const double EI_0 = 0.0;  // TODO: Initial energy intake.
-    const double EI = 0.0;    // TODO: New energy intake.
     const double ECF_0 = 0.2; // TODO: Initial extracellular fluid.
-    const double K = 0.0;     // TODO: Model intercept value.
+    const double H_0 = 0.0;   // TODO: Initial height.
+    const double BW_0 = 0.0;  // TODO: Initial body weight.
+    const double PAL_0 = 0.0; // TODO: Initial physical activity level.
+    const double K_0 = 0.0;   // TODO: Initial intercept value.
 
     // Model parameters.
     const double rho_F = 39.5e3; // Energy content of body fat (kJ/kg).
@@ -99,60 +97,79 @@ void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     const double eta_L = 960.0;  // Lean tissue synthesis energy coefficient (kJ/kg).
     const double beta_TEF = 0.1; // TEF from energy intake (unitless).
     const double beta_AT = 0.14; // AT from energy intake (unitless).
+    const double xi_Na = 3000.0; // sodium from ECF changes (mg/L/day).
+    const double xi_CI = 4000.0; // sodium from carbohydrate changes (mg/day).
 
-    // Energy partitioning equation.
+    // TODO: Update carbohydrate intake.
+    double CI = CI_0;
+
+    // Update glycogen and water.
+    double k_G = CI_0 / (G_0 * G_0);
+    double G = sqrt(CI / k_G);
+    double W = 2.7 * G;
+
+    // TODO: Update energy intake.
+    double EI = EI_0;
+
+    // Update extracellular fluid.
+    double Na_b = 4000.0;
+    double Na_f = Na_b * EI / EI_0;
+    double Delta_Na_diet = Na_f - Na_b;
+    double ECF = ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
+
+    // TODO: Update height.
+    double H = H_0;
+
+    // TODO: Update physical activity level.
+    double PAL = PAL_0;
+
+    // Update resting metabolic rate (Mifflin-St Jeor).
+    double RMR = 9.99 * BW_0 + 6.25 * H * 100.0 - 4.92 * age;
+    RMR += sex == core::Gender::male ? 5.0 : -161.0;
+    RMR *= 4.184; // kcal to kJ
+
+    double delta_0 = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
+
+    // TODO: Update intercept value.
+    double K = K_0;
+
+    // Update thermic effect of food and adaptive thermogenesis.
+    double TEF = beta_TEF * EI - EI_0;
+    double AT = beta_AT * EI - EI_0;
+
+    // Energy partitioning.
     const double C = 10.4 * rho_L / rho_F;
     const double p = C / (C + F_0);
 
-    // Glycogen and water equations.
-    const double G_0 = 0.5;
-    const double k_G = CI_0 / (G_0 * G_0);
-    const double G = sqrt(CI / k_G);
-    const double W = 2.7 * G;
-
-    // Extracellular fluid equation.
-    const double xi_Na = 3000.0; // sodium from ECF changes (mg/L/day).
-    const double xi_CI = 4000.0; // sodium from carbohydrate changes (mg/day).
-    const double Na_b = 4000.0;
-    const double Na_f = Na_b * EI / EI_0;
-    const double Delta_Na_diet = Na_f - Na_b;
-    const double ECF = ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
-
-    const double delta_EI = EI - EI_0;
-    const double delta_0 = 0.0; // TODO: profile.GetPhysicalActivityDelta();
-
-    // Thermic effect of food and adaptive thermogenesis equations.
-    const double TEF = beta_TEF * delta_EI;
-    const double AT = beta_AT * delta_EI;
-
     // First equation ax + by = e.
-    const double a1 = p * rho_F;
-    const double b1 = -(1.0 - p) * rho_L;
-    const double c1 = p * rho_F * F_0 - (1 - p) * rho_L * L_0;
+    double a1 = p * rho_F;
+    double b1 = -(1.0 - p) * rho_L;
+    double c1 = p * rho_F * F_0 - (1 - p) * rho_L * L_0;
 
     // Second equation cx + dy = f.
-    const double a2 = gamma_F + delta_0;
-    const double b2 = gamma_L + delta_0;
-    const double c2 = EI - offset - K - TEF - AT - delta_0 * (G + W + ECF);
+    double a2 = gamma_F + delta_0;
+    double b2 = gamma_L + delta_0;
+    double c2 = EI - offset - K - TEF - AT - delta_0 * (G + W + ECF);
 
-    // Body fat and lean tissue steady state equations.
-    const double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
-    const double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
+    // Update body fat and lean tissue steady state.
+    double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
+    double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
-    const double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
-    const double tau = rho_L * rho_F * (1.0 + x) /
-                       ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
+    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
+    double tau = rho_L * rho_F * (1.0 + x) /
+                 ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
 
-    // Body fat and lean tissue equations.
-    const double F = steady_F + (F_0 - steady_F) * exp(-365.0 / tau);
-    const double L = steady_L + (L_0 - steady_L) * exp(-365.0 / tau);
+    // Update body fat and lean tissue.
+    double F = steady_F + (F_0 - steady_F) * exp(-365.0 / tau);
+    double L = steady_L + (L_0 - steady_L) * exp(-365.0 / tau);
 
-    // Body weight equation.
-    const double BW = F + L + G + W + ECF;
+    // Update body weight.
+    double BW = F + L + G + W + ECF;
 
-    // Energy expenditure equation.
-    const double EE =
-        (offset + K + gamma_F * F + gamma_L * L + delta_0 * BW + TEF + AT + EI * x) / (1.0 + x);
+    double delta_BW = delta_0 * BW;
+
+    // Update energy expenditure.
+    double EE = (offset + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
     // TODO: return
 }
