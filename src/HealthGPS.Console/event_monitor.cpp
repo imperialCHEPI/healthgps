@@ -76,9 +76,9 @@ void EventMonitor::result_event_handler(std::shared_ptr<hgps::EventMessage> mess
 void EventMonitor::info_dispatch_thread(std::stop_token token) {
     fmt::print(fg(fmt::color::light_blue), "Info event thread started...\n");
     while (!token.stop_requested()) {
-        auto m = info_queue_.pop();
-        if (m.has_value()) {
-            m.value()->accept(*this);
+        std::shared_ptr<hgps::EventMessage> m;
+        if (info_queue_.try_pop(m)) {
+            m->accept(*this);
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -90,9 +90,9 @@ void EventMonitor::info_dispatch_thread(std::stop_token token) {
 void EventMonitor::result_dispatch_thread(std::stop_token token) {
     fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
     while (!token.stop_requested()) {
-        auto m = results_queue_.pop();
-        if (m.has_value()) {
-            m.value()->accept(*this);
+        std::shared_ptr<hgps::EventMessage> m;
+        if (results_queue_.try_pop(m)) {
+            m->accept(*this);
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
