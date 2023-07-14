@@ -28,7 +28,8 @@ struct EventMessage {
     /// @brief Initialises a new instance of the EventMessage structure.
     /// @param sender The sender identifier
     /// @param run Current simulation run number
-    EventMessage(std::string sender, unsigned int run) : source{sender}, run_number{run} {}
+    EventMessage(std::string sender, unsigned int run)
+        : source{std::move(sender)}, run_number{run} {}
 
     EventMessage(const EventMessage &) = delete;
     EventMessage(EventMessage &&) = delete;
