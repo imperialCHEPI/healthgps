@@ -1,4 +1,5 @@
 #include "math_util.h"
+#include <algorithm>
 #include <cmath>
 
 namespace hgps::core {

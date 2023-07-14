@@ -1,4 +1,5 @@
 #include "interval.h"
+#include <vector>
 
 namespace hgps::core {
 

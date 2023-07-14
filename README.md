@@ -30,7 +30,8 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 
 ### Linux OS
 
-You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
+You may need to install the latest [GCC Compiler](https://gcc.gnu.org) in your system, the
+application requires `GCC 11.1` or newer to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
 2. Unzip both files content into a local directory of your choice (xxx).
@@ -54,8 +55,7 @@ To start working on the *Health GPS* code base, the suggested development machin
 3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
 4. [Ninja](https://ninja-build.org/) 1.10 or newer.
 5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
-6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment, plus.
-   * [Intel TBB](https://github.com/oneapi-src/oneTBB) library version 2018 or later installed (e.g. `sudo apt update && sudo apt install libtbb-dev`)
+6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment.
 7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the `VCPKG_ROOT` *environment variable* set to the installation directory.
 8. Internet connection.
 
@@ -135,6 +135,7 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
+| [oneAPI TBB](https://github.com/oneapi-src/oneTBB)    | Apache 2.0   |
 
 ### Tools and Frameworks
 

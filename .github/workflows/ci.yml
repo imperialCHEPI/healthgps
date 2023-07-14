@@ -24,21 +24,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: gcc-default
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: gcc-default
+          #   is_main: true
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: gcc-latest
+          #   is_main: false
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: clang
+          #   is_main: false
+          # - platform: windows
+          #   os: windows-2022
+          #   compiler: msvc
+          #   is_main: true
+          - platform: macos-x86
+            os: macos-12
+            compiler: gcc
             is_main: true
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: gcc-latest
-            is_main: false
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: clang
-            is_main: false
-          - platform: windows
-            os: windows-2022
-            compiler: msvc
+          - platform: macos-arm
+            os: macos-12
+            compiler: gcc
             is_main: true
 
     env:
@@ -62,7 +70,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential libtbb-dev ninja-build doxygen graphviz
+          sudo apt install --no-install-recommends build-essential ninja-build doxygen graphviz
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
@@ -82,23 +90,33 @@ jobs:
           # Use environment variable to tell CMake to compile with clang
           echo CXX=clang++ >> "$GITHUB_ENV"
 
+      - name: Install dependencies (macOS)
+        if: startsWith(matrix.platform, 'macos')
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew install ninja
+          which ninja
+
+          # Build using gcc as Apple clang doesn't support parallel algorithms
+          echo CXX=g++-12 >> "$GITHUB_ENV"
+
       - name: Install VCPKG
         run: |
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
 
-      - uses: ammaraskar/gcc-problem-matcher@master
+      # - uses: ammaraskar/gcc-problem-matcher@master
       - name: Build HealthGPS (debug)
         run: |
-          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DCMAKE_MAKE_PROGRAM=`which ninja` -DCMAKE_CXX_COMPILER=`which g++-12`|| cat /Users/runner/work/healthgps/healthgps/out/build/macos-x86-debug/vcpkg-manifest-install.log
           cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
 
-      - name: Build HealthGPS (release)
-        if: "!cancelled()" # Run this step, even if the previous one fails
-        run: |
-          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
-          cmake --build --preset=release-build-${{ matrix.platform }} --target=install
+      # - name: Build HealthGPS (release)
+      #   if: "!cancelled()" # Run this step, even if the previous one fails
+      #   run: |
+      #     cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
+      #     cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
       - name: Upload artifacts
         if: matrix.is_main

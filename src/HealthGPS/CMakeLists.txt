@@ -123,7 +123,6 @@ target_sources(HealthGPS
 		"scenario.h"
 		"simulation.h"
 		"sync_message.h"
-		"threadsafe_queue.h"
 		"two_step_value.h"
 		"weight_category.h"
 		"weight_model.cpp"
