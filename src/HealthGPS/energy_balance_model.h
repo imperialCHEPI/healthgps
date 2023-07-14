@@ -53,7 +53,8 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param final_run Final run or trial run
     /// @param final_shift Offset applied in final run
     /// @return Body weight and baseline adjustment coefficient (if final_run == false)
-    std::array<double, 2> simulate_person(Person &person, bool final_run, double final_shift) const;
+    std::pair<double, double> simulate_person(Person &person, bool final_run,
+                                              double final_shift) const;
 };
 
 /// @brief Defines the energy balance model data type

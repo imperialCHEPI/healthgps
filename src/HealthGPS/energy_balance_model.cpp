@@ -82,8 +82,8 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
-std::array<double, 2> EnergyBalanceModel::simulate_person(Person &person, bool final_run,
-                                                          double final_shift) const {
+std::pair<double, double> EnergyBalanceModel::simulate_person(Person &person, bool final_run,
+                                                              double final_shift) const {
     // Model initial state.
     const double H_0 = person.get_risk_factor_value(H_key);
     const double BW_0 = person.get_risk_factor_value(BW_key);
@@ -194,11 +194,11 @@ std::array<double, 2> EnergyBalanceModel::simulate_person(Person &person, bool f
         // person.risk_factors[ECF_key] = ECF;
         // person.risk_factors[EI_key] = EI;
         // person.risk_factors[EE_key] = EE;
-        return std::array<double, 2>{};
+        return {};
     } else { // Trial run:
         // return BW and baseline adjustment coefficient.
         double trial_adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
-        return std::array<double, 2>{BW, trial_adjust};
+        return {BW, trial_adjust};
     }
 }
 
