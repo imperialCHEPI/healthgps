@@ -5,6 +5,10 @@ repos:
       - id: check-merge-conflict
       - id: check-json
       - id: check-yaml
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.23.3
+    hooks:
+      - id: check-github-workflows
   - repo: https://github.com/pre-commit/mirrors-clang-format
     rev: v16.0.6
     hooks:
