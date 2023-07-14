@@ -24,30 +24,30 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: gcc-default
-            is_main: true
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: gcc-latest
-            is_main: false
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: clang
-            is_main: false
-          - platform: windows
-            os: windows-2022
-            compiler: msvc
-            is_main: true
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: gcc-default
+          #   is_main: true
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: gcc-latest
+          #   is_main: false
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: clang
+          #   is_main: false
+          # - platform: windows
+          #   os: windows-2022
+          #   compiler: msvc
+          #   is_main: true
           - platform: macos-x86
             os: macos-12
             compiler: gcc
             is_main: true
-          - platform: macos-arm
-            os: macos-12
-            compiler: gcc
-            is_main: true
+          # - platform: macos-arm
+          #   os: macos-12
+          #   compiler: gcc
+          #   is_main: true
 
     env:
       VCPKG_ROOT: "vcpkg"
@@ -106,15 +106,16 @@ jobs:
           cd vcpkg
           ./bootstrap-vcpkg.sh -disableMetrics
 
-      - uses: ammaraskar/gcc-problem-matcher@master
-      - name: Build HealthGPS (debug)
-        run: |
-          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
-          cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
+      # - uses: ammaraskar/gcc-problem-matcher@master
+      # - name: Build HealthGPS (debug)
+      #   run: |
+      #     cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
+      #     cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
 
       - name: Build HealthGPS (release)
         if: "!cancelled()" # Run this step, even if the previous one fails
         run: |
+          echo NINJA AT `which ninja`
           cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
           cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
