@@ -5,6 +5,36 @@
 
 namespace hgps {
 
+/// @brief Result data type for a simulated person
+struct SimulatePersonResult {
+    /// @brief Height
+    double H{};
+
+    /// @brief Body weight
+    double BW{};
+
+    /// @brief Pyhsical activity level
+    double PAL{};
+
+    /// @brief Body fat
+    double F{};
+
+    /// @brief Lean tissue
+    double L{};
+
+    /// @brief Extracellular fluid
+    double ECF{};
+
+    /// @brief Energy intake
+    double EI{};
+
+    /// @brief Energy expenditure
+    double EE{};
+
+    /// @brief Baseline adjustment coefficient
+    double adjust{};
+};
+
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
@@ -53,8 +83,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param final_run Final run or trial run
     /// @param final_shift Offset applied in final run
     /// @return Body weight and baseline adjustment coefficient (if final_run == false)
-    std::pair<double, double> simulate_person(Person &person, bool final_run,
-                                              double final_shift) const;
+    SimulatePersonResult simulate_person(Person &person, double shift) const;
 };
 
 /// @brief Defines the energy balance model data type

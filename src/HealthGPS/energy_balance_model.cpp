@@ -61,15 +61,16 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        auto [body_weight, adjustment] = simulate_person(person, false, 0.0);
-        mean_sim_body_weight += body_weight;
-        mean_adjustment_coefficient += adjustment;
+        // Compute baseline adjustment coefficient.
+        SimulatePersonResult result = simulate_person(person, 0.0);
+        mean_sim_body_weight += result.BW;
+        mean_adjustment_coefficient += result.adjust;
     }
 
     // Compute baseline adjustment.
     mean_sim_body_weight /= population_size;
     mean_adjustment_coefficient /= population_size;
-    double final_shift = (target_BW - mean_sim_body_weight) / mean_adjustment_coefficient;
+    double shift = (target_BW - mean_sim_body_weight) / mean_adjustment_coefficient;
 
     // Final run.
     for (auto &person : population) {
@@ -78,12 +79,21 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        simulate_person(person, true, final_shift);
+        // TODO: Compute and update risk factors.
+        simulate_person(person, shift);
+        // SimulatePersonResult result = simulate_person(person, shift);
+        // person.risk_factors[H_key] = result.H;
+        // person.risk_factors[BW_key] = result.BW;
+        // person.risk_factors[PAL_key] = result.PAL;
+        // person.risk_factors[F_key] = result.F;
+        // person.risk_factors[L_key] = result.L;
+        // person.risk_factors[ECF_key] = result.ECF;
+        // person.risk_factors[EI_key] = result.EI;
+        // person.risk_factors[EE_key] = result.EE;
     }
 }
 
-std::pair<double, double> EnergyBalanceModel::simulate_person(Person &person, bool final_run,
-                                                              double final_shift) const {
+SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double shift) const {
     // Model initial state.
     const double H_0 = person.get_risk_factor_value(H_key);
     const double BW_0 = person.get_risk_factor_value(BW_key);
@@ -154,14 +164,10 @@ std::pair<double, double> EnergyBalanceModel::simulate_person(Person &person, bo
     double b1 = -(1.0 - p) * rho_L;
     double c1 = p * rho_F * F_0 - (1 - p) * rho_L * L_0;
 
-    // Check no baseline adjustment in trial run.
-    if (!final_run)
-        final_shift = 0.0;
-
     // Second equation cx + dy = f.
     double a2 = gamma_F + delta_0;
     double b2 = gamma_L + delta_0;
-    double c2 = EI - final_shift - K - TEF - AT - delta_0 * (G + W + ECF);
+    double c2 = EI - shift - K - TEF - AT - delta_0 * (G + W + ECF);
 
     // Update body fat and lean tissue steady state.
     double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
@@ -179,27 +185,25 @@ std::pair<double, double> EnergyBalanceModel::simulate_person(Person &person, bo
     // Update body weight.
     double BW = F + L + G + W + ECF;
 
-    // TODO: Update energy expenditure.
-    // double delta_BW = delta_0 * BW;
-    // double EE =
-    //    (final_shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
+    // Update energy expenditure.
+    double delta_BW = delta_0 * BW;
+    double EE = (shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
-    if (final_run) {
-        // TODO: Save state and return nothing.
-        // person.risk_factors[H_key] = H;
-        // person.risk_factors[BW_key] = BW;
-        // person.risk_factors[PAL_key] = PAL;
-        // person.risk_factors[F_key] = F;
-        // person.risk_factors[L_key] = L;
-        // person.risk_factors[ECF_key] = ECF;
-        // person.risk_factors[EI_key] = EI;
-        // person.risk_factors[EE_key] = EE;
-        return {};
-    }
+    // Compute baseline adjustment coefficient.
+    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
 
-    // Trial run: return BW and baseline adjustment coefficient.
-    double trial_adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
-    return {BW, trial_adjust};
+    // Return simulated state.
+    SimulatePersonResult result{.H = H,
+                                .BW = BW,
+                                .PAL = PAL,
+                                .F = F,
+                                .L = L,
+                                .ECF = ECF,
+                                .EI = EI,
+                                .EE = EE,
+                                .adjust = adjust};
+
+    return result;
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
