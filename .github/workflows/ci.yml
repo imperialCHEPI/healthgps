@@ -109,7 +109,7 @@ jobs:
       # - uses: ammaraskar/gcc-problem-matcher@master
       - name: Build HealthGPS (debug)
         run: |
-          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DCMAKE_MAKE_PROGRAM=`which ninja`
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DCMAKE_MAKE_PROGRAM=`which ninja` || cat /Users/runner/work/healthgps/healthgps/out/build/macos-x86-debug/vcpkg-manifest-install.log
           cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
 
       # - name: Build HealthGPS (release)
