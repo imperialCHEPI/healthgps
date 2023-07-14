@@ -48,7 +48,12 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
     static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
 
-    void get_steady_state(Person &person, double offset = 0.0);
+    /// @brief Simulates the energy balance model for a given person
+    /// @param person The person to simulate
+    /// @param final_run Final run or trial run
+    /// @param final_shift Offset applied in final run
+    /// @return Body weight and baseline adjustment coefficient (if final_run == false)
+    std::array<double, 2> simulate_person(Person &person, bool final_run, double final_shift) const;
 };
 
 /// @brief Defines the energy balance model data type
