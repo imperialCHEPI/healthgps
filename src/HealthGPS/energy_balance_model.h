@@ -37,10 +37,10 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
     // Model parameters.
-    static constexpr double rho_F = 39.5e3; // Energy content of body fat (kJ/kg).
-    static constexpr double rho_L = 7.6e3;  // Energy content of lean tissue (kJ/kg).
-    static constexpr double gamma_F = 13.0; // RMR vs fat regression coefficients (kJ/kg/day).
-    static constexpr double gamma_L = 92.0; // RMR vs lean regression coefficients (kJ/kg/day).
+    static constexpr double rho_F = 39.5e3; // Energy content of fat (kJ/kg).
+    static constexpr double rho_L = 7.6e3;  // Energy content of lean (kJ/kg).
+    static constexpr double gamma_F = 13.0; // RMR fat coefficients (kJ/kg/day).
+    static constexpr double gamma_L = 92.0; // RMR lean coefficients (kJ/kg/day).
     static constexpr double eta_F = 750.0;  // Fat synthesis energy coefficient (kJ/kg).
     static constexpr double eta_L = 960.0;  // Lean synthesis energy coefficient (kJ/kg).
     static constexpr double beta_TEF = 0.1; // TEF from energy intake (unitless).
@@ -48,11 +48,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
     static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
 
-    void get_steady_state(Person &entity, double offset = 0.0);
-
-    std::map<core::Identifier, double> get_current_risk_factors(const HierarchicalMapping &mapping,
-                                                                Person &entity,
-                                                                int time_year) const;
+    void get_steady_state(Person &person, double offset = 0.0);
 };
 
 /// @brief Defines the energy balance model data type

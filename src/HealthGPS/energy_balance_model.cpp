@@ -36,14 +36,11 @@ void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &
 
 void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
     auto age_key = core::Identifier{"age"};
-    for (auto &entity : context.population()) {
+    for (auto &person : context.population()) {
         // Ignore if inactive, newborn risk factors must be generated, not updated!
-        if (!entity.is_active() || entity.age == 0) {
+        if (!person.is_active() || person.age == 0) {
             continue;
         }
-
-        auto current_risk_factors =
-            get_current_risk_factors(context.mapping(), entity, context.time_now());
 
         double energy_intake = 0.0;
         std::unordered_map<core::Identifier, double> nutrient_intakes;
@@ -55,7 +52,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
         // Compute nutrient intakes from food intakes.
         for (const auto &equation : nutrient_equations_) {
-            double food_intake = current_risk_factors.at(equation.first);
+            double food_intake = person.get_risk_factor_value(equation.first);
 
             for (const auto &coefficient : equation.second) {
                 double delta_nutrient = food_intake * coefficient.second;
@@ -73,10 +70,10 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
-void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
+void EnergyBalanceModel::get_steady_state(Person &person, double offset) {
     // TODO: Model initial state.
-    const unsigned int &age = entity.age;
-    const core::Gender &sex = entity.gender;
+    const unsigned int &age = person.age;
+    const core::Gender &sex = person.gender;
     const double G_0 = 0.5;   // Initial glycogen.
     const double CI_0 = 0.0;  // TODO: Initial carbohydrate intake.
     const double F_0 = 0.1;   // TODO: Initial body fat.
@@ -160,22 +157,6 @@ void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     double EE = (offset + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
     // TODO: return
-}
-
-std::map<core::Identifier, double>
-EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping, Person &entity,
-                                             int time_year) const {
-    auto entity_risk_factors = std::map<core::Identifier, double>();
-    entity_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
-    for (const auto &factor : mapping) {
-        if (factor.is_dynamic_factor()) {
-            entity_risk_factors.emplace(factor.key(), time_year - 1);
-        } else {
-            entity_risk_factors.emplace(factor.key(), entity.get_risk_factor_value(factor.key()));
-        }
-    }
-
-    return entity_risk_factors;
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
