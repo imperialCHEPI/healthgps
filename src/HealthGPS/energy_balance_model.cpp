@@ -170,6 +170,7 @@ std::array<double, 2> EnergyBalanceModel::simulate_person(Person &person, bool f
     double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
+    // Compute time constant.
     double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
     double tau = rho_L * rho_F * (1.0 + x) /
                  ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
@@ -181,22 +182,21 @@ std::array<double, 2> EnergyBalanceModel::simulate_person(Person &person, bool f
     // Update body weight.
     double BW = F + L + G + W + ECF;
 
-    double delta_BW = delta_0 * BW;
-
-    // Update energy expenditure.
-    double EE =
-        (final_shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
+    // TODO: Update energy expenditure.
+    // double delta_BW = delta_0 * BW;
+    // double EE =
+    //    (final_shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
     if (final_run) { // Final run:
-        // Save state and return nothing.
-        person.risk_factors[H_key] = H;
-        person.risk_factors[BW_key] = BW;
-        person.risk_factors[PAL_key] = PAL;
-        person.risk_factors[F_key] = F;
-        person.risk_factors[L_key] = L;
-        person.risk_factors[ECF_key] = ECF;
-        person.risk_factors[EI_key] = EI;
-        person.risk_factors[EE_key] = EE;
+        // TODO: Save state and return nothing.
+        // person.risk_factors[H_key] = H;
+        // person.risk_factors[BW_key] = BW;
+        // person.risk_factors[PAL_key] = PAL;
+        // person.risk_factors[F_key] = F;
+        // person.risk_factors[L_key] = L;
+        // person.risk_factors[ECF_key] = ECF;
+        // person.risk_factors[EI_key] = EI;
+        // person.risk_factors[EE_key] = EE;
         return std::array<double, 2>{};
     } else { // Trial run:
         // return BW and baseline adjustment coefficient.
