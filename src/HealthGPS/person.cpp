@@ -48,19 +48,11 @@ double Person::get_risk_factor_value(const core::Identifier &key) const noexcept
 }
 
 float Person::gender_to_value() const noexcept {
-    if (gender == core::Gender::male) {
-        return 1.0f;
-    }
-
-    return 0.0f;
+    return gender == core::Gender::male ? 1.0f : 0.0f;
 }
 
 std::string Person::gender_to_string() const noexcept {
-    if (gender == core::Gender::male) {
-        return "male";
-    }
-
-    return "female";
+    return gender == core::Gender::male ? "male" : "female";
 }
 
 void Person::emigrate(const unsigned int time) {
