@@ -3,6 +3,15 @@
 
 namespace hgps {
 
+// Rsik factor keys.
+const core::Identifier H_key{"height"};
+const core::Identifier BW_key{"weight"};
+const core::Identifier PAL_key{"physical_activity_level"};
+const core::Identifier F_key{"body_fat"};
+const core::Identifier L_key{"lean_tissue"};
+const core::Identifier ECF_key{"extracellular_fluid"};
+const core::Identifier CI_key{"carbohydrate"};
+
 EnergyBalanceModel::EnergyBalanceModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -65,24 +74,30 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             energy_intake += delta_energy;
         }
 
-        // TODO: model after energy intake stage
+        // // Model initial state.
+        // const double H_0 = person.get_risk_factor_value(H_key);
+        // const double BW_0 = person.get_risk_factor_value(BW_key);
+        // const double PAL_0 = person.get_risk_factor_value(PAL_key);
+        // const double F_0 = person.get_risk_factor_value(F_key);
+        // const double L_0 = person.get_risk_factor_value(L_key);
+        // const double ECF_0 = person.get_risk_factor_value(ECF_key);
+        // const double CI_0 = person.get_risk_factor_value(CI_key);
+        // const double G_0 = 0.5;
     }
 }
 
 void EnergyBalanceModel::get_steady_state(Person &person, double offset) {
-    // TODO: Model initial state.
-    const unsigned int &age = person.age;
-    const core::Gender &sex = person.gender;
-    const double H_0 = person.get_risk_factor_value(core::Identifier{"height"});
-    const double BW_0 = person.get_risk_factor_value(core::Identifier{"weight"});
-    const double PAL_0 = person.get_risk_factor_value(core::Identifier{"physical_activity_level"});
-    const double F_0 = person.get_risk_factor_value(core::Identifier{"body_fat"});
-    const double L_0 = person.get_risk_factor_value(core::Identifier{"lean_tissue"});
-    const double ECF_0 = person.get_risk_factor_value(core::Identifier{"extracellular_fluid"});
-    const double CI_0 = person.get_risk_factor_value(core::Identifier{"carbohydrate"});
+    // Model initial state.
+    const double H_0 = person.get_risk_factor_value(H_key);
+    const double BW_0 = person.get_risk_factor_value(BW_key);
+    const double PAL_0 = person.get_risk_factor_value(PAL_key);
+    const double F_0 = person.get_risk_factor_value(F_key);
+    const double L_0 = person.get_risk_factor_value(L_key);
+    const double ECF_0 = person.get_risk_factor_value(ECF_key);
+    const double CI_0 = person.get_risk_factor_value(CI_key);
     const double G_0 = 0.5;
 
-    // TODO: COMPUTE Initial energy intake.
+    // TODO: Initial energy intake.
     const double EI_0 = 0.0;
 
     // TODO: Update carbohydrate intake.
@@ -109,8 +124,8 @@ void EnergyBalanceModel::get_steady_state(Person &person, double offset) {
     double PAL = PAL_0;
 
     // Update resting metabolic rate (Mifflin-St Jeor).
-    double RMR = 9.99 * BW_0 + 6.25 * H * 100.0 - 4.92 * age;
-    RMR += sex == core::Gender::male ? 5.0 : -161.0;
+    double RMR = 9.99 * BW_0 + 6.25 * H * 100.0 - 4.92 * person.age;
+    RMR += person.gender == core::Gender::male ? 5.0 : -161.0;
     RMR *= 4.184; // kcal to kJ
 
     double delta_0 = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
