@@ -1,9 +1,9 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(TBB CONFIG REQUIRED)
 find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
 find_package(Threads REQUIRED)
-find_package(TBB QUIET)
 
 add_executable(HealthGPS.Console "")
 target_compile_features(HealthGPS.Console PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -40,28 +40,16 @@ if(WIN32)
 	target_sources(HealthGPS.Console PRIVATE versioninfo.rc)
 endif(WIN32)
 
-message(STATUS "TBB found: ${TBB_FOUND}")
-if(TBB_FOUND AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-	target_link_libraries(HealthGPS.Console
-	PRIVATE
-		HealthGPS.Core
-		HealthGPS.Datastore
-		HealthGPS
-		fmt::fmt
-		Threads::Threads
-		cxxopts::cxxopts
-		nlohmann_json::nlohmann_json "-ltbb")
-else()
-	target_link_libraries(HealthGPS.Console
-	PRIVATE
-		HealthGPS.Core
-		HealthGPS.Datastore
-		HealthGPS
-		fmt::fmt
-		Threads::Threads
-		cxxopts::cxxopts
-		nlohmann_json::nlohmann_json)
-endif()
+target_link_libraries(HealthGPS.Console
+PRIVATE
+    HealthGPS.Core
+    HealthGPS.Datastore
+    HealthGPS
+    fmt::fmt
+    Threads::Threads
+    cxxopts::cxxopts
+    nlohmann_json::nlohmann_json
+    TBB::tbb)
 
 install(TARGETS HealthGPS.Console DESTINATION "")
 if(WIN32)

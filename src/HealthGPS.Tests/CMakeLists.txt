@@ -1,8 +1,8 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
+find_package(TBB CONFIG REQUIRED)
 find_package(Threads REQUIRED)
-find_package(TBB QUIET)
 
 include(CTest)
 include(GoogleTest)
@@ -42,27 +42,16 @@ target_sources(HealthGPS.Tests
         "RiskFactorData.h"
         "Interval.Test.cpp")
 
-if(TBB_FOUND AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-    target_link_libraries(HealthGPS.Tests
-    PRIVATE
-        HealthGPS.Core
-        HealthGPS.Datastore
-        HealthGPS
-        fmt::fmt
-        Threads::Threads
-        cxxopts::cxxopts
-        GTest::gtest "-ltbb")
-else()
-    target_link_libraries(HealthGPS.Tests
-    PRIVATE
-        HealthGPS.Core
-        HealthGPS.Datastore
-        HealthGPS
-        fmt::fmt
-        Threads::Threads
-        cxxopts::cxxopts
-        GTest::gtest)
-endif()
+target_link_libraries(HealthGPS.Tests
+PRIVATE
+    HealthGPS.Core
+    HealthGPS.Datastore
+    HealthGPS
+    fmt::fmt
+    Threads::Threads
+    cxxopts::cxxopts
+    TBB::tbb
+    GTest::gtest)
 
 # We use a long discovery timeout because this can take a while on CI systems
 gtest_discover_tests(HealthGPS.Tests DISCOVERY_TIMEOUT 30)
