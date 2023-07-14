@@ -12,8 +12,14 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {core::Identifier{"age3"}, [](const Person &p) { return pow(p.age, 3); }},
     {core::Identifier{"ses"}, [](const Person &p) { return p.ses; }},
 
-    // HACK: ew, gross... allows us to mock nutrients we don't have data for yet
+    // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
     {core::Identifier{"carbohydrate"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"height"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"weight"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"physical_activity_level"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"body_fat"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"lean_tissue"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"extracellular_fluid"}, [](const Person &) { return 0.5; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}

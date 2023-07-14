@@ -35,7 +35,6 @@ void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &
 }
 
 void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
-    auto age_key = core::Identifier{"age"};
     for (auto &person : context.population()) {
         // Ignore if inactive, newborn risk factors must be generated, not updated!
         if (!person.is_active() || person.age == 0) {
@@ -74,16 +73,17 @@ void EnergyBalanceModel::get_steady_state(Person &person, double offset) {
     // TODO: Model initial state.
     const unsigned int &age = person.age;
     const core::Gender &sex = person.gender;
-    const double G_0 = 0.5;   // Initial glycogen.
-    const double CI_0 = 0.0;  // TODO: Initial carbohydrate intake.
-    const double F_0 = 0.1;   // TODO: Initial body fat.
-    const double L_0 = 0.1;   // TODO: Initial lean tissue.
-    const double EI_0 = 0.0;  // TODO: Initial energy intake.
-    const double ECF_0 = 0.2; // TODO: Initial extracellular fluid.
-    const double H_0 = 0.0;   // TODO: Initial height.
-    const double BW_0 = 0.0;  // TODO: Initial body weight.
-    const double PAL_0 = 0.0; // TODO: Initial physical activity level.
-    const double K_0 = 0.0;   // TODO: Initial intercept value.
+    const double H_0 = person.get_risk_factor_value(core::Identifier{"height"});
+    const double BW_0 = person.get_risk_factor_value(core::Identifier{"weight"});
+    const double PAL_0 = person.get_risk_factor_value(core::Identifier{"physical_activity_level"});
+    const double F_0 = person.get_risk_factor_value(core::Identifier{"body_fat"});
+    const double L_0 = person.get_risk_factor_value(core::Identifier{"lean_tissue"});
+    const double ECF_0 = person.get_risk_factor_value(core::Identifier{"extracellular_fluid"});
+    const double CI_0 = person.get_risk_factor_value(core::Identifier{"carbohydrate"});
+    const double G_0 = 0.5;
+
+    // TODO: COMPUTE Initial energy intake.
+    const double EI_0 = 0.0;
 
     // TODO: Update carbohydrate intake.
     double CI = CI_0;
@@ -115,12 +115,12 @@ void EnergyBalanceModel::get_steady_state(Person &person, double offset) {
 
     double delta_0 = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
 
-    // TODO: Update intercept value.
-    double K = K_0;
-
     // Update thermic effect of food and adaptive thermogenesis.
     double TEF = beta_TEF * EI - EI_0;
     double AT = beta_AT * EI - EI_0;
+
+    // TODO: Update intercept value.
+    const double K = 0.0; // TODO: Intercept value.
 
     // Energy partitioning.
     const double C = 10.4 * rho_L / rho_F;
