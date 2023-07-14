@@ -43,9 +43,13 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
     }
 }
 
-std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
-load_static_risk_model_definition(const poco::json &opt) {
+std::unique_ptr<hgps::RiskFactorModelDefinition>
+load_static_risk_model_definition(const std::string &model_name, const poco::json &opt) {
     MEASURE_FUNCTION();
+    if (!hgps::core::case_insensitive::equals(model_name, "hlm")) {
+        throw std::invalid_argument{fmt::format("Static model '{}' not recognised", model_name)};
+    }
+
     std::map<int, hgps::HierarchicalLevel> levels;
     std::unordered_map<hgps::core::Identifier, hgps::LinearModel> models;
 
@@ -106,8 +110,23 @@ load_static_risk_model_definition(const poco::json &opt) {
                                                                      std::move(levels));
 }
 
+std::unique_ptr<hgps::RiskFactorModelDefinition>
+load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
+                                   const poco::SettingsInfo &settings) {
+    // Load this dynamic model with the appropriate loader.
+    if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
+        return load_ebhlm_risk_model_definition(opt);
+    }
+    if (hgps::core::case_insensitive::equals(model_name, "newebm")) {
+        return load_newebm_risk_model_definition(opt, settings);
+    }
+
+    throw std::invalid_argument{
+        fmt::format("Dynamic model name '{}' is not recognised.", model_name)};
+}
+
 std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
-load_dynamic_risk_model_definition(const poco::json &opt) {
+load_ebhlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     auto percentage = 0.05;
     std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
@@ -229,49 +248,48 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
         std::move(energy_equation), std::move(nutrient_equations), std::move(age_mean_height));
 }
 
+std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
+load_risk_model_definition(const std::string &model_type, const poco::json &opt,
+                           const poco::SettingsInfo &settings) {
+    // Get model name from JSON
+    const auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
+
+    // Load appropriate model
+    if (hgps::core::case_insensitive::equals(model_type, "static")) {
+        return std::make_pair(hgps::HierarchicalModelType::Static,
+                              load_static_risk_model_definition(model_name, opt));
+    }
+    if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
+        return std::make_pair(hgps::HierarchicalModelType::Dynamic,
+                              load_dynamic_risk_model_definition(model_name, opt, settings));
+    }
+
+    throw std::invalid_argument(fmt::format("Unknown model type: {}", model_type));
+}
+
+poco::json load_json(const std::string &model_filename) {
+    std::ifstream ifs(model_filename, std::ifstream::in);
+    if (!ifs.good()) {
+        throw std::invalid_argument(fmt::format("Model file: {} not found", model_filename));
+    }
+
+    return poco::json::parse(ifs);
+}
+
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                                             const poco::ModellingInfo &info,
                                             const poco::SettingsInfo &settings) {
     MEASURE_FUNCTION();
-    hgps::HierarchicalModelType model_type;
-    std::unique_ptr<hgps::RiskFactorModelDefinition> model_definition;
 
-    for (auto &model : info.risk_factor_models) {
-        const auto &model_filename = model.second;
-        std::ifstream ifs(model_filename, std::ifstream::in);
+    for (const auto &model : info.risk_factor_models) {
+        // Load file and parse JSON
+        const auto opt = load_json(model.second);
 
-        if (!ifs.good()) {
-            throw std::invalid_argument(fmt::format("Model file: {} not found", model_filename));
-        }
+        // Load appropriate dynamic/static model
+        auto [model_type, model_definition] =
+            load_risk_model_definition(model.first, opt, settings);
 
-        // Get this model's name.
-        poco::json parsed_json = poco::json::parse(ifs);
-        std::string model_name = hgps::core::to_lower(parsed_json["ModelName"].get<std::string>());
-
-        if (hgps::core::case_insensitive::equals(model.first, "static")) {
-            // Load this static model with the appropriate loader.
-            model_type = hgps::HierarchicalModelType::Static;
-            if (hgps::core::case_insensitive::equals(model_name, "hlm")) {
-                model_definition = load_static_risk_model_definition(parsed_json);
-            } else {
-                fmt::print(fg(fmt::color::red), "Static model name '{}' is not recognised.\n",
-                           model_name);
-            }
-        } else if (hgps::core::case_insensitive::equals(model.first, "dynamic")) {
-            // Load this dynamic model with the appropriate loader.
-            model_type = hgps::HierarchicalModelType::Dynamic;
-            if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
-                model_definition = load_dynamic_risk_model_definition(parsed_json);
-            } else if (hgps::core::case_insensitive::equals(model_name, "newebm")) {
-                model_definition = load_newebm_risk_model_definition(parsed_json, settings);
-            } else {
-                fmt::print(fg(fmt::color::red), "Dynamic model name '{}' is not recognised.\n",
-                           model_name);
-            }
-        } else {
-            throw std::invalid_argument(fmt::format("Unknown model type: {}", model.first));
-        }
-
+        // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
 
