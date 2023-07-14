@@ -61,9 +61,9 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        auto trial = simulate_person(person, false, 0.0);
-        mean_sim_body_weight += trial[0];
-        mean_adjustment_coefficient += trial[1];
+        auto [body_weight, adjustment] = simulate_person(person, false, 0.0);
+        mean_sim_body_weight += body_weight;
+        mean_adjustment_coefficient += adjustment;
     }
 
     // Compute baseline adjustment.
