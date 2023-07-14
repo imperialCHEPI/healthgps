@@ -107,17 +107,16 @@ jobs:
           ./bootstrap-vcpkg.sh -disableMetrics
 
       # - uses: ammaraskar/gcc-problem-matcher@master
-      # - name: Build HealthGPS (debug)
-      #   run: |
-      #     cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
-      #     cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
-
-      - name: Build HealthGPS (release)
-        if: "!cancelled()" # Run this step, even if the previous one fails
+      - name: Build HealthGPS (debug)
         run: |
-          echo NINJA AT `which ninja`
-          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
-          cmake --build --preset=release-build-${{ matrix.platform }} --target=install
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DCMAKE_MAKE_PROGRAM=`which ninja`
+          cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
+
+      # - name: Build HealthGPS (release)
+      #   if: "!cancelled()" # Run this step, even if the previous one fails
+      #   run: |
+      #     cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
+      #     cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
       - name: Upload artifacts
         if: matrix.is_main
