@@ -99,6 +99,29 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+        {
+            "name": "macos-arm-debug",
+            "displayName": "macOS Debug (ARM architecture)",
+            "description": "Build on macOS (debug; ARM architecture).",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                    "type": "FILEPATH"
+                },
+                "CMAKE_OSX_ARCHITECTURES": "arm64"
+            }
+        },
+        {
+            "name": "macos-arm-release",
+            "displayName": "macOS Release (ARM architecture)",
+            "description": "Build on macOS (release; ARM architecture).",
+            "inherits": "macos-arm-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
         }
     ],
     "buildPresets": [
@@ -137,6 +160,18 @@
             "displayName": "Release",
             "configurePreset": "macos-x86-release",
             "description": "macOS release build (x86 architecture)"
+        },
+        {
+            "name": "debug-build-macos-arm",
+            "displayName": "Default",
+            "configurePreset": "macos-arm-debug",
+            "description": "macOS debug build (ARM architecture)"
+        },
+        {
+            "name": "release-build-macos-arm",
+            "displayName": "Release",
+            "configurePreset": "macos-arm-release",
+            "description": "macOS release build (ARM architecture)"
         }
     ],
     "testPresets": [
@@ -157,6 +192,11 @@
             "name": "core-test-macos-x86",
             "inherits": "core-test-linux",
             "configurePreset": "macos-x86-debug"
+        },
+        {
+            "name": "core-test-macos-arm",
+            "inherits": "core-test-linux",
+            "configurePreset": "macos-arm-debug"
         }
     ]
 }
