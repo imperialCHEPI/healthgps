@@ -88,8 +88,9 @@ struct Person {
 
     /// @brief Gets a risk factor current value
     /// @param key The risk factor identifier
-    /// @return Current risk factor value, if found; otherwise, NaN
-    double get_risk_factor_value(const core::Identifier &key) const noexcept;
+    /// @return Current risk factor value, if found
+    /// @throws std::out_of_range for unknown risk factor
+    double get_risk_factor_value(const core::Identifier &key) const;
 
     /// @brief Gets the gender enumeration as a number for analysis
     /// @return The gender associated value
