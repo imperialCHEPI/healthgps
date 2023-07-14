@@ -88,18 +88,6 @@ void EnergyBalanceModel::get_steady_state(Person &entity, double offset) {
     const double PAL_0 = 0.0; // TODO: Initial physical activity level.
     const double K_0 = 0.0;   // TODO: Initial intercept value.
 
-    // Model parameters.
-    const double rho_F = 39.5e3; // Energy content of body fat (kJ/kg).
-    const double rho_L = 7.6e3;  // Energy content of lean tissue (kJ/kg).
-    const double gamma_F = 13.0; // RMR vs body fat regression coefficients (kJ/kg/day).
-    const double gamma_L = 92.0; // RMR vs lean tissue regression coefficients (kJ/kg/day).
-    const double eta_F = 750.0;  // Body fat synthesis energy coefficient (kJ/kg).
-    const double eta_L = 960.0;  // Lean tissue synthesis energy coefficient (kJ/kg).
-    const double beta_TEF = 0.1; // TEF from energy intake (unitless).
-    const double beta_AT = 0.14; // AT from energy intake (unitless).
-    const double xi_Na = 3000.0; // sodium from ECF changes (mg/L/day).
-    const double xi_CI = 4000.0; // sodium from carbohydrate changes (mg/day).
-
     // TODO: Update carbohydrate intake.
     double CI = CI_0;
 
