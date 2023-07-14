@@ -103,15 +103,12 @@ std::array<double, 2> EnergyBalanceModel::simulate_person(Person &person, bool f
 
     // Compute nutrient intakes from food intakes.
     std::unordered_map<core::Identifier, double> nutrient_intakes;
-    for (const auto &coefficient : energy_equation_) {
-        nutrient_intakes[coefficient.first] = 0.0;
-    }
     for (const auto &equation : nutrient_equations_) {
         double food_intake = person.get_risk_factor_value(equation.first);
 
         for (const auto &coefficient : equation.second) {
             double delta_nutrient = food_intake * coefficient.second;
-            nutrient_intakes.at(coefficient.first) += delta_nutrient;
+            nutrient_intakes[coefficient.first] += delta_nutrient;
         }
     }
 
