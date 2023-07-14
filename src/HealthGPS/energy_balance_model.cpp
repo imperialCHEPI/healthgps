@@ -184,7 +184,7 @@ std::pair<double, double> EnergyBalanceModel::simulate_person(Person &person, bo
     // double EE =
     //    (final_shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
-    if (final_run) { // Final run:
+    if (final_run) {
         // TODO: Save state and return nothing.
         // person.risk_factors[H_key] = H;
         // person.risk_factors[BW_key] = BW;
@@ -195,11 +195,11 @@ std::pair<double, double> EnergyBalanceModel::simulate_person(Person &person, bo
         // person.risk_factors[EI_key] = EI;
         // person.risk_factors[EE_key] = EE;
         return {};
-    } else { // Trial run:
-        // return BW and baseline adjustment coefficient.
-        double trial_adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
-        return {BW, trial_adjust};
     }
+
+    // Trial run: return BW and baseline adjustment coefficient.
+    double trial_adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
+    return {BW, trial_adjust};
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
