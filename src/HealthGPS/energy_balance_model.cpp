@@ -51,7 +51,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             current_risk_factors.at(age_key) = model_age;
         }
 
-        double energy_intake = 0.0;
+        [[maybe_unused]] double energy_intake = 0.0;
         std::unordered_map<core::Identifier, double> nutrient_intakes;
 
         // Initialise nutrients to zero.
