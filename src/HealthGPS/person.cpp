@@ -45,12 +45,12 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     if (current_dispatcher.contains(key)) {
         // Static properties
         return current_dispatcher.at(key)(*this);
-    } else if (risk_factors.contains(key)) {
+    }
+    if (risk_factors.contains(key)) {
         // Dynamic properties
         return risk_factors.at(key);
-    } else {
-        throw std::out_of_range("Risk factor not found: " + key.to_string());
     }
+    throw std::out_of_range("Risk factor not found: " + key.to_string());
 }
 
 float Person::gender_to_value() const noexcept {
