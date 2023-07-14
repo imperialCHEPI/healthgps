@@ -93,7 +93,9 @@ jobs:
       - name: Install dependencies (macOS)
         if: startsWith(matrix.platform, 'macos')
         run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew install ninja
+          which ninja
 
           # Build using gcc as Apple clang doesn't support parallel algorithms
           echo CXX=g++-12 >> "$GITHUB_ENV"
