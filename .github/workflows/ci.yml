@@ -32,6 +32,10 @@ jobs:
             os: macos-12
             compiler: gcc
             is_main: true
+          - platform: macos-arm
+            os: macos-12
+            compiler: gcc
+            is_main: true
 
     env:
       VCPKG_ROOT: vcpkg
