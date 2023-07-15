@@ -46,6 +46,17 @@ const DataTableColumn &DataTable::column(const std::string &name) const {
     throw std::out_of_range(fmt::format("Column name: {} not found.", name));
 }
 
+const std::pair<bool, DataTableColumn &>
+DataTable::column_if_exists(const std::string &name) const {
+    auto found = index_.find(to_lower(name));
+    if (found != index_.end()) {
+        return {true, *columns_.at(found->second)};
+    }
+
+    // Not found.
+    return {false, **columns_.end()};
+}
+
 std::string DataTable::to_string() const noexcept {
     std::stringstream ss;
     std::size_t longestColumnName = 0;

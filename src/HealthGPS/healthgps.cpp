@@ -331,13 +331,13 @@ std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summ
     auto visitor = UnivariateVisitor();
     auto summary = std::map<std::string, core::UnivariateSummary>();
     auto &input_data = definition_.inputs().data();
+
     for (const auto &entry : context_.mapping()) {
-        try {
-            input_data.column(entry.name()).accept(visitor);
+        // HACK: Ignore missing columns.
+        auto &[success, column] = input_data.column_if_exists(entry.name());
+        if (success) {
+            column.accept(visitor);
             summary.emplace(entry.name(), visitor.get_summary());
-        } catch (const std::out_of_range &oor) {
-            // HACK: ignore missing columns
-            continue;
         }
     }
 
