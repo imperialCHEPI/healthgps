@@ -15,6 +15,7 @@ namespace host {
 hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info);
 
 /// @brief Loads the full hierarchical linear regression model definition from a JSON file
+/// @param model_name The name of the model to use
 /// @param opt The parsed model definition JSON file
 /// @return An instance of the hgps::HierarchicalLinearModelDefinition type
 /// @throw std::invalid_argument if static model is unrecognised
@@ -22,7 +23,9 @@ std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_static_risk_model_definition(const std::string &model_name, const poco::json &opt);
 
 /// @brief Loads a dynamic model from a JSON file
+/// @param model_name The name of the model to use
 /// @param opt The parsed model definition JSON file
+/// @param settings The main model settings
 /// @return An instance of the hgps::RiskFactorModelDefinition type
 /// @throw std::invalid_argument if dynamic model is unrecognised
 std::unique_ptr<hgps::RiskFactorModelDefinition>
