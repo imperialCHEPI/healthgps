@@ -105,54 +105,38 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     const double CI_0 = person.get_risk_factor_value(CI_key);
     const double G_0 = 0.5;
 
-    // TODO: Update height.
+    // TODO: Compute height.
     double H = H_0;
 
-    // TODO: Update physical activity level.
+    // TODO: Compute physical activity level.
     double PAL = PAL_0;
 
     // Compute nutrient intakes from food intakes.
-    std::unordered_map<core::Identifier, double> nutrient_intakes;
-    for (const auto &equation : nutrient_equations_) {
-        double food_intake = person.get_risk_factor_value(equation.first);
+    auto nutrient_intakes = compute_nutrient_intakes(person);
 
-        for (const auto &coefficient : equation.second) {
-            double delta_nutrient = food_intake * coefficient.second;
-            nutrient_intakes[coefficient.first] += delta_nutrient;
-        }
-    }
-
-    // Update energy intake and carbohydrate intake.
-    double EI = 0.0;
+    // Compute energy intake and carbohydrate intake.
+    double EI = compute_energy_intake(nutrient_intakes);
     double CI = nutrient_intakes.at(CI_key);
-    for (const auto &coefficient : energy_equation_) {
-        double delta_energy = nutrient_intakes.at(coefficient.first) * coefficient.second;
-        EI += delta_energy;
-    }
 
-    // Update glycogen and water.
-    double k_G = CI_0 / (G_0 * G_0);
-    double G = sqrt(CI / k_G);
+    // Compute glycogen and water.
+    double G = compute_glycogen(CI, CI_0, G_0);
     double W = 2.7 * G;
 
-    // Update extracellular fluid.
-    double Na_b = 4000.0;
-    double Na_f = Na_b * EI / EI_0;
-    double Delta_Na_diet = Na_f - Na_b;
-    double ECF = ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
+    // Compute extracellular fluid.
+    double ECF = compute_extracellular_fluid(EI, EI_0, CI, CI_0, ECF_0);
 
-    // Update resting metabolic rate (Mifflin-St Jeor).
+    // Compute resting metabolic rate (Mifflin-St Jeor).
     double RMR = 9.99 * BW_0 + 6.25 * H * 100.0 - 4.92 * person.age;
     RMR += person.gender == core::Gender::male ? 5.0 : -161.0;
     RMR *= 4.184; // kcal to kJ
 
     double delta_0 = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
 
-    // Update thermic effect of food and adaptive thermogenesis.
+    // Compute thermic effect of food and adaptive thermogenesis.
     double TEF = beta_TEF * EI - EI_0;
     double AT = beta_AT * EI - EI_0;
 
-    // TODO: Update intercept value.
+    // TODO: Compute intercept value.
     const double K = 0.0; // TODO: Intercept value.
 
     // Energy partitioning.
@@ -169,7 +153,7 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     double b2 = gamma_L + delta_0;
     double c2 = EI - shift - K - TEF - AT - delta_0 * (G + W + ECF);
 
-    // Update body fat and lean tissue steady state.
+    // Compute body fat and lean tissue steady state.
     double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
@@ -178,14 +162,14 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     double tau = rho_L * rho_F * (1.0 + x) /
                  ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
 
-    // Update body fat and lean tissue.
+    // Compute body fat and lean tissue.
     double F = steady_F + (F_0 - steady_F) * exp(-365.0 / tau);
     double L = steady_L + (L_0 - steady_L) * exp(-365.0 / tau);
 
-    // Update body weight.
+    // Compute body weight.
     double BW = F + L + G + W + ECF;
 
-    // Update energy expenditure.
+    // Compute energy expenditure.
     double delta_BW = delta_0 * BW;
     double EE = (shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
@@ -204,6 +188,49 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
                                 .adjust = adjust};
 
     return result;
+}
+
+std::unordered_map<core::Identifier, double>
+EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
+    std::unordered_map<core::Identifier, double> nutrient_intakes;
+
+    for (const auto &equation : nutrient_equations_) {
+        double food_intake = person.get_risk_factor_value(equation.first);
+
+        for (const auto &coefficient : equation.second) {
+            double delta_nutrient = food_intake * coefficient.second;
+            nutrient_intakes[coefficient.first] += delta_nutrient;
+        }
+    }
+
+    return nutrient_intakes;
+}
+
+double EnergyBalanceModel::compute_energy_intake(
+    const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
+    double EI = 0.0;
+
+    for (const auto &coefficient : energy_equation_) {
+        double delta_energy = nutrient_intakes.at(coefficient.first) * coefficient.second;
+        EI += delta_energy;
+    }
+
+    return EI;
+}
+
+double EnergyBalanceModel::compute_glycogen(double CI, double CI_0, double G_0) const {
+    double k_G = CI_0 / (G_0 * G_0);
+    double G = sqrt(CI / k_G);
+    return G;
+}
+
+double EnergyBalanceModel::compute_extracellular_fluid(double EI, double EI_0, double CI,
+                                                       double CI_0, double ECF_0) const {
+    double Na_b = 4000.0;
+    double Na_f = Na_b * EI / EI_0;
+    double Delta_Na_diet = Na_f - Na_b;
+    double ECF = ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
+    return ECF;
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
