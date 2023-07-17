@@ -19,14 +19,15 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
 /// @return An instance of the hgps::HierarchicalLinearModelDefinition type
 /// @throw std::invalid_argument if static model is unrecognised
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_static_risk_model_definition(const poco::json &opt);
+load_static_risk_model_definition(const std::string &model_name, const poco::json &opt);
 
 /// @brief Loads a dynamic model from a JSON file
 /// @param opt The parsed model definition JSON file
 /// @return An instance of the hgps::RiskFactorModelDefinition type
 /// @throw std::invalid_argument if dynamic model is unrecognised
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_dynamic_risk_model_definition(const poco::json &opt);
+load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
+                                   const poco::SettingsInfo &settings);
 
 /// @brief Loads the old energy balance model definition from a JSON file
 /// @param opt The parsed model definition JSON file
