@@ -88,21 +88,19 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @brief Compute new nutrient intakes from food intakes.
     /// @param person The person to compute nutrient intakes for
     /// @return A map of computed nutrient intakes
-    std::unordered_map<core::Identifier, double>
-    compute_nutrient_intakes(const Person &person) const;
+    std::unordered_map<core::Identifier, double> compute_nutrients(const Person &person) const;
 
     /// @brief Compute new energy intake from nutrient intakes.
     /// @param nutrient_intakes The nutrient intake
     /// @return The computed energy intake
-    double compute_energy_intake(
-        const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
+    double compute_EI(const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
 
     /// @brief Compute new glycogen.
     /// @param CI The new carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
     /// @param G_0 The initial glycogen
     /// @return The computed glycogen
-    double compute_glycogen(double CI, double CI_0, double G_0) const;
+    double compute_G(double CI, double CI_0, double G_0) const;
 
     /// @brief Compute new extracellular fluid.
     /// @param EI The new energy intake
@@ -111,8 +109,15 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param CI_0 The initial carbohydrate intake
     /// @param ECF_0 The initial extracellular fluid
     /// @return The computed extracellular fluid
-    double compute_extracellular_fluid(double EI, double EI_0, double CI, double CI_0,
-                                       double ECF_0) const;
+    double compute_ECF(double EI, double EI_0, double CI, double CI_0, double ECF_0) const;
+
+    /// @brief Compute resting metabolic rate (Mifflin-St Jeor).
+    /// @param BW The body weight
+    /// @param H The height
+    /// @param age The age
+    /// @param gender The gender
+    /// @return The computed resting metabolic rate
+    double compute_RMR(double BW, double H, unsigned int age, core::Gender gender) const;
 };
 
 /// @brief Defines the energy balance model data type

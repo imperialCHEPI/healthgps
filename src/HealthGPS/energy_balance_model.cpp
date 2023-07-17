@@ -112,23 +112,21 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     double PAL = PAL_0;
 
     // Compute nutrient intakes from food intakes.
-    auto nutrient_intakes = compute_nutrient_intakes(person);
+    auto nutrient_intakes = compute_nutrients(person);
 
     // Compute energy intake and carbohydrate intake.
-    double EI = compute_energy_intake(nutrient_intakes);
+    double EI = compute_EI(nutrient_intakes);
     double CI = nutrient_intakes.at(CI_key);
 
     // Compute glycogen and water.
-    double G = compute_glycogen(CI, CI_0, G_0);
+    double G = compute_G(CI, CI_0, G_0);
     double W = 2.7 * G;
 
     // Compute extracellular fluid.
-    double ECF = compute_extracellular_fluid(EI, EI_0, CI, CI_0, ECF_0);
+    double ECF = compute_ECF(EI, EI_0, CI, CI_0, ECF_0);
 
     // Compute resting metabolic rate (Mifflin-St Jeor).
-    double RMR = 9.99 * BW_0 + 6.25 * H * 100.0 - 4.92 * person.age;
-    RMR += person.gender == core::Gender::male ? 5.0 : -161.0;
-    RMR *= 4.184; // kcal to kJ
+    double RMR = compute_RMR(BW_0, H, person.age, person.gender);
 
     double delta_0 = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
 
@@ -166,15 +164,15 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     double F = steady_F + (F_0 - steady_F) * exp(-365.0 / tau);
     double L = steady_L + (L_0 - steady_L) * exp(-365.0 / tau);
 
+    // Compute baseline adjustment coefficient.
+    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
+
     // Compute body weight.
     double BW = F + L + G + W + ECF;
 
     // Compute energy expenditure.
     double delta_BW = delta_0 * BW;
     double EE = (shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
-
-    // Compute baseline adjustment coefficient.
-    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
 
     // Return simulated state.
     SimulatePersonResult result{.H = H,
@@ -191,7 +189,7 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
 }
 
 std::unordered_map<core::Identifier, double>
-EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
+EnergyBalanceModel::compute_nutrients(const Person &person) const {
     std::unordered_map<core::Identifier, double> nutrient_intakes;
 
     for (const auto &equation : nutrient_equations_) {
@@ -206,7 +204,7 @@ EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
     return nutrient_intakes;
 }
 
-double EnergyBalanceModel::compute_energy_intake(
+double EnergyBalanceModel::compute_EI(
     const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
     double EI = 0.0;
 
@@ -218,19 +216,27 @@ double EnergyBalanceModel::compute_energy_intake(
     return EI;
 }
 
-double EnergyBalanceModel::compute_glycogen(double CI, double CI_0, double G_0) const {
+double EnergyBalanceModel::compute_G(double CI, double CI_0, double G_0) const {
     double k_G = CI_0 / (G_0 * G_0);
     double G = sqrt(CI / k_G);
     return G;
 }
 
-double EnergyBalanceModel::compute_extracellular_fluid(double EI, double EI_0, double CI,
-                                                       double CI_0, double ECF_0) const {
+double EnergyBalanceModel::compute_ECF(double EI, double EI_0, double CI, double CI_0,
+                                       double ECF_0) const {
     double Na_b = 4000.0;
     double Na_f = Na_b * EI / EI_0;
     double Delta_Na_diet = Na_f - Na_b;
     double ECF = ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
     return ECF;
+}
+
+double EnergyBalanceModel::compute_RMR(double BW, double H, unsigned int age,
+                                       core::Gender gender) const {
+    double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
+    RMR += gender == core::Gender::male ? 5.0 : -161.0;
+    RMR *= 4.184; // kcal to kJ
+    return RMR;
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
