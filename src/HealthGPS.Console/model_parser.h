@@ -17,12 +17,14 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
 /// @brief Loads the full hierarchical linear regression model definition from a JSON file
 /// @param opt The parsed model definition JSON file
 /// @return An instance of the hgps::HierarchicalLinearModelDefinition type
+/// @throw std::invalid_argument if static model is unrecognised
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_static_risk_model_definition(const poco::json &opt);
 
 /// @brief Loads a dynamic model from a JSON file
 /// @param opt The parsed model definition JSON file
-/// @return An instance of the hgps::LiteHierarchicalModelDefinition type
+/// @return An instance of the hgps::RiskFactorModelDefinition type
+/// @throw std::invalid_argument if dynamic model is unrecognised
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const poco::json &opt);
 
@@ -51,6 +53,7 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
 /// @brief Load and parse the model file
 /// @param model_filename The path to the model
 /// @return The parsed JSON
+/// @throw std::invalid_argument if file is missing
 poco::json load_json(const std::string &model_filename);
 
 /// @brief Registers a risk factor model definition with the repository
