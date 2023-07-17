@@ -1,8 +1,9 @@
 #pragma once
 #include <thread>
 
+#include <oneapi/tbb/concurrent_queue.h>
+
 #include "HealthGPS/event_aggregator.h"
-#include "HealthGPS/threadsafe_queue.h"
 
 #include "result_writer.h"
 
@@ -35,8 +36,8 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     ResultWriter &result_writer_;
     std::vector<std::jthread> threads_;
     std::vector<std::unique_ptr<hgps::EventSubscriber>> handlers_;
-    hgps::ThreadsafeQueue<std::shared_ptr<hgps::EventMessage>> info_queue_;
-    hgps::ThreadsafeQueue<std::shared_ptr<hgps::EventMessage>> results_queue_;
+    tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> info_queue_;
+    tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> results_queue_;
     std::stop_source cancel_source_;
 
     void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
