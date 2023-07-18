@@ -7,11 +7,14 @@ namespace hgps {
 const core::Identifier H_key{"height"};
 const core::Identifier BW_key{"weight"};
 const core::Identifier PAL_key{"physical_activity_level"};
+const core::Identifier RMR_key{"resting_metabolic_rate"};
 const core::Identifier F_key{"body_fat"};
 const core::Identifier L_key{"lean_tissue"};
 const core::Identifier ECF_key{"extracellular_fluid"};
-const core::Identifier EI_key{"energy_intake"};
+const core::Identifier G_key{"glycogen"};
+const core::Identifier W_key{"water"};
 const core::Identifier EE_key{"energy_expenditure"};
+const core::Identifier EI_key{"energy_intake"};
 const core::Identifier CI_key{"carbohydrate"};
 
 EnergyBalanceModel::EnergyBalanceModel(
@@ -47,7 +50,6 @@ void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &
 
 void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
     hgps::Population &population = context.population();
-    const size_t population_size = population.current_active_size();
     double mean_sim_body_weight = 0.0;
     double mean_adjustment_coefficient = 0.0;
 
@@ -62,12 +64,13 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
         }
 
         // Compute baseline adjustment coefficient.
-        SimulatePersonResult result = simulate_person(person, 0.0);
-        mean_sim_body_weight += result.BW;
-        mean_adjustment_coefficient += result.adjust;
+        SimulatePersonState state = simulate_person(person, 0.0);
+        mean_sim_body_weight += state.BW;
+        mean_adjustment_coefficient += state.adjust;
     }
 
     // Compute baseline adjustment.
+    const size_t population_size = population.current_active_size();
     mean_sim_body_weight /= population_size;
     mean_adjustment_coefficient /= population_size;
     double shift = (target_BW - mean_sim_body_weight) / mean_adjustment_coefficient;
@@ -81,29 +84,32 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
         // TODO: Compute and update risk factors.
         simulate_person(person, shift);
-        // SimulatePersonResult result = simulate_person(person, shift);
-        // person.risk_factors[H_key] = result.H;
-        // person.risk_factors[BW_key] = result.BW;
-        // person.risk_factors[PAL_key] = result.PAL;
-        // person.risk_factors[F_key] = result.F;
-        // person.risk_factors[L_key] = result.L;
-        // person.risk_factors[ECF_key] = result.ECF;
-        // person.risk_factors[EI_key] = result.EI;
-        // person.risk_factors[EE_key] = result.EE;
+        // SimulatePersonState state = simulate_person(person, shift);
+        // person.risk_factors[H_key] = state.H;
+        // person.risk_factors[BW_key] = state.BW;
+        // person.risk_factors[PAL_key] = state.PAL;
+        // person.risk_factors[RMR_key] = state.RMR;
+        // person.risk_factors[F_key] = state.F;
+        // person.risk_factors[L_key] = state.L;
+        // person.risk_factors[ECF_key] = state.ECF;
+        // person.risk_factors[G_key] = state.G;
+        // person.risk_factors[W_key] = state.W;
+        // person.risk_factors[EE_key] = state.EE;
+        // person.risk_factors[EI_key] = state.EI;
     }
 }
 
-SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double shift) const {
-    // Model initial state.
+SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double shift) const {
+    // Initial simulated person state.
     const double H_0 = person.get_risk_factor_value(H_key);
     const double BW_0 = person.get_risk_factor_value(BW_key);
     const double PAL_0 = person.get_risk_factor_value(PAL_key);
     const double F_0 = person.get_risk_factor_value(F_key);
     const double L_0 = person.get_risk_factor_value(L_key);
     const double ECF_0 = person.get_risk_factor_value(ECF_key);
+    const double G_0 = person.get_risk_factor_value(G_key);
     const double EI_0 = person.get_risk_factor_value(EI_key);
     const double CI_0 = person.get_risk_factor_value(CI_key);
-    const double G_0 = 0.5;
 
     // TODO: Compute height.
     double H = H_0;
@@ -111,10 +117,8 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     // TODO: Compute physical activity level.
     double PAL = PAL_0;
 
-    // Compute nutrient intakes from food intakes.
-    auto nutrient_intakes = compute_nutrients(person);
-
     // Compute energy intake and carbohydrate intake.
+    auto nutrient_intakes = compute_nutrients(person);
     double EI = compute_EI(nutrient_intakes);
     double CI = nutrient_intakes.at(CI_key);
 
@@ -141,6 +145,8 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     const double C = 10.4 * rho_L / rho_F;
     const double p = C / (C + F_0);
 
+    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
+
     // First equation ax + by = e.
     double a1 = p * rho_F;
     double b1 = -(1.0 - p) * rho_L;
@@ -156,13 +162,12 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
     // Compute time constant.
-    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
     double tau = rho_L * rho_F * (1.0 + x) /
                  ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
 
     // Compute body fat and lean tissue.
-    double F = steady_F + (F_0 - steady_F) * exp(-365.0 / tau);
-    double L = steady_L + (L_0 - steady_L) * exp(-365.0 / tau);
+    double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
+    double L = steady_L - (steady_L - L_0) * exp(-365.0 / tau);
 
     // Compute baseline adjustment coefficient.
     double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
@@ -174,18 +179,21 @@ SimulatePersonResult EnergyBalanceModel::simulate_person(Person &person, double 
     double delta_BW = delta_0 * BW;
     double EE = (shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
-    // Return simulated state.
-    SimulatePersonResult result{.H = H,
-                                .BW = BW,
-                                .PAL = PAL,
-                                .F = F,
-                                .L = L,
-                                .ECF = ECF,
-                                .EI = EI,
-                                .EE = EE,
-                                .adjust = adjust};
+    // New simulated person state.
+    SimulatePersonState state{.H = H,
+                              .BW = BW,
+                              .PAL = PAL,
+                              .RMR = RMR,
+                              .F = F,
+                              .L = L,
+                              .ECF = ECF,
+                              .G = G,
+                              .W = W,
+                              .EE = EE,
+                              .EI = EI,
+                              .adjust = adjust};
 
-    return result;
+    return state;
 }
 
 std::unordered_map<core::Identifier, double>

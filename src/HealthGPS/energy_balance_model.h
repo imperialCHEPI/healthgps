@@ -5,8 +5,8 @@
 
 namespace hgps {
 
-/// @brief Result data type for a simulated person
-struct SimulatePersonResult {
+/// @brief State data type for a simulated person
+struct SimulatePersonState {
     /// @brief Height
     double H{};
 
@@ -15,6 +15,9 @@ struct SimulatePersonResult {
 
     /// @brief Pyhsical activity level
     double PAL{};
+
+    /// @brief Resting metabolic rate
+    double RMR{};
 
     /// @brief Body fat
     double F{};
@@ -25,11 +28,17 @@ struct SimulatePersonResult {
     /// @brief Extracellular fluid
     double ECF{};
 
-    /// @brief Energy intake
-    double EI{};
+    /// @brief Glycogen
+    double G{};
+
+    /// @brief Water
+    double W{};
 
     /// @brief Energy expenditure
     double EE{};
+
+    /// @brief Energy intake
+    double EI{};
 
     /// @brief Baseline adjustment coefficient
     double adjust{};
@@ -83,7 +92,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param final_run Final run or trial run
     /// @param final_shift Offset applied in final run
     /// @return Body weight and baseline adjustment coefficient (if final_run == false)
-    SimulatePersonResult simulate_person(Person &person, double shift) const;
+    SimulatePersonState simulate_person(Person &person, double shift) const;
 
     /// @brief Compute new nutrient intakes from food intakes.
     /// @param person The person to compute nutrient intakes for

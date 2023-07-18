@@ -16,11 +16,14 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {core::Identifier{"height"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"weight"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"physical_activity_level"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"resting_metabolic_rate"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"body_fat"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"lean_tissue"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"extracellular_fluid"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"energy_intake"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"glycogen"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"water"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"energy_expenditure"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"energy_intake"}, [](const Person &) { return 0.5; }},
     {core::Identifier{"carbohydrate"}, [](const Person &) { return 0.5; }},
 };
 
