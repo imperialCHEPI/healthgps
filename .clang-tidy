@@ -1,4 +1,4 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-osx.*,-clang-analyzer-fuchsia.*,-clang-analyzer-optin.osx.*'
 FormatStyle:     LLVM
 ...
