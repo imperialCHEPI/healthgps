@@ -42,6 +42,12 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     const std::unordered_map<core::Identifier, double> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
+    /// @brief Return the nutrient value bounded within its range
+    /// @param nutrient The nutrient Identifier
+    /// @param value The nutrient value to bound
+    /// @return The bounded nutrient value
+    double bounded_nutrient_value(const core::Identifier &nutrient, double value) const;
+
     std::map<core::Identifier, double> get_current_risk_factors(const HierarchicalMapping &mapping,
                                                                 Person &entity,
                                                                 int time_year) const;
