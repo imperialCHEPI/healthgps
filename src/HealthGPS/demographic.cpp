@@ -130,7 +130,7 @@ void PopulationModule::initialise_population(RuntimeContext &context) {
                 num_females += pop_diff - (half_diff * 2);
             }
 
-            pop_diff = pop_size - (index + num_males + num_females);
+            [[maybe_unused]] auto pop_diff_new = pop_size - (index + num_males + num_females);
             assert(pop_diff == 0);
         } else if (pop_diff < 0) {
             pop_diff *= -1;
@@ -149,8 +149,8 @@ void PopulationModule::initialise_population(RuntimeContext &context) {
             num_males = std::max(0, num_males);
             num_females = std::max(0, num_females);
 
-            pop_diff = pop_size - (index + num_males + num_females);
-            assert(pop_diff == 0);
+            [[maybe_unused]] auto pop_diff_new = pop_size - (index + num_males + num_females);
+            assert(pop_diff_new == 0);
         }
 
         // [index, index + num_males)
