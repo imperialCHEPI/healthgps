@@ -1,4 +1,4 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-osx.*,-clang-analyzer-fuchsia.*,-clang-analyzer-optin.osx.*'
-FormatStyle:     LLVM
+Checks: 'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-osx.*,-clang-analyzer-fuchsia.*,-clang-analyzer-optin.osx.*,bugprone-*,misc-*,modernize-*,readability-*,performance-*,portability-*,-bugprone-easily-swappable-parameters,-modernize-use-trailing-return-type,-readability-identifier-length,-readability-implicit-bool-conversion,-readability-uppercase-literal-suffix,-readability-magic-numbers,-readability-isolate-declaration'
+FormatStyle: LLVM
 ...
