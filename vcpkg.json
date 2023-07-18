@@ -8,7 +8,8 @@
         "nlohmann-json",
         "rapidcsv",
         "crossguid",
-        "gtest"
+        "gtest",
+        "tbb"
     ],
     "builtin-baseline": "1e334d770ac71a89d1c36d51019e60dd08b68f76"
 }

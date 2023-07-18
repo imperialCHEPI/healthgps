@@ -1,3 +1,6 @@
+# Workaround for vcpkg issue: https://github.com/microsoft/vcpkg/issues/31617
+add_compile_definitions(TBB_USE_ASSERT)
+
 # Include sub-projects.
 add_subdirectory (HealthGPS.Core)
 add_subdirectory (HealthGPS.Datastore)

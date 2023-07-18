@@ -62,7 +62,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential libtbb-dev ninja-build doxygen graphviz
+          sudo apt install --no-install-recommends build-essential ninja-build doxygen graphviz
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
