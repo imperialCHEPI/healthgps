@@ -102,11 +102,10 @@ TEST_F(WeightModelTest, AdjustAdultBmi) {
     auto bmi_values = std::array<double, 8>{15.0, 18.4, 18.5, 24.9, 25.0, 29.9, 30.0, 40.0};
     auto classifier = WeightModel{create_lms_model(manager)};
     for (auto &item : genders) {
-        for (auto idx = 0; auto &bmi : bmi_values) {
+        for (auto &bmi : bmi_values) {
             auto entity = create_test_entity(item, adult_age, bmi);
             auto equivalent = classifier.adjust_risk_factor_value(entity, bmi_key, bmi);
             ASSERT_EQ(bmi, equivalent);
-            idx++;
         }
     }
 }
