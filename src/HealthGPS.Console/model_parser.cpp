@@ -207,6 +207,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
         nutrient_equations;
+    std::unordered_map<hgps::core::Identifier, double> food_prices;
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
     // Load nutrient -> energy equation.
@@ -219,6 +220,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     // Load food -> nutrient equations.
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
+        food_prices[food_key] = food["Price"].get<double>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
         for (const auto &nutrient : opt["Nutrients"]) {
@@ -245,7 +247,8 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
     return std::make_unique<hgps::EnergyBalanceModelDefinition>(
-        std::move(energy_equation), std::move(nutrient_equations), std::move(age_mean_height));
+        std::move(energy_equation), std::move(nutrient_equations), std::move(food_prices),
+        std::move(age_mean_height));
 }
 
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>

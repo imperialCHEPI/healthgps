@@ -13,11 +13,13 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @brief Initialises a new instance of the EnergyBalanceModel class
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_equations The nutrient coefficients for each food group
+    /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     EnergyBalanceModel(
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
+        const std::unordered_map<core::Identifier, double> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
     HierarchicalModelType type() const noexcept override;
@@ -34,6 +36,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
+    const std::unordered_map<core::Identifier, double> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
     std::map<core::Identifier, double> get_current_risk_factors(const HierarchicalMapping &mapping,
@@ -47,11 +50,13 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_equations The nutrient coefficients for each food group
+    /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
     EnergyBalanceModelDefinition(
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
+        std::unordered_map<core::Identifier, double> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
     /// @brief Construct a new EnergyBalanceModel from this definition
@@ -61,6 +66,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
   private:
     std::unordered_map<core::Identifier, double> energy_equation_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
+    std::unordered_map<core::Identifier, double> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
 };
 
