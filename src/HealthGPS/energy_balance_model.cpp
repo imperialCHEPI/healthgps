@@ -17,6 +17,9 @@ EnergyBalanceModel::EnergyBalanceModel(
     if (energy_equation_.empty()) {
         throw std::invalid_argument("Energy equation mapping is empty");
     }
+    if (nutrient_ranges_.empty()) {
+        throw std::invalid_argument("Nutrient range mapping is empty");
+    }
     if (nutrient_equations_.empty()) {
         throw std::invalid_argument("Nutrient equation mapping is empty");
     }
