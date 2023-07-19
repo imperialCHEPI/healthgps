@@ -1,5 +1,4 @@
 #include "model_parser.h"
-
 #include "csvparser.h"
 #include "jsonparser.h"
 
@@ -8,6 +7,7 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
+#include <optional>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                                         \
@@ -208,7 +208,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
         nutrient_equations;
-    std::unordered_map<hgps::core::Identifier, double> food_prices;
+    std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
     // Nutrient groups.
@@ -225,7 +225,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     // Food groups.
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
-        food_prices[food_key] = food["Price"].get<double>();
+        food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
         for (const auto &nutrient : opt["Nutrients"]) {
