@@ -31,28 +31,28 @@
     "Foods": [
         {
             "Name": "Carbs",
-            "Price": 0.0,
+            "Price": null,
             "Nutrients": {
                 "Carbs": 1.0
             }
         },
         {
             "Name": "Fat",
-            "Price": 0.0,
+            "Price": null,
             "Nutrients": {
                 "Fat": 1.0
             }
         },
         {
             "Name": "Protein",
-            "Price": 0.0,
+            "Price": null,
             "Nutrients": {
                 "Protein": 1.0
             }
         },
         {
             "Name": "Sodium",
-            "Price": 0.0,
+            "Price": null,
             "Nutrients": {
                 "Sodium": 1.0
             }
