@@ -1,6 +1,8 @@
 #include "energy_balance_model.h"
 #include "runtime_context.h"
 
+#include <algorithm>
+
 namespace hgps {
 
 EnergyBalanceModel::EnergyBalanceModel(
@@ -90,7 +92,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
 
 double EnergyBalanceModel::bounded_nutrient_value(const core::Identifier &nutrient,
                                                   double value) const {
-    const auto &range = nutrient_ranges_.at(nutrient)
+    const auto &range = nutrient_ranges_.at(nutrient);
     return std::clamp(range.first, range.second, value);
 }
 
