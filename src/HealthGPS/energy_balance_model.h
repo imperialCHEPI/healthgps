@@ -3,6 +3,8 @@
 #include "interfaces.h"
 #include "mapping.h"
 
+#include <optional>
+
 namespace hgps {
 
 /// @brief Implements the energy balance model type
@@ -21,7 +23,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
         const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
-        const std::unordered_map<core::Identifier, double> &food_prices,
+        const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
     HierarchicalModelType type() const noexcept override;
@@ -39,7 +41,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
-    const std::unordered_map<core::Identifier, double> &food_prices_;
+    const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
     /// @brief Return the nutrient value bounded within its range
@@ -67,7 +69,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
-        std::unordered_map<core::Identifier, double> food_prices,
+        std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
     /// @brief Construct a new EnergyBalanceModel from this definition
@@ -78,7 +80,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, double> energy_equation_;
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
-    std::unordered_map<core::Identifier, double> food_prices_;
+    std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
 };
 
