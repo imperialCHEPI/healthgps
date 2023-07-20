@@ -47,13 +47,11 @@ double PhysicalActivityScenario::apply(Random &generator, Person &entity, int ti
     auto impact = value;
     auto probability = generator.next_double();
     if (!interventions_book_.contains(entity.id())) {
-        if (entity.age > child_effect.to_age) {
+        if (entity.age > child_effect.to_age || probability >= definition_.coverage_rate) {
             interventions_book_.emplace(entity.id(), PA_NO_EFFECT);
-        } else if (probability < definition_.coverage_rate) {
+        } else {
             impact += child_effect.value;
             interventions_book_.emplace(entity.id(), PA_CHILD_EFFECT);
-        } else {
-            interventions_book_.emplace(entity.id(), PA_NO_EFFECT);
         }
     } else if (interventions_book_.at(entity.id()) == PA_CHILD_EFFECT) {
         if (entity.age > child_effect.to_age) {
