@@ -138,11 +138,8 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     // Compute extracellular fluid.
     double ECF = compute_ECF(EI, EI_0, CI, CI_0, ECF_0);
 
-    // Compute resting metabolic rate (Mifflin-St Jeor).
-    double RMR = compute_RMR(BW_0, H, person.age, person.gender);
-
     // Compute energy cost per unit body weight.
-    double delta = compute_delta(PAL, RMR, BW_0);
+    double delta = compute_delta(PAL, BW_0, H, person.age, person.gender);
 
     // Compute thermic effect of food.
     double TEF = compute_TEF(EI, EI_0);
@@ -195,7 +192,6 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     return SimulatePersonState{.H = H,
                                .BW = BW,
                                .PAL = PAL,
-                               .RMR = RMR,
                                .F = F,
                                .L = L,
                                .ECF = ECF,
@@ -209,6 +205,7 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
 std::unordered_map<core::Identifier, double>
 EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
     std::unordered_map<core::Identifier, double> nutrient_intakes;
+
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         double food_intake = person.get_risk_factor_value(food_key);
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
@@ -216,16 +213,19 @@ EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
             nutrient_intakes[nutrient_key] += delta_nutrient;
         }
     }
+
     return nutrient_intakes;
 }
 
 double EnergyBalanceModel::compute_EI(
     const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
     double EI = 0.0;
+
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
         double delta_energy = nutrient_intakes.at(nutrient_key) * energy_coefficient;
         EI += delta_energy;
     }
+
     return EI;
 }
 
@@ -244,23 +244,25 @@ double EnergyBalanceModel::compute_ECF(double EI, double EI_0, double CI, double
     return ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
 }
 
-double EnergyBalanceModel::compute_RMR(double BW, double H, unsigned int age,
-                                       core::Gender gender) const {
+double EnergyBalanceModel::compute_delta(double PAL, double BW, double H, unsigned int age,
+                                         core::Gender gender) const {
+    // Resting metabolic rate (Mifflin-St Jeor).
     double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
     RMR += gender == core::Gender::male ? 5.0 : -161.0;
-    return RMR * 4.184; // kcal to kJ
-}
+    RMR *= 4.184; // From kcal to kJ
 
-double EnergyBalanceModel::compute_delta(double PAL, double RMR, double BW) const {
+    // Energy expenditure per kg of body weight.
     return ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW;
 }
 
 double EnergyBalanceModel::compute_TEF(double EI, double EI_0) const {
-    return beta_TEF * (EI - EI_0);
+    double delta_EI = EI - EI_0;
+    return beta_TEF * delta_EI;
 }
 
 double EnergyBalanceModel::compute_AT(double EI, double EI_0) const {
-    return beta_AT * (EI - EI_0);
+    double delta_EI = EI - EI_0;
+    return beta_AT * delta_EI;
 }
 
 double EnergyBalanceModel::bounded_nutrient_value(const core::Identifier &nutrient,

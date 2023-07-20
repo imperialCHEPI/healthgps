@@ -18,9 +18,6 @@ struct SimulatePersonState {
     /// @brief Pyhsical activity level
     double PAL{};
 
-    /// @brief Resting metabolic rate
-    double RMR{};
-
     /// @brief Body fat
     double F{};
 
@@ -133,20 +130,13 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @return The computed extracellular fluid
     double compute_ECF(double EI, double EI_0, double CI, double CI_0, double ECF_0) const;
 
-    /// @brief Compute resting metabolic rate (Mifflin-St Jeor).
-    /// @param BW The body weight
-    /// @param H The height
-    /// @param age The age
-    /// @param gender The gender
-    /// @return The computed resting metabolic rate
-    double compute_RMR(double BW, double H, unsigned int age, core::Gender gender) const;
-
     /// @brief Compute energy cost per unit body weight.
     /// @param PAL The physical activity level
     /// @param RMR The resting metabolic rate
     /// @param BW The body weight
     /// @return The computed energy cost per unit body weight
-    double compute_delta(double PAL, double RMR, double BW) const;
+    double compute_delta(double PAL, double BW, double H, unsigned int age,
+                         core::Gender gender) const;
 
     /// @brief Compute thermic effect of food.
     /// @param EI The energy intake
