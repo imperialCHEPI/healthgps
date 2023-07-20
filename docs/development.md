@@ -25,7 +25,15 @@ Download the *Health GPS* source code to the local machine, like so:
 
 Finally, open the `healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
->**NOTE:** *This is the current toolset being used for developing the HealthGPS model, however CMake is supported by VS Code and many other IDE of choice, e.g. the model is current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command line.*
+>**NOTE:** *This is the current toolset being used for developing the HealthGPS model,
+>however CMake is supported by VS Code and many other IDE of choice, e.g. the model is
+>current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command
+>line.*
+
+## GitHub flow
+
+Health-GPS uses the GitHub flow branching pattern for git. For more information, see the
+[GitHub flow guide](https://imperialchepi.github.io/healthgps/github_flow)
 
 ## CMake Build
 
