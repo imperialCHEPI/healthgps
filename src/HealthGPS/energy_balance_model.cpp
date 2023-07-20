@@ -118,7 +118,7 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     double PAL = PAL_0;
 
     // Compute energy intake and carbohydrate intake.
-    auto nutrient_intakes = compute_nutrients(person);
+    auto nutrient_intakes = compute_nutrient_intakes(person);
     double EI = compute_EI(nutrient_intakes);
     double CI = nutrient_intakes.at(CI_key);
 
@@ -197,15 +197,15 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
 }
 
 std::unordered_map<core::Identifier, double>
-EnergyBalanceModel::compute_nutrients(const Person &person) const {
+EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
     std::unordered_map<core::Identifier, double> nutrient_intakes;
 
-    for (const auto &equation : nutrient_equations_) {
-        double food_intake = person.get_risk_factor_value(equation.first);
+    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+        double food_intake = person.get_risk_factor_value(food_key);
 
-        for (const auto &coefficient : equation.second) {
-            double delta_nutrient = food_intake * coefficient.second;
-            nutrient_intakes[coefficient.first] += delta_nutrient;
+        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
+            double delta_nutrient = food_intake * nutrient_coefficient;
+            nutrient_intakes[nutrient_key] += delta_nutrient;
         }
     }
 
@@ -216,8 +216,8 @@ double EnergyBalanceModel::compute_EI(
     const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
     double EI = 0.0;
 
-    for (const auto &coefficient : energy_equation_) {
-        double delta_energy = nutrient_intakes.at(coefficient.first) * coefficient.second;
+    for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
+        double delta_energy = nutrient_intakes.at(nutrient_key) * energy_coefficient;
         EI += delta_energy;
     }
 

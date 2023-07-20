@@ -89,15 +89,15 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
 
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
-    /// @param final_run Final run or trial run
-    /// @param final_shift Offset applied in final run
-    /// @return Body weight and baseline adjustment coefficient (if final_run == false)
+    /// @param shift Model adjustment term
+    /// @return The new state of the person
     SimulatePersonState simulate_person(Person &person, double shift) const;
 
     /// @brief Compute new nutrient intakes from food intakes.
     /// @param person The person to compute nutrient intakes for
     /// @return A map of computed nutrient intakes
-    std::unordered_map<core::Identifier, double> compute_nutrients(const Person &person) const;
+    std::unordered_map<core::Identifier, double>
+    compute_nutrient_intakes(const Person &person) const;
 
     /// @brief Compute new energy intake from nutrient intakes.
     /// @param nutrient_intakes The nutrient intake
