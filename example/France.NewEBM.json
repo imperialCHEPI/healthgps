@@ -9,42 +9,50 @@
     "Nutrients": [
         {
             "Name": "Carbohydrate",
+            "Range": [0.0, 50.0],
             "Energy": 4.0
         },
         {
             "Name": "Fat",
+            "Range": [0.0, 50.0],
             "Energy": 9.0
         },
         {
             "Name": "Protein",
+            "Range": [0.0, 50.0],
             "Energy": 4.0
         },
         {
             "Name": "Sodium",
+            "Range": [0.0, 50.0],
             "Energy": 0.0
         }
     ],
     "Foods": [
         {
             "Name": "Carbohydrate",
+            "Price": null,
             "Nutrients": {
                 "Carbohydrate": 1.0
             }
         },
         {
             "Name": "Fat",
+            "Price": null,
             "Nutrients": {
                 "Fat": 1.0
             }
         },
         {
             "Name": "Protein",
+            "Price": null,
             "Nutrients": {
                 "Protein": 1.0
             }
         },
         {
             "Name": "Sodium",
+            "Price": null,
             "Nutrients": {
                 "Sodium": 1.0
             }
