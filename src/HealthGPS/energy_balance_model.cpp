@@ -141,7 +141,8 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     // Compute resting metabolic rate (Mifflin-St Jeor).
     double RMR = compute_RMR(BW_0, H, person.age, person.gender);
 
-    double delta_0 = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
+    // Compute delta.
+    double delta = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
 
     // Compute thermic effect of food and adaptive thermogenesis.
     double TEF = beta_TEF * EI - EI_0;
@@ -154,39 +155,39 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     const double C = 10.4 * rho_L / rho_F;
     const double p = C / (C + F_0);
 
-    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
-
     // First equation ax + by = e.
     double a1 = p * rho_F;
     double b1 = -(1.0 - p) * rho_L;
     double c1 = p * rho_F * F_0 - (1 - p) * rho_L * L_0;
 
     // Second equation cx + dy = f.
-    double a2 = gamma_F + delta_0;
-    double b2 = gamma_L + delta_0;
-    double c2 = EI - shift - K - TEF - AT - delta_0 * (G + W + ECF);
+    double a2 = gamma_F + delta;
+    double b2 = gamma_L + delta;
+    double c2 = EI - shift - K - TEF - AT - delta * (G + W + ECF);
 
     // Compute body fat and lean tissue steady state.
     double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
+    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
+
     // Compute time constant.
     double tau = rho_L * rho_F * (1.0 + x) /
-                 ((gamma_F + delta_0) * (1.0 - p) * rho_L + (gamma_L + delta_0) * p * rho_F);
+                 ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
 
     // Compute body fat and lean tissue.
     double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
     double L = steady_L - (steady_L - L_0) * exp(-365.0 / tau);
 
+    // Compute adjustment coefficient.
+    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
+
     // Compute body weight.
     double BW = F + L + G + W + ECF;
 
     // Compute energy expenditure.
-    double delta_BW = delta_0 * BW;
-    double EE = (shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
-
-    // Compute adjustment coefficient.
-    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
+    double EE =
+        (shift + K + gamma_F * F + gamma_L * L + delta * BW + TEF + AT + EI * x) / (1.0 + x);
 
     // New simulated person state.
     return SimulatePersonState{.H = H,
