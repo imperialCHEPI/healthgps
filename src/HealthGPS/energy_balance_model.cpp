@@ -236,7 +236,7 @@ double EnergyBalanceModel::compute_RMR(double BW, double H, unsigned int age,
                                        core::Gender gender) const {
     double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
     RMR += gender == core::Gender::male ? 5.0 : -161.0;
-    return RMR *= 4.184; // kcal to kJ
+    return RMR * 4.184; // kcal to kJ
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
