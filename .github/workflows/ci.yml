@@ -93,18 +93,18 @@ jobs:
           cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
 
       - uses: ZedThree/clang-tidy-review@v0.13.1
-        if: matrix.compiler == 'gcc-default'
+        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
         id: review
         with:
           build_dir: out/build/linux-debug
 
       # Uploads an artefact containing clang_fixes.json
       - uses: ZedThree/clang-tidy-review/upload@v0.13.1
-        if: matrix.compiler == 'gcc-default'
+        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
         id: upload-review
 
       # If there are any comments, fail the check
-      - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default'
+      - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
         run: exit 1
 
       - uses: ammaraskar/gcc-problem-matcher@master
