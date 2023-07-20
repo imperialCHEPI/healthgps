@@ -13,12 +13,11 @@ To start working on the *Health GPS* code base, the suggested development machin
 3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
 4. [Ninja](https://ninja-build.org/) 1.10 or newer.
 5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
-6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment, plus.
-   * [Intel TBB](https://github.com/oneapi-src/oneTBB) library version 2018 or later installed (e.g. `sudo apt update && sudo apt install libtbb-dev`)
-7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the VCPKG_ROOT environment variable set to the installation directory.
+6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment.
+7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the `VCPKG_ROOT` *environment variable* set to the installation directory.
 8. Internet connection.
 
-Download the *Health GPS* source code to the local machine, we recommend somewhere like root `/src` or `/source`, since otherwise you may run into path issues with the build systems.
+Download the *Health GPS* source code to the local machine, like so:
 
 ```cmd
 > git clone https://github.com/imperialCHEPI/healthgps
@@ -36,7 +35,7 @@ Health-GPS source code is configured to use [CMake](https://cmake.org/) by defau
 cmake --list-presets=all
 
 # Windows
-cmake --preset='x64-release'
+cmake --preset='windows-release'
 cmake --build --preset='release-build-windows' --target install --config Release
 
 # Linux
@@ -44,15 +43,13 @@ cmake --preset='linux-release'
 cmake --build --preset='release-build-linux' --target install --config Release
 ```
 
-> To build the `Benchmark` application, add `-DBUILD_BENCHMARKS=ON` to the CMake configuration command (first for each OS).
-
 The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/bin` directory.
 
 To run the unit tests:
 
 ```cmd
 # Windows
-cmake --preset='x64-debug'
+cmake --preset='windows-debug'
 cmake --build --preset='debug-build-windows'
 ctest --preset='core-test-windows'
 
@@ -155,23 +152,6 @@ HealthGPS.Console -f healthgps/example/France.Config.json -s ~/healthgps/data
 ```
 
 In general, you should avoid running you own applications on the shared HPC login nodes, the *etiquette* for working with HPC system is the create and submit jobs to be evaluated by the HPC nodes instead. See the [User Guide](userguide#50-hpc-running) for details on how to use the installed Health-GPS modules on the Imperial HPC system.
-
-## Third-party components
-
-The project dependencies are included using [vcpkg](https://github.com/microsoft/vcpkg) package manager, and declared in the *vcpkg.json* manifest file. The package manager is integrated with CMake and automatically invoked by the `find_package` command during build.
-
-| Name  | License |
-|:---   |:---     |
-| [Adevs](https://sourceforge.net/projects/adevs)       | BSD 3-Clause |
-| [crossguid](https://github.com/graeme-hill/crossguid) | MIT          |
-| [cxxopts](https://github.com/jarro2783/cxxopts)       | MIT          |
-| [indicators](https://github.com/p-ranav/indicators)   | MIT          |
-| [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
-| [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
-| [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
-| [googletest](https://github.com/google/googletest)    | BSD 3-Clause |
-| [googletest](https://github.com/google/googletest)    | BSD 3-Clause |
-| [benchmark](https://github.com/google/benchmark)      | Apache-2.0   |
 
 # Implementation
 
