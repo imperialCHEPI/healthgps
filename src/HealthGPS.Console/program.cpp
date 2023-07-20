@@ -19,7 +19,7 @@ int exit_application(int exit_code);
 /// @param argc The number of command arguments
 /// @param argv The list of arguments provided
 /// @return The application exit code
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace host;
 

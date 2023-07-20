@@ -47,7 +47,7 @@ bool RelativeRiskLookup::contains(const int age, const float value) const noexce
     return false;
 }
 
-float RelativeRiskLookup::lookup_value(const int age, const float value) const noexcept {
+float RelativeRiskLookup::lookup_value(const int age, const float value) const {
     if (empty()) {
         return std::nanf("");
     }

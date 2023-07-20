@@ -61,7 +61,7 @@ class MarketingDynamicScenario final : public DynamicInterventionScenario {
     std::set<core::Identifier> factor_impact_;
     std::unordered_map<std::size_t, int> interventions_book_{};
 
-    int get_index_of_impact_by_age(const unsigned int &age) const noexcept;
+    int get_index_of_impact_by_age(const unsigned int &age) const;
     double get_differential_impact(int current_index, int previous_index) const;
 };
 } // namespace hgps
