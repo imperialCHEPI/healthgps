@@ -63,13 +63,13 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        // Compute baseline adjustment coefficient.
+        // Simulate person and compute adjustment coefficient.
         SimulatePersonState state = simulate_person(person, 0.0);
         mean_sim_body_weight += state.BW;
         mean_adjustment_coefficient += state.adjust;
     }
 
-    // Compute baseline adjustment.
+    // Compute model adjustment term.
     const size_t population_size = population.current_active_size();
     mean_sim_body_weight /= population_size;
     mean_adjustment_coefficient /= population_size;
@@ -82,7 +82,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        // TODO: Compute and update risk factors.
+        // TODO: Simulate person and update risk factors.
         simulate_person(person, shift);
         // SimulatePersonState state = simulate_person(person, shift);
         // person.risk_factors[H_key] = state.H;
@@ -169,9 +169,6 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
     double L = steady_L - (steady_L - L_0) * exp(-365.0 / tau);
 
-    // Compute baseline adjustment coefficient.
-    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
-
     // Compute body weight.
     double BW = F + L + G + W + ECF;
 
@@ -179,21 +176,22 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     double delta_BW = delta_0 * BW;
     double EE = (shift + K + gamma_F * F + gamma_L * L + delta_BW + TEF + AT + EI * x) / (1.0 + x);
 
-    // New simulated person state.
-    SimulatePersonState state{.H = H,
-                              .BW = BW,
-                              .PAL = PAL,
-                              .RMR = RMR,
-                              .F = F,
-                              .L = L,
-                              .ECF = ECF,
-                              .G = G,
-                              .W = W,
-                              .EE = EE,
-                              .EI = EI,
-                              .adjust = adjust};
+    // Compute adjustment coefficient.
+    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
 
-    return state;
+    // New simulated person state.
+    return SimulatePersonState{.H = H,
+                               .BW = BW,
+                               .PAL = PAL,
+                               .RMR = RMR,
+                               .F = F,
+                               .L = L,
+                               .ECF = ECF,
+                               .G = G,
+                               .W = W,
+                               .EE = EE,
+                               .EI = EI,
+                               .adjust = adjust};
 }
 
 std::unordered_map<core::Identifier, double>
