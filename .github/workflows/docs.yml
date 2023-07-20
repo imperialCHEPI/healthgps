@@ -1,8 +1,6 @@
-# Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy Jekyll with GitHub Pages dependencies preinstalled
+name: Deploy Jekyll and Doxygen
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: [$default-branch]
 
@@ -24,7 +22,10 @@ concurrency:
 jobs:
   # Build job
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    env:
+      VCPKG_ROOT: "vcpkg"
+      VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,6 +36,23 @@ jobs:
         with:
           source: ./docs
           destination: ./_site
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install --no-install-recommends build-essential ninja-build doxygen graphviz
+      - name: Install VCPKG
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          ./bootstrap-vcpkg.sh -disableMetrics
+      - name: Configure HealthGPS
+        run: |
+          cmake --preset=linux-release
+      - name: Build with doxygen
+        run: |
+          ninja -C out/build/linux-release/ doxygen-docs
+          sudo cp -r out/build/linux-release/src/html _site/api
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
 
