@@ -131,7 +131,7 @@ void PopulationModule::initialise_population(RuntimeContext &context) {
             }
 
             [[maybe_unused]] auto pop_diff_new = pop_size - (index + num_males + num_females);
-            assert(pop_diff == 0);
+            assert(pop_diff_new == 0);
         } else if (pop_diff < 0) {
             pop_diff *= -1;
             if (entry.second.males > entry.second.females) {

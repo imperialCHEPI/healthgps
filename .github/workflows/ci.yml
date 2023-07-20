@@ -104,7 +104,6 @@ jobs:
         id: upload-review
 
       # If there are any comments, fail the check
-      - uses: ZedThree/clang-tidy-review/upload@v0.13.1
       - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default'
         run: exit 1
 
