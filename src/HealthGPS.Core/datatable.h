@@ -50,7 +50,8 @@ class DataTable {
     /// @brief Gets the column by name, also checking if the column exists
     /// @param name The column name
     /// @return A pair containing a success flag, and the column instance on success.
-    const std::pair<bool, DataTableColumn &> column_if_exists(const std::string &name) const;
+    const std::optional<std::reference_wrapper<const DataTableColumn>>
+    column_if_exists(const std::string &name) const;
 
     /// @brief Gets the iterator to the first column of the table.
     /// @return An iterator to the beginning
