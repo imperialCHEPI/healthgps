@@ -98,31 +98,36 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
     /// @param shift Model adjustment term
-    /// @return The new state of the person
+    /// @return The state of the person
     SimulatePersonState simulate_person(Person &person, double shift) const;
 
-    /// @brief Compute new nutrient intakes from food intakes.
+    /// @brief Compute nutrient intakes from food intakes.
     /// @param person The person to compute nutrient intakes for
     /// @return A map of computed nutrient intakes
     std::unordered_map<core::Identifier, double>
     compute_nutrient_intakes(const Person &person) const;
 
-    /// @brief Compute new energy intake from nutrient intakes.
+    /// @brief Compute energy intake from nutrient intakes.
     /// @param nutrient_intakes The nutrient intake
     /// @return The computed energy intake
     double compute_EI(const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
 
-    /// @brief Compute new glycogen.
-    /// @param CI The new carbohydrate intake
+    /// @brief Compute glycogen.
+    /// @param CI The carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
     /// @param G_0 The initial glycogen
     /// @return The computed glycogen
     double compute_G(double CI, double CI_0, double G_0) const;
 
-    /// @brief Compute new extracellular fluid.
-    /// @param EI The new energy intake
+    /// @brief Compute water.
+    /// @param G The glycogen
+    /// @return The computed water
+    double compute_W(double G) const;
+
+    /// @brief Compute extracellular fluid.
+    /// @param EI The energy intake
     /// @param EI_0 The initial energy intake
-    /// @param CI The new carbohydrate intake
+    /// @param CI The carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
     /// @param ECF_0 The initial extracellular fluid
     /// @return The computed extracellular fluid
@@ -142,6 +147,18 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param BW The body weight
     /// @return The computed energy cost per unit body weight
     double compute_delta(double PAL, double RMR, double BW) const;
+
+    /// @brief Compute thermic effect of food.
+    /// @param EI The energy intake
+    /// @param EI_0 The initial energy intake
+    /// @return The computed thermic effect of food
+    double compute_TEF(double EI, double EI_0) const;
+
+    /// @brief Compute adaptive thermogenesis.
+    /// @param EI The energy intake
+    /// @param EI_0 The initial energy intake
+    /// @return The computed adaptive thermogenesis
+    double compute_AT(double EI, double EI_0) const;
 
     /// @brief Return the nutrient value bounded within its range
     /// @param nutrient The nutrient Identifier

@@ -133,7 +133,7 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
 
     // Compute glycogen and water.
     double G = compute_G(CI, CI_0, G_0);
-    double W = 2.7 * G;
+    double W = compute_W(G);
 
     // Compute extracellular fluid.
     double ECF = compute_ECF(EI, EI_0, CI, CI_0, ECF_0);
@@ -144,9 +144,11 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     // Compute energy cost per unit body weight.
     double delta = compute_delta(PAL, RMR, BW_0);
 
-    // Compute thermic effect of food and adaptive thermogenesis.
-    double TEF = beta_TEF * EI - EI_0;
-    double AT = beta_AT * EI - EI_0;
+    // Compute thermic effect of food.
+    double TEF = compute_TEF(EI, EI_0);
+
+    // Compute adaptive thermogenesis.
+    double AT = compute_AT(EI, EI_0);
 
     // TODO: Compute intercept value.
     const double K = 0.0; // TODO: Intercept value.
@@ -232,6 +234,8 @@ double EnergyBalanceModel::compute_G(double CI, double CI_0, double G_0) const {
     return sqrt(CI / k_G);
 }
 
+double EnergyBalanceModel::compute_W(double G) const { return 2.7 * G; }
+
 double EnergyBalanceModel::compute_ECF(double EI, double EI_0, double CI, double CI_0,
                                        double ECF_0) const {
     double Na_b = 4000.0;
@@ -249,6 +253,14 @@ double EnergyBalanceModel::compute_RMR(double BW, double H, unsigned int age,
 
 double EnergyBalanceModel::compute_delta(double PAL, double RMR, double BW) const {
     return ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW;
+}
+
+double EnergyBalanceModel::compute_TEF(double EI, double EI_0) const {
+    return beta_TEF * (EI - EI_0);
+}
+
+double EnergyBalanceModel::compute_AT(double EI, double EI_0) const {
+    return beta_AT * (EI - EI_0);
 }
 
 double EnergyBalanceModel::bounded_nutrient_value(const core::Identifier &nutrient,
