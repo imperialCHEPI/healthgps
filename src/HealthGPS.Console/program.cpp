@@ -104,8 +104,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
-        if (model_input.seed().has_value()) {
-            seed_generator->seed(model_input.seed().value());
+        if (const auto seed = model_input.seed()) {
+            seed_generator->seed(seed.value());
         }
         auto executive = ModelRunner(event_bus, std::move(seed_generator));
 
