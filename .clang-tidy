@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-osx.*,-clang-analyzer-fuchsia.*,-clang-analyzer-optin.osx.*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-osx.*,-clang-analyzer-fuchsia.*,-clang-analyzer-optin.osx.*,bugprone-*,-bugprone-easily-swappable-parameters,-bugprone-narrowing-conversions'
 FormatStyle:     LLVM
 WarningsAsErrors: '*'
 ...
