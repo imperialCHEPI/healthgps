@@ -199,35 +199,29 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
 std::unordered_map<core::Identifier, double>
 EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
     std::unordered_map<core::Identifier, double> nutrient_intakes;
-
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         double food_intake = person.get_risk_factor_value(food_key);
-
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
             double delta_nutrient = food_intake * nutrient_coefficient;
             nutrient_intakes[nutrient_key] += delta_nutrient;
         }
     }
-
     return nutrient_intakes;
 }
 
 double EnergyBalanceModel::compute_EI(
     const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
     double EI = 0.0;
-
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
         double delta_energy = nutrient_intakes.at(nutrient_key) * energy_coefficient;
         EI += delta_energy;
     }
-
     return EI;
 }
 
 double EnergyBalanceModel::compute_G(double CI, double CI_0, double G_0) const {
     double k_G = CI_0 / (G_0 * G_0);
-    double G = sqrt(CI / k_G);
-    return G;
+    return sqrt(CI / k_G);
 }
 
 double EnergyBalanceModel::compute_ECF(double EI, double EI_0, double CI, double CI_0,
@@ -235,16 +229,14 @@ double EnergyBalanceModel::compute_ECF(double EI, double EI_0, double CI, double
     double Na_b = 4000.0;
     double Na_f = Na_b * EI / EI_0;
     double Delta_Na_diet = Na_f - Na_b;
-    double ECF = ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
-    return ECF;
+    return ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
 }
 
 double EnergyBalanceModel::compute_RMR(double BW, double H, unsigned int age,
                                        core::Gender gender) const {
     double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
     RMR += gender == core::Gender::male ? 5.0 : -161.0;
-    RMR *= 4.184; // kcal to kJ
-    return RMR;
+    return RMR *= 4.184; // kcal to kJ
 }
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
