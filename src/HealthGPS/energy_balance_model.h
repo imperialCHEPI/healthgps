@@ -136,6 +136,13 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @return The computed resting metabolic rate
     double compute_RMR(double BW, double H, unsigned int age, core::Gender gender) const;
 
+    /// @brief Compute energy cost per unit body weight.
+    /// @param PAL The physical activity level
+    /// @param RMR The resting metabolic rate
+    /// @param BW The body weight
+    /// @return The computed energy cost per unit body weight
+    double compute_delta(double PAL, double RMR, double BW) const;
+
     /// @brief Return the nutrient value bounded within its range
     /// @param nutrient The nutrient Identifier
     /// @param value The nutrient value to bound

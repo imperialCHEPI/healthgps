@@ -141,8 +141,8 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
     // Compute resting metabolic rate (Mifflin-St Jeor).
     double RMR = compute_RMR(BW_0, H, person.age, person.gender);
 
-    // Compute delta.
-    double delta = ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW_0;
+    // Compute energy cost per unit body weight.
+    double delta = compute_delta(PAL, RMR, BW_0);
 
     // Compute thermic effect of food and adaptive thermogenesis.
     double TEF = beta_TEF * EI - EI_0;
@@ -245,6 +245,10 @@ double EnergyBalanceModel::compute_RMR(double BW, double H, unsigned int age,
     double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
     RMR += gender == core::Gender::male ? 5.0 : -161.0;
     return RMR * 4.184; // kcal to kJ
+}
+
+double EnergyBalanceModel::compute_delta(double PAL, double RMR, double BW) const {
+    return ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW;
 }
 
 double EnergyBalanceModel::bounded_nutrient_value(const core::Identifier &nutrient,
