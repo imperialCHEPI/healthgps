@@ -3,6 +3,7 @@
 #include "riskmodel.h"
 
 #include <nlohmann/json.hpp>
+#include <optional>
 
 namespace host::poco {
 /// @brief JSON parser namespace alias.
@@ -81,4 +82,25 @@ void from_json(const json &j, PolicyScenarioInfo &p);
 // Output information
 void to_json(json &j, const OutputInfo &p);
 void from_json(const json &j, OutputInfo &p);
+
 } // namespace host::poco
+
+namespace std {
+
+// Optional parameters
+template <typename T> void to_json(nlohmann::json &j, const std::optional<T> &p) {
+    if (p) {
+        j = *p;
+    } else {
+        j = nullptr;
+    }
+}
+template <typename T> void from_json(const nlohmann::json &j, std::optional<T> &p) {
+    if (j.is_null()) {
+        p = std::nullopt;
+    } else {
+        p = j.get<T>();
+    }
+}
+
+} // namespace std

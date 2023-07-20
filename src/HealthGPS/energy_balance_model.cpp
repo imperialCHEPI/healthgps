@@ -1,24 +1,33 @@
 #include "energy_balance_model.h"
 #include "runtime_context.h"
 
+#include <algorithm>
+
 namespace hgps {
 
 EnergyBalanceModel::EnergyBalanceModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
+    const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
+    const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
-    : energy_equation_{energy_equation}, nutrient_equations_{nutrient_equations},
+    : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
+      nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
         throw std::invalid_argument("Energy equation mapping is empty");
     }
-
+    if (nutrient_ranges_.empty()) {
+        throw std::invalid_argument("Nutrient range mapping is empty");
+    }
     if (nutrient_equations_.empty()) {
         throw std::invalid_argument("Nutrient equation mapping is empty");
     }
-
+    if (food_prices_.empty()) {
+        throw std::invalid_argument("Food price mapping is empty");
+    }
     if (age_mean_height_.empty()) {
         throw std::invalid_argument("Age mean height mapping is empty");
     }
@@ -81,6 +90,12 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
+double EnergyBalanceModel::bounded_nutrient_value(const core::Identifier &nutrient,
+                                                  double value) const {
+    const auto &range = nutrient_ranges_.at(nutrient);
+    return std::clamp(range.first, range.second, value);
+}
+
 std::map<core::Identifier, double>
 EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping, Person &entity,
                                              int time_year) const {
@@ -99,28 +114,34 @@ EnergyBalanceModel::get_current_risk_factors(const HierarchicalMapping &mapping,
 
 EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
+    std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
+    std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
-    : energy_equation_{std::move(energy_equation)},
-      nutrient_equations_{std::move(nutrient_equations)},
+    : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
+      nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       age_mean_height_{std::move(age_mean_height)} {
 
     if (energy_equation_.empty()) {
         throw std::invalid_argument("Energy equation mapping is empty");
     }
-
+    if (nutrient_ranges_.empty()) {
+        throw std::invalid_argument("Nutrient ranges mapping is empty");
+    }
     if (nutrient_equations_.empty()) {
         throw std::invalid_argument("Nutrient equation mapping is empty");
     }
-
+    if (food_prices_.empty()) {
+        throw std::invalid_argument("Food prices mapping is empty");
+    }
     if (age_mean_height_.empty()) {
         throw std::invalid_argument("Age mean height mapping is empty");
     }
 }
 
 std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
-    return std::make_unique<EnergyBalanceModel>(energy_equation_, nutrient_equations_,
-                                                age_mean_height_);
+    return std::make_unique<EnergyBalanceModel>(
+        energy_equation_, nutrient_ranges_, nutrient_equations_, food_prices_, age_mean_height_);
 }
 
 } // namespace hgps

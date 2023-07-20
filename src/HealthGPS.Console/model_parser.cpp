@@ -1,5 +1,4 @@
 #include "model_parser.h"
-
 #include "csvparser.h"
 #include "jsonparser.h"
 
@@ -8,6 +7,7 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
+#include <optional>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                                         \
@@ -205,20 +205,27 @@ std::unique_ptr<hgps::EnergyBalanceModelDefinition>
 load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInfo &settings) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
+    std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
         nutrient_equations;
+    std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
-    // Load nutrient -> energy equation.
+    // Nutrient groups.
     for (const auto &nutrient : opt["Nutrients"]) {
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
-        auto nutrient_energy = nutrient["Energy"].get<double>();
-        energy_equation[nutrient_key] = nutrient_energy;
+        nutrient_ranges[nutrient_key] = nutrient["Range"].get<std::pair<double, double>>();
+        if (nutrient_ranges[nutrient_key].first > nutrient_ranges[nutrient_key].second) {
+            throw std::invalid_argument(
+                fmt::format("Nutrient range is invalid: {}", nutrient_key.to_string()));
+        }
+        energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
 
-    // Load food -> nutrient equations.
+    // Food groups.
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
+        food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
         for (const auto &nutrient : opt["Nutrients"]) {
@@ -245,7 +252,8 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
     return std::make_unique<hgps::EnergyBalanceModelDefinition>(
-        std::move(energy_equation), std::move(nutrient_equations), std::move(age_mean_height));
+        std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
+        std::move(food_prices), std::move(age_mean_height));
 }
 
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
@@ -311,4 +319,5 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 
     repository.register_baseline_adjustment_definition(std::move(adjustment));
 }
+
 } // namespace host
