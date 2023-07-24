@@ -7,24 +7,17 @@
 #include <tuple>
 
 namespace hgps {
-hgps::MappingEntry::MappingEntry(std::string name, short level, core::Identifier entity_key,
-                                 FactorRange range, bool dynamic_factor)
-    : name_{name}, name_key_{core::Identifier{name}}, level_{level},
-      entity_key_{std::move(entity_key)}, range_{range}, dynamic_factor_{dynamic_factor} {}
-
-MappingEntry::MappingEntry(std::string name, short level, core::Identifier entity_key,
-                           bool dynamic_factor)
-    : MappingEntry(name, level, entity_key, FactorRange{}, dynamic_factor) {}
 
 MappingEntry::MappingEntry(std::string name, short level, core::Identifier entity_key,
                            FactorRange range)
-    : MappingEntry(name, level, entity_key, range, false) {}
+    : name_{name}, name_key_{core::Identifier{name}}, level_{level},
+      entity_key_{std::move(entity_key)}, range_{range} {}
 
 MappingEntry::MappingEntry(std::string name, short level, core::Identifier entity_key)
-    : MappingEntry(name, level, entity_key, FactorRange{}, false) {}
+    : MappingEntry(name, level, entity_key, FactorRange{}) {}
 
 MappingEntry::MappingEntry(std::string name, short level)
-    : MappingEntry(name, level, core::Identifier::empty(), FactorRange{}, false) {}
+    : MappingEntry(name, level, core::Identifier::empty(), FactorRange{}) {}
 
 const std::string &MappingEntry::name() const noexcept { return name_; }
 
@@ -35,8 +28,6 @@ const core::Identifier &MappingEntry::entity_key() const noexcept {
 }
 
 bool MappingEntry::is_entity() const noexcept { return !entity_key_.is_empty(); }
-
-bool MappingEntry::is_dynamic_factor() const noexcept { return dynamic_factor_; }
 
 const core::Identifier &MappingEntry::key() const noexcept { return name_key_; }
 
@@ -68,14 +59,6 @@ HierarchicalMapping::HierarchicalMapping(std::vector<MappingEntry> &&mapping)
 
 const std::vector<MappingEntry> &HierarchicalMapping::entries() const noexcept { return mapping_; }
 
-std::vector<MappingEntry> HierarchicalMapping::entries_without_dynamic() const noexcept {
-    std::vector<MappingEntry> result;
-    std::copy_if(mapping_.begin(), mapping_.end(), std::back_inserter(result),
-                 [](const auto &elem) { return !elem.is_dynamic_factor(); });
-
-    return result;
-}
-
 std::size_t HierarchicalMapping::size() const noexcept { return mapping_.size(); }
 
 int HierarchicalMapping::max_level() const noexcept {
@@ -105,12 +88,4 @@ std::vector<MappingEntry> HierarchicalMapping::at_level(int level) const noexcep
     return result;
 }
 
-std::vector<MappingEntry> HierarchicalMapping::at_level_without_dynamic(int level) const noexcept {
-    std::vector<MappingEntry> result;
-    std::copy_if(
-        mapping_.cbegin(), mapping_.cend(), std::back_inserter(result),
-        [&level](const auto &elem) { return elem.level() == level && !elem.is_dynamic_factor(); });
-
-    return result;
-}
 } // namespace hgps

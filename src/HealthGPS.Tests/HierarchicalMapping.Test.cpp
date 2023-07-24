@@ -4,7 +4,7 @@
 
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
     using namespace hgps;
-    return std::vector<MappingEntry>{MappingEntry("Year", 0, core::Identifier::empty(), true),
+    return std::vector<MappingEntry>{MappingEntry("Year", 0, core::Identifier::empty()),
                                      MappingEntry("Gender", 0, core::Identifier{"gender"}),
                                      MappingEntry("Age", 0, core::Identifier{"age"}),
                                      MappingEntry("SmokingStatus", 1),
@@ -73,22 +73,6 @@ TEST(TestHealthGPS_Mapping, AccessByConstInterator) {
     }
 }
 
-TEST(TestHealthGPS_Mapping, CanIdentifyDynamicFactor) {
-    using namespace hgps;
-
-    auto entries = create_mapping_entries();
-    auto mapping = HierarchicalMapping(std::move(entries));
-    auto dynamic_factor = core::Identifier{"year"};
-
-    for (auto &entry : mapping) {
-        if (entry.key() == dynamic_factor) {
-            ASSERT_TRUE(entry.is_dynamic_factor());
-        } else {
-            ASSERT_FALSE(entry.is_dynamic_factor());
-        }
-    }
-}
-
 TEST(TestHealthGPS_Mapping, AccessAllEntries) {
     using namespace hgps;
 
@@ -129,17 +113,6 @@ TEST(TestHealthGPS_Mapping, AccessSingleEntryThrowForUnknowKey) {
     }
 }
 
-TEST(TestHealthGPS_Mapping, AccessEntriesWithoutDynamicFactor) {
-    using namespace hgps;
-
-    auto entries = create_mapping_entries();
-    auto exp_size = entries.size() - 1u;
-    auto mapping = HierarchicalMapping(std::move(entries));
-    auto all_entries = mapping.entries_without_dynamic();
-
-    ASSERT_EQ(exp_size, all_entries.size());
-}
-
 TEST(TestHealthGPS_Mapping, AccessAllLevelEntries) {
     using namespace hgps;
 
@@ -149,21 +122,6 @@ TEST(TestHealthGPS_Mapping, AccessAllLevelEntries) {
     auto level_0_entries = mapping.at_level(0);
     auto level_1_entries = mapping.at_level(1);
     auto level_2_entries = mapping.at_level(2);
-
-    ASSERT_EQ(exp_size[0], level_0_entries.size());
-    ASSERT_EQ(exp_size[1], level_1_entries.size());
-    ASSERT_EQ(exp_size[2], level_2_entries.size());
-}
-
-TEST(TestHealthGPS_Mapping, AccessLevelEntriesWithoutDynamicFactor) {
-    using namespace hgps;
-
-    auto entries = create_mapping_entries();
-    std::vector<int> exp_size = {2, 2, 1};
-    auto mapping = HierarchicalMapping(std::move(entries));
-    auto level_0_entries = mapping.at_level_without_dynamic(0);
-    auto level_1_entries = mapping.at_level_without_dynamic(1);
-    auto level_2_entries = mapping.at_level_without_dynamic(2);
 
     ASSERT_EQ(exp_size[0], level_0_entries.size());
     ASSERT_EQ(exp_size[1], level_1_entries.size());

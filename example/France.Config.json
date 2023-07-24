@@ -91,7 +91,6 @@
                 "range": [13.88, 39.48983]
             }
         ],
-        "dynamic_risk_factor": "",
         "risk_factor_models": {
             "static": "France.HLM.json",
             "dynamic": "France.EBHLM.json"

@@ -41,7 +41,6 @@ struct RiskFactorInfo {
 
 struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
-    std::string dynamic_risk_factor;
     std::unordered_map<std::string, std::string> risk_factor_models;
     BaselineInfo baseline_adjustment;
 };

@@ -17,7 +17,7 @@ namespace fs = std::filesystem;
 
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
     using namespace hgps;
-    return std::vector<MappingEntry>{MappingEntry("Year", 0, core::Identifier::empty(), true),
+    return std::vector<MappingEntry>{MappingEntry("Year", 0, core::Identifier::empty()),
                                      MappingEntry("Gender", 0, core::Identifier{"gender"}),
                                      MappingEntry("Age", 0, core::Identifier{"age"}),
                                      MappingEntry("SmokingStatus", 1),

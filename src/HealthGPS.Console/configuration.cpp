@@ -210,24 +210,6 @@ Configuration load_configuration(CommandOptions &options) {
             }
         }
 
-        if (!config.modelling.dynamic_risk_factor.empty()) {
-            auto found_dynamic_factor = false;
-            for (auto &factor : config.modelling.risk_factors) {
-                if (core::case_insensitive::equals(factor.name,
-                                                   config.modelling.dynamic_risk_factor)) {
-                    found_dynamic_factor = true;
-                    break;
-                }
-            }
-
-            if (!found_dynamic_factor) {
-                fmt::print(
-                    fg(fmt::color::red),
-                    "\nInvalid configuration, dynamic risk factor: {} is not a risk factor.\n",
-                    config.modelling.dynamic_risk_factor);
-            }
-        }
-
         // Run-time
         opt["running"]["start_time"].get_to(config.start_time);
         opt["running"]["stop_time"].get_to(config.stop_time);
@@ -353,21 +335,12 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
 
     auto mapping = std::vector<MappingEntry>();
     for (auto &item : config.modelling.risk_factors) {
-        if (core::case_insensitive::equals(item.name, config.modelling.dynamic_risk_factor)) {
-            if (item.range.empty()) {
-                mapping.emplace_back(
-                    MappingEntry(item.name, item.level, core::Identifier{item.proxy}, true));
-            } else {
-                auto boundary = FactorRange{item.range[0], item.range[1]};
-                mapping.emplace_back(MappingEntry(item.name, item.level,
-                                                  core::Identifier{item.proxy}, boundary, true));
-            }
-        } else if (!item.range.empty()) {
+        if (item.range.empty()) {
+            mapping.emplace_back(MappingEntry{item.name, item.level, core::Identifier{item.proxy}});
+        } else {
             auto boundary = FactorRange{item.range[0], item.range[1]};
             mapping.emplace_back(
                 MappingEntry{item.name, item.level, core::Identifier{item.proxy}, boundary});
-        } else {
-            mapping.emplace_back(MappingEntry{item.name, item.level, core::Identifier{item.proxy}});
         }
     }
 
