@@ -46,7 +46,7 @@ const DataTableColumn &DataTable::column(const std::string &name) const {
     throw std::out_of_range(fmt::format("Column name: {} not found.", name));
 }
 
-const std::optional<std::reference_wrapper<const DataTableColumn>>
+std::optional<std::reference_wrapper<const DataTableColumn>>
 DataTable::column_if_exists(const std::string &name) const {
     auto found = index_.find(to_lower(name));
     if (found != index_.end()) {
