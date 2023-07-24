@@ -67,7 +67,23 @@ cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
 
-All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to [CMake](https://cmake.org/) via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
+All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also
+declare *build presets* and other options previously provided to [CMake](https://cmake.org/) via
+command line arguments. The use of *presets* provides consistent build scripts across development
+and CI/CD environments using source control for reproducibility.
+
+## Building documentation
+
+Technical documentation for the latest version of Health-GPS [is available on the
+website](https://imperialchepi.github.io/healthgps/).
+
+If you wish to build documentation locally, you need [Doxygen](https://www.doxygen.nl/) installed.
+
+You must enable the `BUILD_DOC` CMake option, e.g.:
+
+```cmd
+> cmake --preset=linux-debug -DBUILD_DOC=ON
+```
 
 ## Optional: Running `pre-commit` hooks
 

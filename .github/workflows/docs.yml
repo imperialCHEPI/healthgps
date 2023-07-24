@@ -49,7 +49,7 @@ jobs:
           ./bootstrap-vcpkg.sh -disableMetrics
       - name: Configure HealthGPS
         run: |
-          cmake --preset=linux-release
+          cmake --preset=linux-release -DBUILD_DOC=ON
       - name: Build with doxygen
         run: |
           ninja -C out/build/linux-release/ doxygen-docs
