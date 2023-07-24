@@ -1,11 +1,12 @@
 name: Deploy Jekyll and Doxygen
 
 on:
-  push:
-    branches: [$default-branch]
+  release:
+    types: [published]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    branches: [main]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
