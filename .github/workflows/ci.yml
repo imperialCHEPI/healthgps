@@ -62,7 +62,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential ninja-build doxygen graphviz
+          sudo apt install --no-install-recommends build-essential ninja-build
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
@@ -93,18 +93,18 @@ jobs:
           cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
 
       - uses: ZedThree/clang-tidy-review@v0.13.1
-        if: matrix.compiler == 'gcc-default'
+        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
         id: review
         with:
           build_dir: out/build/linux-debug
 
       # Uploads an artefact containing clang_fixes.json
       - uses: ZedThree/clang-tidy-review/upload@v0.13.1
-        if: matrix.compiler == 'gcc-default'
+        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
         id: upload-review
 
       # If there are any comments, fail the check
-      - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default'
+      - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
         run: exit 1
 
       - uses: ammaraskar/gcc-problem-matcher@master
@@ -142,13 +142,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: artifact/health_gps_${{ matrix.platform }}.zip
-
-      - name: Doxygen release API deploy
-        if: matrix.compiler == 'gcc-default' && startsWith(github.ref, 'refs/tags/')
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{github.workspace}}/out/build/linux-release/src/html
-          destination_dir: html
-          enable_jekyll: true
-          commit_message: ${{ github.ref_name }} - ${{ github.event.head_commit.message }}
