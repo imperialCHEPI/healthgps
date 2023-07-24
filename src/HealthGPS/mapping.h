@@ -53,18 +53,18 @@ class MappingEntry {
     /// @param level The hierarchical level
     /// @param entity_key The associated Person property, if exists
     /// @param range The factor range
-    MappingEntry(std::string name, short level, core::Identifier entity_key, FactorRange range);
+    MappingEntry(std::string name, int level, core::Identifier entity_key, FactorRange range);
 
     /// @brief Initialises a new instance of the MappingEntry class
     /// @param name Risk factor name
     /// @param level The hierarchical level
     /// @param entity_key The associated Person property, if exists
-    MappingEntry(std::string name, short level, core::Identifier entity_key);
+    MappingEntry(std::string name, int level, core::Identifier entity_key);
 
     /// @brief Initialises a new instance of the MappingEntry class
     /// @param name Risk factor name
     /// @param level The hierarchical level
-    MappingEntry(std::string name, short level);
+    MappingEntry(std::string name, int level);
 
     /// @brief Gets the factor name
     /// @return Factor name
@@ -72,7 +72,7 @@ class MappingEntry {
 
     /// @brief Gets the factor hierarchical level
     /// @return Factor level
-    short level() const noexcept;
+    int level() const noexcept;
 
     /// @brief Gets the factor unique identification
     /// @return Factor identification
@@ -98,7 +98,7 @@ class MappingEntry {
   private:
     std::string name_;
     core::Identifier name_key_;
-    short level_{};
+    int level_{};
     core::Identifier entity_key_;
     FactorRange range_;
 };

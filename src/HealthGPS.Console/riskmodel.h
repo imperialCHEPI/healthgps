@@ -51,7 +51,7 @@ struct HierarchicalModelInfo {
 
 struct VariableInfo {
     std::string name;
-    short level{};
+    int level{};
     std::string factor;
 };
 
