@@ -335,7 +335,7 @@ std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summ
     for (const auto &entry : context_.mapping()) {
         // HACK: Ignore missing columns.
         if (const auto &column = input_data.column_if_exists(entry.name())) {
-            column.value().get().accept(visitor);
+            column->get().accept(visitor);
             summary.emplace(entry.name(), visitor.get_summary());
         }
     }
