@@ -85,7 +85,7 @@ You must enable the `BUILD_DOC` CMake option, e.g.:
 > cmake --preset=linux-debug -DBUILD_DOC=ON
 ```
 
-## Optional: Running `pre-commit` hooks
+## Running `pre-commit` hooks
 
 It is recommended that developers install [`pre-commit`](https://pre-commit.com/) to
 make use of [the hooks](./.pre-commit-config.yaml) we have installed for this
@@ -101,7 +101,7 @@ install the hooks into your local clone of the Health-GPS repository, like so:
 Now, every time attempt to make a git commit, your changes will be checked against the
 `pre-commit` hooks.
 
-## Optional: Performing static analysis with `clang-tidy`
+## Performing static analysis with `clang-tidy`
 
 [`clang-tidy`] is a static analysis tool based on clang, which can identify bugs and
 stylistic problems with C++ code. It comes with a helper script, `run-clang-tidy`, which
