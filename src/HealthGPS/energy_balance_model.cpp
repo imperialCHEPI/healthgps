@@ -209,8 +209,7 @@ EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
         double food_intake = person.get_risk_factor_value(food_key);
         for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            double delta_nutrient = food_intake * nutrient_coefficient;
-            nutrient_intakes[nutrient_key] += delta_nutrient;
+            nutrient_intakes[nutrient_key] += food_intake * nutrient_coefficient;
         }
     }
 
@@ -222,8 +221,7 @@ double EnergyBalanceModel::compute_EI(
     double EI = 0.0;
 
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
-        double delta_energy = nutrient_intakes.at(nutrient_key) * energy_coefficient;
-        EI += delta_energy;
+        EI += nutrient_intakes.at(nutrient_key) * energy_coefficient;
     }
 
     return EI;
