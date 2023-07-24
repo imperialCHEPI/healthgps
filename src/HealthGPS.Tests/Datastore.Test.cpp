@@ -11,6 +11,10 @@ class DatastoreTest : public ::testing::Test {
     DatastoreTest() : manager{test_datastore_path} {}
 
     hgps::data::DataManager manager;
+
+    // We don't need to check because this is just for testing
+    hgps::core::Country uk =
+        manager.get_country("GB").value(); // NOLINT(bugprone-unchecked-optional-access)
 };
 
 TEST_F(DatastoreTest, CreateDataManager) {
@@ -41,14 +45,13 @@ TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
 
 TEST_F(DatastoreTest, CountryPopulation) {
     using namespace hgps::core;
-    auto uk = manager.get_country("GB");
-    auto uk_pop = manager.get_population(uk.value());
+    auto uk_pop = manager.get_population(uk);
 
     // Filter out the ends of the years range
     auto uk_pop_min = uk_pop.front().at_time;
     auto uk_pop_max = uk_pop.back().at_time;
     auto mid_year = std::midpoint(uk_pop_min, uk_pop_max);
-    auto uk_pop_flt = manager.get_population(uk.value(), [&mid_year](const int &value) {
+    auto uk_pop_flt = manager.get_population(uk, [&mid_year](const int &value) {
         return value >= (mid_year - 1) && value <= (mid_year + 1);
     });
 
@@ -85,14 +88,13 @@ TEST_F(DatastoreTest, CountryPopulation) {
 
 TEST_F(DatastoreTest, CountryMortality) {
     using namespace hgps::core;
-    auto uk = manager.get_country("GB");
-    auto uk_deaths = manager.get_mortality(uk.value());
+    auto uk_deaths = manager.get_mortality(uk);
 
     // Filter out the ends of the years range
     auto uk_deaths_min = uk_deaths.front().at_time;
     auto uk_deaths_max = uk_deaths.back().at_time;
     auto mid_year = std::midpoint(uk_deaths_min, uk_deaths_max);
-    auto uk_deaths_flt = manager.get_mortality(uk.value(), [&mid_year](const int &value) {
+    auto uk_deaths_flt = manager.get_mortality(uk, [&mid_year](const int &value) {
         return value >= (mid_year - 1) && value <= (mid_year + 1);
     });
 
@@ -133,7 +135,7 @@ TEST_F(DatastoreTest, RetrieveDeseasesInfo) {
     for (auto &item : diseases) {
         auto info = manager.get_disease_info(item.code);
         EXPECT_TRUE(info.has_value());
-        EXPECT_EQ(item.code, info.value().code);
+        EXPECT_EQ(item.code, info.value().code); // NOLINT(bugprone-unchecked-optional-access)
     }
 
     ASSERT_GT(diseases.size(), 0);
@@ -161,7 +163,6 @@ TEST_F(DatastoreTest, RetrieveDeseasesInfoHasNoValue) {
 }
 
 TEST_F(DatastoreTest, RetrieveDeseaseDefinition) {
-    auto uk = manager.get_country("GB").value();
     auto diseases = manager.get_diseases();
     for (auto &item : diseases) {
         auto entity = manager.get_disease(item, uk);
@@ -177,7 +178,6 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinition) {
 TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty) {
     using namespace hgps::core;
 
-    auto uk = manager.get_country("GB").value();
     auto info = DiseaseInfo{.group = DiseaseGroup::other,
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
@@ -193,8 +193,11 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty) {
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
+
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     auto asthma = manager.get_disease_info(Identifier{"asthma"}).value();
     auto diabetes = manager.get_disease_info(Identifier{"diabetes"}).value();
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     auto table_self = manager.get_relative_risk_to_disease(diabetes, diabetes);
     auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
@@ -214,6 +217,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
 TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
 
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto diabetes = manager.get_disease_info(Identifier{"diabetes"}).value();
     auto info = DiseaseInfo{.group = DiseaseGroup::other,
                             .code = Identifier{"ghost369"},
@@ -231,6 +235,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
     using namespace hgps::core;
 
     auto risk_factor = Identifier{"bmi"};
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     auto diabetes = manager.get_disease_info(Identifier{"diabetes"}).value();
 
     auto col_size = 8;
@@ -254,8 +259,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 }
 
 TEST_F(DatastoreTest, RetrieveAnalysisEntity) {
-    auto uk = manager.get_country("GB");
-    auto entity = manager.get_disease_analysis(uk.value());
+    auto entity = manager.get_disease_analysis(uk);
 
     ASSERT_FALSE(entity.empty());
     ASSERT_GT(entity.disability_weights.size(), 0);
@@ -264,14 +268,13 @@ TEST_F(DatastoreTest, RetrieveAnalysisEntity) {
 }
 
 TEST_F(DatastoreTest, RetrieveBirthIndicators) {
-    auto uk = manager.get_country("GB");
-    auto uk_births = manager.get_birth_indicators(uk.value());
+    auto uk_births = manager.get_birth_indicators(uk);
 
     // Filter out the ends of the years range
     auto uk_births_min = uk_births.front().at_time;
     auto uk_births_max = uk_births.back().at_time;
     auto mid_year = std::midpoint(uk_births_min, uk_births_max);
-    auto uk_births_flt = manager.get_birth_indicators(uk.value(), [&mid_year](const int &value) {
+    auto uk_births_flt = manager.get_birth_indicators(uk, [&mid_year](const int &value) {
         return value >= (mid_year - 1) && value <= (mid_year + 1);
     });
 
@@ -288,7 +291,6 @@ TEST_F(DatastoreTest, RetrieveBirthIndicators) {
 TEST_F(DatastoreTest, RetrieveCancerDefinition) {
     using namespace hgps::core;
 
-    auto uk = manager.get_country("GB").value();
     auto diseases = manager.get_diseases();
     auto cancer_count = 0;
     for (auto &item : diseases) {
@@ -312,7 +314,6 @@ TEST_F(DatastoreTest, RetrieveCancerDefinition) {
 TEST_F(DatastoreTest, RetrieveCancerParameters) {
     using namespace hgps::core;
 
-    auto uk = manager.get_country("GB");
     auto diseases = manager.get_diseases();
     auto cancer_count = 0;
     for (auto &item : diseases) {
@@ -321,7 +322,7 @@ TEST_F(DatastoreTest, RetrieveCancerParameters) {
         }
 
         cancer_count++;
-        auto entity = manager.get_disease_parameter(item, uk.value());
+        auto entity = manager.get_disease_parameter(item, uk);
         ASSERT_GT(entity.at_time, 0);
         ASSERT_FALSE(entity.prevalence_distribution.empty());
         ASSERT_FALSE(entity.survival_rate.empty());

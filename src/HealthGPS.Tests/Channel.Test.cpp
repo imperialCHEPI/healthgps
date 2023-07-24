@@ -12,6 +12,7 @@ TEST(ChannelTest, DefaultConstruction) {
     ASSERT_FALSE(channel.closed());
 }
 
+// NOLINTBEGIN(bugprone-unchecked-optional-access)
 TEST(ChannelTest, SendAndReceive) {
     using namespace hgps;
 
@@ -96,6 +97,7 @@ TEST(ChannelTest, ClosedWillReceive) {
     ASSERT_EQ(9, channel.try_receive().value());
     ASSERT_TRUE(channel.empty());
 }
+// NOLINTEND(bugprone-unchecked-optional-access)
 
 TEST(ChannelTest, ProducerConsummer) {
     using namespace hgps;

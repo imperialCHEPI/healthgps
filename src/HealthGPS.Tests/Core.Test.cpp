@@ -48,6 +48,7 @@ TEST(TestCore, CreateTableColumnWithNulls) {
     auto dbl_col = DoubleDataTableColumn("double", {7.13, 15.37, 20.75}, {true, true, true});
     auto int_col = IntegerDataTableColumn("integer", {0, 15, 200}, {false, true, true});
 
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_EQ(3, str_col.size());
     ASSERT_EQ(1, str_col.null_count());
     ASSERT_EQ("Dog", *str_col.value_safe(1));
@@ -81,6 +82,7 @@ TEST(TestCore, CreateTableColumnWithNulls) {
     ASSERT_FALSE(int_col.is_valid(0));
     ASSERT_FALSE(int_col.is_null(1));
     ASSERT_TRUE(int_col.is_valid(1));
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST(TestCore, CreateTableColumnWithoutNulls) {
@@ -91,6 +93,7 @@ TEST(TestCore, CreateTableColumnWithoutNulls) {
     auto dbl_col = DoubleDataTableColumn("double", {7.13, 15.37, 20.75});
     auto int_col = IntegerDataTableColumn("integer", {0, 15, 200});
 
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_EQ(3, str_col.size());
     ASSERT_EQ(0, str_col.null_count());
     ASSERT_EQ("Dog", *str_col.value_safe(1));
@@ -118,6 +121,7 @@ TEST(TestCore, CreateTableColumnWithoutNulls) {
     ASSERT_EQ(15, int_col.value_unsafe(1));
     ASSERT_TRUE(int_col.is_valid(0));
     ASSERT_FALSE(int_col.is_null(0));
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST(TestCore, CreateTableColumnFailWithLenMismatch) {
@@ -199,7 +203,7 @@ TEST(TestCore, CreateDataTable) {
     ASSERT_EQ(5, table.num_rows());
     ASSERT_EQ(table.num_rows(), int_col.size());
     ASSERT_EQ(78, slow_value);
-    ASSERT_EQ(slow_value, *safe_value);
+    ASSERT_EQ(slow_value, *safe_value); // NOLINT(bugprone-unchecked-optional-access)
     ASSERT_EQ(slow_value, fast_value);
 }
 

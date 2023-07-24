@@ -65,7 +65,7 @@ class RelativeRiskLookup {
     std::map<int, int> rows_index_;
     std::map<float, int> cols_index_;
 
-    float lookup_value(const int age, const float value) const noexcept;
+    float lookup_value(const int age, const float value) const;
 };
 
 /// @brief Defines the relative risk factor table type

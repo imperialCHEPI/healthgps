@@ -19,7 +19,8 @@ void UnivariateVisitor::visit(const core::FloatDataTableColumn &column) {
     }
 
     for (const auto &v : column) {
-        summary_.append(v.value());
+        // We know this won't be nullopt as we've checked null_count() above
+        summary_.append(v.value()); // NOLINT(bugprone-unchecked-optional-access)
     }
 }
 
@@ -34,7 +35,8 @@ void UnivariateVisitor::visit(const core::DoubleDataTableColumn &column) {
     }
 
     for (const auto &v : column) {
-        summary_.append(v.value());
+        // We know this won't be nullopt as we've checked null_count() above
+        summary_.append(v.value()); // NOLINT(bugprone-unchecked-optional-access)
     }
 }
 
@@ -49,7 +51,8 @@ void UnivariateVisitor::visit(const core::IntegerDataTableColumn &column) {
     }
 
     for (const auto &v : column) {
-        summary_.append(v.value());
+        // We know this won't be nullopt as we've checked null_count() above
+        summary_.append(v.value()); // NOLINT(bugprone-unchecked-optional-access)
     }
 }
 } // namespace hgps
