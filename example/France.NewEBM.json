@@ -8,7 +8,7 @@
     },
     "Nutrients": [
         {
-            "Name": "Carbs",
+            "Name": "Carbohydrate",
             "Range": [0.0, 50.0],
             "Energy": 4.0
         },
@@ -30,10 +30,10 @@
     ],
     "Foods": [
         {
-            "Name": "Carbs",
+            "Name": "Carbohydrate",
             "Price": null,
             "Nutrients": {
-                "Carbs": 1.0
+                "Carbohydrate": 1.0
             }
         },
         {
