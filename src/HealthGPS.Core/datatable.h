@@ -47,6 +47,12 @@ class DataTable {
     /// @throws std::out_of_range for column name not found.
     const DataTableColumn &column(const std::string &name) const;
 
+    /// @brief Gets the column by name, also checking if the column exists
+    /// @param name The column name
+    /// @return A pair containing a success flag, and the column instance on success.
+    std::optional<std::reference_wrapper<const DataTableColumn>>
+    column_if_exists(const std::string &name) const;
+
     /// @brief Gets the iterator to the first column of the table.
     /// @return An iterator to the beginning
     IteratorType cbegin() const noexcept { return columns_.cbegin(); }
