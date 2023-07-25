@@ -4,12 +4,9 @@
 
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
     using namespace hgps;
-    return {MappingEntry("Year", 0, core::Identifier::empty()),
-            MappingEntry("Gender", 0, core::Identifier{"gender"}),
-            MappingEntry("Age", 0, core::Identifier{"age"}),
-            MappingEntry("SmokingStatus", 1),
-            MappingEntry("AlcoholConsumption", 1),
-            MappingEntry("BMI", 2)};
+    return {MappingEntry("Gender", 0, core::Identifier{"gender"}),
+            MappingEntry("Age", 0, core::Identifier{"age"}), MappingEntry("SmokingStatus", 1),
+            MappingEntry("AlcoholConsumption", 1), MappingEntry("BMI", 2)};
 }
 
 TEST(TestHealthGPS_Mapping, CreateEmpty) {
@@ -36,7 +33,7 @@ TEST(TestHealthGPS_Mapping, CreateFull) {
     ASSERT_EQ(exp_size, mapping.size());
     ASSERT_EQ(2, mapping.max_level());
 
-    ASSERT_EQ(3, level_zero.size());
+    ASSERT_EQ(2, level_zero.size());
     ASSERT_EQ(2, level_one.size());
     ASSERT_EQ(1, level_two.size());
 }
@@ -117,7 +114,7 @@ TEST(TestHealthGPS_Mapping, AccessAllLevelEntries) {
     using namespace hgps;
 
     auto entries = create_mapping_entries();
-    std::vector<int> exp_size = {3, 2, 1};
+    std::vector<int> exp_size = {2, 2, 1};
     auto mapping = HierarchicalMapping(std::move(entries));
     auto level_0_entries = mapping.at_level(0);
     auto level_1_entries = mapping.at_level(1);
