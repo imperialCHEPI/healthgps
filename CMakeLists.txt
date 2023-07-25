@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.20)
 
-option(BUILD_DOC "Build API documentation" ON)
+option(BUILD_DOC "Build API documentation" OFF)
 option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
 
 # minimum default standard

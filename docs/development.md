@@ -67,9 +67,25 @@ cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
 
-All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also declare *build presets* and other options previously provided to [CMake](https://cmake.org/) via command line arguments. The use of *presets* provides consistent build scripts across development and CI/CD environments using source control for reproducibility.
+All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also
+declare *build presets* and other options previously provided to [CMake](https://cmake.org/) via
+command line arguments. The use of *presets* provides consistent build scripts across development
+and CI/CD environments using source control for reproducibility.
 
-## Optional: Running `pre-commit` hooks
+## Building documentation
+
+Technical documentation for the latest version of Health-GPS [is available on the
+website](https://imperialchepi.github.io/healthgps/).
+
+If you wish to build documentation locally, you need [Doxygen](https://www.doxygen.nl/) installed.
+
+You must enable the `BUILD_DOC` CMake option, e.g.:
+
+```cmd
+> cmake --preset=linux-debug -DBUILD_DOC=ON
+```
+
+## Running `pre-commit` hooks
 
 It is recommended that developers install [`pre-commit`](https://pre-commit.com/) to
 make use of [the hooks](./.pre-commit-config.yaml) we have installed for this
@@ -85,7 +101,7 @@ install the hooks into your local clone of the Health-GPS repository, like so:
 Now, every time attempt to make a git commit, your changes will be checked against the
 `pre-commit` hooks.
 
-## Optional: Performing static analysis with `clang-tidy`
+## Performing static analysis with `clang-tidy`
 
 [`clang-tidy`] is a static analysis tool based on clang, which can identify bugs and
 stylistic problems with C++ code. It comes with a helper script, `run-clang-tidy`, which
