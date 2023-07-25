@@ -368,7 +368,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     channels_.push_back("count");
-    for (auto &factor : context.mapping().entries_without_dynamic()) {
+    for (auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }
 
@@ -404,4 +404,5 @@ std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
                                             config.settings().age_range(),
                                             config.run().comorbidities);
 }
+
 } // namespace hgps

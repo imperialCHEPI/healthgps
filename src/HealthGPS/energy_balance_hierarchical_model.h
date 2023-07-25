@@ -67,8 +67,7 @@ class EnergyBalanceHierarchicalModel final : public HierarchicalLinearModel {
         const std::map<core::Identifier, FactorDynamicEquation> &equations);
 
     std::map<core::Identifier, double> get_current_risk_factors(const HierarchicalMapping &mapping,
-                                                                Person &entity,
-                                                                int time_year) const;
+                                                                Person &entity) const;
 
     double sample_normal_with_boundary(Random &random, double mean, double standard_deviation,
                                        double boundary) const;

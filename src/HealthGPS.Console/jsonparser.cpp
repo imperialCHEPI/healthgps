@@ -127,14 +127,12 @@ void from_json(const json &j, RiskFactorInfo &p) {
 
 void to_json(json &j, const ModellingInfo &p) {
     j = json{{"risk_factors", p.risk_factors},
-             {"dynamic_risk_factor", p.dynamic_risk_factor},
              {"risk_factor_models", p.risk_factor_models},
              {"baseline_adjustments", p.baseline_adjustment}};
 }
 
 void from_json(const json &j, ModellingInfo &p) {
     j.at("risk_factors").get_to(p.risk_factors);
-    j.at("dynamic_risk_factor").get_to(p.dynamic_risk_factor);
     j.at("risk_factor_models").get_to(p.risk_factor_models);
     j.at("baseline_adjustments").get_to(p.baseline_adjustment);
 }

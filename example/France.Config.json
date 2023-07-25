@@ -49,12 +49,6 @@
                 "range": [-2.316299, 2.296689]
             },
             {
-                "name": "Carbohydrate",
-                "level": 0,
-                "proxy": "",
-                "range": [40.0, 400.0]
-            },
-            {
                 "name": "Sodium",
                 "level": 1,
                 "proxy": "",
@@ -91,7 +85,6 @@
                 "range": [13.88, 39.48983]
             }
         ],
-        "dynamic_risk_factor": "",
         "risk_factor_models": {
             "static": "France.HLM.json",
             "dynamic": "France.EBHLM.json"

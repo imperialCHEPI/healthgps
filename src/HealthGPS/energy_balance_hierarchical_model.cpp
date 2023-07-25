@@ -37,8 +37,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
             continue;
         }
 
-        auto current_risk_factors =
-            get_current_risk_factors(context.mapping(), entity, context.time_now());
+        auto current_risk_factors = get_current_risk_factors(context.mapping(), entity);
 
         // Model calibrated on previous year's age
         auto model_age = static_cast<int>(entity.age - 1);
@@ -107,15 +106,11 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
 
 std::map<core::Identifier, double>
 EnergyBalanceHierarchicalModel::get_current_risk_factors(const HierarchicalMapping &mapping,
-                                                         Person &entity, int time_year) const {
+                                                         Person &entity) const {
     auto entity_risk_factors = std::map<core::Identifier, double>();
     entity_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
     for (const auto &factor : mapping) {
-        if (factor.is_dynamic_factor()) {
-            entity_risk_factors.emplace(factor.key(), time_year - 1);
-        } else {
-            entity_risk_factors.emplace(factor.key(), entity.get_risk_factor_value(factor.key()));
-        }
+        entity_risk_factors.emplace(factor.key(), entity.get_risk_factor_value(factor.key()));
     }
 
     return entity_risk_factors;

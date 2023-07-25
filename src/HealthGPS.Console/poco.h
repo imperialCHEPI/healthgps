@@ -34,14 +34,13 @@ struct BaselineInfo {
 
 struct RiskFactorInfo {
     std::string name;
-    short level{};
+    int level{};
     std::string proxy;
     std::vector<double> range;
 };
 
 struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
-    std::string dynamic_risk_factor;
     std::unordered_map<std::string, std::string> risk_factor_models;
     BaselineInfo baseline_adjustment;
 };

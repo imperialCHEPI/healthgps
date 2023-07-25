@@ -53,34 +53,18 @@ class MappingEntry {
     /// @param level The hierarchical level
     /// @param entity_key The associated Person property, if exists
     /// @param range The factor range
-    /// @param dynamic_factor indicates whether this is the dynamic factor
-    MappingEntry(std::string name, short level, core::Identifier entity_key, FactorRange range,
-                 bool dynamic_factor);
+    MappingEntry(std::string name, int level, core::Identifier entity_key, FactorRange range);
 
     /// @brief Initialises a new instance of the MappingEntry class
     /// @param name Risk factor name
     /// @param level The hierarchical level
     /// @param entity_key The associated Person property, if exists
-    /// @param dynamic_factor indicates whether this is the dynamic factor
-    MappingEntry(std::string name, short level, core::Identifier entity_key, bool dynamic_factor);
+    MappingEntry(std::string name, int level, core::Identifier entity_key);
 
     /// @brief Initialises a new instance of the MappingEntry class
     /// @param name Risk factor name
     /// @param level The hierarchical level
-    /// @param entity_key The associated Person property, if exists
-    /// @param range The factor range
-    MappingEntry(std::string name, short level, core::Identifier entity_key, FactorRange range);
-
-    /// @brief Initialises a new instance of the MappingEntry class
-    /// @param name Risk factor name
-    /// @param level The hierarchical level
-    /// @param entity_key The associated Person property, if exists
-    MappingEntry(std::string name, short level, core::Identifier entity_key);
-
-    /// @brief Initialises a new instance of the MappingEntry class
-    /// @param name Risk factor name
-    /// @param level The hierarchical level
-    MappingEntry(std::string name, short level);
+    MappingEntry(std::string name, int level);
 
     /// @brief Gets the factor name
     /// @return Factor name
@@ -88,7 +72,7 @@ class MappingEntry {
 
     /// @brief Gets the factor hierarchical level
     /// @return Factor level
-    short level() const noexcept;
+    int level() const noexcept;
 
     /// @brief Gets the factor unique identification
     /// @return Factor identification
@@ -102,10 +86,6 @@ class MappingEntry {
     /// @return true, if the factor has an associated property; otherwise, false.
     bool is_entity() const noexcept;
 
-    /// @brief Determine whether this instance is a dynamic factor
-    /// @return true, for the dynamic factor; otherwise, false.
-    bool is_dynamic_factor() const noexcept;
-
     /// @brief Gets the factor allowed values range
     /// @return Factor values range
     const FactorRange &range() const noexcept;
@@ -118,10 +98,9 @@ class MappingEntry {
   private:
     std::string name_;
     core::Identifier name_key_;
-    short level_{};
+    int level_{};
     core::Identifier entity_key_;
     FactorRange range_;
-    bool dynamic_factor_;
 };
 
 /// @brief Defines the hierarchical model mapping data type
@@ -142,10 +121,6 @@ class HierarchicalMapping {
     /// @return The mapping entries
     const std::vector<MappingEntry> &entries() const noexcept;
 
-    /// @brief Gets the collection of mapping entries without the dynamic factor
-    /// @return The mapping entries without dynamic factor
-    std::vector<MappingEntry> entries_without_dynamic() const noexcept;
-
     /// @brief Gets the size of the mappings collection
     /// @return The mappings collection size
     std::size_t size() const noexcept;
@@ -164,11 +139,6 @@ class HierarchicalMapping {
     /// @param level The hierarchical level
     /// @return The collection of mappings
     std::vector<MappingEntry> at_level(int level) const noexcept;
-
-    /// @brief Gets the mapping entries at a given hierarchical level without the dynamic factor
-    /// @param level The hierarchical level
-    /// @return The collection of mappings without the dynamic factor
-    std::vector<MappingEntry> at_level_without_dynamic(int level) const noexcept;
 
     /// @brief Gets an iterator to the beginning of the mappings
     /// @return Iterator to the first mapping
@@ -197,4 +167,5 @@ class HierarchicalMapping {
   private:
     std::vector<MappingEntry> mapping_;
 };
+
 } // namespace hgps
