@@ -33,8 +33,8 @@ HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory 
 
 void HealthGPS::initialize() {
     // Reset random number generator
-    if (definition_.inputs().seed().has_value()) {
-        definition_.rnd().seed(definition_.inputs().seed().value());
+    if (const auto seed = definition_.inputs().seed()) {
+        definition_.rnd().seed(seed.value());
     }
 
     end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);

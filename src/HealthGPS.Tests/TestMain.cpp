@@ -15,6 +15,7 @@ cxxopts::Options create_options() {
     return options;
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
 

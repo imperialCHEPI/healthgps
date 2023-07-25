@@ -462,14 +462,19 @@ create_intervention_scenario(SyncChannel &channel, const poco::PolicyScenarioInf
     }
 
     if (info.identifier == "food_labelling") {
+        // I'm not sure if this is safe or not, but I'm supressing the warnings anyway -- Alex
+        // NOLINTBEGIN(bugprone-unchecked-optional-access)
+        const auto cutoff_time = info.coverage_cutoff_time.value();
+        const auto cutoff_age = info.child_cutoff_age.value();
+        // NOLINTEND(bugprone-unchecked-optional-access)
+
         auto &adjustment = info.adjustments.at(0);
         auto definition = FoodLabellingDefinition{
             .active_period = period,
             .impacts = risk_impacts,
             .adjustment_risk_factor = AdjustmentFactor{adjustment.risk_factor, adjustment.value},
-            .coverage = PolicyCoverage{info.coverage_rates, info.coverage_cutoff_time.value()},
-            .transfer_coefficient =
-                TransferCoefficient{info.coefficients, info.child_cutoff_age.value()}};
+            .coverage = PolicyCoverage{info.coverage_rates, cutoff_time},
+            .transfer_coefficient = TransferCoefficient{info.coefficients, cutoff_age}};
 
         return std::make_unique<FoodLabellingScenario>(channel, std::move(definition));
     }

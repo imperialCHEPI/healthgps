@@ -101,6 +101,7 @@ DoubleGenderValue PopulationModule::get_birth_rate(int time_year) const noexcept
     return DoubleGenderValue{0.0, 0.0};
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 double PopulationModule::get_residual_death_rate(int age, core::Gender gender) const noexcept {
     if (residual_death_rates_.contains(age)) {
         return residual_death_rates_.at(age, gender);

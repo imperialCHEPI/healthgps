@@ -116,7 +116,8 @@ jobs:
       - name: Build HealthGPS (release)
         if: "!cancelled()" # Run this step, even if the previous one fails
         run: |
-          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON
+          # Build documentation so we can show Doxygen warnings
+          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON -DBUILD_DOC=ON
           cmake --build --preset=release-build-${{ matrix.platform }} --target=install
 
       - name: Upload artifacts

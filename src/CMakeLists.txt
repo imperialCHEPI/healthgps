@@ -13,7 +13,7 @@ if (BUILD_TESTING)
 	add_subdirectory (HealthGPS.Tests)
 endif()
 
-if (BUILD_DOC AND CMAKE_BUILD_TYPE MATCHES "^[Rr]elease")
+if (BUILD_DOC)
     message(STATUS "Doxygen build folder: ${CMAKE_CURRENT_BINARY_DIR}")
 	set(DOXYGEN_FILE_PATTERNS *.h *.cpp *.md)
 	set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*" "*/HealthGPS.Tests/*")
