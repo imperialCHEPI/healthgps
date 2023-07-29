@@ -51,20 +51,8 @@ class MappingEntry {
     /// @brief Initialises a new instance of the MappingEntry class
     /// @param name Risk factor name
     /// @param level The hierarchical level
-    /// @param entity_key The associated Person property, if exists
     /// @param range The factor range
-    MappingEntry(std::string name, int level, core::Identifier entity_key, FactorRange range);
-
-    /// @brief Initialises a new instance of the MappingEntry class
-    /// @param name Risk factor name
-    /// @param level The hierarchical level
-    /// @param entity_key The associated Person property, if exists
-    MappingEntry(std::string name, int level, core::Identifier entity_key);
-
-    /// @brief Initialises a new instance of the MappingEntry class
-    /// @param name Risk factor name
-    /// @param level The hierarchical level
-    MappingEntry(std::string name, int level);
+    MappingEntry(std::string name, int level, FactorRange range = {});
 
     /// @brief Gets the factor name
     /// @return Factor name
@@ -77,14 +65,6 @@ class MappingEntry {
     /// @brief Gets the factor unique identification
     /// @return Factor identification
     const core::Identifier &key() const noexcept;
-
-    /// @brief Gets the factor's associated Person property identifier
-    /// @return Associated entry identifier
-    const core::Identifier &entity_key() const noexcept;
-
-    /// @brief Determine whether this factor has an associated Person property, e.g. age
-    /// @return true, if the factor has an associated property; otherwise, false.
-    bool is_entity() const noexcept;
 
     /// @brief Gets the factor allowed values range
     /// @return Factor values range
@@ -99,7 +79,6 @@ class MappingEntry {
     std::string name_;
     core::Identifier name_key_;
     int level_{};
-    core::Identifier entity_key_;
     FactorRange range_;
 };
 

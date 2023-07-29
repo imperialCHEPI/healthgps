@@ -97,8 +97,7 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
     determ_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
     for (const auto &item : context.mapping()) {
         if (item.level() < level) {
-            determ_risk_factors.emplace(item.key(),
-                                        entity.get_risk_factor_value(item.entity_key()));
+            determ_risk_factors.emplace(item.key(), entity.get_risk_factor_value(item.key()));
         }
     }
 

@@ -17,8 +17,7 @@ namespace fs = std::filesystem;
 
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
     using namespace hgps;
-    return {MappingEntry("Gender", 0, core::Identifier{"gender"}),
-            MappingEntry("Age", 0, core::Identifier{"age"}), MappingEntry("SmokingStatus", 1),
+    return {MappingEntry("Gender", 0), MappingEntry("Age", 0), MappingEntry("SmokingStatus", 1),
             MappingEntry("AlcoholConsumption", 1), MappingEntry("BMI", 2)};
 }
 
@@ -293,8 +292,8 @@ TEST(TestHealthGPS, ModuleFactoryRegistry) {
 
     auto mapping = HierarchicalMapping(std::vector<MappingEntry>{
         MappingEntry("Year", 0),
-        MappingEntry("Gender", 0, core::Identifier{"gender"}),
-        MappingEntry("Age", 0, core::Identifier{"age"}),
+        MappingEntry("Gender", 0),
+        MappingEntry("Age", 0),
     });
 
     auto diseases = std::vector<core::DiseaseInfo>{DiseaseInfo{.group = DiseaseGroup::other,

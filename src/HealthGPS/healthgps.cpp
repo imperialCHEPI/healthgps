@@ -360,7 +360,7 @@ void hgps::HealthGPS::print_initial_population_statistics() {
 
     for (const auto &entity : context_.population()) {
         for (const auto &entry : context_.mapping()) {
-            sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.entity_key()));
+            sim8_summary[entry.name()].append(entity.get_risk_factor_value(entry.key()));
         }
     }
 

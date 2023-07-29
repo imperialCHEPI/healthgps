@@ -8,26 +8,12 @@
 
 namespace hgps {
 
-MappingEntry::MappingEntry(std::string name, int level, core::Identifier entity_key,
-                           FactorRange range)
-    : name_{name}, name_key_{core::Identifier{name}}, level_{level},
-      entity_key_{std::move(entity_key)}, range_{range} {}
-
-MappingEntry::MappingEntry(std::string name, int level, core::Identifier entity_key)
-    : MappingEntry(name, level, entity_key, FactorRange{}) {}
-
-MappingEntry::MappingEntry(std::string name, int level)
-    : MappingEntry(name, level, core::Identifier::empty(), FactorRange{}) {}
+MappingEntry::MappingEntry(std::string name, int level, FactorRange range)
+    : name_{name}, name_key_{core::Identifier{name}}, level_{level}, range_{range} {}
 
 const std::string &MappingEntry::name() const noexcept { return name_; }
 
 int MappingEntry::level() const noexcept { return level_; }
-
-const core::Identifier &MappingEntry::entity_key() const noexcept {
-    return is_entity() ? entity_key_ : name_key_;
-}
-
-bool MappingEntry::is_entity() const noexcept { return !entity_key_.is_empty(); }
 
 const core::Identifier &MappingEntry::key() const noexcept { return name_key_; }
 

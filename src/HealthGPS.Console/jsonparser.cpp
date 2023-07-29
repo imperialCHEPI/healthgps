@@ -115,13 +115,12 @@ void from_json(const json &j, BaselineInfo &p) {
 
 // Risk Factor Modelling
 void to_json(json &j, const RiskFactorInfo &p) {
-    j = json{{"name", p.name}, {"level", p.level}, {"proxy", p.proxy}, {"range", p.range}};
+    j = json{{"name", p.name}, {"level", p.level}, {"range", p.range}};
 }
 
 void from_json(const json &j, RiskFactorInfo &p) {
     j.at("name").get_to(p.name);
     j.at("level").get_to(p.level);
-    j.at("proxy").get_to(p.proxy);
     j.at("range").get_to(p.range);
 }
 
