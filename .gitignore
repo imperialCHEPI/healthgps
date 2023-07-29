@@ -415,3 +415,6 @@ FodyWeavers.xsd
 
 # Compile commands for clangd language server
 compile_commands.json
+
+# Python venv
+.venv
