@@ -3,9 +3,7 @@
 #include "HealthGPS/mapping.h"
 
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
-    using namespace hgps;
-    return {MappingEntry("Gender", 0), MappingEntry("Age", 0), MappingEntry("SmokingStatus", 1),
-            MappingEntry("AlcoholConsumption", 1), MappingEntry("BMI", 2)};
+    return {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}};
 }
 
 TEST(TestHealthGPS_Mapping, CreateEmpty) {
