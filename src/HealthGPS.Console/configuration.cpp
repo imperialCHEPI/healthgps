@@ -338,7 +338,7 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         if (item.range.empty()) {
             mapping.emplace_back(item.name, item.level);
         } else {
-            auto boundary = FactorRange{item.range[0], item.range[1]};
+            auto boundary = hgps::OptionalRange{{item.range[0], item.range[1]}};
             mapping.emplace_back(item.name, item.level, boundary);
         }
     }
