@@ -3,10 +3,7 @@
 #include "HealthGPS/mapping.h"
 
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
-    using namespace hgps;
-    return {MappingEntry("Gender", 0, core::Identifier{"gender"}),
-            MappingEntry("Age", 0, core::Identifier{"age"}), MappingEntry("SmokingStatus", 1),
-            MappingEntry("AlcoholConsumption", 1), MappingEntry("BMI", 2)};
+    return {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}};
 }
 
 TEST(TestHealthGPS_Mapping, CreateEmpty) {
@@ -48,9 +45,6 @@ TEST(TestHealthGPS_Mapping, AccessByInterator) {
     ASSERT_EQ(exp_size, mapping.size());
     for (auto &entry : mapping) {
         ASSERT_GE(entry.level(), 0);
-        if (!entry.is_entity()) {
-            EXPECT_EQ(entry.key(), entry.entity_key());
-        }
     }
 }
 
@@ -64,9 +58,6 @@ TEST(TestHealthGPS_Mapping, AccessByConstInterator) {
     ASSERT_EQ(exp_size, mapping.size());
     for (const auto &entry : mapping) {
         ASSERT_GE(entry.level(), 0);
-        if (!entry.is_entity()) {
-            EXPECT_EQ(entry.key(), entry.entity_key());
-        }
     }
 }
 

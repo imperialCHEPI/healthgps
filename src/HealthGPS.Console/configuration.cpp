@@ -336,10 +336,10 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
     auto mapping = std::vector<MappingEntry>();
     for (auto &item : config.modelling.risk_factors) {
         if (item.range.empty()) {
-            mapping.emplace_back(item.name, item.level, item.proxy);
+            mapping.emplace_back(item.name, item.level);
         } else {
-            auto boundary = FactorRange{item.range[0], item.range[1]};
-            mapping.emplace_back(item.name, item.level, item.proxy, boundary);
+            auto boundary = hgps::OptionalRange{{item.range[0], item.range[1]}};
+            mapping.emplace_back(item.name, item.level, boundary);
         }
     }
 

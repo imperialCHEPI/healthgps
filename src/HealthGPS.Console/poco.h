@@ -35,7 +35,6 @@ struct BaselineInfo {
 struct RiskFactorInfo {
     std::string name;
     int level{};
-    std::string proxy;
     std::vector<double> range;
 };
 
