@@ -9,7 +9,7 @@
 namespace hgps {
 
 MappingEntry::MappingEntry(std::string name, int level, FactorRange range)
-    : name_{name}, name_key_{core::Identifier{name}}, level_{level}, range_{range} {}
+    : name_{std::move(name)}, name_key_{name_}, level_{level}, range_{range} {}
 
 const std::string &MappingEntry::name() const noexcept { return name_; }
 
