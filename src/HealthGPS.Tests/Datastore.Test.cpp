@@ -13,8 +13,7 @@ class DatastoreTest : public ::testing::Test {
     hgps::data::DataManager manager;
 
     // We don't need to check because this is just for testing
-    hgps::core::Country uk =
-        manager.get_country("GB").value(); // NOLINT(bugprone-unchecked-optional-access)
+    hgps::core::Country uk = manager.get_country("GB");
 };
 
 TEST_F(DatastoreTest, CreateDataManager) {
@@ -29,18 +28,15 @@ TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
     ASSERT_THROW(DataManager{"/home/x/y/z"}, std::invalid_argument);
 }
 
-TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
-    auto countries = manager.get_countries();
-    auto gb2_lower = manager.get_country("gb");
-    auto gb2_upper = manager.get_country("GB");
-    auto gb3_lower = manager.get_country("gbr");
-    auto gb3_upper = manager.get_country("GBR");
+TEST_F(DatastoreTest, CountryMissingThrowsException) {
+    ASSERT_THROW(manager.get_country("xxx"), std::invalid_argument);
+}
 
-    ASSERT_GT(countries.size(), 0);
-    ASSERT_TRUE(gb2_lower.has_value());
-    ASSERT_TRUE(gb2_upper.has_value());
-    ASSERT_TRUE(gb3_lower.has_value());
-    ASSERT_TRUE(gb3_upper.has_value());
+TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
+    ASSERT_NO_THROW(manager.get_country("gb"));
+    ASSERT_NO_THROW(manager.get_country("GB"));
+    ASSERT_NO_THROW(manager.get_country("gbr"));
+    ASSERT_NO_THROW(manager.get_country("GBR"));
 }
 
 TEST_F(DatastoreTest, CountryPopulation) {

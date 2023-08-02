@@ -58,18 +58,19 @@ std::vector<Country> DataManager::get_countries() const {
     return results;
 }
 
-std::optional<Country> DataManager::get_country(std::string alpha) const {
-    auto v = get_countries();
-    auto is_target = [&alpha](const hgps::core::Country &obj) {
-        return core::case_insensitive::equals(obj.alpha2, alpha) ||
-               core::case_insensitive::equals(obj.alpha3, alpha);
+Country DataManager::get_country(std::string alpha) const {
+    auto c = get_countries();
+    auto is_target = [&alpha](const hgps::core::Country &c) {
+        return core::case_insensitive::equals(c.alpha2, alpha) ||
+               core::case_insensitive::equals(c.alpha3, alpha);
     };
 
-    if (auto it = std::find_if(v.begin(), v.end(), is_target); it != v.end()) {
-        return (*it);
+    auto country = std::find_if(c.begin(), c.end(), is_target);
+    if (country != c.end()) {
+        return *country;
     }
 
-    return std::nullopt;
+    throw std::invalid_argument(fmt::format("Target country '{}' not found.", alpha));
 }
 
 std::vector<PopulationItem> DataManager::get_population(Country country) const {

@@ -21,8 +21,8 @@ class Datastore {
 
     /// @brief Gets a single country by the alpha code
     /// @param alpha The country alpha 2 or 3 format code to search
-    /// @return The country's definition, if found, otherwise empty
-    virtual std::optional<Country> get_country(std::string alpha) const = 0;
+    /// @return The country's definition
+    virtual Country get_country(std::string alpha) const = 0;
 
     /// @brief Gets the population growth trend for a country filtered by time
     /// @param country The target country definition
