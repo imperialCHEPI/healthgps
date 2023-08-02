@@ -293,13 +293,7 @@ std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Conf
                config.diseases.size());
 
     for (const auto &code : config.diseases) {
-        auto code_key = core::Identifier{code};
-        auto item = data_api.get_disease_info(code_key);
-        if (item.has_value()) {
-            result.emplace_back(item.value());
-        } else {
-            fmt::print(fg(fmt::color::salmon), "Unknown disease code: {}.\n", code);
-        }
+        result.emplace_back(data_api.get_disease_info(core::Identifier{code}));
     }
 
     return result;

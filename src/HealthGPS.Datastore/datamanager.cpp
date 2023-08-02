@@ -70,7 +70,7 @@ Country DataManager::get_country(std::string alpha) const {
         return *country;
     }
 
-    throw std::invalid_argument(fmt::format("Target country '{}' not found.", alpha));
+    throw std::invalid_argument(fmt::format("Target country: '{}' not found.", alpha));
 }
 
 std::vector<PopulationItem> DataManager::get_population(Country country) const {
@@ -201,7 +201,7 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const {
     return result;
 }
 
-std::optional<DiseaseInfo> DataManager::get_disease_info(core::Identifier code) const {
+DiseaseInfo DataManager::get_disease_info(core::Identifier code) const {
     if (index_.contains("diseases")) {
         auto &registry = index_["diseases"]["registry"];
         auto disease_code_str = code.to_string();
@@ -222,11 +222,11 @@ std::optional<DiseaseInfo> DataManager::get_disease_info(core::Identifier code) 
                 return info;
             }
         }
-    } else {
-        notify_warning("index has no 'diseases' entry.");
+
+        throw std::invalid_argument(fmt::format("Disease code: '{}' not found.", code.to_string()));
     }
 
-    return std::optional<DiseaseInfo>();
+    throw std::runtime_error("Index has no 'diseases' entry.");
 }
 
 DiseaseEntity DataManager::get_disease(DiseaseInfo info, Country country) const {

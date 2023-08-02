@@ -2,7 +2,6 @@
 
 #include "interval.h"
 #include "poco.h"
-#include <optional>
 #include <vector>
 
 namespace hgps::core {
@@ -46,8 +45,8 @@ class Datastore {
 
     /// @brief Gets a single disease information by identifier
     /// @param code The target disease identifier
-    /// @return The disease information, if found, otherwise empty
-    virtual std::optional<DiseaseInfo> get_disease_info(Identifier code) const = 0;
+    /// @return The disease information
+    virtual DiseaseInfo get_disease_info(Identifier code) const = 0;
 
     /// @brief Gets a disease full definition by identifier for a country
     /// @param info The target disease information

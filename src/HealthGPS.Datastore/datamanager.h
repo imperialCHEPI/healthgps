@@ -51,7 +51,7 @@ class DataManager : public Datastore {
 
     std::vector<DiseaseInfo> get_diseases() const override;
 
-    std::optional<DiseaseInfo> get_disease_info(core::Identifier code) const override;
+    DiseaseInfo get_disease_info(core::Identifier code) const override;
 
     DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
 
