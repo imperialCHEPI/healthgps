@@ -131,9 +131,11 @@ TEST_F(DatastoreTest, GetDiseases) {
 TEST_F(DatastoreTest, GetDiseaseInfoMatchesGetDisases) {
     auto diseases = manager.get_diseases();
     for (auto &item : diseases) {
-        EXPECT_NO_THROW(manager.get_disease_info(item.code));
-        auto info = manager.get_disease_info(item.code);
-        EXPECT_EQ(item.code, info.code);
+        auto call = [&] {
+            auto info = manager.get_disease_info(item.code);
+            EXPECT_EQ(item.code, info.code);
+        };
+        EXPECT_NO_THROW(call());
     }
 }
 
@@ -186,8 +188,6 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty) {
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
-    using namespace hgps::core;
-
     auto asthma = manager.get_disease_info("asthma");
     auto diabetes = manager.get_disease_info("diabetes");
 
