@@ -138,8 +138,7 @@ TEST_F(DatastoreTest, GetDiseaseInfoMatchesGetDisases) {
 }
 
 TEST_F(DatastoreTest, GetDiseaseInfoMissingThrowsException) {
-    hgps::core::Identifier fake_code{"FAKE"};
-    EXPECT_THROW(manager.get_disease_info(fake_code), std::invalid_argument);
+    EXPECT_THROW(manager.get_disease_info("FAKE"), std::invalid_argument);
 }
 
 TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo) {
@@ -189,8 +188,8 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty) {
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
 
-    auto asthma = manager.get_disease_info(Identifier{"asthma"});
-    auto diabetes = manager.get_disease_info(Identifier{"diabetes"});
+    auto asthma = manager.get_disease_info("asthma");
+    auto diabetes = manager.get_disease_info("diabetes");
 
     auto table_self = manager.get_relative_risk_to_disease(diabetes, diabetes);
     auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
@@ -210,7 +209,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
 TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
 
-    auto diabetes = manager.get_disease_info(Identifier{"diabetes"});
+    auto diabetes = manager.get_disease_info("diabetes");
     auto info = DiseaseInfo{.group = DiseaseGroup::other,
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
@@ -227,7 +226,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
     using namespace hgps::core;
 
     auto risk_factor = Identifier{"bmi"};
-    auto diabetes = manager.get_disease_info(Identifier{"diabetes"});
+    auto diabetes = manager.get_disease_info("diabetes");
 
     auto col_size = 8;
 
