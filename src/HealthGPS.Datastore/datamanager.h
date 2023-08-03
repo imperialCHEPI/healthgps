@@ -35,7 +35,7 @@ class DataManager : public Datastore {
 
     std::vector<Country> get_countries() const override;
 
-    Country get_country(std::string alpha) const override;
+    Country get_country(const std::string &alpha) const override;
 
     std::vector<PopulationItem> get_population(Country country) const;
 
@@ -51,7 +51,7 @@ class DataManager : public Datastore {
 
     std::vector<DiseaseInfo> get_diseases() const override;
 
-    DiseaseInfo get_disease_info(core::Identifier code) const override;
+    DiseaseInfo get_disease_info(const core::Identifier &code) const override;
 
     DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
 

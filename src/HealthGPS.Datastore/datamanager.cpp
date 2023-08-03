@@ -58,7 +58,7 @@ std::vector<Country> DataManager::get_countries() const {
     return results;
 }
 
-Country DataManager::get_country(std::string alpha) const {
+Country DataManager::get_country(const std::string &alpha) const {
     auto c = get_countries();
     auto is_target = [&alpha](const hgps::core::Country &c) {
         return core::case_insensitive::equals(c.alpha2, alpha) ||
@@ -201,7 +201,7 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const {
     return result;
 }
 
-DiseaseInfo DataManager::get_disease_info(core::Identifier code) const {
+DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const {
     if (index_.contains("diseases")) {
         auto &registry = index_["diseases"]["registry"];
         auto disease_code_str = code.to_string();

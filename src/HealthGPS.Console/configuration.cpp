@@ -293,7 +293,7 @@ std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Conf
                config.diseases.size());
 
     for (const auto &code : config.diseases) {
-        result.emplace_back(data_api.get_disease_info(core::Identifier{code}));
+        result.emplace_back(data_api.get_disease_info(code));
     }
 
     return result;
