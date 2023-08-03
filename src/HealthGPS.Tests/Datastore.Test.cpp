@@ -20,9 +20,9 @@ TEST_F(DatastoreTest, CreateDataManager) {
 }
 
 TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
-    ASSERT_THROW(hgps::data::DataManager{"C:\\x\\y"}, std::invalid_argument);
-    ASSERT_THROW(hgps::data::DataManager{"C:/x/y"}, std::invalid_argument);
-    ASSERT_THROW(hgps::data::DataManager{"/home/x/y/z"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"C:\\x\\y"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"C:/x/y"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"/home/x/y/z"}, std::invalid_argument);
 }
 
 TEST_F(DatastoreTest, CountryMissingThrowsException) {
@@ -30,10 +30,10 @@ TEST_F(DatastoreTest, CountryMissingThrowsException) {
 }
 
 TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
-    ASSERT_NO_THROW(manager.get_country("gb"));
-    ASSERT_NO_THROW(manager.get_country("GB"));
-    ASSERT_NO_THROW(manager.get_country("gbr"));
-    ASSERT_NO_THROW(manager.get_country("GBR"));
+    EXPECT_NO_THROW(manager.get_country("gb"));
+    EXPECT_NO_THROW(manager.get_country("GB"));
+    EXPECT_NO_THROW(manager.get_country("gbr"));
+    EXPECT_NO_THROW(manager.get_country("GBR"));
 }
 
 TEST_F(DatastoreTest, CountryPopulation) {
