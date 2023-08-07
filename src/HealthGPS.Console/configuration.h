@@ -35,12 +35,6 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
 /// @return The configuration file information
 Configuration load_configuration(CommandOptions &options);
 
-/// @brief Creates the configuration output folder for result files
-/// @param folder_path Full path to output folder
-/// @param num_retries Number of attempts before giving up
-/// @return true for successful creation, otherwise false
-bool create_output_folder(std::filesystem::path folder_path, unsigned int num_retries = 3);
-
 /// @brief Gets the collection of diseases that matches the selected input list
 /// @param data_api The back-end data store instance to be used.
 /// @param config User configuration file instance
