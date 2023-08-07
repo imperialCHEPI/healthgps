@@ -2,7 +2,6 @@
 
 #include "interval.h"
 #include "poco.h"
-#include <optional>
 #include <vector>
 
 namespace hgps::core {
@@ -21,8 +20,8 @@ class Datastore {
 
     /// @brief Gets a single country by the alpha code
     /// @param alpha The country alpha 2 or 3 format code to search
-    /// @return The country's definition, if found, otherwise empty
-    virtual std::optional<Country> get_country(std::string alpha) const = 0;
+    /// @return The country's definition
+    virtual Country get_country(const std::string &alpha) const = 0;
 
     /// @brief Gets the population growth trend for a country filtered by time
     /// @param country The target country definition
@@ -46,8 +45,8 @@ class Datastore {
 
     /// @brief Gets a single disease information by identifier
     /// @param code The target disease identifier
-    /// @return The disease information, if found, otherwise empty
-    virtual std::optional<DiseaseInfo> get_disease_info(Identifier code) const = 0;
+    /// @return The disease information
+    virtual DiseaseInfo get_disease_info(const Identifier &code) const = 0;
 
     /// @brief Gets a disease full definition by identifier for a country
     /// @param info The target disease information

@@ -94,6 +94,7 @@ create_fields_index_mapping(const std::vector<std::string> &column_names,
 
     return mapping;
 }
+
 } // namespace detail
 
 bool load_datatable_from_csv(hc::DataTable &out_table, std::string full_filename,

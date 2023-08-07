@@ -7,63 +7,6 @@
         "Alpha3": "FRA"
     },
     "BoundaryPercentage": 0.05,
-    "RiskFactors": [
-        {
-            "Name": "Gender",
-            "Level": 0,
-            "Range": [0, 1]
-        },
-        {
-            "Name": "Age",
-            "Level": 0,
-            "Range": [1, 87]
-        },
-        {
-            "Name": "Age2",
-            "Level": 0,
-            "Range": [1, 7569]
-        },
-        {
-            "Name": "Age3",
-            "Level": 0,
-            "Range": [1, 658503]
-        },
-        {
-            "Name": "SES",
-            "Level": 0,
-            "Range": [-2.316299, 2.296689]
-        },
-        {
-            "Name": "Sodium",
-            "Level": 1,
-            "Range": [1.127384, 8.656519]
-        },
-        {
-            "Name": "Protein",
-            "Level": 1,
-            "Range": [43.50682, 238.4145]
-        },
-        {
-            "Name": "Fat",
-            "Level": 1,
-            "Range": [45.04756, 382.664098658922]
-        },
-        {
-            "Name": "PA",
-            "Level": 2,
-            "Range": [22.22314, 9765.512]
-        },
-        {
-            "Name": "Energy",
-            "Level": 2,
-            "Range": [1326.14051277588, 7522.496]
-        },
-        {
-            "Name": "BMI",
-            "Level": 3,
-            "Range": [13.88, 39.48983]
-        }
-    ],
     "Variables": [
         {
             "Name": "dPA",

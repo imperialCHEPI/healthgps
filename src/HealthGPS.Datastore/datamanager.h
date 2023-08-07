@@ -28,15 +28,14 @@ class DataManager : public Datastore {
     /// @brief Initialises a new instance of the hgps::data::DataManager class.
     /// @param root_directory The store root folder containing the index.json file.
     /// @param verbosity The terminal logging verbosity mode to use.
-    /// @throws std::invalid_argument if the given folder does exists or contains the index.json
-    /// file.
+    /// @throws std::invalid_argument if the root directory or index.json is missing.
     /// @throws std::runtime_error for invalid or unsupported index.json file schema version.
     explicit DataManager(const std::filesystem::path root_directory,
                          VerboseMode verbosity = VerboseMode::none);
 
     std::vector<Country> get_countries() const override;
 
-    std::optional<Country> get_country(std::string alpha) const override;
+    Country get_country(const std::string &alpha) const override;
 
     std::vector<PopulationItem> get_population(Country country) const;
 
@@ -52,7 +51,7 @@ class DataManager : public Datastore {
 
     std::vector<DiseaseInfo> get_diseases() const override;
 
-    std::optional<DiseaseInfo> get_disease_info(core::Identifier code) const override;
+    DiseaseInfo get_disease_info(const core::Identifier &code) const override;
 
     DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
 
