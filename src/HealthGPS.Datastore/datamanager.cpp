@@ -58,18 +58,19 @@ std::vector<Country> DataManager::get_countries() const {
     return results;
 }
 
-std::optional<Country> DataManager::get_country(std::string alpha) const {
-    auto v = get_countries();
-    auto is_target = [&alpha](const hgps::core::Country &obj) {
-        return core::case_insensitive::equals(obj.alpha2, alpha) ||
-               core::case_insensitive::equals(obj.alpha3, alpha);
+Country DataManager::get_country(const std::string &alpha) const {
+    auto c = get_countries();
+    auto is_target = [&alpha](const hgps::core::Country &c) {
+        return core::case_insensitive::equals(c.alpha2, alpha) ||
+               core::case_insensitive::equals(c.alpha3, alpha);
     };
 
-    if (auto it = std::find_if(v.begin(), v.end(), is_target); it != v.end()) {
-        return (*it);
+    auto country = std::find_if(c.begin(), c.end(), is_target);
+    if (country != c.end()) {
+        return *country;
     }
 
-    return std::nullopt;
+    throw std::invalid_argument(fmt::format("Target country: '{}' not found.", alpha));
 }
 
 std::vector<PopulationItem> DataManager::get_population(Country country) const {
@@ -200,7 +201,7 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const {
     return result;
 }
 
-std::optional<DiseaseInfo> DataManager::get_disease_info(core::Identifier code) const {
+DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const {
     if (index_.contains("diseases")) {
         auto &registry = index_["diseases"]["registry"];
         auto disease_code_str = code.to_string();
@@ -221,11 +222,11 @@ std::optional<DiseaseInfo> DataManager::get_disease_info(core::Identifier code) 
                 return info;
             }
         }
-    } else {
-        notify_warning("index has no 'diseases' entry.");
+
+        throw std::invalid_argument(fmt::format("Disease code: '{}' not found.", code.to_string()));
     }
 
-    return std::optional<DiseaseInfo>();
+    throw std::runtime_error("Index has no 'diseases' entry.");
 }
 
 DiseaseEntity DataManager::get_disease(DiseaseInfo info, Country country) const {

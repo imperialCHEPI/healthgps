@@ -11,10 +11,7 @@ class DatastoreTest : public ::testing::Test {
     DatastoreTest() : manager{test_datastore_path} {}
 
     hgps::data::DataManager manager;
-
-    // We don't need to check because this is just for testing
-    hgps::core::Country uk =
-        manager.get_country("GB").value(); // NOLINT(bugprone-unchecked-optional-access)
+    hgps::core::Country uk = manager.get_country("GB");
 };
 
 TEST_F(DatastoreTest, CreateDataManager) {
@@ -23,24 +20,20 @@ TEST_F(DatastoreTest, CreateDataManager) {
 }
 
 TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
-    using namespace hgps::data;
-    ASSERT_THROW(DataManager{"C:\\x\\y"}, std::invalid_argument);
-    ASSERT_THROW(DataManager{"C:/x/y"}, std::invalid_argument);
-    ASSERT_THROW(DataManager{"/home/x/y/z"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"C:\\x\\y"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"C:/x/y"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"/home/x/y/z"}, std::invalid_argument);
+}
+
+TEST_F(DatastoreTest, CountryMissingThrowsException) {
+    ASSERT_THROW(manager.get_country("FAKE"), std::invalid_argument);
 }
 
 TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
-    auto countries = manager.get_countries();
-    auto gb2_lower = manager.get_country("gb");
-    auto gb2_upper = manager.get_country("GB");
-    auto gb3_lower = manager.get_country("gbr");
-    auto gb3_upper = manager.get_country("GBR");
-
-    ASSERT_GT(countries.size(), 0);
-    ASSERT_TRUE(gb2_lower.has_value());
-    ASSERT_TRUE(gb2_upper.has_value());
-    ASSERT_TRUE(gb3_lower.has_value());
-    ASSERT_TRUE(gb3_upper.has_value());
+    EXPECT_NO_THROW(manager.get_country("gb"));
+    EXPECT_NO_THROW(manager.get_country("GB"));
+    EXPECT_NO_THROW(manager.get_country("gbr"));
+    EXPECT_NO_THROW(manager.get_country("GBR"));
 }
 
 TEST_F(DatastoreTest, CountryPopulation) {
@@ -130,15 +123,24 @@ TEST_F(DatastoreTest, CountryMortality) {
     }
 }
 
-TEST_F(DatastoreTest, RetrieveDeseasesInfo) {
+TEST_F(DatastoreTest, GetDiseases) {
+    auto diseases = manager.get_diseases();
+    ASSERT_GT(diseases.size(), 0);
+}
+
+TEST_F(DatastoreTest, GetDiseaseInfoMatchesGetDisases) {
     auto diseases = manager.get_diseases();
     for (auto &item : diseases) {
-        auto info = manager.get_disease_info(item.code);
-        EXPECT_TRUE(info.has_value());
-        EXPECT_EQ(item.code, info.value().code); // NOLINT(bugprone-unchecked-optional-access)
+        auto call = [&] {
+            auto info = manager.get_disease_info(item.code);
+            EXPECT_EQ(item.code, info.code);
+        };
+        EXPECT_NO_THROW(call());
     }
+}
 
-    ASSERT_GT(diseases.size(), 0);
+TEST_F(DatastoreTest, GetDiseaseInfoMissingThrowsException) {
+    EXPECT_THROW(manager.get_disease_info("FAKE"), std::invalid_argument);
 }
 
 TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo) {
@@ -154,12 +156,6 @@ TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo) {
 
     ASSERT_GT(diseases.size(), 0);
     ASSERT_GT(cancer_count, 0);
-}
-
-TEST_F(DatastoreTest, RetrieveDeseasesInfoHasNoValue) {
-    using namespace hgps::core;
-    auto info = manager.get_disease_info(Identifier{"ghost369"});
-    EXPECT_FALSE(info.has_value());
 }
 
 TEST_F(DatastoreTest, RetrieveDeseaseDefinition) {
@@ -192,12 +188,8 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty) {
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
-    using namespace hgps::core;
-
-    // NOLINTBEGIN(bugprone-unchecked-optional-access)
-    auto asthma = manager.get_disease_info(Identifier{"asthma"}).value();
-    auto diabetes = manager.get_disease_info(Identifier{"diabetes"}).value();
-    // NOLINTEND(bugprone-unchecked-optional-access)
+    auto asthma = manager.get_disease_info("asthma");
+    auto diabetes = manager.get_disease_info("diabetes");
 
     auto table_self = manager.get_relative_risk_to_disease(diabetes, diabetes);
     auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
@@ -217,8 +209,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
 TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    auto diabetes = manager.get_disease_info(Identifier{"diabetes"}).value();
+    auto diabetes = manager.get_disease_info("diabetes");
     auto info = DiseaseInfo{.group = DiseaseGroup::other,
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
@@ -235,8 +226,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
     using namespace hgps::core;
 
     auto risk_factor = Identifier{"bmi"};
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    auto diabetes = manager.get_disease_info(Identifier{"diabetes"}).value();
+    auto diabetes = manager.get_disease_info("diabetes");
 
     auto col_size = 8;
 

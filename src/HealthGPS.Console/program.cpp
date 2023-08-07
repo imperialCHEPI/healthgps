@@ -66,17 +66,9 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         auto factory = get_default_simulation_module_factory(data_repository);
 
         // Validate the configuration's target country for the simulation
-        auto countries = data_api.get_countries();
-        fmt::print("\nThere are {} countries in storage.\n", countries.size());
-        auto target = data_api.get_country(config.settings.country);
-        if (target.has_value()) {
-            fmt::print("Target country: {} - {}, population: {:0.3g}%.\n", target.value().code,
-                       target.value().name, config.settings.size_fraction * 100.0f);
-        } else {
-            fmt::print(fg(fmt::color::red), "\nTarget country: {} not found.\n",
-                       config.settings.country);
-            return exit_application(EXIT_FAILURE);
-        }
+        auto country = data_api.get_country(config.settings.country);
+        fmt::print("Target country: {} - {}, population: {:0.3g}%.\n", country.code, country.name,
+                   config.settings.size_fraction * 100.0f);
 
         // Validate the configuration diseases list, must exists in back-end data store
         auto diseases = get_diseases_info(data_api, config);
@@ -95,7 +87,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         std::cout << input_table;
 
         // Create complete model input from configuration
-        auto model_input = create_model_input(input_table, target.value(), config, diseases);
+        auto model_input = create_model_input(input_table, country, config, diseases);
 
         // Create event bus and event monitor with a results file writer
         auto event_bus = DefaultEventBus();
