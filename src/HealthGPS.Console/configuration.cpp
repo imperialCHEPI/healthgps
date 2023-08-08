@@ -158,19 +158,17 @@ Configuration load_configuration(CommandOptions &options) {
     config.app_name = PROJECT_NAME;
     config.app_version = PROJECT_VERSION;
 
-    // input dataset file
-    config.file = opt["inputs"]["dataset"].get<FileInfo>();
-    fs::path full_path = config.file.name;
-    if (full_path.is_relative()) {
-        full_path = options.config_file.parent_path() / config.file.name;
-        if (fs::exists(full_path)) {
-            config.file.name = full_path;
-            fmt::print("Input dataset file..: {}\n", config.file.name.string());
-        }
-    }
+    // Base dir for relative paths
+    const auto config_dir = options.config_file.parent_path();
+    bool success = true;
 
-    if (!fs::exists(full_path)) {
-        fmt::print(fg(fmt::color::red), "\nInput data file: {} not found.\n", full_path.string());
+    // input dataset file
+    try {
+        config.file = get_file_info(opt["inputs"]["dataset"], config_dir);
+        fmt::print("Input dataset file: {}\n", config.file.name.string());
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
     }
 
     // Settings and SES mapping
@@ -178,34 +176,16 @@ Configuration load_configuration(CommandOptions &options) {
     config.ses = opt["modelling"]["ses_model"].get<SESInfo>();
 
     // Modelling information
-    config.modelling = opt["modelling"].get<ModellingInfo>();
-
-    for (auto &model : config.modelling.risk_factor_models) {
-        full_path = model.second;
-        if (full_path.is_relative()) {
-            full_path = options.config_file.parent_path() / model.second;
-            if (fs::exists(full_path)) {
-                model.second = full_path.string();
-                fmt::print("Model: {:<7}, file: {}\n", model.first, model.second.string());
-            }
-        }
-
-        if (!fs::exists(full_path)) {
-            fmt::print(fg(fmt::color::red), "Model: {:<7}, file: {} not found.\n", model.first,
-                       full_path.string());
-        }
+    try {
+        config.modelling = get_modelling_info(opt["modelling"], config_dir);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());
     }
 
-    fmt::print("Baseline factor adjustment:\n");
-    for (auto &item : config.modelling.baseline_adjustment.file_names) {
-        full_path = options.config_file.parent_path() / item.second;
-        if (fs::exists(full_path)) {
-            item.second = full_path;
-            fmt::print("{:<14}, file: {}\n", item.first, full_path.string());
-        } else {
-            fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",
-                       item.first, full_path.string());
-        }
+    if (!success) {
+        // TODO: Check more things before aborting
+        throw std::runtime_error("Could not load config");
     }
 
     // Run-time

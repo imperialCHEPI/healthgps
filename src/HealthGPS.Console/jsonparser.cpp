@@ -1,6 +1,92 @@
 #include "jsonparser.h"
+#include <fmt/color.h>
+#include <fmt/format.h>
 
 namespace host::poco {
+void rebase_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
+    if (path.is_relative()) {
+        path = std::filesystem::weakly_canonical(base_dir / path);
+    }
+
+    if (!std::filesystem::exists(path)) {
+        throw std::invalid_argument{fmt::format("Path does not exist: {}", path.string())};
+    }
+}
+
+std::filesystem::path get_valid_path(const json &j, const std::filesystem::path &base_dir) {
+    auto path = j.get<std::filesystem::path>();
+    rebase_path(path, base_dir);
+    return path;
+}
+
+FileInfo get_file_info(const json &j, const std::filesystem::path &base_dir) {
+    FileInfo info;
+    info.name = get_valid_path(j["name"], base_dir);
+    j.at("format").get_to(info.format);
+    j.at("delimiter").get_to(info.delimiter);
+    j.at("columns").get_to(info.columns);
+    return info;
+}
+
+BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
+    BaselineInfo info;
+    j.at("format").get_to(info.format);
+    j.at("delimiter").get_to(info.delimiter);
+    j.at("encoding").get_to(info.encoding);
+    j.at("file_names").get_to(info.file_names);
+
+    // Rebase paths and check for errors
+    bool success = true;
+    for (auto &[name, path] : info.file_names) {
+        try {
+            rebase_path(path, base_dir);
+            fmt::print("{:<14}, file: {}\n", name, path.string());
+        } catch (const std::invalid_argument &) {
+            fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
+            success = false;
+        }
+    }
+
+    if (!success) {
+        throw std::invalid_argument{"One or more files could not be found"};
+    }
+
+    return info;
+}
+
+ModellingInfo get_modelling_info(const json &j, const std::filesystem::path &base_dir) {
+    bool success = true;
+
+    ModellingInfo info;
+    j.at("risk_factors").get_to(info.risk_factors);
+    j.at("risk_factor_models").get_to(info.risk_factor_models);
+
+    // Rebase paths and check for errors
+    for (auto &[type, path] : info.risk_factor_models) {
+        try {
+            rebase_path(path, base_dir);
+            fmt::print("{:<14}, file: {}\n", type, path.string());
+        } catch (const std::invalid_argument &) {
+            success = false;
+            fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
+                       path.string());
+        }
+    }
+
+    try {
+        info.baseline_adjustment = get_baseline_info(j["baseline_adjustments"], base_dir);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());
+    }
+
+    if (!success) {
+        throw std::invalid_argument("Could not load modelling info");
+    }
+
+    return info;
+}
+
 //--------------------------------------------------------
 // Risk Model JSON serialisation / de-serialisation
 //--------------------------------------------------------
@@ -62,19 +148,6 @@ void from_json(const json &j, HierarchicalLevelInfo &p) {
 // Options JSON serialisation / de-serialisation
 //--------------------------------------------------------
 
-// Data file information
-void to_json(json &j, const FileInfo &p) {
-    j = json{
-        {"name", p.name}, {"format", p.format}, {"delimiter", p.delimiter}, {"columns", p.columns}};
-}
-
-void from_json(const json &j, FileInfo &p) {
-    j.at("name").get_to(p.name);
-    j.at("format").get_to(p.format);
-    j.at("delimiter").get_to(p.delimiter);
-    j.at("columns").get_to(p.columns);
-}
-
 // Settings Information
 void to_json(json &j, const SettingsInfo &p) {
     j = json{{"country_code", p.country},
@@ -88,6 +161,13 @@ void from_json(const json &j, SettingsInfo &p) {
     j.at("age_range").get_to(p.age_range);
 }
 
+// Risk factor modelling
+void from_json(const json &j, RiskFactorInfo &p) {
+    j.at("name").get_to(p.name);
+    j.at("level").get_to(p.level);
+    j.at("range").get_to(p.range);
+}
+
 // SES Model Information
 void to_json(json &j, const SESInfo &p) {
     j = json{{"function_name", p.function}, {"function_parameters", p.parameters}};
@@ -96,44 +176,6 @@ void to_json(json &j, const SESInfo &p) {
 void from_json(const json &j, SESInfo &p) {
     j.at("function_name").get_to(p.function);
     j.at("function_parameters").get_to(p.parameters);
-}
-
-// Baseline scenario adjustments
-void to_json(json &j, const BaselineInfo &p) {
-    j = json{{"format", p.format},
-             {"delimiter", p.delimiter},
-             {"encoding", p.encoding},
-             {"file_names", p.file_names}};
-}
-
-void from_json(const json &j, BaselineInfo &p) {
-    j.at("format").get_to(p.format);
-    j.at("delimiter").get_to(p.delimiter);
-    j.at("encoding").get_to(p.encoding);
-    j.at("file_names").get_to(p.file_names);
-}
-
-// Risk Factor Modelling
-void to_json(json &j, const RiskFactorInfo &p) {
-    j = json{{"name", p.name}, {"level", p.level}, {"range", p.range}};
-}
-
-void from_json(const json &j, RiskFactorInfo &p) {
-    j.at("name").get_to(p.name);
-    j.at("level").get_to(p.level);
-    j.at("range").get_to(p.range);
-}
-
-void to_json(json &j, const ModellingInfo &p) {
-    j = json{{"risk_factors", p.risk_factors},
-             {"risk_factor_models", p.risk_factor_models},
-             {"baseline_adjustments", p.baseline_adjustment}};
-}
-
-void from_json(const json &j, ModellingInfo &p) {
-    j.at("risk_factors").get_to(p.risk_factors);
-    j.at("risk_factor_models").get_to(p.risk_factor_models);
-    j.at("baseline_adjustments").get_to(p.baseline_adjustment);
 }
 
 void to_json(json &j, const VariableInfo &p) {

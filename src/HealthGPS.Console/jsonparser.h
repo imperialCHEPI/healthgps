@@ -2,6 +2,7 @@
 #include "options.h"
 #include "riskmodel.h"
 
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <optional>
 
@@ -14,6 +15,38 @@ namespace host::poco {
 /// @sa https://github.com/nlohmann/json#arbitrary-types-conversions
 /// for details about the contents and code structure in this file.
 using json = nlohmann::json;
+
+/// @brief Get a path, based on base_dir, and check if it exists
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return An absolute path, assuming that base_dir is the base if relative
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+std::filesystem::path get_valid_path(const json &j, const std::filesystem::path &base_dir);
+
+/// @brief Load FileInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return FileInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+FileInfo get_file_info(const json &j, const std::filesystem::path &base_dir);
+
+/// @brief Load BaselineInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return BaselineInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_dir);
+
+/// @brief Load ModellingInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return ModellingInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+ModellingInfo get_modelling_info(const json &j, const std::filesystem::path &base_dir);
 
 //--------------------------------------------------------
 // Full risk factor model POCO types mapping
@@ -37,10 +70,6 @@ void from_json(const json &j, HierarchicalLevelInfo &p);
 // Configuration sections POCO types mapping
 //--------------------------------------------------------
 
-// Data file information
-void to_json(json &j, const FileInfo &p);
-void from_json(const json &j, FileInfo &p);
-
 // Settings Information
 void to_json(json &j, const SettingsInfo &p);
 void from_json(const json &j, SettingsInfo &p);
@@ -49,19 +78,11 @@ void from_json(const json &j, SettingsInfo &p);
 void to_json(json &j, const SESInfo &p);
 void from_json(const json &j, SESInfo &p);
 
-// Baseline scenario adjustments
-void to_json(json &j, const BaselineInfo &p);
-void from_json(const json &j, BaselineInfo &p);
-
 // Lite risk factors models (Energy Balance Model)
-void to_json(json &j, const RiskFactorInfo &p);
 void from_json(const json &j, RiskFactorInfo &p);
 
 void to_json(json &j, const VariableInfo &p);
 void from_json(const json &j, VariableInfo &p);
-
-void to_json(json &j, const ModellingInfo &p);
-void from_json(const json &j, ModellingInfo &p);
 
 void to_json(json &j, const FactorDynamicEquationInfo &p);
 void from_json(const json &j, FactorDynamicEquationInfo &p);
