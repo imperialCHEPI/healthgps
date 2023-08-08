@@ -33,116 +33,6 @@ namespace host {
 using namespace hgps;
 using json = nlohmann::json;
 
-ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
-
-void rebase_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
-    if (path.is_relative()) {
-        path = std::filesystem::weakly_canonical(base_dir / path);
-    }
-
-    if (!std::filesystem::exists(path)) {
-        throw ConfigurationError{fmt::format("Path does not exist: {}", path.string())};
-    }
-}
-
-/// @brief Get a path, based on base_dir, and check if it exists
-/// @param j Input JSON
-/// @param base_dir Base folder
-/// @return An absolute path, assuming that base_dir is the base if relative
-/// @throw json::type_error: Invalid JSON types
-/// @throw ConfigurationError: Path does not exist
-std::filesystem::path get_valid_path(const json &j, const std::filesystem::path &base_dir) {
-    auto path = j.get<std::filesystem::path>();
-    rebase_path(path, base_dir);
-    return path;
-}
-
-/// @brief Load FileInfo from JSON
-/// @param j Input JSON
-/// @param base_dir Base folder
-/// @return FileInfo
-/// @throw json::type_error: Invalid JSON types
-/// @throw ConfigurationError: Path does not exist
-auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
-    poco::FileInfo info;
-    info.name = get_valid_path(j["name"], base_dir);
-    j.at("format").get_to(info.format);
-    j.at("delimiter").get_to(info.delimiter);
-    j.at("columns").get_to(info.columns);
-    return info;
-}
-
-/// @brief Load BaselineInfo from JSON
-/// @param j Input JSON
-/// @param base_dir Base folder
-/// @return BaselineInfo
-/// @throw json::type_error: Invalid JSON types
-/// @throw ConfigurationError: One or more files could not be found
-auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
-    poco::BaselineInfo info;
-    j.at("format").get_to(info.format);
-    j.at("delimiter").get_to(info.delimiter);
-    j.at("encoding").get_to(info.encoding);
-    j.at("file_names").get_to(info.file_names);
-
-    // Rebase paths and check for errors
-    bool success = true;
-    for (auto &[name, path] : info.file_names) {
-        try {
-            rebase_path(path, base_dir);
-            fmt::print("{:<14}, file: {}\n", name, path.string());
-        } catch (const ConfigurationError &) {
-            fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
-            success = false;
-        }
-    }
-
-    if (!success) {
-        throw ConfigurationError{"One or more files could not be found"};
-    }
-
-    return info;
-}
-
-/// @brief Load ModellingInfo from JSON
-/// @param j Input JSON
-/// @param base_dir Base folder
-/// @return ModellingInfo
-/// @throw json::type_error: Invalid JSON types
-/// @throw ConfigurationError: Could not load modelling info
-auto get_modelling_info(const json &j, const std::filesystem::path &base_dir) {
-    bool success = true;
-
-    poco::ModellingInfo info;
-    j.at("risk_factors").get_to(info.risk_factors);
-    j.at("risk_factor_models").get_to(info.risk_factor_models);
-
-    // Rebase paths and check for errors
-    for (auto &[type, path] : info.risk_factor_models) {
-        try {
-            rebase_path(path, base_dir);
-            fmt::print("{:<14}, file: {}\n", type, path.string());
-        } catch (const ConfigurationError &) {
-            success = false;
-            fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
-                       path.string());
-        }
-    }
-
-    try {
-        info.baseline_adjustment = get_baseline_info(j["baseline_adjustments"], base_dir);
-    } catch (const std::exception &e) {
-        success = false;
-        fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());
-    }
-
-    if (!success) {
-        throw ConfigurationError("Could not load modelling info");
-    }
-
-    return info;
-}
-
 std::string get_time_now_str() {
     auto tp = std::chrono::system_clock::now();
     return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
@@ -243,27 +133,357 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
     return cmd;
 }
 
-Configuration load_configuration(CommandOptions &options) {
+ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
+
+auto get_key(const json &j, const std::string &key) {
+    try {
+        return j.at(key);
+    } catch (const std::out_of_range &) {
+        fmt::print(fg(fmt::color::red), "Missing key \"{}\"\n", key);
+        throw ConfigurationError{fmt::format("Missing key \"{}\"", key)};
+    }
+}
+
+template <class T> bool get_to(const json &j, const std::string &key, T &out) {
+    try {
+        j.at(key).get_to(out);
+        return true;
+    } catch (const std::out_of_range &) {
+        fmt::print(fg(fmt::color::red), "Missing key \"{}\"\n", key);
+        return false;
+    } catch (const json::type_error &) {
+        fmt::print(fg(fmt::color::red), "Key \"{}\" is of wrong type\n", key);
+        return false;
+    }
+}
+
+template <class T>
+bool get_to(const json &j, const std::string &key, T &out, const std::string &error_msg) {
+    if (!get_to(j, key, out)) {
+        fmt::print(fg(fmt::color::red), error_msg);
+        return false;
+    }
+
+    return true;
+}
+
+template <class T> bool get_to(const json &j, const std::string &key, T &out, bool &success) {
+    const bool ret = get_to(j, key, out);
+    if (!ret) {
+        success = false;
+    }
+    return ret;
+}
+
+template <class T>
+bool get_to(const json &j, const std::string &key, T &out, const std::string &error_msg,
+            bool &success) {
+    const bool ret = get_to(j, key, out, error_msg);
+    if (!ret) {
+        success = false;
+    }
+    return ret;
+}
+
+void rebase_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
+    if (path.is_relative()) {
+        path = std::filesystem::weakly_canonical(base_dir / path);
+    }
+
+    if (!std::filesystem::exists(path)) {
+        throw ConfigurationError{fmt::format("Path does not exist: {}", path.string())};
+    }
+}
+
+/// @brief Get a path, based on base_dir, and check if it exists
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return An absolute path, assuming that base_dir is the base if relative
+/// @throw json::type_error: Invalid JSON types
+/// @throw ConfigurationError: Path does not exist
+std::filesystem::path get_valid_path(const json &j, const std::filesystem::path &base_dir) {
+    auto path = j.get<std::filesystem::path>();
+    rebase_path(path, base_dir);
+    return path;
+}
+
+bool get_valid_path_to(const json &j, const std::string &key, const std::filesystem::path &base_dir,
+                       std::filesystem::path &out) {
+    if (!get_to(j, key, out)) {
+        return false;
+    }
+
+    try {
+        rebase_path(out, base_dir);
+    } catch (const ConfigurationError &) {
+        fmt::print(fg(fmt::color::red), "Could not find file {}", out.string());
+        return false;
+    }
+
+    return true;
+}
+
+void get_valid_path_to(const json &j, const std::string &key, const std::filesystem::path &base_dir,
+                       std::filesystem::path &out, bool &success) {
+    if (!get_valid_path_to(j, key, base_dir, out)) {
+        success = false;
+    }
+}
+
+/// @brief Load FileInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return FileInfo
+/// @throw ConfigurationError: Invalid config file format
+auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
+    const auto dataset = get_key(j, "dataset");
+
+    bool success = true;
+    poco::FileInfo info;
+    get_valid_path_to(dataset, "name", base_dir, info.name, success);
+    get_to(dataset, "format", info.format, success);
+    get_to(dataset, "delimiter", info.delimiter, success);
+    get_to(dataset, "columns", info.columns, success);
+    if (!success) {
+        throw ConfigurationError{"Could not load input file info"};
+    }
+
+    return info;
+}
+
+/// @brief Load BaselineInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return BaselineInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw ConfigurationError: One or more files could not be found
+auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
+    const auto &adj = get_key(j, "baseline_adjustments");
+
+    bool success = true;
+    poco::BaselineInfo info;
+    get_to(adj, "format", info.format, success);
+    get_to(adj, "delimiter", info.delimiter, success);
+    get_to(adj, "encoding", info.encoding, success);
+    if (get_to(adj, "file_names", info.file_names, success)) {
+        // Rebase paths and check for errors
+        for (auto &[name, path] : info.file_names) {
+            try {
+                rebase_path(path, base_dir);
+                fmt::print("{:<14}, file: {}\n", name, path.string());
+            } catch (const ConfigurationError &) {
+                fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
+                success = false;
+            }
+        }
+    }
+
+    if (!success) {
+        throw ConfigurationError{"Could not get baseline adjustments"};
+    }
+
+    return info;
+}
+
+/// @brief Load ModellingInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @throw json::type_error: Invalid JSON types
+/// @throw ConfigurationError: Could not load modelling info
+void load_modelling_info(const json &j, const std::filesystem::path &base_dir,
+                         Configuration &config) {
+    bool success = true;
+    const auto modelling = get_key(j, "modelling");
+
+    auto &info = config.modelling;
+    get_to(modelling, "risk_factors", info.risk_factors, success);
+
+    // Rebase paths and check for errors
+    if (get_to(modelling, "risk_factor_models", info.risk_factor_models, success)) {
+        for (auto &[type, path] : info.risk_factor_models) {
+            try {
+                rebase_path(path, base_dir);
+                fmt::print("{:<14}, file: {}\n", type, path.string());
+            } catch (const ConfigurationError &) {
+                success = false;
+                fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
+                           path.string());
+            }
+        }
+    }
+
+    try {
+        info.baseline_adjustment = get_baseline_info(modelling, base_dir);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());
+    }
+
+    try {
+        // SES mapping
+        // TODO: Maybe this needs its own helper function
+        config.ses = get_key(modelling, "ses_model").get<poco::SESInfo>();
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
+    }
+
+    if (!success) {
+        throw ConfigurationError("Could not load modelling info");
+    }
+}
+
+void load_interventions(const json &j, Configuration &config) {
+    const auto interventions = get_key(j, "interventions");
+
+    try {
+        // If the type of intervention is null, then there's nothing else to do
+        if (interventions.at("active_type_id").is_null()) {
+            return;
+        }
+    } catch (const std::out_of_range &) {
+        throw ConfigurationError{"Interventions section missing key \"active_type_id\""};
+    }
+
+    core::Identifier active_type_id;
+    try {
+        active_type_id = interventions["active_type_id"].get<core::Identifier>();
+    } catch (const json::type_error &) {
+        throw ConfigurationError{"active_type_id key must be of type string"};
+    }
+
+    /*
+     * NB: This loads all of the policy scenario info from the JSON file, which is
+     * strictly speaking unnecessary, but it does mean that we can verify the data
+     * format is correct.
+     */
+    std::unordered_map<core::Identifier, poco::PolicyScenarioInfo> policy_types;
+    if (!get_to(interventions, "types", policy_types)) {
+        throw ConfigurationError{"Could not load policy types from interventions section"};
+    }
+
+    try {
+        config.intervention = policy_types.at(active_type_id);
+        config.intervention.identifier = active_type_id.to_string();
+        config.has_active_intervention = true;
+    } catch (const std::out_of_range &) {
+        throw ConfigurationError{fmt::format("Unknown active intervention type identifier: {}",
+                                             active_type_id.to_string())};
+    }
+}
+
+void load_running_info(const json &j, Configuration &config) {
+    const auto running = get_key(j, "running");
+
+    bool success = true;
+    get_to(running, "start_time", config.start_time, success);
+    get_to(running, "stop_time", config.stop_time, success);
+    get_to(running, "trial_runs", config.trial_runs, success);
+    get_to(running, "sync_timeout_ms", config.sync_timeout_ms, success);
+    get_to(running, "diseases", config.diseases, success);
+
+    // I copied this logic from the old code, but it seems strange to me. Why do we
+    // store multiple seeds but only use the first? -- Alex
+    std::vector<unsigned int> seeds;
+    if (get_to(running, "seed", seeds, success) && !seeds.empty()) {
+        config.custom_seed = seeds[0];
+    }
+
+    // Intervention Policy
+    try {
+        load_interventions(running, config);
+    } catch (const ConfigurationError &e) {
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red), "Could not load interventions: {}", e.what());
+    }
+
+    if (!success) {
+        throw ConfigurationError{"Could not load running info"};
+    }
+}
+
+bool check_version(const json &j) {
+    int version;
+    if (!get_to(j, "version", version, "Invalid definition, file must have a schema version")) {
+        return false;
+    }
+
+    if (version != 2) {
+        fmt::print(fg(fmt::color::red), "Configuration schema version: {} mismatch, supported: 2",
+                   version);
+        return false;
+    }
+
+    return true;
+}
+
+auto get_settings(const json &j) {
+    if (!j.contains("settings")) {
+        fmt::print(fg(fmt::color::red), "\"settings\" key missing");
+        throw ConfigurationError{"\"settings\" key missing"};
+    }
+
+    return j["settings"].get<poco::SettingsInfo>();
+}
+
+void load_inputs(const json &j, const std::filesystem::path &config_dir, Configuration &config) {
+    const auto inputs = get_key(j, "inputs");
+    bool success = true;
+
+    // Input dataset file
+    try {
+        config.file = get_file_info(inputs, config_dir);
+        fmt::print("Input dataset file: {}\n", config.file.name.string());
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+    }
+
+    // Settings
+    try {
+        config.settings = get_settings(inputs);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load settings info");
+    }
+
+    if (!success) {
+        throw ConfigurationError{"Could not load settings info"};
+    }
+}
+
+Configuration get_configuration(CommandOptions &options) {
     MEASURE_FUNCTION();
     namespace fs = std::filesystem;
     using namespace host::poco;
 
+    bool success = true;
+
     Configuration config;
+    config.job_id = options.job_id;
+
+    // verbosity
+    config.verbosity = core::VerboseMode::none;
+    if (options.verbose) {
+        config.verbosity = core::VerboseMode::verbose;
+    }
+
     std::ifstream ifs(options.config_file, std::ifstream::in);
     if (!ifs) {
         throw ConfigurationError(
             fmt::format("File {} doesn't exist.", options.config_file.string()));
     }
 
-    auto opt = json::parse(ifs);
-    if (!opt.contains("version")) {
-        throw ConfigurationError("Invalid definition, file must have a schema version");
-    }
+    const auto opt = [&ifs]() {
+        try {
+            return json::parse(ifs);
+        } catch (const std::exception &e) {
+            throw ConfigurationError(fmt::format("Could not parse JSON: {}", e.what()));
+        }
+    }();
 
-    const auto version = opt["version"].get<int>();
-    if (version != 2) {
-        throw ConfigurationError(
-            fmt::format("Configuration schema version: {} mismatch, supported: 2", version));
+    if (!check_version(opt)) {
+        success = false;
     }
 
     // application version
@@ -272,82 +492,38 @@ Configuration load_configuration(CommandOptions &options) {
 
     // Base dir for relative paths
     const auto config_dir = options.config_file.parent_path();
-    bool success = true;
 
     // input dataset file
     try {
-        config.file = get_file_info(opt["inputs"]["dataset"], config_dir);
+        load_inputs(opt, config_dir, config);
         fmt::print("Input dataset file: {}\n", config.file.name.string());
     } catch (const std::exception &e) {
         success = false;
         fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
     }
 
-    // Settings and SES mapping
-    config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
-    config.ses = opt["modelling"]["ses_model"].get<SESInfo>();
-
     // Modelling information
     try {
-        config.modelling = get_modelling_info(opt["modelling"], config_dir);
+        load_modelling_info(opt, config_dir, config);
     } catch (const std::exception &e) {
         success = false;
         fmt::print(fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());
     }
 
+    // Run-time info
+    try {
+        load_running_info(opt, config);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load running info: {}\n", e.what());
+    }
+
+    if (get_to(opt, "output", config.output, "Could not load output info", success)) {
+        config.output.folder = expand_environment_variables(config.output.folder);
+    }
+
     if (!success) {
-        // TODO: Check more things before aborting
-        throw std::runtime_error("Could not load config");
-    }
-
-    // Run-time
-    opt["running"]["start_time"].get_to(config.start_time);
-    opt["running"]["stop_time"].get_to(config.stop_time);
-    opt["running"]["trial_runs"].get_to(config.trial_runs);
-    opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
-    auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
-    if (seed.size() > 0) {
-        config.custom_seed = seed[0];
-    }
-
-    opt["running"]["diseases"].get_to(config.diseases);
-
-    // Intervention Policy
-    auto &interventions = opt["running"]["interventions"];
-    if (!interventions["active_type_id"].is_null()) {
-        auto active_type = interventions["active_type_id"].get<std::string>();
-        auto &policy_types = interventions["types"];
-        for (auto it = policy_types.begin(); it != policy_types.end(); ++it) {
-            if (core::case_insensitive::equals(it.key(), active_type)) {
-                config.intervention = it.value().get<PolicyScenarioInfo>();
-                config.intervention.identifier = core::to_lower(it.key());
-                config.has_active_intervention = true;
-                break;
-            }
-        }
-
-        if (!core::case_insensitive::equals(config.intervention.identifier, active_type)) {
-            throw std::runtime_error(
-                fmt::format("Unknown active intervention type identifier: {}", active_type));
-        }
-    }
-
-    config.job_id = options.job_id;
-    config.output = opt["output"].get<OutputInfo>();
-    config.output.folder = expand_environment_variables(config.output.folder);
-    if (!fs::exists(config.output.folder)) {
-        fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
-                   config.output.folder);
-        if (!std::filesystem::create_directories(config.output.folder)) {
-            throw std::runtime_error(
-                fmt::format("Failed to create output folder: {}", config.output.folder));
-        }
-    }
-
-    // verbosity
-    config.verbosity = core::VerboseMode::none;
-    if (options.verbose) {
-        config.verbosity = core::VerboseMode::verbose;
+        throw ConfigurationError{"Error loading config file"};
     }
 
     return config;

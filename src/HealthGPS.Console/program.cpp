@@ -40,10 +40,21 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = load_configuration(cmd_args);
+        config = get_configuration(cmd_args);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);
+    }
+
+    // Create output folder
+    if (!std::filesystem::exists(config.output.folder)) {
+        fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
+                   config.output.folder);
+        if (!std::filesystem::create_directories(config.output.folder)) {
+            fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
+                       config.output.folder);
+            return exit_application(EXIT_FAILURE);
+        }
     }
 
     // Load input data file into a datatable asynchronous

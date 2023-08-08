@@ -42,7 +42,7 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
 /// @brief Loads the input configuration file, *.json, information
 /// @param options User command-line options
 /// @return The configuration file information
-Configuration load_configuration(CommandOptions &options);
+Configuration get_configuration(CommandOptions &options);
 
 /// @brief Gets the collection of diseases that matches the selected input list
 /// @param data_api The back-end data store instance to be used.
