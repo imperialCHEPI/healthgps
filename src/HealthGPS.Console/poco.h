@@ -11,7 +11,6 @@ struct FileInfo {
     std::filesystem::path name;
     std::string format;
     std::string delimiter;
-    std::string encoding;
     std::map<std::string, std::string> columns;
 };
 
