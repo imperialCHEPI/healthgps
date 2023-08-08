@@ -1,5 +1,8 @@
 #pragma once
 #include <functional>
+#include <iterator>
+#include <ranges>
+#include <sstream>
 #include <string>
 
 namespace hgps::core {
@@ -25,6 +28,34 @@ std::string to_upper(const std::string_view &value) noexcept;
 /// @return An array whose elements contain the substrings
 std::vector<std::string_view> split_string(const std::string_view &value,
                                            std::string_view delims) noexcept;
+
+/// @brief Join a range of strings with a delimeter
+/// @param begin Start of range
+/// @param end End of range
+/// @return A new string composed of the joined-up strings
+template <std::input_iterator Iter>
+std::string join_strings(const std::string &delim, Iter begin, Iter end) {
+    if (begin == end) {
+        return {};
+    }
+
+    std::stringstream ss;
+    auto it = begin;
+    ss << *it++;
+    for (; it != end; ++it) {
+        ss << delim << *it;
+    }
+
+    return ss.str();
+}
+
+/// @brief Join a range of strings with a delimeter
+/// @param range Range of strings to join
+/// @return A new string composed of the joined-up strings
+template <std::ranges::range Range>
+std::string join_strings(const std::string &delim, const Range &range) {
+    return join_strings(delim, std::cbegin(range), std::cend(range));
+}
 
 /// @brief Case-insensitive operations on ASCII strings.
 struct case_insensitive final {

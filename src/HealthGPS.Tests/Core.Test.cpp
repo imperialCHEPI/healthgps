@@ -328,3 +328,15 @@ TEST(TestCore, SplitDelimitedString) {
     ASSERT_EQ(parts.front(), csv_parts.front());
     ASSERT_EQ(parts.back(), csv_parts.back());
 }
+
+TEST(TestCore, JoinStrings) {
+    using namespace hgps::core;
+
+    const std::vector<std::string> empty;
+    EXPECT_EQ(join_strings(",", empty), "");
+
+    const std::vector<std::string> source{"The",  "quick", "brown", "fox", "jumps",
+                                          "over", "the",   "lazy",  "dog"};
+    const std::string expected = "The,quick,brown,fox,jumps,over,the,lazy,dog";
+    EXPECT_EQ(join_strings(",", source), expected);
+}
