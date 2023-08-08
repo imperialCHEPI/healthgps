@@ -144,10 +144,10 @@ Configuration load_configuration(CommandOptions &options) {
             throw std::runtime_error("Invalid definition, file must have a schema version");
         }
 
-        auto version = opt["version"].get<int>();
-        if (version != 1 && version != 2) {
-            throw std::runtime_error(fmt::format(
-                "configuration schema version: {} mismatch, supported: 1 and 2", version));
+        const auto version = opt["version"].get<int>();
+        if (version != 2) {
+            throw std::runtime_error(
+                fmt::format("configuration schema version: {} mismatch, supported: 2", version));
         }
 
         // application version
@@ -155,12 +155,7 @@ Configuration load_configuration(CommandOptions &options) {
         config.app_version = PROJECT_VERSION;
 
         // input dataset file
-        auto dataset_key = "dataset";
-        if (version == 1) {
-            dataset_key = "file";
-        }
-
-        config.file = opt["inputs"][dataset_key].get<FileInfo>();
+        config.file = opt["inputs"]["dataset"].get<FileInfo>();
         fs::path full_path = config.file.name;
         if (full_path.is_relative()) {
             full_path = options.config_file.parent_path() / config.file.name;
