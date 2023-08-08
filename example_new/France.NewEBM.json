@@ -58,11 +58,11 @@
             }
         }
     ],
-    "FoodsData": {
-        "file_name": "MAFFCODE_NUTRIENTS_NPM.csv",
-        "format": "csv",
-        "delimiter": ",",
-        "encoding": "UTF8"
+    "FoodsDataFile": {
+        "Name": "MAFFCODE_NUTRIENTS_NPM.csv",
+        "Format": "csv",
+        "Delimiter": ",",
+        "Encoding": "UTF8"
     },
     "AgeMeanHeight": {
         "Male": [

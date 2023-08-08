@@ -7,7 +7,7 @@
 
 namespace host::poco {
 
-struct FileInfo {
+struct DataFileInfo {
     std::string name;
     std::string format;
     std::string delimiter;
@@ -111,4 +111,5 @@ struct PolicyScenarioInfo {
         return "null";
     }
 };
+
 } // namespace host::poco

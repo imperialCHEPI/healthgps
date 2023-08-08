@@ -3,7 +3,6 @@
 #include "HealthGPS/riskfactor_adjustment_types.h"
 
 #include "jsonparser.h"
-#include "options.h"
 
 #include <utility>
 

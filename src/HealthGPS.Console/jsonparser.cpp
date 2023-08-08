@@ -1,6 +1,8 @@
 #include "jsonparser.h"
+#include "poco.h"
 
 namespace host::poco {
+
 //--------------------------------------------------------
 // Risk Model JSON serialisation / de-serialisation
 //--------------------------------------------------------
@@ -63,12 +65,12 @@ void from_json(const json &j, HierarchicalLevelInfo &p) {
 //--------------------------------------------------------
 
 // Data file information
-void to_json(json &j, const FileInfo &p) {
+void to_json(json &j, const DataFileInfo &p) {
     j = json{
         {"name", p.name}, {"format", p.format}, {"delimiter", p.delimiter}, {"columns", p.columns}};
 }
 
-void from_json(const json &j, FileInfo &p) {
+void from_json(const json &j, DataFileInfo &p) {
     j.at("name").get_to(p.name);
     j.at("format").get_to(p.format);
     j.at("delimiter").get_to(p.delimiter);
