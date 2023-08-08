@@ -11,6 +11,7 @@
 #include "HealthGPS/physical_activity_scenario.h"
 #include "HealthGPS/simple_policy_scenario.h"
 
+#include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <chrono>
@@ -30,6 +31,114 @@
 
 namespace host {
 using namespace hgps;
+using json = nlohmann::json;
+void rebase_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
+    if (path.is_relative()) {
+        path = std::filesystem::weakly_canonical(base_dir / path);
+    }
+
+    if (!std::filesystem::exists(path)) {
+        throw std::invalid_argument{fmt::format("Path does not exist: {}", path.string())};
+    }
+}
+
+/// @brief Get a path, based on base_dir, and check if it exists
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return An absolute path, assuming that base_dir is the base if relative
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+std::filesystem::path get_valid_path(const json &j, const std::filesystem::path &base_dir) {
+    auto path = j.get<std::filesystem::path>();
+    rebase_path(path, base_dir);
+    return path;
+}
+
+/// @brief Load FileInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return FileInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
+    poco::FileInfo info;
+    info.name = get_valid_path(j["name"], base_dir);
+    j.at("format").get_to(info.format);
+    j.at("delimiter").get_to(info.delimiter);
+    j.at("columns").get_to(info.columns);
+    return info;
+}
+
+/// @brief Load BaselineInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return BaselineInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
+    poco::BaselineInfo info;
+    j.at("format").get_to(info.format);
+    j.at("delimiter").get_to(info.delimiter);
+    j.at("encoding").get_to(info.encoding);
+    j.at("file_names").get_to(info.file_names);
+
+    // Rebase paths and check for errors
+    bool success = true;
+    for (auto &[name, path] : info.file_names) {
+        try {
+            rebase_path(path, base_dir);
+            fmt::print("{:<14}, file: {}\n", name, path.string());
+        } catch (const std::invalid_argument &) {
+            fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
+            success = false;
+        }
+    }
+
+    if (!success) {
+        throw std::invalid_argument{"One or more files could not be found"};
+    }
+
+    return info;
+}
+
+/// @brief Load ModellingInfo from JSON
+/// @param j Input JSON
+/// @param base_dir Base folder
+/// @return ModellingInfo
+/// @throw json::type_error: Invalid JSON types
+/// @throw std::invalid_argument: Path does not exist
+auto get_modelling_info(const json &j, const std::filesystem::path &base_dir) {
+    bool success = true;
+
+    poco::ModellingInfo info;
+    j.at("risk_factors").get_to(info.risk_factors);
+    j.at("risk_factor_models").get_to(info.risk_factor_models);
+
+    // Rebase paths and check for errors
+    for (auto &[type, path] : info.risk_factor_models) {
+        try {
+            rebase_path(path, base_dir);
+            fmt::print("{:<14}, file: {}\n", type, path.string());
+        } catch (const std::invalid_argument &) {
+            success = false;
+            fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
+                       path.string());
+        }
+    }
+
+    try {
+        info.baseline_adjustment = get_baseline_info(j["baseline_adjustments"], base_dir);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());
+    }
+
+    if (!success) {
+        throw std::invalid_argument("Could not load modelling info");
+    }
+
+    return info;
+}
 
 std::string get_time_now_str() {
     auto tp = std::chrono::system_clock::now();
