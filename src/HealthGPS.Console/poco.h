@@ -6,6 +6,7 @@
 #include <vector>
 
 namespace host::poco {
+
 struct FileInfo {
     std::string name;
     std::string format;
