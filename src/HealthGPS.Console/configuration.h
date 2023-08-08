@@ -11,7 +11,16 @@
 #include "options.h"
 #include "result_file_writer.h"
 
+#include <stdexcept>
+
 namespace host {
+
+/// @brief Represents an error that occurred with the format of a config file
+class ConfigurationError : public std::runtime_error {
+  public:
+    ConfigurationError(const std::string &msg);
+};
+
 /// @brief Get a string representation of current system time
 /// @return The system time as string
 std::string get_time_now_str();

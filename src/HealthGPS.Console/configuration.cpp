@@ -32,13 +32,16 @@
 namespace host {
 using namespace hgps;
 using json = nlohmann::json;
+
+ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
+
 void rebase_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
     if (path.is_relative()) {
         path = std::filesystem::weakly_canonical(base_dir / path);
     }
 
     if (!std::filesystem::exists(path)) {
-        throw std::invalid_argument{fmt::format("Path does not exist: {}", path.string())};
+        throw ConfigurationError{fmt::format("Path does not exist: {}", path.string())};
     }
 }
 
@@ -47,7 +50,7 @@ void rebase_path(std::filesystem::path &path, const std::filesystem::path &base_
 /// @param base_dir Base folder
 /// @return An absolute path, assuming that base_dir is the base if relative
 /// @throw json::type_error: Invalid JSON types
-/// @throw std::invalid_argument: Path does not exist
+/// @throw ConfigurationError: Path does not exist
 std::filesystem::path get_valid_path(const json &j, const std::filesystem::path &base_dir) {
     auto path = j.get<std::filesystem::path>();
     rebase_path(path, base_dir);
@@ -59,7 +62,7 @@ std::filesystem::path get_valid_path(const json &j, const std::filesystem::path 
 /// @param base_dir Base folder
 /// @return FileInfo
 /// @throw json::type_error: Invalid JSON types
-/// @throw std::invalid_argument: Path does not exist
+/// @throw ConfigurationError: Path does not exist
 auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
     poco::FileInfo info;
     info.name = get_valid_path(j["name"], base_dir);
@@ -74,7 +77,7 @@ auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
 /// @param base_dir Base folder
 /// @return BaselineInfo
 /// @throw json::type_error: Invalid JSON types
-/// @throw std::invalid_argument: Path does not exist
+/// @throw ConfigurationError: One or more files could not be found
 auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
     poco::BaselineInfo info;
     j.at("format").get_to(info.format);
@@ -88,14 +91,14 @@ auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
         try {
             rebase_path(path, base_dir);
             fmt::print("{:<14}, file: {}\n", name, path.string());
-        } catch (const std::invalid_argument &) {
+        } catch (const ConfigurationError &) {
             fmt::print(fg(fmt::color::red), "Could not find file: {}\n", path.string());
             success = false;
         }
     }
 
     if (!success) {
-        throw std::invalid_argument{"One or more files could not be found"};
+        throw ConfigurationError{"One or more files could not be found"};
     }
 
     return info;
@@ -106,7 +109,7 @@ auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
 /// @param base_dir Base folder
 /// @return ModellingInfo
 /// @throw json::type_error: Invalid JSON types
-/// @throw std::invalid_argument: Path does not exist
+/// @throw ConfigurationError: Could not load modelling info
 auto get_modelling_info(const json &j, const std::filesystem::path &base_dir) {
     bool success = true;
 
@@ -119,7 +122,7 @@ auto get_modelling_info(const json &j, const std::filesystem::path &base_dir) {
         try {
             rebase_path(path, base_dir);
             fmt::print("{:<14}, file: {}\n", type, path.string());
-        } catch (const std::invalid_argument &) {
+        } catch (const ConfigurationError &) {
             success = false;
             fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n", type,
                        path.string());
@@ -134,7 +137,7 @@ auto get_modelling_info(const json &j, const std::filesystem::path &base_dir) {
     }
 
     if (!success) {
-        throw std::invalid_argument("Could not load modelling info");
+        throw ConfigurationError("Could not load modelling info");
     }
 
     return info;
@@ -248,19 +251,19 @@ Configuration load_configuration(CommandOptions &options) {
     Configuration config;
     std::ifstream ifs(options.config_file, std::ifstream::in);
     if (!ifs) {
-        throw std::runtime_error(
+        throw ConfigurationError(
             fmt::format("File {} doesn't exist.", options.config_file.string()));
     }
 
     auto opt = json::parse(ifs);
     if (!opt.contains("version")) {
-        throw std::runtime_error("Invalid definition, file must have a schema version");
+        throw ConfigurationError("Invalid definition, file must have a schema version");
     }
 
     const auto version = opt["version"].get<int>();
     if (version != 2) {
-        throw std::runtime_error(
-            fmt::format("configuration schema version: {} mismatch, supported: 2", version));
+        throw ConfigurationError(
+            fmt::format("Configuration schema version: {} mismatch, supported: 2", version));
     }
 
     // application version
