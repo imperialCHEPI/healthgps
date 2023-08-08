@@ -165,8 +165,8 @@ Configuration load_configuration(CommandOptions &options) {
         if (full_path.is_relative()) {
             full_path = options.config_file.parent_path() / config.file.name;
             if (fs::exists(full_path)) {
-                config.file.name = full_path.string();
-                fmt::print("Input dataset file..: {}\n", config.file.name);
+                config.file.name = full_path;
+                fmt::print("Input dataset file..: {}\n", config.file.name.string());
             }
         }
 
@@ -188,7 +188,7 @@ Configuration load_configuration(CommandOptions &options) {
                 full_path = options.config_file.parent_path() / model.second;
                 if (fs::exists(full_path)) {
                     model.second = full_path.string();
-                    fmt::print("Model: {:<7}, file: {}\n", model.first, model.second);
+                    fmt::print("Model: {:<7}, file: {}\n", model.first, model.second.string());
                 }
             }
 
@@ -202,7 +202,7 @@ Configuration load_configuration(CommandOptions &options) {
         for (auto &item : config.modelling.baseline_adjustment.file_names) {
             full_path = options.config_file.parent_path() / item.second;
             if (fs::exists(full_path)) {
-                item.second = full_path.string();
+                item.second = full_path;
                 fmt::print("{:<14}, file: {}\n", item.first, full_path.string());
             } else {
                 fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",

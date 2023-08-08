@@ -1,4 +1,5 @@
 #pragma once
+#include <filesystem>
 #include <map>
 #include <optional>
 #include <string>
@@ -7,7 +8,7 @@
 
 namespace host::poco {
 struct FileInfo {
-    std::string name;
+    std::filesystem::path name;
     std::string format;
     std::string delimiter;
     std::string encoding;
@@ -29,7 +30,7 @@ struct BaselineInfo {
     std::string format;
     std::string delimiter;
     std::string encoding;
-    std::map<std::string, std::string> file_names;
+    std::map<std::string, std::filesystem::path> file_names;
 };
 
 struct RiskFactorInfo {
@@ -40,7 +41,7 @@ struct RiskFactorInfo {
 
 struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
-    std::unordered_map<std::string, std::string> risk_factor_models;
+    std::unordered_map<std::string, std::filesystem::path> risk_factor_models;
     BaselineInfo baseline_adjustment;
 };
 

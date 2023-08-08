@@ -38,7 +38,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
         }
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "Failed to parse adjustment file: {} or {}. {}\n",
-                   male_filename, female_filename, ex.what());
+                   male_filename.string(), female_filename.string(), ex.what());
         throw;
     }
 }
@@ -275,10 +275,10 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     throw std::invalid_argument(fmt::format("Unknown model type: {}", model_type));
 }
 
-poco::json load_json(const std::string &model_filename) {
-    std::ifstream ifs(model_filename, std::ifstream::in);
+poco::json load_json(const std::filesystem::path &model_path) {
+    std::ifstream ifs(model_path, std::ifstream::in);
     if (!ifs.good()) {
-        throw std::invalid_argument(fmt::format("Model file: {} not found", model_filename));
+        throw std::invalid_argument(fmt::format("Model file: {} not found", model_path.string()));
     }
 
     return poco::json::parse(ifs);
