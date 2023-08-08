@@ -104,7 +104,7 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
     using namespace rapidcsv;
 
     bool success = true;
-    Document doc{filename, LabelParams{0, -1}, SeparatorParams{delimiter.front()}};
+    Document doc{filename, LabelParams{}, SeparatorParams{delimiter.front()}};
 
     // Validate columns and create file columns map
     auto headers = doc.GetColumnNames();
@@ -123,7 +123,7 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
     }
 
     if (!success) {
-        return false;
+        throw std::runtime_error("Required columns not found in dataset.");
     }
 
     for (const auto &[col_name, csv_col_name] : csv_column_map) {
@@ -153,11 +153,15 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
         }
     }
 
+    if (!success) {
+        throw std::runtime_error("Error parsing dataset.");
+    }
+
     return success;
 }
 
 std::map<hgps::core::Identifier, std::vector<double>>
-load_baseline_from_csv(const std::string &filename, const std::string delimiter) {
+load_baseline_from_csv(const std::string &filename, const std::string &delimiter) {
     using namespace hgps;
     using namespace rapidcsv;
 

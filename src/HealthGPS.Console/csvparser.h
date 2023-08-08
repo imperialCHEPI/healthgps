@@ -24,6 +24,6 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
 /// @param delimiter The data file's columns delimiter character
 /// @return The fully populated table
 std::map<hgps::core::Identifier, std::vector<double>>
-load_baseline_from_csv(const std::string &filename, const std::string delimiter = ",");
+load_baseline_from_csv(const std::string &filename, const std::string &delimiter = ",");
 
 } // namespace host

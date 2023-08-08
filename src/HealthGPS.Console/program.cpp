@@ -78,10 +78,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         }
 
         // Request input datatable instance, wait, if not completed.
-        if (!table_future.get()) {
-            fmt::print(fg(fmt::color::red), "\nInvalid input dataset in configuration.\n");
-            return exit_application(EXIT_FAILURE);
-        }
+        table_future.get();
 
         // Print out the datatable structure information
         std::cout << input_table;

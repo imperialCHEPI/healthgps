@@ -94,4 +94,5 @@ class Datastore {
     /// @return The parameters for the LMS model
     virtual std::vector<LmsDataRow> get_lms_parameters() const = 0;
 };
+
 } // namespace hgps::core

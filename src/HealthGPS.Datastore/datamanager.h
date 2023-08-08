@@ -97,4 +97,5 @@ class DataManager : public Datastore {
 
     void notify_warning(const std::string_view message) const;
 };
+
 } // namespace hgps::data
