@@ -138,128 +138,126 @@ Configuration load_configuration(CommandOptions &options) {
 
     Configuration config;
     std::ifstream ifs(options.config_file, std::ifstream::in);
-    if (ifs) {
-        auto opt = json::parse(ifs);
-        if (!opt.contains("version")) {
-            throw std::runtime_error("Invalid definition, file must have a schema version");
+    if (!ifs) {
+        throw std::runtime_error(
+            fmt::format("File {} doesn't exist.", options.config_file.string()));
+    }
+
+    auto opt = json::parse(ifs);
+    if (!opt.contains("version")) {
+        throw std::runtime_error("Invalid definition, file must have a schema version");
+    }
+
+    const auto version = opt["version"].get<int>();
+    if (version != 2) {
+        throw std::runtime_error(
+            fmt::format("configuration schema version: {} mismatch, supported: 2", version));
+    }
+
+    // application version
+    config.app_name = PROJECT_NAME;
+    config.app_version = PROJECT_VERSION;
+
+    // input dataset file
+    config.file = opt["inputs"]["dataset"].get<FileInfo>();
+    fs::path full_path = config.file.name;
+    if (full_path.is_relative()) {
+        full_path = options.config_file.parent_path() / config.file.name;
+        if (fs::exists(full_path)) {
+            config.file.name = full_path;
+            fmt::print("Input dataset file..: {}\n", config.file.name.string());
         }
+    }
 
-        const auto version = opt["version"].get<int>();
-        if (version != 2) {
-            throw std::runtime_error(
-                fmt::format("configuration schema version: {} mismatch, supported: 2", version));
-        }
+    if (!fs::exists(full_path)) {
+        fmt::print(fg(fmt::color::red), "\nInput data file: {} not found.\n", full_path.string());
+    }
 
-        // application version
-        config.app_name = PROJECT_NAME;
-        config.app_version = PROJECT_VERSION;
+    // Settings and SES mapping
+    config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
+    config.ses = opt["modelling"]["ses_model"].get<SESInfo>();
 
-        // input dataset file
-        config.file = opt["inputs"]["dataset"].get<FileInfo>();
-        fs::path full_path = config.file.name;
+    // Modelling information
+    config.modelling = opt["modelling"].get<ModellingInfo>();
+
+    for (auto &model : config.modelling.risk_factor_models) {
+        full_path = model.second;
         if (full_path.is_relative()) {
-            full_path = options.config_file.parent_path() / config.file.name;
+            full_path = options.config_file.parent_path() / model.second;
             if (fs::exists(full_path)) {
-                config.file.name = full_path;
-                fmt::print("Input dataset file..: {}\n", config.file.name.string());
+                model.second = full_path.string();
+                fmt::print("Model: {:<7}, file: {}\n", model.first, model.second.string());
             }
         }
 
         if (!fs::exists(full_path)) {
-            fmt::print(fg(fmt::color::red), "\nInput data file: {} not found.\n",
+            fmt::print(fg(fmt::color::red), "Model: {:<7}, file: {} not found.\n", model.first,
                        full_path.string());
         }
-
-        // Settings and SES mapping
-        config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
-        config.ses = opt["modelling"]["ses_model"].get<SESInfo>();
-
-        // Modelling information
-        config.modelling = opt["modelling"].get<ModellingInfo>();
-
-        for (auto &model : config.modelling.risk_factor_models) {
-            full_path = model.second;
-            if (full_path.is_relative()) {
-                full_path = options.config_file.parent_path() / model.second;
-                if (fs::exists(full_path)) {
-                    model.second = full_path.string();
-                    fmt::print("Model: {:<7}, file: {}\n", model.first, model.second.string());
-                }
-            }
-
-            if (!fs::exists(full_path)) {
-                fmt::print(fg(fmt::color::red), "Model: {:<7}, file: {} not found.\n", model.first,
-                           full_path.string());
-            }
-        }
-
-        fmt::print("Baseline factor adjustment:\n");
-        for (auto &item : config.modelling.baseline_adjustment.file_names) {
-            full_path = options.config_file.parent_path() / item.second;
-            if (fs::exists(full_path)) {
-                item.second = full_path;
-                fmt::print("{:<14}, file: {}\n", item.first, full_path.string());
-            } else {
-                fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",
-                           item.first, full_path.string());
-            }
-        }
-
-        // Run-time
-        opt["running"]["start_time"].get_to(config.start_time);
-        opt["running"]["stop_time"].get_to(config.stop_time);
-        opt["running"]["trial_runs"].get_to(config.trial_runs);
-        opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
-        auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
-        if (seed.size() > 0) {
-            config.custom_seed = seed[0];
-        }
-
-        opt["running"]["diseases"].get_to(config.diseases);
-
-        // Intervention Policy
-        auto &interventions = opt["running"]["interventions"];
-        if (!interventions["active_type_id"].is_null()) {
-            auto active_type = interventions["active_type_id"].get<std::string>();
-            auto &policy_types = interventions["types"];
-            for (auto it = policy_types.begin(); it != policy_types.end(); ++it) {
-                if (core::case_insensitive::equals(it.key(), active_type)) {
-                    config.intervention = it.value().get<PolicyScenarioInfo>();
-                    config.intervention.identifier = core::to_lower(it.key());
-                    config.has_active_intervention = true;
-                    break;
-                }
-            }
-
-            if (!core::case_insensitive::equals(config.intervention.identifier, active_type)) {
-                throw std::runtime_error(
-                    fmt::format("Unknown active intervention type identifier: {}", active_type));
-            }
-        }
-
-        config.job_id = options.job_id;
-        config.output = opt["output"].get<OutputInfo>();
-        config.output.folder = expand_environment_variables(config.output.folder);
-        if (!fs::exists(config.output.folder)) {
-            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
-                       config.output.folder);
-            if (!std::filesystem::create_directories(config.output.folder)) {
-                throw std::runtime_error(
-                    fmt::format("Failed to create output folder: {}", config.output.folder));
-            }
-        }
-
-        // verbosity
-        config.verbosity = core::VerboseMode::none;
-        if (options.verbose) {
-            config.verbosity = core::VerboseMode::verbose;
-        }
-    } else {
-        std::cout << fmt::format("File {} doesn't exist.", options.config_file.string())
-                  << std::endl;
     }
 
-    ifs.close();
+    fmt::print("Baseline factor adjustment:\n");
+    for (auto &item : config.modelling.baseline_adjustment.file_names) {
+        full_path = options.config_file.parent_path() / item.second;
+        if (fs::exists(full_path)) {
+            item.second = full_path;
+            fmt::print("{:<14}, file: {}\n", item.first, full_path.string());
+        } else {
+            fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",
+                       item.first, full_path.string());
+        }
+    }
+
+    // Run-time
+    opt["running"]["start_time"].get_to(config.start_time);
+    opt["running"]["stop_time"].get_to(config.stop_time);
+    opt["running"]["trial_runs"].get_to(config.trial_runs);
+    opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
+    auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
+    if (seed.size() > 0) {
+        config.custom_seed = seed[0];
+    }
+
+    opt["running"]["diseases"].get_to(config.diseases);
+
+    // Intervention Policy
+    auto &interventions = opt["running"]["interventions"];
+    if (!interventions["active_type_id"].is_null()) {
+        auto active_type = interventions["active_type_id"].get<std::string>();
+        auto &policy_types = interventions["types"];
+        for (auto it = policy_types.begin(); it != policy_types.end(); ++it) {
+            if (core::case_insensitive::equals(it.key(), active_type)) {
+                config.intervention = it.value().get<PolicyScenarioInfo>();
+                config.intervention.identifier = core::to_lower(it.key());
+                config.has_active_intervention = true;
+                break;
+            }
+        }
+
+        if (!core::case_insensitive::equals(config.intervention.identifier, active_type)) {
+            throw std::runtime_error(
+                fmt::format("Unknown active intervention type identifier: {}", active_type));
+        }
+    }
+
+    config.job_id = options.job_id;
+    config.output = opt["output"].get<OutputInfo>();
+    config.output.folder = expand_environment_variables(config.output.folder);
+    if (!fs::exists(config.output.folder)) {
+        fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
+                   config.output.folder);
+        if (!std::filesystem::create_directories(config.output.folder)) {
+            throw std::runtime_error(
+                fmt::format("Failed to create output folder: {}", config.output.folder));
+        }
+    }
+
+    // verbosity
+    config.verbosity = core::VerboseMode::none;
+    if (options.verbose) {
+        config.verbosity = core::VerboseMode::verbose;
+    }
+
     return config;
 }
 
