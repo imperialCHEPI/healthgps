@@ -1,5 +1,5 @@
 #pragma once
-#include "poco.h"
+#include "options.h"
 #include "riskmodel.h"
 
 #include <nlohmann/json.hpp>
@@ -38,8 +38,8 @@ void from_json(const json &j, HierarchicalLevelInfo &p);
 //--------------------------------------------------------
 
 // Data file information
-void to_json(json &j, const DataFileInfo &p);
-void from_json(const json &j, DataFileInfo &p);
+void to_json(json &j, const FileInfo &p);
+void from_json(const json &j, FileInfo &p);
 
 // Settings Information
 void to_json(json &j, const SettingsInfo &p);

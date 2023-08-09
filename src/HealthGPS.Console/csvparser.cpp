@@ -114,7 +114,8 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
             return hc::case_insensitive::equals(col_name, csv_col_name);
         };
 
-        if (auto it = std::find_if(headers.begin(), headers.end(), is_match); it != headers.end()) {
+        auto it = std::find_if(headers.begin(), headers.end(), is_match);
+        if (it != headers.end()) {
             csv_column_map[col_name] = *it;
         } else {
             success = false;

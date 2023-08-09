@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Load input data file into a datatable asynchronous
     auto input_table = core::DataTable();
     auto table_future =
-        core::run_async(load_datatable_from_csv, std::ref(input_table), config.data_file.name,
-                        config.data_file.columns, config.data_file.delimiter);
+        core::run_async(load_datatable_from_csv, std::ref(input_table), config.file.name,
+                        config.file.columns, config.file.delimiter);
 
 #ifdef CATCH_EXCEPTIONS
     try {

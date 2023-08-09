@@ -27,6 +27,7 @@ target_sources(HealthGPS.Console
 		"jsonparser.cpp"
 		"jsonparser.h"
 		"model_info.h"
+		"options.h"
 		"resource.h"
 		"result_writer.h"
 		"riskmodel.h"

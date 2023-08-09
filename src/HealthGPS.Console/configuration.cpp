@@ -86,7 +86,7 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
             cmd.config_file = result["file"].as<std::string>();
             if (cmd.config_file.is_relative()) {
                 cmd.config_file = std::filesystem::absolute(cmd.config_file);
-                fmt::print("Configuration file: {}\n", cmd.config_file.string());
+                fmt::print("Configuration file..: {}\n", cmd.config_file.string());
             }
         }
 
@@ -165,14 +165,14 @@ Configuration load_configuration(CommandOptions &options) {
             dataset_key = "file";
         }
 
-        config.data_file = opt["inputs"][dataset_key].get<DataFileInfo>();
-        file_path = config.data_file.name;
+        config.file = opt["inputs"][dataset_key].get<FileInfo>();
+        file_path = config.file.name;
         if (file_path.is_relative()) {
             file_path = config.root_path / file_path;
-            config.data_file.name = file_path.string();
+            config.file.name = file_path.string();
         }
 
-        fmt::print("Input dataset file: {}\n", config.data_file.name);
+        fmt::print("Input dataset file: {}\n", config.file.name);
         if (!fs::exists(file_path)) {
             fmt::print(fg(fmt::color::red), "\nInput data file: {} not found.\n",
                        file_path.string());
