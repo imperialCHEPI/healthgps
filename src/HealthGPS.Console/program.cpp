@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         auto data_repository = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions
-        register_risk_factor_model_definitions(data_repository, config.modelling, config.settings);
+        register_risk_factor_model_definitions(data_repository, config);
 
         // Compose Health-GPS with the required modules instances
         auto factory = get_default_simulation_module_factory(data_repository);

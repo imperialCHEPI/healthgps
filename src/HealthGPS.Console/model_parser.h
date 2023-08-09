@@ -62,9 +62,8 @@ poco::json load_json(const std::string &model_filename);
 
 /// @brief Registers a risk factor model definition with the repository
 /// @param repository The repository instance to register
-/// @param info The model definition information
-/// @param settings The associated experiment settings
+/// @param config The model configuration
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
-                                            const poco::ModellingInfo &info,
-                                            const poco::SettingsInfo &settings);
+                                            const host::Configuration &config);
+
 } // namespace host

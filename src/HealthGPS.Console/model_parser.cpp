@@ -285,25 +285,24 @@ poco::json load_json(const std::string &model_filename) {
 }
 
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
-                                            const poco::ModellingInfo &info,
-                                            const poco::SettingsInfo &settings) {
+                                            const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    for (const auto &model : info.risk_factor_models) {
+    for (const auto &model : config.modelling.risk_factor_models) {
         // Load file and parse JSON
         const auto opt = load_json(model.second);
 
         // Load appropriate dynamic/static model
         auto [model_type, model_definition] =
-            load_risk_model_definition(model.first, opt, settings);
+            load_risk_model_definition(model.first, opt, config.settings);
 
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
 
-    auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
-    auto age_range =
-        hgps::core::IntegerInterval(settings.age_range.front(), settings.age_range.back());
+    auto adjustment = load_baseline_adjustments(config.modelling.baseline_adjustment);
+    auto age_range = hgps::core::IntegerInterval(config.settings.age_range.front(),
+                                                 config.settings.age_range.back());
     auto max_age = static_cast<std::size_t>(age_range.upper());
     for (const auto &table : adjustment.values) {
         for (const auto &item : table.second) {
