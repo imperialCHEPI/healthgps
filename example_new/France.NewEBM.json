@@ -59,11 +59,11 @@
         }
     ],
     "FoodsDataFile": {
-        "Name": "MAFFCODE_NUTRIENTS_NPM.csv",
-        "Format": "csv",
-        "Delimiter": ",",
-        "Encoding": "UTF8",
-        "Columns": {
+        "name": "MAFFCODE_NUTRIENTS_NPM.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "columns": {
             "maffcode": "integer"
         }
     },

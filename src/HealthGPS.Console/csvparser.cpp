@@ -98,7 +98,8 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
     auto headers = doc.GetColumnNames();
     std::map<std::string, std::string, hc::case_insensitive::comparator> csv_column_map;
     for (const auto &pair : columns) {
-        std::string col_name = hc::to_lower(pair.first);
+        // HACK: replace pair with structured bindings once clang allows it.
+        const std::string &col_name = pair.first;
 
         auto is_match = [&col_name](const auto &csv_col_name) {
             return hc::case_insensitive::equals(col_name, csv_col_name);
@@ -153,7 +154,6 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
 
 std::map<hgps::core::Identifier, std::vector<double>>
 load_baseline_from_csv(const std::string &filename, const std::string &delimiter) {
-    using namespace hgps;
     using namespace rapidcsv;
 
     auto data = std::map<std::string, std::vector<double>>{};
