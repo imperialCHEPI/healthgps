@@ -33,11 +33,6 @@ namespace host {
 using namespace hgps;
 using json = nlohmann::json;
 
-std::string get_time_now_str() {
-    auto tp = std::chrono::system_clock::now();
-    return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
-}
-
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
     options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
@@ -48,13 +43,6 @@ cxxopts::Options create_options() {
         "help", "Help about this application.")("version", "Print the application version number.");
 
     return options;
-}
-
-void print_app_title() {
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
-               "\n# Health-GPS Microsimulation for Policy Options #\n\n");
-
-    fmt::print("Today: {}\n\n", get_time_now_str());
 }
 
 CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]) {

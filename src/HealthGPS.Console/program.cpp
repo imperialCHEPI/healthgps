@@ -8,12 +8,35 @@
 #include "HealthGPS/event_bus.h"
 #include "event_monitor.h"
 
+#include <fmt/chrono.h>
 #include <fmt/color.h>
+
+#include <chrono>
+
+/// @brief Get a string representation of current system time
+/// @return The system time as string
+std::string get_time_now_str() {
+    auto tp = std::chrono::system_clock::now();
+    return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
+}
+
+/// @brief Prints application start-up messages
+void print_app_title() {
+    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
+               "\n# Health-GPS Microsimulation for Policy Options #\n\n");
+
+    fmt::print("Today: {}\n\n", get_time_now_str());
+}
 
 /// @brief Prints application exit message
 /// @param exit_code The application exit code
 /// @return The respective exit code
-int exit_application(int exit_code);
+int exit_application(int exit_code) {
+    fmt::print("\n\n");
+    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
+    fmt::print(" {}.\n\n", get_time_now_str());
+    return exit_code;
+}
 
 /// @brief Health-GPS host application entry point
 /// @param argc The number of command arguments
@@ -172,13 +195,6 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 #endif // CATCH_EXCEPTIONS
 
     return exit_application(EXIT_SUCCESS);
-}
-
-int exit_application(int exit_code) {
-    fmt::print("\n\n");
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
-    fmt::print(" {}.\n\n", host::get_time_now_str());
-    return exit_code;
 }
 
 /// @brief Top-level namespace for Health-GPS Console host application

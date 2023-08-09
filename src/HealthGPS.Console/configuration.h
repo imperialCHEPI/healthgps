@@ -21,16 +21,9 @@ class ConfigurationError : public std::runtime_error {
     ConfigurationError(const std::string &msg);
 };
 
-/// @brief Get a string representation of current system time
-/// @return The system time as string
-std::string get_time_now_str();
-
 /// @brief Creates the command-line interface (CLI) options
 /// @return Health-GPS CLI options
 cxxopts::Options create_options();
-
-/// @brief Prints application start-up messages
-void print_app_title();
 
 /// @brief Parses the command-line interface (CLI) arguments
 /// @param options The valid CLI options
