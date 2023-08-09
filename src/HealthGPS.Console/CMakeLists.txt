@@ -8,7 +8,6 @@ find_package(Threads REQUIRED)
 add_executable(HealthGPS.Console "")
 target_compile_features(HealthGPS.Console PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
-configure_file("version.h.in" "version.h" ESCAPE_QUOTES)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 target_sources(HealthGPS.Console
@@ -36,13 +35,6 @@ target_sources(HealthGPS.Console
 		"result_writer.h"
 		"riskmodel.h"
 		"poco.h")
-
-# Under Windows, we also include a resource file to the build
-if(WIN32)
-    # Make sure that the resource file is seen as an RC file to be compiled with a resource compiler, not a C++ compiler
-    set_source_files_properties(versioninfo.rc LANGUAGE RC)
-	target_sources(HealthGPS.Console PRIVATE versioninfo.rc)
-endif(WIN32)
 
 target_link_libraries(HealthGPS.Console
 PRIVATE

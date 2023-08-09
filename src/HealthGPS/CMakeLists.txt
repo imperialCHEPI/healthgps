@@ -4,6 +4,8 @@ find_package(crossguid CONFIG REQUIRED)
 add_library(HealthGPS STATIC "")
 target_compile_features(HealthGPS PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
+configure_file("version.h.in" "version.h" ESCAPE_QUOTES)
+
 target_sources(HealthGPS
 	PRIVATE
 		"analysis_module.cpp"
@@ -124,14 +126,23 @@ target_sources(HealthGPS
 		"simulation.h"
 		"sync_message.h"
 		"two_step_value.h"
+        "version.h"
 		"weight_category.h"
 		"weight_model.cpp"
 		"weight_model.h")
+
+# Under Windows, we also include a resource file to the build
+if(WIN32)
+    # Make sure that the resource file is seen as an RC file to be compiled with a resource compiler, not a C++ compiler
+    set_source_files_properties(versioninfo.rc LANGUAGE RC)
+	target_sources(HealthGPS PRIVATE versioninfo.rc)
+endif(WIN32)
 
 target_link_libraries(HealthGPS
 	PRIVATE
 		HealthGPS.Core
 		fmt::fmt
 		crossguid)
+target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ROOT_NAMESPACE hgps)
