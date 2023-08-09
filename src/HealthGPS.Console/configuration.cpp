@@ -157,28 +157,8 @@ template <class T> bool get_to(const json &j, const std::string &key, T &out) {
     }
 }
 
-template <class T>
-bool get_to(const json &j, const std::string &key, T &out, const std::string &error_msg) {
-    if (!get_to(j, key, out)) {
-        fmt::print(fg(fmt::color::red), error_msg);
-        return false;
-    }
-
-    return true;
-}
-
 template <class T> bool get_to(const json &j, const std::string &key, T &out, bool &success) {
     const bool ret = get_to(j, key, out);
-    if (!ret) {
-        success = false;
-    }
-    return ret;
-}
-
-template <class T>
-bool get_to(const json &j, const std::string &key, T &out, const std::string &error_msg,
-            bool &success) {
-    const bool ret = get_to(j, key, out, error_msg);
     if (!ret) {
         success = false;
     }
@@ -404,7 +384,8 @@ void load_running_info(const json &j, Configuration &config) {
 
 bool check_version(const json &j) {
     int version;
-    if (!get_to(j, "version", version, "Invalid definition, file must have a schema version")) {
+    if (!get_to(j, "version", version)) {
+        fmt::print(fg(fmt::color::red), "Invalid definition, file must have a schema version");
         return false;
     }
 
@@ -518,8 +499,10 @@ Configuration get_configuration(CommandOptions &options) {
         fmt::print(fg(fmt::color::red), "Could not load running info: {}\n", e.what());
     }
 
-    if (get_to(opt, "output", config.output, "Could not load output info", success)) {
+    if (get_to(opt, "output", config.output, success)) {
         config.output.folder = expand_environment_variables(config.output.folder);
+    } else {
+        fmt::print(fg(fmt::color::red), "Could not load output info");
     }
 
     if (!success) {
