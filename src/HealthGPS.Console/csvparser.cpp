@@ -97,7 +97,9 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
     // Validate columns and create file columns map
     auto headers = doc.GetColumnNames();
     std::map<std::string, std::string, hc::case_insensitive::comparator> csv_column_map;
-    for (const auto &[col_name, col_type] : columns) {
+    for (const auto &pair : columns) {
+        std::string col_name = hc::to_lower(pair.first);
+
         auto is_match = [&col_name](const auto &csv_col_name) {
             return hc::case_insensitive::equals(col_name, csv_col_name);
         };
