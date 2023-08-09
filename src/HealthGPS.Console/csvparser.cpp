@@ -85,19 +85,17 @@ hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
 
 namespace host {
 
-bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string &filename,
-                             const std::map<std::string, std::string> &columns,
-                             const std::string &delimiter) {
+bool load_datatable_from_csv(hgps::core::DataTable &out_table, const poco::FileInfo &file_info) {
     MEASURE_FUNCTION();
     using namespace rapidcsv;
 
     bool success = true;
-    Document doc{filename, LabelParams{}, SeparatorParams{delimiter.front()}};
+    Document doc{file_info.name, LabelParams{}, SeparatorParams{file_info.delimiter.front()}};
 
     // Validate columns and create file columns map
     auto headers = doc.GetColumnNames();
     std::map<std::string, std::string, hc::case_insensitive::comparator> csv_column_map;
-    for (const auto &pair : columns) {
+    for (const auto &pair : file_info.columns) {
         // HACK: replace pair with structured bindings once clang allows it.
         const std::string &col_name = pair.first;
 
@@ -119,7 +117,7 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string
     }
 
     for (const auto &[col_name, csv_col_name] : csv_column_map) {
-        std::string col_type = hc::to_lower(columns.at(col_name));
+        std::string col_type = hc::to_lower(file_info.columns.at(col_name));
 
         // Get raw data
         auto data = doc.GetColumn<std::string>(csv_col_name);

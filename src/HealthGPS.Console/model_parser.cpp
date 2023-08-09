@@ -251,8 +251,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
         throw std::runtime_error(
             fmt::format("Foods nutrition dataset file: {} not found.\n", file_path.string()));
     }
-    load_datatable_from_csv(foods_data_table, foods_file_info.name, foods_file_info.columns,
-                            foods_file_info.delimiter);
+    load_datatable_from_csv(foods_data_table, foods_file_info);
 
     // Load M/F average heights for age.
     unsigned int max_age = config.settings.age_range.back();

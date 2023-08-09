@@ -1,6 +1,7 @@
 #pragma once
 
 #include "HealthGPS.Core/api.h"
+#include "poco.h"
 
 namespace host {
 
@@ -11,13 +12,9 @@ namespace host {
 /// If an external test can be used, this table could be dropped from the inputs.
 ///
 /// @param[out] out_table The datatable to be populated with the inputs data
-/// @param filename The input data file full path
-/// @param columns The data file columns data type
-/// @param delimiter The data file's columns delimiter character
+/// @param file_info The input data file information object
 /// @return true for success, otherwise false.
-bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string &filename,
-                             const std::map<std::string, std::string> &columns,
-                             const std::string &delimiter = ",");
+bool load_datatable_from_csv(hgps::core::DataTable &out_table, const poco::FileInfo &file_info);
 
 /// @brief Loads the contents of baseline adjustments file into a table
 /// @param filename The baseline adjustment file full path
