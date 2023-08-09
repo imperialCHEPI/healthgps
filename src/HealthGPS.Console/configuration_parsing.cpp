@@ -1,4 +1,5 @@
 #include "configuration_parsing.h"
+#include "configuration_parsing_helpers.h"
 #include "jsonparser.h"
 
 #include <fmt/color.h>
@@ -8,58 +9,15 @@
 namespace host {
 using json = nlohmann::json;
 
-/// @brief Load value from JSON, printing an error message if it fails
-/// @param j JSON object
-/// @param key Key to value
-/// @throw ConfigurationError: Key not found
-/// @return Key value
-auto get(const json &j, const std::string &key) {
+nlohmann::json get(const json &j, const std::string &key) {
     try {
         return j.at(key);
-    } catch (const std::out_of_range &) {
+    } catch (const std::exception &) {
         fmt::print(fg(fmt::color::red), "Missing key \"{}\"\n", key);
         throw ConfigurationError{fmt::format("Missing key \"{}\"", key)};
     }
 }
 
-/// @brief Get value from JSON object and store in out
-/// @tparam T Type of output object
-/// @param j JSON object
-/// @param key Key to value
-/// @param out Output object
-/// @return True if value was retrieved successfully, false otherwise
-template <class T> bool get_to(const json &j, const std::string &key, T &out) {
-    try {
-        j.at(key).get_to(out);
-        return true;
-    } catch (const std::out_of_range &) {
-        fmt::print(fg(fmt::color::red), "Missing key \"{}\"\n", key);
-        return false;
-    } catch (const json::type_error &) {
-        fmt::print(fg(fmt::color::red), "Key \"{}\" is of wrong type\n", key);
-        return false;
-    }
-}
-
-/// @brief Get value from JSON object and store in out, setting success flag
-/// @tparam T Type of output object
-/// @param j JSON object
-/// @param key Key to value
-/// @param out Output object
-/// @param success Success flag, set to false in case of failure
-/// @return True if value was retrieved successfully, false otherwise
-template <class T> bool get_to(const json &j, const std::string &key, T &out, bool &success) {
-    const bool ret = get_to(j, key, out);
-    if (!ret) {
-        success = false;
-    }
-    return ret;
-}
-
-/// @brief Rebase path on base_dir
-/// @param path Initial path (relative or absolute)
-/// @param base_dir New base directory for relative path
-/// @throw ConfigurationError: If path does not exist
 void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
     if (path.is_relative()) {
         path = std::filesystem::weakly_canonical(base_dir / path);
@@ -70,12 +28,6 @@ void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path 
     }
 }
 
-/// @brief Get a valid path from a JSON object
-/// @param j JSON object
-/// @param key Key to value
-/// @param base_dir Base directory for relative path
-/// @param out Output variable
-/// @return True if value was retrieved successfully and is valid path, false otherwise
 bool get_valid_path_to(const json &j, const std::string &key, const std::filesystem::path &base_dir,
                        std::filesystem::path &out) {
     if (!get_to(j, key, out)) {
@@ -92,12 +44,6 @@ bool get_valid_path_to(const json &j, const std::string &key, const std::filesys
     return true;
 }
 
-/// @brief Get a valid path from a JSON object
-/// @param j JSON object
-/// @param key Key to value
-/// @param base_dir Base directory for relative path
-/// @param out Output variable
-/// @param success Success flag, set to false in case of failure
 void get_valid_path_to(const json &j, const std::string &key, const std::filesystem::path &base_dir,
                        std::filesystem::path &out, bool &success) {
     if (!get_valid_path_to(j, key, base_dir, out)) {
@@ -105,12 +51,7 @@ void get_valid_path_to(const json &j, const std::string &key, const std::filesys
     }
 }
 
-/// @brief Load FileInfo from JSON
-/// @param j Input JSON
-/// @param base_dir Base folder
-/// @return FileInfo
-/// @throw ConfigurationError: Invalid config file format
-auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
+poco::FileInfo get_file_info(const json &j, const std::filesystem::path &base_dir) {
     const auto dataset = get(j, "dataset");
 
     bool success = true;
@@ -126,7 +67,7 @@ auto get_file_info(const json &j, const std::filesystem::path &base_dir) {
     return info;
 }
 
-auto get_settings(const json &j) {
+poco::SettingsInfo get_settings(const json &j) {
     poco::SettingsInfo info;
     if (!get_to(j, "settings", info)) {
         throw ConfigurationError{"Could not load settings info"};
@@ -135,12 +76,7 @@ auto get_settings(const json &j) {
     return info;
 }
 
-/// @brief Load BaselineInfo from JSON
-/// @param j Input JSON
-/// @param base_dir Base folder
-/// @return BaselineInfo
-/// @throw ConfigurationError: One or more files could not be found
-auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
+poco::BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
     const auto &adj = get(j, "baseline_adjustments");
 
     bool success = true;
@@ -168,10 +104,6 @@ auto get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
     return info;
 }
 
-/// @brief Load interventions from running section
-/// @param running Running section of JSON object
-/// @param config Config object to update
-/// @throw ConfigurationError: Could not load interventions
 void load_interventions(const json &running, Configuration &config) {
     const auto interventions = get(running, "interventions");
 
@@ -180,7 +112,7 @@ void load_interventions(const json &running, Configuration &config) {
         if (interventions.at("active_type_id").is_null()) {
             return;
         }
-    } catch (const std::out_of_range &) {
+    } catch (const json::out_of_range &) {
         throw ConfigurationError{"Interventions section missing key \"active_type_id\""};
     }
 
@@ -206,7 +138,7 @@ void load_interventions(const json &running, Configuration &config) {
         config.intervention = policy_types.at(active_type_id);
         config.intervention.identifier = active_type_id.to_string();
         config.has_active_intervention = true;
-    } catch (const std::out_of_range &) {
+    } catch (const json::out_of_range &) {
         throw ConfigurationError{fmt::format("Unknown active intervention type identifier: {}",
                                              active_type_id.to_string())};
     }
@@ -241,7 +173,7 @@ void load_input_info(const json &j, Configuration &config,
     // Settings
     try {
         config.settings = get_settings(inputs);
-    } catch (const std::exception &e) {
+    } catch (const std::exception &) {
         success = false;
         fmt::print(fg(fmt::color::red), "Could not load settings info");
     }
@@ -284,7 +216,7 @@ void load_modelling_info(const json &j, Configuration &config,
         // SES mapping
         // TODO: Maybe this needs its own helper function
         config.ses = get(modelling, "ses_model").get<poco::SESInfo>();
-    } catch (const std::exception &e) {
+    } catch (const std::exception &) {
         success = false;
         fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
     }
