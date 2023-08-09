@@ -22,7 +22,7 @@ nlohmann::json get(const nlohmann::json &j, const std::string &key);
 /// @param key Key to value
 /// @param out Output object
 /// @return True if value was retrieved successfully, false otherwise
-template <class T> bool get_to(const nlohmann::json &j, const std::string &key, T &out) {
+template <class T> bool get_to(const nlohmann::json &j, const std::string &key, T &out) noexcept {
     try {
         out = j.at(key).get<T>();
         return true;
@@ -43,7 +43,7 @@ template <class T> bool get_to(const nlohmann::json &j, const std::string &key, 
 /// @param success Success flag, set to false in case of failure
 /// @return True if value was retrieved successfully, false otherwise
 template <class T>
-bool get_to(const nlohmann::json &j, const std::string &key, T &out, bool &success) {
+bool get_to(const nlohmann::json &j, const std::string &key, T &out, bool &success) noexcept {
     const bool ret = get_to(j, key, out);
     if (!ret) {
         success = false;
@@ -61,20 +61,21 @@ void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path 
 /// @param j JSON object
 /// @param key Key to value
 /// @param base_dir Base directory for relative path
-/// @param out Output variable
+/// @param path Output variable
 /// @return True if value was retrieved successfully and is valid path, false otherwise
-bool get_valid_path_to(const nlohmann::json &j, const std::string &key,
-                       const std::filesystem::path &base_dir, std::filesystem::path &out);
+bool rebase_valid_path_to(const nlohmann::json &j, const std::string &key,
+                          std::filesystem::path &path,
+                          const std::filesystem::path &base_dir) noexcept;
 
 /// @brief Get a valid path from a JSON object
 /// @param j JSON object
 /// @param key Key to value
 /// @param base_dir Base directory for relative path
-/// @param out Output variable
+/// @param path Output variable
 /// @param success Success flag, set to false in case of failure
-void get_valid_path_to(const nlohmann::json &j, const std::string &key,
-                       const std::filesystem::path &base_dir, std::filesystem::path &out,
-                       bool &success);
+void rebase_valid_path_to(const nlohmann::json &j, const std::string &key,
+                          std::filesystem::path &out, const std::filesystem::path &base_dir,
+                          bool &success) noexcept;
 
 /// @brief Load FileInfo from JSON
 /// @param j Input JSON

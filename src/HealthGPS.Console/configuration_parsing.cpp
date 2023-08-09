@@ -20,7 +20,11 @@ nlohmann::json get(const json &j, const std::string &key) {
 
 void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
     if (path.is_relative()) {
-        path = std::filesystem::weakly_canonical(base_dir / path);
+        try {
+            path = std::filesystem::weakly_canonical(base_dir / path);
+        } catch (const std::filesystem::filesystem_error &e) {
+            throw ConfigurationError{fmt::format("OS error while reading {}", path.string())};
+        }
     }
 
     if (!std::filesystem::exists(path)) {
@@ -28,25 +32,25 @@ void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path 
     }
 }
 
-bool get_valid_path_to(const json &j, const std::string &key, const std::filesystem::path &base_dir,
-                       std::filesystem::path &out) {
-    if (!get_to(j, key, out)) {
+bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &path,
+                          const std::filesystem::path &base_dir) noexcept {
+    if (!get_to(j, key, path)) {
         return false;
     }
 
     try {
-        rebase_valid_path(out, base_dir);
+        rebase_valid_path(path, base_dir);
     } catch (const ConfigurationError &) {
-        fmt::print(fg(fmt::color::red), "Could not find file {}", out.string());
+        fmt::print(fg(fmt::color::red), "Could not find file {}\n", path.string());
         return false;
     }
 
     return true;
 }
 
-void get_valid_path_to(const json &j, const std::string &key, const std::filesystem::path &base_dir,
-                       std::filesystem::path &out, bool &success) {
-    if (!get_valid_path_to(j, key, base_dir, out)) {
+void rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &path,
+                          const std::filesystem::path &base_dir, bool &success) noexcept {
+    if (!rebase_valid_path_to(j, key, path, base_dir)) {
         success = false;
     }
 }
@@ -56,7 +60,7 @@ poco::FileInfo get_file_info(const json &j, const std::filesystem::path &base_di
 
     bool success = true;
     poco::FileInfo info;
-    get_valid_path_to(dataset, "name", base_dir, info.name, success);
+    rebase_valid_path_to(dataset, "name", info.name, base_dir, success);
     get_to(dataset, "format", info.format, success);
     get_to(dataset, "delimiter", info.delimiter, success);
     get_to(dataset, "columns", info.columns, success);
