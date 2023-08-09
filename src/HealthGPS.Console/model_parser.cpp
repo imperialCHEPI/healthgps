@@ -4,6 +4,7 @@
 
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
@@ -237,6 +238,21 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
             }
         }
     }
+
+    // Foods nutrition data table.
+    auto foods_data_table = hgps::core::DataTable{};
+    auto foods_file_info = opt["FoodsDataFile"].get<poco::FileInfo>();
+    std::filesystem::path file_path = foods_file_info.name;
+    if (file_path.is_relative()) {
+        file_path = config.root_path / file_path;
+        foods_file_info.name = file_path.string();
+    }
+    if (!std::filesystem::exists(file_path)) {
+        throw std::runtime_error(
+            fmt::format("Foods nutrition dataset file: {} not found.\n", file_path.string()));
+    }
+    load_datatable_from_csv(foods_data_table, foods_file_info.name, foods_file_info.columns,
+                            foods_file_info.delimiter);
 
     // Load M/F average heights for age.
     unsigned int max_age = config.settings.age_range.back();
