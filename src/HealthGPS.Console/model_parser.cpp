@@ -20,11 +20,10 @@ namespace host {
 
 hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info) {
     MEASURE_FUNCTION();
-    auto &male_filename = info.file_names.at("factorsmean_male");
-    auto &female_filename = info.file_names.at("factorsmean_female");
+    const auto male_filename = info.file_names.at("factorsmean_male").string();
+    const auto female_filename = info.file_names.at("factorsmean_female").string();
 
     try {
-
         if (hgps::core::case_insensitive::equals(info.format, "CSV")) {
             auto data = std::map<hgps::core::Gender,
                                  std::map<hgps::core::Identifier, std::vector<double>>>{};
@@ -38,7 +37,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
         }
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "Failed to parse adjustment file: {} or {}. {}\n",
-                   male_filename.string(), female_filename.string(), ex.what());
+                   male_filename, female_filename, ex.what());
         throw;
     }
 }
