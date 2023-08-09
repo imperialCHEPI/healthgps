@@ -14,7 +14,7 @@
 #define MEASURE_FUNCTION()
 #endif
 
-namespace host {
+namespace {
 
 namespace hc = hgps::core;
 
@@ -81,21 +81,9 @@ hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
     return builder;
 }
 
-std::map<std::string, std::size_t>
-create_fields_index_mapping(const std::vector<std::string> &column_names,
-                            const std::vector<std::string> &fields) {
-    auto mapping = std::map<std::string, std::size_t>();
-    for (auto &field : fields) {
-        auto field_index = hc::case_insensitive::index_of(column_names, field);
-        if (field_index < 0) {
-            throw std::out_of_range(fmt::format("Required field {} not found.", field));
-        }
+} // namespace
 
-        mapping.emplace(field, field_index);
-    }
-
-    return mapping;
-}
+namespace host {
 
 bool load_datatable_from_csv(hgps::core::DataTable &out_table, const std::string &filename,
                              const std::map<std::string, std::string> &columns,
