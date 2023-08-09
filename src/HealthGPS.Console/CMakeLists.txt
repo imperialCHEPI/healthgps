@@ -17,6 +17,8 @@ target_sources(HealthGPS.Console
         "command_options.h"
 		"configuration.cpp"
 		"configuration.h"
+        "configuration_parsing.cpp"
+        "configuration_parsing.h"
 		"csvparser.cpp"
 		"csvparser.h"
 		"event_monitor.cpp"
