@@ -1,5 +1,8 @@
 #pragma once
-#include <cxxopts.hpp>
+
+#include "command_options.h"
+#include "poco.h"
+#include "version.h"
 
 #include "HealthGPS/healthgps.h"
 #include "HealthGPS/intervention_scenario.h"
@@ -8,29 +11,71 @@
 
 #include "HealthGPS.Core/api.h"
 
-#include "options.h"
 #include "result_file_writer.h"
 
 #include <stdexcept>
 
 namespace host {
 
+/// @brief Defines the application configuration data structure
+struct Configuration {
+    /// @brief The input data file details
+    poco::FileInfo file;
+
+    /// @brief Experiment population settings
+    poco::SettingsInfo settings;
+
+    /// @brief Socio-economic status (SES) model inputs
+    poco::SESInfo ses;
+
+    /// @brief User defined model and parameters information
+    poco::ModellingInfo modelling;
+
+    /// @brief List of diseases to include in experiment
+    std::vector<std::string> diseases;
+
+    /// @brief Simulation initialisation custom seed value, optional
+    std::optional<unsigned int> custom_seed;
+
+    /// @brief The experiment start time (simulation clock)
+    unsigned int start_time{};
+
+    /// @brief The experiment stop time (simulation clock)
+    unsigned int stop_time{};
+
+    /// @brief The number of simulation runs (replications) to execute
+    unsigned int trial_runs{};
+
+    /// @brief Baseline to intervention data synchronisation time out (milliseconds)
+    unsigned int sync_timeout_ms{};
+
+    /// @brief Indicates whether an alternative intervention policy is active
+    bool has_active_intervention{false};
+
+    /// @brief The active intervention policy definition
+    poco::PolicyScenarioInfo intervention;
+
+    /// @brief Experiment output folder and file information
+    poco::OutputInfo output;
+
+    /// @brief Application logging verbosity mode
+    hgps::core::VerboseMode verbosity{};
+
+    /// @brief Experiment batch job identifier
+    int job_id{};
+
+    /// @brief Experiment model name
+    const char *app_name = PROJECT_NAME;
+
+    /// @brief Experiment model version
+    const char *app_version = PROJECT_VERSION;
+};
+
 /// @brief Represents an error that occurred with the format of a config file
 class ConfigurationError : public std::runtime_error {
   public:
     ConfigurationError(const std::string &msg);
 };
-
-/// @brief Creates the command-line interface (CLI) options
-/// @return Health-GPS CLI options
-cxxopts::Options create_options();
-
-/// @brief Parses the command-line interface (CLI) arguments
-/// @param options The valid CLI options
-/// @param argc Number of input arguments
-/// @param argv List of input arguments
-/// @return User command-line options
-CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]);
 
 /// @brief Loads the input configuration file, *.json, information
 /// @param options User command-line options

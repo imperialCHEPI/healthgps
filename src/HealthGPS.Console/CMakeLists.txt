@@ -13,6 +13,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 target_sources(HealthGPS.Console
 	PRIVATE
+        "command_options.cpp"
+        "command_options.h"
 		"configuration.cpp"
 		"configuration.h"
 		"csvparser.cpp"
@@ -27,7 +29,6 @@ target_sources(HealthGPS.Console
 		"jsonparser.cpp"
 		"jsonparser.h"
 		"model_info.h"
-		"options.h"
 		"resource.h"
 		"result_writer.h"
 		"riskmodel.h"
