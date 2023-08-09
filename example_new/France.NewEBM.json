@@ -62,7 +62,10 @@
         "Name": "MAFFCODE_NUTRIENTS_NPM.csv",
         "Format": "csv",
         "Delimiter": ",",
-        "Encoding": "UTF8"
+        "Encoding": "UTF8",
+        "Columns": {
+            "maffcode": "integer"
+        }
     },
     "AgeMeanHeight": {
         "Male": [
