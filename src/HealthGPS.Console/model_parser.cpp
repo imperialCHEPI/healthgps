@@ -112,13 +112,13 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
-                                   const poco::SettingsInfo &settings) {
+                                   const host::Configuration &config) {
     // Load this dynamic model with the appropriate loader.
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
         return load_ebhlm_risk_model_definition(opt);
     }
     if (hgps::core::case_insensitive::equals(model_name, "newebm")) {
-        return load_newebm_risk_model_definition(opt, settings);
+        return load_newebm_risk_model_definition(opt, config);
     }
 
     throw std::invalid_argument{
@@ -202,7 +202,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 }
 
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
-load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInfo &settings) {
+load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
@@ -239,7 +239,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     }
 
     // Load M/F average heights for age.
-    unsigned int max_age = settings.age_range.back();
+    unsigned int max_age = config.settings.age_range.back();
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
     if (male_height.size() <= max_age) {
@@ -258,7 +258,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
 
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
-                           const poco::SettingsInfo &settings) {
+                           const host::Configuration &config) {
     // Get model name from JSON
     const auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
 
@@ -269,7 +269,7 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     }
     if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
         return std::make_pair(hgps::HierarchicalModelType::Dynamic,
-                              load_dynamic_risk_model_definition(model_name, opt, settings));
+                              load_dynamic_risk_model_definition(model_name, opt, config));
     }
 
     throw std::invalid_argument(fmt::format("Unknown model type: {}", model_type));
@@ -293,8 +293,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         const auto opt = load_json(model.second);
 
         // Load appropriate dynamic/static model
-        auto [model_type, model_definition] =
-            load_risk_model_definition(model.first, opt, config.settings);
+        auto [model_type, model_definition] = load_risk_model_definition(model.first, opt, config);
 
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
