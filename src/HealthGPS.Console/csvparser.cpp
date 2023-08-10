@@ -85,7 +85,7 @@ hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
 
 namespace host {
 
-bool load_datatable_from_csv(hgps::core::DataTable &out_table, const poco::FileInfo &file_info) {
+hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info) {
     MEASURE_FUNCTION();
     using namespace rapidcsv;
 
@@ -116,6 +116,7 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const poco::FileI
         throw std::runtime_error("Required columns not found in dataset.");
     }
 
+    hgps::core::DataTable out_table{};
     for (const auto &[col_name, csv_col_name] : csv_column_map) {
         std::string col_type = hc::to_lower(file_info.columns.at(col_name));
 
@@ -147,7 +148,7 @@ bool load_datatable_from_csv(hgps::core::DataTable &out_table, const poco::FileI
         throw std::runtime_error("Error parsing dataset.");
     }
 
-    return success;
+    return out_table;
 }
 
 std::map<hgps::core::Identifier, std::vector<double>>

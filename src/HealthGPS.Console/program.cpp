@@ -47,9 +47,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     }
 
     // Load input data file into a datatable asynchronous
-    auto input_table = core::DataTable();
-    auto table_future =
-        core::run_async(load_datatable_from_csv, std::ref(input_table), config.file);
+    auto table_future = core::run_async(load_datatable_from_csv, config.file);
 
 #ifdef CATCH_EXCEPTIONS
     try {
@@ -77,7 +75,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         }
 
         // Request input datatable instance, wait, if not completed.
-        table_future.get();
+        auto input_table = table_future.get();
 
         // Print out the datatable structure information
         std::cout << input_table;

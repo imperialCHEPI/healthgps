@@ -11,10 +11,9 @@ namespace host {
 /// against the input data only and is not used as part of the simulation algorithm.
 /// If an external test can be used, this table could be dropped from the inputs.
 ///
-/// @param[out] out_table The datatable to be populated with the inputs data
 /// @param file_info The input data file information object
-/// @return true for success, otherwise false.
-bool load_datatable_from_csv(hgps::core::DataTable &out_table, const poco::FileInfo &file_info);
+/// @return The datatable to be populated with the inputs data
+hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info);
 
 /// @brief Loads the contents of baseline adjustments file into a table
 /// @param filename The baseline adjustment file full path
