@@ -70,8 +70,9 @@ class DataTable {
     std::unordered_map<std::string, std::size_t> index_{};
     std::vector<std::unique_ptr<DataTableColumn>> columns_{};
     size_t rows_count_ = 0;
-    std::mutex sync_mtx_{};
+    std::unique_ptr<std::mutex> sync_mtx_{};
 };
+
 } // namespace hgps::core
 
 /// @brief Output streams operator for DataTable type.
