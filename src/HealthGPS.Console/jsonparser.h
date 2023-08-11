@@ -37,6 +37,9 @@ void from_json(const json &j, HierarchicalLevelInfo &p);
 // Configuration sections POCO types mapping
 //--------------------------------------------------------
 
+// Data file information
+void to_json(json &j, const FileInfo &p);
+
 // Settings Information
 void to_json(json &j, const SettingsInfo &p);
 void from_json(const json &j, SettingsInfo &p);
@@ -44,6 +47,9 @@ void from_json(const json &j, SettingsInfo &p);
 // SES Model Information
 void to_json(json &j, const SESInfo &p);
 void from_json(const json &j, SESInfo &p);
+
+// Baseline model information
+void to_json(json &j, const BaselineInfo &p);
 
 // Lite risk factors models (Energy Balance Model)
 void from_json(const json &j, RiskFactorInfo &p);

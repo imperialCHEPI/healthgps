@@ -4,6 +4,11 @@ namespace host::poco {
 //--------------------------------------------------------
 // Risk Model JSON serialisation / de-serialisation
 //--------------------------------------------------------
+// Data file information
+void to_json(json &j, const FileInfo &p) {
+    j = json{
+        {"name", p.name}, {"format", p.format}, {"delimiter", p.delimiter}, {"columns", p.columns}};
+}
 
 // Linear models
 void to_json(json &j, const CoefficientInfo &p) {
@@ -112,6 +117,14 @@ void from_json(const json &j, FactorDynamicEquationInfo &p) {
     j.at("Name").get_to(p.name);
     j.at("Coefficients").get_to(p.coefficients);
     j.at("ResidualsStandardDeviation").get_to(p.residuals_standard_deviation);
+}
+
+// Baseline scenario adjustments
+void to_json(json &j, const BaselineInfo &p) {
+    j = json{{"format", p.format},
+             {"delimiter", p.delimiter},
+             {"encoding", p.encoding},
+             {"file_names", p.file_names}};
 }
 
 // Policy Scenario

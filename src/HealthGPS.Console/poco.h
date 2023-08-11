@@ -14,6 +14,11 @@ struct FileInfo {
     std::string format;
     std::string delimiter;
     std::map<std::string, std::string> columns;
+
+    bool operator==(const FileInfo &rhs) const {
+        return std::tie(name, format, delimiter, columns) ==
+               std::tie(rhs.name, rhs.format, rhs.delimiter, columns);
+    }
 };
 
 struct SettingsInfo {
@@ -32,12 +37,17 @@ struct BaselineInfo {
     std::string delimiter;
     std::string encoding;
     std::map<std::string, std::filesystem::path> file_names;
+
+    bool operator==(const BaselineInfo &rhs) const {
+        return std::tie(format, delimiter, encoding, file_names) ==
+               std::tie(rhs.format, rhs.delimiter, rhs.encoding, rhs.file_names);
+    }
 };
 
 struct RiskFactorInfo {
     std::string name;
     int level{};
-    std::vector<double> range;
+    std::optional<hgps::core::DoubleInterval> range;
 };
 
 struct ModellingInfo {

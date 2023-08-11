@@ -154,13 +154,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         SESDefinition{.fuction_name = config.ses.function, .parameters = config.ses.parameters};
 
     auto mapping = std::vector<MappingEntry>();
-    for (auto &item : config.modelling.risk_factors) {
-        if (item.range.empty()) {
-            mapping.emplace_back(item.name, item.level);
-        } else {
-            auto boundary = hgps::OptionalRange{{item.range[0], item.range[1]}};
-            mapping.emplace_back(item.name, item.level, boundary);
-        }
+    for (const auto &item : config.modelling.risk_factors) {
+        mapping.emplace_back(item.name, item.level, item.range);
     }
 
     return ModelInput(input_table, settings, run_info, ses_mapping,
