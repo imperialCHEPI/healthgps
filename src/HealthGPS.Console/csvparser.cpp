@@ -116,7 +116,7 @@ hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info) {
         throw std::runtime_error("Required columns not found in dataset.");
     }
 
-    hgps::core::DataTable out_table{};
+    hgps::core::DataTable out_table;
     for (const auto &[col_name, csv_col_name] : csv_column_map) {
         std::string col_type = hc::to_lower(file_info.columns.at(col_name));
 
