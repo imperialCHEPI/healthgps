@@ -73,6 +73,23 @@ void from_json(const json &j, OutputInfo &p);
 
 } // namespace host::poco
 
+namespace hgps::core {
+using json = nlohmann::json;
+
+template <class T> void to_json(json &j, const Interval<T> &interval) {
+    j = json::array({interval.lower(), interval.upper()});
+}
+
+template <class T> void from_json(const json &j, Interval<T> &interval) {
+    const auto vec = j.get<std::vector<T>>();
+    if (vec.size() != 2) {
+        throw json::type_error::create(302, "Interval arrays must have only two elements", nullptr);
+    }
+
+    interval = Interval<T>{vec[0], vec[1]};
+}
+} // namespace hgps::core
+
 namespace std {
 
 // Optional parameters
@@ -88,6 +105,26 @@ template <typename T> void from_json(const nlohmann::json &j, std::optional<T> &
         p = std::nullopt;
     } else {
         p = j.get<T>();
+    }
+}
+
+template <typename T>
+void to_json(nlohmann::json &j, const std::optional<hgps::core::Interval<T>> &p) {
+    if (p) {
+        j = *p;
+    } else {
+        // Null interval expressed as empty JSON array
+        j = nlohmann::json::array();
+    }
+}
+
+template <typename T>
+void from_json(const nlohmann::json &j, std::optional<hgps::core::Interval<T>> &p) {
+    // Treat null JSON values and empty arrays as a null Interval
+    if (j.is_null() || (j.is_array() && j.empty())) {
+        p = std::nullopt;
+    } else {
+        p = j.get<hgps::core::Interval<T>>();
     }
 }
 

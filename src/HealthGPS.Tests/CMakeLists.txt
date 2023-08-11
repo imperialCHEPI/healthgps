@@ -28,6 +28,7 @@ target_sources(HealthGPS.Tests
         "EventAggregator.Test.cpp"
         "HealthGPS.Test.cpp"
         "HierarchicalMapping.Test.cpp"
+        "JsonParser.Test.cpp"
         "Identifier.Test.cpp"
         "LifeTable.Test.cpp"
         "Map2d.Test.cpp"
