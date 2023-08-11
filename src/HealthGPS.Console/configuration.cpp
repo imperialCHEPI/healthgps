@@ -137,7 +137,9 @@ Configuration load_configuration(CommandOptions &options) {
     using namespace host::poco;
 
     Configuration config;
+    fs::path file_path;
     std::ifstream ifs(options.config_file, std::ifstream::in);
+
     if (ifs) {
         auto opt = json::parse(ifs);
         if (!opt.contains("version")) {
@@ -154,6 +156,9 @@ Configuration load_configuration(CommandOptions &options) {
         config.app_name = PROJECT_NAME;
         config.app_version = PROJECT_VERSION;
 
+        // Configuration root path
+        config.root_path = options.config_file.parent_path();
+
         // input dataset file
         auto dataset_key = "dataset";
         if (version == 1) {
@@ -161,18 +166,16 @@ Configuration load_configuration(CommandOptions &options) {
         }
 
         config.file = opt["inputs"][dataset_key].get<FileInfo>();
-        fs::path full_path = config.file.name;
-        if (full_path.is_relative()) {
-            full_path = options.config_file.parent_path() / config.file.name;
-            if (fs::exists(full_path)) {
-                config.file.name = full_path.string();
-                fmt::print("Input dataset file..: {}\n", config.file.name);
-            }
+        file_path = config.file.name;
+        if (file_path.is_relative()) {
+            file_path = config.root_path / file_path;
+            config.file.name = file_path.string();
         }
 
-        if (!fs::exists(full_path)) {
+        fmt::print("Input dataset file: {}\n", config.file.name);
+        if (!fs::exists(file_path)) {
             fmt::print(fg(fmt::color::red), "\nInput data file: {} not found.\n",
-                       full_path.string());
+                       file_path.string());
         }
 
         // Settings and SES mapping
@@ -181,32 +184,33 @@ Configuration load_configuration(CommandOptions &options) {
 
         // Modelling information
         config.modelling = opt["modelling"].get<ModellingInfo>();
-
         for (auto &model : config.modelling.risk_factor_models) {
-            full_path = model.second;
-            if (full_path.is_relative()) {
-                full_path = options.config_file.parent_path() / model.second;
-                if (fs::exists(full_path)) {
-                    model.second = full_path.string();
-                    fmt::print("Model: {:<7}, file: {}\n", model.first, model.second);
-                }
+            file_path = model.second;
+            if (file_path.is_relative()) {
+                file_path = config.root_path / file_path;
+                model.second = file_path.string();
             }
 
-            if (!fs::exists(full_path)) {
-                fmt::print(fg(fmt::color::red), "Model: {:<7}, file: {} not found.\n", model.first,
-                           full_path.string());
+            fmt::print("Risk factor model: {}, file: {}\n", model.first, model.second);
+            if (!fs::exists(file_path)) {
+                fmt::print(fg(fmt::color::red), "Risk factor model: {}, file: {} not found.\n",
+                           model.first, file_path.string());
             }
         }
 
-        fmt::print("Baseline factor adjustment:\n");
         for (auto &item : config.modelling.baseline_adjustment.file_names) {
-            full_path = options.config_file.parent_path() / item.second;
-            if (fs::exists(full_path)) {
-                item.second = full_path.string();
-                fmt::print("{:<14}, file: {}\n", item.first, full_path.string());
-            } else {
-                fmt::print(fg(fmt::color::red), "Adjustment type: {}, file: {} not found.\n",
-                           item.first, full_path.string());
+            file_path = item.second;
+            if (file_path.is_relative()) {
+                file_path = config.root_path / file_path;
+                item.second = file_path.string();
+            }
+
+            fmt::print("Baseline factor adjustment type: {}, file: {}\n", item.first,
+                       file_path.string());
+            if (!fs::exists(file_path)) {
+                fmt::print(fg(fmt::color::red),
+                           "Baseline factor adjustment type: {}, file: {} not found.\n", item.first,
+                           file_path.string());
             }
         }
 

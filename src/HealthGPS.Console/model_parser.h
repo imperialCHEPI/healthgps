@@ -25,12 +25,12 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 /// @brief Loads a dynamic model from a JSON file
 /// @param model_name The name of the model to use
 /// @param opt The parsed model definition JSON file
-/// @param settings The main model settings
+/// @param config The model configuration
 /// @return An instance of the hgps::RiskFactorModelDefinition type
 /// @throw std::invalid_argument if dynamic model is unrecognised
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
-                                   const poco::SettingsInfo &settings);
+                                   const host::Configuration &config);
 
 /// @brief Loads the old energy balance model definition from a JSON file
 /// @param opt The parsed model definition JSON file
@@ -40,19 +40,19 @@ load_ebhlm_risk_model_definition(const poco::json &opt);
 
 /// @brief Loads the new energy balance model definition from a JSON file
 /// @param opt The parsed model definition JSON file
-/// @param settings The main model settings
+/// @param config The model configuration
 /// @return An instance of the hgps::EnergyBalanceModelDefinition type
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
-load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInfo &settings);
+load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config);
 
 /// @brief Loads a risk model definition from a JSON file
 /// @param model_type The type of model ("dynamic"/"static") to load
 /// @param opt The parsed model definition JSON file
-/// @param settings The main model settings
+/// @param config The model configuration
 /// @return A std::pair containing the model type and model definition
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
-                           const poco::SettingsInfo &settings);
+                           const host::Configuration &config);
 
 /// @brief Load and parse the model file
 /// @param model_filename The path to the model
@@ -62,9 +62,8 @@ poco::json load_json(const std::string &model_filename);
 
 /// @brief Registers a risk factor model definition with the repository
 /// @param repository The repository instance to register
-/// @param info The model definition information
-/// @param settings The associated experiment settings
+/// @param config The model configuration
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
-                                            const poco::ModellingInfo &info,
-                                            const poco::SettingsInfo &settings);
+                                            const host::Configuration &config);
+
 } // namespace host

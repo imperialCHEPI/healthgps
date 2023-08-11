@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 namespace hgps::core {
+
 std::size_t DataTable::num_columns() const noexcept { return columns_.size(); }
 
 std::size_t DataTable::num_rows() const noexcept { return rows_count_; }
@@ -14,7 +15,7 @@ std::vector<std::string> DataTable::names() const { return names_; }
 
 void DataTable::add(std::unique_ptr<DataTableColumn> column) {
 
-    std::scoped_lock lk(sync_mtx_);
+    std::scoped_lock lk(*sync_mtx_);
 
     if ((rows_count_ > 0 && column->size() != rows_count_) ||
         (num_columns() > 0 && rows_count_ == 0 && column->size() != rows_count_)) {
@@ -78,6 +79,7 @@ std::string DataTable::to_string() const noexcept {
 
     return ss.str();
 }
+
 } // namespace hgps::core
 
 std::ostream &operator<<(std::ostream &stream, const hgps::core::DataTable &table) {

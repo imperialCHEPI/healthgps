@@ -66,12 +66,13 @@ class DataTable {
     std::string to_string() const noexcept;
 
   private:
+    std::unique_ptr<std::mutex> sync_mtx_{std::make_unique<std::mutex>()};
     std::vector<std::string> names_{};
     std::unordered_map<std::string, std::size_t> index_{};
     std::vector<std::unique_ptr<DataTableColumn>> columns_{};
     size_t rows_count_ = 0;
-    std::mutex sync_mtx_{};
 };
+
 } // namespace hgps::core
 
 /// @brief Output streams operator for DataTable type.

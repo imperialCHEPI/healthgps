@@ -47,10 +47,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     }
 
     // Load input data file into a datatable asynchronous
-    auto input_table = core::DataTable();
-    auto table_future =
-        core::run_async(load_datatable_from_csv, std::ref(input_table), config.file.name,
-                        config.file.columns, config.file.delimiter);
+    auto table_future = core::run_async(load_datatable_from_csv, config.file);
 
 #ifdef CATCH_EXCEPTIONS
     try {
@@ -60,7 +57,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         auto data_repository = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions
-        register_risk_factor_model_definitions(data_repository, config.modelling, config.settings);
+        register_risk_factor_model_definitions(data_repository, config);
 
         // Compose Health-GPS with the required modules instances
         auto factory = get_default_simulation_module_factory(data_repository);
@@ -78,10 +75,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         }
 
         // Request input datatable instance, wait, if not completed.
-        if (!table_future.get()) {
-            fmt::print(fg(fmt::color::red), "\nInvalid input dataset in configuration.\n");
-            return exit_application(EXIT_FAILURE);
-        }
+        auto input_table = table_future.get();
 
         // Print out the datatable structure information
         std::cout << input_table;
