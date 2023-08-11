@@ -1,4 +1,6 @@
 #pragma once
+#include "HealthGPS.Core/interval.h"
+
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -15,9 +17,9 @@ struct FileInfo {
 };
 
 struct SettingsInfo {
-    std::string country{};
+    std::string country;
+    hgps::core::IntegerInterval age_range;
     float size_fraction{};
-    std::vector<int> age_range;
 };
 
 struct SESInfo {

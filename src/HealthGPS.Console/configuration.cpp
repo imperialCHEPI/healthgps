@@ -131,9 +131,6 @@ std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Conf
 ModelInput create_model_input(core::DataTable &input_table, core::Country country,
                               Configuration &config, std::vector<core::DiseaseInfo> diseases) {
     // Create simulation configuration
-    auto age_range =
-        core::IntegerInterval(config.settings.age_range.front(), config.settings.age_range.back());
-
     auto comorbidities = config.output.comorbidities;
     auto diseases_number = static_cast<unsigned int>(diseases.size());
     if (comorbidities > diseases_number) {
@@ -142,7 +139,7 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
                    config.output.comorbidities, comorbidities);
     }
 
-    auto settings = Settings(country, config.settings.size_fraction, age_range);
+    auto settings = Settings(country, config.settings.size_fraction, config.settings.age_range);
     auto job_custom_seed = create_job_seed(config.job_id, config.custom_seed);
     auto run_info = RunInfo{
         .start_time = config.start_time,

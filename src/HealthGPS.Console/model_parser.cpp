@@ -238,7 +238,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
     }
 
     // Load M/F average heights for age.
-    unsigned int max_age = settings.age_range.back();
+    const auto max_age = static_cast<size_t>(settings.age_range.upper());
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
     if (male_height.size() <= max_age) {
@@ -301,15 +301,13 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
     }
 
     auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
-    auto age_range =
-        hgps::core::IntegerInterval(settings.age_range.front(), settings.age_range.back());
-    auto max_age = static_cast<std::size_t>(age_range.upper());
+    auto max_age = static_cast<std::size_t>(settings.age_range.upper());
     for (const auto &table : adjustment.values) {
         for (const auto &item : table.second) {
             if (item.second.size() <= max_age) {
                 fmt::print(fg(fmt::color::red),
                            "Baseline adjustment files data must cover age range: [{}].\n",
-                           age_range.to_string());
+                           settings.age_range.to_string());
                 throw std::invalid_argument(
                     "Baseline adjustment file must cover the required age range.");
             }
