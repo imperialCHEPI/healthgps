@@ -10,18 +10,15 @@ void check_version(const nlohmann::json &j);
 /// @brief Load input dataset
 /// @param j The root JSON object
 /// @param config The config object to update
-/// @param config_dir The directory of the config file
 /// @throw ConfigurationError: Could not load input dataset
-void load_input_info(const nlohmann::json &j, Configuration &config,
-                     const std::filesystem::path &config_dir);
+void load_input_info(const nlohmann::json &j, Configuration &config);
 
 /// @brief Load ModellingInfo from JSON
 /// @param j The root JSON object
 /// @param config The config object to update
 /// @param config_dir The directory of the config file
 /// @throw ConfigurationError: Could not load modelling info
-void load_modelling_info(const nlohmann::json &j, Configuration &config,
-                         const std::filesystem::path &config_dir);
+void load_modelling_info(const nlohmann::json &j, Configuration &config);
 
 /// @brief Load running section of JSON object
 /// @param j The root JSON object

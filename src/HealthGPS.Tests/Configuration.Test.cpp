@@ -292,8 +292,7 @@ TEST_F(ConfigParsingFixture, GetFileInfo) {
                          .format = "csv",
                          .delimiter = ",",
                          .columns = {{"a", "string"}, {"b", "other string"}}};
-    json j;
-    j["dataset"] = info1;
+    json j = info1;
 
     /*
      * Converting to JSON and back again should work. NB: We just assume that the path
@@ -303,7 +302,7 @@ TEST_F(ConfigParsingFixture, GetFileInfo) {
     EXPECT_EQ(info1, info2);
 
     // Removing a required field should cause an error
-    j["dataset"].erase("format");
+    j.erase("format");
     EXPECT_THROW(get_file_info(j, tmp_path()), ConfigurationError);
 }
 

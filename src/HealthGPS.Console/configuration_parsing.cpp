@@ -55,15 +55,13 @@ void rebase_valid_path_to(const json &j, const std::string &key, std::filesystem
     }
 }
 
-poco::FileInfo get_file_info(const json &j, const std::filesystem::path &base_dir) {
-    const auto dataset = get(j, "dataset");
-
+poco::FileInfo get_file_info(const json &node, const std::filesystem::path &base_dir) {
     bool success = true;
     poco::FileInfo info;
-    rebase_valid_path_to(dataset, "name", info.name, base_dir, success);
-    get_to(dataset, "format", info.format, success);
-    get_to(dataset, "delimiter", info.delimiter, success);
-    get_to(dataset, "columns", info.columns, success);
+    rebase_valid_path_to(node, "name", info.name, base_dir, success);
+    get_to(node, "format", info.format, success);
+    get_to(node, "delimiter", info.delimiter, success);
+    get_to(node, "columns", info.columns, success);
     if (!success) {
         throw ConfigurationError{"Could not load input file info"};
     }
@@ -160,14 +158,13 @@ void check_version(const json &j) {
     }
 }
 
-void load_input_info(const json &j, Configuration &config,
-                     const std::filesystem::path &config_dir) {
+void load_input_info(const json &j, Configuration &config) {
     const auto inputs = get(j, "inputs");
     bool success = true;
 
     // Input dataset file
     try {
-        config.file = get_file_info(inputs, config_dir);
+        config.file = get_file_info(get(inputs, "dataset"), config.root_path);
         fmt::print("Input dataset file: {}\n", config.file.name.string());
     } catch (const std::exception &e) {
         success = false;
@@ -187,8 +184,7 @@ void load_input_info(const json &j, Configuration &config,
     }
 }
 
-void load_modelling_info(const json &j, Configuration &config,
-                         const std::filesystem::path &config_dir) {
+void load_modelling_info(const json &j, Configuration &config) {
     bool success = true;
     const auto modelling = get(j, "modelling");
 
@@ -199,7 +195,7 @@ void load_modelling_info(const json &j, Configuration &config,
     if (get_to(modelling, "risk_factor_models", info.risk_factor_models, success)) {
         for (auto &[type, path] : info.risk_factor_models) {
             try {
-                rebase_valid_path(path, config_dir);
+                rebase_valid_path(path, config.root_path);
                 fmt::print("{:<14}, file: {}\n", type, path.string());
             } catch (const ConfigurationError &) {
                 success = false;
@@ -210,7 +206,7 @@ void load_modelling_info(const json &j, Configuration &config,
     }
 
     try {
-        info.baseline_adjustment = get_baseline_info(modelling, config_dir);
+        info.baseline_adjustment = get_baseline_info(modelling, config.root_path);
     } catch (const std::exception &e) {
         success = false;
         fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());

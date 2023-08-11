@@ -78,11 +78,19 @@ void rebase_valid_path_to(const nlohmann::json &j, const std::string &key,
                           bool &success) noexcept;
 
 /// @brief Load FileInfo from JSON
+/// @param node The node of the JSON object containing the FileInfo
+/// @param base_dir Base folder
+/// @return FileInfo
+/// @throw ConfigurationError: Invalid config file format
+poco::FileInfo get_file_info(const nlohmann::json &node, const std::filesystem::path &base_dir);
+
+/// @brief Read FoodsDataFile attribute from JSON
 /// @param j Input JSON
 /// @param base_dir Base folder
 /// @return FileInfo
 /// @throw ConfigurationError: Invalid config file format
-poco::FileInfo get_file_info(const nlohmann::json &j, const std::filesystem::path &base_dir);
+poco::FileInfo get_foods_data_file_info(const nlohmann::json &j,
+                                        const std::filesystem::path &base_dir);
 
 /// @brief Load settings section of JSON
 /// @param j Input JSON

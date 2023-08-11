@@ -19,6 +19,9 @@ namespace host {
 
 /// @brief Defines the application configuration data structure
 struct Configuration {
+    /// @brief The root path for configuration files
+    std::filesystem::path root_path;
+
     /// @brief The input data file details
     poco::FileInfo file;
 

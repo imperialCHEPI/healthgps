@@ -74,11 +74,11 @@ Configuration get_configuration(CommandOptions &options) {
     }
 
     // Base dir for relative paths
-    const auto config_dir = options.config_file.parent_path();
+    config.root_path = options.config_file.parent_path();
 
     // input dataset file
     try {
-        load_input_info(opt, config, config_dir);
+        load_input_info(opt, config);
         fmt::print("Input dataset file: {}\n", config.file.name.string());
     } catch (const std::exception &e) {
         success = false;
@@ -87,7 +87,7 @@ Configuration get_configuration(CommandOptions &options) {
 
     // Modelling information
     try {
-        load_modelling_info(opt, config, config_dir);
+        load_modelling_info(opt, config);
     } catch (const std::exception &e) {
         success = false;
         fmt::print(fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());

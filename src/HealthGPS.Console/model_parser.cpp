@@ -1,9 +1,11 @@
 #include "model_parser.h"
+#include "configuration_parsing_helpers.h"
 #include "csvparser.h"
 #include "jsonparser.h"
 
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fstream>
@@ -111,13 +113,13 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
-                                   const poco::SettingsInfo &settings) {
+                                   const host::Configuration &config) {
     // Load this dynamic model with the appropriate loader.
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
         return load_ebhlm_risk_model_definition(opt);
     }
     if (hgps::core::case_insensitive::equals(model_name, "newebm")) {
-        return load_newebm_risk_model_definition(opt, settings);
+        return load_newebm_risk_model_definition(opt, config);
     }
 
     throw std::invalid_argument{
@@ -201,7 +203,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 }
 
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
-load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInfo &settings) {
+load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
@@ -237,8 +239,12 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
         }
     }
 
+    // Foods nutrition data table.
+    const auto foods_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
+    const auto foods_data_table = load_datatable_from_csv(foods_file_info);
+
     // Load M/F average heights for age.
-    const auto max_age = static_cast<size_t>(settings.age_range.upper());
+    const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
     if (male_height.size() <= max_age) {
@@ -257,7 +263,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const poco::SettingsInf
 
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
-                           const poco::SettingsInfo &settings) {
+                           const host::Configuration &config) {
     // Get model name from JSON
     const auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
 
@@ -268,7 +274,7 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     }
     if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
         return std::make_pair(hgps::HierarchicalModelType::Dynamic,
-                              load_dynamic_risk_model_definition(model_name, opt, settings));
+                              load_dynamic_risk_model_definition(model_name, opt, config));
     }
 
     throw std::invalid_argument(fmt::format("Unknown model type: {}", model_type));
@@ -284,30 +290,28 @@ poco::json load_json(const std::filesystem::path &model_path) {
 }
 
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
-                                            const poco::ModellingInfo &info,
-                                            const poco::SettingsInfo &settings) {
+                                            const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    for (const auto &model : info.risk_factor_models) {
+    for (const auto &model : config.modelling.risk_factor_models) {
         // Load file and parse JSON
         const auto opt = load_json(model.second);
 
         // Load appropriate dynamic/static model
-        auto [model_type, model_definition] =
-            load_risk_model_definition(model.first, opt, settings);
+        auto [model_type, model_definition] = load_risk_model_definition(model.first, opt, config);
 
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
 
-    auto adjustment = load_baseline_adjustments(info.baseline_adjustment);
-    auto max_age = static_cast<std::size_t>(settings.age_range.upper());
+    auto adjustment = load_baseline_adjustments(config.modelling.baseline_adjustment);
+    auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
     for (const auto &table : adjustment.values) {
         for (const auto &item : table.second) {
             if (item.second.size() <= max_age) {
                 fmt::print(fg(fmt::color::red),
                            "Baseline adjustment files data must cover age range: [{}].\n",
-                           settings.age_range.to_string());
+                           config.settings.age_range.to_string());
                 throw std::invalid_argument(
                     "Baseline adjustment file must cover the required age range.");
             }
