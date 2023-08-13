@@ -7,8 +7,7 @@ namespace hgps::core {
 
 HgpsException::HgpsException(const std::string &what_arg, const std::source_location location)
     : std::runtime_error{what_arg}, location_{location} {
-    what_arg_ = fmt::format("[{}] Error in {}, line {}: {}", file_name(), function_name(), line(),
-                            std::runtime_error::what());
+    what_arg_ = fmt::format("{}:{}: {}", file_name(), line(), std::runtime_error::what());
 }
 
 HgpsException::HgpsException(const char *what_arg, const std::source_location location)
