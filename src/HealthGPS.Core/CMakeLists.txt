@@ -19,7 +19,8 @@ target_sources(HealthGPS.Core
 		"version.h"
 		"identifier.cpp"
 		"identifier.h"
-
+		"exception.h"
+		"exception.cpp"
 		"analysis.h"
 		"api.h"
 		"array2d.h"
