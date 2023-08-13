@@ -2,6 +2,7 @@
 #include "csvparser.h"
 #include "jsonparser.h"
 
+#include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <filesystem>
@@ -35,12 +36,11 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
                          load_baseline_from_csv(female_filename, info.delimiter));
             return hgps::BaselineAdjustment{hgps::FactorAdjustmentTable{std::move(data)}};
         } else {
-            throw std::logic_error("Unsupported file format: " + info.format);
+            throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
         }
     } catch (const std::exception &ex) {
-        fmt::print(fg(fmt::color::red), "Failed to parse adjustment file: {} or {}. {}\n",
-                   male_filename, female_filename, ex.what());
-        throw;
+        throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
+                                                    male_filename, female_filename, ex.what())};
     }
 }
 
@@ -48,7 +48,8 @@ std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_static_risk_model_definition(const std::string &model_name, const poco::json &opt) {
     MEASURE_FUNCTION();
     if (!hgps::core::case_insensitive::equals(model_name, "hlm")) {
-        throw std::invalid_argument{fmt::format("Static model '{}' not recognised", model_name)};
+        throw hgps::core::HgpsException{
+            fmt::format("Static model '{}' not recognised", model_name)};
     }
 
     std::map<int, hgps::HierarchicalLevel> levels;
@@ -122,7 +123,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
         return load_newebm_risk_model_definition(opt, config);
     }
 
-    throw std::invalid_argument{
+    throw hgps::core::HgpsException{
         fmt::format("Dynamic model name '{}' is not recognised.", model_name)};
 }
 
@@ -138,8 +139,8 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
     if (info.percentage > 0.0 && info.percentage < 1.0) {
         percentage = info.percentage;
     } else {
-        throw std::invalid_argument(
-            fmt::format("Boundary percentage outside range (0, 1): {}", info.percentage));
+        throw hgps::core::HgpsException{
+            fmt::format("Boundary percentage outside range (0, 1): {}", info.percentage)};
     }
 
     info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
@@ -190,8 +191,8 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
                     age_equations.female.emplace(hgps::core::to_lower(func.name), function);
                 }
             } else {
-                throw std::invalid_argument(
-                    fmt::format("Unknown model gender type: {}", gender.first));
+                throw hgps::core::HgpsException{
+                    fmt::format("Unknown model gender type: {}", gender.first)};
             }
         }
 
@@ -217,8 +218,8 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
         nutrient_ranges[nutrient_key] = nutrient["Range"].get<std::pair<double, double>>();
         if (nutrient_ranges[nutrient_key].first > nutrient_ranges[nutrient_key].second) {
-            throw std::invalid_argument(
-                fmt::format("Nutrient range is invalid: {}", nutrient_key.to_string()));
+            throw hgps::core::HgpsException{
+                fmt::format("Nutrient range is invalid: {}", nutrient_key.to_string())};
         }
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
@@ -247,8 +248,8 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
         foods_file_info.name = file_path.string();
     }
     if (!std::filesystem::exists(file_path)) {
-        throw std::runtime_error(
-            fmt::format("Foods nutrition dataset file: {} not found.\n", file_path.string()));
+        throw hgps::core::HgpsException{
+            fmt::format("Foods nutrition dataset file: {} not found.\n", file_path.string())};
     }
     auto foods_data_table = load_datatable_from_csv(foods_file_info);
 
@@ -257,10 +258,10 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
     if (male_height.size() <= max_age) {
-        throw std::invalid_argument("AgeMeanHeight (Male) does not cover complete age range");
+        throw hgps::core::HgpsException{"AgeMeanHeight (Male) does not cover complete age range"};
     }
     if (female_height.size() <= max_age) {
-        throw std::invalid_argument("AgeMeanHeight (Female) does not cover complete age range");
+        throw hgps::core::HgpsException{"AgeMeanHeight (Female) does not cover complete age range"};
     }
     age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
@@ -286,13 +287,13 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
                               load_dynamic_risk_model_definition(model_name, opt, config));
     }
 
-    throw std::invalid_argument(fmt::format("Unknown model type: {}", model_type));
+    throw hgps::core::HgpsException{fmt::format("Unknown model type: {}", model_type)};
 }
 
 poco::json load_json(const std::string &model_filename) {
     std::ifstream ifs(model_filename, std::ifstream::in);
     if (!ifs.good()) {
-        throw std::invalid_argument(fmt::format("Model file: {} not found", model_filename));
+        throw hgps::core::HgpsException{fmt::format("Model file: {} not found", model_filename)};
     }
 
     return poco::json::parse(ifs);
@@ -323,8 +324,8 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                 fmt::print(fg(fmt::color::red),
                            "Baseline adjustment files data must cover age range: [{}].\n",
                            age_range.to_string());
-                throw std::invalid_argument(
-                    "Baseline adjustment file must cover the required age range.");
+                throw hgps::core::HgpsException{
+                    "Baseline adjustment file must cover the required age range."};
             }
         }
     }
