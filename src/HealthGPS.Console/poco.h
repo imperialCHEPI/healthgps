@@ -67,6 +67,8 @@ struct PolicyPeriodInfo {
 
         return "null";
     }
+
+    auto operator<=>(const PolicyPeriodInfo &rhs) const = default;
 };
 
 struct PolicyImpactInfo {
@@ -81,11 +83,15 @@ struct PolicyImpactInfo {
 
         return "null";
     }
+
+    auto operator<=>(const PolicyImpactInfo &rhs) const = default;
 };
 
 struct PolicyAdjustmentInfo {
     std::string risk_factor{};
     double value{};
+
+    auto operator<=>(const PolicyAdjustmentInfo &rhs) const = default;
 };
 
 struct PolicyScenarioInfo {
@@ -115,5 +121,7 @@ struct PolicyScenarioInfo {
 
         return "null";
     }
+
+    auto operator<=>(const PolicyScenarioInfo &rhs) const = default;
 };
 } // namespace host::poco

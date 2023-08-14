@@ -109,22 +109,13 @@ poco::BaselineInfo get_baseline_info(const json &j, const std::filesystem::path 
 void load_interventions(const json &running, Configuration &config) {
     const auto interventions = get(running, "interventions");
 
-    try {
-        // If the type of intervention is null, then there's nothing else to do
-        if (interventions.at("active_type_id").is_null()) {
-            return;
-        }
-    } catch (const json::out_of_range &) {
-        throw ConfigurationError{"Interventions section missing key \"active_type_id\""};
-    }
+    bool success = true;
 
-    const auto active_type_id = [&interventions]() {
-        try {
-            return interventions["active_type_id"].get<hgps::core::Identifier>();
-        } catch (const json::type_error &) {
-            throw ConfigurationError{"active_type_id key must be of type string"};
-        }
-    }();
+    std::optional<hgps::core::Identifier> active_type_id; // might be null
+    if (!get_to(interventions, "active_type_id", active_type_id)) {
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red), "active_type_id is invalid\n");
+    }
 
     /*
      * NB: This loads all of the policy scenario info from the JSON file, which is
@@ -133,16 +124,26 @@ void load_interventions(const json &running, Configuration &config) {
      */
     std::unordered_map<hgps::core::Identifier, poco::PolicyScenarioInfo> policy_types;
     if (!get_to(interventions, "types", policy_types)) {
-        throw ConfigurationError{"Could not load policy types from interventions section"};
+        success = false;
+        fmt::print(fmt::fg(fmt::color::red),
+                   "Could not load policy types from interventions section\n");
     }
 
-    try {
-        config.intervention = policy_types.at(active_type_id);
-        config.intervention.identifier = active_type_id.to_string();
-        config.has_active_intervention = true;
-    } catch (const json::out_of_range &) {
-        throw ConfigurationError{fmt::format("Unknown active intervention type identifier: {}",
-                                             active_type_id.to_string())};
+    if (active_type_id) {
+        try {
+            config.intervention = policy_types.at(active_type_id.value());
+            config.intervention.identifier = active_type_id->to_string();
+            config.has_active_intervention = true;
+        } catch (const std::out_of_range &) {
+            success = false;
+            fmt::print(fmt::fg(fmt::color::red),
+                       "Unknown active intervention type identifier: {}\n",
+                       active_type_id->to_string());
+        }
+    }
+
+    if (!success) {
+        throw ConfigurationError{"Failed to load policy interventions"};
     }
 }
 

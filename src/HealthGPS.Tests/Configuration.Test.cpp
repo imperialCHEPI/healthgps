@@ -79,6 +79,12 @@ class ConfigParsingFixture : public ::testing::Test {
         return file_path;
     }
 
+    auto create_config() const {
+        host::Configuration config;
+        config.root_path = dir_.path();
+        return config;
+    }
+
   private:
     TempDir dir_;
 };
@@ -323,4 +329,98 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
     // Using an invalid path should cause an error
     j["baseline_adjustments"]["file_names"]["a"] = random_filename();
     EXPECT_THROW(get_baseline_info(j, tmp_path()), ConfigurationError);
+}
+
+TEST_F(ConfigParsingFixture, LoadInterventions) {
+    constexpr auto *POLICY_A = R"(
+        {
+            "active_period": {
+                    "start_time": 2022,
+                    "finish_time": 2022
+                },
+            "impact_type": "absolute",
+            "impacts": [
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -1.0,
+                    "from_age": 0,
+                    "to_age": null
+                }
+            ]
+        })";
+
+    constexpr auto *POLICY_B = R"(
+        {
+            "active_period": {
+                "start_time": 2022,
+                "finish_time": 2050
+            },
+            "impacts": [
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -0.12,
+                    "from_age": 5,
+                    "to_age": 12
+                },
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -0.31,
+                    "from_age": 13,
+                    "to_age": 18
+                },
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -0.16,
+                    "from_age": 19,
+                    "to_age": null
+                }
+            ]
+        })";
+    const auto policies = [&]() {
+        json p;
+        p["a"] = json::parse(POLICY_A);
+        p["b"] = json::parse(POLICY_B);
+        return p;
+    }();
+
+    {
+        // No intervention
+        auto config = create_config();
+        json j;
+        j["interventions"]["active_type_id"] = nullptr;
+        j["interventions"]["types"] = json::object();
+        EXPECT_NO_THROW(load_interventions(j, config));
+        EXPECT_FALSE(config.has_active_intervention);
+    }
+
+    {
+        // active_type_id key missing
+        auto config = create_config();
+        json j;
+        j["interventions"]["other_key"] = 1;
+        j["interventions"]["types"] = json::object();
+        EXPECT_THROW(load_interventions(j, config), ConfigurationError);
+    }
+
+    {
+        // A valid intervention
+        auto config = create_config();
+        json j;
+        j["interventions"]["active_type_id"] = "A";
+        j["interventions"]["types"] = policies;
+        EXPECT_NO_THROW(load_interventions(j, config));
+        EXPECT_TRUE(config.has_active_intervention);
+        auto intervention = policies["a"].get<PolicyScenarioInfo>();
+        intervention.identifier = "a";
+        EXPECT_EQ(config.intervention, intervention);
+    }
+
+    {
+        // An invalid intervention
+        auto config = create_config();
+        json j;
+        j["interventions"]["active_type_id"] = "c";
+        j["interventions"]["types"] = policies;
+        EXPECT_THROW(load_interventions(j, config), ConfigurationError);
+    }
 }
