@@ -1,6 +1,8 @@
 #include "hierarchical_model_static.h"
 #include "runtime_context.h"
 
+#include "HealthGPS.Core/exception.h"
+
 namespace hgps {
 
 StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
@@ -9,12 +11,11 @@ StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     : models_{models}, levels_{levels} {
 
     if (models_.empty()) {
-        throw std::invalid_argument(
-            "The hierarchical model equations definition must not be empty");
+        throw core::HgpsException("The hierarchical model equations definition must not be empty");
     }
 
     if (levels_.empty()) {
-        throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+        throw core::HgpsException("The hierarchical model levels definition must not be empty");
     }
 }
 
@@ -125,12 +126,11 @@ HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
     : models_{std::move(linear_models)}, levels_{std::move(model_levels)} {
 
     if (models_.empty()) {
-        throw std::invalid_argument(
-            "The hierarchical model equations definition must not be empty");
+        throw core::HgpsException("The hierarchical model equations definition must not be empty");
     }
 
     if (levels_.empty()) {
-        throw std::invalid_argument("The hierarchical model levels definition must not be empty");
+        throw core::HgpsException("The hierarchical model levels definition must not be empty");
     }
 }
 

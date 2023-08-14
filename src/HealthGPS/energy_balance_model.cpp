@@ -1,6 +1,8 @@
 #include "energy_balance_model.h"
 #include "runtime_context.h"
 
+#include "HealthGPS.Core/exception.h"
+
 #include <algorithm>
 
 namespace hgps {
@@ -31,19 +33,19 @@ EnergyBalanceModel::EnergyBalanceModel(
       age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
-        throw std::invalid_argument("Energy equation mapping is empty");
+        throw core::HgpsException("Energy equation mapping is empty");
     }
     if (nutrient_ranges_.empty()) {
-        throw std::invalid_argument("Nutrient range mapping is empty");
+        throw core::HgpsException("Nutrient range mapping is empty");
     }
     if (nutrient_equations_.empty()) {
-        throw std::invalid_argument("Nutrient equation mapping is empty");
+        throw core::HgpsException("Nutrient equation mapping is empty");
     }
     if (food_prices_.empty()) {
-        throw std::invalid_argument("Food price mapping is empty");
+        throw core::HgpsException("Food price mapping is empty");
     }
     if (age_mean_height_.empty()) {
-        throw std::invalid_argument("Age mean height mapping is empty");
+        throw core::HgpsException("Age mean height mapping is empty");
     }
 }
 
@@ -54,7 +56,7 @@ HierarchicalModelType EnergyBalanceModel::type() const noexcept {
 std::string EnergyBalanceModel::name() const noexcept { return "Dynamic"; }
 
 void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
-    throw std::logic_error("EnergyBalanceModel::generate_risk_factors not yet implemented.");
+    throw core::HgpsException("EnergyBalanceModel::generate_risk_factors not yet implemented.");
 }
 
 void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
@@ -280,19 +282,19 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
       age_mean_height_{std::move(age_mean_height)} {
 
     if (energy_equation_.empty()) {
-        throw std::invalid_argument("Energy equation mapping is empty");
+        throw core::HgpsException("Energy equation mapping is empty");
     }
     if (nutrient_ranges_.empty()) {
-        throw std::invalid_argument("Nutrient ranges mapping is empty");
+        throw core::HgpsException("Nutrient ranges mapping is empty");
     }
     if (nutrient_equations_.empty()) {
-        throw std::invalid_argument("Nutrient equation mapping is empty");
+        throw core::HgpsException("Nutrient equation mapping is empty");
     }
     if (food_prices_.empty()) {
-        throw std::invalid_argument("Food prices mapping is empty");
+        throw core::HgpsException("Food prices mapping is empty");
     }
     if (age_mean_height_.empty()) {
-        throw std::invalid_argument("Age mean height mapping is empty");
+        throw core::HgpsException("Age mean height mapping is empty");
     }
 }
 
