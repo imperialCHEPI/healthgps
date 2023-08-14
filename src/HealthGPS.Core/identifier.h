@@ -80,7 +80,7 @@ struct Identifier final {
     std::string value_{};
     std::size_t hash_code_{std::hash<std::string>{}("")};
 
-    void validate_identifeir() const;
+    void validate_identifier() const;
 };
 
 void from_json(const nlohmann::json &j, Identifier &id);
