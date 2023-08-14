@@ -138,12 +138,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n",
                    config.trial_runs);
         auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input);
-        if (config.has_active_intervention) {
+        if (config.active_intervention.has_value()) {
             fmt::print(fg(fmt::color::cyan),
                        "\nStarting intervention simulation with {} trials ...\n",
                        config.trial_runs);
-            auto policy_sim = create_intervention_simulation(channel, factory, event_bus,
-                                                             model_input, config.intervention);
+            auto policy_sim = create_intervention_simulation(
+                channel, factory, event_bus, model_input, config.active_intervention.value());
 
             // Run simulations side by side on a background thread
             auto worker =

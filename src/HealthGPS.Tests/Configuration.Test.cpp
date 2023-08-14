@@ -390,7 +390,7 @@ TEST_F(ConfigParsingFixture, LoadInterventions) {
         j["interventions"]["active_type_id"] = nullptr;
         j["interventions"]["types"] = json::object();
         EXPECT_NO_THROW(load_interventions(j, config));
-        EXPECT_FALSE(config.has_active_intervention);
+        EXPECT_FALSE(config.active_intervention.has_value());
     }
 
     {
@@ -409,10 +409,10 @@ TEST_F(ConfigParsingFixture, LoadInterventions) {
         j["interventions"]["active_type_id"] = "A";
         j["interventions"]["types"] = policies;
         EXPECT_NO_THROW(load_interventions(j, config));
-        EXPECT_TRUE(config.has_active_intervention);
+        EXPECT_TRUE(config.active_intervention.has_value());
         auto intervention = policies["a"].get<PolicyScenarioInfo>();
         intervention.identifier = "a";
-        EXPECT_EQ(config.intervention, intervention);
+        EXPECT_EQ(config.active_intervention, intervention);
     }
 
     {

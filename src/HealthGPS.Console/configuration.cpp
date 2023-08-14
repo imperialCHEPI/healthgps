@@ -206,12 +206,14 @@ std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
 
 ResultFileWriter create_results_file_logger(const Configuration &config,
                                             const hgps::ModelInput &input) {
-    return ResultFileWriter{create_output_file_name(config.output, config.job_id),
-                            ExperimentInfo{.model = config.app_name,
-                                           .version = config.app_version,
-                                           .intervention = config.intervention.identifier,
-                                           .job_id = config.job_id,
-                                           .seed = input.seed().value_or(0u)}};
+    return ResultFileWriter{
+        create_output_file_name(config.output, config.job_id),
+        ExperimentInfo{.model = config.app_name,
+                       .version = config.app_version,
+                       .intervention =
+                           config.active_intervention ? config.active_intervention->identifier : "",
+                       .job_id = config.job_id,
+                       .seed = input.seed().value_or(0u)}};
 }
 
 std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &channel) {

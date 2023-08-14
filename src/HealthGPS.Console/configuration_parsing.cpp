@@ -131,9 +131,8 @@ void load_interventions(const json &running, Configuration &config) {
 
     if (active_type_id) {
         try {
-            config.intervention = policy_types.at(active_type_id.value());
-            config.intervention.identifier = active_type_id->to_string();
-            config.has_active_intervention = true;
+            config.active_intervention = policy_types.at(active_type_id.value());
+            config.active_intervention->identifier = active_type_id->to_string();
         } catch (const std::out_of_range &) {
             success = false;
             fmt::print(fmt::fg(fmt::color::red),

@@ -13,6 +13,7 @@
 
 #include "result_file_writer.h"
 
+#include <optional>
 #include <stdexcept>
 
 namespace host {
@@ -52,11 +53,8 @@ struct Configuration {
     /// @brief Baseline to intervention data synchronisation time out (milliseconds)
     unsigned int sync_timeout_ms{};
 
-    /// @brief Indicates whether an alternative intervention policy is active
-    bool has_active_intervention{false};
-
     /// @brief The active intervention policy definition
-    poco::PolicyScenarioInfo intervention;
+    std::optional<poco::PolicyScenarioInfo> active_intervention;
 
     /// @brief Experiment output folder and file information
     poco::OutputInfo output;
