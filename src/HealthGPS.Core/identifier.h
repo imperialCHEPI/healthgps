@@ -1,7 +1,9 @@
 #pragma once
 #include <functional>
+#include <map>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 
 #include "nlohmann/json.hpp"
 
@@ -85,11 +87,28 @@ struct Identifier final {
 
 void from_json(const nlohmann::json &j, Identifier &id);
 
-void from_json(const nlohmann::json &j, std::map<Identifier, double> &map);
+namespace detail {
+template <template <typename...> class Map, class Value>
+void map_from_json(const nlohmann::json &j, Map<hgps::core::Identifier, Value> &map) {
+    map.clear();
+    for (auto &[key, value] : j.items()) {
+        map.emplace(std::move(key), value.get<Value>());
+    }
+}
+} // namespace detail
 
 } // namespace hgps::core
 
 namespace std {
+template <class T>
+void from_json(const nlohmann::json &j, std::map<hgps::core::Identifier, T> &map) {
+    hgps::core::detail::map_from_json(j, map);
+}
+
+template <class T>
+void from_json(const nlohmann::json &j, std::unordered_map<hgps::core::Identifier, T> &map) {
+    hgps::core::detail::map_from_json(j, map);
+}
 
 /// @brief Hash code function for Identifier type to be used in unordered containers
 template <> struct hash<hgps::core::Identifier> {
