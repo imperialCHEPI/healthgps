@@ -1,19 +1,26 @@
 #pragma once
 
 #include <cstdint>
-#include <source_location>
 #include <stdexcept>
 #include <string>
+
+#if defined(__clang__) && __clang_major__ <= 14
+#include <experimental/source_location>
+using std::experimental::source_location;
+#else
+#include <source_location>
+using std::source_location;
+#endif // defined(__clang__) && __clang_major__ <= 14
 
 namespace hgps::core {
 
 class HgpsException : public std::runtime_error {
   public:
     HgpsException(const std::string &what_arg,
-                  const std::source_location location = std::source_location::current());
+                  const source_location location = source_location::current());
 
     HgpsException(const char *what_arg,
-                  const std::source_location location = std::source_location::current());
+                  const source_location location = source_location::current());
 
     const char *what() const noexcept override;
 
@@ -27,7 +34,7 @@ class HgpsException : public std::runtime_error {
 
   private:
     std::string what_arg_;
-    std::source_location location_;
+    source_location location_;
 };
 
 } // namespace hgps::core

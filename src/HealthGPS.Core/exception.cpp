@@ -5,12 +5,12 @@
 
 namespace hgps::core {
 
-HgpsException::HgpsException(const std::string &what_arg, const std::source_location location)
+HgpsException::HgpsException(const std::string &what_arg, const source_location location)
     : std::runtime_error{what_arg}, location_{location} {
     what_arg_ = fmt::format("{}:{}: {}", file_name(), line(), std::runtime_error::what());
 }
 
-HgpsException::HgpsException(const char *what_arg, const std::source_location location)
+HgpsException::HgpsException(const char *what_arg, const source_location location)
     : HgpsException{std::string{what_arg}, location} {}
 
 const char *HgpsException::what() const noexcept { return what_arg_.c_str(); }
