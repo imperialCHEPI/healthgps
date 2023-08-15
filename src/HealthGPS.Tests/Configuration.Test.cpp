@@ -456,7 +456,7 @@ TEST_F(ConfigParsingFixture, LoadInputInfo) {
                              .columns = {{"a", "string"}, {"b", "other string"}}};
     const SettingsInfo settings_info{.country = "FRA",
                                      .age_range = hgps::core::IntegerInterval{0, 100},
-                                     .size_fraction = 0.0001};
+                                     .size_fraction = 0.0001f};
 
     // Valid inputs
     {
