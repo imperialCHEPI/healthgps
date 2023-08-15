@@ -91,8 +91,8 @@ namespace detail {
 template <template <typename...> class Map, class Value>
 void map_from_json(const nlohmann::json &j, Map<hgps::core::Identifier, Value> &map) {
     map.clear();
-    for (auto &[key, value] : j.items()) {
-        map.emplace(std::move(key), value.get<Value>());
+    for (const auto &item : j.items()) {
+        map.emplace(item.key(), item.value().get<Value>());
     }
 }
 } // namespace detail
