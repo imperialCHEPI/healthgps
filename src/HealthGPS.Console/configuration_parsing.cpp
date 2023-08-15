@@ -22,7 +22,7 @@ void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path 
     if (path.is_relative()) {
         try {
             path = std::filesystem::weakly_canonical(base_dir / path);
-        } catch (const std::filesystem::filesystem_error &e) {
+        } catch (const std::filesystem::filesystem_error &) {
             throw ConfigurationError{fmt::format("OS error while reading {}", path.string())};
         }
     }
