@@ -112,8 +112,7 @@ void load_interventions(const json &running, Configuration &config) {
     bool success = true;
 
     std::optional<hgps::core::Identifier> active_type_id; // might be null
-    if (!get_to(interventions, "active_type_id", active_type_id)) {
-        success = false;
+    if (!get_to(interventions, "active_type_id", active_type_id, success)) {
         fmt::print(fmt::fg(fmt::color::red), "active_type_id is invalid\n");
     }
 
@@ -123,8 +122,7 @@ void load_interventions(const json &running, Configuration &config) {
      * format is correct.
      */
     std::unordered_map<hgps::core::Identifier, poco::PolicyScenarioInfo> policy_types;
-    if (!get_to(interventions, "types", policy_types)) {
-        success = false;
+    if (!get_to(interventions, "types", policy_types, success)) {
         fmt::print(fmt::fg(fmt::color::red),
                    "Could not load policy types from interventions section\n");
     }
