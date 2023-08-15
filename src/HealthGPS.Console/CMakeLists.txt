@@ -31,6 +31,13 @@ add_library(HealthGPS.LibConsole STATIC
 		"riskmodel.h"
 		"poco.h")
 
+# Under Windows, we also include a resource file to the build
+if(WIN32)
+    # Make sure that the resource file is seen as an RC file to be compiled with a resource compiler, not a C++ compiler
+    set_source_files_properties(versioninfo.rc LANGUAGE RC)
+	target_sources(HealthGPS.Console PRIVATE versioninfo.rc)
+endif(WIN32)
+
 target_include_directories(HealthGPS.LibConsole PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(HealthGPS.Console
