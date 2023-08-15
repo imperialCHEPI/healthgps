@@ -52,6 +52,7 @@ void from_json(const json &j, SESInfo &p);
 void to_json(json &j, const BaselineInfo &p);
 
 // Lite risk factors models (Energy Balance Model)
+void to_json(json &j, const RiskFactorInfo &p);
 void from_json(const json &j, RiskFactorInfo &p);
 
 void to_json(json &j, const VariableInfo &p);

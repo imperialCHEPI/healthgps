@@ -22,11 +22,15 @@ struct SettingsInfo {
     std::string country;
     hgps::core::IntegerInterval age_range;
     float size_fraction{};
+
+    auto operator<=>(const SettingsInfo &rhs) const = default;
 };
 
 struct SESInfo {
     std::string function;
     std::vector<double> parameters;
+
+    auto operator<=>(const SESInfo &) const = default;
 };
 
 struct BaselineInfo {
@@ -42,6 +46,8 @@ struct RiskFactorInfo {
     std::string name;
     int level{};
     std::optional<hgps::core::DoubleInterval> range;
+
+    auto operator<=>(const RiskFactorInfo &rhs) const = default;
 };
 
 struct ModellingInfo {
@@ -54,6 +60,8 @@ struct OutputInfo {
     unsigned int comorbidities{};
     std::string folder{};
     std::string file_name{};
+
+    auto operator<=>(const OutputInfo &rhs) const = default;
 };
 
 struct PolicyPeriodInfo {

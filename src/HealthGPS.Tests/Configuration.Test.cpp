@@ -24,6 +24,58 @@ const std::filesystem::path TEST_PATH_ABSOLUTE = R"(C:\Users\hgps_nonexistent\fi
 const std::filesystem::path TEST_PATH_ABSOLUTE = "/home/hgps_nonexistent/file.txt";
 #endif
 
+constexpr auto *POLICY_A = R"(
+        {
+            "active_period": {
+                    "start_time": 2022,
+                    "finish_time": 2022
+                },
+            "impact_type": "absolute",
+            "impacts": [
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -1.0,
+                    "from_age": 0,
+                    "to_age": null
+                }
+            ]
+        })";
+
+constexpr auto *POLICY_B = R"(
+        {
+            "active_period": {
+                "start_time": 2022,
+                "finish_time": 2050
+            },
+            "impacts": [
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -0.12,
+                    "from_age": 5,
+                    "to_age": 12
+                },
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -0.31,
+                    "from_age": 13,
+                    "to_age": 18
+                },
+                {
+                    "risk_factor": "BMI",
+                    "impact_value": -0.16,
+                    "from_age": 19,
+                    "to_age": null
+                }
+            ]
+        })";
+
+const auto POLICIES = []() {
+    json p;
+    p["a"] = json::parse(POLICY_A);
+    p["b"] = json::parse(POLICY_B);
+    return p;
+}();
+
 class TempDir {
   public:
     TempDir() : rnd_{std::random_device()()} {
@@ -332,57 +384,6 @@ TEST_F(ConfigParsingFixture, GetBaseLineInfo) {
 }
 
 TEST_F(ConfigParsingFixture, LoadInterventions) {
-    constexpr auto *POLICY_A = R"(
-        {
-            "active_period": {
-                    "start_time": 2022,
-                    "finish_time": 2022
-                },
-            "impact_type": "absolute",
-            "impacts": [
-                {
-                    "risk_factor": "BMI",
-                    "impact_value": -1.0,
-                    "from_age": 0,
-                    "to_age": null
-                }
-            ]
-        })";
-
-    constexpr auto *POLICY_B = R"(
-        {
-            "active_period": {
-                "start_time": 2022,
-                "finish_time": 2050
-            },
-            "impacts": [
-                {
-                    "risk_factor": "BMI",
-                    "impact_value": -0.12,
-                    "from_age": 5,
-                    "to_age": 12
-                },
-                {
-                    "risk_factor": "BMI",
-                    "impact_value": -0.31,
-                    "from_age": 13,
-                    "to_age": 18
-                },
-                {
-                    "risk_factor": "BMI",
-                    "impact_value": -0.16,
-                    "from_age": 19,
-                    "to_age": null
-                }
-            ]
-        })";
-    const auto policies = [&]() {
-        json p;
-        p["a"] = json::parse(POLICY_A);
-        p["b"] = json::parse(POLICY_B);
-        return p;
-    }();
-
     {
         // No intervention
         auto config = create_config();
@@ -407,10 +408,10 @@ TEST_F(ConfigParsingFixture, LoadInterventions) {
         auto config = create_config();
         json j;
         j["interventions"]["active_type_id"] = "A";
-        j["interventions"]["types"] = policies;
+        j["interventions"]["types"] = POLICIES;
         EXPECT_NO_THROW(load_interventions(j, config));
         EXPECT_TRUE(config.active_intervention.has_value());
-        auto intervention = policies["a"].get<PolicyScenarioInfo>();
+        auto intervention = POLICIES["a"].get<PolicyScenarioInfo>();
         intervention.identifier = "a";
         EXPECT_EQ(config.active_intervention, intervention);
     }
@@ -420,7 +421,238 @@ TEST_F(ConfigParsingFixture, LoadInterventions) {
         auto config = create_config();
         json j;
         j["interventions"]["active_type_id"] = "c";
-        j["interventions"]["types"] = policies;
+        j["interventions"]["types"] = POLICIES;
         EXPECT_THROW(load_interventions(j, config), ConfigurationError);
+    }
+}
+
+TEST(ConfigParsing, CheckVersion) {
+    // Correct version present
+    {
+        json j;
+        j["version"] = 2;
+        EXPECT_NO_THROW(check_version(j));
+    }
+
+    // Wrong version
+    {
+        json j;
+        j["version"] = 1;
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+
+    // Version key missing
+    {
+        json j;
+        j["other_key"] = 2;
+        EXPECT_THROW(check_version(j), ConfigurationError);
+    }
+}
+
+TEST_F(ConfigParsingFixture, LoadInputInfo) {
+    const FileInfo file_info{.name = create_file_absolute(),
+                             .format = "csv",
+                             .delimiter = ",",
+                             .columns = {{"a", "string"}, {"b", "other string"}}};
+    const SettingsInfo settings_info{.country = "FRA",
+                                     .age_range = hgps::core::IntegerInterval{0, 100},
+                                     .size_fraction = 0.0001};
+
+    // Valid inputs
+    {
+        auto config = create_config();
+        json j;
+        j["inputs"]["dataset"] = file_info;
+        j["inputs"]["settings"] = settings_info;
+        EXPECT_NO_THROW(load_input_info(j, config));
+        EXPECT_EQ(config.file, file_info);
+        EXPECT_EQ(config.settings, settings_info);
+    }
+
+    // inputs key missing
+    {
+        json j;
+        j["other_key"] = nullptr;
+        auto config = create_config();
+        EXPECT_THROW(load_input_info(j, config), ConfigurationError);
+    }
+
+    // Missing dataset
+    {
+        auto config = create_config();
+        json j;
+        j["inputs"]["settings"] = settings_info;
+        EXPECT_THROW(load_input_info(j, config), ConfigurationError);
+    }
+
+    // Missing settings
+    {
+        auto config = create_config();
+        json j;
+        j["inputs"]["dataset"] = file_info;
+        EXPECT_THROW(load_input_info(j, config), ConfigurationError);
+    }
+}
+
+TEST_F(ConfigParsingFixture, LoadModellingInfo) {
+    const std::vector<RiskFactorInfo> risk_factors{
+        RiskFactorInfo{.name = "Gender", .level = 0, .range = std::nullopt},
+        RiskFactorInfo{.name = "Age", .level = 1, .range = hgps::core::DoubleInterval(0.0, 1.0)}};
+    const std::unordered_map<std::string, std::filesystem::path> risk_factor_models{
+        {"a", create_file_absolute()}, {"b", create_file_absolute()}};
+    const BaselineInfo baseline_info{
+        .format = "csv",
+        .delimiter = ",",
+        .encoding = "UTF8",
+        .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}}};
+    const poco::SESInfo ses_info{.function = "normal", .parameters = {0.0, 1.0}};
+
+    const json valid_modelling_info = [&]() {
+        json j;
+        j["modelling"]["risk_factors"] = risk_factors;
+        j["modelling"]["risk_factor_models"] = risk_factor_models;
+        j["modelling"]["baseline_adjustments"] = baseline_info;
+        j["modelling"]["ses_model"] = ses_info;
+        return j;
+    }();
+
+    // Valid modelling info
+    {
+        auto config = create_config();
+
+        EXPECT_NO_THROW(load_modelling_info(valid_modelling_info, config));
+        EXPECT_EQ(config.modelling.risk_factors, risk_factors);
+        EXPECT_EQ(config.modelling.risk_factor_models, risk_factor_models);
+        EXPECT_EQ(config.modelling.baseline_adjustment, baseline_info);
+        EXPECT_EQ(config.ses, ses_info);
+    }
+
+    // No modelling key
+    {
+        auto config = create_config();
+        json j;
+        j["other_key"] = nullptr;
+        EXPECT_THROW(load_modelling_info(j, config), ConfigurationError);
+    }
+
+    // Invalid risk factor
+    {
+        auto config = create_config();
+        auto j = valid_modelling_info;
+        j["modelling"]["risk_factors"][0].erase("level");
+        EXPECT_THROW(load_modelling_info(j, config), ConfigurationError);
+    }
+
+    // Invalid risk factor model
+    {
+        auto config = create_config();
+        auto j = valid_modelling_info;
+
+        // Change to non-existent filepath
+        j["modelling"]["risk_factor_models"]["a"] = random_filename();
+
+        EXPECT_THROW(load_modelling_info(j, config), ConfigurationError);
+    }
+
+    // Invalid baseline adjustment
+    {
+        auto config = create_config();
+        auto j = valid_modelling_info;
+        j["modelling"]["baseline_adjustments"].erase("format");
+        EXPECT_THROW(load_modelling_info(j, config), ConfigurationError);
+    }
+
+    // Invalid SES model
+    {
+        auto config = create_config();
+        auto j = valid_modelling_info;
+        j["modelling"]["ses_model"].erase("function_name");
+        EXPECT_THROW(load_modelling_info(j, config), ConfigurationError);
+    }
+}
+
+TEST_F(ConfigParsingFixture, LoadRunningInfo) {
+    constexpr auto start_time = 2010u;
+    constexpr auto stop_time = 2050u;
+    constexpr auto trial_runs = 1u;
+    constexpr auto sync_timeout_ms = 15'000u;
+    constexpr auto seed = 42u;
+    const std::vector<std::string> diseases{"alzheimer", "asthma",      "colorectalcancer",
+                                            "diabetes",  "lowbackpain", "osteoarthritisknee"};
+
+    const auto valid_running_info = [&]() {
+        json j;
+        auto &running = j["running"];
+        running["start_time"] = start_time;
+        running["stop_time"] = stop_time;
+        running["trial_runs"] = trial_runs;
+        running["sync_timeout_ms"] = sync_timeout_ms;
+        running["diseases"] = diseases;
+        running["seed"][0] = seed; // for some reason it has to be an array
+        running["interventions"]["active_type_id"] = "a";
+        running["interventions"]["types"] = POLICIES;
+        return j;
+    }();
+
+    // Valid running info
+    {
+        auto config = create_config();
+        EXPECT_NO_THROW(load_running_info(valid_running_info, config));
+        EXPECT_EQ(config.start_time, start_time);
+        EXPECT_EQ(config.stop_time, stop_time);
+        EXPECT_EQ(config.trial_runs, trial_runs);
+        EXPECT_EQ(config.sync_timeout_ms, sync_timeout_ms);
+        EXPECT_EQ(config.custom_seed, seed);
+        EXPECT_EQ(config.diseases, diseases);
+    }
+
+    // Should still work with empty seed array
+    {
+        auto config = create_config();
+        auto j = valid_running_info;
+        j["running"]["seed"].clear();
+
+        std::string s = j.dump();
+        EXPECT_NO_THROW(load_running_info(j, config));
+        EXPECT_EQ(config.start_time, start_time);
+        EXPECT_EQ(config.stop_time, stop_time);
+        EXPECT_EQ(config.trial_runs, trial_runs);
+        EXPECT_EQ(config.sync_timeout_ms, sync_timeout_ms);
+        EXPECT_EQ(config.diseases, diseases);
+        EXPECT_FALSE(config.custom_seed.has_value());
+    }
+
+    // If any of the required keys are invalid then an error should be thrown
+    for (const auto key : {"start_time", "stop_time", "trial_runs", "sync_timeout_ms", "diseases",
+                           "seed", "interventions"}) {
+        auto config = create_config();
+        auto j = valid_running_info;
+        j["running"][key] = nullptr; // None of the values should be null
+        EXPECT_THROW(load_running_info(j, config), ConfigurationError);
+    }
+}
+
+TEST_F(ConfigParsingFixture, LoadOutputInfo) {
+    const OutputInfo output_info{
+        .comorbidities = 3, .folder = "/home/test", .file_name = "filename.txt"};
+    const auto valid_output_info = [&]() {
+        json j;
+        j["output"] = output_info;
+        return j;
+    }();
+
+    // Valid info
+    {
+        auto config = create_config();
+        EXPECT_NO_THROW(load_output_info(valid_output_info, config));
+        EXPECT_EQ(config.output, output_info);
+    }
+
+    // If any of the required keys are invalid then an error should be thrown
+    for (const auto key : {"folder", "file_name", "comorbidities"}) {
+        auto config = create_config();
+        auto j = valid_output_info;
+        j["output"][key] = nullptr; // None of the values should be null
+        EXPECT_THROW(load_output_info(j, config), ConfigurationError);
     }
 }
