@@ -195,7 +195,4 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 namespace host {
 /// @brief Internal details namespace for private data types and functions
 namespace detail {}
-
-/// @brief Plain old class object (POCO) types for loading configuration file
-namespace poco {}
 } // namespace host

@@ -8,7 +8,14 @@
 #include <unordered_map>
 #include <vector>
 
+/**
+ * @brief Data structures containing model parameters and configuration options
+ *
+ * POCO stands for "plain old class object". These structs represent data structures
+ * which are contained in JSON-formatted configuration files.
+ */
 namespace host::poco {
+//! Information about a data file to be loaded
 struct FileInfo {
     std::filesystem::path name;
     std::string format;
@@ -18,6 +25,7 @@ struct FileInfo {
     auto operator<=>(const FileInfo &rhs) const = default;
 };
 
+//! Experiment's population settings
 struct SettingsInfo {
     std::string country;
     hgps::core::IntegerInterval age_range;
@@ -26,6 +34,7 @@ struct SettingsInfo {
     auto operator<=>(const SettingsInfo &rhs) const = default;
 };
 
+//! Socio-economic status (SES) model inputs
 struct SESInfo {
     std::string function;
     std::vector<double> parameters;
@@ -33,6 +42,7 @@ struct SESInfo {
     auto operator<=>(const SESInfo &) const = default;
 };
 
+//! Baseline adjustment information
 struct BaselineInfo {
     std::string format;
     std::string delimiter;
@@ -42,6 +52,7 @@ struct BaselineInfo {
     auto operator<=>(const BaselineInfo &rhs) const = default;
 };
 
+//! Information about a health risk factor
 struct RiskFactorInfo {
     std::string name;
     int level{};
@@ -50,12 +61,14 @@ struct RiskFactorInfo {
     auto operator<=>(const RiskFactorInfo &rhs) const = default;
 };
 
+//! User-defined model and parameter information
 struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
     std::unordered_map<std::string, std::filesystem::path> risk_factor_models;
     BaselineInfo baseline_adjustment;
 };
 
+//! Experiment output folder and file information
 struct OutputInfo {
     unsigned int comorbidities{};
     std::string folder{};
@@ -64,6 +77,7 @@ struct OutputInfo {
     auto operator<=>(const OutputInfo &rhs) const = default;
 };
 
+//! Information about the period over which a policy is applied
 struct PolicyPeriodInfo {
     int start_time{};
     std::optional<int> finish_time;
@@ -79,6 +93,7 @@ struct PolicyPeriodInfo {
     auto operator<=>(const PolicyPeriodInfo &rhs) const = default;
 };
 
+//! Information about policy impacts
 struct PolicyImpactInfo {
     std::string risk_factor{};
     double impact_value{};
@@ -95,6 +110,7 @@ struct PolicyImpactInfo {
     auto operator<=>(const PolicyImpactInfo &rhs) const = default;
 };
 
+//! Extra adjustments made to a policy
 struct PolicyAdjustmentInfo {
     std::string risk_factor{};
     double value{};
@@ -102,6 +118,7 @@ struct PolicyAdjustmentInfo {
     auto operator<=>(const PolicyAdjustmentInfo &rhs) const = default;
 };
 
+//! Information about an active policy intervention
 struct PolicyScenarioInfo {
     std::string identifier{};
     PolicyPeriodInfo active_period;
