@@ -18,15 +18,11 @@ namespace hgps::core {
 /// @brief HealthGPS base exception class, with source location information
 class HgpsException : public std::runtime_error {
   public:
-    /// @brief Construct a new HgpsException object
-    /// @param what_arg Debug messafe for the exception
+    /// @brief Construct a new HgpsException
+    /// @param what_arg The exception message
     /// @param location Source location (defaults to current location)
     HgpsException(const std::string &what_arg,
                   const source_location location = source_location::current());
-
-    /// @brief Gets the exception debug message
-    /// @return The debug message
-    const char *what() const noexcept override;
 
     /// @brief Gets the exception source location line
     /// @return The location line
@@ -45,7 +41,6 @@ class HgpsException : public std::runtime_error {
     constexpr const char *function_name() const noexcept;
 
   private:
-    std::string what_arg_;
     source_location location_;
 };
 
