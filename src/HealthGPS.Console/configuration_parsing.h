@@ -16,7 +16,6 @@ void load_input_info(const nlohmann::json &j, Configuration &config);
 /// @brief Load ModellingInfo from JSON
 /// @param j The root JSON object
 /// @param config The config object to update
-/// @param config_dir The directory of the config file
 /// @throw ConfigurationError: Could not load modelling info
 void load_modelling_info(const nlohmann::json &j, Configuration &config);
 

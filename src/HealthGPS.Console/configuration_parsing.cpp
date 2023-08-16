@@ -31,16 +31,16 @@ void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path 
 }
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &path,
+bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &out,
                           const std::filesystem::path &base_dir) noexcept {
-    if (!get_to(j, key, path)) {
+    if (!get_to(j, key, out)) {
         return false;
     }
 
     try {
-        rebase_valid_path(path, base_dir);
+        rebase_valid_path(out, base_dir);
     } catch (const ConfigurationError &) {
-        fmt::print(fg(fmt::color::red), "Could not find file {}\n", path.string());
+        fmt::print(fg(fmt::color::red), "Could not find file {}\n", out.string());
         return false;
     }
 
@@ -48,9 +48,9 @@ bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem
 }
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-void rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &path,
+void rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &out,
                           const std::filesystem::path &base_dir, bool &success) noexcept {
-    if (!rebase_valid_path_to(j, key, path, base_dir)) {
+    if (!rebase_valid_path_to(j, key, out, base_dir)) {
         success = false;
     }
 }

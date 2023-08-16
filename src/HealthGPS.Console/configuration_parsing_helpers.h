@@ -61,17 +61,17 @@ void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path 
 /// @param j JSON object
 /// @param key Key to value
 /// @param base_dir Base directory for relative path
-/// @param path Output variable
+/// @param out Output variable
 /// @return True if value was retrieved successfully and is valid path, false otherwise
 bool rebase_valid_path_to(const nlohmann::json &j, const std::string &key,
-                          std::filesystem::path &path,
+                          std::filesystem::path &out,
                           const std::filesystem::path &base_dir) noexcept;
 
 /// @brief Get a valid path from a JSON object
 /// @param j JSON object
 /// @param key Key to value
 /// @param base_dir Base directory for relative path
-/// @param path Output variable
+/// @param out Output variable
 /// @param success Success flag, set to false in case of failure
 void rebase_valid_path_to(const nlohmann::json &j, const std::string &key,
                           std::filesystem::path &out, const std::filesystem::path &base_dir,
