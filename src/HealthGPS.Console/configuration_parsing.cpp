@@ -20,7 +20,7 @@ nlohmann::json get(const json &j, const std::string &key) {
 
 void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path &base_dir) try {
     if (path.is_relative()) {
-        path = std::filesystem::weakly_canonical(base_dir / path);
+        path = std::filesystem::absolute(base_dir / path);
     }
 
     if (!std::filesystem::exists(path)) {
