@@ -1,3 +1,13 @@
+/**
+ * @file
+ * @brief Helper functions used by the JSON library to (de)serialise data structures
+ *
+ * Configuration file serialisation / de-serialisation mapping specific to the `JSON for
+ * Modern C++` library adopted by the project.
+ *
+ * @sa https://github.com/nlohmann/json#arbitrary-types-conversions for details about
+ * the contents and code structure in this file.
+ */
 #pragma once
 #include "poco.h"
 #include "riskmodel.h"
@@ -7,12 +17,6 @@
 
 namespace host::poco {
 /// @brief JSON parser namespace alias.
-///
-/// Configuration file serialisation / de-serialisation mapping specific
-/// to the `JSON for Modern C++` library adopted by the project.
-///
-/// @sa https://github.com/nlohmann/json#arbitrary-types-conversions
-/// for details about the contents and code structure in this file.
 using json = nlohmann::json;
 
 //--------------------------------------------------------

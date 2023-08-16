@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @brief This file contains functions for loading subsections of the main JSON file
+ */
 #pragma once
 #include "configuration.h"
 

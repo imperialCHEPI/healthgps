@@ -1,3 +1,11 @@
+/**
+ * @file configuration_parsing_helpers.h
+ * @brief This file contains helper functions used by the configuration parsing code
+ *
+ * The reason for placing these definitions in a separate header is so as to keep the
+ * main configuration_parsing.h file tidy, whilst also making them available to testing
+ * code.
+ */
 #pragma once
 #include "configuration.h"
 #include "poco.h"

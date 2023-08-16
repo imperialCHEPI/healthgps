@@ -1,3 +1,7 @@
+/**
+ * @file
+ * @brief Functionality for parsing console application's command-line arguments
+ */
 #pragma once
 #include <cxxopts.hpp>
 
