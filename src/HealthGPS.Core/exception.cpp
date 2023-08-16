@@ -1,7 +1,6 @@
 #include "exception.h"
 
 #include <fmt/format.h>
-#include <iostream>
 
 namespace hgps::core {
 
