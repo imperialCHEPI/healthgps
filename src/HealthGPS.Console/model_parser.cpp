@@ -36,7 +36,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
                      load_baseline_from_csv(male_filename, info.delimiter));
         data.emplace(hgps::core::Gender::female,
                      load_baseline_from_csv(female_filename, info.delimiter));
-    } catch (const std::exception &ex) {
+    } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
     }
