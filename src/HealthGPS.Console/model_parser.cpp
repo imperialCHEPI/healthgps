@@ -24,24 +24,24 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
     MEASURE_FUNCTION();
     auto &male_filename = info.file_names.at("factorsmean_male");
     auto &female_filename = info.file_names.at("factorsmean_female");
+    auto data =
+        std::map<hgps::core::Gender, std::map<hgps::core::Identifier, std::vector<double>>>{};
+
+    if (!hgps::core::case_insensitive::equals(info.format, "CSV")) {
+        throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
+    }
 
     try {
-
-        if (hgps::core::case_insensitive::equals(info.format, "CSV")) {
-            auto data = std::map<hgps::core::Gender,
-                                 std::map<hgps::core::Identifier, std::vector<double>>>{};
-            data.emplace(hgps::core::Gender::male,
-                         load_baseline_from_csv(male_filename, info.delimiter));
-            data.emplace(hgps::core::Gender::female,
-                         load_baseline_from_csv(female_filename, info.delimiter));
-            return hgps::BaselineAdjustment{hgps::FactorAdjustmentTable{std::move(data)}};
-        } else {
-            throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
-        }
+        data.emplace(hgps::core::Gender::male,
+                     load_baseline_from_csv(male_filename, info.delimiter));
+        data.emplace(hgps::core::Gender::female,
+                     load_baseline_from_csv(female_filename, info.delimiter));
     } catch (const std::exception &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
     }
+
+    return hgps::BaselineAdjustment{hgps::FactorAdjustmentTable{std::move(data)}};
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
