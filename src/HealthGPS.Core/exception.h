@@ -24,12 +24,6 @@ class HgpsException : public std::runtime_error {
     HgpsException(const std::string &what_arg,
                   const source_location location = source_location::current());
 
-    /// @brief Construct a new HgpsException object
-    /// @param what_arg Debug message for the exception
-    /// @param location Source location (defaults to current location)
-    HgpsException(const char *what_arg,
-                  const source_location location = source_location::current());
-
     /// @brief Gets the exception debug message
     /// @return The debug message
     const char *what() const noexcept override;
