@@ -18,20 +18,19 @@ nlohmann::json get(const json &j, const std::string &key) {
     }
 }
 
-void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path &base_dir) {
+void rebase_valid_path(std::filesystem::path &path, const std::filesystem::path &base_dir) try {
     if (path.is_relative()) {
-        try {
-            path = std::filesystem::weakly_canonical(base_dir / path);
-        } catch (const std::filesystem::filesystem_error &) {
-            throw ConfigurationError{fmt::format("OS error while reading {}", path.string())};
-        }
+        path = std::filesystem::weakly_canonical(base_dir / path);
     }
 
     if (!std::filesystem::exists(path)) {
         throw ConfigurationError{fmt::format("Path does not exist: {}", path.string())};
     }
+} catch (const std::filesystem::filesystem_error &) {
+    throw ConfigurationError{fmt::format("OS error while reading path {}", path.string())};
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &path,
                           const std::filesystem::path &base_dir) noexcept {
     if (!get_to(j, key, path)) {
@@ -48,6 +47,7 @@ bool rebase_valid_path_to(const json &j, const std::string &key, std::filesystem
     return true;
 }
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 void rebase_valid_path_to(const json &j, const std::string &key, std::filesystem::path &path,
                           const std::filesystem::path &base_dir, bool &success) noexcept {
     if (!rebase_valid_path_to(j, key, path, base_dir)) {
