@@ -27,7 +27,7 @@ class MappingEntry {
     /// @param name Risk factor name
     /// @param level The hierarchical level
     /// @param range The factor range
-    MappingEntry(std::string name, int level, OptionalInterval range = {});
+    MappingEntry(std::string name, int level, OptionalInterval range);
 
     /// @brief Gets the factor name
     /// @return Factor name
