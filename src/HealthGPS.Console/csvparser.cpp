@@ -90,7 +90,8 @@ hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info) {
     using namespace rapidcsv;
 
     bool success = true;
-    Document doc{file_info.name, LabelParams{}, SeparatorParams{file_info.delimiter.front()}};
+    Document doc{file_info.name.string(), LabelParams{},
+                 SeparatorParams{file_info.delimiter.front()}};
 
     // Validate columns and create file columns map
     auto headers = doc.GetColumnNames();

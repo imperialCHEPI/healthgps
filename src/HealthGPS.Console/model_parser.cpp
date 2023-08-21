@@ -1,4 +1,5 @@
 #include "model_parser.h"
+#include "configuration_parsing_helpers.h"
 #include "csvparser.h"
 #include "jsonparser.h"
 
@@ -22,8 +23,8 @@ namespace host {
 
 hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info) {
     MEASURE_FUNCTION();
-    auto &male_filename = info.file_names.at("factorsmean_male");
-    auto &female_filename = info.file_names.at("factorsmean_female");
+    const auto male_filename = info.file_names.at("factorsmean_male").string();
+    const auto female_filename = info.file_names.at("factorsmean_female").string();
     auto data =
         std::map<hgps::core::Gender, std::map<hgps::core::Identifier, std::vector<double>>>{};
 
@@ -241,20 +242,11 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
     }
 
     // Foods nutrition data table.
-    auto foods_file_info = opt["FoodsDataFile"].get<poco::FileInfo>();
-    std::filesystem::path file_path = foods_file_info.name;
-    if (file_path.is_relative()) {
-        file_path = config.root_path / file_path;
-        foods_file_info.name = file_path.string();
-    }
-    if (!std::filesystem::exists(file_path)) {
-        throw hgps::core::HgpsException{
-            fmt::format("Foods nutrition dataset file: {} not found.\n", file_path.string())};
-    }
-    auto foods_data_table = load_datatable_from_csv(foods_file_info);
+    const auto foods_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
+    const auto foods_data_table = load_datatable_from_csv(foods_file_info);
 
     // Load M/F average heights for age.
-    unsigned int max_age = config.settings.age_range.back();
+    const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
     if (male_height.size() <= max_age) {
@@ -290,10 +282,11 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     throw hgps::core::HgpsException{fmt::format("Unknown model type: {}", model_type)};
 }
 
-poco::json load_json(const std::string &model_filename) {
-    std::ifstream ifs(model_filename, std::ifstream::in);
+poco::json load_json(const std::filesystem::path &model_path) {
+    std::ifstream ifs(model_path, std::ifstream::in);
     if (!ifs.good()) {
-        throw hgps::core::HgpsException{fmt::format("Model file: {} not found", model_filename)};
+        throw hgps::core::HgpsException{
+            fmt::format("Model file: {} not found", model_path.string())};
     }
 
     return poco::json::parse(ifs);
@@ -315,17 +308,13 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
     }
 
     auto adjustment = load_baseline_adjustments(config.modelling.baseline_adjustment);
-    auto age_range = hgps::core::IntegerInterval(config.settings.age_range.front(),
-                                                 config.settings.age_range.back());
-    auto max_age = static_cast<std::size_t>(age_range.upper());
+    auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
     for (const auto &table : adjustment.values) {
         for (const auto &item : table.second) {
             if (item.second.size() <= max_age) {
-                fmt::print(fg(fmt::color::red),
-                           "Baseline adjustment files data must cover age range: [{}].\n",
-                           age_range.to_string());
                 throw hgps::core::HgpsException{
-                    "Baseline adjustment file must cover the required age range."};
+                    fmt::format("Baseline adjustment file must cover the required age range: [{}].",
+                                config.settings.age_range.to_string())};
             }
         }
     }

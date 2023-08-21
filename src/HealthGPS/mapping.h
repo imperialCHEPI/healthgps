@@ -1,5 +1,6 @@
 #pragma once
 #include "HealthGPS.Core/identifier.h"
+#include "HealthGPS.Core/interval.h"
 
 #include <stdexcept>
 #include <string>
@@ -12,7 +13,7 @@ namespace hgps {
 inline const core::Identifier InterceptKey = core::Identifier{"intercept"};
 
 /// @brief Optional Range of doubles data type
-using OptionalRange = std::optional<std::pair<double, double>>;
+using OptionalInterval = std::optional<core::DoubleInterval>;
 
 /// @brief Defines risk factor mapping entry data type
 ///
@@ -26,7 +27,7 @@ class MappingEntry {
     /// @param name Risk factor name
     /// @param level The hierarchical level
     /// @param range The factor range
-    MappingEntry(std::string name, int level, OptionalRange range = {});
+    MappingEntry(std::string name, int level, OptionalInterval range = {});
 
     /// @brief Gets the factor name
     /// @return Factor name
@@ -42,7 +43,7 @@ class MappingEntry {
 
     /// @brief Gets the factor allowed values range
     /// @return Factor values range
-    const OptionalRange &range() const noexcept;
+    const OptionalInterval &range() const noexcept;
 
     /// @brief Adjusts a value to the factor range, if provided
     /// @param value The value to adjust
@@ -53,7 +54,7 @@ class MappingEntry {
     std::string name_;
     core::Identifier name_key_;
     int level_{};
-    OptionalRange range_;
+    OptionalInterval range_;
 };
 
 /// @brief Defines the hierarchical model mapping data type

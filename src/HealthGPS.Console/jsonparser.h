@@ -1,5 +1,15 @@
+/**
+ * @file
+ * @brief Helper functions used by the JSON library to (de)serialise data structures
+ *
+ * Configuration file serialisation / de-serialisation mapping specific to the `JSON for
+ * Modern C++` library adopted by the project.
+ *
+ * @sa https://github.com/nlohmann/json#arbitrary-types-conversions for details about
+ * the contents and code structure in this file.
+ */
 #pragma once
-#include "options.h"
+#include "poco.h"
 #include "riskmodel.h"
 
 #include <nlohmann/json.hpp>
@@ -7,12 +17,6 @@
 
 namespace host::poco {
 /// @brief JSON parser namespace alias.
-///
-/// Configuration file serialisation / de-serialisation mapping specific
-/// to the `JSON for Modern C++` library adopted by the project.
-///
-/// @sa https://github.com/nlohmann/json#arbitrary-types-conversions
-/// for details about the contents and code structure in this file.
 using json = nlohmann::json;
 
 //--------------------------------------------------------
@@ -39,7 +43,6 @@ void from_json(const json &j, HierarchicalLevelInfo &p);
 
 // Data file information
 void to_json(json &j, const FileInfo &p);
-void from_json(const json &j, FileInfo &p);
 
 // Settings Information
 void to_json(json &j, const SettingsInfo &p);
@@ -49,9 +52,8 @@ void from_json(const json &j, SettingsInfo &p);
 void to_json(json &j, const SESInfo &p);
 void from_json(const json &j, SESInfo &p);
 
-// Baseline scenario adjustments
+// Baseline model information
 void to_json(json &j, const BaselineInfo &p);
-void from_json(const json &j, BaselineInfo &p);
 
 // Lite risk factors models (Energy Balance Model)
 void to_json(json &j, const RiskFactorInfo &p);
@@ -59,9 +61,6 @@ void from_json(const json &j, RiskFactorInfo &p);
 
 void to_json(json &j, const VariableInfo &p);
 void from_json(const json &j, VariableInfo &p);
-
-void to_json(json &j, const ModellingInfo &p);
-void from_json(const json &j, ModellingInfo &p);
 
 void to_json(json &j, const FactorDynamicEquationInfo &p);
 void from_json(const json &j, FactorDynamicEquationInfo &p);
@@ -84,6 +83,23 @@ void to_json(json &j, const OutputInfo &p);
 void from_json(const json &j, OutputInfo &p);
 
 } // namespace host::poco
+
+namespace hgps::core {
+using json = nlohmann::json;
+
+template <class T> void to_json(json &j, const Interval<T> &interval) {
+    j = json::array({interval.lower(), interval.upper()});
+}
+
+template <class T> void from_json(const json &j, Interval<T> &interval) {
+    const auto vec = j.get<std::vector<T>>();
+    if (vec.size() != 2) {
+        throw json::type_error::create(302, "Interval arrays must have only two elements", nullptr);
+    }
+
+    interval = Interval<T>{vec[0], vec[1]};
+}
+} // namespace hgps::core
 
 namespace std {
 

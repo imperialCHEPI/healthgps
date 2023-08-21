@@ -1,7 +1,9 @@
 #pragma once
 #include <functional>
+#include <map>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 
 #include "nlohmann/json.hpp"
 
@@ -80,16 +82,33 @@ struct Identifier final {
     std::string value_{};
     std::size_t hash_code_{std::hash<std::string>{}("")};
 
-    void validate_identifeir() const;
+    void validate_identifier() const;
 };
 
 void from_json(const nlohmann::json &j, Identifier &id);
 
-void from_json(const nlohmann::json &j, std::map<Identifier, double> &map);
+namespace detail {
+template <template <typename...> class Map, class Value>
+void map_from_json(const nlohmann::json &j, Map<hgps::core::Identifier, Value> &map) {
+    map.clear();
+    for (const auto &item : j.items()) {
+        map.emplace(item.key(), item.value().get<Value>());
+    }
+}
+} // namespace detail
 
 } // namespace hgps::core
 
 namespace std {
+template <class T>
+void from_json(const nlohmann::json &j, std::map<hgps::core::Identifier, T> &map) {
+    hgps::core::detail::map_from_json(j, map);
+}
+
+template <class T>
+void from_json(const nlohmann::json &j, std::unordered_map<hgps::core::Identifier, T> &map) {
+    hgps::core::detail::map_from_json(j, map);
+}
 
 /// @brief Hash code function for Identifier type to be used in unordered containers
 template <> struct hash<hgps::core::Identifier> {
