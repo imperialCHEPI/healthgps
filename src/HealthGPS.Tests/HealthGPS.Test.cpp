@@ -37,10 +37,11 @@ void create_test_datatable(hgps::core::DataTable &data) {
         gender_builder.append(gender_values[i]);
         age_builder.append(age_values[i]);
         edu_builder.append(edu_values[i]);
-        if (std::isnan(inc_values[i]))
+        if (std::isnan(inc_values[i])) {
             inc_builder.append_null();
-        else
+        } else {
             inc_builder.append(inc_values[i]);
+        }
     }
 
     data.add(gender_builder.build());
@@ -272,10 +273,11 @@ TEST(TestHealthGPS, ModuleFactoryRegistry) {
     auto count = 10U;
     auto builder = core::FloatDataTableColumnBuilder("Test");
     for (size_t i = 0; i < count; i++) {
-        if ((i % 2) == 0)
+        if ((i % 2) == 0) {
             builder.append(i * 2.5f);
-        else
+        } else {
             builder.append_null();
+        }
     }
 
     auto data = core::DataTable();
@@ -310,7 +312,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry) {
                              });
 
     auto base_module = factory.create(SimulationModuleType::Analysis, config);
-    auto country_mod = static_cast<CountryModule *>(base_module.get());
+    auto *country_mod = static_cast<CountryModule *>(base_module.get());
     country_mod->execute("print");
 
     ASSERT_EQ(SimulationModuleType::Analysis, country_mod->type());
@@ -363,9 +365,9 @@ TEST(TestHealthGPS, CreateDemographicModule) {
 
     auto pop_module = build_population_module(repository, config);
     auto total_pop = pop_module->get_total_population_size(config.start_time());
-    auto &pop_dist = pop_module->get_population_distribution(config.start_time());
+    const auto &pop_dist = pop_module->get_population_distribution(config.start_time());
     auto sum_dist = 0.0f;
-    for (auto &pair : pop_dist) {
+    for (const auto &pair : pop_dist) {
         sum_dist += pair.second.total();
     }
     ASSERT_EQ(SimulationModuleType::Demographic, pop_module->type());

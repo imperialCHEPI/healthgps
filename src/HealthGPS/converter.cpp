@@ -21,7 +21,7 @@ core::Gender StoreConverter::to_gender(const std::string name) {
 DiseaseTable StoreConverter::to_disease_table(const core::DiseaseEntity &entity) {
     auto measures = entity.measures;
     auto data = std::map<int, std::map<core::Gender, DiseaseMeasure>>();
-    for (auto &v : entity.items) {
+    for (const auto &v : entity.items) {
         data[v.with_age][v.gender] = DiseaseMeasure(v.measures);
     }
 
@@ -45,7 +45,7 @@ FloatAgeGenderTable StoreConverter::to_relative_risk_table(const core::RelativeR
     auto rows = std::vector<int>(num_rows);
     auto data = core::FloatArray2D(num_rows, num_cols);
     for (size_t i = 0; i < num_rows; i++) {
-        auto &row = entity.rows[i];
+        const auto &row = entity.rows[i];
         rows[i] = static_cast<int>(row[0]);
         for (size_t j = 1; j < row.size(); j++) {
             data(i, j - 1) = row[j];
@@ -78,7 +78,7 @@ RelativeRiskLookup StoreConverter::to_relative_risk_lookup(const core::RelativeR
 
 RelativeRisk create_relative_risk(const RelativeRiskInfo &info) {
     RelativeRisk result;
-    for (auto &item : info.inputs.diseases()) {
+    for (const auto &item : info.inputs.diseases()) {
         auto table = info.manager.get_relative_risk_to_disease(info.disease, item);
         if (!table.empty() && !table.is_default_value) {
             result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(table));
@@ -141,12 +141,12 @@ StoreConverter::to_analysis_definition(const core::DiseaseAnalysisEntity &entity
 LifeTable StoreConverter::to_life_table(const std::vector<core::BirthItem> &births,
                                         const std::vector<core::MortalityItem> &deaths) {
     auto table_births = std::map<int, Birth>{};
-    for (auto &item : births) {
+    for (const auto &item : births) {
         table_births.emplace(item.at_time, Birth{item.number, item.sex_ratio});
     }
 
     auto table_deaths = std::map<int, std::map<int, Mortality>>{};
-    for (auto &item : deaths) {
+    for (const auto &item : deaths) {
         table_deaths[item.at_time].emplace(item.with_age, Mortality(item.males, item.females));
     }
 
@@ -155,19 +155,19 @@ LifeTable StoreConverter::to_life_table(const std::vector<core::BirthItem> &birt
 
 DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParameterEntity &entity) {
     auto distribution = ParameterLookup{};
-    for (auto &item : entity.prevalence_distribution) {
+    for (const auto &item : entity.prevalence_distribution) {
         distribution.emplace(item.value, DoubleGenderValue(item.male, item.female));
     }
 
     auto survival = ParameterLookup{};
-    for (auto &item : entity.survival_rate) {
+    for (const auto &item : entity.survival_rate) {
         survival.emplace(item.value, DoubleGenderValue(item.male, item.female));
     }
 
     // Make sure that the deaths table is zero based!
     auto deaths = ParameterLookup{};
     auto offset = entity.death_weight.front().value;
-    for (auto &item : entity.death_weight) {
+    for (const auto &item : entity.death_weight) {
         deaths.emplace(item.value - offset, DoubleGenderValue(item.male, item.female));
     }
 
@@ -176,7 +176,7 @@ DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParamete
 
 LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataRow> &dataset) {
     auto lms_dataset = LmsDataset{};
-    for (auto &row : dataset) {
+    for (const auto &row : dataset) {
         lms_dataset[row.age][row.gender] =
             LmsRecord{.lambda = row.lambda, .mu = row.mu, .sigma = row.sigma};
     }

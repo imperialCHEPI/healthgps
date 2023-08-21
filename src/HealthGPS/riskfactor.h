@@ -28,7 +28,7 @@ class RiskFactorModule final : public RiskFactorHostModule {
 
     std::size_t size() const noexcept override;
 
-    bool contains(const HierarchicalModelType &modelType) const noexcept override;
+    bool contains(const HierarchicalModelType &model_type) const noexcept override;
 
     HierarchicalLinearModel &at(const HierarchicalModelType &model_type) const;
 

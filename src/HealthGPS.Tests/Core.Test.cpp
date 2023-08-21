@@ -9,7 +9,7 @@ TEST(TestCore, CreateCountry) {
     using namespace hgps::core;
 
     unsigned short id = 826;
-    auto uk = "United Kingdom";
+    const auto *uk = "United Kingdom";
 
     auto c = Country{.code = id, .name = uk, .alpha2 = "GB", .alpha3 = "GBR"};
 
@@ -132,7 +132,7 @@ TEST(TestCore, TableColumnIterator) {
                                          {true, true, true, false, true, false, true});
 
     double loop_sum = 0.0;
-    for (auto &item : dbl_col) {
+    for (const auto &item : dbl_col) {
         loop_sum += item.value_or(0.0);
     }
 
@@ -172,8 +172,8 @@ TEST(TestCore, CreateDataTable) {
     table.add(int_builder.build());
 
     // Casting to columns type
-    auto &col = table.column("Integer");
-    auto &int_col = static_cast<const IntegerDataTableColumn &>(col);
+    const auto &col = table.column("Integer");
+    const auto &int_col = static_cast<const IntegerDataTableColumn &>(col);
 
     auto slow_value = std::any_cast<int>(col.value(1));
     auto safe_value = int_col.value_safe(1);
@@ -220,7 +220,7 @@ TEST(TestCore, DataTableFailDuplicateColumn) {
 TEST(TestCore, CaseInsensitiveString) {
     using namespace hgps::core;
 
-    auto source = "The quick brown fox jumps over the lazy dog";
+    const auto *source = "The quick brown fox jumps over the lazy dog";
 
     ASSERT_TRUE(case_insensitive::equals("fox", "Fox"));
     ASSERT_TRUE(case_insensitive::contains(source, "FOX"));
@@ -294,10 +294,10 @@ TEST(TestCore, CaseInsensitiveMap) {
 TEST(TestCore, SplitDelimitedString) {
     using namespace hgps::core;
 
-    auto source = "The quick brown fox jumps over the lazy dog";
+    const auto *source = "The quick brown fox jumps over the lazy dog";
     auto parts = split_string(source, " ");
 
-    auto csv_source = "The,quick,brown,fox,jumps,over,the,lazy,dog";
+    const auto *csv_source = "The,quick,brown,fox,jumps,over,the,lazy,dog";
     auto csv_parts = split_string(csv_source, ",");
 
     ASSERT_EQ(9, parts.size());

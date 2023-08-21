@@ -4,12 +4,15 @@
 namespace hgps::core {
 
 std::string trim(std::string value) noexcept {
-    while (!value.empty() && std::isspace(value.back()))
+    while (!value.empty() && std::isspace(value.back())) {
         value.pop_back();
+    }
 
     std::size_t pos = 0;
-    while (pos < value.size() && std::isspace(value[pos]))
+    while (pos < value.size() && std::isspace(value[pos])) {
         ++pos;
+    }
+
     return value.substr(pos);
 }
 
@@ -62,7 +65,8 @@ std::weak_ordering case_insensitive::compare(const std::string_view &left,
     int cmp = to_lower(left).compare(to_lower(right));
     if (cmp < 0) {
         return std::weak_ordering::less;
-    } else if (cmp > 0) {
+    }
+    if (cmp > 0) {
         return std::weak_ordering::greater;
     }
 
@@ -86,8 +90,8 @@ bool case_insensitive::contains(const std::string_view &text,
         return false;
     }
 
-    auto it = std::search(text.cbegin(), text.cend(), str.cbegin(), str.cend(),
-                          [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+    const auto *it = std::search(text.cbegin(), text.cend(), str.cbegin(), str.cend(),
+                                 [](char a, char b) { return std::tolower(a) == std::tolower(b); });
 
     return it != text.cend();
 }
@@ -99,8 +103,9 @@ bool case_insensitive::starts_with(const std::string_view &text,
         return false;
     }
 
-    auto it = std::search(text.cbegin(), text.cbegin() + str.length(), str.cbegin(), str.cend(),
-                          [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+    const auto *it =
+        std::search(text.cbegin(), text.cbegin() + str.length(), str.cbegin(), str.cend(),
+                    [](char a, char b) { return std::tolower(a) == std::tolower(b); });
 
     return it == text.cbegin();
 }

@@ -122,7 +122,7 @@ void UnivariateSummary::append(const std::optional<double> &option) noexcept {
 }
 
 void UnivariateSummary::append(const std::vector<double> &values) noexcept {
-    for (auto &v : values) {
+    for (const auto &v : values) {
         append(v);
     }
 }

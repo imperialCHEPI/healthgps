@@ -17,7 +17,7 @@ inline constexpr double DALY_UNITS = 100'000.0;
 AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
                                const core::IntegerInterval age_range, unsigned int comorbidities)
     : definition_{std::move(definition)}, weight_classifier_{std::move(classifier)},
-      residual_disability_weight_{create_age_gender_table<double>(age_range)}, channels_{},
+      residual_disability_weight_{create_age_gender_table<double>(age_range)},
       comorbidities_{comorbidities} {}
 
 SimulationModuleType AnalysisModule::type() const noexcept {
@@ -27,7 +27,7 @@ SimulationModuleType AnalysisModule::type() const noexcept {
 const std::string &AnalysisModule::name() const noexcept { return name_; }
 
 void AnalysisModule::initialise_population(RuntimeContext &context) {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
@@ -290,12 +290,12 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
         }
 
         series(gender, "count").at(age)++;
-        for (auto &factor : context.mapping().entries()) {
+        for (const auto &factor : context.mapping().entries()) {
             series(gender, factor.key().to_string()).at(age) +=
                 entity.get_risk_factor_value(factor.key());
         }
 
-        for (auto &item : entity.diseases) {
+        for (const auto &item : entity.diseases) {
             if (item.second.status == DiseaseStatus::active) {
                 series(gender, item.first.to_string()).at(age)++;
             }
@@ -318,7 +318,7 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
 
     // Calculate in-place averages
     for (auto index = min_age; index <= max_age; index++) {
-        for (auto &chan : series.channels()) {
+        for (const auto &chan : series.channels()) {
             if (chan == "count") {
                 continue;
             }
@@ -368,11 +368,11 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     channels_.push_back("count");
-    for (auto &factor : context.mapping().entries()) {
+    for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }
 
-    for (auto &disease : context.diseases()) {
+    for (const auto &disease : context.diseases()) {
         channels_.emplace_back(disease.code.to_string());
     }
 

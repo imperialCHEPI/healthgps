@@ -67,7 +67,7 @@ TEST(TestHealthGPS_Mapping, AccessAllEntries) {
     auto entries = create_mapping_entries();
     auto exp_size = entries.size();
     auto mapping = HierarchicalMapping(std::move(entries));
-    auto &all_entries = mapping.entries();
+    const auto &all_entries = mapping.entries();
 
     ASSERT_EQ(exp_size, all_entries.size());
 }

@@ -23,21 +23,21 @@ Person &Population::at(std::size_t index) { return people_.at(index); }
 
 const Person &Population::at(std::size_t index) const { return people_.at(index); }
 
-void Population::add(Person &&entity, unsigned int time) noexcept {
+void Population::add(Person &&person, unsigned int time) noexcept {
     auto recycle = find_index_of_recyclables(time, 1);
-    if (recycle.size() > 0) {
-        people_.at(recycle.at(0)) = entity;
+    if (!recycle.empty()) {
+        people_.at(recycle.at(0)) = person;
         return;
     }
 
-    people_.emplace_back(entity);
+    people_.emplace_back(person);
 }
 
 void Population::add_newborn_babies(std::size_t number, core::Gender gender,
                                     unsigned int time) noexcept {
     auto recycle = find_index_of_recyclables(time, number);
     auto remaining = number;
-    if (recycle.size() > 0) {
+    if (!recycle.empty()) {
         auto replacebles = std::min(number, recycle.size());
         for (auto index = std::size_t{0}; index < replacebles; index++) {
             people_.at(recycle.at(index)) = Person{gender};
@@ -54,7 +54,7 @@ std::vector<int> Population::find_index_of_recyclables(unsigned int time,
                                                        std::size_t top) const noexcept {
     auto indices = std::vector<int>{};
     indices.reserve(top);
-    for (auto index = 0; auto &entity : people_) {
+    for (auto index = 0; const auto &entity : people_) {
         if (!entity.is_active() && entity.time_of_death() < time &&
             entity.time_of_migration() < time) {
             indices.emplace_back(index);

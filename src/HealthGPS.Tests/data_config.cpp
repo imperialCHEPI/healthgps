@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-std::string test_datastore_path = "";
+std::string test_datastore_path;
 
 std::string resolve_path(const std::string &relative_path) {
     namespace fs = std::filesystem;

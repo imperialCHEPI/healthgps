@@ -19,7 +19,7 @@ class RepositoryTest : public ::testing::Test {
 };
 
 TEST_F(RepositoryTest, CreateRepository) {
-    auto &diseases = repository.get_diseases();
+    const auto &diseases = repository.get_diseases();
     ASSERT_GT(diseases.size(), 0);
 }
 
@@ -27,14 +27,14 @@ TEST_F(RepositoryTest, DiseaseInfoIsCached) {
     using namespace std::chrono;
 
     auto start = steady_clock::now();
-    auto &diseases_cold = repository.get_diseases();
+    const auto &diseases_cold = repository.get_diseases();
     auto stop = steady_clock::now();
     auto duration_cold = (stop - start);
 
     auto number_of_trials = 13;
     for (auto i = 0; i < number_of_trials; i++) {
         start = steady_clock::now();
-        auto &diseases_hot = repository.get_diseases();
+        const auto &diseases_hot = repository.get_diseases();
         stop = steady_clock::now();
         auto duration_hot = (stop - start);
 
@@ -45,9 +45,9 @@ TEST_F(RepositoryTest, DiseaseInfoIsCached) {
 
 TEST_F(RepositoryTest, DiseaseInfoIsCaseInsensitive) {
     using namespace hgps;
-    auto &all_diseases = repository.get_diseases();
+    const auto &all_diseases = repository.get_diseases();
     ASSERT_GT(all_diseases.size(), 0);
-    auto &disease = all_diseases.at(0);
+    const auto &disease = all_diseases.at(0);
 
     auto code_title = disease.code.to_string();
     if (std::islower(code_title.at(0))) {

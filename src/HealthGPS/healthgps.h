@@ -84,6 +84,6 @@ class HealthGPS : public Simulation {
     hgps::IntegerAgeGenderTable create_net_migration();
     std::map<std::string, core::UnivariateSummary> create_input_data_summary() const;
 
-    Person partial_clone_entity(const Person &source) const noexcept;
+    static Person partial_clone_entity(const Person &source) noexcept;
 };
 } // namespace hgps

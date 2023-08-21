@@ -60,7 +60,7 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
     auto registry = get_default_disease_model_registry();
     auto models = std::map<core::Identifier, std::shared_ptr<DiseaseModel>>();
 
-    auto &diseases = config.diseases();
+    const auto &diseases = config.diseases();
     std::mutex m;
     std::for_each(
         core::execution_policy, std::begin(diseases), std::end(diseases), [&](auto &info) {

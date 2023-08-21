@@ -98,7 +98,7 @@ void ResultFileWriter::write_json_begin(const std::filesystem::path output) {
 
 void ResultFileWriter::write_json_end() { stream_ << "]}"; }
 
-std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage &message) const {
+std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage &message) {
     using json = nlohmann::ordered_json;
     using namespace hgps::core;
 
@@ -149,7 +149,7 @@ std::string ResultFileWriter::to_json_string(const hgps::ResultEventMessage &mes
 
 void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message) {
     csvstream_ << "source,run,time,gender_name,index_id";
-    for (auto &chan : message.content.series.channels()) {
+    for (const auto &chan : message.content.series.channels()) {
         csvstream_ << "," << chan;
     }
 
@@ -160,8 +160,8 @@ void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message)
 void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &message) {
     using namespace hgps::core;
 
-    auto sep = ",";
-    auto &series = message.content.series;
+    const auto *sep = ",";
+    const auto &series = message.content.series;
     std::stringstream mss;
     std::stringstream fss;
 
@@ -170,7 +170,7 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
             << "male" << sep << index;
         fss << message.source << sep << message.run_number << sep << message.model_time << sep
             << "female" << sep << index;
-        for (auto &key : series.channels()) {
+        for (const auto &key : series.channels()) {
             mss << sep << series.at(Gender::male, key).at(index);
             fss << sep << series.at(Gender::female, key).at(index);
         }

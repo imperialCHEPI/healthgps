@@ -5,7 +5,7 @@ namespace hgps {
 
 SimplePolicyScenario::SimplePolicyScenario(SyncChannel &data_sync,
                                            SimplePolicyDefinition &&definition)
-    : channel_{data_sync}, definition_{std::move(definition)}, factor_impact_{} {
+    : channel_{data_sync}, definition_{std::move(definition)} {
     for (const auto &factor : definition_.impacts) {
         factor_impact_.emplace(factor.risk_factor, factor);
     }

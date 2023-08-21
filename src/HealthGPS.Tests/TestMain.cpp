@@ -27,7 +27,8 @@ int main(int argc, char **argv) {
     if (result.count("help")) {
         std::cout << options.help() << std::endl;
         return EXIT_SUCCESS;
-    } else if (result.count("storage")) {
+    }
+    if (result.count("storage")) {
         storage_path = std::filesystem::path{result["storage"].as<std::string>()};
         if (storage_path.is_relative()) {
             storage_path = std::filesystem::absolute(storage_path);

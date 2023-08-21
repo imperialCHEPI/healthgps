@@ -47,7 +47,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
             current_risk_factors.at(age_key) = model_age;
         }
 
-        auto &equations = equations_at(model_age);
+        const auto &equations = equations_at(model_age);
         if (entity.gender == core::Gender::male) {
             update_risk_factors_exposure(context, entity, current_risk_factors, equations.male);
         } else {
@@ -57,7 +57,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
 }
 
 const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
-    for (auto &entry : equations_) {
+    for (const auto &entry : equations_) {
         if (entry.first.contains(age)) {
             // If there is an equation for the age, return it.
             return entry.second;
@@ -79,7 +79,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
     for (auto level = 1; level <= context.mapping().max_level(); level++) {
         auto level_factors = context.mapping().at_level(level);
         for (const auto &factor : level_factors) {
-            auto &factor_equation = equations.at(factor.key());
+            const auto &factor_equation = equations.at(factor.key());
 
             auto original_value = entity.get_risk_factor_value(factor.key());
             auto delta_factor = 0.0;
@@ -87,7 +87,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
                 if (current_risk_factors.contains(coeff.first)) {
                     delta_factor += coeff.second * current_risk_factors.at(coeff.first);
                 } else {
-                    auto &factor_key = variables_.at(coeff.first);
+                    const auto &factor_key = variables_.at(coeff.first);
                     delta_factor += coeff.second * delta_comp_factors.at(factor_key);
                 }
             }
@@ -108,7 +108,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
 
 std::map<core::Identifier, double>
 EnergyBalanceHierarchicalModel::get_current_risk_factors(const HierarchicalMapping &mapping,
-                                                         Person &entity) const {
+                                                         Person &entity) {
     auto entity_risk_factors = std::map<core::Identifier, double>();
     entity_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
     for (const auto &factor : mapping) {

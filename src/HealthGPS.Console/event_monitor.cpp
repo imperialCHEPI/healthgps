@@ -9,8 +9,7 @@
 
 namespace host {
 EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer)
-    : result_writer_{result_writer}, threads_{}, handlers_{}, info_queue_{}, results_queue_{},
-      cancel_source_{} {
+    : result_writer_{result_writer} {
     handlers_.emplace_back(
         event_bus.subscribe(hgps::EventType::runner, std::bind(&EventMonitor::info_event_handler,
                                                                this, std::placeholders::_1)));

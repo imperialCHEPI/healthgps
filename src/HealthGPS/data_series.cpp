@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 namespace hgps {
-DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size}, channels_{}, data_{} {
+DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
     data_.emplace(core::Gender::male, std::map<std::string, std::vector<double>>{});
     data_.emplace(core::Gender::female, std::map<std::string, std::vector<double>>{});
 }
@@ -36,7 +36,7 @@ void DataSeries::add_channel(std::string key) {
 }
 
 void DataSeries::add_channels(const std::vector<std::string> &keys) {
-    for (auto &item : keys) {
+    for (const auto &item : keys) {
         add_channel(item);
     }
 }

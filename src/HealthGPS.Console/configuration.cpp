@@ -249,7 +249,7 @@ create_intervention_scenario(SyncChannel &channel, const poco::PolicyScenarioInf
     fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
     auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
     auto risk_impacts = std::vector<PolicyImpact>{};
-    for (auto &item : info.impacts) {
+    for (const auto &item : info.impacts) {
         risk_impacts.emplace_back(PolicyImpact{core::Identifier{item.risk_factor},
                                                item.impact_value, item.from_age, item.to_age});
     }
@@ -285,7 +285,7 @@ create_intervention_scenario(SyncChannel &channel, const poco::PolicyScenarioInf
         const auto cutoff_age = info.child_cutoff_age.value();
         // NOLINTEND(bugprone-unchecked-optional-access)
 
-        auto &adjustment = info.adjustments.at(0);
+        const auto &adjustment = info.adjustments.at(0);
         auto definition = FoodLabellingDefinition{
             .active_period = period,
             .impacts = risk_impacts,
@@ -329,12 +329,12 @@ std::string expand_environment_variables(const std::string &path) {
     }
 
     std::string variable = post.substr(0, post.find('}'));
-    std::string value = "";
+    std::string value;
 
     post = post.substr(post.find('}') + 1);
-    const char *v = std::getenv(variable.c_str()); // C4996, but safe here.
-    if (v != NULL)
-        value = std::string(v);
+    if (const char *v = std::getenv(variable.c_str())) { // C4996, but safe here.
+        value = v;
+    }
 
     return expand_environment_variables(pre + value + post);
 }

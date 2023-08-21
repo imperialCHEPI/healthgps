@@ -5,15 +5,15 @@
 namespace hgps {
 LifeTable::LifeTable(std::map<int, Birth> &&births,
                      std::map<int, std::map<int, Mortality>> &&deaths)
-    : birth_table_{std::move(births)}, death_table_{std::move(deaths)}, time_range_{},
-      age_range_{} {
+    : birth_table_{std::move(births)}, death_table_{std::move(deaths)} {
     if (birth_table_.empty()) {
         if (!death_table_.empty()) {
             throw std::invalid_argument("empty births and deaths content mismatch");
         }
 
         return;
-    } else if (death_table_.empty()) {
+    }
+    if (death_table_.empty()) {
         throw std::invalid_argument("births and empty deaths content mismatch");
     }
 

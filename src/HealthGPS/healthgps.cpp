@@ -104,7 +104,7 @@ adevs::Time HealthGPS::update(adevs::SimEnv<int> *env) {
     return adevs_inf<adevs::Time>();
 }
 
-adevs::Time HealthGPS::update(adevs::SimEnv<int> *, std::vector<int> &) {
+adevs::Time HealthGPS::update(adevs::SimEnv<int> * /*env*/, std::vector<int> & /*x*/) {
     // This method is never called because nobody sends messages.
     return adevs_inf<adevs::Time>();
 }
@@ -196,12 +196,13 @@ IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
     auto start_population_size = static_cast<int>(definition_.inputs().settings().size_fraction() *
                                                   total_initial_population);
 
-    auto &current_population_table = demographic_->get_population_distribution(context_.time_now());
+    const auto &current_population_table =
+        demographic_->get_population_distribution(context_.time_now());
     auto expected_population = create_age_gender_table<int>(context_.age_range());
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
     for (int age = start_age; age <= end_age; age++) {
-        auto &age_info = current_population_table.at(age);
+        const auto &age_info = current_population_table.at(age);
         expected_population.at(age, core::Gender::male) = static_cast<int>(
             std::round(age_info.males * start_population_size / total_initial_population));
 
@@ -232,19 +233,19 @@ void HealthGPS::apply_net_migration(int net_value, const unsigned int &age,
                                     const core::Gender &gender) {
     if (net_value > 0) {
         auto &pop = context_.population();
-        auto similar_indeces =
+        auto similar_indices =
             core::find_index_of_all(core::execution_policy, pop, [&](const Person &entity) {
                 return entity.is_active() && entity.age == age && entity.gender == gender;
             });
 
-        if (similar_indeces.size() > 0) {
+        if (!similar_indices.empty()) {
             // Needed for repeatability in random selection
-            std::sort(similar_indeces.begin(), similar_indeces.end());
+            std::sort(similar_indices.begin(), similar_indices.end());
 
             for (auto trial = 0; trial < net_value; trial++) {
                 auto index =
-                    context_.random().next_int(static_cast<int>(similar_indeces.size()) - 1);
-                const auto &source = pop.at(similar_indeces.at(index));
+                    context_.random().next_int(static_cast<int>(similar_indices.size()) - 1);
+                const auto &source = pop.at(similar_indices.at(index));
                 context_.population().add(partial_clone_entity(source), context_.time_now());
             }
         }
@@ -275,18 +276,17 @@ hgps::IntegerAgeGenderTable HealthGPS::get_net_migration() {
     auto message = context_.scenario().channel().try_receive(context_.sync_timeout_millis());
     if (message.has_value()) {
         auto &basePtr = message.value();
-        auto messagePrt = dynamic_cast<NetImmigrationMessage *>(basePtr.get());
+        auto *messagePrt = dynamic_cast<NetImmigrationMessage *>(basePtr.get());
         if (messagePrt) {
             return messagePrt->data();
         }
 
         throw std::runtime_error(
             "Simulation out of sync, failed to receive a net immigration message");
-    } else {
-        throw std::runtime_error(fmt::format(
-            "Simulation out of sync, receive net immigration message has timed out after {} ms.",
-            context_.sync_timeout_millis()));
     }
+    throw std::runtime_error(fmt::format(
+        "Simulation out of sync, receive net immigration message has timed out after {} ms.",
+        context_.sync_timeout_millis()));
 }
 
 hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
@@ -311,7 +311,7 @@ hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
     return net_emigration;
 }
 
-Person HealthGPS::partial_clone_entity(const Person &source) const noexcept {
+Person HealthGPS::partial_clone_entity(const Person &source) noexcept {
     auto clone = Person{};
     clone.age = source.age;
     clone.gender = source.gender;
@@ -330,7 +330,7 @@ Person HealthGPS::partial_clone_entity(const Person &source) const noexcept {
 std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summary() const {
     auto visitor = UnivariateVisitor();
     auto summary = std::map<std::string, core::UnivariateSummary>();
-    auto &input_data = definition_.inputs().data();
+    const auto &input_data = definition_.inputs().data();
 
     for (const auto &entry : context_.mapping()) {
         // HACK: Ignore missing columns.
@@ -381,7 +381,7 @@ void hgps::HealthGPS::print_initial_population_statistics() {
 
     auto orig_summary = original_future.get();
     for (const auto &entry : context_.mapping()) {
-        auto &col = entry.name();
+        const auto &col = entry.name();
         ss << fmt::format("| {:{}} : {:14.4f} : {:14.5f} : {:14.5f} : {:14.5f} |\n", col, pad,
                           orig_summary[col].average(), sim8_summary[col].average(),
                           orig_summary[col].std_deviation(), sim8_summary[col].std_deviation());

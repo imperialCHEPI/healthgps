@@ -21,7 +21,7 @@ namespace hc = hgps::core;
 hc::StringDataTableColumnBuilder parse_string_column(const std::string &name,
                                                      const std::vector<std::string> &data) {
     auto builder = hc::StringDataTableColumnBuilder(name);
-    for (auto &value : data) {
+    for (const auto &value : data) {
         // trim string
         auto str = hc::trim(value);
 
@@ -39,7 +39,7 @@ hc::StringDataTableColumnBuilder parse_string_column(const std::string &name,
 hc::IntegerDataTableColumnBuilder parse_int_column(const std::string &name,
                                                    const std::vector<std::string> &data) {
     auto builder = hc::IntegerDataTableColumnBuilder(name);
-    for (auto &value : data) {
+    for (const auto &value : data) {
         if (value.length() > 0) {
             builder.append(std::stoi(value));
             continue;
@@ -54,7 +54,7 @@ hc::IntegerDataTableColumnBuilder parse_int_column(const std::string &name,
 hc::FloatDataTableColumnBuilder parse_float_column(const std::string &name,
                                                    const std::vector<std::string> &data) {
     auto builder = hc::FloatDataTableColumnBuilder(name);
-    for (auto &value : data) {
+    for (const auto &value : data) {
         if (value.length() > 0) {
             builder.append(std::stof(value));
             continue;
@@ -69,7 +69,7 @@ hc::FloatDataTableColumnBuilder parse_float_column(const std::string &name,
 hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
                                                      const std::vector<std::string> &data) {
     auto builder = hc::DoubleDataTableColumnBuilder(name);
-    for (auto &value : data) {
+    for (const auto &value : data) {
         if (value.length() > 0) {
             builder.append(std::stod(value));
             continue;

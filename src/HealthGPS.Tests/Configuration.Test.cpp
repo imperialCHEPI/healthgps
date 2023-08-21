@@ -101,7 +101,7 @@ class TempDir {
     mutable std::mt19937 rnd_;
     std::filesystem::path path_;
 
-    std::filesystem::path createTempDir() {
+    static std::filesystem::path createTempDir() {
         const auto rnd = std::random_device()();
         const auto path =
             std::filesystem::path{::testing::TempDir()} / "hgps" / std::to_string(rnd);
@@ -623,8 +623,8 @@ TEST_F(ConfigParsingFixture, LoadRunningInfo) {
     }
 
     // If any of the required keys are invalid then an error should be thrown
-    for (const auto key : {"start_time", "stop_time", "trial_runs", "sync_timeout_ms", "diseases",
-                           "seed", "interventions"}) {
+    for (const auto *const key : {"start_time", "stop_time", "trial_runs", "sync_timeout_ms",
+                                  "diseases", "seed", "interventions"}) {
         auto config = create_config();
         auto j = valid_running_info;
         j["running"][key] = nullptr; // None of the values should be null
@@ -649,7 +649,7 @@ TEST_F(ConfigParsingFixture, LoadOutputInfo) {
     }
 
     // If any of the required keys are invalid then an error should be thrown
-    for (const auto key : {"folder", "file_name", "comorbidities"}) {
+    for (const auto *const key : {"folder", "file_name", "comorbidities"}) {
         auto config = create_config();
         auto j = valid_output_info;
         j["output"][key] = nullptr; // None of the values should be null
