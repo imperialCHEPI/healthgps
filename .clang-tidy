@@ -18,5 +18,8 @@ Checks: >
     -readability-uppercase-literal-suffix,
     -readability-magic-numbers,
     -readability-isolate-declaration,
+CheckOptions:
+    - key: readability-function-cognitive-complexity.IgnoreMacros
+      value: true
 FormatStyle: LLVM
 WarningsAsErrors: "*"
