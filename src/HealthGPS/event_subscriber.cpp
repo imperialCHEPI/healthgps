@@ -16,5 +16,5 @@ void EventSubscriberHandler::unsubscribe() const {
         event_hub_->unsubscribe(*this);
     }
 }
-const EventHandlerIdentifier EventSubscriberHandler::id() const noexcept { return identifier_; }
+EventHandlerIdentifier EventSubscriberHandler::id() const noexcept { return identifier_; }
 } // namespace hgps

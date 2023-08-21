@@ -52,7 +52,7 @@ class EventSubscriber {
 
     /// @brief Gets the subscriber unique identifier
     /// @return The event handler identifier
-    [[nodiscard]] virtual const EventHandlerIdentifier id() const noexcept = 0;
+    [[nodiscard]] virtual EventHandlerIdentifier id() const noexcept = 0;
 };
 
 /// @brief Defines the event aggregator interface type
