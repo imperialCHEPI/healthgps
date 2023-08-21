@@ -4,6 +4,7 @@ Checks: >
     clang-diagnostic-*,
     clang-analyzer-*,
     bugprone-*,
+    readability-*,
 
     # Checks to exclude
     -*,
@@ -11,6 +12,11 @@ Checks: >
     -clang-analyzer-fuchsia.*,
     -clang-analyzer-optin.osx.*,
     -bugprone-easily-swappable-parameters,
-    -bugprone-narrowing-conversions
+    -bugprone-narrowing-conversions,
+    -readability-identifier-length,
+    -readability-implicit-bool-conversion,
+    -readability-uppercase-literal-suffix,
+    -readability-magic-numbers,
+    -readability-isolate-declaration,
 FormatStyle: LLVM
 WarningsAsErrors: "*"
