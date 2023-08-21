@@ -119,24 +119,4 @@ template <typename T> void from_json(const nlohmann::json &j, std::optional<T> &
     }
 }
 
-template <typename T>
-void to_json(nlohmann::json &j, const std::optional<hgps::core::Interval<T>> &p) {
-    if (p) {
-        j = *p;
-    } else {
-        // Null interval expressed as empty JSON array
-        j = nlohmann::json::array();
-    }
-}
-
-template <typename T>
-void from_json(const nlohmann::json &j, std::optional<hgps::core::Interval<T>> &p) {
-    // Treat null JSON values and empty arrays as a null Interval
-    if (j.is_null() || (j.is_array() && j.empty())) {
-        p = std::nullopt;
-    } else {
-        p = j.get<hgps::core::Interval<T>>();
-    }
-}
-
 } // namespace std
