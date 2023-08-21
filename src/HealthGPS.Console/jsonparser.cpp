@@ -4,6 +4,11 @@ namespace host::poco {
 //--------------------------------------------------------
 // Risk Model JSON serialisation / de-serialisation
 //--------------------------------------------------------
+// Data file information
+void to_json(json &j, const FileInfo &p) {
+    j = json{
+        {"name", p.name}, {"format", p.format}, {"delimiter", p.delimiter}, {"columns", p.columns}};
+}
 
 // Linear models
 void to_json(json &j, const CoefficientInfo &p) {
@@ -62,19 +67,6 @@ void from_json(const json &j, HierarchicalLevelInfo &p) {
 // Options JSON serialisation / de-serialisation
 //--------------------------------------------------------
 
-// Data file information
-void to_json(json &j, const FileInfo &p) {
-    j = json{
-        {"name", p.name}, {"format", p.format}, {"delimiter", p.delimiter}, {"columns", p.columns}};
-}
-
-void from_json(const json &j, FileInfo &p) {
-    j.at("name").get_to(p.name);
-    j.at("format").get_to(p.format);
-    j.at("delimiter").get_to(p.delimiter);
-    j.at("columns").get_to(p.columns);
-}
-
 // Settings Information
 void to_json(json &j, const SettingsInfo &p) {
     j = json{{"country_code", p.country},
@@ -88,32 +80,7 @@ void from_json(const json &j, SettingsInfo &p) {
     j.at("age_range").get_to(p.age_range);
 }
 
-// SES Model Information
-void to_json(json &j, const SESInfo &p) {
-    j = json{{"function_name", p.function}, {"function_parameters", p.parameters}};
-}
-
-void from_json(const json &j, SESInfo &p) {
-    j.at("function_name").get_to(p.function);
-    j.at("function_parameters").get_to(p.parameters);
-}
-
-// Baseline scenario adjustments
-void to_json(json &j, const BaselineInfo &p) {
-    j = json{{"format", p.format},
-             {"delimiter", p.delimiter},
-             {"encoding", p.encoding},
-             {"file_names", p.file_names}};
-}
-
-void from_json(const json &j, BaselineInfo &p) {
-    j.at("format").get_to(p.format);
-    j.at("delimiter").get_to(p.delimiter);
-    j.at("encoding").get_to(p.encoding);
-    j.at("file_names").get_to(p.file_names);
-}
-
-// Risk Factor Modelling
+// Risk factor modelling
 void to_json(json &j, const RiskFactorInfo &p) {
     j = json{{"name", p.name}, {"level", p.level}, {"range", p.range}};
 }
@@ -124,16 +91,14 @@ void from_json(const json &j, RiskFactorInfo &p) {
     j.at("range").get_to(p.range);
 }
 
-void to_json(json &j, const ModellingInfo &p) {
-    j = json{{"risk_factors", p.risk_factors},
-             {"risk_factor_models", p.risk_factor_models},
-             {"baseline_adjustments", p.baseline_adjustment}};
+// SES Model Information
+void to_json(json &j, const SESInfo &p) {
+    j = json{{"function_name", p.function}, {"function_parameters", p.parameters}};
 }
 
-void from_json(const json &j, ModellingInfo &p) {
-    j.at("risk_factors").get_to(p.risk_factors);
-    j.at("risk_factor_models").get_to(p.risk_factor_models);
-    j.at("baseline_adjustments").get_to(p.baseline_adjustment);
+void from_json(const json &j, SESInfo &p) {
+    j.at("function_name").get_to(p.function);
+    j.at("function_parameters").get_to(p.parameters);
 }
 
 void to_json(json &j, const VariableInfo &p) {
@@ -156,6 +121,14 @@ void from_json(const json &j, FactorDynamicEquationInfo &p) {
     j.at("Name").get_to(p.name);
     j.at("Coefficients").get_to(p.coefficients);
     j.at("ResidualsStandardDeviation").get_to(p.residuals_standard_deviation);
+}
+
+// Baseline scenario adjustments
+void to_json(json &j, const BaselineInfo &p) {
+    j = json{{"format", p.format},
+             {"delimiter", p.delimiter},
+             {"encoding", p.encoding},
+             {"file_names", p.file_names}};
 }
 
 // Policy Scenario

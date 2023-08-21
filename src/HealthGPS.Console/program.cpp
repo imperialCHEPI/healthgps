@@ -8,12 +8,35 @@
 #include "HealthGPS/event_bus.h"
 #include "event_monitor.h"
 
+#include <fmt/chrono.h>
 #include <fmt/color.h>
+
+#include <chrono>
+
+/// @brief Get a string representation of current system time
+/// @return The system time as string
+std::string get_time_now_str() {
+    auto tp = std::chrono::system_clock::now();
+    return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
+}
+
+/// @brief Prints application start-up messages
+void print_app_title() {
+    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
+               "\n# Health-GPS Microsimulation for Policy Options #\n\n");
+
+    fmt::print("Today: {}\n\n", get_time_now_str());
+}
 
 /// @brief Prints application exit message
 /// @param exit_code The application exit code
 /// @return The respective exit code
-int exit_application(int exit_code);
+int exit_application(int exit_code) {
+    fmt::print("\n\n");
+    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
+    fmt::print(" {}.\n\n", get_time_now_str());
+    return exit_code;
+}
 
 /// @brief Health-GPS host application entry point
 /// @param argc The number of command arguments
@@ -40,10 +63,21 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = load_configuration(cmd_args);
+        config = get_configuration(cmd_args);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);
+    }
+
+    // Create output folder
+    if (!std::filesystem::exists(config.output.folder)) {
+        fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
+                   config.output.folder);
+        if (!std::filesystem::create_directories(config.output.folder)) {
+            fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
+                       config.output.folder);
+            return exit_application(EXIT_FAILURE);
+        }
     }
 
     // Load input data file into a datatable asynchronous
@@ -104,12 +138,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n",
                    config.trial_runs);
         auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input);
-        if (config.has_active_intervention) {
+        if (config.active_intervention.has_value()) {
             fmt::print(fg(fmt::color::cyan),
                        "\nStarting intervention simulation with {} trials ...\n",
                        config.trial_runs);
-            auto policy_sim = create_intervention_simulation(channel, factory, event_bus,
-                                                             model_input, config.intervention);
+            auto policy_sim = create_intervention_simulation(
+                channel, factory, event_bus, model_input, config.active_intervention.value());
 
             // Run simulations side by side on a background thread
             auto worker =
@@ -157,18 +191,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     return exit_application(EXIT_SUCCESS);
 }
 
-int exit_application(int exit_code) {
-    fmt::print("\n\n");
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
-    fmt::print(" {}.\n\n", host::get_time_now_str());
-    return exit_code;
-}
-
 /// @brief Top-level namespace for Health-GPS Console host application
 namespace host {
 /// @brief Internal details namespace for private data types and functions
 namespace detail {}
-
-/// @brief Plain old class object (POCO) types for loading configuration file
-namespace poco {}
 } // namespace host

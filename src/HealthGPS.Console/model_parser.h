@@ -2,8 +2,8 @@
 #include "HealthGPS/repository.h"
 #include "HealthGPS/riskfactor_adjustment_types.h"
 
+#include "configuration.h"
 #include "jsonparser.h"
-#include "options.h"
 
 #include <utility>
 

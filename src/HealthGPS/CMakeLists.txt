@@ -4,6 +4,8 @@ find_package(crossguid CONFIG REQUIRED)
 add_library(HealthGPS STATIC "")
 target_compile_features(HealthGPS PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
+configure_file("version.h.in" "version.h" ESCAPE_QUOTES)
+
 target_sources(HealthGPS
 	PRIVATE
 		"analysis_module.cpp"
@@ -124,6 +126,7 @@ target_sources(HealthGPS
 		"simulation.h"
 		"sync_message.h"
 		"two_step_value.h"
+        "version.h"
 		"weight_category.h"
 		"weight_model.cpp"
 		"weight_model.h")
@@ -133,5 +136,6 @@ target_link_libraries(HealthGPS
 		HealthGPS.Core
 		fmt::fmt
 		crossguid)
+target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ROOT_NAMESPACE hgps)

@@ -1,4 +1,5 @@
 #include "configuration.h"
+#include "configuration_parsing.h"
 #include "jsonparser.h"
 #include "version.h"
 
@@ -11,6 +12,7 @@
 #include "HealthGPS/physical_activity_scenario.h"
 #include "HealthGPS/simple_policy_scenario.h"
 
+#include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <chrono>
@@ -30,264 +32,87 @@
 
 namespace host {
 using namespace hgps;
+using json = nlohmann::json;
 
-std::string get_time_now_str() {
-    auto tp = std::chrono::system_clock::now();
-    return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
-}
+ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
 
-cxxopts::Options create_options() {
-    cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
-        "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
-        "j,jobid", "The batch execution job identifier.",
-        cxxopts::value<int>())("verbose", "Print more information about progress",
-                               cxxopts::value<bool>()->default_value("false"))(
-        "help", "Help about this application.")("version", "Print the application version number.");
-
-    return options;
-}
-
-void print_app_title() {
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
-               "\n# Health-GPS Microsimulation for Policy Options #\n\n");
-
-    fmt::print("Today: {}\n\n", get_time_now_str());
-}
-
-CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]) {
-    MEASURE_FUNCTION();
-    namespace fs = std::filesystem;
-
-    CommandOptions cmd;
-    try {
-        cmd.success = true;
-        cmd.exit_code = EXIT_SUCCESS;
-        cmd.verbose = false;
-        auto result = options.parse(argc, argv);
-        if (result.count("help")) {
-            std::cout << options.help() << std::endl;
-            cmd.success = false;
-            return cmd;
-        }
-
-        if (result.count("version")) {
-            fmt::print("Version {}\n\n", PROJECT_VERSION);
-            cmd.success = false;
-            return cmd;
-        }
-
-        cmd.verbose = result["verbose"].as<bool>();
-        if (cmd.verbose) {
-            fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
-        }
-
-        if (result.count("file")) {
-            cmd.config_file = result["file"].as<std::string>();
-            if (cmd.config_file.is_relative()) {
-                cmd.config_file = std::filesystem::absolute(cmd.config_file);
-                fmt::print("Configuration file..: {}\n", cmd.config_file.string());
-            }
-        }
-
-        if (!fs::exists(cmd.config_file)) {
-            fmt::print(fg(fmt::color::red), "\nConfiguration file: {} not found.\n",
-                       cmd.config_file.string());
-            cmd.exit_code = EXIT_FAILURE;
-        }
-
-        if (result.count("storage")) {
-            cmd.storage_folder = result["storage"].as<std::string>();
-            if (cmd.storage_folder.is_relative()) {
-                cmd.storage_folder = std::filesystem::absolute(cmd.storage_folder);
-                fmt::print("File storage folder.: {}\n", cmd.storage_folder.string());
-            }
-        }
-
-        if (!fs::exists(cmd.storage_folder)) {
-            fmt::print(fg(fmt::color::red), "\nFile storage folder: {} not found.\n",
-                       cmd.storage_folder.string());
-            cmd.exit_code = EXIT_FAILURE;
-        }
-
-        if (result.count("jobid")) {
-            cmd.job_id = result["jobid"].as<int>();
-            if (cmd.job_id < 1) {
-                fmt::print(fg(fmt::color::red),
-                           "\nJob identifier value outside range: (0 < x) given: {}.\n",
-                           std::to_string(cmd.job_id));
-                cmd.exit_code = EXIT_FAILURE;
-            }
-        }
-
-        cmd.success = cmd.exit_code == EXIT_SUCCESS;
-    } catch (const cxxopts::exceptions::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}.\n", ex.what());
-        fmt::print("\n{}\n", options.help());
-        cmd.success = false;
-        cmd.exit_code = EXIT_FAILURE;
-    }
-
-    return cmd;
-}
-
-Configuration load_configuration(CommandOptions &options) {
+Configuration get_configuration(CommandOptions &options) {
     MEASURE_FUNCTION();
     namespace fs = std::filesystem;
     using namespace host::poco;
 
+    bool success = true;
+
     Configuration config;
-    fs::path file_path;
+    config.job_id = options.job_id;
+
+    // verbosity
+    config.verbosity = core::VerboseMode::none;
+    if (options.verbose) {
+        config.verbosity = core::VerboseMode::verbose;
+    }
+
     std::ifstream ifs(options.config_file, std::ifstream::in);
-
-    if (ifs) {
-        auto opt = json::parse(ifs);
-        if (!opt.contains("version")) {
-            throw std::runtime_error("Invalid definition, file must have a schema version");
-        }
-
-        auto version = opt["version"].get<int>();
-        if (version != 1 && version != 2) {
-            throw std::runtime_error(fmt::format(
-                "configuration schema version: {} mismatch, supported: 1 and 2", version));
-        }
-
-        // application version
-        config.app_name = PROJECT_NAME;
-        config.app_version = PROJECT_VERSION;
-
-        // Configuration root path
-        config.root_path = options.config_file.parent_path();
-
-        // input dataset file
-        auto dataset_key = "dataset";
-        if (version == 1) {
-            dataset_key = "file";
-        }
-
-        config.file = opt["inputs"][dataset_key].get<FileInfo>();
-        file_path = config.file.name;
-        if (file_path.is_relative()) {
-            file_path = config.root_path / file_path;
-            config.file.name = file_path.string();
-        }
-
-        fmt::print("Input dataset file: {}\n", config.file.name);
-        if (!fs::exists(file_path)) {
-            fmt::print(fg(fmt::color::red), "\nInput data file: {} not found.\n",
-                       file_path.string());
-        }
-
-        // Settings and SES mapping
-        config.settings = opt["inputs"]["settings"].get<SettingsInfo>();
-        config.ses = opt["modelling"]["ses_model"].get<SESInfo>();
-
-        // Modelling information
-        config.modelling = opt["modelling"].get<ModellingInfo>();
-        for (auto &model : config.modelling.risk_factor_models) {
-            file_path = model.second;
-            if (file_path.is_relative()) {
-                file_path = config.root_path / file_path;
-                model.second = file_path.string();
-            }
-
-            fmt::print("Risk factor model: {}, file: {}\n", model.first, model.second);
-            if (!fs::exists(file_path)) {
-                fmt::print(fg(fmt::color::red), "Risk factor model: {}, file: {} not found.\n",
-                           model.first, file_path.string());
-            }
-        }
-
-        for (auto &item : config.modelling.baseline_adjustment.file_names) {
-            file_path = item.second;
-            if (file_path.is_relative()) {
-                file_path = config.root_path / file_path;
-                item.second = file_path.string();
-            }
-
-            fmt::print("Baseline factor adjustment type: {}, file: {}\n", item.first,
-                       file_path.string());
-            if (!fs::exists(file_path)) {
-                fmt::print(fg(fmt::color::red),
-                           "Baseline factor adjustment type: {}, file: {} not found.\n", item.first,
-                           file_path.string());
-            }
-        }
-
-        // Run-time
-        opt["running"]["start_time"].get_to(config.start_time);
-        opt["running"]["stop_time"].get_to(config.stop_time);
-        opt["running"]["trial_runs"].get_to(config.trial_runs);
-        opt["running"]["sync_timeout_ms"].get_to(config.sync_timeout_ms);
-        auto seed = opt["running"]["seed"].get<std::vector<unsigned int>>();
-        if (seed.size() > 0) {
-            config.custom_seed = seed[0];
-        }
-
-        opt["running"]["diseases"].get_to(config.diseases);
-
-        // Intervention Policy
-        auto &interventions = opt["running"]["interventions"];
-        if (!interventions["active_type_id"].is_null()) {
-            auto active_type = interventions["active_type_id"].get<std::string>();
-            auto &policy_types = interventions["types"];
-            for (auto it = policy_types.begin(); it != policy_types.end(); ++it) {
-                if (core::case_insensitive::equals(it.key(), active_type)) {
-                    config.intervention = it.value().get<PolicyScenarioInfo>();
-                    config.intervention.identifier = core::to_lower(it.key());
-                    config.has_active_intervention = true;
-                    break;
-                }
-            }
-
-            if (!core::case_insensitive::equals(config.intervention.identifier, active_type)) {
-                throw std::runtime_error(
-                    fmt::format("Unknown active intervention type identifier: {}", active_type));
-            }
-        }
-
-        config.job_id = options.job_id;
-        config.output = opt["output"].get<OutputInfo>();
-        config.output.folder = expand_environment_variables(config.output.folder);
-        if (!fs::exists(config.output.folder)) {
-            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
-                       config.output.folder);
-            if (!create_output_folder(config.output.folder)) {
-                throw std::runtime_error(
-                    fmt::format("Failed to create output folder: {}", config.output.folder));
-            }
-        }
-
-        // verbosity
-        config.verbosity = core::VerboseMode::none;
-        if (options.verbose) {
-            config.verbosity = core::VerboseMode::verbose;
-        }
-    } else {
-        std::cout << fmt::format("File {} doesn't exist.", options.config_file.string())
-                  << std::endl;
+    if (!ifs) {
+        throw ConfigurationError(
+            fmt::format("File {} doesn't exist.", options.config_file.string()));
     }
 
-    ifs.close();
-    return config;
-}
-
-bool create_output_folder(std::filesystem::path folder_path, unsigned int num_retries) {
-    using namespace std::chrono_literals;
-    for (unsigned int i = 1; i <= num_retries; i++) {
+    const auto opt = [&ifs]() {
         try {
-            if (std::filesystem::create_directories(folder_path)) {
-                return true;
-            }
-        } catch (const std::exception &ex) {
-            fmt::print(fg(fmt::color::red), "Failed to create output folder, attempt #{} - {}.\n",
-                       i, ex.what());
+            return json::parse(ifs);
+        } catch (const std::exception &e) {
+            throw ConfigurationError(fmt::format("Could not parse JSON: {}", e.what()));
         }
+    }();
 
-        std::this_thread::sleep_for(1000ms);
+    // Check the file format version
+    try {
+        check_version(opt);
+    } catch (const ConfigurationError &) {
+        success = false;
     }
 
-    return false;
+    // Base dir for relative paths
+    config.root_path = options.config_file.parent_path();
+
+    // input dataset file
+    try {
+        load_input_info(opt, config);
+        fmt::print("Input dataset file: {}\n", config.file.name.string());
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load dataset file: {}\n", e.what());
+    }
+
+    // Modelling information
+    try {
+        load_modelling_info(opt, config);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());
+    }
+
+    // Run-time info
+    try {
+        load_running_info(opt, config);
+    } catch (const std::exception &e) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load running info: {}\n", e.what());
+    }
+
+    try {
+        load_output_info(opt, config);
+    } catch (const ConfigurationError &) {
+        success = false;
+        fmt::print(fg(fmt::color::red), "Could not load output info");
+    }
+
+    if (!success) {
+        throw ConfigurationError{"Error loading config file"};
+    }
+
+    return config;
 }
 
 std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Configuration &config) {
@@ -306,9 +131,6 @@ std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Conf
 ModelInput create_model_input(core::DataTable &input_table, core::Country country,
                               Configuration &config, std::vector<core::DiseaseInfo> diseases) {
     // Create simulation configuration
-    auto age_range =
-        core::IntegerInterval(config.settings.age_range.front(), config.settings.age_range.back());
-
     auto comorbidities = config.output.comorbidities;
     auto diseases_number = static_cast<unsigned int>(diseases.size());
     if (comorbidities > diseases_number) {
@@ -317,7 +139,7 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
                    config.output.comorbidities, comorbidities);
     }
 
-    auto settings = Settings(country, config.settings.size_fraction, age_range);
+    auto settings = Settings(country, config.settings.size_fraction, config.settings.age_range);
     auto job_custom_seed = create_job_seed(config.job_id, config.custom_seed);
     auto run_info = RunInfo{
         .start_time = config.start_time,
@@ -332,13 +154,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         SESDefinition{.fuction_name = config.ses.function, .parameters = config.ses.parameters};
 
     auto mapping = std::vector<MappingEntry>();
-    for (auto &item : config.modelling.risk_factors) {
-        if (item.range.empty()) {
-            mapping.emplace_back(item.name, item.level);
-        } else {
-            auto boundary = hgps::OptionalRange{{item.range[0], item.range[1]}};
-            mapping.emplace_back(item.name, item.level, boundary);
-        }
+    for (const auto &item : config.modelling.risk_factors) {
+        mapping.emplace_back(item.name, item.level, item.range);
     }
 
     return ModelInput(input_table, settings, run_info, ses_mapping,
@@ -389,12 +206,14 @@ std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
 
 ResultFileWriter create_results_file_logger(const Configuration &config,
                                             const hgps::ModelInput &input) {
-    return ResultFileWriter{create_output_file_name(config.output, config.job_id),
-                            ExperimentInfo{.model = config.app_name,
-                                           .version = config.app_version,
-                                           .intervention = config.intervention.identifier,
-                                           .job_id = config.job_id,
-                                           .seed = input.seed().value_or(0u)}};
+    return ResultFileWriter{
+        create_output_file_name(config.output, config.job_id),
+        ExperimentInfo{.model = config.app_name,
+                       .version = config.app_version,
+                       .intervention =
+                           config.active_intervention ? config.active_intervention->identifier : "",
+                       .job_id = config.job_id,
+                       .seed = input.seed().value_or(0u)}};
 }
 
 std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &channel) {

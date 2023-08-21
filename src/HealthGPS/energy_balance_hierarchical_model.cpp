@@ -1,6 +1,8 @@
 #include "energy_balance_hierarchical_model.h"
 #include "runtime_context.h"
 
+#include "HealthGPS.Core/exception.h"
+
 namespace hgps {
 
 EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
@@ -9,11 +11,11 @@ EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
     : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
-        throw std::invalid_argument("The model equations definition must not be empty");
+        throw core::HgpsException("The model equations definition must not be empty");
     }
 
     if (variables_.empty()) {
-        throw std::invalid_argument("The model variables definition must not be empty");
+        throw core::HgpsException("The model variables definition must not be empty");
     }
 }
 
@@ -25,7 +27,7 @@ std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dyna
 
 void EnergyBalanceHierarchicalModel::generate_risk_factors(
     [[maybe_unused]] RuntimeContext &context) {
-    throw std::logic_error(
+    throw core::HgpsException(
         "EnergyBalanceHierarchicalModel::generate_risk_factors not yet implemented.");
 }
 
@@ -131,11 +133,11 @@ LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
       boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
-        throw std::invalid_argument("The model equations definition must not be empty");
+        throw core::HgpsException("The model equations definition must not be empty");
     }
 
     if (variables_.empty()) {
-        throw std::invalid_argument("The model variables definition must not be empty");
+        throw core::HgpsException("The model variables definition must not be empty");
     }
 }
 

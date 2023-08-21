@@ -58,8 +58,8 @@ template <Numerical TYPE> class Interval {
     auto operator<=>(const Interval<TYPE> &rhs) const = default;
 
   private:
-    TYPE lower_;
-    TYPE upper_;
+    TYPE lower_{};
+    TYPE upper_{};
 };
 
 /// @brief Interval representation integer data type

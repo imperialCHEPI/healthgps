@@ -12,7 +12,7 @@ Identifier Identifier::empty() {
 
 Identifier::Identifier(std::string value) : value_{to_lower(value)} {
     if (!value_.empty()) {
-        validate_identifeir();
+        validate_identifier();
     }
 
     hash_code_ = std::hash<std::string>{}(value_);
@@ -40,7 +40,7 @@ bool Identifier::equal(const Identifier &other) const noexcept {
     return hash_code_ == other.hash_code_;
 }
 
-void Identifier::validate_identifeir() const {
+void Identifier::validate_identifier() const {
     if (std::isdigit(value_.at(0))) {
         throw std::invalid_argument("Identifier must not start with a numeric value");
     }
@@ -57,11 +57,5 @@ std::ostream &operator<<(std::ostream &stream, const Identifier &identifier) {
 }
 
 void from_json(const nlohmann::json &j, Identifier &id) { id = Identifier{j.get<std::string>()}; }
-
-void from_json(const nlohmann::json &j, std::map<Identifier, double> &map) {
-    for (auto &[key, value] : j.items()) {
-        map.emplace(key, value.get<double>());
-    }
-}
 
 } // namespace hgps::core

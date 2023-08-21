@@ -15,11 +15,10 @@ target_sources(HealthGPS.Core
 		"univariate_summary.h"
 		"math_util.cpp"
 		"math_util.h"
-		"version.cpp"
-		"version.h"
 		"identifier.cpp"
 		"identifier.h"
-
+		"exception.h"
+		"exception.cpp"
 		"analysis.h"
 		"api.h"
 		"array2d.h"

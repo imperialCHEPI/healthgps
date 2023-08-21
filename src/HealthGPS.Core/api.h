@@ -10,7 +10,6 @@
 #include "interval.h"
 #include "poco.h"
 #include "univariate_summary.h"
-#include "version.h"
 #include "visitor.h"
 
 namespace hgps {
