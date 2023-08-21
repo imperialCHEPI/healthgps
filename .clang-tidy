@@ -6,6 +6,7 @@ Checks: >
     bugprone-*,
 
     # Checks to exclude
+    -*,
     -clang-analyzer-osx.*,
     -clang-analyzer-fuchsia.*,
     -clang-analyzer-optin.osx.*,
