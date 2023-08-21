@@ -143,7 +143,7 @@ TEST_F(DatastoreTest, GetDiseaseInfoMissingThrowsException) {
     EXPECT_THROW(manager.get_disease_info("FAKE"), std::invalid_argument);
 }
 
-TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo) {
+TEST_F(DatastoreTest, RetrieveDiseasesTypeInInfo) {
     using namespace hgps::core;
 
     auto diseases = manager.get_diseases();
@@ -158,7 +158,7 @@ TEST_F(DatastoreTest, RetrieveDeseasesTypeInInfo) {
     ASSERT_GT(cancer_count, 0);
 }
 
-TEST_F(DatastoreTest, RetrieveDeseaseDefinition) {
+TEST_F(DatastoreTest, RetrieveDiseaseDefinition) {
     auto diseases = manager.get_diseases();
     for (auto &item : diseases) {
         auto entity = manager.get_disease(item, uk);
@@ -171,7 +171,7 @@ TEST_F(DatastoreTest, RetrieveDeseaseDefinition) {
     }
 }
 
-TEST_F(DatastoreTest, RetrieveDeseaseDefinitionIsEmpty) {
+TEST_F(DatastoreTest, RetrieveDiseaseDefinitionIsEmpty) {
     using namespace hgps::core;
 
     auto info = DiseaseInfo{.group = DiseaseGroup::other,

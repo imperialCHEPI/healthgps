@@ -8,7 +8,7 @@
 
 namespace hgps {
 
-MappingEntry::MappingEntry(std::string name, int level, OptionalRange range)
+MappingEntry::MappingEntry(std::string name, int level, OptionalInterval range)
     : name_{std::move(name)}, name_key_{name_}, level_{level}, range_{std::move(range)} {}
 
 const std::string &MappingEntry::name() const noexcept { return name_; }
@@ -17,11 +17,11 @@ int MappingEntry::level() const noexcept { return level_; }
 
 const core::Identifier &MappingEntry::key() const noexcept { return name_key_; }
 
-const OptionalRange &MappingEntry::range() const noexcept { return range_; }
+const OptionalInterval &MappingEntry::range() const noexcept { return range_; }
 
 double MappingEntry::get_bounded_value(const double &value) const noexcept {
     if (range_.has_value()) {
-        return std::min(std::max(value, range_->first), range_->second);
+        return std::clamp(value, range_->lower(), range_->upper());
     }
     return value;
 }

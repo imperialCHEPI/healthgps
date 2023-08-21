@@ -1,5 +1,15 @@
+/**
+ * @file
+ * @brief Main header file for functionality related to loading config files
+ *
+ * This file contains definitions for the main functions required to load JSON-formatted
+ * configuration files from disk.
+ */
 #pragma once
-#include <cxxopts.hpp>
+
+#include "command_options.h"
+#include "poco.h"
+#include "version.h"
 
 #include "HealthGPS/healthgps.h"
 #include "HealthGPS/intervention_scenario.h"
@@ -8,38 +18,77 @@
 
 #include "HealthGPS.Core/api.h"
 
-#include "options.h"
 #include "result_file_writer.h"
 
+#include <optional>
+#include <stdexcept>
+
 namespace host {
-/// @brief Get a string representation of current system time
-/// @return The system time as string
-std::string get_time_now_str();
 
-/// @brief Creates the command-line interface (CLI) options
-/// @return Health-GPS CLI options
-cxxopts::Options create_options();
+/// @brief Defines the application configuration data structure
+struct Configuration {
+    /// @brief The root path for configuration files
+    std::filesystem::path root_path;
 
-/// @brief Prints application start-up messages
-void print_app_title();
+    /// @brief The input data file details
+    poco::FileInfo file;
 
-/// @brief Parses the command-line interface (CLI) arguments
-/// @param options The valid CLI options
-/// @param argc Number of input arguments
-/// @param argv List of input arguments
-/// @return User command-line options
-CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]);
+    /// @brief Experiment population settings
+    poco::SettingsInfo settings;
+
+    /// @brief Socio-economic status (SES) model inputs
+    poco::SESInfo ses;
+
+    /// @brief User defined model and parameters information
+    poco::ModellingInfo modelling;
+
+    /// @brief List of diseases to include in experiment
+    std::vector<std::string> diseases;
+
+    /// @brief Simulation initialisation custom seed value, optional
+    std::optional<unsigned int> custom_seed;
+
+    /// @brief The experiment start time (simulation clock)
+    unsigned int start_time{};
+
+    /// @brief The experiment stop time (simulation clock)
+    unsigned int stop_time{};
+
+    /// @brief The number of simulation runs (replications) to execute
+    unsigned int trial_runs{};
+
+    /// @brief Baseline to intervention data synchronisation time out (milliseconds)
+    unsigned int sync_timeout_ms{};
+
+    /// @brief The active intervention policy definition
+    std::optional<poco::PolicyScenarioInfo> active_intervention;
+
+    /// @brief Experiment output folder and file information
+    poco::OutputInfo output;
+
+    /// @brief Application logging verbosity mode
+    hgps::core::VerboseMode verbosity{};
+
+    /// @brief Experiment batch job identifier
+    int job_id{};
+
+    /// @brief Experiment model name
+    const char *app_name = PROJECT_NAME;
+
+    /// @brief Experiment model version
+    const char *app_version = PROJECT_VERSION;
+};
+
+/// @brief Represents an error that occurred with the format of a config file
+class ConfigurationError : public std::runtime_error {
+  public:
+    ConfigurationError(const std::string &msg);
+};
 
 /// @brief Loads the input configuration file, *.json, information
 /// @param options User command-line options
 /// @return The configuration file information
-Configuration load_configuration(CommandOptions &options);
-
-/// @brief Creates the configuration output folder for result files
-/// @param folder_path Full path to output folder
-/// @param num_retries Number of attempts before giving up
-/// @return true for successful creation, otherwise false
-bool create_output_folder(std::filesystem::path folder_path, unsigned int num_retries = 3);
+Configuration get_configuration(CommandOptions &options);
 
 /// @brief Gets the collection of diseases that matches the selected input list
 /// @param data_api The back-end data store instance to be used.

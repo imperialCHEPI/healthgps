@@ -18,6 +18,7 @@ target_sources(HealthGPS.Tests
         "data_config.cpp"
         "AgeGenderTable.Test.cpp"
         "Channel.Test.cpp"
+        "Configuration.Test.cpp"
         "Core.Array2DTest.cpp"
         "Core.Test.cpp"
         "Core.UnivariateSummary.Test.cpp"
@@ -28,6 +29,7 @@ target_sources(HealthGPS.Tests
         "EventAggregator.Test.cpp"
         "HealthGPS.Test.cpp"
         "HierarchicalMapping.Test.cpp"
+        "JsonParser.Test.cpp"
         "Identifier.Test.cpp"
         "LifeTable.Test.cpp"
         "Map2d.Test.cpp"
@@ -45,6 +47,7 @@ target_link_libraries(HealthGPS.Tests
 PRIVATE
     HealthGPS.Core
     HealthGPS.Datastore
+    HealthGPS.LibConsole
     HealthGPS
     fmt::fmt
     Threads::Threads
