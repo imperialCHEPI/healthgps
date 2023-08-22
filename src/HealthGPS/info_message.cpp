@@ -30,7 +30,7 @@ void InfoEventMessage::accept(EventMessageVisitor &visitor) const { visitor.visi
 
 namespace detail {
 
-std::string model_action_str(const ModelAction action) {
+std::string model_action_str(ModelAction action) {
     switch (action) {
     case ModelAction::update:
         return "update";

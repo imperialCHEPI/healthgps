@@ -54,6 +54,6 @@ struct InfoEventMessage final : public EventMessage {
 
 namespace detail {
 /// @brief Converts enumeration to string, not pretty but no support in C++
-std::string model_action_str(const ModelAction action);
+std::string model_action_str(ModelAction action);
 } // namespace detail
 } // namespace hgps
