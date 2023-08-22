@@ -101,6 +101,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         context.identifier(), context.current_run(), context.time_now(), result));
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
                                                      ModelResult &result) const {
     auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
@@ -211,6 +212,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
 
     result.indicators = daly_handle.get();
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 double AnalysisModule::calculate_disability_weight(const Person &entity) const {
     auto sum = 1.0;
@@ -258,6 +260,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                            DataSeries &series) const {
     using namespace core;
@@ -341,6 +344,7 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
         }
     }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 void AnalysisModule::classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const {
     auto weight_class = weight_classifier_.classify_weight(entity);

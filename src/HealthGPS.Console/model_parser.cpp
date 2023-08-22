@@ -128,6 +128,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
         fmt::format("Dynamic model name '{}' is not recognised.", model_name)};
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
 load_ebhlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
@@ -203,6 +204,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
     return std::make_unique<hgps::LiteHierarchicalModelDefinition>(
         std::move(equations), std::move(variables), percentage);
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
 load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
