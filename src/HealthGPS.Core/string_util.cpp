@@ -90,8 +90,10 @@ bool case_insensitive::contains(const std::string_view &text,
         return false;
     }
 
-    const auto *it = std::search(text.cbegin(), text.cend(), str.cbegin(), str.cend(),
-                                 [](char a, char b) { return std::tolower(a) == std::tolower(b); });
+    // "it" is a pointer type on gcc, but not MSVC, so "const auto *it" won't work
+    // NOLINTNEXTLINE(readability-qualified-auto)
+    const auto it = std::search(text.cbegin(), text.cend(), str.cbegin(), str.cend(),
+                                [](char a, char b) { return std::tolower(a) == std::tolower(b); });
 
     return it != text.cend();
 }
@@ -103,7 +105,9 @@ bool case_insensitive::starts_with(const std::string_view &text,
         return false;
     }
 
-    const auto *it =
+    // "it" is a pointer type on gcc, but not MSVC, so "const auto *it" won't work
+    // NOLINTNEXTLINE(readability-qualified-auto)
+    const auto it =
         std::search(text.cbegin(), text.cbegin() + str.length(), str.cbegin(), str.cend(),
                     [](char a, char b) { return std::tolower(a) == std::tolower(b); });
 
