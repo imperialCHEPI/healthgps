@@ -93,7 +93,7 @@ class DataManager : public Datastore {
 
     static std::map<std::string, std::size_t>
     create_fields_index_mapping(const std::vector<std::string> &column_names,
-                                const std::vector<std::string> fields);
+                                const std::vector<std::string> &fields);
 
     void notify_warning(const std::string_view message) const;
 };

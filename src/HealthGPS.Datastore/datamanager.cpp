@@ -700,7 +700,7 @@ std::string DataManager::replace_string_tokens(std::string source,
 
 std::map<std::string, std::size_t>
 DataManager::create_fields_index_mapping(const std::vector<std::string> &column_names,
-                                         const std::vector<std::string> fields) {
+                                         const std::vector<std::string> &fields) {
     auto mapping = std::map<std::string, std::size_t>();
     for (const auto &field : fields) {
         auto field_index = core::case_insensitive::index_of(column_names, field);
