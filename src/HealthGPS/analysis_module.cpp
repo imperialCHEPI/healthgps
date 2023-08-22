@@ -357,7 +357,7 @@ void AnalysisModule::classify_weight(hgps::DataSeries &series, const hgps::Perso
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
     default:
-        throw std::logic_error("Unknow weight classification category.");
+        throw std::logic_error("Unknown weight classification category.");
         break;
     }
 }
