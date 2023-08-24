@@ -41,38 +41,39 @@ class DataManager : public Datastore {
 
     std::vector<PopulationItem>
     get_population(const Country &country,
-                   const std::function<bool(unsigned int)> time_filter) const override;
+                   const std::function<bool(unsigned int)> &time_filter) const override;
 
     std::vector<MortalityItem> get_mortality(const Country &country) const;
 
     std::vector<MortalityItem>
     get_mortality(const Country &country,
-                  const std::function<bool(unsigned int)> time_filter) const override;
+                  const std::function<bool(unsigned int)> &time_filter) const override;
 
     std::vector<DiseaseInfo> get_diseases() const override;
 
     DiseaseInfo get_disease_info(const core::Identifier &code) const override;
 
-    DiseaseEntity get_disease(DiseaseInfo info, Country country) const override;
+    DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const override;
 
-    RelativeRiskEntity get_relative_risk_to_disease(DiseaseInfo source,
-                                                    DiseaseInfo target) const override;
+    RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
+                                                    const DiseaseInfo &target) const override;
 
     RelativeRiskEntity
-    get_relative_risk_to_risk_factor(DiseaseInfo source, Gender gender,
-                                     core::Identifier risk_factor_key) const override;
+    get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
+                                     const core::Identifier &risk_factor_key) const override;
 
     /// @copydoc core::Datastore::get_disease_parameter
     /// @throws std::out_of_range for unknown disease parameter file type.
-    CancerParameterEntity get_disease_parameter(DiseaseInfo info, Country country) const override;
+    CancerParameterEntity get_disease_parameter(const DiseaseInfo &info,
+                                                const Country &country) const override;
 
-    DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
+    DiseaseAnalysisEntity get_disease_analysis(const Country &country) const override;
 
     std::vector<BirthItem> get_birth_indicators(const Country &country) const;
 
     std::vector<BirthItem>
-    get_birth_indicators(const Country country,
-                         const std::function<bool(unsigned int)> time_filter) const override;
+    get_birth_indicators(const Country &country,
+                         const std::function<bool(unsigned int)> &time_filter) const override;
 
     std::vector<LmsDataRow> get_lms_parameters() const override;
 
@@ -84,7 +85,7 @@ class DataManager : public Datastore {
     RelativeRiskEntity generate_default_relative_risk_to_disease() const;
 
     std::map<int, std::map<Gender, double>>
-    load_cost_of_diseases(Country country, nlohmann::json node,
+    load_cost_of_diseases(const Country &country, const nlohmann::json &node,
                           const std::filesystem::path &parent_path) const;
 
     std::vector<LifeExpectancyItem> load_life_expectancy(const Country &country) const;
@@ -96,7 +97,7 @@ class DataManager : public Datastore {
     create_fields_index_mapping(const std::vector<std::string> &column_names,
                                 const std::vector<std::string> &fields);
 
-    void notify_warning(const std::string_view message) const;
+    void notify_warning(std::string_view message) const;
 };
 
 } // namespace hgps::data

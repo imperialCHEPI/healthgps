@@ -29,7 +29,7 @@ class Datastore {
     /// @return The resulting list of population trend items
     virtual std::vector<PopulationItem>
     get_population(const Country &country,
-                   const std::function<bool(unsigned int)> time_filter) const = 0;
+                   const std::function<bool(unsigned int)> &time_filter) const = 0;
 
     /// @brief Gets the population mortality trend for a country filtered by time
     /// @param country The target country definition
@@ -37,7 +37,7 @@ class Datastore {
     /// @return The resulting list of mortality trend items
     virtual std::vector<MortalityItem>
     get_mortality(const Country &country,
-                  const std::function<bool(unsigned int)> time_filter) const = 0;
+                  const std::function<bool(unsigned int)> &time_filter) const = 0;
 
     /// @brief Gets the collection of diseases information in the store
     /// @return The list of diseases defined
@@ -52,14 +52,14 @@ class Datastore {
     /// @param info The target disease information
     /// @param country The target country definition
     /// @return The disease definition, check empty() = true for missing data.
-    virtual DiseaseEntity get_disease(DiseaseInfo info, Country country) const = 0;
+    virtual DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const = 0;
 
     /// @brief Gets the relative risk effects for disease to disease interactions
     /// @param source The source disease information
     /// @param target The target disease information
     /// @return The disease-disease effects, check empty() = true for missing data.
-    virtual RelativeRiskEntity get_relative_risk_to_disease(DiseaseInfo source,
-                                                            DiseaseInfo target) const = 0;
+    virtual RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
+                                                            const DiseaseInfo &target) const = 0;
 
     /// @brief Gets the relative risk effects for risk factor to disease interactions
     /// @param source The disease information
@@ -67,28 +67,28 @@ class Datastore {
     /// @param risk_factor_key The risk factor identifier
     /// @return The risk factor-disease effects, check empty() = true for missing data.
     virtual RelativeRiskEntity
-    get_relative_risk_to_risk_factor(DiseaseInfo source, Gender gender,
-                                     Identifier risk_factor_key) const = 0;
+    get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
+                                     const Identifier &risk_factor_key) const = 0;
 
     /// @brief Gets the parameters required by cancer type diseases for a country
     /// @param info The disease of type cancer information
     /// @param country The target country definition
     /// @return The cancer parameters, check empty() = true for missing data.
-    virtual CancerParameterEntity get_disease_parameter(DiseaseInfo info,
-                                                        Country country) const = 0;
+    virtual CancerParameterEntity get_disease_parameter(const DiseaseInfo &info,
+                                                        const Country &country) const = 0;
 
     /// @brief Gets the Burden of Diseases (BoD) analysis dataset for a country
     /// @param country The target country definition
     /// @return The BoD analysis data, check empty() = true for missing data.
-    virtual DiseaseAnalysisEntity get_disease_analysis(const Country country) const = 0;
+    virtual DiseaseAnalysisEntity get_disease_analysis(const Country &country) const = 0;
 
     /// @brief Gets the population birth indicators for a country filtered by time
     /// @param country The target country definition
     /// @param time_filter The time filter predicate, e.g. years range
     /// @return The resulting list of birth indicator items
     virtual std::vector<BirthItem>
-    get_birth_indicators(const Country country,
-                         const std::function<bool(unsigned int)> time_filter) const = 0;
+    get_birth_indicators(const Country &country,
+                         const std::function<bool(unsigned int)> &time_filter) const = 0;
 
     /// @brief Gets the LMS (lambda-mu-sigma) parameters for childhood growth charts
     /// @return The parameters for the LMS model

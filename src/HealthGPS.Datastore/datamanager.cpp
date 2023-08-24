@@ -81,7 +81,7 @@ std::vector<PopulationItem> DataManager::get_population(const Country &country) 
 
 std::vector<PopulationItem>
 DataManager::get_population(const Country &country,
-                            const std::function<bool(unsigned int)> time_filter) const {
+                            const std::function<bool(unsigned int)> &time_filter) const {
     auto results = std::vector<PopulationItem>();
 
     if (index_.contains("demographic")) {
@@ -132,7 +132,7 @@ std::vector<MortalityItem> DataManager::get_mortality(const Country &country) co
 
 std::vector<MortalityItem>
 DataManager::get_mortality(const Country &country,
-                           const std::function<bool(unsigned int)> time_filter) const {
+                           const std::function<bool(unsigned int)> &time_filter) const {
     auto results = std::vector<MortalityItem>();
     if (index_.contains("demographic")) {
         auto nodepath = index_["demographic"]["path"].get<std::string>();
@@ -231,7 +231,7 @@ DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const {
     throw std::runtime_error("Index has no 'diseases' entry.");
 }
 
-DiseaseEntity DataManager::get_disease(DiseaseInfo info, Country country) const {
+DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &country) const {
     DiseaseEntity result;
     result.info = info;
     result.country = country;
@@ -294,8 +294,8 @@ DiseaseEntity DataManager::get_disease(DiseaseInfo info, Country country) const 
     return result;
 }
 
-RelativeRiskEntity DataManager::get_relative_risk_to_disease(DiseaseInfo source,
-                                                             DiseaseInfo target) const {
+RelativeRiskEntity DataManager::get_relative_risk_to_disease(const DiseaseInfo &source,
+                                                             const DiseaseInfo &target) const {
     if (index_.contains("diseases")) {
         auto diseases_path = index_["diseases"]["path"].get<std::string>();
         auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
@@ -362,8 +362,8 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(DiseaseInfo source,
 }
 
 RelativeRiskEntity
-DataManager::get_relative_risk_to_risk_factor(DiseaseInfo source, Gender gender,
-                                              core::Identifier risk_factor_key) const {
+DataManager::get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
+                                              const core::Identifier &risk_factor_key) const {
     auto table = RelativeRiskEntity();
     if (!index_.contains("diseases")) {
         notify_warning("index has no 'diseases' entry.");
@@ -416,7 +416,8 @@ DataManager::get_relative_risk_to_risk_factor(DiseaseInfo source, Gender gender,
     return table;
 }
 
-CancerParameterEntity DataManager::get_disease_parameter(DiseaseInfo info, Country country) const {
+CancerParameterEntity DataManager::get_disease_parameter(const DiseaseInfo &info,
+                                                         const Country &country) const {
     auto table = CancerParameterEntity();
     if (!index_.contains("diseases")) {
         notify_warning("index has no 'diseases' entry.");
@@ -487,8 +488,8 @@ std::vector<BirthItem> DataManager::get_birth_indicators(const Country &country)
 }
 
 std::vector<BirthItem>
-DataManager::get_birth_indicators(const Country country,
-                                  const std::function<bool(unsigned int)> time_filter) const {
+DataManager::get_birth_indicators(const Country &country,
+                                  const std::function<bool(unsigned int)> &time_filter) const {
     std::vector<BirthItem> result;
     if (index_.contains("demographic")) {
         auto nodepath = index_["demographic"]["path"].get<std::string>();
@@ -560,7 +561,7 @@ std::vector<LmsDataRow> DataManager::get_lms_parameters() const {
     return parameters;
 }
 
-DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) const {
+DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country &country) const {
     DiseaseAnalysisEntity entity;
     if (!index_.contains("analysis")) {
         notify_warning("index has no 'analysis' entry.");
@@ -589,7 +590,7 @@ DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) c
         entity.disability_weights.emplace(row[0], std::stof(row[1]));
     }
 
-    entity.cost_of_diseases = load_cost_of_diseases(country, cost_node, local_root_path.string());
+    entity.cost_of_diseases = load_cost_of_diseases(country, cost_node, local_root_path);
     entity.life_expectancy = load_life_expectancy(country);
     return entity;
 }
@@ -616,7 +617,7 @@ RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() cons
 }
 
 std::map<int, std::map<Gender, double>>
-DataManager::load_cost_of_diseases(Country country, nlohmann::json node,
+DataManager::load_cost_of_diseases(const Country &country, const nlohmann::json &node,
                                    const std::filesystem::path &parent_path) const {
     std::map<int, std::map<Gender, double>> result;
     auto cost_path = node["path"].get<std::string>();
@@ -718,7 +719,7 @@ DataManager::create_fields_index_mapping(const std::vector<std::string> &column_
     return mapping;
 }
 
-void DataManager::notify_warning(const std::string_view message) const {
+void DataManager::notify_warning(std::string_view message) const {
     if (verbosity_ == VerboseMode::none) {
         return;
     }
