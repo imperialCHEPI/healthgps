@@ -49,7 +49,7 @@ class RuntimeMetric {
     /// @param metric_key Metric identifier.
     /// @param value Metric value.
     /// @return true if insertion happened; otherwise, false.
-    bool emplace(const std::string &metric_key, const double value);
+    bool emplace(const std::string &metric_key, double value);
 
     /// @brief Removes a specified metric from the container.
     /// @param metric_key Metric identifier.

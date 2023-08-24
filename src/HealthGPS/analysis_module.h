@@ -39,7 +39,7 @@ class AnalysisModule final : public UpdatableModule {
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
 
-    double calculate_residual_disability_weight(int age, const core::Gender gender,
+    double calculate_residual_disability_weight(int age, core::Gender gender,
                                                 const DoubleAgeGenderTable &expected_sum,
                                                 const IntegerAgeGenderTable &expected_count);
 

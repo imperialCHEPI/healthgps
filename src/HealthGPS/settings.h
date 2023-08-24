@@ -13,8 +13,7 @@ class Settings {
     /// @param size_fraction Virtual population fraction of the real population
     /// @param age_range Allowed age range in the population
     /// @throws std::out_of_range for size fraction value outside of the range (0, 1].
-    Settings(core::Country country, const float size_fraction,
-             const core::IntegerInterval &age_range);
+    Settings(core::Country country, float size_fraction, const core::IntegerInterval &age_range);
 
     /// @brief Gets the experiment target country information
     /// @return Country information
