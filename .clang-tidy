@@ -5,6 +5,7 @@ Checks: >
     clang-analyzer-*,
     bugprone-*,
     readability-*,
+    modernize-*,
 
     # Checks to exclude
     -*,
@@ -13,6 +14,7 @@ Checks: >
     -clang-analyzer-optin.osx.*,
     -bugprone-easily-swappable-parameters,
     -bugprone-narrowing-conversions,
+    -modernize-use-trailing-return-type,
     -readability-identifier-length,
     -readability-implicit-bool-conversion,
     -readability-uppercase-literal-suffix,
