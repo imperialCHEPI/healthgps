@@ -6,6 +6,7 @@ Checks: >
     bugprone-*,
     readability-*,
     modernize-*,
+    performance-*,
 
     # Checks to exclude
     -*,
