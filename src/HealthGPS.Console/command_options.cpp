@@ -19,6 +19,7 @@ cxxopts::Options create_options() {
     return options;
 }
 
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
 CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]) {
     namespace fs = std::filesystem;
 

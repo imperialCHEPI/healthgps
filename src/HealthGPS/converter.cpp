@@ -24,7 +24,7 @@ DiseaseTable StoreConverter::to_disease_table(const core::DiseaseEntity &entity)
         data[v.with_age][v.gender] = DiseaseMeasure(v.measures);
     }
 
-    return DiseaseTable(entity.info, std::move(measures), std::move(data));
+    return {entity.info, std::move(measures), std::move(data)};
 }
 
 FloatAgeGenderTable StoreConverter::to_relative_risk_table(const core::RelativeRiskEntity &entity) {
@@ -51,7 +51,7 @@ FloatAgeGenderTable StoreConverter::to_relative_risk_table(const core::RelativeR
         }
     }
 
-    return FloatAgeGenderTable(MonotonicVector(rows), cols, std::move(data));
+    return {MonotonicVector(rows), cols, std::move(data)};
 }
 
 RelativeRiskLookup StoreConverter::to_relative_risk_lookup(const core::RelativeRiskEntity &entity) {
@@ -72,7 +72,7 @@ RelativeRiskLookup StoreConverter::to_relative_risk_lookup(const core::RelativeR
         }
     }
 
-    return RelativeRiskLookup(MonotonicVector(rows), MonotonicVector(cols), std::move(data));
+    return {MonotonicVector(rows), MonotonicVector(cols), std::move(data)};
 }
 
 RelativeRisk create_relative_risk(const RelativeRiskInfo &info) {
@@ -133,8 +133,7 @@ StoreConverter::to_analysis_definition(const core::DiseaseAnalysisEntity &entity
         weights.emplace(core::Identifier{item.first}, item.second);
     }
 
-    return AnalysisDefinition(std::move(life_expectancy), std::move(cost_of_disease),
-                              std::move(weights));
+    return {std::move(life_expectancy), std::move(cost_of_disease), std::move(weights)};
 }
 
 LifeTable StoreConverter::to_life_table(const std::vector<core::BirthItem> &births,
@@ -149,7 +148,7 @@ LifeTable StoreConverter::to_life_table(const std::vector<core::BirthItem> &birt
         table_deaths[item.at_time].emplace(item.with_age, Mortality(item.males, item.females));
     }
 
-    return LifeTable(std::move(table_births), std::move(table_deaths));
+    return {std::move(table_births), std::move(table_deaths)};
 }
 
 DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParameterEntity &entity) {
@@ -170,7 +169,7 @@ DiseaseParameter StoreConverter::to_disease_parameter(const core::CancerParamete
         deaths.emplace(item.value - offset, DoubleGenderValue(item.male, item.female));
     }
 
-    return DiseaseParameter(entity.at_time, distribution, survival, deaths);
+    return {entity.at_time, distribution, survival, deaths};
 }
 
 LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataRow> &dataset) {
@@ -180,6 +179,6 @@ LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataR
             LmsRecord{.lambda = row.lambda, .mu = row.mu, .sigma = row.sigma};
     }
 
-    return LmsDefinition{std::move(lms_dataset)};
+    return {std::move(lms_dataset)};
 }
 } // namespace hgps::detail

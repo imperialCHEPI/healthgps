@@ -158,8 +158,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         mapping.emplace_back(item.name, item.level, item.range);
     }
 
-    return ModelInput(input_table, settings, run_info, ses_mapping,
-                      HierarchicalMapping(std::move(mapping)), diseases);
+    return {input_table, settings, run_info, ses_mapping, HierarchicalMapping(std::move(mapping)),
+            diseases};
 }
 
 std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {

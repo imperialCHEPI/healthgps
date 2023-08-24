@@ -77,7 +77,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
                     .name = "Colorectal cancer"},
     };
 
-    return ModelInput(data, settings, info, ses, mapping, diseases);
+    return {data, settings, info, ses, mapping, diseases};
 }
 
 TEST(TestHealthGPS, RandomBitGenerator) {

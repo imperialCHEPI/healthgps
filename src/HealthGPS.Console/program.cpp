@@ -191,8 +191,10 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     return exit_application(EXIT_SUCCESS);
 }
 
+// NOLINTBEGIN(modernize-concat-nested-namespaces)
 /// @brief Top-level namespace for Health-GPS Console host application
 namespace host {
 /// @brief Internal details namespace for private data types and functions
 namespace detail {}
 } // namespace host
+// NOLINTEND(modernize-concat-nested-namespaces)
