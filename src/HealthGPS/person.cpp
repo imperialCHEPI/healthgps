@@ -29,7 +29,7 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
 Person::Person() : id_{++Person::newUID} {}
 
 Person::Person(const core::Gender birth_gender) noexcept
-    : gender{birth_gender}, age{0}, id_{++Person::newUID} {}
+    : gender{birth_gender}, id_{++Person::newUID} {}
 
 std::size_t Person::id() const noexcept { return id_; }
 

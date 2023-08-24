@@ -1,6 +1,8 @@
 #include "info_message.h"
 #include <fmt/format.h>
 
+#include <utility>
+
 namespace hgps {
 
 InfoEventMessage::InfoEventMessage(std::string sender, ModelAction action, unsigned int run,
@@ -9,7 +11,7 @@ InfoEventMessage::InfoEventMessage(std::string sender, ModelAction action, unsig
 
 InfoEventMessage::InfoEventMessage(std::string sender, ModelAction action, unsigned int run,
                                    int time, std::string msg) noexcept
-    : EventMessage{sender, run}, model_action{action}, model_time{time}, message{msg} {}
+    : EventMessage{sender, run}, model_action{action}, model_time{time}, message{std::move(msg)} {}
 
 int InfoEventMessage::id() const noexcept { return static_cast<int>(EventType::info); }
 

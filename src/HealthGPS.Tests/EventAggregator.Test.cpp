@@ -64,7 +64,9 @@ TEST(TestHealthGPS_EventBus, AddEventSubscribers) {
 
     // auto counter = 0;
     auto handler = TestHandler{};
-    auto member_callback = std::bind(&TestHandler::handler_event, &handler, _1);
+    auto member_callback = [ObjectPtr = &handler](auto &&PH1) {
+        ObjectPtr->handler_event(std::forward<decltype(PH1)>(PH1));
+    };
 
     auto hub = DefaultEventBus{};
     auto free_sub = hub.subscribe(EventType::info, free_handler_event);
@@ -90,7 +92,9 @@ TEST(TestHealthGPS_EventBus, HandlerAutoUnsubscribe) {
 
     auto counter = 0;
     auto handler = TestHandler{};
-    auto member_callback = std::bind(&TestHandler::handler_event, &handler, _1);
+    auto member_callback = [ObjectPtr = &handler](auto &&PH1) {
+        ObjectPtr->handler_event(std::forward<decltype(PH1)>(PH1));
+    };
 
     auto hub = DefaultEventBus{};
     {
@@ -114,7 +118,9 @@ TEST(TestHealthGPS_EventBus, ContainerAutoUnsubscribe) {
 
     auto counter = 0;
     auto handler = TestHandler{};
-    auto member_callback = std::bind(&TestHandler::handler_event, &handler, _1);
+    auto member_callback = [ObjectPtr = &handler](auto &&PH1) {
+        ObjectPtr->handler_event(std::forward<decltype(PH1)>(PH1));
+    };
 
     std::vector<std::unique_ptr<EventSubscriber>> subscribers;
 
@@ -141,7 +147,9 @@ TEST(TestHealthGPS_EventBus, ClearUnsubscribes) {
 
     auto counter = 0;
     auto handler = TestHandler{};
-    auto member_callback = std::bind(&TestHandler::handler_event, &handler, _1);
+    auto member_callback = [ObjectPtr = &handler](auto &&PH1) {
+        ObjectPtr->handler_event(std::forward<decltype(PH1)>(PH1));
+    };
 
     auto hub = DefaultEventBus{};
     auto free_sub = hub.subscribe(EventType::info, free_handler_event);
@@ -161,7 +169,9 @@ TEST(TestHealthGPS_EventBus, PublishToSubscribers) {
     auto counter = 0;
     auto expected = 2;
     auto handler = TestHandler{};
-    auto callback = std::bind(&TestHandler::handler_event, &handler, _1);
+    auto callback = [ObjectPtr = &handler](auto &&PH1) {
+        ObjectPtr->handler_event(std::forward<decltype(PH1)>(PH1));
+    };
 
     auto hub = DefaultEventBus{};
     auto fun_sub = hub.subscribe(EventType::info, callback);
@@ -186,7 +196,9 @@ TEST(TestHealthGPS_EventBus, PublishToFilteredSubscribers) {
     auto count_expected = 2;
 
     auto info_handler = TestHandler{};
-    auto info_callback = std::bind(&TestHandler::handler_event, &info_handler, _1);
+    auto info_callback = [ObjectPtr = &info_handler](auto &&PH1) {
+        ObjectPtr->handler_event(std::forward<decltype(PH1)>(PH1));
+    };
 
     auto hub = DefaultEventBus{};
     auto info_sub = hub.subscribe(EventType::info, info_callback);

@@ -371,7 +371,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         return;
     }
 
-    channels_.push_back("count");
+    channels_.emplace_back("count");
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }

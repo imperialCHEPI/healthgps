@@ -51,9 +51,9 @@ class ModelInput {
     /// @param ses_info Socio-economic status (SES) model information
     /// @param risk_mapping Hierarchical risk factors model mappings
     /// @param diseases Selected diseases to include in experiment
-    ModelInput(core::DataTable &data, const Settings &settings, const RunInfo &run_info,
-               const SESDefinition &ses_info, const HierarchicalMapping &risk_mapping,
-               const std::vector<core::DiseaseInfo> &diseases);
+    ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
+               SESDefinition ses_info, HierarchicalMapping risk_mapping,
+               std::vector<core::DiseaseInfo> diseases);
 
     /// @brief Gets the simulation experiment settings definition
     /// @return Experiment settings definition

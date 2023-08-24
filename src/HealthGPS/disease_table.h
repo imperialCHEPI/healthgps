@@ -24,7 +24,7 @@ class DiseaseMeasure {
 
     /// @brief Initialises a new instance of the DiseaseMeasure class.
     /// @param measures The disease measures value mapping
-    DiseaseMeasure(const std::map<int, double> &measures);
+    DiseaseMeasure(std::map<int, double> measures);
 
     /// @brief Gets the size of the measure collection
     /// @return

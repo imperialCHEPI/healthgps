@@ -1,12 +1,13 @@
 #include <stdexcept>
+#include <utility>
 
 #include "settings.h"
 
 namespace hgps {
 
-Settings::Settings(const core::Country &country, const float size_fraction,
+Settings::Settings(core::Country country, const float size_fraction,
                    const core::IntegerInterval &age_range)
-    : country_{country}, size_fraction_{size_fraction}, age_range_{age_range} {
+    : country_{std::move(country)}, size_fraction_{size_fraction}, age_range_{age_range} {
 
     // TODO: Create a fraction type wrapper
     if (size_fraction <= 0.0 || size_fraction > 1.0) {

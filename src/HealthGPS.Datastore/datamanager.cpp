@@ -356,7 +356,7 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(DiseaseInfo source,
 
     notify_warning("index has no 'diseases' entry.");
 
-    return RelativeRiskEntity();
+    return {};
 }
 
 RelativeRiskEntity
@@ -609,7 +609,7 @@ RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() cons
     }
     notify_warning("index has no 'diseases' entry.");
 
-    return RelativeRiskEntity();
+    return {};
 }
 
 std::map<int, std::map<Gender, double>>

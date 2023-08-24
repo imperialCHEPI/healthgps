@@ -56,7 +56,7 @@ std::optional<core::DiseaseInfo> CachedRepository::get_disease_info(core::Identi
         return *it;
     }
 
-    return std::optional<core::DiseaseInfo>();
+    return {};
 }
 
 DiseaseDefinition &CachedRepository::get_disease_definition(const core::DiseaseInfo &info,

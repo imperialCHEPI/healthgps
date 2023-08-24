@@ -46,7 +46,7 @@ void Population::add_newborn_babies(std::size_t number, core::Gender gender,
     }
 
     for (auto i = std::size_t{0}; i < remaining; i++) {
-        people_.emplace_back(Person{gender});
+        people_.emplace_back(gender);
     }
 }
 

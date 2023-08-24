@@ -4,8 +4,7 @@
 #include "default_cancer_model.h"
 #include <fmt/format.h>
 
-namespace hgps {
-namespace detail {
+namespace hgps::detail {
 core::Gender StoreConverter::to_gender(const std::string name) {
     if (core::case_insensitive::equals(name, "male")) {
         return core::Gender::male;
@@ -183,5 +182,4 @@ LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataR
 
     return LmsDefinition{std::move(lms_dataset)};
 }
-} // namespace detail
-} // namespace hgps
+} // namespace hgps::detail

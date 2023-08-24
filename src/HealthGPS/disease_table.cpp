@@ -2,11 +2,12 @@
 
 #include <fmt/format.h>
 #include <stdexcept>
+#include <utility>
 
 namespace hgps {
 /* --------------------   Disease Measure Implementation ----------------- */
 
-DiseaseMeasure::DiseaseMeasure(const std::map<int, double> &measures) : measures_{measures} {}
+DiseaseMeasure::DiseaseMeasure(std::map<int, double> measures) : measures_{std::move(measures)} {}
 
 std::size_t DiseaseMeasure::size() const noexcept { return measures_.size(); }
 

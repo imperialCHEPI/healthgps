@@ -210,7 +210,7 @@ TEST(ChannelTest, MultipleConsumers) {
     // Create multiple consumers
     std::vector<std::jthread> threads;
     for (auto i = 0; i < number_of_consumers; ++i) {
-        threads.emplace_back(std::jthread{consumer});
+        threads.emplace_back(consumer);
     }
 
     // Producer
