@@ -18,6 +18,7 @@ Checks: >
     -bugprone-easily-swappable-parameters,
     -bugprone-narrowing-conversions,
     -modernize-use-trailing-return-type,
+    -modernize-use-nodiscard,
     -readability-identifier-length,
     -readability-implicit-bool-conversion,
     -readability-uppercase-literal-suffix,
