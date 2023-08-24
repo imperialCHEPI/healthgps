@@ -43,7 +43,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
 }
 
 void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &context) {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto sum = create_age_gender_table<double>(age_range);
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
@@ -97,7 +97,7 @@ double DefaultDiseaseModel::get_excess_mortality(const Person &entity) const noe
 }
 
 DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(RuntimeContext &context) {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto sum = create_age_gender_table<double>(age_range);
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
@@ -148,13 +148,13 @@ double DefaultDiseaseModel::calculate_combined_relative_risk(const Person &entit
 
 double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Person &entity) const {
     auto relative_risk_value = 1.0;
-    auto &relative_factors = definition_.get().relative_risk_factors();
-    for (auto &factor : entity.risk_factors) {
+    const auto &relative_factors = definition_.get().relative_risk_factors();
+    for (const auto &factor : entity.risk_factors) {
         if (!relative_factors.contains(factor.first)) {
             continue;
         }
 
-        auto &lut = relative_factors.at(factor.first).at(entity.gender);
+        const auto &lut = relative_factors.at(factor.first).at(entity.gender);
         auto factor_value =
             weight_classifier_.adjust_risk_factor_value(entity, factor.first, factor.second);
         auto lookup_value = static_cast<float>(factor_value);
@@ -169,8 +169,8 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &e
                                                                  const int &start_time,
                                                                  const int &time_now) const {
     auto relative_risk_value = 1.0;
-    auto &lut = definition_.get().relative_risk_diseases();
-    for (auto &disease : entity.diseases) {
+    const auto &lut = definition_.get().relative_risk_diseases();
+    for (const auto &disease : entity.diseases) {
         if (!lut.contains(disease.first)) {
             continue;
         }
@@ -213,7 +213,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         }
 
         if (entity.age == 0) {
-            if (entity.diseases.size() > 0) {
+            if (!entity.diseases.empty()) {
                 entity.diseases.clear(); // Should not have nay disease at birth!
             }
 

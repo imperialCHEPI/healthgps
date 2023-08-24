@@ -9,15 +9,16 @@
 namespace hgps {
 PopulationModule::PopulationModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
                                    LifeTable &&life_table)
-    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)}, birth_rates_{},
-      residual_death_rates_{} {
+    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)} {
     if (pop_data_.empty()) {
         if (!life_table_.empty()) {
             throw std::invalid_argument("empty population and life table content mismatch.");
         }
 
         return;
-    } else if (life_table_.empty()) {
+    }
+
+    if (life_table_.empty()) {
         throw std::invalid_argument("population and empty life table content mismatch.");
     }
 
@@ -49,7 +50,7 @@ const std::string &PopulationModule::name() const noexcept { return name_; }
 std::size_t PopulationModule::get_total_population_size(int time_year) const noexcept {
     auto total = 0.0f;
     if (pop_data_.contains(time_year)) {
-        auto &year_data = pop_data_.at(time_year);
+        const auto &year_data = pop_data_.at(time_year);
         total = std::accumulate(year_data.begin(), year_data.end(), 0.0f,
                                 [](const float previous, const auto &element) {
                                     return previous + element.second.total();
@@ -79,11 +80,11 @@ PopulationModule::get_age_gender_distribution(int time_year) const noexcept {
         return result;
     }
 
-    auto &year_data = pop_data_.at(time_year);
+    const auto &year_data = pop_data_.at(time_year);
     if (!year_data.empty()) {
         double total_ratio = 1.0 / get_total_population_size(time_year);
 
-        for (auto &age : year_data) {
+        for (const auto &age : year_data) {
             result.emplace(age.first, DoubleGenderValue(age.second.males * total_ratio,
                                                         age.second.females * total_ratio));
         }
@@ -216,7 +217,7 @@ void PopulationModule::update_residual_mortality(RuntimeContext &context,
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         if (message.has_value()) {
             auto &basePtr = message.value();
-            auto messagePrt = dynamic_cast<ResidualMortalityMessage *>(basePtr.get());
+            auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(basePtr.get());
             if (messagePrt) {
                 residual_death_rates_ = messagePrt->data();
             } else {
@@ -235,7 +236,7 @@ void PopulationModule::initialise_birth_rates() {
     auto start_time = life_table_.time_limits().lower();
     auto end_time = life_table_.time_limits().upper();
     for (int year = start_time; year <= end_time; year++) {
-        auto &births = life_table_.get_births_at(year);
+        const auto &births = life_table_.get_births_at(year);
         auto population_size = get_total_population_size(year);
 
         double male_birth_rate =
@@ -249,7 +250,7 @@ void PopulationModule::initialise_birth_rates() {
 
 GenderTable<int, double> PopulationModule::create_death_rates_table(int time_year) {
     auto &population = pop_data_.at(time_year);
-    auto &mortality = life_table_.get_mortalities_at(time_year);
+    const auto &mortality = life_table_.get_mortalities_at(time_year);
     auto death_rates = create_integer_gender_table<double>(life_table_.age_limits());
     auto start_age = life_table_.age_limits().lower();
     auto end_age = life_table_.age_limits().upper();
@@ -314,9 +315,8 @@ PopulationModule::calculate_residual_mortality(RuntimeContext &context,
     return residual_mortality;
 }
 
-double
-PopulationModule::calculate_excess_mortality_product(const Person &entity,
-                                                     const DiseaseHostModule &disease_host) const {
+double PopulationModule::calculate_excess_mortality_product(const Person &entity,
+                                                            const DiseaseHostModule &disease_host) {
     auto product = 1.0;
     for (const auto &item : entity.diseases) {
         if (item.second.status == DiseaseStatus::active) {

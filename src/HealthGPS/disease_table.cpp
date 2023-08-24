@@ -24,7 +24,8 @@ DiseaseTable::DiseaseTable(const core::DiseaseInfo &info, std::map<std::string, 
 
     if (info.code.is_empty()) {
         throw std::invalid_argument("Invalid disease information with empty identifier");
-    } else if (data_.empty()) {
+    }
+    if (data_.empty()) {
         return; // empty table
     }
 

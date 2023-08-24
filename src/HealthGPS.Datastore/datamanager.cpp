@@ -176,8 +176,8 @@ DataManager::get_mortality(Country country,
 std::vector<DiseaseInfo> DataManager::get_diseases() const {
     auto result = std::vector<DiseaseInfo>();
     if (index_.contains("diseases")) {
-        auto &registry = index_["diseases"]["registry"];
-        for (auto &item : registry) {
+        const auto &registry = index_["diseases"]["registry"];
+        for (const auto &item : registry) {
             auto info = DiseaseInfo{};
             auto group_str = std::string{};
             auto code_srt = std::string{};
@@ -203,10 +203,10 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const {
 
 DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const {
     if (index_.contains("diseases")) {
-        auto &registry = index_["diseases"]["registry"];
+        const auto &registry = index_["diseases"]["registry"];
         auto disease_code_str = code.to_string();
         auto info = DiseaseInfo{};
-        for (auto &item : registry) {
+        for (const auto &item : registry) {
             auto item_code_str = std::string{};
             item["id"].get_to(item_code_str);
             if (item_code_str == disease_code_str) {
@@ -297,7 +297,7 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(DiseaseInfo source,
     if (index_.contains("diseases")) {
         auto diseases_path = index_["diseases"]["path"].get<std::string>();
         auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
-        auto &risk_node = index_["diseases"]["disease"]["relative_risk"];
+        const auto &risk_node = index_["diseases"]["disease"]["relative_risk"];
         auto default_value = risk_node["to_disease"]["default_value"].get<float>();
 
         auto risk_folder = risk_node["path"].get<std::string>();
@@ -347,15 +347,14 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(DiseaseInfo source,
             }
 
             return table;
-        } else {
-            notify_warning(fmt::format("{} to {} relative risk file not found, using default.",
-                                       source_code_str, target_code_str));
         }
+        notify_warning(fmt::format("{} to {} relative risk file not found, using default.",
+                                   source_code_str, target_code_str));
 
         return generate_default_relative_risk_to_disease();
-    } else {
-        notify_warning("index has no 'diseases' entry.");
     }
+
+    notify_warning("index has no 'diseases' entry.");
 
     return RelativeRiskEntity();
 }
@@ -372,7 +371,7 @@ DataManager::get_relative_risk_to_risk_factor(DiseaseInfo source, Gender gender,
     // Creates full file name from store configuration
     auto diseases_path = index_["diseases"]["path"].get<std::string>();
     auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
-    auto &risk_node = index_["diseases"]["disease"]["relative_risk"];
+    const auto &risk_node = index_["diseases"]["disease"]["relative_risk"];
 
     auto risk_folder = risk_node["path"].get<std::string>();
     auto file_folder = risk_node["to_risk_factor"]["path"].get<std::string>();
@@ -426,9 +425,9 @@ CancerParameterEntity DataManager::get_disease_parameter(DiseaseInfo info, Count
     auto disease_path = index_["diseases"]["path"].get<std::string>();
     auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
 
-    auto &params_node = index_["diseases"]["disease"]["parameters"];
+    const auto &params_node = index_["diseases"]["disease"]["parameters"];
     auto params_folder = params_node["path"].get<std::string>();
-    auto &params_files = params_node["files"];
+    const auto &params_files = params_node["files"];
 
     // Tokenized folder name X{info.code}X
     auto info_code_str = info.code.to_string();
@@ -444,7 +443,7 @@ CancerParameterEntity DataManager::get_disease_parameter(DiseaseInfo info, Count
         return table;
     }
 
-    for (auto &file : params_files.items()) {
+    for (const auto &file : params_files.items()) {
         auto file_name = (files_folder / file.value().get<std::string>());
         if (!std::filesystem::exists(file_name)) {
             notify_warning(fmt::format("{}, {} parameters file: '{}' not found.", info_code_str,
@@ -567,7 +566,7 @@ DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) c
 
     auto analysis_folder = index_["analysis"]["path"].get<std::string>();
     auto disability_filename = index_["analysis"]["disability_file_name"].get<std::string>();
-    auto &cost_node = index_["analysis"]["cost_of_disease"];
+    const auto &cost_node = index_["analysis"]["cost_of_disease"];
 
     auto local_root_path = (root_ / analysis_folder);
     disability_filename = (local_root_path / disability_filename).string();
@@ -595,7 +594,7 @@ DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country country) c
 RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() const {
     if (index_.contains("diseases")) {
         auto age_limits = index_["diseases"]["age_limits"].get<std::vector<int>>();
-        auto &to_disease = index_["diseases"]["disease"]["relative_risk"]["to_disease"];
+        const auto &to_disease = index_["diseases"]["disease"]["relative_risk"]["to_disease"];
         auto default_value = to_disease["default_value"].get<float>();
 
         auto table = RelativeRiskEntity();
@@ -607,9 +606,8 @@ RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() cons
         }
 
         return table;
-    } else {
-        notify_warning("index has no 'diseases' entry.");
     }
+    notify_warning("index has no 'diseases' entry.");
 
     return RelativeRiskEntity();
 }
@@ -683,7 +681,7 @@ std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(const Country 
 }
 
 std::string DataManager::replace_string_tokens(std::string source,
-                                               std::vector<std::string> tokens) const {
+                                               std::vector<std::string> tokens) {
     std::string output = source;
     std::size_t tk_end = 0;
     for (auto &tk : tokens) {
@@ -702,9 +700,9 @@ std::string DataManager::replace_string_tokens(std::string source,
 
 std::map<std::string, std::size_t>
 DataManager::create_fields_index_mapping(const std::vector<std::string> &column_names,
-                                         const std::vector<std::string> fields) const {
+                                         const std::vector<std::string> &fields) {
     auto mapping = std::map<std::string, std::size_t>();
-    for (auto &field : fields) {
+    for (const auto &field : fields) {
         auto field_index = core::case_insensitive::index_of(column_names, field);
         if (field_index < 0) {
             throw std::out_of_range(

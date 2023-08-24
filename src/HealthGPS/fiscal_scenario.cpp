@@ -7,8 +7,7 @@
 namespace hgps {
 FiscalPolicyScenario::FiscalPolicyScenario(SyncChannel &data_sync,
                                            FiscalPolicyDefinition &&definition)
-    : channel_{data_sync}, definition_{std::move(definition)}, factor_impact_{},
-      interventions_book_{} {
+    : channel_{data_sync}, definition_{std::move(definition)} {
 
     if (definition_.impacts.size() != 3) {
         throw std::invalid_argument("Number of impact levels mismatch, must be 3.");
@@ -88,11 +87,12 @@ double FiscalPolicyScenario::apply([[maybe_unused]] Random &generator, Person &e
                 interventions_book_.at(entity.id()) = age;
                 auto effect = adult_effect.value - teen_effect.value;
                 return value + (factor_value * effect);
-            } else if (definition_.impact_type == FiscalImpactType::optimist) {
-                return value;
-            } else {
-                throw std::logic_error("Fiscal intervention impact type not implemented.");
             }
+            if (definition_.impact_type == FiscalImpactType::optimist) {
+                return value;
+            }
+
+            throw std::logic_error("Fiscal intervention impact type not implemented.");
         }
 
         return value;
@@ -113,7 +113,8 @@ const std::vector<PolicyImpact> &FiscalPolicyScenario::impacts() const noexcept 
 FiscalImpactType parse_fiscal_impact_type(std::string impact_type) {
     if (core::case_insensitive::equals(impact_type, "pessimist")) {
         return FiscalImpactType::pessimist;
-    } else if (core::case_insensitive::equals(impact_type, "optimist")) {
+    }
+    if (core::case_insensitive::equals(impact_type, "optimist")) {
         return FiscalImpactType::optimist;
     }
 

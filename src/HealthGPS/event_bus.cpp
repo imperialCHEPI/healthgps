@@ -48,7 +48,7 @@ bool DefaultEventBus::unsubscribe(const EventSubscriber &subscriber) {
                 }
             }
 
-            if (result == true) {
+            if (result) {
                 subscribers_.erase(sub_id);
             }
         }

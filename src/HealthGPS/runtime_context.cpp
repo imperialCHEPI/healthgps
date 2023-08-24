@@ -35,9 +35,7 @@ const core::IntegerInterval &RuntimeContext::age_range() const noexcept {
     return definition_.get().inputs().settings().age_range();
 }
 
-const std::string RuntimeContext::identifier() const noexcept {
-    return definition_.get().identifier();
-}
+std::string RuntimeContext::identifier() const noexcept { return definition_.get().identifier(); }
 
 void RuntimeContext::set_current_time(const int time_now) noexcept { time_now_ = time_now; }
 

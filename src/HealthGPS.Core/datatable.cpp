@@ -59,7 +59,7 @@ DataTable::column_if_exists(const std::string &name) const {
 std::string DataTable::to_string() const noexcept {
     std::stringstream ss;
     std::size_t longestColumnName = 0;
-    for (auto &col : columns_) {
+    for (const auto &col : columns_) {
         longestColumnName = std::max(longestColumnName, col->name().length());
     }
 
@@ -70,7 +70,7 @@ std::string DataTable::to_string() const noexcept {
     ss << fmt::format("|{:-<{}}|\n", '-', width);
     ss << fmt::format("| {:{}} : {:10} : {:>10} |\n", "Column Name", pad, "Data Type", "# Nulls");
     ss << fmt::format("|{:-<{}}|\n", '-', width);
-    for (auto &col : columns_) {
+    for (const auto &col : columns_) {
         ss << fmt::format("| {:{}} : {:10} : {:10} |\n", col->name(), pad, col->type(),
                           col->null_count());
     }

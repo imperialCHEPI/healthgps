@@ -9,8 +9,7 @@ inline constexpr int PA_NO_EFFECT = -2;
 
 PhysicalActivityScenario::PhysicalActivityScenario(SyncChannel &data_sync,
                                                    PhysicalActivityDefinition &&definition)
-    : channel_{data_sync}, definition_{std::move(definition)}, factor_impact_{},
-      interventions_book_{} {
+    : channel_{data_sync}, definition_{std::move(definition)} {
     if (definition_.impacts.size() < 2) {
         throw std::invalid_argument("Number of impact levels mismatch, must be greater than 2.");
     }

@@ -40,24 +40,24 @@ RiskfactorAdjustmentModel::get_adjustment_coefficients(RuntimeContext &context) 
 
     // Receive message with timeout
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-    if (message.has_value()) {
-        auto &basePtr = message.value();
-        auto messagePrt = dynamic_cast<BaselineAdjustmentMessage *>(basePtr.get());
-        if (messagePrt) {
-            return messagePrt->data();
-        }
-
-        throw std::runtime_error(
-            "Simulation out of sync, failed to receive a baseline adjustments message");
-    } else {
+    if (!message.has_value()) {
         throw std::runtime_error(
             "Simulation out of sync, receive baseline adjustments message has timed out");
     }
+
+    auto &basePtr = message.value();
+    auto *messagePrt = dynamic_cast<BaselineAdjustmentMessage *>(basePtr.get());
+    if (!messagePrt) {
+        throw std::runtime_error(
+            "Simulation out of sync, failed to receive a baseline adjustments message");
+    }
+
+    return messagePrt->data();
 }
 
 FactorAdjustmentTable
 RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &context) const {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
     auto coefficients = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
 
@@ -82,7 +82,7 @@ RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &con
 
 FactorAdjustmentTable
 RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
-                                                    const core::IntegerInterval &age_range) const {
+                                                    const core::IntegerInterval &age_range) {
     auto max_age = age_range.upper() + 1;
     auto moments = std::map<core::Gender, std::map<core::Identifier, std::vector<FirstMoment>>>{};
 
@@ -94,7 +94,7 @@ RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
         }
 
         auto &table = moments.at(entity.gender);
-        for (auto &factor : entity.risk_factors) {
+        for (const auto &factor : entity.risk_factors) {
             if (!table.contains(factor.first)) {
                 table.emplace(factor.first, std::vector<FirstMoment>(max_age));
             }

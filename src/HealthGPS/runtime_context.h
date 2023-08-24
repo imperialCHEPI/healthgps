@@ -72,7 +72,7 @@ class RuntimeContext {
 
     /// @brief Gets the simulation identifier for outside world messages
     /// @return Simulation identifier
-    const std::string identifier() const noexcept;
+    std::string identifier() const noexcept;
 
     /// @brief Sets the current simulation time value
     /// @param time_now The new simulation time

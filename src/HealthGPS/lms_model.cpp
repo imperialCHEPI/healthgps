@@ -46,7 +46,7 @@ double hgps::LmsModel::adjust_risk_factor_value(const Person &entity,
 
 WeightCategory LmsModel::classify_weight_bmi(const Person &entity, double bmi) const {
     if (entity.age <= child_cutoff_age_) {
-        auto &params = definition_.get().at(entity.age, entity.gender);
+        const auto &params = definition_.get().at(entity.age, entity.gender);
 
         auto zscore = 0.0;
         if (params.lambda == 0.0) {
@@ -58,13 +58,15 @@ WeightCategory LmsModel::classify_weight_bmi(const Person &entity, double bmi) c
 
         if (zscore > 2.0) {
             return WeightCategory::obese;
-        } else if (zscore > 1.0) {
+        }
+        if (zscore > 1.0) {
             return WeightCategory::overweight;
         }
     } else {
         if (bmi >= 30.0) {
             return WeightCategory::obese;
-        } else if (bmi >= 25.0) {
+        }
+        if (bmi >= 25.0) {
             return WeightCategory::overweight;
         }
     }

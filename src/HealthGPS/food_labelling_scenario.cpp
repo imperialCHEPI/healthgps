@@ -6,9 +6,8 @@ inline constexpr int FOP_NO_EFFECT = -2;
 
 FoodLabellingScenario::FoodLabellingScenario(SyncChannel &data_sync,
                                              FoodLabellingDefinition &&definition)
-    : channel_{data_sync}, definition_{std::move(definition)}, factor_impact_{},
-      interventions_book_{} {
-    if (definition_.impacts.size() < 1) {
+    : channel_{data_sync}, definition_{std::move(definition)} {
+    if (definition_.impacts.empty()) {
         throw std::invalid_argument("Number of impact levels mismatch, must be greater than 1.");
     }
 

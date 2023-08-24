@@ -82,7 +82,7 @@ TEST(TestCore_Interval, ParseInteger) {
     auto upper = 10;
 
     auto animal = IntegerInterval{lower, upper};
-    auto any_str = "TheFox";
+    const auto *any_str = "TheFox";
     auto cat = parse_integer_interval(animal.to_string());
     ASSERT_EQ(animal, cat);
     ASSERT_THROW(parse_integer_interval(any_str), std::invalid_argument);
@@ -94,7 +94,7 @@ TEST(TestCore_Interval, ParseFloat) {
     auto upper = 10.f;
 
     auto animal = FloatInterval{lower, upper};
-    auto any_str = "TheFox";
+    const auto *any_str = "TheFox";
     auto cat = parse_float_interval(animal.to_string());
     ASSERT_EQ(animal, cat);
     ASSERT_THROW(parse_float_interval(any_str), std::invalid_argument);
@@ -106,7 +106,7 @@ TEST(TestCore_Interval, ParseDouble) {
     auto upper = 10.0;
 
     auto animal = DoubleInterval{lower, upper};
-    auto any_str = "TheFox";
+    const auto *any_str = "TheFox";
     auto cat = parse_double_interval(animal.to_string());
     ASSERT_EQ(animal, cat);
     ASSERT_THROW(parse_double_interval(any_str), std::invalid_argument);

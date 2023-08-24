@@ -17,7 +17,7 @@ inline constexpr double DALY_UNITS = 100'000.0;
 AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
                                const core::IntegerInterval age_range, unsigned int comorbidities)
     : definition_{std::move(definition)}, weight_classifier_{std::move(classifier)},
-      residual_disability_weight_{create_age_gender_table<double>(age_range)}, channels_{},
+      residual_disability_weight_{create_age_gender_table<double>(age_range)},
       comorbidities_{comorbidities} {}
 
 SimulationModuleType AnalysisModule::type() const noexcept {
@@ -27,7 +27,7 @@ SimulationModuleType AnalysisModule::type() const noexcept {
 const std::string &AnalysisModule::name() const noexcept { return name_; }
 
 void AnalysisModule::initialise_population(RuntimeContext &context) {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
@@ -101,6 +101,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         context.identifier(), context.current_run(), context.time_now(), result));
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
                                                      ModelResult &result) const {
     auto risk_factors = std::map<core::Identifier, std::map<core::Gender, double>>();
@@ -211,6 +212,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
 
     result.indicators = daly_handle.get();
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 double AnalysisModule::calculate_disability_weight(const Person &entity) const {
     auto sum = 1.0;
@@ -258,6 +260,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                            DataSeries &series) const {
     using namespace core;
@@ -290,12 +293,12 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
         }
 
         series(gender, "count").at(age)++;
-        for (auto &factor : context.mapping().entries()) {
+        for (const auto &factor : context.mapping().entries()) {
             series(gender, factor.key().to_string()).at(age) +=
                 entity.get_risk_factor_value(factor.key());
         }
 
-        for (auto &item : entity.diseases) {
+        for (const auto &item : entity.diseases) {
             if (item.second.status == DiseaseStatus::active) {
                 series(gender, item.first.to_string()).at(age)++;
             }
@@ -318,7 +321,7 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
 
     // Calculate in-place averages
     for (auto index = min_age; index <= max_age; index++) {
-        for (auto &chan : series.channels()) {
+        for (const auto &chan : series.channels()) {
             if (chan == "count") {
                 continue;
             }
@@ -341,6 +344,7 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
         }
     }
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 void AnalysisModule::classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const {
     auto weight_class = weight_classifier_.classify_weight(entity);
@@ -357,7 +361,7 @@ void AnalysisModule::classify_weight(hgps::DataSeries &series, const hgps::Perso
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
     default:
-        throw std::logic_error("Unknow weight classification category.");
+        throw std::logic_error("Unknown weight classification category.");
         break;
     }
 }
@@ -368,11 +372,11 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     channels_.push_back("count");
-    for (auto &factor : context.mapping().entries()) {
+    for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }
 
-    for (auto &disease : context.diseases()) {
+    for (const auto &disease : context.diseases()) {
         channels_.emplace_back(disease.code.to_string());
     }
 

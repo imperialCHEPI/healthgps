@@ -9,9 +9,8 @@ inline constexpr int MARKETING_FORMER = -2;
 
 hgps::MarketingDynamicScenario::MarketingDynamicScenario(SyncChannel &data_sync,
                                                          MarketingDynamicDefinition &&definition)
-    : channel_{data_sync}, definition_{std::move(definition)}, factor_impact_{},
-      interventions_book_{} {
-    if (definition_.impacts.size() < 1) {
+    : channel_{data_sync}, definition_{std::move(definition)} {
+    if (definition_.impacts.empty()) {
         throw std::invalid_argument("Number of impact levels mismatch, must be greater than 1.");
     }
 

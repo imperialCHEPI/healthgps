@@ -3,8 +3,7 @@
 namespace hgps {
 MarketingPolicyScenario::MarketingPolicyScenario(SyncChannel &data_sync,
                                                  MarketingPolicyDefinition &&definition)
-    : channel_{data_sync}, definition_{std::move(definition)}, factor_impact_{},
-      interventions_book_{} {
+    : channel_{data_sync}, definition_{std::move(definition)} {
 
     if (definition_.impacts.size() != 3) {
         throw std::invalid_argument("Number of impact levels mismatch, must be 3.");

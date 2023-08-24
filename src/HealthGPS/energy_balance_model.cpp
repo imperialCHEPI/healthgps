@@ -5,6 +5,11 @@
 
 #include <algorithm>
 
+/*
+ * Suppress this clang-tidy warning for now, because most (all?) of these methods won't
+ * be suitable for converting to statics once the model is finished.
+ */
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 namespace hgps {
 
 // Risk factor keys.
@@ -304,3 +309,4 @@ std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_mo
 }
 
 } // namespace hgps
+// NOLINTEND(readability-convert-member-functions-to-static)

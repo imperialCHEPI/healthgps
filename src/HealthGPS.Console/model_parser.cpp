@@ -62,7 +62,7 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
         opt["levels"].get<std::unordered_map<std::string, poco::HierarchicalLevelInfo>>();
 
     for (const auto &model_item : model_info.models) {
-        auto &at = model_item.second;
+        const auto &at = model_item.second;
 
         std::unordered_map<hgps::core::Identifier, hgps::Coefficient> coeffs;
         for (const auto &pair : at.coefficients) {
@@ -128,6 +128,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
         fmt::format("Dynamic model name '{}' is not recognised.", model_name)};
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
 load_ebhlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
@@ -146,7 +147,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 
     info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
     for (const auto &it : opt["Equations"].items()) {
-        auto &age_key = it.key();
+        const auto &age_key = it.key();
         info.equations.emplace(
             age_key, std::map<std::string, std::vector<poco::FactorDynamicEquationInfo>>());
 
@@ -203,6 +204,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
     return std::make_unique<hgps::LiteHierarchicalModelDefinition>(
         std::move(equations), std::move(variables), percentage);
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
 load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {

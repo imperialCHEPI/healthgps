@@ -45,7 +45,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
 }
 
 void DefaultCancerModel::initialise_average_relative_risk(RuntimeContext &context) {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto sum = create_age_gender_table<double>(age_range);
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
@@ -90,7 +90,7 @@ void DefaultCancerModel::update_disease_status(RuntimeContext &context) {
 }
 
 double DefaultCancerModel::get_excess_mortality(const Person &entity) const noexcept {
-    auto &disease_info = entity.diseases.at(disease_type());
+    const auto &disease_info = entity.diseases.at(disease_type());
     auto max_onset = definition_.get().parameters().max_time_since_onset;
     if (disease_info.time_since_onset < 0 || disease_info.time_since_onset >= max_onset) {
         return 0.0;
@@ -98,7 +98,7 @@ double DefaultCancerModel::get_excess_mortality(const Person &entity) const noex
 
     auto mortality_id = definition_.get().table().at(MeasureKey::mortality);
     auto excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
-    auto &death_weight =
+    const auto &death_weight =
         definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
     if (entity.gender == core::Gender::male) {
         return excess_mortality * death_weight.males;
@@ -108,7 +108,7 @@ double DefaultCancerModel::get_excess_mortality(const Person &entity) const noex
 }
 
 DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(RuntimeContext &context) {
-    auto &age_range = context.age_range();
+    const auto &age_range = context.age_range();
     auto sum = create_age_gender_table<double>(age_range);
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
@@ -159,13 +159,13 @@ double DefaultCancerModel::calculate_combined_relative_risk(const Person &entity
 
 double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person &entity) const {
     auto relative_risk_value = 1.0;
-    auto &relative_factors = definition_.get().relative_risk_factors();
-    for (auto &factor : entity.risk_factors) {
+    const auto &relative_factors = definition_.get().relative_risk_factors();
+    for (const auto &factor : entity.risk_factors) {
         if (!relative_factors.contains(factor.first)) {
             continue;
         }
 
-        auto &lut = relative_factors.at(factor.first).at(entity.gender);
+        const auto &lut = relative_factors.at(factor.first).at(entity.gender);
         auto factor_value =
             weight_classifier_.adjust_risk_factor_value(entity, factor.first, factor.second);
         auto lookup_value = static_cast<float>(factor_value);
@@ -180,8 +180,8 @@ double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &en
                                                                 const int &start_time,
                                                                 const int &time_now) const {
     auto relative_risk_value = 1.0;
-    auto &lut = definition_.get().relative_risk_diseases();
-    for (auto &disease : entity.diseases) {
+    const auto &lut = definition_.get().relative_risk_diseases();
+    for (const auto &disease : entity.diseases) {
         if (!lut.contains(disease.first)) {
             continue;
         }
@@ -228,7 +228,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         }
 
         if (entity.age == 0) {
-            if (entity.diseases.size() > 0) {
+            if (!entity.diseases.empty()) {
                 entity.diseases.clear(); // Should not have nay disease at birth!
             }
 
@@ -266,11 +266,11 @@ double DefaultCancerModel::calculate_incidence_probability(const Person &entity,
 int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,
                                                    const core::Gender &gender) const {
 
-    auto &pdf = definition_.get().parameters().prevalence_distribution;
+    const auto &pdf = definition_.get().parameters().prevalence_distribution;
     auto values = std::vector<int>{};
     auto cumulative = std::vector<double>{};
     auto sum = 0.0;
-    for (auto &item : pdf) {
+    for (const auto &item : pdf) {
         auto p = item.second.males;
         if (gender != core::Gender::male) {
             p = item.second.females;

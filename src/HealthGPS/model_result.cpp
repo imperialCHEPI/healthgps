@@ -21,13 +21,13 @@ std::string ModelResult::to_string() const noexcept {
                       indicators.disability_adjusted_life_years);
 
     ss << fmt::format("{:{}}  : {:>14} : {:>14}\n", "#Risk factors average", pad, "Male", "Female");
-    for (auto &item : risk_ractor_average) {
+    for (const auto &item : risk_ractor_average) {
         ss << fmt::format(" {:{}} : {:>14.5f} : {:>14.5f}\n", item.first, pad, item.second.male,
                           item.second.female);
     }
 
     ss << fmt::format("{:{}}  : {:>14} : {:>14}\n", "#Prevalence", pad, "Male", "Female");
-    for (auto &item : disease_prevalence) {
+    for (const auto &item : disease_prevalence) {
         ss << fmt::format(" {:{}} : {:>14.5f} : {:>14.5f}\n", item.first, pad, item.second.male,
                           item.second.female);
     }

@@ -12,14 +12,15 @@ using ElapsedTime = std::chrono::duration<double, std::milli>;
 
 ModelRunner::ModelRunner(EventAggregator &bus,
                          std::unique_ptr<RandomBitGenerator> generator) noexcept
-    : running_{false}, event_bus_{bus}, rnd_{std::move(generator)}, source_{} {}
+    : running_{false}, event_bus_{bus}, rnd_{std::move(generator)} {}
 
 double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     if (trial_runs < 1) {
         throw std::invalid_argument("The number of trial runs must not be less than one");
-    } else if (baseline.type() != ScenarioType::baseline) {
+    }
+    if (baseline.type() != ScenarioType::baseline) {
         throw std::invalid_argument(
-            fmt::format("Simulation: '{}' can not be evaluated alone", baseline.name()));
+            fmt::format("Simulation: '{}' cannot be evaluated alone", baseline.name()));
     }
 
     if (running_.load()) {
@@ -62,10 +63,12 @@ double ModelRunner::run(Simulation &baseline, Simulation &intervention,
                         const unsigned int trial_runs) {
     if (trial_runs < 1) {
         throw std::invalid_argument("The number of trial runs must not be less than one.");
-    } else if (baseline.type() != ScenarioType::baseline) {
+    }
+    if (baseline.type() != ScenarioType::baseline) {
         throw std::invalid_argument(
             fmt::format("Baseline simulation: {} type mismatch.", baseline.name()));
-    } else if (intervention.type() != ScenarioType::intervention) {
+    }
+    if (intervention.type() != ScenarioType::intervention) {
         throw std::invalid_argument(
             fmt::format("Intervention simulation: {} type mismatch.", intervention.name()));
     }

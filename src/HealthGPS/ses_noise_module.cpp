@@ -37,12 +37,12 @@ void SESNoiseModule::initialise_population(RuntimeContext &context) {
 void SESNoiseModule::update_population(RuntimeContext &context) {
     auto newborn_age = 0u;
     auto &pop = context.population();
-    auto indeces = core::find_index_of_all(core::execution_policy, pop, [&](const Person &entity) {
+    auto indices = core::find_index_of_all(core::execution_policy, pop, [&](const Person &entity) {
         return entity.age == newborn_age;
     });
 
-    std::sort(indeces.begin(), indeces.end());
-    for (auto &index : indeces) {
+    std::sort(indices.begin(), indices.end());
+    for (auto &index : indices) {
         pop[index].ses = context.random().next_normal(parameters_[0], parameters_[1]);
     }
 }

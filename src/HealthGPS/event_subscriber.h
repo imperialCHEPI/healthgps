@@ -24,7 +24,7 @@ class EventSubscriberHandler final : public EventSubscriber {
 
     void unsubscribe() const override;
 
-    [[nodiscard]] const EventHandlerIdentifier id() const noexcept override;
+    [[nodiscard]] EventHandlerIdentifier id() const noexcept override;
 
   private:
     EventHandlerIdentifier identifier_;

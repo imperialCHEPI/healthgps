@@ -7,13 +7,13 @@
 #include "HealthGPS/runner_message.h"
 
 struct TestHandler {
-    void handler_event(std::shared_ptr<hgps::EventMessage>) { counter++; }
+    void handler_event(std::shared_ptr<hgps::EventMessage> /*unused*/) { counter++; }
 
     int counter{};
 };
 
 static int global_counter = 0;
-static void free_handler_event(std::shared_ptr<hgps::EventMessage>) { global_counter++; }
+static void free_handler_event(std::shared_ptr<hgps::EventMessage> /*unused*/) { global_counter++; }
 
 TEST(TestHealthGPS_EventBus, CreateHandlerIdentifier) {
     using namespace hgps;

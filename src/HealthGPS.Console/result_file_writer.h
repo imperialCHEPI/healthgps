@@ -41,7 +41,7 @@ class ResultFileWriter final : public ResultWriter {
     void write_json_begin(const std::filesystem::path output);
     void write_json_end();
 
-    std::string to_json_string(const hgps::ResultEventMessage &message) const;
+    static std::string to_json_string(const hgps::ResultEventMessage &message);
     void write_csv_channels(const hgps::ResultEventMessage &message);
     void write_csv_header(const hgps::ResultEventMessage &message);
 };

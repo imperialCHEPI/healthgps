@@ -76,8 +76,8 @@ class PopulationModule final : public DemographicModule {
                                                           const DiseaseHostModule &disease_host);
 
     void update_residual_mortality(RuntimeContext &context, const DiseaseHostModule &disease_host);
-    double calculate_excess_mortality_product(const Person &entity,
-                                              const DiseaseHostModule &disease_host) const;
+    static double calculate_excess_mortality_product(const Person &entity,
+                                                     const DiseaseHostModule &disease_host);
     int update_age_and_death_events(RuntimeContext &context, const DiseaseHostModule &disease_host);
 };
 

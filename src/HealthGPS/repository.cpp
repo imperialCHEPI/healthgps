@@ -6,9 +6,7 @@
 
 namespace hgps {
 
-CachedRepository::CachedRepository(core::Datastore &manager)
-    : mutex_{}, data_manager_{manager}, rf_model_definition_{}, baseline_adjustments_{},
-      diseases_info_{}, diseases_{}, lms_parameters_{} {}
+CachedRepository::CachedRepository(core::Datastore &manager) : data_manager_{manager} {}
 
 void CachedRepository::register_risk_factor_model_definition(
     const HierarchicalModelType &model_type,
@@ -50,7 +48,7 @@ const std::vector<core::DiseaseInfo> &CachedRepository::get_diseases() {
 }
 
 std::optional<core::DiseaseInfo> CachedRepository::get_disease_info(core::Identifier code) {
-    auto &all_diseases = get_diseases();
+    const auto &all_diseases = get_diseases();
     auto it = std::find_if(all_diseases.cbegin(), all_diseases.cend(),
                            [&code](const core::DiseaseInfo &other) { return other.code == code; });
 

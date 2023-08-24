@@ -53,7 +53,7 @@ class DataManager : public Datastore {
 
     DiseaseInfo get_disease_info(const core::Identifier &code) const override;
 
-    DiseaseEntity get_disease(DiseaseInfo code, Country country) const override;
+    DiseaseEntity get_disease(DiseaseInfo info, Country country) const override;
 
     RelativeRiskEntity get_relative_risk_to_disease(DiseaseInfo source,
                                                     DiseaseInfo target) const override;
@@ -89,11 +89,11 @@ class DataManager : public Datastore {
 
     std::vector<LifeExpectancyItem> load_life_expectancy(const Country &country) const;
 
-    std::string replace_string_tokens(std::string source, std::vector<std::string> tokens) const;
+    static std::string replace_string_tokens(std::string source, std::vector<std::string> tokens);
 
-    std::map<std::string, std::size_t>
+    static std::map<std::string, std::size_t>
     create_fields_index_mapping(const std::vector<std::string> &column_names,
-                                const std::vector<std::string> fields) const;
+                                const std::vector<std::string> &fields);
 
     void notify_warning(const std::string_view message) const;
 };
