@@ -39,7 +39,6 @@ ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_er
 
 Configuration get_configuration(CommandOptions &options) {
     MEASURE_FUNCTION();
-    namespace fs = std::filesystem;
     using namespace host::poco;
 
     bool success = true;

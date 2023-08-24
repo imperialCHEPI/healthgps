@@ -13,8 +13,6 @@
 #include <map>
 #include <optional>
 
-namespace fs = std::filesystem;
-
 static std::vector<hgps::MappingEntry> create_mapping_entries() {
     return {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}};
 }

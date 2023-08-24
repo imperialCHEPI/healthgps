@@ -9,8 +9,6 @@
 
 #include <array>
 
-namespace fs = std::filesystem;
-
 hgps::LmsDefinition lms_parameters;
 
 inline const hgps::core::Identifier bmi_key = hgps::core::Identifier{"bmi"};

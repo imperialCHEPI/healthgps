@@ -3,8 +3,6 @@
 
 #include "HealthGPS.Datastore/api.h"
 
-namespace fs = std::filesystem;
-
 // The fixture for testing class Foo.
 class DatastoreTest : public ::testing::Test {
   protected:
