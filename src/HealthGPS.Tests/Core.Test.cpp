@@ -173,7 +173,7 @@ TEST(TestCore, CreateDataTable) {
 
     // Casting to columns type
     const auto &col = table.column("Integer");
-    const auto &int_col = static_cast<const IntegerDataTableColumn &>(col);
+    const auto &int_col = dynamic_cast<const IntegerDataTableColumn &>(col);
 
     auto slow_value = std::any_cast<int>(col.value(1));
     auto safe_value = int_col.value_safe(1);

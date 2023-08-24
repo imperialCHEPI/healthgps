@@ -29,15 +29,9 @@ ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, Exper
     write_json_begin(output_filename);
 }
 
-ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept {
-    stream_.close();
-    stream_ = std::move(other.stream_);
-
-    csvstream_.close();
-    csvstream_ = std::move(other.csvstream_);
-
-    info_ = std::move(other.info_);
-}
+ResultFileWriter::ResultFileWriter(ResultFileWriter &&other) noexcept
+    : stream_{std::move(other.stream_)}, csvstream_{std::move(other.csvstream_)},
+      info_{std::move(other.info_)} {}
 
 ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept {
     stream_.close();

@@ -310,7 +310,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry) {
                              });
 
     auto base_module = factory.create(SimulationModuleType::Analysis, config);
-    auto *country_mod = static_cast<CountryModule *>(base_module.get());
+    auto *country_mod = dynamic_cast<CountryModule *>(base_module.get());
     country_mod->execute("print");
 
     ASSERT_EQ(SimulationModuleType::Analysis, country_mod->type());
