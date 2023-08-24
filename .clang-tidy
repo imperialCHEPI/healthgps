@@ -8,6 +8,7 @@ Checks: >
     modernize-*,
     performance-*,
     misc-*,
+    cppcoreguidelines-*,
 
     # Checks to exclude
     -*,
@@ -25,6 +26,15 @@ Checks: >
     -misc-const-correctness,
     -misc-no-recursion,
     -misc-non-private-member-variables-in-classes,
+    -cppcoreguidelines-avoid-magic-numbers,
+    -cppcoreguidelines-narrowing-conversions,
+    -cppcoreguidelines-init-variables,
+    -cppcoreguidelines-non-private-member-variables-in-classes,
+    -cppcoreguidelines-avoid-non-const-global-variables,
+    -cppcoreguidelines-avoid-c-arrays,
+    -cppcoreguidelines-pro-bounds-constant-array-index,
+    -cppcoreguidelines-special-member-functions,
+    -cppcoreguidelines-macro-usage,
 CheckOptions:
     - key: readability-function-cognitive-complexity.IgnoreMacros
       value: true
