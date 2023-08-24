@@ -7,6 +7,7 @@ Checks: >
     readability-*,
     modernize-*,
     performance-*,
+    misc-*,
 
     # Checks to exclude
     -*,
@@ -21,6 +22,9 @@ Checks: >
     -readability-uppercase-literal-suffix,
     -readability-magic-numbers,
     -readability-isolate-declaration,
+    -misc-const-correctness,
+    -misc-no-recursion,
+    -misc-non-private-member-variables-in-classes,
 CheckOptions:
     - key: readability-function-cognitive-complexity.IgnoreMacros
       value: true
