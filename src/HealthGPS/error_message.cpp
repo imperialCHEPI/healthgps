@@ -6,7 +6,7 @@ namespace hgps {
 
 ErrorEventMessage::ErrorEventMessage(std::string sender, unsigned int run, int time,
                                      std::string what) noexcept
-    : EventMessage{sender, run}, model_time{time}, message{std::move(what)} {}
+    : EventMessage{std::move(sender), run}, model_time{time}, message{std::move(what)} {}
 
 int ErrorEventMessage::id() const noexcept { return static_cast<int>(EventType::error); }
 

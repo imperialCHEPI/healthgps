@@ -20,7 +20,8 @@ hgps::FiscalPolicyDefinition create_fiscal_policy_definition(hgps::FiscalImpactT
     return FiscalPolicyDefinition{impact_type, period, impacts};
 }
 
-hgps::MarketingDynamicDefinition create_dynamic_marketing_definition(std::vector<double> dynamic) {
+hgps::MarketingDynamicDefinition
+create_dynamic_marketing_definition(const std::vector<double> &dynamic) {
     using namespace hgps;
     auto period = PolicyInterval(2022, 2030);
     auto impacts = std::vector<PolicyImpact>{PolicyImpact{bmi_key, -0.12, 5, 12},

@@ -6,9 +6,11 @@
 #include <fstream>
 #include <rapidcsv.h>
 
+#include <utility>
+
 namespace hgps::data {
-DataManager::DataManager(const std::filesystem::path root_directory, VerboseMode verbosity)
-    : root_{root_directory}, verbosity_{verbosity} {
+DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbosity)
+    : root_{std::move(root_directory)}, verbosity_{verbosity} {
     auto full_filename = root_ / "index.json";
     auto ifs = std::ifstream{full_filename, std::ifstream::in};
     if (ifs) {
@@ -73,12 +75,12 @@ Country DataManager::get_country(const std::string &alpha) const {
     throw std::invalid_argument(fmt::format("Target country: '{}' not found.", alpha));
 }
 
-std::vector<PopulationItem> DataManager::get_population(Country country) const {
+std::vector<PopulationItem> DataManager::get_population(const Country &country) const {
     return DataManager::get_population(country, [](const unsigned int &) { return true; });
 }
 
 std::vector<PopulationItem>
-DataManager::get_population(Country country,
+DataManager::get_population(const Country &country,
                             const std::function<bool(const unsigned int &)> time_filter) const {
     auto results = std::vector<PopulationItem>();
 
@@ -124,12 +126,12 @@ DataManager::get_population(Country country,
     return results;
 }
 
-std::vector<MortalityItem> DataManager::get_mortality(Country country) const {
+std::vector<MortalityItem> DataManager::get_mortality(const Country &country) const {
     return DataManager::get_mortality(country, [](const unsigned int &) { return true; });
 }
 
 std::vector<MortalityItem>
-DataManager::get_mortality(Country country,
+DataManager::get_mortality(const Country &country,
                            const std::function<bool(const unsigned int &)> time_filter) const {
     auto results = std::vector<MortalityItem>();
     if (index_.contains("demographic")) {
@@ -204,7 +206,7 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const {
 DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const {
     if (index_.contains("diseases")) {
         const auto &registry = index_["diseases"]["registry"];
-        auto disease_code_str = code.to_string();
+        const auto &disease_code_str = code.to_string();
         auto info = DiseaseInfo{};
         for (const auto &item : registry) {
             auto item_code_str = std::string{};
@@ -480,7 +482,7 @@ CancerParameterEntity DataManager::get_disease_parameter(DiseaseInfo info, Count
     return table;
 }
 
-std::vector<BirthItem> DataManager::get_birth_indicators(const Country country) const {
+std::vector<BirthItem> DataManager::get_birth_indicators(const Country &country) const {
     return DataManager::get_birth_indicators(country, [](const unsigned int &) { return true; });
 }
 
@@ -614,7 +616,7 @@ RelativeRiskEntity DataManager::generate_default_relative_risk_to_disease() cons
 
 std::map<int, std::map<Gender, double>>
 DataManager::load_cost_of_diseases(Country country, nlohmann::json node,
-                                   std::filesystem::path parent_path) const {
+                                   const std::filesystem::path &parent_path) const {
     std::map<int, std::map<Gender, double>> result;
     auto cost_path = node["path"].get<std::string>();
     auto filename = node["file_name"].get<std::string>();
@@ -680,14 +682,14 @@ std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(const Country 
     return result;
 }
 
-std::string DataManager::replace_string_tokens(std::string source,
-                                               std::vector<std::string> tokens) {
+std::string DataManager::replace_string_tokens(const std::string &source,
+                                               const std::vector<std::string> &tokens) {
     std::string output = source;
     std::size_t tk_end = 0;
-    for (auto &tk : tokens) {
-        auto tk_start = output.find_first_of("{", tk_end);
+    for (const auto &tk : tokens) {
+        auto tk_start = output.find_first_of('{', tk_end);
         if (tk_start != std::string::npos) {
-            tk_end = output.find_first_of("}", tk_start + 1);
+            tk_end = output.find_first_of('}', tk_start + 1);
             if (tk_end != std::string::npos) {
                 output = output.replace(tk_start, tk_end - tk_start + 1, tk);
                 tk_end = tk_start + tk.length();

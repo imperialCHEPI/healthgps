@@ -5,7 +5,7 @@
 #include <fmt/format.h>
 
 namespace hgps::detail {
-core::Gender StoreConverter::to_gender(const std::string name) {
+core::Gender StoreConverter::to_gender(const std::string &name) {
     if (core::case_insensitive::equals(name, "male")) {
         return core::Gender::male;
     }

@@ -1,20 +1,22 @@
 #include "runner_message.h"
 #include <fmt/format.h>
 
+#include <utility>
+
 hgps::RunnerEventMessage::RunnerEventMessage(std::string sender, RunnerAction run_action) noexcept
-    : RunnerEventMessage(sender, run_action, 0u, 0.0) {}
+    : RunnerEventMessage(std::move(sender), run_action, 0u, 0.0) {}
 
 hgps::RunnerEventMessage::RunnerEventMessage(std::string sender, RunnerAction run_action,
                                              double elapsed) noexcept
-    : RunnerEventMessage(sender, run_action, 0u, elapsed) {}
+    : RunnerEventMessage(std::move(sender), run_action, 0u, elapsed) {}
 
 hgps::RunnerEventMessage::RunnerEventMessage(std::string sender, RunnerAction run_action,
                                              unsigned int run) noexcept
-    : RunnerEventMessage(sender, run_action, run, 0.0) {}
+    : RunnerEventMessage(std::move(sender), run_action, run, 0.0) {}
 
 hgps::RunnerEventMessage::RunnerEventMessage(std::string sender, RunnerAction run_action,
                                              unsigned int run, double elapsed) noexcept
-    : EventMessage{sender, run}, action{run_action}, elapsed_ms{elapsed} {}
+    : EventMessage{std::move(sender), run}, action{run_action}, elapsed_ms{elapsed} {}
 
 int hgps::RunnerEventMessage::id() const noexcept { return static_cast<int>(EventType::runner); }
 

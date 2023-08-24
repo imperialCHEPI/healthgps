@@ -3,20 +3,21 @@
 #include <cmath>
 #include <fmt/format.h>
 #include <sstream>
+#include <utility>
 
 namespace hgps::core {
 UnivariateSummary::UnivariateSummary()
     : name_{"Untitled"}, min_{std::nan("")}, max_{std::nan("")} {}
 
-UnivariateSummary::UnivariateSummary(const std::string name)
-    : name_{name}, min_{std::nan("")}, max_{std::nan("")} {}
+UnivariateSummary::UnivariateSummary(std::string name)
+    : name_{std::move(name)}, min_{std::nan("")}, max_{std::nan("")} {}
 
-UnivariateSummary::UnivariateSummary(const std::vector<double> values) : UnivariateSummary() {
+UnivariateSummary::UnivariateSummary(const std::vector<double> &values) : UnivariateSummary() {
     append(values);
 }
 
-UnivariateSummary::UnivariateSummary(const std::string name, const std::vector<double> values)
-    : UnivariateSummary(name) {
+UnivariateSummary::UnivariateSummary(std::string name, const std::vector<double> &values)
+    : UnivariateSummary(std::move(name)) {
     append(values);
 }
 

@@ -30,7 +30,7 @@ struct Identifier final {
     /// @param value The string identifier
     /// @throws std::invalid_argument for value starting with a number or containing invalid
     /// characters.
-    Identifier(std::string value);
+    Identifier(const std::string &value);
 
     /// @brief Checks whether this is an empty identifier
     /// @return true if the identifier is empty; otherwise, false.

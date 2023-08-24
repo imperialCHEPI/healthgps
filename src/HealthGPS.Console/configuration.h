@@ -104,7 +104,7 @@ std::vector<hgps::core::DiseaseInfo> get_diseases_info(hgps::core::Datastore &da
 /// @param diseases Selected diseases for experiment
 /// @return The respective model input instance
 hgps::ModelInput create_model_input(hgps::core::DataTable &input_table, hgps::core::Country country,
-                                    Configuration &config,
+                                    const Configuration &config,
                                     std::vector<hgps::core::DiseaseInfo> diseases);
 
 /// @brief Creates the full output file name from user input configuration

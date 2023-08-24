@@ -22,6 +22,7 @@
 #include <iostream>
 #include <optional>
 #include <thread>
+#include <utility>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()                                                                         \
@@ -121,6 +122,8 @@ std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Conf
     fmt::print("\nThere are {} diseases in storage, {} selected.\n", diseases.size(),
                config.diseases.size());
 
+    result.reserve(config.diseases.size());
+
     for (const auto &code : config.diseases) {
         result.emplace_back(data_api.get_disease_info(code));
     }
@@ -129,7 +132,8 @@ std::vector<core::DiseaseInfo> get_diseases_info(core::Datastore &data_api, Conf
 }
 
 ModelInput create_model_input(core::DataTable &input_table, core::Country country,
-                              Configuration &config, std::vector<core::DiseaseInfo> diseases) {
+                              const Configuration &config,
+                              std::vector<core::DiseaseInfo> diseases) {
     // Create simulation configuration
     auto comorbidities = config.output.comorbidities;
     auto diseases_number = static_cast<unsigned int>(diseases.size());
@@ -139,7 +143,8 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
                    config.output.comorbidities, comorbidities);
     }
 
-    auto settings = Settings(country, config.settings.size_fraction, config.settings.age_range);
+    auto settings =
+        Settings(std::move(country), config.settings.size_fraction, config.settings.age_range);
     auto job_custom_seed = create_job_seed(config.job_id, config.custom_seed);
     auto run_info = RunInfo{
         .start_time = config.start_time,
@@ -158,8 +163,12 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
         mapping.emplace_back(item.name, item.level, item.range);
     }
 
-    return {input_table, settings, run_info, ses_mapping, HierarchicalMapping(std::move(mapping)),
-            diseases};
+    return {input_table,
+            settings,
+            run_info,
+            ses_mapping,
+            HierarchicalMapping(std::move(mapping)),
+            std::move(diseases)};
 }
 
 std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
@@ -172,9 +181,9 @@ std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
     // filename token replacement
     auto file_name = info.file_name;
     std::size_t tk_end = 0;
-    auto tk_start = file_name.find_first_of("{", tk_end);
+    auto tk_start = file_name.find_first_of('{', tk_end);
     if (tk_start != std::string::npos) {
-        tk_end = file_name.find_first_of("}", tk_start + 1);
+        tk_end = file_name.find_first_of('}', tk_start + 1);
         if (tk_end != std::string::npos) {
             auto token_str = file_name.substr(tk_start, tk_end - tk_start + 1);
             if (!core::case_insensitive::equals(token_str, "{TIMESTAMP}")) {
@@ -191,7 +200,7 @@ std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
     }
 
     if (job_id > 0) {
-        tk_start = log_file_name.find_last_of(".");
+        tk_start = log_file_name.find_last_of('.');
         if (tk_start != std::string::npos) {
             log_file_name.replace(tk_start, size_t{1}, fmt::format("_{}.", std::to_string(job_id)));
         } else {
@@ -206,14 +215,14 @@ std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
 
 ResultFileWriter create_results_file_logger(const Configuration &config,
                                             const hgps::ModelInput &input) {
-    return ResultFileWriter{
-        create_output_file_name(config.output, config.job_id),
-        ExperimentInfo{.model = config.app_name,
-                       .version = config.app_version,
-                       .intervention =
-                           config.active_intervention ? config.active_intervention->identifier : "",
-                       .job_id = config.job_id,
-                       .seed = input.seed().value_or(0u)}};
+    return {create_output_file_name(config.output, config.job_id),
+            ExperimentInfo{.model = config.app_name,
+                           .version = config.app_version,
+                           .intervention = config.active_intervention
+                                               ? config.active_intervention->identifier
+                                               : "",
+                           .job_id = config.job_id,
+                           .seed = input.seed().value_or(0u)}};
 }
 
 std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &channel) {

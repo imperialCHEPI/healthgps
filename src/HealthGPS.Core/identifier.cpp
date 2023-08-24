@@ -10,7 +10,7 @@ Identifier Identifier::empty() {
     return instance;
 }
 
-Identifier::Identifier(std::string value) : value_{to_lower(value)} {
+Identifier::Identifier(const std::string &value) : value_{to_lower(value)} {
     if (!value_.empty()) {
         validate_identifier();
     }

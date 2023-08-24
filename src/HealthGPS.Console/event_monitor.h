@@ -41,10 +41,10 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     std::stop_source cancel_source_;
 
     void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
-    void error_event_handler(std::shared_ptr<hgps::EventMessage> message);
+    void error_event_handler(const std::shared_ptr<hgps::EventMessage> &message);
     void result_event_handler(std::shared_ptr<hgps::EventMessage> message);
 
-    void info_dispatch_thread(std::stop_token token);
-    void result_dispatch_thread(std::stop_token token);
+    void info_dispatch_thread(const std::stop_token &token);
+    void result_dispatch_thread(const std::stop_token &token);
 };
 } // namespace host

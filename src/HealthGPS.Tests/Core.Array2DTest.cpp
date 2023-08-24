@@ -193,7 +193,7 @@ TEST(TestCore_Array2D, PrintDataToString) {
 
     ASSERT_TRUE(i3str.size() > 10);
     EXPECT_EQ(0, i3str.find_first_of("Array"));
-    EXPECT_TRUE(i3str.find_first_of(":") > 0);
+    EXPECT_TRUE(i3str.find_first_of(':') > 0);
     EXPECT_EQ('\n', i3str.back());
 }
 

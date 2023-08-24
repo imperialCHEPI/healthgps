@@ -58,19 +58,19 @@ void EventMonitor::visit(const hgps::ErrorEventMessage &message) {
 void EventMonitor::visit(const hgps::ResultEventMessage &message) { result_writer_.write(message); }
 
 void EventMonitor::info_event_handler(std::shared_ptr<hgps::EventMessage> message) {
-    info_queue_.push(message);
+    info_queue_.emplace(std::move(message));
 }
 
-void EventMonitor::error_event_handler(std::shared_ptr<hgps::EventMessage> message) {
+void EventMonitor::error_event_handler(const std::shared_ptr<hgps::EventMessage> &message) {
     // handle error synchronous, no delay!
     message->accept(*this);
 }
 
 void EventMonitor::result_event_handler(std::shared_ptr<hgps::EventMessage> message) {
-    results_queue_.push(message);
+    results_queue_.emplace(std::move(message));
 }
 
-void EventMonitor::info_dispatch_thread(std::stop_token token) {
+void EventMonitor::info_dispatch_thread(const std::stop_token &token) {
     fmt::print(fg(fmt::color::light_blue), "Info event thread started...\n");
     while (!token.stop_requested()) {
         std::shared_ptr<hgps::EventMessage> m;
@@ -84,7 +84,7 @@ void EventMonitor::info_dispatch_thread(std::stop_token token) {
     fmt::print(fg(fmt::color::light_blue), "Info event thread exited.\n");
 }
 
-void EventMonitor::result_dispatch_thread(std::stop_token token) {
+void EventMonitor::result_dispatch_thread(const std::stop_token &token) {
     fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
     while (!token.stop_requested()) {
         std::shared_ptr<hgps::EventMessage> m;

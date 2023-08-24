@@ -25,7 +25,7 @@ TEST(TestHealthGPS_Population, CreateUniquePerson) {
 
     auto p1 = Person{};
     auto p2 = Person{};
-    auto p3 = p1;
+    const auto &p3 = p1;
 
     ASSERT_GT(p1.id(), 0);
     ASSERT_GT(p2.id(), p1.id());

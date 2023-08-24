@@ -7,11 +7,12 @@ namespace hgps {
 
 InfoEventMessage::InfoEventMessage(std::string sender, ModelAction action, unsigned int run,
                                    int time) noexcept
-    : InfoEventMessage(sender, action, run, time, std::string{}) {}
+    : InfoEventMessage(std::move(sender), action, run, time, std::string{}) {}
 
 InfoEventMessage::InfoEventMessage(std::string sender, ModelAction action, unsigned int run,
                                    int time, std::string msg) noexcept
-    : EventMessage{sender, run}, model_action{action}, model_time{time}, message{std::move(msg)} {}
+    : EventMessage{std::move(sender), run}, model_action{action}, model_time{time},
+      message{std::move(msg)} {}
 
 int InfoEventMessage::id() const noexcept { return static_cast<int>(EventType::info); }
 

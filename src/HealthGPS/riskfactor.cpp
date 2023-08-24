@@ -3,9 +3,9 @@
 namespace hgps {
 
 RiskFactorModule::RiskFactorModule(
-    std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> &&models,
-    RiskfactorAdjustmentModel &&adjustments)
-    : models_{std::move(models)}, adjustment_{std::move(adjustments)} {
+    std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models,
+    const RiskfactorAdjustmentModel &adjustments)
+    : models_{std::move(models)}, adjustment_{adjustments} {
 
     if (models_.empty()) {
         throw std::invalid_argument(
@@ -81,6 +81,6 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
 
     auto adjustment_model =
         RiskfactorAdjustmentModel{repository.get_baseline_adjustment_definition()};
-    return std::make_unique<RiskFactorModule>(std::move(models), std::move(adjustment_model));
+    return std::make_unique<RiskFactorModule>(std::move(models), adjustment_model);
 }
 } // namespace hgps

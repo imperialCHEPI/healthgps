@@ -8,10 +8,11 @@
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
 #include <sstream>
+#include <utility>
 
 namespace host {
-ResultFileWriter::ResultFileWriter(const std::filesystem::path file_name, const ExperimentInfo info)
-    : info_{info} {
+ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
+    : info_{std::move(info)} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
     if (stream_.fail() || !stream_.is_open()) {
         throw std::invalid_argument(fmt::format("Cannot open output file: {}", file_name.string()));
@@ -75,7 +76,7 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
     write_csv_channels(message);
 }
 
-void ResultFileWriter::write_json_begin(const std::filesystem::path output) {
+void ResultFileWriter::write_json_begin(const std::filesystem::path &output) {
     using json = nlohmann::ordered_json;
 
     auto tp = std::chrono::system_clock::now();
@@ -91,7 +92,7 @@ void ResultFileWriter::write_json_begin(const std::filesystem::path output) {
         {"result", {1, 2}}};
 
     auto json_header = msg.dump();
-    auto array_start = json_header.find_last_of("[");
+    auto array_start = json_header.find_last_of('[');
     stream_ << json_header.substr(0, array_start + 1);
     stream_.flush();
 }

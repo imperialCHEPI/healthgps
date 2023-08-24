@@ -28,7 +28,7 @@ class Datastore {
     /// @param time_filter The time filter predicate, e.g., years range
     /// @return The resulting list of population trend items
     virtual std::vector<PopulationItem>
-    get_population(Country country,
+    get_population(const Country &country,
                    const std::function<bool(const unsigned int &)> time_filter) const = 0;
 
     /// @brief Gets the population mortality trend for a country filtered by time
@@ -36,7 +36,7 @@ class Datastore {
     /// @param time_filter The time filter predicate, e.g., years range
     /// @return The resulting list of mortality trend items
     virtual std::vector<MortalityItem>
-    get_mortality(Country country,
+    get_mortality(const Country &country,
                   const std::function<bool(const unsigned int &)> time_filter) const = 0;
 
     /// @brief Gets the collection of diseases information in the store

@@ -115,7 +115,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         std::cout << input_table;
 
         // Create complete model input from configuration
-        auto model_input = create_model_input(input_table, country, config, diseases);
+        auto model_input =
+            create_model_input(input_table, std::move(country), config, std::move(diseases));
 
         // Create event bus and event monitor with a results file writer
         auto event_bus = DefaultEventBus();

@@ -24,37 +24,37 @@ class RuntimeMetric {
     /// @brief Gets a reference to a metric value by identifier, no bounds checking.
     /// @param metric_key Metric identifier.
     /// @return Reference to metric value.
-    double &operator[](const std::string metric_key);
+    double &operator[](const std::string &metric_key);
 
     /// @brief Gets a reference to a metric value by identifier with bounds checking.
     /// @param metric_key Metric identifier.
     /// @return Reference to metric value.
     /// @throws std::out_of_range if the container does not have a metric with the specified
     /// identifier.
-    double &at(const std::string metric_key);
+    double &at(const std::string &metric_key);
 
     /// @brief Gets a read-only reference to a metric value by identifier with bounds checking.
     /// @param metric_key Metric identifier.
     /// @return Reference to metric value.
     /// @throws std::out_of_range if the container does not have a metric with the specified
     /// identifier.
-    const double &at(const std::string metric_key) const;
+    const double &at(const std::string &metric_key) const;
 
     /// @brief Checks if the container contains a metric with specific identifier
     /// @param metric_key Metric identifier.
     /// @return true if there is such a metric; otherwise, false.
-    bool contains(const std::string metric_key) const noexcept;
+    bool contains(const std::string &metric_key) const noexcept;
 
     /// @brief Inserts a new metric into the container constructed in-place with arguments.
     /// @param metric_key Metric identifier.
     /// @param value Metric value.
     /// @return true if insertion happened; otherwise, false.
-    bool emplace(const std::string metric_key, const double value);
+    bool emplace(const std::string &metric_key, const double value);
 
     /// @brief Removes a specified metric from the container.
     /// @param metric_key Metric identifier.
     /// @return true if deletion happened; otherwise, false.
-    bool erase(const std::string metric_key);
+    bool erase(const std::string &metric_key);
 
     /// @brief Erases all metrics from the container.
     void clear() noexcept;

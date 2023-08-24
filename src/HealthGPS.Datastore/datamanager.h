@@ -30,23 +30,23 @@ class DataManager : public Datastore {
     /// @param verbosity The terminal logging verbosity mode to use.
     /// @throws std::invalid_argument if the root directory or index.json is missing.
     /// @throws std::runtime_error for invalid or unsupported index.json file schema version.
-    explicit DataManager(const std::filesystem::path root_directory,
+    explicit DataManager(std::filesystem::path root_directory,
                          VerboseMode verbosity = VerboseMode::none);
 
     std::vector<Country> get_countries() const override;
 
     Country get_country(const std::string &alpha) const override;
 
-    std::vector<PopulationItem> get_population(Country country) const;
+    std::vector<PopulationItem> get_population(const Country &country) const;
 
     std::vector<PopulationItem>
-    get_population(Country country,
+    get_population(const Country &country,
                    const std::function<bool(const unsigned int &)> time_filter) const override;
 
-    std::vector<MortalityItem> get_mortality(Country country) const;
+    std::vector<MortalityItem> get_mortality(const Country &country) const;
 
     std::vector<MortalityItem>
-    get_mortality(Country country,
+    get_mortality(const Country &country,
                   const std::function<bool(const unsigned int &)> time_filter) const override;
 
     std::vector<DiseaseInfo> get_diseases() const override;
@@ -68,7 +68,7 @@ class DataManager : public Datastore {
 
     DiseaseAnalysisEntity get_disease_analysis(const Country country) const override;
 
-    std::vector<BirthItem> get_birth_indicators(const Country country) const;
+    std::vector<BirthItem> get_birth_indicators(const Country &country) const;
 
     std::vector<BirthItem> get_birth_indicators(
         const Country country,
@@ -85,11 +85,12 @@ class DataManager : public Datastore {
 
     std::map<int, std::map<Gender, double>>
     load_cost_of_diseases(Country country, nlohmann::json node,
-                          std::filesystem::path parent_path) const;
+                          const std::filesystem::path &parent_path) const;
 
     std::vector<LifeExpectancyItem> load_life_expectancy(const Country &country) const;
 
-    static std::string replace_string_tokens(std::string source, std::vector<std::string> tokens);
+    static std::string replace_string_tokens(const std::string &source,
+                                             const std::vector<std::string> &tokens);
 
     static std::map<std::string, std::size_t>
     create_fields_index_mapping(const std::vector<std::string> &column_names,

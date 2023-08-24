@@ -69,5 +69,5 @@ class FiscalPolicyScenario final : public InterventionScenario {
     std::unordered_map<std::size_t, int> interventions_book_{};
 };
 
-FiscalImpactType parse_fiscal_impact_type(std::string impact);
+FiscalImpactType parse_fiscal_impact_type(const std::string &impact);
 } // namespace hgps

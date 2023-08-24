@@ -110,7 +110,7 @@ const std::vector<PolicyImpact> &FiscalPolicyScenario::impacts() const noexcept 
     return definition_.impacts;
 }
 
-FiscalImpactType parse_fiscal_impact_type(std::string impact_type) {
+FiscalImpactType parse_fiscal_impact_type(const std::string &impact_type) {
     if (core::case_insensitive::equals(impact_type, "pessimist")) {
         return FiscalImpactType::pessimist;
     }

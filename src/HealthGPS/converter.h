@@ -34,7 +34,7 @@ class StoreConverter {
   public:
     StoreConverter() = delete;
 
-    static core::Gender to_gender(const std::string name);
+    static core::Gender to_gender(const std::string &name);
 
     static DiseaseTable to_disease_table(const core::DiseaseEntity &entity);
 
