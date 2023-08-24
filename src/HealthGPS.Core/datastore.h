@@ -29,7 +29,7 @@ class Datastore {
     /// @return The resulting list of population trend items
     virtual std::vector<PopulationItem>
     get_population(const Country &country,
-                   const std::function<bool(const unsigned int &)> time_filter) const = 0;
+                   const std::function<bool(unsigned int)> time_filter) const = 0;
 
     /// @brief Gets the population mortality trend for a country filtered by time
     /// @param country The target country definition
@@ -37,7 +37,7 @@ class Datastore {
     /// @return The resulting list of mortality trend items
     virtual std::vector<MortalityItem>
     get_mortality(const Country &country,
-                  const std::function<bool(const unsigned int &)> time_filter) const = 0;
+                  const std::function<bool(unsigned int)> time_filter) const = 0;
 
     /// @brief Gets the collection of diseases information in the store
     /// @return The list of diseases defined
@@ -88,7 +88,7 @@ class Datastore {
     /// @return The resulting list of birth indicator items
     virtual std::vector<BirthItem>
     get_birth_indicators(const Country country,
-                         const std::function<bool(const unsigned int &)> time_filter) const = 0;
+                         const std::function<bool(unsigned int)> time_filter) const = 0;
 
     /// @brief Gets the LMS (lambda-mu-sigma) parameters for childhood growth charts
     /// @return The parameters for the LMS model

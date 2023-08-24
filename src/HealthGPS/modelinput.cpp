@@ -15,13 +15,11 @@ const Settings &ModelInput::settings() const noexcept { return settings_; }
 
 const core::DataTable &ModelInput::data() const noexcept { return input_data_; }
 
-const unsigned int &ModelInput::start_time() const noexcept { return run_info_.start_time; }
+unsigned int ModelInput::start_time() const noexcept { return run_info_.start_time; }
 
-const unsigned int &ModelInput::stop_time() const noexcept { return run_info_.stop_time; }
+unsigned int ModelInput::stop_time() const noexcept { return run_info_.stop_time; }
 
-const unsigned int &ModelInput::sync_timeout_ms() const noexcept {
-    return run_info_.sync_timeout_ms;
-}
+unsigned int ModelInput::sync_timeout_ms() const noexcept { return run_info_.sync_timeout_ms; }
 
 const std::optional<unsigned int> &ModelInput::seed() const noexcept { return run_info_.seed; }
 

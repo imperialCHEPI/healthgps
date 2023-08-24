@@ -19,13 +19,13 @@ class Random {
     /// @brief Generates the next random integer in sequence in range [min(), max_value)
     /// @param max_value The maximum value
     /// @return A random integer value in range [min(), max_value)
-    int next_int(const int &max_value);
+    int next_int(int max_value);
 
     /// @brief Generates the next random integer in sequence in range [min_value, max_value)
     /// @param min_value The minimum value
     /// @param max_value The maximum value
     /// @return A random integer value in range [min_value, max_value)
-    int next_int(const int &min_value, const int &max_value);
+    int next_int(int min_value, int max_value);
 
     /// @brief Generates a random floating point number in range [0,1)
     /// @return A floating point value in range [0,1).
@@ -39,7 +39,7 @@ class Random {
     /// @param mean The mean parameter
     /// @param standard_deviation The standard deviation parameter
     /// @return The generated floating point random number
-    double next_normal(const double &mean, const double &standard_deviation);
+    double next_normal(double mean, double standard_deviation);
 
     /// @brief Samples a random value from an empirical distribution
     /// @param values The empirical distribution values
@@ -55,8 +55,8 @@ class Random {
 
   private:
     std::reference_wrapper<RandomBitGenerator> engine_;
-    int next_int_internal(const int &min_value, const int &max_value);
-    double next_uniform_internal(const double &min_value, const double &max_value);
-    double next_normal_internal(const double &mean, const double &standard_deviation);
+    int next_int_internal(int min_value, int max_value);
+    double next_uniform_internal(double min_value, double max_value);
+    double next_normal_internal(double mean, double standard_deviation);
 };
 } // namespace hgps

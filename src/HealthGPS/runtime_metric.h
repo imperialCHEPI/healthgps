@@ -38,7 +38,7 @@ class RuntimeMetric {
     /// @return Reference to metric value.
     /// @throws std::out_of_range if the container does not have a metric with the specified
     /// identifier.
-    const double &at(const std::string &metric_key) const;
+    double at(const std::string &metric_key) const;
 
     /// @brief Checks if the container contains a metric with specific identifier
     /// @param metric_key Metric identifier.

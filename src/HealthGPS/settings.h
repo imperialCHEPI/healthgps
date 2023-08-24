@@ -22,7 +22,7 @@ class Settings {
 
     /// @brief The virtual population fraction from the real population size in range (0, 1]
     /// @return The size fraction in range (0, 1]
-    const float &size_fraction() const noexcept;
+    float size_fraction() const noexcept;
 
     /// @brief The experiment population age range constraint
     /// @return The allowed age range

@@ -19,7 +19,7 @@ const core::Identifier &MappingEntry::key() const noexcept { return name_key_; }
 
 const OptionalInterval &MappingEntry::range() const noexcept { return range_; }
 
-double MappingEntry::get_bounded_value(const double &value) const noexcept {
+double MappingEntry::get_bounded_value(double value) const noexcept {
     if (range_.has_value()) {
         return std::clamp(value, range_->lower(), range_->upper());
     }

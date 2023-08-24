@@ -48,7 +48,7 @@ class MappingEntry {
     /// @brief Adjusts a value to the factor range, if provided
     /// @param value The value to adjust
     /// @return The bounded value
-    double get_bounded_value(const double &value) const noexcept;
+    double get_bounded_value(double value) const noexcept;
 
   private:
     std::string name_;

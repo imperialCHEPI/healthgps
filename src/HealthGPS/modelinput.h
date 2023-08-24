@@ -65,15 +65,15 @@ class ModelInput {
 
     /// @brief Gets the experiment start time
     /// @return Experiment start time
-    const unsigned int &start_time() const noexcept;
+    unsigned int start_time() const noexcept;
 
     /// @brief Gets the experiment stop time
     /// @return Experiment stop time
-    const unsigned int &stop_time() const noexcept;
+    unsigned int stop_time() const noexcept;
 
     /// @brief Gets the scenarios data synchronisation timeout (milliseconds)
     /// @return Scenarios synchronisation timeout
-    const unsigned int &sync_timeout_ms() const noexcept;
+    unsigned int sync_timeout_ms() const noexcept;
 
     /// @brief Gets the user custom seed to initialise the pseudo-number generator
     /// @return User custom seed value, if provide; otherwise empty.

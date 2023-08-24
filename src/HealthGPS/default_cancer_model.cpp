@@ -148,9 +148,8 @@ DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(Runtime
     return result;
 }
 
-double DefaultCancerModel::calculate_combined_relative_risk(const Person &entity,
-                                                            const int &start_time,
-                                                            const int &time_now) const {
+double DefaultCancerModel::calculate_combined_relative_risk(const Person &entity, int start_time,
+                                                            int time_now) const {
     auto combined_risk_value = 1.0;
     combined_risk_value *= calculate_relative_risk_for_risk_factors(entity);
     combined_risk_value *= calculate_relative_risk_for_diseases(entity, start_time, time_now);
@@ -177,8 +176,8 @@ double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person
 }
 
 double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &entity,
-                                                                const int &start_time,
-                                                                const int &time_now) const {
+                                                                int start_time,
+                                                                int time_now) const {
     auto relative_risk_value = 1.0;
     const auto &lut = definition_.get().relative_risk_diseases();
     for (const auto &disease : entity.diseases) {
@@ -252,9 +251,8 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     }
 }
 
-double DefaultCancerModel::calculate_incidence_probability(const Person &entity,
-                                                           const int &start_time,
-                                                           const int &time_now) const {
+double DefaultCancerModel::calculate_incidence_probability(const Person &entity, int start_time,
+                                                           int time_now) const {
     auto incidence_id = definition_.get().table().at(MeasureKey::incidence);
     auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
     auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);

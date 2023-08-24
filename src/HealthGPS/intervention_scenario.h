@@ -80,7 +80,7 @@ struct PolicyImpact {
     /// @brief Determine whether this impact should be applied to a given age
     /// @param age The age to check
     /// @return true, if the age is in the impact valid range; otherwise, false.
-    bool contains(const unsigned int &age) const noexcept {
+    bool contains(unsigned int age) const noexcept {
         if (age < from_age) {
             return false;
         }
@@ -120,7 +120,7 @@ struct PolicyInterval {
     /// @brief Determine whether this interval contains a given time
     /// @param time The time to check
     /// @return true, if the time is in the interval range; otherwise, false.
-    bool contains(const int &time) const noexcept {
+    bool contains(int time) const noexcept {
         if (time < start_time) {
             return false;
         }

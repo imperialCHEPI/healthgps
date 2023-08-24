@@ -59,7 +59,7 @@ class EnergyBalanceHierarchicalModel final : public HierarchicalLinearModel {
     const std::map<core::Identifier, core::Identifier> &variables_;
     double boundary_percentage_;
 
-    const AgeGroupGenderEquation &equations_at(const int &age) const;
+    const AgeGroupGenderEquation &equations_at(int age) const;
 
     void update_risk_factors_exposure(
         RuntimeContext &context, Person &entity,

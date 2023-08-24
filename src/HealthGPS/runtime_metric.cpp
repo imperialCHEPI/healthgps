@@ -8,9 +8,7 @@ double &RuntimeMetric::operator[](const std::string &metric_key) { return metric
 
 double &RuntimeMetric::at(const std::string &metric_key) { return metrics_.at(metric_key); }
 
-const double &RuntimeMetric::at(const std::string &metric_key) const {
-    return metrics_.at(metric_key);
-}
+double RuntimeMetric::at(const std::string &metric_key) const { return metrics_.at(metric_key); }
 
 bool RuntimeMetric::contains(const std::string &metric_key) const noexcept {
     return metrics_.contains(metric_key);

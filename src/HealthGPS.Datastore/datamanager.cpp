@@ -76,12 +76,12 @@ Country DataManager::get_country(const std::string &alpha) const {
 }
 
 std::vector<PopulationItem> DataManager::get_population(const Country &country) const {
-    return DataManager::get_population(country, [](const unsigned int &) { return true; });
+    return DataManager::get_population(country, [](unsigned int) { return true; });
 }
 
 std::vector<PopulationItem>
 DataManager::get_population(const Country &country,
-                            const std::function<bool(const unsigned int &)> time_filter) const {
+                            const std::function<bool(unsigned int)> time_filter) const {
     auto results = std::vector<PopulationItem>();
 
     if (index_.contains("demographic")) {
@@ -127,12 +127,12 @@ DataManager::get_population(const Country &country,
 }
 
 std::vector<MortalityItem> DataManager::get_mortality(const Country &country) const {
-    return DataManager::get_mortality(country, [](const unsigned int &) { return true; });
+    return DataManager::get_mortality(country, [](unsigned int) { return true; });
 }
 
 std::vector<MortalityItem>
 DataManager::get_mortality(const Country &country,
-                           const std::function<bool(const unsigned int &)> time_filter) const {
+                           const std::function<bool(unsigned int)> time_filter) const {
     auto results = std::vector<MortalityItem>();
     if (index_.contains("demographic")) {
         auto nodepath = index_["demographic"]["path"].get<std::string>();
@@ -483,11 +483,12 @@ CancerParameterEntity DataManager::get_disease_parameter(DiseaseInfo info, Count
 }
 
 std::vector<BirthItem> DataManager::get_birth_indicators(const Country &country) const {
-    return DataManager::get_birth_indicators(country, [](const unsigned int &) { return true; });
+    return DataManager::get_birth_indicators(country, [](unsigned int) { return true; });
 }
 
-std::vector<BirthItem> DataManager::get_birth_indicators(
-    const Country country, const std::function<bool(const unsigned int &)> time_filter) const {
+std::vector<BirthItem>
+DataManager::get_birth_indicators(const Country country,
+                                  const std::function<bool(unsigned int)> time_filter) const {
     std::vector<BirthItem> result;
     if (index_.contains("demographic")) {
         auto nodepath = index_["demographic"]["path"].get<std::string>();

@@ -86,7 +86,7 @@ const PolicyDynamic &MarketingDynamicScenario::dynamic() const noexcept {
     return definition_.dynamic;
 }
 
-int MarketingDynamicScenario::get_index_of_impact_by_age(const unsigned int &age) const {
+int MarketingDynamicScenario::get_index_of_impact_by_age(unsigned int age) const {
     for (auto index = 0; const auto &policy : definition_.impacts) {
         if (policy.contains(age)) {
             return index;

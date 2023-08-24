@@ -18,7 +18,7 @@ Settings::Settings(core::Country country, const float size_fraction,
 
 const core::Country &Settings::country() const noexcept { return country_; }
 
-const float &Settings::size_fraction() const noexcept { return size_fraction_; }
+float Settings::size_fraction() const noexcept { return size_fraction_; }
 
 const core::IntegerInterval &Settings::age_range() const noexcept { return age_range_; }
 } // namespace hgps
