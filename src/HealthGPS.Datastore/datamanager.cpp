@@ -81,7 +81,7 @@ std::vector<PopulationItem> DataManager::get_population(const Country &country) 
 
 std::vector<PopulationItem>
 DataManager::get_population(const Country &country,
-                            const std::function<bool(unsigned int)> &time_filter) const {
+                            std::function<bool(unsigned int)> time_filter) const {
     auto results = std::vector<PopulationItem>();
 
     if (index_.contains("demographic")) {
@@ -132,7 +132,7 @@ std::vector<MortalityItem> DataManager::get_mortality(const Country &country) co
 
 std::vector<MortalityItem>
 DataManager::get_mortality(const Country &country,
-                           const std::function<bool(unsigned int)> &time_filter) const {
+                           std::function<bool(unsigned int)> time_filter) const {
     auto results = std::vector<MortalityItem>();
     if (index_.contains("demographic")) {
         auto nodepath = index_["demographic"]["path"].get<std::string>();
@@ -489,7 +489,7 @@ std::vector<BirthItem> DataManager::get_birth_indicators(const Country &country)
 
 std::vector<BirthItem>
 DataManager::get_birth_indicators(const Country &country,
-                                  const std::function<bool(unsigned int)> &time_filter) const {
+                                  std::function<bool(unsigned int)> time_filter) const {
     std::vector<BirthItem> result;
     if (index_.contains("demographic")) {
         auto nodepath = index_["demographic"]["path"].get<std::string>();

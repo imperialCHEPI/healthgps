@@ -41,13 +41,13 @@ class DataManager : public Datastore {
 
     std::vector<PopulationItem>
     get_population(const Country &country,
-                   const std::function<bool(unsigned int)> &time_filter) const override;
+                   std::function<bool(unsigned int)> time_filter) const override;
 
     std::vector<MortalityItem> get_mortality(const Country &country) const;
 
     std::vector<MortalityItem>
     get_mortality(const Country &country,
-                  const std::function<bool(unsigned int)> &time_filter) const override;
+                  std::function<bool(unsigned int)> time_filter) const override;
 
     std::vector<DiseaseInfo> get_diseases() const override;
 
@@ -73,7 +73,7 @@ class DataManager : public Datastore {
 
     std::vector<BirthItem>
     get_birth_indicators(const Country &country,
-                         const std::function<bool(unsigned int)> &time_filter) const override;
+                         std::function<bool(unsigned int)> time_filter) const override;
 
     std::vector<LmsDataRow> get_lms_parameters() const override;
 
