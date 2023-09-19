@@ -33,6 +33,7 @@ Checks: >
     -cppcoreguidelines-non-private-member-variables-in-classes,
     -cppcoreguidelines-avoid-non-const-global-variables,
     -cppcoreguidelines-avoid-c-arrays,
+    -cppcoreguidelines-avoid-do-while,
     -cppcoreguidelines-pro-bounds-constant-array-index,
     -cppcoreguidelines-special-member-functions,
     -cppcoreguidelines-macro-usage,
