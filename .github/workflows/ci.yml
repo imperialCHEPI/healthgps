@@ -62,7 +62,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential ninja-build
+          sudo apt install --no-install-recommends build-essential ninja-build lcov
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
@@ -90,7 +90,7 @@ jobs:
 
       - name: Configure HealthGPS (debug)
         run: |
-          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON
 
       - uses: ZedThree/clang-tidy-review@v0.13.1
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
@@ -130,6 +130,11 @@ jobs:
 
       - name: Run tests
         run: ctest --preset=core-test-${{ matrix.platform }}
+
+      - name: Generate coverage report
+        if: matrix.compiler == 'gcc-default'
+        working-directory: ${{github.workspace}}/out/build/${{ matrix.platform }}-debug
+        run: geninfo . --include 'src/HealthGPS*' --exclude 'src/HealthGPS.Tests' --output-file main_coverage.info
 
       - name: Zip output folder
         if: startsWith(github.ref, 'refs/tags/') && matrix.is_main
