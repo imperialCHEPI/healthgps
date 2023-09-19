@@ -12,10 +12,7 @@ struct TestHandler {
     int counter{};
 };
 
-static int global_counter = 0;
-static void free_handler_event(const std::shared_ptr<hgps::EventMessage> & /*unused*/) {
-    global_counter++;
-}
+const auto event_noop = [](const std::shared_ptr<hgps::EventMessage> & /*unused*/) {};
 
 TEST(TestHealthGPS_EventBus, CreateHandlerIdentifier) {
     using namespace hgps;
@@ -71,7 +68,7 @@ TEST(TestHealthGPS_EventBus, AddEventSubscribers) {
     };
 
     auto hub = DefaultEventBus{};
-    auto free_sub = hub.subscribe(EventType::info, free_handler_event);
+    auto free_sub = hub.subscribe(EventType::info, event_noop);
     auto fun_sub = hub.subscribe(EventType::info, member_callback);
     // GCC lambda optimization bug, optimized out.
     // auto lam_sub = hub.subscribe(EventType::info,
@@ -100,7 +97,7 @@ TEST(TestHealthGPS_EventBus, HandlerAutoUnsubscribe) {
 
     auto hub = DefaultEventBus{};
     {
-        auto free_sub = hub.subscribe(EventType::info, free_handler_event);
+        auto free_sub = hub.subscribe(EventType::info, event_noop);
         auto fun_sub = hub.subscribe(EventType::info, member_callback);
         auto lam_sub =
             hub.subscribe(EventType::info,
@@ -128,7 +125,7 @@ TEST(TestHealthGPS_EventBus, ContainerAutoUnsubscribe) {
     std::vector<std::unique_ptr<EventSubscriber>> subscribers;
 
     auto hub = DefaultEventBus{};
-    subscribers.push_back(hub.subscribe(EventType::info, free_handler_event));
+    subscribers.push_back(hub.subscribe(EventType::info, event_noop));
     subscribers.push_back(hub.subscribe(EventType::info, member_callback));
     subscribers.push_back(hub.subscribe(
         EventType::info, [&counter](const std::shared_ptr<hgps::EventMessage> &) { counter++; }));
@@ -155,7 +152,7 @@ TEST(TestHealthGPS_EventBus, ClearUnsubscribes) {
     };
 
     auto hub = DefaultEventBus{};
-    auto free_sub = hub.subscribe(EventType::info, free_handler_event);
+    auto free_sub = hub.subscribe(EventType::info, event_noop);
     auto fun_sub = hub.subscribe(EventType::info, member_callback);
     auto lam_sub = hub.subscribe(
         EventType::info, [&counter](const std::shared_ptr<hgps::EventMessage> &) { counter++; });
