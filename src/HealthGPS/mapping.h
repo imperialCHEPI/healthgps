@@ -69,7 +69,7 @@ class HierarchicalMapping {
 
     /// @brief Initialises a new instance of the HierarchicalMapping class
     /// @param mapping The collection of mapping entries
-    HierarchicalMapping(std::vector<MappingEntry> &&mapping);
+    HierarchicalMapping(std::vector<MappingEntry> mapping);
 
     /// @brief Gets the collection of mapping entries
     /// @return The mapping entries

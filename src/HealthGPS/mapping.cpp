@@ -36,7 +36,7 @@ inline bool operator<(const MappingEntry &lhs, const MappingEntry &rhs) {
 
 /*-------------   Hierarchical Mapping implementation ------------- */
 
-HierarchicalMapping::HierarchicalMapping(std::vector<MappingEntry> &&mapping)
+HierarchicalMapping::HierarchicalMapping(std::vector<MappingEntry> mapping)
     : mapping_{std::move(mapping)} {
 
     std::sort(mapping_.begin(), mapping_.end());
