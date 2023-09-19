@@ -2,9 +2,10 @@
 
 #include "HealthGPS/mapping.h"
 
-static std::vector<hgps::MappingEntry> create_mapping_entries() {
-    return {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}};
-}
+namespace {
+std::vector<hgps::MappingEntry> mapping_entries{
+    {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}}};
+} // anonymous namespace
 
 TEST(TestHealthGPS_Mapping, CreateEmpty) {
     using namespace hgps;
@@ -19,15 +20,13 @@ TEST(TestHealthGPS_Mapping, CreateEmpty) {
 TEST(TestHealthGPS_Mapping, CreateFull) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
-    auto exp_size = entries.size();
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
 
     auto level_zero = mapping.at_level(0);
     auto level_one = mapping.at_level(1);
     auto level_two = mapping.at_level(2);
 
-    ASSERT_EQ(exp_size, mapping.size());
+    ASSERT_EQ(mapping_entries.size(), mapping.size());
     ASSERT_EQ(2, mapping.max_level());
 
     ASSERT_EQ(2, level_zero.size());
@@ -38,11 +37,9 @@ TEST(TestHealthGPS_Mapping, CreateFull) {
 TEST(TestHealthGPS_Mapping, AccessByInterator) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
-    auto exp_size = entries.size();
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
 
-    ASSERT_EQ(exp_size, mapping.size());
+    ASSERT_EQ(mapping_entries.size(), mapping.size());
     for (auto &entry : mapping) {
         ASSERT_GE(entry.level(), 0);
     }
@@ -51,11 +48,9 @@ TEST(TestHealthGPS_Mapping, AccessByInterator) {
 TEST(TestHealthGPS_Mapping, AccessByConstInterator) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
-    auto exp_size = entries.size();
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
 
-    ASSERT_EQ(exp_size, mapping.size());
+    ASSERT_EQ(mapping_entries.size(), mapping.size());
     for (const auto &entry : mapping) {
         ASSERT_GE(entry.level(), 0);
     }
@@ -64,19 +59,16 @@ TEST(TestHealthGPS_Mapping, AccessByConstInterator) {
 TEST(TestHealthGPS_Mapping, AccessAllEntries) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
-    auto exp_size = entries.size();
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
     const auto &all_entries = mapping.entries();
 
-    ASSERT_EQ(exp_size, all_entries.size());
+    ASSERT_EQ(mapping_entries.size(), all_entries.size());
 }
 
 TEST(TestHealthGPS_Mapping, AccessSingleEntry) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
 
     auto age_key = core::Identifier{"Age"};
     auto gender_key = core::Identifier{"GENDER"};
@@ -91,11 +83,10 @@ TEST(TestHealthGPS_Mapping, AccessSingleEntry) {
 TEST(TestHealthGPS_Mapping, AccessSingleEntryThrowForUnknowKey) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
     auto test_keys = std::vector<core::Identifier>{core::Identifier{"Cat"}, core::Identifier{"Dog"},
                                                    core::Identifier{"Cow"}};
 
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
     for (const auto &key : test_keys) {
         ASSERT_THROW(mapping.at(key), std::out_of_range);
     }
@@ -104,9 +95,8 @@ TEST(TestHealthGPS_Mapping, AccessSingleEntryThrowForUnknowKey) {
 TEST(TestHealthGPS_Mapping, AccessAllLevelEntries) {
     using namespace hgps;
 
-    auto entries = create_mapping_entries();
     std::vector<int> exp_size = {2, 2, 1};
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
     auto level_0_entries = mapping.at_level(0);
     auto level_1_entries = mapping.at_level(1);
     auto level_2_entries = mapping.at_level(2);

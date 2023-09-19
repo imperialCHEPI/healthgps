@@ -3,8 +3,6 @@
 
 #include "HealthGPS.Datastore/api.h"
 
-namespace fs = std::filesystem;
-
 // The fixture for testing class Foo.
 class DatastoreTest : public ::testing::Test {
   protected:
@@ -44,9 +42,8 @@ TEST_F(DatastoreTest, CountryPopulation) {
     auto uk_pop_min = uk_pop.front().at_time;
     auto uk_pop_max = uk_pop.back().at_time;
     auto mid_year = std::midpoint(uk_pop_min, uk_pop_max);
-    auto uk_pop_flt = manager.get_population(uk, [&mid_year](const int &value) {
-        return value >= (mid_year - 1) && value <= (mid_year + 1);
-    });
+    auto uk_pop_flt = manager.get_population(
+        uk, [&mid_year](int value) { return value >= (mid_year - 1) && value <= (mid_year + 1); });
 
     ASSERT_GT(uk_pop.size(), 0);
     ASSERT_GT(uk_pop_flt.size(), 0);
@@ -87,9 +84,8 @@ TEST_F(DatastoreTest, CountryMortality) {
     auto uk_deaths_min = uk_deaths.front().at_time;
     auto uk_deaths_max = uk_deaths.back().at_time;
     auto mid_year = std::midpoint(uk_deaths_min, uk_deaths_max);
-    auto uk_deaths_flt = manager.get_mortality(uk, [&mid_year](const int &value) {
-        return value >= (mid_year - 1) && value <= (mid_year + 1);
-    });
+    auto uk_deaths_flt = manager.get_mortality(
+        uk, [&mid_year](int value) { return value >= (mid_year - 1) && value <= (mid_year + 1); });
 
     ASSERT_GT(uk_deaths.size(), 0);
     ASSERT_GT(uk_deaths_flt.size(), 0);
@@ -264,9 +260,8 @@ TEST_F(DatastoreTest, RetrieveBirthIndicators) {
     auto uk_births_min = uk_births.front().at_time;
     auto uk_births_max = uk_births.back().at_time;
     auto mid_year = std::midpoint(uk_births_min, uk_births_max);
-    auto uk_births_flt = manager.get_birth_indicators(uk, [&mid_year](const int &value) {
-        return value >= (mid_year - 1) && value <= (mid_year + 1);
-    });
+    auto uk_births_flt = manager.get_birth_indicators(
+        uk, [&mid_year](int value) { return value >= (mid_year - 1) && value <= (mid_year + 1); });
 
     ASSERT_FALSE(uk_births.empty());
     ASSERT_GT(uk_births.size(), 0);

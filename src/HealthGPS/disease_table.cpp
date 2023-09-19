@@ -2,19 +2,18 @@
 
 #include <fmt/format.h>
 #include <stdexcept>
+#include <utility>
 
 namespace hgps {
 /* --------------------   Disease Measure Implementation ----------------- */
 
-DiseaseMeasure::DiseaseMeasure(const std::map<int, double> &measures) : measures_{measures} {}
+DiseaseMeasure::DiseaseMeasure(std::map<int, double> measures) : measures_{std::move(measures)} {}
 
 std::size_t DiseaseMeasure::size() const noexcept { return measures_.size(); }
 
-const double &DiseaseMeasure::at(const int measure_id) const { return measures_.at(measure_id); }
+double DiseaseMeasure::at(const int measure_id) const { return measures_.at(measure_id); }
 
-const double &DiseaseMeasure::operator[](const int measure_id) const {
-    return measures_.at(measure_id);
-}
+double DiseaseMeasure::operator[](const int measure_id) const { return measures_.at(measure_id); }
 
 /* --------------------   Disease Table Implementation ----------------- */
 
@@ -58,11 +57,9 @@ bool DiseaseTable::contains(const int age) const noexcept { return data_.contain
 
 const std::map<std::string, int> &DiseaseTable::measures() const noexcept { return measures_; }
 
-const int &DiseaseTable::at(const std::string &measure) const { return measures_.at(measure); }
+int DiseaseTable::at(const std::string &measure) const { return measures_.at(measure); }
 
-const int &DiseaseTable::operator[](const std::string &measure) const {
-    return measures_.at(measure);
-}
+int DiseaseTable::operator[](const std::string &measure) const { return measures_.at(measure); }
 
 DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) {
     return data_.at(age).at(gender);

@@ -79,7 +79,7 @@ class HealthGPS : public Simulation {
 
     hgps::IntegerAgeGenderTable get_current_expected_population() const;
     hgps::IntegerAgeGenderTable get_current_simulated_population();
-    void apply_net_migration(int net_value, const unsigned int &age, const core::Gender &gender);
+    void apply_net_migration(int net_value, unsigned int age, const core::Gender &gender);
     hgps::IntegerAgeGenderTable get_net_migration();
     hgps::IntegerAgeGenderTable create_net_migration();
     std::map<std::string, core::UnivariateSummary> create_input_data_summary() const;

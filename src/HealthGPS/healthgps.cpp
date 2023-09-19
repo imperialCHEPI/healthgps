@@ -229,8 +229,7 @@ IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
     return simulated_population;
 }
 
-void HealthGPS::apply_net_migration(int net_value, const unsigned int &age,
-                                    const core::Gender &gender) {
+void HealthGPS::apply_net_migration(int net_value, unsigned int age, const core::Gender &gender) {
     if (net_value > 0) {
         auto &pop = context_.population();
         auto similar_indices =

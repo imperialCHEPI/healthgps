@@ -77,10 +77,11 @@ struct PolicyImpact {
     /// @brief Impact applies to age, if no value, no upper limit
     std::optional<unsigned int> to_age{};
 
+    // NOLINTBEGIN(bugprone-exception-escape)
     /// @brief Determine whether this impact should be applied to a given age
     /// @param age The age to check
     /// @return true, if the age is in the impact valid range; otherwise, false.
-    bool contains(const unsigned int &age) const noexcept {
+    bool contains(unsigned int age) const noexcept {
         if (age < from_age) {
             return false;
         }
@@ -91,6 +92,7 @@ struct PolicyImpact {
 
         return true;
     }
+    // NOLINTEND(bugprone-exception-escape)
 };
 
 /// @brief Defines the policy active interval
@@ -117,10 +119,11 @@ struct PolicyInterval {
     /// @brief The intervention finish time, if given, or no upper bound.
     std::optional<int> finish_time{};
 
+    // NOLINTBEGIN(bugprone-exception-escape)
     /// @brief Determine whether this interval contains a given time
     /// @param time The time to check
     /// @return true, if the time is in the interval range; otherwise, false.
-    bool contains(const int &time) const noexcept {
+    bool contains(int time) const noexcept {
         if (time < start_time) {
             return false;
         }
@@ -131,6 +134,7 @@ struct PolicyInterval {
 
         return true;
     }
+    // NOLINTEND(bugprone-exception-escape)
 };
 
 /// @brief Defines the policy dynamic parameters

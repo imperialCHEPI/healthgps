@@ -19,8 +19,8 @@ class RiskFactorModule final : public RiskFactorHostModule {
     /// module type.
     /// @throws std::out_of_range for model type and model instance type mismatch.
     RiskFactorModule(
-        std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> &&models,
-        RiskfactorAdjustmentModel &&adjustments);
+        std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models,
+        const RiskfactorAdjustmentModel &adjustments);
 
     SimulationModuleType type() const noexcept override;
 

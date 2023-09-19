@@ -10,15 +10,15 @@ DataSeries::DataSeries(std::size_t sample_size) : sample_size_{sample_size} {
     data_.emplace(core::Gender::female, std::map<std::string, std::vector<double>>{});
 }
 
-std::vector<double> &DataSeries::operator()(core::Gender gender, std::string key) {
+std::vector<double> &DataSeries::operator()(core::Gender gender, const std::string &key) {
     return data_.at(gender).at(key);
 }
 
-std::vector<double> &DataSeries::at(core::Gender gender, std::string key) {
+std::vector<double> &DataSeries::at(core::Gender gender, const std::string &key) {
     return data_.at(gender).at(key);
 }
 
-const std::vector<double> &DataSeries::at(core::Gender gender, std::string key) const {
+const std::vector<double> &DataSeries::at(core::Gender gender, const std::string &key) const {
     return data_.at(gender).at(key);
 }
 

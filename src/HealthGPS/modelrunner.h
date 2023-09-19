@@ -59,7 +59,7 @@ class ModelRunner {
     std::stop_source source_;
     std::string runner_id_{};
 
-    void run_model_thread(std::stop_token token, Simulation &model, const unsigned int run,
+    void run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
                           const std::optional<unsigned int> seed = std::nullopt);
 
     void notify(std::unique_ptr<hgps::EventMessage> message);

@@ -67,7 +67,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
 void AnalysisModule::update_population(RuntimeContext &context) { publish_result_message(context); }
 
 double
-AnalysisModule::calculate_residual_disability_weight(const int &age, const core::Gender gender,
+AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender gender,
                                                      const DoubleAgeGenderTable &expected_sum,
                                                      const IntegerAgeGenderTable &expected_count) {
     auto residual_value = 0.0;
@@ -371,7 +371,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         return;
     }
 
-    channels_.push_back("count");
+    channels_.emplace_back("count");
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }

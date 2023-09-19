@@ -56,7 +56,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
     }
 }
 
-const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(const int &age) const {
+const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(int age) const {
     for (const auto &entry : equations_) {
         if (entry.first.contains(age)) {
             // If there is an equation for the age, return it.

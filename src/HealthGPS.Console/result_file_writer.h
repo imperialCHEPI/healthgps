@@ -20,7 +20,7 @@ class ResultFileWriter final : public ResultWriter {
     /// @brief Initialises an instance of the host::ResultFileWriter class.
     /// @param file_name The JSON output file full name
     /// @param info The associated experiment information
-    ResultFileWriter(const std::filesystem::path file_name, const ExperimentInfo info);
+    ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info);
 
     ResultFileWriter(const ResultFileWriter &) = delete;
     ResultFileWriter &operator=(const ResultFileWriter &) = delete;
@@ -38,7 +38,7 @@ class ResultFileWriter final : public ResultWriter {
     std::atomic<bool> first_row_{true};
     ExperimentInfo info_;
 
-    void write_json_begin(const std::filesystem::path output);
+    void write_json_begin(const std::filesystem::path &output);
     void write_json_end();
 
     static std::string to_json_string(const hgps::ResultEventMessage &message);

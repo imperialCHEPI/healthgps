@@ -9,7 +9,7 @@
 namespace hgps {
 
 MappingEntry::MappingEntry(std::string name, int level, OptionalInterval range)
-    : name_{std::move(name)}, name_key_{name_}, level_{level}, range_{std::move(range)} {}
+    : name_{std::move(name)}, name_key_{name_}, level_{level}, range_{range} {}
 
 const std::string &MappingEntry::name() const noexcept { return name_; }
 
@@ -19,7 +19,7 @@ const core::Identifier &MappingEntry::key() const noexcept { return name_key_; }
 
 const OptionalInterval &MappingEntry::range() const noexcept { return range_; }
 
-double MappingEntry::get_bounded_value(const double &value) const noexcept {
+double MappingEntry::get_bounded_value(double value) const noexcept {
     if (range_.has_value()) {
         return std::clamp(value, range_->lower(), range_->upper());
     }
@@ -36,7 +36,7 @@ inline bool operator<(const MappingEntry &lhs, const MappingEntry &rhs) {
 
 /*-------------   Hierarchical Mapping implementation ------------- */
 
-HierarchicalMapping::HierarchicalMapping(std::vector<MappingEntry> &&mapping)
+HierarchicalMapping::HierarchicalMapping(std::vector<MappingEntry> mapping)
     : mapping_{std::move(mapping)} {
 
     std::sort(mapping_.begin(), mapping_.end());

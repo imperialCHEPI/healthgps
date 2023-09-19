@@ -18,16 +18,16 @@ class UnivariateSummary {
 
     /// @brief Initialises a new instance of the UnivariateSummary class.
     /// @param name The factor or variable name
-    UnivariateSummary(const std::string name);
+    UnivariateSummary(std::string name);
 
     /// @brief Initialises a new instance of the UnivariateSummary class.
     /// @param values The values to summary
-    UnivariateSummary(const std::vector<double> values);
+    UnivariateSummary(const std::vector<double> &values);
 
     /// @brief Initialises a new instance of the UnivariateSummary class.
     /// @param name The factor or variable name
     /// @param values The values to summary
-    UnivariateSummary(const std::string name, const std::vector<double> values);
+    UnivariateSummary(std::string name, const std::vector<double> &values);
 
     /// @brief Gets the factor or variable name
     /// @return The name identification

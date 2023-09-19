@@ -13,11 +13,10 @@
 #include <map>
 #include <optional>
 
-namespace fs = std::filesystem;
-
-static std::vector<hgps::MappingEntry> create_mapping_entries() {
-    return {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}};
-}
+namespace {
+std::vector<hgps::MappingEntry> mapping_entries{
+    {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}}};
+} // anonymous namespace
 
 void create_test_datatable(hgps::core::DataTable &data) {
     using namespace hgps;
@@ -63,8 +62,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
         {"gender", "Gender"}, {"age", "Age"}, {"education", "Education"}, {"income", "Income"}};
     auto ses = SESDefinition{.fuction_name = "normal", .parameters = std::vector<double>{0.0, 1.0}};
 
-    auto entries = create_mapping_entries();
-    auto mapping = HierarchicalMapping(std::move(entries));
+    auto mapping = HierarchicalMapping(mapping_entries);
 
     auto diseases = std::vector<core::DiseaseInfo>{
         DiseaseInfo{
@@ -77,7 +75,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
                     .name = "Colorectal cancer"},
     };
 
-    return ModelInput(data, settings, info, ses, mapping, diseases);
+    return {data, settings, info, ses, mapping, diseases};
 }
 
 TEST(TestHealthGPS, RandomBitGenerator) {
@@ -312,7 +310,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry) {
                              });
 
     auto base_module = factory.create(SimulationModuleType::Analysis, config);
-    auto *country_mod = static_cast<CountryModule *>(base_module.get());
+    auto *country_mod = dynamic_cast<CountryModule *>(base_module.get());
     country_mod->execute("print");
 
     ASSERT_EQ(SimulationModuleType::Analysis, country_mod->type());

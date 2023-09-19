@@ -24,7 +24,7 @@ class DiseaseMeasure {
 
     /// @brief Initialises a new instance of the DiseaseMeasure class.
     /// @param measures The disease measures value mapping
-    DiseaseMeasure(const std::map<int, double> &measures);
+    DiseaseMeasure(std::map<int, double> measures);
 
     /// @brief Gets the size of the measure collection
     /// @return
@@ -34,13 +34,13 @@ class DiseaseMeasure {
     /// @param measure_id Measure identifier
     /// @return Measure value
     /// @throws std::out_of_range for unknown measure identifier
-    const double &at(int measure_id) const;
+    double at(int measure_id) const;
 
     /// @brief Gets the measure value by identifier
     /// @param measure_id Measure identifier
     /// @return Measure value
     /// @throws std::out_of_range for unknown measure identifier
-    const double &operator[](int measure_id) const;
+    double operator[](int measure_id) const;
 
   private:
     std::map<int, double> measures_;
@@ -88,13 +88,13 @@ class DiseaseTable {
     /// @param measure The measure name
     /// @return Measure identifier
     /// @throws std::out_of_range for unknown measure name
-    const int &at(const std::string &measure) const;
+    int at(const std::string &measure) const;
 
     /// @brief Gets a measure identifier by name
     /// @param measure The measure name
     /// @return Measure identifier
     /// @throws std::out_of_range for unknown measure name
-    const int &operator[](const std::string &measure) const;
+    int operator[](const std::string &measure) const;
 
     /// @brief Lookup for the disease measure entries by age and gender
     /// @param age The age to lookup

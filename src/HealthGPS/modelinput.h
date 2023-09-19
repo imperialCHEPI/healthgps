@@ -51,9 +51,9 @@ class ModelInput {
     /// @param ses_info Socio-economic status (SES) model information
     /// @param risk_mapping Hierarchical risk factors model mappings
     /// @param diseases Selected diseases to include in experiment
-    ModelInput(core::DataTable &data, const Settings &settings, const RunInfo &run_info,
-               const SESDefinition &ses_info, const HierarchicalMapping &risk_mapping,
-               const std::vector<core::DiseaseInfo> &diseases);
+    ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
+               SESDefinition ses_info, HierarchicalMapping risk_mapping,
+               std::vector<core::DiseaseInfo> diseases);
 
     /// @brief Gets the simulation experiment settings definition
     /// @return Experiment settings definition
@@ -65,15 +65,15 @@ class ModelInput {
 
     /// @brief Gets the experiment start time
     /// @return Experiment start time
-    const unsigned int &start_time() const noexcept;
+    unsigned int start_time() const noexcept;
 
     /// @brief Gets the experiment stop time
     /// @return Experiment stop time
-    const unsigned int &stop_time() const noexcept;
+    unsigned int stop_time() const noexcept;
 
     /// @brief Gets the scenarios data synchronisation timeout (milliseconds)
     /// @return Scenarios synchronisation timeout
-    const unsigned int &sync_timeout_ms() const noexcept;
+    unsigned int sync_timeout_ms() const noexcept;
 
     /// @brief Gets the user custom seed to initialise the pseudo-number generator
     /// @return User custom seed value, if provide; otherwise empty.

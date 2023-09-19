@@ -375,7 +375,7 @@ std::unique_ptr<PopulationModule> build_population_module(Repository &repository
 
     auto min_time = config.start_time();
     auto max_time = config.stop_time();
-    auto time_filter = [&min_time, &max_time](const unsigned int &value) {
+    auto time_filter = [&min_time, &max_time](unsigned int value) {
         return value >= min_time && value <= max_time;
     };
 

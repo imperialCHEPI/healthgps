@@ -7,8 +7,6 @@
 
 #include <chrono>
 
-namespace fs = std::filesystem;
-
 // The fixture for testing class Foo.
 class RepositoryTest : public ::testing::Test {
   protected:

@@ -27,7 +27,7 @@ class DataSeries {
     /// @return The channel data
     /// @throws std::out_of_range if the container does not have a
     /// channel with the specified age and key
-    std::vector<double> &operator()(core::Gender gender, std::string key);
+    std::vector<double> &operator()(core::Gender gender, const std::string &key);
 
     /// @brief Gets a reference to a channel by Gender and identifier
     /// @param gender The gender enumeration
@@ -35,7 +35,7 @@ class DataSeries {
     /// @return The channel data
     /// @throws std::out_of_range if the container does not have a
     /// channel with the specified age and key
-    std::vector<double> &at(core::Gender gender, std::string key);
+    std::vector<double> &at(core::Gender gender, const std::string &key);
 
     /// @brief Gets a read-only reference to a channel by Gender and identifier
     /// @param gender The gender enumeration
@@ -43,7 +43,7 @@ class DataSeries {
     /// @return The channel data
     /// @throws std::out_of_range if the container does not have a
     /// channel with the specified age and key
-    const std::vector<double> &at(core::Gender gender, std::string key) const;
+    const std::vector<double> &at(core::Gender gender, const std::string &key) const;
 
     /// @brief Gets the collection of channel identifiers
     /// @return The collection of channel identifiers

@@ -124,8 +124,8 @@ void ModelRunner::cancel() noexcept {
     }
 }
 
-void ModelRunner::run_model_thread(std::stop_token token, Simulation &model, const unsigned int run,
-                                   const std::optional<unsigned int> seed) {
+void ModelRunner::run_model_thread(const std::stop_token &token, Simulation &model,
+                                   unsigned int run, const std::optional<unsigned int> seed) {
     auto run_start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_begin, run));

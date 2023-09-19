@@ -82,8 +82,7 @@ TEST(TestRelativeRiskLookup, InterpolateValueLookup) {
     ASSERT_EQ(expected_rows, lut.rows());
     ASSERT_EQ(expected_cols, lut.columns());
     ASSERT_EQ(expected_size, lut.size());
-    for (size_t i = 0; i < test_values.size(); i++) {
-        auto value = test_values[i];
+    for (float value : test_values) {
         auto lut_value = lut(test_age, value);
         if (value <= lut_cols.front()) {
             ASSERT_EQ(expected_row3.front(), lut_value);
