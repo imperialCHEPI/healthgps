@@ -5,6 +5,8 @@ repos:
       - id: check-merge-conflict
       - id: check-json
       - id: check-yaml
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.24.1
     hooks:

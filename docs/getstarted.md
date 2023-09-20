@@ -68,7 +68,7 @@ risk_factor <- "BMI"
 sim_data <- cbind(groups, data$result$risk_factors_average[[risk_factor]])
 
 # pivot data
-info <- sim_data %>% group_by(scenario, time) %>% 
+info <- sim_data %>% group_by(scenario, time) %>%
   summarise(runs = n(),
             avg_male = mean(male, na.rm = TRUE),
             sd_male = sd(male, na.rm = TRUE),
