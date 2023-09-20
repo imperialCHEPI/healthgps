@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 
 option(BUILD_DOC "Build API documentation" OFF)
 option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
@@ -21,11 +21,12 @@ if(CATCH_EXCEPTIONS)
     add_definitions(-DCATCH_EXCEPTIONS)
 endif()
 
-project(Health-GPS
-        VERSION 1.2.2.0
-        DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
-        HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
-        LANGUAGES CXX)
+project(
+    Health-GPS
+    VERSION 1.2.2.0
+    DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
+    HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
+    LANGUAGES CXX)
 
 include(FetchContent)
 include(cmake/PreventInSourceBuilds.cmake)
@@ -52,4 +53,4 @@ endif()
 
 include(CTest)
 
-add_subdirectory (src)
+add_subdirectory(src)
