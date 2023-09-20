@@ -136,6 +136,12 @@ jobs:
         working-directory: ${{github.workspace}}/out/build/${{ matrix.platform }}-debug
         run: geninfo . --include 'src/HealthGPS*' --exclude 'src/HealthGPS.Tests' --output-file main_coverage.info
 
+      - name: Upload coverage reports to Codecov
+        if: matrix.compiler == 'gcc-default'
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Zip output folder
         if: startsWith(github.ref, 'refs/tags/') && matrix.is_main
         working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
