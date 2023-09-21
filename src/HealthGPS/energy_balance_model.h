@@ -52,6 +52,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The minimum and maximum nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
+    /// @param food_names An ordered list of food names
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     EnergyBalanceModel(
@@ -59,6 +60,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
         const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
+        const std::vector<core::Identifier> &food_names,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
@@ -77,6 +79,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
+    const std::vector<core::Identifier> food_names_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
@@ -164,6 +167,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The minimum and maximum nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
+    /// @param food_names An ordered list of food names
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
@@ -171,6 +175,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
+        std::vector<core::Identifier> food_names,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
@@ -182,6 +187,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, double> energy_equation_;
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
+    std::vector<core::Identifier> food_names_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
 };

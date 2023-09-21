@@ -58,6 +58,19 @@
             }
         }
     ],
+    "FoodsCorrelationFile": {
+        "name": "ResidualDietCorrelationMatrix.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "columns": {
+            "Alcohol": "double",
+            "Carbohydrate": "double",
+            "Fat": "double",
+            "Protein": "double",
+            "Sodium": "double"
+        }
+    },
     "FoodsDataFile": {
         "name": "MAFFCODE_NUTRIENTS_NPM.csv",
         "format": "csv",

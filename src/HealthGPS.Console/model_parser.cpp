@@ -6,6 +6,7 @@
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include <Eigen/Dense>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -213,6 +214,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
         nutrient_equations;
+    std::vector<hgps::core::Identifier> food_names;
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
@@ -243,9 +245,23 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
         }
     }
 
+    // Foods correlation matrix.
+    const auto foods_correlation_file_info =
+        host::get_file_info(opt["FoodsCorrelationFile"], config.root_path);
+    const auto foods_correlation_table = load_datatable_from_csv(foods_correlation_file_info);
+    Eigen::MatrixXd foods_correlation(foods_correlation_table.num_rows(),
+                                      foods_correlation_table.num_columns());
+    for (size_t col = 0; col < foods_correlation_table.num_columns(); col++) {
+        food_names.emplace_back(foods_correlation_table.column(col).name());
+        for (size_t row = 0; row < foods_correlation_table.num_rows(); row++) {
+            foods_correlation(row, col) =
+                std::any_cast<double>(foods_correlation_table.column(col).value(row));
+        }
+    }
+
     // Foods nutrition data table.
-    const auto foods_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
-    const auto foods_data_table = load_datatable_from_csv(foods_file_info);
+    const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
+    const auto food_data_table = load_datatable_from_csv(food_data_file_info);
 
     // Load M/F average heights for age.
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
@@ -262,7 +278,7 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
 
     return std::make_unique<hgps::EnergyBalanceModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(age_mean_height));
+        std::move(food_names), std::move(food_prices), std::move(age_mean_height));
 }
 
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
