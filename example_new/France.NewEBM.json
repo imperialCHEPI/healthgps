@@ -30,32 +30,67 @@
     ],
     "Foods": [
         {
+            "Name": "Alcohol",
+            "Intercept": 0.0,
+            "Coefficients": {},
+            "Nutrients": {},
+            "price": null
+        },
+        {
             "Name": "Carbohydrate",
-            "Price": null,
+            "Intercept": 144.892664419936,
+            "Coefficients": {
+                "sex": 49.8438360972037,
+                "age1": 4.41913084504824,
+                "age2": -0.112923606431506,
+                "age3": 0.000805963411059104
+            },
             "Nutrients": {
                 "Carbohydrate": 1.0
-            }
+            },
+            "Price": null
         },
         {
             "Name": "Fat",
-            "Price": null,
+            "Intercept": 54.7022488365615,
+            "Coefficients": {
+                "sex": 16.8496529666428,
+                "age1": 1.26675975307563,
+                "age2": -0.0228652850403492,
+                "age3": 0.000117433532087498
+            },
             "Nutrients": {
                 "Fat": 1.0
-            }
+            },
+            "Price": null
         },
         {
             "Name": "Protein",
-            "Price": null,
+            "Intercept": 44.0097180197551,
+            "Coefficients": {
+                "sex": 20.1230510354203,
+                "age1": 1.6160602212611,
+                "age2": -0.0278924197606527,
+                "age3": 0.000143142339925315
+            },
             "Nutrients": {
                 "Protein": 1.0
-            }
+            },
+            "Price": null
         },
         {
             "Name": "Sodium",
-            "Price": null,
+            "Intercept": 1133.32921917935,
+            "Coefficients": {
+                "sex": 677.323597232314,
+                "age1": 81.1929219640613,
+                "age2": -1.61262994329241,
+                "age3": 0.0104179627659843
+            },
             "Nutrients": {
                 "Sodium": 1.0
-            }
+            },
+            "Price": null
         }
     ],
     "FoodsCorrelationFile": {
