@@ -4,6 +4,7 @@
 #include "HealthGPS.Core/exception.h"
 
 #include <algorithm>
+#include <utility>
 
 /*
  * Suppress this clang-tidy warning for now, because most (all?) of these methods won't
@@ -31,13 +32,14 @@ EnergyBalanceModel::EnergyBalanceModel(
     const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
-    const std::vector<core::Identifier> &food_names, const FoodLinearModels &food_models,
+    std::vector<core::Identifier> food_names, const FoodLinearModels &food_models,
     const Eigen::MatrixXd &food_cholesky,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
-      nutrient_equations_{nutrient_equations}, food_names_{food_names}, food_models_{food_models},
-      food_cholesky_{food_cholesky}, food_prices_{food_prices}, age_mean_height_{age_mean_height} {
+      nutrient_equations_{nutrient_equations}, food_names_{std::move(food_names)},
+      food_models_{food_models}, food_cholesky_{food_cholesky}, food_prices_{food_prices},
+      age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
