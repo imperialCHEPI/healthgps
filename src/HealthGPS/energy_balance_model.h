@@ -8,6 +8,12 @@
 
 namespace hgps {
 
+/// @brief Defines the linear models used to initialise a Person's food values
+struct FoodLinearModels {
+    std::unordered_map<core::Identifier, double> intercept;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Identifier, double>> coefficients;
+};
+
 /// @brief State data type for a simulated person
 struct SimulatePersonState {
     /// @brief Height
