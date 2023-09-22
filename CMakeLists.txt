@@ -40,7 +40,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 if(MSVC)
     add_compile_options(/W4 /permissive-)
-    
+
     if(GENERATE_COVERAGE)
         message(WARNING "Code coverage cannot be generated for MSVC, ignoring")
     endif()
@@ -50,7 +50,7 @@ if(MSVC)
     endif()
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
-    
+
     if(GENERATE_COVERAGE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g --coverage")
     endif()
