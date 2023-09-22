@@ -8,7 +8,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.24.1
+    rev: 0.26.3
     hooks:
       - id: check-github-workflows
   - repo: https://github.com/pre-commit/mirrors-clang-format
@@ -17,12 +17,12 @@ repos:
       - id: clang-format
         files: '.*\.(h|cpp)'
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.2
+    rev: v3.0.3
     hooks:
       - id: prettier
         files: '(.*\.(json|yaml|yml)|\.clang-tidy)$'
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.35.0
+    rev: v0.36.0
     hooks:
       - id: markdownlint
         args: ["--disable", "MD013", "MD041", "--"]
