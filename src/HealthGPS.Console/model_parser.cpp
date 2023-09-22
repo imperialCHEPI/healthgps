@@ -245,6 +245,15 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
         }
     }
 
+    // Food linear models.
+    hgps::FoodLinearModels food_models;
+    for (const auto &food : opt["Foods"]) {
+        auto food_key = food["Name"].get<hgps::core::Identifier>();
+        food_models.intercepts[food_key] = food["Intercept"].get<double>();
+        food_models.coefficients[food_key] =
+            food["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+    }
+
     // Food names and correlation matrix.
     std::vector<hgps::core::Identifier> food_names;
     const auto food_correlations_file_info =
