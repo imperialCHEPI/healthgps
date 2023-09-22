@@ -6,6 +6,7 @@
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include <Eigen/Cholesky>
 #include <Eigen/Dense>
 #include <filesystem>
 #include <fmt/color.h>
@@ -214,7 +215,6 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
         nutrient_equations;
-    std::vector<hgps::core::Identifier> food_names;
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
@@ -245,19 +245,21 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
         }
     }
 
-    // Foods correlation matrix.
-    const auto foods_correlation_file_info =
+    // Food names and correlation matrix.
+    std::vector<hgps::core::Identifier> food_names;
+    const auto food_correlations_file_info =
         host::get_file_info(opt["FoodsCorrelationFile"], config.root_path);
-    const auto foods_correlation_table = load_datatable_from_csv(foods_correlation_file_info);
-    Eigen::MatrixXd foods_correlation(foods_correlation_table.num_rows(),
-                                      foods_correlation_table.num_columns());
-    for (size_t col = 0; col < foods_correlation_table.num_columns(); col++) {
-        food_names.emplace_back(foods_correlation_table.column(col).name());
-        for (size_t row = 0; row < foods_correlation_table.num_rows(); row++) {
-            foods_correlation(row, col) =
-                std::any_cast<double>(foods_correlation_table.column(col).value(row));
+    const auto food_correlations_table = load_datatable_from_csv(food_correlations_file_info);
+    Eigen::MatrixXd food_correlations{food_correlations_table.num_rows(),
+                                      food_correlations_table.num_columns()};
+    for (size_t col = 0; col < food_correlations_table.num_columns(); col++) {
+        food_names.emplace_back(food_correlations_table.column(col).name());
+        for (size_t row = 0; row < food_correlations_table.num_rows(); row++) {
+            food_correlations(row, col) =
+                std::any_cast<double>(food_correlations_table.column(col).value(row));
         }
     }
+    auto food_cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{food_correlations}.matrixL()};
 
     // Foods nutrition data table.
     const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
