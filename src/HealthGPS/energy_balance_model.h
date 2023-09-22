@@ -60,6 +60,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     /// @param nutrient_ranges The minimum and maximum nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_names An ordered list of food names
+    /// @param food_models The linear models used to initialise a person's food values
     /// @param food_cholesky The Cholesky decomposition of the food correlation matrix
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
@@ -68,7 +69,8 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
         const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
-        const std::vector<core::Identifier> &food_names, const Eigen::MatrixXd &food_cholesky,
+        const std::vector<core::Identifier> &food_names, const FoodLinearModels &food_models,
+        const Eigen::MatrixXd &food_cholesky,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
@@ -88,6 +90,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::vector<core::Identifier> food_names_;
+    const FoodLinearModels food_models_;
     const Eigen::MatrixXd food_cholesky_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
@@ -177,6 +180,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     /// @param nutrient_ranges The minimum and maximum nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_names An ordered list of food names
+    /// @param food_models The linear models used to initialise a person's food values
     /// @param food_cholesky The Cholesky decomposition of the food correlation matrix
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
@@ -185,7 +189,8 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
-        std::vector<core::Identifier> food_names, Eigen::MatrixXd food_cholesky,
+        std::vector<core::Identifier> food_names, FoodLinearModels food_models,
+        Eigen::MatrixXd food_cholesky,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
@@ -198,6 +203,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::vector<core::Identifier> food_names_;
+    FoodLinearModels food_models_;
     Eigen::MatrixXd food_cholesky_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;

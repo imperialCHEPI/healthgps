@@ -289,8 +289,8 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
 
     return std::make_unique<hgps::EnergyBalanceModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_names), std::move(food_cholesky), std::move(food_prices),
-        std::move(age_mean_height));
+        std::move(food_names), std::move(food_models), std::move(food_cholesky),
+        std::move(food_prices), std::move(age_mean_height));
 }
 
 std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
