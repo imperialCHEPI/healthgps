@@ -41,6 +41,8 @@ target_sources(
             "food_labelling_scenario.h"
             "healthgps.cpp"
             "healthgps.h"
+            "static_linear_model.cpp"
+            "static_linear_model.h"
             "hierarchical_model_static.cpp"
             "hierarchical_model_static.h"
             "info_message.cpp"
