@@ -162,7 +162,7 @@ The ***running*** section defines simulation *run-time* period, *start/stop time
                     "start_time": 2022,
                     "finish_time": 2050
                 },
-                "dynamics":[0.15, 0.0, 0.0], 
+                "dynamics":[0.15, 0.0, 0.0],
                 "impacts": [
                     {"risk_factor":"BMI", "impact_value":-0.12, "from_age":5,  "to_age":12},
                     {"risk_factor":"BMI", "impact_value":-0.31, "from_age":13, "to_age":18},
@@ -436,7 +436,7 @@ Defines the file storage for country specific data containing historic estimates
 "demographic": {
     "format": "csv",
     "delimiter": ",",
-    "encoding": "UTF8",    
+    "encoding": "UTF8",
     ...
     "path": "undb",
     "age_limits": [0, 100],
@@ -472,7 +472,7 @@ The ***relative risk*** data is stored in a sub-folder, with *disease* to *disea
 "diseases": {
     "format": "csv",
     "delimiter": ",",
-    "encoding": "UTF8",    
+    "encoding": "UTF8",
     ...
     "path": "diseases",
     "age_limits": [1, 100],
@@ -640,7 +640,7 @@ risk_factor <- "BMI"
 sim_data <- cbind(groups, data$result$risk_factors_average[[risk_factor]])
 
 # pivot dataset
-info <- sim_data %>% group_by(scenario, time) %>% 
+info <- sim_data %>% group_by(scenario, time) %>%
   summarise(runs = n(),
             avg_male = mean(male, na.rm = TRUE),
             sd_male = sd(male, na.rm = TRUE),
@@ -705,7 +705,7 @@ Every software package installed in the HPC is called a **module**. The *module 
 |module rm tools/dev  | Remove a loaded module version                         |
 |module purge         | Unload all loaded modules, clear all modules           |
 
-> **Warning**  
+> **Warning**
 > Modules name are *case sensitive* for both script and search.
 
 Module packages can be installed *globally* within the HPC system, old style, or different stacks depending on Software maturity and quality (recommended). To see all available stacks, type command: `module av tools`, the Health-GPS Software can be installed via three stacks:
@@ -752,7 +752,7 @@ To submit the above job script, check its status, and view the console output, t
 # Submit Health-GPS job, print out the job id
 qsub healthgps.pbs
 
-# Check the status of all submitted jobs (not completed only). 
+# Check the status of all submitted jobs (not completed only).
 qstat
 
 # View Health-GPS console output
@@ -856,7 +856,7 @@ To access the STOP project storage, named `stop`, from the user space:
 # Show the RDS root directory (should print out /rds/general/project/)
 echo $RDS_PROJECT
 
-# The STOP project storage root folder can be accessed via: 
+# The STOP project storage root folder can be accessed via:
 ls ${RDS_PROJECT}/stop
 
 # Or via explicit full path
@@ -913,7 +913,7 @@ HealthGPS.Console -f ${RDS_PROJECT}stop/live/demo/example/France.Config.json -s 
 
 The array job must complete within 1 hour, run on a single compute node, with 8 CPU cores and 64GB of memory. The experiment comprises of 5 parallel batches with 10 simulation runs in each, performing a total of 50 simulation runs to evaluate the impact of the intervention scenario above.
 
->**Note**  
+>**Note**
 > In practice, `walltime` is around 8 hours, each batch or sub-job contains 50 simulation runs, the array size ranges from 50 to 100 sub-jobs, resulting on 2500 to 5000 simulation runs per array job, or simulation experiment. *The job configuration affects the queuing system where the job ends up*.
 
 Now submit the array job to be evaluated by the HPC system, and check the status until complete
@@ -939,7 +939,7 @@ You can also monitor your job status and other HPC resources information via the
 
 where `X = $PBS_ARRAY_INDEX` value appended to the fine name to allow the reconstruction of the overall experiment for analysis. The simulation results file can be large, and grow with the size of the experiment, users should create results processing scripts or tools to be executed on the HPC to tabulate the results, create plots dataset, etc to minimise the coping of large files over the network.
 
-> **Note**  
+> **Note**
 > The processing of the detailed simulation result files requires the use of the **array index** as a column to *unique identify* each row across multiple files in the combined file. The array batches run independent in parallel, when combining the result files, the *run* column will have duplicates in the resulting file.
 
 The simulation logs are generated next to the array job script (`$PBS_O_WORKDIR`) by default, each array batch generates three log files:
@@ -958,7 +958,7 @@ With large array jobs, this can cause the number of files in the submission dire
 ...
 ```
 
->**Warning**  
+>**Warning**
 *Create one logs directory per-project job*. Using a single 'logs' directory for all your submitted jobs' log files defeats the purpose.
 
 If you end-up with many job log files in a folder, the following command can be used to clear all log files from the current directory:

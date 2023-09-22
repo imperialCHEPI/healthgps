@@ -135,10 +135,10 @@ Software can be installed via three stacks:
 * **development** (tools/dev) - a generic stack for software not current available directly from EasyBuild, available on the login nodes but without any guarantees,  software on this stack might change on short notice due to required rebuilds.
 * **production** (tools/prod) - a generic stack for software available as an [EasyBuild package](https://github.com/easybuilders/easybuild-easyconfigs), built to support specific architectures, and is *not* available on the login nodes. To *view* which software is installed, load the *'tools/prod-headnode'* and search for the software.
 
-> **Warning**  
+> **Warning**
 > Modules name are case sensitive for both script and search.
 >
-> **Note**  
+> **Note**
 > To get access to [Imperial HPC](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/) and learn more about [EasyBuild](https://easybuild.io/), users should consider taking the hands-on [workshops](https://www.imperial.ac.uk/students/academic-support/graduate-school/students/doctoral/professional-development/research-computing-data-science/courses/) offered by the Imperial's Professional Development Programme, specially **the Linux command line & large-scale computing** courses.
 
 The remaining of this tutorial focus on building a Health-GPS *release* source code, `version 1.2.1.0 or newer`, on the *Imperial HPC* using *EasyBuild* on the **local** stack. Installing Health-GPS on the *development* and *production* stacks must be done via the [Software Install](https://servicemgt.imperial.ac.uk/ask?id=sc_cat_item&sys_id=7c8e0ddf1b6eb8101fd24043b24bcb7f) request service. Health-GPS still has dependencies missing in the EasyBuild production pipeline, configuration [pull requests](https://github.com/easybuilders/easybuild-easyconfigs/pulls?q=healthgps) are under review, the following script builds on the latest Health-GPS version (1.3.0.0) that is available on the *development stack*.
@@ -257,16 +257,16 @@ try {
         seed_generator->seed(model_input.seed().value());
     }
     auto executive = ModelRunner(event_bus, std::move(seed_generator));
-    
+
     // Create baseline scenario with data sync channel
     auto channel = SyncChannel{};
     auto baseline_scenario = std::make_unique<BaselineScenario>(channel);
-    
+
     // Create simulation engine for baseline scenario
     auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
     auto baseline = HealthGPS{
         SimulationDefinition{ model_input,
-            std::move(baseline_scenario), 
+            std::move(baseline_scenario),
             std::move(baseline_rnd)},
         factory, event_bus };
 
@@ -303,7 +303,7 @@ try {
             runtime = executive.run(baseline, config.trial_runs);
             done.store(true);
         } };
-        
+
         // Waits for it to finish, cancellation can be enabled here
         while (!done.load()) {
             std::this_thread::sleep_for(std::chrono::microseconds(100));
@@ -350,7 +350,7 @@ SimulationModuleFactory get_default_simulation_module_factory(Repository& manage
             return build_ses_noise_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::Demographic,
-        [](Repository& repository, const ModelInput& config) -> 
+        [](Repository& repository, const ModelInput& config) ->
         SimulationModuleFactory::ModuleType {
             return build_population_module(repository, config); });
 
@@ -360,12 +360,12 @@ SimulationModuleFactory get_default_simulation_module_factory(Repository& manage
             return build_risk_factor_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::Disease,
-        [](Repository& repository, const ModelInput& config) -> 
+        [](Repository& repository, const ModelInput& config) ->
         SimulationModuleFactory::ModuleType {
             return build_disease_module(repository, config); });
 
     factory.register_builder(SimulationModuleType::Analysis,
-        [](Repository& repository, const ModelInput& config) -> 
+        [](Repository& repository, const ModelInput& config) ->
         SimulationModuleFactory::ModuleType {
             return build_analysis_module(repository, config); });
 
