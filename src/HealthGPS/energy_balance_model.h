@@ -70,7 +70,7 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         std::vector<core::Identifier> food_names, FoodLinearModels food_models,
-        const Eigen::MatrixXd &food_cholesky,
+        Eigen::MatrixXd food_cholesky,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
