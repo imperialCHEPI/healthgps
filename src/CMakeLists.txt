@@ -2,21 +2,22 @@
 add_compile_definitions(TBB_USE_ASSERT)
 
 # Include sub-projects.
-add_subdirectory (HealthGPS.Core)
-add_subdirectory (HealthGPS.Datastore)
-add_subdirectory (HealthGPS)
-add_subdirectory (HealthGPS.Console)
+add_subdirectory(HealthGPS.Core)
+add_subdirectory(HealthGPS.Datastore)
+add_subdirectory(HealthGPS)
+add_subdirectory(HealthGPS.Console)
 
-if (BUILD_TESTING)
-	enable_testing()
-	message(STATUS "Building Tests ...")
-	add_subdirectory (HealthGPS.Tests)
+if(BUILD_TESTING)
+    enable_testing()
+    message(STATUS "Building Tests ...")
+    add_subdirectory(HealthGPS.Tests)
 endif()
 
-if (BUILD_DOC)
+if(BUILD_DOC)
     message(STATUS "Doxygen build folder: ${CMAKE_CURRENT_BINARY_DIR}")
-	set(DOXYGEN_FILE_PATTERNS *.h *.cpp *.md)
-	set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*" "*/HealthGPS.Tests/*")
+    set(DOXYGEN_FILE_PATTERNS *.h *.cpp *.md)
+    set(DOXYGEN_EXCLUDE_PATTERNS "*/vcpkg_installed/*" "*/_deps/" "*/docs/*" "*/external/*"
+                                 "*/HealthGPS.Tests/*")
     enable_doxygen("awesome-sidebar")
 endif()
 

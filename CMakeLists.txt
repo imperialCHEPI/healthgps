@@ -1,7 +1,8 @@
-cmake_minimum_required (VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 
 option(BUILD_DOC "Build API documentation" OFF)
 option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
+option(GENERATE_COVERAGE "Generate code coverage information" OFF)
 
 # minimum default standard
 set(CMAKE_CXX_STANDARD 20)
@@ -21,11 +22,12 @@ if(CATCH_EXCEPTIONS)
     add_definitions(-DCATCH_EXCEPTIONS)
 endif()
 
-project(Health-GPS
-        VERSION 1.2.2.0
-        DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
-        HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
-        LANGUAGES CXX)
+project(
+    Health-GPS
+    VERSION 1.2.2.0
+    DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
+    HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
+    LANGUAGES CXX)
 
 include(FetchContent)
 include(cmake/PreventInSourceBuilds.cmake)
@@ -38,12 +40,20 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 message(STATUS "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 if(MSVC)
     add_compile_options(/W4 /permissive-)
+    
+    if(GENERATE_COVERAGE)
+        message(WARNING "Code coverage cannot be generated for MSVC, ignoring")
+    endif()
 
     if(WARNINGS_AS_ERRORS)
         add_compile_options(/WX)
     endif()
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
+    
+    if(GENERATE_COVERAGE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g --coverage")
+    endif()
 
     if(WARNINGS_AS_ERRORS)
         add_compile_options(-Werror)
@@ -52,4 +62,4 @@ endif()
 
 include(CTest)
 
-add_subdirectory (src)
+add_subdirectory(src)
