@@ -31,12 +31,12 @@ EnergyBalanceModel::EnergyBalanceModel(
     const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
-    const std::vector<core::Identifier> &food_names,
+    const std::vector<core::Identifier> &food_names, const Eigen::MatrixXd &food_cholesky,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
-      nutrient_equations_{nutrient_equations}, food_names_{food_names}, food_prices_{food_prices},
-      age_mean_height_{age_mean_height} {
+      nutrient_equations_{nutrient_equations}, food_names_{food_names},
+      food_cholesky_{food_cholesky}, food_prices_{food_prices}, age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -49,6 +49,9 @@ EnergyBalanceModel::EnergyBalanceModel(
     }
     if (food_names_.empty()) {
         throw core::HgpsException("Food names list is empty");
+    }
+    if (!food_cholesky_.allFinite()) {
+        throw core::HgpsException("Food Cholesky matrix contains non-finite values");
     }
     if (food_prices_.empty()) {
         throw core::HgpsException("Food price mapping is empty");
@@ -284,12 +287,13 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
-    std::vector<core::Identifier> food_names,
+    std::vector<core::Identifier> food_names, Eigen::MatrixXd food_cholesky,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
     : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_names_{std::move(food_names)},
-      food_prices_{std::move(food_prices)}, age_mean_height_{std::move(age_mean_height)} {
+      food_cholesky_{std::move(food_cholesky)}, food_prices_{std::move(food_prices)},
+      age_mean_height_{std::move(age_mean_height)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -303,6 +307,9 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     if (food_names_.empty()) {
         throw core::HgpsException("Food names list is empty");
     }
+    if (!food_cholesky_.allFinite()) {
+        throw core::HgpsException("Food Cholesky matrix contains non-finite values");
+    }
     if (food_prices_.empty()) {
         throw core::HgpsException("Food prices mapping is empty");
     }
@@ -313,8 +320,8 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
 
 std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
     return std::make_unique<EnergyBalanceModel>(energy_equation_, nutrient_ranges_,
-                                                nutrient_equations_, food_names_, food_prices_,
-                                                age_mean_height_);
+                                                nutrient_equations_, food_names_, food_cholesky_,
+                                                food_prices_, age_mean_height_);
 }
 
 } // namespace hgps
