@@ -91,7 +91,7 @@
         ],
         "risk_factor_models": {
             "static": "France.HLM.json",
-            "dynamic": "France.NewEBM.json"
+            "dynamic": "KevinHall.json"
         },
         "baseline_adjustments": {
             "format": "csv",

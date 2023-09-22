@@ -43,7 +43,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt);
 /// @param config The model configuration
 /// @return An instance of the hgps::EnergyBalanceModelDefinition type
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
-load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config);
+load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config);
 
 /// @brief Loads a risk model definition from a JSON file
 /// @param model_type The type of model ("dynamic"/"static") to load

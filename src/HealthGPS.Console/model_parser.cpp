@@ -122,8 +122,8 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
         return load_ebhlm_risk_model_definition(opt);
     }
-    if (hgps::core::case_insensitive::equals(model_name, "newebm")) {
-        return load_newebm_risk_model_definition(opt, config);
+    if (hgps::core::case_insensitive::equals(model_name, "kevinhall")) {
+        return load_kevinhall_risk_model_definition(opt, config);
     }
 
     throw hgps::core::HgpsException{
@@ -209,7 +209,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 // NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
-load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
