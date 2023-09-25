@@ -131,7 +131,7 @@ load_linear_risk_model_definition(const poco::json &opt, const host::Configurati
 
     // Risk factor linear models.
     hgps::LinearModelParams models;
-    for (const auto &factor : opt["RiskFactors"]) {
+    for (const auto &factor : opt["RiskFactorModels"]) {
         auto factor_key = factor["Name"].get<hgps::core::Identifier>();
         models.intercepts[factor_key] = factor["Intercept"].get<double>();
         models.coefficients[factor_key] =
@@ -141,7 +141,7 @@ load_linear_risk_model_definition(const poco::json &opt, const host::Configurati
     // Risk factor names and correlation matrix.
     std::vector<hgps::core::Identifier> names;
     const auto correlations_file_info =
-        host::get_file_info(opt["RisakFactorCorrelationFile"], config.root_path);
+        host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlations_table = load_datatable_from_csv(correlations_file_info);
     Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
     for (size_t col = 0; col < correlations_table.num_columns(); col++) {

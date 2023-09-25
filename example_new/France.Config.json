@@ -90,7 +90,7 @@
             }
         ],
         "risk_factor_models": {
-            "static": "France.HLM.json",
+            "static": "StaticLinear.json",
             "dynamic": "KevinHall.json"
         },
         "baseline_adjustments": {

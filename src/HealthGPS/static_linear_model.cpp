@@ -29,9 +29,19 @@ HierarchicalModelType StaticLinearModel::type() const noexcept {
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
-void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {}
+void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
+    for (auto &entity : context.population()) {
+    }
+}
 
-void StaticLinearModel::update_risk_factors(RuntimeContext &context) {}
+void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
+    for (auto &entity : context.population()) {
+        // Only newborns should be initialised.
+        if (entity.age > 0) {
+            continue;
+        }
+    }
+}
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::vector<core::Identifier> risk_factor_names, LinearModelParams risk_factor_models,
