@@ -3,9 +3,15 @@
 #include "interfaces.h"
 #include "mapping.h"
 
-#include "hierarchical_model_static.h"
+#include <Eigen/Dense>
 
 namespace hgps {
+
+/// @brief Defines the linear model parameters used to initialise risk factors
+struct LinearModelParams {
+    std::unordered_map<core::Identifier, double> intercepts;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Identifier, double>> coefficients;
+};
 
 /// @brief Implements the static linear model type
 ///
@@ -13,10 +19,11 @@ namespace hgps {
 class StaticLinearModel final : public HierarchicalLinearModel {
   public:
     /// @brief Initialises a new instance of the StaticLinearModel class
-    /// @param models The model equations
-    /// @param levels The hierarchical model level definition
-    StaticLinearModel(const std::unordered_map<core::Identifier, LinearModel> &models,
-                      const std::map<int, HierarchicalLevel> &levels);
+    /// @param risk_factor_names An ordered list of risk factor names
+    /// @param risk_factor_models The linear models used to initialise a person's risk factor values
+    /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
+    StaticLinearModel(std::vector<core::Identifier> risk_factor_names,
+                      LinearModelParams risk_factor_models, Eigen::MatrixXd risk_factor_cholesky);
 
     HierarchicalModelType type() const noexcept override;
 
@@ -27,30 +34,31 @@ class StaticLinearModel final : public HierarchicalLinearModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
-    const std::unordered_map<core::Identifier, LinearModel> &models_;
-    const std::map<int, HierarchicalLevel> &levels_;
-
-    void generate_for_entity(RuntimeContext &context, Person &entity, int level,
-                             std::vector<MappingEntry> &level_factors);
+    const std::vector<core::Identifier> risk_factor_names_;
+    const LinearModelParams risk_factor_models_;
+    const Eigen::MatrixXd risk_factor_cholesky_;
 };
 
 /// @brief Defines the static linear model data type
 class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
-    /// @param linear_models The linear regression models equations
-    /// @param model_levels The hierarchical model levels definition
+    /// @param risk_factor_names An ordered list of risk factor names
+    /// @param risk_factor_models The linear models used to initialise a person's risk factor values
+    /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws std::invalid_argument for empty arguments
-    StaticLinearModelDefinition(std::unordered_map<core::Identifier, LinearModel> linear_models,
-                                std::map<int, HierarchicalLevel> model_levels);
+    StaticLinearModelDefinition(std::vector<core::Identifier> risk_factor_names,
+                                LinearModelParams risk_factor_models,
+                                Eigen::MatrixXd risk_factor_cholesky);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
     std::unique_ptr<HierarchicalLinearModel> create_model() const override;
 
   private:
-    std::unordered_map<core::Identifier, LinearModel> models_;
-    std::map<int, HierarchicalLevel> levels_;
+    std::vector<core::Identifier> risk_factor_names_;
+    LinearModelParams risk_factor_models_;
+    Eigen::MatrixXd risk_factor_cholesky_;
 };
 
 } // namespace hgps

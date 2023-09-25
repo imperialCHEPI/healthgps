@@ -128,64 +128,33 @@ load_hlm_risk_model_definition(const poco::json &opt) {
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_linear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
-    std::map<int, hgps::HierarchicalLevel> levels;
-    std::unordered_map<hgps::core::Identifier, hgps::LinearModel> models;
 
-    poco::HierarchicalModelInfo model_info;
-    model_info.models = opt["models"].get<std::unordered_map<std::string, poco::LinearModelInfo>>();
-    model_info.levels =
-        opt["levels"].get<std::unordered_map<std::string, poco::HierarchicalLevelInfo>>();
-
-    for (const auto &model_item : model_info.models) {
-        const auto &at = model_item.second;
-
-        std::unordered_map<hgps::core::Identifier, hgps::Coefficient> coeffs;
-        for (const auto &pair : at.coefficients) {
-            coeffs.emplace(hgps::core::Identifier(pair.first),
-                           hgps::Coefficient{.value = pair.second.value,
-                                             .pvalue = pair.second.pvalue,
-                                             .tvalue = pair.second.tvalue,
-                                             .std_error = pair.second.std_error});
-        }
-
-        models.emplace(
-            hgps::core::Identifier(model_item.first),
-            hgps::LinearModel{.coefficients = std::move(coeffs),
-                              .residuals_standard_deviation = at.residuals_standard_deviation,
-                              .rsquared = at.rsquared});
+    // Risk factor linear models.
+    hgps::LinearModelParams models;
+    for (const auto &factor : opt["RiskFactors"]) {
+        auto factor_key = factor["Name"].get<hgps::core::Identifier>();
+        models.intercepts[factor_key] = factor["Intercept"].get<double>();
+        models.coefficients[factor_key] =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
     }
 
-    for (auto &level_item : model_info.levels) {
-        auto &at = level_item.second;
-        std::unordered_map<hgps::core::Identifier, int> col_names;
-        auto variables_count = static_cast<int>(at.variables.size());
-        for (int i = 0; i < variables_count; i++) {
-            col_names.emplace(hgps::core::Identifier{at.variables[i]}, i);
+    // Risk factor names and correlation matrix.
+    std::vector<hgps::core::Identifier> names;
+    const auto correlations_file_info =
+        host::get_file_info(opt["RisakFactorCorrelationFile"], config.root_path);
+    const auto correlations_table = load_datatable_from_csv(correlations_file_info);
+    Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
+    for (size_t col = 0; col < correlations_table.num_columns(); col++) {
+        names.emplace_back(correlations_table.column(col).name());
+        for (size_t row = 0; row < correlations_table.num_rows(); row++) {
+            correlations(row, col) =
+                std::any_cast<double>(correlations_table.column(col).value(row));
         }
-
-        levels.emplace(
-            std::stoi(level_item.first),
-            hgps::HierarchicalLevel{
-                .variables = std::move(col_names),
-                .transition = hgps::core::DoubleArray2D(at.transition.rows, at.transition.cols,
-                                                        at.transition.data),
-
-                .inverse_transition = hgps::core::DoubleArray2D(at.inverse_transition.rows,
-                                                                at.inverse_transition.cols,
-                                                                at.inverse_transition.data),
-
-                .residual_distribution = hgps::core::DoubleArray2D(at.residual_distribution.rows,
-                                                                   at.residual_distribution.cols,
-                                                                   at.residual_distribution.data),
-
-                .correlation = hgps::core::DoubleArray2D(at.correlation.rows, at.correlation.cols,
-                                                         at.correlation.data),
-
-                .variances = at.variances});
     }
+    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
-    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(models),
-                                                               std::move(levels));
+    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(names), std::move(models),
+                                                               std::move(cholesky));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -318,31 +287,6 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
         }
     }
 
-    // Food linear models.
-    hgps::FoodLinearModels food_models;
-    for (const auto &food : opt["Foods"]) {
-        auto food_key = food["Name"].get<hgps::core::Identifier>();
-        food_models.intercepts[food_key] = food["Intercept"].get<double>();
-        food_models.coefficients[food_key] =
-            food["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
-    }
-
-    // Food names and correlation matrix.
-    std::vector<hgps::core::Identifier> food_names;
-    const auto food_correlations_file_info =
-        host::get_file_info(opt["FoodsCorrelationFile"], config.root_path);
-    const auto food_correlations_table = load_datatable_from_csv(food_correlations_file_info);
-    Eigen::MatrixXd food_correlations{food_correlations_table.num_rows(),
-                                      food_correlations_table.num_columns()};
-    for (size_t col = 0; col < food_correlations_table.num_columns(); col++) {
-        food_names.emplace_back(food_correlations_table.column(col).name());
-        for (size_t row = 0; row < food_correlations_table.num_rows(); row++) {
-            food_correlations(row, col) =
-                std::any_cast<double>(food_correlations_table.column(col).value(row));
-        }
-    }
-    auto food_cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{food_correlations}.matrixL()};
-
     // Foods nutrition data table.
     const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
     const auto food_data_table = load_datatable_from_csv(food_data_file_info);
@@ -362,7 +306,6 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     return std::make_unique<hgps::EnergyBalanceModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_names), std::move(food_models), std::move(food_cholesky),
         std::move(food_prices), std::move(age_mean_height));
 }
 
