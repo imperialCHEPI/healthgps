@@ -119,7 +119,7 @@ void StaticLinearModel::generate_for_entity(RuntimeContext &context, Person &ent
     }
 }
 
-HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
+StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unordered_map<core::Identifier, LinearModel> linear_models,
     std::map<int, HierarchicalLevel> model_levels)
     : models_{std::move(linear_models)}, levels_{std::move(model_levels)} {
@@ -133,7 +133,7 @@ HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> HierarchicalLinearModelDefinition::create_model() const {
+std::unique_ptr<HierarchicalLinearModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(models_, levels_);
 }
 

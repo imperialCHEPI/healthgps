@@ -14,15 +14,31 @@ namespace host {
 /// @return An instance of the hgps::BaselineAdjustment type
 hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info);
 
-/// @brief Loads the full hierarchical linear regression model definition from a JSON file
+/// @brief Loads a static risk factor model from a JSON file
 /// @param model_name The name of the model to use
+/// @param opt The parsed model definition JSON file
+/// @param config The model configuration
+/// @return An instance of the hgps::RiskFactorModelDefinition type
+/// @throw std::invalid_argument if static model is unrecognised
+std::unique_ptr<hgps::RiskFactorModelDefinition>
+load_static_risk_model_definition(const std::string &model_name, const poco::json &opt,
+                                  const host::Configuration &config);
+
+/// @brief Loads the full hierarchical linear regression model definition from a JSON file
 /// @param opt The parsed model definition JSON file
 /// @return An instance of the hgps::HierarchicalLinearModelDefinition type
 /// @throw std::invalid_argument if static model is unrecognised
-std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_static_risk_model_definition(const std::string &model_name, const poco::json &opt);
+std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
+load_hlm_risk_model_definition(const poco::json &opt);
 
-/// @brief Loads a dynamic model from a JSON file
+/// @brief Loads the linear regression model definition from a JSON file
+/// @param opt The parsed model definition JSON file
+/// @param config The model configuration
+/// @return An instance of the hgps::StaticLinearModelDefinition type
+std::unique_ptr<hgps::StaticLinearModelDefinition>
+load_linear_risk_model_definition(const poco::json &opt, const host::Configuration &config);
+
+/// @brief Loads a dynamic risk factor model from a JSON file
 /// @param model_name The name of the model to use
 /// @param opt The parsed model definition JSON file
 /// @param config The model configuration
@@ -54,11 +70,11 @@ std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefi
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
                            const host::Configuration &config);
 
-/// @brief Load and parse the model file
-/// @param model_filename The path to the model
+/// @brief Load and parse a JSON model file
+/// @param model_path The path to the model file
 /// @return The parsed JSON
 /// @throw std::invalid_argument if file is missing
-poco::json load_json(const std::string &model_filename);
+poco::json load_json(const std::filesystem::path &model_path);
 
 /// @brief Registers a risk factor model definition with the repository
 /// @param repository The repository instance to register

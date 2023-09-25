@@ -48,13 +48,23 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_static_risk_model_definition(const std::string &model_name, const poco::json &opt) {
-    MEASURE_FUNCTION();
-    if (!hgps::core::case_insensitive::equals(model_name, "hlm")) {
-        throw hgps::core::HgpsException{
-            fmt::format("Static model '{}' not recognised", model_name)};
+load_static_risk_model_definition(const std::string &model_name, const poco::json &opt,
+                                  const host::Configuration &config) {
+    // Load this static model with the appropriate loader.
+    if (hgps::core::case_insensitive::equals(model_name, "hlm")) {
+        return load_hlm_risk_model_definition(opt);
+    }
+    if (hgps::core::case_insensitive::equals(model_name, "linear")) {
+        return load_linear_risk_model_definition(opt, config);
     }
 
+    throw hgps::core::HgpsException{
+        fmt::format("Static model name '{}' not recognised", model_name)};
+}
+
+std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
+load_hlm_risk_model_definition(const poco::json &opt) {
+    MEASURE_FUNCTION();
     std::map<int, hgps::HierarchicalLevel> levels;
     std::unordered_map<hgps::core::Identifier, hgps::LinearModel> models;
 
@@ -113,6 +123,69 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 
     return std::make_unique<hgps::HierarchicalLinearModelDefinition>(std::move(models),
                                                                      std::move(levels));
+}
+
+std::unique_ptr<hgps::StaticLinearModelDefinition>
+load_linear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+    MEASURE_FUNCTION();
+    std::map<int, hgps::HierarchicalLevel> levels;
+    std::unordered_map<hgps::core::Identifier, hgps::LinearModel> models;
+
+    poco::HierarchicalModelInfo model_info;
+    model_info.models = opt["models"].get<std::unordered_map<std::string, poco::LinearModelInfo>>();
+    model_info.levels =
+        opt["levels"].get<std::unordered_map<std::string, poco::HierarchicalLevelInfo>>();
+
+    for (const auto &model_item : model_info.models) {
+        const auto &at = model_item.second;
+
+        std::unordered_map<hgps::core::Identifier, hgps::Coefficient> coeffs;
+        for (const auto &pair : at.coefficients) {
+            coeffs.emplace(hgps::core::Identifier(pair.first),
+                           hgps::Coefficient{.value = pair.second.value,
+                                             .pvalue = pair.second.pvalue,
+                                             .tvalue = pair.second.tvalue,
+                                             .std_error = pair.second.std_error});
+        }
+
+        models.emplace(
+            hgps::core::Identifier(model_item.first),
+            hgps::LinearModel{.coefficients = std::move(coeffs),
+                              .residuals_standard_deviation = at.residuals_standard_deviation,
+                              .rsquared = at.rsquared});
+    }
+
+    for (auto &level_item : model_info.levels) {
+        auto &at = level_item.second;
+        std::unordered_map<hgps::core::Identifier, int> col_names;
+        auto variables_count = static_cast<int>(at.variables.size());
+        for (int i = 0; i < variables_count; i++) {
+            col_names.emplace(hgps::core::Identifier{at.variables[i]}, i);
+        }
+
+        levels.emplace(
+            std::stoi(level_item.first),
+            hgps::HierarchicalLevel{
+                .variables = std::move(col_names),
+                .transition = hgps::core::DoubleArray2D(at.transition.rows, at.transition.cols,
+                                                        at.transition.data),
+
+                .inverse_transition = hgps::core::DoubleArray2D(at.inverse_transition.rows,
+                                                                at.inverse_transition.cols,
+                                                                at.inverse_transition.data),
+
+                .residual_distribution = hgps::core::DoubleArray2D(at.residual_distribution.rows,
+                                                                   at.residual_distribution.cols,
+                                                                   at.residual_distribution.data),
+
+                .correlation = hgps::core::DoubleArray2D(at.correlation.rows, at.correlation.cols,
+                                                         at.correlation.data),
+
+                .variances = at.variances});
+    }
+
+    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(models),
+                                                               std::move(levels));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -302,7 +375,7 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     // Load appropriate model
     if (hgps::core::case_insensitive::equals(model_type, "static")) {
         return std::make_pair(hgps::HierarchicalModelType::Static,
-                              load_static_risk_model_definition(model_name, opt));
+                              load_static_risk_model_definition(model_name, opt, config));
     }
     if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
         return std::make_pair(hgps::HierarchicalModelType::Dynamic,
