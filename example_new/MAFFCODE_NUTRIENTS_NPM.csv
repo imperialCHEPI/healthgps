@@ -1,4 +1,4 @@
-maffcode,description,a_fats,a_saturates,a_monounsats,a_polyunsats,a_carbs,a_cals,a_sodium,a_totalsugars,a_addedsugar,a_alcohol,a_fibre,a_cholest,a_protein,NPM score
+MAFF code,Description,Fat,Saturated fat,Monounsaturated fat,Polyunsaturated fat,Carbohydrate,Energy,Sodium,Total sugar,Added sugar,Alcohol,Fibre,Cholesterol,Protein,NPM score
 402,UHT whole milk,4.13832,2.63676,1.11972,0.13158,4.644,68.48868,0.044118,4.644,0,0,0,13.674,3.4572,1
 403,Sterilised whole milk,4.13832,2.63676,1.11972,0.13158,4.644,68.48868,0.044118,4.644,0,0,0,13.674,3.4572,1
 404,Pasteurised or homogenised whole milk,4.13832,2.63676,1.11972,0.13158,4.644,68.48868,0.044118,4.644,0,0,0,13.674,3.4572,1
