@@ -31,12 +31,12 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
 load_hlm_risk_model_definition(const poco::json &opt);
 
-/// @brief Loads the linear regression model definition from a JSON file
+/// @brief Loads the static linear regression model definition from a JSON file
 /// @param opt The parsed model definition JSON file
 /// @param config The model configuration
 /// @return An instance of the hgps::StaticLinearModelDefinition type
 std::unique_ptr<hgps::StaticLinearModelDefinition>
-load_linear_risk_model_definition(const poco::json &opt, const host::Configuration &config);
+load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config);
 
 /// @brief Loads a dynamic risk factor model from a JSON file
 /// @param model_name The name of the model to use

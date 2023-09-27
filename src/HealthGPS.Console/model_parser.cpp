@@ -54,8 +54,8 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
     if (hgps::core::case_insensitive::equals(model_name, "hlm")) {
         return load_hlm_risk_model_definition(opt);
     }
-    if (hgps::core::case_insensitive::equals(model_name, "linear")) {
-        return load_linear_risk_model_definition(opt, config);
+    if (hgps::core::case_insensitive::equals(model_name, "staticlinear")) {
+        return load_staticlinear_risk_model_definition(opt, config);
     }
 
     throw hgps::core::HgpsException{
@@ -126,7 +126,7 @@ load_hlm_risk_model_definition(const poco::json &opt) {
 }
 
 std::unique_ptr<hgps::StaticLinearModelDefinition>
-load_linear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
     // Risk factor linear models.
