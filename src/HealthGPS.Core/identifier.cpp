@@ -61,5 +61,5 @@ void from_json(const nlohmann::json &j, Identifier &id) { id = Identifier{j.get<
 
 } // namespace core
 
-core::Identifier operator""_id(const char *id, size_t) { return {id}; }
+core::Identifier operator""_id(const char *id, size_t /*unused*/) { return {id}; }
 } // namespace hgps
