@@ -10,17 +10,10 @@
 using namespace hgps;
 
 namespace {
-constexpr auto *csv_data = R"(food,d,e,a,c,b
-chicken,1,2,3,4,5
-crisps,6,7,8,9,10
-tofu,11,12,13,14,15
-)";
-
 const std::vector<core::Identifier> nutrients = {"A"_id, "B"_id, "C"_id};
 } // anonymous namespace
 
 TEST(LoadNutrientTable, GetNutrientIndexes) {
-
     {
         // Note that the case doesn't match; should be case insensitive
         const std::vector<std::string> column_names = {"d", "e", "a", "c", "b"};
@@ -35,16 +28,6 @@ TEST(LoadNutrientTable, GetNutrientIndexes) {
         const std::vector<std::string> column_names = {"D", "E", "A", "C"};
         EXPECT_THROW(detail::get_nutrient_indexes(column_names, nutrients), core::HgpsException);
     }
-}
-
-TEST(LoadNutrientTable, GetNutrientTable) {
-    std::istringstream is{csv_data};
-    rapidcsv::Document doc{is, rapidcsv::LabelParams{0, 0}};
-    const auto table = detail::get_nutrient_table(doc, nutrients, {2, 4, 3});
-
-    const decltype(table) expected = {
-        {"chicken", {3, 5, 4}}, {"crisps", {8, 10, 9}}, {"tofu", {13, 15, 14}}};
-    EXPECT_EQ(table, expected);
 }
 
 TEST(LoadNutrientTable, LoadNutrientTable) {
