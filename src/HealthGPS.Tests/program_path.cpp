@@ -1,7 +1,7 @@
 #include "program_path.h"
 
 #ifdef __linux__
-#include <limits.h>
+#include <climits>
 #include <unistd.h>
 #endif
 #ifdef _WIN32
