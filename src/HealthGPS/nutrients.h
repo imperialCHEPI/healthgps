@@ -9,7 +9,7 @@
 
 namespace hgps {
 namespace detail {
-/// @brief Work out which column each macronutrient isin
+/// @brief Work out which column each macronutrient is in
 /// @param column_names Column names for CSV file
 /// @param nutrients Macronutrients
 /// @return Index for each macronutrient in order
