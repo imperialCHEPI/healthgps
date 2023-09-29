@@ -22,7 +22,7 @@ repos:
       - id: prettier
         files: '(.*\.(json|yaml|yml)|\.clang-tidy)$'
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.36.0
+    rev: v0.37.0
     hooks:
       - id: markdownlint
         args: ["--disable", "MD013", "MD041", "--"]
