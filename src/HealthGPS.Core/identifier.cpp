@@ -4,7 +4,8 @@
 #include <algorithm>
 #include <stdexcept>
 
-namespace hgps::core {
+namespace hgps {
+namespace core {
 Identifier Identifier::empty() {
     static Identifier instance = Identifier();
     return instance;
@@ -58,4 +59,7 @@ std::ostream &operator<<(std::ostream &stream, const Identifier &identifier) {
 
 void from_json(const nlohmann::json &j, Identifier &id) { id = Identifier{j.get<std::string>()}; }
 
-} // namespace hgps::core
+} // namespace core
+
+core::Identifier operator""_id(const char *id, size_t /*unused*/) { return {id}; }
+} // namespace hgps

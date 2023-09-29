@@ -66,6 +66,8 @@ target_sources(
             "modulefactory.h"
             "mtrandom.cpp"
             "mtrandom.h"
+            "nutrients.h"
+            "nutrients.cpp"
             "person.cpp"
             "person.h"
             "population.cpp"

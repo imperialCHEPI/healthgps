@@ -16,6 +16,8 @@ target_sources(
             "pch.h"
             "data_config.h"
             "data_config.cpp"
+            "program_path.h"
+            "program_path.cpp"
             "AgeGenderTable.Test.cpp"
             "Channel.Test.cpp"
             "Configuration.Test.cpp"
@@ -41,7 +43,8 @@ target_sources(
             "WeightModel.Test.cpp"
             "CountryModule.h"
             "RiskFactorData.h"
-            "Interval.Test.cpp")
+            "Interval.Test.cpp"
+            "LoadNutrientTable.cpp")
 
 target_link_libraries(
     HealthGPS.Tests
@@ -63,5 +66,16 @@ if(WIN32)
     install(IMPORTED_RUNTIME_ARTIFACTS fmt::fmt)
     install(IMPORTED_RUNTIME_ARTIFACTS GTest::gtest)
 endif()
+
+# Additional data files required for tests
+set(TO_COPY nutrient_table.csv)
+foreach(FILE IN LISTS TO_COPY)
+    add_custom_command(
+        TARGET HealthGPS.Tests
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}"
+                "$<TARGET_FILE_DIR:HealthGPS.Tests>")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}" DESTINATION bin)
+endforeach(FILE IN LISTS TO_COPY)
 
 set(ROOT_NAMESPACE hgps::test)
