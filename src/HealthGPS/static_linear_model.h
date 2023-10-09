@@ -33,6 +33,11 @@ class StaticLinearModel final : public HierarchicalLinearModel {
 
     void update_risk_factors(RuntimeContext &context) override;
 
+    void linear_approximation(Person &person);
+
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::vector<double>>>
+    mean_by_age_and_sex(RuntimeContext &context);
+
   private:
     const std::vector<core::Identifier> risk_factor_names_;
     const LinearModelParams risk_factor_models_;
