@@ -46,6 +46,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (person.age > 0) {
             continue;
         }
+
+        linear_approximation(person);
     }
 }
 

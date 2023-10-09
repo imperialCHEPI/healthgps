@@ -5,25 +5,26 @@ namespace hgps {
 std::atomic<std::size_t> Person::newUID{0};
 
 std::map<core::Identifier, std::function<double(const Person &)>> Person::current_dispatcher{
-    {core::Identifier{"intercept"}, [](const Person &) { return 1.0; }},
-    {core::Identifier{"gender"}, [](const Person &p) { return p.gender_to_value(); }},
-    {core::Identifier{"age"}, [](const Person &p) { return static_cast<double>(p.age); }},
-    {core::Identifier{"age2"}, [](const Person &p) { return pow(p.age, 2); }},
-    {core::Identifier{"age3"}, [](const Person &p) { return pow(p.age, 3); }},
-    {core::Identifier{"ses"}, [](const Person &p) { return p.ses; }},
+    {core::Identifier{"Intercept"}, [](const Person &) { return 1.0; }},
+    {core::Identifier{"Gender"}, [](const Person &p) { return p.gender_to_value(); }},
+    {core::Identifier{"Age"}, [](const Person &p) { return static_cast<double>(p.age); }},
+    {core::Identifier{"Age2"}, [](const Person &p) { return pow(p.age, 2); }},
+    {core::Identifier{"Age3"}, [](const Person &p) { return pow(p.age, 3); }},
+    {core::Identifier{"SES"}, [](const Person &p) { return p.ses; }},
 
     // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
-    {core::Identifier{"height"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"weight"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"physical_activity_level"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"body_fat"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"lean_tissue"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"extracellular_fluid"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"glycogen"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"water"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"energy_expenditure"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"energy_intake"}, [](const Person &) { return 0.5; }},
-    {core::Identifier{"carbohydrate"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"Height"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"Weight"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"BMI"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"PhysicalActivityLevel"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"BodyFat"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"LeanTissue"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"ExtracellularFluid"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"Glycogen"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"Water"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"EnergyExpenditure"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"EnergyIntake"}, [](const Person &) { return 0.5; }},
+    {core::Identifier{"Carbohydrate"}, [](const Person &) { return 0.5; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}
