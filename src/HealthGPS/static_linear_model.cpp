@@ -64,40 +64,6 @@ void StaticLinearModel::linear_approximation(Person &person) {
     }
 }
 
-std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::vector<double>>>
-StaticLinearModel::mean_by_age_and_sex(RuntimeContext &context) {
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::vector<double>>>
-        mean;
-    const int max_age = context.age_range().upper() + 1;
-
-    for (const auto &factor_name : risk_factor_names_) {
-        mean[factor_name] = std::unordered_map<core::Gender, std::vector<double>>{};
-        mean[factor_name].emplace(core::Gender::male, max_age);
-        mean[factor_name].emplace(core::Gender::female, max_age);
-        std::unordered_map<core::Gender, std::vector<int>> count;
-        count.emplace(core::Gender::male, max_age);
-        count.emplace(core::Gender::female, max_age);
-
-        for (auto &person : context.population()) {
-            if (!person.is_active()) {
-                continue;
-            }
-            mean[factor_name][person.gender][person.age] += person.risk_factors[factor_name];
-            count[person.gender][person.age] += 1;
-        }
-
-        for (const auto &[sex, count_by_age] : count) {
-            for (int age = 0; age < max_age; age++) {
-                if (count_by_age[age] > 0) {
-                    mean[factor_name][sex][age] /= count_by_age[age];
-                }
-            }
-        }
-    }
-
-    return mean;
-}
-
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::vector<core::Identifier> risk_factor_names, LinearModelParams risk_factor_models,
     Eigen::MatrixXd risk_factor_cholesky)
