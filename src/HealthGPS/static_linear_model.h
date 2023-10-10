@@ -33,6 +33,8 @@ class StaticLinearModel final : public HierarchicalLinearModel {
 
     void update_risk_factors(RuntimeContext &context) override;
 
+    Eigen::VectorXd correlated_samples(RuntimeContext &context);
+
     void linear_approximation(Person &person);
 
   private:

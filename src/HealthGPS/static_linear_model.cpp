@@ -31,24 +31,50 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
-    // Approximate risk factor values with linear models.
     for (auto &person : context.population()) {
-        linear_approximation(person);
-    }
 
-    // TODO: Correlated risk factor sampling.
+        // Approximate risk factor values with linear models.
+        linear_approximation(person);
+
+        // Correlated residual sampling.
+        auto samples = correlated_samples(context);
+    }
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     for (auto &person : context.population()) {
+
         // Only newborns should be initialised.
         if (person.age > 0) {
             continue;
         }
 
+        // Approximate risk factor values with linear models.
         linear_approximation(person);
+
+        // Correlated residual sampling.
+        auto samples = correlated_samples(context);
     }
+}
+
+Eigen::VectorXd StaticLinearModel::correlated_samples(RuntimeContext &context) {
+
+    // Correlated samples using Cholesky decomposition.
+    Eigen::VectorXd samples{risk_factor_names_.size()};
+    for (size_t i = 0; i < risk_factor_names_.size(); i++) {
+        samples[i] = context.random().next_normal(0.0, 1.0);
+    }
+    samples = risk_factor_cholesky_ * samples;
+
+    // Bound and scale the samples.
+    double sigma_cap = 3.0; // for removing outliers
+    for (size_t i = 0; i < risk_factor_names_.size(); i++) {
+        samples[i] = std::min(std::max(samples[i], -sigma_cap), sigma_cap);
+        samples[i] = samples[i] / sigma_cap;
+    }
+
+    return samples;
 }
 
 void StaticLinearModel::linear_approximation(Person &person) {
