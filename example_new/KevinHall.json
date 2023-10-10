@@ -63,7 +63,8 @@
         "delimiter": ",",
         "encoding": "UTF8",
         "columns": {
-            "maffcode": "integer"
+            "MAFF code": "integer",
+            "Description": "string"
         }
     },
     "AgeMeanHeight": {
