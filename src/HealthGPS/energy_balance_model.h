@@ -15,7 +15,7 @@ struct SimulatePersonState {
     /// @brief Body weight
     double BW{};
 
-    /// @brief Pyhsical activity level
+    /// @brief Physical activity level
     double PAL{};
 
     /// @brief Body fat

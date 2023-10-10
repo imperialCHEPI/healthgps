@@ -7,7 +7,8 @@
 
 #include "nlohmann/json.hpp"
 
-namespace hgps::core {
+namespace hgps {
+namespace core {
 
 /// @brief Entity unique identifier data type
 ///
@@ -97,7 +98,11 @@ void map_from_json(const nlohmann::json &j, Map<hgps::core::Identifier, Value> &
 }
 } // namespace detail
 
-} // namespace hgps::core
+} // namespace core
+
+//! Allow users to use _id suffix to create Identifier (e.g. "Disease"_id)
+core::Identifier operator""_id(const char *id, size_t);
+} // namespace hgps
 
 namespace std {
 template <class T>
