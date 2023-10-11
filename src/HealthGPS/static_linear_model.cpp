@@ -47,7 +47,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     for (auto &person : context.population()) {
 
-        // Only newborns should be initialised.
+        // Do not initialise non-newborns.
         if (person.age > 0) {
             continue;
         }
