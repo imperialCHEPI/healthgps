@@ -22,6 +22,7 @@ class StaticLinearModel final : public HierarchicalLinearModel {
     /// @param risk_factor_names An ordered list of risk factor names
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @throws HgpsException for invalid arguments
     StaticLinearModel(std::vector<core::Identifier> risk_factor_names,
                       LinearModelParams risk_factor_models, Eigen::MatrixXd risk_factor_cholesky);
 
@@ -50,7 +51,7 @@ class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
     /// @param risk_factor_names An ordered list of risk factor names
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
-    /// @throws std::invalid_argument for empty arguments
+    /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(std::vector<core::Identifier> risk_factor_names,
                                 LinearModelParams risk_factor_models,
                                 Eigen::MatrixXd risk_factor_cholesky);
