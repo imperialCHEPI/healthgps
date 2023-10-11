@@ -38,6 +38,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
         // Correlated residual sampling.
         auto samples = correlated_samples(context);
+
+        // TODO: add residuals to risk factor values
     }
 }
 
@@ -55,6 +57,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         // Correlated residual sampling.
         auto samples = correlated_samples(context);
+
+        // TODO: add residuals to risk factor values
     }
 }
 
