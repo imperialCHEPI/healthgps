@@ -46,6 +46,7 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [Adevs](https://sourceforge.net/projects/adevs)       | BSD 3-Clause |
 | [crossguid](https://github.com/graeme-hill/crossguid) | MIT          |
 | [cxxopts](https://github.com/jarro2783/cxxopts)       | MIT          |
+| [eigen](https://eigen.tuxfamily.org)                  | MPL2         |
 | [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |

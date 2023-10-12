@@ -6,6 +6,8 @@
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
+#include <Eigen/Cholesky>
+#include <Eigen/Dense>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -46,13 +48,23 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_static_risk_model_definition(const std::string &model_name, const poco::json &opt) {
-    MEASURE_FUNCTION();
-    if (!hgps::core::case_insensitive::equals(model_name, "hlm")) {
-        throw hgps::core::HgpsException{
-            fmt::format("Static model '{}' not recognised", model_name)};
+load_static_risk_model_definition(const std::string &model_name, const poco::json &opt,
+                                  const host::Configuration &config) {
+    // Load this static model with the appropriate loader.
+    if (hgps::core::case_insensitive::equals(model_name, "hlm")) {
+        return load_hlm_risk_model_definition(opt);
+    }
+    if (hgps::core::case_insensitive::equals(model_name, "staticlinear")) {
+        return load_staticlinear_risk_model_definition(opt, config);
     }
 
+    throw hgps::core::HgpsException{
+        fmt::format("Static model name '{}' not recognised", model_name)};
+}
+
+std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
+load_hlm_risk_model_definition(const poco::json &opt) {
+    MEASURE_FUNCTION();
     std::map<int, hgps::HierarchicalLevel> levels;
     std::unordered_map<hgps::core::Identifier, hgps::LinearModel> models;
 
@@ -113,6 +125,38 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
                                                                      std::move(levels));
 }
 
+std::unique_ptr<hgps::StaticLinearModelDefinition>
+load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+    MEASURE_FUNCTION();
+
+    // Risk factor linear models.
+    hgps::LinearModelParams models;
+    for (const auto &factor : opt["RiskFactorModels"]) {
+        auto factor_key = factor["Name"].get<hgps::core::Identifier>();
+        models.intercepts[factor_key] = factor["Intercept"].get<double>();
+        models.coefficients[factor_key] =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+    }
+
+    // Risk factor names and correlation matrix.
+    std::vector<hgps::core::Identifier> names;
+    const auto correlations_file_info =
+        host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
+    const auto correlations_table = load_datatable_from_csv(correlations_file_info);
+    Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
+    for (size_t col = 0; col < correlations_table.num_columns(); col++) {
+        names.emplace_back(correlations_table.column(col).name());
+        for (size_t row = 0; row < correlations_table.num_rows(); row++) {
+            correlations(row, col) =
+                std::any_cast<double>(correlations_table.column(col).value(row));
+        }
+    }
+    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
+
+    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(names), std::move(models),
+                                                               std::move(cholesky));
+}
+
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
                                    const host::Configuration &config) {
@@ -120,8 +164,8 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
         return load_ebhlm_risk_model_definition(opt);
     }
-    if (hgps::core::case_insensitive::equals(model_name, "newebm")) {
-        return load_newebm_risk_model_definition(opt, config);
+    if (hgps::core::case_insensitive::equals(model_name, "kevinhall")) {
+        return load_kevinhall_risk_model_definition(opt, config);
     }
 
     throw hgps::core::HgpsException{
@@ -207,7 +251,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 // NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::EnergyBalanceModelDefinition>
-load_newebm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
@@ -244,8 +288,8 @@ load_newebm_risk_model_definition(const poco::json &opt, const host::Configurati
     }
 
     // Foods nutrition data table.
-    const auto foods_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
-    const auto foods_data_table = load_datatable_from_csv(foods_file_info);
+    const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
+    const auto food_data_table = load_datatable_from_csv(food_data_file_info);
 
     // Load M/F average heights for age.
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
@@ -274,7 +318,7 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     // Load appropriate model
     if (hgps::core::case_insensitive::equals(model_type, "static")) {
         return std::make_pair(hgps::HierarchicalModelType::Static,
-                              load_static_risk_model_definition(model_name, opt));
+                              load_static_risk_model_definition(model_name, opt, config));
     }
     if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
         return std::make_pair(hgps::HierarchicalModelType::Dynamic,

@@ -5,6 +5,7 @@
     "dependencies": [
         "fmt",
         "cxxopts",
+        "eigen3",
         "nlohmann-json",
         "rapidcsv",
         "crossguid",

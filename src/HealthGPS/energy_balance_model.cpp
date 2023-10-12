@@ -4,6 +4,7 @@
 #include "HealthGPS.Core/exception.h"
 
 #include <algorithm>
+#include <utility>
 
 /*
  * Suppress this clang-tidy warning for now, because most (all?) of these methods won't
@@ -13,18 +14,18 @@
 namespace hgps {
 
 // Risk factor keys.
-const core::Identifier H_key{"height"};
-const core::Identifier BW_key{"weight"};
-const core::Identifier PAL_key{"physical_activity_level"};
-const core::Identifier RMR_key{"resting_metabolic_rate"};
-const core::Identifier F_key{"body_fat"};
-const core::Identifier L_key{"lean_tissue"};
-const core::Identifier ECF_key{"extracellular_fluid"};
-const core::Identifier G_key{"glycogen"};
-const core::Identifier W_key{"water"};
-const core::Identifier EE_key{"energy_expenditure"};
-const core::Identifier EI_key{"energy_intake"};
-const core::Identifier CI_key{"carbohydrate"};
+const core::Identifier H_key{"Height"};
+const core::Identifier BW_key{"Weight"};
+const core::Identifier PAL_key{"PhysicalActivityLevel"};
+const core::Identifier RMR_key{"RestingMetabolicRate"};
+const core::Identifier F_key{"BodyFat"};
+const core::Identifier L_key{"LeanTissue"};
+const core::Identifier ECF_key{"ExtracellularFluid"};
+const core::Identifier G_key{"Glycogen"};
+const core::Identifier W_key{"Water"};
+const core::Identifier EE_key{"EnergyExpenditure"};
+const core::Identifier EI_key{"EnergyIntake"};
+const core::Identifier CI_key{"Carbohydrate"};
 
 EnergyBalanceModel::EnergyBalanceModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
