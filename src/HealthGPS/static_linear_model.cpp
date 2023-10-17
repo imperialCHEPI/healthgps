@@ -24,9 +24,7 @@ StaticLinearModel::StaticLinearModel(std::vector<core::Identifier> risk_factor_n
     }
 }
 
-HierarchicalModelType StaticLinearModel::type() const noexcept {
-    return HierarchicalModelType::Static;
-}
+RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 

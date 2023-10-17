@@ -62,7 +62,7 @@ class EnergyBalanceModel final : public RiskFactorModel {
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
-    HierarchicalModelType type() const noexcept override;
+    RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
 

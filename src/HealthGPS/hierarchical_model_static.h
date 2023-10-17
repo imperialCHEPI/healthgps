@@ -66,7 +66,7 @@ class StaticHierarchicalLinearModel final : public RiskFactorModel {
     StaticHierarchicalLinearModel(const std::unordered_map<core::Identifier, LinearModel> &models,
                                   const std::map<int, HierarchicalLevel> &levels);
 
-    HierarchicalModelType type() const noexcept override;
+    RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
 

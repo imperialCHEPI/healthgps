@@ -66,7 +66,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 /// @param opt The parsed model definition JSON file
 /// @param config The model configuration
 /// @return A std::pair containing the model type and model definition
-std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
+std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
                            const host::Configuration &config);
 

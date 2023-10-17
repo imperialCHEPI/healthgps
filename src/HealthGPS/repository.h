@@ -35,7 +35,7 @@ class Repository {
     /// @param model_type Static or Dynamic
     /// @return The risk factor model definition
     virtual const RiskFactorModelDefinition &
-    get_risk_factor_model_definition(const HierarchicalModelType &model_type) const = 0;
+    get_risk_factor_model_definition(const RiskFactorModelType &model_type) const = 0;
 
     /// @brief Gets the user provided baseline risk factors adjustment dataset
     /// @return Baseline risk factors adjustments
@@ -79,7 +79,7 @@ class CachedRepository final : public Repository {
     /// @param model_type Static or Dynamic
     /// @param definition The risk factor model definition instance
     void
-    register_risk_factor_model_definition(const HierarchicalModelType &model_type,
+    register_risk_factor_model_definition(const RiskFactorModelType &model_type,
                                           std::unique_ptr<RiskFactorModelDefinition> definition);
 
     /// @brief Register a user provided baseline risk factors adjustments dataset
@@ -89,7 +89,7 @@ class CachedRepository final : public Repository {
     core::Datastore &manager() noexcept override;
 
     const RiskFactorModelDefinition &
-    get_risk_factor_model_definition(const HierarchicalModelType &model_type) const override;
+    get_risk_factor_model_definition(const RiskFactorModelType &model_type) const override;
 
     BaselineAdjustment &get_baseline_adjustment_definition() override;
 
@@ -107,8 +107,7 @@ class CachedRepository final : public Repository {
   private:
     mutable std::mutex mutex_;
     std::reference_wrapper<core::Datastore> data_manager_;
-    std::map<HierarchicalModelType, std::unique_ptr<RiskFactorModelDefinition>>
-        rf_model_definition_;
+    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModelDefinition>> rf_model_definition_;
     BaselineAdjustment baseline_adjustments_;
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;

@@ -19,8 +19,8 @@ StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     }
 }
 
-HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
-    return HierarchicalModelType::Static;
+RiskFactorModelType StaticHierarchicalLinearModel::type() const noexcept {
+    return RiskFactorModelType::Static;
 }
 
 std::string StaticHierarchicalLinearModel::name() const noexcept { return "Static"; }

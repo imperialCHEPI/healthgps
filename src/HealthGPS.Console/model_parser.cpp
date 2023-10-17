@@ -309,7 +309,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
         std::move(food_prices), std::move(age_mean_height));
 }
 
-std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
+std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
                            const host::Configuration &config) {
     // Get model name from JSON
@@ -317,11 +317,11 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
 
     // Load appropriate model
     if (hgps::core::case_insensitive::equals(model_type, "static")) {
-        return std::make_pair(hgps::HierarchicalModelType::Static,
+        return std::make_pair(hgps::RiskFactorModelType::Static,
                               load_static_risk_model_definition(model_name, opt, config));
     }
     if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
-        return std::make_pair(hgps::HierarchicalModelType::Dynamic,
+        return std::make_pair(hgps::RiskFactorModelType::Dynamic,
                               load_dynamic_risk_model_definition(model_name, opt, config));
     }
 

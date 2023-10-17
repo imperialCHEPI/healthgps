@@ -26,11 +26,11 @@ enum class SimulationModuleType : uint8_t {
 };
 
 /// @brief Health GPS risk factor module types enumeration
-enum class HierarchicalModelType : uint8_t {
-    /// @brief Static hierarchical model
+enum class RiskFactorModelType : uint8_t {
+    /// @brief Static model
     Static,
 
-    /// @brief Dynamic hierarchical model
+    /// @brief Dynamic model
     Dynamic,
 };
 
@@ -95,7 +95,7 @@ class DiseaseHostModule : public UpdatableModule {
                                         const Person &entity) const noexcept = 0;
 };
 
-/// @brief Generic risk factors module interface to host hierarchical models
+/// @brief Generic risk factors module interface to host risk factor models
 class RiskFactorHostModule : public UpdatableModule {
   public:
     /// @brief Gets the number of diseases model hosted
@@ -103,9 +103,9 @@ class RiskFactorHostModule : public UpdatableModule {
     virtual std::size_t size() const noexcept = 0;
 
     /// @brief Indicates whether the host contains a model of type.
-    /// @param modelType The hierarchical model type identifier
-    /// @return true if the hierarchical model is found, otherwise false.
-    virtual bool contains(const HierarchicalModelType &modelType) const noexcept = 0;
+    /// @param modelType The model type identifier
+    /// @return true if the model is found, otherwise false.
+    virtual bool contains(const RiskFactorModelType &modelType) const noexcept = 0;
 
     /// @brief Apply baseline risk factor adjustments to population
     /// @param context The simulation run-time context
@@ -133,7 +133,7 @@ class DemographicModule : public SimulationModule {
                                    const DiseaseHostModule &disease_host) = 0;
 };
 
-/// @brief Hierarchical linear model interface
+/// @brief Risk factor model interface
 class RiskFactorModel {
   public:
     /// @brief Destroys a RiskFactorModel instance
@@ -141,7 +141,7 @@ class RiskFactorModel {
 
     /// @brief Gets the model type identifier
     /// @return The module type identifier
-    virtual HierarchicalModelType type() const noexcept = 0;
+    virtual RiskFactorModelType type() const noexcept = 0;
 
     /// @brief Gets the model name
     /// @return The human-readable model name

@@ -26,7 +26,7 @@ class StaticLinearModel final : public RiskFactorModel {
     StaticLinearModel(std::vector<core::Identifier> risk_factor_names,
                       LinearModelParams risk_factor_models, Eigen::MatrixXd risk_factor_cholesky);
 
-    HierarchicalModelType type() const noexcept override;
+    RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
 

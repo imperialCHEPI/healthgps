@@ -44,7 +44,7 @@ class EnergyBalanceHierarchicalModel final : public RiskFactorModel {
         const std::map<core::Identifier, core::Identifier> &variables,
         const double boundary_percentage);
 
-    HierarchicalModelType type() const noexcept override;
+    RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
 

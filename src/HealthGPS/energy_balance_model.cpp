@@ -55,8 +55,8 @@ EnergyBalanceModel::EnergyBalanceModel(
     }
 }
 
-HierarchicalModelType EnergyBalanceModel::type() const noexcept {
-    return HierarchicalModelType::Dynamic;
+RiskFactorModelType EnergyBalanceModel::type() const noexcept {
+    return RiskFactorModelType::Dynamic;
 }
 
 std::string EnergyBalanceModel::name() const noexcept { return "Dynamic"; }

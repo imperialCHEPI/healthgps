@@ -9,8 +9,7 @@ namespace hgps {
 CachedRepository::CachedRepository(core::Datastore &manager) : data_manager_{manager} {}
 
 void CachedRepository::register_risk_factor_model_definition(
-    const HierarchicalModelType &model_type,
-    std::unique_ptr<RiskFactorModelDefinition> definition) {
+    const RiskFactorModelType &model_type, std::unique_ptr<RiskFactorModelDefinition> definition) {
     std::unique_lock<std::mutex> lock(mutex_);
 
     if (rf_model_definition_.contains(model_type)) {
@@ -28,7 +27,7 @@ void CachedRepository::register_baseline_adjustment_definition(BaselineAdjustmen
 core::Datastore &CachedRepository::manager() noexcept { return data_manager_; }
 
 const RiskFactorModelDefinition &
-CachedRepository::get_risk_factor_model_definition(const HierarchicalModelType &model_type) const {
+CachedRepository::get_risk_factor_model_definition(const RiskFactorModelType &model_type) const {
     std::scoped_lock<std::mutex> lock(mutex_);
     return *rf_model_definition_.at(model_type);
 }
