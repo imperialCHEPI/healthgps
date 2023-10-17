@@ -1,6 +1,5 @@
 #pragma once
 
-#include "hierarchical_model.h"
 #include "modelinput.h"
 #include "repository.h"
 #include "riskfactor_adjustment.h"

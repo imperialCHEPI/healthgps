@@ -120,7 +120,6 @@ target_sources(
             "finally.h"
             "gender_table.h"
             "gender_value.h"
-            "hierarchical_model.h"
             "interfaces.h"
             "intervention_scenario.h"
             "map2d.h"
