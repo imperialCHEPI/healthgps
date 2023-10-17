@@ -1,4 +1,4 @@
-#include "energy_balance_hierarchical_model.h"
+#include "dynamic_hierarchical_linear_model.h"
 #include "runtime_context.h"
 
 #include "HealthGPS.Core/exception.h"

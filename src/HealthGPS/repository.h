@@ -1,6 +1,6 @@
 #pragma once
 #include "disease_definition.h"
-#include "energy_balance_hierarchical_model.h"
+#include "dynamic_hierarchical_linear_model.h"
 #include "energy_balance_model.h"
 #include "interfaces.h"
 #include "lms_definition.h"
