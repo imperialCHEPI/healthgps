@@ -46,15 +46,15 @@ struct SimulatePersonState {
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class EnergyBalanceModel final : public RiskFactorModel {
+class KevinHallModel final : public RiskFactorModel {
   public:
-    /// @brief Initialises a new instance of the EnergyBalanceModel class
+    /// @brief Initialises a new instance of the KevinHallModel class
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The minimum and maximum nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
-    EnergyBalanceModel(
+    KevinHallModel(
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -157,24 +157,24 @@ class EnergyBalanceModel final : public RiskFactorModel {
 };
 
 /// @brief Defines the energy balance model data type
-class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
+class KevinHallModelDefinition final : public RiskFactorModelDefinition {
   public:
-    /// @brief Initialises a new instance of the EnergyBalanceModelDefinition class
+    /// @brief Initialises a new instance of the KevinHallModelDefinition class
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The minimum and maximum nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
-    EnergyBalanceModelDefinition(
+    KevinHallModelDefinition(
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
-    /// @brief Construct a new EnergyBalanceModel from this definition
-    /// @return A unique pointer to the new EnergyBalanceModel instance
+    /// @brief Construct a new KevinHallModel from this definition
+    /// @return A unique pointer to the new KevinHallModel instance
     std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:

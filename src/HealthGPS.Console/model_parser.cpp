@@ -250,7 +250,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
-std::unique_ptr<hgps::EnergyBalanceModelDefinition>
+std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
@@ -304,7 +304,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
-    return std::make_unique<hgps::EnergyBalanceModelDefinition>(
+    return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
         std::move(food_prices), std::move(age_mean_height));
 }

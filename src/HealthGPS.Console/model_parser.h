@@ -54,11 +54,11 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
 load_ebhlm_risk_model_definition(const poco::json &opt);
 
-/// @brief Loads the new energy balance model definition from a JSON file
+/// @brief Loads the Kevin Hall energy balance model definition from a JSON file
 /// @param opt The parsed model definition JSON file
 /// @param config The model configuration
-/// @return An instance of the hgps::EnergyBalanceModelDefinition type
-std::unique_ptr<hgps::EnergyBalanceModelDefinition>
+/// @return An instance of the hgps::KevinHallModelDefinition type
+std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config);
 
 /// @brief Loads a risk model definition from a JSON file
