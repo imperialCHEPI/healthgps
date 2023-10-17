@@ -1,4 +1,4 @@
-#include "energy_balance_model.h"
+#include "kevin_hall_model.h"
 #include "runtime_context.h"
 
 #include "HealthGPS.Core/exception.h"
