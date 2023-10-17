@@ -83,13 +83,13 @@ class StaticHierarchicalLinearModel final : public RiskFactorModel {
 };
 
 /// @brief Defines the full hierarchical linear model data type
-class HierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
+class StaticHierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
   public:
-    /// @brief Initialises a new instance of the HierarchicalLinearModelDefinition class
+    /// @brief Initialises a new instance of the StaticHierarchicalLinearModelDefinition class
     /// @param linear_models The linear regression models equations
     /// @param model_levels The hierarchical model levels definition
     /// @throws std::invalid_argument for empty arguments
-    HierarchicalLinearModelDefinition(
+    StaticHierarchicalLinearModelDefinition(
         std::unordered_map<core::Identifier, LinearModel> linear_models,
         std::map<int, HierarchicalLevel> model_levels);
 

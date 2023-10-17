@@ -62,7 +62,7 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
         fmt::format("Static model name '{}' not recognised", model_name)};
 }
 
-std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
+std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
 load_hlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     std::map<int, hgps::HierarchicalLevel> levels;
@@ -121,8 +121,8 @@ load_hlm_risk_model_definition(const poco::json &opt) {
                 .variances = at.variances});
     }
 
-    return std::make_unique<hgps::HierarchicalLinearModelDefinition>(std::move(models),
-                                                                     std::move(levels));
+    return std::make_unique<hgps::StaticHierarchicalLinearModelDefinition>(std::move(models),
+                                                                           std::move(levels));
 }
 
 std::unique_ptr<hgps::StaticLinearModelDefinition>

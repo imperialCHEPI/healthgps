@@ -30,9 +30,9 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 
 /// @brief Loads the full hierarchical linear regression model definition from a JSON file
 /// @param opt The parsed model definition JSON file
-/// @return An instance of the hgps::HierarchicalLinearModelDefinition type
+/// @return An instance of the hgps::StaticHierarchicalLinearModelDefinition type
 /// @throw std::invalid_argument if static model is unrecognised
-std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
+std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
 load_hlm_risk_model_definition(const poco::json &opt);
 
 /// @brief Loads the static linear regression model definition from a JSON file
