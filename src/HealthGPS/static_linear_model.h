@@ -16,7 +16,7 @@ struct LinearModelParams {
 /// @brief Implements the static linear model type
 ///
 /// @details The static model is used to initialise the virtual population.
-class StaticLinearModel final : public HierarchicalLinearModel {
+class StaticLinearModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the StaticLinearModel class
     /// @param risk_factor_names An ordered list of risk factor names
@@ -58,7 +58,7 @@ class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
-    std::unique_ptr<HierarchicalLinearModel> create_model() const override;
+    std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
     std::vector<core::Identifier> risk_factor_names_;

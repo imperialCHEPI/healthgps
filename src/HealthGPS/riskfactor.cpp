@@ -3,7 +3,7 @@
 namespace hgps {
 
 RiskFactorModule::RiskFactorModule(
-    std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models,
+    std::map<HierarchicalModelType, std::unique_ptr<RiskFactorModel>> models,
     const RiskfactorAdjustmentModel &adjustments)
     : models_{std::move(models)}, adjustment_{adjustments} {
 
@@ -39,7 +39,7 @@ bool RiskFactorModule::contains(const HierarchicalModelType &model_type) const n
     return models_.contains(model_type);
 }
 
-HierarchicalLinearModel &RiskFactorModule::at(const HierarchicalModelType &model_type) const {
+RiskFactorModel &RiskFactorModule::at(const HierarchicalModelType &model_type) const {
     return *models_.at(model_type);
 }
 
@@ -65,7 +65,7 @@ void RiskFactorModule::apply_baseline_adjustments(RuntimeContext &context) {
 std::unique_ptr<RiskFactorModule>
 build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInput &config) {
 
-    auto models = std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>{};
+    auto models = std::map<HierarchicalModelType, std::unique_ptr<RiskFactorModel>>{};
 
     // Static (initialisation) model
     const auto &static_definition =

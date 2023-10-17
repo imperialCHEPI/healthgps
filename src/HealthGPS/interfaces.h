@@ -134,10 +134,10 @@ class DemographicModule : public SimulationModule {
 };
 
 /// @brief Hierarchical linear model interface
-class HierarchicalLinearModel {
+class RiskFactorModel {
   public:
-    /// @brief Destroys a HierarchicalLinearModel instance
-    virtual ~HierarchicalLinearModel() = default;
+    /// @brief Destroys a RiskFactorModel instance
+    virtual ~RiskFactorModel() = default;
 
     /// @brief Gets the model type identifier
     /// @return The module type identifier
@@ -163,7 +163,7 @@ class RiskFactorModelDefinition {
     virtual ~RiskFactorModelDefinition() = default;
 
     /// @brief Creates a new risk factor model from this definition
-    virtual std::unique_ptr<HierarchicalLinearModel> create_model() const = 0;
+    virtual std::unique_ptr<RiskFactorModel> create_model() const = 0;
 };
 
 /// @brief Diseases model interface

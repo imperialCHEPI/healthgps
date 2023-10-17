@@ -18,9 +18,8 @@ class RiskFactorModule final : public RiskFactorHostModule {
     /// @throws std::invalid_argument for empty hierarchical models collection or missing required
     /// module type.
     /// @throws std::out_of_range for model type and model instance type mismatch.
-    RiskFactorModule(
-        std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models,
-        const RiskfactorAdjustmentModel &adjustments);
+    RiskFactorModule(std::map<HierarchicalModelType, std::unique_ptr<RiskFactorModel>> models,
+                     const RiskfactorAdjustmentModel &adjustments);
 
     SimulationModuleType type() const noexcept override;
 
@@ -30,7 +29,7 @@ class RiskFactorModule final : public RiskFactorHostModule {
 
     bool contains(const HierarchicalModelType &model_type) const noexcept override;
 
-    HierarchicalLinearModel &at(const HierarchicalModelType &model_type) const;
+    RiskFactorModel &at(const HierarchicalModelType &model_type) const;
 
     void initialise_population(RuntimeContext &context) override;
 
@@ -39,7 +38,7 @@ class RiskFactorModule final : public RiskFactorHostModule {
     void apply_baseline_adjustments(RuntimeContext &context) override;
 
   private:
-    std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>> models_;
+    std::map<HierarchicalModelType, std::unique_ptr<RiskFactorModel>> models_;
     RiskfactorAdjustmentModel adjustment_;
     std::string name_{"RiskFactor"};
 };

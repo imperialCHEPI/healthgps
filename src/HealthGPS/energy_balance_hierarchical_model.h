@@ -33,7 +33,7 @@ struct AgeGroupGenderEquation {
 /// @brief Implements the dynamic hierarchical linear model (energy balance) type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class EnergyBalanceHierarchicalModel final : public HierarchicalLinearModel {
+class EnergyBalanceHierarchicalModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the EnergyBalanceHierarchicalModel class
     /// @param equations The linear regression equations
@@ -48,7 +48,6 @@ class EnergyBalanceHierarchicalModel final : public HierarchicalLinearModel {
 
     std::string name() const noexcept override;
 
-    /// @copydoc HierarchicalLinearModel::generate_risk_factors
     /// @throws std::logic_error the dynamic model does not generate risk factors.
     void generate_risk_factors(RuntimeContext &context) override;
 
@@ -88,7 +87,7 @@ class LiteHierarchicalModelDefinition final : public RiskFactorModelDefinition {
 
     /// @brief Construct a new EnergyBalanceHierarchicalModel from this definition
     /// @return A unique pointer to the new EnergyBalanceHierarchicalModel instance
-    std::unique_ptr<HierarchicalLinearModel> create_model() const override;
+    std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations_;

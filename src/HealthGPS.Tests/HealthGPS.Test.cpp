@@ -391,7 +391,7 @@ TEST(TestHealthGPS, CreateRiskFactorModule)
         auto static_definition = get_static_test_model(baseline_data);
         auto dynamic_definion = get_dynamic_test_model(baseline_data);
         auto risk_models = std::unordered_map<HierarchicalModelType,
-std::unique_ptr<HierarchicalLinearModel>>(); risk_models.emplace(HierarchicalModelType::Static,
+std::unique_ptr<RiskFactorModel>>(); risk_models.emplace(HierarchicalModelType::Static,
 std::make_unique<StaticHierarchicalLinearModel>(static_definition));
         risk_models.emplace(HierarchicalModelType::Dynamic,
 std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
@@ -406,7 +406,7 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
 
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty) {
     using namespace hgps;
-    auto risk_models = std::map<HierarchicalModelType, std::unique_ptr<HierarchicalLinearModel>>();
+    auto risk_models = std::map<HierarchicalModelType, std::unique_ptr<RiskFactorModel>>();
     auto adjustments = BaselineAdjustment{};
     ASSERT_THROW(
         auto x = RiskFactorModule(std::move(risk_models), RiskfactorAdjustmentModel{adjustments}),
@@ -420,7 +420,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
         auto baseline_data = hgps::BaselineAdjustment{};
         auto dynamic_definion = get_dynamic_test_model(baseline_data);
         auto risk_models = std::unordered_map<HierarchicalModelType,
-std::unique_ptr<HierarchicalLinearModel>>(); risk_models.emplace(HierarchicalModelType::Dynamic,
+std::unique_ptr<RiskFactorModel>>(); risk_models.emplace(HierarchicalModelType::Dynamic,
 std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
 
         ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
@@ -433,7 +433,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
         auto baseline_data = hgps::BaselineAdjustment{};
         auto static_definition = get_static_test_model(baseline_data());
         auto risk_models = std::unordered_map<HierarchicalModelType,
-std::unique_ptr<HierarchicalLinearModel>>(); risk_models.emplace(HierarchicalModelType::Static,
+std::unique_ptr<RiskFactorModel>>(); risk_models.emplace(HierarchicalModelType::Static,
 std::make_unique<StaticHierarchicalLinearModel>(static_definition));
 
         ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);

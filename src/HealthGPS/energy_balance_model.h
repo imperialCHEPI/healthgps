@@ -46,7 +46,7 @@ struct SimulatePersonState {
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class EnergyBalanceModel final : public HierarchicalLinearModel {
+class EnergyBalanceModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the EnergyBalanceModel class
     /// @param energy_equation The energy coefficients for each nutrient
@@ -66,7 +66,6 @@ class EnergyBalanceModel final : public HierarchicalLinearModel {
 
     std::string name() const noexcept override;
 
-    /// @copydoc HierarchicalLinearModel::generate_risk_factors
     /// @throws std::logic_error the dynamic model does not generate risk factors.
     void generate_risk_factors(RuntimeContext &context) override;
 
@@ -176,7 +175,7 @@ class EnergyBalanceModelDefinition final : public RiskFactorModelDefinition {
 
     /// @brief Construct a new EnergyBalanceModel from this definition
     /// @return A unique pointer to the new EnergyBalanceModel instance
-    std::unique_ptr<HierarchicalLinearModel> create_model() const override;
+    std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
     std::unordered_map<core::Identifier, double> energy_equation_;

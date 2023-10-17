@@ -112,7 +112,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> StaticLinearModelDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(risk_factor_names_, risk_factor_models_,
                                                risk_factor_cholesky_);
 }

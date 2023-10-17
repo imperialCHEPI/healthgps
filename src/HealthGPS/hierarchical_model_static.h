@@ -58,7 +58,7 @@ struct HierarchicalLevel {
 ///
 /// @details The static model is used to initialise the virtual population,
 /// the model uses principal component analysis for residual normalisation.
-class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
+class StaticHierarchicalLinearModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the StaticHierarchicalLinearModel class
     /// @param models The model equations
@@ -95,7 +95,7 @@ class HierarchicalLinearModelDefinition final : public RiskFactorModelDefinition
 
     /// @brief Construct a new StaticHierarchicalLinearModel from this definition
     /// @return A unique pointer to the new StaticHierarchicalLinearModel instance
-    std::unique_ptr<HierarchicalLinearModel> create_model() const override;
+    std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
     std::unordered_map<core::Identifier, LinearModel> models_;

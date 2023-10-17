@@ -141,7 +141,7 @@ LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> LiteHierarchicalModelDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> LiteHierarchicalModelDefinition::create_model() const {
     return std::make_unique<EnergyBalanceHierarchicalModel>(equations_, variables_,
                                                             boundary_percentage_);
 }

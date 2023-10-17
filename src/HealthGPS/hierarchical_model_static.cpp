@@ -134,7 +134,7 @@ HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> HierarchicalLinearModelDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> HierarchicalLinearModelDefinition::create_model() const {
     return std::make_unique<StaticHierarchicalLinearModel>(models_, levels_);
 }
 

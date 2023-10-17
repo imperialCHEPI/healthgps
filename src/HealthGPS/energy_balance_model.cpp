@@ -304,7 +304,7 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> EnergyBalanceModelDefinition::create_model() const {
     return std::make_unique<EnergyBalanceModel>(
         energy_equation_, nutrient_ranges_, nutrient_equations_, food_prices_, age_mean_height_);
 }
