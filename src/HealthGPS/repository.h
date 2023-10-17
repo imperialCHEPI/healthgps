@@ -2,11 +2,11 @@
 #include "disease_definition.h"
 #include "energy_balance_hierarchical_model.h"
 #include "energy_balance_model.h"
-#include "hierarchical_model_static.h"
 #include "interfaces.h"
 #include "lms_definition.h"
 #include "modelinput.h"
 #include "riskfactor_adjustment_types.h"
+#include "static_hierarchical_linear_model.h"
 #include "static_linear_model.h"
 #include <functional>
 #include <memory>

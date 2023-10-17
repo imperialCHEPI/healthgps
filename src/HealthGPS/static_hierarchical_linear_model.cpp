@@ -1,4 +1,4 @@
-#include "hierarchical_model_static.h"
+#include "static_hierarchical_linear_model.h"
 #include "runtime_context.h"
 
 #include "HealthGPS.Core/exception.h"
