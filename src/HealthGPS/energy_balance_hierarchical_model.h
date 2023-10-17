@@ -30,16 +30,16 @@ struct AgeGroupGenderEquation {
     std::map<core::Identifier, FactorDynamicEquation> female{};
 };
 
-/// @brief Implements the dynamic hierarchical linear model (energy balance) type
+/// @brief Implements the dynamic hierarchical linear model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class EnergyBalanceHierarchicalModel final : public RiskFactorModel {
+class DynamicHierarchicalLinearModel final : public RiskFactorModel {
   public:
-    /// @brief Initialises a new instance of the EnergyBalanceHierarchicalModel class
+    /// @brief Initialises a new instance of the DynamicHierarchicalLinearModel class
     /// @param equations The linear regression equations
     /// @param variables The factors delta variables mapping
     /// @param boundary_percentage The boundary percentage to sample
-    EnergyBalanceHierarchicalModel(
+    DynamicHierarchicalLinearModel(
         const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
         const std::map<core::Identifier, core::Identifier> &variables,
         const double boundary_percentage);
@@ -85,8 +85,8 @@ class LiteHierarchicalModelDefinition final : public RiskFactorModelDefinition {
         std::map<core::Identifier, core::Identifier> variables,
         const double boundary_percentage = 0.05);
 
-    /// @brief Construct a new EnergyBalanceHierarchicalModel from this definition
-    /// @return A unique pointer to the new EnergyBalanceHierarchicalModel instance
+    /// @brief Construct a new DynamicHierarchicalLinearModel from this definition
+    /// @return A unique pointer to the new DynamicHierarchicalLinearModel instance
     std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
