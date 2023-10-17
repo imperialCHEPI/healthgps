@@ -126,7 +126,7 @@ double DynamicHierarchicalLinearModel::sample_normal_with_boundary(Random &rando
     return std::min(std::max(candidate, -cap), +cap);
 }
 
-LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
+DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefinition(
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
     : equations_{std::move(equations)}, variables_{std::move(variables)},
@@ -141,7 +141,7 @@ LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
     }
 }
 
-std::unique_ptr<RiskFactorModel> LiteHierarchicalModelDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> DynamicHierarchicalLinearModelDefinition::create_model() const {
     return std::make_unique<DynamicHierarchicalLinearModel>(equations_, variables_,
                                                             boundary_percentage_);
 }

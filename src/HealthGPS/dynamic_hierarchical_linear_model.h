@@ -73,14 +73,14 @@ class DynamicHierarchicalLinearModel final : public RiskFactorModel {
 };
 
 /// @brief Defines the lite hierarchical linear model data type
-class LiteHierarchicalModelDefinition final : public RiskFactorModelDefinition {
+class DynamicHierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
   public:
-    /// @brief Initialises a new instance of the LiteHierarchicalModelDefinition class
+    /// @brief Initialises a new instance of the DynamicHierarchicalLinearModelDefinition class
     /// @param equations The linear regression equations
     /// @param variables The factors delta variables mapping
     /// @param boundary_percentage The boundary percentage to sample
     /// @throws std::invalid_argument for empty model equations definition
-    LiteHierarchicalModelDefinition(
+    DynamicHierarchicalLinearModelDefinition(
         std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
         std::map<core::Identifier, core::Identifier> variables,
         const double boundary_percentage = 0.05);

@@ -173,7 +173,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
+std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
 load_ebhlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     auto percentage = 0.05;
@@ -245,7 +245,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
         equations.emplace(age_key, std::move(age_equations));
     }
 
-    return std::make_unique<hgps::LiteHierarchicalModelDefinition>(
+    return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
         std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
