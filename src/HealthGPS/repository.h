@@ -1,13 +1,9 @@
 #pragma once
 #include "disease_definition.h"
-#include "dynamic_hierarchical_linear_model.h"
 #include "interfaces.h"
-#include "kevin_hall_model.h"
 #include "lms_definition.h"
 #include "modelinput.h"
 #include "riskfactor_adjustment_types.h"
-#include "static_hierarchical_linear_model.h"
-#include "static_linear_model.h"
 #include <functional>
 #include <memory>
 #include <mutex>
