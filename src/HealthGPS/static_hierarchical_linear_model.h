@@ -58,7 +58,7 @@ struct HierarchicalLevel {
 ///
 /// @details The static model is used to initialise the virtual population,
 /// the model uses principal component analysis for residual normalisation.
-class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
+class StaticHierarchicalLinearModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the StaticHierarchicalLinearModel class
     /// @param models The model equations
@@ -66,7 +66,7 @@ class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
     StaticHierarchicalLinearModel(const std::unordered_map<core::Identifier, LinearModel> &models,
                                   const std::map<int, HierarchicalLevel> &levels);
 
-    HierarchicalModelType type() const noexcept override;
+    RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
 
@@ -83,19 +83,19 @@ class StaticHierarchicalLinearModel final : public HierarchicalLinearModel {
 };
 
 /// @brief Defines the full hierarchical linear model data type
-class HierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
+class StaticHierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
   public:
-    /// @brief Initialises a new instance of the HierarchicalLinearModelDefinition class
+    /// @brief Initialises a new instance of the StaticHierarchicalLinearModelDefinition class
     /// @param linear_models The linear regression models equations
     /// @param model_levels The hierarchical model levels definition
     /// @throws std::invalid_argument for empty arguments
-    HierarchicalLinearModelDefinition(
+    StaticHierarchicalLinearModelDefinition(
         std::unordered_map<core::Identifier, LinearModel> linear_models,
         std::map<int, HierarchicalLevel> model_levels);
 
     /// @brief Construct a new StaticHierarchicalLinearModel from this definition
     /// @return A unique pointer to the new StaticHierarchicalLinearModel instance
-    std::unique_ptr<HierarchicalLinearModel> create_model() const override;
+    std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
     std::unordered_map<core::Identifier, LinearModel> models_;

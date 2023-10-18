@@ -2,7 +2,6 @@
 #include "HealthGPS.Core/thread_util.h"
 #include "baseline_sync_message.h"
 #include "converter.h"
-#include "hierarchical_model.h"
 #include "info_message.h"
 #include "mtrandom.h"
 #include "univariate_visitor.h"

@@ -1,11 +1,11 @@
-#include "energy_balance_hierarchical_model.h"
+#include "dynamic_hierarchical_linear_model.h"
 #include "runtime_context.h"
 
 #include "HealthGPS.Core/exception.h"
 
 namespace hgps {
 
-EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
+DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
     : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
@@ -19,19 +19,19 @@ EnergyBalanceHierarchicalModel::EnergyBalanceHierarchicalModel(
     }
 }
 
-HierarchicalModelType EnergyBalanceHierarchicalModel::type() const noexcept {
-    return HierarchicalModelType::Dynamic;
+RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
+    return RiskFactorModelType::Dynamic;
 }
 
-std::string EnergyBalanceHierarchicalModel::name() const noexcept { return "Dynamic"; }
+std::string DynamicHierarchicalLinearModel::name() const noexcept { return "Dynamic"; }
 
-void EnergyBalanceHierarchicalModel::generate_risk_factors(
+void DynamicHierarchicalLinearModel::generate_risk_factors(
     [[maybe_unused]] RuntimeContext &context) {
     throw core::HgpsException(
-        "EnergyBalanceHierarchicalModel::generate_risk_factors not yet implemented.");
+        "DynamicHierarchicalLinearModel::generate_risk_factors not yet implemented.");
 }
 
-void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context) {
+void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {
     auto age_key = core::Identifier{"age"};
     for (auto &entity : context.population()) {
         // Ignore if inactive, newborn risk factors must be generated, not updated!
@@ -56,7 +56,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors(RuntimeContext &context
     }
 }
 
-const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(int age) const {
+const AgeGroupGenderEquation &DynamicHierarchicalLinearModel::equations_at(int age) const {
     for (const auto &entry : equations_) {
         if (entry.first.contains(age)) {
             // If there is an equation for the age, return it.
@@ -71,7 +71,7 @@ const AgeGroupGenderEquation &EnergyBalanceHierarchicalModel::equations_at(int a
     return equations_.rbegin()->second;
 }
 
-void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
+void DynamicHierarchicalLinearModel::update_risk_factors_exposure(
     RuntimeContext &context, Person &entity,
     const std::map<core::Identifier, double> &current_risk_factors,
     const std::map<core::Identifier, FactorDynamicEquation> &equations) {
@@ -107,7 +107,7 @@ void EnergyBalanceHierarchicalModel::update_risk_factors_exposure(
 }
 
 std::map<core::Identifier, double>
-EnergyBalanceHierarchicalModel::get_current_risk_factors(const HierarchicalMapping &mapping,
+DynamicHierarchicalLinearModel::get_current_risk_factors(const HierarchicalMapping &mapping,
                                                          Person &entity) {
     auto entity_risk_factors = std::map<core::Identifier, double>();
     entity_risk_factors.emplace(InterceptKey, entity.get_risk_factor_value(InterceptKey));
@@ -118,7 +118,7 @@ EnergyBalanceHierarchicalModel::get_current_risk_factors(const HierarchicalMappi
     return entity_risk_factors;
 }
 
-double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &random, double mean,
+double DynamicHierarchicalLinearModel::sample_normal_with_boundary(Random &random, double mean,
                                                                    double standard_deviation,
                                                                    double boundary) const {
     auto candidate = random.next_normal(mean, standard_deviation);
@@ -126,7 +126,7 @@ double EnergyBalanceHierarchicalModel::sample_normal_with_boundary(Random &rando
     return std::min(std::max(candidate, -cap), +cap);
 }
 
-LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
+DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefinition(
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
     : equations_{std::move(equations)}, variables_{std::move(variables)},
@@ -141,8 +141,8 @@ LiteHierarchicalModelDefinition::LiteHierarchicalModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> LiteHierarchicalModelDefinition::create_model() const {
-    return std::make_unique<EnergyBalanceHierarchicalModel>(equations_, variables_,
+std::unique_ptr<RiskFactorModel> DynamicHierarchicalLinearModelDefinition::create_model() const {
+    return std::make_unique<DynamicHierarchicalLinearModel>(equations_, variables_,
                                                             boundary_percentage_);
 }
 

@@ -1,4 +1,4 @@
-#include "hierarchical_model_static.h"
+#include "static_hierarchical_linear_model.h"
 #include "runtime_context.h"
 
 #include "HealthGPS.Core/exception.h"
@@ -19,8 +19,8 @@ StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     }
 }
 
-HierarchicalModelType StaticHierarchicalLinearModel::type() const noexcept {
-    return HierarchicalModelType::Static;
+RiskFactorModelType StaticHierarchicalLinearModel::type() const noexcept {
+    return RiskFactorModelType::Static;
 }
 
 std::string StaticHierarchicalLinearModel::name() const noexcept { return "Static"; }
@@ -120,7 +120,7 @@ void StaticHierarchicalLinearModel::generate_for_entity(RuntimeContext &context,
     }
 }
 
-HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
+StaticHierarchicalLinearModelDefinition::StaticHierarchicalLinearModelDefinition(
     std::unordered_map<core::Identifier, LinearModel> linear_models,
     std::map<int, HierarchicalLevel> model_levels)
     : models_{std::move(linear_models)}, levels_{std::move(model_levels)} {
@@ -134,7 +134,7 @@ HierarchicalLinearModelDefinition::HierarchicalLinearModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> HierarchicalLinearModelDefinition::create_model() const {
+std::unique_ptr<RiskFactorModel> StaticHierarchicalLinearModelDefinition::create_model() const {
     return std::make_unique<StaticHierarchicalLinearModel>(models_, levels_);
 }
 

@@ -1,4 +1,4 @@
-#include "energy_balance_model.h"
+#include "kevin_hall_model.h"
 #include "runtime_context.h"
 
 #include "HealthGPS.Core/exception.h"
@@ -27,7 +27,7 @@ const core::Identifier EE_key{"EnergyExpenditure"};
 const core::Identifier EI_key{"EnergyIntake"};
 const core::Identifier CI_key{"Carbohydrate"};
 
-EnergyBalanceModel::EnergyBalanceModel(
+KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -55,17 +55,15 @@ EnergyBalanceModel::EnergyBalanceModel(
     }
 }
 
-HierarchicalModelType EnergyBalanceModel::type() const noexcept {
-    return HierarchicalModelType::Dynamic;
+RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
+
+std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
+
+void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
+    throw core::HgpsException("KevinHallModel::generate_risk_factors not yet implemented.");
 }
 
-std::string EnergyBalanceModel::name() const noexcept { return "Dynamic"; }
-
-void EnergyBalanceModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
-    throw core::HgpsException("EnergyBalanceModel::generate_risk_factors not yet implemented.");
-}
-
-void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
+void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     hgps::Population &population = context.population();
     double mean_sim_body_weight = 0.0;
     double mean_adjustment_coefficient = 0.0;
@@ -116,7 +114,7 @@ void EnergyBalanceModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
-SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double shift) const {
+SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
     const double H_0 = person.get_risk_factor_value(H_key);
     const double BW_0 = person.get_risk_factor_value(BW_key);
@@ -211,7 +209,7 @@ SimulatePersonState EnergyBalanceModel::simulate_person(Person &person, double s
 }
 
 std::unordered_map<core::Identifier, double>
-EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
+KevinHallModel::compute_nutrient_intakes(const Person &person) const {
     std::unordered_map<core::Identifier, double> nutrient_intakes;
 
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
@@ -224,7 +222,7 @@ EnergyBalanceModel::compute_nutrient_intakes(const Person &person) const {
     return nutrient_intakes;
 }
 
-double EnergyBalanceModel::compute_EI(
+double KevinHallModel::compute_EI(
     const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
     double EI = 0.0;
 
@@ -235,23 +233,23 @@ double EnergyBalanceModel::compute_EI(
     return EI;
 }
 
-double EnergyBalanceModel::compute_G(double CI, double CI_0, double G_0) const {
+double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
     double k_G = CI_0 / (G_0 * G_0);
     return sqrt(CI / k_G);
 }
 
-double EnergyBalanceModel::compute_W(double G) const { return 2.7 * G; }
+double KevinHallModel::compute_W(double G) const { return 2.7 * G; }
 
-double EnergyBalanceModel::compute_ECF(double EI, double EI_0, double CI, double CI_0,
-                                       double ECF_0) const {
+double KevinHallModel::compute_ECF(double EI, double EI_0, double CI, double CI_0,
+                                   double ECF_0) const {
     double Na_b = 4000.0;
     double Na_f = Na_b * EI / EI_0;
     double Delta_Na_diet = Na_f - Na_b;
     return ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
 }
 
-double EnergyBalanceModel::compute_delta(double PAL, double BW, double H, unsigned int age,
-                                         core::Gender gender) const {
+double KevinHallModel::compute_delta(double PAL, double BW, double H, unsigned int age,
+                                     core::Gender gender) const {
     // Resting metabolic rate (Mifflin-St Jeor).
     double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
     RMR += gender == core::Gender::male ? 5.0 : -161.0;
@@ -261,23 +259,23 @@ double EnergyBalanceModel::compute_delta(double PAL, double BW, double H, unsign
     return ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW;
 }
 
-double EnergyBalanceModel::compute_TEF(double EI, double EI_0) const {
+double KevinHallModel::compute_TEF(double EI, double EI_0) const {
     double delta_EI = EI - EI_0;
     return beta_TEF * delta_EI;
 }
 
-double EnergyBalanceModel::compute_AT(double EI, double EI_0) const {
+double KevinHallModel::compute_AT(double EI, double EI_0) const {
     double delta_EI = EI - EI_0;
     return beta_AT * delta_EI;
 }
 
-double EnergyBalanceModel::bounded_nutrient_value(const core::Identifier &nutrient,
-                                                  double value) const {
+double KevinHallModel::bounded_nutrient_value(const core::Identifier &nutrient,
+                                              double value) const {
     const auto &range = nutrient_ranges_.at(nutrient);
     return std::clamp(range.first, range.second, value);
 }
 
-EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
+KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
@@ -304,9 +302,9 @@ EnergyBalanceModelDefinition::EnergyBalanceModelDefinition(
     }
 }
 
-std::unique_ptr<HierarchicalLinearModel> EnergyBalanceModelDefinition::create_model() const {
-    return std::make_unique<EnergyBalanceModel>(
-        energy_equation_, nutrient_ranges_, nutrient_equations_, food_prices_, age_mean_height_);
+std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
+    return std::make_unique<KevinHallModel>(energy_equation_, nutrient_ranges_, nutrient_equations_,
+                                            food_prices_, age_mean_height_);
 }
 
 } // namespace hgps

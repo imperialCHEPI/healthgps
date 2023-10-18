@@ -34,7 +34,7 @@ std::string join_string_map(const std::vector<std::string> &v, std::string_view 
     return s.str();
 }
 
-// std::string generate_test_code(hgps::HierarchicalModelType model_type, std::string filename) {
+// std::string generate_test_code(hgps::RiskFactorModelType model_type, std::string filename) {
 //	std::stringstream ss;
 //	HierarchicalModelInfo hmodel;
 //	std::ifstream ifs(filename, std::ifstream::in);

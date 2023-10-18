@@ -62,7 +62,7 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
         fmt::format("Static model name '{}' not recognised", model_name)};
 }
 
-std::unique_ptr<hgps::HierarchicalLinearModelDefinition>
+std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
 load_hlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     std::map<int, hgps::HierarchicalLevel> levels;
@@ -121,8 +121,8 @@ load_hlm_risk_model_definition(const poco::json &opt) {
                 .variances = at.variances});
     }
 
-    return std::make_unique<hgps::HierarchicalLinearModelDefinition>(std::move(models),
-                                                                     std::move(levels));
+    return std::make_unique<hgps::StaticHierarchicalLinearModelDefinition>(std::move(models),
+                                                                           std::move(levels));
 }
 
 std::unique_ptr<hgps::StaticLinearModelDefinition>
@@ -173,7 +173,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-std::unique_ptr<hgps::LiteHierarchicalModelDefinition>
+std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
 load_ebhlm_risk_model_definition(const poco::json &opt) {
     MEASURE_FUNCTION();
     auto percentage = 0.05;
@@ -245,12 +245,12 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
         equations.emplace(age_key, std::move(age_equations));
     }
 
-    return std::make_unique<hgps::LiteHierarchicalModelDefinition>(
+    return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
         std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
-std::unique_ptr<hgps::EnergyBalanceModelDefinition>
+std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
@@ -304,12 +304,12 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
-    return std::make_unique<hgps::EnergyBalanceModelDefinition>(
+    return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
         std::move(food_prices), std::move(age_mean_height));
 }
 
-std::pair<hgps::HierarchicalModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
+std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
 load_risk_model_definition(const std::string &model_type, const poco::json &opt,
                            const host::Configuration &config) {
     // Get model name from JSON
@@ -317,11 +317,11 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
 
     // Load appropriate model
     if (hgps::core::case_insensitive::equals(model_type, "static")) {
-        return std::make_pair(hgps::HierarchicalModelType::Static,
+        return std::make_pair(hgps::RiskFactorModelType::Static,
                               load_static_risk_model_definition(model_name, opt, config));
     }
     if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
-        return std::make_pair(hgps::HierarchicalModelType::Dynamic,
+        return std::make_pair(hgps::RiskFactorModelType::Dynamic,
                               load_dynamic_risk_model_definition(model_name, opt, config));
     }
 
