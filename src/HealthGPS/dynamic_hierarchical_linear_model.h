@@ -72,7 +72,7 @@ class DynamicHierarchicalLinearModel final : public RiskFactorModel {
                                        double boundary) const;
 };
 
-/// @brief Defines the lite hierarchical linear model data type
+/// @brief Defines the dynamic hierarchical linear model data type
 class DynamicHierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the DynamicHierarchicalLinearModelDefinition class
