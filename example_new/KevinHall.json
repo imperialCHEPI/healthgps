@@ -67,18 +67,18 @@
             "Description": "string"
         }
     },
-    "SectorPrevalence": {
-        "Rural": {
-            "Male": {
-                "18": 0.65,
-                "100": 0.6
-            },
-            "Female": {
-                "18": 0.65,
-                "100": 0.6
-            }
+    "RuralPrevalence": [
+        {
+            "AgeRange": [0, 17],
+            "Female": 0.65,
+            "Male": 0.65
+        },
+        {
+            "AgeRange": [18, 100],
+            "Female": 0.6,
+            "Male": 0.6
         }
-    },
+    ],
     "AgeMeanHeight": {
         "Male": [
             0.498, 0.757, 0.868, 0.952, 1.023, 1.092, 1.155, 1.219, 1.28, 1.333,
