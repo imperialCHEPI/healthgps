@@ -61,11 +61,11 @@ RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorMod
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
-void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
+void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise sector for everyone.
     for (auto &person : context.population()) {
-        initialise_sector(person);
+        initialise_sector(context, person);
     }
 }
 
@@ -80,7 +80,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        initialise_sector(person);
+        initialise_sector(context, person);
     }
 
     // TODO: Compute target body weight.
@@ -131,7 +131,22 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
-void KevinHallModel::initialise_sector([[maybe_unused]] Person &person) const {}
+void KevinHallModel::initialise_sector(RuntimeContext &context, Person &person) const {
+
+    // Get prevalence for age and sex (default is zero).
+    double prevalence = 0.0;
+    for (const auto &[age_range, prevalence_by_sex] : rural_prevalence_) {
+        if (age_range.contains(person.age)) {
+            prevalence = prevalence_by_sex.at(person.gender);
+            break;
+        }
+    }
+
+    // Sample the person's sector.
+    double rand = context.random().next_double();
+    auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
+    person.sector = sector;
+}
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.

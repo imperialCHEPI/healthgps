@@ -96,8 +96,9 @@ class KevinHallModel final : public RiskFactorModel {
     static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
 
     /// @brief Initialise the sector of a person
+    /// @param context The runtime context
     /// @param person The person to initialise sector for
-    void initialise_sector(Person &person) const;
+    void initialise_sector(RuntimeContext &context, Person &person) const;
 
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
