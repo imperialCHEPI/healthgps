@@ -61,17 +61,34 @@ RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorMod
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
-void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {}
+void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
+
+    // Initialise sector for everyone.
+    for (auto &person : context.population()) {
+        initialise_sector(person);
+    }
+}
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     hgps::Population &population = context.population();
-    double mean_sim_body_weight = 0.0;
-    double mean_adjustment_coefficient = 0.0;
+
+    // Initialise sector for newborns.
+    for (auto &person : population) {
+
+        // Do not initialise non-newborns.
+        if (person.age > 0) {
+            continue;
+        }
+
+        initialise_sector(person);
+    }
 
     // TODO: Compute target body weight.
     const float target_BW = 100.0;
 
     // Trial run.
+    double mean_sim_body_weight = 0.0;
+    double mean_adjustment_coefficient = 0.0;
     for (auto &person : population) {
         // Ignore if inactive.
         if (!person.is_active()) {
@@ -113,6 +130,8 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         // person.risk_factors[EI_key] = state.EI;
     }
 }
+
+void KevinHallModel::initialise_sector([[maybe_unused]] Person &person) const {}
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
