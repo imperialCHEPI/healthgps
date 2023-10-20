@@ -61,9 +61,7 @@ RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorMod
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
-void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
-    throw core::HgpsException("KevinHallModel::generate_risk_factors not yet implemented.");
-}
+void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {}
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     hgps::Population &population = context.population();

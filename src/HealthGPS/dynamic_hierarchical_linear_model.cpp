@@ -26,10 +26,7 @@ RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
 std::string DynamicHierarchicalLinearModel::name() const noexcept { return "Dynamic"; }
 
 void DynamicHierarchicalLinearModel::generate_risk_factors(
-    [[maybe_unused]] RuntimeContext &context) {
-    throw core::HgpsException(
-        "DynamicHierarchicalLinearModel::generate_risk_factors not yet implemented.");
-}
+    [[maybe_unused]] RuntimeContext &context) {}
 
 void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {
     auto age_key = core::Identifier{"age"};
