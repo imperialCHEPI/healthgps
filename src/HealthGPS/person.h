@@ -56,6 +56,9 @@ struct Person {
     /// @brief Current age in years
     unsigned int age{};
 
+    /// @brief Sector (region) assigned value
+    core::Sector sector{core::Sector::unknown};
+
     /// @brief Social-economic status (SES) assigned value
     double ses{};
 

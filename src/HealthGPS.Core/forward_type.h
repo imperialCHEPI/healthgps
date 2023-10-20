@@ -37,6 +37,9 @@ enum class DiseaseGroup : uint8_t {
 
 /// @brief Enumerates sector types
 enum class Sector : uint8_t {
+    /// @brief Unknown sector
+    unknown,
+
     /// @brief Urban sector
     urban,
 
