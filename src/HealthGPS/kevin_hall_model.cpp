@@ -33,10 +33,12 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
+    const std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
+        &rural_prevalence,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
-      age_mean_height_{age_mean_height} {
+      rural_prevalence_{rural_prevalence}, age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -280,10 +282,12 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
+    std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
+        rural_prevalence,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
     : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
-      age_mean_height_{std::move(age_mean_height)} {
+      rural_prevalence_{std::move(rural_prevalence)}, age_mean_height_{std::move(age_mean_height)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -297,6 +301,9 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (food_prices_.empty()) {
         throw core::HgpsException("Food prices mapping is empty");
     }
+    if (rural_prevalence_.empty()) {
+        throw core::HgpsException("Rural prevalence mapping is empty");
+    }
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
     }
@@ -304,7 +311,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
     return std::make_unique<KevinHallModel>(energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, age_mean_height_);
+                                            food_prices_, rural_prevalence_, age_mean_height_);
 }
 
 } // namespace hgps

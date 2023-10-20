@@ -253,14 +253,10 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
-    std::unordered_map<hgps::core::Identifier, double> energy_equation;
-    std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
-    std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
-        nutrient_equations;
-    std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
-    std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
     // Nutrient groups.
+    std::unordered_map<hgps::core::Identifier, double> energy_equation;
+    std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
     for (const auto &nutrient : opt["Nutrients"]) {
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
         nutrient_ranges[nutrient_key] = nutrient["Range"].get<std::pair<double, double>>();
@@ -272,6 +268,9 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     }
 
     // Food groups.
+    std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
+        nutrient_equations;
+    std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
@@ -302,6 +301,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     }
 
     // Load M/F average heights for age.
+    std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
@@ -316,7 +316,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(age_mean_height));
+        std::move(food_prices), std::move(rural_prevalence), std::move(age_mean_height));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
