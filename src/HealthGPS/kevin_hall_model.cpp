@@ -134,17 +134,17 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 void KevinHallModel::initialise_sector(RuntimeContext &context, Person &person) const {
 
     // Get prevalence for age and sex (default is zero).
-    double prevalence = 0.0;
+    double rural_prevalence = 0.0;
     for (const auto &[age_range, prevalence_by_sex] : rural_prevalence_) {
         if (age_range.contains(person.age)) {
-            prevalence = prevalence_by_sex.at(person.gender);
+            rural_prevalence = prevalence_by_sex.at(person.gender);
             break;
         }
     }
 
     // Sample the person's sector.
     double rand = context.random().next_double();
-    auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
+    auto sector = rand < rural_prevalence ? core::Sector::rural : core::Sector::urban;
     person.sector = sector;
 }
 
