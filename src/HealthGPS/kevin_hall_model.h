@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: LinearModelParams (in static_linear_model.h) should be moved somewhere better.
+#include "static_linear_model.h"
+
 #include "interfaces.h"
 #include "mapping.h"
 
@@ -54,6 +57,7 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param income_models The income models for each income category
     /// @param age_mean_height The mean height at all ages (male and female)
     KevinHallModel(
         const std::unordered_map<core::Identifier, double> &energy_equation,
@@ -63,6 +67,7 @@ class KevinHallModel final : public RiskFactorModel {
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
             &rural_prevalence,
+        const LinearModelParams &income_models,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
     RiskFactorModelType type() const noexcept override;
@@ -81,6 +86,7 @@ class KevinHallModel final : public RiskFactorModel {
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence_;
+    const LinearModelParams &income_models_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
     // Model parameters.
@@ -174,6 +180,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param income_models The income models for each income category
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
@@ -183,6 +190,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
             rural_prevalence,
+        LinearModelParams income_models,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
     /// @brief Construct a new KevinHallModel from this definition
@@ -196,6 +204,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence_;
+    LinearModelParams income_models_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
 };
 
