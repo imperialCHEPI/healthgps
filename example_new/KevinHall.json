@@ -79,9 +79,9 @@
             "Male": 0.6
         }
     ],
-    "IncomeModel": [
+    "IncomeModels": [
         {
-            "Category": 2,
+            "Name": "Category_2",
             "Intercept": 0.75498278113169,
             "Coefficients": {
                 "Sex": 0.0204338261883629,
@@ -90,7 +90,7 @@
             }
         },
         {
-            "Category": 3,
+            "Name": "Category_3",
             "Intercept": 1.48856946873517,
             "Coefficients": {
                 "Sex": 0.000641255498596025,

@@ -299,6 +299,15 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
                                              {hgps::core::Gender::male, age_group["Male"]}};
     }
 
+    // Income models for different income classifications.
+    hgps::LinearModelParams income_models;
+    for (const auto &factor : opt["IncomeModels"]) {
+        auto income_class_key = factor["Name"].get<hgps::core::Identifier>();
+        income_models.intercepts[income_class_key] = factor["Intercept"].get<double>();
+        income_models.coefficients[income_class_key] =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+    }
+
     // Load M/F average heights for age.
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
