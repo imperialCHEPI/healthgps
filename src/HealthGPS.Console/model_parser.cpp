@@ -295,9 +295,8 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
         rural_prevalence;
     for (const auto &age_group : opt["RuralPrevalence"]) {
         auto age_group_range = age_group["AgeRange"].get<hgps::core::IntegerInterval>();
-        rural_prevalence[age_group_range] = {
-            {hgps::core::Gender::female, age_group["Female"]},
-            {hgps::core::Gender::male, age_group["Male"]}};
+        rural_prevalence[age_group_range] = {{hgps::core::Gender::female, age_group["Female"]},
+                                             {hgps::core::Gender::male, age_group["Male"]}};
     }
 
     // Load M/F average heights for age.
