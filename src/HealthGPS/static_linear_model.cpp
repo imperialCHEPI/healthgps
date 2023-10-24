@@ -6,18 +6,13 @@
 
 namespace hgps {
 
-StaticLinearModel::StaticLinearModel(std::vector<core::Identifier> risk_factor_names,
-                                     LinearModelParams risk_factor_models,
+StaticLinearModel::StaticLinearModel(std::vector<LinearModelParams> risk_factor_models,
                                      Eigen::MatrixXd risk_factor_cholesky)
-    : risk_factor_names_{std::move(risk_factor_names)},
-      risk_factor_models_{std::move(risk_factor_models)},
+    : risk_factor_models_{std::move(risk_factor_models)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
 
-    if (risk_factor_names_.empty()) {
-        throw core::HgpsException("Risk factor names list is empty");
-    }
-    if (risk_factor_models_.intercepts.empty() || risk_factor_models_.coefficients.empty()) {
-        throw core::HgpsException("Risk factor models mapping is incomplete");
+    if (risk_factor_models_.empty()) {
+        throw core::HgpsException("Risk factor model list is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -64,7 +59,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 Eigen::VectorXd StaticLinearModel::correlated_samples(RuntimeContext &context) {
 
     // Correlated samples using Cholesky decomposition.
-    Eigen::VectorXd samples{risk_factor_names_.size()};
+    Eigen::VectorXd samples{risk_factor_models_.size()};
     std::ranges::generate(samples, [&context] { return context.random().next_normal(0.0, 1.0); });
     samples = risk_factor_cholesky_ * samples;
 
@@ -80,30 +75,22 @@ Eigen::VectorXd StaticLinearModel::correlated_samples(RuntimeContext &context) {
 void StaticLinearModel::linear_approximation(Person &person) {
 
     // Approximate risk factor values for person with linear models.
-    for (const auto &factor_name : risk_factor_names_) {
-        double factor = risk_factor_models_.intercepts.at(factor_name);
-        const auto &coefficients = risk_factor_models_.coefficients.at(factor_name);
-
-        for (const auto &[coefficient_name, coefficient_value] : coefficients) {
+    for (const auto &model : risk_factor_models_) {
+        double factor = model.intercept;
+        for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-
-        person.risk_factors[factor_name] = factor;
+        person.risk_factors[model.name] = factor;
     }
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    std::vector<core::Identifier> risk_factor_names, LinearModelParams risk_factor_models,
-    Eigen::MatrixXd risk_factor_cholesky)
-    : risk_factor_names_{std::move(risk_factor_names)},
-      risk_factor_models_{std::move(risk_factor_models)},
+    std::vector<LinearModelParams> risk_factor_models, Eigen::MatrixXd risk_factor_cholesky)
+    : risk_factor_models_{std::move(risk_factor_models)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
 
-    if (risk_factor_names_.empty()) {
-        throw core::HgpsException("Risk factor names list is empty");
-    }
-    if (risk_factor_models_.intercepts.empty() || risk_factor_models_.coefficients.empty()) {
-        throw core::HgpsException("Risk factor models mapping is incomplete");
+    if (risk_factor_models_.empty()) {
+        throw core::HgpsException("Risk factor model list is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -111,8 +98,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    return std::make_unique<StaticLinearModel>(risk_factor_names_, risk_factor_models_,
-                                               risk_factor_cholesky_);
+    return std::make_unique<StaticLinearModel>(risk_factor_models_, risk_factor_cholesky_);
 }
 
 } // namespace hgps

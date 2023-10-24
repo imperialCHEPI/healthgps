@@ -129,31 +129,50 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Risk factor linear models.
-    hgps::LinearModelParams models;
-    for (const auto &factor : opt["RiskFactorModels"]) {
-        auto factor_key = factor["Name"].get<hgps::core::Identifier>();
-        models.intercepts[factor_key] = factor["Intercept"].get<double>();
-        models.coefficients[factor_key] =
-            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
-    }
-
-    // Risk factor names and correlation matrix.
-    std::vector<hgps::core::Identifier> names;
+    // Risk factor linear models and correlation matrix.
+    std::vector<hgps::LinearModelParams> risk_factor_models;
     const auto correlations_file_info =
         host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlations_table = load_datatable_from_csv(correlations_file_info);
     Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
-    for (size_t col = 0; col < correlations_table.num_columns(); col++) {
-        names.emplace_back(correlations_table.column(col).name());
-        for (size_t row = 0; row < correlations_table.num_rows(); row++) {
-            correlations(row, col) =
-                std::any_cast<double>(correlations_table.column(col).value(row));
+
+    for (size_t i = 0; i < opt["RiskFactorModels"].size(); i++) {
+        // Risk factor model.
+        const auto &factor = opt["RiskFactorModels"][i];
+        hgps::LinearModelParams model;
+        model.name = factor["Name"].get<hgps::core::Identifier>();
+        model.intercept = factor["Intercept"].get<double>();
+        model.coefficients =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+        risk_factor_models.emplace_back(std::move(model));
+
+        // Correlation matrix column.
+        for (size_t j = 0; j < correlations_table.num_rows(); j++) {
+            correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
+        }
+
+        // Check correlation matrix column name matches risk factor name.
+        auto column_name = hgps::core::Identifier{correlations_table.column(i).name()};
+        if (model.name != column_name) {
+            throw hgps::core::HgpsException{
+                fmt::format("Risk factor {} name ({}) does not match correlation matrix "
+                            "column {} name ({})",
+                            i, model.name.to_string(), i, column_name.to_string())};
         }
     }
+
+    // Check correlation matrix column count matches risk factor count.
+    if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
+        throw hgps::core::HgpsException{
+            fmt::format("Risk factor count ({}) does not match correlation "
+                        "matrix column count ({})",
+                        opt["RiskFactorModels"].size(), correlations_table.num_columns())};
+    }
+
+    // Compute Cholesky decomposition of correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
-    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(names), std::move(models),
+    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(risk_factor_models),
                                                                std::move(cholesky));
 }
 
@@ -300,12 +319,14 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     }
 
     // Income models for different income classifications.
-    hgps::LinearModelParams income_models;
+    std::vector<hgps::LinearModelParams> income_models;
     for (const auto &factor : opt["IncomeModels"]) {
-        auto income_class_key = factor["Name"].get<hgps::core::Identifier>();
-        income_models.intercepts[income_class_key] = factor["Intercept"].get<double>();
-        income_models.coefficients[income_class_key] =
+        hgps::LinearModelParams model;
+        model.name = factor["Name"].get<hgps::core::Identifier>();
+        model.intercept = factor["Intercept"].get<double>();
+        model.coefficients =
             factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+        income_models.emplace_back(std::move(model));
     }
 
     // Load M/F average heights for age.

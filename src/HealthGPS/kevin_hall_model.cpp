@@ -35,7 +35,7 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence,
-    const LinearModelParams &income_models,
+    const std::vector<LinearModelParams> &income_models,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
@@ -57,8 +57,8 @@ KevinHallModel::KevinHallModel(
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
-    if (income_models_.intercepts.empty() || income_models_.coefficients.empty()) {
-        throw core::HgpsException("Income models mapping is incomplete");
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models list is empty");
     }
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
@@ -155,6 +155,20 @@ void KevinHallModel::initialise_sector(RuntimeContext &context, Person &person) 
     auto sector = rand < rural_prevalence ? core::Sector::rural : core::Sector::urban;
     person.sector = sector;
 }
+
+// void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) const {
+//     auto logits = std::vector<double>(income_models_.intercepts.size(), 0.0);
+
+//     // Get income model for person's sector.
+//     const auto &income_model = income_models_.coefficients.at(person.sector);
+
+//     // Compute income category.
+//     double income = income_models_.intercepts.at(person.sector);
+//     for (const auto &[factor_name, coefficient] : income_model) {
+//         income += coefficient * person.get_risk_factor_value(factor_name);
+//     }
+
+// }
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
@@ -324,7 +338,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence,
-    LinearModelParams income_models,
+    std::vector<LinearModelParams> income_models,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
     : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
@@ -346,8 +360,8 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
-    if (income_models_.intercepts.empty() || income_models_.coefficients.empty()) {
-        throw core::HgpsException("Income models mapping is incomplete");
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models list is empty");
     }
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
