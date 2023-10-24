@@ -81,6 +81,11 @@
     ],
     "IncomeModels": [
         {
+            "Name": "Category_1",
+            "Intercept": 1.0,
+            "Coefficients": {}
+        },
+        {
             "Name": "Category_2",
             "Intercept": 0.75498278113169,
             "Coefficients": {
