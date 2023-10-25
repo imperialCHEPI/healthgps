@@ -113,6 +113,10 @@ struct Person {
     /// @throws HgpsException if sector is unknown
     float sector_to_value() const;
 
+    /// @brief Check if person is an adult (18 or over)
+    /// @return true if person is 18 or over; else false
+    bool over_18() const noexcept;
+
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time
     /// @throws std::logic_error for attempting to set to non-active individuals.

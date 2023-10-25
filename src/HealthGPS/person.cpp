@@ -12,6 +12,7 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Age"_id, [](const Person &p) { return static_cast<double>(p.age); }},
     {"Age2"_id, [](const Person &p) { return pow(p.age, 2); }},
     {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
+    {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
     {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
 
@@ -79,6 +80,8 @@ float Person::sector_to_value() const {
     }
     return sector == core::Sector::urban ? 0.0f : 1.0f;
 }
+
+bool Person::over_18() const noexcept { return age >= 18; }
 
 void Person::emigrate(const unsigned int time) {
     if (!is_active()) {
