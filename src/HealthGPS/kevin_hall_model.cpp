@@ -71,17 +71,17 @@ std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
-    // Initialise sector for everyone.
+    // Initialise sector and income for everyone.
     for (auto &person : context.population()) {
         initialise_sector(context, person);
+        initialise_income(context, person);
     }
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
-    hgps::Population &population = context.population();
 
-    // Initialise sector for newborns.
-    for (auto &person : population) {
+    // Initialise sector and income for newborns.
+    for (auto &person : context.population()) {
 
         // Do not initialise non-newborns.
         if (person.age > 0) {
@@ -89,6 +89,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
 
         initialise_sector(context, person);
+        initialise_income(context, person);
     }
 
     // TODO: Compute target body weight.
@@ -97,7 +98,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     // Trial run.
     double mean_sim_body_weight = 0.0;
     double mean_adjustment_coefficient = 0.0;
-    for (auto &person : population) {
+    for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
             continue;
@@ -110,13 +111,13 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     }
 
     // Compute model adjustment term.
-    const size_t population_size = population.current_active_size();
+    const size_t population_size = context.population().current_active_size();
     mean_sim_body_weight /= population_size;
     mean_adjustment_coefficient /= population_size;
     double shift = (target_BW - mean_sim_body_weight) / mean_adjustment_coefficient;
 
     // Final run.
-    for (auto &person : population) {
+    for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
             continue;
