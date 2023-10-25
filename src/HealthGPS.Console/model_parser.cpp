@@ -144,12 +144,6 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         model.intercept = factor["Intercept"].get<double>();
         model.coefficients =
             factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
-        risk_factor_models.emplace_back(std::move(model));
-
-        // Correlation matrix column.
-        for (size_t j = 0; j < correlations_table.num_rows(); j++) {
-            correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
-        }
 
         // Check correlation matrix column name matches risk factor name.
         auto column_name = hgps::core::Identifier{correlations_table.column(i).name()};
@@ -159,6 +153,12 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
                             "column {} name ({})",
                             i, model.name.to_string(), i, column_name.to_string())};
         }
+
+        // Write data structures.
+        for (size_t j = 0; j < correlations_table.num_rows(); j++) {
+            correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
+        }
+        risk_factor_models.emplace_back(std::move(model));
     }
 
     // Check correlation matrix column count matches risk factor count.
