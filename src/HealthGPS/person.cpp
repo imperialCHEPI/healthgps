@@ -1,5 +1,7 @@
 #include "person.h"
 
+#include "HealthGPS.Core/exception.h"
+
 namespace hgps {
 
 std::atomic<std::size_t> Person::newUID{0};
@@ -10,6 +12,7 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Age"_id, [](const Person &p) { return static_cast<double>(p.age); }},
     {"Age2"_id, [](const Person &p) { return pow(p.age, 2); }},
     {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
+    {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
 
     // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
@@ -56,12 +59,25 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     throw std::out_of_range("Risk factor not found: " + key.to_string());
 }
 
-float Person::gender_to_value() const noexcept {
+float Person::gender_to_value() const {
+    if (gender == core::Gender::unknown) {
+        throw core::HgpsException("Gender is unknown.");
+    }
     return gender == core::Gender::male ? 1.0f : 0.0f;
 }
 
-std::string Person::gender_to_string() const noexcept {
+std::string Person::gender_to_string() const {
+    if (gender == core::Gender::unknown) {
+        throw core::HgpsException("Gender is unknown.");
+    }
     return gender == core::Gender::male ? "male" : "female";
+}
+
+float Person::sector_to_value() const {
+    if (sector == core::Sector::unknown) {
+        throw core::HgpsException("Sector is unknown.");
+    }
+    return sector == core::Sector::urban ? 0.0f : 1.0f;
 }
 
 void Person::emigrate(const unsigned int time) {
