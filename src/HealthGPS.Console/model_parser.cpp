@@ -310,12 +310,12 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     const auto food_data_table = load_datatable_from_csv(food_data_file_info);
 
     // Rural sector prevalence for age groups and sex.
-    std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
+    std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence;
     for (const auto &age_group : opt["RuralPrevalence"]) {
-        auto age_group_range = age_group["AgeRange"].get<hgps::core::IntegerInterval>();
-        rural_prevalence[age_group_range] = {{hgps::core::Gender::female, age_group["Female"]},
-                                             {hgps::core::Gender::male, age_group["Male"]}};
+        auto age_group_name = age_group["Name"].get<hgps::core::Identifier>();
+        rural_prevalence[age_group_name] = {{hgps::core::Gender::female, age_group["Female"]},
+                                            {hgps::core::Gender::male, age_group["Male"]}};
     }
 
     // Income models for different income classifications.

@@ -69,12 +69,12 @@
     },
     "RuralPrevalence": [
         {
-            "AgeRange": [0, 17],
+            "Name": "Under18",
             "Female": 0.65,
             "Male": 0.65
         },
         {
-            "AgeRange": [18, 100],
+            "Name": "From18",
             "Female": 0.6,
             "Male": 0.6
         }
@@ -89,7 +89,7 @@
             "Name": "Category_2",
             "Intercept": 0.75498278113169,
             "Coefficients": {
-                "Sex": 0.0204338261883629,
+                "Gender": 0.0204338261883629,
                 "Over18": 0.0486699373325097,
                 "Sector": -0.706477682886734
             }
@@ -98,7 +98,7 @@
             "Name": "Category_3",
             "Intercept": 1.48856946873517,
             "Coefficients": {
-                "Sex": 0.000641255498596025,
+                "Gender": 0.000641255498596025,
                 "Over18": 0.206622749570132,
                 "Sector": -1.71313287940798
             }

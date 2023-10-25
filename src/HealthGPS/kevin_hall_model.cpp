@@ -33,7 +33,7 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-    const std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
+    const std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence,
     const std::vector<LinearModelParams> &income_models,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
@@ -142,19 +142,37 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
 void KevinHallModel::initialise_sector(RuntimeContext &context, Person &person) const {
 
-    // Get prevalence for age and sex (default is zero).
-    double rural_prevalence = 0.0;
-    for (const auto &[age_range, prevalence_by_sex] : rural_prevalence_) {
-        if (age_range.contains(person.age)) {
-            rural_prevalence = prevalence_by_sex.at(person.gender);
-            break;
-        }
+    // Get rural prevalence for age group and sex.
+    double prevalence;
+    if (person.age < 18) {
+        prevalence = rural_prevalence_.at("Under18"_id).at(person.gender);
+    } else {
+        prevalence = rural_prevalence_.at("From18"_id).at(person.gender);
     }
 
     // Sample the person's sector.
     double rand = context.random().next_double();
-    auto sector = rand < rural_prevalence ? core::Sector::rural : core::Sector::urban;
+    auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
     person.sector = sector;
+}
+
+void KevinHallModel::update_sector(RuntimeContext &context, Person &person) const {
+
+    // Only update rural sector 18 year olds.
+    if ((person.age != 18) || (person.sector != core::Sector::rural)) {
+        return;
+    }
+
+    // Get rural prevalence for age group and sex.
+    double prevalence_under18 = rural_prevalence_.at("Under18"_id).at(person.gender);
+    double prevalence_from18 = rural_prevalence_.at("From18"_id).at(person.gender);
+
+    // Compute random rural to urban transition.
+    double rand = context.random().next_double();
+    double p_rural_to_urban = 1.0 - prevalence_from18 / prevalence_under18;
+    if (rand < p_rural_to_urban) {
+        person.sector = core::Sector::urban;
+    }
 }
 
 void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) const {
@@ -361,7 +379,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-    std::map<hgps::core::IntegerInterval, std::unordered_map<hgps::core::Gender, double>>
+    std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence,
     std::vector<LinearModelParams> income_models,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
