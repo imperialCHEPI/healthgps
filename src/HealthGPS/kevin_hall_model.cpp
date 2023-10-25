@@ -147,7 +147,7 @@ void KevinHallModel::initialise_sector(RuntimeContext &context, Person &person) 
     if (person.age < 18) {
         prevalence = rural_prevalence_.at("Under18"_id).at(person.gender);
     } else {
-        prevalence = rural_prevalence_.at("From18"_id).at(person.gender);
+        prevalence = rural_prevalence_.at("Over18"_id).at(person.gender);
     }
 
     // Sample the person's sector.
@@ -165,11 +165,11 @@ void KevinHallModel::update_sector(RuntimeContext &context, Person &person) cons
 
     // Get rural prevalence for age group and sex.
     double prevalence_under18 = rural_prevalence_.at("Under18"_id).at(person.gender);
-    double prevalence_from18 = rural_prevalence_.at("From18"_id).at(person.gender);
+    double prevalence_over18 = rural_prevalence_.at("Over18"_id).at(person.gender);
 
     // Compute random rural to urban transition.
     double rand = context.random().next_double();
-    double p_rural_to_urban = 1.0 - prevalence_from18 / prevalence_under18;
+    double p_rural_to_urban = 1.0 - prevalence_over18 / prevalence_under18;
     if (rand < p_rural_to_urban) {
         person.sector = core::Sector::urban;
     }
