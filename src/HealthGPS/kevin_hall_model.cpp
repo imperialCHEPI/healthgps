@@ -71,7 +71,7 @@ std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
-    // Initialise sector and income for everyone.
+    // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_sector(context, person);
         initialise_income(context, person);
@@ -80,16 +80,15 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
-    // Initialise sector and income for newborns.
+    // Initialise newborns and update others.
     for (auto &person : context.population()) {
-
-        // Do not initialise non-newborns.
-        if (person.age > 0) {
-            continue;
+        if (person.age == 0) {
+            initialise_sector(context, person);
+            initialise_income(context, person);
+        } else {
+            update_sector(context, person);
+            update_income(context, person);
         }
-
-        initialise_sector(context, person);
-        initialise_income(context, person);
     }
 
     // TODO: Compute target body weight.
@@ -211,6 +210,16 @@ void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) 
     }
 
     throw core::HgpsException("Logic Error: failed to initialise income category");
+}
+
+void KevinHallModel::update_income(RuntimeContext &context, Person &person) const {
+
+    // Only update 18 year olds.
+    if (person.age != 18) {
+        return;
+    }
+
+    initialise_income(context, person);
 }
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {

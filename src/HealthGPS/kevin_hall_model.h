@@ -116,6 +116,11 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param person The person to initialise sector for
     void initialise_income(RuntimeContext &context, Person &person) const;
 
+    /// @brief Update the income category of a person
+    /// @param context The runtime context
+    /// @param person The person to update sector for
+    void update_income(RuntimeContext &context, Person &person) const;
+
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
     /// @param shift Model adjustment term
