@@ -215,11 +215,9 @@ void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) 
 void KevinHallModel::update_income(RuntimeContext &context, Person &person) const {
 
     // Only update 18 year olds.
-    if (person.age != 18) {
-        return;
+    if (person.age == 18) {
+        initialise_income(context, person);
     }
-
-    initialise_income(context, person);
 }
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
