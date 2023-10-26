@@ -275,14 +275,10 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     // Nutrient groups.
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
-    std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
+    std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval> nutrient_ranges;
     for (const auto &nutrient : opt["Nutrients"]) {
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
-        nutrient_ranges[nutrient_key] = nutrient["Range"].get<std::pair<double, double>>();
-        if (nutrient_ranges[nutrient_key].first > nutrient_ranges[nutrient_key].second) {
-            throw hgps::core::HgpsException{
-                fmt::format("Nutrient range is invalid: {}", nutrient_key.to_string())};
-        }
+        nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
 

@@ -30,24 +30,6 @@ TEST(TestCore_Interval, CreatePositive) {
     ASSERT_TRUE(animal.contains(dog));
 }
 
-TEST(TestCore_Interval, CreateNegative) {
-    using namespace hgps::core;
-    auto lower = 0;
-    auto upper = -10;
-    auto len = upper - lower;
-    auto mid = len / 2;
-    auto animal = IntegerInterval{lower, upper};
-    auto cat = IntegerInterval{mid, upper};
-    auto dog = IntegerInterval{lower, mid};
-
-    ASSERT_EQ(lower, animal.lower());
-    ASSERT_EQ(upper, animal.upper());
-    ASSERT_EQ(len, animal.length());
-    ASSERT_TRUE(animal.contains(mid));
-    ASSERT_TRUE(animal.contains(cat));
-    ASSERT_TRUE(animal.contains(dog));
-}
-
 TEST(TestCore_Interval, Comparable) {
     using namespace hgps::core;
 

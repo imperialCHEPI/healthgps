@@ -53,7 +53,7 @@ class KevinHallModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the KevinHallModel class
     /// @param energy_equation The energy coefficients for each nutrient
-    /// @param nutrient_ranges The minimum and maximum nutrient values
+    /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
@@ -61,7 +61,7 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param age_mean_height The mean height at all ages (male and female)
     KevinHallModel(
         const std::unordered_map<core::Identifier, double> &energy_equation,
-        const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
+        const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
@@ -80,7 +80,7 @@ class KevinHallModel final : public RiskFactorModel {
 
   private:
     const std::unordered_map<core::Identifier, double> &energy_equation_;
-    const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges_;
+    const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
@@ -178,12 +178,6 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param EI_0 The initial energy intake
     /// @return The computed adaptive thermogenesis
     double compute_AT(double EI, double EI_0) const;
-
-    /// @brief Return the nutrient value bounded within its range
-    /// @param nutrient The nutrient Identifier
-    /// @param value The nutrient value to bound
-    /// @return The bounded nutrient value
-    double bounded_nutrient_value(const core::Identifier &nutrient, double value) const;
 };
 
 /// @brief Defines the energy balance model data type
@@ -191,7 +185,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
     /// @param energy_equation The energy coefficients for each nutrient
-    /// @param nutrient_ranges The minimum and maximum nutrient values
+    /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
@@ -200,7 +194,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         std::unordered_map<core::Identifier, double> energy_equation,
-        std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
+        std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
@@ -214,7 +208,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
 
   private:
     std::unordered_map<core::Identifier, double> energy_equation_;
-    std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges_;
+    std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>

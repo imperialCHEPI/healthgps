@@ -3,7 +3,6 @@
 
 #include "HealthGPS.Core/exception.h"
 
-#include <algorithm>
 #include <utility>
 
 /*
@@ -29,7 +28,7 @@ const core::Identifier CI_key{"Carbohydrate"};
 
 KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
-    const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
+    const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
@@ -375,15 +374,9 @@ double KevinHallModel::compute_AT(double EI, double EI_0) const {
     return beta_AT * delta_EI;
 }
 
-double KevinHallModel::bounded_nutrient_value(const core::Identifier &nutrient,
-                                              double value) const {
-    const auto &range = nutrient_ranges_.at(nutrient);
-    return std::clamp(range.first, range.second, value);
-}
-
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
-    std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
+    std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
