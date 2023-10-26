@@ -65,8 +65,8 @@ class KevinHallModel final : public RiskFactorModel {
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-        const std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
-            &rural_prevalence,
+        const std::unordered_map<hgps::core::Identifier,
+                                 std::unordered_map<hgps::core::Gender, double>> &rural_prevalence,
         const std::vector<LinearModelParams> &income_models,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
@@ -84,7 +84,7 @@ class KevinHallModel final : public RiskFactorModel {
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
-    const std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence_;
     const std::vector<LinearModelParams> &income_models_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
@@ -197,7 +197,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-        std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
             rural_prevalence,
         std::vector<LinearModelParams> income_models,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
@@ -211,7 +211,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
-    std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence_;
     std::vector<LinearModelParams> income_models_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;

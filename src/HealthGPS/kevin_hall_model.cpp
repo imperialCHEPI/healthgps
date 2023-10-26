@@ -32,7 +32,7 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-    const std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence,
     const std::vector<LinearModelParams> &income_models,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
@@ -379,7 +379,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-    std::map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence,
     std::vector<LinearModelParams> income_models,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
