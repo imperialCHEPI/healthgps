@@ -178,10 +178,10 @@ void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) 
     // Compute logits for each income category.
     auto logits = std::vector<double>{};
     logits.reserve(income_models_.size());
-    for (size_t i = 0; i < income_models_.size(); i++) {
-        logits[i] = income_models_[i].intercept;
-        for (const auto &[factor_name, coefficient] : income_models_[i].coefficients) {
-            logits[i] += coefficient * person.get_risk_factor_value(factor_name);
+    for (const auto &income_model : income_models_) {
+        logits.push_back(income_model.intercept);
+        for (const auto &[factor_name, coefficient] : income_model.coefficients) {
+            logits.back() += coefficient * person.get_risk_factor_value(factor_name);
         }
     }
 
@@ -189,21 +189,21 @@ void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) 
     auto e_logits = std::vector<double>{};
     e_logits.reserve(income_models_.size());
     double e_logits_sum = 0.0;
-    for (size_t i = 0; i < income_models_.size(); i++) {
-        e_logits[i] = exp(logits[i]);
-        e_logits_sum += e_logits[i];
+    for (const auto &logit : logits) {
+        e_logits.push_back(exp(logit));
+        e_logits_sum += e_logits.back();
     }
 
     // Compute income category probabilities.
     auto probabilities = std::vector<double>{};
     probabilities.reserve(income_models_.size());
-    for (size_t i = 0; i < income_models_.size(); i++) {
-        probabilities[i] = e_logits[i] / e_logits_sum;
+    for (const auto &e_logit : e_logits) {
+        probabilities.push_back(e_logit / e_logits_sum);
     }
 
     // Compute income category.
     double rand = context.random().next_double();
-    for (size_t i = 0; i < probabilities.size(); i++) {
+    for (size_t i = 0; i < income_models_.size(); i++) {
         if (rand < probabilities[i]) {
             person.income = income_models_[i].name;
             return;
