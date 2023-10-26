@@ -6,7 +6,11 @@ on:
   release:
     types: [published]
     branches: [main]
+
 jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
   sha256:
     name: sha256
     runs-on: ubuntu-latest
@@ -21,3 +25,54 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: sha256sum.txt
+
+  build:
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+            compiler: gcc-default
+          - platform: windows
+            os: windows-2022
+            compiler: msvc
+
+    env:
+      VCPKG_ROOT: "vcpkg"
+      VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
+
+      # Update when there is a new version of gcc available
+      LATEST_GCC_VERSION: 13
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # VCPKG routine
+      - uses: ./.github/actions/vcpkg-routine
+
+      - name: Build HealthGPS (release)
+        run: |
+          # Build documentation so we can show Doxygen warnings
+          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON -DBUILD_DOC=ON
+          cmake --build --preset=release-build-${{ matrix.platform }} --target=install
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: health-gps-${{ matrix.platform }}
+          path: |
+            ${{ github.workspace }}/out/install/${{ matrix.platform }}-*/*
+
+      - name: Zip output folder
+        working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
+        run: |
+          mkdir ${{github.workspace}}/artifact
+          7z a -tzip ${{github.workspace}}/artifact/health_gps_${{ matrix.platform }}.zip *.dll *.Console*
+
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifact/health_gps_${{ matrix.platform }}.zip
