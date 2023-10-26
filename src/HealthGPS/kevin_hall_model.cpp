@@ -176,7 +176,8 @@ void KevinHallModel::update_sector(RuntimeContext &context, Person &person) cons
 void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) const {
 
     // Compute logits for each income category.
-    auto logits = std::vector<double>(income_models_.size());
+    auto logits = std::vector<double>{};
+    logits.reserve(income_models_.size());
     for (size_t i = 0; i < income_models_.size(); i++) {
         logits[i] = income_models_[i].intercept;
         for (const auto &[factor_name, coefficient] : income_models_[i].coefficients) {
@@ -185,7 +186,8 @@ void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) 
     }
 
     // Compute softmax probabilities for each income category.
-    auto e_logits = std::vector<double>(income_models_.size());
+    auto e_logits = std::vector<double>{};
+    e_logits.reserve(income_models_.size());
     double e_logits_sum = 0.0;
     for (size_t i = 0; i < income_models_.size(); i++) {
         e_logits[i] = exp(logits[i]);
@@ -193,7 +195,8 @@ void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) 
     }
 
     // Compute income category probabilities.
-    auto probabilities = std::vector<double>(income_models_.size());
+    auto probabilities = std::vector<double>{};
+    probabilities.reserve(income_models_.size());
     for (size_t i = 0; i < income_models_.size(); i++) {
         probabilities[i] = e_logits[i] / e_logits_sum;
     }
