@@ -19,7 +19,7 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
     {"Height"_id, [](const Person &) { return 0.5; }},
     {"Weight"_id, [](const Person &) { return 0.5; }},
-    //{"BMI"_id, [](const Person &) { return 0.5; }},
+    {"BMI"_id, [](const Person &) { return 0.5; }},
     {"PhysicalActivityLevel"_id, [](const Person &) { return 0.5; }},
     {"BodyFat"_id, [](const Person &) { return 0.5; }},
     {"LeanTissue"_id, [](const Person &) { return 0.5; }},
