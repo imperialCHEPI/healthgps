@@ -81,7 +81,7 @@
     "running": {
         "seed": [123456789],
         "start_time": 2010,
-        "stop_time": 2050,
+        "stop_time": 2015,
         "trial_runs": 1,
         "sync_timeout_ms": 15000,
         "diseases": [
