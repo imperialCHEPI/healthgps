@@ -56,8 +56,14 @@ struct Person {
     /// @brief Current age in years
     unsigned int age{};
 
+    /// @brief Sector (region) assigned value
+    core::Sector sector{core::Sector::unknown};
+
     /// @brief Social-economic status (SES) assigned value
     double ses{};
+
+    /// @brief Income category
+    core::Identifier income{};
 
     /// @brief Current risk factors values
     std::map<core::Identifier, double> risk_factors;
@@ -94,11 +100,22 @@ struct Person {
 
     /// @brief Gets the gender enumeration as a number for analysis
     /// @return The gender associated value
-    float gender_to_value() const noexcept;
+    /// @throws HgpsException if gender is unknown
+    float gender_to_value() const;
 
     /// @brief Gets the gender enumeration name string
     /// @return The gender name
-    std::string gender_to_string() const noexcept;
+    /// @throws HgpsException if gender is unknown
+    std::string gender_to_string() const;
+
+    /// @brief Gets the sector enumeration as a number
+    /// @return The sector value (0 for urban, 1 for rural)
+    /// @throws HgpsException if sector is unknown
+    float sector_to_value() const;
+
+    /// @brief Check if person is an adult (18 or over)
+    /// @return true if person is 18 or over; else false
+    bool over_18() const noexcept;
 
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time

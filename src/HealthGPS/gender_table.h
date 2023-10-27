@@ -157,10 +157,10 @@ GenderTable<int, TYPE> create_integer_gender_table(const core::IntegerInterval &
 /// @tparam TYPE The values data type
 /// @param age_range The age breakpoints range
 /// @return A new instance of the AgeGenderTable class
-/// @throws std::out_of_range for age range 'lower' of negative value or less than the 'upper' value
+/// @throws std::out_of_range for age range 'lower' of negative value or equal to the 'upper' value
 template <core::Numerical TYPE>
 AgeGenderTable<TYPE> create_age_gender_table(const core::IntegerInterval &age_range) {
-    if (age_range.lower() < 0 || age_range.lower() >= age_range.upper()) {
+    if (age_range.lower() < 0 || age_range.lower() == age_range.upper()) {
         throw std::invalid_argument(
             "The 'age lower' value must be greater than zero and less than the 'age upper' value.");
     }

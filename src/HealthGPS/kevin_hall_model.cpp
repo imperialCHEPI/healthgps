@@ -3,7 +3,6 @@
 
 #include "HealthGPS.Core/exception.h"
 
-#include <algorithm>
 #include <utility>
 
 /*
@@ -29,13 +28,17 @@ const core::Identifier CI_key{"Carbohydrate"};
 
 KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
-    const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
+    const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
+    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        &rural_prevalence,
+    const std::vector<LinearModelParams> &income_models,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
+      rural_prevalence_{rural_prevalence}, income_models_{income_models},
       age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
@@ -50,6 +53,12 @@ KevinHallModel::KevinHallModel(
     if (food_prices_.empty()) {
         throw core::HgpsException("Food price mapping is empty");
     }
+    if (rural_prevalence_.empty()) {
+        throw core::HgpsException("Rural prevalence mapping is empty");
+    }
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models list is empty");
+    }
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
     }
@@ -59,20 +68,40 @@ RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorMod
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
-void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {
-    throw core::HgpsException("KevinHallModel::generate_risk_factors not yet implemented.");
+void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
+
+    // Initialise everyone.
+    for (auto &person : context.population()) {
+        initialise_sector(context, person);
+        initialise_income(context, person);
+    }
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
-    hgps::Population &population = context.population();
-    double mean_sim_body_weight = 0.0;
-    double mean_adjustment_coefficient = 0.0;
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age == 0) {
+            initialise_sector(context, person);
+            initialise_income(context, person);
+        } else {
+            update_sector(context, person);
+            update_income(context, person);
+        }
+    }
 
     // TODO: Compute target body weight.
     const float target_BW = 100.0;
 
     // Trial run.
-    for (auto &person : population) {
+    double mean_sim_body_weight = 0.0;
+    double mean_adjustment_coefficient = 0.0;
+    for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
             continue;
@@ -85,13 +114,13 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     }
 
     // Compute model adjustment term.
-    const size_t population_size = population.current_active_size();
+    const size_t population_size = context.population().current_active_size();
     mean_sim_body_weight /= population_size;
     mean_adjustment_coefficient /= population_size;
     double shift = (target_BW - mean_sim_body_weight) / mean_adjustment_coefficient;
 
     // Final run.
-    for (auto &person : population) {
+    for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
             continue;
@@ -111,6 +140,90 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         // person.risk_factors[W_key] = state.W;
         // person.risk_factors[EE_key] = state.EE;
         // person.risk_factors[EI_key] = state.EI;
+    }
+}
+
+void KevinHallModel::initialise_sector(RuntimeContext &context, Person &person) const {
+
+    // Get rural prevalence for age group and sex.
+    double prevalence;
+    if (person.age < 18) {
+        prevalence = rural_prevalence_.at("Under18"_id).at(person.gender);
+    } else {
+        prevalence = rural_prevalence_.at("Over18"_id).at(person.gender);
+    }
+
+    // Sample the person's sector.
+    double rand = context.random().next_double();
+    auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
+    person.sector = sector;
+}
+
+void KevinHallModel::update_sector(RuntimeContext &context, Person &person) const {
+
+    // Only update rural sector 18 year olds.
+    if ((person.age != 18) || (person.sector != core::Sector::rural)) {
+        return;
+    }
+
+    // Get rural prevalence for age group and sex.
+    double prevalence_under18 = rural_prevalence_.at("Under18"_id).at(person.gender);
+    double prevalence_over18 = rural_prevalence_.at("Over18"_id).at(person.gender);
+
+    // Compute random rural to urban transition.
+    double rand = context.random().next_double();
+    double p_rural_to_urban = 1.0 - prevalence_over18 / prevalence_under18;
+    if (rand < p_rural_to_urban) {
+        person.sector = core::Sector::urban;
+    }
+}
+
+void KevinHallModel::initialise_income(RuntimeContext &context, Person &person) const {
+
+    // Compute logits for each income category.
+    auto logits = std::vector<double>{};
+    logits.reserve(income_models_.size());
+    for (const auto &income_model : income_models_) {
+        logits.push_back(income_model.intercept);
+        for (const auto &[factor_name, coefficient] : income_model.coefficients) {
+            logits.back() += coefficient * person.get_risk_factor_value(factor_name);
+        }
+    }
+
+    // Compute softmax probabilities for each income category.
+    auto e_logits = std::vector<double>{};
+    e_logits.reserve(income_models_.size());
+    double e_logits_sum = 0.0;
+    for (const auto &logit : logits) {
+        e_logits.push_back(exp(logit));
+        e_logits_sum += e_logits.back();
+    }
+
+    // Compute income category probabilities.
+    auto probabilities = std::vector<double>{};
+    probabilities.reserve(income_models_.size());
+    for (const auto &e_logit : e_logits) {
+        probabilities.push_back(e_logit / e_logits_sum);
+    }
+
+    // Compute income category.
+    double rand = context.random().next_double();
+    for (size_t i = 0; i < income_models_.size(); i++) {
+        if (rand < probabilities[i]) {
+            person.income = income_models_[i].name;
+            return;
+        }
+        rand -= probabilities[i];
+    }
+
+    throw core::HgpsException("Logic Error: failed to initialise income category");
+}
+
+void KevinHallModel::update_income(RuntimeContext &context, Person &person) const {
+
+    // Only update 18 year olds.
+    if (person.age == 18) {
+        initialise_income(context, person);
     }
 }
 
@@ -269,20 +382,18 @@ double KevinHallModel::compute_AT(double EI, double EI_0) const {
     return beta_AT * delta_EI;
 }
 
-double KevinHallModel::bounded_nutrient_value(const core::Identifier &nutrient,
-                                              double value) const {
-    const auto &range = nutrient_ranges_.at(nutrient);
-    return std::clamp(range.first, range.second, value);
-}
-
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
-    std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
+    std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        rural_prevalence,
+    std::vector<LinearModelParams> income_models,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
     : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
+      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
       age_mean_height_{std::move(age_mean_height)} {
 
     if (energy_equation_.empty()) {
@@ -297,6 +408,12 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (food_prices_.empty()) {
         throw core::HgpsException("Food prices mapping is empty");
     }
+    if (rural_prevalence_.empty()) {
+        throw core::HgpsException("Rural prevalence mapping is empty");
+    }
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models list is empty");
+    }
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
     }
@@ -304,7 +421,8 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
     return std::make_unique<KevinHallModel>(energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, age_mean_height_);
+                                            food_prices_, rural_prevalence_, income_models_,
+                                            age_mean_height_);
 }
 
 } // namespace hgps

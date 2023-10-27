@@ -48,7 +48,6 @@ class DynamicHierarchicalLinearModel final : public RiskFactorModel {
 
     std::string name() const noexcept override;
 
-    /// @throws std::logic_error the dynamic model does not generate risk factors.
     void generate_risk_factors(RuntimeContext &context) override;
 
     void update_risk_factors(RuntimeContext &context) override;

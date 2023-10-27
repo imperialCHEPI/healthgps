@@ -129,31 +129,50 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Risk factor linear models.
-    hgps::LinearModelParams models;
-    for (const auto &factor : opt["RiskFactorModels"]) {
-        auto factor_key = factor["Name"].get<hgps::core::Identifier>();
-        models.intercepts[factor_key] = factor["Intercept"].get<double>();
-        models.coefficients[factor_key] =
-            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
-    }
-
-    // Risk factor names and correlation matrix.
-    std::vector<hgps::core::Identifier> names;
+    // Risk factor linear models and correlation matrix.
+    std::vector<hgps::LinearModelParams> risk_factor_models;
     const auto correlations_file_info =
         host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlations_table = load_datatable_from_csv(correlations_file_info);
     Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
-    for (size_t col = 0; col < correlations_table.num_columns(); col++) {
-        names.emplace_back(correlations_table.column(col).name());
-        for (size_t row = 0; row < correlations_table.num_rows(); row++) {
-            correlations(row, col) =
-                std::any_cast<double>(correlations_table.column(col).value(row));
+
+    for (size_t i = 0; i < opt["RiskFactorModels"].size(); i++) {
+        // Risk factor model.
+        const auto &factor = opt["RiskFactorModels"][i];
+        hgps::LinearModelParams model;
+        model.name = factor["Name"].get<hgps::core::Identifier>();
+        model.intercept = factor["Intercept"].get<double>();
+        model.coefficients =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+
+        // Check correlation matrix column name matches risk factor name.
+        auto column_name = hgps::core::Identifier{correlations_table.column(i).name()};
+        if (model.name != column_name) {
+            throw hgps::core::HgpsException{
+                fmt::format("Risk factor {} name ({}) does not match correlation matrix "
+                            "column {} name ({})",
+                            i, model.name.to_string(), i, column_name.to_string())};
         }
+
+        // Write data structures.
+        for (size_t j = 0; j < correlations_table.num_rows(); j++) {
+            correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
+        }
+        risk_factor_models.emplace_back(std::move(model));
     }
+
+    // Check correlation matrix column count matches risk factor count.
+    if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
+        throw hgps::core::HgpsException{
+            fmt::format("Risk factor count ({}) does not match correlation "
+                        "matrix column count ({})",
+                        opt["RiskFactorModels"].size(), correlations_table.num_columns())};
+    }
+
+    // Compute Cholesky decomposition of correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
-    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(names), std::move(models),
+    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(risk_factor_models),
                                                                std::move(cholesky));
 }
 
@@ -253,25 +272,20 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
-    std::unordered_map<hgps::core::Identifier, double> energy_equation;
-    std::unordered_map<hgps::core::Identifier, std::pair<double, double>> nutrient_ranges;
-    std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
-        nutrient_equations;
-    std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
-    std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
 
     // Nutrient groups.
+    std::unordered_map<hgps::core::Identifier, double> energy_equation;
+    std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval> nutrient_ranges;
     for (const auto &nutrient : opt["Nutrients"]) {
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
-        nutrient_ranges[nutrient_key] = nutrient["Range"].get<std::pair<double, double>>();
-        if (nutrient_ranges[nutrient_key].first > nutrient_ranges[nutrient_key].second) {
-            throw hgps::core::HgpsException{
-                fmt::format("Nutrient range is invalid: {}", nutrient_key.to_string())};
-        }
+        nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
 
     // Food groups.
+    std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
+        nutrient_equations;
+    std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
@@ -291,7 +305,28 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
     const auto food_data_table = load_datatable_from_csv(food_data_file_info);
 
+    // Rural sector prevalence for age groups and sex.
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        rural_prevalence;
+    for (const auto &age_group : opt["RuralPrevalence"]) {
+        auto age_group_name = age_group["Name"].get<hgps::core::Identifier>();
+        rural_prevalence[age_group_name] = {{hgps::core::Gender::female, age_group["Female"]},
+                                            {hgps::core::Gender::male, age_group["Male"]}};
+    }
+
+    // Income models for different income classifications.
+    std::vector<hgps::LinearModelParams> income_models;
+    for (const auto &factor : opt["IncomeModels"]) {
+        hgps::LinearModelParams model;
+        model.name = factor["Name"].get<hgps::core::Identifier>();
+        model.intercept = factor["Intercept"].get<double>();
+        model.coefficients =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+        income_models.emplace_back(std::move(model));
+    }
+
     // Load M/F average heights for age.
+    std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
     auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
     auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
@@ -306,7 +341,8 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(age_mean_height));
+        std::move(food_prices), std::move(rural_prevalence), std::move(income_models),
+        std::move(age_mean_height));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
