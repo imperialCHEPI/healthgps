@@ -81,6 +81,11 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
         if (person.age == 0) {
             initialise_sector(context, person);
             initialise_income(context, person);
