@@ -9,8 +9,9 @@ namespace hgps {
 
 /// @brief Defines the linear model parameters used to initialise risk factors
 struct LinearModelParams {
-    std::unordered_map<core::Identifier, double> intercepts;
-    std::unordered_map<core::Identifier, std::unordered_map<core::Identifier, double>> coefficients;
+    core::Identifier name;
+    double intercept;
+    std::unordered_map<core::Identifier, double> coefficients;
 };
 
 /// @brief Implements the static linear model type
@@ -19,12 +20,11 @@ struct LinearModelParams {
 class StaticLinearModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the StaticLinearModel class
-    /// @param risk_factor_names An ordered list of risk factor names
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws HgpsException for invalid arguments
-    StaticLinearModel(std::vector<core::Identifier> risk_factor_names,
-                      LinearModelParams risk_factor_models, Eigen::MatrixXd risk_factor_cholesky);
+    StaticLinearModel(std::vector<LinearModelParams> risk_factor_models,
+                      Eigen::MatrixXd risk_factor_cholesky);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -39,8 +39,7 @@ class StaticLinearModel final : public RiskFactorModel {
     void linear_approximation(Person &person);
 
   private:
-    const std::vector<core::Identifier> risk_factor_names_;
-    const LinearModelParams risk_factor_models_;
+    const std::vector<LinearModelParams> risk_factor_models_;
     const Eigen::MatrixXd risk_factor_cholesky_;
 };
 
@@ -48,12 +47,10 @@ class StaticLinearModel final : public RiskFactorModel {
 class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
-    /// @param risk_factor_names An ordered list of risk factor names
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws HgpsException for invalid arguments
-    StaticLinearModelDefinition(std::vector<core::Identifier> risk_factor_names,
-                                LinearModelParams risk_factor_models,
+    StaticLinearModelDefinition(std::vector<LinearModelParams> risk_factor_models,
                                 Eigen::MatrixXd risk_factor_cholesky);
 
     /// @brief Construct a new StaticLinearModel from this definition
@@ -61,8 +58,7 @@ class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
     std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
-    std::vector<core::Identifier> risk_factor_names_;
-    LinearModelParams risk_factor_models_;
+    std::vector<LinearModelParams> risk_factor_models_;
     Eigen::MatrixXd risk_factor_cholesky_;
 };
 

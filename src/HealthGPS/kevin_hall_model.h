@@ -1,5 +1,8 @@
 #pragma once
 
+// TODO: LinearModelParams (in static_linear_model.h) should be moved somewhere better.
+#include "static_linear_model.h"
+
 #include "interfaces.h"
 #include "mapping.h"
 
@@ -50,33 +53,40 @@ class KevinHallModel final : public RiskFactorModel {
   public:
     /// @brief Initialises a new instance of the KevinHallModel class
     /// @param energy_equation The energy coefficients for each nutrient
-    /// @param nutrient_ranges The minimum and maximum nutrient values
+    /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
+    /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param income_models The income models for each income category
     /// @param age_mean_height The mean height at all ages (male and female)
     KevinHallModel(
         const std::unordered_map<core::Identifier, double> &energy_equation,
-        const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges,
+        const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
+        const std::unordered_map<hgps::core::Identifier,
+                                 std::unordered_map<hgps::core::Gender, double>> &rural_prevalence,
+        const std::vector<LinearModelParams> &income_models,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
 
     RiskFactorModelType type() const noexcept override;
 
     std::string name() const noexcept override;
 
-    /// @throws std::logic_error the dynamic model does not generate risk factors.
     void generate_risk_factors(RuntimeContext &context) override;
 
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
     const std::unordered_map<core::Identifier, double> &energy_equation_;
-    const std::unordered_map<core::Identifier, std::pair<double, double>> &nutrient_ranges_;
+    const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
+    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        &rural_prevalence_;
+    const std::vector<LinearModelParams> &income_models_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
 
     // Model parameters.
@@ -90,6 +100,26 @@ class KevinHallModel final : public RiskFactorModel {
     static constexpr double beta_AT = 0.14; // AT from energy intake (unitless).
     static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
     static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
+
+    /// @brief Initialise the sector of a person
+    /// @param context The runtime context
+    /// @param person The person to initialise sector for
+    void initialise_sector(RuntimeContext &context, Person &person) const;
+
+    /// @brief Update the sector of a person
+    /// @param context The runtime context
+    /// @param person The person to update sector for
+    void update_sector(RuntimeContext &context, Person &person) const;
+
+    /// @brief Initialise the income category of a person
+    /// @param context The runtime context
+    /// @param person The person to initialise sector for
+    void initialise_income(RuntimeContext &context, Person &person) const;
+
+    /// @brief Update the income category of a person
+    /// @param context The runtime context
+    /// @param person The person to update sector for
+    void update_income(RuntimeContext &context, Person &person) const;
 
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
@@ -148,12 +178,6 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param EI_0 The initial energy intake
     /// @return The computed adaptive thermogenesis
     double compute_AT(double EI, double EI_0) const;
-
-    /// @brief Return the nutrient value bounded within its range
-    /// @param nutrient The nutrient Identifier
-    /// @param value The nutrient value to bound
-    /// @return The bounded nutrient value
-    double bounded_nutrient_value(const core::Identifier &nutrient, double value) const;
 };
 
 /// @brief Defines the energy balance model data type
@@ -161,16 +185,21 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
   public:
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
     /// @param energy_equation The energy coefficients for each nutrient
-    /// @param nutrient_ranges The minimum and maximum nutrient values
+    /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
+    /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param income_models The income models for each income category
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         std::unordered_map<core::Identifier, double> energy_equation,
-        std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges,
+        std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
+        std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+            rural_prevalence,
+        std::vector<LinearModelParams> income_models,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
 
     /// @brief Construct a new KevinHallModel from this definition
@@ -179,9 +208,12 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
 
   private:
     std::unordered_map<core::Identifier, double> energy_equation_;
-    std::unordered_map<core::Identifier, std::pair<double, double>> nutrient_ranges_;
+    std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        rural_prevalence_;
+    std::vector<LinearModelParams> income_models_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
 };
 

@@ -35,6 +35,18 @@ enum class DiseaseGroup : uint8_t {
     cancer
 };
 
+/// @brief Enumerates sector types
+enum class Sector : uint8_t {
+    /// @brief Unknown sector
+    unknown,
+
+    /// @brief Urban sector
+    urban,
+
+    /// @brief Rural sector
+    rural
+};
+
 /// @brief C++20 concept for numeric columns types
 template <typename T>
 concept Numerical = std::is_arithmetic_v<T>;
@@ -60,4 +72,5 @@ class DoubleDataTableColumn;
 class IntegerDataTableColumn;
 
 class DataTableColumnVisitor;
+
 } // namespace hgps::core

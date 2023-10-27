@@ -159,7 +159,7 @@ TEST(TestHealthGPS_AgeGenderTable, CreateWithWrongRangerThrows) {
     using namespace hgps;
 
     auto negative_range = core::IntegerInterval(-1, 10);
-    auto inverted_range = core::IntegerInterval(10, 1);
+    auto inverted_range = core::IntegerInterval(1, 1);
 
     ASSERT_THROW(create_age_gender_table<double>(negative_range), std::invalid_argument);
     ASSERT_THROW(create_age_gender_table<double>(inverted_range), std::invalid_argument);
