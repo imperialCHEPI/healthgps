@@ -31,14 +31,15 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
+    const BaselineAdjustment &risk_factor_means,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence,
     const std::vector<LinearModelParams> &income_models,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
     : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
-      nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
-      rural_prevalence_{rural_prevalence}, income_models_{income_models},
+      nutrient_equations_{nutrient_equations}, risk_factor_means_{risk_factor_means},
+      food_prices_{food_prices}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
       age_mean_height_{age_mean_height} {
 
     if (energy_equation_.empty()) {
@@ -49,6 +50,9 @@ KevinHallModel::KevinHallModel(
     }
     if (nutrient_equations_.empty()) {
         throw core::HgpsException("Nutrient equation mapping is empty");
+    }
+    if (risk_factor_means_.values.empty()) {
+        throw core::HgpsException("Risk factor means mapping is empty");
     }
     if (food_prices_.empty()) {
         throw core::HgpsException("Food price mapping is empty");
@@ -386,13 +390,15 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
+    BaselineAdjustment risk_factor_means,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence,
     std::vector<LinearModelParams> income_models,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
     : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
-      nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
+      nutrient_equations_{std::move(nutrient_equations)},
+      risk_factor_means_{std::move(risk_factor_means)}, food_prices_{std::move(food_prices)},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
       age_mean_height_{std::move(age_mean_height)} {
 
@@ -404,6 +410,9 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     }
     if (nutrient_equations_.empty()) {
         throw core::HgpsException("Nutrient equation mapping is empty");
+    }
+    if (risk_factor_means_.values.empty()) {
+        throw core::HgpsException("Risk factor means mapping is empty");
     }
     if (food_prices_.empty()) {
         throw core::HgpsException("Food prices mapping is empty");
@@ -421,8 +430,8 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
     return std::make_unique<KevinHallModel>(energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, rural_prevalence_, income_models_,
-                                            age_mean_height_);
+                                            risk_factor_means_, food_prices_, rural_prevalence_,
+                                            income_models_, age_mean_height_);
 }
 
 } // namespace hgps
