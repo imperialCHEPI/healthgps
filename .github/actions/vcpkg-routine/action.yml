@@ -6,40 +6,6 @@ runs:
   using: "composite"
 
   steps:
-    - name: Set up MSVC (Windows)
-      if: matrix.platform == 'windows'
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-
-    - name: Install dependencies (Linux)
-      if: matrix.platform == 'linux'
-      shell: bash
-      run: |
-        sudo apt update
-        sudo apt upgrade -y
-        sudo apt install --no-install-recommends build-essential ninja-build lcov
-
-    - name: Install latest gcc (Linux)
-      if: matrix.compiler == 'gcc-latest'
-      shell: bash
-      run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get update
-        sudo apt-get install g++-$LATEST_GCC_VERSION
-
-        # Use environment variable to tell CMake to compile with this version of gcc
-        echo CXX=g++-$LATEST_GCC_VERSION >> "$GITHUB_ENV"
-
-    - name: Install clang (Linux)
-      if: matrix.platform == 'linux' && matrix.compiler == 'clang'
-      shell: bash
-      run: |
-        sudo apt install --no-install-recommends clang
-
-        # Use environment variable to tell CMake to compile with clang
-        echo CXX=clang++ >> "$GITHUB_ENV"
-
     - name: Install VCPKG
       shell: bash
       run: |

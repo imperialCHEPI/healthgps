@@ -18,20 +18,17 @@ jobs:
         include:
           - platform: linux
             os: ubuntu-22.04
-            compiler: gcc-default
           - platform: windows
             os: windows-2022
-            compiler: msvc
-
     env:
       VCPKG_ROOT: "vcpkg"
       VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
 
-      # Update when there is a new version of gcc available
-      LATEST_GCC_VERSION: 13
-
     steps:
       - uses: actions/checkout@v3
+
+      # Compiler setup
+      - uses: ./.github/actions/compiler-setup
 
       # VCPKG routine
       - uses: ./.github/actions/vcpkg-routine

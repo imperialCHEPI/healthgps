@@ -45,6 +45,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # Compiler setup
+      - uses: ./.github/actions/compiler-setup
+
       # VCPKG routine
       - uses: ./.github/actions/vcpkg-routine
 
