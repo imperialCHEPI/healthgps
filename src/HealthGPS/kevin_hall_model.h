@@ -5,7 +5,6 @@
 
 #include "interfaces.h"
 #include "mapping.h"
-#include "riskfactor_adjustment_types.h"
 
 #include <optional>
 
@@ -56,7 +55,6 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
-    /// @param risk_factor_means The mean risk factor values by sex and age
     /// @param food_prices The unit price for each food group
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -66,7 +64,6 @@ class KevinHallModel final : public RiskFactorModel {
         const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
-        const BaselineAdjustment &risk_factor_means,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<hgps::core::Identifier,
                                  std::unordered_map<hgps::core::Gender, double>> &rural_prevalence,
@@ -86,7 +83,6 @@ class KevinHallModel final : public RiskFactorModel {
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
-    const BaselineAdjustment &risk_factor_means_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         &rural_prevalence_;
@@ -191,7 +187,6 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
-    /// @param risk_factor_means The mean risk factor values by sex and age
     /// @param food_prices The unit price for each food group
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -201,7 +196,6 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
-        BaselineAdjustment risk_factor_means,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
             rural_prevalence,
@@ -216,7 +210,6 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, double> energy_equation_;
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
-    BaselineAdjustment risk_factor_means_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
         rural_prevalence_;
