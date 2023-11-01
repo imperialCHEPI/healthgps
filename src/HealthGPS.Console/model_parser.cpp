@@ -209,8 +209,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     // Compute Cholesky decomposition of correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
-    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(risk_factor_models),
-                                                               std::move(cholesky));
+    return std::make_unique<hgps::StaticLinearModelDefinition>(
+        std::move(risk_factor_models), std::move(risk_factor_means), std::move(cholesky));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>

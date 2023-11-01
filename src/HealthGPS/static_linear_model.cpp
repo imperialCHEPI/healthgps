@@ -6,13 +6,18 @@
 
 namespace hgps {
 
-StaticLinearModel::StaticLinearModel(std::vector<LinearModelParams> risk_factor_models,
-                                     Eigen::MatrixXd risk_factor_cholesky)
+StaticLinearModel::StaticLinearModel(const std::vector<LinearModelParams> &risk_factor_models,
+                                     const BaselineAdjustment &risk_factor_means,
+                                     const Eigen::MatrixXd &risk_factor_cholesky)
     : risk_factor_models_{std::move(risk_factor_models)},
+      risk_factor_means_{std::move(risk_factor_means)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
+    }
+    if (risk_factor_means_.values.empty()) {
+        throw core::HgpsException("Risk factor means mapping is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -85,12 +90,17 @@ void StaticLinearModel::linear_approximation(Person &person) {
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    std::vector<LinearModelParams> risk_factor_models, Eigen::MatrixXd risk_factor_cholesky)
+    std::vector<LinearModelParams> risk_factor_models, BaselineAdjustment risk_factor_means,
+    Eigen::MatrixXd risk_factor_cholesky)
     : risk_factor_models_{std::move(risk_factor_models)},
+      risk_factor_means_{std::move(risk_factor_means)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
+    }
+    if (risk_factor_means_.values.empty()) {
+        throw core::HgpsException("Risk factor means mapping is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -98,7 +108,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    return std::make_unique<StaticLinearModel>(risk_factor_models_, risk_factor_cholesky_);
+    return std::make_unique<StaticLinearModel>(risk_factor_models_, risk_factor_means_,
+                                               risk_factor_cholesky_);
 }
 
 } // namespace hgps
