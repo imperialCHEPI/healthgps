@@ -31,11 +31,8 @@ jobs:
       # VCPKG routine
       - uses: ./.github/actions/vcpkg-routine
 
-      - name: Build HealthGPS (release)
-        run: |
-          # Build documentation so we can show Doxygen warnings
-          cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON -DBUILD_DOC=ON
-          cmake --build --preset=release-build-${{ matrix.platform }} --target=install
+      # Build HealthGPS (release)
+      - uses: ./.github/actions/build-release
 
       - name: Zip output folder
         working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
