@@ -131,7 +131,7 @@ void HealthGPS::initialise_population() {
     // Social economics status
     ses_->initialise_population(context_);
 
-    // Generate risk factors*
+    // Generate risk factors
     risk_factor_->initialise_population(context_);
     risk_factor_->apply_baseline_adjustments(context_);
 
@@ -150,16 +150,14 @@ void HealthGPS::update_population() {
     // update basic information: demographics + diseases
     demographic_->update_population(context_, *disease_);
 
-    // update population socio-economic status
-    ses_->update_population(context_);
-
-    // initialise risk factors for newborns and updates population risk factors
-    risk_factor_->update_population(context_);
-
     // Calculate the net immigration by gender and age, update the population accordingly
     update_net_immigration();
 
-    // apply risk factors baseline adjustment to population
+    // update population socio-economic status
+    ses_->update_population(context_);
+
+    // Update population risk factors
+    risk_factor_->update_population(context_);
     risk_factor_->apply_baseline_adjustments(context_);
 
     // Update diseases status: remission and incidence
