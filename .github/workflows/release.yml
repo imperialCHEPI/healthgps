@@ -6,11 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    uses: ./.github/workflows/ci.yml
-
   build:
-    needs: test
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -40,13 +36,6 @@ jobs:
           # Build documentation so we can show Doxygen warnings
           cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON -DBUILD_DOC=ON
           cmake --build --preset=release-build-${{ matrix.platform }} --target=install
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: health-gps-${{ matrix.platform }}
-          path: |
-            ${{ github.workspace }}/out/install/${{ matrix.platform }}-*/*
 
       - name: Zip output folder
         working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
