@@ -39,4 +39,3 @@ runs:
 
         # Use environment variable to tell CMake to compile with clang
         echo CXX=clang++ >> "$GITHUB_ENV"
-
