@@ -111,7 +111,6 @@ target_sources(
             "univariate_visitor.h"
             "analysis_definition.h"
             "api.h"
-            "baseline_sync_message.h"
             "channel.h"
             "disease_definition.h"
             "disease_registry.h"

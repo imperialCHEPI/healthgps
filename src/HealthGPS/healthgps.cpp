@@ -1,10 +1,10 @@
 #include "healthgps.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
-#include "baseline_sync_message.h"
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "sync_message.h"
 #include "univariate_visitor.h"
 
 #include <algorithm>
@@ -13,7 +13,15 @@
 #include <memory>
 #include <stdexcept>
 
+namespace { // anonymous namespace
+
+/// @brief Defines the net immigration synchronisation message
+using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>;
+
+} // anonymous namespace
+
 namespace hgps {
+
 HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
                      EventAggregator &bus)
     : Simulation(std::move(definition)), context_{bus, definition_} {
