@@ -36,6 +36,10 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(const BaselineAdjustment &r
     }
 }
 
+const BaselineAdjustment &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
+    return risk_factor_expected_;
+}
+
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) const {
     // TODO: for ALL risk factors
 }
