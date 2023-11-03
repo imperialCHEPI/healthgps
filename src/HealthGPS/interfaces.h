@@ -9,9 +9,6 @@
 
 namespace hgps {
 
-/// @brief Population age record data structure
-struct PopulationRecord;
-
 /// @brief Health GPS simulation modules types enumeration
 enum class SimulationModuleType : uint8_t {
     /// @brief Risk factor module
@@ -94,6 +91,29 @@ class RiskFactorHostModule : public UpdatableModule {
     virtual void apply_baseline_adjustments(RuntimeContext &context) = 0;
 };
 
+/// @brief Define the population record data type for the demographic dataset
+struct PopulationRecord {
+    /// @brief Initialise a new instance of the PopulationRecord structure
+    /// @param pop_age Age reference
+    /// @param num_males Number of males
+    /// @param num_females Number of females
+    PopulationRecord(int pop_age, float num_males, float num_females)
+        : age{pop_age}, males{num_males}, females{num_females} {}
+
+    /// @brief Age reference in years
+    int age{};
+
+    /// @brief Number of males
+    float males{};
+
+    /// @brief NUmber of females
+    float females{};
+
+    /// @brief Gets the total number at age
+    /// @return Total number for age
+    float total() const noexcept { return males + females; }
+};
+
 /// @brief Demographic prospects module interface
 class DemographicModule : public SimulationModule {
   public:
@@ -146,4 +166,5 @@ class DiseaseModel {
     /// @return the mortality rate value, if found, otherwise zero.
     virtual double get_excess_mortality(const Person &entity) const noexcept = 0;
 };
+
 } // namespace hgps
