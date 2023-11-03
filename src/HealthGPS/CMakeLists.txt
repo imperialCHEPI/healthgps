@@ -86,6 +86,7 @@ target_sources(
             "result_message.h"
             "riskfactor.cpp"
             "riskfactor.h"
+            "riskfactor_model.h"
             "riskfactor_adjustment.cpp"
             "riskfactor_adjustment.h"
             "riskfactor_adjustment_types.h"
