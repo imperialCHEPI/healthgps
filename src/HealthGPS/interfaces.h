@@ -4,7 +4,7 @@
 #include "HealthGPS.Core/identifier.h"
 
 #include "person.h"
-#include "riskfactor_model.h"
+#include "risk_factor_model.h"
 #include "runtime_context.h"
 
 namespace hgps {

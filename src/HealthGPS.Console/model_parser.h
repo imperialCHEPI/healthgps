@@ -2,7 +2,7 @@
 
 #include "HealthGPS/dynamic_hierarchical_linear_model.h"
 #include "HealthGPS/kevin_hall_model.h"
-#include "HealthGPS/riskfactor_adjustment_types.h"
+#include "HealthGPS/riskfactor_adjustment.h"
 #include "HealthGPS/static_hierarchical_linear_model.h"
 #include "HealthGPS/static_linear_model.h"
 

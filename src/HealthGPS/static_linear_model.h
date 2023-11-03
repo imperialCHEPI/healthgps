@@ -2,7 +2,7 @@
 
 #include "interfaces.h"
 #include "mapping.h"
-#include "riskfactor_adjustment_types.h"
+#include "riskfactor_adjustment.h"
 
 #include <Eigen/Dense>
 

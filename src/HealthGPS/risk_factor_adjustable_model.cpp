@@ -1,54 +1,23 @@
-#include "riskfactor_adjustment.h"
+#include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/thread_util.h"
-#include "sync_message.h"
 
-#include <cmath>
-#include <memory>
+#include "risk_factor_adjustable_model.h"
+#include "sync_message.h"
 
 namespace { // anonymous namespace
 
 /// @brief Defines the baseline risk factors adjustment synchronisation message
-using BaselineAdjustmentMessage = hgps::SyncDataMessage<hgps::FactorAdjustmentTable>;
+using RiskFactorAdjustmentMessage = hgps::SyncDataMessage<hgps::SexAgeTable>;
 
 /// @brief Defines the first statistical moment type
 struct FirstMoment {
-    /// @brief Determine whether the moment is empty
-    /// @return true if the moment is empty; otherwise, false.
-    bool empty() const noexcept { return count_ < 1; }
-    /// @brief Gets the number of values added to the moment
-    /// @return Number of values
-    int count() const noexcept { return count_; }
-    /// @brief Gets the values sum
-    /// @return Sum value
-    double sum() const noexcept { return sum_; }
-
-    /// @brief Gets the values mean
-    /// @return Mean value
-    double mean() const noexcept {
-        if (count_ > 0) {
-            return sum_ / count_;
-        }
-
-        return 0.0;
-    }
-
-    /// @brief Appends a value to the moment
-    /// @param value The new value
+  public:
     void append(double value) noexcept {
         count_++;
         sum_ += value;
     }
 
-    /// @brief Clear the moment
-    void clear() noexcept {
-        count_ = 0;
-        sum_ = 0.0;
-    }
-
-    /// @brief Compare FirstMoment instances
-    /// @param other The other instance to compare
-    /// @return The comparison result
-    auto operator<=>(const FirstMoment &other) const = default;
+    double mean() const noexcept { return (count_ > 0) ? (sum_ / count_) : 0.0; }
 
   private:
     int count_{};
@@ -59,62 +28,71 @@ struct FirstMoment {
 
 namespace hgps {
 
-RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(BaselineAdjustment &adjustments)
-    : adjustments_{adjustments} {}
+RiskFactorAdjustableModel::RiskFactorAdjustableModel(const BaselineAdjustment &risk_factor_expected)
+    : risk_factor_expected_{risk_factor_expected} {
 
-void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
+    if (risk_factor_expected_.values.empty()) {
+        throw core::HgpsException("Risk factor means mapping is empty");
+    }
+}
+
+void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) const {
+    // TODO: for ALL risk factors
+}
+
+void RiskFactorAdjustableModel::adjust_risk_factors(
+    RuntimeContext &context, const std::vector<core::Identifier> &names) const {
+    auto coefficients = get_adjustments(context);
+
     auto &pop = context.population();
-    auto coefficients = get_adjustment_coefficients(context);
-    std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &entity) {
-        if (!entity.is_active()) {
+    std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
+        if (!person.is_active()) {
             return;
         }
 
-        auto &table = coefficients.row(entity.gender);
+        auto &table = coefficients.row(person.gender);
         for (auto &factor : table) {
-            auto current_value = entity.get_risk_factor_value(factor.first);
-            auto adjustment = factor.second.at(entity.age);
-            entity.risk_factors.at(factor.first) = current_value + adjustment;
+            auto current_value = person.get_risk_factor_value(factor.first);
+            auto adjustment = factor.second.at(person.age);
+            person.risk_factors.at(factor.first) = current_value + adjustment;
         }
     });
 
     if (context.scenario().type() == ScenarioType::baseline) {
-        context.scenario().channel().send(std::make_unique<BaselineAdjustmentMessage>(
+        context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(coefficients)));
     }
 }
 
-FactorAdjustmentTable
-RiskfactorAdjustmentModel::get_adjustment_coefficients(RuntimeContext &context) const {
+SexAgeTable RiskFactorAdjustableModel::get_adjustments(RuntimeContext &context) const {
     if (context.scenario().type() == ScenarioType::baseline) {
-        return calculate_adjustment_coefficients(context);
+        return calculate_adjustments(context);
     }
 
     // Receive message with timeout
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
     if (!message.has_value()) {
-        throw std::runtime_error(
+        throw core::HgpsException(
             "Simulation out of sync, receive baseline adjustments message has timed out");
     }
 
     auto &basePtr = message.value();
-    auto *messagePrt = dynamic_cast<BaselineAdjustmentMessage *>(basePtr.get());
+    auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
     if (!messagePrt) {
-        throw std::runtime_error(
+        throw core::HgpsException(
             "Simulation out of sync, failed to receive a baseline adjustments message");
     }
 
     return messagePrt->data();
 }
 
-FactorAdjustmentTable
-RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &context) const {
+SexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
     auto coefficients = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
 
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range);
-    auto &baseline_means = adjustments_.get().values;
+    auto simulated_means = calculate_simulated_mean(context);
+    auto &baseline_means = risk_factor_expected_.values;
     for (auto &gender : simulated_means) {
         coefficients.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
@@ -129,18 +107,17 @@ RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &con
         }
     }
 
-    return FactorAdjustmentTable{std::move(coefficients)};
+    return SexAgeTable{std::move(coefficients)};
 }
 
-FactorAdjustmentTable
-RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
-                                                    const core::IntegerInterval &age_range) {
+SexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) const {
+    const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
     auto moments = std::map<core::Gender, std::map<core::Identifier, std::vector<FirstMoment>>>{};
 
     moments.emplace(core::Gender::male, std::map<core::Identifier, std::vector<FirstMoment>>{});
     moments.emplace(core::Gender::female, std::map<core::Identifier, std::vector<FirstMoment>>{});
-    for (const auto &entity : population) {
+    for (const auto &entity : context.population()) {
         if (!entity.is_active()) {
             continue;
         }
@@ -166,6 +143,7 @@ RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
         }
     }
 
-    return FactorAdjustmentTable{std::move(means)};
+    return SexAgeTable{std::move(means)};
 }
+
 } // namespace hgps

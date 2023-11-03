@@ -6,8 +6,7 @@
 #include "interfaces.h"
 #include "lms_definition.h"
 #include "modelinput.h"
-#include "riskfactor_adjustment_types.h"
-#include "riskfactor_model.h"
+#include "riskfactor_adjustment.h"
 #include <functional>
 #include <memory>
 #include <mutex>
