@@ -34,11 +34,6 @@ enum class RiskFactorModelType : uint8_t {
     Dynamic,
 };
 
-/// @brief Defines a map template with case insensitive string keys and type.
-/// @tparam T The map value data type
-template <typename T>
-using case_insensitive_map = std::map<std::string, T, core::case_insensitive::comparator>;
-
 /// @brief Simulation entity data structure
 struct Person;
 
