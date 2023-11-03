@@ -1,10 +1,10 @@
 #pragma once
 
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/identifier.h"
+
 #include <atomic>
 #include <map>
-
-#include "HealthGPS.Core/identifier.h"
-#include "interfaces.h"
 
 namespace hgps {
 

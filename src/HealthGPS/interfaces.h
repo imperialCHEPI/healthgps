@@ -3,16 +3,13 @@
 #include "HealthGPS.Core/forward_type.h"
 #include "HealthGPS.Core/identifier.h"
 
-namespace hgps {
+#include "person.h"
+#include "runtime_context.h"
 
-/// @brief Simulation entity data structure
-struct Person;
+namespace hgps {
 
 /// @brief Population age record data structure
 struct PopulationRecord;
-
-/// @brief Simulation run-time context for shared data and state.
-class RuntimeContext;
 
 /// @brief Health GPS risk factor module types enumeration
 enum class RiskFactorModelType : uint8_t {
