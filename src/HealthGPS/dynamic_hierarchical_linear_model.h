@@ -1,5 +1,7 @@
 #pragma once
 
+#include "HealthGPS.Core/identifier.h"
+
 #include "interfaces.h"
 #include "mapping.h"
 #include "random_algorithm.h"

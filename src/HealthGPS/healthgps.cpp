@@ -1,5 +1,6 @@
 #include "healthgps.h"
 #include "HealthGPS.Core/thread_util.h"
+#include "HealthGPS.Core/univariate_summary.h"
 #include "baseline_sync_message.h"
 #include "converter.h"
 #include "info_message.h"

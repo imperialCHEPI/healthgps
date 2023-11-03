@@ -1,11 +1,60 @@
 #pragma once
-#include "HealthGPS.Core/api.h"
-#include "randombit_generator.h"
 
-#include <map>
-#include <memory>
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/identifier.h"
 
 namespace hgps {
+
+/// @brief Simulation entity data structure
+struct Person;
+
+/// @brief Population age record data structure
+struct PopulationRecord;
+
+/// @brief Simulation run-time context for shared data and state.
+class RuntimeContext;
+
+/// @brief Health GPS risk factor module types enumeration
+enum class RiskFactorModelType : uint8_t {
+    /// @brief Static model
+    Static,
+
+    /// @brief Dynamic model
+    Dynamic,
+};
+
+/// @brief Risk factor model interface
+class RiskFactorModel {
+  public:
+    /// @brief Destroys a RiskFactorModel instance
+    virtual ~RiskFactorModel() = default;
+
+    /// @brief Gets the model type identifier
+    /// @return The module type identifier
+    virtual RiskFactorModelType type() const noexcept = 0;
+
+    /// @brief Gets the model name
+    /// @return The human-readable model name
+    virtual std::string name() const noexcept = 0;
+
+    /// @brief Generates the initial risk factors for a population and newborns
+    /// @param context The simulation run-time context
+    virtual void generate_risk_factors(RuntimeContext &context) = 0;
+
+    /// @brief Update risk factors for population
+    /// @param context The simulation run-time context
+    virtual void update_risk_factors(RuntimeContext &context) = 0;
+};
+
+/// @brief Risk factor model definition interface
+class RiskFactorModelDefinition {
+  public:
+    /// @brief Destroys a RiskFactorModelDefinition instance
+    virtual ~RiskFactorModelDefinition() = default;
+
+    /// @brief Creates a new risk factor model from this definition
+    virtual std::unique_ptr<RiskFactorModel> create_model() const = 0;
+};
 
 /// @brief Health GPS simulation modules types enumeration
 enum class SimulationModuleType : uint8_t {
@@ -24,24 +73,6 @@ enum class SimulationModuleType : uint8_t {
     /// @brief Statistical analysis module, e.g. BoD module
     Analysis,
 };
-
-/// @brief Health GPS risk factor module types enumeration
-enum class RiskFactorModelType : uint8_t {
-    /// @brief Static model
-    Static,
-
-    /// @brief Dynamic model
-    Dynamic,
-};
-
-/// @brief Simulation entity data structure
-struct Person;
-
-/// @brief Population age record data structure
-struct PopulationRecord;
-
-/// @brief Simulation run-time context for shared data and state.
-class RuntimeContext;
 
 /// @brief Simulation modules interface
 class SimulationModule {
@@ -126,39 +157,6 @@ class DemographicModule : public SimulationModule {
     /// @param disease_host The diseases host module instance
     virtual void update_population(RuntimeContext &context,
                                    const DiseaseHostModule &disease_host) = 0;
-};
-
-/// @brief Risk factor model interface
-class RiskFactorModel {
-  public:
-    /// @brief Destroys a RiskFactorModel instance
-    virtual ~RiskFactorModel() = default;
-
-    /// @brief Gets the model type identifier
-    /// @return The module type identifier
-    virtual RiskFactorModelType type() const noexcept = 0;
-
-    /// @brief Gets the model name
-    /// @return The human-readable model name
-    virtual std::string name() const noexcept = 0;
-
-    /// @brief Generates the initial risk factors for a population and newborns
-    /// @param context The simulation run-time context
-    virtual void generate_risk_factors(RuntimeContext &context) = 0;
-
-    /// @brief Update risk factors for population
-    /// @param context The simulation run-time context
-    virtual void update_risk_factors(RuntimeContext &context) = 0;
-};
-
-/// @brief Risk factor model definition interface
-class RiskFactorModelDefinition {
-  public:
-    /// @brief Destroys a RiskFactorModelDefinition instance
-    virtual ~RiskFactorModelDefinition() = default;
-
-    /// @brief Creates a new risk factor model from this definition
-    virtual std::unique_ptr<RiskFactorModel> create_model() const = 0;
 };
 
 /// @brief Diseases model interface
