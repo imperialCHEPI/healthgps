@@ -1,12 +1,20 @@
 #include "demographic.h"
 #include "HealthGPS.Core/thread_util.h"
-#include "baseline_sync_message.h"
 #include "converter.h"
+#include "sync_message.h"
 #include <algorithm>
 #include <cassert>
 #include <mutex>
 
+namespace { // anonymous namespace
+
+/// @brief Defines the residual mortality synchronisation message
+using ResidualMortalityMessage = hgps::SyncDataMessage<hgps::GenderTable<int, double>>;
+
+} // anonymous namespace
+
 namespace hgps {
+
 PopulationModule::PopulationModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
                                    LifeTable &&life_table)
     : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)} {
