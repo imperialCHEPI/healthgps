@@ -9,9 +9,8 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(const std::vector<LinearModelParams> &risk_factor_models,
                                      const BaselineAdjustment &risk_factor_means,
                                      const Eigen::MatrixXd &risk_factor_cholesky)
-    : risk_factor_models_{std::move(risk_factor_models)},
-      risk_factor_means_{std::move(risk_factor_means)},
-      risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
+    : risk_factor_models_{risk_factor_models}, risk_factor_means_{risk_factor_means},
+      risk_factor_cholesky_{risk_factor_cholesky} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
