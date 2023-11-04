@@ -27,9 +27,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
     MEASURE_FUNCTION();
     const auto male_filename = info.file_names.at("factorsmean_male").string();
     const auto female_filename = info.file_names.at("factorsmean_female").string();
-    auto data =
-        std::unordered_map<hgps::core::Gender,
-                           std::unordered_map<hgps::core::Identifier, std::vector<double>>>{};
+    auto data = hgps::RiskFactorSexAgeTable{};
 
     if (!hgps::core::case_insensitive::equals(info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
@@ -45,7 +43,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
                                                     male_filename, female_filename, ex.what())};
     }
 
-    return hgps::BaselineAdjustment{hgps::RiskFactorSexAgeTable{std::move(data)}};
+    return hgps::BaselineAdjustment{std::move(data)};
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -166,19 +164,17 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     const poco::BaselineInfo &baseline_info = config.modelling.baseline_adjustment;
     const std::string male_filename = baseline_info.file_names.at("factorsmean_male").string();
     const std::string female_filename = baseline_info.file_names.at("factorsmean_female").string();
-    auto data =
-        std::unordered_map<hgps::core::Gender,
-                           std::unordered_map<hgps::core::Identifier, std::vector<double>>>{};
+    auto risk_factor_means = hgps::RiskFactorSexAgeTable{};
 
     if (!hgps::core::case_insensitive::equals(baseline_info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + baseline_info.format};
     }
 
     try {
-        data.emplace(hgps::core::Gender::male,
-                     load_baseline_from_csv(male_filename, baseline_info.delimiter));
-        data.emplace(hgps::core::Gender::female,
-                     load_baseline_from_csv(female_filename, baseline_info.delimiter));
+        risk_factor_means.emplace(hgps::core::Gender::male,
+                                  load_baseline_from_csv(male_filename, baseline_info.delimiter));
+        risk_factor_means.emplace(hgps::core::Gender::female,
+                                  load_baseline_from_csv(female_filename, baseline_info.delimiter));
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
@@ -186,18 +182,15 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
 
     // Check means are defined for all risk factors.
     for (const hgps::LinearModelParams &model : risk_factor_models) {
-        if (!data.at(hgps::core::Gender::male).contains(model.name)) {
+        if (!risk_factor_means.at(hgps::core::Gender::male).contains(model.name)) {
             throw hgps::core::HgpsException{
                 fmt::format("'{}' not defined in male factor means.", model.name.to_string())};
         }
-        if (!data.at(hgps::core::Gender::female).contains(model.name)) {
+        if (!risk_factor_means.at(hgps::core::Gender::female).contains(model.name)) {
             throw hgps::core::HgpsException{
                 fmt::format("'{}' not defined in female factor means.", model.name.to_string())};
         }
     }
-
-    // Write data structures.
-    auto risk_factor_means = hgps::RiskFactorSexAgeTable{std::move(data)};
 
     // Check correlation matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
