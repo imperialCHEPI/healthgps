@@ -15,15 +15,14 @@ namespace hgps {
 using SexAgeTable = hgps::Map2d<hgps::core::Gender, hgps::core::Identifier, std::vector<double>>;
 
 /// @brief Defines the risk factor baseline adjustment data type
-struct RiskFactorAdjustmentTable final {
-    /// @brief Initialises a new instance of the RiskFactorAdjustmentTable structure
-    RiskFactorAdjustmentTable() = default;
+struct RiskFactorSexAgeTable final {
+    /// @brief Initialises a new instance of the RiskFactorSexAgeTable structure
+    RiskFactorSexAgeTable() = default;
 
-    /// @brief Initialises a new instance of the RiskFactorAdjustmentTable structure
+    /// @brief Initialises a new instance of the RiskFactorSexAgeTable structure
     /// @param adjustment_table The baseline adjustment table
     /// @throws HgpsException for empty adjustment table or table missing ga gender entry
-    RiskFactorAdjustmentTable(SexAgeTable &&adjustment_table)
-        : values{std::move(adjustment_table)} {
+    RiskFactorSexAgeTable(SexAgeTable &&adjustment_table) : values{std::move(adjustment_table)} {
 
         if (values.empty()) {
             throw core::HgpsException("The risk factors adjustment table must not be empty.");
@@ -48,11 +47,11 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModel instance
     /// @param risk_factor_expected The expected risk factor values by sex and age
-    RiskFactorAdjustableModel(const BaselineAdjustment &risk_factor_expected);
+    RiskFactorAdjustableModel(const SexAgeTable &risk_factor_expected);
 
     /// @brief Gets the expected risk factor values by sex and age
     /// @returns The expected risk factor values by sex and age
-    const BaselineAdjustment &get_risk_factor_expected() const noexcept;
+    const SexAgeTable &get_risk_factor_expected() const noexcept;
 
     /// @brief Adjust ALL risk factors such that mean simulated value matches expected value
     /// @param context The simulation run-time context
@@ -71,7 +70,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     SexAgeTable get_adjustments(RuntimeContext &context) const;
 
-    const BaselineAdjustment &risk_factor_expected_;
+    const SexAgeTable &risk_factor_expected_;
 };
 
 } // namespace hgps

@@ -28,15 +28,15 @@ struct FirstMoment {
 
 namespace hgps {
 
-RiskFactorAdjustableModel::RiskFactorAdjustableModel(const BaselineAdjustment &risk_factor_expected)
+RiskFactorAdjustableModel::RiskFactorAdjustableModel(const SexAgeTable &risk_factor_expected)
     : risk_factor_expected_{risk_factor_expected} {
 
-    if (risk_factor_expected_.values.empty()) {
-        throw core::HgpsException("Risk factor means mapping is empty");
+    if (risk_factor_expected_.empty()) {
+        throw core::HgpsException("Risk factor expected value mapping is empty");
     }
 }
 
-const BaselineAdjustment &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
+const SexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
     return risk_factor_expected_;
 }
 
@@ -93,25 +93,24 @@ SexAgeTable RiskFactorAdjustableModel::get_adjustments(RuntimeContext &context) 
 SexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
-    auto coefficients = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
+    auto adjustments = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
 
     auto simulated_means = calculate_simulated_mean(context);
-    auto &baseline_means = risk_factor_expected_.values;
     for (auto &gender : simulated_means) {
-        coefficients.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
+        adjustments.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
-            coefficients.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
+            adjustments.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                auto coeff_value =
-                    baseline_means.at(gender.first, factor.first).at(age) - factor.second.at(age);
-                if (!std::isnan(coeff_value)) {
-                    coefficients.at(gender.first).at(factor.first).at(age) = coeff_value;
+                auto adjust = risk_factor_expected_.at(gender.first, factor.first).at(age) -
+                              factor.second.at(age);
+                if (!std::isnan(adjust)) {
+                    adjustments.at(gender.first).at(factor.first).at(age) = adjust;
                 }
             }
         }
     }
 
-    return SexAgeTable{std::move(coefficients)};
+    return SexAgeTable{std::move(adjustments)};
 }
 
 SexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) const {
