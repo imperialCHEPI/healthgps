@@ -11,9 +11,6 @@
 
 #include <utility>
 
-// TODO: temp include while we port baseline adjustments
-#include "HealthGPS/riskfactor_adjustment.h"
-
 namespace host {
 
 /// @brief Loads baseline adjustments information from a file
