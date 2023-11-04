@@ -3,18 +3,19 @@
 #include "HealthGPS/gender_value.h"
 #include "HealthGPS/map2d.h"
 
-using IntegerMap2d = hgps::Map2d<int, int, int>;
-using TimeAgeMap2d = hgps::Map2d<int, int, hgps::DoubleGenderValue>;
+using IntegerMap2D = hgps::Map2D<int, int, int>;
+using TimeAgeMap2D = hgps::Map2D<int, int, hgps::DoubleGenderValue>;
 
 TEST(TestHealthGPS_Map2d, CreateEmpty) {
     using namespace hgps;
 
-    auto m = IntegerMap2d(std::map<int, std::map<int, int>>{});
+    auto m = IntegerMap2D(std::map<int, std::map<int, int>>{});
 
     ASSERT_TRUE(m.empty());
+    ASSERT_THROW(m.empty(1), std::out_of_range);
     ASSERT_EQ(0, m.rows());
-    ASSERT_EQ(0, m.columns());
     ASSERT_FALSE(m.contains(1));
+    ASSERT_THROW(m.contains(1, 1), std::out_of_range);
 }
 
 TEST(TestHealthGPS_Map2d, CreateWithBasicType) {
@@ -26,13 +27,14 @@ TEST(TestHealthGPS_Map2d, CreateWithBasicType) {
         {2022, {{1, 3}, {2, 7}, {3, 9}}},
     };
 
-    auto m = IntegerMap2d(std::move(data));
+    auto m = IntegerMap2D(std::move(data));
 
     ASSERT_FALSE(m.empty());
+    ASSERT_FALSE(m.empty(2019));
     ASSERT_EQ(4, m.rows());
-    ASSERT_EQ(3, m.columns());
-    ASSERT_EQ(12, m.size());
+    ASSERT_EQ(3, m.columns(2020));
     ASSERT_TRUE(m.contains(2021));
+    ASSERT_TRUE(m.contains(2022, 3));
 }
 
 TEST(TestHealthGPS_Map2d, CreateWithUserType) {
@@ -44,12 +46,12 @@ TEST(TestHealthGPS_Map2d, CreateWithUserType) {
         {2022, {{1, DoubleGenderValue{3, 6}}, {2, DoubleGenderValue{7, 21}}}},
     };
 
-    auto m = TimeAgeMap2d(std::move(data));
+    auto m = TimeAgeMap2D(std::move(data));
 
     ASSERT_FALSE(m.empty());
+    ASSERT_FALSE(m.empty(2019));
     ASSERT_EQ(4, m.rows());
-    ASSERT_EQ(2, m.columns());
-    ASSERT_EQ(8, m.size());
+    ASSERT_EQ(2, m.columns(2020));
     ASSERT_TRUE(m.contains(2021));
     ASSERT_TRUE(m.contains(2021, 2));
     ASSERT_EQ(2, m.at(2021, 1).males);
@@ -65,7 +67,7 @@ TEST(TestHealthGPS_Map2d, IterateOverRows) {
         {2022, {{1, DoubleGenderValue{3, 6}}, {2, DoubleGenderValue{7, 21}}}},
     };
 
-    auto m = TimeAgeMap2d(std::move(data));
+    auto m = TimeAgeMap2D(std::move(data));
     for (auto &row : m) {
 
         ASSERT_FALSE(row.second.empty());
@@ -82,8 +84,8 @@ TEST(TestHealthGPS_Map2d, AccessSingleRows) {
         {2022, {{1, DoubleGenderValue{3, 6}}, {2, DoubleGenderValue{7, 21}}}},
     };
 
-    auto m = TimeAgeMap2d(std::move(data));
-    auto r = m.row(2022);
+    auto m = TimeAgeMap2D(std::move(data));
+    auto r = m.at(2022);
 
     ASSERT_FALSE(r.empty());
     ASSERT_EQ(2, r.size());
@@ -102,9 +104,10 @@ TEST(TestHealthGPS_Map2d, AccessSingleCell) {
         {2022, {{1, DoubleGenderValue{3, 6}}, {2, DoubleGenderValue{7, 21}}}},
     };
 
-    auto m = TimeAgeMap2d(std::move(data));
+    auto m = TimeAgeMap2D(std::move(data));
     ASSERT_EQ(5, m.at(2019, 1).males);
     ASSERT_EQ(6, m.at(2022, 1).females);
     ASSERT_EQ(9, m.at(2020, 2).males);
     ASSERT_EQ(21, m.at(2022, 2).females);
+    ASSERT_THROW(m.at(2030, 1), std::out_of_range);
 }

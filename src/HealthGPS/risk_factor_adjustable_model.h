@@ -7,12 +7,14 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
+// TODO: replace BaselineAdjustment with one of these (BaselineAdjustment is a thin wrapper to one
+// of these with error checking -- which can be done in model_parser instead)
 #include "riskfactor_adjustment.h" // TODO: use new table class
 
 namespace hgps {
 
 /// @brief Defines a table type for double values by sex and age
-using SexAgeTable = hgps::Map2d<hgps::core::Gender, hgps::core::Identifier, std::vector<double>>;
+using SexAgeTable = hgps::Map2D<hgps::core::Gender, hgps::core::Identifier, std::vector<double>>;
 
 /// @brief Defines the risk factor baseline adjustment data type
 struct RiskFactorSexAgeTable final {

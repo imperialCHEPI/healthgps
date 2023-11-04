@@ -6,7 +6,7 @@
 namespace hgps {
 
 /// @brief Defines the risk factors adjustment table type
-using FactorAdjustmentTable = Map2d<core::Gender, core::Identifier, std::vector<double>>;
+using FactorAdjustmentTable = Map2D<core::Gender, core::Identifier, std::vector<double>>;
 
 /// @brief Defines the risk factor baseline adjustment data type
 struct BaselineAdjustment final {

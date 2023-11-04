@@ -70,7 +70,7 @@ void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
             return;
         }
 
-        auto &table = coefficients.row(entity.gender);
+        auto &table = coefficients.at(entity.gender);
         for (auto &factor : table) {
             auto current_value = entity.get_risk_factor_value(factor.first);
             auto adjustment = factor.second.at(entity.age);
@@ -137,9 +137,9 @@ RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
                                                     const core::IntegerInterval &age_range) {
     auto max_age = age_range.upper() + 1;
     auto moments = std::map<core::Gender, std::map<core::Identifier, std::vector<FirstMoment>>>{};
-
     moments.emplace(core::Gender::male, std::map<core::Identifier, std::vector<FirstMoment>>{});
     moments.emplace(core::Gender::female, std::map<core::Identifier, std::vector<FirstMoment>>{});
+
     for (const auto &entity : population) {
         if (!entity.is_active()) {
             continue;

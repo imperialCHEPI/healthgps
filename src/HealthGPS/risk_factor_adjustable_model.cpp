@@ -45,6 +45,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) con
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(
+    // TODO: names SHOULD BE A std::unordered_set FOR FASTER INCLUSION LOOKUP
+
     RuntimeContext &context, const std::vector<core::Identifier> &names) const {
     auto coefficients = get_adjustments(context);
 
@@ -54,7 +56,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
             return;
         }
 
-        auto &table = coefficients.row(person.gender);
+        auto &table = coefficients.at(person.gender);
         for (auto &factor : table) {
             auto current_value = person.get_risk_factor_value(factor.first);
             auto adjustment = factor.second.at(person.age);
