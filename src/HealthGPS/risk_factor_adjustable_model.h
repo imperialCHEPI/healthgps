@@ -7,10 +7,6 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
-// TODO: replace BaselineAdjustment with one of these (BaselineAdjustment is a thin wrapper to one
-// of these with error checking -- which can be done in model_parser instead)
-#include "riskfactor_adjustment.h" // TODO: use new table class
-
 namespace hgps {
 
 /// @brief Defines a table type for double values by sex and age
