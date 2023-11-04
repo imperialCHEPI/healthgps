@@ -14,7 +14,7 @@
 namespace hgps {
 
 /// @brief Defines a table type for double values by sex and age
-using SexAgeTable = hgps::Map2D<hgps::core::Gender, hgps::core::Identifier, std::vector<double>>;
+using SexAgeTable = OrderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
 
 /// @brief Defines the risk factor baseline adjustment data type
 struct RiskFactorSexAgeTable final {
