@@ -14,7 +14,7 @@
 namespace hgps {
 
 /// @brief Defines a table type for double values by sex and age
-using SexAgeTable = OrderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
+using SexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
 
 /// @brief Defines the risk factor baseline adjustment data type
 struct RiskFactorSexAgeTable final {
@@ -59,11 +59,14 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param context The simulation run-time context
     virtual void adjust_risk_factors(RuntimeContext &context) const;
 
-    /// @brief Adjust SOME risk factors such that mean simulated value matches expected value
-    /// @param context The simulation run-time context
-    /// @param names The list of risk factors to be adjusted
-    virtual void adjust_risk_factors(RuntimeContext &context,
-                                     const std::vector<core::Identifier> &names) const;
+    // TODO: for SOME risk factors
+    // TODO: names should be a std::unordered_set for faster inclusion check
+
+    // /// @brief Adjust SOME risk factors such that mean simulated value matches expected value
+    // /// @param context The simulation run-time context
+    // /// @param names The list of risk factors to be adjusted
+    // virtual void adjust_risk_factors(RuntimeContext &context,
+    //                                  const std::set<core::Identifier> &names) const;
 
   private:
     SexAgeTable calculate_simulated_mean(RuntimeContext &context) const;

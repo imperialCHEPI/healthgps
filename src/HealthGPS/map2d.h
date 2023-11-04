@@ -11,7 +11,7 @@ namespace hgps {
 /// @tparam TRow Rows date type
 /// @tparam TCol Columns data type
 /// @tparam TCell Cell value data type
-template <template <class, class> class TMap, class TRow, class TCol, class TCell> class Map2d {
+template <template <class...> class TMap, class TRow, class TCol, class TCell> class Map2d {
   public:
     /// @brief Initialises a new instance of the Map2d class.
     Map2d() = default;

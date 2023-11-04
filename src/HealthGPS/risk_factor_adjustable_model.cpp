@@ -41,14 +41,7 @@ const SexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected() const n
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) const {
-    // TODO: for ALL risk factors
-}
-
-void RiskFactorAdjustableModel::adjust_risk_factors(
-    // TODO: names SHOULD BE A std::unordered_set FOR FASTER INCLUSION LOOKUP
-
-    RuntimeContext &context, const std::vector<core::Identifier> &names) const {
-    auto coefficients = get_adjustments(context);
+    auto adjustments = get_adjustments(context);
 
     auto &pop = context.population();
     std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
@@ -56,7 +49,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
             return;
         }
 
-        auto &table = coefficients.at(person.gender);
+        auto &table = adjustments.at(person.gender);
         for (auto &factor : table) {
             auto current_value = person.get_risk_factor_value(factor.first);
             auto adjustment = factor.second.at(person.age);
@@ -66,7 +59,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
     if (context.scenario().type() == ScenarioType::baseline) {
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
-            context.current_run(), context.time_now(), std::move(coefficients)));
+            context.current_run(), context.time_now(), std::move(adjustments)));
     }
 }
 
@@ -95,11 +88,14 @@ SexAgeTable RiskFactorAdjustableModel::get_adjustments(RuntimeContext &context) 
 SexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
-    auto adjustments = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
+    auto adjustments =
+        std::unordered_map<core::Gender,
+                           std::unordered_map<core::Identifier, std::vector<double>>>{};
 
     auto simulated_means = calculate_simulated_mean(context);
     for (auto &gender : simulated_means) {
-        adjustments.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
+        adjustments.emplace(gender.first,
+                            std::unordered_map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
             adjustments.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
@@ -118,10 +114,14 @@ SexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &con
 SexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
-    auto moments = std::map<core::Gender, std::map<core::Identifier, std::vector<FirstMoment>>>{};
+    auto moments =
+        std::unordered_map<core::Gender,
+                           std::unordered_map<core::Identifier, std::vector<FirstMoment>>>{};
 
-    moments.emplace(core::Gender::male, std::map<core::Identifier, std::vector<FirstMoment>>{});
-    moments.emplace(core::Gender::female, std::map<core::Identifier, std::vector<FirstMoment>>{});
+    moments.emplace(core::Gender::male,
+                    std::unordered_map<core::Identifier, std::vector<FirstMoment>>{});
+    moments.emplace(core::Gender::female,
+                    std::unordered_map<core::Identifier, std::vector<FirstMoment>>{});
     for (const auto &entity : context.population()) {
         if (!entity.is_active()) {
             continue;
@@ -137,9 +137,10 @@ SexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &
         }
     }
 
-    auto means = std::map<core::Gender, std::map<core::Identifier, std::vector<double>>>{};
+    auto means = std::unordered_map<core::Gender,
+                                    std::unordered_map<core::Identifier, std::vector<double>>>{};
     for (auto &gender : moments) {
-        means.emplace(gender.first, std::map<core::Identifier, std::vector<double>>{});
+        means.emplace(gender.first, std::unordered_map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
             means.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
