@@ -7,7 +7,7 @@
 namespace { // anonymous namespace
 
 /// @brief Defines the baseline risk factors adjustment synchronisation message
-using RiskFactorAdjustmentMessage = hgps::SyncDataMessage<hgps::SexAgeTable>;
+using RiskFactorAdjustmentMessage = hgps::SyncDataMessage<hgps::FactorSexAgeTable>;
 
 /// @brief Defines the first statistical moment type
 struct FirstMoment {
@@ -28,7 +28,7 @@ struct FirstMoment {
 
 namespace hgps {
 
-RiskFactorAdjustableModel::RiskFactorAdjustableModel(const SexAgeTable &risk_factor_expected)
+RiskFactorAdjustableModel::RiskFactorAdjustableModel(const FactorSexAgeTable &risk_factor_expected)
     : risk_factor_expected_{risk_factor_expected} {
 
     if (risk_factor_expected_.empty()) {
@@ -36,7 +36,7 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(const SexAgeTable &risk_fac
     }
 }
 
-const SexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
+const FactorSexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
     return risk_factor_expected_;
 }
 
@@ -63,7 +63,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) con
     }
 }
 
-SexAgeTable RiskFactorAdjustableModel::get_adjustments(RuntimeContext &context) const {
+FactorSexAgeTable RiskFactorAdjustableModel::get_adjustments(RuntimeContext &context) const {
     if (context.scenario().type() == ScenarioType::baseline) {
         return calculate_adjustments(context);
     }
@@ -85,7 +85,7 @@ SexAgeTable RiskFactorAdjustableModel::get_adjustments(RuntimeContext &context) 
     return messagePrt->data();
 }
 
-SexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
+FactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
     auto adjustments =
@@ -108,10 +108,10 @@ SexAgeTable RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &con
         }
     }
 
-    return SexAgeTable{std::move(adjustments)};
+    return FactorSexAgeTable{std::move(adjustments)};
 }
 
-SexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) const {
+FactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
     auto moments =
@@ -149,7 +149,7 @@ SexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &
         }
     }
 
-    return SexAgeTable{std::move(means)};
+    return FactorSexAgeTable{std::move(means)};
 }
 
 } // namespace hgps

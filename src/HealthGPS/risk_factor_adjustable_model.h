@@ -10,7 +10,7 @@
 namespace hgps {
 
 /// @brief Defines a table type for double values by sex and age
-using SexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
+using FactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
 
 /// @brief Defines the risk factor baseline adjustment data type
 struct RiskFactorSexAgeTable final {
@@ -20,7 +20,8 @@ struct RiskFactorSexAgeTable final {
     /// @brief Initialises a new instance of the RiskFactorSexAgeTable structure
     /// @param adjustment_table The baseline adjustment table
     /// @throws HgpsException for empty adjustment table or table missing ga gender entry
-    RiskFactorSexAgeTable(SexAgeTable &&adjustment_table) : values{std::move(adjustment_table)} {
+    RiskFactorSexAgeTable(FactorSexAgeTable &&adjustment_table)
+        : values{std::move(adjustment_table)} {
 
         if (values.empty()) {
             throw core::HgpsException("The risk factors adjustment table must not be empty.");
@@ -37,7 +38,7 @@ struct RiskFactorSexAgeTable final {
     }
 
     /// @brief The risk factors adjustment table values
-    SexAgeTable values{};
+    FactorSexAgeTable values{};
 };
 
 /// @brief Risk factor model interface with mean adjustment by sex and age
@@ -45,11 +46,11 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModel instance
     /// @param risk_factor_expected The expected risk factor values by sex and age
-    RiskFactorAdjustableModel(const SexAgeTable &risk_factor_expected);
+    RiskFactorAdjustableModel(const FactorSexAgeTable &risk_factor_expected);
 
     /// @brief Gets the expected risk factor values by sex and age
     /// @returns The expected risk factor values by sex and age
-    const SexAgeTable &get_risk_factor_expected() const noexcept;
+    const FactorSexAgeTable &get_risk_factor_expected() const noexcept;
 
     /// @brief Adjust ALL risk factors such that mean simulated value matches expected value
     /// @param context The simulation run-time context
@@ -65,13 +66,13 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     //                                  const std::set<core::Identifier> &names) const;
 
   private:
-    SexAgeTable calculate_simulated_mean(RuntimeContext &context) const;
+    FactorSexAgeTable get_adjustments(RuntimeContext &context) const;
 
-    SexAgeTable calculate_adjustments(RuntimeContext &context) const;
+    FactorSexAgeTable calculate_adjustments(RuntimeContext &context) const;
 
-    SexAgeTable get_adjustments(RuntimeContext &context) const;
+    static FactorSexAgeTable calculate_simulated_mean(RuntimeContext &context);
 
-    const SexAgeTable &risk_factor_expected_;
+    const FactorSexAgeTable &risk_factor_expected_;
 };
 
 } // namespace hgps
