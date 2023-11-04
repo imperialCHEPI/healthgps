@@ -45,7 +45,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
                                                     male_filename, female_filename, ex.what())};
     }
 
-    return hgps::BaselineAdjustment{hgps::FactorSexAgeTable{std::move(data)}};
+    return hgps::BaselineAdjustment{hgps::RiskFactorSexAgeTable{std::move(data)}};
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -197,7 +197,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Write data structures.
-    auto risk_factor_means_table = hgps::FactorSexAgeTable{std::move(data)};
+    auto risk_factor_means_table = hgps::RiskFactorSexAgeTable{std::move(data)};
     auto risk_factor_means = hgps::BaselineAdjustment{std::move(risk_factor_means_table)};
 
     // Check correlation matrix column count matches risk factor count.

@@ -8,7 +8,7 @@
 namespace { // anonymous namespace
 
 /// @brief Defines the baseline risk factors adjustment synchronisation message
-using BaselineAdjustmentMessage = hgps::SyncDataMessage<hgps::FactorSexAgeTable>;
+using BaselineAdjustmentMessage = hgps::SyncDataMessage<hgps::RiskFactorSexAgeTable>;
 
 /// @brief Defines the first statistical moment type
 struct FirstMoment {
@@ -84,7 +84,7 @@ void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
     }
 }
 
-FactorSexAgeTable
+RiskFactorSexAgeTable
 RiskfactorAdjustmentModel::get_adjustment_coefficients(RuntimeContext &context) const {
     if (context.scenario().type() == ScenarioType::baseline) {
         return calculate_adjustment_coefficients(context);
@@ -107,7 +107,7 @@ RiskfactorAdjustmentModel::get_adjustment_coefficients(RuntimeContext &context) 
     return messagePrt->data();
 }
 
-FactorSexAgeTable
+RiskFactorSexAgeTable
 RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
@@ -132,10 +132,10 @@ RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &con
         }
     }
 
-    return FactorSexAgeTable{std::move(coefficients)};
+    return RiskFactorSexAgeTable{std::move(coefficients)};
 }
 
-FactorSexAgeTable
+RiskFactorSexAgeTable
 RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
                                                     const core::IntegerInterval &age_range) {
     auto max_age = age_range.upper() + 1;
@@ -174,7 +174,7 @@ RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
         }
     }
 
-    return FactorSexAgeTable{std::move(means)};
+    return RiskFactorSexAgeTable{std::move(means)};
 }
 
 } // namespace hgps

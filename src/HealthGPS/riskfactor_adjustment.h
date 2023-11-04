@@ -15,7 +15,8 @@ struct BaselineAdjustment final {
     /// @brief Initialises a new instance of the BaselineAdjustment structure
     /// @param adjustment_table The baseline adjustment table
     /// @throws std::invalid_argument for empty adjustment table or table missing a gender entry
-    BaselineAdjustment(FactorSexAgeTable &&adjustment_table) : values{std::move(adjustment_table)} {
+    BaselineAdjustment(RiskFactorSexAgeTable &&adjustment_table)
+        : values{std::move(adjustment_table)} {
 
         if (values.empty()) {
             throw std::invalid_argument("The risk factors adjustment table must not be empty.");
@@ -32,7 +33,7 @@ struct BaselineAdjustment final {
     }
 
     /// @brief The risk factors adjustment table values
-    FactorSexAgeTable values{};
+    RiskFactorSexAgeTable values{};
 };
 
 /// @brief Defines the baseline risk factors adjustment model.
@@ -52,11 +53,11 @@ class RiskfactorAdjustmentModel {
   private:
     std::reference_wrapper<BaselineAdjustment> adjustments_;
 
-    static FactorSexAgeTable calculate_simulated_mean(Population &population,
-                                                      const core::IntegerInterval &age_range);
+    static RiskFactorSexAgeTable calculate_simulated_mean(Population &population,
+                                                          const core::IntegerInterval &age_range);
 
-    FactorSexAgeTable calculate_adjustment_coefficients(RuntimeContext &context) const;
+    RiskFactorSexAgeTable calculate_adjustment_coefficients(RuntimeContext &context) const;
 
-    FactorSexAgeTable get_adjustment_coefficients(RuntimeContext &context) const;
+    RiskFactorSexAgeTable get_adjustment_coefficients(RuntimeContext &context) const;
 };
 } // namespace hgps
