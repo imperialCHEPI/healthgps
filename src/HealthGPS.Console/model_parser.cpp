@@ -197,8 +197,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Write data structures.
-    auto risk_factor_means_table = hgps::RiskFactorSexAgeTable{std::move(data)};
-    auto risk_factor_means = hgps::BaselineAdjustment{std::move(risk_factor_means_table)};
+    auto risk_factor_means = hgps::RiskFactorSexAgeTable{std::move(data)};
 
     // Check correlation matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {

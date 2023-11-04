@@ -2,7 +2,7 @@
 
 #include "interfaces.h"
 #include "mapping.h"
-#include "riskfactor_adjustment.h"
+#include "risk_factor_adjustable_model.h"
 
 #include <Eigen/Dense>
 
@@ -26,7 +26,7 @@ class StaticLinearModel final : public RiskFactorModel {
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(const std::vector<LinearModelParams> &risk_factor_models,
-                      const BaselineAdjustment &risk_factor_means,
+                      const RiskFactorSexAgeTable &risk_factor_means,
                       const Eigen::MatrixXd &risk_factor_cholesky);
 
     RiskFactorModelType type() const noexcept override;
@@ -43,7 +43,7 @@ class StaticLinearModel final : public RiskFactorModel {
 
   private:
     const std::vector<LinearModelParams> &risk_factor_models_;
-    const BaselineAdjustment &risk_factor_means_;
+    const RiskFactorSexAgeTable &risk_factor_means_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
 };
 
@@ -56,7 +56,7 @@ class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(std::vector<LinearModelParams> risk_factor_models,
-                                BaselineAdjustment risk_factor_means,
+                                RiskFactorSexAgeTable risk_factor_means,
                                 Eigen::MatrixXd risk_factor_cholesky);
 
     /// @brief Construct a new StaticLinearModel from this definition
@@ -65,7 +65,7 @@ class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
 
   private:
     std::vector<LinearModelParams> risk_factor_models_;
-    BaselineAdjustment risk_factor_means_;
+    RiskFactorSexAgeTable risk_factor_means_;
     Eigen::MatrixXd risk_factor_cholesky_;
 };
 
