@@ -19,7 +19,7 @@ hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info);
 /// @param filename The baseline adjustment file full path
 /// @param delimiter The data file's columns delimiter character
 /// @return The fully populated table
-std::map<hgps::core::Identifier, std::vector<double>>
+std::unordered_map<hgps::core::Identifier, std::vector<double>>
 load_baseline_from_csv(const std::string &filename, const std::string &delimiter = ",");
 
 } // namespace host

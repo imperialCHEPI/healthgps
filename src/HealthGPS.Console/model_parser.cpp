@@ -28,7 +28,8 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
     const auto male_filename = info.file_names.at("factorsmean_male").string();
     const auto female_filename = info.file_names.at("factorsmean_female").string();
     auto data =
-        std::map<hgps::core::Gender, std::map<hgps::core::Identifier, std::vector<double>>>{};
+        std::unordered_map<hgps::core::Gender,
+                           std::unordered_map<hgps::core::Identifier, std::vector<double>>>{};
 
     if (!hgps::core::case_insensitive::equals(info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
@@ -44,7 +45,7 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
                                                     male_filename, female_filename, ex.what())};
     }
 
-    return hgps::BaselineAdjustment{hgps::FactorAdjustmentTable{std::move(data)}};
+    return hgps::BaselineAdjustment{hgps::FactorSexAgeTable{std::move(data)}};
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -166,7 +167,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     const std::string male_filename = baseline_info.file_names.at("factorsmean_male").string();
     const std::string female_filename = baseline_info.file_names.at("factorsmean_female").string();
     auto data =
-        std::map<hgps::core::Gender, std::map<hgps::core::Identifier, std::vector<double>>>{};
+        std::unordered_map<hgps::core::Gender,
+                           std::unordered_map<hgps::core::Identifier, std::vector<double>>>{};
 
     if (!hgps::core::case_insensitive::equals(baseline_info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + baseline_info.format};
@@ -195,7 +197,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Write data structures.
-    auto risk_factor_means_table = hgps::FactorAdjustmentTable{std::move(data)};
+    auto risk_factor_means_table = hgps::FactorSexAgeTable{std::move(data)};
     auto risk_factor_means = hgps::BaselineAdjustment{std::move(risk_factor_means_table)};
 
     // Check correlation matrix column count matches risk factor count.

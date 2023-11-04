@@ -2,7 +2,7 @@
 
 #include "HealthGPS/dynamic_hierarchical_linear_model.h"
 #include "HealthGPS/kevin_hall_model.h"
-#include "HealthGPS/riskfactor_adjustment.h"
+#include "HealthGPS/risk_factor_adjustable_model.h"
 #include "HealthGPS/static_hierarchical_linear_model.h"
 #include "HealthGPS/static_linear_model.h"
 
@@ -10,6 +10,9 @@
 #include "jsonparser.h"
 
 #include <utility>
+
+// TODO: temp include while we port baseline adjustments
+#include "HealthGPS/riskfactor_adjustment.h"
 
 namespace host {
 

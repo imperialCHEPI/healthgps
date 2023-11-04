@@ -3,10 +3,9 @@
 #include "map2d.h"
 #include "runtime_context.h"
 
-namespace hgps {
+#include "risk_factor_adjustable_model.h"
 
-/// @brief Defines the risk factors adjustment table type
-using FactorAdjustmentTable = OrderedMap2d<core::Gender, core::Identifier, std::vector<double>>;
+namespace hgps {
 
 /// @brief Defines the risk factor baseline adjustment data type
 struct BaselineAdjustment final {
@@ -16,8 +15,8 @@ struct BaselineAdjustment final {
     /// @brief Initialises a new instance of the BaselineAdjustment structure
     /// @param adjustment_table The baseline adjustment table
     /// @throws std::invalid_argument for empty adjustment table or table missing a gender entry
-    BaselineAdjustment(FactorAdjustmentTable &&adjustment_table)
-        : values{std::move(adjustment_table)} {
+    BaselineAdjustment(FactorSexAgeTable &&adjustment_table) : values{std::move(adjustment_table)} {
+
         if (values.empty()) {
             throw std::invalid_argument("The risk factors adjustment table must not be empty.");
         } else if (values.rows() != 2) {
@@ -33,7 +32,7 @@ struct BaselineAdjustment final {
     }
 
     /// @brief The risk factors adjustment table values
-    FactorAdjustmentTable values{};
+    FactorSexAgeTable values{};
 };
 
 /// @brief Defines the baseline risk factors adjustment model.
@@ -53,11 +52,11 @@ class RiskfactorAdjustmentModel {
   private:
     std::reference_wrapper<BaselineAdjustment> adjustments_;
 
-    static FactorAdjustmentTable calculate_simulated_mean(Population &population,
-                                                          const core::IntegerInterval &age_range);
+    static FactorSexAgeTable calculate_simulated_mean(Population &population,
+                                                      const core::IntegerInterval &age_range);
 
-    FactorAdjustmentTable calculate_adjustment_coefficients(RuntimeContext &context) const;
+    FactorSexAgeTable calculate_adjustment_coefficients(RuntimeContext &context) const;
 
-    FactorAdjustmentTable get_adjustment_coefficients(RuntimeContext &context) const;
+    FactorSexAgeTable get_adjustment_coefficients(RuntimeContext &context) const;
 };
 } // namespace hgps

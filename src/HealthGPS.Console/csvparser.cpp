@@ -152,11 +152,11 @@ hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info) {
     return out_table;
 }
 
-std::map<hgps::core::Identifier, std::vector<double>>
+std::unordered_map<hgps::core::Identifier, std::vector<double>>
 load_baseline_from_csv(const std::string &filename, const std::string &delimiter) {
     using namespace rapidcsv;
 
-    auto data = std::map<std::string, std::vector<double>>{};
+    auto data = std::unordered_map<std::string, std::vector<double>>{};
     auto doc = Document{filename, LabelParams{}, SeparatorParams(delimiter.front())};
     auto column_names = doc.GetColumnNames();
     auto column_count = column_names.size();
@@ -186,7 +186,7 @@ load_baseline_from_csv(const std::string &filename, const std::string &delimiter
         col.second.shrink_to_fit();
     }
 
-    auto result = std::map<hc::Identifier, std::vector<double>>{};
+    auto result = std::unordered_map<hc::Identifier, std::vector<double>>{};
     for (const auto &col : data) {
         result.emplace(hc::Identifier{col.first}, col.second);
     }
