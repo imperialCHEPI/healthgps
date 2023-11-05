@@ -70,17 +70,20 @@ template <template <class...> class TMap, class TRow, class TCol, class TCell> c
     /// @throws std::out_of_range for invalid row identifier
     std::size_t columns(const TRow &row_key) const { return table_.at(row_key).size(); }
 
-    /// @brief Determines whether the container contains a row
+    /// @brief Determines whether the map contains a row
     /// @param row_key The row identifier
-    /// @return true, if the contains the row; otherwise, false
+    /// @return true if the map contains the row; otherwise false
     /// @throws std::out_of_range for invalid row identifier
     bool contains(const TRow &row_key) const noexcept { return table_.contains(row_key); }
 
-    /// @brief Determines whether the container contains a value
+    /// @brief Determines whether the map contains a value
     /// @param row_key The row identifier
     /// @param col_key The column identifier
-    /// @return true, if the contains the row; otherwise, false
+    /// @return true if the map contains the value; otherwise false
     bool contains(const TRow &row_key, const TCol &col_key) const {
+        if (!table_.contains(row_key)) {
+            return false;
+        }
         return table_.at(row_key).contains(col_key);
     }
 
