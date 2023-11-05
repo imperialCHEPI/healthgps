@@ -63,24 +63,23 @@ RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(RiskFactorSexAgeTable &risk
     : risk_factor_expected_{risk_factor_expected} {}
 
 void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
+    RiskFactorSexAgeTable adjustments = get_adjustments(context);
+
     auto &pop = context.population();
-    auto coefficients = get_adjustments(context);
-    std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &entity) {
-        if (!entity.is_active()) {
+    std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
+        if (!person.is_active()) {
             return;
         }
 
-        auto &table = coefficients.at(entity.gender);
-        for (auto &factor : table) {
-            auto current_value = entity.get_risk_factor_value(factor.first);
-            auto adjustment = factor.second.at(entity.age);
-            entity.risk_factors.at(factor.first) = current_value + adjustment;
+        for (auto &factor : adjustments.at(person.gender)) {
+            const double delta = factor.second.at(person.age);
+            person.risk_factors.at(factor.first) += delta;
         }
     });
 
     if (context.scenario().type() == ScenarioType::baseline) {
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
-            context.current_run(), context.time_now(), std::move(coefficients)));
+            context.current_run(), context.time_now(), std::move(adjustments)));
     }
 }
 
@@ -92,14 +91,14 @@ RiskFactorSexAgeTable RiskfactorAdjustmentModel::get_adjustments(RuntimeContext 
     // Receive message with timeout
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
     if (!message.has_value()) {
-        throw std::runtime_error(
+        throw core::HgpsException(
             "Simulation out of sync, receive baseline adjustments message has timed out");
     }
 
     auto &basePtr = message.value();
     auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
     if (!messagePrt) {
-        throw std::runtime_error(
+        throw core::HgpsException(
             "Simulation out of sync, failed to receive a baseline adjustments message");
     }
 

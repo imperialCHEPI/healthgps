@@ -41,8 +41,9 @@ const RiskFactorSexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected
     return risk_factor_expected_;
 }
 
-void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) const {
-    auto adjustments = get_adjustments(context);
+void RiskFactorAdjustableModel::adjust_risk_factors(
+    RuntimeContext &context, const std::unordered_set<core::Identifier> &risk_factor_names) const {
+    RiskFactorSexAgeTable adjustments = get_adjustments(context);
 
     auto &pop = context.population();
     std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
@@ -50,11 +51,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context) con
             return;
         }
 
-        auto &table = adjustments.at(person.gender);
-        for (auto &factor : table) {
-            auto current_value = person.get_risk_factor_value(factor.first);
-            auto adjustment = factor.second.at(person.age);
-            person.risk_factors.at(factor.first) = current_value + adjustment;
+        for (auto &factor_key : risk_factor_names) {
+            const double delta = adjustments.at(person.gender, factor_key).at(person.age);
+            person.risk_factors.at(factor_key) += delta;
         }
     });
 
