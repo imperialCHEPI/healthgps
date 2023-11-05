@@ -59,12 +59,12 @@ struct FirstMoment {
 
 namespace hgps {
 
-RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(BaselineAdjustment &adjustments)
-    : adjustments_{adjustments} {}
+RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(BaselineAdjustment &risk_factor_expected)
+    : risk_factor_expected_{risk_factor_expected} {}
 
 void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
     auto &pop = context.population();
-    auto coefficients = get_adjustment_coefficients(context);
+    auto coefficients = get_adjustments(context);
     std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &entity) {
         if (!entity.is_active()) {
             return;
@@ -84,10 +84,9 @@ void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
     }
 }
 
-RiskFactorSexAgeTable
-RiskfactorAdjustmentModel::get_adjustment_coefficients(RuntimeContext &context) const {
+RiskFactorSexAgeTable RiskfactorAdjustmentModel::get_adjustments(RuntimeContext &context) const {
     if (context.scenario().type() == ScenarioType::baseline) {
-        return calculate_adjustment_coefficients(context);
+        return calculate_adjustments(context);
     }
 
     // Receive message with timeout
@@ -108,31 +107,31 @@ RiskfactorAdjustmentModel::get_adjustment_coefficients(RuntimeContext &context) 
 }
 
 RiskFactorSexAgeTable
-RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &context) const {
+RiskfactorAdjustmentModel::calculate_adjustments(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
-    auto coefficients =
-        std::unordered_map<core::Gender,
-                           std::unordered_map<core::Identifier, std::vector<double>>>{};
 
+    // Compute simulated means.
     auto simulated_means = calculate_simulated_mean(context);
-    auto &baseline_means = adjustments_.get().values;
+    auto &baseline_means = risk_factor_expected_.get().values;
+
+    // Compute adjustments.
+    auto adjustments = RiskFactorSexAgeTable{};
     for (auto &gender : simulated_means) {
-        coefficients.emplace(gender.first,
-                             std::unordered_map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
-            coefficients.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
+            adjustments.emplace(gender.first, factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                auto coeff_value =
-                    baseline_means.at(gender.first, factor.first).at(age) - factor.second.at(age);
-                if (!std::isnan(coeff_value)) {
-                    coefficients.at(gender.first).at(factor.first).at(age) = coeff_value;
+                const double expected = baseline_means.at(gender.first, factor.first).at(age);
+                const double simulated = factor.second.at(age);
+                const double delta = expected - simulated;
+                if (!std::isnan(delta)) {
+                    adjustments.at(gender.first, factor.first).at(age) = delta;
                 }
             }
         }
     }
 
-    return RiskFactorSexAgeTable{std::move(coefficients)};
+    return adjustments;
 }
 
 RiskFactorSexAgeTable RiskfactorAdjustmentModel::calculate_simulated_mean(RuntimeContext &context) {

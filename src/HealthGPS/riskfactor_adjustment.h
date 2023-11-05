@@ -41,8 +41,8 @@ class RiskfactorAdjustmentModel {
   public:
     RiskfactorAdjustmentModel() = delete;
     /// @brief Initialises a new instance of the BaselineAdjustment class
-    /// @param adjustments The baseline adjustment definition
-    RiskfactorAdjustmentModel(BaselineAdjustment &adjustments);
+    /// @param risk_factor_expected The expected risk factor values
+    RiskfactorAdjustmentModel(BaselineAdjustment &risk_factor_expected);
 
     /// @brief Applies the baseline adjustments to the population risk factor values
     /// @param context The simulation shared runtime context instance
@@ -51,12 +51,13 @@ class RiskfactorAdjustmentModel {
     void Apply(RuntimeContext &context);
 
   private:
-    RiskFactorSexAgeTable get_adjustment_coefficients(RuntimeContext &context) const;
+    RiskFactorSexAgeTable get_adjustments(RuntimeContext &context) const;
 
-    RiskFactorSexAgeTable calculate_adjustment_coefficients(RuntimeContext &context) const;
+    RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context) const;
 
     static RiskFactorSexAgeTable calculate_simulated_mean(RuntimeContext &context);
 
-    std::reference_wrapper<BaselineAdjustment> adjustments_;
+    std::reference_wrapper<BaselineAdjustment> risk_factor_expected_;
 };
+
 } // namespace hgps

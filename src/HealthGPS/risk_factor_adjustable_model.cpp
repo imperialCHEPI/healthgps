@@ -90,27 +90,28 @@ RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
-    auto adjustments =
-        std::unordered_map<core::Gender,
-                           std::unordered_map<core::Identifier, std::vector<double>>>{};
 
+    // Compute simulated means.
     auto simulated_means = calculate_simulated_mean(context);
+
+    // Compute adjustments.
+    auto adjustments = RiskFactorSexAgeTable{};
     for (auto &gender : simulated_means) {
-        adjustments.emplace(gender.first,
-                            std::unordered_map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
-            adjustments.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
+            adjustments.emplace(gender.first, factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                auto adjust = risk_factor_expected_.at(gender.first, factor.first).at(age) -
-                              factor.second.at(age);
-                if (!std::isnan(adjust)) {
-                    adjustments.at(gender.first).at(factor.first).at(age) = adjust;
+                const double expected =
+                    risk_factor_expected_.at(gender.first, factor.first).at(age);
+                const double simulated = factor.second.at(age);
+                const double delta = expected - simulated;
+                if (!std::isnan(delta)) {
+                    adjustments.at(gender.first, factor.first).at(age) = delta;
                 }
             }
         }
     }
 
-    return RiskFactorSexAgeTable{std::move(adjustments)};
+    return adjustments;
 }
 
 RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) {
