@@ -7,8 +7,8 @@
 
 namespace { // anonymous namespace
 
-/// @brief Defines the baseline risk factors adjustment synchronisation message
-using BaselineAdjustmentMessage = hgps::SyncDataMessage<hgps::RiskFactorSexAgeTable>;
+/// @brief Defines the risk factors adjustment synchronisation message
+using RiskFactorAdjustmentMessage = hgps::SyncDataMessage<hgps::RiskFactorSexAgeTable>;
 
 /// @brief Defines the first statistical moment type
 struct FirstMoment {
@@ -79,7 +79,7 @@ void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
     });
 
     if (context.scenario().type() == ScenarioType::baseline) {
-        context.scenario().channel().send(std::make_unique<BaselineAdjustmentMessage>(
+        context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(coefficients)));
     }
 }
@@ -97,7 +97,7 @@ RiskFactorSexAgeTable RiskfactorAdjustmentModel::get_adjustments(RuntimeContext 
     }
 
     auto &basePtr = message.value();
-    auto *messagePrt = dynamic_cast<BaselineAdjustmentMessage *>(basePtr.get());
+    auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
     if (!messagePrt) {
         throw std::runtime_error(
             "Simulation out of sync, failed to receive a baseline adjustments message");

@@ -6,7 +6,7 @@
 
 namespace { // anonymous namespace
 
-/// @brief Defines the baseline risk factors adjustment synchronisation message
+/// @brief Defines the risk factors adjustment synchronisation message
 using RiskFactorAdjustmentMessage = hgps::SyncDataMessage<hgps::RiskFactorSexAgeTable>;
 
 /// @brief Defines the first statistical moment type
