@@ -89,8 +89,6 @@ target_sources(
             "risk_factor_model.h"
             "risk_factor_adjustable_model.h"
             "risk_factor_adjustable_model.cpp"
-            "riskfactor_adjustment.cpp"
-            "riskfactor_adjustment.h"
             "runner_message.cpp"
             "runner_message.h"
             "runtime_context.cpp"

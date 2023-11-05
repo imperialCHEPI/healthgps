@@ -19,23 +19,12 @@ void CachedRepository::register_risk_factor_model_definition(
     rf_model_definition_.emplace(model_type, std::move(definition));
 }
 
-void CachedRepository::register_risk_factor_expected_values(
-    RiskFactorSexAgeTable risk_factor_expected) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    risk_factor_expected_ = std::move(risk_factor_expected);
-}
-
 core::Datastore &CachedRepository::manager() noexcept { return data_manager_; }
 
 const RiskFactorModelDefinition &
 CachedRepository::get_risk_factor_model_definition(const RiskFactorModelType &model_type) const {
     std::scoped_lock<std::mutex> lock(mutex_);
     return *rf_model_definition_.at(model_type);
-}
-
-RiskFactorSexAgeTable &CachedRepository::get_risk_factor_expected_values() {
-    std::scoped_lock<std::mutex> lock(mutex_);
-    return risk_factor_expected_;
 }
 
 const std::vector<core::DiseaseInfo> &CachedRepository::get_diseases() {

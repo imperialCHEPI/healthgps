@@ -85,10 +85,6 @@ class RiskFactorHostModule : public UpdatableModule {
     /// @param modelType The model type identifier
     /// @return true if the model is found, otherwise false.
     virtual bool contains(const RiskFactorModelType &modelType) const noexcept = 0;
-
-    /// @brief Apply baseline risk factor adjustments to population
-    /// @param context The simulation run-time context
-    virtual void apply_baseline_adjustments(RuntimeContext &context) = 0;
 };
 
 /// @brief Define the population record data type for the demographic dataset

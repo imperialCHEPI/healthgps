@@ -23,16 +23,17 @@
 
 namespace host {
 
-hgps::RiskFactorSexAgeTable load_baseline_adjustments(const poco::BaselineInfo &info) {
+hgps::RiskFactorSexAgeTable load_risk_factor_expected(const host::Configuration &config) {
     MEASURE_FUNCTION();
-    const auto male_filename = info.file_names.at("factorsmean_male").string();
-    const auto female_filename = info.file_names.at("factorsmean_female").string();
-    auto table = hgps::RiskFactorSexAgeTable{};
 
+    const auto &info = config.modelling.baseline_adjustment;
     if (!hgps::core::case_insensitive::equals(info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
     }
 
+    auto table = hgps::RiskFactorSexAgeTable{};
+    const auto male_filename = info.file_names.at("factorsmean_male").string();
+    const auto female_filename = info.file_names.at("factorsmean_female").string();
     try {
         table.emplace_row(hgps::core::Gender::male,
                           load_baseline_from_csv(male_filename, info.delimiter));
@@ -41,6 +42,17 @@ hgps::RiskFactorSexAgeTable load_baseline_adjustments(const poco::BaselineInfo &
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
+    }
+
+    const auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
+    for (const auto &sex : table) {
+        for (const auto &factor : sex.second) {
+            if (factor.second.size() <= max_age) {
+                throw hgps::core::HgpsException{
+                    fmt::format("Baseline adjustment file must cover the required age range: [{}].",
+                                config.settings.age_range.to_string())};
+            }
+        }
     }
 
     return table;
@@ -161,26 +173,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Risk factor mean values by sex and age.
-    const poco::BaselineInfo &baseline_info = config.modelling.baseline_adjustment;
-    const std::string male_filename = baseline_info.file_names.at("factorsmean_male").string();
-    const std::string female_filename = baseline_info.file_names.at("factorsmean_female").string();
-    auto risk_factor_means = hgps::RiskFactorSexAgeTable{};
-
-    if (!hgps::core::case_insensitive::equals(baseline_info.format, "CSV")) {
-        throw hgps::core::HgpsException{"Unsupported file format: " + baseline_info.format};
-    }
-
-    try {
-        risk_factor_means.emplace_row(
-            hgps::core::Gender::male,
-            load_baseline_from_csv(male_filename, baseline_info.delimiter));
-        risk_factor_means.emplace_row(
-            hgps::core::Gender::female,
-            load_baseline_from_csv(female_filename, baseline_info.delimiter));
-    } catch (const std::runtime_error &ex) {
-        throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
-                                                    male_filename, female_filename, ex.what())};
-    }
+    hgps::RiskFactorSexAgeTable risk_factor_means = load_risk_factor_expected(config);
 
     // Check means are defined for all risk factors.
     for (const hgps::LinearModelParams &model : risk_factor_models) {
@@ -421,20 +414,6 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
-
-    auto adjustment = load_baseline_adjustments(config.modelling.baseline_adjustment);
-    auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
-    for (const auto &table : adjustment) {
-        for (const auto &item : table.second) {
-            if (item.second.size() <= max_age) {
-                throw hgps::core::HgpsException{
-                    fmt::format("Baseline adjustment file must cover the required age range: [{}].",
-                                config.settings.age_range.to_string())};
-            }
-        }
-    }
-
-    repository.register_risk_factor_expected_values(std::move(adjustment));
 }
 
 } // namespace host

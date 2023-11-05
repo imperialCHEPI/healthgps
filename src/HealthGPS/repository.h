@@ -23,6 +23,7 @@ class Repository {
     Repository(const Repository &) = delete;
     Repository &operator=(Repository &&) = delete;
     Repository &operator=(const Repository &) = delete;
+
     /// @brief Destroys a Repository instance
     virtual ~Repository() = default;
 
@@ -35,10 +36,6 @@ class Repository {
     /// @return The risk factor model definition
     virtual const RiskFactorModelDefinition &
     get_risk_factor_model_definition(const RiskFactorModelType &model_type) const = 0;
-
-    /// @brief Gets the user provided risk factor expected values dataset
-    /// @return The risk factor expweected values dataset
-    virtual RiskFactorSexAgeTable &get_risk_factor_expected_values() = 0;
 
     /// @brief Gets the collection of all diseases available in the back-end storage
     /// @return Collection of diseases information
@@ -81,18 +78,10 @@ class CachedRepository final : public Repository {
     register_risk_factor_model_definition(const RiskFactorModelType &model_type,
                                           std::unique_ptr<RiskFactorModelDefinition> definition);
 
-    /// @brief Register a user provided risk factor expected values dataset
-    /// @param risk_factor_expected The risk factors expected values dataset
-    void register_risk_factor_expected_values(RiskFactorSexAgeTable risk_factor_expected);
-
     core::Datastore &manager() noexcept override;
 
     const RiskFactorModelDefinition &
     get_risk_factor_model_definition(const RiskFactorModelType &model_type) const override;
-
-    /// @brief Gets the user provided risk factor expected values dataset
-    /// @return The risk factor expweected values dataset
-    RiskFactorSexAgeTable &get_risk_factor_expected_values() override;
 
     const std::vector<core::DiseaseInfo> &get_diseases() override;
 
@@ -109,7 +98,6 @@ class CachedRepository final : public Repository {
     mutable std::mutex mutex_;
     std::reference_wrapper<core::Datastore> data_manager_;
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModelDefinition>> rf_model_definition_;
-    RiskFactorSexAgeTable risk_factor_expected_;
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;
     LmsDefinition lms_parameters_;

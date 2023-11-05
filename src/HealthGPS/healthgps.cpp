@@ -142,7 +142,6 @@ void HealthGPS::initialise_population() {
 
     // Generate risk factors
     risk_factor_->initialise_population(context_);
-    risk_factor_->apply_baseline_adjustments(context_);
 
     // Initialise diseases
     disease_->initialise_population(context_);
@@ -167,7 +166,6 @@ void HealthGPS::update_population() {
 
     // Update population risk factors
     risk_factor_->update_population(context_);
-    risk_factor_->apply_baseline_adjustments(context_);
 
     // Update diseases status: remission and incidence
     disease_->update_population(context_);
