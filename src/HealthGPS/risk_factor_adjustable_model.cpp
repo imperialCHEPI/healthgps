@@ -76,7 +76,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
         }
 
         for (auto &factor : keys) {
-            const double delta = adjustments.at(person.gender, factor).at(person.age);
+            double delta = adjustments.at(person.gender, factor).at(person.age);
             person.risk_factors.at(factor) += delta;
         }
     });
@@ -90,21 +90,21 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
 RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
-    const auto &age_range = context.age_range();
+    auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
     // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context);
+    auto simulated_means = calculate_simulated_mean(context, keys);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
-    for (auto &sex : std::views::keys(risk_factor_expected_)) {
-        for (auto &factor : keys) {
+    for (const auto &sex : std::views::keys(risk_factor_expected_)) {
+        for (const auto &factor : keys) {
             adjustments.emplace(sex, factor, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                const double expect = risk_factor_expected_.at(sex, factor).at(age);
-                const double sim_mean = simulated_means.at(sex, factor).at(age);
-                const double delta = expect - sim_mean;
+                double expect = risk_factor_expected_.at(sex, factor).at(age);
+                double sim_mean = simulated_means.at(sex, factor).at(age);
+                double delta = expect - sim_mean;
                 if (!std::isnan(delta)) {
                     adjustments.at(sex, factor).at(age) = delta;
                 }
@@ -115,7 +115,8 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     return adjustments;
 }
 
-RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context) {
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
+    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
     auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
@@ -125,21 +126,24 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(Runtim
         if (!person.is_active()) {
             continue;
         }
-        for (const auto &factor : person.risk_factors) {
-            if (!moments.contains(person.gender, factor.first)) {
-                moments.emplace(person.gender, factor.first, std::vector<FirstMoment>(max_age));
+
+        for (const auto &factor : keys) {
+            if (!moments.contains(person.gender, factor)) {
+                moments.emplace(person.gender, factor, std::vector<FirstMoment>(max_age));
             }
-            moments.at(person.gender, factor.first).at(person.age).append(factor.second);
+            double value = person.risk_factors.at(factor);
+            moments.at(person.gender, factor).at(person.age).append(value);
         }
     }
 
     // Compute means.
     auto means = RiskFactorSexAgeTable{};
-    for (auto &sex : moments) {
-        for (auto &factor : sex.second) {
-            means.emplace(sex.first, factor.first, std::vector<double>(max_age, 0.0));
+    for (const auto &sex : std::views::keys(risk_factor_expected_)) {
+        for (const auto &factor : keys) {
+            means.emplace(sex, factor, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                means.at(sex.first, factor.first).at(age) = factor.second.at(age).mean();
+                double value = moments.at(sex, factor).at(age).mean();
+                means.at(sex, factor).at(age) = value;
             }
         }
     }

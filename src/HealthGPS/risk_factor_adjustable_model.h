@@ -35,7 +35,9 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     calculate_adjustments(RuntimeContext &context,
                           const std::unordered_set<core::Identifier> &keys) const;
 
-    static RiskFactorSexAgeTable calculate_simulated_mean(RuntimeContext &context);
+    RiskFactorSexAgeTable
+    calculate_simulated_mean(RuntimeContext &context,
+                             const std::unordered_set<core::Identifier> &keys) const;
 
     const RiskFactorSexAgeTable &risk_factor_expected_;
 };
