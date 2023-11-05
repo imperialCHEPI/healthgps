@@ -20,8 +20,6 @@ class RiskfactorAdjustmentModel {
     void Apply(RuntimeContext &context);
 
   private:
-    RiskFactorSexAgeTable get_adjustments(RuntimeContext &context) const;
-
     RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context) const;
 
     static RiskFactorSexAgeTable calculate_simulated_mean(RuntimeContext &context);

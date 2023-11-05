@@ -63,8 +63,32 @@ RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(RiskFactorSexAgeTable &risk
     : risk_factor_expected_{risk_factor_expected} {}
 
 void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
-    RiskFactorSexAgeTable adjustments = get_adjustments(context);
+    RiskFactorSexAgeTable adjustments;
 
+    // Baseline scenatio: compute adjustments.
+    if (context.scenario().type() == ScenarioType::baseline) {
+        adjustments = calculate_adjustments(context);
+    }
+
+    // Intervention scenario: recieve adjustments from baseline scenario.
+    else {
+        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        if (!message.has_value()) {
+            throw core::HgpsException(
+                "Simulation out of sync, receive baseline adjustments message has timed out");
+        }
+
+        auto &basePtr = message.value();
+        auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
+        if (!messagePrt) {
+            throw core::HgpsException(
+                "Simulation out of sync, failed to receive a baseline adjustments message");
+        }
+
+        adjustments = messagePrt->data();
+    }
+
+    // Baseline and Intervention scenario: apply adjustments to population.
     auto &pop = context.population();
     std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
@@ -77,32 +101,11 @@ void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
         }
     });
 
+    // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
     }
-}
-
-RiskFactorSexAgeTable RiskfactorAdjustmentModel::get_adjustments(RuntimeContext &context) const {
-    if (context.scenario().type() == ScenarioType::baseline) {
-        return calculate_adjustments(context);
-    }
-
-    // Receive message with timeout
-    auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-    if (!message.has_value()) {
-        throw core::HgpsException(
-            "Simulation out of sync, receive baseline adjustments message has timed out");
-    }
-
-    auto &basePtr = message.value();
-    auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
-    if (!messagePrt) {
-        throw core::HgpsException(
-            "Simulation out of sync, failed to receive a baseline adjustments message");
-    }
-
-    return messagePrt->data();
 }
 
 RiskFactorSexAgeTable
