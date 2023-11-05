@@ -115,7 +115,7 @@ RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &con
         std::unordered_map<core::Gender,
                            std::unordered_map<core::Identifier, std::vector<double>>>{};
 
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range);
+    auto simulated_means = calculate_simulated_mean(context);
     auto &baseline_means = adjustments_.get().values;
     for (auto &gender : simulated_means) {
         coefficients.emplace(gender.first,
@@ -135,46 +135,36 @@ RiskfactorAdjustmentModel::calculate_adjustment_coefficients(RuntimeContext &con
     return RiskFactorSexAgeTable{std::move(coefficients)};
 }
 
-RiskFactorSexAgeTable
-RiskfactorAdjustmentModel::calculate_simulated_mean(Population &population,
-                                                    const core::IntegerInterval &age_range) {
+RiskFactorSexAgeTable RiskfactorAdjustmentModel::calculate_simulated_mean(RuntimeContext &context) {
+    auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
-    auto moments =
-        std::unordered_map<core::Gender,
-                           std::unordered_map<core::Identifier, std::vector<FirstMoment>>>{};
-    moments.emplace(core::Gender::male,
-                    std::unordered_map<core::Identifier, std::vector<FirstMoment>>{});
-    moments.emplace(core::Gender::female,
-                    std::unordered_map<core::Identifier, std::vector<FirstMoment>>{});
 
-    for (const auto &entity : population) {
-        if (!entity.is_active()) {
+    // Compute first moments.
+    auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
+    for (const auto &person : context.population()) {
+        if (!person.is_active()) {
             continue;
         }
-
-        auto &table = moments.at(entity.gender);
-        for (const auto &factor : entity.risk_factors) {
-            if (!table.contains(factor.first)) {
-                table.emplace(factor.first, std::vector<FirstMoment>(max_age));
+        for (const auto &factor : person.risk_factors) {
+            if (!moments.contains(person.gender, factor.first)) {
+                moments.emplace(person.gender, factor.first, std::vector<FirstMoment>(max_age));
             }
-
-            table.at(factor.first).at(entity.age).append(factor.second);
+            moments.at(person.gender, factor.first).at(person.age).append(factor.second);
         }
     }
 
-    auto means = std::unordered_map<core::Gender,
-                                    std::unordered_map<core::Identifier, std::vector<double>>>{};
+    // Compute means.
+    auto means = RiskFactorSexAgeTable{};
     for (auto &gender : moments) {
-        means.emplace(gender.first, std::unordered_map<core::Identifier, std::vector<double>>{});
         for (auto &factor : gender.second) {
-            means.at(gender.first).emplace(factor.first, std::vector<double>(max_age, 0.0));
+            means.emplace(gender.first, factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                means.at(gender.first).at(factor.first).at(age) = factor.second.at(age).mean();
+                means.at(gender.first, factor.first).at(age) = factor.second.at(age).mean();
             }
         }
     }
 
-    return RiskFactorSexAgeTable{std::move(means)};
+    return means;
 }
 
 } // namespace hgps
