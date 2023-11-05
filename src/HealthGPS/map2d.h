@@ -120,7 +120,7 @@ template <template <class...> class TMap, class TRow, class TCol, class TCell> c
     /// @param ...args The arguments to forward to the column insert method
     /// @return Return type for the underlying map's insert method
     /// @throws std::out_of_range for invalid row identifier
-    template <class... Args> auto insert(const TRow &row_key, Args &&...args) {
+    template <class... Args> auto insert(const TRow &&row_key, Args &&...args) {
         return table_.at(row_key).insert(std::forward<Args>(args)...);
     }
 
@@ -136,7 +136,7 @@ template <template <class...> class TMap, class TRow, class TCol, class TCell> c
     /// @param ...args The arguments to forward to the column emplace method
     /// @return Return type for the underlying map's emplace method
     /// @throws std::out_of_range for invalid row identifier
-    template <class... Args> auto emplace(const TRow &row_key, Args &&...args) {
+    template <class... Args> auto emplace(const TRow &&row_key, Args &&...args) {
         return table_.at(row_key).emplace(std::forward<Args>(args)...);
     }
 
