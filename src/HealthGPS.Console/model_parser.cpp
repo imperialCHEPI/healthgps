@@ -34,10 +34,10 @@ hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &inf
     }
 
     try {
-        data.emplace(hgps::core::Gender::male,
-                     load_baseline_from_csv(male_filename, info.delimiter));
-        data.emplace(hgps::core::Gender::female,
-                     load_baseline_from_csv(female_filename, info.delimiter));
+        data.emplace_row(hgps::core::Gender::male,
+                         load_baseline_from_csv(male_filename, info.delimiter));
+        data.emplace_row(hgps::core::Gender::female,
+                         load_baseline_from_csv(female_filename, info.delimiter));
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
@@ -171,10 +171,12 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     try {
-        risk_factor_means.emplace(hgps::core::Gender::male,
-                                  load_baseline_from_csv(male_filename, baseline_info.delimiter));
-        risk_factor_means.emplace(hgps::core::Gender::female,
-                                  load_baseline_from_csv(female_filename, baseline_info.delimiter));
+        risk_factor_means.emplace_row(
+            hgps::core::Gender::male,
+            load_baseline_from_csv(male_filename, baseline_info.delimiter));
+        risk_factor_means.emplace_row(
+            hgps::core::Gender::female,
+            load_baseline_from_csv(female_filename, baseline_info.delimiter));
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};

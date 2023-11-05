@@ -111,33 +111,37 @@ template <template <class...> class TMap, class TRow, class TCol, class TCell> c
     /// @brief Insert a row into the table
     /// @param ...args The arguments to forward to the row insert method
     /// @return Return type for the underlying map's insert method
-    template <class... Args> auto insert(Args &&...args) noexcept {
-        return table_.insert(std::forward<Args>(args)...);
+    template <class... FArgs> auto insert_row(FArgs &&...args) noexcept {
+        return table_.insert(std::forward<FArgs>(args)...);
     }
 
     /// @brief Insert a column into a given row of the table
     /// @param row_key The row identifier
     /// @param ...args The arguments to forward to the column insert method
     /// @return Return type for the underlying map's insert method
-    /// @throws std::out_of_range for invalid row identifier
-    template <class... Args> auto insert(const TRow &&row_key, Args &&...args) {
-        return table_.at(row_key).insert(std::forward<Args>(args)...);
+    template <class FRow, class... FArgs> auto insert(FRow &&row_key, FArgs &&...args) noexcept {
+        if (!table_.contains(row_key)) {
+            table_.insert(row_key, TMap<TCol, TCell>{});
+        }
+        return table_.at(std::forward<FRow>(row_key)).insert(std::forward<FArgs>(args)...);
     }
 
     /// @brief Emplace a row into the table
     /// @param ...args The arguments to forward to the row emplace method
     /// @return Return type for the underlying map's emplace method
-    template <class... Args> auto emplace(Args &&...args) noexcept {
-        return table_.emplace(std::forward<Args>(args)...);
+    template <class... FArgs> auto emplace_row(FArgs &&...args) noexcept {
+        return table_.emplace(std::forward<FArgs>(args)...);
     }
 
     /// @brief Emplace a column into a given row of the table
     /// @param row_key The row identifier
-    /// @param ...args The arguments to forward to the column emplace method
+    /// @param ...args The arguments to forward to the row emplace method
     /// @return Return type for the underlying map's emplace method
-    /// @throws std::out_of_range for invalid row identifier
-    template <class... Args> auto emplace(const TRow &&row_key, Args &&...args) {
-        return table_.at(row_key).emplace(std::forward<Args>(args)...);
+    template <class FRow, class... FArgs> auto emplace(FRow &&row_key, FArgs &&...args) noexcept {
+        if (!table_.contains(row_key)) {
+            table_.emplace(row_key, TMap<TCol, TCell>{});
+        }
+        return table_.at(std::forward<FRow>(row_key)).emplace(std::forward<FArgs>(args)...);
     }
 
   private:
