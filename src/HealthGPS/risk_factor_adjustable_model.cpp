@@ -42,12 +42,12 @@ const RiskFactorSexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(
-    RuntimeContext &context, const std::unordered_set<core::Identifier> &risk_factor_keys) const {
+    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
     RiskFactorSexAgeTable adjustments;
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = calculate_adjustments(context);
+        adjustments = calculate_adjustments(context, keys);
     }
 
     // Intervention scenario: recieve adjustments from baseline scenario.
@@ -68,16 +68,16 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
         adjustments = messagePrt->data();
     }
 
-    // Baseline and Intervention scenario: apply adjustments to population.
+    // All scenarios: apply adjustments to population.
     auto &pop = context.population();
     std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
         }
 
-        for (auto &factor_key : risk_factor_keys) {
-            const double delta = adjustments.at(person.gender, factor_key).at(person.age);
-            person.risk_factors.at(factor_key) += delta;
+        for (auto &factor : keys) {
+            const double delta = adjustments.at(person.gender, factor).at(person.age);
+            person.risk_factors.at(factor) += delta;
         }
     });
 
@@ -88,8 +88,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
     }
 }
 
-RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const {
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
+    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
     const auto &age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
@@ -98,16 +98,15 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context) const 
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
-    for (auto &gender : simulated_means) {
-        for (auto &factor : gender.second) {
-            adjustments.emplace(gender.first, factor.first, std::vector<double>(max_age, 0.0));
+    for (auto &sex : std::views::keys(risk_factor_expected_)) {
+        for (auto &factor : keys) {
+            adjustments.emplace(sex, factor, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                const double expected =
-                    risk_factor_expected_.at(gender.first, factor.first).at(age);
-                const double simulated = factor.second.at(age);
-                const double delta = expected - simulated;
+                const double expect = risk_factor_expected_.at(sex, factor).at(age);
+                const double sim_mean = simulated_means.at(sex, factor).at(age);
+                const double delta = expect - sim_mean;
                 if (!std::isnan(delta)) {
-                    adjustments.at(gender.first, factor.first).at(age) = delta;
+                    adjustments.at(sex, factor).at(age) = delta;
                 }
             }
         }
@@ -136,11 +135,11 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(Runtim
 
     // Compute means.
     auto means = RiskFactorSexAgeTable{};
-    for (auto &gender : moments) {
-        for (auto &factor : gender.second) {
-            means.emplace(gender.first, factor.first, std::vector<double>(max_age, 0.0));
+    for (auto &sex : moments) {
+        for (auto &factor : sex.second) {
+            means.emplace(sex.first, factor.first, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                means.at(gender.first, factor.first).at(age) = factor.second.at(age).mean();
+                means.at(sex.first, factor.first).at(age) = factor.second.at(age).mean();
             }
         }
     }

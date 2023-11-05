@@ -26,12 +26,14 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
-    /// @param risk_factor_keys A set of keys for risk factors to be adjusted
+    /// @param keys A set of keys for risk factors to be adjusted
     void adjust_risk_factors(RuntimeContext &context,
-                             const std::unordered_set<core::Identifier> &risk_factor_keys) const;
+                             const std::unordered_set<core::Identifier> &keys) const;
 
   private:
-    RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context) const;
+    RiskFactorSexAgeTable
+    calculate_adjustments(RuntimeContext &context,
+                          const std::unordered_set<core::Identifier> &keys) const;
 
     static RiskFactorSexAgeTable calculate_simulated_mean(RuntimeContext &context);
 
