@@ -15,7 +15,7 @@ TEST(TestHealthGPS_Map2d, CreateEmpty) {
     ASSERT_THROW(m.empty(1), std::out_of_range);
     ASSERT_EQ(0, m.rows());
     ASSERT_FALSE(m.contains(1));
-    ASSERT_THROW(m.contains(1, 1), std::out_of_range);
+    ASSERT_FALSE(m.contains(1, 1));
 }
 
 TEST(TestHealthGPS_Map2d, CreateWithBasicType) {

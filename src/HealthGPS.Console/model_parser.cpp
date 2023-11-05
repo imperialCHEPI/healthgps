@@ -23,27 +23,27 @@
 
 namespace host {
 
-hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info) {
+hgps::RiskFactorSexAgeTable load_baseline_adjustments(const poco::BaselineInfo &info) {
     MEASURE_FUNCTION();
     const auto male_filename = info.file_names.at("factorsmean_male").string();
     const auto female_filename = info.file_names.at("factorsmean_female").string();
-    auto data = hgps::RiskFactorSexAgeTable{};
+    auto table = hgps::RiskFactorSexAgeTable{};
 
     if (!hgps::core::case_insensitive::equals(info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
     }
 
     try {
-        data.emplace_row(hgps::core::Gender::male,
-                         load_baseline_from_csv(male_filename, info.delimiter));
-        data.emplace_row(hgps::core::Gender::female,
-                         load_baseline_from_csv(female_filename, info.delimiter));
+        table.emplace_row(hgps::core::Gender::male,
+                          load_baseline_from_csv(male_filename, info.delimiter));
+        table.emplace_row(hgps::core::Gender::female,
+                          load_baseline_from_csv(female_filename, info.delimiter));
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
     }
 
-    return hgps::BaselineAdjustment{std::move(data)};
+    return table;
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -424,7 +424,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 
     auto adjustment = load_baseline_adjustments(config.modelling.baseline_adjustment);
     auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
-    for (const auto &table : adjustment.values) {
+    for (const auto &table : adjustment) {
         for (const auto &item : table.second) {
             if (item.second.size() <= max_age) {
                 throw hgps::core::HgpsException{
@@ -434,7 +434,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         }
     }
 
-    repository.register_baseline_adjustment_definition(std::move(adjustment));
+    repository.register_risk_factor_expected_values(std::move(adjustment));
 }
 
 } // namespace host

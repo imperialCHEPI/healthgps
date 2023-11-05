@@ -401,17 +401,17 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
         ASSERT_EQ(SimulationModuleType::RiskFactor, risk_module.type());
         ASSERT_EQ("RiskFactor", risk_module.name());
 }
-
 */
 
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty) {
     using namespace hgps;
     auto risk_models = std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>>();
-    auto adjustments = BaselineAdjustment{};
-    ASSERT_THROW(
-        auto x = RiskFactorModule(std::move(risk_models), RiskfactorAdjustmentModel{adjustments}),
-        std::invalid_argument);
+    auto expected_values = RiskFactorSexAgeTable{};
+    ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models),
+                                           RiskfactorAdjustmentModel{expected_values}),
+                 std::invalid_argument);
 }
+
 /*
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
 {

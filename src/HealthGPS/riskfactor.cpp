@@ -81,8 +81,8 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
     auto dynamic_model = dynamic_definition.create_model();
     models.emplace(RiskFactorModelType::Dynamic, std::move(dynamic_model));
 
-    auto adjustment_model =
-        RiskfactorAdjustmentModel{repository.get_baseline_adjustment_definition()};
+    auto adjustment_model = RiskfactorAdjustmentModel{repository.get_risk_factor_expected_values()};
     return std::make_unique<RiskFactorModule>(std::move(models), adjustment_model);
 }
+
 } // namespace hgps

@@ -15,8 +15,8 @@ namespace host {
 
 /// @brief Loads baseline adjustments information from a file
 /// @param info Baseline file information
-/// @return An instance of the hgps::BaselineAdjustment type
-hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info);
+/// @return An instance of the hgps::RiskFactorSexAgeTable type
+hgps::RiskFactorSexAgeTable load_baseline_adjustments(const poco::BaselineInfo &info);
 
 /// @brief Loads a static risk factor model from a JSON file
 /// @param model_name The name of the model to use

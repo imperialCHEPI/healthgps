@@ -59,7 +59,7 @@ struct FirstMoment {
 
 namespace hgps {
 
-RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(BaselineAdjustment &risk_factor_expected)
+RiskfactorAdjustmentModel::RiskfactorAdjustmentModel(RiskFactorSexAgeTable &risk_factor_expected)
     : risk_factor_expected_{risk_factor_expected} {}
 
 void RiskfactorAdjustmentModel::Apply(RuntimeContext &context) {
@@ -113,7 +113,7 @@ RiskfactorAdjustmentModel::calculate_adjustments(RuntimeContext &context) const 
 
     // Compute simulated means.
     auto simulated_means = calculate_simulated_mean(context);
-    auto &baseline_means = risk_factor_expected_.get().values;
+    auto &baseline_means = risk_factor_expected_.get();
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
