@@ -7,7 +7,8 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
-#include <unordered_set>
+#include <vector>
+
 namespace hgps {
 
 /// @brief Defines a table type for double values by sex and age
@@ -26,18 +27,16 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
-    /// @param keys A set of keys for risk factors to be adjusted
+    /// @param keys A list of keys for risk factors to be adjusted
     void adjust_risk_factors(RuntimeContext &context,
-                             const std::unordered_set<core::Identifier> &keys) const;
+                             const std::vector<core::Identifier> &keys) const;
 
   private:
-    RiskFactorSexAgeTable
-    calculate_adjustments(RuntimeContext &context,
-                          const std::unordered_set<core::Identifier> &keys) const;
+    RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context,
+                                                const std::vector<core::Identifier> &keys) const;
 
     static RiskFactorSexAgeTable
-    calculate_simulated_mean(RuntimeContext &context,
-                             const std::unordered_set<core::Identifier> &keys);
+    calculate_simulated_mean(RuntimeContext &context, const std::vector<core::Identifier> &keys);
 
     const RiskFactorSexAgeTable &risk_factor_expected_;
 };

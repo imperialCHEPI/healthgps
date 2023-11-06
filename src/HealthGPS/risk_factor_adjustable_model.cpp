@@ -42,7 +42,7 @@ const RiskFactorSexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(
-    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
+    RuntimeContext &context, const std::vector<core::Identifier> &keys) const {
     RiskFactorSexAgeTable adjustments;
 
     // Baseline scenatio: compute adjustments.
@@ -88,8 +88,9 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
     }
 }
 
-RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
-    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
+RiskFactorSexAgeTable
+RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
+                                                 const std::vector<core::Identifier> &keys) const {
     auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
@@ -115,8 +116,9 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     return adjustments;
 }
 
-RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
-    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) {
+RiskFactorSexAgeTable
+RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context,
+                                                    const std::vector<core::Identifier> &keys) {
     auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
