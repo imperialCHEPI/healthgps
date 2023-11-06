@@ -173,17 +173,17 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Risk factor mean values by sex and age.
-    hgps::RiskFactorSexAgeTable risk_factor_means = load_risk_factor_expected(config);
+    hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
 
-    // Check means are defined for all risk factors.
+    // Check expected values are defined for all risk factors.
     for (const hgps::LinearModelParams &model : risk_factor_models) {
-        if (!risk_factor_means.at(hgps::core::Gender::male).contains(model.name)) {
-            throw hgps::core::HgpsException{
-                fmt::format("'{}' not defined in male factor means.", model.name.to_string())};
+        if (!risk_factor_expected.at(hgps::core::Gender::male).contains(model.name)) {
+            throw hgps::core::HgpsException{fmt::format(
+                "'{}' not defined in male risk factor expected values.", model.name.to_string())};
         }
-        if (!risk_factor_means.at(hgps::core::Gender::female).contains(model.name)) {
-            throw hgps::core::HgpsException{
-                fmt::format("'{}' not defined in female factor means.", model.name.to_string())};
+        if (!risk_factor_expected.at(hgps::core::Gender::female).contains(model.name)) {
+            throw hgps::core::HgpsException{fmt::format(
+                "'{}' not defined in female risk factor expected values.", model.name.to_string())};
         }
     }
 
@@ -199,7 +199,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(risk_factor_models), std::move(risk_factor_means), std::move(cholesky));
+        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>

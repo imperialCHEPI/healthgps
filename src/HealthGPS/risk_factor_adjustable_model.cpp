@@ -151,4 +151,18 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
     return means;
 }
 
+RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
+    RiskFactorSexAgeTable risk_factor_expected)
+    : RiskFactorModelDefinition{}, risk_factor_expected_{std::move(risk_factor_expected)} {
+
+    if (risk_factor_expected_.empty()) {
+        throw core::HgpsException("Risk factor expected value mapping is empty");
+    }
+}
+
+const RiskFactorSexAgeTable &
+RiskFactorAdjustableModelDefinition::get_risk_factor_expected() const noexcept {
+    return risk_factor_expected_;
+}
+
 } // namespace hgps

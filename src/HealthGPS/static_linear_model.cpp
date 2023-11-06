@@ -6,17 +6,14 @@
 
 namespace hgps {
 
-StaticLinearModel::StaticLinearModel(const std::vector<LinearModelParams> &risk_factor_models,
-                                     const RiskFactorSexAgeTable &risk_factor_means,
+StaticLinearModel::StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
+                                     const std::vector<LinearModelParams> &risk_factor_models,
                                      const Eigen::MatrixXd &risk_factor_cholesky)
-    : risk_factor_models_{risk_factor_models}, risk_factor_means_{risk_factor_means},
+    : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
       risk_factor_cholesky_{risk_factor_cholesky} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
-    }
-    if (risk_factor_means_.empty()) {
-        throw core::HgpsException("Risk factor means mapping is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -89,17 +86,14 @@ void StaticLinearModel::linear_approximation(Person &person) {
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    std::vector<LinearModelParams> risk_factor_models, RiskFactorSexAgeTable risk_factor_means,
+    RiskFactorSexAgeTable risk_factor_expected, std::vector<LinearModelParams> risk_factor_models,
     Eigen::MatrixXd risk_factor_cholesky)
-    : risk_factor_models_{std::move(risk_factor_models)},
-      risk_factor_means_{std::move(risk_factor_means)},
+    : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
+      risk_factor_models_{std::move(risk_factor_models)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
-    }
-    if (risk_factor_means_.empty()) {
-        throw core::HgpsException("Risk factor means mapping is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -107,7 +101,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    return std::make_unique<StaticLinearModel>(risk_factor_models_, risk_factor_means_,
+    const auto &risk_factor_expected = get_risk_factor_expected();
+    return std::make_unique<StaticLinearModel>(risk_factor_expected, risk_factor_models_,
                                                risk_factor_cholesky_);
 }
 
