@@ -3,6 +3,8 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <vector>
+
 namespace hgps {
 
 DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
@@ -27,8 +29,17 @@ RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
 
 std::string DynamicHierarchicalLinearModel::name() const noexcept { return "Dynamic"; }
 
-void DynamicHierarchicalLinearModel::generate_risk_factors(
-    [[maybe_unused]] RuntimeContext &context) {}
+void DynamicHierarchicalLinearModel::generate_risk_factors(RuntimeContext &context) {
+
+    // Adjust risk factors such that mean sim value matches expected value.
+    std::vector<core::Identifier> factor_keys;
+    factor_keys.reserve(variables_.size());
+    for (const auto &factor : variables_) {
+        // factor.second contains the factor name.
+        factor_keys.emplace_back(factor.second);
+    }
+    adjust_risk_factors(context, factor_keys);
+}
 
 void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {
     auto age_key = core::Identifier{"age"};
@@ -53,6 +64,15 @@ void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context
             update_risk_factors_exposure(context, entity, current_risk_factors, equations.female);
         }
     }
+
+    // Adjust risk factors such that mean sim value matches expected value.
+    std::vector<core::Identifier> factor_keys;
+    factor_keys.reserve(variables_.size());
+    for (const auto &factor : variables_) {
+        // factor.second contains the factor name.
+        factor_keys.emplace_back(factor.second);
+    }
+    adjust_risk_factors(context, factor_keys);
 }
 
 const AgeGroupGenderEquation &DynamicHierarchicalLinearModel::equations_at(int age) const {
