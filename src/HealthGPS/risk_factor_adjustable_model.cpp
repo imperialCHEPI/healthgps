@@ -95,7 +95,7 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
     auto max_age = age_range.upper() + 1;
 
     // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context, keys);
+    auto simulated_means = calculate_simulated_mean(context.population(), age_range, keys);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
@@ -117,14 +117,14 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
 }
 
 RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_simulated_mean(RuntimeContext &context,
+RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
+                                                    const core::IntegerInterval age_range,
                                                     const std::vector<core::Identifier> &keys) {
-    auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
-    for (const auto &person : context.population()) {
+    for (const auto &person : population) {
         if (!person.is_active()) {
             continue;
         }

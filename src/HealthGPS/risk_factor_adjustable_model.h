@@ -36,7 +36,8 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
                                                 const std::vector<core::Identifier> &keys) const;
 
     static RiskFactorSexAgeTable
-    calculate_simulated_mean(RuntimeContext &context, const std::vector<core::Identifier> &keys);
+    calculate_simulated_mean(Population &population, const core::IntegerInterval age_range,
+                             const std::vector<core::Identifier> &keys);
 
     const RiskFactorSexAgeTable &risk_factor_expected_;
 };
