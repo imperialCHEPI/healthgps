@@ -172,7 +172,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         risk_factor_models.emplace_back(std::move(model));
     }
 
-    // Risk factor mean values by sex and age.
+    // Risk factor expected values by sex and age.
     hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
 
     // Check expected values are defined for all risk factors.
@@ -207,7 +207,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
                                    const host::Configuration &config) {
     // Load this dynamic model with the appropriate loader.
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
-        return load_ebhlm_risk_model_definition(opt);
+        return load_ebhlm_risk_model_definition(opt, config);
     }
     if (hgps::core::case_insensitive::equals(model_name, "kevinhall")) {
         return load_kevinhall_risk_model_definition(opt, config);
@@ -219,7 +219,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
-load_ebhlm_risk_model_definition(const poco::json &opt) {
+load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
     auto percentage = 0.05;
     std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
@@ -290,8 +290,11 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
         equations.emplace(age_key, std::move(age_equations));
     }
 
+    // Risk factor expected values by sex and age.
+    hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
+
     return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
-        std::move(equations), std::move(variables), percentage);
+        std::move(expected), std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 

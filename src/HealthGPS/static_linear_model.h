@@ -47,7 +47,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 };
 
 /// @brief Defines the static linear model data type
-class StaticLinearModelDefinition final : public RiskFactorAdjustableModelDefinition {
+class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   public:
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
     /// @param risk_factor_expected The risk factor expected values by sex and age
