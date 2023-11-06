@@ -75,7 +75,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
             return;
         }
 
-        for (auto &factor : keys) {
+        for (const auto &factor : keys) {
             double delta = adjustments.at(person.gender, factor).at(person.age);
             person.risk_factors.at(factor) += delta;
         }
@@ -116,7 +116,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
 }
 
 RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
-    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) const {
+    RuntimeContext &context, const std::unordered_set<core::Identifier> &keys) {
     auto age_range = context.age_range();
     auto max_age = age_range.upper() + 1;
 
@@ -138,7 +138,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_simulated_mean(
 
     // Compute means.
     auto means = RiskFactorSexAgeTable{};
-    for (const auto &sex : std::views::keys(risk_factor_expected_)) {
+    for (const auto &sex : std::views::keys(moments)) {
         for (const auto &factor : keys) {
             means.emplace(sex, factor, std::vector<double>(max_age, 0.0));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
