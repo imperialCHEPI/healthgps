@@ -405,8 +405,7 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
 
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty) {
     using namespace hgps;
-    auto risk_models = std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>>();
-    ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
+    ASSERT_THROW(RiskFactorModule{{}}, std::invalid_argument);
 }
 
 /*
