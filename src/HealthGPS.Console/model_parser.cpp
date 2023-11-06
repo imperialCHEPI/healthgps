@@ -221,11 +221,10 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
 load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
-    auto percentage = 0.05;
-    std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
-    std::map<hgps::core::IntegerInterval, hgps::AgeGroupGenderEquation> equations;
 
     auto info = poco::LiteHierarchicalModelInfo{};
+
+    auto percentage = 0.05;
     opt["BoundaryPercentage"].get_to(info.percentage);
     if (info.percentage > 0.0 && info.percentage < 1.0) {
         percentage = info.percentage;
@@ -234,7 +233,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuratio
             fmt::format("Boundary percentage outside range (0, 1): {}", info.percentage)};
     }
 
-    info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
+    std::map<hgps::core::IntegerInterval, hgps::AgeGroupGenderEquation> equations;
     for (const auto &it : opt["Equations"].items()) {
         const auto &age_key = it.key();
         info.equations.emplace(
@@ -248,6 +247,8 @@ load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuratio
         }
     }
 
+    std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
+    info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
     for (const auto &item : info.variables) {
         variables.emplace(hgps::core::Identifier{item.name}, hgps::core::Identifier{item.factor});
     }
