@@ -108,14 +108,19 @@ struct Person {
     /// @throws HgpsException if gender is unknown
     std::string gender_to_string() const;
 
+    /// @brief Check if person is an adult (18 or over)
+    /// @return true if person is 18 or over; else false
+    bool over_18() const noexcept;
+
     /// @brief Gets the sector enumeration as a number
     /// @return The sector value (0 for urban, 1 for rural)
     /// @throws HgpsException if sector is unknown
     float sector_to_value() const;
 
-    /// @brief Check if person is an adult (18 or over)
-    /// @return true if person is 18 or over; else false
-    bool over_18() const noexcept;
+    /// @brief Gets the income enumeration as a number
+    /// @return The income value (low = 1, middle = 2, high = 3)
+    /// @throws HgpsException if income is unknown
+    float income_to_value() const;
 
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time
