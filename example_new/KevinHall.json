@@ -24,11 +24,6 @@
     ],
     "Foods": [
         {
-            "Name": "Alcohol",
-            "Nutrients": {},
-            "Price": null
-        },
-        {
             "Name": "Carbohydrate",
             "Nutrients": {
                 "Carbohydrate": 1.0

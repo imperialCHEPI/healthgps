@@ -141,49 +141,53 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     MEASURE_FUNCTION();
 
     // Risk factor linear models and correlation matrix.
-    std::vector<hgps::LinearModelParams> risk_factor_models;
+    std::unordered_map<hgps::core::Identifier, hgps::LinearModelParams> risk_factor_models;
     const auto correlations_file_info =
         host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlations_table = load_datatable_from_csv(correlations_file_info);
     Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
 
-    for (size_t i = 0; i < opt["RiskFactorModels"].size(); i++) {
-        // Risk factor model.
-        const auto &factor = opt["RiskFactorModels"][i];
+    size_t i = 0;
+    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+        auto factor_name = hgps::core::Identifier{key};
+
+        // Risk factor model parameters.
         hgps::LinearModelParams model;
-        model.name = factor["Name"].get<hgps::core::Identifier>();
-        model.intercept = factor["Intercept"].get<double>();
+        model.intercept = json_params["Intercept"].get<double>();
         model.coefficients =
-            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+            json_params["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
 
         // Check correlation matrix column name matches risk factor name.
-        auto column_name = hgps::core::Identifier{correlations_table.column(i).name()};
-        if (model.name != column_name) {
+        auto column_name = correlations_table.column(i).name();
+        if (!hgps::core::case_insensitive::equals(key, column_name)) {
             throw hgps::core::HgpsException{
                 fmt::format("Risk factor {} name ({}) does not match correlation matrix "
                             "column {} name ({})",
-                            i, model.name.to_string(), i, column_name.to_string())};
+                            i, key, i, column_name)};
         }
 
         // Write data structures.
         for (size_t j = 0; j < correlations_table.num_rows(); j++) {
             correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
         }
-        risk_factor_models.emplace_back(std::move(model));
+        risk_factor_models.emplace(std::move(factor_name), std::move(model));
+
+        // Increment table column index.
+        i++;
     }
 
     // Risk factor expected values by sex and age.
     hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
 
     // Check expected values are defined for all risk factors.
-    for (const hgps::LinearModelParams &model : risk_factor_models) {
-        if (!risk_factor_expected.at(hgps::core::Gender::male).contains(model.name)) {
+    for (const auto &name : std::views::keys(risk_factor_models)) {
+        if (!risk_factor_expected.at(hgps::core::Gender::male).contains(name)) {
             throw hgps::core::HgpsException{fmt::format(
-                "'{}' not defined in male risk factor expected values.", model.name.to_string())};
+                "'{}' not defined in male risk factor expected values.", name.to_string())};
         }
-        if (!risk_factor_expected.at(hgps::core::Gender::female).contains(model.name)) {
+        if (!risk_factor_expected.at(hgps::core::Gender::female).contains(name)) {
             throw hgps::core::HgpsException{fmt::format(
-                "'{}' not defined in female risk factor expected values.", model.name.to_string())};
+                "'{}' not defined in female risk factor expected values.", name.to_string())};
         }
     }
 
@@ -208,14 +212,32 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Income models for different income classifications.
-    std::vector<hgps::LinearModelParams> income_models;
-    for (const auto &factor : opt["IncomeModels"]) {
+    std::unordered_map<hgps::core::Income, hgps::LinearModelParams> income_models;
+    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+
+        // Get income category.
+        hgps::core::Income category;
+        if (hgps::core::case_insensitive::equals(key, "Unknown")) {
+            category = hgps::core::Income::unknown;
+        } else if (hgps::core::case_insensitive::equals(key, "Low")) {
+            category = hgps::core::Income::low;
+        } else if (hgps::core::case_insensitive::equals(key, "Middle")) {
+            category = hgps::core::Income::middle;
+        } else if (hgps::core::case_insensitive::equals(key, "High")) {
+            category = hgps::core::Income::high;
+        } else {
+            throw hgps::core::HgpsException(
+                fmt::format("Income category {} is unrecognised.", key));
+        }
+
+        // Get income model parameters.
         hgps::LinearModelParams model;
-        model.name = factor["Name"].get<hgps::core::Identifier>();
-        model.intercept = factor["Intercept"].get<double>();
+        model.intercept = json_params["Intercept"].get<double>();
         model.coefficients =
-            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
-        income_models.emplace_back(std::move(model));
+            json_params["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+
+        // Insert income model.
+        income_models.emplace(std::move(category), std::move(model));
     }
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(

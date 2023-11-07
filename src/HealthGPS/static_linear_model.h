@@ -10,7 +10,6 @@ namespace hgps {
 
 /// @brief Defines the linear model parameters used to initialise risk factors
 struct LinearModelParams {
-    core::Identifier name;
     double intercept;
     std::unordered_map<core::Identifier, double> coefficients;
 };
@@ -29,11 +28,11 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         const RiskFactorSexAgeTable &risk_factor_expected,
-        const std::vector<LinearModelParams> &risk_factor_models,
+        const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
         const Eigen::MatrixXd &risk_factor_cholesky,
-        const std::unordered_map<hgps::core::Identifier,
-                                 std::unordered_map<hgps::core::Gender, double>> &rural_prevalence,
-        const std::vector<LinearModelParams> &income_models);
+        const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+            &rural_prevalence,
+        const std::unordered_map<core::Income, LinearModelParams> &income_models);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -68,11 +67,11 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param person The person to update sector for
     void update_income(RuntimeContext &context, Person &person) const;
 
-    const std::vector<LinearModelParams> &risk_factor_models_;
+    const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
-    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
-    const std::vector<LinearModelParams> &income_models_;
+    const std::unordered_map<core::Income, LinearModelParams> &income_models_;
 };
 
 /// @brief Defines the static linear model data type
@@ -87,21 +86,22 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         RiskFactorSexAgeTable risk_factor_expected,
-        std::vector<LinearModelParams> risk_factor_models, Eigen::MatrixXd risk_factor_cholesky,
-        std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
+        Eigen::MatrixXd risk_factor_cholesky,
+        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
-        std::vector<LinearModelParams> income_models);
+        std::unordered_map<core::Income, LinearModelParams> income_models);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
     std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
-    std::vector<LinearModelParams> risk_factor_models_;
+    std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models_;
     Eigen::MatrixXd risk_factor_cholesky_;
-    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
-    std::vector<LinearModelParams> income_models_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
 };
 
 } // namespace hgps

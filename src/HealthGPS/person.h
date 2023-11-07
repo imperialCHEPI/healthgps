@@ -60,8 +60,7 @@ struct Person {
     core::Sector sector{core::Sector::unknown};
 
     /// @brief Income category
-    // core::Income income{core::Income::unknown};
-    core::Identifier income{};
+    core::Income income{core::Income::unknown};
 
     /// @brief Social-economic status (SES) assigned value
     double ses{};

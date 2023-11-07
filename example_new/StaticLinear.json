@@ -12,14 +12,12 @@
             "Male": 0.6
         }
     ],
-    "IncomeModels": [
-        {
-            "Name": "Low",
+    "IncomeModels": {
+        "Low": {
             "Intercept": 0.0,
             "Coefficients": {}
         },
-        {
-            "Name": "Middle",
+        "Middle": {
             "Intercept": -0.0023671151435328,
             "Coefficients": {
                 "Gender": 0.0244784583947992,
@@ -27,8 +25,7 @@
                 "Sector": -0.491794449118805
             }
         },
-        {
-            "Name": "High",
+        "High": {
             "Intercept": 0.0187952471153142,
             "Coefficients": {
                 "Gender": 0.02018185354194,
@@ -36,15 +33,9 @@
                 "Sector": -1.5870837069653
             }
         }
-    ],
-    "RiskFactorModels": [
-        {
-            "Name": "Alcohol",
-            "Intercept": 0.0,
-            "Coefficients": {}
-        },
-        {
-            "Name": "Carbohydrate",
+    },
+    "RiskFactorModels": {
+        "Carbohydrate": {
             "Intercept": 144.892664419936,
             "Coefficients": {
                 "gender": 49.8438360972037,
@@ -53,8 +44,7 @@
                 "age3": 0.000805963411059104
             }
         },
-        {
-            "Name": "Fat",
+        "Fat": {
             "Intercept": 54.7022488365615,
             "Coefficients": {
                 "gender": 16.8496529666428,
@@ -63,8 +53,7 @@
                 "age3": 0.000117433532087498
             }
         },
-        {
-            "Name": "Protein",
+        "Protein": {
             "Intercept": 44.0097180197551,
             "Coefficients": {
                 "gender": 20.1230510354203,
@@ -73,8 +62,7 @@
                 "age3": 0.000143142339925315
             }
         },
-        {
-            "Name": "Sodium",
+        "Sodium": {
             "Intercept": 1133.32921917935,
             "Coefficients": {
                 "gender": 677.323597232314,
@@ -83,14 +71,13 @@
                 "age3": 0.0104179627659843
             }
         }
-    ],
+    },
     "RiskFactorCorrelationFile": {
         "name": "ResidualDietCorrelationMatrix.csv",
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
         "columns": {
-            "Alcohol": "double",
             "Carbohydrate": "double",
             "Fat": "double",
             "Protein": "double",

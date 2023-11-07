@@ -8,11 +8,11 @@ namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &risk_factor_expected,
-    const std::vector<LinearModelParams> &risk_factor_models,
+    const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
     const Eigen::MatrixXd &risk_factor_cholesky,
-    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
-    const std::vector<LinearModelParams> &income_models)
+    const std::unordered_map<core::Income, LinearModelParams> &income_models)
     : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
       risk_factor_cholesky_{risk_factor_cholesky}, rural_prevalence_{rural_prevalence},
       income_models_{income_models} {
@@ -97,12 +97,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 void StaticLinearModel::linear_approximation(Person &person) {
 
     // Approximate risk factor values for person with linear models.
-    for (const auto &model : risk_factor_models_) {
-        double factor = model.intercept;
-        for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
+    for (const auto &[model_name, model_params] : risk_factor_models_) {
+        double factor = model_params.intercept;
+        for (const auto &[coefficient_name, coefficient_value] : model_params.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-        person.risk_factors[model.name] = factor;
+        person.risk_factors[model_name] = factor;
     }
 }
 
@@ -152,39 +152,36 @@ void StaticLinearModel::update_sector(RuntimeContext &context, Person &person) c
 void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person) const {
 
     // Compute logits for each income category.
-    auto logits = std::vector<double>{};
-    logits.reserve(income_models_.size());
-    for (const auto &income_model : income_models_) {
-        logits.push_back(income_model.intercept);
-        for (const auto &[factor_name, coefficient] : income_model.coefficients) {
-            logits.back() += coefficient * person.get_risk_factor_value(factor_name);
+    auto logits = std::unordered_map<core::Income, double>{};
+    for (const auto &[income, params] : income_models_) {
+        logits[income] = params.intercept;
+        for (const auto &[factor, coefficient] : params.coefficients) {
+            logits.at(income) += coefficient * person.get_risk_factor_value(factor);
         }
     }
 
     // Compute softmax probabilities for each income category.
-    auto e_logits = std::vector<double>{};
-    e_logits.reserve(income_models_.size());
+    auto e_logits = std::unordered_map<core::Income, double>{};
     double e_logits_sum = 0.0;
-    for (const auto &logit : logits) {
-        e_logits.push_back(exp(logit));
-        e_logits_sum += e_logits.back();
+    for (const auto &[income, logit] : logits) {
+        e_logits[income] = exp(logit);
+        e_logits_sum += e_logits.at(income);
     }
 
     // Compute income category probabilities.
-    auto probabilities = std::vector<double>{};
-    probabilities.reserve(income_models_.size());
-    for (const auto &e_logit : e_logits) {
-        probabilities.push_back(e_logit / e_logits_sum);
+    auto probabilities = std::unordered_map<core::Income, double>{};
+    for (const auto &[income, e_logit] : e_logits) {
+        probabilities[income] = e_logit / e_logits_sum;
     }
 
     // Compute income category.
     double rand = context.random().next_double();
-    for (size_t i = 0; i < income_models_.size(); i++) {
-        if (rand < probabilities[i]) {
-            person.income = income_models_[i].name;
+    for (const auto &[income, probability] : probabilities) {
+        if (rand < probability) {
+            person.income = income;
             return;
         }
-        rand -= probabilities[i];
+        rand -= probability;
     }
 
     throw core::HgpsException("Logic Error: failed to initialise income category");
@@ -199,11 +196,11 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person) c
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    RiskFactorSexAgeTable risk_factor_expected, std::vector<LinearModelParams> risk_factor_models,
+    RiskFactorSexAgeTable risk_factor_expected,
+    std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
     Eigen::MatrixXd risk_factor_cholesky,
-    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
-        rural_prevalence,
-    std::vector<LinearModelParams> income_models)
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
+    std::unordered_map<core::Income, LinearModelParams> income_models)
     : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
       risk_factor_models_{std::move(risk_factor_models)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)},
