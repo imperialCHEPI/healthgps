@@ -17,6 +17,7 @@ struct FirstMoment {
         sum_ += value;
     }
 
+    // Empty mean is zero, not NaN, since the slot may not be empty in intervention scenario.
     double mean() const noexcept { return (count_ > 0) ? (sum_ / count_) : 0.0; }
 
   private:
