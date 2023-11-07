@@ -59,11 +59,12 @@ struct Person {
     /// @brief Sector (region) assigned value
     core::Sector sector{core::Sector::unknown};
 
+    /// @brief Income category
+    // core::Income income{core::Income::unknown};
+    core::Identifier income{};
+
     /// @brief Social-economic status (SES) assigned value
     double ses{};
-
-    /// @brief Income category
-    core::Identifier income{};
 
     /// @brief Current risk factors values
     std::map<core::Identifier, double> risk_factors;

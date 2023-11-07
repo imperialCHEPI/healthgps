@@ -14,12 +14,12 @@
     ],
     "IncomeModels": [
         {
-            "Name": "Category_1",
+            "Name": "Low",
             "Intercept": 0.0,
             "Coefficients": {}
         },
         {
-            "Name": "Category_2",
+            "Name": "Middle",
             "Intercept": -0.0023671151435328,
             "Coefficients": {
                 "Gender": 0.0244784583947992,
@@ -28,7 +28,7 @@
             }
         },
         {
-            "Name": "Category_3",
+            "Name": "High",
             "Intercept": 0.0187952471153142,
             "Coefficients": {
                 "Gender": 0.02018185354194,

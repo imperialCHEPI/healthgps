@@ -47,6 +47,21 @@ enum class Sector : uint8_t {
     rural
 };
 
+/// @brief Enumerates income categories
+enum class Income : uint8_t {
+    /// @brief Unknown income
+    unknown,
+
+    /// @brief Low income
+    low,
+
+    /// @brief Middle income
+    middle,
+
+    /// @brief High income
+    high
+};
+
 /// @brief C++20 concept for numeric columns types
 template <typename T>
 concept Numerical = std::is_arithmetic_v<T>;
