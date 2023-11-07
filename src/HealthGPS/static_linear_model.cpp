@@ -6,10 +6,11 @@
 
 namespace hgps {
 
-StaticLinearModel::StaticLinearModel(std::vector<LinearModelParams> risk_factor_models,
-                                     Eigen::MatrixXd risk_factor_cholesky)
-    : risk_factor_models_{std::move(risk_factor_models)},
-      risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
+StaticLinearModel::StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
+                                     const std::vector<LinearModelParams> &risk_factor_models,
+                                     const Eigen::MatrixXd &risk_factor_cholesky)
+    : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
+      risk_factor_cholesky_{risk_factor_cholesky} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
@@ -85,8 +86,10 @@ void StaticLinearModel::linear_approximation(Person &person) {
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    std::vector<LinearModelParams> risk_factor_models, Eigen::MatrixXd risk_factor_cholesky)
-    : risk_factor_models_{std::move(risk_factor_models)},
+    RiskFactorSexAgeTable risk_factor_expected, std::vector<LinearModelParams> risk_factor_models,
+    Eigen::MatrixXd risk_factor_cholesky)
+    : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
+      risk_factor_models_{std::move(risk_factor_models)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
 
     if (risk_factor_models_.empty()) {
@@ -98,7 +101,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    return std::make_unique<StaticLinearModel>(risk_factor_models_, risk_factor_cholesky_);
+    const auto &risk_factor_expected = get_risk_factor_expected();
+    return std::make_unique<StaticLinearModel>(risk_factor_expected, risk_factor_models_,
+                                               risk_factor_cholesky_);
 }
 
 } // namespace hgps

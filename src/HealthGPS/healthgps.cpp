@@ -1,9 +1,10 @@
 #include "healthgps.h"
 #include "HealthGPS.Core/thread_util.h"
-#include "baseline_sync_message.h"
+#include "HealthGPS.Core/univariate_summary.h"
 #include "converter.h"
 #include "info_message.h"
 #include "mtrandom.h"
+#include "sync_message.h"
 #include "univariate_visitor.h"
 
 #include <algorithm>
@@ -12,7 +13,15 @@
 #include <memory>
 #include <stdexcept>
 
+namespace { // anonymous namespace
+
+/// @brief Defines the net immigration synchronisation message
+using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>;
+
+} // anonymous namespace
+
 namespace hgps {
+
 HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
                      EventAggregator &bus)
     : Simulation(std::move(definition)), context_{bus, definition_} {
@@ -131,9 +140,8 @@ void HealthGPS::initialise_population() {
     // Social economics status
     ses_->initialise_population(context_);
 
-    // Generate risk factors*
+    // Generate risk factors
     risk_factor_->initialise_population(context_);
-    risk_factor_->apply_baseline_adjustments(context_);
 
     // Initialise diseases
     disease_->initialise_population(context_);
@@ -150,17 +158,14 @@ void HealthGPS::update_population() {
     // update basic information: demographics + diseases
     demographic_->update_population(context_, *disease_);
 
-    // update population socio-economic status
-    ses_->update_population(context_);
-
-    // initialise risk factors for newborns and updates population risk factors
-    risk_factor_->update_population(context_);
-
     // Calculate the net immigration by gender and age, update the population accordingly
     update_net_immigration();
 
-    // apply risk factors baseline adjustment to population
-    risk_factor_->apply_baseline_adjustments(context_);
+    // update population socio-economic status
+    ses_->update_population(context_);
+
+    // Update population risk factors
+    risk_factor_->update_population(context_);
 
     // Update diseases status: remission and incidence
     disease_->update_population(context_);

@@ -1,8 +1,10 @@
 #pragma once
 
-#include "interfaces.h"
+#include "HealthGPS.Core/identifier.h"
+
 #include "mapping.h"
 #include "random_algorithm.h"
+#include "risk_factor_adjustable_model.h"
 
 namespace hgps {
 
@@ -33,13 +35,15 @@ struct AgeGroupGenderEquation {
 /// @brief Implements the dynamic hierarchical linear model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class DynamicHierarchicalLinearModel final : public RiskFactorModel {
+class DynamicHierarchicalLinearModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the DynamicHierarchicalLinearModel class
+    /// @param expected The expected values
     /// @param equations The linear regression equations
     /// @param variables The factors delta variables mapping
     /// @param boundary_percentage The boundary percentage to sample
     DynamicHierarchicalLinearModel(
+        const RiskFactorSexAgeTable &expected,
         const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
         const std::map<core::Identifier, core::Identifier> &variables,
         const double boundary_percentage);
@@ -72,14 +76,16 @@ class DynamicHierarchicalLinearModel final : public RiskFactorModel {
 };
 
 /// @brief Defines the dynamic hierarchical linear model data type
-class DynamicHierarchicalLinearModelDefinition final : public RiskFactorModelDefinition {
+class DynamicHierarchicalLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   public:
     /// @brief Initialises a new instance of the DynamicHierarchicalLinearModelDefinition class
+    /// @param expected The expected values
     /// @param equations The linear regression equations
     /// @param variables The factors delta variables mapping
     /// @param boundary_percentage The boundary percentage to sample
     /// @throws std::invalid_argument for empty model equations definition
     DynamicHierarchicalLinearModelDefinition(
+        RiskFactorSexAgeTable expected,
         std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
         std::map<core::Identifier, core::Identifier> variables,
         const double boundary_percentage = 0.05);

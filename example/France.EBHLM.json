@@ -9,28 +9,27 @@
     "BoundaryPercentage": 0.05,
     "Variables": [
         {
+            "Name": "dBMI",
+            "Factor": "bmi"
+        },
+        {
             "Name": "dPA",
-            "Level": 3,
             "Factor": "pa"
         },
         {
             "Name": "dEnergy",
-            "Level": 3,
             "Factor": "energy"
         },
         {
             "Name": "dProtein",
-            "Level": 2,
             "Factor": "protein"
         },
         {
             "Name": "dSodium",
-            "Level": 2,
             "Factor": "sodium"
         },
         {
             "Name": "dFat",
-            "Level": 2,
             "Factor": "fat"
         }
     ],

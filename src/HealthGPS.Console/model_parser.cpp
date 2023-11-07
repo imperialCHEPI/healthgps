@@ -23,28 +23,39 @@
 
 namespace host {
 
-hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info) {
+hgps::RiskFactorSexAgeTable load_risk_factor_expected(const host::Configuration &config) {
     MEASURE_FUNCTION();
-    const auto male_filename = info.file_names.at("factorsmean_male").string();
-    const auto female_filename = info.file_names.at("factorsmean_female").string();
-    auto data =
-        std::map<hgps::core::Gender, std::map<hgps::core::Identifier, std::vector<double>>>{};
 
+    const auto &info = config.modelling.baseline_adjustment;
     if (!hgps::core::case_insensitive::equals(info.format, "CSV")) {
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
     }
 
+    auto table = hgps::RiskFactorSexAgeTable{};
+    const auto male_filename = info.file_names.at("factorsmean_male").string();
+    const auto female_filename = info.file_names.at("factorsmean_female").string();
     try {
-        data.emplace(hgps::core::Gender::male,
-                     load_baseline_from_csv(male_filename, info.delimiter));
-        data.emplace(hgps::core::Gender::female,
-                     load_baseline_from_csv(female_filename, info.delimiter));
+        table.emplace_row(hgps::core::Gender::male,
+                          load_baseline_from_csv(male_filename, info.delimiter));
+        table.emplace_row(hgps::core::Gender::female,
+                          load_baseline_from_csv(female_filename, info.delimiter));
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
     }
 
-    return hgps::BaselineAdjustment{hgps::FactorAdjustmentTable{std::move(data)}};
+    const auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
+    for (const auto &sex : table) {
+        for (const auto &factor : sex.second) {
+            if (factor.second.size() <= max_age) {
+                throw hgps::core::HgpsException{
+                    fmt::format("Baseline adjustment file must cover the required age range: [{}].",
+                                config.settings.age_range.to_string())};
+            }
+        }
+    }
+
+    return table;
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -161,6 +172,21 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         risk_factor_models.emplace_back(std::move(model));
     }
 
+    // Risk factor expected values by sex and age.
+    hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
+
+    // Check expected values are defined for all risk factors.
+    for (const hgps::LinearModelParams &model : risk_factor_models) {
+        if (!risk_factor_expected.at(hgps::core::Gender::male).contains(model.name)) {
+            throw hgps::core::HgpsException{fmt::format(
+                "'{}' not defined in male risk factor expected values.", model.name.to_string())};
+        }
+        if (!risk_factor_expected.at(hgps::core::Gender::female).contains(model.name)) {
+            throw hgps::core::HgpsException{fmt::format(
+                "'{}' not defined in female risk factor expected values.", model.name.to_string())};
+        }
+    }
+
     // Check correlation matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
         throw hgps::core::HgpsException{
@@ -172,8 +198,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     // Compute Cholesky decomposition of correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
-    return std::make_unique<hgps::StaticLinearModelDefinition>(std::move(risk_factor_models),
-                                                               std::move(cholesky));
+    return std::make_unique<hgps::StaticLinearModelDefinition>(
+        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -181,7 +207,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
                                    const host::Configuration &config) {
     // Load this dynamic model with the appropriate loader.
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
-        return load_ebhlm_risk_model_definition(opt);
+        return load_ebhlm_risk_model_definition(opt, config);
     }
     if (hgps::core::case_insensitive::equals(model_name, "kevinhall")) {
         return load_kevinhall_risk_model_definition(opt, config);
@@ -193,13 +219,12 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
-load_ebhlm_risk_model_definition(const poco::json &opt) {
+load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
-    auto percentage = 0.05;
-    std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
-    std::map<hgps::core::IntegerInterval, hgps::AgeGroupGenderEquation> equations;
 
     auto info = poco::LiteHierarchicalModelInfo{};
+
+    auto percentage = 0.05;
     opt["BoundaryPercentage"].get_to(info.percentage);
     if (info.percentage > 0.0 && info.percentage < 1.0) {
         percentage = info.percentage;
@@ -208,7 +233,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
             fmt::format("Boundary percentage outside range (0, 1): {}", info.percentage)};
     }
 
-    info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
+    std::map<hgps::core::IntegerInterval, hgps::AgeGroupGenderEquation> equations;
     for (const auto &it : opt["Equations"].items()) {
         const auto &age_key = it.key();
         info.equations.emplace(
@@ -222,6 +247,8 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
         }
     }
 
+    std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
+    info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
     for (const auto &item : info.variables) {
         variables.emplace(hgps::core::Identifier{item.name}, hgps::core::Identifier{item.factor});
     }
@@ -264,8 +291,11 @@ load_ebhlm_risk_model_definition(const poco::json &opt) {
         equations.emplace(age_key, std::move(age_equations));
     }
 
+    // Risk factor expected values by sex and age.
+    hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
+
     return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
-        std::move(equations), std::move(variables), percentage);
+        std::move(expected), std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
@@ -388,20 +418,6 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
-
-    auto adjustment = load_baseline_adjustments(config.modelling.baseline_adjustment);
-    auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
-    for (const auto &table : adjustment.values) {
-        for (const auto &item : table.second) {
-            if (item.second.size() <= max_age) {
-                throw hgps::core::HgpsException{
-                    fmt::format("Baseline adjustment file must cover the required age range: [{}].",
-                                config.settings.age_range.to_string())};
-            }
-        }
-    }
-
-    repository.register_baseline_adjustment_definition(std::move(adjustment));
 }
 
 } // namespace host

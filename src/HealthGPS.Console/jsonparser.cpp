@@ -101,13 +101,10 @@ void from_json(const json &j, SESInfo &p) {
     j.at("function_parameters").get_to(p.parameters);
 }
 
-void to_json(json &j, const VariableInfo &p) {
-    j = json{{"Name", p.name}, {"Level", p.level}, {"Factor", p.factor}};
-}
+void to_json(json &j, const VariableInfo &p) { j = json{{"Name", p.name}, {"Factor", p.factor}}; }
 
 void from_json(const json &j, VariableInfo &p) {
     j.at("Name").get_to(p.name);
-    j.at("Level").get_to(p.level);
     j.at("Factor").get_to(p.factor);
 }
 

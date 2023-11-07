@@ -2,6 +2,7 @@
 
 #include "interfaces.h"
 #include "mapping.h"
+#include "risk_factor_adjustable_model.h"
 
 #include <Eigen/Dense>
 
@@ -17,14 +18,16 @@ struct LinearModelParams {
 /// @brief Implements the static linear model type
 ///
 /// @details The static model is used to initialise the virtual population.
-class StaticLinearModel final : public RiskFactorModel {
+class StaticLinearModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the StaticLinearModel class
+    /// @param risk_factor_expected The risk factor expected values by sex and age
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws HgpsException for invalid arguments
-    StaticLinearModel(std::vector<LinearModelParams> risk_factor_models,
-                      Eigen::MatrixXd risk_factor_cholesky);
+    StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
+                      const std::vector<LinearModelParams> &risk_factor_models,
+                      const Eigen::MatrixXd &risk_factor_cholesky);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -39,18 +42,20 @@ class StaticLinearModel final : public RiskFactorModel {
     void linear_approximation(Person &person);
 
   private:
-    const std::vector<LinearModelParams> risk_factor_models_;
-    const Eigen::MatrixXd risk_factor_cholesky_;
+    const std::vector<LinearModelParams> &risk_factor_models_;
+    const Eigen::MatrixXd &risk_factor_cholesky_;
 };
 
 /// @brief Defines the static linear model data type
-class StaticLinearModelDefinition final : public RiskFactorModelDefinition {
+class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   public:
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
+    /// @param risk_factor_expected The risk factor expected values by sex and age
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @throws HgpsException for invalid arguments
-    StaticLinearModelDefinition(std::vector<LinearModelParams> risk_factor_models,
+    StaticLinearModelDefinition(RiskFactorSexAgeTable risk_factor_expected,
+                                std::vector<LinearModelParams> risk_factor_models,
                                 Eigen::MatrixXd risk_factor_cholesky);
 
     /// @brief Construct a new StaticLinearModel from this definition

@@ -1,9 +1,11 @@
 #pragma once
-#include "HealthGPS.Core/api.h"
-#include "randombit_generator.h"
 
-#include <map>
-#include <memory>
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/identifier.h"
+
+#include "person.h"
+#include "risk_factor_model.h"
+#include "runtime_context.h"
 
 namespace hgps {
 
@@ -24,29 +26,6 @@ enum class SimulationModuleType : uint8_t {
     /// @brief Statistical analysis module, e.g. BoD module
     Analysis,
 };
-
-/// @brief Health GPS risk factor module types enumeration
-enum class RiskFactorModelType : uint8_t {
-    /// @brief Static model
-    Static,
-
-    /// @brief Dynamic model
-    Dynamic,
-};
-
-/// @brief Defines a map template with case insensitive string keys and type.
-/// @tparam T The map value data type
-template <typename T>
-using case_insensitive_map = std::map<std::string, T, core::case_insensitive::comparator>;
-
-/// @brief Simulation entity data structure
-struct Person;
-
-/// @brief Population age record data structure
-struct PopulationRecord;
-
-/// @brief Simulation run-time context for shared data and state.
-class RuntimeContext;
 
 /// @brief Simulation modules interface
 class SimulationModule {
@@ -106,10 +85,29 @@ class RiskFactorHostModule : public UpdatableModule {
     /// @param modelType The model type identifier
     /// @return true if the model is found, otherwise false.
     virtual bool contains(const RiskFactorModelType &modelType) const noexcept = 0;
+};
 
-    /// @brief Apply baseline risk factor adjustments to population
-    /// @param context The simulation run-time context
-    virtual void apply_baseline_adjustments(RuntimeContext &context) = 0;
+/// @brief Define the population record data type for the demographic dataset
+struct PopulationRecord {
+    /// @brief Initialise a new instance of the PopulationRecord structure
+    /// @param pop_age Age reference
+    /// @param num_males Number of males
+    /// @param num_females Number of females
+    PopulationRecord(int pop_age, float num_males, float num_females)
+        : age{pop_age}, males{num_males}, females{num_females} {}
+
+    /// @brief Age reference in years
+    int age{};
+
+    /// @brief Number of males
+    float males{};
+
+    /// @brief NUmber of females
+    float females{};
+
+    /// @brief Gets the total number at age
+    /// @return Total number for age
+    float total() const noexcept { return males + females; }
 };
 
 /// @brief Demographic prospects module interface
@@ -131,39 +129,6 @@ class DemographicModule : public SimulationModule {
     /// @param disease_host The diseases host module instance
     virtual void update_population(RuntimeContext &context,
                                    const DiseaseHostModule &disease_host) = 0;
-};
-
-/// @brief Risk factor model interface
-class RiskFactorModel {
-  public:
-    /// @brief Destroys a RiskFactorModel instance
-    virtual ~RiskFactorModel() = default;
-
-    /// @brief Gets the model type identifier
-    /// @return The module type identifier
-    virtual RiskFactorModelType type() const noexcept = 0;
-
-    /// @brief Gets the model name
-    /// @return The human-readable model name
-    virtual std::string name() const noexcept = 0;
-
-    /// @brief Generates the initial risk factors for a population and newborns
-    /// @param context The simulation run-time context
-    virtual void generate_risk_factors(RuntimeContext &context) = 0;
-
-    /// @brief Update risk factors for population
-    /// @param context The simulation run-time context
-    virtual void update_risk_factors(RuntimeContext &context) = 0;
-};
-
-/// @brief Risk factor model definition interface
-class RiskFactorModelDefinition {
-  public:
-    /// @brief Destroys a RiskFactorModelDefinition instance
-    virtual ~RiskFactorModelDefinition() = default;
-
-    /// @brief Creates a new risk factor model from this definition
-    virtual std::unique_ptr<RiskFactorModel> create_model() const = 0;
 };
 
 /// @brief Diseases model interface
@@ -197,4 +162,5 @@ class DiseaseModel {
     /// @return the mortality rate value, if found, otherwise zero.
     virtual double get_excess_mortality(const Person &entity) const noexcept = 0;
 };
+
 } // namespace hgps

@@ -19,22 +19,12 @@ void CachedRepository::register_risk_factor_model_definition(
     rf_model_definition_.emplace(model_type, std::move(definition));
 }
 
-void CachedRepository::register_baseline_adjustment_definition(BaselineAdjustment definition) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    baseline_adjustments_ = std::move(definition);
-}
-
 core::Datastore &CachedRepository::manager() noexcept { return data_manager_; }
 
 const RiskFactorModelDefinition &
 CachedRepository::get_risk_factor_model_definition(const RiskFactorModelType &model_type) const {
     std::scoped_lock<std::mutex> lock(mutex_);
     return *rf_model_definition_.at(model_type);
-}
-
-BaselineAdjustment &CachedRepository::get_baseline_adjustment_definition() {
-    std::scoped_lock<std::mutex> lock(mutex_);
-    return baseline_adjustments_;
 }
 
 const std::vector<core::DiseaseInfo> &CachedRepository::get_diseases() {

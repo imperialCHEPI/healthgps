@@ -82,25 +82,25 @@
     "IncomeModels": [
         {
             "Name": "Category_1",
-            "Intercept": 1.0,
+            "Intercept": 0.0,
             "Coefficients": {}
         },
         {
             "Name": "Category_2",
-            "Intercept": 0.75498278113169,
+            "Intercept": -0.0023671151435328,
             "Coefficients": {
-                "Gender": 0.0204338261883629,
-                "Over18": 0.0486699373325097,
-                "Sector": -0.706477682886734
+                "Gender": 0.0244784583947992,
+                "Over18": 0.276669591410528,
+                "Sector": -0.491794449118805
             }
         },
         {
             "Name": "Category_3",
-            "Intercept": 1.48856946873517,
+            "Intercept": 0.0187952471153142,
             "Coefficients": {
-                "Gender": 0.000641255498596025,
-                "Over18": 0.206622749570132,
-                "Sector": -1.71313287940798
+                "Gender": 0.02018185354194,
+                "Over18": 0.607099252829797,
+                "Sector": -1.5870837069653
             }
         }
     ],

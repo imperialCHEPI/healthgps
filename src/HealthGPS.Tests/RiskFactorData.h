@@ -114,7 +114,7 @@ std::string join_string_map(const std::vector<std::string> &v, std::string_view 
 //	return ss.str();
 // }
 
-// hgps::HierarchicalLinearModelDefinition get_static_test_model(hgps::BaselineAdjustment&
+// hgps::HierarchicalLinearModelDefinition get_static_test_model(hgps::RiskFactorSexAgeTable&
 // baseline_data) {
 //	/* Auto-generated code, do not change **** */
 //
@@ -191,7 +191,7 @@ std::string join_string_map(const std::vector<std::string> &v, std::string_view 
 // std::move(baseline_data) };
 // }
 //
-// hgps::HierarchicalLinearModelDefinition get_dynamic_test_model(hgps::BaselineAdjustment&
+// hgps::HierarchicalLinearModelDefinition get_dynamic_test_model(hgps::RiskFactorSexAgeTable&
 // baseline_data) {
 //	/* Auto-generated code, do not change **** */
 //

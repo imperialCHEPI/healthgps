@@ -1,9 +1,12 @@
 #pragma once
+
+#include "HealthGPS.Core/datastore.h"
+
 #include "disease_definition.h"
 #include "interfaces.h"
 #include "lms_definition.h"
 #include "modelinput.h"
-#include "riskfactor_adjustment_types.h"
+#include "risk_factor_adjustable_model.h"
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -20,6 +23,7 @@ class Repository {
     Repository(const Repository &) = delete;
     Repository &operator=(Repository &&) = delete;
     Repository &operator=(const Repository &) = delete;
+
     /// @brief Destroys a Repository instance
     virtual ~Repository() = default;
 
@@ -32,10 +36,6 @@ class Repository {
     /// @return The risk factor model definition
     virtual const RiskFactorModelDefinition &
     get_risk_factor_model_definition(const RiskFactorModelType &model_type) const = 0;
-
-    /// @brief Gets the user provided baseline risk factors adjustment dataset
-    /// @return Baseline risk factors adjustments
-    virtual BaselineAdjustment &get_baseline_adjustment_definition() = 0;
 
     /// @brief Gets the collection of all diseases available in the back-end storage
     /// @return Collection of diseases information
@@ -78,16 +78,10 @@ class CachedRepository final : public Repository {
     register_risk_factor_model_definition(const RiskFactorModelType &model_type,
                                           std::unique_ptr<RiskFactorModelDefinition> definition);
 
-    /// @brief Register a user provided baseline risk factors adjustments dataset
-    /// @param definition The baseline risk factors adjustments dataset
-    void register_baseline_adjustment_definition(BaselineAdjustment definition);
-
     core::Datastore &manager() noexcept override;
 
     const RiskFactorModelDefinition &
     get_risk_factor_model_definition(const RiskFactorModelType &model_type) const override;
-
-    BaselineAdjustment &get_baseline_adjustment_definition() override;
 
     const std::vector<core::DiseaseInfo> &get_diseases() override;
 
@@ -104,7 +98,6 @@ class CachedRepository final : public Repository {
     mutable std::mutex mutex_;
     std::reference_wrapper<core::Datastore> data_manager_;
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModelDefinition>> rf_model_definition_;
-    BaselineAdjustment baseline_adjustments_;
     std::vector<core::DiseaseInfo> diseases_info_;
     std::map<core::Identifier, DiseaseDefinition> diseases_;
     LmsDefinition lms_parameters_;
