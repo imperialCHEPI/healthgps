@@ -237,7 +237,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
             json_params["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
 
         // Insert income model.
-        income_models.emplace(std::move(category), std::move(model));
+        income_models.emplace(category, std::move(model));
     }
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
