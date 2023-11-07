@@ -24,10 +24,16 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param risk_factor_expected The risk factor expected values by sex and age
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param income_models The income models for each income category
     /// @throws HgpsException for invalid arguments
-    StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
-                      const std::vector<LinearModelParams> &risk_factor_models,
-                      const Eigen::MatrixXd &risk_factor_cholesky);
+    StaticLinearModel(
+        const RiskFactorSexAgeTable &risk_factor_expected,
+        const std::vector<LinearModelParams> &risk_factor_models,
+        const Eigen::MatrixXd &risk_factor_cholesky,
+        const std::unordered_map<hgps::core::Identifier,
+                                 std::unordered_map<hgps::core::Gender, double>> &rural_prevalence,
+        const std::vector<LinearModelParams> &income_models);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -37,13 +43,36 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void update_risk_factors(RuntimeContext &context) override;
 
-    Eigen::VectorXd correlated_samples(RuntimeContext &context);
-
+  private:
     void linear_approximation(Person &person);
 
-  private:
+    Eigen::VectorXd correlated_sample(RuntimeContext &context);
+
+    /// @brief Initialise the sector of a person
+    /// @param context The runtime context
+    /// @param person The person to initialise sector for
+    void initialise_sector(RuntimeContext &context, Person &person) const;
+
+    /// @brief Update the sector of a person
+    /// @param context The runtime context
+    /// @param person The person to update sector for
+    void update_sector(RuntimeContext &context, Person &person) const;
+
+    /// @brief Initialise the income category of a person
+    /// @param context The runtime context
+    /// @param person The person to initialise sector for
+    void initialise_income(RuntimeContext &context, Person &person) const;
+
+    /// @brief Update the income category of a person
+    /// @param context The runtime context
+    /// @param person The person to update sector for
+    void update_income(RuntimeContext &context, Person &person) const;
+
     const std::vector<LinearModelParams> &risk_factor_models_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
+    const std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        &rural_prevalence_;
+    const std::vector<LinearModelParams> &income_models_;
 };
 
 /// @brief Defines the static linear model data type
@@ -53,10 +82,15 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param risk_factor_expected The risk factor expected values by sex and age
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param income_models The income models for each income category
     /// @throws HgpsException for invalid arguments
-    StaticLinearModelDefinition(RiskFactorSexAgeTable risk_factor_expected,
-                                std::vector<LinearModelParams> risk_factor_models,
-                                Eigen::MatrixXd risk_factor_cholesky);
+    StaticLinearModelDefinition(
+        RiskFactorSexAgeTable risk_factor_expected,
+        std::vector<LinearModelParams> risk_factor_models, Eigen::MatrixXd risk_factor_cholesky,
+        std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+            rural_prevalence,
+        std::vector<LinearModelParams> income_models);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -65,6 +99,9 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   private:
     std::vector<LinearModelParams> risk_factor_models_;
     Eigen::MatrixXd risk_factor_cholesky_;
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        rural_prevalence_;
+    std::vector<LinearModelParams> income_models_;
 };
 
 } // namespace hgps

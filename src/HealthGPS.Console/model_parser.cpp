@@ -198,8 +198,29 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     // Compute Cholesky decomposition of correlation matrix.
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
+    // Rural sector prevalence for age groups and sex.
+    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
+        rural_prevalence;
+    for (const auto &age_group : opt["RuralPrevalence"]) {
+        auto age_group_name = age_group["Name"].get<hgps::core::Identifier>();
+        rural_prevalence[age_group_name] = {{hgps::core::Gender::female, age_group["Female"]},
+                                            {hgps::core::Gender::male, age_group["Male"]}};
+    }
+
+    // Income models for different income classifications.
+    std::vector<hgps::LinearModelParams> income_models;
+    for (const auto &factor : opt["IncomeModels"]) {
+        hgps::LinearModelParams model;
+        model.name = factor["Name"].get<hgps::core::Identifier>();
+        model.intercept = factor["Intercept"].get<double>();
+        model.coefficients =
+            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
+        income_models.emplace_back(std::move(model));
+    }
+
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky));
+        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky),
+        std::move(rural_prevalence), std::move(income_models));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -335,26 +356,6 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
     const auto food_data_table = load_datatable_from_csv(food_data_file_info);
 
-    // Rural sector prevalence for age groups and sex.
-    std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
-        rural_prevalence;
-    for (const auto &age_group : opt["RuralPrevalence"]) {
-        auto age_group_name = age_group["Name"].get<hgps::core::Identifier>();
-        rural_prevalence[age_group_name] = {{hgps::core::Gender::female, age_group["Female"]},
-                                            {hgps::core::Gender::male, age_group["Male"]}};
-    }
-
-    // Income models for different income classifications.
-    std::vector<hgps::LinearModelParams> income_models;
-    for (const auto &factor : opt["IncomeModels"]) {
-        hgps::LinearModelParams model;
-        model.name = factor["Name"].get<hgps::core::Identifier>();
-        model.intercept = factor["Intercept"].get<double>();
-        model.coefficients =
-            factor["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
-        income_models.emplace_back(std::move(model));
-    }
-
     // Load M/F average heights for age.
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
@@ -371,8 +372,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(rural_prevalence), std::move(income_models),
-        std::move(age_mean_height));
+        std::move(food_prices), std::move(age_mean_height));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
