@@ -180,14 +180,16 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
 
     // Check expected values are defined for all risk factors.
-    for (const auto &name : std::views::keys(risk_factor_models)) {
-        if (!risk_factor_expected.at(hgps::core::Gender::male).contains(name)) {
-            throw hgps::core::HgpsException{fmt::format(
-                "'{}' not defined in male risk factor expected values.", name.to_string())};
+    for (const auto &model : risk_factor_models) {
+        if (!risk_factor_expected.at(hgps::core::Gender::male).contains(model.first)) {
+            throw hgps::core::HgpsException{
+                fmt::format("'{}' is not defined in male risk factor expected values.",
+                            model.first.to_string())};
         }
-        if (!risk_factor_expected.at(hgps::core::Gender::female).contains(name)) {
-            throw hgps::core::HgpsException{fmt::format(
-                "'{}' not defined in female risk factor expected values.", name.to_string())};
+        if (!risk_factor_expected.at(hgps::core::Gender::female).contains(model.first)) {
+            throw hgps::core::HgpsException{
+                fmt::format("'{}' is not defined in female risk factor expected values.",
+                            model.first.to_string())};
         }
     }
 
