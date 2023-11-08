@@ -26,6 +26,9 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
+    // Adjust weigth risk factor such its mean sim value matches expected value.
+    adjust_risk_factors(context, {"Weight"_id});
+
     for (auto &person : context.population()) {
 
         // Approximate risk factor values with linear models.
