@@ -35,7 +35,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         linear_approximation(person);
 
         // Initialise weight
-        initialise_weight(person);
+        initialise_weight(person, context.random());
 
         // Correlated residual sampling.
         auto samples = correlated_samples(context);
@@ -95,19 +95,24 @@ void StaticLinearModel::linear_approximation(Person &person) {
 /// 
 /// It uses the baseline adjustment to get its initial value, based on its sex and age.
 /// @param person The person fo initialise the weight for.
-void StaticLinearModel::initialise_weight(Person &person) { 
+void StaticLinearModel::initialise_weight(Person &person, Random generator) { 
     
-                double energyintakebaseline =
-    this.baselineMeans[individual.sex][individual.age].GetValue("energyintake");
+    auto energyintake_bl = get_risk_factor_expected().at(person.gender, "EnergyIntake"_id).at(person.age);
+    auto weightbaseline = get_risk_factor_expected().at(person.gender, "Weight"_id).at(person.age);
+    auto energy_quantile = person.get_risk_factor_value("EnergyIntake"_id) / energyintake_bl;
+    auto weight_quantile = get_weight_quantile(energy_quantile, person.gender, generator);
+    person.weight = weightbaseline * weight_quantile;
+}
 
-    double eneregyQuantile = individual.energyintake / energyintakebaseline;
-
-    double weightQuantile = GetWeightQuantile(eneregyQuantile, individual.sex);
-    double w0 = this.baselineMeans[individual.sex][individual.age].GetValue("weight");
-
-    double weight = w0 * weightQuantile;
-    
-    person.weight = 42.0;
+/// Returns the weight quantile for the given gender.
+/// 
+/// TODO For now just a dummy, most likely infeasible, implementation.
+/// @energy_quantile The energy quantile this weight relates to, in turn related with the age.
+/// @gender The gender of the person.
+/// @generator Random number generator for the simulation.
+double StaticLinearModel::get_weight_quantile(double energy_quantile, core::Gender gender,
+    Random generator) {
+    return 42 * generator.next_double();
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(

@@ -41,7 +41,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void linear_approximation(Person &person);
 
-    void initialise_weight(Person &person);
+    void initialise_weight(Person &person, Random generator);
+
+    double get_weight_quantile(double energy_quantile, core::Gender gender, Random generator);
 
   private:
     const std::vector<LinearModelParams> &risk_factor_models_;
