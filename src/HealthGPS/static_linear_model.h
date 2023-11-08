@@ -41,6 +41,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void linear_approximation(Person &person);
 
+    void initialise_weight(Person &person);
+
   private:
     const std::vector<LinearModelParams> &risk_factor_models_;
     const Eigen::MatrixXd &risk_factor_cholesky_;

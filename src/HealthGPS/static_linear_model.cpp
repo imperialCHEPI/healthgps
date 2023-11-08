@@ -31,6 +31,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         // Approximate risk factor values with linear models.
         linear_approximation(person);
 
+        // Initialise weight
+        initialise_weight(person);
+
         // Correlated residual sampling.
         auto samples = correlated_samples(context);
 
@@ -83,6 +86,14 @@ void StaticLinearModel::linear_approximation(Person &person) {
         }
         person.risk_factors[model.name] = factor;
     }
+}
+
+/// Initialises the weight of a person.
+/// 
+/// It uses the baseline adjustment to get its initial value, based on its sex and age.
+/// @param person The person fo initialise the weight for.
+void StaticLinearModel::initialise_weight(Person &person) {
+
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
