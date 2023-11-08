@@ -56,6 +56,9 @@ struct Person {
     /// @brief Current age in years
     unsigned int age{};
 
+    /// @brief Current weight of the person, in kg
+    double weight{};
+
     /// @brief Sector (region) assigned value
     core::Sector sector{core::Sector::unknown};
 

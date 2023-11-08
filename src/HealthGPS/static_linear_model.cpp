@@ -27,7 +27,7 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust weigth risk factor such its mean sim value matches expected value.
-    adjust_risk_factors(context, {"Weight"_id});
+    adjust_risk_factors(context, {"Weight"_id, "EnergyIntake"_id});
 
     for (auto &person : context.population()) {
 
@@ -95,8 +95,19 @@ void StaticLinearModel::linear_approximation(Person &person) {
 /// 
 /// It uses the baseline adjustment to get its initial value, based on its sex and age.
 /// @param person The person fo initialise the weight for.
-void StaticLinearModel::initialise_weight(Person &person) {
+void StaticLinearModel::initialise_weight(Person &person) { 
+    
+                double energyintakebaseline =
+    this.baselineMeans[individual.sex][individual.age].GetValue("energyintake");
 
+    double eneregyQuantile = individual.energyintake / energyintakebaseline;
+
+    double weightQuantile = GetWeightQuantile(eneregyQuantile, individual.sex);
+    double w0 = this.baselineMeans[individual.sex][individual.age].GetValue("weight");
+
+    double weight = w0 * weightQuantile;
+    
+    person.weight = 42.0;
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
