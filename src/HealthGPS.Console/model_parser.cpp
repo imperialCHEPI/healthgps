@@ -152,15 +152,16 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     const auto quantiles_male = load_datatable_from_csv(
         host::get_file_info(opt["WeightQuantiles"]["male"], config.root_path));
     std::map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
-        {hgps::core::Gender::female, std::vector<double>(quantiles_female.num_rows())},
-        {hgps::core::Gender::male, std::vector<double>(quantiles_female.num_columns())}};
+        {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
+    weight_quantiles[hgps::core::Gender::female].reserve(quantiles_female.num_rows());
+    weight_quantiles[hgps::core::Gender::male].reserve(quantiles_male.num_rows());
     for (size_t j = 0; j < quantiles_female.num_rows(); j++) {
-        weight_quantiles[hgps::core::Gender::female][j] =
-            std::any_cast<double>(quantiles_female.column(0).value(j));
+        weight_quantiles[hgps::core::Gender::female].push_back(
+            std::any_cast<double>(quantiles_female.column(0).value(j)));
     }
     for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
-        weight_quantiles[hgps::core::Gender::male][j] =
-            std::any_cast<double>(quantiles_male.column(0).value(j));
+        weight_quantiles[hgps::core::Gender::male].push_back(
+            std::any_cast<double>(quantiles_male.column(0).value(j)));
     }
 
     // Risk factor linear models.
