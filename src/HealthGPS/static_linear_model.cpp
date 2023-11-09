@@ -102,7 +102,7 @@ void StaticLinearModel::linear_approximation(Person &person) {
 /// It uses the baseline adjustment to get its initial value, based on its sex and age.
 /// @param person The person fo initialise the weight for.
 /// @generator Random number generator for the simulation.
-void StaticLinearModel::initialise_weight(Person &person, Random generator) {
+void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
 
     auto weight_bl = get_risk_factor_expected().at(person.gender, "Weight"_id).at(person.age);
     auto weight_quantile = get_weight_quantile(person.gender, generator);
@@ -113,7 +113,7 @@ void StaticLinearModel::initialise_weight(Person &person, Random generator) {
 ///
 /// @gender The gender of the person.
 /// @generator Random number generator for the simulation.
-double StaticLinearModel::get_weight_quantile(core::Gender gender, Random generator) {
+double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &generator) {
 
     int index = static_cast<int>(generator.next_double() * weight_quantiles_.at(gender).size());
     return weight_quantiles_.at(gender)[index];
