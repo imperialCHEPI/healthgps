@@ -6,11 +6,13 @@
 
 namespace hgps {
 
-StaticLinearModel::StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
-                                     const std::vector<LinearModelParams> &risk_factor_models,
-                                     const Eigen::MatrixXd &risk_factor_cholesky)
+StaticLinearModel::StaticLinearModel(
+    const RiskFactorSexAgeTable &risk_factor_expected,
+    const std::vector<LinearModelParams> &risk_factor_models,
+    const Eigen::MatrixXd &risk_factor_cholesky,
+    const std::map<core::Gender, std::vector<double>> &weight_quantiles)
     : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
-      risk_factor_cholesky_{risk_factor_cholesky} {
+      risk_factor_cholesky_{risk_factor_cholesky}, weight_quantiles_{weight_quantiles} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
@@ -18,6 +20,10 @@ StaticLinearModel::StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_ex
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
+    // TODO: Uncomment when fully implemented
+    // if (weight_quantiles_.empty()) {
+    //    throw core::HgpsException("Weigth quantiles dictionary is empty");
+    //}
 }
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
@@ -25,9 +31,6 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-
-    // Adjust weigth risk factor such its mean sim value matches expected value.
-    adjust_risk_factors(context, {"Weight"_id, "EnergyIntake"_id});
 
     for (auto &person : context.population()) {
 
@@ -42,6 +45,9 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
         // TODO: add residuals to risk factor values
     }
+
+    // Adjust weigth risk factor such its mean sim value matches expected value.
+    adjust_risk_factors(context, {"Weight"_id});
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -92,28 +98,31 @@ void StaticLinearModel::linear_approximation(Person &person) {
 }
 
 /// Initialises the weight of a person.
-/// 
+///
 /// It uses the baseline adjustment to get its initial value, based on its sex and age.
 /// @param person The person fo initialise the weight for.
 void StaticLinearModel::initialise_weight(Person &person, Random generator) {
 
-    auto energyintake_bl =
-        get_risk_factor_expected().at(person.gender, "EnergyIntake"_id).at(person.age);
     auto weight_bl = get_risk_factor_expected().at(person.gender, "Weight"_id).at(person.age);
-    auto energy_quantile = person.get_risk_factor_value("EnergyIntake"_id) / energyintake_bl;
-    auto weight_quantile = get_weight_quantile(energy_quantile, person.gender, generator);
+    auto weight_quantile = get_weight_quantile(person.gender, generator);
     person.risk_factors["Weight"_id] = weight_bl * weight_quantile;
 }
 
 /// Returns the weight quantile for the given gender.
-/// 
+///
 /// TODO For now just a dummy, most likely infeasible, implementation.
 /// @energy_quantile The energy quantile this weight relates to, in turn related with the age.
 /// @gender The gender of the person.
 /// @generator Random number generator for the simulation.
-double StaticLinearModel::get_weight_quantile(double energy_quantile, core::Gender gender,
-                                              Random generator) {
-    return 42 * generator.next_double();
+double StaticLinearModel::get_weight_quantile(core::Gender gender, Random generator) {
+
+    // TODO: Remove when fully implemented
+    if (weight_quantiles_.empty()) {
+        return 1.0;
+    }
+
+    int index = static_cast<int>(generator.next_double() * weight_quantiles_.at(gender).size());
+    return weight_quantiles_.at(gender)[index];
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(

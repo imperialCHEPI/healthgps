@@ -27,7 +27,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
                       const std::vector<LinearModelParams> &risk_factor_models,
-                      const Eigen::MatrixXd &risk_factor_cholesky);
+                      const Eigen::MatrixXd &risk_factor_cholesky,
+                      const std::map<core::Gender, std::vector<double>> &weight_quantiles);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -43,11 +44,12 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void initialise_weight(Person &person, Random generator);
 
-    double get_weight_quantile(double energy_quantile, core::Gender gender, Random generator);
-
   private:
     const std::vector<LinearModelParams> &risk_factor_models_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
+    const std::map<core::Gender, std::vector<double>> &weight_quantiles_;
+
+    double get_weight_quantile(core::Gender gender, Random generator);
 };
 
 /// @brief Defines the static linear model data type
