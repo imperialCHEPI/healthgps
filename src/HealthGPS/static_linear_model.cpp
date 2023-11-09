@@ -22,7 +22,7 @@ StaticLinearModel::StaticLinearModel(
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
     if (weight_quantiles_.empty()) {
-        throw core::HgpsException("Weigth quantiles dictionary is empty");
+        throw core::HgpsException("Weight quantiles dictionary is empty");
     }
 }
 
