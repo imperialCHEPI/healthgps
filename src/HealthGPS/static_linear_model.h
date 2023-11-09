@@ -22,6 +22,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Initialises a new instance of the StaticLinearModel class
     /// @param risk_factor_expected The risk factor expected values by sex and age
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
+    /// @param risk_factor_lambda The lambda values of the risk factors
+    /// @param risk_factor_stddev The standard deviations of the risk factors
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -29,6 +31,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     StaticLinearModel(
         const RiskFactorSexAgeTable &risk_factor_expected,
         const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
+        const std::unordered_map<core::Identifier, double> &risk_factor_lambda,
+        const std::unordered_map<core::Identifier, double> &risk_factor_stddev,
         const Eigen::MatrixXd &risk_factor_cholesky,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
@@ -68,6 +72,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void update_income(RuntimeContext &context, Person &person) const;
 
     const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models_;
+    const std::unordered_map<core::Identifier, double> &risk_factor_lambda_;
+    const std::unordered_map<core::Identifier, double> &risk_factor_stddev_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
@@ -80,6 +86,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
     /// @param risk_factor_expected The risk factor expected values by sex and age
     /// @param risk_factor_models The linear models used to initialise a person's risk factor values
+    /// @param risk_factor_lambda The lambda values of the risk factors
+    /// @param risk_factor_stddev The standard deviations of the risk factors
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -87,6 +95,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     StaticLinearModelDefinition(
         RiskFactorSexAgeTable risk_factor_expected,
         std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
+        std::unordered_map<core::Identifier, double> risk_factor_lambda,
+        std::unordered_map<core::Identifier, double> risk_factor_stddev,
         Eigen::MatrixXd risk_factor_cholesky,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
@@ -98,6 +108,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
   private:
     std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models_;
+    std::unordered_map<core::Identifier, double> risk_factor_lambda_;
+    std::unordered_map<core::Identifier, double> risk_factor_stddev_;
     Eigen::MatrixXd risk_factor_cholesky_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;

@@ -9,16 +9,25 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &risk_factor_expected,
     const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
+    const std::unordered_map<core::Identifier, double> &risk_factor_lambda,
+    const std::unordered_map<core::Identifier, double> &risk_factor_stddev,
     const Eigen::MatrixXd &risk_factor_cholesky,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models)
     : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
+      risk_factor_lambda_{risk_factor_lambda}, risk_factor_stddev_{risk_factor_stddev},
       risk_factor_cholesky_{risk_factor_cholesky}, rural_prevalence_{rural_prevalence},
       income_models_{income_models} {
 
     if (risk_factor_models_.empty()) {
-        throw core::HgpsException("Risk factor model list is empty");
+        throw core::HgpsException("Risk factor model mapping is empty");
+    }
+    if (risk_factor_lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda mapping is empty");
+    }
+    if (risk_factor_stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation mapping is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -198,16 +207,26 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person) c
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     RiskFactorSexAgeTable risk_factor_expected,
     std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
+    std::unordered_map<core::Identifier, double> risk_factor_lambda,
+    std::unordered_map<core::Identifier, double> risk_factor_stddev,
     Eigen::MatrixXd risk_factor_cholesky,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models)
     : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
       risk_factor_models_{std::move(risk_factor_models)},
+      risk_factor_lambda_{std::move(risk_factor_lambda)},
+      risk_factor_stddev_{std::move(risk_factor_stddev)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)} {
 
     if (risk_factor_models_.empty()) {
-        throw core::HgpsException("Risk factor model list is empty");
+        throw core::HgpsException("Risk factor model mapping is empty");
+    }
+    if (risk_factor_lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda mapping is empty");
+    }
+    if (risk_factor_stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation mapping is empty");
     }
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
@@ -222,9 +241,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &risk_factor_expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(risk_factor_expected, risk_factor_models_,
-                                               risk_factor_cholesky_, rural_prevalence_,
-                                               income_models_);
+    return std::make_unique<StaticLinearModel>(
+        risk_factor_expected, risk_factor_models_, risk_factor_lambda_, risk_factor_stddev_,
+        risk_factor_cholesky_, rural_prevalence_, income_models_);
 }
 
 } // namespace hgps

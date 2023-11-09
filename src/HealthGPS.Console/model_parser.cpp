@@ -176,6 +176,20 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         i++;
     }
 
+    // Risk factor lambda values.
+    std::unordered_map<hgps::core::Identifier, double> risk_factor_lambda;
+    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+        auto factor_name = hgps::core::Identifier{key};
+        risk_factor_lambda.emplace(factor_name, json_params["Lambda"].get<double>());
+    }
+
+    // Risk factor standard deviations.
+    std::unordered_map<hgps::core::Identifier, double> risk_factor_stddev;
+    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+        auto factor_name = hgps::core::Identifier{key};
+        risk_factor_stddev.emplace(factor_name, json_params["StdDev"].get<double>());
+    }
+
     // Risk factor expected values by sex and age.
     hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
 
@@ -243,7 +257,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky),
+        std::move(risk_factor_expected), std::move(risk_factor_models),
+        std::move(risk_factor_lambda), std::move(risk_factor_stddev), std::move(cholesky),
         std::move(rural_prevalence), std::move(income_models));
 }
 
