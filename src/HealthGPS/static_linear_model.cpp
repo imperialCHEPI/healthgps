@@ -101,7 +101,7 @@ void StaticLinearModel::initialise_weight(Person &person, Random generator) {
     auto weightbaseline = get_risk_factor_expected().at(person.gender, "Weight"_id).at(person.age);
     auto energy_quantile = person.get_risk_factor_value("EnergyIntake"_id) / energyintake_bl;
     auto weight_quantile = get_weight_quantile(energy_quantile, person.gender, generator);
-    person.weight = weightbaseline * weight_quantile;
+    person.risk_factors["Weight"_id] = weightbaseline * weight_quantile;
 }
 
 /// Returns the weight quantile for the given gender.
