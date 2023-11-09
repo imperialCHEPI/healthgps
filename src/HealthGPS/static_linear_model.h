@@ -42,14 +42,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void linear_approximation(Person &person);
 
-    void initialise_weight(Person &person, Random generator);
+    void initialise_weight(Person &person, Random &generator);
 
   private:
     const std::vector<LinearModelParams> &risk_factor_models_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
     const std::map<core::Gender, std::vector<double>> &weight_quantiles_;
 
-    double get_weight_quantile(core::Gender gender, Random generator);
+    double get_weight_quantile(core::Gender gender, Random &generator);
 };
 
 /// @brief Defines the static linear model data type
