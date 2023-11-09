@@ -60,7 +60,7 @@
             "Sodium": "double"
         }
     },
-    "WeightModel": {
+    "WeightQuantiles": {
         "female": {
             "name": "weight_quantiles_NCDRisk_female.csv",
             "format": "csv",
