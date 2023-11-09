@@ -113,6 +113,9 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
     /// @return An iterator to the end
     IteratorType end() const { return IteratorType(*this, size()); }
 
+    /// Returns the underlying column data as a vector.
+    std::vector<value_type> values() { return data_; }
+
   private:
     std::string name_;
     std::vector<TYPE> data_;
