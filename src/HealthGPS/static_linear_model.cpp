@@ -7,29 +7,29 @@
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
-    const RiskFactorSexAgeTable &risk_factor_expected,
-    const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
-    const std::unordered_map<core::Identifier, double> &risk_factor_lambda,
-    const std::unordered_map<core::Identifier, double> &risk_factor_stddev,
-    const Eigen::MatrixXd &risk_factor_cholesky, const double risk_factor_info_speed,
+    const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
+    const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, const double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models)
-    : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
-      risk_factor_lambda_{risk_factor_lambda}, risk_factor_stddev_{risk_factor_stddev},
-      risk_factor_cholesky_{risk_factor_cholesky}, risk_factor_info_speed_{risk_factor_info_speed},
+    : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
+      stddev_{stddev}, cholesky_{cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models} {
 
-    if (risk_factor_models_.empty()) {
-        throw core::HgpsException("Risk factor model mapping is empty");
+    if (names_.empty()) {
+        throw core::HgpsException("Risk factor names list is empty");
     }
-    if (risk_factor_lambda_.empty()) {
-        throw core::HgpsException("Risk factor lambda mapping is empty");
+    if (models_.empty()) {
+        throw core::HgpsException("Risk factor model list is empty");
     }
-    if (risk_factor_stddev_.empty()) {
-        throw core::HgpsException("Risk factor standard deviation mapping is empty");
+    if (lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda list is empty");
     }
-    if (!risk_factor_cholesky_.allFinite()) {
+    if (stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation list is empty");
+    }
+    if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
     if (rural_prevalence_.empty()) {
@@ -56,10 +56,10 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
 
         // Approximate risk factor values with linear models.
-        linear_approximation(person);
+        compute_linear_models(person);
 
         // Correlated residual sampling.
-        auto samples = correlated_sample(context);
+        compute_correlated_residuals(person, context.random());
 
         // TODO: add residuals to risk factor values
         // TODO: separate functions for init and update, like in sector/income
@@ -93,34 +93,42 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
 
         // Approximate risk factor values with linear models.
-        linear_approximation(person);
+        compute_linear_models(person);
 
         // Correlated residual sampling.
-        auto samples = correlated_sample(context);
+        compute_correlated_residuals(person, context.random());
 
         // TODO: add residuals to risk factor values
         // TODO: separate functions for init and update, like in sector/income
     }
 }
 
-void StaticLinearModel::linear_approximation(Person &person) {
+void StaticLinearModel::compute_linear_models(Person &person) {
 
     // Approximate risk factor values for person with linear models.
-    for (const auto &[model_name, model_params] : risk_factor_models_) {
-        double factor = model_params.intercept;
-        for (const auto &[coefficient_name, coefficient_value] : model_params.coefficients) {
+    for (size_t i = 0; i < names_.size(); i++) {
+        auto name = names_[i];
+        auto model = models_[i];
+        double factor = model.intercept;
+        for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-        person.risk_factors[model_name] = factor;
+        person.risk_factors[name] = factor;
     }
 }
 
-Eigen::VectorXd StaticLinearModel::correlated_sample(RuntimeContext &context) {
+void StaticLinearModel::compute_correlated_residuals(Person &person, Random &random) {
 
     // Correlated samples using Cholesky decomposition.
-    Eigen::VectorXd samples{risk_factor_models_.size()};
-    std::ranges::generate(samples, [&context] { return context.random().next_normal(0.0, 1.0); });
-    return risk_factor_cholesky_ * samples;
+    Eigen::VectorXd residuals{names_.size()};
+    std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
+    residuals = cholesky_ * residuals;
+
+    // Save correlated residuals.
+    for (size_t i = 0; i < names_.size(); i++) {
+        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        person.risk_factors[residual_name] += residuals[i];
+    }
 }
 
 void StaticLinearModel::initialise_sector(RuntimeContext &context, Person &person) const {
@@ -205,31 +213,29 @@ void StaticLinearModel::update_income(RuntimeContext &context, Person &person) c
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    RiskFactorSexAgeTable risk_factor_expected,
-    std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
-    std::unordered_map<core::Identifier, double> risk_factor_lambda,
-    std::unordered_map<core::Identifier, double> risk_factor_stddev,
-    Eigen::MatrixXd risk_factor_cholesky, double risk_factor_info_speed,
+    RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
+    std::vector<LinearModelParams> models, std::vector<double> lambda, std::vector<double> stddev,
+    Eigen::MatrixXd cholesky, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models)
-    : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
-      risk_factor_models_{std::move(risk_factor_models)},
-      risk_factor_lambda_{std::move(risk_factor_lambda)},
-      risk_factor_stddev_{std::move(risk_factor_stddev)},
-      risk_factor_cholesky_{std::move(risk_factor_cholesky)},
-      risk_factor_info_speed_{risk_factor_info_speed},
+    : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
+      models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
+      cholesky_{std::move(cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)} {
 
-    if (risk_factor_models_.empty()) {
-        throw core::HgpsException("Risk factor model mapping is empty");
+    if (names_.empty()) {
+        throw core::HgpsException("Risk factor names list is empty");
     }
-    if (risk_factor_lambda_.empty()) {
-        throw core::HgpsException("Risk factor lambda mapping is empty");
+    if (models_.empty()) {
+        throw core::HgpsException("Risk factor model list is empty");
     }
-    if (risk_factor_stddev_.empty()) {
-        throw core::HgpsException("Risk factor standard deviation mapping is empty");
+    if (lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda list is empty");
     }
-    if (!risk_factor_cholesky_.allFinite()) {
+    if (stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation list is empty");
+    }
+    if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
     if (rural_prevalence_.empty()) {
@@ -241,10 +247,10 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    const auto &risk_factor_expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(
-        risk_factor_expected, risk_factor_models_, risk_factor_lambda_, risk_factor_stddev_,
-        risk_factor_cholesky_, risk_factor_info_speed_, rural_prevalence_, income_models_);
+    const auto &expected = get_risk_factor_expected();
+    return std::make_unique<StaticLinearModel>(expected, names_, models_, lambda_, stddev_,
+                                               cholesky_, info_speed_, rural_prevalence_,
+                                               income_models_);
 }
 
 } // namespace hgps
