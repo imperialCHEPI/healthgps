@@ -122,7 +122,7 @@ double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &gener
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     RiskFactorSexAgeTable risk_factor_expected, std::vector<LinearModelParams> risk_factor_models,
     Eigen::MatrixXd risk_factor_cholesky,
-    const std::map<core::Gender, std::vector<double>> weight_quantiles)
+    std::map<core::Gender, std::vector<double>> weight_quantiles)
     : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
       risk_factor_models_{std::move(risk_factor_models)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)},

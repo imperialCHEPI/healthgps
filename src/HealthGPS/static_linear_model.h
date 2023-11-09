@@ -63,7 +63,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     StaticLinearModelDefinition(RiskFactorSexAgeTable risk_factor_expected,
                                 std::vector<LinearModelParams> risk_factor_models,
                                 Eigen::MatrixXd risk_factor_cholesky,
-                                const std::map<core::Gender, std::vector<double>> weight_quantiles);
+                                std::map<core::Gender, std::vector<double>> weight_quantiles);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
