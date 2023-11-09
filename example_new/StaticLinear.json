@@ -36,6 +36,8 @@
     },
     "RiskFactorModels": {
         "Carbohydrate": {
+            "Lambda": 0.464646464646465,
+            "StdDev": 0.355914645643261,
             "Intercept": -0.301472503001538,
             "Coefficients": {
                 "Gender": 0.000165437259825899,
@@ -47,6 +49,8 @@
             }
         },
         "Fat": {
+            "Lambda": 0.181818181818182,
+            "StdDev": 0.495987693346367,
             "Intercept": -0.717670235377601,
             "Coefficients": {
                 "Gender": 0.00484145642553939,
@@ -58,6 +62,8 @@
             }
         },
         "Protein": {
+            "Lambda": 0.383838383838384,
+            "StdDev": 0.334621435517159,
             "Intercept": -0.40616835622407,
             "Coefficients": {
                 "Gender": 0.00144291169364387,
@@ -69,6 +75,8 @@
             }
         },
         "Sodium": {
+            "Lambda": 0.343434343434343,
+            "StdDev": 0.457419444704665,
             "Intercept": -0.295331736884487,
             "Coefficients": {
                 "Gender": 0.00172923781820812,
