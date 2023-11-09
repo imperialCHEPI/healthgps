@@ -15,7 +15,7 @@ namespace hgps {
 // Risk factor keys.
 const core::Identifier H_key{"Height"};
 const core::Identifier BW_key{"Weight"};
-const core::Identifier PAL_key{"PhysicalActivityLevel"};
+const core::Identifier PAL_key{"PhysicalActivity"};
 const core::Identifier RMR_key{"RestingMetabolicRate"};
 const core::Identifier F_key{"BodyFat"};
 const core::Identifier L_key{"LeanTissue"};
