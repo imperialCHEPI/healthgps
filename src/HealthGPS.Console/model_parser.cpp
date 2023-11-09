@@ -140,13 +140,31 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Risk factor linear models and correlation matrix.
-    std::vector<hgps::LinearModelParams> risk_factor_models;
+    // Correlation matrix.
     const auto correlations_file_info =
         host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlations_table = load_datatable_from_csv(correlations_file_info);
     Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
 
+    // Weight quantiles.
+    const auto quantiles_female = load_datatable_from_csv(
+        host::get_file_info(opt["WeightQuantiles"]["female"], config.root_path));
+    const auto quantiles_male = load_datatable_from_csv(
+        host::get_file_info(opt["WeightQuantiles"]["male"], config.root_path));
+    std::map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
+        {hgps::core::Gender::female, std::vector<double>(quantiles_female.num_rows())},
+        {hgps::core::Gender::male, std::vector<double>(quantiles_female.num_columns())}};
+    for (size_t j = 0; j < quantiles_female.num_rows(); j++) {
+        weight_quantiles[hgps::core::Gender::female][j] =
+            std::any_cast<double>(quantiles_female.column(0).value(j));
+    }
+    for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
+        weight_quantiles[hgps::core::Gender::male][j] =
+            std::any_cast<double>(quantiles_male.column(0).value(j));
+    }
+
+    // Risk factor linear models.
+    std::vector<hgps::LinearModelParams> risk_factor_models;
     for (size_t i = 0; i < opt["RiskFactorModels"].size(); i++) {
         // Risk factor model.
         const auto &factor = opt["RiskFactorModels"][i];
@@ -199,7 +217,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky));
+        std::move(risk_factor_expected), std::move(risk_factor_models), std::move(cholesky),
+        std::move(weight_quantiles));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
