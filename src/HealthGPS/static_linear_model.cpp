@@ -10,7 +10,8 @@ StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &risk_factor_expected,
     const std::vector<LinearModelParams> &risk_factor_models,
     const Eigen::MatrixXd &risk_factor_cholesky,
-    const std::map<core::Gender, std::vector<double>> &weight_quantiles)
+    const std::map<core::Gender, std::vector<double>> &weight_quantiles =
+        std::map<core::Gender, std::vector<double>>())
     : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
       risk_factor_cholesky_{risk_factor_cholesky}, weight_quantiles_{weight_quantiles} {
 
