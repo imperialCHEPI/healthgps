@@ -99,5 +99,6 @@
             "Protein": "double",
             "Sodium": "double"
         }
-    }
+    },
+    "InformationSpeed": 0.1
 }

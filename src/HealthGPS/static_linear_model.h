@@ -25,6 +25,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param risk_factor_lambda The lambda values of the risk factors
     /// @param risk_factor_stddev The standard deviations of the risk factors
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @param risk_factor_info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @throws HgpsException for invalid arguments
@@ -33,7 +34,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
         const std::unordered_map<core::Identifier, double> &risk_factor_lambda,
         const std::unordered_map<core::Identifier, double> &risk_factor_stddev,
-        const Eigen::MatrixXd &risk_factor_cholesky,
+        const Eigen::MatrixXd &risk_factor_cholesky, const double risk_factor_info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models);
@@ -75,6 +76,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, double> &risk_factor_lambda_;
     const std::unordered_map<core::Identifier, double> &risk_factor_stddev_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
+    const double risk_factor_info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
@@ -89,6 +91,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param risk_factor_lambda The lambda values of the risk factors
     /// @param risk_factor_stddev The standard deviations of the risk factors
     /// @param risk_factor_cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @param risk_factor_info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @throws HgpsException for invalid arguments
@@ -97,7 +100,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
         std::unordered_map<core::Identifier, double> risk_factor_lambda,
         std::unordered_map<core::Identifier, double> risk_factor_stddev,
-        Eigen::MatrixXd risk_factor_cholesky,
+        Eigen::MatrixXd risk_factor_cholesky, double risk_factor_info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models);
@@ -111,6 +114,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Identifier, double> risk_factor_lambda_;
     std::unordered_map<core::Identifier, double> risk_factor_stddev_;
     Eigen::MatrixXd risk_factor_cholesky_;
+    double risk_factor_info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;

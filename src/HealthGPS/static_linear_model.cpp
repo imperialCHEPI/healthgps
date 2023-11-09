@@ -11,14 +11,14 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, LinearModelParams> &risk_factor_models,
     const std::unordered_map<core::Identifier, double> &risk_factor_lambda,
     const std::unordered_map<core::Identifier, double> &risk_factor_stddev,
-    const Eigen::MatrixXd &risk_factor_cholesky,
+    const Eigen::MatrixXd &risk_factor_cholesky, const double risk_factor_info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models)
     : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
       risk_factor_lambda_{risk_factor_lambda}, risk_factor_stddev_{risk_factor_stddev},
-      risk_factor_cholesky_{risk_factor_cholesky}, rural_prevalence_{rural_prevalence},
-      income_models_{income_models} {
+      risk_factor_cholesky_{risk_factor_cholesky}, risk_factor_info_speed_{risk_factor_info_speed},
+      rural_prevalence_{rural_prevalence}, income_models_{income_models} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model mapping is empty");
@@ -209,7 +209,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unordered_map<core::Identifier, LinearModelParams> risk_factor_models,
     std::unordered_map<core::Identifier, double> risk_factor_lambda,
     std::unordered_map<core::Identifier, double> risk_factor_stddev,
-    Eigen::MatrixXd risk_factor_cholesky,
+    Eigen::MatrixXd risk_factor_cholesky, double risk_factor_info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models)
     : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
@@ -217,6 +217,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       risk_factor_lambda_{std::move(risk_factor_lambda)},
       risk_factor_stddev_{std::move(risk_factor_stddev)},
       risk_factor_cholesky_{std::move(risk_factor_cholesky)},
+      risk_factor_info_speed_{risk_factor_info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)} {
 
     if (risk_factor_models_.empty()) {
@@ -243,7 +244,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
     const auto &risk_factor_expected = get_risk_factor_expected();
     return std::make_unique<StaticLinearModel>(
         risk_factor_expected, risk_factor_models_, risk_factor_lambda_, risk_factor_stddev_,
-        risk_factor_cholesky_, rural_prevalence_, income_models_);
+        risk_factor_cholesky_, risk_factor_info_speed_, rural_prevalence_, income_models_);
 }
 
 } // namespace hgps

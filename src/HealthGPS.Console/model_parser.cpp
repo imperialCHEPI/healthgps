@@ -176,19 +176,17 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         i++;
     }
 
-    // Risk factor lambda values.
-    std::unordered_map<hgps::core::Identifier, double> risk_factor_lambda;
-    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
-        auto factor_name = hgps::core::Identifier{key};
-        risk_factor_lambda.emplace(factor_name, json_params["Lambda"].get<double>());
+    // Check correlation matrix column count matches risk factor count.
+    if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
+        throw hgps::core::HgpsException{
+            fmt::format("Risk factor count ({}) does not match correlation "
+                        "matrix column count ({})",
+                        opt["RiskFactorModels"].size(), correlations_table.num_columns())};
     }
 
-    // Risk factor standard deviations.
-    std::unordered_map<hgps::core::Identifier, double> risk_factor_stddev;
-    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
-        auto factor_name = hgps::core::Identifier{key};
-        risk_factor_stddev.emplace(factor_name, json_params["StdDev"].get<double>());
-    }
+    // Compute Cholesky decomposition of correlation matrix.
+    auto risk_factor_cholesky =
+        Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
 
     // Risk factor expected values by sex and age.
     hgps::RiskFactorSexAgeTable risk_factor_expected = load_risk_factor_expected(config);
@@ -207,16 +205,22 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         }
     }
 
-    // Check correlation matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
-        throw hgps::core::HgpsException{
-            fmt::format("Risk factor count ({}) does not match correlation "
-                        "matrix column count ({})",
-                        opt["RiskFactorModels"].size(), correlations_table.num_columns())};
+    // Risk factor lambda values.
+    std::unordered_map<hgps::core::Identifier, double> risk_factor_lambda;
+    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+        auto factor_name = hgps::core::Identifier{key};
+        risk_factor_lambda.emplace(factor_name, json_params["Lambda"].get<double>());
     }
 
-    // Compute Cholesky decomposition of correlation matrix.
-    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
+    // Risk factor standard deviations.
+    std::unordered_map<hgps::core::Identifier, double> risk_factor_stddev;
+    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+        auto factor_name = hgps::core::Identifier{key};
+        risk_factor_stddev.emplace(factor_name, json_params["StdDev"].get<double>());
+    }
+
+    // Information speed of risk factor update.
+    const double risk_factor_info_speed = opt["InformationSpeed"].get<double>();
 
     // Rural sector prevalence for age groups and sex.
     std::unordered_map<hgps::core::Identifier, std::unordered_map<hgps::core::Gender, double>>
@@ -258,8 +262,9 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(risk_factor_expected), std::move(risk_factor_models),
-        std::move(risk_factor_lambda), std::move(risk_factor_stddev), std::move(cholesky),
-        std::move(rural_prevalence), std::move(income_models));
+        std::move(risk_factor_lambda), std::move(risk_factor_stddev),
+        std::move(risk_factor_cholesky), risk_factor_info_speed, std::move(rural_prevalence),
+        std::move(income_models));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
