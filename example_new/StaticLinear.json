@@ -59,5 +59,25 @@
             "Protein": "double",
             "Sodium": "double"
         }
+    },
+    "WeightModel": {
+        "female": {
+            "name": "weight_quantiles_NCDRisk_female.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "columns": {
+                "x": "double"
+            }
+        },
+        "male": {
+            "name": "weight_quantiles_NCDRisk_male.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "columns": {
+                "x": "double"
+            }
+        }
     }
 }
