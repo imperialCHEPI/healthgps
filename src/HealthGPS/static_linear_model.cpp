@@ -115,7 +115,7 @@ void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
 /// @generator Random number generator for the simulation.
 double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &generator) {
 
-    auto index = static_cast<size_t>(generator.next_int(weight_quantiles_.at(gender).size()));
+    auto index = generator.next_int(weight_quantiles_.at(gender).size() - 1);
     return weight_quantiles_.at(gender)[index];
 }
 
