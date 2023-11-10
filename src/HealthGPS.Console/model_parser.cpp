@@ -140,15 +140,17 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
+    // Correlation matrix.
+    const auto correlations_file_info =
+        host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
+    const auto correlations_table = load_datatable_from_csv(correlations_file_info);
+    Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
+
     // Risk factor names, models, parameters and correlation matrix.
     std::vector<hgps::core::Identifier> names{};
     std::vector<hgps::LinearModelParams> models{};
     std::vector<double> lambda{};
     std::vector<double> stddev{};
-    const auto correlations_file_info =
-        host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    const auto correlations_table = load_datatable_from_csv(correlations_file_info);
-    Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -248,10 +250,28 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         income_models.emplace(category, std::move(model));
     }
 
+    // Weight quantiles.
+    const auto quantiles_female = load_datatable_from_csv(
+        host::get_file_info(opt["WeightQuantiles"]["female"], config.root_path));
+    const auto quantiles_male = load_datatable_from_csv(
+        host::get_file_info(opt["WeightQuantiles"]["male"], config.root_path));
+    std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
+        {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
+    weight_quantiles[hgps::core::Gender::female].reserve(quantiles_female.num_rows());
+    weight_quantiles[hgps::core::Gender::male].reserve(quantiles_male.num_rows());
+    for (size_t j = 0; j < quantiles_female.num_rows(); j++) {
+        weight_quantiles[hgps::core::Gender::female].push_back(
+            std::any_cast<double>(quantiles_female.column(0).value(j)));
+    }
+    for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
+        weight_quantiles[hgps::core::Gender::male].push_back(
+            std::any_cast<double>(quantiles_male.column(0).value(j)));
+    }
+
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(names), std::move(models), std::move(lambda),
         std::move(stddev), std::move(cholesky), info_speed, std::move(rural_prevalence),
-        std::move(income_models));
+        std::move(income_models), std::move(weight_quantiles));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>

@@ -30,6 +30,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
+    /// @param weight_quantiles The weight quantiles
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
@@ -37,7 +38,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, const double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
-        const std::unordered_map<core::Income, LinearModelParams> &income_models);
+        const std::unordered_map<core::Income, LinearModelParams> &income_models,
+        const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -78,6 +80,17 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     void update_income(Person &person, Random &random) const;
 
+    /// @brief Initialises the weight of a person.
+    /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
+    /// @param person The person fo initialise the weight for.
+    /// @param generator Random number generator for the simulation.
+    void initialise_weight(Person &person, Random &generator);
+
+    /// @brief Returns the weight quantile for the given gender.
+    /// @param gender The gender of the person.
+    /// @param generator Random number generator for the simulation.
+    double get_weight_quantile(core::Gender gender, Random &generator);
+
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
     const std::vector<double> &lambda_;
@@ -87,6 +100,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
+    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
 };
 
 /// @brief Defines the static linear model data type
@@ -102,6 +116,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
+    /// @param weight_quantiles The weight quantiles
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
@@ -109,7 +124,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::vector<double> stddev, Eigen::MatrixXd cholesky, double info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
-        std::unordered_map<core::Income, LinearModelParams> income_models);
+        std::unordered_map<core::Income, LinearModelParams> income_models,
+        std::unordered_map<core::Gender, std::vector<double>> weight_quantiles);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -125,6 +141,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
+    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
 };
 
 } // namespace hgps

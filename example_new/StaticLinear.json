@@ -100,5 +100,25 @@
             "Sodium": "double"
         }
     },
-    "InformationSpeed": 0.1
+    "InformationSpeed": 0.1,
+    "WeightQuantiles": {
+        "Female": {
+            "name": "weight_quantiles_NCDRisk_female.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "columns": {
+                "x": "double"
+            }
+        },
+        "Male": {
+            "name": "weight_quantiles_NCDRisk_male.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "UTF8",
+            "columns": {
+                "x": "double"
+            }
+        }
+    }
 }
