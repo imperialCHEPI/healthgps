@@ -58,7 +58,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     std::vector<double> compute_residuals(Random &random) const;
 
-    double inverse_box_cox(double factor, double lambda) const;
+    static double inverse_box_cox(double factor, double lambda);
 
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for

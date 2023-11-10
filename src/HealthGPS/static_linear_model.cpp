@@ -188,7 +188,7 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
     return correlated_residuals;
 }
 
-double StaticLinearModel::inverse_box_cox(double factor, double lambda) const {
+double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
     return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
