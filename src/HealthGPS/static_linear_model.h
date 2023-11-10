@@ -27,7 +27,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(const RiskFactorSexAgeTable &risk_factor_expected,
                       const std::vector<LinearModelParams> &risk_factor_models,
-                      const Eigen::MatrixXd &risk_factor_cholesky);
+                      const Eigen::MatrixXd &risk_factor_cholesky,
+                      const std::map<core::Gender, std::vector<double>> &weight_quantiles);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -41,9 +42,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void linear_approximation(Person &person);
 
+    void initialise_weight(Person &person, Random &generator);
+
   private:
     const std::vector<LinearModelParams> &risk_factor_models_;
     const Eigen::MatrixXd &risk_factor_cholesky_;
+    const std::map<core::Gender, std::vector<double>> &weight_quantiles_;
+
+    double get_weight_quantile(core::Gender gender, Random &generator);
 };
 
 /// @brief Defines the static linear model data type
@@ -56,7 +62,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(RiskFactorSexAgeTable risk_factor_expected,
                                 std::vector<LinearModelParams> risk_factor_models,
-                                Eigen::MatrixXd risk_factor_cholesky);
+                                Eigen::MatrixXd risk_factor_cholesky,
+                                std::map<core::Gender, std::vector<double>> weight_quantiles);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -65,6 +72,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   private:
     std::vector<LinearModelParams> risk_factor_models_;
     Eigen::MatrixXd risk_factor_cholesky_;
+    std::map<core::Gender, std::vector<double>> weight_quantiles_;
 };
 
 } // namespace hgps
