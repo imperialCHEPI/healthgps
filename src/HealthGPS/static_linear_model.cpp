@@ -92,6 +92,18 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age == 0) {
+            initialise_weight(person, context.random());
+        }
+    }
 }
 
 void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
