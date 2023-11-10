@@ -21,10 +21,9 @@ StaticLinearModel::StaticLinearModel(
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
-    // TODO: Uncomment when fully implemented
-    // if (weight_quantiles_.empty()) {
-    //    throw core::HgpsException("Weigth quantiles dictionary is empty");
-    //}
+    if (weight_quantiles_.empty()) {
+        throw core::HgpsException("Weight quantiles dictionary is empty");
+    }
 }
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
@@ -116,21 +115,18 @@ void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
 /// @generator Random number generator for the simulation.
 double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &generator) {
 
-    // TODO: Remove when fully implemented
-    if (weight_quantiles_.empty()) {
-        return 1.0;
-    }
-
     auto index = static_cast<size_t>(generator.next_double() * weight_quantiles_.at(gender).size());
     return weight_quantiles_.at(gender)[index];
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     RiskFactorSexAgeTable risk_factor_expected, std::vector<LinearModelParams> risk_factor_models,
-    Eigen::MatrixXd risk_factor_cholesky)
+    Eigen::MatrixXd risk_factor_cholesky,
+    std::map<core::Gender, std::vector<double>> weight_quantiles)
     : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
       risk_factor_models_{std::move(risk_factor_models)},
-      risk_factor_cholesky_{std::move(risk_factor_cholesky)} {
+      risk_factor_cholesky_{std::move(risk_factor_cholesky)},
+      weight_quantiles_{std::move(weight_quantiles)} {
 
     if (risk_factor_models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
@@ -138,12 +134,15 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
+    if (weight_quantiles_.empty()) {
+        throw core::HgpsException("Weight quantiles dictionary is empty");
+    }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &risk_factor_expected = get_risk_factor_expected();
     return std::make_unique<StaticLinearModel>(risk_factor_expected, risk_factor_models_,
-                                               risk_factor_cholesky_);
+                                               risk_factor_cholesky_, weight_quantiles_);
 }
 
 } // namespace hgps

@@ -62,7 +62,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(RiskFactorSexAgeTable risk_factor_expected,
                                 std::vector<LinearModelParams> risk_factor_models,
-                                Eigen::MatrixXd risk_factor_cholesky);
+                                Eigen::MatrixXd risk_factor_cholesky,
+                                std::map<core::Gender, std::vector<double>> weight_quantiles);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -71,6 +72,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   private:
     std::vector<LinearModelParams> risk_factor_models_;
     Eigen::MatrixXd risk_factor_cholesky_;
+    std::map<core::Gender, std::vector<double>> weight_quantiles_;
 };
 
 } // namespace hgps
