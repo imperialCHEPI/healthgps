@@ -35,7 +35,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     StaticLinearModel(
         const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
         const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
-        const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, const double info_speed,
+        const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
