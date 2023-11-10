@@ -108,7 +108,7 @@
             "delimiter": ",",
             "encoding": "UTF8",
             "columns": {
-                "x": "double"
+                "quantile": "double"
             }
         },
         "Male": {
@@ -117,7 +117,7 @@
             "delimiter": ",",
             "encoding": "UTF8",
             "columns": {
-                "x": "double"
+                "quantile": "double"
             }
         }
     }
