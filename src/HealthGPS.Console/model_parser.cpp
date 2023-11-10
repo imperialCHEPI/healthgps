@@ -268,6 +268,9 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
             std::any_cast<double>(quantiles_male.column(0).value(j)));
     }
 
+    // Standard deviation of physical activity.
+    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(names), std::move(models), std::move(lambda),
         std::move(stddev), std::move(cholesky), info_speed, std::move(rural_prevalence),

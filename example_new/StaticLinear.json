@@ -120,5 +120,6 @@
                 "quantile": "double"
             }
         }
-    }
+    },
+    "PhysicalActivityStdDev": 0.06
 }
