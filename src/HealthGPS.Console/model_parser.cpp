@@ -252,9 +252,9 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
 
     // Weight quantiles.
     const auto quantiles_female = load_datatable_from_csv(
-        host::get_file_info(opt["WeightQuantiles"]["female"], config.root_path));
+        host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
     const auto quantiles_male = load_datatable_from_csv(
-        host::get_file_info(opt["WeightQuantiles"]["male"], config.root_path));
+        host::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
     std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
         {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
     weight_quantiles[hgps::core::Gender::female].reserve(quantiles_female.num_rows());
