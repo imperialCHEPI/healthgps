@@ -134,6 +134,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!risk_factor_cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
+    if (weight_quantiles_.empty()) {
+        throw core::HgpsException("Weight quantiles dictionary is empty");
+    }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
