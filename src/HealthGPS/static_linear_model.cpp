@@ -13,11 +13,12 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
+    const double physical_activity_stddev,
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles)
     : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
       stddev_{stddev}, cholesky_{cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      weight_quantiles_{weight_quantiles} {
+      physical_activity_stddev_{physical_activity_stddev}, weight_quantiles_{weight_quantiles} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -292,11 +293,13 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     Eigen::MatrixXd cholesky, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
+    double physical_activity_stddev,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles)
     : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
       models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
       cholesky_{std::move(cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
+      physical_activity_stddev_{physical_activity_stddev},
       weight_quantiles_{std::move(weight_quantiles)} {
 
     if (names_.empty()) {
@@ -327,9 +330,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(expected, names_, models_, lambda_, stddev_,
-                                               cholesky_, info_speed_, rural_prevalence_,
-                                               income_models_, weight_quantiles_);
+    return std::make_unique<StaticLinearModel>(
+        expected, names_, models_, lambda_, stddev_, cholesky_, info_speed_, rural_prevalence_,
+        income_models_, physical_activity_stddev_, weight_quantiles_);
 }
 
 } // namespace hgps

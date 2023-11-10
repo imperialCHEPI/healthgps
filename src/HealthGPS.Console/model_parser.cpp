@@ -250,6 +250,9 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         income_models.emplace(category, std::move(model));
     }
 
+    // Standard deviation of physical activity.
+    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+
     // Weight quantiles.
     const auto quantiles_female = load_datatable_from_csv(
         host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
@@ -268,13 +271,10 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
             std::any_cast<double>(quantiles_male.column(0).value(j)));
     }
 
-    // Standard deviation of physical activity.
-    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
-
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(names), std::move(models), std::move(lambda),
         std::move(stddev), std::move(cholesky), info_speed, std::move(rural_prevalence),
-        std::move(income_models), std::move(weight_quantiles));
+        std::move(income_models), physical_activity_stddev, std::move(weight_quantiles));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
