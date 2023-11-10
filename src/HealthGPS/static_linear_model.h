@@ -48,29 +48,35 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
-    void compute_linear_models(Person &person);
+    void initialise_factors(Person &person, Random &random) const;
 
-    void compute_correlated_residuals(Person &person, Random &random);
+    void update_factors(Person &person, Random &random) const;
+
+    std::vector<double> compute_linear_models(Person &person) const;
+
+    std::vector<double> compute_residuals(Random &random) const;
+
+    double inverse_box_cox(double factor, double lambda) const;
 
     /// @brief Initialise the sector of a person
-    /// @param context The runtime context
     /// @param person The person to initialise sector for
-    void initialise_sector(RuntimeContext &context, Person &person) const;
+    /// @param random The random number generator from the runtime context
+    void initialise_sector(Person &person, Random &random) const;
 
     /// @brief Update the sector of a person
-    /// @param context The runtime context
     /// @param person The person to update sector for
-    void update_sector(RuntimeContext &context, Person &person) const;
+    /// @param random The random number generator from the runtime context
+    void update_sector(Person &person, Random &random) const;
 
     /// @brief Initialise the income category of a person
-    /// @param context The runtime context
     /// @param person The person to initialise sector for
-    void initialise_income(RuntimeContext &context, Person &person) const;
+    /// @param random The random number generator from the runtime context
+    void initialise_income(Person &person, Random &random) const;
 
     /// @brief Update the income category of a person
-    /// @param context The runtime context
     /// @param person The person to update sector for
-    void update_income(RuntimeContext &context, Person &person) const;
+    /// @param random The random number generator from the runtime context
+    void update_income(Person &person, Random &random) const;
 
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;

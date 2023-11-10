@@ -46,29 +46,20 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
-    // Initialise income and sector for everyone.
+    // Initialise everyone.
     for (auto &person : context.population()) {
-        initialise_sector(context, person);
-        initialise_income(context, person);
+        initialise_sector(person, context.random());
+        initialise_income(person, context.random());
+        initialise_factors(person, context.random());
     }
 
-    // Initialise risk factors for everyone.
-    for (auto &person : context.population()) {
-
-        // Approximate risk factor values with linear models.
-        compute_linear_models(person);
-
-        // Correlated residual sampling.
-        compute_correlated_residuals(person, context.random());
-
-        // TODO: add residuals to risk factor values
-        // TODO: separate functions for init and update, like in sector/income
-    }
+    // Adjust risk factors to match expected values.
+    adjust_risk_factors(context, names_);
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
-    // Initialise sector and income for newborns and update others.
+    // Initialise newborns and update others.
     for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
@@ -76,34 +67,70 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
 
         if (person.age == 0) {
-            initialise_sector(context, person);
-            initialise_income(context, person);
+            initialise_sector(person, context.random());
+            initialise_income(person, context.random());
+            initialise_factors(person, context.random());
         } else {
-            update_sector(context, person);
-            update_income(context, person);
+            update_sector(person, context.random());
+            update_income(person, context.random());
+            update_factors(person, context.random());
         }
     }
 
-    // Initialise risk factors for newborns and update others.
-    for (auto &person : context.population()) {
+    // Adjust risk factors to match expected values.
+    adjust_risk_factors(context, names_);
+}
 
-        // Do not initialise non-newborns.
-        if (!person.is_active() || person.age > 0) {
-            continue;
-        }
+void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
 
-        // Approximate risk factor values with linear models.
-        compute_linear_models(person);
+    // Approximate risk factor values with linear models.
+    auto linear_factors = compute_linear_models(person);
 
-        // Correlated residual sampling.
-        compute_correlated_residuals(person, context.random());
+    // Correlated residual sampling.
+    auto residuals = compute_residuals(random);
 
-        // TODO: add residuals to risk factor values
-        // TODO: separate functions for init and update, like in sector/income
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        double residual_new = residuals[i];
+        person.risk_factors[residual_name] = residual_new;
+
+        // Initialise risk factor.
+        double factor_new = linear_factors[i] + residual_new * stddev_[i];
+        double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
+        person.risk_factors[names_[i]] = factor_new;
     }
 }
 
-void StaticLinearModel::compute_linear_models(Person &person) {
+void StaticLinearModel::update_factors(Person &person, Random &random) const {
+
+    // Approximate risk factor values with linear models.
+    auto linear_factors = compute_linear_models(person);
+
+    // Correlated residual sampling.
+    auto residuals = compute_residuals(random);
+
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Update residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        double residual_new = residuals[i] * info_speed_;
+        residual_new += sqrt(1.0 - info_speed_ * info_speed_) * person.risk_factors[residual_name];
+        person.risk_factors[residual_name] = residual_new;
+
+        // Update risk factor.
+        double factor_new = linear_factors[i] + residual_new * stddev_[i];
+        double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
+        person.risk_factors[names_[i]] = factor_new;
+    }
+}
+
+std::vector<double> StaticLinearModel::compute_linear_models(Person &person) const {
+    std::vector<double> factors{};
+    factors.reserve(names_.size());
 
     // Approximate risk factor values for person with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
@@ -113,11 +140,15 @@ void StaticLinearModel::compute_linear_models(Person &person) {
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-        person.risk_factors[name] = factor;
+        factors.emplace_back(factor);
     }
+
+    return factors;
 }
 
-void StaticLinearModel::compute_correlated_residuals(Person &person, Random &random) {
+std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
+    std::vector<double> correlated_residuals{};
+    correlated_residuals.reserve(names_.size());
 
     // Correlated samples using Cholesky decomposition.
     Eigen::VectorXd residuals{names_.size()};
@@ -126,12 +157,17 @@ void StaticLinearModel::compute_correlated_residuals(Person &person, Random &ran
 
     // Save correlated residuals.
     for (size_t i = 0; i < names_.size(); i++) {
-        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-        person.risk_factors[residual_name] += residuals[i];
+        correlated_residuals.emplace_back(residuals[i]);
     }
+
+    return correlated_residuals;
 }
 
-void StaticLinearModel::initialise_sector(RuntimeContext &context, Person &person) const {
+double StaticLinearModel::inverse_box_cox(double factor, double lambda) const {
+    return pow(lambda * factor + 1.0, 1.0 / lambda);
+}
+
+void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
 
     // Get rural prevalence for age group and sex.
     double prevalence;
@@ -142,12 +178,12 @@ void StaticLinearModel::initialise_sector(RuntimeContext &context, Person &perso
     }
 
     // Sample the person's sector.
-    double rand = context.random().next_double();
+    double rand = random.next_double();
     auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
     person.sector = sector;
 }
 
-void StaticLinearModel::update_sector(RuntimeContext &context, Person &person) const {
+void StaticLinearModel::update_sector(Person &person, Random &random) const {
 
     // Only update rural sector 18 year olds.
     if ((person.age != 18) || (person.sector != core::Sector::rural)) {
@@ -159,14 +195,14 @@ void StaticLinearModel::update_sector(RuntimeContext &context, Person &person) c
     double prevalence_over18 = rural_prevalence_.at("Over18"_id).at(person.gender);
 
     // Compute random rural to urban transition.
-    double rand = context.random().next_double();
+    double rand = random.next_double();
     double p_rural_to_urban = 1.0 - prevalence_over18 / prevalence_under18;
     if (rand < p_rural_to_urban) {
         person.sector = core::Sector::urban;
     }
 }
 
-void StaticLinearModel::initialise_income(RuntimeContext &context, Person &person) const {
+void StaticLinearModel::initialise_income(Person &person, Random &random) const {
 
     // Compute logits for each income category.
     auto logits = std::unordered_map<core::Income, double>{};
@@ -192,7 +228,7 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
     }
 
     // Compute income category.
-    double rand = context.random().next_double();
+    double rand = random.next_double();
     for (const auto &[income, probability] : probabilities) {
         if (rand < probability) {
             person.income = income;
@@ -204,11 +240,11 @@ void StaticLinearModel::initialise_income(RuntimeContext &context, Person &perso
     throw core::HgpsException("Logic Error: failed to initialise income category");
 }
 
-void StaticLinearModel::update_income(RuntimeContext &context, Person &person) const {
+void StaticLinearModel::update_income(Person &person, Random &random) const {
 
     // Only update 18 year olds.
     if (person.age == 18) {
-        initialise_income(context, person);
+        initialise_income(person, random);
     }
 }
 
