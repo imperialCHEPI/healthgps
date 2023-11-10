@@ -140,9 +140,11 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Risk factor names, linear models and correlation matrix.
+    // Risk factor names, models, parameters and correlation matrix.
     std::vector<hgps::core::Identifier> names{};
     std::vector<hgps::LinearModelParams> models{};
+    std::vector<double> lambda{};
+    std::vector<double> stddev{};
     const auto correlations_file_info =
         host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlations_table = load_datatable_from_csv(correlations_file_info);
@@ -169,6 +171,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         // Write data structures.
         names.emplace_back(key);
         models.emplace_back(std::move(model));
+        lambda.emplace_back(json_params["Lambda"].get<double>());
+        stddev.emplace_back(json_params["StdDev"].get<double>());
         for (size_t j = 0; j < correlations_table.num_rows(); j++) {
             correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
         }
@@ -201,18 +205,6 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
             throw hgps::core::HgpsException{fmt::format(
                 "'{}' is not defined in female risk factor expected values.", name.to_string())};
         }
-    }
-
-    // Risk factor lambda values.
-    std::vector<double> lambda;
-    for (const auto &name : names) {
-        lambda.emplace_back(opt["RiskFactorModels"][name.to_string()]["Lambda"].get<double>());
-    }
-
-    // Risk factor standard deviations.
-    std::vector<double> stddev;
-    for (const auto &name : names) {
-        stddev.emplace_back(opt["RiskFactorModels"][name.to_string()]["StdDev"].get<double>());
     }
 
     // Information speed of risk factor update.
