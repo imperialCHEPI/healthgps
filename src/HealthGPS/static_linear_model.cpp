@@ -57,6 +57,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(person, context.random());
+        initialise_physical_activity(person, context.random());
     }
 
     // Adjust risk factors to match expected values.
@@ -84,6 +85,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(person, context.random());
+            initialise_physical_activity(person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
@@ -274,11 +276,19 @@ void StaticLinearModel::update_income(Person &person, Random &random) const {
     }
 }
 
-void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
+void StaticLinearModel::initialise_physical_activity(Person &person, Random &random) const {
+    auto key = "PhysicalActivity"_id;
+    double expected = get_risk_factor_expected().at(person.gender, key).at(person.age);
+    double rand = random.next_normal(0.0, physical_activity_stddev_);
+    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
+    person.risk_factors[key] = factor;
+}
 
-    auto weight_bl = get_risk_factor_expected().at(person.gender, "Weight"_id).at(person.age);
+void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
+    auto key = "Weight"_id;
+    auto weight_bl = get_risk_factor_expected().at(person.gender, key).at(person.age);
     auto weight_quantile = get_weight_quantile(person.gender, generator);
-    person.risk_factors["Weight"_id] = weight_bl * weight_quantile;
+    person.risk_factors[key] = weight_bl * weight_quantile;
 }
 
 double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &generator) {

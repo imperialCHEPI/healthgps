@@ -82,6 +82,11 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     void update_income(Person &person, Random &random) const;
 
+    /// @brief Initialise the physical activity of a person
+    /// @param person The person to initialise sector for
+    /// @param random The random number generator from the runtime context
+    void initialise_physical_activity(Person &person, Random &random) const;
+
     /// @brief Initialises the weight of a person.
     /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
     /// @param person The person fo initialise the weight for.
