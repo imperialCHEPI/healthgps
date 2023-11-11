@@ -100,11 +100,18 @@ class KevinHallModel final : public RiskFactorModel {
     /// @return The computed nutrient intakes
     std::unordered_map<core::Identifier, double> compute_nutrient_intakes(Person &person) const;
 
+    /// @brief Initialise total energy intake from nutrient intakes
+    /// @param person The person to initialise
+    void initialise_energy_intake(Person &person) const;
+
+    /// @brief Update total energy intake from nutrient intakes
+    /// @param person The person to update
+    void update_energy_intake(Person &person) const;
+
     /// @brief Compute energy intake from nutrient intakes.
-    /// @param nutrient_intakes The nutrient intake
+    /// @param person The person to compute energy intake for
     /// @return The computed energy intake
-    double compute_energy_intake(
-        const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
+    double compute_energy_intake(Person &person) const;
 
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
