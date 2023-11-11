@@ -63,12 +63,12 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
 
-    // Initialise newborns.
+    // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_weight(person, context.random());
     }
 
-    // Adjust weight risk factor such its mean sim value matches expected value.
+    // Adjust weight to matche expected values.
     adjust_risk_factors(context, {"Weight"_id});
 }
 

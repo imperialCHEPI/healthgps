@@ -87,22 +87,30 @@ class KevinHallModel final : public RiskFactorModel {
     static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
     static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
 
+    /// @brief Initialise total nutrient intakes from food intakes
+    /// @param person The person to initialise
+    void initialise_nutrient_intakes(Person &person) const;
+
+    /// @brief Update total nutrient intakes from food intakes
+    /// @param person The person to update
+    void update_nutrient_intakes(Person &person) const;
+
+    /// @brief Compute nutrient intakes from food intakes.
+    /// @param person The person to compute nutrient intakes for
+    /// @return The computed nutrient intakes
+    std::unordered_map<core::Identifier, double> compute_nutrient_intakes(Person &person) const;
+
+    /// @brief Compute energy intake from nutrient intakes.
+    /// @param nutrient_intakes The nutrient intake
+    /// @return The computed energy intake
+    double compute_energy_intake(
+        const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
+
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
     /// @param shift Model adjustment term
     /// @return The state of the person
     SimulatePersonState simulate_person(Person &person, double shift) const;
-
-    /// @brief Compute nutrient intakes from food intakes.
-    /// @param person The person to compute nutrient intakes for
-    /// @return A map of computed nutrient intakes
-    std::unordered_map<core::Identifier, double>
-    compute_nutrient_intakes(const Person &person) const;
-
-    /// @brief Compute energy intake from nutrient intakes.
-    /// @param nutrient_intakes The nutrient intake
-    /// @return The computed energy intake
-    double compute_EI(const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
 
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake

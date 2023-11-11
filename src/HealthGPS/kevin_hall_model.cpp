@@ -44,9 +44,29 @@ RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorMod
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
-void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {}
+void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
+
+    // Initialise everyone.
+    for (auto &person : context.population()) {
+        initialise_nutrient_intakes(person);
+    }
+}
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age == 0) {
+            initialise_nutrient_intakes(person);
+        } else {
+            update_nutrient_intakes(person);
+        }
+    }
 
     // TODO: Compute target body weight.
     const float target_BW = 100.0;
@@ -95,6 +115,49 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
+void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
+    auto nutrient_intakes = compute_nutrient_intakes(person);
+
+    // Initialise nutrient intakes.
+    for (auto &[nutrient_key, nutrient_value] : nutrient_intakes) {
+        person.risk_factors[nutrient_key] = nutrient_value;
+    }
+}
+
+void KevinHallModel::update_nutrient_intakes(Person &person) const {
+    auto nutrient_intakes = compute_nutrient_intakes(person);
+
+    // Update nutrient intakes.
+    for (auto &[nutrient_key, nutrient_value] : nutrient_intakes) {
+        person.risk_factors[nutrient_key] = nutrient_value;
+    }
+}
+
+std::unordered_map<core::Identifier, double>
+KevinHallModel::compute_nutrient_intakes(Person &person) const {
+    std::unordered_map<core::Identifier, double> nutrient_intakes;
+
+    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+        double food_intake = person.get_risk_factor_value(food_key);
+        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
+            nutrient_intakes[nutrient_key] += food_intake * nutrient_coefficient;
+        }
+    }
+
+    return nutrient_intakes;
+}
+
+double KevinHallModel::compute_energy_intake(
+    const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
+    double energy_intake = 0.0;
+
+    for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
+        energy_intake += nutrient_intakes.at(nutrient_key) * energy_coefficient;
+    }
+
+    return energy_intake;
+}
+
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
     const double H_0 = person.get_risk_factor_value("Height"_id);
@@ -113,10 +176,12 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     // TODO: Compute physical activity level.
     double PAL = PAL_0;
 
-    // Compute energy intake and carbohydrate intake.
-    auto nutrient_intakes = compute_nutrient_intakes(person);
-    double EI = compute_EI(nutrient_intakes);
-    double CI = nutrient_intakes.at("Carbohydrate"_id);
+    // TODO: some nutrient values need saving from previous year.
+
+    // Updated energy intake and carbohydrate intake.
+    // TODO: above, set EI_0 and CI_0 to risk_factors[*_previous].
+    double EI = person.get_risk_factor_value("EnergyIntake"_id);
+    double CI = person.get_risk_factor_value("Carbohydrate"_id);
 
     // Compute glycogen and water.
     double G = compute_G(CI, CI_0, G_0);
@@ -186,31 +251,6 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
                                .EE = EE,
                                .EI = EI,
                                .adjust = adjust};
-}
-
-std::unordered_map<core::Identifier, double>
-KevinHallModel::compute_nutrient_intakes(const Person &person) const {
-    std::unordered_map<core::Identifier, double> nutrient_intakes;
-
-    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
-        double food_intake = person.get_risk_factor_value(food_key);
-        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            nutrient_intakes[nutrient_key] += food_intake * nutrient_coefficient;
-        }
-    }
-
-    return nutrient_intakes;
-}
-
-double KevinHallModel::compute_EI(
-    const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
-    double EI = 0.0;
-
-    for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
-        EI += nutrient_intakes.at(nutrient_key) * energy_coefficient;
-    }
-
-    return EI;
 }
 
 double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
