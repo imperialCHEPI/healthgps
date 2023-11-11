@@ -35,7 +35,7 @@
         }
     },
     "RiskFactorModels": {
-        "Carbohydrate": {
+        "FoodCarbohydrate": {
             "Lambda": 0.262626262626263,
             "StdDev": 0.337810256621877,
             "Intercept": -0.241505734056409,
@@ -48,7 +48,7 @@
                 "Income": 0.0810023788842083
             }
         },
-        "Fat": {
+        "FoodFat": {
             "Lambda": 0.141414141414141,
             "StdDev": 0.436763527499362,
             "Intercept": -0.693521187677,
@@ -61,7 +61,7 @@
                 "Income": 0.373256996730791
             }
         },
-        "Protein": {
+        "FoodProtein": {
             "Lambda": 0.181818181818182,
             "StdDev": 0.313311862739698,
             "Intercept": -0.368761566020644,
@@ -74,7 +74,7 @@
                 "Income": 0.169359574630698
             }
         },
-        "Sodium": {
+        "FoodSodium": {
             "Lambda": 0.222222222222222,
             "StdDev": 0.409282851216763,
             "Intercept": -0.279383536605788,
@@ -94,10 +94,10 @@
         "delimiter": ",",
         "encoding": "UTF8",
         "columns": {
-            "Carbohydrate": "double",
-            "Fat": "double",
-            "Protein": "double",
-            "Sodium": "double"
+            "FoodCarbohydrate": "double",
+            "FoodFat": "double",
+            "FoodProtein": "double",
+            "FoodSodium": "double"
         }
     },
     "InformationSpeed": 0.1,
