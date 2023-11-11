@@ -24,7 +24,6 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"LeanTissue"_id, [](const Person &) { return 0.5; }},
     {"ExtracellularFluid"_id, [](const Person &) { return 0.5; }},
     {"Glycogen"_id, [](const Person &) { return 0.5; }},
-    {"Water"_id, [](const Person &) { return 0.5; }},
     {"EnergyExpenditure"_id, [](const Person &) { return 0.5; }},
     {"EnergyIntake"_id, [](const Person &) { return 0.5; }},
     {"Carbohydrate"_id, [](const Person &) { return 0.5; }},

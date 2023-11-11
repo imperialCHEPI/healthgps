@@ -21,7 +21,6 @@ const core::Identifier F_key{"BodyFat"};
 const core::Identifier L_key{"LeanTissue"};
 const core::Identifier ECF_key{"ExtracellularFluid"};
 const core::Identifier G_key{"Glycogen"};
-const core::Identifier W_key{"Water"};
 const core::Identifier EE_key{"EnergyExpenditure"};
 const core::Identifier EI_key{"EnergyIntake"};
 const core::Identifier CI_key{"Carbohydrate"};
@@ -104,7 +103,6 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         // person.risk_factors[L_key] = state.L;
         // person.risk_factors[ECF_key] = state.ECF;
         // person.risk_factors[G_key] = state.G;
-        // person.risk_factors[W_key] = state.W;
         // person.risk_factors[EE_key] = state.EE;
         // person.risk_factors[EI_key] = state.EI;
     }
@@ -198,7 +196,6 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
                                .L = L,
                                .ECF = ECF,
                                .G = G,
-                               .W = W,
                                .EE = EE,
                                .EI = EI,
                                .adjust = adjust};

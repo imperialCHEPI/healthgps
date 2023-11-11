@@ -30,9 +30,6 @@ struct SimulatePersonState {
     /// @brief Glycogen
     double G{};
 
-    /// @brief Water
-    double W{};
-
     /// @brief Energy expenditure
     double EE{};
 
