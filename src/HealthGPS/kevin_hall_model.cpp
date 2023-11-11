@@ -12,19 +12,6 @@
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 namespace hgps {
 
-// Risk factor keys.
-const core::Identifier H_key{"Height"};
-const core::Identifier BW_key{"Weight"};
-const core::Identifier PAL_key{"PhysicalActivity"};
-const core::Identifier RMR_key{"RestingMetabolicRate"};
-const core::Identifier F_key{"BodyFat"};
-const core::Identifier L_key{"LeanTissue"};
-const core::Identifier ECF_key{"ExtracellularFluid"};
-const core::Identifier G_key{"Glycogen"};
-const core::Identifier EE_key{"EnergyExpenditure"};
-const core::Identifier EI_key{"EnergyIntake"};
-const core::Identifier CI_key{"Carbohydrate"};
-
 KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
@@ -95,30 +82,30 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         // TODO: Simulate person and update risk factors.
         simulate_person(person, shift);
         // SimulatePersonState state = simulate_person(person, shift);
-        // person.risk_factors[H_key] = state.H;
-        // person.risk_factors[BW_key] = state.BW;
-        // person.risk_factors[PAL_key] = state.PAL;
-        // person.risk_factors[RMR_key] = state.RMR;
-        // person.risk_factors[F_key] = state.F;
-        // person.risk_factors[L_key] = state.L;
-        // person.risk_factors[ECF_key] = state.ECF;
-        // person.risk_factors[G_key] = state.G;
-        // person.risk_factors[EE_key] = state.EE;
-        // person.risk_factors[EI_key] = state.EI;
+        // person.risk_factors["Height"_id] = state.H;
+        // person.risk_factors["Weight"_id] = state.BW;
+        // person.risk_factors["PhysicalActivity"_id] = state.PAL;
+        // person.risk_factors["RestingMetabolicRate"_id] = state.RMR;
+        // person.risk_factors["BodyFat"_id] = state.F;
+        // person.risk_factors["LeanTissue"_id] = state.L;
+        // person.risk_factors["ExtracellularFluid"_id] = state.ECF;
+        // person.risk_factors["Glycogen"_id] = state.G;
+        // person.risk_factors["EnergyExpenditure"_id] = state.EE;
+        // person.risk_factors["EnergyIntake"_id] = state.EI;
     }
 }
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
-    const double H_0 = person.get_risk_factor_value(H_key);
-    const double BW_0 = person.get_risk_factor_value(BW_key);
-    const double PAL_0 = person.get_risk_factor_value(PAL_key);
-    const double F_0 = person.get_risk_factor_value(F_key);
-    const double L_0 = person.get_risk_factor_value(L_key);
-    const double ECF_0 = person.get_risk_factor_value(ECF_key);
-    const double G_0 = person.get_risk_factor_value(G_key);
-    const double EI_0 = person.get_risk_factor_value(EI_key);
-    const double CI_0 = person.get_risk_factor_value(CI_key);
+    const double H_0 = person.get_risk_factor_value("Height"_id);
+    const double BW_0 = person.get_risk_factor_value("Weight"_id);
+    const double PAL_0 = person.get_risk_factor_value("PhysicalActivity"_id);
+    const double F_0 = person.get_risk_factor_value("BodyFat"_id);
+    const double L_0 = person.get_risk_factor_value("LeanTissue"_id);
+    const double ECF_0 = person.get_risk_factor_value("ExtracellularFluid"_id);
+    const double G_0 = person.get_risk_factor_value("Glycogen"_id);
+    const double EI_0 = person.get_risk_factor_value("EnergyIntake"_id);
+    const double CI_0 = person.get_risk_factor_value("Carbohydrate"_id);
 
     // TODO: Compute height.
     double H = H_0;
@@ -129,7 +116,7 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     // Compute energy intake and carbohydrate intake.
     auto nutrient_intakes = compute_nutrient_intakes(person);
     double EI = compute_EI(nutrient_intakes);
-    double CI = nutrient_intakes.at(CI_key);
+    double CI = nutrient_intakes.at("Carbohydrate"_id);
 
     // Compute glycogen and water.
     double G = compute_G(CI, CI_0, G_0);
