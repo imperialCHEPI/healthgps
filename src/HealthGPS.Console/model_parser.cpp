@@ -411,25 +411,35 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
     // Weight quantiles.
-    const auto quantiles_female = load_datatable_from_csv(
+    const auto weight_quantiles_table_F = load_datatable_from_csv(
         host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
-    const auto quantiles_male = load_datatable_from_csv(
+    const auto weight_quantiles_table_M = load_datatable_from_csv(
         host::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
     std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
         {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
-    weight_quantiles[hgps::core::Gender::female].reserve(quantiles_female.num_rows());
-    weight_quantiles[hgps::core::Gender::male].reserve(quantiles_male.num_rows());
-    for (size_t j = 0; j < quantiles_female.num_rows(); j++) {
+    weight_quantiles[hgps::core::Gender::female].reserve(weight_quantiles_table_F.num_rows());
+    weight_quantiles[hgps::core::Gender::male].reserve(weight_quantiles_table_M.num_rows());
+    for (size_t j = 0; j < weight_quantiles_table_F.num_rows(); j++) {
         weight_quantiles[hgps::core::Gender::female].push_back(
-            std::any_cast<double>(quantiles_female.column(0).value(j)));
+            std::any_cast<double>(weight_quantiles_table_F.column(0).value(j)));
     }
-    for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
+    for (size_t j = 0; j < weight_quantiles_table_M.num_rows(); j++) {
         weight_quantiles[hgps::core::Gender::male].push_back(
-            std::any_cast<double>(quantiles_male.column(0).value(j)));
+            std::any_cast<double>(weight_quantiles_table_M.column(0).value(j)));
     }
     for (auto &[sex, quantiles] : weight_quantiles) {
         std::sort(quantiles.begin(), quantiles.end());
     }
+
+    // Energy Physical Activity quantiles.
+    const auto epa_quantiles_table = load_datatable_from_csv(
+        host::get_file_info(opt["EnergyPhysicalActivityQuantiles"], config.root_path));
+    std::vector<double> epa_quantiles;
+    epa_quantiles.reserve(epa_quantiles_table.num_rows());
+    for (size_t j = 0; j < epa_quantiles_table.num_rows(); j++) {
+        epa_quantiles.push_back(std::any_cast<double>(epa_quantiles_table.column(0).value(j)));
+    }
+    std::sort(epa_quantiles.begin(), epa_quantiles.end());
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),

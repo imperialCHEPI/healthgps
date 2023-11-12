@@ -108,5 +108,14 @@
                 "quantile": "double"
             }
         }
+    },
+    "EnergyPhysicalActivityQuantiles": {
+        "name": "energy_physicalactivity_quantiles.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "columns": {
+            "quantile": "double"
+        }
     }
 }
