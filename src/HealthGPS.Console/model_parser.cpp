@@ -254,31 +254,10 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
-    // Weight quantiles.
-    const auto quantiles_female = load_datatable_from_csv(
-        host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
-    const auto quantiles_male = load_datatable_from_csv(
-        host::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
-    std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
-        {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
-    weight_quantiles[hgps::core::Gender::female].reserve(quantiles_female.num_rows());
-    weight_quantiles[hgps::core::Gender::male].reserve(quantiles_male.num_rows());
-    for (size_t j = 0; j < quantiles_female.num_rows(); j++) {
-        weight_quantiles[hgps::core::Gender::female].push_back(
-            std::any_cast<double>(quantiles_female.column(0).value(j)));
-    }
-    for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
-        weight_quantiles[hgps::core::Gender::male].push_back(
-            std::any_cast<double>(quantiles_male.column(0).value(j)));
-    }
-    for (auto &[sex, quantiles] : weight_quantiles) {
-        std::sort(quantiles.begin(), quantiles.end());
-    }
-
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(names), std::move(models), std::move(lambda),
         std::move(stddev), std::move(cholesky), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev, std::move(weight_quantiles));
+        std::move(income_models), physical_activity_stddev);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
@@ -428,9 +407,30 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
     age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
 
+    // Weight quantiles.
+    const auto quantiles_female = load_datatable_from_csv(
+        host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
+    const auto quantiles_male = load_datatable_from_csv(
+        host::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
+    std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
+        {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
+    weight_quantiles[hgps::core::Gender::female].reserve(quantiles_female.num_rows());
+    weight_quantiles[hgps::core::Gender::male].reserve(quantiles_male.num_rows());
+    for (size_t j = 0; j < quantiles_female.num_rows(); j++) {
+        weight_quantiles[hgps::core::Gender::female].push_back(
+            std::any_cast<double>(quantiles_female.column(0).value(j)));
+    }
+    for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
+        weight_quantiles[hgps::core::Gender::male].push_back(
+            std::any_cast<double>(quantiles_male.column(0).value(j)));
+    }
+    for (auto &[sex, quantiles] : weight_quantiles) {
+        std::sort(quantiles.begin(), quantiles.end());
+    }
+
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(age_mean_height));
+        std::move(food_prices), std::move(age_mean_height), std::move(weight_quantiles));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
