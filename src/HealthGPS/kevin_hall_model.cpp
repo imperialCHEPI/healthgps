@@ -13,6 +13,7 @@
 namespace hgps {
 
 KevinHallModel::KevinHallModel(
+    const RiskFactorSexAgeTable &expected,
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -20,9 +21,10 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height,
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles)
-    : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
-      nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
-      age_mean_height_{age_mean_height}, weight_quantiles_{weight_quantiles} {
+    : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
+      nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
+      food_prices_{food_prices}, age_mean_height_{age_mean_height},
+      weight_quantiles_{weight_quantiles} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -54,13 +56,11 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
-        // TODO: initialise_weight
-        // initialise_weight(person, context.random());
+        initialise_weight(person, context.random());
     }
 
-    // TODO: make this an adjustable model and feed in expected values
-    // // Adjust weight to matche expected values.
-    // adjust_risk_factors(context, {"Weight"_id});
+    // Adjust weight to matche expected values.
+    adjust_risk_factors(context, {"Weight"_id});
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -75,8 +75,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         if (person.age == 0) {
             initialise_nutrient_intakes(person);
             initialise_energy_intake(person);
-            // TODO: initialise_weight
-            // initialise_weight(person, context.random());
+            initialise_weight(person, context.random());
         } else {
             update_nutrient_intakes(person);
             update_energy_intake(person);
@@ -325,13 +324,12 @@ double KevinHallModel::compute_AT(double EI, double EI_0) const {
     return beta_AT * delta_EI;
 }
 
-// TODO: add expected values for weight init
-// void KevinHallModel::initialise_weight(Person &person, Random &generator) {
-//     auto key = "Weight"_id;
-//     auto weight_bl = get_risk_factor_expected().at(person.gender, key).at(person.age);
-//     auto weight_quantile = get_weight_quantile(person.gender, generator);
-//     person.risk_factors[key] = weight_bl * weight_quantile;
-// }
+void KevinHallModel::initialise_weight(Person &person, Random &generator) {
+    auto key = "Weight"_id;
+    auto weight_bl = get_risk_factor_expected().at(person.gender, key).at(person.age);
+    auto weight_quantile = get_weight_quantile(person.gender, generator);
+    person.risk_factors[key] = weight_bl * weight_quantile;
+}
 
 double KevinHallModel::get_weight_quantile(core::Gender gender, Random &generator) {
 
@@ -340,13 +338,14 @@ double KevinHallModel::get_weight_quantile(core::Gender gender, Random &generato
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
-    std::unordered_map<core::Identifier, double> energy_equation,
+    RiskFactorSexAgeTable expected, std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles)
-    : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected)},
+      energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       age_mean_height_{std::move(age_mean_height)}, weight_quantiles_{std::move(weight_quantiles)} {
 
@@ -371,8 +370,10 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, age_mean_height_, weight_quantiles_);
+    const auto &expected = get_risk_factor_expected();
+    return std::make_unique<KevinHallModel>(expected, energy_equation_, nutrient_ranges_,
+                                            nutrient_equations_, food_prices_, age_mean_height_,
+                                            weight_quantiles_);
 }
 
 } // namespace hgps

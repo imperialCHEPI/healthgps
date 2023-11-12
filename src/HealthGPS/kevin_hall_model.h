@@ -2,8 +2,10 @@
 
 #include "interfaces.h"
 #include "mapping.h"
+#include "risk_factor_adjustable_model.h"
 
 #include <optional>
+#include <vector>
 
 namespace hgps {
 
@@ -43,9 +45,10 @@ struct SimulatePersonState {
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class KevinHallModel final : public RiskFactorModel {
+class KevinHallModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the KevinHallModel class
+    /// @param expected The risk factor expected values by sex and age
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -53,6 +56,7 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
     KevinHallModel(
+        const RiskFactorSexAgeTable &expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -143,12 +147,11 @@ class KevinHallModel final : public RiskFactorModel {
     /// @return The computed adaptive thermogenesis
     double compute_AT(double EI, double EI_0) const;
 
-    // TODO: add expected values for weight init
     /// @brief Initialises the weight of a person.
     /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
     /// @param person The person fo initialise the weight for.
     /// @param generator Random number generator for the simulation.
-    // void initialise_weight(Person &person, Random &generator);
+    void initialise_weight(Person &person, Random &generator);
 
     /// @brief Returns the weight quantile for the given gender.
     /// @param gender The gender of the person.
@@ -177,9 +180,10 @@ class KevinHallModel final : public RiskFactorModel {
 };
 
 /// @brief Defines the energy balance model data type
-class KevinHallModelDefinition final : public RiskFactorModelDefinition {
+class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinition {
   public:
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
+    /// @param expected The risk factor expected values by sex and age
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -188,6 +192,7 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
+        RiskFactorSexAgeTable expected,
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,

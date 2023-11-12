@@ -361,6 +361,9 @@ std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
+    // Risk factor expected values by sex and age.
+    hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
+
     // Nutrient groups.
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval> nutrient_ranges;
@@ -429,8 +432,9 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     }
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
-        std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(age_mean_height), std::move(weight_quantiles));
+        std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),
+        std::move(nutrient_equations), std::move(food_prices), std::move(age_mean_height),
+        std::move(weight_quantiles));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>

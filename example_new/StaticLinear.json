@@ -101,25 +101,5 @@
         }
     },
     "InformationSpeed": 0.1,
-    "WeightQuantiles": {
-        "Female": {
-            "name": "weight_quantiles_NCDRisk_female.csv",
-            "format": "csv",
-            "delimiter": ",",
-            "encoding": "UTF8",
-            "columns": {
-                "quantile": "double"
-            }
-        },
-        "Male": {
-            "name": "weight_quantiles_NCDRisk_male.csv",
-            "format": "csv",
-            "delimiter": ",",
-            "encoding": "UTF8",
-            "columns": {
-                "quantile": "double"
-            }
-        }
-    },
     "PhysicalActivityStdDev": 0.06
 }
