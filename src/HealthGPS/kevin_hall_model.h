@@ -55,6 +55,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
+    /// @param epa_quantiles The Energy Physical Activity quantiles (must be sorted)
     KevinHallModel(
         const RiskFactorSexAgeTable &expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
@@ -63,7 +64,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height,
-        const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles);
+        const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
+        const std::vector<double> &epa_quantiles);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -165,6 +167,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
+    const std::vector<double> &epa_quantiles_;
 
     // Model parameters.
     static constexpr double rho_F = 39.5e3; // Energy content of fat (kJ/kg).
@@ -190,6 +193,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
+    /// @param epa_quantiles The Energy Physical Activity quantiles (must be sorted)
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         RiskFactorSexAgeTable expected,
@@ -198,7 +202,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> age_mean_height,
-        std::unordered_map<core::Gender, std::vector<double>> weight_quantiles);
+        std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
+        std::vector<double> epa_quantiles);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -211,6 +216,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
+    std::vector<double> epa_quantiles_;
 };
 
 } // namespace hgps

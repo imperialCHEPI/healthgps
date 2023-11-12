@@ -444,7 +444,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),
         std::move(nutrient_equations), std::move(food_prices), std::move(age_mean_height),
-        std::move(weight_quantiles));
+        std::move(weight_quantiles), std::move(epa_quantiles));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
