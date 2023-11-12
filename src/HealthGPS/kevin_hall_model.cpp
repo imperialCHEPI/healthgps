@@ -3,6 +3,8 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <algorithm>
+#include <iterator>
 #include <utility>
 
 /*
@@ -60,7 +62,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
-        initialise_weight(person, context.random());
+        initialise_weight(person);
     }
 
     // Adjust weight to matche expected values.
@@ -79,7 +81,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         if (person.age == 0) {
             initialise_nutrient_intakes(person);
             initialise_energy_intake(person);
-            initialise_weight(person, context.random());
+            initialise_weight(person);
         } else {
             update_nutrient_intakes(person);
             update_energy_intake(person);
@@ -328,17 +330,38 @@ double KevinHallModel::compute_AT(double EI, double EI_0) const {
     return beta_AT * delta_EI;
 }
 
-void KevinHallModel::initialise_weight(Person &person, Random &generator) {
-    auto key = "Weight"_id;
-    auto weight_bl = get_risk_factor_expected().at(person.gender, key).at(person.age);
-    auto weight_quantile = get_weight_quantile(person.gender, generator);
-    person.risk_factors[key] = weight_bl * weight_quantile;
+void KevinHallModel::initialise_weight(Person &person) {
+    const auto &expected = get_risk_factor_expected();
+
+    // Compute E/PA expected.
+    double ei_expected = expected.at(person.gender, "EnergyIntake"_id).at(person.age);
+    double pa_expected = expected.at(person.gender, "PhysicalActivity"_id).at(person.age);
+    double epa_expected = ei_expected / pa_expected;
+
+    // Compute E/PA actual.
+    double ei_actual = person.get_risk_factor_value("EnergyIntake"_id);
+    double pa_actual = person.get_risk_factor_value("PhysicalActivity"_id);
+    double epa_actual = ei_actual / pa_actual;
+
+    // Compute E/PA quantile.
+    double epa_quantile = epa_actual / epa_expected;
+
+    // Compute new weight.
+    auto w_expected = expected.at(person.gender, "Weight"_id).at(person.age);
+    auto w_quantile = get_weight_quantile(epa_quantile, person.gender);
+    person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
 
-double KevinHallModel::get_weight_quantile(core::Gender gender, Random &generator) {
+double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) {
 
-    auto index = static_cast<size_t>(generator.next_double() * weight_quantiles_.at(gender).size());
-    return weight_quantiles_.at(gender)[index];
+    // Compute Energy Physical Activity percentile.
+    auto epa_first = std::lower_bound(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
+    auto epa_index = std::distance(epa_quantiles_.begin(), epa_first);
+    auto epa_percentile = epa_index / epa_quantiles_.size();
+
+    // Find weight quantile.
+    auto weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
+    return weight_quantiles_.at(sex)[weight_index];
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(

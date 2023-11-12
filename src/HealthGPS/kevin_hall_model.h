@@ -55,7 +55,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
-    /// @param epa_quantiles The Energy Physical Activity quantiles (must be sorted)
+    /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     KevinHallModel(
         const RiskFactorSexAgeTable &expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
@@ -152,13 +152,12 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Initialises the weight of a person.
     /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
     /// @param person The person fo initialise the weight for.
-    /// @param generator Random number generator for the simulation.
-    void initialise_weight(Person &person, Random &generator);
+    void initialise_weight(Person &person);
 
-    /// @brief Returns the weight quantile for the given gender.
-    /// @param gender The gender of the person.
-    /// @param generator Random number generator for the simulation.
-    double get_weight_quantile(core::Gender gender, Random &generator);
+    /// @brief Returns the weight quantile for the given E overPA quantile and sex.
+    /// @param epa_quantile The Energy / Physical Activity quantile.
+    /// @param sex The sex of the person.
+    double get_weight_quantile(double epa_quantile, core::Gender sex);
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
@@ -193,7 +192,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
-    /// @param epa_quantiles The Energy Physical Activity quantiles (must be sorted)
+    /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         RiskFactorSexAgeTable expected,
