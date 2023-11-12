@@ -347,8 +347,8 @@ void KevinHallModel::initialise_weight(Person &person) {
     double epa_quantile = epa_actual / epa_expected;
 
     // Compute new weight.
-    auto w_expected = expected.at(person.gender, "Weight"_id).at(person.age);
-    auto w_quantile = get_weight_quantile(epa_quantile, person.gender);
+    double w_expected = expected.at(person.gender, "Weight"_id).at(person.age);
+    double w_quantile = get_weight_quantile(epa_quantile, person.gender);
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
 
