@@ -8,6 +8,7 @@
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
+#include <algorithm>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -269,6 +270,9 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     for (size_t j = 0; j < quantiles_male.num_rows(); j++) {
         weight_quantiles[hgps::core::Gender::male].push_back(
             std::any_cast<double>(quantiles_male.column(0).value(j)));
+    }
+    for (auto &[sex, quantiles] : weight_quantiles) {
+        std::sort(quantiles.begin(), quantiles.end());
     }
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
