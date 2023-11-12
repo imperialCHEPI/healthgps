@@ -157,6 +157,8 @@ KevinHallModel::compute_nutrient_intakes(Person &person) const {
 void KevinHallModel::initialise_energy_intake(Person &person) const {
     double energy_intake = compute_energy_intake(person);
     person.risk_factors["EnergyIntake"_id] = energy_intake;
+
+    // Begin at steady state (EI = EE).
     person.risk_factors["EnergyExpenditure"_id] = energy_intake;
 
     // TODO: set old value to new value
@@ -165,7 +167,6 @@ void KevinHallModel::initialise_energy_intake(Person &person) const {
 void KevinHallModel::update_energy_intake(Person &person) const {
     double energy_intake = compute_energy_intake(person);
     person.risk_factors["EnergyIntake"_id] = energy_intake;
-    person.risk_factors["EnergyExpenditure"_id] = energy_intake;
 
     // TODO: set old value to previous value
 }
