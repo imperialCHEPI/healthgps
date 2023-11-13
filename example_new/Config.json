@@ -49,7 +49,7 @@
                 "range": [-2.316299, 2.296689]
             },
             {
-                "name": "PhysicalActivityLevel",
+                "name": "PhysicalActivity",
                 "level": 2,
                 "range": [22.22314, 9765.512]
             },

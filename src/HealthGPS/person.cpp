@@ -14,13 +14,12 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
     {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
     {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
+    {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
 
     // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
     {"Height"_id, [](const Person &) { return 0.5; }},
-    {"Weight"_id, [](const Person &) { return 0.5; }},
     //{"BMI"_id, [](const Person &) { return 0.5; }},
-    {"PhysicalActivityLevel"_id, [](const Person &) { return 0.5; }},
     {"BodyFat"_id, [](const Person &) { return 0.5; }},
     {"LeanTissue"_id, [](const Person &) { return 0.5; }},
     {"ExtracellularFluid"_id, [](const Person &) { return 0.5; }},
@@ -74,14 +73,31 @@ std::string Person::gender_to_string() const {
     return gender == core::Gender::male ? "male" : "female";
 }
 
+bool Person::over_18() const noexcept { return age >= 18; }
+
 float Person::sector_to_value() const {
-    if (sector == core::Sector::unknown) {
+    switch (sector) {
+    case core::Sector::urban:
+        return 0.0f;
+    case core::Sector::rural:
+        return 1.0f;
+    default:
         throw core::HgpsException("Sector is unknown.");
     }
-    return sector == core::Sector::urban ? 0.0f : 1.0f;
 }
 
-bool Person::over_18() const noexcept { return age >= 18; }
+float Person::income_to_value() const {
+    switch (income) {
+    case core::Income::low:
+        return 1.0f;
+    case core::Income::middle:
+        return 2.0f;
+    case core::Income::high:
+        return 3.0f;
+    default:
+        throw core::HgpsException("Income is unknown.");
+    }
+}
 
 void Person::emigrate(const unsigned int time) {
     if (!is_active()) {

@@ -7,22 +7,42 @@
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
-    const RiskFactorSexAgeTable &risk_factor_expected,
-    const std::vector<LinearModelParams> &risk_factor_models,
-    const Eigen::MatrixXd &risk_factor_cholesky,
-    const std::map<core::Gender, std::vector<double>> &weight_quantiles =
-        std::map<core::Gender, std::vector<double>>())
-    : RiskFactorAdjustableModel{risk_factor_expected}, risk_factor_models_{risk_factor_models},
-      risk_factor_cholesky_{risk_factor_cholesky}, weight_quantiles_{weight_quantiles} {
+    const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
+    const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, const double info_speed,
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+        &rural_prevalence,
+    const std::unordered_map<core::Income, LinearModelParams> &income_models,
+    const double physical_activity_stddev,
+    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles)
+    : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
+      stddev_{stddev}, cholesky_{cholesky}, info_speed_{info_speed},
+      rural_prevalence_{rural_prevalence}, income_models_{income_models},
+      physical_activity_stddev_{physical_activity_stddev}, weight_quantiles_{weight_quantiles} {
 
-    if (risk_factor_models_.empty()) {
+    if (names_.empty()) {
+        throw core::HgpsException("Risk factor names list is empty");
+    }
+    if (models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
     }
-    if (!risk_factor_cholesky_.allFinite()) {
+    if (lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda list is empty");
+    }
+    if (stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation list is empty");
+    }
+    if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
+    if (rural_prevalence_.empty()) {
+        throw core::HgpsException("Rural prevalence mapping is empty");
+    }
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models mapping is empty");
+    }
     if (weight_quantiles_.empty()) {
-        throw core::HgpsException("Weight quantiles dictionary is empty");
+        throw core::HgpsException("Weight quantiles mapping is empty");
     }
 }
 
@@ -32,87 +52,245 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
+    // Initialise everyone.
     for (auto &person : context.population()) {
-
-        // Approximate risk factor values with linear models.
-        linear_approximation(person);
-
-        // Initialise weight
-        initialise_weight(person, context.random());
-
-        // Correlated residual sampling.
-        auto samples = correlated_samples(context);
-
-        // TODO: add residuals to risk factor values
+        initialise_sector(person, context.random());
+        initialise_income(person, context.random());
+        initialise_factors(person, context.random());
+        initialise_physical_activity(person, context.random());
     }
 
-    // Adjust weigth risk factor such its mean sim value matches expected value.
+    // Adjust risk factors to match expected values.
+    adjust_risk_factors(context, names_);
+
+    // Initialise newborns.
+    for (auto &person : context.population()) {
+        initialise_weight(person, context.random());
+    }
+
+    // Adjust weight risk factor such its mean sim value matches expected value.
     adjust_risk_factors(context, {"Weight"_id});
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
+    // Initialise newborns and update others.
     for (auto &person : context.population()) {
-
-        // Do not initialise non-newborns.
-        if (person.age > 0) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
             continue;
         }
 
-        // Approximate risk factor values with linear models.
-        linear_approximation(person);
+        if (person.age == 0) {
+            initialise_sector(person, context.random());
+            initialise_income(person, context.random());
+            initialise_factors(person, context.random());
+            initialise_physical_activity(person, context.random());
+        } else {
+            update_sector(person, context.random());
+            update_income(person, context.random());
+            update_factors(person, context.random());
+        }
+    }
 
-        // Correlated residual sampling.
-        auto samples = correlated_samples(context);
+    // Adjust risk factors to match expected values.
+    adjust_risk_factors(context, names_);
 
-        // TODO: add residuals to risk factor values
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age == 0) {
+            initialise_weight(person, context.random());
+        }
     }
 }
 
-Eigen::VectorXd StaticLinearModel::correlated_samples(RuntimeContext &context) {
+void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
 
-    // Correlated samples using Cholesky decomposition.
-    Eigen::VectorXd samples{risk_factor_models_.size()};
-    std::ranges::generate(samples, [&context] { return context.random().next_normal(0.0, 1.0); });
-    samples = risk_factor_cholesky_ * samples;
+    // Approximate risk factor values with linear models.
+    auto linear_factors = compute_linear_models(person);
 
-    // Bound and scale the samples.
-    std::ranges::transform(samples, samples.begin(), [](double sample) {
-        constexpr double sigma_cap = 3.0; // for removing outliers
-        return std::clamp(sample, -sigma_cap, sigma_cap) / sigma_cap;
-    });
+    // Correlated residual sampling.
+    auto residuals = compute_residuals(random);
 
-    return samples;
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        double residual_new = residuals[i];
+        person.risk_factors[residual_name] = residual_new;
+
+        // Initialise risk factor.
+        double factor_new = linear_factors[i] + residual_new * stddev_[i];
+        double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
+        person.risk_factors[names_[i]] = factor_new;
+    }
 }
 
-void StaticLinearModel::linear_approximation(Person &person) {
+void StaticLinearModel::update_factors(Person &person, Random &random) const {
+
+    // Approximate risk factor values with linear models.
+    auto linear_factors = compute_linear_models(person);
+
+    // Correlated residual sampling.
+    auto residuals = compute_residuals(random);
+
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Update residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        double residual_new = residuals[i] * info_speed_;
+        residual_new += sqrt(1.0 - info_speed_ * info_speed_) * person.risk_factors[residual_name];
+        person.risk_factors[residual_name] = residual_new;
+
+        // Update risk factor.
+        double factor_new = linear_factors[i] + residual_new * stddev_[i];
+        double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
+        person.risk_factors[names_[i]] = factor_new;
+    }
+}
+
+std::vector<double> StaticLinearModel::compute_linear_models(Person &person) const {
+    std::vector<double> factors{};
+    factors.reserve(names_.size());
 
     // Approximate risk factor values for person with linear models.
-    for (const auto &model : risk_factor_models_) {
+    for (size_t i = 0; i < names_.size(); i++) {
+        auto name = names_[i];
+        auto model = models_[i];
         double factor = model.intercept;
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-        person.risk_factors[model.name] = factor;
+        factors.emplace_back(factor);
+    }
+
+    return factors;
+}
+
+std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
+    std::vector<double> correlated_residuals{};
+    correlated_residuals.reserve(names_.size());
+
+    // Correlated samples using Cholesky decomposition.
+    Eigen::VectorXd residuals{names_.size()};
+    std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
+    residuals = cholesky_ * residuals;
+
+    // Save correlated residuals.
+    for (size_t i = 0; i < names_.size(); i++) {
+        correlated_residuals.emplace_back(residuals[i]);
+    }
+
+    return correlated_residuals;
+}
+
+double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
+    return pow(lambda * factor + 1.0, 1.0 / lambda);
+}
+
+void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
+
+    // Get rural prevalence for age group and sex.
+    double prevalence;
+    if (person.age < 18) {
+        prevalence = rural_prevalence_.at("Under18"_id).at(person.gender);
+    } else {
+        prevalence = rural_prevalence_.at("Over18"_id).at(person.gender);
+    }
+
+    // Sample the person's sector.
+    double rand = random.next_double();
+    auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
+    person.sector = sector;
+}
+
+void StaticLinearModel::update_sector(Person &person, Random &random) const {
+
+    // Only update rural sector 18 year olds.
+    if ((person.age != 18) || (person.sector != core::Sector::rural)) {
+        return;
+    }
+
+    // Get rural prevalence for age group and sex.
+    double prevalence_under18 = rural_prevalence_.at("Under18"_id).at(person.gender);
+    double prevalence_over18 = rural_prevalence_.at("Over18"_id).at(person.gender);
+
+    // Compute random rural to urban transition.
+    double rand = random.next_double();
+    double p_rural_to_urban = 1.0 - prevalence_over18 / prevalence_under18;
+    if (rand < p_rural_to_urban) {
+        person.sector = core::Sector::urban;
     }
 }
 
-/// Initialises the weight of a person.
-///
-/// It uses the baseline adjustment to get its initial value, based on its sex and age.
-/// @param person The person fo initialise the weight for.
-/// @generator Random number generator for the simulation.
-void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
+void StaticLinearModel::initialise_income(Person &person, Random &random) const {
 
-    auto weight_bl = get_risk_factor_expected().at(person.gender, "Weight"_id).at(person.age);
-    auto weight_quantile = get_weight_quantile(person.gender, generator);
-    person.risk_factors["Weight"_id] = weight_bl * weight_quantile;
+    // Compute logits for each income category.
+    auto logits = std::unordered_map<core::Income, double>{};
+    for (const auto &[income, params] : income_models_) {
+        logits[income] = params.intercept;
+        for (const auto &[factor, coefficient] : params.coefficients) {
+            logits.at(income) += coefficient * person.get_risk_factor_value(factor);
+        }
+    }
+
+    // Compute softmax probabilities for each income category.
+    auto e_logits = std::unordered_map<core::Income, double>{};
+    double e_logits_sum = 0.0;
+    for (const auto &[income, logit] : logits) {
+        e_logits[income] = exp(logit);
+        e_logits_sum += e_logits.at(income);
+    }
+
+    // Compute income category probabilities.
+    auto probabilities = std::unordered_map<core::Income, double>{};
+    for (const auto &[income, e_logit] : e_logits) {
+        probabilities[income] = e_logit / e_logits_sum;
+    }
+
+    // Compute income category.
+    double rand = random.next_double();
+    for (const auto &[income, probability] : probabilities) {
+        if (rand < probability) {
+            person.income = income;
+            return;
+        }
+        rand -= probability;
+    }
+
+    throw core::HgpsException("Logic Error: failed to initialise income category");
 }
 
-/// Returns the weight quantile for the given gender.
-///
-/// @gender The gender of the person.
-/// @generator Random number generator for the simulation.
+void StaticLinearModel::update_income(Person &person, Random &random) const {
+
+    // Only update 18 year olds.
+    if (person.age == 18) {
+        initialise_income(person, random);
+    }
+}
+
+void StaticLinearModel::initialise_physical_activity(Person &person, Random &random) const {
+    auto key = "PhysicalActivity"_id;
+    double expected = get_risk_factor_expected().at(person.gender, key).at(person.age);
+    double rand = random.next_normal(0.0, physical_activity_stddev_);
+    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
+    person.risk_factors[key] = factor;
+}
+
+void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
+    auto key = "Weight"_id;
+    auto weight_bl = get_risk_factor_expected().at(person.gender, key).at(person.age);
+    auto weight_quantile = get_weight_quantile(person.gender, generator);
+    person.risk_factors[key] = weight_bl * weight_quantile;
+}
+
 double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &generator) {
 
     auto index = static_cast<size_t>(generator.next_double() * weight_quantiles_.at(gender).size());
@@ -120,29 +298,51 @@ double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &gener
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    RiskFactorSexAgeTable risk_factor_expected, std::vector<LinearModelParams> risk_factor_models,
-    Eigen::MatrixXd risk_factor_cholesky,
-    std::map<core::Gender, std::vector<double>> weight_quantiles)
-    : RiskFactorAdjustableModelDefinition{std::move(risk_factor_expected)},
-      risk_factor_models_{std::move(risk_factor_models)},
-      risk_factor_cholesky_{std::move(risk_factor_cholesky)},
+    RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
+    std::vector<LinearModelParams> models, std::vector<double> lambda, std::vector<double> stddev,
+    Eigen::MatrixXd cholesky, double info_speed,
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double physical_activity_stddev,
+    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles)
+    : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
+      models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
+      cholesky_{std::move(cholesky)}, info_speed_{info_speed},
+      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
+      physical_activity_stddev_{physical_activity_stddev},
       weight_quantiles_{std::move(weight_quantiles)} {
 
-    if (risk_factor_models_.empty()) {
+    if (names_.empty()) {
+        throw core::HgpsException("Risk factor names list is empty");
+    }
+    if (models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
     }
-    if (!risk_factor_cholesky_.allFinite()) {
+    if (lambda_.empty()) {
+        throw core::HgpsException("Risk factor lambda list is empty");
+    }
+    if (stddev_.empty()) {
+        throw core::HgpsException("Risk factor standard deviation list is empty");
+    }
+    if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
+    if (rural_prevalence_.empty()) {
+        throw core::HgpsException("Rural prevalence mapping is empty");
+    }
+    if (income_models_.empty()) {
+        throw core::HgpsException("Income models mapping is empty");
+    }
     if (weight_quantiles_.empty()) {
-        throw core::HgpsException("Weight quantiles dictionary is empty");
+        throw core::HgpsException("Weight quantiles mapping is empty");
     }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    const auto &risk_factor_expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(risk_factor_expected, risk_factor_models_,
-                                               risk_factor_cholesky_, weight_quantiles_);
+    const auto &expected = get_risk_factor_expected();
+    return std::make_unique<StaticLinearModel>(
+        expected, names_, models_, lambda_, stddev_, cholesky_, info_speed_, rural_prevalence_,
+        income_models_, physical_activity_stddev_, weight_quantiles_);
 }
 
 } // namespace hgps
