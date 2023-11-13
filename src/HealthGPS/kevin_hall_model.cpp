@@ -356,7 +356,7 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
 
     // Compute Energy Physical Activity percentile (taking midpoint of duplicates).
     auto epa_range = std::equal_range(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
-    double epa_index = std::distance(epa_quantiles_.begin(), epa_range.first);
+    double epa_index = static_cast<double>(std::distance(epa_quantiles_.begin(), epa_range.first));
     epa_index += std::distance(epa_range.first, epa_range.second) / 2.0;
     double epa_percentile = epa_index / epa_quantiles_.size();
 
