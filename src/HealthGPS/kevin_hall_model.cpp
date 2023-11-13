@@ -361,7 +361,7 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
     double epa_percentile = epa_index / epa_quantiles_.size();
 
     // Find weight quantile.
-    size_t weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
+    auto weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
     return weight_quantiles_.at(sex)[weight_index];
 }
 
