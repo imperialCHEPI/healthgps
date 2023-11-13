@@ -354,13 +354,14 @@ void KevinHallModel::initialise_weight(Person &person) {
 
 double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) {
 
-    // Compute Energy Physical Activity percentile.
-    auto epa_first = std::lower_bound(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
-    auto epa_index = std::distance(epa_quantiles_.begin(), epa_first);
-    auto epa_percentile = epa_index / epa_quantiles_.size();
+    // Compute Energy Physical Activity percentile (taking midpoint of duplicates).
+    auto epa_range = std::equal_range(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
+    double epa_index = std::distance(epa_quantiles_.begin(), epa_range.first);
+    epa_index += std::distance(epa_range.first, epa_range.second) / 2.0;
+    double epa_percentile = epa_index / epa_quantiles_.size();
 
     // Find weight quantile.
-    auto weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
+    size_t weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
     return weight_quantiles_.at(sex)[weight_index];
 }
 
