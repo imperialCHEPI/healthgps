@@ -330,7 +330,7 @@ double KevinHallModel::compute_AT(double EI, double EI_0) const {
     return beta_AT * delta_EI;
 }
 
-void KevinHallModel::initialise_weight(Person &person) {
+void KevinHallModel::initialise_weight(Person &person) const {
     const auto &expected = get_risk_factor_expected();
 
     // Compute E/PA expected.
@@ -352,7 +352,7 @@ void KevinHallModel::initialise_weight(Person &person) {
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
 
-double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) {
+double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) const {
 
     // Compute Energy Physical Activity percentile (taking midpoint of duplicates).
     auto epa_range = std::equal_range(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
@@ -364,6 +364,63 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
     auto weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
     return weight_quantiles_.at(sex)[weight_index];
 }
+
+UnorderedMap2d<core::Gender, int, double>
+KevinHallModel::compute_mean_weight_powers(Population &population, double power) const {
+
+    // Local struct to hold count and sum of weight powers.
+    struct SumCount {
+      public:
+        void append(double value) noexcept {
+            sum_ += value;
+            count_++;
+        }
+
+        double mean() const noexcept { return sum_ / count_; }
+
+      private:
+        double sum_{};
+        int count_{};
+    };
+
+    // Compute sums and counts of weight powers for sex and age.
+    auto sumcounts = UnorderedMap2d<core::Gender, int, SumCount>{};
+    sumcounts.emplace_row(core::Gender::female, std::unordered_map<int, SumCount>{});
+    sumcounts.emplace_row(core::Gender::male, std::unordered_map<int, SumCount>{});
+    for (const auto &person : population) {
+        if (!person.is_active()) {
+            continue;
+        }
+
+        double value = pow(person.risk_factors.at("Weight"_id), power);
+        sumcounts.at(person.gender)[person.age].append(value);
+    }
+
+    // Compute means of weight powers for sex and age.
+    auto means = UnorderedMap2d<core::Gender, int, double>{};
+    for (const auto &[sex, sumcounts_by_sex] : sumcounts) {
+        means.emplace_row(sex, std::unordered_map<int, double>{});
+        for (const auto &[age, sumcount] : sumcounts_by_sex) {
+            means.at(sex)[age] = sumcount.mean();
+        }
+    }
+
+    return means;
+}
+
+// void KevinHallModel::initialise_height(Person &person) {
+//     // TODO: generate and save height residual, then call common code
+//     // (see how this is done for nutrients in StaticLinearModel)
+// }
+
+// void KevinHallModel::update_height(Person &person) {
+//     // TODO: return if age >= 19, then call common code
+// }
+
+// double KevinHallModel::compute_new_height(Person &person) {
+//     // TODO: common height compute code goes here
+//     return 0.0;
+// }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
     RiskFactorSexAgeTable expected, std::unordered_map<core::Identifier, double> energy_equation,

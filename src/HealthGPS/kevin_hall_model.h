@@ -1,6 +1,7 @@
 #pragma once
 
 #include "interfaces.h"
+#include "map2d.h"
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
 
@@ -150,14 +151,36 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     double compute_AT(double EI, double EI_0) const;
 
     /// @brief Initialises the weight of a person.
-    /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
     /// @param person The person fo initialise the weight for.
-    void initialise_weight(Person &person);
+    void initialise_weight(Person &person) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param sex The sex of the person.
-    double get_weight_quantile(double epa_quantile, core::Gender sex);
+    double get_weight_quantile(double epa_quantile, core::Gender sex) const;
+
+    /// @brief Compute the mean of weight raised to power for eacg sex and age
+    /// @param population The population to compute the mean for
+    /// @param power The power to raise the weight to
+    /// @return The weight power means by sex and age
+    UnorderedMap2d<core::Gender, int, double> compute_mean_weight_powers(Population &population,
+                                                                         double power) const;
+
+    // // TODO: implement this
+    // /// @brief Initialises the height of a person.
+    // /// @param person The person fo initialise the height for.
+    // void initialise_height(Person &person);
+
+    // // TODO: implement this
+    // /// @brief Updates the height of a person.
+    // /// @param person The person fo update the height for.
+    // void update_height(Person &person);
+
+    // // TODO: implement this
+    // /// @brief Compute a new height value for the given person.
+    // /// @param person The person to compute the height for.
+    // /// @return The computed height.
+    // double compute_new_height(Person &person);
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
