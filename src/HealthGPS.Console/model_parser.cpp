@@ -148,10 +148,10 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
 
     // Risk factor names, models, parameters and correlation matrix.
-    std::vector<hgps::core::Identifier> names{};
-    std::vector<hgps::LinearModelParams> models{};
-    std::vector<double> lambda{};
-    std::vector<double> stddev{};
+    std::vector<hgps::core::Identifier> names;
+    std::vector<hgps::LinearModelParams> models;
+    std::vector<double> lambda;
+    std::vector<double> stddev;
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
