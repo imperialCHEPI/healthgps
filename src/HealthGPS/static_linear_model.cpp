@@ -9,11 +9,11 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
     const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
-    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, const double info_speed,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    const double physical_activity_stddev)
+    double physical_activity_stddev)
     : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
       stddev_{stddev}, cholesky_{cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
