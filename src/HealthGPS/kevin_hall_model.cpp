@@ -3,6 +3,8 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <algorithm>
+#include <iterator>
 #include <utility>
 
 /*
@@ -12,30 +14,20 @@
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 namespace hgps {
 
-// Risk factor keys.
-const core::Identifier H_key{"Height"};
-const core::Identifier BW_key{"Weight"};
-const core::Identifier PAL_key{"PhysicalActivity"};
-const core::Identifier RMR_key{"RestingMetabolicRate"};
-const core::Identifier F_key{"BodyFat"};
-const core::Identifier L_key{"LeanTissue"};
-const core::Identifier ECF_key{"ExtracellularFluid"};
-const core::Identifier G_key{"Glycogen"};
-const core::Identifier W_key{"Water"};
-const core::Identifier EE_key{"EnergyExpenditure"};
-const core::Identifier EI_key{"EnergyIntake"};
-const core::Identifier CI_key{"Carbohydrate"};
-
 KevinHallModel::KevinHallModel(
+    const RiskFactorSexAgeTable &expected,
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height)
-    : energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
-      nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
-      age_mean_height_{age_mean_height} {
+    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height,
+    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
+    const std::vector<double> &epa_quantiles)
+    : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
+      nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
+      food_prices_{food_prices}, age_mean_height_{age_mean_height},
+      weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -52,15 +44,49 @@ KevinHallModel::KevinHallModel(
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
     }
+    if (weight_quantiles_.empty()) {
+        throw core::HgpsException("Weight quantiles mapping is empty");
+    }
+    if (epa_quantiles_.empty()) {
+        throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
+    }
 }
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
-void KevinHallModel::generate_risk_factors([[maybe_unused]] RuntimeContext &context) {}
+void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
+
+    // Initialise everyone.
+    for (auto &person : context.population()) {
+        initialise_nutrient_intakes(person);
+        initialise_energy_intake(person);
+        initialise_weight(person);
+    }
+
+    // Adjust weight to matche expected values.
+    adjust_risk_factors(context, {"Weight"_id});
+}
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age == 0) {
+            initialise_nutrient_intakes(person);
+            initialise_energy_intake(person);
+            initialise_weight(person);
+        } else {
+            update_nutrient_intakes(person);
+            update_energy_intake(person);
+        }
+    }
 
     // TODO: Compute target body weight.
     const float target_BW = 100.0;
@@ -96,31 +122,90 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         // TODO: Simulate person and update risk factors.
         simulate_person(person, shift);
         // SimulatePersonState state = simulate_person(person, shift);
-        // person.risk_factors[H_key] = state.H;
-        // person.risk_factors[BW_key] = state.BW;
-        // person.risk_factors[PAL_key] = state.PAL;
-        // person.risk_factors[RMR_key] = state.RMR;
-        // person.risk_factors[F_key] = state.F;
-        // person.risk_factors[L_key] = state.L;
-        // person.risk_factors[ECF_key] = state.ECF;
-        // person.risk_factors[G_key] = state.G;
-        // person.risk_factors[W_key] = state.W;
-        // person.risk_factors[EE_key] = state.EE;
-        // person.risk_factors[EI_key] = state.EI;
+        // person.risk_factors["Height"_id] = state.H;
+        // person.risk_factors["Weight"_id] = state.BW;
+        // person.risk_factors["PhysicalActivity"_id] = state.PAL;
+        // person.risk_factors["RestingMetabolicRate"_id] = state.RMR;
+        // person.risk_factors["BodyFat"_id] = state.F;
+        // person.risk_factors["LeanTissue"_id] = state.L;
+        // person.risk_factors["ExtracellularFluid"_id] = state.ECF;
+        // person.risk_factors["Glycogen"_id] = state.G;
+        // person.risk_factors["EnergyExpenditure"_id] = state.EE;
+        // person.risk_factors["EnergyIntake"_id] = state.EI;
+    }
+}
+
+void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
+
+    // Initialise nutrient intakes.
+    set_nutrient_intakes(person);
+
+    // TODO: set old value to new value (only some nutrients)
+}
+
+void KevinHallModel::update_nutrient_intakes(Person &person) const {
+
+    // Update nutrient intakes.
+    set_nutrient_intakes(person);
+
+    // TODO: set old value to previous value (only some nutrients)
+}
+
+void KevinHallModel::set_nutrient_intakes(Person &person) const {
+
+    // Reset nutrient intakes to zero.
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        person.risk_factors[nutrient_key] = 0.0;
+    }
+
+    // Compute nutrient intakes from food intakes.
+    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+        double food_intake = person.risk_factors.at(food_key);
+        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
+            person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+        }
+    }
+}
+
+void KevinHallModel::initialise_energy_intake(Person &person) const {
+    set_energy_intake(person);
+
+    // Begin at steady state (EI = EE).
+    person.risk_factors["EnergyExpenditure"_id] = person.risk_factors.at("EnergyIntake"_id);
+
+    // TODO: set old value to new value
+}
+
+void KevinHallModel::update_energy_intake(Person &person) const {
+    set_energy_intake(person);
+
+    // TODO: set old value to previous value
+}
+
+void KevinHallModel::set_energy_intake(Person &person) const {
+
+    // Reset energy intake to zero.
+    const auto energy_intake_key = "EnergyIntake"_id;
+    person.risk_factors[energy_intake_key] = 0.0;
+
+    // Compute energy intake from nutrient intakes.
+    for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
+        double nutrient_intake = person.risk_factors.at(nutrient_key);
+        person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
     }
 }
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
-    const double H_0 = person.get_risk_factor_value(H_key);
-    const double BW_0 = person.get_risk_factor_value(BW_key);
-    const double PAL_0 = person.get_risk_factor_value(PAL_key);
-    const double F_0 = person.get_risk_factor_value(F_key);
-    const double L_0 = person.get_risk_factor_value(L_key);
-    const double ECF_0 = person.get_risk_factor_value(ECF_key);
-    const double G_0 = person.get_risk_factor_value(G_key);
-    const double EI_0 = person.get_risk_factor_value(EI_key);
-    const double CI_0 = person.get_risk_factor_value(CI_key);
+    const double H_0 = person.get_risk_factor_value("Height"_id);
+    const double BW_0 = person.get_risk_factor_value("Weight"_id);
+    const double PAL_0 = person.get_risk_factor_value("PhysicalActivity"_id);
+    const double F_0 = person.get_risk_factor_value("BodyFat"_id);
+    const double L_0 = person.get_risk_factor_value("LeanTissue"_id);
+    const double ECF_0 = person.get_risk_factor_value("ExtracellularFluid"_id);
+    const double G_0 = person.get_risk_factor_value("Glycogen"_id);
+    const double EI_0 = person.get_risk_factor_value("EnergyIntake"_id);
+    const double CI_0 = person.get_risk_factor_value("Carbohydrate"_id);
 
     // TODO: Compute height.
     double H = H_0;
@@ -128,10 +213,12 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     // TODO: Compute physical activity level.
     double PAL = PAL_0;
 
-    // Compute energy intake and carbohydrate intake.
-    auto nutrient_intakes = compute_nutrient_intakes(person);
-    double EI = compute_EI(nutrient_intakes);
-    double CI = nutrient_intakes.at(CI_key);
+    // TODO: some nutrient values need saving from previous year.
+
+    // Updated energy intake and carbohydrate intake.
+    // TODO: above, set EI_0 and CI_0 to risk_factors[*_previous].
+    double EI = person.get_risk_factor_value("EnergyIntake"_id);
+    double CI = person.get_risk_factor_value("Carbohydrate"_id);
 
     // Compute glycogen and water.
     double G = compute_G(CI, CI_0, G_0);
@@ -198,35 +285,9 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
                                .L = L,
                                .ECF = ECF,
                                .G = G,
-                               .W = W,
                                .EE = EE,
                                .EI = EI,
                                .adjust = adjust};
-}
-
-std::unordered_map<core::Identifier, double>
-KevinHallModel::compute_nutrient_intakes(const Person &person) const {
-    std::unordered_map<core::Identifier, double> nutrient_intakes;
-
-    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
-        double food_intake = person.get_risk_factor_value(food_key);
-        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            nutrient_intakes[nutrient_key] += food_intake * nutrient_coefficient;
-        }
-    }
-
-    return nutrient_intakes;
-}
-
-double KevinHallModel::compute_EI(
-    const std::unordered_map<core::Identifier, double> &nutrient_intakes) const {
-    double EI = 0.0;
-
-    for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
-        EI += nutrient_intakes.at(nutrient_key) * energy_coefficient;
-    }
-
-    return EI;
 }
 
 double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
@@ -265,15 +326,54 @@ double KevinHallModel::compute_AT(double EI, double EI_0) const {
     return beta_AT * delta_EI;
 }
 
+void KevinHallModel::initialise_weight(Person &person) {
+    const auto &expected = get_risk_factor_expected();
+
+    // Compute E/PA expected.
+    double ei_expected = expected.at(person.gender, "EnergyIntake"_id).at(person.age);
+    double pa_expected = expected.at(person.gender, "PhysicalActivity"_id).at(person.age);
+    double epa_expected = ei_expected / pa_expected;
+
+    // Compute E/PA actual.
+    double ei_actual = person.get_risk_factor_value("EnergyIntake"_id);
+    double pa_actual = person.get_risk_factor_value("PhysicalActivity"_id);
+    double epa_actual = ei_actual / pa_actual;
+
+    // Compute E/PA quantile.
+    double epa_quantile = epa_actual / epa_expected;
+
+    // Compute new weight.
+    double w_expected = expected.at(person.gender, "Weight"_id).at(person.age);
+    double w_quantile = get_weight_quantile(epa_quantile, person.gender);
+    person.risk_factors["Weight"_id] = w_expected * w_quantile;
+}
+
+double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) {
+
+    // Compute Energy Physical Activity percentile (taking midpoint of duplicates).
+    auto epa_range = std::equal_range(epa_quantiles_.begin(), epa_quantiles_.end(), epa_quantile);
+    auto epa_index = static_cast<double>(std::distance(epa_quantiles_.begin(), epa_range.first));
+    epa_index += std::distance(epa_range.first, epa_range.second) / 2.0;
+    auto epa_percentile = epa_index / epa_quantiles_.size();
+
+    // Find weight quantile.
+    auto weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
+    return weight_quantiles_.at(sex)[weight_index];
+}
+
 KevinHallModelDefinition::KevinHallModelDefinition(
-    std::unordered_map<core::Identifier, double> energy_equation,
+    RiskFactorSexAgeTable expected, std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-    std::unordered_map<core::Gender, std::vector<double>> age_mean_height)
-    : energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
+    std::unordered_map<core::Gender, std::vector<double>> age_mean_height,
+    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
+    std::vector<double> epa_quantiles)
+    : RiskFactorAdjustableModelDefinition{std::move(expected)},
+      energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
-      age_mean_height_{std::move(age_mean_height)} {
+      age_mean_height_{std::move(age_mean_height)}, weight_quantiles_{std::move(weight_quantiles)},
+      epa_quantiles_{std::move(epa_quantiles)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -290,11 +390,19 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (age_mean_height_.empty()) {
         throw core::HgpsException("Age mean height mapping is empty");
     }
+    if (weight_quantiles_.empty()) {
+        throw core::HgpsException("Weight quantiles mapping is empty");
+    }
+    if (epa_quantiles_.empty()) {
+        throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
+    }
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, age_mean_height_);
+    const auto &expected = get_risk_factor_expected();
+    return std::make_unique<KevinHallModel>(expected, energy_equation_, nutrient_ranges_,
+                                            nutrient_equations_, food_prices_, age_mean_height_,
+                                            weight_quantiles_, epa_quantiles_);
 }
 
 } // namespace hgps

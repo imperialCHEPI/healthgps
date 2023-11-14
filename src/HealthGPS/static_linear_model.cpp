@@ -9,16 +9,15 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
     const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
-    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, const double info_speed,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    const double physical_activity_stddev,
-    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles)
+    double physical_activity_stddev)
     : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
       stddev_{stddev}, cholesky_{cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev}, weight_quantiles_{weight_quantiles} {
+      physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -41,9 +40,6 @@ StaticLinearModel::StaticLinearModel(
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
-    if (weight_quantiles_.empty()) {
-        throw core::HgpsException("Weight quantiles mapping is empty");
-    }
 }
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
@@ -62,14 +58,6 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
-
-    // Initialise newborns.
-    for (auto &person : context.population()) {
-        initialise_weight(person, context.random());
-    }
-
-    // Adjust weight risk factor such its mean sim value matches expected value.
-    adjust_risk_factors(context, {"Weight"_id});
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -95,18 +83,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
-
-    // Initialise newborns and update others.
-    for (auto &person : context.population()) {
-        // Ignore if inactive.
-        if (!person.is_active()) {
-            continue;
-        }
-
-        if (person.age == 0) {
-            initialise_weight(person, context.random());
-        }
-    }
 }
 
 void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
@@ -284,33 +260,18 @@ void StaticLinearModel::initialise_physical_activity(Person &person, Random &ran
     person.risk_factors[key] = factor;
 }
 
-void StaticLinearModel::initialise_weight(Person &person, Random &generator) {
-    auto key = "Weight"_id;
-    auto weight_bl = get_risk_factor_expected().at(person.gender, key).at(person.age);
-    auto weight_quantile = get_weight_quantile(person.gender, generator);
-    person.risk_factors[key] = weight_bl * weight_quantile;
-}
-
-double StaticLinearModel::get_weight_quantile(core::Gender gender, Random &generator) {
-
-    auto index = static_cast<size_t>(generator.next_double() * weight_quantiles_.at(gender).size());
-    return weight_quantiles_.at(gender)[index];
-}
-
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
     std::vector<LinearModelParams> models, std::vector<double> lambda, std::vector<double> stddev,
     Eigen::MatrixXd cholesky, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
-    double physical_activity_stddev,
-    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles)
+    double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
       models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
       cholesky_{std::move(cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
-      physical_activity_stddev_{physical_activity_stddev},
-      weight_quantiles_{std::move(weight_quantiles)} {
+      physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -333,16 +294,13 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
-    if (weight_quantiles_.empty()) {
-        throw core::HgpsException("Weight quantiles mapping is empty");
-    }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(
-        expected, names_, models_, lambda_, stddev_, cholesky_, info_speed_, rural_prevalence_,
-        income_models_, physical_activity_stddev_, weight_quantiles_);
+    return std::make_unique<StaticLinearModel>(expected, names_, models_, lambda_, stddev_,
+                                               cholesky_, info_speed_, rural_prevalence_,
+                                               income_models_, physical_activity_stddev_);
 }
 
 } // namespace hgps

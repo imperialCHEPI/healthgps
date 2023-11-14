@@ -2,8 +2,10 @@
 
 #include "interfaces.h"
 #include "mapping.h"
+#include "risk_factor_adjustable_model.h"
 
 #include <optional>
+#include <vector>
 
 namespace hgps {
 
@@ -30,9 +32,6 @@ struct SimulatePersonState {
     /// @brief Glycogen
     double G{};
 
-    /// @brief Water
-    double W{};
-
     /// @brief Energy expenditure
     double EE{};
 
@@ -46,21 +45,27 @@ struct SimulatePersonState {
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
-class KevinHallModel final : public RiskFactorModel {
+class KevinHallModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the KevinHallModel class
+    /// @param expected The risk factor expected values by sex and age
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
+    /// @param weight_quantiles The weight quantiles (must be sorted)
+    /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     KevinHallModel(
+        const RiskFactorSexAgeTable &expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-        const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height);
+        const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height,
+        const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
+        const std::vector<double> &epa_quantiles);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -71,41 +76,35 @@ class KevinHallModel final : public RiskFactorModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
-    const std::unordered_map<core::Identifier, double> &energy_equation_;
-    const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
-    const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
-        &nutrient_equations_;
-    const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
-    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
+    /// @brief Initialise total nutrient intakes from food intakes
+    /// @param person The person to initialise
+    void initialise_nutrient_intakes(Person &person) const;
 
-    // Model parameters.
-    static constexpr double rho_F = 39.5e3; // Energy content of fat (kJ/kg).
-    static constexpr double rho_L = 7.6e3;  // Energy content of lean (kJ/kg).
-    static constexpr double gamma_F = 13.0; // RMR fat coefficients (kJ/kg/day).
-    static constexpr double gamma_L = 92.0; // RMR lean coefficients (kJ/kg/day).
-    static constexpr double eta_F = 750.0;  // Fat synthesis energy coefficient (kJ/kg).
-    static constexpr double eta_L = 960.0;  // Lean synthesis energy coefficient (kJ/kg).
-    static constexpr double beta_TEF = 0.1; // TEF from energy intake (unitless).
-    static constexpr double beta_AT = 0.14; // AT from energy intake (unitless).
-    static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
-    static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
+    /// @brief Update total nutrient intakes from food intakes
+    /// @param person The person to update
+    void update_nutrient_intakes(Person &person) const;
+
+    /// @brief Compute and set nutrient intakes from food intakes.
+    /// @param person The person to compute nutrient intakes for
+    void set_nutrient_intakes(Person &person) const;
+
+    /// @brief Initialise total energy intake from nutrient intakes
+    /// @param person The person to initialise
+    void initialise_energy_intake(Person &person) const;
+
+    /// @brief Update total energy intake from nutrient intakes
+    /// @param person The person to update
+    void update_energy_intake(Person &person) const;
+
+    /// @brief Compute and set energy intake from nutrient intakes.
+    /// @param person The person to compute energy intake for
+    void set_energy_intake(Person &person) const;
 
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
     /// @param shift Model adjustment term
     /// @return The state of the person
     SimulatePersonState simulate_person(Person &person, double shift) const;
-
-    /// @brief Compute nutrient intakes from food intakes.
-    /// @param person The person to compute nutrient intakes for
-    /// @return A map of computed nutrient intakes
-    std::unordered_map<core::Identifier, double>
-    compute_nutrient_intakes(const Person &person) const;
-
-    /// @brief Compute energy intake from nutrient intakes.
-    /// @param nutrient_intakes The nutrient intake
-    /// @return The computed energy intake
-    double compute_EI(const std::unordered_map<core::Identifier, double> &nutrient_intakes) const;
 
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake
@@ -147,24 +146,61 @@ class KevinHallModel final : public RiskFactorModel {
     /// @param EI_0 The initial energy intake
     /// @return The computed adaptive thermogenesis
     double compute_AT(double EI, double EI_0) const;
+
+    /// @brief Initialises the weight of a person.
+    /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
+    /// @param person The person fo initialise the weight for.
+    void initialise_weight(Person &person);
+
+    /// @brief Returns the weight quantile for the given E overPA quantile and sex.
+    /// @param epa_quantile The Energy / Physical Activity quantile.
+    /// @param sex The sex of the person.
+    double get_weight_quantile(double epa_quantile, core::Gender sex);
+
+    const std::unordered_map<core::Identifier, double> &energy_equation_;
+    const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
+    const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
+        &nutrient_equations_;
+    const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
+    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
+    const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
+    const std::vector<double> &epa_quantiles_;
+
+    // Model parameters.
+    static constexpr double rho_F = 39.5e3; // Energy content of fat (kJ/kg).
+    static constexpr double rho_L = 7.6e3;  // Energy content of lean (kJ/kg).
+    static constexpr double gamma_F = 13.0; // RMR fat coefficients (kJ/kg/day).
+    static constexpr double gamma_L = 92.0; // RMR lean coefficients (kJ/kg/day).
+    static constexpr double eta_F = 750.0;  // Fat synthesis energy coefficient (kJ/kg).
+    static constexpr double eta_L = 960.0;  // Lean synthesis energy coefficient (kJ/kg).
+    static constexpr double beta_TEF = 0.1; // TEF from energy intake (unitless).
+    static constexpr double beta_AT = 0.14; // AT from energy intake (unitless).
+    static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
+    static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
 };
 
 /// @brief Defines the energy balance model data type
-class KevinHallModelDefinition final : public RiskFactorModelDefinition {
+class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinition {
   public:
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
+    /// @param expected The risk factor expected values by sex and age
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
     /// @param age_mean_height The mean height at all ages (male and female)
+    /// @param weight_quantiles The weight quantiles (must be sorted)
+    /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
+        RiskFactorSexAgeTable expected,
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-        std::unordered_map<core::Gender, std::vector<double>> age_mean_height);
+        std::unordered_map<core::Gender, std::vector<double>> age_mean_height,
+        std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
+        std::vector<double> epa_quantiles);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -176,6 +212,8 @@ class KevinHallModelDefinition final : public RiskFactorModelDefinition {
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
     std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
+    std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
+    std::vector<double> epa_quantiles_;
 };
 
 } // namespace hgps
