@@ -60,7 +60,7 @@ class RuntimeContext {
 
     /// @brief Gets a reference to the engine random number generator
     /// @return Random number generator
-    Random &random() noexcept;
+    Random &random() const noexcept;
 
     /// @brief Gets a read-only reference to the hierarchical risk factors mapping
     /// @return Risk factor mapping
@@ -103,7 +103,7 @@ class RuntimeContext {
     std::reference_wrapper<EventAggregator> event_bus_;
     std::reference_wrapper<SimulationDefinition> definition_;
     Population population_;
-    Random generator_;
+    mutable Random generator_;
     RuntimeMetric metrics_{};
     unsigned int current_run_{};
     int model_start_time_{};
