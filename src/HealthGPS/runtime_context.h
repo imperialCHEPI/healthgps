@@ -46,6 +46,10 @@ class RuntimeContext {
     /// @return Virtual population
     Population &population() noexcept;
 
+    /// @brief Gets a reference to the virtual population container
+    /// @return Virtual population
+    const Population &population() const noexcept;
+
     /// @brief Gets a reference to the runtime metrics container
     /// @return Runtime metrics
     RuntimeMetric &metrics() noexcept;
