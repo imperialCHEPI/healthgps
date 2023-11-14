@@ -171,18 +171,26 @@ void KevinHallModel::set_nutrient_intakes(Person &person) const {
 }
 
 void KevinHallModel::initialise_energy_intake(Person &person) const {
+
+    // Initialise energy intake.
     set_energy_intake(person);
 
-    // Begin at steady state (EI = EE).
-    person.risk_factors["EnergyExpenditure"_id] = person.risk_factors.at("EnergyIntake"_id);
+    // Start with previous = current.
+    double energy_intake = person.risk_factors.at("EnergyIntake"_id);
+    person.risk_factors["EnergyIntake_previous"_id] = energy_intake;
 
-    // TODO: set old value to new value
+    // Begin at steady state (EI = EE).
+    person.risk_factors["EnergyExpenditure"_id] = energy_intake;
 }
 
 void KevinHallModel::update_energy_intake(Person &person) const {
-    set_energy_intake(person);
 
-    // TODO: set old value to previous value
+    // Set previous energy intake.
+    double previous_energy_intake = person.risk_factors.at("EnergyIntake"_id);
+    person.risk_factors.at("EnergyIntake_previous"_id) = previous_energy_intake;
+
+    // Update energy intake.
+    set_energy_intake(person);
 }
 
 void KevinHallModel::set_energy_intake(Person &person) const {
@@ -251,7 +259,7 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
-    const double H_0 = person.get_risk_factor_value("Height"_id);
+    const double H = person.get_risk_factor_value("Height"_id);
     const double BW_0 = person.get_risk_factor_value("Weight"_id);
     const double PAL_0 = person.get_risk_factor_value("PhysicalActivity"_id);
     const double F_0 = person.get_risk_factor_value("BodyFat"_id);
@@ -260,9 +268,6 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     const double G_0 = person.get_risk_factor_value("Glycogen"_id);
     const double EI_0 = person.get_risk_factor_value("EnergyIntake"_id);
     const double CI_0 = person.get_risk_factor_value("Carbohydrate"_id);
-
-    // TODO: Compute height.
-    double H = H_0;
 
     // TODO: Compute physical activity level.
     double PAL = PAL_0;
