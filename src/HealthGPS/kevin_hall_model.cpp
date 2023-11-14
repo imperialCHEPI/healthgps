@@ -63,6 +63,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(person);
+        initialise_kevin_hall_state(person);
     }
 
     // Adjust weight to matche expected values.
@@ -82,9 +83,11 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
             initialise_nutrient_intakes(person);
             initialise_energy_intake(person);
             initialise_weight(person);
+            initialise_kevin_hall_state(person);
         } else {
             update_nutrient_intakes(person);
             update_energy_intake(person);
+            update_weight(person);
         }
     }
 
@@ -399,6 +402,14 @@ void KevinHallModel::initialise_weight(Person &person) const {
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
 
+void KevinHallModel::update_weight(Person &person) const {
+    if (person.age < kevin_hall_age_min) {
+        initialise_weight(person);
+    } else {
+        simulate_person(person, 0.0);
+    }
+}
+
 double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) const {
 
     // Compute Energy Physical Activity percentile (taking midpoint of duplicates).
@@ -413,7 +424,7 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
 }
 
 UnorderedMap2d<core::Gender, int, double>
-KevinHallModel::compute_mean_weight_powers(Population &population, double power) const {
+KevinHallModel::compute_mean_weight(Population &population, std::optional<double> power) const {
 
     // Local struct to hold count and sum of weight powers.
     struct SumCount {
@@ -439,7 +450,13 @@ KevinHallModel::compute_mean_weight_powers(Population &population, double power)
             continue;
         }
 
-        double value = pow(person.risk_factors.at("Weight"_id), power);
+        double value;
+        if (power.has_value()) {
+            value = pow(person.risk_factors.at("Weight"_id), power.value());
+        } else {
+            value = person.risk_factors.at("Weight"_id);
+        }
+
         sumcounts.at(person.gender)[person.age].append(value);
     }
 

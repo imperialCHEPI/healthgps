@@ -161,17 +161,21 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person fo initialise the weight for.
     void initialise_weight(Person &person) const;
 
+    /// @brief Updates the weight of a person.
+    /// @param person The person fo update the weight for.
+    void update_weight(Person &person) const;
+
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param sex The sex of the person.
     double get_weight_quantile(double epa_quantile, core::Gender sex) const;
 
-    /// @brief Compute the mean of weight raised to power for eacg sex and age
+    /// @brief Compute the mean of weight (optionally raised to a power) for eac sex and age
     /// @param population The population to compute the mean for
-    /// @param power The power to raise the weight to
+    /// @param power The (optional) power to raise the weight to
     /// @return The weight power means by sex and age
-    UnorderedMap2d<core::Gender, int, double> compute_mean_weight_powers(Population &population,
-                                                                         double power) const;
+    UnorderedMap2d<core::Gender, int, double>
+    compute_mean_weight(Population &population, std::optional<double> power = std::nullopt) const;
 
     // // TODO: implement this
     // /// @brief Initialises the height of a person.
@@ -199,16 +203,17 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::vector<double> &epa_quantiles_;
 
     // Model parameters.
-    static constexpr double rho_F = 39.5e3; // Energy content of fat (kJ/kg).
-    static constexpr double rho_L = 7.6e3;  // Energy content of lean (kJ/kg).
-    static constexpr double gamma_F = 13.0; // RMR fat coefficients (kJ/kg/day).
-    static constexpr double gamma_L = 92.0; // RMR lean coefficients (kJ/kg/day).
-    static constexpr double eta_F = 750.0;  // Fat synthesis energy coefficient (kJ/kg).
-    static constexpr double eta_L = 960.0;  // Lean synthesis energy coefficient (kJ/kg).
-    static constexpr double beta_TEF = 0.1; // TEF from energy intake (unitless).
-    static constexpr double beta_AT = 0.14; // AT from energy intake (unitless).
-    static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
-    static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
+    static constexpr int kevin_hall_age_min = 19; // Minimum age for the model.
+    static constexpr double rho_F = 39.5e3;       // Energy content of fat (kJ/kg).
+    static constexpr double rho_L = 7.6e3;        // Energy content of lean (kJ/kg).
+    static constexpr double gamma_F = 13.0;       // RMR fat coefficients (kJ/kg/day).
+    static constexpr double gamma_L = 92.0;       // RMR lean coefficients (kJ/kg/day).
+    static constexpr double eta_F = 750.0;        // Fat synthesis energy coefficient (kJ/kg).
+    static constexpr double eta_L = 960.0;        // Lean synthesis energy coefficient (kJ/kg).
+    static constexpr double beta_TEF = 0.1;       // TEF from energy intake (unitless).
+    static constexpr double beta_AT = 0.14;       // AT from energy intake (unitless).
+    static constexpr double xi_Na = 3000.0;       // Na from ECF changes (mg/L/day).
+    static constexpr double xi_CI = 4000.0;       // Na from carbohydrate changes (mg/day).
 };
 
 /// @brief Defines the energy balance model data type
