@@ -427,7 +427,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
         weight_quantiles[hgps::core::Gender::male].push_back(
             std::any_cast<double>(weight_quantiles_table_M.column(0).value(j)));
     }
-    for (auto &[sex, quantiles] : weight_quantiles) {
+    for (auto &[unused, quantiles] : weight_quantiles) {
         std::sort(quantiles.begin(), quantiles.end());
     }
 

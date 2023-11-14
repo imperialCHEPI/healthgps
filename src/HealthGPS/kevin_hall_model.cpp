@@ -136,67 +136,63 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
-    auto nutrient_intakes = compute_nutrient_intakes(person);
 
     // Initialise nutrient intakes.
-    for (auto &[nutrient_key, nutrient_value] : nutrient_intakes) {
-        person.risk_factors[nutrient_key] = nutrient_value;
-    }
+    set_nutrient_intakes(person);
 
     // TODO: set old value to new value (only some nutrients)
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
-    auto nutrient_intakes = compute_nutrient_intakes(person);
 
     // Update nutrient intakes.
-    for (auto &[nutrient_key, nutrient_value] : nutrient_intakes) {
-        person.risk_factors[nutrient_key] = nutrient_value;
-    }
+    set_nutrient_intakes(person);
 
     // TODO: set old value to previous value (only some nutrients)
 }
 
-std::unordered_map<core::Identifier, double>
-KevinHallModel::compute_nutrient_intakes(Person &person) const {
-    std::unordered_map<core::Identifier, double> nutrient_intakes;
+void KevinHallModel::set_nutrient_intakes(Person &person) const {
 
-    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
-        double food_intake = person.get_risk_factor_value(food_key);
-        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            nutrient_intakes[nutrient_key] += food_intake * nutrient_coefficient;
-        }
+    // Reset nutrient intakes to zero.
+    for (const auto &[nutrient_key, unused] : energy_equation_) {
+        person.risk_factors[nutrient_key] = 0.0;
     }
 
-    return nutrient_intakes;
+    // Compute nutrient intakes from food intakes.
+    for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+        double food_intake = person.risk_factors.at(food_key);
+        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
+            person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+        }
+    }
 }
 
 void KevinHallModel::initialise_energy_intake(Person &person) const {
-    double energy_intake = compute_energy_intake(person);
-    person.risk_factors["EnergyIntake"_id] = energy_intake;
+    set_energy_intake(person);
 
     // Begin at steady state (EI = EE).
-    person.risk_factors["EnergyExpenditure"_id] = energy_intake;
+    person.risk_factors["EnergyExpenditure"_id] = person.risk_factors.at("EnergyIntake"_id);
 
     // TODO: set old value to new value
 }
 
 void KevinHallModel::update_energy_intake(Person &person) const {
-    double energy_intake = compute_energy_intake(person);
-    person.risk_factors["EnergyIntake"_id] = energy_intake;
+    set_energy_intake(person);
 
     // TODO: set old value to previous value
 }
 
-double KevinHallModel::compute_energy_intake(Person &person) const {
-    double energy_intake = 0.0;
+void KevinHallModel::set_energy_intake(Person &person) const {
 
+    // Reset energy intake to zero.
+    const auto energy_intake_key = "EnergyIntake"_id;
+    person.risk_factors[energy_intake_key] = 0.0;
+
+    // Compute energy intake from nutrient intakes.
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
-        double nutrient_intake = person.get_risk_factor_value(nutrient_key);
-        energy_intake += nutrient_intake * energy_coefficient;
+        double nutrient_intake = person.risk_factors.at(nutrient_key);
+        person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
     }
-
-    return energy_intake;
 }
 
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
