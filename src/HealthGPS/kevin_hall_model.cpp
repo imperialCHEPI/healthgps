@@ -143,15 +143,23 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
     // Initialise nutrient intakes.
     set_nutrient_intakes(person);
 
-    // TODO: set old value to new value (only some nutrients)
+    // Start with previous = current.
+    double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
+    person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
+    double sodium = person.risk_factors.at("Sodium"_id);
+    person.risk_factors["Sodium_previous"_id] = sodium;
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
 
+    // Set previous nutrient intakes.
+    double previous_carbohydrate = person.risk_factors.at("Carbohydrate"_id);
+    person.risk_factors.at("Carbohydrate_previous"_id) = previous_carbohydrate;
+    double previous_sodium = person.risk_factors.at("Sodium"_id);
+    person.risk_factors.at("Sodium_previous"_id) = previous_sodium;
+
     // Update nutrient intakes.
     set_nutrient_intakes(person);
-
-    // TODO: set old value to previous value (only some nutrients)
 }
 
 void KevinHallModel::set_nutrient_intakes(Person &person) const {
