@@ -195,6 +195,57 @@ void KevinHallModel::set_energy_intake(Person &person) const {
     }
 }
 
+void KevinHallModel::initialise_kevin_hall_state(Person &person,
+                                                 std::optional<double> adjustment) const {
+
+    // Apply optional weight adjustment.
+    if (adjustment.has_value()) {
+        person.risk_factors.at("Weight"_id) += adjustment.value();
+    }
+
+    // Get already computed values.
+    double height = person.risk_factors.at("Height"_id);
+    double weight = person.risk_factors.at("Weight"_id);
+    double physical_activity = person.risk_factors.at("PhysicalActivity"_id);
+    double energy_intake = person.risk_factors.at("EnergyIntake"_id);
+
+    // Body fat.
+    double body_fat;
+    if (person.gender == core::Gender::female) {
+        body_fat = weight *
+                   (0.14 * person.age + 39.96 * log(weight / pow(height / 100, 2.0)) - 102.01) /
+                   100.0;
+    } else if (person.gender == core::Gender::male) {
+        body_fat = weight *
+                   (0.14 * person.age + 37.31 * log(weight / pow(height / 100, 2.0)) - 103.94) /
+                   100.0;
+    } else {
+        throw core::HgpsException("Unknown gender");
+    }
+
+    if (body_fat < 0.0) {
+        // HACK: deal with negative body fat.
+        body_fat = 0.2 * weight;
+    }
+
+    // Glycogen, water, extracellular fluid and lean tissue.
+    double glycogen = 0.01 * weight;
+    double water = 2.7 * glycogen;
+    double extracellular_fluid = 0.7 * 0.235 * weight;
+    double lean_tissue = weight - body_fat - glycogen - water - extracellular_fluid;
+
+    // Model intercept value.
+    double delta = compute_delta(person.age, person.gender, physical_activity, weight, height);
+    double K = energy_intake - (gamma_F * body_fat + gamma_L * lean_tissue + delta * weight);
+
+    // Set new state.
+    person.risk_factors["Glycogen"_id] = glycogen;
+    person.risk_factors["ExtracellularFluid"_id] = extracellular_fluid;
+    person.risk_factors["BodyFat"_id] = body_fat;
+    person.risk_factors["LeanTissue"_id] = lean_tissue;
+    person.risk_factors["Intercept_K"_id] = K;
+}
+
 SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
     // Initial simulated person state.
     const double H_0 = person.get_risk_factor_value("Height"_id);
@@ -228,7 +279,7 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     double ECF = compute_ECF(EI, EI_0, CI, CI_0, ECF_0);
 
     // Compute energy cost per unit body weight.
-    double delta = compute_delta(PAL, BW_0, H, person.age, person.gender);
+    double delta = compute_delta(person.age, person.gender, PAL, BW_0, H);
 
     // Compute thermic effect of food.
     double TEF = compute_TEF(EI, EI_0);
@@ -305,11 +356,11 @@ double KevinHallModel::compute_ECF(double EI, double EI_0, double CI, double CI_
     return ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
 }
 
-double KevinHallModel::compute_delta(double PAL, double BW, double H, unsigned int age,
-                                     core::Gender gender) const {
+double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, double BW,
+                                     double H) const {
     // Resting metabolic rate (Mifflin-St Jeor).
-    double RMR = 9.99 * BW + 6.25 * H * 100.0 - 4.92 * age;
-    RMR += gender == core::Gender::male ? 5.0 : -161.0;
+    double RMR = 9.99 * BW + 6.25 * H - 4.92 * age;
+    RMR += sex == core::Gender::male ? 5.0 : -161.0;
     RMR *= 4.184; // From kcal to kJ
 
     // Energy expenditure per kg of body weight.

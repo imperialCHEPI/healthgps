@@ -1,5 +1,7 @@
 #pragma once
 
+#include "HealthGPS.Core/exception.h"
+
 #include "interfaces.h"
 #include "map2d.h"
 #include "mapping.h"
@@ -101,6 +103,12 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person to compute energy intake for
     void set_energy_intake(Person &person) const;
 
+    /// @brief  Initialise the Kevin Hall state variables of a person
+    /// @param person The person to initialise
+    /// @param adjustment An optional weight adjustment term (default is zero)
+    void initialise_kevin_hall_state(Person &person,
+                                     std::optional<double> adjustment = std::nullopt) const;
+
     /// @brief Simulates the energy balance model for a given person
     /// @param person The person to simulate
     /// @param shift Model adjustment term
@@ -129,12 +137,13 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     double compute_ECF(double EI, double EI_0, double CI, double CI_0, double ECF_0) const;
 
     /// @brief Compute energy cost per unit body weight.
+    /// @param age The age of the person
+    /// @param sex the sex of the person
     /// @param PAL The physical activity level
-    /// @param RMR The resting metabolic rate
     /// @param BW The body weight
+    /// @param H The height (cm)
     /// @return The computed energy cost per unit body weight
-    double compute_delta(double PAL, double BW, double H, unsigned int age,
-                         core::Gender gender) const;
+    double compute_delta(int age, core::Gender sex, double PAL, double BW, double H) const;
 
     /// @brief Compute thermic effect of food.
     /// @param EI The energy intake
