@@ -12,6 +12,9 @@
 
 namespace hgps {
 
+/// @brief Defines a table type for Kevin Hall adjustments by sex and age
+using KevinHallAdjustmentTable = UnorderedMap2d<core::Gender, int, double>;
+
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
@@ -125,6 +128,11 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param adjustment The weight adjustment term
     void kevin_hall_adjust(Person &person, double adjustment) const;
 
+    /// @brief Compute Kevin Hall adjustments for sex and age
+    /// @param population The population to compute the adjustments for
+    /// @return The Kevin Hall adjustments by sex and age
+    KevinHallAdjustmentTable compute_kevin_hall_adjustments(Population &population) const;
+
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param sex The sex of the person.
@@ -134,14 +142,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param population The population to compute the mean for
     /// @param power The (optional) power to raise the weight to
     /// @return The weight power means by sex and age
-    UnorderedMap2d<core::Gender, int, double>
-    compute_mean_weight(Population &population, std::optional<double> power = std::nullopt) const;
-
-    /// @brief Compute or recieve Kevin Hall adjustments for sex and age
-    /// @param population The population to compute the adjustments for
-    /// @return The Kevin Hall adjustments by sex and age
-    UnorderedMap2d<core::Gender, int, double>
-    get_kevin_hall_adjustments(Population &population) const;
+    KevinHallAdjustmentTable compute_mean_weight(Population &population,
+                                                 std::optional<double> power = std::nullopt) const;
 
     // // TODO: implement this
     // /// @brief Initialises the height of a person.

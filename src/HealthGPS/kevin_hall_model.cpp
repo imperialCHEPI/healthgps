@@ -1,11 +1,19 @@
+#include "HealthGPS.Core/exception.h"
+
 #include "kevin_hall_model.h"
 #include "runtime_context.h"
-
-#include "HealthGPS.Core/exception.h"
+#include "sync_message.h"
 
 #include <algorithm>
 #include <iterator>
 #include <utility>
+
+namespace { // anonymous namespace
+
+using KevinHallAdjustmentMessage =
+    hgps::SyncDataMessage<hgps::UnorderedMap2d<hgps::core::Gender, int, double>>;
+
+} // anonymous namespace
 
 /*
  * Suppress this clang-tidy warning for now, because most (all?) of these methods won't
@@ -92,7 +100,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Update: Kevin Hall applies only to adults.
+    // Update: different model for children and adults.
     for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
@@ -106,10 +114,32 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Compute Kevin Hall variable adjustment.
-    auto adjustments = get_kevin_hall_adjustments(context.population());
+    KevinHallAdjustmentTable adjustments;
 
-    // Adjust: Kevin Hall applies only to adults.
+    // Baseline scenatio: compute adjustments.
+    if (context.scenario().type() == ScenarioType::baseline) {
+        adjustments = compute_kevin_hall_adjustments(context.population());
+    }
+
+    // Intervention scenario: recieve adjustments from baseline scenario.
+    else {
+        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        if (!message.has_value()) {
+            throw core::HgpsException(
+                "Simulation out of sync, receive Kevin Hall adjustments message has timed out");
+        }
+
+        auto &basePtr = message.value();
+        auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(basePtr.get());
+        if (!messagePrt) {
+            throw core::HgpsException(
+                "Simulation out of sync, failed to receive a Kevin Hall adjustments message");
+        }
+
+        adjustments = messagePrt->data();
+    }
+
+    // Adjust: different model for children and adults.
     for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
@@ -125,7 +155,29 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // TODO: Send adjustments to intervention if in baseline scenario.
+    // Baseline scenario: send adjustments to intervention scenario.
+    if (context.scenario().type() == ScenarioType::baseline) {
+        context.scenario().channel().send(std::make_unique<KevinHallAdjustmentMessage>(
+            context.current_run(), context.time_now(), std::move(adjustments)));
+    }
+}
+
+KevinHallAdjustmentTable
+KevinHallModel::compute_kevin_hall_adjustments(Population &population) const {
+    auto expected = get_risk_factor_expected();
+    auto weight_means = compute_mean_weight(population);
+
+    // Compute adjustments.
+    auto adjustments = KevinHallAdjustmentTable{};
+    for (const auto &[sex, weight_means_by_sex] : weight_means) {
+        adjustments.emplace_row(sex, std::unordered_map<int, double>{});
+        for (const auto &[age, weight_mean] : weight_means_by_sex) {
+            double weight_expected = expected.at(sex, "Weight"_id).at(age);
+            adjustments.at(sex)[age] = weight_expected - weight_mean;
+        }
+    }
+
+    return adjustments;
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
@@ -452,8 +504,8 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
     return weight_quantiles_.at(sex)[weight_index];
 }
 
-UnorderedMap2d<core::Gender, int, double>
-KevinHallModel::compute_mean_weight(Population &population, std::optional<double> power) const {
+KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &population,
+                                                             std::optional<double> power) const {
 
     // Local struct to hold count and sum of weight powers.
     struct SumCount {
@@ -490,7 +542,7 @@ KevinHallModel::compute_mean_weight(Population &population, std::optional<double
     }
 
     // Compute means of weight powers for sex and age.
-    auto means = UnorderedMap2d<core::Gender, int, double>{};
+    auto means = KevinHallAdjustmentTable{};
     for (const auto &[sex, sumcounts_by_sex] : sumcounts) {
         means.emplace_row(sex, std::unordered_map<int, double>{});
         for (const auto &[age, sumcount] : sumcounts_by_sex) {
@@ -499,26 +551,6 @@ KevinHallModel::compute_mean_weight(Population &population, std::optional<double
     }
 
     return means;
-}
-
-UnorderedMap2d<core::Gender, int, double>
-KevinHallModel::get_kevin_hall_adjustments(Population &population) const {
-    auto expected = get_risk_factor_expected();
-    auto weight_means = compute_mean_weight(population);
-
-    // TODO: Recieve adjustments from baseline if in intervention scenario.
-
-    // Compute adjustments.
-    auto adjustments = UnorderedMap2d<core::Gender, int, double>{};
-    for (const auto &[sex, weight_means_by_sex] : weight_means) {
-        adjustments.emplace_row(sex, std::unordered_map<int, double>{});
-        for (const auto &[age, weight_mean] : weight_means_by_sex) {
-            double weight_expected = expected.at(sex, "Weight"_id).at(age);
-            adjustments.at(sex)[age] = weight_expected - weight_mean;
-        }
-    }
-
-    return weight_means;
 }
 
 // void KevinHallModel::initialise_height(Person &person) {
