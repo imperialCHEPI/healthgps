@@ -400,20 +400,6 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     auto height_params =
         opt["HeightModel"].get<std::unordered_map<hgps::core::Identifier, double>>();
 
-    // Load M/F average heights for age.
-    std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
-    const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
-    auto male_height = opt["AgeMeanHeight"]["Male"].get<std::vector<double>>();
-    auto female_height = opt["AgeMeanHeight"]["Female"].get<std::vector<double>>();
-    if (male_height.size() <= max_age) {
-        throw hgps::core::HgpsException{"AgeMeanHeight (Male) does not cover complete age range"};
-    }
-    if (female_height.size() <= max_age) {
-        throw hgps::core::HgpsException{"AgeMeanHeight (Female) does not cover complete age range"};
-    }
-    age_mean_height.emplace(hgps::core::Gender::male, std::move(male_height));
-    age_mean_height.emplace(hgps::core::Gender::female, std::move(female_height));
-
     // Weight quantiles.
     const auto weight_quantiles_table_F = load_datatable_from_csv(
         host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
