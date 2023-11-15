@@ -71,6 +71,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_kevin_hall_state(person);
+        compute_bmi(person);
     }
 }
 
@@ -123,6 +124,16 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         } else {
             kevin_hall_adjust(person, adjustment);
         }
+    }
+
+    // Compute the new BMI values, if needed
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        compute_bmi(person);
     }
 
     // TODO: Send adjustments to intervention if in baseline scenario.
@@ -366,6 +377,14 @@ double KevinHallModel::compute_EE(double BW, double F, double L, double EI, doub
     return (K + gamma_F * F + gamma_L * L + delta * BW + beta_TEF + beta_AT +
             x * (EI - rho_G * 0.0)) /
            (1 + x);
+}
+
+/// Compute's a person BMI assuming height in cm
+/// @param person The person to calculate the BMI for.
+void KevinHallModel::compute_bmi(Person &person) {
+    auto w = person.risk_factors.at("Weight"_id);
+    auto h = person.risk_factors.at("Height"_id) * 100;
+    person.risk_factors["BMI"_id] = w / (h * h);
 }
 
 void KevinHallModel::initialise_weight(Person &person) const {

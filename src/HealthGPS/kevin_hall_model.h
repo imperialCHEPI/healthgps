@@ -106,6 +106,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     double compute_EE(double BW, double F, double L, double EI, double K, double delta,
                       double x) const;
 
+    /// @brief Compute's a person BMI assuming height in cm
+    /// @param person The person to calculate the BMI for.
+    void compute_bmi(Person &person) const;
+
     /// @brief Initialises the weight of a person.
     /// @param person The person fo initialise the weight for.
     void initialise_weight(Person &person) const;
