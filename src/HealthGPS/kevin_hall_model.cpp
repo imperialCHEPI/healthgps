@@ -29,13 +29,13 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations,
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-    const std::unordered_map<core::Identifier, double> &height_params,
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
-    const std::vector<double> &epa_quantiles)
+    const std::vector<double> &epa_quantiles,
+    const std::unordered_map<core::Gender, double> &height_stddev, double height_slope)
     : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
       nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
-      food_prices_{food_prices}, height_params_{height_params}, weight_quantiles_{weight_quantiles},
-      epa_quantiles_{epa_quantiles} {
+      food_prices_{food_prices}, weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
+      height_stddev_{height_stddev}, height_slope_{height_slope} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -49,14 +49,14 @@ KevinHallModel::KevinHallModel(
     if (food_prices_.empty()) {
         throw core::HgpsException("Food price mapping is empty");
     }
-    if (height_params_.empty()) {
-        throw core::HgpsException("Height model parameter mapping is empty");
-    }
     if (weight_quantiles_.empty()) {
         throw core::HgpsException("Weight quantiles mapping is empty");
     }
     if (epa_quantiles_.empty()) {
         throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
+    }
+    if (height_stddev_.empty()) {
+        throw core::HgpsException("Height standard deviation mapping is empty");
     }
 }
 
@@ -562,24 +562,29 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
 //     // TODO: return if age >= 19, then call common code
 // }
 
-// double KevinHallModel::compute_new_height(Person &person) {
-//     // TODO: common height compute code goes here
-//     return 0.0;
-// }
+double KevinHallModel::compute_new_height(Person &person) {
+    auto expected = get_risk_factor_expected();
+
+    double stddev = height_stddev_.at(person.gender);
+    double W = person.risk_factors.at("Weight"_id);
+
+    // TODO: common height compute code goes here
+    return 0.0;
+}
 
 KevinHallModelDefinition::KevinHallModelDefinition(
     RiskFactorSexAgeTable expected, std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-    std::unordered_map<core::Identifier, double> height_params,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
-    std::vector<double> epa_quantiles)
+    std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
+    double height_slope)
     : RiskFactorAdjustableModelDefinition{std::move(expected)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
-      height_params_{std::move(height_params)}, weight_quantiles_{std::move(weight_quantiles)},
-      epa_quantiles_{std::move(epa_quantiles)} {
+      weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
+      height_stddev_{std::move(height_stddev)}, height_slope_{height_slope} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -593,22 +598,22 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     if (food_prices_.empty()) {
         throw core::HgpsException("Food prices mapping is empty");
     }
-    if (height_params_.empty()) {
-        throw core::HgpsException("Height model parameter mapping is empty");
-    }
     if (weight_quantiles_.empty()) {
         throw core::HgpsException("Weight quantiles mapping is empty");
     }
     if (epa_quantiles_.empty()) {
         throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
     }
+    if (height_stddev_.empty()) {
+        throw core::HgpsException("Height standard deviation mapping is empty");
+    }
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
     const auto &expected = get_risk_factor_expected();
     return std::make_unique<KevinHallModel>(expected, energy_equation_, nutrient_ranges_,
-                                            nutrient_equations_, food_prices_, height_params_,
-                                            weight_quantiles_, epa_quantiles_);
+                                            nutrient_equations_, food_prices_, weight_quantiles_,
+                                            epa_quantiles_, height_stddev_, height_slope_);
 }
 
 } // namespace hgps
