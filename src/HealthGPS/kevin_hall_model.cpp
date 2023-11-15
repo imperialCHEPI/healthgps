@@ -63,11 +63,15 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(person);
-        initialise_kevin_hall_state(person);
     }
 
     // Adjust weight to matche expected values.
     adjust_risk_factors(context, {"Weight"_id});
+
+    // Initialise everyone.
+    for (auto &person : context.population()) {
+        initialise_kevin_hall_state(person);
+    }
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
@@ -82,16 +86,46 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         if (person.age == 0) {
             initialise_nutrient_intakes(person);
             initialise_energy_intake(person);
-            initialise_weight(person);
-            initialise_kevin_hall_state(person);
         } else {
             update_nutrient_intakes(person);
             update_energy_intake(person);
-            update_weight(person);
         }
     }
 
-    // TODO: Weight adjustment.
+    // Update: Kevin Hall applies only to adults.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age < kevin_hall_age_min) {
+            initialise_weight(person);
+        } else {
+            kevin_hall_run(person);
+        }
+    }
+
+    // Compute Kevin Hall variable adjustment.
+    auto adjustments = get_kevin_hall_adjustments(context.population());
+
+    // Adjust: Kevin Hall applies only to adults.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        auto &adjustment = adjustments.at(person.gender, person.age);
+
+        if (person.age < kevin_hall_age_min) {
+            initialise_kevin_hall_state(person, adjustment);
+        } else {
+            kevin_hall_adjust(person, adjustment);
+        }
+    }
+
+    // TODO: Send adjustments to intervention if in baseline scenario.
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
@@ -176,52 +210,56 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     }
 
     // Get already computed values.
-    double height = 0; // TODO: person.risk_factors.at("Height"_id);
-    double weight = person.risk_factors.at("Weight"_id);
-    double physical_activity = person.risk_factors.at("PhysicalActivity"_id);
-    double energy_intake = person.risk_factors.at("EnergyIntake"_id);
+    double H = 0; // TODO: person.risk_factors.at("Height"_id);
+    double BW = person.risk_factors.at("Weight"_id);
+    double PAL = person.risk_factors.at("PhysicalActivity"_id);
+    double EI = person.risk_factors.at("EnergyIntake"_id);
 
     // Body fat.
-    double body_fat;
+    double F;
     if (person.gender == core::Gender::female) {
-        body_fat = weight *
-                   (0.14 * person.age + 39.96 * log(weight / pow(height / 100, 2.0)) - 102.01) /
-                   100.0;
+        F = BW * (0.14 * person.age + 39.96 * log(BW / pow(H / 100, 2.0)) - 102.01) / 100.0;
     } else if (person.gender == core::Gender::male) {
-        body_fat = weight *
-                   (0.14 * person.age + 37.31 * log(weight / pow(height / 100, 2.0)) - 103.94) /
-                   100.0;
+        F = BW * (0.14 * person.age + 37.31 * log(BW / pow(H / 100, 2.0)) - 103.94) / 100.0;
     } else {
         throw core::HgpsException("Unknown gender");
     }
 
-    if (body_fat < 0.0) {
+    if (F < 0.0) {
         // HACK: deal with negative body fat.
-        body_fat = 0.2 * weight;
+        F = 0.2 * BW;
     }
 
-    // Glycogen, water, extracellular fluid and lean tissue.
-    double glycogen = 0.01 * weight;
-    double water = 2.7 * glycogen;
-    double extracellular_fluid = 0.7 * 0.235 * weight;
-    double lean_tissue = weight - body_fat - glycogen - water - extracellular_fluid;
+    // Glycogen, water and extracellular fluid.
+    double G = 0.01 * BW;
+    double W = 2.7 * G;
+    double ECF = 0.7 * 0.235 * BW;
+
+    // Lean tissue.
+    double L = BW - F - G - W - ECF;
 
     // Model intercept value.
-    double delta = compute_delta(person.age, person.gender, physical_activity, weight, height);
-    double K = energy_intake - (gamma_F * body_fat + gamma_L * lean_tissue + delta * weight);
+    double delta = compute_delta(person.age, person.gender, PAL, BW, H);
+    double K = EI - (gamma_F * F + gamma_L * L + delta * BW);
+
+    // Compute energy expenditure.
+    double C = 10.4 * rho_L / rho_F;
+    double p = C / (C + F);
+    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
+    double EE = compute_EE(BW, F, L, EI, K, delta, x);
 
     // Set new state.
-    person.risk_factors["Glycogen"_id] = glycogen;
-    person.risk_factors["ExtracellularFluid"_id] = extracellular_fluid;
-    person.risk_factors["BodyFat"_id] = body_fat;
-    person.risk_factors["LeanTissue"_id] = lean_tissue;
+    person.risk_factors["BodyFat"_id] = F;
+    person.risk_factors["LeanTissue"_id] = L;
+    person.risk_factors["Glycogen"_id] = G;
+    person.risk_factors["ExtracellularFluid"_id] = ECF;
     person.risk_factors["Intercept_K"_id] = K;
 
-    // TODO: Compute and set new energy expenditure.
-    // TODO: SAME FOR ADJUSTMENT FOR kevin_hall_min_age PEOPLE
+    // Set new energy expenditure (may not exist yet).
+    person.risk_factors["EnergyExpenditure"_id] = EE;
 }
 
-void KevinHallModel::simulate_person(Person &person) const {
+void KevinHallModel::kevin_hall_run(Person &person) const {
 
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
@@ -293,9 +331,6 @@ void KevinHallModel::simulate_person(Person &person) const {
     // Compute body weight.
     double BW = F + L + G + W + ECF;
 
-    // TODO: CHECK EQN WITH ALI: Compute energy expenditure (in adjustment step and init).
-    // double EE = (K + gamma_F * F + gamma_L * L + delta * BW + TEF + AT + EI * x) / (1.0 + x);
-
     // Set new state.
     person.risk_factors.at("Glycogen"_id) = G;
     person.risk_factors.at("ExtracellularFluid"_id) = ECF;
@@ -324,6 +359,15 @@ double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, doub
     return ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW;
 }
 
+double KevinHallModel::compute_EE(double BW, double F, double L, double EI, double K, double delta,
+                                  double x) const {
+    // OLD: return (K + gamma_F * F + gamma_L * L + delta * BW + TEF + AT + EI * x) / (1.0 + x);
+    // TODO: Double-check new calculation below is correct.
+    return (K + gamma_F * F + gamma_L * L + delta * BW + beta_TEF + beta_AT +
+            x * (EI - rho_G * 0.0)) /
+           (1 + x);
+}
+
 void KevinHallModel::initialise_weight(Person &person) const {
     const auto &expected = get_risk_factor_expected();
 
@@ -346,12 +390,53 @@ void KevinHallModel::initialise_weight(Person &person) const {
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
 
-void KevinHallModel::update_weight(Person &person) const {
-    if (person.age < kevin_hall_age_min) {
-        initialise_weight(person);
-    } else {
-        simulate_person(person);
-    }
+void KevinHallModel::kevin_hall_adjust(Person &person, double adjustment) const {
+    double H = 0; // TODO: person.risk_factors.at("Height"_id);
+    double BW_0 = person.risk_factors.at("Weight"_id);
+    double F_0 = person.risk_factors.at("BodyFat"_id);
+    double L_0 = person.risk_factors.at("LeanTissue"_id);
+    double G = person.risk_factors.at("Glycogen"_id);
+    double W = 2.7 * G;
+    double ECF_0 = person.risk_factors.at("ExtracellularFluid"_id);
+    double PAL = person.risk_factors.at("PhysicalActivity"_id);
+    double EI = person.risk_factors.at("EnergyIntake"_id);
+    double K_0 = person.risk_factors.at("Intercept_K"_id);
+
+    double C = 10.4 * rho_L / rho_F;
+
+    // Compute previous energy expenditure.
+    double p_0 = C / (C + F_0);
+    double x_0 = p_0 * eta_L / rho_L + (1.0 - p_0) * eta_F / rho_F;
+    double delta_0 = compute_delta(person.age, person.gender, PAL, BW_0, H);
+    double EE_0 = compute_EE(BW_0, F_0, L_0, EI, K_0, delta_0, x_0);
+
+    // Adjust weight and compute adjustment ratio for other factors.
+    double BW = BW_0 + adjustment;
+    double ratio = (BW - G - W) / (BW_0 - G - W);
+
+    // Adjust other factors to compensate.
+    double F = F_0 * ratio;
+    double L = L_0 * ratio;
+    double ECF = ECF_0 * ratio;
+
+    // Compute new energy expenditure.
+    double p = C / (C + F);
+    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
+    double delta = compute_delta(person.age, person.gender, PAL, BW, H);
+    double EE = compute_EE(BW, F, L, EI, K_0, delta, x);
+
+    // Adjust model intercept.
+    double K = K_0 + (1 + x) * (EE_0 - EE);
+
+    // Set new state.
+    person.risk_factors.at("Weight"_id) = BW;
+    person.risk_factors.at("BodyFat"_id) = F;
+    person.risk_factors.at("LeanTissue"_id) = L;
+    person.risk_factors.at("ExtracellularFluid"_id) = ECF;
+    person.risk_factors.at("Intercept_K"_id) = K;
+
+    // Set new energy expenditure (may not exist yet).
+    person.risk_factors["EnergyExpenditure"_id] = EE;
 }
 
 double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex) const {
@@ -414,6 +499,26 @@ KevinHallModel::compute_mean_weight(Population &population, std::optional<double
     }
 
     return means;
+}
+
+UnorderedMap2d<core::Gender, int, double>
+KevinHallModel::get_kevin_hall_adjustments(Population &population) const {
+    auto expected = get_risk_factor_expected();
+    auto weight_means = compute_mean_weight(population);
+
+    // TODO: Recieve adjustments from baseline if in intervention scenario.
+
+    // Compute adjustments.
+    auto adjustments = UnorderedMap2d<core::Gender, int, double>{};
+    for (const auto &[sex, weight_means_by_sex] : weight_means) {
+        adjustments.emplace_row(sex, std::unordered_map<int, double>{});
+        for (const auto &[age, weight_mean] : weight_means_by_sex) {
+            double weight_expected = expected.at(sex, "Weight"_id).at(age);
+            adjustments.at(sex)[age] = weight_expected - weight_mean;
+        }
+    }
+
+    return weight_means;
 }
 
 // void KevinHallModel::initialise_height(Person &person) {

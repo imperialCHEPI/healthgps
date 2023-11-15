@@ -70,16 +70,6 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person to compute energy intake for
     void set_energy_intake(Person &person) const;
 
-    /// @brief  Initialise the Kevin Hall state variables of a person
-    /// @param person The person to initialise
-    /// @param adjustment An optional weight adjustment term (default is zero)
-    void initialise_kevin_hall_state(Person &person,
-                                     std::optional<double> adjustment = std::nullopt) const;
-
-    /// @brief Run the Kevin Hall energy balance model for a given person
-    /// @param person The person to simulate
-    void simulate_person(Person &person) const;
-
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
@@ -104,13 +94,36 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @return The computed energy cost per unit body weight
     double compute_delta(int age, core::Gender sex, double PAL, double BW, double H) const;
 
+    /// @brief Compute energy expenditure.
+    /// @param BW The body weight
+    /// @param F The fat mass
+    /// @param L The lean tissue
+    /// @param EI The energy intake
+    /// @param K The model intercept
+    /// @param delta The energy cost per unit body weight
+    /// @param x TODO: what is this?
+    /// @return The computed energy expenditure
+    double compute_EE(double BW, double F, double L, double EI, double K, double delta,
+                      double x) const;
+
     /// @brief Initialises the weight of a person.
     /// @param person The person fo initialise the weight for.
     void initialise_weight(Person &person) const;
 
-    /// @brief Updates the weight of a person.
+    /// @brief  Initialise the Kevin Hall state variables of a person
+    /// @param person The person to initialise
+    /// @param adjustment An optional weight adjustment term (default is zero)
+    void initialise_kevin_hall_state(Person &person,
+                                     std::optional<double> adjustment = std::nullopt) const;
+
+    /// @brief Run the Kevin Hall energy balance model for a given person
+    /// @param person The person to simulate
+    void kevin_hall_run(Person &person) const;
+
+    /// @brief Adjusts the Kevin Hall variables of a person to baseline.
     /// @param person The person fo update the weight for.
-    void update_weight(Person &person) const;
+    /// @param adjustment The weight adjustment term
+    void kevin_hall_adjust(Person &person, double adjustment) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
@@ -123,6 +136,12 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @return The weight power means by sex and age
     UnorderedMap2d<core::Gender, int, double>
     compute_mean_weight(Population &population, std::optional<double> power = std::nullopt) const;
+
+    /// @brief Compute or recieve Kevin Hall adjustments for sex and age
+    /// @param population The population to compute the adjustments for
+    /// @return The Kevin Hall adjustments by sex and age
+    UnorderedMap2d<core::Gender, int, double>
+    get_kevin_hall_adjustments(Population &population) const;
 
     // // TODO: implement this
     // /// @brief Initialises the height of a person.
@@ -153,6 +172,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     static constexpr int kevin_hall_age_min = 19; // Minimum age for the model.
     static constexpr double rho_F = 39.5e3;       // Energy content of fat (kJ/kg).
     static constexpr double rho_L = 7.6e3;        // Energy content of lean (kJ/kg).
+    static constexpr double rho_G = 17.6e3;       // Energy content of glycogen (kJ/kg).
     static constexpr double gamma_F = 13.0;       // RMR fat coefficients (kJ/kg/day).
     static constexpr double gamma_L = 92.0;       // RMR lean coefficients (kJ/kg/day).
     static constexpr double eta_F = 750.0;        // Fat synthesis energy coefficient (kJ/kg).
