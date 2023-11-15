@@ -383,7 +383,7 @@ double KevinHallModel::compute_EE(double BW, double F, double L, double EI, doub
 /// @param person The person to calculate the BMI for.
 void KevinHallModel::compute_bmi(Person &person) const {
     auto w = person.risk_factors.at("Weight"_id);
-    auto h = person.risk_factors.at("Height"_id) * 100;
+    auto h = person.risk_factors.at("Height"_id) / 100;
     person.risk_factors["BMI"_id] = w / (h * h);
 }
 
