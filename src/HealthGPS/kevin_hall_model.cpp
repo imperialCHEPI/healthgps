@@ -91,51 +91,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // TODO: Compute target body weight.
-    const float target_BW = 100.0;
-
-    // Trial run.
-    double mean_sim_body_weight = 0.0;
-    double mean_adjustment_coefficient = 0.0;
-    for (auto &person : context.population()) {
-        // Ignore if inactive.
-        if (!person.is_active()) {
-            continue;
-        }
-
-        // Simulate person and compute adjustment coefficient.
-        SimulatePersonState state = simulate_person(person, 0.0);
-        mean_sim_body_weight += state.BW;
-        mean_adjustment_coefficient += state.adjust;
-    }
-
-    // Compute model adjustment term.
-    const size_t population_size = context.population().current_active_size();
-    mean_sim_body_weight /= population_size;
-    mean_adjustment_coefficient /= population_size;
-    double shift = (target_BW - mean_sim_body_weight) / mean_adjustment_coefficient;
-
-    // Final run.
-    for (auto &person : context.population()) {
-        // Ignore if inactive.
-        if (!person.is_active()) {
-            continue;
-        }
-
-        // TODO: Simulate person and update risk factors.
-        simulate_person(person, shift);
-        // SimulatePersonState state = simulate_person(person, shift);
-        // person.risk_factors["Height"_id] = state.H;
-        // person.risk_factors["Weight"_id] = state.BW;
-        // person.risk_factors["PhysicalActivity"_id] = state.PAL;
-        // person.risk_factors["RestingMetabolicRate"_id] = state.RMR;
-        // person.risk_factors["BodyFat"_id] = state.F;
-        // person.risk_factors["LeanTissue"_id] = state.L;
-        // person.risk_factors["ExtracellularFluid"_id] = state.ECF;
-        // person.risk_factors["Glycogen"_id] = state.G;
-        // person.risk_factors["EnergyExpenditure"_id] = state.EE;
-        // person.risk_factors["EnergyIntake"_id] = state.EI;
-    }
+    // TODO: Weight adjustment.
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
@@ -186,9 +142,6 @@ void KevinHallModel::initialise_energy_intake(Person &person) const {
     // Start with previous = current.
     double energy_intake = person.risk_factors.at("EnergyIntake"_id);
     person.risk_factors["EnergyIntake_previous"_id] = energy_intake;
-
-    // Begin at steady state (EI = EE).
-    person.risk_factors["EnergyExpenditure"_id] = energy_intake;
 }
 
 void KevinHallModel::update_energy_intake(Person &person) const {
@@ -223,7 +176,7 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     }
 
     // Get already computed values.
-    double height = person.risk_factors.at("Height"_id);
+    double height = 0; // TODO: person.risk_factors.at("Height"_id);
     double weight = person.risk_factors.at("Weight"_id);
     double physical_activity = person.risk_factors.at("PhysicalActivity"_id);
     double energy_intake = person.risk_factors.at("EnergyIntake"_id);
@@ -263,52 +216,57 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     person.risk_factors["BodyFat"_id] = body_fat;
     person.risk_factors["LeanTissue"_id] = lean_tissue;
     person.risk_factors["Intercept_K"_id] = K;
+
+    // TODO: Compute and set new energy expenditure.
+    // TODO: SAME FOR ADJUSTMENT FOR kevin_hall_min_age PEOPLE
 }
 
-SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift) const {
-    // Initial simulated person state.
-    const double H = person.get_risk_factor_value("Height"_id);
-    const double BW_0 = person.get_risk_factor_value("Weight"_id);
-    const double PAL_0 = person.get_risk_factor_value("PhysicalActivity"_id);
-    const double F_0 = person.get_risk_factor_value("BodyFat"_id);
-    const double L_0 = person.get_risk_factor_value("LeanTissue"_id);
-    const double ECF_0 = person.get_risk_factor_value("ExtracellularFluid"_id);
-    const double G_0 = person.get_risk_factor_value("Glycogen"_id);
-    const double EI_0 = person.get_risk_factor_value("EnergyIntake"_id);
-    const double CI_0 = person.get_risk_factor_value("Carbohydrate"_id);
+void KevinHallModel::simulate_person(Person &person) const {
 
-    // TODO: Compute physical activity level.
-    double PAL = PAL_0;
-
-    // TODO: some nutrient values need saving from previous year.
-
-    // Updated energy intake and carbohydrate intake.
-    // TODO: above, set EI_0 and CI_0 to risk_factors[*_previous].
-    double EI = person.get_risk_factor_value("EnergyIntake"_id);
-    double CI = person.get_risk_factor_value("Carbohydrate"_id);
-
-    // Compute glycogen and water.
-    double G = compute_G(CI, CI_0, G_0);
-    double W = compute_W(G);
-
-    // Compute extracellular fluid.
-    double ECF = compute_ECF(EI, EI_0, CI, CI_0, ECF_0);
+    // Get initial body weight.
+    double BW_0 = person.risk_factors.at("Weight"_id);
 
     // Compute energy cost per unit body weight.
+    double PAL = person.risk_factors.at("PhysicalActivity"_id);
+    double H = 0; // TODO: person.risk_factors.at("Height"_id);
     double delta = compute_delta(person.age, person.gender, PAL, BW_0, H);
 
+    // Get carbohydrate intake and energy intake.
+    double CI_0 = person.risk_factors.at("Carbohydrate_previous"_id);
+    double CI = person.risk_factors.at("Carbohydrate"_id);
+    double EI_0 = person.risk_factors.at("EnergyIntake_previous"_id);
+    double EI = person.risk_factors.at("EnergyIntake"_id);
+    double delta_EI = EI - EI_0;
+
     // Compute thermic effect of food.
-    double TEF = compute_TEF(EI, EI_0);
+    double TEF = beta_TEF * delta_EI;
 
     // Compute adaptive thermogenesis.
-    double AT = compute_AT(EI, EI_0);
+    double AT = beta_AT * delta_EI;
 
-    // TODO: Compute intercept value.
-    const double K = 0.0; // TODO: Intercept value.
+    // Compute glycogen and water.
+    double G_0 = person.risk_factors.at("Glycogen"_id);
+    double G = compute_G(CI, CI_0, G_0);
+    double W = 2.7 * G;
+
+    // Compute extracellular fluid.
+    double Na_0 = person.risk_factors.at("Sodium_previous"_id);
+    double Na = person.risk_factors.at("Sodium"_id);
+    double delta_Na = Na - Na_0;
+    double ECF_0 = person.risk_factors.at("ExtracellularFluid"_id);
+    double ECF = compute_ECF(delta_Na, CI, CI_0, ECF_0);
+
+    // Get initial body fat and lean tissue.
+    double F_0 = person.risk_factors.at("BodyFat"_id);
+    double L_0 = person.risk_factors.at("LeanTissue"_id);
+
+    // Get intercept value.
+    double K = person.risk_factors.at("Intercept_K"_id);
 
     // Energy partitioning.
-    const double C = 10.4 * rho_L / rho_F;
-    const double p = C / (C + F_0);
+    double C = 10.4 * rho_L / rho_F;
+    double p = C / (C + F_0);
+    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
 
     // First equation ax + by = e.
     double a1 = p * rho_F;
@@ -318,13 +276,11 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     // Second equation cx + dy = f.
     double a2 = gamma_F + delta;
     double b2 = gamma_L + delta;
-    double c2 = EI - shift - K - TEF - AT - delta * (G + W + ECF);
+    double c2 = EI - K - TEF - AT - delta * (G + W + ECF);
 
     // Compute body fat and lean tissue steady state.
     double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
-
-    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
 
     // Compute time constant.
     double tau = rho_L * rho_F * (1.0 + x) /
@@ -334,27 +290,18 @@ SimulatePersonState KevinHallModel::simulate_person(Person &person, double shift
     double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
     double L = steady_L - (steady_L - L_0) * exp(-365.0 / tau);
 
-    // Compute adjustment coefficient.
-    double adjust = -(a1 - b1) * (1.0 - exp(-365.0 / tau)) / (a1 * b2 - a2 * b1);
-
     // Compute body weight.
     double BW = F + L + G + W + ECF;
 
-    // Compute energy expenditure.
-    double EE =
-        (shift + K + gamma_F * F + gamma_L * L + delta * BW + TEF + AT + EI * x) / (1.0 + x);
+    // TODO: CHECK EQN WITH ALI: Compute energy expenditure (in adjustment step and init).
+    // double EE = (K + gamma_F * F + gamma_L * L + delta * BW + TEF + AT + EI * x) / (1.0 + x);
 
-    // New simulated person state.
-    return SimulatePersonState{.H = H,
-                               .BW = BW,
-                               .PAL = PAL,
-                               .F = F,
-                               .L = L,
-                               .ECF = ECF,
-                               .G = G,
-                               .EE = EE,
-                               .EI = EI,
-                               .adjust = adjust};
+    // Set new state.
+    person.risk_factors.at("Glycogen"_id) = G;
+    person.risk_factors.at("ExtracellularFluid"_id) = ECF;
+    person.risk_factors.at("BodyFat"_id) = F;
+    person.risk_factors.at("LeanTissue"_id) = L;
+    person.risk_factors.at("Weight"_id) = BW;
 }
 
 double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
@@ -362,14 +309,8 @@ double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
     return sqrt(CI / k_G);
 }
 
-double KevinHallModel::compute_W(double G) const { return 2.7 * G; }
-
-double KevinHallModel::compute_ECF(double EI, double EI_0, double CI, double CI_0,
-                                   double ECF_0) const {
-    double Na_b = 4000.0;
-    double Na_f = Na_b * EI / EI_0;
-    double Delta_Na_diet = Na_f - Na_b;
-    return ECF_0 + (Delta_Na_diet - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
+double KevinHallModel::compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const {
+    return ECF_0 + (delta_Na - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
 }
 
 double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, double BW,
@@ -383,16 +324,6 @@ double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, doub
     return ((1.0 - beta_TEF) * PAL - 1.0) * RMR / BW;
 }
 
-double KevinHallModel::compute_TEF(double EI, double EI_0) const {
-    double delta_EI = EI - EI_0;
-    return beta_TEF * delta_EI;
-}
-
-double KevinHallModel::compute_AT(double EI, double EI_0) const {
-    double delta_EI = EI - EI_0;
-    return beta_AT * delta_EI;
-}
-
 void KevinHallModel::initialise_weight(Person &person) const {
     const auto &expected = get_risk_factor_expected();
 
@@ -402,8 +333,8 @@ void KevinHallModel::initialise_weight(Person &person) const {
     double epa_expected = ei_expected / pa_expected;
 
     // Compute E/PA actual.
-    double ei_actual = person.get_risk_factor_value("EnergyIntake"_id);
-    double pa_actual = person.get_risk_factor_value("PhysicalActivity"_id);
+    double ei_actual = person.risk_factors.at("EnergyIntake"_id);
+    double pa_actual = person.risk_factors.at("PhysicalActivity"_id);
     double epa_actual = ei_actual / pa_actual;
 
     // Compute E/PA quantile.
@@ -419,7 +350,7 @@ void KevinHallModel::update_weight(Person &person) const {
     if (person.age < kevin_hall_age_min) {
         initialise_weight(person);
     } else {
-        simulate_person(person, 0.0);
+        simulate_person(person);
     }
 }
 

@@ -12,39 +12,6 @@
 
 namespace hgps {
 
-/// @brief State data type for a simulated person
-struct SimulatePersonState {
-    /// @brief Height
-    double H{};
-
-    /// @brief Body weight
-    double BW{};
-
-    /// @brief Physical activity level
-    double PAL{};
-
-    /// @brief Body fat
-    double F{};
-
-    /// @brief Lean tissue
-    double L{};
-
-    /// @brief Extracellular fluid
-    double ECF{};
-
-    /// @brief Glycogen
-    double G{};
-
-    /// @brief Energy expenditure
-    double EE{};
-
-    /// @brief Energy intake
-    double EI{};
-
-    /// @brief Baseline adjustment coefficient
-    double adjust{};
-};
-
 /// @brief Implements the energy balance model type
 ///
 /// @details The dynamic model is used to advance the virtual population over time.
@@ -109,11 +76,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void initialise_kevin_hall_state(Person &person,
                                      std::optional<double> adjustment = std::nullopt) const;
 
-    /// @brief Simulates the energy balance model for a given person
+    /// @brief Run the Kevin Hall energy balance model for a given person
     /// @param person The person to simulate
-    /// @param shift Model adjustment term
-    /// @return The state of the person
-    SimulatePersonState simulate_person(Person &person, double shift) const;
+    void simulate_person(Person &person) const;
 
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake
@@ -122,19 +87,13 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @return The computed glycogen
     double compute_G(double CI, double CI_0, double G_0) const;
 
-    /// @brief Compute water.
-    /// @param G The glycogen
-    /// @return The computed water
-    double compute_W(double G) const;
-
     /// @brief Compute extracellular fluid.
-    /// @param EI The energy intake
-    /// @param EI_0 The initial energy intake
+    /// @param delta_Na The change in dietary sodium
     /// @param CI The carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
     /// @param ECF_0 The initial extracellular fluid
     /// @return The computed extracellular fluid
-    double compute_ECF(double EI, double EI_0, double CI, double CI_0, double ECF_0) const;
+    double compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const;
 
     /// @brief Compute energy cost per unit body weight.
     /// @param age The age of the person
@@ -144,18 +103,6 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param H The height (cm)
     /// @return The computed energy cost per unit body weight
     double compute_delta(int age, core::Gender sex, double PAL, double BW, double H) const;
-
-    /// @brief Compute thermic effect of food.
-    /// @param EI The energy intake
-    /// @param EI_0 The initial energy intake
-    /// @return The computed thermic effect of food
-    double compute_TEF(double EI, double EI_0) const;
-
-    /// @brief Compute adaptive thermogenesis.
-    /// @param EI The energy intake
-    /// @param EI_0 The initial energy intake
-    /// @return The computed adaptive thermogenesis
-    double compute_AT(double EI, double EI_0) const;
 
     /// @brief Initialises the weight of a person.
     /// @param person The person fo initialise the weight for.

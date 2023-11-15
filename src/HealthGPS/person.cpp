@@ -18,15 +18,7 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"SES"_id, [](const Person &p) { return p.ses; }},
 
     // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
-    {"Height"_id, [](const Person &) { return 0.5; }},
     //{"BMI"_id, [](const Person &) { return 0.5; }},
-    {"BodyFat"_id, [](const Person &) { return 0.5; }},
-    {"LeanTissue"_id, [](const Person &) { return 0.5; }},
-    {"ExtracellularFluid"_id, [](const Person &) { return 0.5; }},
-    {"Glycogen"_id, [](const Person &) { return 0.5; }},
-    {"EnergyExpenditure"_id, [](const Person &) { return 0.5; }},
-    {"EnergyIntake"_id, [](const Person &) { return 0.5; }},
-    {"Carbohydrate"_id, [](const Person &) { return 0.5; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}
