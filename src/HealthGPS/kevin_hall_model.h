@@ -26,7 +26,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
-    /// @param age_mean_height The mean height at all ages (male and female)
+    /// @param height_params The height model parameters
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     KevinHallModel(
@@ -36,7 +36,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-        const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height,
+        const std::unordered_map<core::Identifier, double> &height_params,
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
         const std::vector<double> &epa_quantiles);
 
@@ -166,7 +166,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
-    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
+    const std::unordered_map<core::Identifier, double> &height_params_;
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
     const std::vector<double> &epa_quantiles_;
 
@@ -194,7 +194,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
-    /// @param age_mean_height The mean height at all ages (male and female)
+    /// @param height_params The height model parameters
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @throws std::invalid_argument for empty arguments
@@ -204,7 +204,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-        std::unordered_map<core::Gender, std::vector<double>> age_mean_height,
+        std::unordered_map<core::Identifier, double> height_params,
         std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
         std::vector<double> epa_quantiles);
 
@@ -217,7 +217,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
-    std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
+    std::unordered_map<core::Identifier, double> height_params_;
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
     std::vector<double> epa_quantiles_;
 };
