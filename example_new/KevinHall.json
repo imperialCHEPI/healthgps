@@ -89,6 +89,11 @@
             1.633, 1.633, 1.633, 1.633, 1.633, 1.633, 1.633, 1.633, 1.633
         ]
     },
+    "HeightModel": {
+        "Slope": 0.11,
+        "StdDevFemale": 0.04,
+        "StdDevMale": 0.04
+    },
     "WeightQuantiles": {
         "Female": {
             "name": "weight_quantiles_NCDRisk_female.csv",

@@ -396,6 +396,10 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
     const auto food_data_table = load_datatable_from_csv(food_data_file_info);
 
+    // Load height model parameters.
+    auto height_model =
+        opt["HeightModel"].get<std::unordered_map<hgps::core::Identifier, double>>();
+
     // Load M/F average heights for age.
     std::unordered_map<hgps::core::Gender, std::vector<double>> age_mean_height;
     const auto max_age = static_cast<size_t>(config.settings.age_range.upper());
