@@ -60,7 +60,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     /// @brief Compute and set nutrient intakes from food intakes.
     /// @param person The person to compute nutrient intakes for
-    void set_nutrient_intakes(Person &person) const;
+    void compute_nutrient_intakes(Person &person) const;
 
     /// @brief Initialise total energy intake from nutrient intakes
     /// @param person The person to initialise
@@ -72,7 +72,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     /// @brief Compute and set energy intake from nutrient intakes.
     /// @param person The person to compute energy intake for
-    void set_energy_intake(Person &person) const;
+    void compute_energy_intake(Person &person) const;
 
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake

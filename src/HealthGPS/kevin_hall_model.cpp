@@ -243,7 +243,7 @@ KevinHallModel::compute_kevin_hall_adjustments(Population &population) const {
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
 
     // Initialise nutrient intakes.
-    set_nutrient_intakes(person);
+    compute_nutrient_intakes(person);
 
     // Start with previous = current.
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
@@ -261,10 +261,10 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
     person.risk_factors.at("Sodium_previous"_id) = previous_sodium;
 
     // Update nutrient intakes.
-    set_nutrient_intakes(person);
+    compute_nutrient_intakes(person);
 }
 
-void KevinHallModel::set_nutrient_intakes(Person &person) const {
+void KevinHallModel::compute_nutrient_intakes(Person &person) const {
 
     // Reset nutrient intakes to zero.
     for (const auto &[nutrient_key, unused] : energy_equation_) {
@@ -283,7 +283,7 @@ void KevinHallModel::set_nutrient_intakes(Person &person) const {
 void KevinHallModel::initialise_energy_intake(Person &person) const {
 
     // Initialise energy intake.
-    set_energy_intake(person);
+    compute_energy_intake(person);
 
     // Start with previous = current.
     double energy_intake = person.risk_factors.at("EnergyIntake"_id);
@@ -297,10 +297,10 @@ void KevinHallModel::update_energy_intake(Person &person) const {
     person.risk_factors.at("EnergyIntake_previous"_id) = previous_energy_intake;
 
     // Update energy intake.
-    set_energy_intake(person);
+    compute_energy_intake(person);
 }
 
-void KevinHallModel::set_energy_intake(Person &person) const {
+void KevinHallModel::compute_energy_intake(Person &person) const {
 
     // Reset energy intake to zero.
     const auto energy_intake_key = "EnergyIntake"_id;
