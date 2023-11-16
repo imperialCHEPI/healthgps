@@ -1,6 +1,9 @@
 #pragma once
 
+#include "HealthGPS.Core/exception.h"
+
 #include "interfaces.h"
+#include "map2d.h"
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
 
@@ -9,38 +12,8 @@
 
 namespace hgps {
 
-/// @brief State data type for a simulated person
-struct SimulatePersonState {
-    /// @brief Height
-    double H{};
-
-    /// @brief Body weight
-    double BW{};
-
-    /// @brief Physical activity level
-    double PAL{};
-
-    /// @brief Body fat
-    double F{};
-
-    /// @brief Lean tissue
-    double L{};
-
-    /// @brief Extracellular fluid
-    double ECF{};
-
-    /// @brief Glycogen
-    double G{};
-
-    /// @brief Energy expenditure
-    double EE{};
-
-    /// @brief Energy intake
-    double EI{};
-
-    /// @brief Baseline adjustment coefficient
-    double adjust{};
-};
+/// @brief Defines a table type for Kevin Hall adjustments by sex and age
+using KevinHallAdjustmentTable = UnorderedMap2d<core::Gender, int, double>;
 
 /// @brief Implements the energy balance model type
 ///
@@ -100,12 +73,6 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person to compute energy intake for
     void set_energy_intake(Person &person) const;
 
-    /// @brief Simulates the energy balance model for a given person
-    /// @param person The person to simulate
-    /// @param shift Model adjustment term
-    /// @return The state of the person
-    SimulatePersonState simulate_person(Person &person, double shift) const;
-
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
@@ -113,49 +80,90 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @return The computed glycogen
     double compute_G(double CI, double CI_0, double G_0) const;
 
-    /// @brief Compute water.
-    /// @param G The glycogen
-    /// @return The computed water
-    double compute_W(double G) const;
-
     /// @brief Compute extracellular fluid.
-    /// @param EI The energy intake
-    /// @param EI_0 The initial energy intake
+    /// @param delta_Na The change in dietary sodium
     /// @param CI The carbohydrate intake
     /// @param CI_0 The initial carbohydrate intake
     /// @param ECF_0 The initial extracellular fluid
     /// @return The computed extracellular fluid
-    double compute_ECF(double EI, double EI_0, double CI, double CI_0, double ECF_0) const;
+    double compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const;
 
     /// @brief Compute energy cost per unit body weight.
+    /// @param age The age of the person
+    /// @param sex the sex of the person
     /// @param PAL The physical activity level
-    /// @param RMR The resting metabolic rate
     /// @param BW The body weight
+    /// @param H The height (cm)
     /// @return The computed energy cost per unit body weight
-    double compute_delta(double PAL, double BW, double H, unsigned int age,
-                         core::Gender gender) const;
+    double compute_delta(int age, core::Gender sex, double PAL, double BW, double H) const;
 
-    /// @brief Compute thermic effect of food.
+    /// @brief Compute energy expenditure.
+    /// @param BW The body weight
+    /// @param F The fat mass
+    /// @param L The lean tissue
     /// @param EI The energy intake
-    /// @param EI_0 The initial energy intake
-    /// @return The computed thermic effect of food
-    double compute_TEF(double EI, double EI_0) const;
+    /// @param K The model intercept
+    /// @param delta The energy cost per unit body weight
+    /// @param x TODO: what is this?
+    /// @return The computed energy expenditure
+    double compute_EE(double BW, double F, double L, double EI, double K, double delta,
+                      double x) const;
 
-    /// @brief Compute adaptive thermogenesis.
-    /// @param EI The energy intake
-    /// @param EI_0 The initial energy intake
-    /// @return The computed adaptive thermogenesis
-    double compute_AT(double EI, double EI_0) const;
+    /// @brief Compute's a person BMI assuming height in cm
+    /// @param person The person to calculate the BMI for.
+    void compute_bmi(Person &person) const;
 
     /// @brief Initialises the weight of a person.
-    /// @details It uses the baseline adjustment to get its initial value, based on its sex and age.
     /// @param person The person fo initialise the weight for.
-    void initialise_weight(Person &person);
+    void initialise_weight(Person &person) const;
+
+    /// @brief  Initialise the Kevin Hall state variables of a person
+    /// @param person The person to initialise
+    /// @param adjustment An optional weight adjustment term (default is zero)
+    void initialise_kevin_hall_state(Person &person,
+                                     std::optional<double> adjustment = std::nullopt) const;
+
+    /// @brief Run the Kevin Hall energy balance model for a given person
+    /// @param person The person to simulate
+    void kevin_hall_run(Person &person) const;
+
+    /// @brief Adjusts the Kevin Hall variables of a person to baseline.
+    /// @param person The person fo update the weight for.
+    /// @param adjustment The weight adjustment term
+    void kevin_hall_adjust(Person &person, double adjustment) const;
+
+    /// @brief Compute Kevin Hall adjustments for sex and age
+    /// @param population The population to compute the adjustments for
+    /// @return The Kevin Hall adjustments by sex and age
+    KevinHallAdjustmentTable compute_kevin_hall_adjustments(Population &population) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param sex The sex of the person.
-    double get_weight_quantile(double epa_quantile, core::Gender sex);
+    double get_weight_quantile(double epa_quantile, core::Gender sex) const;
+
+    /// @brief Compute the mean of weight (optionally raised to a power) for eac sex and age
+    /// @param population The population to compute the mean for
+    /// @param power The (optional) power to raise the weight to
+    /// @return The weight power means by sex and age
+    KevinHallAdjustmentTable compute_mean_weight(Population &population,
+                                                 std::optional<double> power = std::nullopt) const;
+
+    // // TODO: implement this
+    // /// @brief Initialises the height of a person.
+    // /// @param person The person fo initialise the height for.
+    // void initialise_height(Person &person);
+
+    // // TODO: implement this
+    // /// @brief Updates the height of a person.
+    // /// @param person The person fo update the height for.
+    // void update_height(Person &person);
+
+    // // TODO: implement this
+    // /// @brief Compute a new height value for the given person.
+    // /// @param person The person to compute the height for.
+    // /// @return The computed height.
+    // double compute_new_height(Person &person);
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
@@ -167,16 +175,18 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::vector<double> &epa_quantiles_;
 
     // Model parameters.
-    static constexpr double rho_F = 39.5e3; // Energy content of fat (kJ/kg).
-    static constexpr double rho_L = 7.6e3;  // Energy content of lean (kJ/kg).
-    static constexpr double gamma_F = 13.0; // RMR fat coefficients (kJ/kg/day).
-    static constexpr double gamma_L = 92.0; // RMR lean coefficients (kJ/kg/day).
-    static constexpr double eta_F = 750.0;  // Fat synthesis energy coefficient (kJ/kg).
-    static constexpr double eta_L = 960.0;  // Lean synthesis energy coefficient (kJ/kg).
-    static constexpr double beta_TEF = 0.1; // TEF from energy intake (unitless).
-    static constexpr double beta_AT = 0.14; // AT from energy intake (unitless).
-    static constexpr double xi_Na = 3000.0; // Na from ECF changes (mg/L/day).
-    static constexpr double xi_CI = 4000.0; // Na from carbohydrate changes (mg/day).
+    static constexpr int kevin_hall_age_min = 19; // Minimum age for the model.
+    static constexpr double rho_F = 39.5e3;       // Energy content of fat (kJ/kg).
+    static constexpr double rho_L = 7.6e3;        // Energy content of lean (kJ/kg).
+    static constexpr double rho_G = 17.6e3;       // Energy content of glycogen (kJ/kg).
+    static constexpr double gamma_F = 13.0;       // RMR fat coefficients (kJ/kg/day).
+    static constexpr double gamma_L = 92.0;       // RMR lean coefficients (kJ/kg/day).
+    static constexpr double eta_F = 750.0;        // Fat synthesis energy coefficient (kJ/kg).
+    static constexpr double eta_L = 960.0;        // Lean synthesis energy coefficient (kJ/kg).
+    static constexpr double beta_TEF = 0.1;       // TEF from energy intake (unitless).
+    static constexpr double beta_AT = 0.14;       // AT from energy intake (unitless).
+    static constexpr double xi_Na = 3000.0;       // Na from ECF changes (mg/L/day).
+    static constexpr double xi_CI = 4000.0;       // Na from carbohydrate changes (mg/day).
 };
 
 /// @brief Defines the energy balance model data type
