@@ -139,12 +139,14 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param sex The sex of the person.
     double get_weight_quantile(double epa_quantile, core::Gender sex) const;
 
-    /// @brief Compute the mean of weight (optionally raised to a power) for eac sex and age
+    /// @brief Compute the mean of weight (optionally raised to a power) for each sex and age
     /// @param population The population to compute the mean for
     /// @param power The (optional) power to raise the weight to
+    /// @param age The (optional) age to compute the mean for (default all)
     /// @return The weight power means by sex and age
     KevinHallAdjustmentTable compute_mean_weight(Population &population,
-                                                 std::optional<double> power = std::nullopt) const;
+                                                 std::optional<double> power = std::nullopt,
+                                                 std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Initialises the height of a person.
     /// @param person The person fo initialise the height for.
@@ -156,11 +158,6 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person fo update the height for.
     /// @param W_power_mean The mean hweight power for the person's sex and age
     void update_height(Person &person, double W_power_mean) const;
-
-    /// @brief Compute and set a new height value for the given person.
-    /// @param person The person to compute the height for.
-    /// @param W_power_mean The mean hweight power for the person's sex and age
-    void set_height(Person &person, double W_power_mean) const;
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
