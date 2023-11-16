@@ -149,17 +149,17 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     // // TODO: implement this
     // /// @brief Initialises the height of a person.
     // /// @param person The person fo initialise the height for.
-    // void initialise_height(Person &person);
+    // void initialise_height(Person &person) const;
 
     // // TODO: implement this
     // /// @brief Updates the height of a person.
     // /// @param person The person fo update the height for.
-    // void update_height(Person &person);
+    // void update_height(Person &person) const;
 
-    /// @brief Compute a new height value for the given person.
+    /// @brief Compute and set a new height value for the given person.
     /// @param person The person to compute the height for.
-    /// @return The computed height.
-    double compute_new_height(Person &person);
+    /// @param weight_power_mean The weight power for the person's sex and age
+    void set_height(Person &person, double weight_power_mean) const;
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;

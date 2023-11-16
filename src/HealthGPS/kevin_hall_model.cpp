@@ -164,7 +164,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
 KevinHallAdjustmentTable
 KevinHallModel::compute_kevin_hall_adjustments(Population &population) const {
-    auto expected = get_risk_factor_expected();
+    const auto &expected = get_risk_factor_expected();
     auto weight_means = compute_mean_weight(population);
 
     // Compute adjustments.
@@ -562,14 +562,20 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
 //     // TODO: return if age >= 19, then call common code
 // }
 
-double KevinHallModel::compute_new_height(Person &person) {
-    auto expected = get_risk_factor_expected();
-
-    double stddev = height_stddev_.at(person.gender);
+void KevinHallModel::set_height(Person &person, double W_power_mean) const {
     double W = person.risk_factors.at("Weight"_id);
+    double H_expected = get_risk_factor_expected().at(person.gender, "Height"_id).at(person.age);
+    // TODO: double H_residual = person.risk_factors.at("Height_residual"_id);
+    double stddev = height_stddev_.at(person.gender);
+    double slope = height_slope_;
+    double H_residual = person.risk_factors.at("Height_residual"_id) * stddev;
 
-    // TODO: common height compute code goes here
-    return 0.0;
+    // Compute height.
+    double exp_norm_mean = exp(0.5 * stddev * stddev);
+    double H = H_expected * (pow(W, slope) / W_power_mean) * (exp(H_residual) / exp_norm_mean);
+
+    // Set height (may not exist yet).
+    person.risk_factors["Height"_id] = H;
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
