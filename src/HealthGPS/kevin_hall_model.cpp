@@ -611,10 +611,10 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
 
     // Compute means of weight powers for sex and age.
     auto means = KevinHallAdjustmentTable{};
-    for (const auto &[sex, sumcounts_by_sex] : sumcounts) {
-        means.emplace_row(sex, std::unordered_map<int, double>{});
-        for (const auto &[age, sumcount] : sumcounts_by_sex) {
-            means.at(sex)[age] = sumcount.mean();
+    for (const auto &[sumcount_sex, sumcounts_by_sex] : sumcounts) {
+        means.emplace_row(sumcount_sex, std::unordered_map<int, double>{});
+        for (const auto &[sumcount_age, sumcount] : sumcounts_by_sex) {
+            means.at(sumcount_sex)[sumcount_age] = sumcount.mean();
         }
     }
 
