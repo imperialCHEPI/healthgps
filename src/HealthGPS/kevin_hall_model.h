@@ -146,20 +146,21 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     KevinHallAdjustmentTable compute_mean_weight(Population &population,
                                                  std::optional<double> power = std::nullopt) const;
 
-    // // TODO: implement this
-    // /// @brief Initialises the height of a person.
-    // /// @param person The person fo initialise the height for.
-    // void initialise_height(Person &person) const;
+    /// @brief Initialises the height of a person.
+    /// @param person The person fo initialise the height for.
+    /// @param W_power_mean The mean hweight power for the person's sex and age
+    /// @param random The random number generator
+    void initialise_height(Person &person, double W_power_mean, Random &random) const;
 
-    // // TODO: implement this
-    // /// @brief Updates the height of a person.
-    // /// @param person The person fo update the height for.
-    // void update_height(Person &person) const;
+    /// @brief Updates the height of a person.
+    /// @param person The person fo update the height for.
+    /// @param W_power_mean The mean hweight power for the person's sex and age
+    void update_height(Person &person, double W_power_mean) const;
 
     /// @brief Compute and set a new height value for the given person.
     /// @param person The person to compute the height for.
-    /// @param weight_power_mean The weight power for the person's sex and age
-    void set_height(Person &person, double weight_power_mean) const;
+    /// @param W_power_mean The mean hweight power for the person's sex and age
+    void set_height(Person &person, double W_power_mean) const;
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;

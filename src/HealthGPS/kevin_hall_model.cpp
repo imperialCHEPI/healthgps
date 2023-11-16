@@ -553,22 +553,33 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
     return means;
 }
 
-// void KevinHallModel::initialise_height(Person &person) {
-//     // TODO: generate and save height residual, then call common code
-//     // (see how this is done for nutrients in StaticLinearModel)
-// }
+void KevinHallModel::initialise_height(Person &person, double W_power_mean, Random &random) const {
 
-// void KevinHallModel::update_height(Person &person) {
-//     // TODO: return if age >= 19, then call common code
-// }
+    // Initialise lifelong height residual.
+    double H_residual = random.next_normal(0, height_stddev_.at(person.gender));
+    person.risk_factors["Height_residual"_id] = H_residual;
+
+    // Initialise height.
+    set_height(person, W_power_mean);
+}
+
+void KevinHallModel::update_height(Person &person, double W_power_mean) const {
+
+    // Don't update if person is aged 19 or over.
+    if (person.age >= 19) {
+        return;
+    }
+
+    // Update height.
+    set_height(person, W_power_mean);
+}
 
 void KevinHallModel::set_height(Person &person, double W_power_mean) const {
     double W = person.risk_factors.at("Weight"_id);
     double H_expected = get_risk_factor_expected().at(person.gender, "Height"_id).at(person.age);
-    // TODO: double H_residual = person.risk_factors.at("Height_residual"_id);
+    double H_residual = person.risk_factors.at("Height_residual"_id);
     double stddev = height_stddev_.at(person.gender);
     double slope = height_slope_;
-    double H_residual = person.risk_factors.at("Height_residual"_id) * stddev;
 
     // Compute height.
     double exp_norm_mean = exp(0.5 * stddev * stddev);
