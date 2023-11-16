@@ -428,7 +428,9 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     std::sort(epa_quantiles.begin(), epa_quantiles.end());
 
     // Load height model parameters.
-    auto height_stddev = opt["HeightStdDev"].get<std::unordered_map<hgps::core::Gender, double>>();
+    std::unordered_map<hgps::core::Gender, double> height_stddev = {
+        {hgps::core::Gender::female, opt["HeightStdDev"]["Female"].get<double>()},
+        {hgps::core::Gender::male, opt["HeightStdDev"]["Male"].get<double>()}};
     auto height_slope = opt["HeightSlope"].get<double>();
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
