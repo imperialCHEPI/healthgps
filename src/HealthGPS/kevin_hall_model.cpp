@@ -285,7 +285,7 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     }
 
     // Get already computed values.
-    double H = 0; // TODO: person.risk_factors.at("Height"_id);
+    double H = person.risk_factors.at("Height"_id);
     double BW = person.risk_factors.at("Weight"_id);
     double PAL = person.risk_factors.at("PhysicalActivity"_id);
     double EI = person.risk_factors.at("EnergyIntake"_id);
@@ -341,7 +341,7 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
 
     // Compute energy cost per unit body weight.
     double PAL = person.risk_factors.at("PhysicalActivity"_id);
-    double H = 0; // TODO: person.risk_factors.at("Height"_id);
+    double H = person.risk_factors.at("Height"_id);
     double delta = compute_delta(person.age, person.gender, PAL, BW_0, H);
 
     // Get carbohydrate intake and energy intake.
@@ -466,7 +466,7 @@ void KevinHallModel::initialise_weight(Person &person) const {
 }
 
 void KevinHallModel::kevin_hall_adjust(Person &person, double adjustment) const {
-    double H = 0; // TODO: person.risk_factors.at("Height"_id);
+    double H = person.risk_factors.at("Height"_id);
     double BW_0 = person.risk_factors.at("Weight"_id);
     double F_0 = person.risk_factors.at("BodyFat"_id);
     double L_0 = person.risk_factors.at("LeanTissue"_id);
