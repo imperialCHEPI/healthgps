@@ -17,11 +17,13 @@ int RuntimeContext::sync_timeout_millis() const noexcept {
 
 Population &RuntimeContext::population() noexcept { return population_; }
 
+const Population &RuntimeContext::population() const noexcept { return population_; }
+
 RuntimeMetric &RuntimeContext::metrics() noexcept { return metrics_; }
 
 Scenario &RuntimeContext::scenario() noexcept { return definition_.get().scenario(); }
 
-Random &RuntimeContext::random() noexcept { return generator_; }
+Random &RuntimeContext::random() const noexcept { return generator_; }
 
 const HierarchicalMapping &RuntimeContext::mapping() const noexcept {
     return definition_.get().inputs().risk_mapping();
