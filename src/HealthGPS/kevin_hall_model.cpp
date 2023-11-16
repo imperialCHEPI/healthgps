@@ -76,8 +76,13 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     // Adjust weight to matche expected values.
     adjust_risk_factors(context, {"Weight"_id});
 
+    // Compute weight power means by sex and age.
+    auto W_power_means = compute_mean_weight(context.population(), height_slope_);
+
     // Initialise everyone.
     for (auto &person : context.population()) {
+        double W_power_mean = W_power_means.at(person.gender, person.age);
+        initialise_height(person, W_power_mean, context.random());
         initialise_kevin_hall_state(person);
     }
 }
@@ -114,9 +119,8 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    KevinHallAdjustmentTable adjustments;
-
     // Baseline scenatio: compute adjustments.
+    KevinHallAdjustmentTable adjustments;
     if (context.scenario().type() == ScenarioType::baseline) {
         adjustments = compute_kevin_hall_adjustments(context.population());
     }
@@ -159,6 +163,25 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     if (context.scenario().type() == ScenarioType::baseline) {
         context.scenario().channel().send(std::make_unique<KevinHallAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
+    }
+
+    // Compute weight power means by sex and age.
+    auto W_power_means = compute_mean_weight(context.population(), height_slope_);
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+
+        double W_power_mean = W_power_means.at(person.gender, person.age);
+
+        if (person.age == 0) {
+            initialise_height(person, W_power_mean, context.random());
+        } else {
+            update_height(person, W_power_mean);
+        }
     }
 }
 
