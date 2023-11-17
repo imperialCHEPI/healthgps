@@ -594,8 +594,12 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
     sumcounts.emplace_row(core::Gender::female, std::unordered_map<int, SumCount>{});
     sumcounts.emplace_row(core::Gender::male, std::unordered_map<int, SumCount>{});
     for (const auto &person : population) {
-        bool age_mismatch = age.has_value() && person.age != age.value();
-        if (!person.is_active() || age_mismatch) {
+        // Ignore if inactive.
+        if (!person.is_active()) {
+            continue;
+        }
+        // Ignore if the person's age is not the optionally specified age.
+        if (age.has_value() && person.age != age.value()) {
             continue;
         }
 
