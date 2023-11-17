@@ -286,11 +286,12 @@ KevinHallModel::compute_weight_adjustments(Population &population,
 
     // Compute adjustments.
     auto adjustments = KevinHallAdjustmentTable{};
-    for (const auto &[sex, W_means_by_sex] : W_means) {
-        adjustments.emplace_row(sex, std::unordered_map<int, double>{});
-        for (const auto &[age, W_mean] : W_means_by_sex) {
-            double W_expected = expected.at(sex, "Weight"_id).at(age);
-            adjustments.at(sex)[age] = W_expected - W_mean;
+    for (const auto &[W_mean_sex, W_means_by_sex] : W_means) {
+        adjustments.emplace_row(W_mean_sex, std::unordered_map<int, double>{});
+        for (const auto &[W_mean_age, W_mean] : W_means_by_sex) {
+            // NOTE: we only have the ages we requested here.
+            double W_expected = expected.at(W_mean_sex, "Weight"_id).at(W_mean_age);
+            adjustments.at(W_mean_sex)[W_mean_age] = W_expected - W_mean;
         }
     }
 
