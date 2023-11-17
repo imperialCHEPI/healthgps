@@ -120,7 +120,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         double W_expected = expected.at(person.gender, "Weight"_id).at(0);
         double W_mean = W_newborn_means.at(person.gender, 0);
         double adjustment = W_expected - W_mean;
-        person.risk_factors.at("Weight"_id) -= adjustment;
+        person.risk_factors.at("Weight"_id) += adjustment;
     }
 
     // Compute newborn weight power means by sex.
