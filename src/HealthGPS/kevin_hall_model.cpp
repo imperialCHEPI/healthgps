@@ -90,58 +90,111 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
-    // Initialise newborns and update others.
+    // Update (initialise) newborns.
+    update_newborns(context);
+
+    // Update non-newborns.
+    update_non_newborns(context);
+
+    // Compute BMI values for everyone.
     for (auto &person : context.population()) {
         // Ignore if inactive.
         if (!person.is_active()) {
             continue;
         }
 
-        if (person.age == 0) {
-            initialise_nutrient_intakes(person);
-            initialise_energy_intake(person);
-            initialise_weight(person);
-        } else {
-            update_nutrient_intakes(person);
-            update_energy_intake(person);
+        compute_bmi(person);
+    }
+}
+
+void KevinHallModel::update_newborns(RuntimeContext &context) const {
+
+    // Initialise nutrient and energy intake and weight for newborns.
+    for (auto &person : context.population()) {
+        // Ignore if inactive or not newborn.
+        if (!person.is_active()) {
+            continue;
         }
+        if (person.age != 0) {
+            continue;
+        }
+
+        initialise_nutrient_intakes(person);
+        initialise_energy_intake(person);
+        initialise_weight(person);
     }
 
     // TODO: This newborn adjustment needs sending to intervention scenario -- see #266.
+
+    // NOTE: FOR REFACTORING: This block should eventually be replaced by a call to
+    // `adjust_risk_factors(context, {"Weight"_id}, IntegerInterval{0, 0});` once age_range
+    // is implemented in the adjustment method, as it is redundant and does not communicate
+    // the newborn weight adjustment to the intervention (see #266).
+
+    // NOTE: FOR REFACTORING: Then, this whole method can be replaced with a generalised
+    // initialise method, which accepts an age range, and both the `generate_risk_factors`
+    // (on `context.age_range()`) and `update_risk_factors` (on `IntegerInterval{0, 0}`)
+    // can call this new method.
+
     // Adjust newborn weight to match expected.
-    const auto &expected = get_risk_factor_expected();
-    auto W_newborn_means = compute_mean_weight(context.population(), std::nullopt, 0);
+    auto adjustments = compute_weight_adjustments(context.population(), 0);
     for (auto &person : context.population()) {
-        // Ignore if inactive or not a newborn.
-        if (!person.is_active() || person.age != 0) {
+        // Ignore if inactive or not newborn.
+        if (!person.is_active()) {
+            continue;
+        }
+        if (person.age != 0) {
             continue;
         }
 
-        double W_expected = expected.at(person.gender, "Weight"_id).at(0);
-        double W_mean = W_newborn_means.at(person.gender, 0);
-        double adjustment = W_expected - W_mean;
+        double adjustment = adjustments.at(person.gender, person.age);
         person.risk_factors.at("Weight"_id) += adjustment;
     }
 
-    // Compute newborn weight power means by sex.
-    auto W_newborn_power_means = compute_mean_weight(context.population(), height_slope_, 0);
+    // NOTE: FOR REFACTORING: End of semi-redundant block.
 
-    // Initialise newborns.
+    // Compute newborn weight power means by sex.
+    auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
+
+    // Initialise height and other Kevin Hall state for newborns.
     for (auto &person : context.population()) {
-        // Ignore if inactive or not a newborn.
-        if (!person.is_active() || person.age != 0) {
+        // Ignore if inactive or not newborn.
+        if (!person.is_active()) {
+            continue;
+        }
+        if (person.age != 0) {
             continue;
         }
 
-        double W_power_mean = W_newborn_power_means.at(person.gender, person.age);
+        double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(person, W_power_mean, context.random());
         initialise_kevin_hall_state(person);
     }
+}
 
-    // Update: different model for children and adults (no newborns).
+void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
+
+    // Update nutrient and energy intake for non-newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn.
-        if (!person.is_active() || person.age == 0) {
+        if (!person.is_active()) {
+            continue;
+        }
+        if (person.age == 0) {
+            continue;
+        }
+
+        update_nutrient_intakes(person);
+        update_energy_intake(person);
+    }
+
+    // Update weight for non-newborns.
+    for (auto &person : context.population()) {
+        // Ignore if inactive or newborn.
+        if (!person.is_active()) {
+            continue;
+        }
+        if (person.age == 0) {
             continue;
         }
 
@@ -152,34 +205,16 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
     }
 
-    // Baseline scenatio: compute adjustments.
-    KevinHallAdjustmentTable adjustments;
-    if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = compute_kevin_hall_adjustments(context.population());
-    }
+    // Compute (baseline) or receive (intervention) weight adjustments.
+    auto adjustments = get_weight_adjustments(context);
 
-    // Intervention scenario: recieve adjustments from baseline scenario.
-    else {
-        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (!message.has_value()) {
-            throw core::HgpsException(
-                "Simulation out of sync, receive Kevin Hall adjustments message has timed out");
-        }
-
-        auto &basePtr = message.value();
-        auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(basePtr.get());
-        if (!messagePrt) {
-            throw core::HgpsException(
-                "Simulation out of sync, failed to receive a Kevin Hall adjustments message");
-        }
-
-        adjustments = messagePrt->data();
-    }
-
-    // Adjust: different model for children and adults (no newborns).
+    // Adjust weight and other Kevin Hall state for non-newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn.
-        if (!person.is_active() || person.age == 0) {
+        if (!person.is_active()) {
+            continue;
+        }
+        if (person.age == 0) {
             continue;
         }
 
@@ -187,7 +222,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         if (person.age < kevin_hall_age_min) {
             initialise_kevin_hall_state(person, adjustment);
         } else {
-            kevin_hall_adjust(person, adjustment);
+            adjust_weight(person, adjustment);
         }
     }
 
@@ -203,37 +238,59 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     // Update: (no newborns or 19 and over).
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn or aged 19 and over.
-        if (!person.is_active() || person.age == 0 || person.age >= 19) {
+        if (!person.is_active()) {
+            continue;
+        }
+        if (person.age == 0) {
+            continue;
+        }
+        if (person.age >= 19) {
             continue;
         }
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
         update_height(person, W_power_mean);
     }
+}
 
-    // Compute BMI values for everyone.
-    for (auto &person : context.population()) {
-        // Ignore if inactive.
-        if (!person.is_active()) {
-            continue;
-        }
+KevinHallAdjustmentTable KevinHallModel::get_weight_adjustments(RuntimeContext &context) const {
+    KevinHallAdjustmentTable adjustments;
 
-        compute_bmi(person);
+    // Baseline scenatio: compute adjustments.
+    if (context.scenario().type() == ScenarioType::baseline) {
+        return compute_weight_adjustments(context.population());
     }
+
+    // Intervention scenario: recieve adjustments from baseline scenario.
+    auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+    if (!message.has_value()) {
+        throw core::HgpsException(
+            "Simulation out of sync, receive Kevin Hall adjustments message has timed out");
+    }
+
+    auto &basePtr = message.value();
+    auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(basePtr.get());
+    if (!messagePrt) {
+        throw core::HgpsException(
+            "Simulation out of sync, failed to receive a Kevin Hall adjustments message");
+    }
+
+    return messagePrt->data();
 }
 
 KevinHallAdjustmentTable
-KevinHallModel::compute_kevin_hall_adjustments(Population &population) const {
+KevinHallModel::compute_weight_adjustments(Population &population,
+                                           std::optional<unsigned> age) const {
     const auto &expected = get_risk_factor_expected();
-    auto weight_means = compute_mean_weight(population);
+    auto W_means = compute_mean_weight(population, std::nullopt, age);
 
     // Compute adjustments.
     auto adjustments = KevinHallAdjustmentTable{};
-    for (const auto &[sex, weight_means_by_sex] : weight_means) {
+    for (const auto &[sex, W_means_by_sex] : W_means) {
         adjustments.emplace_row(sex, std::unordered_map<int, double>{});
-        for (const auto &[age, weight_mean] : weight_means_by_sex) {
-            double weight_expected = expected.at(sex, "Weight"_id).at(age);
-            adjustments.at(sex)[age] = weight_expected - weight_mean;
+        for (const auto &[age, W_mean] : W_means_by_sex) {
+            double W_expected = expected.at(sex, "Weight"_id).at(age);
+            adjustments.at(sex)[age] = W_expected - W_mean;
         }
     }
 
@@ -508,7 +565,7 @@ void KevinHallModel::initialise_weight(Person &person) const {
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
 
-void KevinHallModel::kevin_hall_adjust(Person &person, double adjustment) const {
+void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
     double H = person.risk_factors.at("Height"_id);
     double BW_0 = person.risk_factors.at("Weight"_id);
     double F_0 = person.risk_factors.at("BodyFat"_id);
@@ -594,11 +651,10 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
     sumcounts.emplace_row(core::Gender::female, std::unordered_map<int, SumCount>{});
     sumcounts.emplace_row(core::Gender::male, std::unordered_map<int, SumCount>{});
     for (const auto &person : population) {
-        // Ignore if inactive.
+        // Ignore if inactive or not the optionally specified age.
         if (!person.is_active()) {
             continue;
         }
-        // Ignore if the person's age is not the optionally specified age.
         if (age.has_value() && person.age != age.value()) {
             continue;
         }

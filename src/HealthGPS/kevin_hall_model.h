@@ -50,6 +50,14 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
+    /// @brief Handle the update (initialisation) of newborns separately
+    /// @param context The runtime context
+    void update_newborns(RuntimeContext &context) const;
+
+    /// @brief Handle the update on non-newborns separately
+    /// @param context The runtime context
+    void update_non_newborns(RuntimeContext &context) const;
+
     /// @brief Initialise total nutrient intakes from food intakes
     /// @param person The person to initialise
     void initialise_nutrient_intakes(Person &person) const;
@@ -128,15 +136,22 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person to simulate
     void kevin_hall_run(Person &person) const;
 
-    /// @brief Adjusts the Kevin Hall variables of a person to baseline.
+    /// @brief Adjusts the weight of a person to baseline.
     /// @param person The person fo update the weight for.
     /// @param adjustment The weight adjustment term
-    void kevin_hall_adjust(Person &person, double adjustment) const;
+    void adjust_weight(Person &person, double adjustment) const;
 
-    /// @brief Compute Kevin Hall adjustments for sex and age
+    /// @brief Computes weight adjustments or recieves them from the baseline scenario
+    /// @return The computed (baseline) or recieved (intervention) weight adjustments
+    KevinHallAdjustmentTable get_weight_adjustments(RuntimeContext &context) const;
+
+    /// @brief Compute weight adjustments for sex and age
     /// @param population The population to compute the adjustments for
-    /// @return The Kevin Hall adjustments by sex and age
-    KevinHallAdjustmentTable compute_kevin_hall_adjustments(Population &population) const;
+    /// @param age The (optional) age to compute the adjustments for (default all)
+    /// @return The weight adjustments by sex and age
+    KevinHallAdjustmentTable
+    compute_weight_adjustments(Population &population,
+                               std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
