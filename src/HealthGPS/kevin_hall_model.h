@@ -26,9 +26,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
-    /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
+    /// @param height_stddev The height model female/male standard deviations
+    /// @param height_slope The height model slope
     KevinHallModel(
         const RiskFactorSexAgeTable &expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
@@ -36,9 +37,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
             &nutrient_equations,
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
-        const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height,
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
-        const std::vector<double> &epa_quantiles);
+        const std::vector<double> &epa_quantiles,
+        const std::unordered_map<core::Gender, double> &height_stddev, double height_slope);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -49,6 +50,14 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
+    /// @brief Handle the update (initialisation) of newborns separately
+    /// @param context The runtime context
+    void update_newborns(RuntimeContext &context) const;
+
+    /// @brief Handle the update on non-newborns separately
+    /// @param context The runtime context
+    void update_non_newborns(RuntimeContext &context) const;
+
     /// @brief Initialise total nutrient intakes from food intakes
     /// @param person The person to initialise
     void initialise_nutrient_intakes(Person &person) const;
@@ -59,7 +68,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     /// @brief Compute and set nutrient intakes from food intakes.
     /// @param person The person to compute nutrient intakes for
-    void set_nutrient_intakes(Person &person) const;
+    void compute_nutrient_intakes(Person &person) const;
 
     /// @brief Initialise total energy intake from nutrient intakes
     /// @param person The person to initialise
@@ -71,7 +80,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     /// @brief Compute and set energy intake from nutrient intakes.
     /// @param person The person to compute energy intake for
-    void set_energy_intake(Person &person) const;
+    void compute_energy_intake(Person &person) const;
 
     /// @brief Compute glycogen.
     /// @param CI The carbohydrate intake
@@ -127,52 +136,64 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param person The person to simulate
     void kevin_hall_run(Person &person) const;
 
-    /// @brief Adjusts the Kevin Hall variables of a person to baseline.
+    /// @brief Adjusts the weight of a person to baseline.
     /// @param person The person fo update the weight for.
     /// @param adjustment The weight adjustment term
-    void kevin_hall_adjust(Person &person, double adjustment) const;
+    void adjust_weight(Person &person, double adjustment) const;
 
-    /// @brief Compute Kevin Hall adjustments for sex and age
+    /// @brief Computes weight adjustments or recieves them from the baseline scenario
+    /// @param context The runtime context
+    /// @return The computed (baseline) or recieved (intervention) weight adjustments
+    KevinHallAdjustmentTable recieve_weight_adjustments(RuntimeContext &context) const;
+
+    /// @brief Sends weight adjustments to the intervention scenario
+    /// @param context The runtime context
+    /// @param adjustments The weight adjustments to send
+    void send_weight_adjustments(RuntimeContext &context,
+                                 KevinHallAdjustmentTable &&adjustments) const;
+
+    /// @brief Compute weight adjustments for sex and age
     /// @param population The population to compute the adjustments for
-    /// @return The Kevin Hall adjustments by sex and age
-    KevinHallAdjustmentTable compute_kevin_hall_adjustments(Population &population) const;
+    /// @param age The (optional) age to compute the adjustments for (default all)
+    /// @return The weight adjustments by sex and age
+    KevinHallAdjustmentTable
+    compute_weight_adjustments(Population &population,
+                               std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param sex The sex of the person.
     double get_weight_quantile(double epa_quantile, core::Gender sex) const;
 
-    /// @brief Compute the mean of weight (optionally raised to a power) for eac sex and age
+    /// @brief Compute the mean of weight (optionally raised to a power) for each sex and age
     /// @param population The population to compute the mean for
     /// @param power The (optional) power to raise the weight to
+    /// @param age The (optional) age to compute the mean for (default all)
     /// @return The weight power means by sex and age
     KevinHallAdjustmentTable compute_mean_weight(Population &population,
-                                                 std::optional<double> power = std::nullopt) const;
+                                                 std::optional<double> power = std::nullopt,
+                                                 std::optional<unsigned> age = std::nullopt) const;
 
-    // // TODO: implement this
-    // /// @brief Initialises the height of a person.
-    // /// @param person The person fo initialise the height for.
-    // void initialise_height(Person &person);
+    /// @brief Initialises the height of a person.
+    /// @param person The person fo initialise the height for.
+    /// @param W_power_mean The mean hweight power for the person's sex and age
+    /// @param random The random number generator
+    void initialise_height(Person &person, double W_power_mean, Random &random) const;
 
-    // // TODO: implement this
-    // /// @brief Updates the height of a person.
-    // /// @param person The person fo update the height for.
-    // void update_height(Person &person);
-
-    // // TODO: implement this
-    // /// @brief Compute a new height value for the given person.
-    // /// @param person The person to compute the height for.
-    // /// @return The computed height.
-    // double compute_new_height(Person &person);
+    /// @brief Updates the height of a person.
+    /// @param person The person fo update the height for.
+    /// @param W_power_mean The mean hweight power for the person's sex and age
+    void update_height(Person &person, double W_power_mean) const;
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
         &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
-    const std::unordered_map<core::Gender, std::vector<double>> &age_mean_height_;
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
     const std::vector<double> &epa_quantiles_;
+    const std::unordered_map<core::Gender, double> &height_stddev_;
+    const double height_slope_;
 
     // Model parameters.
     static constexpr int kevin_hall_age_min = 19; // Minimum age for the model.
@@ -198,9 +219,10 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
     /// @param food_prices The unit price for each food group
-    /// @param age_mean_height The mean height at all ages (male and female)
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
+    /// @param height_stddev The height model female/male standard deviations
+    /// @param height_slope The height model slope
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         RiskFactorSexAgeTable expected,
@@ -208,9 +230,9 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
-        std::unordered_map<core::Gender, std::vector<double>> age_mean_height,
         std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
-        std::vector<double> epa_quantiles);
+        std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
+        double height_slope);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -221,9 +243,10 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges_;
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations_;
     std::unordered_map<core::Identifier, std::optional<double>> food_prices_;
-    std::unordered_map<core::Gender, std::vector<double>> age_mean_height_;
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
     std::vector<double> epa_quantiles_;
+    std::unordered_map<core::Gender, double> height_stddev_;
+    double height_slope_;
 };
 
 } // namespace hgps
