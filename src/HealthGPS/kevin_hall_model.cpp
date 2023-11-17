@@ -112,10 +112,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // Initialise nutrient and energy intake and weight for newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or not newborn.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age != 0) {
+        if (!person.is_active() || (person.age != 0)) {
             continue;
         }
 
@@ -140,10 +137,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     auto adjustments = compute_weight_adjustments(context.population(), 0);
     for (auto &person : context.population()) {
         // Ignore if inactive or not newborn.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age != 0) {
+        if (!person.is_active() || (person.age != 0)) {
             continue;
         }
 
@@ -159,10 +153,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // Initialise height and other Kevin Hall state for newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or not newborn.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age != 0) {
+        if (!person.is_active() || (person.age != 0)) {
             continue;
         }
 
