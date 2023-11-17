@@ -168,10 +168,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     // Update nutrient and energy intake for non-newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age == 0) {
+        if (!person.is_active() || (person.age == 0)) {
             continue;
         }
 
@@ -182,10 +179,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     // Update weight for non-newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age == 0) {
+        if (!person.is_active() || (person.age == 0)) {
             continue;
         }
 
@@ -202,10 +196,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     // Adjust weight and other Kevin Hall state for non-newborns.
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age == 0) {
+        if (!person.is_active() || (person.age == 0)) {
             continue;
         }
 
@@ -226,13 +217,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     // Update: (no newborns or 19 and over).
     for (auto &person : context.population()) {
         // Ignore if inactive or newborn or aged 19 and over.
-        if (!person.is_active()) {
-            continue;
-        }
-        if (person.age == 0) {
-            continue;
-        }
-        if (person.age >= 19) {
+        if (!person.is_active() || ((person.age == 0) || (person.age >= 19))) {
             continue;
         }
 
