@@ -142,8 +142,15 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void adjust_weight(Person &person, double adjustment) const;
 
     /// @brief Computes weight adjustments or recieves them from the baseline scenario
+    /// @param context The runtime context
     /// @return The computed (baseline) or recieved (intervention) weight adjustments
-    KevinHallAdjustmentTable get_weight_adjustments(RuntimeContext &context) const;
+    KevinHallAdjustmentTable recieve_weight_adjustments(RuntimeContext &context) const;
+
+    /// @brief Sends weight adjustments to the intervention scenario
+    /// @param context The runtime context
+    /// @param adjustments The weight adjustments to send
+    void send_weight_adjustments(RuntimeContext &context,
+                                 KevinHallAdjustmentTable &&adjustments) const;
 
     /// @brief Compute weight adjustments for sex and age
     /// @param population The population to compute the adjustments for

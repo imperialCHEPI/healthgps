@@ -205,8 +205,8 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         }
     }
 
-    // Compute (baseline) or receive (intervention) weight adjustments.
-    auto adjustments = get_weight_adjustments(context);
+    // Compute (baseline) or receive (intervention) weight adjustments from baseline scenario.
+    auto adjustments = recieve_weight_adjustments(context);
 
     // Adjust weight and other Kevin Hall state for non-newborns.
     for (auto &person : context.population()) {
@@ -226,11 +226,8 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         }
     }
 
-    // Baseline scenario: send adjustments to intervention scenario.
-    if (context.scenario().type() == ScenarioType::baseline) {
-        context.scenario().channel().send(std::make_unique<KevinHallAdjustmentMessage>(
-            context.current_run(), context.time_now(), std::move(adjustments)));
-    }
+    // Send (baseline) weight adjustments to intervention scenario.
+    send_weight_adjustments(context, std::move(adjustments));
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -253,7 +250,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 }
 
-KevinHallAdjustmentTable KevinHallModel::get_weight_adjustments(RuntimeContext &context) const {
+KevinHallAdjustmentTable KevinHallModel::recieve_weight_adjustments(RuntimeContext &context) const {
     KevinHallAdjustmentTable adjustments;
 
     // Baseline scenatio: compute adjustments.
@@ -276,6 +273,16 @@ KevinHallAdjustmentTable KevinHallModel::get_weight_adjustments(RuntimeContext &
     }
 
     return messagePrt->data();
+}
+
+void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
+                                             KevinHallAdjustmentTable &&adjustments) const {
+
+    // Baseline scenario: send adjustments.
+    if (context.scenario().type() == ScenarioType::baseline) {
+        context.scenario().channel().send(std::make_unique<KevinHallAdjustmentMessage>(
+            context.current_run(), context.time_now(), std::move(adjustments)));
+    }
 }
 
 KevinHallAdjustmentTable
