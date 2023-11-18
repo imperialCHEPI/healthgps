@@ -191,7 +191,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 
     // Compute (baseline) or receive (intervention) weight adjustments from baseline scenario.
-    auto adjustments = recieve_weight_adjustments(context);
+    auto adjustments = receive_weight_adjustments(context);
 
     // Adjust weight and other Kevin Hall state for non-newborns.
     for (auto &person : context.population()) {
@@ -226,7 +226,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 }
 
-KevinHallAdjustmentTable KevinHallModel::recieve_weight_adjustments(RuntimeContext &context) const {
+KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
     KevinHallAdjustmentTable adjustments;
 
     // Baseline scenatio: compute adjustments.
@@ -234,7 +234,7 @@ KevinHallAdjustmentTable KevinHallModel::recieve_weight_adjustments(RuntimeConte
         return compute_weight_adjustments(context.population());
     }
 
-    // Intervention scenario: recieve adjustments from baseline scenario.
+    // Intervention scenario: receive adjustments from baseline scenario.
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
     if (!message.has_value()) {
         throw core::HgpsException(
