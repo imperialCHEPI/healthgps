@@ -141,20 +141,30 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Correlation matrix.
-    const auto correlations_file_info =
+    // Risk factor correlation matrix.
+    const auto correlation_file_info =
         host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    const auto correlations_table = load_datatable_from_csv(correlations_file_info);
-    Eigen::MatrixXd correlations{correlations_table.num_rows(), correlations_table.num_columns()};
+    const auto correlation_table = load_datatable_from_csv(correlation_file_info);
+    Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
 
-    // Risk factor names, models, parameters and correlation matrix.
+    // Policy covariance matrix.
+    const auto policy_covariance_file_info =
+        host::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
+    const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
+    Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
+                                      policy_covariance_table.num_columns()};
+
+    // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<hgps::core::Identifier> names;
     std::vector<hgps::LinearModelParams> models;
     std::vector<double> lambda;
     std::vector<double> stddev;
+    std::vector<hgps::LinearModelParams> policy_models;
+    std::vector<hgps::core::DoubleInterval> policy_ranges;
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+        names.emplace_back(key);
 
         // Risk factor model parameters.
         hgps::LinearModelParams model;
@@ -162,38 +172,73 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         model.coefficients =
             json_params["Coefficients"].get<std::unordered_map<hgps::core::Identifier, double>>();
 
-        // Check correlation matrix column name matches risk factor name.
-        auto column_name = correlations_table.column(i).name();
+        // Check risk factor correlation matrix column name matches risk factor name.
+        auto column_name = correlation_table.column(i).name();
         if (!hgps::core::case_insensitive::equals(key, column_name)) {
             throw hgps::core::HgpsException{
-                fmt::format("Risk factor {} name ({}) does not match correlation matrix "
-                            "column {} name ({})",
+                fmt::format("Risk factor {} name ({}) does not match risk "
+                            "factor correlation matrix column {} name ({})",
                             i, key, i, column_name)};
         }
 
-        // Write data structures.
-        names.emplace_back(key);
+        // Write risk factor data structures.
         models.emplace_back(std::move(model));
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
-        for (size_t j = 0; j < correlations_table.num_rows(); j++) {
-            correlations(i, j) = std::any_cast<double>(correlations_table.column(i).value(j));
+        for (size_t j = 0; j < correlation_table.num_rows(); j++) {
+            correlation(i, j) = std::any_cast<double>(correlation_table.column(i).value(j));
+        }
+
+        // Intervention policy model parameters.
+        const auto &policy_json_params = json_params["Policy"];
+        hgps::LinearModelParams policy_model;
+        policy_model.intercept = policy_json_params["Intercept"].get<double>();
+        policy_model.coefficients = policy_json_params["Coefficients"]
+                                        .get<std::unordered_map<hgps::core::Identifier, double>>();
+
+        // Check intervention policy covariance matrix column name matches risk factor name.
+        auto policy_column_name = policy_covariance_table.column(i).name();
+        if (!hgps::core::case_insensitive::equals(key, policy_column_name)) {
+            throw hgps::core::HgpsException{
+                fmt::format("Risk factor {} name ({}) does not match intervention "
+                            "policy covariance matrix column {} name ({})",
+                            i, key, i, policy_column_name)};
+        }
+
+        // Write intervention policy data structures.
+        policy_models.emplace_back(std::move(policy_model));
+        policy_ranges.emplace_back(policy_json_params["Range"].get<hgps::core::DoubleInterval>());
+        for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
+            policy_covariance(i, j) =
+                std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
 
         // Increment table column index.
         i++;
     }
 
-    // Check correlation matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != correlations_table.num_columns()) {
-        throw hgps::core::HgpsException{
-            fmt::format("Risk factor count ({}) does not match correlation "
-                        "matrix column count ({})",
-                        opt["RiskFactorModels"].size(), correlations_table.num_columns())};
+    // Check risk factor correlation matrix column count matches risk factor count.
+    if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
+        throw hgps::core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
+                                                    "factor correlation matrix column count ({})",
+                                                    opt["RiskFactorModels"].size(),
+                                                    correlation_table.num_columns())};
     }
 
-    // Compute Cholesky decomposition of correlation matrix.
-    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlations}.matrixL()};
+    // Compute Cholesky decomposition of the risk factor correlation matrix.
+    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
+
+    // Check intervention policy covariance matrix column count matches risk factor count.
+    if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
+        throw hgps::core::HgpsException{
+            fmt::format("Risk factor count ({}) does not match intervention "
+                        "policy covariance matrix column count ({})",
+                        opt["RiskFactorModels"].size(), policy_covariance_table.num_columns())};
+    }
+
+    // Compute Cholesky decomposition of the intervention policy covariance matrix.
+    auto policy_cholesky =
+        Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
 
     // Risk factor expected values by sex and age.
     hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
