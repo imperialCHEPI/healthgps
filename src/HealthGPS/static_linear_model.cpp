@@ -106,6 +106,7 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
     // Correlated residual sampling.
     auto residuals = compute_residuals(random);
 
+    // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Initialise residual.
@@ -114,8 +115,8 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
         person.risk_factors[residual_name] = residual_new;
 
         // Initialise risk factor.
-        double factor_new = linear_factors[i] + residual_new * stddev_[i];
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        double factor_new = linear_factors[i] + residual_new * stddev_[i];
         factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
         person.risk_factors[names_[i]] = factor_new;
     }
@@ -129,19 +130,21 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
     // Correlated residual sampling.
     auto residuals = compute_residuals(random);
 
+    // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        double residual_old = person.risk_factors.at(residual_name);
         double residual_new = residuals[i] * info_speed_;
-        residual_new += sqrt(1.0 - info_speed_ * info_speed_) * person.risk_factors[residual_name];
-        person.risk_factors[residual_name] = residual_new;
+        residual_new += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
+        person.risk_factors.at(residual_name) = residual_new;
 
         // Update risk factor.
-        double factor_new = linear_factors[i] + residual_new * stddev_[i];
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        double factor_new = linear_factors[i] + residual_new * stddev_[i];
         factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
-        person.risk_factors[names_[i]] = factor_new;
+        person.risk_factors.at(names_[i]) = factor_new;
     }
 }
 
