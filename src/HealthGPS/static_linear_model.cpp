@@ -66,9 +66,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(person, context.random());
-        if (context.scenario().type() == ScenarioType::intervention) {
-            initialise_policies(person, context.random());
-        }
+        initialise_policies(person, context.random(), context.scenario().type());
         initialise_physical_activity(person, context.random());
     }
 
@@ -89,17 +87,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(person, context.random());
-            if (context.scenario().type() == ScenarioType::intervention) {
-                initialise_policies(person, context.random());
-            }
+            initialise_policies(person, context.random(), context.scenario().type());
             initialise_physical_activity(person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
             update_factors(person, context.random());
-            if (context.scenario().type() == ScenarioType::intervention) {
-                update_policies(person);
-            }
+            update_policies(person, context.scenario().type());
         }
     }
 
@@ -161,7 +155,8 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
     }
 }
 
-void StaticLinearModel::initialise_policies(Person &person, Random &random) const {
+void StaticLinearModel::initialise_policies(Person &person, Random &random,
+                                            ScenarioType scenario) const {
 
     // Approximate intervention policy values with linear models.
     auto linear = compute_linear_models(person);
@@ -177,16 +172,20 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random) cons
         double residual = residuals[i];
         person.risk_factors[residual_name] = residual;
 
-        // Apply intervention policy.
+        // Compute intervention policy.
         double policy = linear[i] + residual;
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old + (1.0 + policy / 100.0);
-        person.risk_factors.at(names_[i]) = factor;
+
+        // Apply intervention policy for intervention scenario.
+        if (scenario == ScenarioType::intervention) {
+            person.risk_factors.at(names_[i]) = factor;
+        }
     }
 }
 
-void StaticLinearModel::update_policies(Person &person) const {
+void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) const {
 
     // Approximate intervention policy values with linear models.
     auto linear = compute_linear_models(person);
@@ -198,12 +197,16 @@ void StaticLinearModel::update_policies(Person &person) const {
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
         double residual = person.risk_factors.at(residual_name);
 
-        // Apply intervention policy.
+        // Compute intervention policy.
         double policy = linear[i] + residual;
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old + (1.0 + policy / 100.0);
-        person.risk_factors.at(names_[i]) = factor;
+
+        // Apply intervention policy for intervention scenario.
+        if (scenario == ScenarioType::intervention) {
+            person.risk_factors.at(names_[i]) = factor;
+        }
     }
 }
 
