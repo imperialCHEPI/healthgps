@@ -58,15 +58,19 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
+    static double inverse_box_cox(double factor, double lambda);
+
     void initialise_factors(Person &person, Random &random) const;
 
     void update_factors(Person &person, Random &random) const;
 
+    void initialise_policies(Person &person, Random &random) const;
+
+    void update_policies(Person &person) const;
+
     std::vector<double> compute_linear_models(Person &person) const;
 
-    std::vector<double> compute_residuals(Random &random) const;
-
-    static double inverse_box_cox(double factor, double lambda);
+    std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
 
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for

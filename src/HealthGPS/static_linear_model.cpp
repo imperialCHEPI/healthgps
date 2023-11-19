@@ -98,37 +98,41 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     adjust_risk_factors(context, names_);
 }
 
+double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
+    return pow(lambda * factor + 1.0, 1.0 / lambda);
+}
+
 void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
 
     // Approximate risk factor values with linear models.
-    auto linear_factors = compute_linear_models(person);
+    auto linear = compute_linear_models(person);
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random);
+    auto residuals = compute_residuals(random, cholesky_);
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Initialise residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-        double residual_new = residuals[i];
-        person.risk_factors[residual_name] = residual_new;
+        double residual = residuals[i];
+        person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
-        double factor_new = linear_factors[i] + residual_new * stddev_[i];
-        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
-        person.risk_factors[names_[i]] = factor_new;
+        double factor = linear[i] + residual * stddev_[i];
+        factor = expected * inverse_box_cox(factor, lambda_[i]);
+        person.risk_factors[names_[i]] = factor;
     }
 }
 
 void StaticLinearModel::update_factors(Person &person, Random &random) const {
 
     // Approximate risk factor values with linear models.
-    auto linear_factors = compute_linear_models(person);
+    auto linear = compute_linear_models(person);
 
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random);
+    auto residuals = compute_residuals(random, cholesky_);
 
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -136,21 +140,67 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual_new = residuals[i] * info_speed_;
-        residual_new += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
-        person.risk_factors.at(residual_name) = residual_new;
+        double residual = residuals[i] * info_speed_;
+        residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
+        person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
-        double factor_new = linear_factors[i] + residual_new * stddev_[i];
-        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
-        person.risk_factors.at(names_[i]) = factor_new;
+        double factor = linear[i] + residual * stddev_[i];
+        factor = expected * inverse_box_cox(factor, lambda_[i]);
+        person.risk_factors.at(names_[i]) = factor;
+    }
+}
+
+void StaticLinearModel::initialise_policies(Person &person, Random &random) const {
+
+    // Approximate intervention policy values with linear models.
+    auto linear = compute_linear_models(person);
+
+    // Correlated residual sampling.
+    auto residuals = compute_residuals(random, policy_cholesky_);
+
+    // Initialise residuals and intervention policies (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
+        double residual = residuals[i];
+        person.risk_factors[residual_name] = residual;
+
+        // Apply intervention policy.
+        double policy = linear[i] + residual;
+        policy = policy_ranges_[i].clamp(policy);
+        double factor_old = person.risk_factors.at(names_[i]);
+        double factor = factor_old + (1.0 + policy / 100.0);
+        person.risk_factors.at(names_[i]) = factor;
+    }
+}
+
+void StaticLinearModel::update_policies(Person &person) const {
+
+    // Approximate intervention policy values with linear models.
+    auto linear = compute_linear_models(person);
+
+    // Initialise residuals and intervention policies (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
+        double residual = person.risk_factors.at(residual_name);
+
+        // Apply intervention policy.
+        double policy = linear[i] + residual;
+        policy = policy_ranges_[i].clamp(policy);
+        double factor_old = person.risk_factors.at(names_[i]);
+        double factor = factor_old + (1.0 + policy / 100.0);
+        person.risk_factors.at(names_[i]) = factor;
     }
 }
 
 std::vector<double> StaticLinearModel::compute_linear_models(Person &person) const {
-    std::vector<double> factors{};
-    factors.reserve(names_.size());
+    std::vector<double> linear{};
+    linear.reserve(names_.size());
 
     // Approximate risk factor values for person with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
@@ -160,20 +210,24 @@ std::vector<double> StaticLinearModel::compute_linear_models(Person &person) con
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-        factors.emplace_back(factor);
+        for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
+            factor += coefficient_value * log(person.get_risk_factor_value(coefficient_name));
+        }
+        linear.emplace_back(factor);
     }
 
-    return factors;
+    return linear;
 }
 
-std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
+std::vector<double> StaticLinearModel::compute_residuals(Random &random,
+                                                         const Eigen::MatrixXd &cholesky) const {
     std::vector<double> correlated_residuals{};
     correlated_residuals.reserve(names_.size());
 
     // Correlated samples using Cholesky decomposition.
     Eigen::VectorXd residuals{names_.size()};
     std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
-    residuals = cholesky_ * residuals;
+    residuals = cholesky * residuals;
 
     // Save correlated residuals.
     for (size_t i = 0; i < names_.size(); i++) {
@@ -181,10 +235,6 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
     }
 
     return correlated_residuals;
-}
-
-double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
