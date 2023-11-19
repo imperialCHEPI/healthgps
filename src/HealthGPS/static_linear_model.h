@@ -5,14 +5,16 @@
 #include "risk_factor_adjustable_model.h"
 
 #include <Eigen/Dense>
+#include <unordered_map>
 #include <vector>
 
 namespace hgps {
 
 /// @brief Defines the linear model parameters used to initialise risk factors
 struct LinearModelParams {
-    double intercept;
-    std::unordered_map<core::Identifier, double> coefficients;
+    double intercept{};
+    std::unordered_map<core::Identifier, double> coefficients{};
+    std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
 /// @brief Implements the static linear model type

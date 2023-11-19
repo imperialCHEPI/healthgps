@@ -195,6 +195,9 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
         policy_model.intercept = policy_json_params["Intercept"].get<double>();
         policy_model.coefficients = policy_json_params["Coefficients"]
                                         .get<std::unordered_map<hgps::core::Identifier, double>>();
+        policy_model.log_coefficients =
+            policy_json_params["LogCoefficients"]
+                .get<std::unordered_map<hgps::core::Identifier, double>>();
 
         // Check intervention policy covariance matrix column name matches risk factor name.
         auto policy_column_name = policy_covariance_table.column(i).name();
