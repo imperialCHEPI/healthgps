@@ -66,12 +66,16 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(person, context.random());
-        initialise_policies(person, context.random(), context.scenario().type());
         initialise_physical_activity(person, context.random());
     }
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
+
+    // Initialise everyone.
+    for (auto &person : context.population()) {
+        initialise_policies(person, context.random(), context.scenario().type());
+    }
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -87,18 +91,29 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(person, context.random());
-            initialise_policies(person, context.random(), context.scenario().type());
             initialise_physical_activity(person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
             update_factors(person, context.random());
-            update_policies(person, context.scenario().type());
         }
     }
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
+
+        if (person.age == 0) {
+            initialise_policies(person, context.random(), context.scenario().type());
+        } else {
+            update_policies(person, context.scenario().type());
+        }
+    }
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
