@@ -176,7 +176,7 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random,
         double policy = linear[i] + residual;
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
-        double factor = factor_old + (1.0 + policy / 100.0);
+        double factor = factor_old * (1.0 + policy / 100.0);
 
         // Apply intervention policy for intervention scenario.
         if (scenario == ScenarioType::intervention) {
@@ -201,7 +201,7 @@ void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) c
         double policy = linear[i] + residual;
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
-        double factor = factor_old + (1.0 + policy / 100.0);
+        double factor = factor_old * (1.0 + policy / 100.0);
 
         // Apply intervention policy for intervention scenario.
         if (scenario == ScenarioType::intervention) {
