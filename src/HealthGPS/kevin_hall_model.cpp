@@ -200,7 +200,13 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
             continue;
         }
 
-        auto &adjustment = adjustments.at(person.gender, person.age);
+        double adjustment;
+        if (adjustments.contains(person.gender, person.age)) {
+            adjustment = adjustments.at(person.gender, person.age);
+        } else {
+            adjustment = 0.0;
+        }
+
         if (person.age < kevin_hall_age_min) {
             initialise_kevin_hall_state(person, adjustment);
         } else {
