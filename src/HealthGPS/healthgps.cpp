@@ -159,7 +159,9 @@ void HealthGPS::initialise_population() {
     std::vector<core::Identifier> keys = {
         "Age",     "Gender", "Sector",           "Income",       "Carbohydrate", "Fat",
         "Protein", "Sodium", "PhysicalActivity", "EnergyIntake", "Height",       "Weight"};
-    std::ofstream file(fmt::format("initialise_{}.csv", context_.time_now()));
+    std::string scenario =
+        context_.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention";
+    std::ofstream file(fmt::format("initialise_{}_{}.csv", scenario, context_.time_now()));
 
     for (const auto &key : keys) {
         file << key.to_string() << ",";
@@ -204,7 +206,9 @@ void HealthGPS::update_population() {
     std::vector<core::Identifier> keys = {
         "Age",     "Gender", "Sector",           "Income",       "Carbohydrate", "Fat",
         "Protein", "Sodium", "PhysicalActivity", "EnergyIntake", "Height",       "Weight"};
-    std::ofstream file(fmt::format("update_{}.csv", context_.time_now()));
+    std::string scenario =
+        context_.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention";
+    std::ofstream file(fmt::format("update_{}_{}.csv", scenario, context_.time_now()));
 
     for (const auto &key : keys) {
         file << key.to_string() << ",";
