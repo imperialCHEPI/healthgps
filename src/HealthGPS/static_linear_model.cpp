@@ -123,7 +123,7 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
 
     // Approximate risk factor values with linear models.
-    auto linear = compute_linear_models(person);
+    auto linear = compute_linear_models(person, models_);
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -147,7 +147,7 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
 void StaticLinearModel::update_factors(Person &person, Random &random) const {
 
     // Approximate risk factor values with linear models.
-    auto linear = compute_linear_models(person);
+    auto linear = compute_linear_models(person, models_);
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -174,7 +174,7 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random,
                                             ScenarioType scenario) const {
 
     // Approximate intervention policy values with linear models.
-    auto linear = compute_linear_models(person);
+    auto linear = compute_linear_models(person, policy_models_);
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, policy_cholesky_);
@@ -204,7 +204,7 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random,
 void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) const {
 
     // Approximate intervention policy values with linear models.
-    auto linear = compute_linear_models(person);
+    auto linear = compute_linear_models(person, policy_models_);
 
     // Initialise residuals and intervention policies (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -227,14 +227,16 @@ void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) c
     }
 }
 
-std::vector<double> StaticLinearModel::compute_linear_models(Person &person) const {
+std::vector<double>
+StaticLinearModel::compute_linear_models(Person &person,
+                                         const std::vector<LinearModelParams> &models) const {
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
     // Approximate risk factor values for person with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
         auto name = names_[i];
-        auto model = models_[i];
+        auto model = models[i];
         double factor = model.intercept;
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
