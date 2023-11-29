@@ -188,7 +188,8 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random,
         person.risk_factors[residual_name] = residual;
 
         // Compute intervention policy.
-        double policy = linear[i] + residual;
+        // double policy = linear[i] + residual;
+        double policy = linear[i];
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
@@ -210,10 +211,11 @@ void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) c
 
         // Initialise residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
-        double residual = person.risk_factors.at(residual_name);
+        // double residual = person.risk_factors.at(residual_name);
 
         // Compute intervention policy.
-        double policy = linear[i] + residual;
+        // double policy = linear[i] + residual;
+        double policy = linear[i];
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
