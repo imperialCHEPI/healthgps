@@ -74,7 +74,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     for (auto &person : context.population()) {
-        initialise_policies(person, context.random(), context.scenario().type());
+        initialise_policies(person, context.random(), context.scenario().type(), context);
     }
 }
 
@@ -109,9 +109,9 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         }
 
         if (person.age == 0) {
-            initialise_policies(person, context.random(), context.scenario().type());
+            initialise_policies(person, context.random(), context.scenario().type(), context);
         } else {
-            update_policies(person, context.scenario().type());
+            update_policies(person, context.scenario().type(), context);
         }
     }
 }
@@ -170,8 +170,8 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
     }
 }
 
-void StaticLinearModel::initialise_policies(Person &person, Random &random,
-                                            ScenarioType scenario) const {
+void StaticLinearModel::initialise_policies(Person &person, Random &random, ScenarioType scenario,
+                                            RuntimeContext &context) const {
 
     // Approximate intervention policy values with linear models.
     auto linear = compute_linear_models(person, policy_models_);
@@ -194,14 +194,18 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random,
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
+        // HACK: start intervening after 2 years from sim start.
+        bool intervene = (context.time_now() - context.start_time()) > 2;
+
         // Apply intervention policy for intervention scenario.
-        if (scenario == ScenarioType::intervention) {
+        if (intervene && scenario == ScenarioType::intervention) {
             person.risk_factors.at(names_[i]) = factor;
         }
     }
 }
 
-void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) const {
+void StaticLinearModel::update_policies(Person &person, ScenarioType scenario,
+                                        RuntimeContext &context) const {
 
     // Approximate intervention policy values with linear models.
     auto linear = compute_linear_models(person, policy_models_);
@@ -220,8 +224,11 @@ void StaticLinearModel::update_policies(Person &person, ScenarioType scenario) c
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
+        // HACK: start intervening after 2 years from sim start.
+        bool intervene = (context.time_now() - context.start_time()) > 2;
+
         // Apply intervention policy for intervention scenario.
-        if (scenario == ScenarioType::intervention) {
+        if (intervene && scenario == ScenarioType::intervention) {
             person.risk_factors.at(names_[i]) = factor;
         }
     }
