@@ -13,10 +13,6 @@
 #include <memory>
 #include <stdexcept>
 
-// HACK: write individuals' risk factors to files.
-#include <fmt/format.h>
-#include <fstream>
-
 namespace { // anonymous namespace
 
 /// @brief Defines the net immigration synchronisation message
@@ -154,31 +150,6 @@ void HealthGPS::initialise_population() {
     analysis_->initialise_population(context_);
 
     print_initial_population_statistics();
-
-    // HACK: write individuals' risk factors to files.
-    std::vector<core::Identifier> keys = {
-        "Age",     "Gender", "Sector",           "Income",       "Carbohydrate", "Fat",
-        "Protein", "Sodium", "PhysicalActivity", "EnergyIntake", "Height",       "Weight"};
-    std::string scenario =
-        context_.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention";
-    std::ofstream file(fmt::format("initialise_{}_{}.csv", scenario, context_.time_now()));
-
-    for (const auto &key : keys) {
-        file << key.to_string() << ",";
-    }
-    file << "\n";
-
-    for (const auto &person : context_.population()) {
-        if (!person.is_active()) {
-            continue;
-        }
-
-        for (const auto &key : keys) {
-            file << person.get_risk_factor_value(key) << ",";
-        }
-        file << "\n";
-    }
-    file.close();
 }
 
 void HealthGPS::update_population() {
@@ -201,31 +172,6 @@ void HealthGPS::update_population() {
 
     // Publish results to data logger
     analysis_->update_population(context_);
-
-    // HACK: write individuals' risk factors to files.
-    std::vector<core::Identifier> keys = {
-        "Age",     "Gender", "Sector",           "Income",       "Carbohydrate", "Fat",
-        "Protein", "Sodium", "PhysicalActivity", "EnergyIntake", "Height",       "Weight"};
-    std::string scenario =
-        context_.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention";
-    std::ofstream file(fmt::format("update_{}_{}.csv", scenario, context_.time_now()));
-
-    for (const auto &key : keys) {
-        file << key.to_string() << ",";
-    }
-    file << "\n";
-
-    for (const auto &person : context_.population()) {
-        if (!person.is_active()) {
-            continue;
-        }
-
-        for (const auto &key : keys) {
-            file << person.get_risk_factor_value(key) << ",";
-        }
-        file << "\n";
-    }
-    file.close();
 }
 
 void HealthGPS::update_net_immigration() {
