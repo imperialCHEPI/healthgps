@@ -229,7 +229,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Compute Cholesky decomposition of the risk factor correlation matrix.
-    auto cholesky = Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL();
+    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
 
     // Check intervention policy covariance matrix column count matches risk factor count.
     if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
@@ -240,7 +240,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     }
 
     // Compute Cholesky decomposition of the intervention policy covariance matrix.
-    auto policy_cholesky = Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL();
+    auto policy_cholesky =
+        Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
 
     // Risk factor expected values by sex and age.
     hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
@@ -484,7 +485,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),
         std::move(nutrient_equations), std::move(food_prices), std::move(weight_quantiles),
-        std::move(epa_quantiles), std::move(height_stddev), height_slope);
+        std::move(epa_quantiles), std::move(height_stddev), std::move(height_slope));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
