@@ -130,11 +130,11 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 
 void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
 
-    // Approximate risk factor values with linear models.
-    auto linear = compute_linear_models(person, models_);
-
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
+
+    // Approximate risk factor values with linear models.
+    auto linear = compute_linear_models(person, models_);
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -154,11 +154,11 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
 
 void StaticLinearModel::update_factors(Person &person, Random &random) const {
 
-    // Approximate risk factor values with linear models.
-    auto linear = compute_linear_models(person, models_);
-
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
+
+    // Approximate risk factor values with linear models.
+    auto linear = compute_linear_models(person, models_);
 
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -179,12 +179,18 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
 }
 
 void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
-
-    // Approximate intervention policy values with linear models.
-    auto linear = compute_linear_models(person, policy_models_);
+    // NOTE: we need to keey baseline and intervention scenarios RNG in sync.
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, policy_cholesky_);
+
+    // No-op if intervention scenario.
+    if (!intervene) {
+        return;
+    }
+
+    // Approximate intervention policy values with linear models.
+    auto linear = compute_linear_models(person, policy_models_);
 
     // Initialise residuals and intervention policies (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
@@ -200,14 +206,18 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
-        // Apply intervention policy for intervention scenario.
-        if (intervene) {
-            person.risk_factors.at(names_[i]) = factor;
-        }
+        // Apply intervention policy.
+        person.risk_factors.at(names_[i]) = factor;
     }
 }
 
 void StaticLinearModel::update_policies(Person &person, bool intervene) const {
+    // NOTE: we need to keey baseline and intervention scenarios RNG in sync.
+
+    // No-op if not intervention scenario.
+    if (!intervene) {
+        return;
+    }
 
     // Approximate intervention policy values with linear models.
     auto linear = compute_linear_models(person, policy_models_);
@@ -225,10 +235,8 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
-        // Apply intervention policy for intervention scenario.
-        if (intervene) {
-            person.risk_factors.at(names_[i]) = factor;
-        }
+        // Apply intervention policy.
+        person.risk_factors.at(names_[i]) = factor;
     }
 }
 
