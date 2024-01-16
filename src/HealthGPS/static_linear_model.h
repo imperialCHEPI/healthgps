@@ -5,14 +5,16 @@
 #include "risk_factor_adjustable_model.h"
 
 #include <Eigen/Dense>
+#include <unordered_map>
 #include <vector>
 
 namespace hgps {
 
 /// @brief Defines the linear model parameters used to initialise risk factors
 struct LinearModelParams {
-    double intercept;
-    std::unordered_map<core::Identifier, double> coefficients;
+    double intercept{};
+    std::unordered_map<core::Identifier, double> coefficients{};
+    std::unordered_map<core::Identifier, double> log_coefficients{};
 };
 
 /// @brief Implements the static linear model type
@@ -26,7 +28,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param models The linear models used to compute a person's risk factor values
     /// @param lambda The lambda values of the risk factors
     /// @param stddev The standard deviations of the risk factors
-    /// @param cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @param cholesky Cholesky decomposition of the risk factor correlation matrix
+    /// @param policy_models The linear models used to compute a person's intervention policies
+    /// @param policy_ranges The boundaries of the intervention policy values
+    /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -35,7 +40,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     StaticLinearModel(
         const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
         const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
-        const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, double info_speed,
+        const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
+        const std::vector<LinearModelParams> &policy_models,
+        const std::vector<core::DoubleInterval> &policy_ranges,
+        const Eigen::MatrixXd &policy_cholesky, double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
@@ -50,15 +58,20 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
+    static double inverse_box_cox(double factor, double lambda);
+
     void initialise_factors(Person &person, Random &random) const;
 
     void update_factors(Person &person, Random &random) const;
 
-    std::vector<double> compute_linear_models(Person &person) const;
+    void initialise_policies(Person &person, Random &random, bool intervene) const;
 
-    std::vector<double> compute_residuals(Random &random) const;
+    void update_policies(Person &person, bool intervene) const;
 
-    static double inverse_box_cox(double factor, double lambda);
+    std::vector<double> compute_linear_models(Person &person,
+                                              const std::vector<LinearModelParams> &models) const;
+
+    std::vector<double> compute_residuals(Random &random, const Eigen::MatrixXd &cholesky) const;
 
     /// @brief Initialise the sector of a person
     /// @param person The person to initialise sector for
@@ -90,6 +103,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::vector<double> &lambda_;
     const std::vector<double> &stddev_;
     const Eigen::MatrixXd &cholesky_;
+    const std::vector<LinearModelParams> &policy_models_;
+    const std::vector<core::DoubleInterval> &policy_ranges_;
+    const Eigen::MatrixXd &policy_cholesky_;
     const double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
@@ -103,10 +119,13 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
     /// @param expected The risk factor expected values by sex and age
     /// @param names The risk factor names
-    /// @param models The linear models used to compute a person's risk factor values
+    /// @param models The linear models used to compute a person's risk factors
     /// @param lambda The lambda values of the risk factors
     /// @param stddev The standard deviations of the risk factors
-    /// @param cholesky The Cholesky decomposition of the risk factor correlation matrix
+    /// @param cholesky Cholesky decomposition of the risk factor correlation matrix
+    /// @param policy_models The linear models used to compute a person's intervention policies
+    /// @param policy_ranges The boundaries of the intervention policy values
+    /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -115,7 +134,10 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     StaticLinearModelDefinition(
         RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
         std::vector<LinearModelParams> models, std::vector<double> lambda,
-        std::vector<double> stddev, Eigen::MatrixXd cholesky, double info_speed,
+        std::vector<double> stddev, Eigen::MatrixXd cholesky,
+        std::vector<LinearModelParams> policy_models,
+        std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
+        double info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
@@ -131,6 +153,9 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::vector<double> lambda_;
     std::vector<double> stddev_;
     Eigen::MatrixXd cholesky_;
+    std::vector<LinearModelParams> policy_models_;
+    std::vector<core::DoubleInterval> policy_ranges_;
+    Eigen::MatrixXd policy_cholesky_;
     double info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
