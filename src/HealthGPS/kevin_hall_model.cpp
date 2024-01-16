@@ -191,7 +191,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 
     // Compute (baseline) or receive (intervention) weight adjustments from baseline scenario.
-    auto adjustments = recieve_weight_adjustments(context);
+    auto adjustments = receive_weight_adjustments(context);
 
     // Adjust weight and other Kevin Hall state for non-newborns.
     for (auto &person : context.population()) {
@@ -200,7 +200,13 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
             continue;
         }
 
-        auto &adjustment = adjustments.at(person.gender, person.age);
+        double adjustment;
+        if (adjustments.contains(person.gender, person.age)) {
+            adjustment = adjustments.at(person.gender, person.age);
+        } else {
+            adjustment = 0.0;
+        }
+
         if (person.age < kevin_hall_age_min) {
             initialise_kevin_hall_state(person, adjustment);
         } else {
@@ -226,7 +232,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     }
 }
 
-KevinHallAdjustmentTable KevinHallModel::recieve_weight_adjustments(RuntimeContext &context) const {
+KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
     KevinHallAdjustmentTable adjustments;
 
     // Baseline scenatio: compute adjustments.
@@ -234,7 +240,7 @@ KevinHallAdjustmentTable KevinHallModel::recieve_weight_adjustments(RuntimeConte
         return compute_weight_adjustments(context.population());
     }
 
-    // Intervention scenario: recieve adjustments from baseline scenario.
+    // Intervention scenario: receive adjustments from baseline scenario.
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
     if (!message.has_value()) {
         throw core::HgpsException(
@@ -607,7 +613,8 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
     auto epa_percentile = epa_index / epa_quantiles_.size();
 
     // Find weight quantile.
-    auto weight_index = static_cast<size_t>(epa_percentile * (weight_quantiles_.size() - 1));
+    size_t weight_index_last = weight_quantiles_.at(sex).size() - 1;
+    auto weight_index = static_cast<size_t>(epa_percentile * weight_index_last);
     return weight_quantiles_.at(sex)[weight_index];
 }
 

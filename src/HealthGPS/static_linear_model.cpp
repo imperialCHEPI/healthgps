@@ -9,13 +9,17 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
     const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
-    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky, double info_speed,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
+    const std::vector<LinearModelParams> &policy_models,
+    const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
+    double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
-      stddev_{stddev}, cholesky_{cholesky}, info_speed_{info_speed},
+      stddev_{stddev}, cholesky_{cholesky}, policy_models_{policy_models},
+      policy_ranges_{policy_ranges}, policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev} {
 
@@ -33,6 +37,15 @@ StaticLinearModel::StaticLinearModel(
     }
     if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
+    }
+    if (policy_models_.empty()) {
+        throw core::HgpsException("Intervention policy model list is empty");
+    }
+    if (policy_ranges_.empty()) {
+        throw core::HgpsException("Intervention policy ranges list is empty");
+    }
+    if (!policy_cholesky_.allFinite()) {
+        throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
@@ -58,6 +71,15 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
+
+    // Initialise everyone.
+    for (auto &person : context.population()) {
+        // HACK: start intervening after 2 years from sim start.
+        bool intervene = (context.scenario().type() == ScenarioType::intervention &&
+                          (context.time_now() - context.start_time()) > 2);
+
+        initialise_policies(person, context.random(), intervene);
+    }
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -83,81 +105,173 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Adjust risk factors to match expected values.
     adjust_risk_factors(context, names_);
+
+    // Initialise newborns and update others.
+    for (auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
+
+        // HACK: start intervening after 2 years from sim start.
+        bool intervene = (context.scenario().type() == ScenarioType::intervention &&
+                          (context.time_now() - context.start_time()) > 2);
+
+        if (person.age == 0) {
+            initialise_policies(person, context.random(), intervene);
+        } else {
+            update_policies(person, intervene);
+        }
+    }
+}
+
+double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
+    return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
 void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
 
-    // Approximate risk factor values with linear models.
-    auto linear_factors = compute_linear_models(person);
-
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random);
+    auto residuals = compute_residuals(random, cholesky_);
 
+    // Approximate risk factor values with linear models.
+    auto linear = compute_linear_models(person, models_);
+
+    // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Initialise residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-        double residual_new = residuals[i];
-        person.risk_factors[residual_name] = residual_new;
+        double residual = residuals[i];
+        person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
-        double factor_new = linear_factors[i] + residual_new * stddev_[i];
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
-        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
-        person.risk_factors[names_[i]] = factor_new;
+        double factor = linear[i] + residual * stddev_[i];
+        factor = expected * inverse_box_cox(factor, lambda_[i]);
+        person.risk_factors[names_[i]] = factor;
     }
 }
 
 void StaticLinearModel::update_factors(Person &person, Random &random) const {
 
-    // Approximate risk factor values with linear models.
-    auto linear_factors = compute_linear_models(person);
-
     // Correlated residual sampling.
-    auto residuals = compute_residuals(random);
+    auto residuals = compute_residuals(random, cholesky_);
 
+    // Approximate risk factor values with linear models.
+    auto linear = compute_linear_models(person, models_);
+
+    // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-        double residual_new = residuals[i] * info_speed_;
-        residual_new += sqrt(1.0 - info_speed_ * info_speed_) * person.risk_factors[residual_name];
-        person.risk_factors[residual_name] = residual_new;
+        double residual_old = person.risk_factors.at(residual_name);
+        double residual = residuals[i] * info_speed_;
+        residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
+        person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double factor_new = linear_factors[i] + residual_new * stddev_[i];
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
-        factor_new = expected * inverse_box_cox(factor_new, lambda_[i]);
-        person.risk_factors[names_[i]] = factor_new;
+        double factor = linear[i] + residual * stddev_[i];
+        factor = expected * inverse_box_cox(factor, lambda_[i]);
+        person.risk_factors.at(names_[i]) = factor;
     }
 }
 
-std::vector<double> StaticLinearModel::compute_linear_models(Person &person) const {
-    std::vector<double> factors{};
-    factors.reserve(names_.size());
+void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
+    // NOTE: we need to keey baseline and intervention scenarios RNG in sync.
+
+    // Correlated residual sampling.
+    auto residuals = compute_residuals(random, policy_cholesky_);
+
+    // No-op if intervention scenario.
+    if (!intervene) {
+        return;
+    }
+
+    // Approximate intervention policy values with linear models.
+    auto linear = compute_linear_models(person, policy_models_);
+
+    // Initialise residuals and intervention policies (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
+        double residual = residuals[i];
+        person.risk_factors[residual_name] = residual;
+
+        // Compute intervention policy.
+        double policy = linear[i] + residual;
+        policy = policy_ranges_[i].clamp(policy);
+        double factor_old = person.risk_factors.at(names_[i]);
+        double factor = factor_old * (1.0 + policy / 100.0);
+
+        // Apply intervention policy.
+        person.risk_factors.at(names_[i]) = factor;
+    }
+}
+
+void StaticLinearModel::update_policies(Person &person, bool intervene) const {
+    // NOTE: we need to keey baseline and intervention scenarios RNG in sync.
+
+    // No-op if not intervention scenario.
+    if (!intervene) {
+        return;
+    }
+
+    // Approximate intervention policy values with linear models.
+    auto linear = compute_linear_models(person, policy_models_);
+
+    // Initialise residuals and intervention policies (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise residual.
+        auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
+        double residual = person.risk_factors.at(residual_name);
+
+        // Compute intervention policy.
+        double policy = linear[i] + residual;
+        policy = policy_ranges_[i].clamp(policy);
+        double factor_old = person.risk_factors.at(names_[i]);
+        double factor = factor_old * (1.0 + policy / 100.0);
+
+        // Apply intervention policy.
+        person.risk_factors.at(names_[i]) = factor;
+    }
+}
+
+std::vector<double>
+StaticLinearModel::compute_linear_models(Person &person,
+                                         const std::vector<LinearModelParams> &models) const {
+    std::vector<double> linear{};
+    linear.reserve(names_.size());
 
     // Approximate risk factor values for person with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
         auto name = names_[i];
-        auto model = models_[i];
+        auto model = models[i];
         double factor = model.intercept;
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             factor += coefficient_value * person.get_risk_factor_value(coefficient_name);
         }
-        factors.emplace_back(factor);
+        for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
+            factor += coefficient_value * log(person.get_risk_factor_value(coefficient_name));
+        }
+        linear.emplace_back(factor);
     }
 
-    return factors;
+    return linear;
 }
 
-std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
+std::vector<double> StaticLinearModel::compute_residuals(Random &random,
+                                                         const Eigen::MatrixXd &cholesky) const {
     std::vector<double> correlated_residuals{};
     correlated_residuals.reserve(names_.size());
 
     // Correlated samples using Cholesky decomposition.
     Eigen::VectorXd residuals{names_.size()};
     std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
-    residuals = cholesky_ * residuals;
+    residuals = cholesky * residuals;
 
     // Save correlated residuals.
     for (size_t i = 0; i < names_.size(); i++) {
@@ -165,10 +279,6 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random) const {
     }
 
     return correlated_residuals;
-}
-
-double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
 void StaticLinearModel::initialise_sector(Person &person, Random &random) const {
@@ -263,14 +373,18 @@ void StaticLinearModel::initialise_physical_activity(Person &person, Random &ran
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
     std::vector<LinearModelParams> models, std::vector<double> lambda, std::vector<double> stddev,
-    Eigen::MatrixXd cholesky, double info_speed,
+    Eigen::MatrixXd cholesky, std::vector<LinearModelParams> policy_models,
+    std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
+    double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
       models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
-      cholesky_{std::move(cholesky)}, info_speed_{info_speed},
-      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
+      cholesky_{std::move(cholesky)}, policy_models_{std::move(policy_models)},
+      policy_ranges_{std::move(policy_ranges)}, policy_cholesky_{std::move(policy_cholesky)},
+      info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
+      income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
@@ -288,6 +402,15 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!cholesky_.allFinite()) {
         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
     }
+    if (policy_models_.empty()) {
+        throw core::HgpsException("Intervention policy model list is empty");
+    }
+    if (policy_ranges_.empty()) {
+        throw core::HgpsException("Intervention policy ranges list is empty");
+    }
+    if (!policy_cholesky_.allFinite()) {
+        throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
+    }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
@@ -299,7 +422,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &expected = get_risk_factor_expected();
     return std::make_unique<StaticLinearModel>(expected, names_, models_, lambda_, stddev_,
-                                               cholesky_, info_speed_, rural_prevalence_,
+                                               cholesky_, policy_models_, policy_ranges_,
+                                               policy_cholesky_, info_speed_, rural_prevalence_,
                                                income_models_, physical_activity_stddev_);
 }
 

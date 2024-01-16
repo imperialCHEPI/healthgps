@@ -39,8 +39,10 @@ double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     baseline.initialize();
 
     for (auto run = 1u; run <= trial_runs; run++) {
+        auto run_seed = std::optional<unsigned int>{rnd_->operator()()};
+
         auto worker = std::jthread(&ModelRunner::run_model_thread, this, source_.get_token(),
-                                   std::ref(baseline), run, std::nullopt);
+                                   std::ref(baseline), run, run_seed);
 
         worker.join();
         if (source_.stop_requested()) {

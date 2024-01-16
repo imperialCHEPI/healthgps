@@ -51,7 +51,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
         adjustments = calculate_adjustments(context, keys);
     }
 
-    // Intervention scenario: recieve adjustments from baseline scenario.
+    // Intervention scenario: receive adjustments from baseline scenario.
     else {
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         if (!message.has_value()) {
