@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Gallbladder and biliary diseases,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.0003009316738997344,0.0002554510923738448,0.00010831279311763864
 826,United Kingdom,Gallbladder and biliary diseases,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.00032570479541340263,0.0002554510923738448,0.00010831279311763864
 826,United Kingdom,Gallbladder and biliary diseases,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.00036363461847181613,0.0002554510923738448,0.00010831279311763864

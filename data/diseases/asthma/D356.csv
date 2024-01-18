@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Asthma,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.018627494838978593,0.027145269486184016,0.00819757798537577
 356,India,Asthma,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.01898597931311316,0.027145269486184016,0.00819757798537577
 356,India,Asthma,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.019475016326920128,0.027145269486184016,0.00819757798537577

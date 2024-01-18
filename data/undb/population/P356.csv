@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Age,PopMale,PopFemale,PopTotal
+LocID,Location,VarID,Variant,Time,Age,PopMale,PopFemale,PopTotal
 356,India,2,Medium,1950,0,6934342,6571153,13505495
 356,India,2,Medium,1950,1,5837898,5551341,11389238
 356,India,2,Medium,1950,2,5094324,4934917,10029240

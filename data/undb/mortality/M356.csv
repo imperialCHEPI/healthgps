@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Age,DeathMale,DeathFemale,DeathTotal
+LocID,Location,VarID,Variant,Time,Age,DeathMale,DeathFemale,DeathTotal
 356,India,2,Medium,1950,0,1410766,1406698,2817464
 356,India,2,Medium,1950,1,392493,396201,788694
 356,India,2,Medium,1950,2,158876,167484,326360

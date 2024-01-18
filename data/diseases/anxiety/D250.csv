@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Anxiety disorders,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.011523180103400447,0.0028036765525362504,0.0010713730920845002
 250,France,Anxiety disorders,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.002504274556323222,0.0028036765525362504,0.0010713730920845002
 250,France,Anxiety disorders,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.003160365917082899,0.0028036765525362504,0.0010713730920845002

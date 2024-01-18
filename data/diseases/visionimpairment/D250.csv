@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Vision impairment due to cataract unsqueezed,2019,5,1 to 4,1,False,1,Male,5,prevalence,1.9487534347891237E-08,0,0
 250,France,Vision impairment due to cataract unsqueezed,2019,5,1 to 4,2,True,1,Male,5,prevalence,3.385313771687361E-08,0,0
 250,France,Vision impairment due to cataract unsqueezed,2019,5,1 to 4,3,True,1,Male,5,prevalence,6.086099789556307E-08,0,0

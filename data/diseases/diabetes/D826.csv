@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Diabetes mellitus type 2,2019,5,1 to 4,1,False,1,Male,6,Incidence,6.39052056846288E-05,0,0
 826,United Kingdom,Diabetes mellitus type 2,2019,5,1 to 4,2,True,1,Male,6,Incidence,2.922088308649559E-05,0,0
 826,United Kingdom,Diabetes mellitus type 2,2019,5,1 to 4,3,True,1,Male,6,Incidence,4.9257240649660226E-05,0,0

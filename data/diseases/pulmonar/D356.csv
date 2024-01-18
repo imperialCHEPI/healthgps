@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Chronic obstructive pulmonary disease,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.0008501517484020628,0.000570803789032548,0.00039605012977191403
 356,India,Chronic obstructive pulmonary disease,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.0008974930920855104,0.000570803789032548,0.00039605012977191403
 356,India,Chronic obstructive pulmonary disease,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.0009672744332674668,0.000570803789032548,0.00039605012977191403

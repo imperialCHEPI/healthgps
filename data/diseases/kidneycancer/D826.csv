@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Kidney cancer,2019,5,1 to 4,1,False,1,Male,6,Incidence,4.894462755941724E-05,1.2826679754889706E-05,6.321021408431416E-06
 826,United Kingdom,Kidney cancer,2019,5,1 to 4,2,True,1,Male,6,Incidence,8.296565741854488E-07,1.2826679754889706E-05,6.321021408431416E-06
 826,United Kingdom,Kidney cancer,2019,5,1 to 4,3,True,1,Male,6,Incidence,7.190759129077538E-07,1.2826679754889706E-05,6.321021408431416E-06

@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Gallbladder and biliary diseases,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.00013644064279090342,0.00015378425000000002,5.543475E-05
 250,France,Gallbladder and biliary diseases,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.00014287890714946843,0.00015378425000000002,5.543475E-05
 250,France,Gallbladder and biliary diseases,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.0001524224992767904,0.00015378425000000002,5.543475E-05

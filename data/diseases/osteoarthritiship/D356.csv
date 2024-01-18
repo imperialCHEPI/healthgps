@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Osteoarthritis of the hip,2019,5,1 to 4,1,False,1,Male,5,Prevalence,1.5764106828972715E-10,0,0
 356,India,Osteoarthritis of the hip,2019,5,1 to 4,2,True,1,Male,5,Prevalence,4.126355740465602E-10,0,0
 356,India,Osteoarthritis of the hip,2019,5,1 to 4,3,True,1,Male,5,Prevalence,1.0647943059611841E-09,0,0

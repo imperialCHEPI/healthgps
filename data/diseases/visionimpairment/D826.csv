@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Vision impairment due to cataract unsqueezed,2019,5,1 to 4,1,False,1,Male,5,prevalence,1.9611968768055632E-08,0,0
 826,United Kingdom,Vision impairment due to cataract unsqueezed,2019,5,1 to 4,2,True,1,Male,5,prevalence,3.406367173085408E-08,0,0
 826,United Kingdom,Vision impairment due to cataract unsqueezed,2019,5,1 to 4,3,True,1,Male,5,prevalence,6.122896653433374E-08,0,0

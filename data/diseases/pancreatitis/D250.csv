@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Chronic pancreatitis,2019,5,1 to 4,1,False,1,Male,5,prevalence,8.94436802080332E-06,1.1843949999999999E-05,2.8943025000000006E-06
 250,France,Chronic pancreatitis,2019,5,1 to 4,2,True,1,Male,5,prevalence,9.333469073890778E-06,1.1843949999999999E-05,2.8943025000000006E-06
 250,France,Chronic pancreatitis,2019,5,1 to 4,3,True,1,Male,5,prevalence,9.908430576703673E-06,1.1843949999999999E-05,2.8943025000000006E-06

@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Esophageal cancer,2019,5,1 to 4,1,False,1,Male,6,Incidence,2.1780653544928913E-09,0,0
 826,United Kingdom,Esophageal cancer,2019,5,1 to 4,2,True,1,Male,6,Incidence,2.9979123465761766E-09,0,0
 826,United Kingdom,Esophageal cancer,2019,5,1 to 4,3,True,1,Male,6,Incidence,5.3716614068873304E-09,0,0

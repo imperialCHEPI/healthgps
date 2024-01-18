@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Anxiety disorders,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.009205474683491602,0.0019915054813442763,0.000985137727899493
 826,United Kingdom,Anxiety disorders,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.002025623813998531,0.0019915054813442763,0.000985137727899493
 826,United Kingdom,Anxiety disorders,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.0025587765111655153,0.0019915054813442763,0.000985137727899493

@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Chronic obstructive pulmonary disease,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.0008115501190971552,0.0005671862170089303,0.00034658408219925173
 826,United Kingdom,Chronic obstructive pulmonary disease,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.0008565824235691705,0.0005671862170089303,0.00034658408219925173
 826,United Kingdom,Chronic obstructive pulmonary disease,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.0009229303817329268,0.0005671862170089303,0.00034658408219925173

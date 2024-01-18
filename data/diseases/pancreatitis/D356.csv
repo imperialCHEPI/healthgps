@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Chronic pancreatitis,2019,5,1 to 4,1,False,1,Male,5,prevalence,2.0251814013928264E-05,2.0847940111973812E-05,6.797651744746876E-06
 356,India,Chronic pancreatitis,2019,5,1 to 4,2,True,1,Male,5,prevalence,2.1277505882955375E-05,2.0847940111973812E-05,6.797651744746876E-06
 356,India,Chronic pancreatitis,2019,5,1 to 4,3,True,1,Male,5,prevalence,2.2782060988702766E-05,2.0847940111973812E-05,6.797651744746876E-06

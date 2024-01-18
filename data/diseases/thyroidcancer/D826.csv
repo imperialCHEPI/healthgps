@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Thyroid cancer,2019,5,1 to 4,1,False,1,Male,6,Incidence,8.673330167035369E-06,0,0
 826,United Kingdom,Thyroid cancer,2019,5,1 to 4,2,True,1,Male,6,Incidence,1.8705892336408363E-06,0,0
 826,United Kingdom,Thyroid cancer,2019,5,1 to 4,3,True,1,Male,6,Incidence,2.2142825219003585E-06,0,0

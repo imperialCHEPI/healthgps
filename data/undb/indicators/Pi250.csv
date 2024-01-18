@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Births,SRB,LEx,LExMale,LExFemale,Deaths,DeathsMale,DeathsFemale,NetMigrations
+LocID,Location,VarID,Variant,Time,Births,SRB,LEx,LExMale,LExFemale,Deaths,DeathsMale,DeathsFemale,NetMigrations
 250,France,2,Medium,1950,868587,1.051,66.3819,63.4363,69.1887,533995,271815,262180,46927
 250,France,2,Medium,1951,842897,1.052,66.0939,63.1697,68.8963,566424,286483,279941,50613
 250,France,2,Medium,1952,833997,1.052,67.3935,64.4143,70.225,525413,267076,258336,55813

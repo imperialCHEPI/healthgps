@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Age,PopMale,PopFemale,PopTotal
+LocID,Location,VarID,Variant,Time,Age,PopMale,PopFemale,PopTotal
 250,France,2,Medium,1950,0,423043,406998,830041
 250,France,2,Medium,1950,1,419026,403116,822143
 250,France,2,Medium,1950,2,416175,400449,816624

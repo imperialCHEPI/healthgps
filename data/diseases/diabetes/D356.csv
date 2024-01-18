@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Diabetes mellitus type 2,2019,5,1 to 4,1,False,1,Male,6,Incidence,5.170494522701794E-05,0,0
 356,India,Diabetes mellitus type 2,2019,5,1 to 4,2,True,1,Male,6,Incidence,2.232792354219292E-05,0,0
 356,India,Diabetes mellitus type 2,2019,5,1 to 4,3,True,1,Male,6,Incidence,3.703477458558236E-05,0,0

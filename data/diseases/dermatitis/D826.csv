@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Atopic dermatitis,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.08781357912879112,0.12572124521321776,0.10804224348867471
 826,United Kingdom,Atopic dermatitis,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.08722861013785281,0.12572124521321776,0.10804224348867471
 826,United Kingdom,Atopic dermatitis,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.08629985832536348,0.12572124521321776,0.10804224348867471

@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Births,SRB,LEx,LExMale,LExFemale,Deaths,DeathsMale,DeathsFemale,NetMigrations
+LocID,Location,VarID,Variant,Time,Births,SRB,LEx,LExMale,LExFemale,Deaths,DeathsMale,DeathsFemale,NetMigrations
 356,India,2,Medium,1950,15651496,1.051,41.7232,42.5995,40.8008,7942496,3935660,4006836,124658
 356,India,2,Medium,1951,16041888,1.051,41.7437,42.6349,40.8048,8171043,4054483,4116559,98023
 356,India,2,Medium,1952,16458330,1.051,42.038,42.9119,41.1155,8293345,4122618,4170728,15795

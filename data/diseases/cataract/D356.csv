@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Blindness due to cataract unsqueezed,2019,5,1 to 4,1,False,1,Male,5,prevalence,4.766901304594727E-08,0,0
 356,India,Blindness due to cataract unsqueezed,2019,5,1 to 4,2,True,1,Male,5,prevalence,8.28070011660226E-08,0,0
 356,India,Blindness due to cataract unsqueezed,2019,5,1 to 4,3,True,1,Male,5,prevalence,1.4885429820027918E-07,0,0

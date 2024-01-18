@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,All causes,2019,5,1 to 4,1,False,1,Male,3,YLD,0.04956834602252611,0.06654295157414807,0.03557375226923331
 356,India,All causes,2019,5,1 to 4,2,True,1,Male,3,YLD,0.04956834602252611,0.06654295157414807,0.03557375226923331
 356,India,All causes,2019,5,1 to 4,3,True,1,Male,3,YLD,0.04956834602252611,0.06654295157414807,0.03557375226923331

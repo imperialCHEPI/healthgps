@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Multiple sclerosis,2019,5,1 to 4,1,False,1,Male,5,Prevalence,6.234062466459661E-07,0,0
 356,India,Multiple sclerosis,2019,5,1 to 4,2,True,1,Male,5,Prevalence,7.462719684209084E-07,0,0
 356,India,Multiple sclerosis,2019,5,1 to 4,3,True,1,Male,5,Prevalence,9.365619771591632E-07,0,0

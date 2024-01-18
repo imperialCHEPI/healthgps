@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Rheumatoid arthritis,2019,5,1 to 4,1,False,1,Male,6,Incidence,5.616654355019993E-05,0,0
 826,United Kingdom,Rheumatoid arthritis,2019,5,1 to 4,2,True,1,Male,6,Incidence,9.176117500578464E-06,0,0
 826,United Kingdom,Rheumatoid arthritis,2019,5,1 to 4,3,True,1,Male,6,Incidence,1.3556682420349688E-05,0,0

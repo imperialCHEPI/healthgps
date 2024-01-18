@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Kidney cancer,2019,5,1 to 4,1,False,1,Male,6,Incidence,6.12759575391343E-05,1.6017664183241953E-05,7.914011606064877E-06
 250,France,Kidney cancer,2019,5,1 to 4,2,True,1,Male,6,Incidence,4.143073459257174E-07,1.6017664183241953E-05,7.914011606064877E-06
 250,France,Kidney cancer,2019,5,1 to 4,3,True,1,Male,6,Incidence,1.8166107324864483E-07,1.6017664183241953E-05,7.914011606064877E-06

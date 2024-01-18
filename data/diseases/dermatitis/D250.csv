@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Atopic dermatitis,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.09287226181730919,0.13727,0.107598
 250,France,Atopic dermatitis,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.0923464621342182,0.13727,0.107598
 250,France,Atopic dermatitis,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.09149715522920526,0.13727,0.107598

@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Psoriasis,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.004613715445597636,0.0037730173988690004,0.0032074400129181876
 826,United Kingdom,Psoriasis,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.0047872360745810595,0.0037730173988690004,0.0032074400129181876
 826,United Kingdom,Psoriasis,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.005038607584852727,0.0037730173988690004,0.0032074400129181876

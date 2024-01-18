@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Breast cancer,2019,5,1 to 4,1,False,1,Male,5,Prevalence,8.895560087434012E-08,0,0
 250,France,Breast cancer,2019,5,1 to 4,2,True,1,Male,5,Prevalence,1.2509069653988242E-07,0,0
 250,France,Breast cancer,2019,5,1 to 4,3,True,1,Male,5,Prevalence,1.8392670321377704E-07,0,0

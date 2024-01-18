@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Myocardial infarction due to ischemic heart disease,2019,5,1 to 4,1,False,1,Male,5,prevalence,6.142693564844486E-08,0,0
 250,France,Myocardial infarction due to ischemic heart disease,2019,5,1 to 4,2,True,1,Male,5,prevalence,8.868009755985714E-08,0,0
 250,France,Myocardial infarction due to ischemic heart disease,2019,5,1 to 4,3,True,1,Male,5,prevalence,1.3421389161771669E-07,0,0

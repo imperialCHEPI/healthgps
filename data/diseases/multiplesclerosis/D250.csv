@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Multiple sclerosis,2019,5,1 to 4,1,False,1,Male,5,Prevalence,3.8682289674923746E-06,0,0
 250,France,Multiple sclerosis,2019,5,1 to 4,2,True,1,Male,5,Prevalence,4.699006605134784E-06,0,0
 250,France,Multiple sclerosis,2019,5,1 to 4,3,True,1,Male,5,Prevalence,6.000398171502606E-06,0,0

@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Gastroesophageal reflux disease,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.000832378570065469,0,0
 826,United Kingdom,Gastroesophageal reflux disease,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.00048510783468149973,0,0
 826,United Kingdom,Gastroesophageal reflux disease,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.0006925137694184475,0,0

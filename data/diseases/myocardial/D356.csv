@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Myocardial infarction due to ischemic heart disease,2019,5,1 to 4,1,False,1,Male,5,prevalence,2.4669218235265036E-08,0,0
 356,India,Myocardial infarction due to ischemic heart disease,2019,5,1 to 4,2,True,1,Male,5,prevalence,3.5669893315605327E-08,0,0
 356,India,Myocardial infarction due to ischemic heart disease,2019,5,1 to 4,3,True,1,Male,5,prevalence,5.407556299832824E-08,0,0

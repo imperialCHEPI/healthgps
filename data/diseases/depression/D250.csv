@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Major depressive disorder,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.0014435317175756832,8.973113027523625E-05,1.393198007659574E-05
 250,France,Major depressive disorder,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.002057528054421076,8.973113027523625E-05,1.393198007659574E-05
 250,France,Major depressive disorder,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.0024825875461075976,8.973113027523625E-05,1.393198007659574E-05

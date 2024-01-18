@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Cirrhosis and other chronic liver diseases,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.003768798373115643,5.94322782952737E-05,1.1018847490929354E-06
 250,France,Cirrhosis and other chronic liver diseases,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.0003909915373855739,5.94322782952737E-05,1.1018847490929354E-06
 250,France,Cirrhosis and other chronic liver diseases,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.0006127835495420563,5.94322782952737E-05,1.1018847490929354E-06

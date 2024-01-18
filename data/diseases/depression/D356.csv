@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Major depressive disorder,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.00048805423917163245,3.862317688636575E-05,5.581306507705408E-06
 356,India,Major depressive disorder,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.000722688092030295,3.862317688636575E-05,5.581306507705408E-06
 356,India,Major depressive disorder,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.0009187740944825975,3.862317688636575E-05,5.581306507705408E-06

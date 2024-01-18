@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 356,India,Anxiety disorders,2019,5,1 to 4,1,False,1,Male,6,Incidence,0.00293124344436684,0.0006220631474520375,0.00027437560456884723
 356,India,Anxiety disorders,2019,5,1 to 4,2,True,1,Male,6,Incidence,0.000673698819399797,0.0006220631474520375,0.00027437560456884723
 356,India,Anxiety disorders,2019,5,1 to 4,3,True,1,Male,6,Incidence,0.000864539744396319,0.0006220631474520375,0.00027437560456884723
