@@ -1,0 +1,218 @@
+﻿{
+  "input_file": {
+    "running": {
+      "diseases": [
+        "alzheimer",
+        "angina",
+        "anxiety",
+        "asthma",
+        "dermatitis",
+        "cataract",
+        "pulmonar",
+        "pancreatitis",
+        "cirrhosis",
+        "diabetes",
+        "gallbladder",
+        "reflux",
+        "gout",
+        "lowbackpain",
+        "depression",
+        "migraine",
+        "multiplesclerosis",
+        "myocardial",
+        "osteoarthritiship",
+        "osteoarthritisknee",
+        "parkinson",
+        "psoriasis",
+        "arthritis",
+        "visionimpairment",
+        "breastcancer",
+        "colorectalcancer",
+        "esophaguscancer",
+        "gallbladdercancer",
+        "kidneycancer",
+        "livercancer",
+        "ovarycancer",
+        "pancreascancer",
+        "stomachcancer",
+        "thyroidcancer"
+      ]
+    }
+  },
+  "index_file": {
+    "diseases": {
+      "registry": [
+        {
+          "group": "other",
+          "id": "alzheimer",
+          "name": "Alzheimer"
+        },
+        {
+          "group": "other",
+          "id": "angina",
+          "name": "Angina"
+        },
+        {
+          "group": "other",
+          "id": "anxiety",
+          "name": "Anxiety Disorder"
+        },
+        {
+          "group": "other",
+          "id": "asthma",
+          "name": "Asthma"
+        },
+        {
+          "group": "other",
+          "id": "dermatitis",
+          "name": "Atopic Dermatitis"
+        },
+        {
+          "group": "other",
+          "id": "cataract",
+          "name": "Blindness Due to Cataract Unsqueezed"
+        },
+        {
+          "group": "other",
+          "id": "pulmonar",
+          "name": "Chronic Obstructive Pulmonary Disease"
+        },
+        {
+          "group": "other",
+          "id": "pancreatitis",
+          "name": "Chronic Pancreatitis"
+        },
+        {
+          "group": "other",
+          "id": "cirrhosis",
+          "name": "Cirrhosis"
+        },
+        {
+          "group": "other",
+          "id": "diabetes",
+          "name": "Diabetes"
+        },
+        {
+          "group": "other",
+          "id": "gallbladder",
+          "name": "Gallbladder and Biliary Diseases"
+        },
+        {
+          "group": "other",
+          "id": "reflux",
+          "name": "Gastroesophageal Reflux Disease"
+        },
+        {
+          "group": "other",
+          "id": "gout",
+          "name": "Gout"
+        },
+        {
+          "group": "other",
+          "id": "lowbackpain",
+          "name": "Low Back Pain"
+        },
+        {
+          "group": "other",
+          "id": "depression",
+          "name": "Major Depressive Disorder"
+        },
+        {
+          "group": "other",
+          "id": "migraine",
+          "name": "Migraine"
+        },
+        {
+          "group": "other",
+          "id": "multiplesclerosis",
+          "name": "Multiple Sclerosis"
+        },
+        {
+          "group": "other",
+          "id": "myocardial",
+          "name": "Myocardial Infarction"
+        },
+        {
+          "group": "other",
+          "id": "osteoarthritiship",
+          "name": "Osteoarthritis of the hip"
+        },
+        {
+          "group": "other",
+          "id": "osteoarthritisknee",
+          "name": "Osteoarthritis Of The Knee"
+        },
+        {
+          "group": "other",
+          "id": "parkinson",
+          "name": "Parkinson Disease"
+        },
+        {
+          "group": "other",
+          "id": "psoriasis",
+          "name": "Psoriasis"
+        },
+        {
+          "group": "other",
+          "id": "arthritis",
+          "name": "Rheumatoid Arthritis"
+        },
+        {
+          "group": "other",
+          "id": "visionimpairment",
+          "name": "Vision Impairment Due to Cataract Unsqueezed"
+        },
+        {
+          "group": "cancer",
+          "id": "breastcancer",
+          "name": "Breast Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "colorectalcancer",
+          "name": "Colorectum Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "esophaguscancer",
+          "name": "Esophagus Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "gallbladdercancer",
+          "name": "Gallbladder Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "kidneycancer",
+          "name": "Kidney Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "livercancer",
+          "name": "Liver Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "ovarycancer",
+          "name": "Ovary Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "pancreascancer",
+          "name": "Pancreas Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "stomachcancer",
+          "name": "Stomach Cancer"
+        },
+        {
+          "group": "cancer",
+          "id": "thyroidcancer",
+          "name": "Thyroid Cancer"
+        }
+      ]
+    }
+  }
+}
