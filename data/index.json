@@ -156,6 +156,26 @@
                 "name": "Vision Impairment Due to Cataract Unsqueezed"
             },
             {
+                "group": "other",
+                "id": "intracerebralhemorrhage",
+                "name": "Intracerebral Hemorrhage"
+            },
+            {
+                "group": "other",
+                "id": "ischemicheartdisease",
+                "name": "Ischemic Heart Disease"
+            },
+            {
+                "group": "other",
+                "id": "ischemicstroke",
+                "name": "Ischemic Stroke"
+            },
+            {
+                "group": "other",
+                "id": "subarachnoidhemorrhage",
+                "name": "Subarachnoid Hemorrhage"
+            },
+            {
                 "group": "cancer",
                 "id": "breastcancer",
                 "name": "Breast Cancer"
