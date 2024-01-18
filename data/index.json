@@ -43,7 +43,7 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "description":"Diseases indicators, measures and relative risk factors.",
+        "description": "Diseases indicators, measures and relative risk factors.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
@@ -53,69 +53,157 @@
         "disease": {
             "path": "{DISEASE_TYPE}",
             "file_name": "D{COUNTRY_CODE}.csv",
-            "relative_risk":{
+            "relative_risk": {
                 "path": "relative_risk",
-                "to_disease":{
-                    "path":"disease",
+                "to_disease": {
+                    "path": "disease",
                     "file_name": "{DISEASE_TYPE}_{DISEASE_TYPE}.csv",
                     "default_value": 1.0
                 },
-                "to_risk_factor":{
-                    "path":"risk_factor",
+                "to_risk_factor": {
+                    "path": "risk_factor",
                     "file_name": "{GENDER}_{DISEASE_TYPE}_{RISK_FACTOR}.csv"
                 }
             },
-            "parameters":{
-                "path":"P{COUNTRY_CODE}",
-                "files":{
+            "parameters": {
+                "path": "P{COUNTRY_CODE}",
+                "files": {
                     "distribution": "prevalence_distribution.csv",
                     "survival_rate": "survival_rate_parameters.csv",
                     "death_weight": "death_weights.csv"
                 }
             }
         },
-        "registry":[
-            {"group":"other","id":"alzheimer","name":"Alzheimer"},
-            {"group":"other","id":"angina","name":"Angina"},
-            {"group":"other","id":"anxiety","name":"Anxiety Disorder"},
-            {"group":"other","id":"asthma","name":"Asthma"},
-            {"group":"other","id":"dermatitis","name":"Atopic Dermatitis"},
-            {"group":"other","id":"cataract","name":"Blindness Due to Cataract Unsqueezed"},
-            {"group":"other","id":"pulmonar","name":"Chronic Obstructive Pulmonary Disease"},
-            {"group":"other","id":"pancreatitis","name":"Chronic Pancreatitis"},
-            {"group":"other","id":"cirrhosis","name":"Cirrhosis"},
-            {"group":"other","id":"diabetes","name":"Diabetes"},
-            {"group":"other","id":"gallbladder","name":"Gallbladder and Biliary Diseases"},
-            {"group":"other","id":"reflux","name":"Gastroesophageal Reflux Disease"},
-            {"group":"other","id":"gout","name":"Gout"},
-            {"group":"other","id":"lowbackpain","name":"Low Back Pain"},
-            {"group":"other","id":"depression","name":"Major Depressive Disorder"},
-            {"group":"other","id":"migraine","name":"Migraine"},
-            {"group":"other","id":"multiplesclerosis","name":"Multiple Sclerosis"},
-            {"group":"other","id":"myocardial","name":"Myocardial Infarction"},
-            {"group":"other","id":"osteoarthritiship","name":"Osteoarthritis of the hip"},
-            {"group":"other","id":"osteoarthritisknee","name":"Osteoarthritis Of The Knee"},
-            {"group":"other","id":"parkinson","name":"Parkinson Disease"},
-            {"group":"other","id":"psoriasis","name":"Psoriasis"},
-            {"group":"other","id":"arthritis","name":"Rheumatoid Arthritis"},
-            {"group":"other","id":"visionimpairment","name":"Vision Impairment Due to Cataract Unsqueezed"},
-            {"group":"cancer","id":"breastcancer","name":"Breast Cancer"},
-            {"group":"cancer","id":"colorectalcancer","name":"Colorectum Cancer"},
-            {"group":"cancer","id":"esophaguscancer","name":"Esophagus Cancer"},
-            {"group":"cancer","id":"gallbladdercancer","name":"Gallbladder Cancer"},
-            {"group":"cancer","id":"kidneycancer","name":"Kidney Cancer"},
-            {"group":"cancer","id":"livercancer","name":"Liver Cancer"},
-            {"group":"cancer","id":"ovarycancer","name":"Ovary Cancer"},
-            {"group":"cancer","id":"pancreascancer","name":"Pancreas Cancer"},
-            {"group":"cancer","id":"stomachcancer","name":"Stomach Cancer"},
-            {"group":"cancer","id":"thyroidcancer","name":"Thyroid Cancer"}
+        "registry": [
+            { "group": "other", "id": "alzheimer", "name": "Alzheimer" },
+            { "group": "other", "id": "angina", "name": "Angina" },
+            { "group": "other", "id": "anxiety", "name": "Anxiety Disorder" },
+            { "group": "other", "id": "asthma", "name": "Asthma" },
+            {
+                "group": "other",
+                "id": "dermatitis",
+                "name": "Atopic Dermatitis"
+            },
+            {
+                "group": "other",
+                "id": "cataract",
+                "name": "Blindness Due to Cataract Unsqueezed"
+            },
+            {
+                "group": "other",
+                "id": "pulmonar",
+                "name": "Chronic Obstructive Pulmonary Disease"
+            },
+            {
+                "group": "other",
+                "id": "pancreatitis",
+                "name": "Chronic Pancreatitis"
+            },
+            { "group": "other", "id": "cirrhosis", "name": "Cirrhosis" },
+            { "group": "other", "id": "diabetes", "name": "Diabetes" },
+            {
+                "group": "other",
+                "id": "gallbladder",
+                "name": "Gallbladder and Biliary Diseases"
+            },
+            {
+                "group": "other",
+                "id": "reflux",
+                "name": "Gastroesophageal Reflux Disease"
+            },
+            { "group": "other", "id": "gout", "name": "Gout" },
+            { "group": "other", "id": "lowbackpain", "name": "Low Back Pain" },
+            {
+                "group": "other",
+                "id": "depression",
+                "name": "Major Depressive Disorder"
+            },
+            { "group": "other", "id": "migraine", "name": "Migraine" },
+            {
+                "group": "other",
+                "id": "multiplesclerosis",
+                "name": "Multiple Sclerosis"
+            },
+            {
+                "group": "other",
+                "id": "myocardial",
+                "name": "Myocardial Infarction"
+            },
+            {
+                "group": "other",
+                "id": "osteoarthritiship",
+                "name": "Osteoarthritis of the hip"
+            },
+            {
+                "group": "other",
+                "id": "osteoarthritisknee",
+                "name": "Osteoarthritis Of The Knee"
+            },
+            {
+                "group": "other",
+                "id": "parkinson",
+                "name": "Parkinson Disease"
+            },
+            { "group": "other", "id": "psoriasis", "name": "Psoriasis" },
+            {
+                "group": "other",
+                "id": "arthritis",
+                "name": "Rheumatoid Arthritis"
+            },
+            {
+                "group": "other",
+                "id": "visionimpairment",
+                "name": "Vision Impairment Due to Cataract Unsqueezed"
+            },
+            {
+                "group": "cancer",
+                "id": "breastcancer",
+                "name": "Breast Cancer"
+            },
+            {
+                "group": "cancer",
+                "id": "colorectalcancer",
+                "name": "Colorectum Cancer"
+            },
+            {
+                "group": "cancer",
+                "id": "esophaguscancer",
+                "name": "Esophagus Cancer"
+            },
+            {
+                "group": "cancer",
+                "id": "gallbladdercancer",
+                "name": "Gallbladder Cancer"
+            },
+            {
+                "group": "cancer",
+                "id": "kidneycancer",
+                "name": "Kidney Cancer"
+            },
+            { "group": "cancer", "id": "livercancer", "name": "Liver Cancer" },
+            { "group": "cancer", "id": "ovarycancer", "name": "Ovary Cancer" },
+            {
+                "group": "cancer",
+                "id": "pancreascancer",
+                "name": "Pancreas Cancer"
+            },
+            {
+                "group": "cancer",
+                "id": "stomachcancer",
+                "name": "Stomach Cancer"
+            },
+            {
+                "group": "cancer",
+                "id": "thyroidcancer",
+                "name": "Thyroid Cancer"
+            }
         ]
     },
-    "analysis":{
+    "analysis": {
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "description":"Observed burden of disease measures and disability weigths.",
+        "description": "Observed burden of disease measures and disability weigths.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
@@ -123,9 +211,9 @@
         "age_limits": [1, 100],
         "time_year": 2019,
         "disability_file_name": "disability_weights.csv",
-        "lms_file_name":"lms_parameters.csv",
+        "lms_file_name": "lms_parameters.csv",
         "cost_of_disease": {
-            "path":"cost",
+            "path": "cost",
             "file_name": "BoD{COUNTRY_CODE}.csv"
         }
     }
