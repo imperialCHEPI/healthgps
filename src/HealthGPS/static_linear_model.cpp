@@ -179,29 +179,30 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
 }
 
 void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
-    // NOTE: we need to keey baseline and intervention scenarios RNG in sync.
+    // NOTE: we need to keep baseline and intervention scenario RNGs in sync.
 
-    // Correlated residual sampling.
+    // Intervention policy residual components.
     auto residuals = compute_residuals(random, policy_cholesky_);
 
-    // No-op if intervention scenario.
+    // Save residuals (never updated in lifetime).
+    for (size_t i = 0; i < names_.size(); i++) {
+        auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
+        person.risk_factors[residual_name] = residuals[i];
+    }
+
+    // No-op if not intervening.
     if (!intervene) {
         return;
     }
 
-    // Approximate intervention policy values with linear models.
+    // Intervention policy linear components.
     auto linear = compute_linear_models(person, policy_models_);
 
-    // Initialise residuals and intervention policies (do not exist yet).
+    // Compute and apply all intervention policies.
     for (size_t i = 0; i < names_.size(); i++) {
 
-        // Initialise residual.
-        auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
-        double residual = residuals[i];
-        person.risk_factors[residual_name] = residual;
-
         // Compute intervention policy.
-        double policy = linear[i] + residual;
+        double policy = linear[i] + residuals[i];
         policy = policy_ranges_[i].clamp(policy);
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
@@ -212,20 +213,20 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
 }
 
 void StaticLinearModel::update_policies(Person &person, bool intervene) const {
-    // NOTE: we need to keey baseline and intervention scenarios RNG in sync.
+    // NOTE: we need to keep baseline and intervention scenario RNGs in sync.
 
-    // No-op if not intervention scenario.
+    // No-op if not intervening.
     if (!intervene) {
         return;
     }
 
-    // Approximate intervention policy values with linear models.
+    // Intervention policy linear components.
     auto linear = compute_linear_models(person, policy_models_);
 
-    // Initialise residuals and intervention policies (do not exist yet).
+    // Compute and apply all intervention policies.
     for (size_t i = 0; i < names_.size(); i++) {
 
-        // Initialise residual.
+        // Load residual component.
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
         double residual = person.risk_factors.at(residual_name);
 
