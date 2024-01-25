@@ -10,6 +10,7 @@ class DatastoreTest : public ::testing::Test {
 
     hgps::data::DataManager manager;
     hgps::core::Country uk = manager.get_country("GB");
+    hgps::core::Country india = manager.get_country("IN");
 };
 
 TEST_F(DatastoreTest, CreateDataManager) {
@@ -157,13 +158,13 @@ TEST_F(DatastoreTest, RetrieveDiseasesTypeInInfo) {
 TEST_F(DatastoreTest, RetrieveDiseaseDefinition) {
     auto diseases = manager.get_diseases();
     for (auto &item : diseases) {
-        auto entity = manager.get_disease(item, uk);
+        auto entity = manager.get_disease(item, india);
 
         ASSERT_FALSE(entity.empty());
         ASSERT_GT(entity.measures.size(), 0);
         ASSERT_GT(entity.items.size(), 0);
         EXPECT_EQ(item.code, entity.info.code);
-        EXPECT_EQ(uk.code, entity.country.code);
+        EXPECT_EQ(india.code, entity.country.code);
     }
 }
 
@@ -174,13 +175,13 @@ TEST_F(DatastoreTest, RetrieveDiseaseDefinitionIsEmpty) {
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
 
-    auto entity = manager.get_disease(info, uk);
+    auto entity = manager.get_disease(info, india);
 
     ASSERT_TRUE(entity.empty());
     ASSERT_EQ(0, entity.items.size());
     ASSERT_EQ(0, entity.measures.size());
     EXPECT_EQ(info.code, entity.info.code);
-    EXPECT_EQ(uk.code, entity.country.code);
+    EXPECT_EQ(india.code, entity.country.code);
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
