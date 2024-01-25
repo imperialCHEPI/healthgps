@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 250,France,Osteoarthritis of the knee,2019,5,1 to 4,1,False,1,Male,5,Prevalence,1.6938975790014056E-10,0,0
 250,France,Osteoarthritis of the knee,2019,5,1 to 4,2,True,1,Male,5,Prevalence,4.4680405243203595E-10,0,0
 250,France,Osteoarthritis of the knee,2019,5,1 to 4,3,True,1,Male,5,Prevalence,1.1632274130861674E-09,0,0

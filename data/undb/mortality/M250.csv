@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Age,DeathMale,DeathFemale,DeathTotal
+LocID,Location,VarID,Variant,Time,Age,DeathMale,DeathFemale,DeathTotal
 250,France,2,Medium,1950,0,25776,18878,44654
 250,France,2,Medium,1950,1,2186,1890,4076
 250,France,2,Medium,1950,2,827,675,1502

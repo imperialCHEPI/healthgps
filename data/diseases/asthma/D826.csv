@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Asthma,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.06280713152170582,0.09402236196828025,0.03293858194097027
 826,United Kingdom,Asthma,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.06410578074849481,0.09402236196828025,0.03293858194097027
 826,United Kingdom,Asthma,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.06593863183918419,0.09402236196828025,0.03293858194097027

@@ -1,4 +1,4 @@
-﻿LocID,Location,VarID,Variant,Time,Births,SRB,LEx,LExMale,LExFemale,Deaths,DeathsMale,DeathsFemale,NetMigrations
+LocID,Location,VarID,Variant,Time,Births,SRB,LEx,LExMale,LExFemale,Deaths,DeathsMale,DeathsFemale,NetMigrations
 826,United Kingdom,2,Medium,1950,822441,1.061,68.631,66.2395,70.9231,589147,301173,287975,14763
 826,United Kingdom,2,Medium,1951,798047,1.06,68.2352,65.7138,70.6829,631875,324339,307536,19460
 826,United Kingdom,2,Medium,1952,794278,1.056,69.5176,66.8325,72.1066,573608,298006,275602,19516
