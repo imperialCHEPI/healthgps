@@ -81,6 +81,9 @@ std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_static_risk_model_definition(const std::string &model_name, const poco::json &opt,
                                   const host::Configuration &config) {
     // Load this static model with the appropriate loader.
+    if (hgps::core::case_insensitive::equals(model_name, "dummy")) {
+        return load_dummy_model_definition(hgps::RiskFactorModelType::Static, opt);
+    }
     if (hgps::core::case_insensitive::equals(model_name, "hlm")) {
         return load_hlm_risk_model_definition(opt);
     }
@@ -331,6 +334,9 @@ std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
                                    const host::Configuration &config) {
     // Load this dynamic model with the appropriate loader.
+    if (hgps::core::case_insensitive::equals(model_name, "dummy")) {
+        return load_dummy_model_definition(hgps::RiskFactorModelType::Dynamic, opt);
+    }
     if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
         return load_ebhlm_risk_model_definition(opt, config);
     }
