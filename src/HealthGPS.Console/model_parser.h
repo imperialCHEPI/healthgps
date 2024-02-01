@@ -1,5 +1,6 @@
 #pragma once
 
+#include "HealthGPS/dummy_model.h"
 #include "HealthGPS/dynamic_hierarchical_linear_model.h"
 #include "HealthGPS/kevin_hall_model.h"
 #include "HealthGPS/risk_factor_adjustable_model.h"
@@ -17,6 +18,14 @@ namespace host {
 /// @param config The model configuration
 /// @return An instance of the hgps::RiskFactorSexAgeTable type
 hgps::RiskFactorSexAgeTable load_risk_factor_expected(const Configuration &config);
+
+/// @brief Loads either a static or dynamic dummy risk factor model from a JSON file
+/// @param type Model type (static or dynamic)
+/// @param opt The parsed model definition JSON file
+/// @return An instance of the hgps::DummyModelDefinition type
+/// @throw std::invalid_argument if error parsing model configuration file
+std::unique_ptr<hgps::DummyModelDefinition>
+load_dummy_model_definition(hgps::RiskFactorModelType type, const poco::json &opt);
 
 /// @brief Loads a static risk factor model from a JSON file
 /// @param model_name The name of the model to use
