@@ -20,12 +20,20 @@ class DummyModel final : public RiskFactorModel {
     DummyModel(RiskFactorModelType type, const std::vector<core::Identifier> &names,
                const std::vector<double> &values, const std::vector<double> &policy);
 
+    /// @brief Get the risk factor model type
+    /// @return The risk factor model type
     RiskFactorModelType type() const noexcept override;
 
+    /// @brief Get the risk factor model name
+    /// @return The risk factor model name
     std::string name() const noexcept override;
 
+    /// @brief Initialise risk factor values and apply intervention policy
+    /// @param context The runtime context
     void generate_risk_factors(RuntimeContext &context) override;
 
+    /// @brief Update risk factor values and apply intervention policy
+    /// @param context The runtime context
     void update_risk_factors(RuntimeContext &context) override;
 
   private:
