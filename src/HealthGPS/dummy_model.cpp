@@ -14,6 +14,9 @@ DummyModel::DummyModel(RiskFactorModelType type, const std::vector<core::Identif
     if (policy_.empty()) {
         throw core::HgpsException("Risk factor policy lisy empty");
     }
+    if (names_.size() != values_.size() || names_.size() != policy_.size()) {
+        throw core::HgpsException("Risk factor name, value and policy list sizes mismatch");
+    }
 }
 
 RiskFactorModelType DummyModel::type() const noexcept { return type_; }
@@ -65,6 +68,9 @@ DummyModelDefinition::DummyModelDefinition(RiskFactorModelType type,
     }
     if (policy_.empty()) {
         throw core::HgpsException("Risk factor policy lisy empty");
+    }
+    if (names_.size() != values_.size() || names_.size() != policy_.size()) {
+        throw core::HgpsException("Risk factor name, value and policy list sizes mismatch");
     }
 }
 
