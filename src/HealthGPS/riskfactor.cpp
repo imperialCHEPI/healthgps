@@ -3,9 +3,8 @@
 namespace hgps {
 
 RiskFactorModule::RiskFactorModule(
-    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> models,
-    const RiskfactorAdjustmentModel &adjustments)
-    : models_{std::move(models)}, adjustment_{adjustments} {
+    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> models)
+    : models_{std::move(models)} {
 
     if (models_.empty()) {
         throw std::invalid_argument("Missing required model of types = static and dynamic.");
@@ -45,6 +44,9 @@ RiskFactorModel &RiskFactorModule::at(const RiskFactorModelType &model_type) con
 void RiskFactorModule::initialise_population(RuntimeContext &context) {
     auto &static_model = models_.at(RiskFactorModelType::Static);
     static_model->generate_risk_factors(context);
+
+    auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
+    dynamic_model->generate_risk_factors(context);
 }
 
 void RiskFactorModule::update_population(RuntimeContext &context) {
@@ -55,10 +57,6 @@ void RiskFactorModule::update_population(RuntimeContext &context) {
     // Update risk factors for population
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
     dynamic_model->update_risk_factors(context);
-}
-
-void RiskFactorModule::apply_baseline_adjustments(RuntimeContext &context) {
-    adjustment_.Apply(context);
 }
 
 std::unique_ptr<RiskFactorModule>
@@ -78,8 +76,7 @@ build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInp
     auto dynamic_model = dynamic_definition.create_model();
     models.emplace(RiskFactorModelType::Dynamic, std::move(dynamic_model));
 
-    auto adjustment_model =
-        RiskfactorAdjustmentModel{repository.get_baseline_adjustment_definition()};
-    return std::make_unique<RiskFactorModule>(std::move(models), adjustment_model);
+    return std::make_unique<RiskFactorModule>(std::move(models));
 }
+
 } // namespace hgps

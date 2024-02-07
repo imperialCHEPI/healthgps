@@ -253,7 +253,7 @@ TEST(TestHealthGPS, SimulationInitialise)
         auto manager = DataManager(store_full_path);
         auto repository = CachedRepository(manager);
 
-        auto baseline_data = hgps::BaselineAdjustment{};
+        auto baseline_data = hgps::RiskFactorSexAgeTable{};
         repository.register_linear_model_definition(RiskFactorModelType::Static,
 get_static_test_model(baseline_data));
         repository.register_linear_model_definition(RiskFactorModelType::Dynamic,
@@ -387,7 +387,7 @@ TEST(TestHealthGPS, CreateRiskFactorModule)
         //auto dynamic_code = generate_test_code(
         //	RiskFactorModelType::Dynamic, "C:/HealthGPS/Test/DHLM.Json");
 
-        auto baseline_data = hgps::BaselineAdjustment{};
+        auto baseline_data = hgps::RiskFactorSexAgeTable{};
         auto static_definition = get_static_test_model(baseline_data);
         auto dynamic_definion = get_dynamic_test_model(baseline_data);
         auto risk_models = std::unordered_map<RiskFactorModelType,
@@ -401,23 +401,19 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
         ASSERT_EQ(SimulationModuleType::RiskFactor, risk_module.type());
         ASSERT_EQ("RiskFactor", risk_module.name());
 }
-
 */
 
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty) {
     using namespace hgps;
-    auto risk_models = std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>>();
-    auto adjustments = BaselineAdjustment{};
-    ASSERT_THROW(
-        auto x = RiskFactorModule(std::move(risk_models), RiskfactorAdjustmentModel{adjustments}),
-        std::invalid_argument);
+    ASSERT_THROW(RiskFactorModule{{}}, std::invalid_argument);
 }
+
 /*
 TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
 {
         using namespace hgps;
 
-        auto baseline_data = hgps::BaselineAdjustment{};
+        auto baseline_data = hgps::RiskFactorSexAgeTable{};
         auto dynamic_definion = get_dynamic_test_model(baseline_data);
         auto risk_models = std::unordered_map<RiskFactorModelType,
 std::unique_ptr<RiskFactorModel>>(); risk_models.emplace(RiskFactorModelType::Dynamic,
@@ -430,7 +426,7 @@ TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
 {
         using namespace hgps;
 
-        auto baseline_data = hgps::BaselineAdjustment{};
+        auto baseline_data = hgps::RiskFactorSexAgeTable{};
         auto static_definition = get_static_test_model(baseline_data());
         auto risk_models = std::unordered_map<RiskFactorModelType,
 std::unique_ptr<RiskFactorModel>>(); risk_models.emplace(RiskFactorModelType::Static,

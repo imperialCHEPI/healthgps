@@ -3,12 +3,16 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <vector>
+
 namespace hgps {
 
 DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
+    const RiskFactorSexAgeTable &expected,
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
-    : equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {
+    : RiskFactorAdjustableModel{expected}, equations_{equations}, variables_{variables},
+      boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
         throw core::HgpsException("The model equations definition must not be empty");
@@ -25,10 +29,16 @@ RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
 
 std::string DynamicHierarchicalLinearModel::name() const noexcept { return "Dynamic"; }
 
-void DynamicHierarchicalLinearModel::generate_risk_factors(
-    [[maybe_unused]] RuntimeContext &context) {
-    throw core::HgpsException(
-        "DynamicHierarchicalLinearModel::generate_risk_factors not yet implemented.");
+void DynamicHierarchicalLinearModel::generate_risk_factors(RuntimeContext &context) {
+
+    // Adjust risk factors such that mean sim value matches expected value.
+    std::vector<core::Identifier> factor_keys;
+    factor_keys.reserve(variables_.size());
+    for (const auto &factor : variables_) {
+        // factor.second contains the factor name.
+        factor_keys.emplace_back(factor.second);
+    }
+    adjust_risk_factors(context, factor_keys);
 }
 
 void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -54,6 +64,15 @@ void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context
             update_risk_factors_exposure(context, entity, current_risk_factors, equations.female);
         }
     }
+
+    // Adjust risk factors such that mean sim value matches expected value.
+    std::vector<core::Identifier> factor_keys;
+    factor_keys.reserve(variables_.size());
+    for (const auto &factor : variables_) {
+        // factor.second contains the factor name.
+        factor_keys.emplace_back(factor.second);
+    }
+    adjust_risk_factors(context, factor_keys);
 }
 
 const AgeGroupGenderEquation &DynamicHierarchicalLinearModel::equations_at(int age) const {
@@ -127,10 +146,11 @@ double DynamicHierarchicalLinearModel::sample_normal_with_boundary(Random &rando
 }
 
 DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefinition(
+    RiskFactorSexAgeTable expected,
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
-    : equations_{std::move(equations)}, variables_{std::move(variables)},
-      boundary_percentage_{boundary_percentage} {
+    : RiskFactorAdjustableModelDefinition{std::move(expected)}, equations_{std::move(equations)},
+      variables_{std::move(variables)}, boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
         throw core::HgpsException("The model equations definition must not be empty");
@@ -142,7 +162,8 @@ DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefiniti
 }
 
 std::unique_ptr<RiskFactorModel> DynamicHierarchicalLinearModelDefinition::create_model() const {
-    return std::make_unique<DynamicHierarchicalLinearModel>(equations_, variables_,
+    const auto &expected = get_risk_factor_expected();
+    return std::make_unique<DynamicHierarchicalLinearModel>(expected, equations_, variables_,
                                                             boundary_percentage_);
 }
 

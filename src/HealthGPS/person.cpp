@@ -1,5 +1,7 @@
 #include "person.h"
 
+#include "HealthGPS.Core/exception.h"
+
 namespace hgps {
 
 std::atomic<std::size_t> Person::newUID{0};
@@ -10,21 +12,10 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Age"_id, [](const Person &p) { return static_cast<double>(p.age); }},
     {"Age2"_id, [](const Person &p) { return pow(p.age, 2); }},
     {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
+    {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
+    {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
+    {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
-
-    // HACK: ew, gross... allows us to mock risk factors we don't have data for yet
-    {"Height"_id, [](const Person &) { return 0.5; }},
-    {"Weight"_id, [](const Person &) { return 0.5; }},
-    //{"BMI"_id, [](const Person &) { return 0.5; }},
-    {"PhysicalActivityLevel"_id, [](const Person &) { return 0.5; }},
-    {"BodyFat"_id, [](const Person &) { return 0.5; }},
-    {"LeanTissue"_id, [](const Person &) { return 0.5; }},
-    {"ExtracellularFluid"_id, [](const Person &) { return 0.5; }},
-    {"Glycogen"_id, [](const Person &) { return 0.5; }},
-    {"Water"_id, [](const Person &) { return 0.5; }},
-    {"EnergyExpenditure"_id, [](const Person &) { return 0.5; }},
-    {"EnergyIntake"_id, [](const Person &) { return 0.5; }},
-    {"Carbohydrate"_id, [](const Person &) { return 0.5; }},
 };
 
 Person::Person() : id_{++Person::newUID} {}
@@ -56,12 +47,44 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     throw std::out_of_range("Risk factor not found: " + key.to_string());
 }
 
-float Person::gender_to_value() const noexcept {
+float Person::gender_to_value() const {
+    if (gender == core::Gender::unknown) {
+        throw core::HgpsException("Gender is unknown.");
+    }
     return gender == core::Gender::male ? 1.0f : 0.0f;
 }
 
-std::string Person::gender_to_string() const noexcept {
+std::string Person::gender_to_string() const {
+    if (gender == core::Gender::unknown) {
+        throw core::HgpsException("Gender is unknown.");
+    }
     return gender == core::Gender::male ? "male" : "female";
+}
+
+bool Person::over_18() const noexcept { return age >= 18; }
+
+float Person::sector_to_value() const {
+    switch (sector) {
+    case core::Sector::urban:
+        return 0.0f;
+    case core::Sector::rural:
+        return 1.0f;
+    default:
+        throw core::HgpsException("Sector is unknown.");
+    }
+}
+
+float Person::income_to_value() const {
+    switch (income) {
+    case core::Income::low:
+        return 1.0f;
+    case core::Income::middle:
+        return 2.0f;
+    case core::Income::high:
+        return 3.0f;
+    default:
+        throw core::HgpsException("Income is unknown.");
+    }
 }
 
 void Person::emigrate(const unsigned int time) {

@@ -1,6 +1,10 @@
 #pragma once
+
+#include "HealthGPS.Core/exception.h"
 #include "forward_type.h"
 #include "string_util.h"
+
+#include <algorithm>
 #include <fmt/format.h>
 
 namespace hgps::core {
@@ -16,7 +20,11 @@ template <Numerical TYPE> class Interval {
     /// @param lower_value Lower bound value
     /// @param upper_value Upper bound value
     explicit Interval(TYPE lower_value, TYPE upper_value)
-        : lower_{lower_value}, upper_{upper_value} {}
+        : lower_{lower_value}, upper_{upper_value} {
+        if (lower_ > upper_) {
+            throw HgpsException(fmt::format("Invalid interval: {}-{}", lower_, upper_));
+        }
+    }
 
     /// @brief Gets the interval lower bound
     /// @return The lower bound value
@@ -33,13 +41,7 @@ template <Numerical TYPE> class Interval {
     /// @brief Determines whether a value is in the Interval.
     /// @param value The value to check
     /// @return true if the value is in the interval; otherwise, false.
-    bool contains(TYPE value) const noexcept {
-        if (lower_ < upper_) {
-            return lower_ <= value && value <= upper_;
-        }
-
-        return lower_ >= value && value >= upper_;
-    }
+    bool contains(TYPE value) const noexcept { return lower_ <= value && value <= upper_; }
 
     /// @brief Determines whether an Interval is inside this instance interval.
     /// @param other The other Interval to check
@@ -47,6 +49,11 @@ template <Numerical TYPE> class Interval {
     bool contains(Interval<TYPE> &other) const noexcept {
         return contains(other.lower_) && contains(other.upper_);
     }
+
+    /// @brief Clamp a given value to the interval boundaries
+    /// @param value The value to clamp
+    /// @return The clamped value
+    TYPE clamp(TYPE value) const noexcept { return std::clamp(value, lower_, upper_); }
 
     /// @brief Convert this instance to a string representation
     /// @return The equivalent string representation

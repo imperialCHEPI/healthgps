@@ -1,10 +1,10 @@
 #pragma once
 
+#include "HealthGPS.Core/forward_type.h"
+#include "HealthGPS.Core/identifier.h"
+
 #include <atomic>
 #include <map>
-
-#include "HealthGPS.Core/identifier.h"
-#include "interfaces.h"
 
 namespace hgps {
 
@@ -56,6 +56,12 @@ struct Person {
     /// @brief Current age in years
     unsigned int age{};
 
+    /// @brief Sector (region) assigned value
+    core::Sector sector{core::Sector::unknown};
+
+    /// @brief Income category
+    core::Income income{core::Income::unknown};
+
     /// @brief Social-economic status (SES) assigned value
     double ses{};
 
@@ -94,11 +100,27 @@ struct Person {
 
     /// @brief Gets the gender enumeration as a number for analysis
     /// @return The gender associated value
-    float gender_to_value() const noexcept;
+    /// @throws HgpsException if gender is unknown
+    float gender_to_value() const;
 
     /// @brief Gets the gender enumeration name string
     /// @return The gender name
-    std::string gender_to_string() const noexcept;
+    /// @throws HgpsException if gender is unknown
+    std::string gender_to_string() const;
+
+    /// @brief Check if person is an adult (18 or over)
+    /// @return true if person is 18 or over; else false
+    bool over_18() const noexcept;
+
+    /// @brief Gets the sector enumeration as a number
+    /// @return The sector value (0 for urban, 1 for rural)
+    /// @throws HgpsException if sector is unknown
+    float sector_to_value() const;
+
+    /// @brief Gets the income enumeration as a number
+    /// @return The income value (low = 1, middle = 2, high = 3)
+    /// @throws HgpsException if income is unknown
+    float income_to_value() const;
 
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time

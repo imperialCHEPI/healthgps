@@ -3,8 +3,8 @@
 #include "HealthGPS/gender_value.h"
 #include "HealthGPS/map2d.h"
 
-using IntegerMap2d = hgps::Map2d<int, int, int>;
-using TimeAgeMap2d = hgps::Map2d<int, int, hgps::DoubleGenderValue>;
+using IntegerMap2d = hgps::OrderedMap2d<int, int, int>;
+using TimeAgeMap2d = hgps::OrderedMap2d<int, int, hgps::DoubleGenderValue>;
 
 TEST(TestHealthGPS_Map2d, CreateEmpty) {
     using namespace hgps;
@@ -12,9 +12,10 @@ TEST(TestHealthGPS_Map2d, CreateEmpty) {
     auto m = IntegerMap2d(std::map<int, std::map<int, int>>{});
 
     ASSERT_TRUE(m.empty());
+    ASSERT_THROW(m.empty(1), std::out_of_range);
     ASSERT_EQ(0, m.rows());
-    ASSERT_EQ(0, m.columns());
     ASSERT_FALSE(m.contains(1));
+    ASSERT_FALSE(m.contains(1, 1));
 }
 
 TEST(TestHealthGPS_Map2d, CreateWithBasicType) {
@@ -29,10 +30,11 @@ TEST(TestHealthGPS_Map2d, CreateWithBasicType) {
     auto m = IntegerMap2d(std::move(data));
 
     ASSERT_FALSE(m.empty());
+    ASSERT_FALSE(m.empty(2019));
     ASSERT_EQ(4, m.rows());
-    ASSERT_EQ(3, m.columns());
-    ASSERT_EQ(12, m.size());
+    ASSERT_EQ(3, m.columns(2020));
     ASSERT_TRUE(m.contains(2021));
+    ASSERT_TRUE(m.contains(2022, 3));
 }
 
 TEST(TestHealthGPS_Map2d, CreateWithUserType) {
@@ -47,9 +49,9 @@ TEST(TestHealthGPS_Map2d, CreateWithUserType) {
     auto m = TimeAgeMap2d(std::move(data));
 
     ASSERT_FALSE(m.empty());
+    ASSERT_FALSE(m.empty(2019));
     ASSERT_EQ(4, m.rows());
-    ASSERT_EQ(2, m.columns());
-    ASSERT_EQ(8, m.size());
+    ASSERT_EQ(2, m.columns(2020));
     ASSERT_TRUE(m.contains(2021));
     ASSERT_TRUE(m.contains(2021, 2));
     ASSERT_EQ(2, m.at(2021, 1).males);
@@ -66,8 +68,8 @@ TEST(TestHealthGPS_Map2d, IterateOverRows) {
     };
 
     auto m = TimeAgeMap2d(std::move(data));
-    for (auto &row : m) {
 
+    for (auto &row : m) {
         ASSERT_FALSE(row.second.empty());
         ASSERT_EQ(2, row.second.size());
     }
@@ -83,7 +85,7 @@ TEST(TestHealthGPS_Map2d, AccessSingleRows) {
     };
 
     auto m = TimeAgeMap2d(std::move(data));
-    auto r = m.row(2022);
+    auto r = m.at(2022);
 
     ASSERT_FALSE(r.empty());
     ASSERT_EQ(2, r.size());
@@ -103,8 +105,10 @@ TEST(TestHealthGPS_Map2d, AccessSingleCell) {
     };
 
     auto m = TimeAgeMap2d(std::move(data));
+
     ASSERT_EQ(5, m.at(2019, 1).males);
     ASSERT_EQ(6, m.at(2022, 1).females);
     ASSERT_EQ(9, m.at(2020, 2).males);
     ASSERT_EQ(21, m.at(2022, 2).females);
+    ASSERT_THROW(m.at(2030, 1), std::out_of_range);
 }

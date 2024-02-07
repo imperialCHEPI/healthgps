@@ -1,11 +1,14 @@
 #pragma once
 
-#include <vector>
+#include "HealthGPS.Core/univariate_summary.h"
 
 #include "event_aggregator.h"
+#include "gender_table.h"
 #include "runtime_context.h"
 #include "simulation.h"
 #include "simulation_module.h"
+
+#include <vector>
 
 namespace hgps {
 

@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,Low back pain,2019,5,1 to 4,1,False,1,Male,5,Prevalence,0.004592867047455224,0,0
 826,United Kingdom,Low back pain,2019,5,1 to 4,2,True,1,Male,5,Prevalence,0.005251883457265081,0,0
 826,United Kingdom,Low back pain,2019,5,1 to 4,3,True,1,Male,5,Prevalence,0.006238982741838028,0,0

@@ -2,7 +2,7 @@
 
 #include "HealthGPS/dynamic_hierarchical_linear_model.h"
 #include "HealthGPS/kevin_hall_model.h"
-#include "HealthGPS/riskfactor_adjustment_types.h"
+#include "HealthGPS/risk_factor_adjustable_model.h"
 #include "HealthGPS/static_hierarchical_linear_model.h"
 #include "HealthGPS/static_linear_model.h"
 
@@ -13,10 +13,10 @@
 
 namespace host {
 
-/// @brief Loads baseline adjustments information from a file
-/// @param info Baseline file information
-/// @return An instance of the hgps::BaselineAdjustment type
-hgps::BaselineAdjustment load_baseline_adjustments(const poco::BaselineInfo &info);
+/// @brief Loads risk factor expected values from a file
+/// @param config The model configuration
+/// @return An instance of the hgps::RiskFactorSexAgeTable type
+hgps::RiskFactorSexAgeTable load_risk_factor_expected(const Configuration &config);
 
 /// @brief Loads a static risk factor model from a JSON file
 /// @param model_name The name of the model to use
@@ -56,7 +56,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 /// @param opt The parsed model definition JSON file
 /// @return An instance of the hgps::DynamicHierarchicalLinearModelDefinition type
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
-load_ebhlm_risk_model_definition(const poco::json &opt);
+load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuration &config);
 
 /// @brief Loads the Kevin Hall energy balance model definition from a JSON file
 /// @param opt The parsed model definition JSON file

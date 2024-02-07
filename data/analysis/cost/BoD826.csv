@@ -1,4 +1,4 @@
-﻿location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
+location_id,location,disease,time,age_group_id,age_group,age,is_filled,gender_id,gender,measure_id,measure,mean,lower,upper
 826,United Kingdom,All causes,2019,5,1 to 4,1,False,1,Male,3,YLD,0.02765427487685876,0.03786811030090322,0.019406122790404955
 826,United Kingdom,All causes,2019,5,1 to 4,2,True,1,Male,3,YLD,0.02765427487685876,0.03786811030090322,0.019406122790404955
 826,United Kingdom,All causes,2019,5,1 to 4,3,True,1,Male,3,YLD,0.02765427487685876,0.03786811030090322,0.019406122790404955
