@@ -1,0 +1,14 @@
+name: VCPKG routine
+
+description: VCPKG routine
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install VCPKG
+      shell: bash
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh -disableMetrics

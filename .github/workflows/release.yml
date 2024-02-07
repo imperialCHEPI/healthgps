@@ -1,23 +1,46 @@
-# release.yml - Automatic creation of sha256 file for release tarball
-
 name: Release
 run-name: Publishing release ${{ github.ref_name }}
 on:
   release:
     types: [published]
     branches: [main]
+
 jobs:
-  sha256:
-    name: sha256
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+            compiler: gcc-default
+          - platform: windows
+            os: windows-2022
+            compiler: msvc
+    env:
+      VCPKG_ROOT: "vcpkg"
+      VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
+
     steps:
-      - name: Tarball url
-        run: echo "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz"
-      - name: Create tarball sha256
+      - uses: actions/checkout@v3
+
+      # Compiler setup
+      - uses: ./.github/actions/compiler-setup
+
+      # VCPKG routine
+      - uses: ./.github/actions/vcpkg-routine
+
+      # Build HealthGPS (release)
+      - uses: ./.github/actions/build-release
+
+      - name: Zip output folder
+        working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
         run: |
-          curl -O -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | sha256sum > sha256sum.txt
-          sha256sum ${{ github.ref_name }}.tar.gz > sha256sum.txt
-      - name: Upload sha256sum file
+          mkdir ${{github.workspace}}/artifact
+          7z a -tzip ${{github.workspace}}/artifact/health_gps_${{ matrix.platform }}.zip *.dll *.Console*
+
+      - name: Upload release artifacts
         uses: softprops/action-gh-release@v1
         with:
-          files: sha256sum.txt
+          files: artifact/health_gps_${{ matrix.platform }}.zip
