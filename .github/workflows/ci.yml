@@ -32,10 +32,6 @@ jobs:
             os: ubuntu-22.04
             compiler: gcc-latest
             is_main: false
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: clang
-            is_main: false
           - platform: windows
             os: windows-2022
             compiler: msvc
@@ -73,14 +69,6 @@ jobs:
 
           # Use environment variable to tell CMake to compile with this version of gcc
           echo CXX=g++-$LATEST_GCC_VERSION >> "$GITHUB_ENV"
-
-      - name: Install clang (Linux)
-        if: matrix.platform == 'linux' && matrix.compiler == 'clang'
-        run: |
-          sudo apt install --no-install-recommends clang
-
-          # Use environment variable to tell CMake to compile with clang
-          echo CXX=clang++ >> "$GITHUB_ENV"
 
       - name: Install VCPKG
         run: |
