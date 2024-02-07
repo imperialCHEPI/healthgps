@@ -21,39 +21,7 @@ StaticLinearModel::StaticLinearModel(
       stddev_{stddev}, cholesky_{cholesky}, policy_models_{policy_models},
       policy_ranges_{policy_ranges}, policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {
-
-    if (names_.empty()) {
-        throw core::HgpsException("Risk factor names list is empty");
-    }
-    if (models_.empty()) {
-        throw core::HgpsException("Risk factor model list is empty");
-    }
-    if (lambda_.empty()) {
-        throw core::HgpsException("Risk factor lambda list is empty");
-    }
-    if (stddev_.empty()) {
-        throw core::HgpsException("Risk factor standard deviation list is empty");
-    }
-    if (!cholesky_.allFinite()) {
-        throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
-    }
-    if (policy_models_.empty()) {
-        throw core::HgpsException("Intervention policy model list is empty");
-    }
-    if (policy_ranges_.empty()) {
-        throw core::HgpsException("Intervention policy ranges list is empty");
-    }
-    if (!policy_cholesky_.allFinite()) {
-        throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
-    }
-    if (rural_prevalence_.empty()) {
-        throw core::HgpsException("Rural prevalence mapping is empty");
-    }
-    if (income_models_.empty()) {
-        throw core::HgpsException("Income models mapping is empty");
-    }
-}
+      physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 

@@ -12,16 +12,7 @@ DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
     : RiskFactorAdjustableModel{expected}, equations_{equations}, variables_{variables},
-      boundary_percentage_{boundary_percentage} {
-
-    if (equations_.empty()) {
-        throw core::HgpsException("The model equations definition must not be empty");
-    }
-
-    if (variables_.empty()) {
-        throw core::HgpsException("The model variables definition must not be empty");
-    }
-}
+      boundary_percentage_{boundary_percentage} {}
 
 RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
     return RiskFactorModelType::Dynamic;
@@ -155,7 +146,6 @@ DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefiniti
     if (equations_.empty()) {
         throw core::HgpsException("The model equations definition must not be empty");
     }
-
     if (variables_.empty()) {
         throw core::HgpsException("The model variables definition must not be empty");
     }

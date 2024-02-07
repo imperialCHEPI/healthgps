@@ -4,20 +4,7 @@ namespace hgps {
 
 DummyModel::DummyModel(RiskFactorModelType type, const std::vector<core::Identifier> &names,
                        const std::vector<double> &values, const std::vector<double> &policy)
-    : type_{type}, names_{names}, values_{values}, policy_{policy} {
-    if (names_.empty()) {
-        throw core::HgpsException("Risk factor names list is empty");
-    }
-    if (values_.empty()) {
-        throw core::HgpsException("Risk factor values list is empty");
-    }
-    if (policy_.empty()) {
-        throw core::HgpsException("Risk factor policy lisy empty");
-    }
-    if (names_.size() != values_.size() || names_.size() != policy_.size()) {
-        throw core::HgpsException("Risk factor name, value and policy list sizes mismatch");
-    }
-}
+    : type_{type}, names_{names}, values_{values}, policy_{policy} {}
 
 RiskFactorModelType DummyModel::type() const noexcept { return type_; }
 
@@ -60,6 +47,7 @@ DummyModelDefinition::DummyModelDefinition(RiskFactorModelType type,
                                            std::vector<double> values, std::vector<double> policy)
     : type_{type}, names_{std::move(names)}, values_{std::move(values)},
       policy_{std::move(policy)} {
+
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
     }
