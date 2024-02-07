@@ -8,16 +8,7 @@ namespace hgps {
 StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
     const std::unordered_map<core::Identifier, LinearModel> &models,
     const std::map<int, HierarchicalLevel> &levels)
-    : models_{models}, levels_{levels} {
-
-    if (models_.empty()) {
-        throw core::HgpsException("The hierarchical model equations definition must not be empty");
-    }
-
-    if (levels_.empty()) {
-        throw core::HgpsException("The hierarchical model levels definition must not be empty");
-    }
-}
+    : models_{models}, levels_{levels} {}
 
 RiskFactorModelType StaticHierarchicalLinearModel::type() const noexcept {
     return RiskFactorModelType::Static;
@@ -128,7 +119,6 @@ StaticHierarchicalLinearModelDefinition::StaticHierarchicalLinearModelDefinition
     if (models_.empty()) {
         throw core::HgpsException("The hierarchical model equations definition must not be empty");
     }
-
     if (levels_.empty()) {
         throw core::HgpsException("The hierarchical model levels definition must not be empty");
     }

@@ -59,14 +59,35 @@ hgps::RiskFactorSexAgeTable load_risk_factor_expected(const host::Configuration 
     return table;
 }
 
+std::unique_ptr<hgps::DummyModelDefinition>
+load_dummy_model_definition(hgps::RiskFactorModelType type, const poco::json &opt) {
+    MEASURE_FUNCTION();
+
+    // Get dummy model parameters
+    std::vector<hgps::core::Identifier> names;
+    std::vector<double> values;
+    std::vector<double> policy;
+    for (const auto &[key, json_params] : opt["ModelParameters"].items()) {
+        names.emplace_back(key);
+        values.emplace_back(json_params["Value"].get<double>());
+        policy.emplace_back(json_params["Policy"].get<double>());
+    }
+
+    return std::make_unique<hgps::DummyModelDefinition>(type, std::move(names), std::move(values),
+                                                        std::move(policy));
+}
+
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_static_risk_model_definition(const std::string &model_name, const poco::json &opt,
                                   const host::Configuration &config) {
     // Load this static model with the appropriate loader.
-    if (hgps::core::case_insensitive::equals(model_name, "hlm")) {
+    if (model_name == "dummy") {
+        return load_dummy_model_definition(hgps::RiskFactorModelType::Static, opt);
+    }
+    if (model_name == "hlm") {
         return load_hlm_risk_model_definition(opt);
     }
-    if (hgps::core::case_insensitive::equals(model_name, "staticlinear")) {
+    if (model_name == "staticlinear") {
         return load_staticlinear_risk_model_definition(opt, config);
     }
 
@@ -313,10 +334,13 @@ std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
                                    const host::Configuration &config) {
     // Load this dynamic model with the appropriate loader.
-    if (hgps::core::case_insensitive::equals(model_name, "ebhlm")) {
+    if (model_name == "dummy") {
+        return load_dummy_model_definition(hgps::RiskFactorModelType::Dynamic, opt);
+    }
+    if (model_name == "ebhlm") {
         return load_ebhlm_risk_model_definition(opt, config);
     }
-    if (hgps::core::case_insensitive::equals(model_name, "kevinhall")) {
+    if (model_name == "kevinhall") {
         return load_kevinhall_risk_model_definition(opt, config);
     }
 

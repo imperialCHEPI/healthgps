@@ -35,30 +35,7 @@ KevinHallModel::KevinHallModel(
     : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
       nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
       food_prices_{food_prices}, weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {
-
-    if (energy_equation_.empty()) {
-        throw core::HgpsException("Energy equation mapping is empty");
-    }
-    if (nutrient_ranges_.empty()) {
-        throw core::HgpsException("Nutrient range mapping is empty");
-    }
-    if (nutrient_equations_.empty()) {
-        throw core::HgpsException("Nutrient equation mapping is empty");
-    }
-    if (food_prices_.empty()) {
-        throw core::HgpsException("Food price mapping is empty");
-    }
-    if (weight_quantiles_.empty()) {
-        throw core::HgpsException("Weight quantiles mapping is empty");
-    }
-    if (epa_quantiles_.empty()) {
-        throw core::HgpsException("Energy Physical Activity quantiles mapping is empty");
-    }
-    if (height_stddev_.empty()) {
-        throw core::HgpsException("Height standard deviation mapping is empty");
-    }
-}
+      height_stddev_{height_stddev}, height_slope_{height_slope} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 

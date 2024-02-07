@@ -26,6 +26,8 @@ target_sources(
             "disease.h"
             "disease_table.cpp"
             "disease_table.h"
+            "dummy_model.cpp"
+            "dummy_model.h"
             "dynamic_hierarchical_linear_model.cpp"
             "dynamic_hierarchical_linear_model.h"
             "kevin_hall_model.cpp"
