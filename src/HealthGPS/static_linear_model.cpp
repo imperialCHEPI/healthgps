@@ -42,11 +42,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     for (auto &person : context.population()) {
-        // HACK: start intervening after 2 years from sim start.
-        bool intervene = (context.scenario().type() == ScenarioType::intervention &&
-                          (context.time_now() - context.start_time()) > 2);
-
-        initialise_policies(person, context.random(), intervene);
+        initialise_policies(person, context.random(), false);
     }
 }
 
