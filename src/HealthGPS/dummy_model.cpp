@@ -3,8 +3,9 @@
 namespace hgps {
 
 DummyModel::DummyModel(RiskFactorModelType type, const std::vector<core::Identifier> &names,
-                       const std::vector<double> &values, const std::vector<double> &policy)
-    : type_{type}, names_{names}, values_{values}, policy_{policy} {}
+                       const std::vector<double> &values, const std::vector<double> &policy,
+                       const std::vector<int> &policy_start)
+    : type_{type}, names_{names}, values_{values}, policy_{policy}, policy_start_{policy_start} {}
 
 RiskFactorModelType DummyModel::type() const noexcept { return type_; }
 
@@ -14,15 +15,11 @@ void DummyModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     for (auto &entity : context.population()) {
-        set_risk_factors(entity, false);
+        set_risk_factors(entity, context);
     }
 }
 
 void DummyModel::update_risk_factors(RuntimeContext &context) {
-
-    // HACK: start intervening after 2 years from sim start.
-    bool intervene = (context.scenario().type() == ScenarioType::intervention &&
-                      (context.time_now() - context.start_time()) >= 2);
 
     // Initialise everyone except inactive.
     for (auto &entity : context.population()) {
@@ -31,16 +28,21 @@ void DummyModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        set_risk_factors(entity, intervene);
+        set_risk_factors(entity, context);
     }
 }
 
-void DummyModel::set_risk_factors(Person &person, bool intervene) const {
-    for (auto i = 0u; i < names_.size(); ++i) {
+void DummyModel::set_risk_factors(Person &person, RuntimeContext &context) const {
+    for (auto i = 0u; i < names_.size(); i++) {
         person.risk_factors[names_[i]] = values_[i];
 
-        // Apply policy if we are intervening.
-        if (intervene) {
+        // Skip policy update if not intervention scenario.
+        if (context.scenario().type() != ScenarioType::intervention) {
+            continue;
+        }
+
+        // Apply policy to factor if start time is reached.
+        if ((context.time_now() - context.start_time()) >= policy_start_[i]) {
             person.risk_factors[names_[i]] += policy_[i];
         }
     }
@@ -48,9 +50,10 @@ void DummyModel::set_risk_factors(Person &person, bool intervene) const {
 
 DummyModelDefinition::DummyModelDefinition(RiskFactorModelType type,
                                            std::vector<core::Identifier> names,
-                                           std::vector<double> values, std::vector<double> policy)
-    : type_{type}, names_{std::move(names)}, values_{std::move(values)},
-      policy_{std::move(policy)} {
+                                           std::vector<double> values, std::vector<double> policy,
+                                           std::vector<int> policy_start)
+    : type_{type}, names_{std::move(names)}, values_{std::move(values)}, policy_{std::move(policy)},
+      policy_start_{std::move(policy_start)} {
 
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
@@ -61,13 +64,17 @@ DummyModelDefinition::DummyModelDefinition(RiskFactorModelType type,
     if (policy_.empty()) {
         throw core::HgpsException("Risk factor policy lisy empty");
     }
-    if (names_.size() != values_.size() || names_.size() != policy_.size()) {
-        throw core::HgpsException("Risk factor name, value and policy list sizes mismatch");
+    if (policy_start_.empty()) {
+        throw core::HgpsException("Risk factor policy start list is empty");
+    }
+    if (names_.size() != values_.size() || names_.size() != policy_.size() ||
+        names_.size() != policy_start_.size()) {
+        throw core::HgpsException("Risk factor param list sizes mismatch");
     }
 }
 
 std::unique_ptr<RiskFactorModel> DummyModelDefinition::create_model() const {
-    return std::make_unique<DummyModel>(type_, names_, values_, policy_);
+    return std::make_unique<DummyModel>(type_, names_, values_, policy_, policy_start_);
 }
 
 } // namespace hgps

@@ -17,8 +17,10 @@ class DummyModel final : public RiskFactorModel {
     /// @param names Risk factor names
     /// @param values Constant values to set risk factors to
     /// @param policy Risk factor policy in intervention scenario
+    /// @param policy_start Policy start iteration
     DummyModel(RiskFactorModelType type, const std::vector<core::Identifier> &names,
-               const std::vector<double> &values, const std::vector<double> &policy);
+               const std::vector<double> &values, const std::vector<double> &policy,
+               const std::vector<int> &policy_start);
 
     /// @brief Get the risk factor model type
     /// @return The risk factor model type
@@ -39,13 +41,14 @@ class DummyModel final : public RiskFactorModel {
   private:
     /// @brief Set risk factor values and apply intervention policy
     /// @param person The person to set the risk factors for
-    /// @param intervene Flag to apply intervention policy
-    void set_risk_factors(Person &person, bool intervene) const;
+    /// @param context The runtime context
+    void set_risk_factors(Person &person, RuntimeContext &context) const;
 
     const RiskFactorModelType type_;
     const std::vector<core::Identifier> &names_;
     const std::vector<double> &values_;
     const std::vector<double> &policy_;
+    const std::vector<int> &policy_start_;
 };
 
 /// @brief Defines the dummy risk factor model type
@@ -56,8 +59,10 @@ class DummyModelDefinition final : public RiskFactorModelDefinition {
     /// @param names Risk factor names
     /// @param values Constant values to set risk factors to
     /// @param policy Risk factor policy in intervention scenario
+    /// @param policy_start Policy start iteration
     DummyModelDefinition(RiskFactorModelType type, std::vector<core::Identifier> names,
-                         std::vector<double> values, std::vector<double> policy);
+                         std::vector<double> values, std::vector<double> policy,
+                         std::vector<int> policy_start);
 
     /// @brief Construct a new DummyModel from this definition
     /// @return A unique pointer to the new DummyModel instance
@@ -68,6 +73,7 @@ class DummyModelDefinition final : public RiskFactorModelDefinition {
     std::vector<core::Identifier> names_;
     std::vector<double> values_;
     std::vector<double> policy_;
+    std::vector<int> policy_start_;
 };
 
 } // namespace hgps
