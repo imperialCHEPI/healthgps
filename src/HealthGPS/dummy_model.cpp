@@ -15,7 +15,7 @@ void DummyModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     for (auto &entity : context.population()) {
-        set_risk_factors(entity, context);
+        set_risk_factors(entity, context.scenario().type(), 0);
     }
 }
 
@@ -28,21 +28,17 @@ void DummyModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        set_risk_factors(entity, context);
+        int time_elapsed = context.time_now() - context.start_time();
+        set_risk_factors(entity, context.scenario().type(), time_elapsed);
     }
 }
 
-void DummyModel::set_risk_factors(Person &person, RuntimeContext &context) const {
+void DummyModel::set_risk_factors(Person &person, ScenarioType scenario, int time_elapsed) const {
     for (auto i = 0u; i < names_.size(); i++) {
         person.risk_factors[names_[i]] = values_[i];
 
-        // Skip policy update if not intervention scenario.
-        if (context.scenario().type() != ScenarioType::intervention) {
-            continue;
-        }
-
-        // Apply policy to factor if start time is reached.
-        if ((context.time_now() - context.start_time()) >= policy_start_[i]) {
+        // Apply policy to factor if intervening and start time is reached.
+        if (scenario == ScenarioType::intervention && time_elapsed >= policy_start_[i]) {
             person.risk_factors[names_[i]] += policy_[i];
         }
     }

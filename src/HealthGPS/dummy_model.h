@@ -17,7 +17,7 @@ class DummyModel final : public RiskFactorModel {
     /// @param names Risk factor names
     /// @param values Constant values to set risk factors to
     /// @param policy Risk factor policy in intervention scenario
-    /// @param policy_start Policy start iteration
+    /// @param policy_start Policy start (in years since the start of the simulation)
     DummyModel(RiskFactorModelType type, const std::vector<core::Identifier> &names,
                const std::vector<double> &values, const std::vector<double> &policy,
                const std::vector<int> &policy_start);
@@ -41,8 +41,9 @@ class DummyModel final : public RiskFactorModel {
   private:
     /// @brief Set risk factor values and apply intervention policy
     /// @param person The person to set the risk factors for
-    /// @param context The runtime context
-    void set_risk_factors(Person &person, RuntimeContext &context) const;
+    /// @param scenario The scenario (either baseline or intervention)
+    /// @param time_elapsed The number of years since the start of the simulation
+    void set_risk_factors(Person &person, ScenarioType scenario, int time_elapsed) const;
 
     const RiskFactorModelType type_;
     const std::vector<core::Identifier> &names_;
@@ -59,7 +60,7 @@ class DummyModelDefinition final : public RiskFactorModelDefinition {
     /// @param names Risk factor names
     /// @param values Constant values to set risk factors to
     /// @param policy Risk factor policy in intervention scenario
-    /// @param policy_start Policy start iteration
+    /// @param policy_start Policy start (in years since the start of the simulation)
     DummyModelDefinition(RiskFactorModelType type, std::vector<core::Identifier> names,
                          std::vector<double> values, std::vector<double> policy,
                          std::vector<int> policy_start);
