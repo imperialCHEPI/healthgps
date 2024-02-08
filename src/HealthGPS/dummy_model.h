@@ -39,8 +39,8 @@ class DummyModel final : public RiskFactorModel {
   private:
     /// @brief Set risk factor values and apply intervention policy
     /// @param person The person to set the risk factors for
-    /// @param scenario The scenario type (baseline or intervention)
-    void set_risk_factors(Person &person, ScenarioType scenario) const;
+    /// @param intervene Flag to apply intervention policy
+    void set_risk_factors(Person &person, bool intervene) const;
 
     const RiskFactorModelType type_;
     const std::vector<core::Identifier> &names_;

@@ -50,7 +50,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // HACK: start intervening after 2 years from sim start.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
-                      (context.time_now() - context.start_time()) > 2);
+                      (context.time_now() - context.start_time()) >= 2);
 
     // Initialise newborns and update others.
     for (auto &person : context.population()) {

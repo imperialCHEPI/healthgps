@@ -14,11 +14,15 @@ void DummyModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     for (auto &entity : context.population()) {
-        set_risk_factors(entity, context.scenario().type());
+        set_risk_factors(entity, false);
     }
 }
 
 void DummyModel::update_risk_factors(RuntimeContext &context) {
+
+    // HACK: start intervening after 2 years from sim start.
+    bool intervene = (context.scenario().type() == ScenarioType::intervention &&
+                      (context.time_now() - context.start_time()) >= 2);
 
     // Initialise everyone except inactive.
     for (auto &entity : context.population()) {
@@ -27,16 +31,16 @@ void DummyModel::update_risk_factors(RuntimeContext &context) {
             continue;
         }
 
-        set_risk_factors(entity, context.scenario().type());
+        set_risk_factors(entity, intervene);
     }
 }
 
-void DummyModel::set_risk_factors(Person &person, ScenarioType scenario) const {
+void DummyModel::set_risk_factors(Person &person, bool intervene) const {
     for (auto i = 0u; i < names_.size(); ++i) {
         person.risk_factors[names_[i]] = values_[i];
 
-        // Apply intervention policy.
-        if (scenario == ScenarioType::intervention) {
+        // Apply policy if we are intervening.
+        if (intervene) {
             person.risk_factors[names_[i]] += policy_[i];
         }
     }
