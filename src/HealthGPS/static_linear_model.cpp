@@ -42,15 +42,15 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     for (auto &person : context.population()) {
-        // HACK: start intervening after 2 years from sim start.
-        bool intervene = (context.scenario().type() == ScenarioType::intervention &&
-                          (context.time_now() - context.start_time()) > 2);
-
-        initialise_policies(person, context.random(), intervene);
+        initialise_policies(person, context.random(), false);
     }
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
+
+    // HACK: start intervening after 2 years from sim start.
+    bool intervene = (context.scenario().type() == ScenarioType::intervention &&
+                      (context.time_now() - context.start_time()) >= 2);
 
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
@@ -79,10 +79,6 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (!person.is_active()) {
             continue;
         }
-
-        // HACK: start intervening after 2 years from sim start.
-        bool intervene = (context.scenario().type() == ScenarioType::intervention &&
-                          (context.time_now() - context.start_time()) > 2);
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);

@@ -67,14 +67,16 @@ load_dummy_model_definition(hgps::RiskFactorModelType type, const poco::json &op
     std::vector<hgps::core::Identifier> names;
     std::vector<double> values;
     std::vector<double> policy;
+    std::vector<int> policy_start;
     for (const auto &[key, json_params] : opt["ModelParameters"].items()) {
         names.emplace_back(key);
         values.emplace_back(json_params["Value"].get<double>());
         policy.emplace_back(json_params["Policy"].get<double>());
+        policy_start.emplace_back(json_params["PolicyStart"].get<int>());
     }
 
     return std::make_unique<hgps::DummyModelDefinition>(type, std::move(names), std::move(values),
-                                                        std::move(policy));
+                                                        std::move(policy), std::move(policy_start));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
