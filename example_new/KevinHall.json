@@ -52,16 +52,6 @@
             "Price": null
         }
     ],
-    "FoodsDataFile": {
-        "name": "MAFFCODE_NUTRIENTS_NPM.csv",
-        "format": "csv",
-        "delimiter": ",",
-        "encoding": "UTF8",
-        "columns": {
-            "MAFF code": "integer",
-            "Description": "string"
-        }
-    },
     "WeightQuantiles": {
         "Female": {
             "name": "weight_quantiles_NCDRisk_female.csv",
