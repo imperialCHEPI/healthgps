@@ -467,10 +467,6 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
         }
     }
 
-    // Foods nutrition data table.
-    const auto food_data_file_info = host::get_file_info(opt["FoodsDataFile"], config.root_path);
-    const auto food_data_table = load_datatable_from_csv(food_data_file_info);
-
     // Weight quantiles.
     const auto weight_quantiles_table_F = load_datatable_from_csv(
         host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
