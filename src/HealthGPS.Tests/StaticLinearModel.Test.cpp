@@ -3,7 +3,7 @@
 #include "HealthGPS/static_linear_model.h"
 
 // Create a test fixture for the StaticLinearModel parameters
-class ModelParameters : public ::testing::Test {
+class ModelParameters : public::testing::Test {
     public:
         hgps::RiskFactorSexAgeTable expected;
         std::vector<hgps::core::Identifier> names;
@@ -164,23 +164,27 @@ class ModelParameters : public ::testing::Test {
 // Create test fixture for a StaticLinearModel class instance
 class StaticLinearModelTestFixture : public::testing::Test {
     public:
-        StaticLinearModel testModel(
-            expected,
-            names,
-            models,
-            lambda,
-            stddev,
-            cholesky,
-            policy_models,
-            policy_ranges,
-            policy_cholesky,
-            info_speed,
-            rural_prevalence,
-            income_models,
-            physical_activity_stddev
-        );
+        StaticLinearModelTestFixture(const ModelParameters& params) : params_(params) {
+            // Create a StaticLinearModel instance
+            hgps::StaticLinearModel testModel{
+                params_.expected,
+                params_.names,
+                params_.models,
+                params_.lambda,
+                params_.stddev,
+                params_.cholesky,
+                params_.policy_models,
+                params_.policy_ranges,
+                params_.policy_cholesky,
+                params_.info_speed,
+                params_.rural_prevalence,
+                params_.income_models,
+                params_.physical_activity_stddev
+            };
+        }
 };
 
 TEST_F(StaticLinearModelTestFixture, InitialiseFactors) {
     // Test logic goes here
+    
 }
