@@ -2,9 +2,10 @@
 
 #include "HealthGPS/static_linear_model.h"
 
-// Create a test fixture for the StaticLinearModel parameters
-class ModelParameters : public::testing::Test {
+// Create test fixture for a StaticLinearModel class instance
+class StaticLinearModelTestFixture : public::testing::Test {
     public:
+
         hgps::RiskFactorSexAgeTable expected;
         std::vector<hgps::core::Identifier> names;
         std::vector<hgps::LinearModelParams> models;
@@ -15,6 +16,8 @@ class ModelParameters : public::testing::Test {
         std::vector<hgps::LinearModelParams> policy_models;
         std::vector<hgps::core::DoubleInterval> policy_ranges;
         Eigen::MatrixXd policy_cholesky;
+
+        StaticLinearModel* testModel;
 
         void SetUp() override {
             auto expected = hgps::RiskFactorSexAgeTable{};
@@ -149,30 +152,8 @@ class ModelParameters : public::testing::Test {
 
             const double physical_activity_stddev = 0.06;
 
-    };
-};
+        };
 
-// Create test fixture for a StaticLinearModel class instance
-class StaticLinearModelTestFixture : public::testing::Test {
-    public:
-        StaticLinearModelTestFixture(const ModelParameters& params) : params_(params) {
-            // Create a StaticLinearModel instance
-            hgps::StaticLinearModel testModel{
-                params_.expected,
-                params_.names,
-                params_.models,
-                params_.lambda,
-                params_.stddev,
-                params_.cholesky,
-                params_.policy_models,
-                params_.policy_ranges,
-                params_.policy_cholesky,
-                params_.info_speed,
-                params_.rural_prevalence,
-                params_.income_models,
-                params_.physical_activity_stddev
-            };
-        }
 };
 
 TEST_F(StaticLinearModelTestFixture, InitialiseFactors) {
