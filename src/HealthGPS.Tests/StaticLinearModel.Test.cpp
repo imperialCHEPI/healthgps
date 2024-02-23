@@ -17,7 +17,9 @@ class StaticLinearModelTestFixture : public::testing::Test {
         std::vector<hgps::core::DoubleInterval> policy_ranges;
         Eigen::MatrixXd policy_cholesky;
 
-        StaticLinearModel* testModel;
+        hgps::StaticLinearModel* testModel;
+        hgps::Person* testPerson;
+        hgps::Random* testRandom;
 
         void SetUp() override {
             auto expected = hgps::RiskFactorSexAgeTable{};
@@ -152,11 +154,16 @@ class StaticLinearModelTestFixture : public::testing::Test {
 
             const double physical_activity_stddev = 0.06;
 
+            testPerson = new hgps::Person();
+            testRandom = new hgps::Random();
+
+            testModel = new hgps::StaticLinearModel(names, models, lambda, stddev, cholesky, policy_models, policy_ranges, policy_cholesky, info_speed, rural_prevalence, income_models, physical_activity_stddev);
+
         };
 
 };
 
 TEST_F(StaticLinearModelTestFixture, InitialiseFactors) {
-    // Test logic goes here
-    
+    // Just check that initialise_factors runs successfully
+    testModel->initialise_factors(*testPerson, *testRandom);
 }
