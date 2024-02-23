@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "HealthGPS/static_linear_model.h"
+#include "HealthGPS/mtrandom.h"
 
 // Create test fixture for a StaticLinearModel class instance
 class StaticLinearModelTestFixture : public::testing::Test {
@@ -17,9 +18,9 @@ class StaticLinearModelTestFixture : public::testing::Test {
         std::vector<hgps::core::DoubleInterval> policy_ranges;
         Eigen::MatrixXd policy_cholesky;
 
-        hgps::StaticLinearModel* testModel;
-        hgps::Person* testPerson;
-        hgps::Random* testRandom;
+        hgps::StaticLinearModel* test_model;
+        hgps::Person* test_person;
+        hgps::Random* test_random;
 
         void SetUp() override {
             auto expected = hgps::RiskFactorSexAgeTable{};
@@ -154,10 +155,25 @@ class StaticLinearModelTestFixture : public::testing::Test {
 
             const double physical_activity_stddev = 0.06;
 
-            testPerson = new hgps::Person();
-            testRandom = new hgps::Random();
+            test_person = new hgps::Person();
+            auto engine = hgps::MTRandom32{123456789};
+            test_random = new hgps::Random(engine);
 
-            testModel = new hgps::StaticLinearModel(names, models, lambda, stddev, cholesky, policy_models, policy_ranges, policy_cholesky, info_speed, rural_prevalence, income_models, physical_activity_stddev);
+            test_model = new hgps::StaticLinearModel(
+                expected,
+                names,
+                models,
+                lambda,
+                stddev,
+                cholesky,
+                policy_models,
+                policy_ranges,
+                policy_cholesky,
+                info_speed,
+                rural_prevalence,
+                income_models,
+                physical_activity_stddev
+            );
 
         };
 
@@ -165,5 +181,5 @@ class StaticLinearModelTestFixture : public::testing::Test {
 
 TEST_F(StaticLinearModelTestFixture, InitialiseFactors) {
     // Just check that initialise_factors runs successfully
-    testModel->initialise_factors(*testPerson, *testRandom);
+    test_model->initialise_factors(*test_person, *test_random);
 }
