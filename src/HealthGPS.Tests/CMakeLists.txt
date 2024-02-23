@@ -39,6 +39,7 @@ target_sources(
             "RelativeRiskLookup.Test.cpp"
             "RuntimeMetric.Test.cpp"
             "Scenario.Test.cpp"
+            "StaticLinearModel.Test.cpp"
             "TestMain.cpp"
             "WeightModel.Test.cpp"
             "CountryModule.h"
