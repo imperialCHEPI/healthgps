@@ -5,6 +5,7 @@
 #include "weight_model.h"
 
 namespace hgps {
+
 /// @brief Defines the standard diseases (non-cancer) model data type.
 class DefaultDiseaseModel final : public DiseaseModel {
   public:
@@ -27,7 +28,7 @@ class DefaultDiseaseModel final : public DiseaseModel {
 
     void update_disease_status(RuntimeContext &context) override;
 
-    double get_excess_mortality(const Person &entity) const noexcept override;
+    double get_excess_mortality(const Person &person) const noexcept override;
 
   private:
     std::reference_wrapper<DiseaseDefinition> definition_;
@@ -35,15 +36,16 @@ class DefaultDiseaseModel final : public DiseaseModel {
     DoubleAgeGenderTable average_relative_risk_;
 
     DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext &context);
-    double calculate_combined_relative_risk(const Person &entity, int start_time,
+    double calculate_combined_relative_risk(const Person &person, int start_time,
                                             int time_now) const;
-    double calculate_relative_risk_for_diseases(const Person &entity, int start_time,
+    double calculate_relative_risk_for_diseases(const Person &person, int start_time,
                                                 int time_now) const;
-    double calculate_relative_risk_for_risk_factors(const Person &entity) const;
-    double calculate_incidence_probability(const Person &entity, int start_time,
+    double calculate_relative_risk_for_risk_factors(const Person &person) const;
+    double calculate_incidence_probability(const Person &person, int start_time,
                                            int time_now) const;
 
     void update_remission_cases(RuntimeContext &context);
     void update_incidence_cases(RuntimeContext &context);
 };
+
 } // namespace hgps
