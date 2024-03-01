@@ -36,15 +36,17 @@ class DefaultDiseaseModel final : public DiseaseModel {
     DoubleAgeGenderTable average_relative_risk_;
 
     DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext &context);
+
     double calculate_combined_relative_risk(const Person &person, int start_time,
                                             int time_now) const;
+
     double calculate_relative_risk_for_diseases(const Person &person, int start_time,
                                                 int time_now) const;
+
     double calculate_relative_risk_for_risk_factors(const Person &person) const;
-    double calculate_incidence_probability(const Person &person, int start_time,
-                                           int time_now) const;
 
     void update_remission_cases(RuntimeContext &context);
+
     void update_incidence_cases(RuntimeContext &context);
 };
 

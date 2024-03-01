@@ -211,6 +211,8 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
 }
 
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
+    int incidence_id = definition_.get().table().at(MeasureKey::incidence);
+
     for (auto &person : context.population()) {
         // Skip if person is inactive.
         if (!person.is_active()) {
@@ -229,25 +231,17 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
             continue;
         }
 
-        auto probability =
-            calculate_incidence_probability(person, context.start_time(), context.time_now());
+        auto relative_risk =
+            calculate_combined_relative_risk(person, context.start_time(), context.time_now());
+        auto average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+        auto incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        auto probability = incidence * relative_risk / average_relative_risk;
         auto hazard = context.random().next_double();
         if (hazard < probability) {
             person.diseases[disease_type()] =
                 Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
         }
     }
-}
-
-double DefaultDiseaseModel::calculate_incidence_probability(const Person &person, int start_time,
-                                                            int time_now) const {
-    int incidence_id = definition_.get().table().at(MeasureKey::incidence);
-
-    auto combined_relative_risk = calculate_combined_relative_risk(person, start_time, time_now);
-    auto average_relative_risk = average_relative_risk_.at(person.age, person.gender);
-    auto incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
-    auto probability = incidence * combined_relative_risk / average_relative_risk;
-    return probability;
 }
 
 } // namespace hgps
