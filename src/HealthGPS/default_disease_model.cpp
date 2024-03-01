@@ -188,10 +188,12 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &p
 void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
     auto remission_id = definition_.get().table().at(MeasureKey::remission);
     for (auto &person : context.population()) {
-        if (person.age == 0 || !person.is_active()) {
+        // Skip if person is inactive or newborn.
+        if (!person.is_active() || person.age == 0) {
             continue;
         }
 
+        // Skip if person does not have the disease.
         if (!person.diseases.contains(disease_type()) ||
             person.diseases.at(disease_type()).status != DiseaseStatus::active) {
             continue;
@@ -207,19 +209,18 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
 
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     for (auto &person : context.population()) {
+        // Skip if person is inactive.
         if (!person.is_active()) {
             continue;
         }
 
+        // Clear newborn diseases.
         if (person.age == 0) {
-            if (!person.diseases.empty()) {
-                person.diseases.clear(); // Should not have nay disease at birth!
-            }
-
+            person.diseases.clear();
             continue;
         }
 
-        // Already have disease
+        // Skip if the person already has the disease.
         if (person.diseases.contains(disease_type()) &&
             person.diseases.at(disease_type()).status == DiseaseStatus::active) {
             continue;
