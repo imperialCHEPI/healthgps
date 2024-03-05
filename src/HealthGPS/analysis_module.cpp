@@ -91,7 +91,7 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
-    auto handle = core::run_async(&hgps::AnalysisModule::calculate_historical_statistics, this,
+    auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
     calculate_population_statistics(context, result.series);
@@ -127,8 +127,8 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto analysis_time = static_cast<unsigned int>(context.time_now());
 
     auto daly_handle =
-        core::run_async(&hgps::AnalysisModule::calculate_dalys, this,
-                        std::ref(context.population()), age_upper_bound, analysis_time);
+        core::run_async(&AnalysisModule::calculate_dalys, this, std::ref(context.population()),
+                        age_upper_bound, analysis_time);
 
     auto population_size = static_cast<int>(context.population().size());
     auto population_dead = 0;
@@ -261,8 +261,8 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &context,
-                                                           DataSeries &series) const {
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
+                                                     DataSeries &series) const {
     using namespace core;
 
     auto min_age = context.age_range().lower();
@@ -346,17 +346,17 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
-void AnalysisModule::classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const {
+void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
-    case hgps::WeightCategory::normal:
+    case WeightCategory::normal:
         series(entity.gender, "normal_weight").at(entity.age)++;
         break;
-    case hgps::WeightCategory::overweight:
+    case WeightCategory::overweight:
         series(entity.gender, "over_weight").at(entity.age)++;
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
-    case hgps::WeightCategory::obese:
+    case WeightCategory::obese:
         series(entity.gender, "obese_weight").at(entity.age)++;
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
