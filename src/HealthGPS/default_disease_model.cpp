@@ -148,19 +148,19 @@ double DefaultDiseaseModel::calculate_combined_relative_risk(const Person &perso
 }
 
 double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Person &person) const {
+    const auto &relative_risk_tables = definition_.get().relative_risk_factors();
+
     double relative_risk = 1.0;
-    const auto &relative_factors = definition_.get().relative_risk_factors();
-    for (const auto &factor : person.risk_factors) {
-        if (!relative_factors.contains(factor.first)) {
+    for (const auto &[factor_name, factor_value] : person.risk_factors) {
+        if (!relative_risk_tables.contains(factor_name)) {
             continue;
         }
 
-        const auto &lut = relative_factors.at(factor.first).at(person.gender);
-        auto factor_value =
-            weight_classifier_.adjust_risk_factor_value(person, factor.first, factor.second);
-        auto lookup_value = static_cast<float>(factor_value);
-        auto relative_factor_value = lut(person.age, lookup_value);
-        relative_risk *= relative_factor_value;
+        auto factor_value_adjusted =
+            weight_classifier_.adjust_risk_factor_value(person, factor_name, factor_value);
+
+        const auto &rr_table = relative_risk_tables.at(factor_name);
+        relative_risk *= rr_table.at(person.gender)(person.age, factor_value_adjusted);
     }
 
     return relative_risk;
@@ -169,18 +169,19 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
 double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &person,
                                                                  int start_time,
                                                                  int time_now) const {
+    const auto &relative_risk_tables = definition_.get().relative_risk_diseases();
+
     double relative_risk = 1.0;
-    const auto &lut = definition_.get().relative_risk_diseases();
-    for (const auto &disease : person.diseases) {
-        if (!lut.contains(disease.first)) {
+    for (const auto &[disease_name, disease_state] : person.diseases) {
+        if (!relative_risk_tables.contains(disease_name)) {
             continue;
         }
 
         // Only include existing diseases
-        if (disease.second.status == DiseaseStatus::active &&
-            (start_time == time_now || disease.second.start_time < time_now)) {
-            auto relative_disease_vale = lut.at(disease.first)(person.age, person.gender);
-            relative_risk *= relative_disease_vale;
+        if (disease_state.status == DiseaseStatus::active &&
+            (start_time == time_now || disease_state.start_time < time_now)) {
+            const auto &rr_table = relative_risk_tables.at(disease_name);
+            relative_risk *= rr_table(person.age, person.gender);
         }
     }
 
