@@ -263,8 +263,6 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
-    using namespace core;
-
     auto min_age = context.age_range().lower();
     auto max_age = context.age_range().upper();
     if (series.size() > 0) {
@@ -293,6 +291,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         }
 
         series(gender, "count").at(age)++;
+
         for (const auto &factor : context.mapping().entries()) {
             series(gender, factor.key().to_string()).at(age) +=
                 entity.get_risk_factor_value(factor.key());
@@ -312,34 +311,32 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
 
     // Calculate DALY
-    for (auto idx = min_age; idx <= max_age; idx++) {
-        series(Gender::male, "daly").at(idx) =
-            series(Gender::male, "yll").at(idx) + series(Gender::male, "yld").at(idx);
-        series(Gender::female, "daly").at(idx) =
-            series(Gender::female, "yll").at(idx) + series(Gender::female, "yld").at(idx);
+    for (int i = min_age; i <= max_age; i++) {
+        series(core::Gender::male, "daly").at(i) =
+            series(core::Gender::male, "yll").at(i) + series(core::Gender::male, "yld").at(i);
+        series(core::Gender::female, "daly").at(i) =
+            series(core::Gender::female, "yll").at(i) + series(core::Gender::female, "yld").at(i);
     }
 
     // Calculate in-place averages
-    for (auto index = min_age; index <= max_age; index++) {
+    for (auto i = min_age; i <= max_age; i++) {
         for (const auto &chan : series.channels()) {
             if (chan == "count") {
                 continue;
             }
 
-            auto real_count = series(Gender::male, "count").at(index);
-            if (real_count > 0.0) {
-                series(Gender::male, chan).at(index) =
-                    series(Gender::male, chan).at(index) / real_count;
+            double male_count = series(core::Gender::male, "count").at(i);
+            if (male_count > 0.0) {
+                series(core::Gender::male, chan).at(i) /= male_count;
             } else {
-                series(Gender::male, chan).at(index) = 0.0;
+                series(core::Gender::male, chan).at(i) = 0.0;
             }
 
-            real_count = series(Gender::female, "count").at(index);
-            if (real_count > 0.0) {
-                series(Gender::female, chan).at(index) =
-                    series(Gender::female, chan).at(index) / real_count;
+            double female_count = series(core::Gender::female, "count").at(i);
+            if (female_count > 0.0) {
+                series(core::Gender::female, chan).at(i) /= female_count;
             } else {
-                series(Gender::female, chan).at(index) = 0.0;
+                series(core::Gender::female, chan).at(i) = 0.0;
             }
         }
     }
@@ -372,6 +369,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     channels_.emplace_back("count");
+
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }
