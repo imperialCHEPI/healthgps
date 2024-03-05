@@ -297,9 +297,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 entity.get_risk_factor_value(factor.key());
         }
 
-        for (const auto &item : entity.diseases) {
-            if (item.second.status == DiseaseStatus::active) {
-                series(gender, item.first.to_string()).at(age)++;
+        for (const auto &[disease_name, disease_state] : entity.diseases) {
+            if (disease_state.status == DiseaseStatus::active) {
+                series(gender, "prevalence_" + disease_name.to_string()).at(age)++;
+                if (disease_state.start_time == context.time_now()) {
+                    series(gender, "incidence_" + disease_name.to_string()).at(age)++;
+                }
             }
         }
 
@@ -375,7 +378,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     for (const auto &disease : context.diseases()) {
-        channels_.emplace_back(disease.code.to_string());
+        channels_.emplace_back("prevalence_" + disease.code.to_string());
+        channels_.emplace_back("incidence_" + disease.code.to_string());
     }
 
     channels_.emplace_back("disability_weight");
