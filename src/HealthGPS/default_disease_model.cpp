@@ -31,11 +31,14 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
             continue;
         }
 
-        auto relative_risk = calculate_relative_risk_for_risk_factors(person);
-        auto average_relative_risk = relative_risk_table(person.age, person.gender);
-        auto prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
-        auto probability = prevalence * relative_risk / average_relative_risk;
-        auto hazard = context.random().next_double();
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+
+        double average_relative_risk = relative_risk_table(person.age, person.gender);
+
+        double prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
+        double probability = prevalence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
         if (hazard < probability) {
             person.diseases[disease_type()] =
                 Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
@@ -54,10 +57,12 @@ void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &conte
             return;
         }
 
-        auto combine_risk =
-            calculate_combined_relative_risk(person, context.start_time(), context.time_now());
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        relative_risk *= calculate_relative_risk_for_diseases(person);
+
         auto lock = std::unique_lock{sum_mutex};
-        sum(person.age, person.gender) += combine_risk;
+        sum(person.age, person.gender) += relative_risk;
         count(person.age, person.gender)++;
     });
 
@@ -109,7 +114,9 @@ DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(Runtim
             return;
         }
 
-        auto relative_risk = calculate_relative_risk_for_risk_factors(person);
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+
         auto lock = std::unique_lock{sum_mutex};
         sum(person.age, person.gender) += relative_risk;
         count(person.age, person.gender)++;
@@ -139,14 +146,6 @@ DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(Runtim
     return result;
 }
 
-double DefaultDiseaseModel::calculate_combined_relative_risk(const Person &person, int start_time,
-                                                             int time_now) const {
-    double relative_risk = 1.0;
-    relative_risk *= calculate_relative_risk_for_risk_factors(person);
-    relative_risk *= calculate_relative_risk_for_diseases(person, start_time, time_now);
-    return relative_risk;
-}
-
 double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Person &person) const {
     const auto &relative_risk_tables = definition_.get().relative_risk_factors();
 
@@ -166,9 +165,7 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
     return relative_risk;
 }
 
-double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &person,
-                                                                 int start_time,
-                                                                 int time_now) const {
+double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &person) const {
     const auto &relative_risk_tables = definition_.get().relative_risk_diseases();
 
     double relative_risk = 1.0;
@@ -178,8 +175,7 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &p
         }
 
         // Only include existing diseases
-        if (disease_state.status == DiseaseStatus::active &&
-            (start_time == time_now || disease_state.start_time < time_now)) {
+        if (disease_state.status == DiseaseStatus::active) {
             const auto &rr_table = relative_risk_tables.at(disease_name);
             relative_risk *= rr_table(person.age, person.gender);
         }
@@ -232,12 +228,15 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
             continue;
         }
 
-        auto relative_risk =
-            calculate_combined_relative_risk(person, context.start_time(), context.time_now());
-        auto average_relative_risk = average_relative_risk_.at(person.age, person.gender);
-        auto incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
-        auto probability = incidence * relative_risk / average_relative_risk;
-        auto hazard = context.random().next_double();
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        relative_risk *= calculate_relative_risk_for_diseases(person);
+
+        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+
+        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        double probability = incidence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
         if (hazard < probability) {
             person.diseases[disease_type()] =
                 Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
