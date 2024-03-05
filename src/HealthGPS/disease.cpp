@@ -37,6 +37,11 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
     for (auto &model : models_) {
         model.second->initialise_average_relative_risk(context);
     }
+
+    // Do a 'dry run' to get simulated incidence.
+    for (auto &model : models_) {
+        model.second->update_disease_status(context);
+    }
 }
 
 void DiseaseModule::update_population(RuntimeContext &context) {
