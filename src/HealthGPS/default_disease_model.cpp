@@ -155,8 +155,8 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
             continue;
         }
 
-        auto factor_value_adjusted =
-            weight_classifier_.adjust_risk_factor_value(person, factor_name, factor_value);
+        float factor_value_adjusted = static_cast<float>(
+            weight_classifier_.adjust_risk_factor_value(person, factor_name, factor_value));
 
         const auto &rr_table = relative_risk_tables.at(factor_name);
         relative_risk *= rr_table.at(person.gender)(person.age, factor_value_adjusted);
