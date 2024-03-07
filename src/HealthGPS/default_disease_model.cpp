@@ -41,7 +41,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
         double hazard = context.random().next_double();
         if (hazard < probability) {
             person.diseases[disease_type()] =
-                Disease{.status = DiseaseStatus::active, .start_time = (context.time_now() - 1)};
+                Disease{.status = DiseaseStatus::active, .start_time = 0};
         }
     }
 }

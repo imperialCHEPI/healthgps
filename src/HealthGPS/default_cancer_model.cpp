@@ -42,7 +42,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
         if (hazard < probability) {
             int time_since_onset = calculate_time_since_onset(context, person.gender);
             person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
-                                                      .start_time = (context.time_now() - 1),
+                                                      .start_time = 0,
                                                       .time_since_onset = time_since_onset};
         }
     }
