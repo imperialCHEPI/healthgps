@@ -16,12 +16,12 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    double physical_activity_stddev)
+    core::Income income_default, double physical_activity_stddev)
     : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
       stddev_{stddev}, cholesky_{cholesky}, policy_models_{policy_models},
       policy_ranges_{policy_ranges}, policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {}
+      income_default_{income_default}, physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -342,14 +342,14 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
     double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
-    std::unordered_map<core::Income, LinearModelParams> income_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models, core::Income income_default,
     double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
       models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
       cholesky_{std::move(cholesky)}, policy_models_{std::move(policy_models)},
       policy_ranges_{std::move(policy_ranges)}, policy_cholesky_{std::move(policy_cholesky)},
       info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      income_models_{std::move(income_models)},
+      income_models_{std::move(income_models)}, income_default_{income_default},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
@@ -386,10 +386,10 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(expected, names_, models_, lambda_, stddev_,
-                                               cholesky_, policy_models_, policy_ranges_,
-                                               policy_cholesky_, info_speed_, rural_prevalence_,
-                                               income_models_, physical_activity_stddev_);
+    return std::make_unique<StaticLinearModel>(
+        expected, names_, models_, lambda_, stddev_, cholesky_, policy_models_, policy_ranges_,
+        policy_cholesky_, info_speed_, rural_prevalence_, income_models_, income_default_,
+        physical_activity_stddev_);
 }
 
 } // namespace hgps
