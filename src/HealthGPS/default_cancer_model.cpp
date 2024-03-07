@@ -23,23 +23,27 @@ const core::Identifier &DefaultCancerModel::disease_type() const noexcept {
 }
 
 void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
+    int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
+
     auto relative_risk_table = calculate_average_relative_risk(context);
-    auto prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
-    for (auto &entity : context.population()) {
-        if (!entity.is_active() || !definition_.get().table().contains(entity.age)) {
+    for (auto &person : context.population()) {
+        if (!person.is_active() || !definition_.get().table().contains(person.age)) {
             continue;
         }
 
-        auto relative_risk_value = calculate_relative_risk_for_risk_factors(entity);
-        auto average_relative_risk = relative_risk_table(entity.age, entity.gender);
-        auto prevalence = definition_.get().table()(entity.age, entity.gender).at(prevalence_id);
-        auto probability = prevalence * relative_risk_value / average_relative_risk;
-        auto hazard = context.random().next_double();
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+
+        double average_relative_risk = relative_risk_table(person.age, person.gender);
+
+        double prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
+        double probability = prevalence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
         if (hazard < probability) {
-            auto onset = calculate_time_since_onset(context, entity.gender);
-            entity.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
-                                                      .start_time = context.time_now(),
-                                                      .time_since_onset = onset};
+            int time_since_onset = calculate_time_since_onset(context, person.gender);
+            person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
+                                                      .start_time = (context.time_now() - 1),
+                                                      .time_since_onset = time_since_onset};
         }
     }
 }
@@ -50,19 +54,21 @@ void DefaultCancerModel::initialise_average_relative_risk(RuntimeContext &contex
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &entity) {
-        if (!entity.is_active()) {
+    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &person) {
+        if (!person.is_active()) {
             return;
         }
 
-        auto combine_risk =
-            calculate_combined_relative_risk(entity, context.start_time(), context.time_now());
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        relative_risk *= calculate_relative_risk_for_diseases(person);
+
         auto lock = std::unique_lock{sum_mutex};
-        sum(entity.age, entity.gender) += combine_risk;
-        count(entity.age, entity.gender)++;
+        sum(person.age, person.gender) += relative_risk;
+        count(person.age, person.gender)++;
     });
 
-    auto default_average = 1.0;
+    double default_average = 1.0;
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         auto male_average = default_average;
         auto female_average = default_average;
@@ -89,22 +95,22 @@ void DefaultCancerModel::update_disease_status(RuntimeContext &context) {
     update_incidence_cases(context);
 }
 
-double DefaultCancerModel::get_excess_mortality(const Person &entity) const noexcept {
-    const auto &disease_info = entity.diseases.at(disease_type());
+double DefaultCancerModel::get_excess_mortality(const Person &person) const noexcept {
+    int mortality_id = definition_.get().table().at(MeasureKey::mortality);
+
+    const auto &disease_info = person.diseases.at(disease_type());
     auto max_onset = definition_.get().parameters().max_time_since_onset;
     if (disease_info.time_since_onset < 0 || disease_info.time_since_onset >= max_onset) {
         return 0.0;
     }
 
-    auto mortality_id = definition_.get().table().at(MeasureKey::mortality);
-    auto excess_mortality = definition_.get().table()(entity.age, entity.gender).at(mortality_id);
-    const auto &death_weight =
+    double excess_mortality = definition_.get().table()(person.age, person.gender).at(mortality_id);
+    const auto &sex_death_weights =
         definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
-    if (entity.gender == core::Gender::male) {
-        return excess_mortality * death_weight.males;
-    }
+    double death_weight =
+        (person.gender == core::Gender::male) ? sex_death_weights.males : sex_death_weights.females;
 
-    return excess_mortality * death_weight.females;
+    return excess_mortality * death_weight;
 }
 
 DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(RuntimeContext &context) {
@@ -113,18 +119,20 @@ DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(Runtime
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &entity) {
-        if (!entity.is_active()) {
+    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &person) {
+        if (!person.is_active()) {
             return;
         }
 
-        auto combine_risk = calculate_relative_risk_for_risk_factors(entity);
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+
         auto lock = std::unique_lock{sum_mutex};
-        sum(entity.age, entity.gender) += combine_risk;
-        count(entity.age, entity.gender)++;
+        sum(person.age, person.gender) += relative_risk;
+        count(person.age, person.gender)++;
     });
 
-    auto default_average = 1.0;
+    double default_average = 1.0;
     auto result = create_age_gender_table<double>(age_range);
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         auto male_average = default_average;
@@ -148,117 +156,105 @@ DoubleAgeGenderTable DefaultCancerModel::calculate_average_relative_risk(Runtime
     return result;
 }
 
-double DefaultCancerModel::calculate_combined_relative_risk(const Person &entity, int start_time,
-                                                            int time_now) const {
-    auto combined_risk_value = 1.0;
-    combined_risk_value *= calculate_relative_risk_for_risk_factors(entity);
-    combined_risk_value *= calculate_relative_risk_for_diseases(entity, start_time, time_now);
-    return combined_risk_value;
-}
+double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person &person) const {
+    const auto &relative_risk_tables = definition_.get().relative_risk_factors();
 
-double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person &entity) const {
-    auto relative_risk_value = 1.0;
-    const auto &relative_factors = definition_.get().relative_risk_factors();
-    for (const auto &factor : entity.risk_factors) {
-        if (!relative_factors.contains(factor.first)) {
+    double relative_risk = 1.0;
+    for (const auto &[factor_name, factor_value] : person.risk_factors) {
+        if (!relative_risk_tables.contains(factor_name)) {
             continue;
         }
 
-        const auto &lut = relative_factors.at(factor.first).at(entity.gender);
-        auto factor_value =
-            weight_classifier_.adjust_risk_factor_value(entity, factor.first, factor.second);
-        auto lookup_value = static_cast<float>(factor_value);
-        auto relative_factor_value = lut(entity.age, lookup_value);
-        relative_risk_value *= relative_factor_value;
+        auto factor_value_adjusted = static_cast<float>(
+            weight_classifier_.adjust_risk_factor_value(person, factor_name, factor_value));
+
+        const auto &rr_table = relative_risk_tables.at(factor_name);
+        relative_risk *= rr_table.at(person.gender)(person.age, factor_value_adjusted);
     }
 
-    return relative_risk_value;
+    return relative_risk;
 }
 
-double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &entity,
-                                                                int start_time,
-                                                                int time_now) const {
-    auto relative_risk_value = 1.0;
-    const auto &lut = definition_.get().relative_risk_diseases();
-    for (const auto &disease : entity.diseases) {
-        if (!lut.contains(disease.first)) {
+double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &person) const {
+    const auto &relative_risk_tables = definition_.get().relative_risk_diseases();
+
+    double relative_risk = 1.0;
+    for (const auto &[disease_name, disease_state] : person.diseases) {
+        if (!relative_risk_tables.contains(disease_name)) {
             continue;
         }
 
         // Only include existing diseases
-        if (disease.second.status == DiseaseStatus::active &&
-            (start_time == time_now || disease.second.start_time < time_now)) {
-            auto relative_disease_vale = lut.at(disease.first)(entity.age, entity.gender);
-
-            relative_risk_value *= relative_disease_vale;
+        if (disease_state.status == DiseaseStatus::active) {
+            const auto &rr_table = relative_risk_tables.at(disease_name);
+            relative_risk *= rr_table(person.age, person.gender);
         }
     }
 
-    return relative_risk_value;
+    return relative_risk;
 }
 
 void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
-    auto max_onset = definition_.get().parameters().max_time_since_onset;
-    auto &pop = context.population();
-    std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &entity) {
-        if (entity.age == 0 || !entity.is_active()) {
-            return;
+    int max_onset = definition_.get().parameters().max_time_since_onset;
+
+    for (auto &person : context.population()) {
+        // Skip if person is inactive or newborn.
+        if (!person.is_active() || person.age == 0) {
+            continue;
         }
 
-        if (!entity.diseases.contains(disease_type()) ||
-            entity.diseases.at(disease_type()).status != DiseaseStatus::active) {
-            return;
+        // Skip if person does not have the disease.
+        if (!person.diseases.contains(disease_type()) ||
+            person.diseases.at(disease_type()).status != DiseaseStatus::active) {
+            continue;
         }
 
         // Increment duration by one year
-        auto &disease = entity.diseases.at(disease_type());
+        auto &disease = person.diseases.at(disease_type());
         disease.time_since_onset++;
         if (disease.time_since_onset >= max_onset) {
             disease.status = DiseaseStatus::free;
             disease.time_since_onset = -1;
         }
-    });
+    }
 }
 
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
-    for (auto &entity : context.population()) {
-        if (!entity.is_active()) {
+    int incidence_id = definition_.get().table().at(MeasureKey::incidence);
+
+    for (auto &person : context.population()) {
+        // Skip if person is inactive.
+        if (!person.is_active()) {
             continue;
         }
 
-        if (entity.age == 0) {
-            if (!entity.diseases.empty()) {
-                entity.diseases.clear(); // Should not have nay disease at birth!
-            }
-
+        // Clear newborn diseases.
+        if (person.age == 0) {
+            person.diseases.clear();
             continue;
         }
 
-        // Already have disease
-        if (entity.diseases.contains(disease_type()) &&
-            entity.diseases.at(disease_type()).status == DiseaseStatus::active) {
+        // Skip if the person already has the disease.
+        if (person.diseases.contains(disease_type()) &&
+            person.diseases.at(disease_type()).status == DiseaseStatus::active) {
             continue;
         }
 
-        auto probability =
-            calculate_incidence_probability(entity, context.start_time(), context.time_now());
-        auto hazard = context.random().next_double();
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        relative_risk *= calculate_relative_risk_for_diseases(person);
+
+        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+
+        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        double probability = incidence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
         if (hazard < probability) {
-            entity.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
+            person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
                                                       .start_time = context.time_now(),
                                                       .time_since_onset = 0};
         }
     }
-}
-
-double DefaultCancerModel::calculate_incidence_probability(const Person &entity, int start_time,
-                                                           int time_now) const {
-    auto incidence_id = definition_.get().table().at(MeasureKey::incidence);
-    auto combined_relative_risk = calculate_combined_relative_risk(entity, start_time, time_now);
-    auto average_relative_risk = average_relative_risk_.at(entity.age, entity.gender);
-    auto incidence = definition_.get().table()(entity.age, entity.gender).at(incidence_id);
-    auto probability = incidence * combined_relative_risk / average_relative_risk;
-    return probability;
 }
 
 int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,
@@ -267,12 +263,9 @@ int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,
     const auto &pdf = definition_.get().parameters().prevalence_distribution;
     auto values = std::vector<int>{};
     auto cumulative = std::vector<double>{};
-    auto sum = 0.0;
+    double sum = 0.0;
     for (const auto &item : pdf) {
-        auto p = item.second.males;
-        if (gender != core::Gender::male) {
-            p = item.second.females;
-        }
+        double p = (gender == core::Gender::male) ? item.second.males : item.second.females;
 
         sum += p;
         values.emplace_back(item.first);
@@ -281,4 +274,5 @@ int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,
 
     return context.random().next_empirical_discrete(values, cumulative);
 }
+
 } // namespace hgps

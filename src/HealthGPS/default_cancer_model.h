@@ -28,7 +28,7 @@ class DefaultCancerModel final : public DiseaseModel {
 
     void update_disease_status(RuntimeContext &context) override;
 
-    double get_excess_mortality(const Person &entity) const noexcept override;
+    double get_excess_mortality(const Person &person) const noexcept override;
 
   private:
     std::reference_wrapper<DiseaseDefinition> definition_;
@@ -36,16 +36,16 @@ class DefaultCancerModel final : public DiseaseModel {
     DoubleAgeGenderTable average_relative_risk_;
 
     DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext &context);
-    double calculate_combined_relative_risk(const Person &entity, int start_time,
-                                            int time_now) const;
-    double calculate_relative_risk_for_diseases(const Person &entity, int start_time,
-                                                int time_now) const;
-    double calculate_relative_risk_for_risk_factors(const Person &entity) const;
-    double calculate_incidence_probability(const Person &entity, int start_time,
-                                           int time_now) const;
+
+    double calculate_relative_risk_for_diseases(const Person &person) const;
+
+    double calculate_relative_risk_for_risk_factors(const Person &person) const;
 
     void update_remission_cases(RuntimeContext &context);
+
     void update_incidence_cases(RuntimeContext &context);
+
     int calculate_time_since_onset(RuntimeContext &context, const core::Gender &gender) const;
 };
+
 } // namespace hgps
