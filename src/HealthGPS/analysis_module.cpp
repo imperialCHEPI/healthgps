@@ -91,7 +91,7 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
-    auto handle = core::run_async(&hgps::AnalysisModule::calculate_historical_statistics, this,
+    auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
     calculate_population_statistics(context, result.series);
@@ -127,8 +127,8 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto analysis_time = static_cast<unsigned int>(context.time_now());
 
     auto daly_handle =
-        core::run_async(&hgps::AnalysisModule::calculate_dalys, this,
-                        std::ref(context.population()), age_upper_bound, analysis_time);
+        core::run_async(&AnalysisModule::calculate_dalys, this, std::ref(context.population()),
+                        age_upper_bound, analysis_time);
 
     auto population_size = static_cast<int>(context.population().size());
     auto population_dead = 0;
@@ -261,10 +261,8 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &context,
-                                                           DataSeries &series) const {
-    using namespace core;
-
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
+                                                     DataSeries &series) const {
     auto min_age = context.age_range().lower();
     auto max_age = context.age_range().upper();
     if (series.size() > 0) {
@@ -293,14 +291,18 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
         }
 
         series(gender, "count").at(age)++;
+
         for (const auto &factor : context.mapping().entries()) {
             series(gender, factor.key().to_string()).at(age) +=
                 entity.get_risk_factor_value(factor.key());
         }
 
-        for (const auto &item : entity.diseases) {
-            if (item.second.status == DiseaseStatus::active) {
-                series(gender, item.first.to_string()).at(age)++;
+        for (const auto &[disease_name, disease_state] : entity.diseases) {
+            if (disease_state.status == DiseaseStatus::active) {
+                series(gender, "prevalence_" + disease_name.to_string()).at(age)++;
+                if (disease_state.start_time == context.time_now()) {
+                    series(gender, "incidence_" + disease_name.to_string()).at(age)++;
+                }
             }
         }
 
@@ -312,51 +314,49 @@ void hgps::AnalysisModule::calculate_population_statistics(RuntimeContext &conte
     }
 
     // Calculate DALY
-    for (auto idx = min_age; idx <= max_age; idx++) {
-        series(Gender::male, "daly").at(idx) =
-            series(Gender::male, "yll").at(idx) + series(Gender::male, "yld").at(idx);
-        series(Gender::female, "daly").at(idx) =
-            series(Gender::female, "yll").at(idx) + series(Gender::female, "yld").at(idx);
+    for (int i = min_age; i <= max_age; i++) {
+        series(core::Gender::male, "daly").at(i) =
+            series(core::Gender::male, "yll").at(i) + series(core::Gender::male, "yld").at(i);
+        series(core::Gender::female, "daly").at(i) =
+            series(core::Gender::female, "yll").at(i) + series(core::Gender::female, "yld").at(i);
     }
 
     // Calculate in-place averages
-    for (auto index = min_age; index <= max_age; index++) {
+    for (auto i = min_age; i <= max_age; i++) {
         for (const auto &chan : series.channels()) {
             if (chan == "count") {
                 continue;
             }
 
-            auto real_count = series(Gender::male, "count").at(index);
-            if (real_count > 0.0) {
-                series(Gender::male, chan).at(index) =
-                    series(Gender::male, chan).at(index) / real_count;
+            double male_count = series(core::Gender::male, "count").at(i);
+            if (male_count > 0.0) {
+                series(core::Gender::male, chan).at(i) /= male_count;
             } else {
-                series(Gender::male, chan).at(index) = 0.0;
+                series(core::Gender::male, chan).at(i) = 0.0;
             }
 
-            real_count = series(Gender::female, "count").at(index);
-            if (real_count > 0.0) {
-                series(Gender::female, chan).at(index) =
-                    series(Gender::female, chan).at(index) / real_count;
+            double female_count = series(core::Gender::female, "count").at(i);
+            if (female_count > 0.0) {
+                series(core::Gender::female, chan).at(i) /= female_count;
             } else {
-                series(Gender::female, chan).at(index) = 0.0;
+                series(core::Gender::female, chan).at(i) = 0.0;
             }
         }
     }
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
-void AnalysisModule::classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const {
+void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
-    case hgps::WeightCategory::normal:
+    case WeightCategory::normal:
         series(entity.gender, "normal_weight").at(entity.age)++;
         break;
-    case hgps::WeightCategory::overweight:
+    case WeightCategory::overweight:
         series(entity.gender, "over_weight").at(entity.age)++;
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
-    case hgps::WeightCategory::obese:
+    case WeightCategory::obese:
         series(entity.gender, "obese_weight").at(entity.age)++;
         series(entity.gender, "above_weight").at(entity.age)++;
         break;
@@ -372,12 +372,14 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     channels_.emplace_back("count");
+
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back(factor.key().to_string());
     }
 
     for (const auto &disease : context.diseases()) {
-        channels_.emplace_back(disease.code.to_string());
+        channels_.emplace_back("prevalence_" + disease.code.to_string());
+        channels_.emplace_back("incidence_" + disease.code.to_string());
     }
 
     channels_.emplace_back("disability_weight");

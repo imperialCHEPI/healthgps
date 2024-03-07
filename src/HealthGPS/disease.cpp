@@ -29,6 +29,7 @@ DiseaseModule::operator[](const core::Identifier &disease_id) const {
 }
 
 void DiseaseModule::initialise_population(RuntimeContext &context) {
+    // Initialise disease status based on prevalence
     for (auto &model : models_) {
         model.second->initialise_disease_status(context);
     }
@@ -36,6 +37,11 @@ void DiseaseModule::initialise_population(RuntimeContext &context) {
     // Recalculate relative risks once diseases status were generated
     for (auto &model : models_) {
         model.second->initialise_average_relative_risk(context);
+    }
+
+    // After initialising with prevalence, do a 'dry run' to simulate incidence.
+    for (auto &model : models_) {
+        model.second->update_disease_status(context);
     }
 }
 
