@@ -14,9 +14,7 @@ DefaultCancerModel::DefaultCancerModel(DiseaseDefinition &definition, WeightMode
     }
 }
 
-core::DiseaseGroup DefaultCancerModel::group() const noexcept {
-    return definition_.get().identifier().group;
-}
+core::DiseaseGroup DefaultCancerModel::group() const noexcept { return core::DiseaseGroup::cancer; }
 
 const core::Identifier &DefaultCancerModel::disease_type() const noexcept {
     return definition_.get().identifier().code;
@@ -41,6 +39,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
         double hazard = context.random().next_double();
         if (hazard < probability) {
             int time_since_onset = calculate_time_since_onset(context, person.gender);
+            // start_time = 0 means the disease existed before the simulation started.
             person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
                                                       .start_time = 0,
                                                       .time_since_onset = time_since_onset};

@@ -14,9 +14,7 @@ DefaultDiseaseModel::DefaultDiseaseModel(DiseaseDefinition &definition, WeightMo
     }
 }
 
-core::DiseaseGroup DefaultDiseaseModel::group() const noexcept {
-    return definition_.get().identifier().group;
-}
+core::DiseaseGroup DefaultDiseaseModel::group() const noexcept { return core::DiseaseGroup::other; }
 
 const core::Identifier &DefaultDiseaseModel::disease_type() const noexcept {
     return definition_.get().identifier().code;
@@ -40,6 +38,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
         double probability = prevalence * relative_risk / average_relative_risk;
         double hazard = context.random().next_double();
         if (hazard < probability) {
+            // start_time = 0 means the disease existed before the simulation started.
             person.diseases[disease_type()] =
                 Disease{.status = DiseaseStatus::active, .start_time = 0};
         }
