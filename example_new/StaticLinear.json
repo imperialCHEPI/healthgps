@@ -5,13 +5,13 @@
     "RuralPrevalence": [
         {
             "Name": "Under18",
-            "Female": 0.65,
-            "Male": 0.65
+            "Female": 0.626739964429027,
+            "Male": 0.624047373841401
         },
         {
             "Name": "Over18",
-            "Female": 0.6,
-            "Male": 0.6
+            "Female": 0.587936516771846,
+            "Male": 0.583313018464474
         }
     ],
     "IncomeDefault": "Middle",
