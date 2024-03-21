@@ -76,6 +76,26 @@
                 "range": [984.7666, 8844.316]
             },
             {
+                "name": "Carbohydrate",
+                "level": 1,
+                "range": [120.155, 774.2651]
+            },
+            {
+                "name": "Fat",
+                "level": 1,
+                "range": [14.65918, 204.6782]
+            },
+            {
+                "name": "Protein",
+                "level": 1,
+                "range": [20.3546, 126.8509]
+            },
+            {
+                "name": "Sodium",
+                "level": 1,
+                "range": [984.7666, 8844.316]
+            },
+            {
                 "name": "PhysicalActivity",
                 "level": 2,
                 "range": [1.388473, 1.835487]
