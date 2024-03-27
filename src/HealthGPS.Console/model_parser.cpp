@@ -518,7 +518,9 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
     std::unordered_map<hgps::core::Gender, double> height_stddev = {
         {hgps::core::Gender::female, opt["HeightStdDev"]["Female"].get<double>()},
         {hgps::core::Gender::male, opt["HeightStdDev"]["Male"].get<double>()}};
-    auto height_slope = opt["HeightSlope"].get<double>();
+    std::unordered_map<hgps::core::Gender, double> height_slope = {
+        {hgps::core::Gender::female, opt["HeightSlope"]["Female"].get<double>()},
+        {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),

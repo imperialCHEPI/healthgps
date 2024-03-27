@@ -29,7 +29,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @param height_stddev The height model female/male standard deviations
-    /// @param height_slope The height model slope
+    /// @param height_slope The height female/male model slopes
     KevinHallModel(
         const RiskFactorSexAgeTable &expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
@@ -39,7 +39,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
         const std::vector<double> &epa_quantiles,
-        const std::unordered_map<core::Gender, double> &height_stddev, double height_slope);
+        const std::unordered_map<core::Gender, double> &height_stddev,
+        const std::unordered_map<core::Gender, double> &height_slope);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -170,9 +171,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param power The (optional) power to raise the weight to
     /// @param age The (optional) age to compute the mean for (default all)
     /// @return The weight power means by sex and age
-    KevinHallAdjustmentTable compute_mean_weight(Population &population,
-                                                 std::optional<double> power = std::nullopt,
-                                                 std::optional<unsigned> age = std::nullopt) const;
+    KevinHallAdjustmentTable compute_mean_weight(
+        Population &population,
+        std::optional<std::unordered_map<core::Gender, double>> power = std::nullopt,
+        std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Initialises the height of a person.
     /// @param person The person fo initialise the height for.
@@ -193,7 +195,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
     const std::vector<double> &epa_quantiles_;
     const std::unordered_map<core::Gender, double> &height_stddev_;
-    const double height_slope_;
+    const std::unordered_map<core::Gender, double> &height_slope_;
 
     // Model parameters.
     static constexpr int kevin_hall_age_min = 19; // Minimum age for the model.
@@ -222,7 +224,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @param height_stddev The height model female/male standard deviations
-    /// @param height_slope The height model slope
+    /// @param height_slope The height model female/male slopes
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         RiskFactorSexAgeTable expected,
@@ -232,7 +234,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
         std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-        double height_slope);
+        std::unordered_map<core::Gender, double> height_slope);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -246,7 +248,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles_;
     std::vector<double> epa_quantiles_;
     std::unordered_map<core::Gender, double> height_stddev_;
-    double height_slope_;
+    std::unordered_map<core::Gender, double> height_slope_;
 };
 
 } // namespace hgps
