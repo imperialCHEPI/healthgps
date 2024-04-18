@@ -1,7 +1,8 @@
 #include "default_disease_model.h"
-#include "HealthGPS.Core/thread_util.h"
 #include "person.h"
 #include "runtime_context.h"
+
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -51,7 +52,7 @@ void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &conte
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &person) {
+    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &person) {
         if (!person.is_active()) {
             return;
         }
@@ -108,7 +109,7 @@ DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(Runtim
     auto count = create_age_gender_table<double>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &person) {
+    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &person) {
         if (!person.is_active()) {
             return;
         }

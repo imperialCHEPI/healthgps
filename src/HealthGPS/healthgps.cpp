@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 #include <iostream>
 #include <memory>
+#include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
 
 namespace { // anonymous namespace
@@ -221,7 +222,7 @@ IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
     auto simulated_population = create_age_gender_table<int>(context_.age_range());
     auto &pop = context_.population();
     auto count_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &entity) {
+    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
             return;
         }
@@ -236,10 +237,9 @@ IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
 void HealthGPS::apply_net_migration(int net_value, unsigned int age, const core::Gender &gender) {
     if (net_value > 0) {
         auto &pop = context_.population();
-        auto similar_indices =
-            core::find_index_of_all(core::execution_policy, pop, [&](const Person &entity) {
-                return entity.is_active() && entity.age == age && entity.gender == gender;
-            });
+        auto similar_indices = core::find_index_of_all(pop, [&](const Person &entity) {
+            return entity.is_active() && entity.age == age && entity.gender == gender;
+        });
 
         if (!similar_indices.empty()) {
             // Needed for repeatability in random selection
