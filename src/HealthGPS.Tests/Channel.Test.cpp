@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "HealthGPS/channel.h"
+#include <oneapi/tbb/parallel_for_each.h>
 #include <thread>
 
 TEST(ChannelTest, DefaultConstruction) {
@@ -234,7 +235,8 @@ TEST(ChannelTest, MultipleConsumers) {
     });
 
     producer.join();
-    std::for_each(threads.begin(), threads.end(), [](std::jthread &thread) { thread.join(); });
+    tbb::parallel_for_each(threads.begin(), threads.end(),
+                           [](std::jthread &thread) { thread.join(); });
 
     ASSERT_EQ(expected, sum_of_reads);
 }
