@@ -175,6 +175,11 @@
                 "id": "subarachnoidhemorrhage",
                 "name": "Subarachnoid Hemorrhage"
             },
+	    { 
+		"group": "other", 
+		"id": "chronickidneydisease", 
+		"name": "Chronic kidney disease" 
+	    },
             {
                 "group": "cancer",
                 "id": "breastcancer",
