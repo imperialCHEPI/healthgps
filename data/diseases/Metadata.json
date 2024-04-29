@@ -30,7 +30,7 @@
                 "ischemicheartdisease",
                 "ischemicstroke",
                 "subarachnoidhemorrhage",
-	        "chronickidneydisease",
+                "chronickidneydisease",
                 "breastcancer",
                 "colorectalcancer",
                 "esophaguscancer",
@@ -187,7 +187,7 @@
                     "id": "subarachnoidhemorrhage",
                     "name": "Subarachnoid Hemorrhage"
                 },
-		{
+                {
                     "group": "other",
                     "id": "chronickidneydisease",
                     "name": "Chronic kidney disease"
