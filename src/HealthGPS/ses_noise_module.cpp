@@ -37,9 +37,8 @@ void SESNoiseModule::initialise_population(RuntimeContext &context) {
 void SESNoiseModule::update_population(RuntimeContext &context) {
     auto newborn_age = 0u;
     auto &pop = context.population();
-    auto indices = core::find_index_of_all(core::execution_policy, pop, [&](const Person &entity) {
-        return entity.age == newborn_age;
-    });
+    auto indices = core::find_index_of_all(
+        pop, [&](const Person &entity) { return entity.age == newborn_age; });
 
     std::sort(indices.begin(), indices.end());
     for (auto &index : indices) {

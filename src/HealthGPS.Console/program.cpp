@@ -12,6 +12,8 @@
 #include <fmt/color.h>
 
 #include <chrono>
+#include <cstdlib>
+#include <oneapi/tbb/global_control.h>
 
 /// @brief Get a string representation of current system time
 /// @return The system time as string
@@ -45,6 +47,13 @@ int exit_application(int exit_code) {
 int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace host;
+
+    // Set thread limit from OMP_THREAD_LIMIT, if set in environment.
+    char *env_threads = std::getenv("OMP_THREAD_LIMIT");
+    int threads =
+        env_threads != nullptr ? std::atoi(env_threads) : tbb::this_task_arena::max_concurrency();
+    auto thread_control =
+        tbb::global_control(tbb::global_control::max_allowed_parallelism, threads);
 
     // Create CLI options and validate minimum arguments
     auto options = create_options();
