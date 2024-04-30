@@ -6,6 +6,8 @@
 #include <cassert>
 #include <mutex>
 
+#include <oneapi/tbb/parallel_for_each.h>
+
 namespace { // anonymous namespace
 
 /// @brief Defines the residual mortality synchronisation message
@@ -279,7 +281,7 @@ PopulationModule::calculate_residual_mortality(RuntimeContext &context,
     auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &entity) {
+    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
             return;
         }
