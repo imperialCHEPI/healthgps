@@ -1,0 +1,809 @@
+location_id,location,cause_id,cause_name,year,age_group,age,gender_id,gender,measure_id,measure,mean,upper,lower
+D356,India,589,Chronic kidney disease,2019,<1 year,0,1,Male,5,prevalence,0.000784771,0.000948265,0.000629889
+D356,India,589,Chronic kidney disease,2019,<1 year,0,2,Female,5,prevalence,0.000391767,0.000503882,0.000297777
+D356,India,589,Chronic kidney disease,2019,<1 year,0,1,Male,6,incidence,0.001450017,0.001775505,0.001156455
+D356,India,589,Chronic kidney disease,2019,<1 year,0,2,Female,6,incidence,0.000754758,0.000973869,0.000563944
+D356,India,589,Chronic kidney disease,2019,<1 year,0,1,Male,15,mortality,0.017568681,,
+D356,India,589,Chronic kidney disease,2019,<1 year,0,2,Female,15,mortality,0.007807225,,
+D356,India,589,Chronic kidney disease,2019,<1 year,0,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,<1 year,0,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,1,Male,5,prevalence,0.002767769,0.003327421,0.002292736
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,2,Female,5,prevalence,0.001745125,0.002184188,0.001366418
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,1,Male,6,incidence,0.000543707,0.000710834,0.000397237
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,2,Female,6,incidence,0.000418579,0.000559505,0.000293765
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,1,Male,15,mortality,0.000976809,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,2,Female,15,mortality,0.002820964,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,1,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,1,Male,5,prevalence,0.002767769,0.003327421,0.002292736
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,2,Female,5,prevalence,0.001745125,0.002184188,0.001366418
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,1,Male,6,incidence,0.000543707,0.000710834,0.000397237
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,2,Female,6,incidence,0.000418579,0.000559505,0.000293765
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,1,Male,15,mortality,0.000976809,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,2,Female,15,mortality,0.002820964,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,2,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,1,Male,5,prevalence,0.002767769,0.003327421,0.002292736
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,2,Female,5,prevalence,0.001745125,0.002184188,0.001366418
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,1,Male,6,incidence,0.000543707,0.000710834,0.000397237
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,2,Female,6,incidence,0.000418579,0.000559505,0.000293765
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,1,Male,15,mortality,0.000976809,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,2,Female,15,mortality,0.002820964,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,3,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,1,Male,5,prevalence,0.002767769,0.003327421,0.002292736
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,2,Female,5,prevalence,0.001745125,0.002184188,0.001366418
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,1,Male,6,incidence,0.000543707,0.000710834,0.000397237
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,2,Female,6,incidence,0.000418579,0.000559505,0.000293765
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,1,Male,15,mortality,0.000976809,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,2,Female,15,mortality,0.002820964,,
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,1-4 years,4,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,1,Male,5,prevalence,0.004357755,0.005169258,0.003576174
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,2,Female,5,prevalence,0.003319359,0.004073609,0.00263047
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,1,Male,6,incidence,0.000152049,0.000250872,7.52E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,2,Female,6,incidence,0.000185343,0.000286317,9.91E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,1,Male,15,mortality,0.00066723,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,2,Female,15,mortality,0.000893988,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,5,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,1,Male,5,prevalence,0.004357755,0.005169258,0.003576174
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,2,Female,5,prevalence,0.003319359,0.004073609,0.00263047
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,1,Male,6,incidence,0.000152049,0.000250872,7.52E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,2,Female,6,incidence,0.000185343,0.000286317,9.91E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,1,Male,15,mortality,0.00066723,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,2,Female,15,mortality,0.000893988,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,6,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,1,Male,5,prevalence,0.004357755,0.005169258,0.003576174
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,2,Female,5,prevalence,0.003319359,0.004073609,0.00263047
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,1,Male,6,incidence,0.000152049,0.000250872,7.52E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,2,Female,6,incidence,0.000185343,0.000286317,9.91E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,1,Male,15,mortality,0.00066723,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,2,Female,15,mortality,0.000893988,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,7,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,1,Male,5,prevalence,0.004357755,0.005169258,0.003576174
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,2,Female,5,prevalence,0.003319359,0.004073609,0.00263047
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,1,Male,6,incidence,0.000152049,0.000250872,7.52E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,2,Female,6,incidence,0.000185343,0.000286317,9.91E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,1,Male,15,mortality,0.00066723,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,2,Female,15,mortality,0.000893988,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,8,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,1,Male,5,prevalence,0.004357755,0.005169258,0.003576174
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,2,Female,5,prevalence,0.003319359,0.004073609,0.00263047
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,1,Male,6,incidence,0.000152049,0.000250872,7.52E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,2,Female,6,incidence,0.000185343,0.000286317,9.91E-05
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,1,Male,15,mortality,0.00066723,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,2,Female,15,mortality,0.000893988,,
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,5-9 years,9,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,1,Male,5,prevalence,0.007140579,0.008386631,0.005967344
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,2,Female,5,prevalence,0.006474894,0.007751016,0.00528736
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,1,Male,6,incidence,0.000138865,0.00023643,6.02E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,2,Female,6,incidence,0.000164335,0.000277162,7.28E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,1,Male,15,mortality,0.000595826,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,2,Female,15,mortality,0.001038989,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,10,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,1,Male,5,prevalence,0.007140579,0.008386631,0.005967344
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,2,Female,5,prevalence,0.006474894,0.007751016,0.00528736
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,1,Male,6,incidence,0.000138865,0.00023643,6.02E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,2,Female,6,incidence,0.000164335,0.000277162,7.28E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,1,Male,15,mortality,0.000595826,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,2,Female,15,mortality,0.001038989,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,11,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,1,Male,5,prevalence,0.007140579,0.008386631,0.005967344
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,2,Female,5,prevalence,0.006474894,0.007751016,0.00528736
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,1,Male,6,incidence,0.000138865,0.00023643,6.02E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,2,Female,6,incidence,0.000164335,0.000277162,7.28E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,1,Male,15,mortality,0.000595826,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,2,Female,15,mortality,0.001038989,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,12,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,1,Male,5,prevalence,0.007140579,0.008386631,0.005967344
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,2,Female,5,prevalence,0.006474894,0.007751016,0.00528736
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,1,Male,6,incidence,0.000138865,0.00023643,6.02E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,2,Female,6,incidence,0.000164335,0.000277162,7.28E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,1,Male,15,mortality,0.000595826,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,2,Female,15,mortality,0.001038989,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,13,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,1,Male,5,prevalence,0.007140579,0.008386631,0.005967344
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,2,Female,5,prevalence,0.006474894,0.007751016,0.00528736
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,1,Male,6,incidence,0.000138865,0.00023643,6.02E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,2,Female,6,incidence,0.000164335,0.000277162,7.28E-05
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,1,Male,15,mortality,0.000595826,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,2,Female,15,mortality,0.001038989,,
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,10-14 years,14,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,1,Male,5,prevalence,0.018044525,0.022616475,0.014531689
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,2,Female,5,prevalence,0.017919109,0.022553649,0.014212228
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,1,Male,6,incidence,0.000175458,0.000293173,8.33E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,2,Female,6,incidence,0.000202719,0.000333917,9.55E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,1,Male,15,mortality,0.000706237,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,2,Female,15,mortality,0.000631853,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,15,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,1,Male,5,prevalence,0.018044525,0.022616475,0.014531689
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,2,Female,5,prevalence,0.017919109,0.022553649,0.014212228
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,1,Male,6,incidence,0.000175458,0.000293173,8.33E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,2,Female,6,incidence,0.000202719,0.000333917,9.55E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,1,Male,15,mortality,0.000706237,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,2,Female,15,mortality,0.000631853,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,16,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,1,Male,5,prevalence,0.018044525,0.022616475,0.014531689
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,2,Female,5,prevalence,0.017919109,0.022553649,0.014212228
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,1,Male,6,incidence,0.000175458,0.000293173,8.33E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,2,Female,6,incidence,0.000202719,0.000333917,9.55E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,1,Male,15,mortality,0.000706237,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,2,Female,15,mortality,0.000631853,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,17,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,1,Male,5,prevalence,0.018044525,0.022616475,0.014531689
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,2,Female,5,prevalence,0.017919109,0.022553649,0.014212228
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,1,Male,6,incidence,0.000175458,0.000293173,8.33E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,2,Female,6,incidence,0.000202719,0.000333917,9.55E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,1,Male,15,mortality,0.000706237,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,2,Female,15,mortality,0.000631853,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,18,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,1,Male,5,prevalence,0.018044525,0.022616475,0.014531689
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,2,Female,5,prevalence,0.017919109,0.022553649,0.014212228
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,1,Male,6,incidence,0.000175458,0.000293173,8.33E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,2,Female,6,incidence,0.000202719,0.000333917,9.55E-05
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,1,Male,15,mortality,0.000706237,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,2,Female,15,mortality,0.000631853,,
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,15-19 years,19,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,1,Male,5,prevalence,0.040544218,0.052346075,0.031120664
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,2,Female,5,prevalence,0.038825148,0.050337397,0.029765927
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,1,Male,6,incidence,0.000181725,0.000278406,8.44E-05
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,2,Female,6,incidence,0.000243294,0.000366437,0.000125189
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,1,Male,15,mortality,0.000583686,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,2,Female,15,mortality,0.000506733,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,20,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,1,Male,5,prevalence,0.040544218,0.052346075,0.031120664
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,2,Female,5,prevalence,0.038825148,0.050337397,0.029765927
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,1,Male,6,incidence,0.000181725,0.000278406,8.44E-05
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,2,Female,6,incidence,0.000243294,0.000366437,0.000125189
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,1,Male,15,mortality,0.000583686,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,2,Female,15,mortality,0.000506733,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,21,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,1,Male,5,prevalence,0.040544218,0.052346075,0.031120664
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,2,Female,5,prevalence,0.038825148,0.050337397,0.029765927
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,1,Male,6,incidence,0.000181725,0.000278406,8.44E-05
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,2,Female,6,incidence,0.000243294,0.000366437,0.000125189
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,1,Male,15,mortality,0.000583686,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,2,Female,15,mortality,0.000506733,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,22,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,1,Male,5,prevalence,0.040544218,0.052346075,0.031120664
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,2,Female,5,prevalence,0.038825148,0.050337397,0.029765927
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,1,Male,6,incidence,0.000181725,0.000278406,8.44E-05
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,2,Female,6,incidence,0.000243294,0.000366437,0.000125189
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,1,Male,15,mortality,0.000583686,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,2,Female,15,mortality,0.000506733,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,23,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,1,Male,5,prevalence,0.040544218,0.052346075,0.031120664
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,2,Female,5,prevalence,0.038825148,0.050337397,0.029765927
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,1,Male,6,incidence,0.000181725,0.000278406,8.44E-05
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,2,Female,6,incidence,0.000243294,0.000366437,0.000125189
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,1,Male,15,mortality,0.000583686,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,2,Female,15,mortality,0.000506733,,
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,20-24 years,24,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,1,Male,5,prevalence,0.069407169,0.086654535,0.053820053
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,2,Female,5,prevalence,0.064517531,0.080850877,0.049979286
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,1,Male,6,incidence,0.000200522,0.000338881,8.38E-05
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,2,Female,6,incidence,0.000273618,0.000435706,0.00012494
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,1,Male,15,mortality,0.000460214,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,2,Female,15,mortality,0.000414042,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,25,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,1,Male,5,prevalence,0.069407169,0.086654535,0.053820053
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,2,Female,5,prevalence,0.064517531,0.080850877,0.049979286
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,1,Male,6,incidence,0.000200522,0.000338881,8.38E-05
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,2,Female,6,incidence,0.000273618,0.000435706,0.00012494
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,1,Male,15,mortality,0.000460214,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,2,Female,15,mortality,0.000414042,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,26,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,1,Male,5,prevalence,0.069407169,0.086654535,0.053820053
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,2,Female,5,prevalence,0.064517531,0.080850877,0.049979286
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,1,Male,6,incidence,0.000200522,0.000338881,8.38E-05
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,2,Female,6,incidence,0.000273618,0.000435706,0.00012494
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,1,Male,15,mortality,0.000460214,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,2,Female,15,mortality,0.000414042,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,27,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,1,Male,5,prevalence,0.069407169,0.086654535,0.053820053
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,2,Female,5,prevalence,0.064517531,0.080850877,0.049979286
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,1,Male,6,incidence,0.000200522,0.000338881,8.38E-05
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,2,Female,6,incidence,0.000273618,0.000435706,0.00012494
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,1,Male,15,mortality,0.000460214,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,2,Female,15,mortality,0.000414042,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,28,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,1,Male,5,prevalence,0.069407169,0.086654535,0.053820053
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,2,Female,5,prevalence,0.064517531,0.080850877,0.049979286
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,1,Male,6,incidence,0.000200522,0.000338881,8.38E-05
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,2,Female,6,incidence,0.000273618,0.000435706,0.00012494
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,1,Male,15,mortality,0.000460214,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,2,Female,15,mortality,0.000414042,,
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,25-29 years,29,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,1,Male,5,prevalence,0.088175403,0.10954685,0.067424912
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,2,Female,5,prevalence,0.089134231,0.110370821,0.067702598
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,1,Male,6,incidence,0.000322714,0.000514139,0.000158277
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,2,Female,6,incidence,0.000382873,0.000613679,0.000200057
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,1,Male,15,mortality,0.000640562,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,2,Female,15,mortality,0.000420885,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,30,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,1,Male,5,prevalence,0.088175403,0.10954685,0.067424912
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,2,Female,5,prevalence,0.089134231,0.110370821,0.067702598
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,1,Male,6,incidence,0.000322714,0.000514139,0.000158277
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,2,Female,6,incidence,0.000382873,0.000613679,0.000200057
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,1,Male,15,mortality,0.000640562,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,2,Female,15,mortality,0.000420885,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,31,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,1,Male,5,prevalence,0.088175403,0.10954685,0.067424912
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,2,Female,5,prevalence,0.089134231,0.110370821,0.067702598
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,1,Male,6,incidence,0.000322714,0.000514139,0.000158277
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,2,Female,6,incidence,0.000382873,0.000613679,0.000200057
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,1,Male,15,mortality,0.000640562,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,2,Female,15,mortality,0.000420885,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,32,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,1,Male,5,prevalence,0.088175403,0.10954685,0.067424912
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,2,Female,5,prevalence,0.089134231,0.110370821,0.067702598
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,1,Male,6,incidence,0.000322714,0.000514139,0.000158277
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,2,Female,6,incidence,0.000382873,0.000613679,0.000200057
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,1,Male,15,mortality,0.000640562,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,2,Female,15,mortality,0.000420885,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,33,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,1,Male,5,prevalence,0.088175403,0.10954685,0.067424912
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,2,Female,5,prevalence,0.089134231,0.110370821,0.067702598
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,1,Male,6,incidence,0.000322714,0.000514139,0.000158277
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,2,Female,6,incidence,0.000382873,0.000613679,0.000200057
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,1,Male,15,mortality,0.000640562,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,2,Female,15,mortality,0.000420885,,
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,30-34 years,34,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,1,Male,5,prevalence,0.101197828,0.127730033,0.075955083
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,2,Female,5,prevalence,0.110694381,0.138676023,0.08414302
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,1,Male,6,incidence,0.000591946,0.000868156,0.000347619
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,2,Female,6,incidence,0.00076368,0.001096757,0.000468529
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,1,Male,15,mortality,0.000842721,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,2,Female,15,mortality,0.000450987,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,35,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,1,Male,5,prevalence,0.101197828,0.127730033,0.075955083
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,2,Female,5,prevalence,0.110694381,0.138676023,0.08414302
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,1,Male,6,incidence,0.000591946,0.000868156,0.000347619
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,2,Female,6,incidence,0.00076368,0.001096757,0.000468529
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,1,Male,15,mortality,0.000842721,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,2,Female,15,mortality,0.000450987,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,36,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,1,Male,5,prevalence,0.101197828,0.127730033,0.075955083
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,2,Female,5,prevalence,0.110694381,0.138676023,0.08414302
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,1,Male,6,incidence,0.000591946,0.000868156,0.000347619
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,2,Female,6,incidence,0.00076368,0.001096757,0.000468529
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,1,Male,15,mortality,0.000842721,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,2,Female,15,mortality,0.000450987,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,37,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,1,Male,5,prevalence,0.101197828,0.127730033,0.075955083
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,2,Female,5,prevalence,0.110694381,0.138676023,0.08414302
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,1,Male,6,incidence,0.000591946,0.000868156,0.000347619
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,2,Female,6,incidence,0.00076368,0.001096757,0.000468529
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,1,Male,15,mortality,0.000842721,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,2,Female,15,mortality,0.000450987,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,38,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,1,Male,5,prevalence,0.101197828,0.127730033,0.075955083
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,2,Female,5,prevalence,0.110694381,0.138676023,0.08414302
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,1,Male,6,incidence,0.000591946,0.000868156,0.000347619
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,2,Female,6,incidence,0.00076368,0.001096757,0.000468529
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,1,Male,15,mortality,0.000842721,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,2,Female,15,mortality,0.000450987,,
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,35-39 years,39,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,1,Male,5,prevalence,0.11633219,0.148532364,0.088827809
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,2,Female,5,prevalence,0.120046933,0.152350884,0.092011902
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,1,Male,6,incidence,0.001028438,0.001431325,0.000682721
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,2,Female,6,incidence,0.001266173,0.001702183,0.000880679
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,1,Male,15,mortality,0.001047121,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,2,Female,15,mortality,0.000684425,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,40,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,1,Male,5,prevalence,0.11633219,0.148532364,0.088827809
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,2,Female,5,prevalence,0.120046933,0.152350884,0.092011902
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,1,Male,6,incidence,0.001028438,0.001431325,0.000682721
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,2,Female,6,incidence,0.001266173,0.001702183,0.000880679
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,1,Male,15,mortality,0.001047121,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,2,Female,15,mortality,0.000684425,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,41,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,1,Male,5,prevalence,0.11633219,0.148532364,0.088827809
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,2,Female,5,prevalence,0.120046933,0.152350884,0.092011902
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,1,Male,6,incidence,0.001028438,0.001431325,0.000682721
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,2,Female,6,incidence,0.001266173,0.001702183,0.000880679
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,1,Male,15,mortality,0.001047121,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,2,Female,15,mortality,0.000684425,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,42,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,1,Male,5,prevalence,0.11633219,0.148532364,0.088827809
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,2,Female,5,prevalence,0.120046933,0.152350884,0.092011902
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,1,Male,6,incidence,0.001028438,0.001431325,0.000682721
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,2,Female,6,incidence,0.001266173,0.001702183,0.000880679
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,1,Male,15,mortality,0.001047121,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,2,Female,15,mortality,0.000684425,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,43,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,1,Male,5,prevalence,0.11633219,0.148532364,0.088827809
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,2,Female,5,prevalence,0.120046933,0.152350884,0.092011902
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,1,Male,6,incidence,0.001028438,0.001431325,0.000682721
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,2,Female,6,incidence,0.001266173,0.001702183,0.000880679
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,1,Male,15,mortality,0.001047121,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,2,Female,15,mortality,0.000684425,,
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,40-44 years,44,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,1,Male,5,prevalence,0.131116278,0.167318335,0.10207815
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,2,Female,5,prevalence,0.120759624,0.153306233,0.094532153
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,1,Male,6,incidence,0.001780344,0.002400648,0.001221619
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,2,Female,6,incidence,0.001733272,0.002345441,0.001189067
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,1,Male,15,mortality,0.001425781,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,2,Female,15,mortality,0.001054891,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,45,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,1,Male,5,prevalence,0.131116278,0.167318335,0.10207815
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,2,Female,5,prevalence,0.120759624,0.153306233,0.094532153
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,1,Male,6,incidence,0.001780344,0.002400648,0.001221619
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,2,Female,6,incidence,0.001733272,0.002345441,0.001189067
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,1,Male,15,mortality,0.001425781,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,2,Female,15,mortality,0.001054891,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,46,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,1,Male,5,prevalence,0.131116278,0.167318335,0.10207815
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,2,Female,5,prevalence,0.120759624,0.153306233,0.094532153
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,1,Male,6,incidence,0.001780344,0.002400648,0.001221619
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,2,Female,6,incidence,0.001733272,0.002345441,0.001189067
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,1,Male,15,mortality,0.001425781,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,2,Female,15,mortality,0.001054891,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,47,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,1,Male,5,prevalence,0.131116278,0.167318335,0.10207815
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,2,Female,5,prevalence,0.120759624,0.153306233,0.094532153
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,1,Male,6,incidence,0.001780344,0.002400648,0.001221619
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,2,Female,6,incidence,0.001733272,0.002345441,0.001189067
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,1,Male,15,mortality,0.001425781,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,2,Female,15,mortality,0.001054891,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,48,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,1,Male,5,prevalence,0.131116278,0.167318335,0.10207815
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,2,Female,5,prevalence,0.120759624,0.153306233,0.094532153
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,1,Male,6,incidence,0.001780344,0.002400648,0.001221619
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,2,Female,6,incidence,0.001733272,0.002345441,0.001189067
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,1,Male,15,mortality,0.001425781,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,2,Female,15,mortality,0.001054891,,
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,45-49 years,49,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,1,Male,5,prevalence,0.15663565,0.196356664,0.122439875
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,2,Female,5,prevalence,0.133535787,0.165261974,0.105462389
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,1,Male,6,incidence,0.00276389,0.003815876,0.001960714
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,2,Female,6,incidence,0.00235723,0.003411144,0.001591299
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,1,Male,15,mortality,0.001825477,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,2,Female,15,mortality,0.002034344,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,50,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,1,Male,5,prevalence,0.15663565,0.196356664,0.122439875
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,2,Female,5,prevalence,0.133535787,0.165261974,0.105462389
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,1,Male,6,incidence,0.00276389,0.003815876,0.001960714
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,2,Female,6,incidence,0.00235723,0.003411144,0.001591299
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,1,Male,15,mortality,0.001825477,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,2,Female,15,mortality,0.002034344,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,51,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,1,Male,5,prevalence,0.15663565,0.196356664,0.122439875
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,2,Female,5,prevalence,0.133535787,0.165261974,0.105462389
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,1,Male,6,incidence,0.00276389,0.003815876,0.001960714
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,2,Female,6,incidence,0.00235723,0.003411144,0.001591299
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,1,Male,15,mortality,0.001825477,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,2,Female,15,mortality,0.002034344,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,52,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,1,Male,5,prevalence,0.15663565,0.196356664,0.122439875
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,2,Female,5,prevalence,0.133535787,0.165261974,0.105462389
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,1,Male,6,incidence,0.00276389,0.003815876,0.001960714
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,2,Female,6,incidence,0.00235723,0.003411144,0.001591299
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,1,Male,15,mortality,0.001825477,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,2,Female,15,mortality,0.002034344,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,53,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,1,Male,5,prevalence,0.15663565,0.196356664,0.122439875
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,2,Female,5,prevalence,0.133535787,0.165261974,0.105462389
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,1,Male,6,incidence,0.00276389,0.003815876,0.001960714
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,2,Female,6,incidence,0.00235723,0.003411144,0.001591299
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,1,Male,15,mortality,0.001825477,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,2,Female,15,mortality,0.002034344,,
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,50-54 years,54,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,1,Male,5,prevalence,0.18536264,0.227856799,0.147633096
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,2,Female,5,prevalence,0.161406845,0.197649955,0.129885024
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,1,Male,6,incidence,0.004054061,0.005433662,0.002687316
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,2,Female,6,incidence,0.003744428,0.005084607,0.002434463
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,1,Male,15,mortality,0.002663141,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,2,Female,15,mortality,0.002014915,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,55,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,1,Male,5,prevalence,0.18536264,0.227856799,0.147633096
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,2,Female,5,prevalence,0.161406845,0.197649955,0.129885024
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,1,Male,6,incidence,0.004054061,0.005433662,0.002687316
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,2,Female,6,incidence,0.003744428,0.005084607,0.002434463
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,1,Male,15,mortality,0.002663141,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,2,Female,15,mortality,0.002014915,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,56,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,1,Male,5,prevalence,0.18536264,0.227856799,0.147633096
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,2,Female,5,prevalence,0.161406845,0.197649955,0.129885024
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,1,Male,6,incidence,0.004054061,0.005433662,0.002687316
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,2,Female,6,incidence,0.003744428,0.005084607,0.002434463
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,1,Male,15,mortality,0.002663141,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,2,Female,15,mortality,0.002014915,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,57,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,1,Male,5,prevalence,0.18536264,0.227856799,0.147633096
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,2,Female,5,prevalence,0.161406845,0.197649955,0.129885024
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,1,Male,6,incidence,0.004054061,0.005433662,0.002687316
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,2,Female,6,incidence,0.003744428,0.005084607,0.002434463
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,1,Male,15,mortality,0.002663141,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,2,Female,15,mortality,0.002014915,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,58,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,1,Male,5,prevalence,0.18536264,0.227856799,0.147633096
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,2,Female,5,prevalence,0.161406845,0.197649955,0.129885024
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,1,Male,6,incidence,0.004054061,0.005433662,0.002687316
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,2,Female,6,incidence,0.003744428,0.005084607,0.002434463
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,1,Male,15,mortality,0.002663141,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,2,Female,15,mortality,0.002014915,,
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,55-59 years,59,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,1,Male,5,prevalence,0.204033019,0.244461605,0.167403514
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,2,Female,5,prevalence,0.190189297,0.226081509,0.157200941
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,1,Male,6,incidence,0.006342773,0.008587293,0.004383431
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,2,Female,6,incidence,0.006437195,0.00885964,0.004496212
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,1,Male,15,mortality,0.003107301,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,2,Female,15,mortality,0.002536084,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,60,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,1,Male,5,prevalence,0.204033019,0.244461605,0.167403514
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,2,Female,5,prevalence,0.190189297,0.226081509,0.157200941
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,1,Male,6,incidence,0.006342773,0.008587293,0.004383431
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,2,Female,6,incidence,0.006437195,0.00885964,0.004496212
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,1,Male,15,mortality,0.003107301,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,2,Female,15,mortality,0.002536084,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,61,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,1,Male,5,prevalence,0.204033019,0.244461605,0.167403514
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,2,Female,5,prevalence,0.190189297,0.226081509,0.157200941
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,1,Male,6,incidence,0.006342773,0.008587293,0.004383431
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,2,Female,6,incidence,0.006437195,0.00885964,0.004496212
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,1,Male,15,mortality,0.003107301,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,2,Female,15,mortality,0.002536084,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,62,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,1,Male,5,prevalence,0.204033019,0.244461605,0.167403514
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,2,Female,5,prevalence,0.190189297,0.226081509,0.157200941
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,1,Male,6,incidence,0.006342773,0.008587293,0.004383431
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,2,Female,6,incidence,0.006437195,0.00885964,0.004496212
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,1,Male,15,mortality,0.003107301,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,2,Female,15,mortality,0.002536084,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,63,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,1,Male,5,prevalence,0.204033019,0.244461605,0.167403514
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,2,Female,5,prevalence,0.190189297,0.226081509,0.157200941
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,1,Male,6,incidence,0.006342773,0.008587293,0.004383431
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,2,Female,6,incidence,0.006437195,0.00885964,0.004496212
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,1,Male,15,mortality,0.003107301,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,2,Female,15,mortality,0.002536084,,
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,64,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,60-64 years,65,1,Male,5,prevalence,0.235133801,0.274700682,0.201124336
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,2,Female,5,prevalence,0.230610746,0.270307271,0.195861046
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,1,Male,6,incidence,0.009489185,0.012457287,0.00674491
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,2,Female,6,incidence,0.009552534,0.012775029,0.006690266
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,1,Male,15,mortality,0.003963101,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,2,Female,15,mortality,0.002668474,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,65,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,1,Male,5,prevalence,0.235133801,0.274700682,0.201124336
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,2,Female,5,prevalence,0.230610746,0.270307271,0.195861046
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,1,Male,6,incidence,0.009489185,0.012457287,0.00674491
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,2,Female,6,incidence,0.009552534,0.012775029,0.006690266
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,1,Male,15,mortality,0.003963101,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,2,Female,15,mortality,0.002668474,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,66,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,1,Male,5,prevalence,0.235133801,0.274700682,0.201124336
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,2,Female,5,prevalence,0.230610746,0.270307271,0.195861046
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,1,Male,6,incidence,0.009489185,0.012457287,0.00674491
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,2,Female,6,incidence,0.009552534,0.012775029,0.006690266
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,1,Male,15,mortality,0.003963101,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,2,Female,15,mortality,0.002668474,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,67,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,1,Male,5,prevalence,0.235133801,0.274700682,0.201124336
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,2,Female,5,prevalence,0.230610746,0.270307271,0.195861046
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,1,Male,6,incidence,0.009489185,0.012457287,0.00674491
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,2,Female,6,incidence,0.009552534,0.012775029,0.006690266
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,1,Male,15,mortality,0.003963101,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,2,Female,15,mortality,0.002668474,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,68,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,1,Male,5,prevalence,0.235133801,0.274700682,0.201124336
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,2,Female,5,prevalence,0.230610746,0.270307271,0.195861046
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,1,Male,6,incidence,0.009489185,0.012457287,0.00674491
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,2,Female,6,incidence,0.009552534,0.012775029,0.006690266
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,1,Male,15,mortality,0.003963101,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,2,Female,15,mortality,0.002668474,,
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,65-69 years,69,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,1,Male,5,prevalence,0.300703767,0.348642944,0.258585807
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,2,Female,5,prevalence,0.312972588,0.362542584,0.269317794
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,1,Male,6,incidence,0.01151002,0.01478326,0.008024993
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,2,Female,6,incidence,0.011750172,0.015186561,0.008153297
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,1,Male,15,mortality,0.004307919,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,2,Female,15,mortality,0.002647832,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,70,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,1,Male,5,prevalence,0.300703767,0.348642944,0.258585807
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,2,Female,5,prevalence,0.312972588,0.362542584,0.269317794
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,1,Male,6,incidence,0.01151002,0.01478326,0.008024993
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,2,Female,6,incidence,0.011750172,0.015186561,0.008153297
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,1,Male,15,mortality,0.004307919,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,2,Female,15,mortality,0.002647832,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,71,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,1,Male,5,prevalence,0.300703767,0.348642944,0.258585807
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,2,Female,5,prevalence,0.312972588,0.362542584,0.269317794
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,1,Male,6,incidence,0.01151002,0.01478326,0.008024993
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,2,Female,6,incidence,0.011750172,0.015186561,0.008153297
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,1,Male,15,mortality,0.004307919,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,2,Female,15,mortality,0.002647832,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,72,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,1,Male,5,prevalence,0.300703767,0.348642944,0.258585807
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,2,Female,5,prevalence,0.312972588,0.362542584,0.269317794
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,1,Male,6,incidence,0.01151002,0.01478326,0.008024993
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,2,Female,6,incidence,0.011750172,0.015186561,0.008153297
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,1,Male,15,mortality,0.004307919,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,2,Female,15,mortality,0.002647832,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,73,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,1,Male,5,prevalence,0.300703767,0.348642944,0.258585807
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,2,Female,5,prevalence,0.312972588,0.362542584,0.269317794
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,1,Male,6,incidence,0.01151002,0.01478326,0.008024993
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,2,Female,6,incidence,0.011750172,0.015186561,0.008153297
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,1,Male,15,mortality,0.004307919,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,2,Female,15,mortality,0.002647832,,
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,70-74 years,74,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,1,Male,5,prevalence,0.387199014,0.449195482,0.333357365
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,2,Female,5,prevalence,0.41955403,0.485672445,0.362150445
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,1,Male,6,incidence,0.011370104,0.015355443,0.007990787
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,2,Female,6,incidence,0.011159314,0.01515419,0.007822611
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,1,Male,15,mortality,0.004326791,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,2,Female,15,mortality,0.003079376,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,75,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,1,Male,5,prevalence,0.387199014,0.449195482,0.333357365
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,2,Female,5,prevalence,0.41955403,0.485672445,0.362150445
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,1,Male,6,incidence,0.011370104,0.015355443,0.007990787
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,2,Female,6,incidence,0.011159314,0.01515419,0.007822611
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,1,Male,15,mortality,0.004326791,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,2,Female,15,mortality,0.003079376,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,76,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,1,Male,5,prevalence,0.387199014,0.449195482,0.333357365
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,2,Female,5,prevalence,0.41955403,0.485672445,0.362150445
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,1,Male,6,incidence,0.011370104,0.015355443,0.007990787
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,2,Female,6,incidence,0.011159314,0.01515419,0.007822611
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,1,Male,15,mortality,0.004326791,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,2,Female,15,mortality,0.003079376,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,77,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,1,Male,5,prevalence,0.387199014,0.449195482,0.333357365
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,2,Female,5,prevalence,0.41955403,0.485672445,0.362150445
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,1,Male,6,incidence,0.011370104,0.015355443,0.007990787
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,2,Female,6,incidence,0.011159314,0.01515419,0.007822611
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,1,Male,15,mortality,0.004326791,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,2,Female,15,mortality,0.003079376,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,78,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,1,Male,5,prevalence,0.387199014,0.449195482,0.333357365
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,2,Female,5,prevalence,0.41955403,0.485672445,0.362150445
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,1,Male,6,incidence,0.011370104,0.015355443,0.007990787
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,2,Female,6,incidence,0.011159314,0.01515419,0.007822611
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,1,Male,15,mortality,0.004326791,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,2,Female,15,mortality,0.003079376,,
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,75-79 years,79,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,80,1,Male,5,prevalence,0.46134946,0.535781225,0.400735576
+D356,India,589,Chronic kidney disease,2019,80-84,80,2,Female,5,prevalence,0.501133644,0.585405358,0.43382256
+D356,India,589,Chronic kidney disease,2019,80-84,80,1,Male,6,incidence,0.010529021,0.01428942,0.007193973
+D356,India,589,Chronic kidney disease,2019,80-84,80,2,Female,6,incidence,0.00905829,0.012490783,0.006104264
+D356,India,589,Chronic kidney disease,2019,80-84,80,1,Male,15,mortality,0.00561454,,
+D356,India,589,Chronic kidney disease,2019,80-84,80,2,Female,15,mortality,0.003037384,,
+D356,India,589,Chronic kidney disease,2019,80-84,80,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,80,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,81,1,Male,5,prevalence,0.46134946,0.535781225,0.400735576
+D356,India,589,Chronic kidney disease,2019,80-84,81,2,Female,5,prevalence,0.501133644,0.585405358,0.43382256
+D356,India,589,Chronic kidney disease,2019,80-84,81,1,Male,6,incidence,0.010529021,0.01428942,0.007193973
+D356,India,589,Chronic kidney disease,2019,80-84,81,2,Female,6,incidence,0.00905829,0.012490783,0.006104264
+D356,India,589,Chronic kidney disease,2019,80-84,81,1,Male,15,mortality,0.00561454,,
+D356,India,589,Chronic kidney disease,2019,80-84,81,2,Female,15,mortality,0.003037384,,
+D356,India,589,Chronic kidney disease,2019,80-84,81,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,81,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,82,1,Male,5,prevalence,0.46134946,0.535781225,0.400735576
+D356,India,589,Chronic kidney disease,2019,80-84,82,2,Female,5,prevalence,0.501133644,0.585405358,0.43382256
+D356,India,589,Chronic kidney disease,2019,80-84,82,1,Male,6,incidence,0.010529021,0.01428942,0.007193973
+D356,India,589,Chronic kidney disease,2019,80-84,82,2,Female,6,incidence,0.00905829,0.012490783,0.006104264
+D356,India,589,Chronic kidney disease,2019,80-84,82,1,Male,15,mortality,0.00561454,,
+D356,India,589,Chronic kidney disease,2019,80-84,82,2,Female,15,mortality,0.003037384,,
+D356,India,589,Chronic kidney disease,2019,80-84,82,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,82,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,83,1,Male,5,prevalence,0.46134946,0.535781225,0.400735576
+D356,India,589,Chronic kidney disease,2019,80-84,83,2,Female,5,prevalence,0.501133644,0.585405358,0.43382256
+D356,India,589,Chronic kidney disease,2019,80-84,83,1,Male,6,incidence,0.010529021,0.01428942,0.007193973
+D356,India,589,Chronic kidney disease,2019,80-84,83,2,Female,6,incidence,0.00905829,0.012490783,0.006104264
+D356,India,589,Chronic kidney disease,2019,80-84,83,1,Male,15,mortality,0.00561454,,
+D356,India,589,Chronic kidney disease,2019,80-84,83,2,Female,15,mortality,0.003037384,,
+D356,India,589,Chronic kidney disease,2019,80-84,83,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,83,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,84,1,Male,5,prevalence,0.46134946,0.535781225,0.400735576
+D356,India,589,Chronic kidney disease,2019,80-84,84,2,Female,5,prevalence,0.501133644,0.585405358,0.43382256
+D356,India,589,Chronic kidney disease,2019,80-84,84,1,Male,6,incidence,0.010529021,0.01428942,0.007193973
+D356,India,589,Chronic kidney disease,2019,80-84,84,2,Female,6,incidence,0.00905829,0.012490783,0.006104264
+D356,India,589,Chronic kidney disease,2019,80-84,84,1,Male,15,mortality,0.00561454,,
+D356,India,589,Chronic kidney disease,2019,80-84,84,2,Female,15,mortality,0.003037384,,
+D356,India,589,Chronic kidney disease,2019,80-84,84,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,80-84,84,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,85,1,Male,5,prevalence,0.487115276,0.557374371,0.430263669
+D356,India,589,Chronic kidney disease,2019,85-89,85,2,Female,5,prevalence,0.524914022,0.59814596,0.461278727
+D356,India,589,Chronic kidney disease,2019,85-89,85,1,Male,6,incidence,0.009852518,0.013642013,0.006579851
+D356,India,589,Chronic kidney disease,2019,85-89,85,2,Female,6,incidence,0.008109418,0.011449081,0.005279055
+D356,India,589,Chronic kidney disease,2019,85-89,85,1,Male,15,mortality,0.008113474,,
+D356,India,589,Chronic kidney disease,2019,85-89,85,2,Female,15,mortality,0.004008172,,
+D356,India,589,Chronic kidney disease,2019,85-89,85,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,85,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,86,1,Male,5,prevalence,0.487115276,0.557374371,0.430263669
+D356,India,589,Chronic kidney disease,2019,85-89,86,2,Female,5,prevalence,0.524914022,0.59814596,0.461278727
+D356,India,589,Chronic kidney disease,2019,85-89,86,1,Male,6,incidence,0.009852518,0.013642013,0.006579851
+D356,India,589,Chronic kidney disease,2019,85-89,86,2,Female,6,incidence,0.008109418,0.011449081,0.005279055
+D356,India,589,Chronic kidney disease,2019,85-89,86,1,Male,15,mortality,0.008113474,,
+D356,India,589,Chronic kidney disease,2019,85-89,86,2,Female,15,mortality,0.004008172,,
+D356,India,589,Chronic kidney disease,2019,85-89,86,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,86,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,87,1,Male,5,prevalence,0.487115276,0.557374371,0.430263669
+D356,India,589,Chronic kidney disease,2019,85-89,87,2,Female,5,prevalence,0.524914022,0.59814596,0.461278727
+D356,India,589,Chronic kidney disease,2019,85-89,87,1,Male,6,incidence,0.009852518,0.013642013,0.006579851
+D356,India,589,Chronic kidney disease,2019,85-89,87,2,Female,6,incidence,0.008109418,0.011449081,0.005279055
+D356,India,589,Chronic kidney disease,2019,85-89,87,1,Male,15,mortality,0.008113474,,
+D356,India,589,Chronic kidney disease,2019,85-89,87,2,Female,15,mortality,0.004008172,,
+D356,India,589,Chronic kidney disease,2019,85-89,87,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,87,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,88,1,Male,5,prevalence,0.487115276,0.557374371,0.430263669
+D356,India,589,Chronic kidney disease,2019,85-89,88,2,Female,5,prevalence,0.524914022,0.59814596,0.461278727
+D356,India,589,Chronic kidney disease,2019,85-89,88,1,Male,6,incidence,0.009852518,0.013642013,0.006579851
+D356,India,589,Chronic kidney disease,2019,85-89,88,2,Female,6,incidence,0.008109418,0.011449081,0.005279055
+D356,India,589,Chronic kidney disease,2019,85-89,88,1,Male,15,mortality,0.008113474,,
+D356,India,589,Chronic kidney disease,2019,85-89,88,2,Female,15,mortality,0.004008172,,
+D356,India,589,Chronic kidney disease,2019,85-89,88,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,88,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,89,1,Male,5,prevalence,0.487115276,0.557374371,0.430263669
+D356,India,589,Chronic kidney disease,2019,85-89,89,2,Female,5,prevalence,0.524914022,0.59814596,0.461278727
+D356,India,589,Chronic kidney disease,2019,85-89,89,1,Male,6,incidence,0.009852518,0.013642013,0.006579851
+D356,India,589,Chronic kidney disease,2019,85-89,89,2,Female,6,incidence,0.008109418,0.011449081,0.005279055
+D356,India,589,Chronic kidney disease,2019,85-89,89,1,Male,15,mortality,0.008113474,,
+D356,India,589,Chronic kidney disease,2019,85-89,89,2,Female,15,mortality,0.004008172,,
+D356,India,589,Chronic kidney disease,2019,85-89,89,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,85-89,89,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,90,1,Male,5,prevalence,0.49042449,0.555029312,0.434126807
+D356,India,589,Chronic kidney disease,2019,90-94,90,2,Female,5,prevalence,0.526672099,0.597554906,0.464930501
+D356,India,589,Chronic kidney disease,2019,90-94,90,1,Male,6,incidence,0.009692545,0.013736207,0.006315169
+D356,India,589,Chronic kidney disease,2019,90-94,90,2,Female,6,incidence,0.00931941,0.013062014,0.006228722
+D356,India,589,Chronic kidney disease,2019,90-94,90,1,Male,15,mortality,0.012670652,,
+D356,India,589,Chronic kidney disease,2019,90-94,90,2,Female,15,mortality,0.0060271,,
+D356,India,589,Chronic kidney disease,2019,90-94,90,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,90,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,91,1,Male,5,prevalence,0.49042449,0.555029312,0.434126807
+D356,India,589,Chronic kidney disease,2019,90-94,91,2,Female,5,prevalence,0.526672099,0.597554906,0.464930501
+D356,India,589,Chronic kidney disease,2019,90-94,91,1,Male,6,incidence,0.009692545,0.013736207,0.006315169
+D356,India,589,Chronic kidney disease,2019,90-94,91,2,Female,6,incidence,0.00931941,0.013062014,0.006228722
+D356,India,589,Chronic kidney disease,2019,90-94,91,1,Male,15,mortality,0.012670652,,
+D356,India,589,Chronic kidney disease,2019,90-94,91,2,Female,15,mortality,0.0060271,,
+D356,India,589,Chronic kidney disease,2019,90-94,91,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,91,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,92,1,Male,5,prevalence,0.49042449,0.555029312,0.434126807
+D356,India,589,Chronic kidney disease,2019,90-94,92,2,Female,5,prevalence,0.526672099,0.597554906,0.464930501
+D356,India,589,Chronic kidney disease,2019,90-94,92,1,Male,6,incidence,0.009692545,0.013736207,0.006315169
+D356,India,589,Chronic kidney disease,2019,90-94,92,2,Female,6,incidence,0.00931941,0.013062014,0.006228722
+D356,India,589,Chronic kidney disease,2019,90-94,92,1,Male,15,mortality,0.012670652,,
+D356,India,589,Chronic kidney disease,2019,90-94,92,2,Female,15,mortality,0.0060271,,
+D356,India,589,Chronic kidney disease,2019,90-94,92,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,92,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,93,1,Male,5,prevalence,0.49042449,0.555029312,0.434126807
+D356,India,589,Chronic kidney disease,2019,90-94,93,2,Female,5,prevalence,0.526672099,0.597554906,0.464930501
+D356,India,589,Chronic kidney disease,2019,90-94,93,1,Male,6,incidence,0.009692545,0.013736207,0.006315169
+D356,India,589,Chronic kidney disease,2019,90-94,93,2,Female,6,incidence,0.00931941,0.013062014,0.006228722
+D356,India,589,Chronic kidney disease,2019,90-94,93,1,Male,15,mortality,0.012670652,,
+D356,India,589,Chronic kidney disease,2019,90-94,93,2,Female,15,mortality,0.0060271,,
+D356,India,589,Chronic kidney disease,2019,90-94,93,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,93,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,94,1,Male,5,prevalence,0.49042449,0.555029312,0.434126807
+D356,India,589,Chronic kidney disease,2019,90-94,94,2,Female,5,prevalence,0.526672099,0.597554906,0.464930501
+D356,India,589,Chronic kidney disease,2019,90-94,94,1,Male,6,incidence,0.009692545,0.013736207,0.006315169
+D356,India,589,Chronic kidney disease,2019,90-94,94,2,Female,6,incidence,0.00931941,0.013062014,0.006228722
+D356,India,589,Chronic kidney disease,2019,90-94,94,1,Male,15,mortality,0.012670652,,
+D356,India,589,Chronic kidney disease,2019,90-94,94,2,Female,15,mortality,0.0060271,,
+D356,India,589,Chronic kidney disease,2019,90-94,94,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,90-94,94,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,95,1,Male,5,prevalence,0.50832267,0.580510526,0.448572719
+D356,India,589,Chronic kidney disease,2019,95+ years,95,2,Female,5,prevalence,0.540114646,0.618048604,0.475550215
+D356,India,589,Chronic kidney disease,2019,95+ years,95,1,Male,6,incidence,0.009992528,0.01529583,0.006347559
+D356,India,589,Chronic kidney disease,2019,95+ years,95,2,Female,6,incidence,0.011569434,0.017771732,0.007156042
+D356,India,589,Chronic kidney disease,2019,95+ years,95,1,Male,15,mortality,0.019625194,,
+D356,India,589,Chronic kidney disease,2019,95+ years,95,2,Female,15,mortality,0.008445015,,
+D356,India,589,Chronic kidney disease,2019,95+ years,95,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,95,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,96,1,Male,5,prevalence,0.50832267,0.580510526,0.448572719
+D356,India,589,Chronic kidney disease,2019,95+ years,96,2,Female,5,prevalence,0.540114646,0.618048604,0.475550215
+D356,India,589,Chronic kidney disease,2019,95+ years,96,1,Male,6,incidence,0.009992528,0.01529583,0.006347559
+D356,India,589,Chronic kidney disease,2019,95+ years,96,2,Female,6,incidence,0.011569434,0.017771732,0.007156042
+D356,India,589,Chronic kidney disease,2019,95+ years,96,1,Male,15,mortality,0.019625194,,
+D356,India,589,Chronic kidney disease,2019,95+ years,96,2,Female,15,mortality,0.008445015,,
+D356,India,589,Chronic kidney disease,2019,95+ years,96,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,96,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,97,1,Male,5,prevalence,0.50832267,0.580510526,0.448572719
+D356,India,589,Chronic kidney disease,2019,95+ years,97,2,Female,5,prevalence,0.540114646,0.618048604,0.475550215
+D356,India,589,Chronic kidney disease,2019,95+ years,97,1,Male,6,incidence,0.009992528,0.01529583,0.006347559
+D356,India,589,Chronic kidney disease,2019,95+ years,97,2,Female,6,incidence,0.011569434,0.017771732,0.007156042
+D356,India,589,Chronic kidney disease,2019,95+ years,97,1,Male,15,mortality,0.019625194,,
+D356,India,589,Chronic kidney disease,2019,95+ years,97,2,Female,15,mortality,0.008445015,,
+D356,India,589,Chronic kidney disease,2019,95+ years,97,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,97,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,98,1,Male,5,prevalence,0.50832267,0.580510526,0.448572719
+D356,India,589,Chronic kidney disease,2019,95+ years,98,2,Female,5,prevalence,0.540114646,0.618048604,0.475550215
+D356,India,589,Chronic kidney disease,2019,95+ years,98,1,Male,6,incidence,0.009992528,0.01529583,0.006347559
+D356,India,589,Chronic kidney disease,2019,95+ years,98,2,Female,6,incidence,0.011569434,0.017771732,0.007156042
+D356,India,589,Chronic kidney disease,2019,95+ years,98,1,Male,15,mortality,0.019625194,,
+D356,India,589,Chronic kidney disease,2019,95+ years,98,2,Female,15,mortality,0.008445015,,
+D356,India,589,Chronic kidney disease,2019,95+ years,98,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,98,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,99,1,Male,5,prevalence,0.50832267,0.580510526,0.448572719
+D356,India,589,Chronic kidney disease,2019,95+ years,99,2,Female,5,prevalence,0.540114646,0.618048604,0.475550215
+D356,India,589,Chronic kidney disease,2019,95+ years,99,1,Male,6,incidence,0.009992528,0.01529583,0.006347559
+D356,India,589,Chronic kidney disease,2019,95+ years,99,2,Female,6,incidence,0.011569434,0.017771732,0.007156042
+D356,India,589,Chronic kidney disease,2019,95+ years,99,1,Male,15,mortality,0.019625194,,
+D356,India,589,Chronic kidney disease,2019,95+ years,99,2,Female,15,mortality,0.008445015,,
+D356,India,589,Chronic kidney disease,2019,95+ years,99,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,99,2,Female,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,100,1,Male,5,prevalence,0.50832267,0.580510526,0.448572719
+D356,India,589,Chronic kidney disease,2019,95+ years,100,2,Female,5,prevalence,0.540114646,0.618048604,0.475550215
+D356,India,589,Chronic kidney disease,2019,95+ years,100,1,Male,6,incidence,0.009992528,0.01529583,0.006347559
+D356,India,589,Chronic kidney disease,2019,95+ years,100,2,Female,6,incidence,0.011569434,0.017771732,0.007156042
+D356,India,589,Chronic kidney disease,2019,95+ years,100,1,Male,15,mortality,0.019625194,,
+D356,India,589,Chronic kidney disease,2019,95+ years,100,2,Female,15,mortality,0.008445015,,
+D356,India,589,Chronic kidney disease,2019,95+ years,100,1,Male,7,remission,0,0,0
+D356,India,589,Chronic kidney disease,2019,95+ years,100,2,Female,7,remission,0,0,0
