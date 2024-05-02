@@ -27,7 +27,8 @@ void print_app_title() {
     fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
                "\n# Health-GPS Microsimulation for Policy Options #\n\n");
 
-    fmt::print("Today: {}\n\n", get_time_now_str());
+    fmt::print("Today: {}\nMaximum threads: {}\n\n", get_time_now_str(),
+               tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism));
 }
 
 /// @brief Prints application exit message
