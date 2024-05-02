@@ -8,17 +8,17 @@ namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
     const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
-    const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
-    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
-    const std::vector<LinearModelParams> &policy_models,
+    const std::vector<LinearModelParams> &models, const std::vector<core::DoubleInterval> &ranges,
+    const std::vector<double> &lambda, const std::vector<double> &stddev,
+    const Eigen::MatrixXd &cholesky, const std::vector<LinearModelParams> &policy_models,
     const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
     double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     core::Income income_default, double physical_activity_stddev)
-    : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, lambda_{lambda},
-      stddev_{stddev}, cholesky_{cholesky}, policy_models_{policy_models},
+    : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, ranges_{ranges},
+      lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky}, policy_models_{policy_models},
       policy_ranges_{policy_ranges}, policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
       income_default_{income_default}, physical_activity_stddev_{physical_activity_stddev} {}
@@ -392,9 +392,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     const auto &expected = get_risk_factor_expected();
     return std::make_unique<StaticLinearModel>(
-        expected, names_, models_, lambda_, stddev_, cholesky_, policy_models_, policy_ranges_,
-        policy_cholesky_, info_speed_, rural_prevalence_, income_models_, income_default_,
-        physical_activity_stddev_);
+        expected, names_, models_, ranges_, lambda_, stddev_, cholesky_, policy_models_,
+        policy_ranges_, policy_cholesky_, info_speed_, rural_prevalence_, income_models_,
+        income_default, physical_activity_stddev_);
 }
 
 } // namespace hgps
