@@ -30,7 +30,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param stddev The standard deviations of the risk factors
     /// @param cholesky Cholesky decomposition of the risk factor correlation matrix
     /// @param policy_models The linear models used to compute a person's intervention policies
-    /// @param policy_ranges The boundaries of the intervention policy values
+    /// @param policy_ranges The intervention policy value boundaries
     /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
@@ -122,11 +122,12 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param expected The risk factor expected values by sex and age
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factors
+    /// @param ranges The risk factor value boundaries
     /// @param lambda The lambda values of the risk factors
     /// @param stddev The standard deviations of the risk factors
     /// @param cholesky Cholesky decomposition of the risk factor correlation matrix
     /// @param policy_models The linear models used to compute a person's intervention policies
-    /// @param policy_ranges The boundaries of the intervention policy values
+    /// @param policy_ranges The intervention policy value boundaries
     /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
@@ -136,8 +137,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
-        std::vector<LinearModelParams> models, std::vector<double> lambda,
-        std::vector<double> stddev, Eigen::MatrixXd cholesky,
+        std::vector<LinearModelParams> models, std::vector<core::DoubleInterval> ranges,
+        std::vector<double> lambda, std::vector<double> stddev, Eigen::MatrixXd cholesky,
         std::vector<LinearModelParams> policy_models,
         std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
         double info_speed,
@@ -153,6 +154,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   private:
     std::vector<core::Identifier> names_;
     std::vector<LinearModelParams> models_;
+    std::vector<core::DoubleInterval> ranges_;
     std::vector<double> lambda_;
     std::vector<double> stddev_;
     Eigen::MatrixXd cholesky_;
