@@ -328,10 +328,10 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(expected), std::move(names), std::move(models), std::move(lambda),
-        std::move(stddev), std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
-        std::move(policy_cholesky), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev);
+        std::move(expected), std::move(names), std::move(models), std::move(ranges),
+        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
+        std::move(policy_ranges), std::move(policy_cholesky), info_speed,
+        std::move(rural_prevalence), std::move(income_models), physical_activity_stddev);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>

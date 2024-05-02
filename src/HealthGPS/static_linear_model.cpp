@@ -337,19 +337,19 @@ void StaticLinearModel::initialise_physical_activity(Person &person, Random &ran
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
-    std::vector<LinearModelParams> models, std::vector<double> lambda, std::vector<double> stddev,
-    Eigen::MatrixXd cholesky, std::vector<LinearModelParams> policy_models,
-    std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
-    double info_speed,
+    std::vector<LinearModelParams> models, std::vector<core::DoubleInterval> ranges,
+    std::vector<double> lambda, std::vector<double> stddev, Eigen::MatrixXd cholesky,
+    std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,
+    Eigen::MatrixXd policy_cholesky, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
-      models_{std::move(models)}, lambda_{std::move(lambda)}, stddev_{std::move(stddev)},
-      cholesky_{std::move(cholesky)}, policy_models_{std::move(policy_models)},
-      policy_ranges_{std::move(policy_ranges)}, policy_cholesky_{std::move(policy_cholesky)},
-      info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      income_models_{std::move(income_models)},
+      models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
+      stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
+      policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
+      policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
+      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
@@ -357,6 +357,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
     if (models_.empty()) {
         throw core::HgpsException("Risk factor model list is empty");
+    }
+    if (ranges_.empty()) {
+        throw core::HgpsException("Risk factor ranges list is empty");
     }
     if (lambda_.empty()) {
         throw core::HgpsException("Risk factor lambda list is empty");
