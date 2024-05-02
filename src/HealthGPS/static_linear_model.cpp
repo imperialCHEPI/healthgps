@@ -114,6 +114,11 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
+
+        // Clamp risk factor to range.
+        factor = ranges_[i].clamp(factor);
+
+        // Save risk factor.
         person.risk_factors[names_[i]] = factor;
     }
 }
@@ -140,6 +145,11 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
+
+        // Clamp risk factor to range.
+        factor = ranges_[i].clamp(factor);
+
+        // Save risk factor.
         person.risk_factors.at(names_[i]) = factor;
     }
 }
