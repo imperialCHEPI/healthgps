@@ -180,6 +180,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<hgps::core::Identifier> names;
     std::vector<hgps::LinearModelParams> models;
+    std::vector<hgps::core::DoubleInterval> ranges;
     std::vector<double> lambda;
     std::vector<double> stddev;
     std::vector<hgps::LinearModelParams> policy_models;
@@ -206,6 +207,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
+        ranges.emplace_back(json_params["Range"].get<hgps::core::DoubleInterval>());
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
