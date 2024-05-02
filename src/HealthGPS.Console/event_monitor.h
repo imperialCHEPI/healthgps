@@ -38,8 +38,8 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     tbb::task_group_context tg_context_;
     tbb::task_group tg_;
     std::vector<std::unique_ptr<hgps::EventSubscriber>> handlers_;
-    tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> info_queue_;
-    tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> results_queue_;
+    tbb::concurrent_bounded_queue<std::shared_ptr<hgps::EventMessage>> info_queue_;
+    tbb::concurrent_bounded_queue<std::shared_ptr<hgps::EventMessage>> results_queue_;
 
     void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
     void error_event_handler(const std::shared_ptr<hgps::EventMessage> &message);
@@ -47,5 +47,6 @@ class EventMonitor final : public hgps::EventMessageVisitor {
 
     void info_dispatch_thread();
     void result_dispatch_thread();
+    void dequeue_forever(tbb::concurrent_bounded_queue<std::shared_ptr<hgps::EventMessage>> &queue);
 };
 } // namespace host

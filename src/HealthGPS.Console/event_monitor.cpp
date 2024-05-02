@@ -40,6 +40,8 @@ EventMonitor::~EventMonitor() noexcept {
 
 void EventMonitor::stop() noexcept {
     tg_context_.cancel_group_execution();
+    info_queue_.abort();
+    results_queue_.abort();
     tg_.wait();
 }
 
@@ -70,31 +72,28 @@ void EventMonitor::result_event_handler(std::shared_ptr<hgps::EventMessage> mess
     results_queue_.emplace(std::move(message));
 }
 
+void EventMonitor::dequeue_forever(
+    tbb::concurrent_bounded_queue<std::shared_ptr<hgps::EventMessage>> &queue) {
+    try {
+        while (!tg_context_.is_group_execution_cancelled()) {
+            std::shared_ptr<hgps::EventMessage> m;
+            queue.pop(m);
+            m->accept(*this);
+        }
+    } catch (tbb::user_abort &) {
+        // queue's abort() method was called while waiting for pop()
+    }
+}
+
 void EventMonitor::info_dispatch_thread() {
     fmt::print(fg(fmt::color::light_blue), "Info event thread started...\n");
-    while (!tg_context_.is_group_execution_cancelled()) {
-        std::shared_ptr<hgps::EventMessage> m;
-        if (info_queue_.try_pop(m)) {
-            m->accept(*this);
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    }
-
+    dequeue_forever(info_queue_);
     fmt::print(fg(fmt::color::light_blue), "Info event thread exited.\n");
 }
 
 void EventMonitor::result_dispatch_thread() {
     fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
-    while (!tg_context_.is_group_execution_cancelled()) {
-        std::shared_ptr<hgps::EventMessage> m;
-        if (results_queue_.try_pop(m)) {
-            m->accept(*this);
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    }
-
+    dequeue_forever(results_queue_);
     fmt::print(fg(fmt::color::gray), "Result event thread exited.\n");
 }
 } // namespace host
