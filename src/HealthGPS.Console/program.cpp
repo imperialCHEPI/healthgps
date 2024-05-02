@@ -162,7 +162,6 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         }
 
         // Waits for messages queue to be processed before stopping events monitor
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
         event_monitor.stop();
 
