@@ -78,7 +78,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             double value = person.risk_factors.at(factors[i]) + delta;
 
             // Clamp value to an optionally specified range.
-            if (!ranges.has_value()) {
+            if (ranges.has_value()) {
                 const auto &range = ranges.value().get()[i];
                 value = range.clamp(value);
             }
