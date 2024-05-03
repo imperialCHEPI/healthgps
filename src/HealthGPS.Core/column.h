@@ -20,7 +20,8 @@ class DataTableColumn {
     DataTableColumn &operator=(DataTableColumn &&) = delete;
 
     /// @brief Destroys a DataTableColumn instance
-    virtual ~DataTableColumn() = default;;
+    virtual ~DataTableColumn() = default;
+    ;
 
     /// @brief Gets the column type name
     /// @return Column type name
