@@ -1,0 +1,186 @@
+{
+    "ModelName": "StaticLinear",
+    "InformationSpeed": 0.1,
+    "PhysicalActivityStdDev": 0.06,
+    "RuralPrevalence": [
+        {
+            "Name": "Under18",
+            "Female": 0.626739964429027,
+            "Male": 0.624047373841401
+        },
+        {
+            "Name": "Over18",
+            "Female": 0.587936516771846,
+            "Male": 0.583313018464474
+        }
+    ],
+    "IncomeDefault": "Middle",
+    "IncomeModels": {
+        "Low": {
+            "Intercept": 0.0,
+            "Coefficients": {}
+        },
+        "Middle": {
+            "Intercept": -0.0683240814272077,
+            "Coefficients": {
+                "Gender": 0.032217497176628,
+                "Over18": 0.298055376100666,
+                "Sector": -0.383372795038086
+            }
+        },
+        "High": {
+            "Intercept": -0.0427919974409829,
+            "Coefficients": {
+                "Gender": 0.0447125663820498,
+                "Over18": 0.619113033863595,
+                "Sector": -1.39658672904111
+            }
+        }
+    },
+    "RiskFactorModels": {
+        "FoodCarbohydrate": {
+            "Lambda": 0.303030303030303,
+            "StdDev": 0.323546436042623,
+            "Range": [64.76517, 930.1518],
+            "Intercept": -0.163564941825921,
+            "Coefficients": {
+                "Gender": 0.001909201186864,
+                "Age": -0.000212546757902497,
+                "Age2": 1.87236401928853e-7,
+                "Age3": -1.13592924060027e-8,
+                "Sector": 0.0583895658455863,
+                "Income": 0.0516596927242407
+            },
+            "Policy": {
+                "Range": [-8.03, 0.086],
+                "Intercept": -1.05447617013696,
+                "Coefficients": {
+                    "Gender": 0.0303250477046311,
+                    "Age": 0.00141452834835562,
+                    "Sector": 0.224289305139274,
+                    "Income": -0.240873809490624
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.501407961046751,
+                    "FoodFat": -0.570740670573432,
+                    "FoodProtein": 0.0498013240083559,
+                    "FoodSodium": -0.0695194417583296
+                }
+            }
+        },
+        "FoodFat": {
+            "Lambda": 0.141414141414141,
+            "StdDev": 0.464325512741348,
+            "Range": [5.783735, 175.6248],
+            "Intercept": -0.554488757309044,
+            "Coefficients": {
+                "Gender": 0.00102119865887904,
+                "Age": -0.00462679326537629,
+                "Age2": 5.47946635530975e-5,
+                "Age3": -2.39659075915002e-7,
+                "Sector": -0.0863212060348545,
+                "Income": 0.302938242093029
+            },
+            "Policy": {
+                "Range": [-12.698, -0.003],
+                "Intercept": 1.08215897351388,
+                "Coefficients": {
+                    "Gender": 0.0401506029529304,
+                    "Age": 0.00322089372040589,
+                    "Sector": 0.391941393811509,
+                    "Income": -0.889566324418439
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": -0.629126925840758,
+                    "FoodFat": 0.767055489081896,
+                    "FoodProtein": 0.11723326951757,
+                    "FoodSodium": -0.313803249984475
+                }
+            }
+        },
+        "FoodProtein": {
+            "Lambda": 0.141414141414141,
+            "StdDev": 0.316612639385793,
+            "Range": [10.21256, 149.174],
+            "Intercept": -0.253982902057632,
+            "Coefficients": {
+                "Gender": 0.00230009880181239,
+                "Age": -0.000940138272923037,
+                "Age2": 6.05566801607947e-6,
+                "Age3": -2.30866807307216e-8,
+                "Sector": 0.0228382301683487,
+                "Income": 0.113898881231242
+            },
+            "Policy": {
+                "Range": [-9.918, 0.061],
+                "Intercept": 1.03189334475653,
+                "Coefficients": {
+                    "Gender": 0.0485436073131216,
+                    "Age": 0.00184412050744483,
+                    "Sector": 0.310859037110144,
+                    "Income": -0.336398020059
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": -0.0956460445718708,
+                    "FoodFat": -0.500866042698564,
+                    "FoodProtein": 0.813190130599969,
+                    "FoodSodium": -0.357000548778017
+                }
+            }
+        },
+        "FoodSodium": {
+            "Lambda": 0.181818181818182,
+            "StdDev": 0.42022134002726,
+            "Range": [356.78, 10508.54],
+            "Intercept": -0.186646397184792,
+            "Coefficients": {
+                "Gender": 0.00324988697857038,
+                "Age": -0.000823686051671132,
+                "Age2": 1.08381456533309e-5,
+                "Age3": -8.59404983799456e-8,
+                "Sector": 0.00601589219498129,
+                "Income": 0.0661571251934935
+            },
+            "Policy": {
+                "Range": [-14.23, -0.002],
+                "Intercept": -2.63804353965301,
+                "Coefficients": {
+                    "Gender": 0.0301534956094056,
+                    "Age": 0.00126437217878607,
+                    "Sector": 0.26918436229669,
+                    "Income": -0.308176440811183
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": -0.519941770949376,
+                    "FoodFat": -0.434378111344917,
+                    "FoodProtein": 0.0798588147063119,
+                    "FoodSodium": 0.788950190079322
+                }
+            }
+        }
+    },
+    "RiskFactorCorrelationFile": {
+        "name": "residual_risk_factor_correlation.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "columns": {
+            "FoodCarbohydrate": "double",
+            "FoodFat": "double",
+            "FoodProtein": "double",
+            "FoodSodium": "double"
+        }
+    },
+    "PolicyCovarianceFile": {
+        "name": "residual_policy_covariance.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "UTF8",
+        "columns": {
+            "FoodCarbohydrate": "double",
+            "FoodFat": "double",
+            "FoodProtein": "double",
+            "FoodSodium": "double"
+        }
+    }
+}
