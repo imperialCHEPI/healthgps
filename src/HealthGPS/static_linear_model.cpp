@@ -410,7 +410,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
     return std::make_unique<StaticLinearModel>(
         expected, names_, models_, ranges_, lambda_, stddev_, cholesky_, policy_models_,
         policy_ranges_, policy_cholesky_, info_speed_, rural_prevalence_, income_models_,
-        income_default, physical_activity_stddev_);
+        income_default_, physical_activity_stddev_);
 }
 
 } // namespace hgps
