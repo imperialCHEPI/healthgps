@@ -18,8 +18,8 @@ struct FirstMoment {
         sum_ += value;
     }
 
-    // Empty mean is zero, not NaN, since the slot may not be empty in intervention scenario.
-    double mean() const noexcept { return (count_ > 0) ? (sum_ / count_) : 0.0; }
+    // Empty mean is NaN, so risk factors are not adjusted.
+    double mean() const noexcept { return sum_ / count_; }
 
   private:
     int count_{};
@@ -32,24 +32,20 @@ namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     const RiskFactorSexAgeTable &risk_factor_expected)
-    : risk_factor_expected_{risk_factor_expected} {
-
-    if (risk_factor_expected_.empty()) {
-        throw core::HgpsException("Risk factor expected value mapping is empty");
-    }
-}
+    : risk_factor_expected_{risk_factor_expected} {}
 
 const RiskFactorSexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
     return risk_factor_expected_;
 }
 
-void RiskFactorAdjustableModel::adjust_risk_factors(
-    RuntimeContext &context, const std::vector<core::Identifier> &keys) const {
+void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
+                                                    const std::vector<core::Identifier> &factors,
+                                                    OptionalRanges ranges) const {
     RiskFactorSexAgeTable adjustments;
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = calculate_adjustments(context, keys);
+        adjustments = calculate_adjustments(context, factors);
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
@@ -77,9 +73,18 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
             return;
         }
 
-        for (const auto &factor : keys) {
-            double delta = adjustments.at(person.gender, factor).at(person.age);
-            person.risk_factors.at(factor) += delta;
+        for (size_t i = 0; i < factors.size(); i++) {
+            double delta = adjustments.at(person.gender, factors[i]).at(person.age);
+            double value = person.risk_factors.at(factors[i]) + delta;
+
+            // Clamp value to an optionally specified range.
+            if (!ranges.has_value()) {
+                const auto &range = ranges.value().get()[i];
+                value = range.clamp(value);
+            }
+
+            // Set the adjusted value.
+            person.risk_factors.at(factors[i]) = value;
         }
     });
 
@@ -90,27 +95,32 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
     }
 }
 
-RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
-                                                 const std::vector<core::Identifier> &keys) const {
+RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
+    RuntimeContext &context, const std::vector<core::Identifier> &factors) const {
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
     // Compute simulated means.
-    auto simulated_means = calculate_simulated_mean(context.population(), age_range, keys);
+    auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
-        for (const auto &factor : keys) {
-            adjustments.emplace(sex, factor, std::vector<double>(age_count, 0.0));
+        for (const auto &factor : factors) {
+            adjustments.emplace(sex, factor, std::vector<double>(age_count));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
                 double expect = risk_factor_expected_.at(sex, factor).at(age);
                 double sim_mean = simulated_means_by_sex.at(factor).at(age);
-                double delta = expect - sim_mean;
-                if (!std::isnan(delta)) {
-                    adjustments.at(sex, factor).at(age) = delta;
+
+                // Delta should remain zero if simulated mean is NaN.
+                double delta = 0.0;
+
+                // Else, delta is the distance from expected value.
+                if (!std::isnan(sim_mean)) {
+                    delta = expect - sim_mean;
                 }
+
+                adjustments.at(sex, factor).at(age) = delta;
             }
         }
     }
@@ -121,7 +131,7 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                                                     const core::IntegerInterval age_range,
-                                                    const std::vector<core::Identifier> &keys) {
+                                                    const std::vector<core::Identifier> &factors) {
     auto age_count = age_range.upper() + 1;
 
     // Compute first moments.
@@ -131,7 +141,7 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             continue;
         }
 
-        for (const auto &factor : keys) {
+        for (const auto &factor : factors) {
             if (!moments.contains(person.gender, factor)) {
                 moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
             }
@@ -143,8 +153,8 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
     // Compute means.
     auto means = RiskFactorSexAgeTable{};
     for (const auto &[sex, moments_by_sex] : moments) {
-        for (const auto &factor : keys) {
-            means.emplace(sex, factor, std::vector<double>(age_count, 0.0));
+        for (const auto &factor : factors) {
+            means.emplace(sex, factor, std::vector<double>(age_count));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
                 double value = moments_by_sex.at(factor).at(age).mean();
                 means.at(sex, factor).at(age) = value;

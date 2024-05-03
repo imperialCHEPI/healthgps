@@ -7,7 +7,16 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
+#include <functional>
+#include <optional>
 #include <vector>
+
+namespace { // anonymous namespace
+
+using OptionalRanges =
+    std::optional<std::reference_wrapper<const std::vector<hgps::core::DoubleInterval>>>;
+
+} // anonymous namespace
 
 namespace hgps {
 
@@ -27,17 +36,18 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
-    /// @param keys A list of keys for risk factors to be adjusted
-    void adjust_risk_factors(RuntimeContext &context,
-                             const std::vector<core::Identifier> &keys) const;
+    /// @param factors A list of risk factors to be adjusted
+    /// @param ranges An optional list of risk factor value boundaries
+    void adjust_risk_factors(RuntimeContext &context, const std::vector<core::Identifier> &factors,
+                             OptionalRanges ranges = std::nullopt) const;
 
   private:
     RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context,
-                                                const std::vector<core::Identifier> &keys) const;
+                                                const std::vector<core::Identifier> &factors) const;
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
-                             const std::vector<core::Identifier> &keys);
+                             const std::vector<core::Identifier> &factors);
 
     const RiskFactorSexAgeTable &risk_factor_expected_;
 };
