@@ -14,7 +14,6 @@
             "Male": 0.583313018464474
         }
     ],
-    "IncomeDefault": "Middle",
     "IncomeModels": {
         "Low": {
             "Intercept": 0.0,
