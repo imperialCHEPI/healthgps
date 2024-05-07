@@ -2,6 +2,7 @@
 #include <thread>
 
 #include <oneapi/tbb/concurrent_queue.h>
+#include <oneapi/tbb/task_group.h>
 
 #include "HealthGPS/event_aggregator.h"
 
@@ -34,17 +35,17 @@ class EventMonitor final : public hgps::EventMessageVisitor {
 
   private:
     ResultWriter &result_writer_;
-    std::vector<std::jthread> threads_;
+    tbb::task_group_context tg_context_;
+    tbb::task_group tg_;
     std::vector<std::unique_ptr<hgps::EventSubscriber>> handlers_;
     tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> info_queue_;
     tbb::concurrent_queue<std::shared_ptr<hgps::EventMessage>> results_queue_;
-    std::stop_source cancel_source_;
 
     void info_event_handler(std::shared_ptr<hgps::EventMessage> message);
     void error_event_handler(const std::shared_ptr<hgps::EventMessage> &message);
     void result_event_handler(std::shared_ptr<hgps::EventMessage> message);
 
-    void info_dispatch_thread(const std::stop_token &token);
-    void result_dispatch_thread(const std::stop_token &token);
+    void info_dispatch_thread();
+    void result_dispatch_thread();
 };
 } // namespace host

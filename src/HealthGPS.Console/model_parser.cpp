@@ -180,6 +180,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<hgps::core::Identifier> names;
     std::vector<hgps::LinearModelParams> models;
+    std::vector<hgps::core::DoubleInterval> ranges;
     std::vector<double> lambda;
     std::vector<double> stddev;
     std::vector<hgps::LinearModelParams> policy_models;
@@ -206,6 +207,7 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
+        ranges.emplace_back(json_params["Range"].get<hgps::core::DoubleInterval>());
         lambda.emplace_back(json_params["Lambda"].get<double>());
         stddev.emplace_back(json_params["StdDev"].get<double>());
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
@@ -342,10 +344,11 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(expected), std::move(names), std::move(models), std::move(lambda),
-        std::move(stddev), std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
-        std::move(policy_cholesky), info_speed, std::move(rural_prevalence),
-        std::move(income_models), income_default, physical_activity_stddev);
+        std::move(expected), std::move(names), std::move(models), std::move(ranges),
+        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
+        std::move(policy_ranges), std::move(policy_cholesky), info_speed,
+        std::move(rural_prevalence), std::move(income_models), income_default,
+        physical_activity_stddev);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
