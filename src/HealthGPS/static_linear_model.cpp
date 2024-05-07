@@ -115,11 +115,8 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
 
-        // Clamp risk factor to range.
-        double factor_clamped = ranges_[i].clamp(factor);
-
-        // Save risk factor.
-        person.risk_factors[names_[i]] = factor_clamped;
+        // Save clamped risk factor.
+        person.risk_factors[names_[i]] = ranges_[i].clamp(factor);
     }
 }
 
@@ -146,11 +143,8 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
 
-        // Clamp risk factor to range.
-        double factor_clamped = ranges_[i].clamp(factor);
-
-        // Save risk factor.
-        person.risk_factors.at(names_[i]) = factor_clamped;
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
     }
 }
 
@@ -183,11 +177,8 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
-        // Clamp policy-adjusted risk factor to range.
-        double factor_clamped = ranges_[i].clamp(factor);
-
-        // Save risk factor.
-        person.risk_factors.at(names_[i]) = factor_clamped;
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
     }
 }
 
@@ -215,11 +206,8 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
-        // Clamp policy-adjusted risk factor to range.
-        double factor_clamped = ranges_[i].clamp(factor);
-
-        // Save risk factor.
-        person.risk_factors.at(names_[i]) = factor_clamped;
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
     }
 }
 
