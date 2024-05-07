@@ -60,7 +60,7 @@ The same recommendation applies to *folders* and *file names* definitions in cro
 | :---      | :---   | :---      | :---       |
 | 5         | prevalence | Prevalence | |
 | 6         | incidence  | Incidence  | |
-| 7         | remission  | Remission| | |
+| 7         | remission  | Remission  | |
 | 15        | mortality  | Mortality  | |
 
 ### BoD Measure Type
