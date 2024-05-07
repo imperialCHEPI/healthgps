@@ -19,7 +19,7 @@ class EventMessageVisitor {
     EventMessageVisitor &operator=(EventMessageVisitor &&) = delete;
 
     /// @brief Destroy an instance of the visitor class
-    virtual ~EventMessageVisitor() {};
+    virtual ~EventMessageVisitor() = default;;
 
     /// @brief Visits a hgps::RunnerEventMessage message type
     /// @param message The message instance to visit
