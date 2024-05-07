@@ -161,7 +161,6 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
             runtime = executive.run(baseline_sim, config.trial_runs);
         }
 
-        // Waits for messages queue to be processed before stopping events monitor
         fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);
         event_monitor.stop();
 
