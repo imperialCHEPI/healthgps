@@ -48,6 +48,9 @@ if(MSVC)
     if(WARNINGS_AS_ERRORS)
         add_compile_options(/WX)
     endif()
+
+    # Suppress warnings about std::getenv
+    add_compile_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 
