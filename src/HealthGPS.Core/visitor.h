@@ -18,7 +18,6 @@ class DataTableColumnVisitor {
 
     /// @brief Destroys a DataTableColumnVisitor instance
     virtual ~DataTableColumnVisitor() = default;
-    ;
 
     /// @brief Visits a column of StringDataTableColumn type
     /// @param column The column instance
