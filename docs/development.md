@@ -323,7 +323,7 @@ The simulation executive can run experiments for baseline scenario only, or base
 
 | Property     | Overall | Male  | Female | Description             |
 | :---         | :---:   | :---: | :---:  |:---                     |
-| Id           | ✓       | -     | -      | The message type identifier (results type)
+| Id           | ✓       | -     | -      | The message type identifier (results type) |
 | Source       | ✓       | -     | -      | The results experiment identification |
 | Run number   | ✓       | -     | -      | The results rum number identification |
 | Model time   | ✓       | -     | -      | The results model time identification |
