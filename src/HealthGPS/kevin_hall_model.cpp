@@ -666,8 +666,7 @@ void KevinHallModel::update_height(Person &person, double W_power_mean) const {
     double H_expected = get_risk_factor_expected().at(person.gender, "Height"_id).at(person.age);
     double H_residual = person.risk_factors.at("Height_residual"_id);
     double stddev = height_stddev_.at(person.gender);
-    auto slopes = height_slope_;
-    double slope = slopes.at(person.gender);
+    double slope = height_slope_.at(person.gender);
 
     // Compute height.
     double exp_norm_mean = exp(0.5 * stddev * stddev);
