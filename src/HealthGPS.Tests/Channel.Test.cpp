@@ -235,8 +235,9 @@ TEST(ChannelTest, MultipleConsumers) {
     });
 
     producer.join();
-    tbb::parallel_for_each(threads.begin(), threads.end(),
-                           [](std::jthread &thread) { thread.join(); });
+    for (auto &thread : threads) {
+        thread.join();
+    }
 
     ASSERT_EQ(expected, sum_of_reads);
 }
