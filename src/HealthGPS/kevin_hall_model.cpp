@@ -31,7 +31,8 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices,
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
-    const std::unordered_map<core::Gender, double> &height_stddev, double height_slope)
+    const std::unordered_map<core::Gender, double> &height_stddev,
+    const std::unordered_map<core::Gender, double> &height_slope)
     : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
       nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
       food_prices_{food_prices}, weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
@@ -595,9 +596,10 @@ double KevinHallModel::get_weight_quantile(double epa_quantile, core::Gender sex
     return weight_quantiles_.at(sex)[weight_index];
 }
 
-KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &population,
-                                                             std::optional<double> power,
-                                                             std::optional<unsigned> age) const {
+KevinHallAdjustmentTable
+KevinHallModel::compute_mean_weight(Population &population,
+                                    std::optional<std::unordered_map<core::Gender, double>> power,
+                                    std::optional<unsigned> age) const {
 
     // Local struct to hold count and sum of weight powers.
     struct SumCount {
@@ -629,7 +631,7 @@ KevinHallAdjustmentTable KevinHallModel::compute_mean_weight(Population &populat
 
         double value;
         if (power.has_value()) {
-            value = pow(person.risk_factors.at("Weight"_id), power.value());
+            value = pow(person.risk_factors.at("Weight"_id), power.value()[person.gender]);
         } else {
             value = person.risk_factors.at("Weight"_id);
         }
@@ -664,7 +666,7 @@ void KevinHallModel::update_height(Person &person, double W_power_mean) const {
     double H_expected = get_risk_factor_expected().at(person.gender, "Height"_id).at(person.age);
     double H_residual = person.risk_factors.at("Height_residual"_id);
     double stddev = height_stddev_.at(person.gender);
-    double slope = height_slope_;
+    double slope = height_slope_.at(person.gender);
 
     // Compute height.
     double exp_norm_mean = exp(0.5 * stddev * stddev);
@@ -681,12 +683,12 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    double height_slope)
+    std::unordered_map<core::Gender, double> height_slope)
     : RiskFactorAdjustableModelDefinition{std::move(expected)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{height_slope} {
+      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -708,6 +710,9 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     }
     if (height_stddev_.empty()) {
         throw core::HgpsException("Height standard deviation mapping is empty");
+    }
+    if (height_slope_.empty()) {
+        throw core::HgpsException("Height slope mapping is empty");
     }
 }
 
