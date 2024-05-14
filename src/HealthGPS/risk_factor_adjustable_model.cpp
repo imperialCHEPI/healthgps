@@ -1,8 +1,9 @@
 #include "HealthGPS.Core/exception.h"
-#include "HealthGPS.Core/thread_util.h"
 
 #include "risk_factor_adjustable_model.h"
 #include "sync_message.h"
+
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace { // anonymous namespace
 
@@ -71,7 +72,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(
 
     // All scenarios: apply adjustments to population.
     auto &pop = context.population();
-    std::for_each(core::execution_policy, pop.begin(), pop.end(), [&](auto &person) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
         }

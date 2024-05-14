@@ -1,6 +1,7 @@
 
-#include "analysis_module.h"
 #include "HealthGPS.Core/thread_util.h"
+
+#include "analysis_module.h"
 #include "converter.h"
 #include "lms_model.h"
 #include "weight_model.h"
@@ -8,6 +9,7 @@
 #include <cmath>
 #include <functional>
 #include <future>
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -32,7 +34,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     auto expected_count = create_age_gender_table<int>(age_range);
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    std::for_each(core::execution_policy, pop.cbegin(), pop.cend(), [&](const auto &entity) {
+    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
         if (!entity.is_active()) {
             return;
         }

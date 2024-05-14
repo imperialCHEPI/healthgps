@@ -1,8 +1,9 @@
 #include "disease.h"
-#include "HealthGPS.Core/thread_util.h"
 #include "disease_registry.h"
 #include "lms_model.h"
 #include "weight_model.h"
+
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -68,24 +69,23 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
 
     const auto &diseases = config.diseases();
     std::mutex m;
-    std::for_each(
-        core::execution_policy, std::begin(diseases), std::end(diseases), [&](auto &info) {
-            auto info_code_str = info.code.to_string();
-            auto other = repository.get_disease_info(info_code_str);
-            if (!registry.contains(info.group) || !other.has_value()) {
-                throw std::out_of_range("Unknown disease definition: " + info_code_str);
-            }
+    tbb::parallel_for_each(std::begin(diseases), std::end(diseases), [&](auto &info) {
+        auto info_code_str = info.code.to_string();
+        auto other = repository.get_disease_info(info_code_str);
+        if (!registry.contains(info.group) || !other.has_value()) {
+            throw std::out_of_range("Unknown disease definition: " + info_code_str);
+        }
 
-            auto &disease_definition = repository.get_disease_definition(info, config);
-            auto &lms_definition = repository.get_lms_definition();
-            auto classifier = WeightModel{LmsModel{lms_definition}};
+        auto &disease_definition = repository.get_disease_definition(info, config);
+        auto &lms_definition = repository.get_lms_definition();
+        auto classifier = WeightModel{LmsModel{lms_definition}};
 
-            // Sync region
-            std::scoped_lock lock(m);
-            models.emplace(core::Identifier{info.code},
-                           registry.at(info.group)(disease_definition, std::move(classifier),
-                                                   config.settings().age_range()));
-        });
+        // Sync region
+        std::scoped_lock lock(m);
+        models.emplace(core::Identifier{info.code},
+                       registry.at(info.group)(disease_definition, std::move(classifier),
+                                               config.settings().age_range()));
+    });
 
     return std::make_unique<DiseaseModule>(std::move(models));
 }
