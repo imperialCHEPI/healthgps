@@ -82,11 +82,11 @@
         }
     },
     "HeightStdDev": {
-        "Female": 0.04,
-        "Male": 0.04
+        "Female": 0.096,
+        "Male": 0.085
     },
     "HeightSlope": {
-        "Female": 0.11,
-        "Male": 0.11
+        "Female": 0.3564,
+        "Male": 0.3718
     }
 }
