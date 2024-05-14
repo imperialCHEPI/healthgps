@@ -188,6 +188,9 @@ The Health-GPS build and installation on the HPC is now complete using EasyBuild
 
 When using HPC job scheduling software, such as PBS, some thought must be given to how many CPU threads to request, since resource allocation is strictly enforced. Jobs with lower thread counts may have higher priority than large resource hungry jobs, but choose too few and you risk job termination due to using in excess of the original request. Whilst this trade-off is left for you to decide, Health-GPS provides a means of hard-limiting the number of threads its simulations use. Health-GPS uses ([oneTBB](https://github.com/oneapi-src/oneTBB)) for it's multi-threading, and uses the maximum visible CPU cores by default. However, users may limit the number of threads a simulation uses by setting the `OMP_THREAD_LIMIT` environment variable in their terminal to a given limit before executing the Health-GPS command. For instance, on the Imperial HPC, type `export OMP_THREAD_LIMIT=64` in your PBS script before running your main Health-GPS command.
 
+> **Note**
+> The decision to use [oneTBB](https://github.com/oneapi-src/oneTBB) for multi-threading was taken since the parallel algorithms of the `C++20` stanard library offer no means for the software engineer, thus the user, to impose limits on thread usage.
+
 ### Known Issues
 
 * EasyBuild by default optimises the software for different types of hardware available within a HPC systems, the following compiler flags: `-ftree-vectorize -march=native -fno-math-errno` are typical used for Health-GPS builds using GCC version 11.1 or newer. The cluster contains many CPU types, e.g., AMD rome, and Intel skylake, haswell, ivy, sandy. The mismatch between building and using CPUs might cause performance issues, a **workaround** is to lock the `cpu_type=rome` in the PBS job script, *if you know the build CPU type*.
