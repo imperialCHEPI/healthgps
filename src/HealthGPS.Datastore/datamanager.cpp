@@ -12,7 +12,7 @@ namespace hgps::data {
 DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbosity)
     : root_{std::move(root_directory)}, verbosity_{verbosity} {
     auto full_filename = root_ / "index.json";
-    auto ifs = std::ifstream{full_filename, std::ifstream::in};
+    auto ifs = std::ifstream{full_filename};
     if (!ifs) {
         throw std::invalid_argument(
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
