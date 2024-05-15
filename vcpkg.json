@@ -10,6 +10,7 @@
         "cxxopts",
         "eigen3",
         "nlohmann-json",
+        "jsoncons",
         "rapidcsv",
         "crossguid",
         "gtest",
