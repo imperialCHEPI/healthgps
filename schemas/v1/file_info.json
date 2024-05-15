@@ -1,0 +1,15 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "http://example.com/file_info.json",
+    "type": "object",
+    "properties": {
+        "format": { "const": "csv" },
+        "delimiter": { "const": "," },
+        "encoding": { "const": "UTF8" },
+        "description": { "type": "string" },
+        "source": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "license": { "type": "string" },
+        "path": { "type": "string" }
+    }
+}
