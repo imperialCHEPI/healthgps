@@ -16,8 +16,6 @@ target_sources(
             "pch.h"
             "data_config.h"
             "data_config.cpp"
-            "program_path.h"
-            "program_path.cpp"
             "AgeGenderTable.Test.cpp"
             "Channel.Test.cpp"
             "Configuration.Test.cpp"

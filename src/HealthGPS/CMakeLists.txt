@@ -76,6 +76,8 @@ target_sources(
             "person.h"
             "population.cpp"
             "population.h"
+            "program_path.cpp"
+            "program_path.h"
             "physical_activity_scenario.cpp"
             "physical_activity_scenario.h"
             "random_algorithm.cpp"

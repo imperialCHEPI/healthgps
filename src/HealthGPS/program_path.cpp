@@ -16,6 +16,7 @@ namespace {
 void throw_path_error() { throw hgps::core::HgpsException("Could not get program path"); }
 } // anonymous namespace
 
+namespace hgps {
 std::filesystem::path get_program_directory() { return get_program_path().parent_path(); }
 
 std::filesystem::path get_program_path() {
@@ -35,3 +36,4 @@ std::filesystem::path get_program_path() {
 
     return path.data();
 }
+} // namespace hgps
