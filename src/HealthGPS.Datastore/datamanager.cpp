@@ -1,12 +1,60 @@
 #include "datamanager.h"
 #include "HealthGPS.Core/math_util.h"
 #include "HealthGPS.Core/string_util.h"
+#include "HealthGPS/program_path.h"
 
 #include <fmt/color.h>
 #include <fstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
 #include <rapidcsv.h>
 
 #include <utility>
+
+namespace {
+using namespace jsoncons;
+
+json resolve_uri(const jsoncons::uri &uri, const std::filesystem::path &schema_directory) {
+    constexpr const char *url_prefix = "http://example.com/";
+
+    const auto &uri_str = uri.string();
+    if (!uri_str.starts_with(url_prefix)) {
+        throw std::runtime_error(fmt::format("Unable to load URL: {}", uri_str));
+    }
+
+    // Strip URL prefix and load file from local filesystem
+    const auto schema_path = schema_directory / std::filesystem::path{uri.path().substr(1)};
+    auto ifs = std::ifstream{schema_path};
+    if (!ifs) {
+        throw std::runtime_error("Failed to read schema file");
+    }
+
+    return json::parse(ifs);
+}
+
+void validate_index(const std::filesystem::path &schema_directory, std::ifstream &ifs) {
+    // **YUCK**: We have to read in the data with jsoncons here rather than reusing
+    // the nlohmann-json representation :-(
+    const auto index = json::parse(ifs);
+
+    // Go back to start of file so caller can re-read it
+    ifs.seekg(0);
+
+    // Load schema
+    auto ifs_schema = std::ifstream{schema_directory / "data_index.json"};
+    if (!ifs_schema) {
+        throw std::runtime_error("Failed to load schema");
+    }
+
+    const auto resolver = [&schema_directory](const auto &uri) {
+        return resolve_uri(uri, schema_directory);
+    };
+    const auto schema = jsonschema::make_json_schema(json::parse(ifs_schema), resolver);
+
+    // Perform validation
+    schema.validate(index);
+}
+} // namespace
 
 namespace hgps::data {
 DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbosity)
@@ -17,6 +65,10 @@ DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbo
         throw std::invalid_argument(
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
     }
+
+    // Validate against schema
+    const auto schema_directory = get_program_directory() / "schemas" / "v1";
+    validate_index(schema_directory, ifs);
 
     index_ = nlohmann::json::parse(ifs);
 

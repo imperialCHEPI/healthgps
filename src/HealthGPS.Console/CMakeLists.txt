@@ -70,4 +70,6 @@ if(WIN32)
     install(IMPORTED_RUNTIME_ARTIFACTS fmt::fmt)
 endif()
 
+install(DIRECTORY ../../schemas DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+
 set(ROOT_NAMESPACE hgps)

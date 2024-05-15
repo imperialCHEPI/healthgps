@@ -128,7 +128,7 @@ jobs:
         working-directory: ${{github.workspace}}/out/install/${{ matrix.platform }}-release/bin/
         run: |
           mkdir ${{github.workspace}}/artifact
-          7z a -tzip ${{github.workspace}}/artifact/health_gps_${{ matrix.platform }}.zip *.dll *.Console*
+          7z a -tzip ${{github.workspace}}/artifact/health_gps_${{ matrix.platform }}.zip *.dll *.Console* schemas
 
       - name: Upload release artifacts
         if: startsWith(github.ref, 'refs/tags/') && matrix.is_main
