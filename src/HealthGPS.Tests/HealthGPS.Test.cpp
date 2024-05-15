@@ -234,36 +234,6 @@ TEST(TestHealthGPS, CreateRuntimeContext) {
     ASSERT_EQ(0, context.time_now());
 }
 
-/*
-TEST(TestHealthGPS, SimulationInitialise)
-{
-        using namespace hgps;
-        using namespace hgps::data;
-
-        DataTable data;
-        create_test_datatable(data);
-
-        auto bus = DefaultEventBus{};
-        auto channel = SyncChannel{};
-        auto rnd = MTRandom32{ 123456789 };
-        auto scenario = BaselineScenario{ channel };
-        auto config = create_test_configuration(data);
-        auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
-
-        auto manager = DataManager(store_full_path);
-        auto repository = CachedRepository(manager);
-
-        auto baseline_data = hgps::RiskFactorSexAgeTable{};
-        repository.register_linear_model_definition(RiskFactorModelType::Static,
-get_static_test_model(baseline_data));
-        repository.register_linear_model_definition(RiskFactorModelType::Dynamic,
-get_dynamic_test_model(baseline_data));
-
-        auto factory = get_default_simulation_module_factory(repository);
-        ASSERT_NO_THROW(HealthGPS(std::move(definition), factory, bus));
-}
-*/
-
 TEST(TestHealthGPS, ModuleFactoryRegistry) {
     using namespace hgps;
     using namespace hgps::data;
