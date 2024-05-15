@@ -13,20 +13,21 @@ DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbo
     : root_{std::move(root_directory)}, verbosity_{verbosity} {
     auto full_filename = root_ / "index.json";
     auto ifs = std::ifstream{full_filename, std::ifstream::in};
-    if (ifs) {
-        index_ = nlohmann::json::parse(ifs);
-        if (!index_.contains("version")) {
-            throw std::runtime_error("File-based store, invalid definition missing schema version");
-        }
-
-        auto version = index_["version"].get<int>();
-        if (version != 2) {
-            throw std::runtime_error(fmt::format(
-                "File-based store, index schema version: {} mismatch, supported: 2", version));
-        }
-    } else {
+    if (!ifs) {
         throw std::invalid_argument(
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
+    }
+
+    index_ = nlohmann::json::parse(ifs);
+
+    if (!index_.contains("version")) {
+        throw std::runtime_error("File-based store, invalid definition missing schema version");
+    }
+
+    auto version = index_["version"].get<int>();
+    if (version != 2) {
+        throw std::runtime_error(fmt::format(
+            "File-based store, index schema version: {} mismatch, supported: 2", version));
     }
 }
 
