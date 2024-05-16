@@ -38,7 +38,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Adjust risk factors to match expected values.
-    adjust_risk_factors(context, names_);
+    adjust_risk_factors(context, names_, ranges_);
 
     // Initialise everyone.
     for (auto &person : context.population()) {
@@ -72,7 +72,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     }
 
     // Adjust risk factors to match expected values.
-    adjust_risk_factors(context, names_);
+    adjust_risk_factors(context, names_, ranges_);
 
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
@@ -112,7 +112,9 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
-        person.risk_factors[names_[i]] = factor;
+
+        // Save clamped risk factor.
+        person.risk_factors[names_[i]] = ranges_[i].clamp(factor);
     }
 }
 
@@ -138,7 +140,9 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
         double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
-        person.risk_factors.at(names_[i]) = factor;
+
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
     }
 }
 
@@ -171,8 +175,8 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
-        // Apply intervention policy.
-        person.risk_factors.at(names_[i]) = factor;
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
     }
 }
 
@@ -200,8 +204,8 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
-        // Apply intervention policy.
-        person.risk_factors.at(names_[i]) = factor;
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
     }
 }
 
