@@ -26,11 +26,12 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param expected The risk factor expected values by sex and age
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factor values
+    /// @param ranges The value range of each risk factor
     /// @param lambda The lambda values of the risk factors
     /// @param stddev The standard deviations of the risk factors
     /// @param cholesky Cholesky decomposition of the risk factor correlation matrix
     /// @param policy_models The linear models used to compute a person's intervention policies
-    /// @param policy_ranges The boundaries of the intervention policy values
+    /// @param policy_ranges The value range of each intervention policy
     /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
@@ -39,7 +40,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
-        const std::vector<LinearModelParams> &models, const std::vector<double> &lambda,
+        const std::vector<LinearModelParams> &models,
+        const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
         const std::vector<LinearModelParams> &policy_models,
         const std::vector<core::DoubleInterval> &policy_ranges,
@@ -100,6 +102,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
+    const std::vector<core::DoubleInterval> &ranges_;
     const std::vector<double> &lambda_;
     const std::vector<double> &stddev_;
     const Eigen::MatrixXd &cholesky_;
