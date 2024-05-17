@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include "HealthGPS/channel.h"
-#include <oneapi/tbb/parallel_for_each.h>
 #include <thread>
 
 TEST(ChannelTest, DefaultConstruction) {
