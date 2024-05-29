@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://example.com/file_info.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json",
     "type": "object",
     "properties": {
         "format": { "const": "csv" },

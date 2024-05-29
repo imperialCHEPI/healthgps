@@ -15,7 +15,8 @@ namespace {
 using namespace jsoncons;
 
 json resolve_uri(const jsoncons::uri &uri, const std::filesystem::path &schema_directory) {
-    constexpr const char *url_prefix = "http://example.com/";
+    constexpr const char *url_prefix =
+        "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/";
 
     const auto &uri_str = uri.string();
     if (!uri_str.starts_with(url_prefix)) {
@@ -23,7 +24,8 @@ json resolve_uri(const jsoncons::uri &uri, const std::filesystem::path &schema_d
     }
 
     // Strip URL prefix and load file from local filesystem
-    const auto schema_path = schema_directory / std::filesystem::path{uri.path().substr(1)};
+    const auto filename = std::filesystem::path{uri.path()}.filename();
+    const auto schema_path = schema_directory / filename;
     auto ifs = std::ifstream{schema_path};
     if (!ifs) {
         throw std::runtime_error("Failed to read schema file");

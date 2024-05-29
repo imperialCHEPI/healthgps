@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://example.com/data_index.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index.json",
     "title": "Index file for input data",
     "description": "Metadata and paths for Health-GPS input files",
     "type": "object",
@@ -8,7 +8,9 @@
         "version": { "const": 2 },
         "country": {
             "allOf": [
-                { "$ref": "http://example.com/file_info.json" },
+                {
+                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                },
                 {
                     "type": "object",
                     "properties": {
@@ -19,7 +21,9 @@
         },
         "demographic": {
             "allOf": [
-                { "$ref": "http://example.com/file_info.json" },
+                {
+                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                },
                 {
                     "type": "object",
                     "properties": {
@@ -64,7 +68,9 @@
         },
         "diseases": {
             "allOf": [
-                { "$ref": "http://example.com/file_info.json" },
+                {
+                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                },
                 {
                     "type": "object",
                     "properties": {
@@ -149,7 +155,9 @@
         },
         "analysis": {
             "allOf": [
-                { "$ref": "http://example.com/file_info.json" },
+                {
+                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                },
                 {
                     "type": "object",
                     "properties": {
