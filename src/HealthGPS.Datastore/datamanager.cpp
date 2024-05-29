@@ -39,9 +39,6 @@ void validate_index(const std::filesystem::path &schema_directory, std::ifstream
     // the nlohmann-json representation :-(
     const auto index = json::parse(ifs);
 
-    // Go back to start of file so caller can re-read it
-    ifs.seekg(0);
-
     // Load schema
     auto ifs_schema = std::ifstream{schema_directory / "data_index.json"};
     if (!ifs_schema) {
@@ -68,10 +65,6 @@ DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbo
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
     }
 
-    // Validate against schema
-    const auto schema_directory = get_program_directory() / "schemas" / "v1";
-    validate_index(schema_directory, ifs);
-
     index_ = nlohmann::json::parse(ifs);
 
     if (!index_.contains("version")) {
@@ -83,6 +76,11 @@ DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbo
         throw std::runtime_error(fmt::format(
             "File-based store, index schema version: {} mismatch, supported: 2", version));
     }
+
+    // Validate against schema
+    ifs.seekg(0);
+    const auto schema_directory = get_program_directory() / "schemas" / "v1";
+    validate_index(schema_directory, ifs);
 }
 
 std::vector<Country> DataManager::get_countries() const {
