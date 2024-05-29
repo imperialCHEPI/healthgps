@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "program_path.h"
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS/nutrients.h"
+#include "HealthGPS/program_path.h"
 
 #include <filesystem>
 #include <sstream>
@@ -31,7 +31,7 @@ TEST(LoadNutrientTable, GetNutrientIndexes) {
 }
 
 TEST(LoadNutrientTable, LoadNutrientTable) {
-    const auto csv_path = (get_program_directory() / "nutrient_table.csv").string();
+    const auto csv_path = (hgps::get_program_directory() / "nutrient_table.csv").string();
     const auto table = load_nutrient_table(csv_path, nutrients);
 
     const decltype(table) expected = {

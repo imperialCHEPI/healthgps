@@ -228,7 +228,7 @@
         "format": "csv",
         "delimiter": ",",
         "encoding": "UTF8",
-        "description": "Observed burden of disease measures and disability weigths.",
+        "description": "Observed burden of disease measures and disability weights.",
         "source": "The Institute for Health Metrics and Evaluation - IHME",
         "url": "http://www.healthdata.org/",
         "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License",
