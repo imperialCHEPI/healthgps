@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # ------------ Custom User Options ----------------
+*.zip
 
 # CMake presets, build directories and binary files
 build/

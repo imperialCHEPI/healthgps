@@ -1,8 +1,10 @@
 #include "datamanager.h"
+#include "schema.h"
+#include "zip_file.h"
+
 #include "HealthGPS.Core/math_util.h"
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS/program_path.h"
-#include "schema.h"
 
 #include <fmt/color.h>
 #include <rapidcsv.h>
@@ -10,23 +12,22 @@
 #include <fstream>
 #include <utility>
 
-namespace hgps::data {
-DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbosity)
-    : root_{std::move(root_directory)}, verbosity_{verbosity} {
-    auto full_filename = root_ / "index.json";
+namespace {
+nlohmann::json read_input_files_from_directory(const std::filesystem::path &root_directory) {
+    auto full_filename = root_directory / "index.json";
     auto ifs = std::ifstream{full_filename};
     if (!ifs) {
         throw std::invalid_argument(
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
     }
 
-    index_ = nlohmann::json::parse(ifs);
+    auto index = nlohmann::json::parse(ifs);
 
-    if (!index_.contains("version")) {
+    if (!index.contains("version")) {
         throw std::runtime_error("File-based store, invalid definition missing schema version");
     }
 
-    auto version = index_["version"].get<int>();
+    auto version = index["version"].get<int>();
     if (version != 2) {
         throw std::runtime_error(fmt::format(
             "File-based store, index schema version: {} mismatch, supported: 2", version));
@@ -34,8 +35,26 @@ DataManager::DataManager(std::filesystem::path root_directory, VerboseMode verbo
 
     // Validate against schema
     ifs.seekg(0);
-    const auto schema_directory = get_program_directory() / "schemas" / "v1";
-    validate_index(schema_directory, ifs);
+    const auto schema_directory = hgps::get_program_directory() / "schemas" / "v1";
+    hgps::data::validate_index(schema_directory, ifs);
+
+    return index;
+}
+} // anonymous namespace
+
+namespace hgps::data {
+DataManager::DataManager(std::filesystem::path path, VerboseMode verbosity)
+    : verbosity_{verbosity} {
+    if (std::filesystem::is_regular_file(path)) {
+        // If it's a file, assume it's a zip file
+        root_ = create_temporary_directory();
+        extract_zip_file(path, root_);
+    } else {
+        // Otherwise it's a folder
+        root_ = std::move(path);
+    }
+
+    index_ = read_input_files_from_directory(root_);
 }
 
 std::vector<Country> DataManager::get_countries() const {
