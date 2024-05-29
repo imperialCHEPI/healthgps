@@ -9,7 +9,7 @@
 
 namespace host {
 EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer)
-    : result_writer_{result_writer} {
+    : result_writer_{result_writer}, tg_{tg_context_} {
     handlers_.emplace_back(event_bus.subscribe(hgps::EventType::runner, [this](auto &&PH1) {
         info_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
@@ -26,8 +26,8 @@ EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &resul
         error_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
-    threads_.emplace_back(&EventMonitor::info_dispatch_thread, this, cancel_source_.get_token());
-    threads_.emplace_back(&EventMonitor::result_dispatch_thread, this, cancel_source_.get_token());
+    tg_.run([this] { info_dispatch_thread(); });
+    tg_.run([this] { result_dispatch_thread(); });
 }
 
 EventMonitor::~EventMonitor() noexcept {
@@ -39,8 +39,8 @@ EventMonitor::~EventMonitor() noexcept {
 }
 
 void EventMonitor::stop() noexcept {
-    cancel_source_.request_stop();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    tg_context_.cancel_group_execution();
+    tg_.wait();
 }
 
 void EventMonitor::visit(const hgps::RunnerEventMessage &message) {
@@ -70,9 +70,9 @@ void EventMonitor::result_event_handler(std::shared_ptr<hgps::EventMessage> mess
     results_queue_.emplace(std::move(message));
 }
 
-void EventMonitor::info_dispatch_thread(const std::stop_token &token) {
+void EventMonitor::info_dispatch_thread() {
     fmt::print(fg(fmt::color::light_blue), "Info event thread started...\n");
-    while (!token.stop_requested()) {
+    while (!tg_context_.is_group_execution_cancelled()) {
         std::shared_ptr<hgps::EventMessage> m;
         if (info_queue_.try_pop(m)) {
             m->accept(*this);
@@ -84,9 +84,9 @@ void EventMonitor::info_dispatch_thread(const std::stop_token &token) {
     fmt::print(fg(fmt::color::light_blue), "Info event thread exited.\n");
 }
 
-void EventMonitor::result_dispatch_thread(const std::stop_token &token) {
+void EventMonitor::result_dispatch_thread() {
     fmt::print(fg(fmt::color::gray), "Result event thread started...\n");
-    while (!token.stop_requested()) {
+    while (!tg_context_.is_group_execution_cancelled()) {
         std::shared_ptr<hgps::EventMessage> m;
         if (results_queue_.try_pop(m)) {
             m->accept(*this);
