@@ -141,7 +141,8 @@ target_sources(
             "weight_model.cpp"
             "weight_model.h")
 
-target_link_libraries(HealthGPS PRIVATE HealthGPS.Core fmt::fmt crossguid OpenSSL::Crypto sago::platform_folders)
+target_link_libraries(HealthGPS PRIVATE HealthGPS.Core fmt::fmt crossguid OpenSSL::Crypto
+                                        sago::platform_folders)
 target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ROOT_NAMESPACE hgps)

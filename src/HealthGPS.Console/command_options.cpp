@@ -61,17 +61,7 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
         }
 
         if (result.count("storage")) {
-            cmd.storage_folder = result["storage"].as<std::string>();
-            if (cmd.storage_folder.is_relative()) {
-                cmd.storage_folder = std::filesystem::absolute(cmd.storage_folder);
-                fmt::print("File storage folder.: {}\n", cmd.storage_folder.string());
-            }
-        }
-
-        if (!fs::exists(cmd.storage_folder)) {
-            fmt::print(fg(fmt::color::red), "\nFile storage folder: {} not found.\n",
-                       cmd.storage_folder.string());
-            cmd.exit_code = EXIT_FAILURE;
+            cmd.data_path_or_url = result["storage"].as<std::string>();
         }
 
         if (result.count("jobid")) {
