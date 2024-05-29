@@ -21,17 +21,8 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
     }
 
+    // Read in JSON file
     auto index = nlohmann::json::parse(ifs);
-
-    if (!index.contains("version")) {
-        throw std::runtime_error("File-based store, invalid definition missing schema version");
-    }
-
-    auto version = index["version"].get<int>();
-    if (version != 2) {
-        throw std::runtime_error(fmt::format(
-            "File-based store, index schema version: {} mismatch, supported: 2", version));
-    }
 
     // Validate against schema
     ifs.seekg(0);

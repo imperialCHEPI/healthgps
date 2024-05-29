@@ -8,7 +8,6 @@
         "$schema": {
             "const": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index.json"
         },
-        "version": { "const": 2 },
         "country": {
             "allOf": [
                 {
