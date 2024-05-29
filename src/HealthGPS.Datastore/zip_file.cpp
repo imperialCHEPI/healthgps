@@ -30,7 +30,7 @@ void extract_zip_file(const std::filesystem::path &file_path,
 
     using namespace libzippp;
 
-    ZipArchive zf(file_path);
+    ZipArchive zf(file_path.string());
     zf.open();
 
     std::filesystem::path out_path;
