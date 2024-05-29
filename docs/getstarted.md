@@ -14,7 +14,7 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
 2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [example_HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/example_HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
+3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
 4. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
 5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
@@ -27,7 +27,7 @@ application requires `GCC 11.1` or newer to be installed.
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
 2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [example_HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/example_HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
+3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
 4. Open a command terminal and navigate to the directory used in step 2 (xxx).
 5. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.

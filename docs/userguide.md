@@ -554,7 +554,7 @@ You may need to install the latest [Visual C++ Redistributable](https://docs.mic
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
 2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [example_HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/example_HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
+3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
 4. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
 5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
@@ -566,7 +566,7 @@ You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Inte
 
 1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
 2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [example_HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/example_HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
+3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
 4. Open a command terminal and navigate to the directory used in step 2 (xxx).
 5. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
 `-s` the path to the root folder of the *backend storage* respectively.
@@ -686,7 +686,7 @@ The simulation detailed results file contains a dynamic number of columns, which
 
 The column **count** gives the *number of individuals* in the *row group*, the remaining columns contain average values for the group's data at each column. This result file can easily be used to construct pivot tables and plots. The column *count* can be combined with the averaged columns to estimate other statistical measures, such as *variance* and *standard deviation*.
 
-[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/example_HLM_France/model/France.Config.json "Configuration file example"
+[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/model/France.Config.json "Configuration file example"
 
 [datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"
 
