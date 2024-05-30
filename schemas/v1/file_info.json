@@ -11,5 +11,6 @@
         "url": { "type": "string", "format": "uri" },
         "license": { "type": "string" },
         "path": { "type": "string" }
-    }
+    },
+    "required": ["path"]
 }
