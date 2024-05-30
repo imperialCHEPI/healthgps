@@ -17,7 +17,7 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
     auto full_filename = root_directory / "index.json";
     auto ifs = std::ifstream{full_filename};
     if (!ifs) {
-        throw std::invalid_argument(
+        throw std::runtime_error(
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
     }
 
@@ -104,7 +104,7 @@ Country DataManager::get_country(const std::string &alpha) const {
         return *country;
     }
 
-    throw std::invalid_argument(fmt::format("Target country: '{}' not found.", alpha));
+    throw std::runtime_error(fmt::format("Target country: '{}' not found.", alpha));
 }
 
 std::vector<PopulationItem> DataManager::get_population(const Country &country) const {
@@ -257,7 +257,7 @@ DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const {
             }
         }
 
-        throw std::invalid_argument(fmt::format("Disease code: '{}' not found.", code.to_string()));
+        throw std::runtime_error(fmt::format("Disease code: '{}' not found.", code.to_string()));
     }
 
     throw std::runtime_error("Index has no 'diseases' entry.");

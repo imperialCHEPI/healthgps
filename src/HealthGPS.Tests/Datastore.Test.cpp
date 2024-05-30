@@ -25,7 +25,7 @@ TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
 }
 
 TEST_F(DatastoreTest, CountryMissingThrowsException) {
-    ASSERT_THROW(manager.get_country("FAKE"), std::invalid_argument);
+    ASSERT_THROW(manager.get_country("FAKE"), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
@@ -137,7 +137,7 @@ TEST_F(DatastoreTest, GetDiseaseInfoMatchesGetDisases) {
 }
 
 TEST_F(DatastoreTest, GetDiseaseInfoMissingThrowsException) {
-    EXPECT_THROW(manager.get_disease_info("FAKE"), std::invalid_argument);
+    EXPECT_THROW(manager.get_disease_info("FAKE"), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, RetrieveDiseasesTypeInInfo) {
