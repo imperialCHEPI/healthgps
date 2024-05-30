@@ -126,43 +126,47 @@
                                                 }
                                             },
                                             "required": ["path", "file_name"]
-                                        },
-                                        "parameters": {
-                                            "type": "object",
-                                            "properties": {
-                                                "path": { "type": "string" },
-                                                "files": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "distribution": {
-                                                            "type": "string"
-                                                        },
-                                                        "survival_rate": {
-                                                            "type": "string"
-                                                        },
-                                                        "death_weight": {
-                                                            "type": "string"
-                                                        }
-                                                    },
-                                                    "required": [
-                                                        "distribution",
-                                                        "survival_rate",
-                                                        "death_weight"
-                                                    ]
-                                                }
-                                            },
-                                            "required": ["path", "files"]
                                         }
                                     },
                                     "required": [
                                         "path",
                                         "to_disease",
-                                        "to_risk_factor",
-                                        "parameters"
+                                        "to_risk_factor"
                                     ]
+                                },
+                                "parameters": {
+                                    "type": "object",
+                                    "properties": {
+                                        "path": { "type": "string" },
+                                        "files": {
+                                            "type": "object",
+                                            "properties": {
+                                                "distribution": {
+                                                    "type": "string"
+                                                },
+                                                "survival_rate": {
+                                                    "type": "string"
+                                                },
+                                                "death_weight": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "distribution",
+                                                "survival_rate",
+                                                "death_weight"
+                                            ]
+                                        }
+                                    },
+                                    "required": ["path", "files"]
                                 }
                             },
-                            "required": ["path", "file_name", "relative_risk"]
+                            "required": [
+                                "path",
+                                "file_name",
+                                "relative_risk",
+                                "parameters"
+                            ]
                         },
                         "registry": {
                             "type": "array",
