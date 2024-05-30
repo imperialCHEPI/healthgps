@@ -45,13 +45,15 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
 namespace hgps::data {
 DataManager::DataManager(std::filesystem::path path, VerboseMode verbosity)
     : verbosity_{verbosity} {
-    if (std::filesystem::is_regular_file(path)) {
+    if (std::filesystem::is_directory(path)) {
+        root_ = std::move(path);
+    } else if (std::filesystem::is_regular_file(path) && path.extension() == ".zip") {
         // If it's a file, assume it's a zip file
         root_ = create_temporary_directory();
         extract_zip_file(path, root_);
     } else {
-        // Otherwise it's a folder
-        root_ = std::move(path);
+        throw std::runtime_error(
+            fmt::format("Path must either point to a zip file or a directory: {}", path.string()));
     }
 
     index_ = read_input_files_from_directory(root_);
