@@ -24,6 +24,18 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
     // Read in JSON file
     auto index = nlohmann::json::parse(ifs);
 
+    // Check that the file has a $schema property and that it matches the URL of the
+    // schema version we support
+    if (!index.contains("$schema")) {
+        throw std::runtime_error(fmt::format("Index file missing required $schema property: {}",
+                                             full_filename.string()));
+    }
+    const auto schema_url = index.at("$schema").get<std::string>();
+    if (schema_url != HGPS_DATA_INDEX_SCHEMA_URL) {
+        throw std::runtime_error(fmt::format("Invalid schema URL provided: {} (expected: {})",
+                                             schema_url, HGPS_DATA_INDEX_SCHEMA_URL));
+    }
+
     // Validate against schema
     ifs.seekg(0);
     const auto schema_directory = hgps::get_program_directory() / "schemas" / "v1";
