@@ -19,9 +19,9 @@ TEST_F(DatastoreTest, CreateDataManager) {
 }
 
 TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
-    EXPECT_THROW(hgps::data::DataManager{"C:\\x\\y"}, std::invalid_argument);
-    EXPECT_THROW(hgps::data::DataManager{"C:/x/y"}, std::invalid_argument);
-    EXPECT_THROW(hgps::data::DataManager{"/home/x/y/z"}, std::invalid_argument);
+    EXPECT_THROW(hgps::data::DataManager{"C:\\x\\y"}, std::runtime_error);
+    EXPECT_THROW(hgps::data::DataManager{"C:/x/y"}, std::runtime_error);
+    EXPECT_THROW(hgps::data::DataManager{"/home/x/y/z"}, std::runtime_error);
 }
 
 TEST_F(DatastoreTest, CountryMissingThrowsException) {
