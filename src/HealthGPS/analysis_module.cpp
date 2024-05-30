@@ -276,7 +276,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &entity : context.population()) {
         auto age = entity.age;
-        auto over_18 = entity.gender;
+        auto over_18 = entity.over_18;
 
         if (!entity.is_active()) {
             if (!entity.is_alive() && entity.time_of_death() == current_time) {
