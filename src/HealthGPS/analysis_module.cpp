@@ -276,41 +276,41 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &entity : context.population()) {
         auto age = entity.age;
-        auto gender = entity.gender;
+        auto over_18 = entity.gender;
 
         if (!entity.is_active()) {
             if (!entity.is_alive() && entity.time_of_death() == current_time) {
-                series(gender, "deaths").at(age)++;
-                auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                series(gender, "yll").at(age) += std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                series(over_18, "deaths").at(age)++;
+                auto expcted_life = definition_.life_expectancy().at(context.time_now(), over_18);
+                series(over_18, "yll").at(age) += std::max(expcted_life - age, 0.0f) * DALY_UNITS;
             }
 
             if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
-                series(gender, "migrations").at(age)++;
+                series(over_18, "migrations").at(age)++;
             }
 
             continue;
         }
 
-        series(gender, "count").at(age)++;
+        series(over_18, "count").at(age)++;
 
         for (const auto &factor : context.mapping().entries()) {
-            series(gender, factor.key().to_string()).at(age) +=
+            series(over_18, factor.key().to_string()).at(age) +=
                 entity.get_risk_factor_value(factor.key());
         }
 
         for (const auto &[disease_name, disease_state] : entity.diseases) {
             if (disease_state.status == DiseaseStatus::active) {
-                series(gender, "prevalence_" + disease_name.to_string()).at(age)++;
+                series(over_18, "prevalence_" + disease_name.to_string()).at(age)++;
                 if (disease_state.start_time == context.time_now()) {
-                    series(gender, "incidence_" + disease_name.to_string()).at(age)++;
+                    series(over_18, "incidence_" + disease_name.to_string()).at(age)++;
                 }
             }
         }
 
         auto dw = calculate_disability_weight(entity);
-        series(gender, "disability_weight").at(age) += dw;
-        series(gender, "yld").at(age) += (dw * DALY_UNITS);
+        series(over_18, "disability_weight").at(age) += dw;
+        series(over_18, "yld").at(age) += (dw * DALY_UNITS);
 
         classify_weight(series, entity);
     }
