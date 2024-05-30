@@ -45,6 +45,10 @@ if(MSVC)
         message(WARNING "Code coverage cannot be generated for MSVC, ignoring")
     endif()
 
+    # Needed to avoid this error: fatal error C1128: number of sections exceeded object file format
+    # limit: compile with /bigobj
+    add_compile_options(/bigobj)
+
     if(WARNINGS_AS_ERRORS)
         add_compile_options(/WX)
     endif()
