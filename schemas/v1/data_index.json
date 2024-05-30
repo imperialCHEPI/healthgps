@@ -12,9 +12,8 @@
                 },
                 {
                     "type": "object",
-                    "properties": {
-                        "file_name": { "type": "string" }
-                    }
+                    "properties": { "file_name": { "type": "string" } },
+                    "required": ["file_name"]
                 }
             ]
         },
@@ -51,7 +50,8 @@
                                 "description": { "type": "string" },
                                 "path": { "type": "string" },
                                 "file_name": { "type": "string" }
-                            }
+                            },
+                            "required": ["description", "path", "file_name"]
                         },
                         "mortality": {
                             "type": "object",
@@ -59,9 +59,17 @@
                                 "description": { "type": "string" },
                                 "path": { "type": "string" },
                                 "file_name": { "type": "string" }
-                            }
+                            },
+                            "required": ["description", "path", "file_name"]
                         }
-                    }
+                    },
+                    "required": [
+                        "age_limits",
+                        "time_limits",
+                        "projections",
+                        "population",
+                        "mortality"
+                    ]
                 }
             ]
         },
@@ -102,7 +110,12 @@
                                                 "default_value": {
                                                     "type": "number"
                                                 }
-                                            }
+                                            },
+                                            "required": [
+                                                "path",
+                                                "file_name",
+                                                "default_value"
+                                            ]
                                         },
                                         "to_risk_factor": {
                                             "type": "object",
@@ -111,7 +124,8 @@
                                                 "file_name": {
                                                     "type": "string"
                                                 }
-                                            }
+                                            },
+                                            "required": ["path", "file_name"]
                                         },
                                         "parameters": {
                                             "type": "object",
@@ -129,13 +143,26 @@
                                                         "death_weight": {
                                                             "type": "string"
                                                         }
-                                                    }
+                                                    },
+                                                    "required": [
+                                                        "distribution",
+                                                        "survival_rate",
+                                                        "death_weight"
+                                                    ]
                                                 }
-                                            }
+                                            },
+                                            "required": ["path", "files"]
                                         }
-                                    }
+                                    },
+                                    "required": [
+                                        "path",
+                                        "to_disease",
+                                        "to_risk_factor",
+                                        "parameters"
+                                    ]
                                 }
-                            }
+                            },
+                            "required": ["path", "file_name", "relative_risk"]
                         },
                         "registry": {
                             "type": "array",
@@ -145,10 +172,17 @@
                                     "group": { "enum": ["other", "cancer"] },
                                     "id": { "type": "string" },
                                     "name": { "type": "string" }
-                                }
+                                },
+                                "required": ["group", "id", "name"]
                             }
                         }
-                    }
+                    },
+                    "required": [
+                        "age_limits",
+                        "time_year",
+                        "disease",
+                        "registry"
+                    ]
                 }
             ]
         },
@@ -177,11 +211,20 @@
                             "properties": {
                                 "path": { "type": "string" },
                                 "file_name": { "type": "string" }
-                            }
+                            },
+                            "required": ["path", "file_name"]
                         }
-                    }
+                    },
+                    "required": [
+                        "age_limits",
+                        "time_year",
+                        "disability_file_name",
+                        "lms_file_name",
+                        "cost_of_disease"
+                    ]
                 }
             ]
         }
-    }
+    },
+    "required": ["country", "demographic", "diseases", "analysis"]
 }
