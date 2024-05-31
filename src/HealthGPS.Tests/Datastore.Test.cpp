@@ -175,13 +175,7 @@ TEST_F(DatastoreTest, RetrieveDiseaseDefinitionIsEmpty) {
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
 
-    auto entity = manager.get_disease(info, india);
-
-    ASSERT_TRUE(entity.empty());
-    ASSERT_EQ(0, entity.items.size());
-    ASSERT_EQ(0, entity.measures.size());
-    EXPECT_EQ(info.code, entity.info.code);
-    EXPECT_EQ(india.code, entity.country.code);
+    EXPECT_THROW(manager.get_disease(info, india), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
@@ -203,7 +197,7 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
     ASSERT_FALSE(table_other.is_default_value);
 }
 
-TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
+TEST_F(DatastoreTest, MissingDiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
 
     auto diabetes = manager.get_disease_info("diabetes");
@@ -211,12 +205,7 @@ TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
 
-    auto default_table = manager.get_relative_risk_to_disease(diabetes, info);
-    ASSERT_EQ(3, default_table.columns.size());
-    ASSERT_GT(default_table.rows.size(), 0);
-    ASSERT_EQ(1.0, default_table.rows[0][1]);
-    ASSERT_EQ(1.0, default_table.rows[0][2]);
-    ASSERT_TRUE(default_table.is_default_value);
+    EXPECT_THROW(manager.get_relative_risk_to_disease(diabetes, info), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
