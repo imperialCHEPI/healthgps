@@ -400,7 +400,7 @@ std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
                                                       const ModelInput &config) {
     auto analysis_entity = repository.manager().get_disease_analysis(config.settings().country());
     auto &lms_definition = repository.get_lms_definition();
-    if (analysis_entity.empty() || lms_definition.empty()) {
+    if (lms_definition.empty()) {
         throw std::logic_error(
             "Failed to create analysis module, invalid disease analysis definition.");
     }

@@ -51,13 +51,13 @@ class Datastore {
     /// @brief Gets a disease full definition by identifier for a country
     /// @param info The target disease information
     /// @param country The target country definition
-    /// @return The disease definition, check empty() = true for missing data.
+    /// @return The disease definition
     virtual DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const = 0;
 
     /// @brief Gets the relative risk effects for disease to disease interactions
     /// @param source The source disease information
     /// @param target The target disease information
-    /// @return The disease-disease effects, check empty() = true for missing data.
+    /// @return The disease-disease effects
     virtual RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
                                                             const DiseaseInfo &target) const = 0;
 
@@ -73,13 +73,13 @@ class Datastore {
     /// @brief Gets the parameters required by cancer type diseases for a country
     /// @param info The disease of type cancer information
     /// @param country The target country definition
-    /// @return The cancer parameters, check empty() = true for missing data.
+    /// @return The cancer parameters
     virtual CancerParameterEntity get_disease_parameter(const DiseaseInfo &info,
                                                         const Country &country) const = 0;
 
     /// @brief Gets the Burden of Diseases (BoD) analysis dataset for a country
     /// @param country The target country definition
-    /// @return The BoD analysis data, check empty() = true for missing data.
+    /// @return The BoD analysis data
     virtual DiseaseAnalysisEntity get_disease_analysis(const Country &country) const = 0;
 
     /// @brief Gets the population birth indicators for a country filtered by time

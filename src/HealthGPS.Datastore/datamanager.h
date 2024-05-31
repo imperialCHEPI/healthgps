@@ -82,8 +82,6 @@ class DataManager : public Datastore {
     VerboseMode verbosity_;
     nlohmann::json index_;
 
-    RelativeRiskEntity generate_default_relative_risk_to_disease() const;
-
     std::map<int, std::map<Gender, double>>
     load_cost_of_diseases(const Country &country, const nlohmann::json &node,
                           const std::filesystem::path &parent_path) const;
