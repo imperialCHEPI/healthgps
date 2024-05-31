@@ -85,19 +85,15 @@ RelativeRisk create_relative_risk(const RelativeRiskInfo &info) {
     }
 
     for (auto &factor : info.risk_factors) {
-        auto table_male = info.manager.get_relative_risk_to_risk_factor(
-            info.disease, core::Gender::male, factor.key());
-        auto table_feme = info.manager.get_relative_risk_to_risk_factor(
-            info.disease, core::Gender::female, factor.key());
-
-        if (!table_male.empty()) {
+        if (const auto table_male = info.manager.get_relative_risk_to_risk_factor(
+                info.disease, core::Gender::male, factor.key())) {
             result.risk_factors[factor.key()].emplace(
-                core::Gender::male, StoreConverter::to_relative_risk_lookup(table_male));
+                core::Gender::male, StoreConverter::to_relative_risk_lookup(*table_male));
         }
-
-        if (!table_feme.empty()) {
+        if (const auto table_female = info.manager.get_relative_risk_to_risk_factor(
+                info.disease, core::Gender::female, factor.key())) {
             result.risk_factors[factor.key()].emplace(
-                core::Gender::female, StoreConverter::to_relative_risk_lookup(table_feme));
+                core::Gender::female, StoreConverter::to_relative_risk_lookup(*table_female));
         }
     }
 

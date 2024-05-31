@@ -393,13 +393,12 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(const DiseaseInfo &
     return {};
 }
 
-RelativeRiskEntity
+std::optional<RelativeRiskEntity>
 DataManager::get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
                                               const core::Identifier &risk_factor_key) const {
-    auto table = RelativeRiskEntity();
     if (!index_.contains("diseases")) {
         notify_warning("index has no 'diseases' entry.");
-        return table;
+        return std::nullopt;
     }
 
     // Creates full file name from store configuration
@@ -425,12 +424,12 @@ DataManager::get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender 
     if (!std::filesystem::exists(filename)) {
         notify_warning(fmt::format("{} to {} relative risk file not found, disabled.",
                                    source_code_str, factor_key_str));
-        return table;
+        return std::nullopt;
     }
 
     rapidcsv::Document doc(filename);
-    table.is_default_value = false;
-    table.columns = doc.GetColumnNames();
+    auto table =
+        RelativeRiskEntity{.is_default_value = false, .columns = doc.GetColumnNames(), .rows = {}};
     auto row_size = table.columns.size();
     for (size_t i = 0; i < doc.GetRowCount(); i++) {
         auto row = doc.GetRow<std::string>(i);

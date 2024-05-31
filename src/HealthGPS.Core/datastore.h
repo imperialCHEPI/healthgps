@@ -2,6 +2,8 @@
 
 #include "interval.h"
 #include "poco.h"
+
+#include <optional>
 #include <vector>
 
 namespace hgps::core {
@@ -63,8 +65,8 @@ class Datastore {
     /// @param source The disease information
     /// @param gender The gender enumeration
     /// @param risk_factor_key The risk factor identifier
-    /// @return The risk factor-disease effects, check empty() = true for missing data.
-    virtual RelativeRiskEntity
+    /// @return The risk factor-disease effects or std::nullopt if data missing
+    virtual std::optional<RelativeRiskEntity>
     get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
                                      const Identifier &risk_factor_key) const = 0;
 

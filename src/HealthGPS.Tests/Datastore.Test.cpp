@@ -227,9 +227,10 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 
     auto col_size = 8;
 
-    auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
-    auto table_feme =
-        manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
+    auto table_male =
+        *manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
+    auto table_female =
+        *manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
 
     ASSERT_EQ(col_size, table_male.columns.size());
     ASSERT_GT(table_male.rows.size(), 0);
@@ -238,11 +239,11 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 
     ASSERT_FALSE(table_male.is_default_value);
 
-    ASSERT_EQ(col_size, table_feme.columns.size());
-    ASSERT_GT(table_feme.rows.size(), 0);
-    ASSERT_EQ(table_feme.rows[0][1], table_feme.rows[0][2]);
-    ASSERT_NE(table_feme.rows[0][1], table_feme.rows[0][3]);
-    ASSERT_FALSE(table_feme.is_default_value);
+    ASSERT_EQ(col_size, table_female.columns.size());
+    ASSERT_GT(table_female.rows.size(), 0);
+    ASSERT_EQ(table_female.rows[0][1], table_female.rows[0][2]);
+    ASSERT_NE(table_female.rows[0][1], table_female.rows[0][3]);
+    ASSERT_FALSE(table_female.is_default_value);
 }
 
 TEST_F(DatastoreTest, RetrieveAnalysisEntity) {
