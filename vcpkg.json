@@ -15,7 +15,8 @@
         "crossguid",
         "gtest",
         "tbb",
-        "libzippp"
+        "libzippp",
+        "openssl"
     ],
     "builtin-baseline": "bd2b54836beed96e1efbe9aaf8ee800f5448856d"
 }

@@ -53,6 +53,7 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
 | [oneAPI TBB](https://github.com/oneapi-src/oneTBB)    | Apache 2.0   |
 | [libzippp](https://github.com/ctabin/libzippp)        | MIT          |
+| [openssl](https://www.openssl.org)                    | Apache 2.0   |
 
 ### Tools and Frameworks
 
