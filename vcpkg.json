@@ -16,7 +16,8 @@
         "gtest",
         "tbb",
         "libzippp",
-        "openssl"
+        "openssl",
+        "platform-folders"
     ],
     "builtin-baseline": "bd2b54836beed96e1efbe9aaf8ee800f5448856d"
 }
