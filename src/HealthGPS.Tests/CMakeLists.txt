@@ -23,6 +23,7 @@ target_sources(
             "Core.Test.cpp"
             "Core.UnivariateSummary.Test.cpp"
             "Core.MathHelper.Test.cpp"
+            "Sha256.Test.cpp"
             "Datastore.Test.cpp"
             "Repository.Test.cpp"
             "DiseaseModels.Test.cpp"
@@ -66,7 +67,7 @@ if(WIN32)
 endif()
 
 # Additional data files required for tests
-set(TO_COPY nutrient_table.csv ../../schemas)
+set(TO_COPY example_file.txt nutrient_table.csv ../../schemas)
 foreach(FILE IN LISTS TO_COPY)
     file(COPY "${FILE}" DESTINATION ".")
 endforeach(FILE IN LISTS TO_COPY)
