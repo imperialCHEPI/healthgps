@@ -1,3 +1,4 @@
+// NOLINTBEGIN(modernize-avoid-c-arrays)
 #include "pch.h"
 
 #include "HealthGPS/program_dirs.h"
