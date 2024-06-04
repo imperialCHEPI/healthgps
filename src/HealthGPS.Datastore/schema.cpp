@@ -10,11 +10,8 @@ namespace hgps::data {
 using namespace jsoncons;
 
 json resolve_uri(const jsoncons::uri &uri, const std::filesystem::path &schema_directory) {
-    constexpr const char *url_prefix =
-        "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/";
-
     const auto &uri_str = uri.string();
-    if (!uri_str.starts_with(url_prefix)) {
+    if (!uri_str.starts_with(HGPS_SCHEMA_URL_PREFIX)) {
         throw std::runtime_error(fmt::format("Unable to load URL: {}", uri_str));
     }
 

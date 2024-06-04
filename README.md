@@ -49,6 +49,7 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [eigen](https://eigen.tuxfamily.org)                  | MPL2         |
 | [fmt](https://github.com/fmtlib/fmt)                  | MIT          |
 | [nlohmann-json](https://github.com/nlohmann/json)     | MIT          |
+| [jsoncons](https://github.com/danielaparker/jsoncons) | Boost        |
 | [rapidcsv](https://github.com/d99kris/rapidcsv)       | BSD 3-Clause |
 | [oneAPI TBB](https://github.com/oneapi-src/oneTBB)    | Apache 2.0   |
 | [libzippp](https://github.com/ctabin/libzippp)        | MIT          |

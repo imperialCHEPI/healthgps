@@ -5,7 +5,6 @@
     "description": "Metadata and paths for Health-GPS input files",
     "type": "object",
     "properties": {
-        "version": { "const": 2 },
         "country": {
             "allOf": [
                 {

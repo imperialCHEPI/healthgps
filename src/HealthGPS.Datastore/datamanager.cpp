@@ -21,16 +21,19 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
             fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
     }
 
+    // Read in JSON file
     auto index = nlohmann::json::parse(ifs);
 
-    if (!index.contains("version")) {
-        throw std::runtime_error("File-based store, invalid definition missing schema version");
+    // Check that the file has a $schema property and that it matches the URL of the
+    // schema version we support
+    if (!index.contains("$schema")) {
+        throw std::runtime_error(fmt::format("Index file missing required $schema property: {}",
+                                             full_filename.string()));
     }
-
-    auto version = index["version"].get<int>();
-    if (version != 2) {
-        throw std::runtime_error(fmt::format(
-            "File-based store, index schema version: {} mismatch, supported: 2", version));
+    const auto schema_url = index.at("$schema").get<std::string>();
+    if (schema_url != HGPS_DATA_INDEX_SCHEMA_URL) {
+        throw std::runtime_error(fmt::format("Invalid schema URL provided: {} (expected: {})",
+                                             schema_url, HGPS_DATA_INDEX_SCHEMA_URL));
     }
 
     // Validate against schema
