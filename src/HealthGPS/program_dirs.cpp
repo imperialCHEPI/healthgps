@@ -1,4 +1,4 @@
-#include "program_path.h"
+#include "program_dirs.h"
 
 #ifdef __linux__
 #include <climits>

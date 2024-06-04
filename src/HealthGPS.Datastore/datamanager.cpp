@@ -4,7 +4,7 @@
 
 #include "HealthGPS.Core/math_util.h"
 #include "HealthGPS.Core/string_util.h"
-#include "HealthGPS/program_path.h"
+#include "HealthGPS/program_dirs.h"
 
 #include <fmt/color.h>
 #include <rapidcsv.h>
