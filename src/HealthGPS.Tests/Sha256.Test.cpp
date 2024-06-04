@@ -1,3 +1,4 @@
+// NOLINTBEGIN(modernize-avoid-c-arrays)
 #include "pch.h"
 
 #include "HealthGPS/program_dirs.h"
@@ -47,3 +48,4 @@ TEST(SHA256, compute_sha256_for_file_chunked) {
     EXPECT_EQ(hgps::compute_sha256_for_file(file_path, 2),
               "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03");
 }
+// NOLINTEND(modernize-avoid-c-arrays)
