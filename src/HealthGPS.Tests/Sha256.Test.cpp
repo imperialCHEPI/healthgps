@@ -1,6 +1,6 @@
 #include "pch.h"
 
-#include "HealthGPS/program_path.h"
+#include "HealthGPS/program_dirs.h"
 #include "HealthGPS/sha256.h"
 
 TEST(SHA256, SHA256Context) {
