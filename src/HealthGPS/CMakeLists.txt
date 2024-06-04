@@ -1,6 +1,7 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(crossguid CONFIG REQUIRED)
 find_package(OpenSSL CONFIG REQUIRED)
+find_package(platform_folders CONFIG REQUIRED)
 
 add_library(HealthGPS STATIC "")
 target_compile_features(HealthGPS PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -140,7 +141,7 @@ target_sources(
             "weight_model.cpp"
             "weight_model.h")
 
-target_link_libraries(HealthGPS PRIVATE HealthGPS.Core fmt::fmt crossguid OpenSSL::Crypto)
+target_link_libraries(HealthGPS PRIVATE HealthGPS.Core fmt::fmt crossguid OpenSSL::Crypto sago::platform_folders)
 target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ROOT_NAMESPACE hgps)
