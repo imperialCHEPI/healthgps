@@ -47,11 +47,11 @@ void HealthGPS::initialize() {
     }
 
     end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
-    std::cout << "Microsimulation algorithm initialised: " << name() << std::endl;
+    std::cout << "Microsimulation algorithm initialised: " << name() << '\n';
 }
 
 void HealthGPS::terminate() {
-    std::cout << "Microsimulation algorithm terminate: " << name() << std::endl;
+    std::cout << "Microsimulation algorithm terminate: " << name() << '\n';
 }
 
 void HealthGPS::setup_run(unsigned int run_number) noexcept {

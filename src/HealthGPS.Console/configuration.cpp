@@ -258,8 +258,8 @@ create_intervention_scenario(SyncChannel &channel, const poco::PolicyScenarioInf
     auto period = PolicyInterval(info.active_period.start_time, info.active_period.finish_time);
     auto risk_impacts = std::vector<PolicyImpact>{};
     for (const auto &item : info.impacts) {
-        risk_impacts.emplace_back(PolicyImpact{core::Identifier{item.risk_factor},
-                                               item.impact_value, item.from_age, item.to_age});
+        risk_impacts.emplace_back(core::Identifier{item.risk_factor}, item.impact_value,
+                                  item.from_age, item.to_age);
     }
 
     // TODO: Validate intervention JSON definitions!!!
