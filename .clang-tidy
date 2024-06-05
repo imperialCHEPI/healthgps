@@ -25,6 +25,7 @@ Checks: >
     -readability-magic-numbers,
     -readability-isolate-declaration,
     -misc-const-correctness,
+    -misc-include-cleaner,
     -misc-no-recursion,
     -misc-non-private-member-variables-in-classes,
     -cppcoreguidelines-avoid-magic-numbers,
