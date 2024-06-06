@@ -337,6 +337,9 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             series(core::Gender::female, chan).at(i) /= female_count;
         }
     }
+
+    // Calculate standard deviation
+    calculate_standard_deviation(context, series);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
