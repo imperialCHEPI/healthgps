@@ -348,9 +348,12 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context, DataS
     int max_age = context.age_range().upper();
 
     for (const auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
+
         unsigned int age = person.age;
         core::Gender sex = person.gender;
-
         for (const auto &factor : context.mapping().entries()) {
             double value = person.get_risk_factor_value(factor.key());
             double mean = series(sex, "mean_" + factor.key().to_string()).at(age);
