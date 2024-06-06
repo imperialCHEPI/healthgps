@@ -343,8 +343,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
-void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
-                                                  DataSeries &series) const {
+void AnalysisModule::calculate_standard_deviation(RuntimeContext &context, DataSeries &series) {
     int min_age = context.age_range().lower();
     int max_age = context.age_range().upper();
 
