@@ -80,18 +80,18 @@ jobs:
           cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON
 
       - uses: ZedThree/clang-tidy-review@v0.13.1
-        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
+        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' && github.actor == 'pre-commit-ci[bot]')
         id: review
         with:
           build_dir: out/build/linux-debug
 
       # Uploads an artefact containing clang_fixes.json
       - uses: ZedThree/clang-tidy-review/upload@v0.13.1
-        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
+        if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' && github.actor == 'pre-commit-ci[bot]')
         id: upload-review
 
       # If there are any comments, fail the check
-      - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default' && github.event_name == 'pull_request'
+      - if: steps.review.outputs.total_comments > 0 && matrix.compiler == 'gcc-default' && !(github.actor == 'dependabot[bot]' && github.actor == 'pre-commit-ci[bot]')
         run: exit 1
 
       - uses: ammaraskar/gcc-problem-matcher@master
