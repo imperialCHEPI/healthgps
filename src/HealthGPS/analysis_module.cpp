@@ -295,7 +295,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         series(gender, "count").at(age)++;
 
         for (const auto &factor : context.mapping().entries()) {
-            series(gender, factor.key().to_string()).at(age) +=
+            series(gender, "mean_" + factor.key().to_string()).at(age) +=
                 entity.get_risk_factor_value(factor.key());
         }
 
@@ -326,27 +326,58 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     // Calculate in-place averages
     for (auto i = min_age; i <= max_age; i++) {
         for (const auto &chan : series.channels()) {
-            if (chan == "count") {
+            if (chan == "count" || chan.starts_with("std_")) {
                 continue;
             }
 
             double male_count = series(core::Gender::male, "count").at(i);
-            if (male_count > 0.0) {
-                series(core::Gender::male, chan).at(i) /= male_count;
-            } else {
-                series(core::Gender::male, chan).at(i) = 0.0;
-            }
+            series(core::Gender::male, chan).at(i) /= male_count;
 
             double female_count = series(core::Gender::female, "count").at(i);
-            if (female_count > 0.0) {
-                series(core::Gender::female, chan).at(i) /= female_count;
-            } else {
-                series(core::Gender::female, chan).at(i) = 0.0;
-            }
+            series(core::Gender::female, chan).at(i) /= female_count;
         }
     }
 }
 // NOLINTEND(readability-function-cognitive-complexity)
+
+void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
+                                                  DataSeries &series) const {
+    int min_age = context.age_range().lower();
+    int max_age = context.age_range().upper();
+
+    for (const auto &person : context.population()) {
+        unsigned int age = person.age;
+        core::Gender sex = person.gender;
+
+        for (const auto &factor : context.mapping().entries()) {
+            double value = person.get_risk_factor_value(factor.key());
+            double mean = series(sex, "mean_" + factor.key().to_string()).at(age);
+            double diff = value - mean;
+            series(sex, "std_" + factor.key().to_string()).at(age) += diff * diff;
+        }
+    }
+
+    // Calculate in-place standard deviation.
+    for (int i = min_age; i <= max_age; i++) {
+        for (const auto &chan : series.channels()) {
+            if (!chan.starts_with("std_")) {
+                continue;
+            }
+
+            // Factor standard deviation for females.
+            double female_count = series(core::Gender::female, "count").at(i);
+            double female_sum = series(core::Gender::female, chan).at(i);
+            double female_std = std::sqrt(female_sum / female_count);
+            series(core::Gender::female, chan).at(i) = female_std;
+
+            // Factor standard deviation for males.
+            double male_count = series(core::Gender::male, "count").at(i);
+            double male_sum = series(core::Gender::male, chan).at(i);
+            double male_std = std::sqrt(male_sum / male_count);
+            series(core::Gender::male, chan).at(i) = male_std;
+        }
+    }
+}
 
 void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
     auto weight_class = weight_classifier_.classify_weight(entity);
@@ -376,7 +407,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("count");
 
     for (const auto &factor : context.mapping().entries()) {
-        channels_.emplace_back(factor.key().to_string());
+        channels_.emplace_back("mean_" + factor.key().to_string());
+        channels_.emplace_back("std_" + factor.key().to_string());
     }
 
     for (const auto &disease : context.diseases()) {
