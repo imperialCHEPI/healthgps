@@ -216,10 +216,12 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 
     auto col_size = 8;
 
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     auto table_male =
         *manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
     auto table_female =
         *manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 
     ASSERT_EQ(col_size, table_male.columns.size());
     ASSERT_GT(table_male.rows.size(), 0);
