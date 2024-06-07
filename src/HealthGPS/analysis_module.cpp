@@ -50,8 +50,9 @@ void AnalysisModule::initialise_map(RuntimeContext &context) {
     auto min_factor2 = min_max.first->get_risk_factor_value(factor2);
     auto max_factor2 = min_max.second->get_risk_factor_value(factor2);
 
-    // The dimensions of the 2D map is the number of integer values of each factor, or 100 bins of equal size, whichever is smaller
-    // (100 is an arbitrary number, it could be any other number depending on the desired resolution of the map)
+    // The dimensions of the 2D map is the number of integer values of each factor, or 100 bins of
+    // equal size, whichever is smaller (100 is an arbitrary number, it could be any other number
+    // depending on the desired resolution of the map)
     auto factor1_bins = std::min(100, static_cast<int>(max_factor1 - min_factor1));
     auto factor2_bins = std::min(100, static_cast<int>(max_factor2 - min_factor2));
 

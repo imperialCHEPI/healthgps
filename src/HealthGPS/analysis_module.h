@@ -38,7 +38,7 @@ class AnalysisModule final : public UpdatableModule {
     std::vector<std::string> channels_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
-    std::map<int,std::map<int,std::map<std::string, double>>> calculated_factors_;
+    std::map<int, std::map<int, std::map<std::string, double>>> calculated_factors_;
 
     void AnalysisModule::initialise_map(RuntimeContext &context);
 
