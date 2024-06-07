@@ -37,7 +37,7 @@ jobs:
       LATEST_GCC_VERSION: 13
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up MSVC (Windows)
         if: matrix.platform == 'windows'
