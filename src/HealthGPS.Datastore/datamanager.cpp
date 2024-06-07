@@ -301,8 +301,9 @@ DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &c
     return result;
 }
 
-RelativeRiskEntity DataManager::get_relative_risk_to_disease(const DiseaseInfo &source,
-                                                             const DiseaseInfo &target) const {
+std::optional<RelativeRiskEntity>
+DataManager::get_relative_risk_to_disease(const DiseaseInfo &source,
+                                          const DiseaseInfo &target) const {
     auto diseases_path = index_["diseases"]["path"].get<std::string>();
     auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
     const auto &risk_node = index_["diseases"]["disease"]["relative_risk"];
@@ -325,14 +326,14 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(const DiseaseInfo &
     filename =
         (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
     if (!std::filesystem::exists(filename)) {
-        throw std::runtime_error(
+        notify_warning(
             fmt::format("{} to {} relative risk file not found", source_code_str, target_code_str));
+        return std::nullopt;
     }
 
     rapidcsv::Document doc(filename);
 
     auto table = RelativeRiskEntity();
-    table.is_default_value = false;
     table.columns = doc.GetColumnNames();
 
     auto row_size = table.columns.size();
@@ -354,9 +355,9 @@ RelativeRiskEntity DataManager::get_relative_risk_to_disease(const DiseaseInfo &
     }
 
     if (non_default_count < 1) {
-        table.is_default_value = true;
         notify_warning(fmt::format("{} to {} relative risk file has only default values.",
                                    source_code_str, target_code_str));
+        return std::nullopt;
     }
 
     return table;
@@ -391,8 +392,7 @@ DataManager::get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender 
     }
 
     rapidcsv::Document doc(filename);
-    auto table =
-        RelativeRiskEntity{.is_default_value = false, .columns = doc.GetColumnNames(), .rows = {}};
+    auto table = RelativeRiskEntity{.columns = doc.GetColumnNames(), .rows = {}};
     auto row_size = table.columns.size();
     for (size_t i = 0; i < doc.GetRowCount(); i++) {
         auto row = doc.GetRow<std::string>(i);

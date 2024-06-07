@@ -78,9 +78,8 @@ RelativeRiskLookup StoreConverter::to_relative_risk_lookup(const core::RelativeR
 RelativeRisk create_relative_risk(const RelativeRiskInfo &info) {
     RelativeRisk result;
     for (const auto &item : info.inputs.diseases()) {
-        const auto table = info.manager.get_relative_risk_to_disease(info.disease, item);
-        if (!table.is_default_value) {
-            result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(table));
+        if (const auto table = info.manager.get_relative_risk_to_disease(info.disease, item)) {
+            result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(*table));
         }
     }
 

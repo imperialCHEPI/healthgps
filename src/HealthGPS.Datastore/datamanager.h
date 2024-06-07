@@ -55,8 +55,9 @@ class DataManager : public Datastore {
 
     DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const override;
 
-    RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
-                                                    const DiseaseInfo &target) const override;
+    std::optional<RelativeRiskEntity>
+    get_relative_risk_to_disease(const DiseaseInfo &source,
+                                 const DiseaseInfo &target) const override;
 
     std::optional<RelativeRiskEntity>
     get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,

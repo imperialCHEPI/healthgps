@@ -186,15 +186,12 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
     auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
 
     // diabetes to diabetes files-based default values
-    ASSERT_EQ(3, table_self.columns.size());
-    ASSERT_GT(table_self.rows.size(), 0);
-    ASSERT_EQ(table_self.rows[0][1], table_self.rows[0][2]);
-    ASSERT_TRUE(table_self.is_default_value);
+    EXPECT_FALSE(table_self.has_value());
 
-    ASSERT_EQ(3, table_other.columns.size());
-    ASSERT_GT(table_other.rows.size(), 0);
-    ASSERT_EQ(table_other.rows[0][1], table_other.rows[0][2]);
-    ASSERT_FALSE(table_other.is_default_value);
+    ASSERT_TRUE(table_other.has_value());
+    EXPECT_EQ(3, table_other->columns.size());
+    EXPECT_GT(table_other->rows.size(), 0);
+    EXPECT_EQ(table_other->rows[0][1], table_other->rows[0][2]);
 }
 
 TEST_F(DatastoreTest, MissingDiseaseRelativeRiskToDisease) {
@@ -205,7 +202,7 @@ TEST_F(DatastoreTest, MissingDiseaseRelativeRiskToDisease) {
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
 
-    EXPECT_THROW(manager.get_relative_risk_to_disease(diabetes, info), std::runtime_error);
+    ASSERT_FALSE(manager.get_relative_risk_to_disease(diabetes, info).has_value());
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
@@ -216,25 +213,20 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 
     auto col_size = 8;
 
-    // NOLINTBEGIN(bugprone-unchecked-optional-access)
-    auto table_male =
-        *manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
+    auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
+    ASSERT_TRUE(table_male.has_value());
+    EXPECT_EQ(col_size, table_male->columns.size());
+    EXPECT_FALSE(table_male->rows.empty());
+    EXPECT_EQ(table_male->rows[0][1], table_male->rows[0][2]);
+    EXPECT_NE(table_male->rows[0][1], table_male->rows[0][3]);
+
     auto table_female =
-        *manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
-    // NOLINTEND(bugprone-unchecked-optional-access)
-
-    ASSERT_EQ(col_size, table_male.columns.size());
-    ASSERT_GT(table_male.rows.size(), 0);
-    ASSERT_EQ(table_male.rows[0][1], table_male.rows[0][2]);
-    ASSERT_NE(table_male.rows[0][1], table_male.rows[0][3]);
-
-    ASSERT_FALSE(table_male.is_default_value);
-
-    ASSERT_EQ(col_size, table_female.columns.size());
-    ASSERT_GT(table_female.rows.size(), 0);
-    ASSERT_EQ(table_female.rows[0][1], table_female.rows[0][2]);
-    ASSERT_NE(table_female.rows[0][1], table_female.rows[0][3]);
-    ASSERT_FALSE(table_female.is_default_value);
+        manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
+    ASSERT_TRUE(table_female.has_value());
+    EXPECT_EQ(col_size, table_female->columns.size());
+    EXPECT_FALSE(table_female->rows.empty());
+    EXPECT_EQ(table_female->rows[0][1], table_female->rows[0][2]);
+    EXPECT_NE(table_female->rows[0][1], table_female->rows[0][3]);
 }
 
 TEST_F(DatastoreTest, RetrieveAnalysisEntity) {

@@ -57,9 +57,10 @@ class Datastore {
     /// @brief Gets the relative risk effects for disease to disease interactions
     /// @param source The source disease information
     /// @param target The target disease information
-    /// @return The disease-disease effects
-    virtual RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
-                                                            const DiseaseInfo &target) const = 0;
+    /// @return The disease-disease effects or std::nullopt if file doesn't exist or only contains
+    ///         default values
+    virtual std::optional<RelativeRiskEntity>
+    get_relative_risk_to_disease(const DiseaseInfo &source, const DiseaseInfo &target) const = 0;
 
     /// @brief Gets the relative risk effects for risk factor to disease interactions
     /// @param source The disease information
