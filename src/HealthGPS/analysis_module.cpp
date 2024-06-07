@@ -57,7 +57,8 @@ void AnalysisModule::initialise_map(RuntimeContext &context) {
     auto factor2_bins = std::min(100, static_cast<int>(max_factor2 - min_factor2));
 
     // Create a 2D map with the specified number of bins
-    calculated_factors_ = std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, double>>>{};
+    calculated_factors_ =
+        std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, double>>>{};
     for (int i = 0; i < factor1_bins; i++) {
         for (int j = 0; j < factor2_bins; j++) {
             calculated_factors_[i][j] = std::unordered_map<std::string, double>{};
