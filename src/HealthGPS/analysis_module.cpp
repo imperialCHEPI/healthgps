@@ -57,10 +57,10 @@ void AnalysisModule::initialise_map(RuntimeContext &context) {
     auto factor2_bins = std::min(100, static_cast<int>(max_factor2 - min_factor2));
 
     // Create a 2D map with the specified number of bins
-    calculated_factors_ = std::map<int, std::map<int, std::map<std::string, double>>>{};
+    calculated_factors_ = std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, double>>>{};
     for (int i = 0; i < factor1_bins; i++) {
         for (int j = 0; j < factor2_bins; j++) {
-            calculated_factors_[i][j] = std::map<std::string, double>{};
+            calculated_factors_[i][j] = std::unordered_map<std::string, double>{};
         }
     }
 }
@@ -109,7 +109,7 @@ void AnalysisModule::update_population(RuntimeContext &context) {
 
     // The inner map will have keys which are every factor except the two we are analysing
     // The value of each key will be reset to 0.0
-    std::map<std::string, double> inner_map{};
+    std::unordered_map<std::string, double> inner_map{};
     for (const auto &entry : context.mapping().entries()) {
         if (entry.key() != context.mapping().entries().at(0).key() &&
             entry.key() != context.mapping().entries().at(1).key()) {

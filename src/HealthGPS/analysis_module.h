@@ -38,9 +38,9 @@ class AnalysisModule final : public UpdatableModule {
     std::vector<std::string> channels_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
-    std::map<int, std::map<int, std::map<std::string, double>>> calculated_factors_;
+    std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, double>>> calculated_factors_;
 
-    void AnalysisModule::initialise_map(RuntimeContext &context);
+    void initialise_map(RuntimeContext &context);
 
     double calculate_residual_disability_weight(int age, core::Gender gender,
                                                 const DoubleAgeGenderTable &expected_sum,
