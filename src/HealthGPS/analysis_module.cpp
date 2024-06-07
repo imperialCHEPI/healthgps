@@ -402,7 +402,7 @@ std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
     auto &lms_definition = repository.get_lms_definition();
     if (lms_definition.empty()) {
         throw std::logic_error(
-            "Failed to create analysis module, invalid disease analysis definition.");
+            "Failed to create analysis module: invalid LMS model definition.");
     }
 
     auto definition = detail::StoreConverter::to_analysis_definition(analysis_entity);
