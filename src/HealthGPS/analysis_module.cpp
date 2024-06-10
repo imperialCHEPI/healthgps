@@ -344,20 +344,20 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 // NOLINTEND(readability-function-cognitive-complexity)
 
 void AnalysisModule::calculate_standard_deviation(RuntimeContext &context, DataSeries &series) {
-    int min_age = context.age_range().lower();
-    int max_age = context.age_range().upper();
+    const int min_age = context.age_range().lower();
+    const int max_age = context.age_range().upper();
 
     for (const auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
 
-        unsigned int age = person.age;
-        core::Gender sex = person.gender;
+        const unsigned int age = person.age;
+        const core::Gender sex = person.gender;
         for (const auto &factor : context.mapping().entries()) {
-            double value = person.get_risk_factor_value(factor.key());
-            double mean = series(sex, "mean_" + factor.key().to_string()).at(age);
-            double diff = value - mean;
+            const double value = person.get_risk_factor_value(factor.key());
+            const double mean = series(sex, "mean_" + factor.key().to_string()).at(age);
+            const double diff = value - mean;
             series(sex, "std_" + factor.key().to_string()).at(age) += diff * diff;
         }
     }
@@ -370,15 +370,15 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context, DataS
             }
 
             // Factor standard deviation for females.
-            double female_count = series(core::Gender::female, "count").at(i);
-            double female_sum = series(core::Gender::female, chan).at(i);
-            double female_std = std::sqrt(female_sum / female_count);
+            const double female_count = series(core::Gender::female, "count").at(i);
+            const double female_sum = series(core::Gender::female, chan).at(i);
+            const double female_std = std::sqrt(female_sum / female_count);
             series(core::Gender::female, chan).at(i) = female_std;
 
             // Factor standard deviation for males.
-            double male_count = series(core::Gender::male, "count").at(i);
-            double male_sum = series(core::Gender::male, chan).at(i);
-            double male_std = std::sqrt(male_sum / male_count);
+            const double male_count = series(core::Gender::male, "count").at(i);
+            const double male_sum = series(core::Gender::male, chan).at(i);
+            const double male_std = std::sqrt(male_sum / male_count);
             series(core::Gender::male, chan).at(i) = male_std;
         }
     }
