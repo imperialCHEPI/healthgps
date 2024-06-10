@@ -84,6 +84,8 @@ jobs:
         id: review
         with:
           build_dir: out/build/linux-debug
+          config_file: .clang-tidy
+          lgtm_comment_body: ""
 
       # Uploads an artefact containing clang_fixes.json
       - uses: ZedThree/clang-tidy-review/upload@v0.19.0
