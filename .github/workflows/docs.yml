@@ -55,7 +55,7 @@ jobs:
           ninja -C out/build/linux-release/ doxygen-docs
           sudo cp -r out/build/linux-release/src/html _site/api
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
 
   # Deployment job
   deploy:
