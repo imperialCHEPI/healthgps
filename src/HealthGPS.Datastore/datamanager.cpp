@@ -51,7 +51,6 @@ DataManager::DataManager(std::filesystem::path path, VerboseMode verbosity)
     if (std::filesystem::is_directory(path)) {
         root_ = std::move(path);
     } else if (std::filesystem::is_regular_file(path) && path.extension() == ".zip") {
-        // If it's a file, assume it's a zip file
         root_ = create_temporary_directory();
         extract_zip_file(path, root_);
     } else {

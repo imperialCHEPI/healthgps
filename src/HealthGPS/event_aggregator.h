@@ -82,7 +82,7 @@ class EventAggregator {
     /// @return The event subscriber instance
     [[nodiscard]] virtual std::unique_ptr<EventSubscriber>
     subscribe(EventType event_id,
-              std::function<void(std::shared_ptr<EventMessage> message)> &&handler) = 0;
+              std::function<void(std::shared_ptr<EventMessage> message)> handler) = 0;
 
     /// @brief Unsubscribes from an event notification
     /// @param subscriber The event subscriber instance

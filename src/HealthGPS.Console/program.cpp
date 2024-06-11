@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Create CLI options and validate minimum arguments
     auto options = create_options();
     if (argc < 2) {
-        std::cout << options.help() << std::endl;
+        std::cout << options.help() << '\n';
         return exit_application(EXIT_FAILURE);
     }
 

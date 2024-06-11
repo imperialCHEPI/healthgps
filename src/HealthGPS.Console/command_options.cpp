@@ -30,7 +30,7 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
         cmd.verbose = false;
         auto result = options.parse(argc, argv);
         if (result.count("help")) {
-            std::cout << options.help() << std::endl;
+            std::cout << options.help() << '\n';
             cmd.success = false;
             return cmd;
         }
