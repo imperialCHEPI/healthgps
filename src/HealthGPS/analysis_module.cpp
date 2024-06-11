@@ -26,44 +26,38 @@ SimulationModuleType AnalysisModule::type() const noexcept {
     return SimulationModuleType::Analysis;
 }
 
-void AnalysisModule::initialise_map(RuntimeContext &context) {
+void AnalysisModule::initialise_vector(RuntimeContext &context) {
     // Set some arbitrary factors
-    auto factor1 = context.mapping().entries().at(0).key().to_string();
-    auto factor2 = context.mapping().entries().at(1).key().to_string();
+    std::vector<core::Identifier> factors{"Gender"_id, "Age"_id};
 
-    // Get the minimum and maximum of the two factors in the population
-    auto min_max = std::minmax_element(context.population().cbegin(), context.population().cend(),
-                                       [](const auto &a, const auto &b) {
-                                           return a.get_risk_factor_value(factor1) <
-                                                  b.get_risk_factor_value(factor1);
-                                       });
+    std::vector<int> factor_bins;
 
-    auto min_factor1 = min_max.first->get_risk_factor_value(factor1);
-    auto max_factor1 = min_max.second->get_risk_factor_value(factor1);
+    for (const auto &factor : factors) {
+        auto min_max = std::minmax_element(context.population().cbegin(), context.population().cend(),
+                                           [&factor](const auto &a, const auto &b) {
+                                               return a.get_risk_factor_value(factor) <
+                                                      b.get_risk_factor_value(factor);
+                                           });
 
-    min_max = std::minmax_element(context.population().cbegin(), context.population().cend(),
-                                  [](const auto &a, const auto &b) {
-                                      return a.get_risk_factor_value(factor2) <
-                                             b.get_risk_factor_value(factor2);
-                                  });
+        auto min_factor = min_max.first->get_risk_factor_value(factor);
+        auto max_factor = min_max.second->get_risk_factor_value(factor);
 
-    auto min_factor2 = min_max.first->get_risk_factor_value(factor2);
-    auto max_factor2 = min_max.second->get_risk_factor_value(factor2);
-
-    // The dimensions of the 2D map is the number of integer values of each factor, or 100 bins of
-    // equal size, whichever is smaller (100 is an arbitrary number, it could be any other number
-    // depending on the desired resolution of the map)
-    auto factor1_bins = std::min(100, static_cast<int>(max_factor1 - min_factor1));
-    auto factor2_bins = std::min(100, static_cast<int>(max_factor2 - min_factor2));
-
-    // Create a 2D map with the specified number of bins
-    calculated_factors_ =
-        std::unordered_map<int, std::unordered_map<int, std::unordered_map<std::string, double>>>{};
-    for (int i = 0; i < factor1_bins; i++) {
-        for (int j = 0; j < factor2_bins; j++) {
-            calculated_factors_[i][j] = std::unordered_map<std::string, double>{};
-        }
+        // The number of bins to use for each factor is the number of integer values of the factor, or 100 bins of
+        // equal size, whichever is smaller (100 is an arbitrary number, it could be any other number
+        // depending on the desired resolution of the map)
+        factor_bins.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
     }
+
+    // The number of factors to calculate is the number of factors minus the length of the `factors` vector.
+    auto num_factors_to_calc = context.mapping().entries().size() - factors.size();
+
+    // The product of the number of bins for each factor can be used to calculate the size of the `calculated_factors_` in the next step
+    auto total_num_bins = std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1,
+                                    std::multiplies<int>());
+
+    // Set the vector size and initialise all values to 0.0
+    calculated_factors_.resize(total_num_bins * num_factors_to_calc, 0.0);
+
 }
 
 const std::string &AnalysisModule::name() const noexcept { return name_; }
@@ -108,22 +102,8 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
 
 void AnalysisModule::update_population(RuntimeContext &context) {
 
-    // The inner map will have keys which are every factor except the two we are analysing
-    // The value of each key will be reset to 0.0
-    std::unordered_map<std::string, double> inner_map{};
-    for (const auto &entry : context.mapping().entries()) {
-        if (entry.key() != context.mapping().entries().at(0).key() &&
-            entry.key() != context.mapping().entries().at(1).key()) {
-            inner_map[entry.key().to_string()] = 0.0;
-        }
-    }
-
-    // Iterate over every element in calculated_factors_ and set its value to inner map
-    for (auto &outer : calculated_factors_) {
-        for (auto &inner : outer.second) {
-            inner.second = inner_map;
-        }
-    }
+    // Reset the calculated factors vector to 0.0
+    std::fill(calculated_factors_.begin(), calculated_factors_.end(), 0.0);
 
     publish_result_message(context);
 }
