@@ -6,12 +6,12 @@ namespace hgps {
 
 std::unique_ptr<EventSubscriber>
 DefaultEventBus::subscribe(EventType event_id,
-                           std::function<void(std::shared_ptr<EventMessage> message)> &&function) {
+                           std::function<void(std::shared_ptr<EventMessage> message)> function) {
     auto handle_id = std::string{};
     exclusive_access([&]() {
         auto event_key = static_cast<int>(event_id);
         handle_id = xg::newGuid().str();
-        subscribers_.emplace(handle_id, function);
+        subscribers_.emplace(handle_id, std::move(function));
         registry_.emplace(event_key, handle_id);
     });
 

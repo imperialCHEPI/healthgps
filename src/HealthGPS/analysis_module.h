@@ -54,8 +54,14 @@ class AnalysisModule final : public UpdatableModule {
                                    unsigned int death_year) const;
 
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
+
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
     void initialise_output_channels(RuntimeContext &context);
+
+    /// @brief Calculates the standard deviation of factors given data series containing means
+    /// @param context The runtime context
+    /// @param series The data series containing factor means
+    static void calculate_standard_deviation(RuntimeContext &context, DataSeries &series);
 };
 
 /// @brief Builds a new instance of the AnalysisModule using the given data infrastructure
