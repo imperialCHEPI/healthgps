@@ -33,31 +33,32 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     std::vector<int> factor_bins;
 
     for (const auto &factor : factors) {
-        auto min_max = std::minmax_element(context.population().cbegin(), context.population().cend(),
-                                           [&factor](const auto &a, const auto &b) {
-                                               return a.get_risk_factor_value(factor) <
-                                                      b.get_risk_factor_value(factor);
-                                           });
+        auto min_max = std::minmax_element(
+            context.population().cbegin(), context.population().cend(),
+            [&factor](const auto &a, const auto &b) {
+                return a.get_risk_factor_value(factor) < b.get_risk_factor_value(factor);
+            });
 
         auto min_factor = min_max.first->get_risk_factor_value(factor);
         auto max_factor = min_max.second->get_risk_factor_value(factor);
 
-        // The number of bins to use for each factor is the number of integer values of the factor, or 100 bins of
-        // equal size, whichever is smaller (100 is an arbitrary number, it could be any other number
-        // depending on the desired resolution of the map)
+        // The number of bins to use for each factor is the number of integer values of the factor,
+        // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
+        // any other number depending on the desired resolution of the map)
         factor_bins.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
     }
 
-    // The number of factors to calculate is the number of factors minus the length of the `factors` vector.
+    // The number of factors to calculate is the number of factors minus the length of the `factors`
+    // vector.
     auto num_factors_to_calc = context.mapping().entries().size() - factors.size();
 
-    // The product of the number of bins for each factor can be used to calculate the size of the `calculated_factors_` in the next step
-    auto total_num_bins = std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1,
-                                    std::multiplies<int>());
+    // The product of the number of bins for each factor can be used to calculate the size of the
+    // `calculated_factors_` in the next step
+    auto total_num_bins =
+        std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1, std::multiplies<int>());
 
     // Set the vector size and initialise all values to 0.0
     calculated_factors_.resize(total_num_bins * num_factors_to_calc, 0.0);
-
 }
 
 const std::string &AnalysisModule::name() const noexcept { return name_; }
