@@ -189,9 +189,12 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
     EXPECT_FALSE(table_self.has_value());
 
     ASSERT_TRUE(table_other.has_value());
+
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     EXPECT_EQ(3, table_other->columns.size());
     EXPECT_GT(table_other->rows.size(), 0);
     EXPECT_EQ(table_other->rows[0][1], table_other->rows[0][2]);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(DatastoreTest, MissingDiseaseRelativeRiskToDisease) {
@@ -213,8 +216,10 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 
     auto col_size = 8;
 
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
     ASSERT_TRUE(table_male.has_value());
+
     EXPECT_EQ(col_size, table_male->columns.size());
     EXPECT_FALSE(table_male->rows.empty());
     EXPECT_EQ(table_male->rows[0][1], table_male->rows[0][2]);
@@ -223,10 +228,12 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
     auto table_female =
         manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
     ASSERT_TRUE(table_female.has_value());
+
     EXPECT_EQ(col_size, table_female->columns.size());
     EXPECT_FALSE(table_female->rows.empty());
     EXPECT_EQ(table_female->rows[0][1], table_female->rows[0][2]);
     EXPECT_NE(table_female->rows[0][1], table_female->rows[0][3]);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(DatastoreTest, RetrieveAnalysisEntity) {
