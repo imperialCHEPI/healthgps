@@ -365,7 +365,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
                 float expcted_life = definition_.life_expectancy().at(context.time_now(), sex);
-                float yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
                 std_accumulate("yll", sex, age, yll);
                 std_accumulate("daly", sex, age, yll);
             }
