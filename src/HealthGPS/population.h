@@ -60,7 +60,7 @@ class Population {
     /// @brief Adds a Person to the virtual population
     /// @param person The new Person instance
     /// @param time Current simulation time
-    void add(Person &&person, unsigned int time) noexcept;
+    void add(Person person, unsigned int time) noexcept;
 
     /// @brief Adds newborn babies of gender to the virtual population, age = 0
     /// @param number The number of newborn babies to add

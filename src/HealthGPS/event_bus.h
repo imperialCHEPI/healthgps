@@ -14,7 +14,7 @@ class DefaultEventBus final : public EventAggregator {
   public:
     [[nodiscard]] std::unique_ptr<EventSubscriber>
     subscribe(EventType event_id,
-              std::function<void(std::shared_ptr<EventMessage> message)> &&function) override;
+              std::function<void(std::shared_ptr<EventMessage> message)> function) override;
 
     void publish(std::unique_ptr<EventMessage> message) override;
 

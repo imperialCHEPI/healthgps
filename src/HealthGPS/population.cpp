@@ -23,14 +23,13 @@ Person &Population::at(std::size_t index) { return people_.at(index); }
 
 const Person &Population::at(std::size_t index) const { return people_.at(index); }
 
-void Population::add(Person &&person, unsigned int time) noexcept {
-    auto recycle = find_index_of_recyclables(time, 1);
+void Population::add(Person person, unsigned int time) noexcept {
+    const auto recycle = find_index_of_recyclables(time, 1);
     if (!recycle.empty()) {
-        people_.at(recycle.at(0)) = person;
-        return;
+        people_.at(recycle.at(0)) = std::move(person);
+    } else {
+        people_.emplace_back(std::move(person));
     }
-
-    people_.emplace_back(person);
 }
 
 void Population::add_newborn_babies(std::size_t number, core::Gender gender,
