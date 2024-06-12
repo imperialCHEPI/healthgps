@@ -31,13 +31,12 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     std::vector<core::Identifier> factors{"Gender"_id, "Age"_id};
 
     std::vector<int> factor_bins;
+    factor_bins.reserve(factors.size());
 
     for (const auto &factor : factors) {
-        auto min_max = std::minmax_element(
-            context.population().cbegin(), context.population().cend(),
-            [&factor](const auto &a, const auto &b) {
-                return a.get_risk_factor_value(factor) < b.get_risk_factor_value(factor);
-            });
+        auto min_max = std::ranges::minmax_element(context.population(), [&factor](const auto &entity1, const auto &entity2) {
+            return entity1.get_risk_factor_value(factor) < entity2.get_risk_factor_value(factor);
+        });
 
         auto min_factor = min_max.first->get_risk_factor_value(factor);
         auto max_factor = min_max.second->get_risk_factor_value(factor);
@@ -58,7 +57,7 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
         std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1, std::multiplies<int>());
 
     // Set the vector size and initialise all values to 0.0
-    calculated_factors_.resize(total_num_bins * num_factors_to_calc, 0.0);
+    calculated_factors_.resize(total_num_bins * num_factors_to_calc);
 }
 
 const std::string &AnalysisModule::name() const noexcept { return name_; }
@@ -104,7 +103,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
 void AnalysisModule::update_population(RuntimeContext &context) {
 
     // Reset the calculated factors vector to 0.0
-    std::fill(calculated_factors_.begin(), calculated_factors_.end(), 0.0);
+    std::ranges::fill(calculated_factors_, 0.0);
 
     publish_result_message(context);
 }
