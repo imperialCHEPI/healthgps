@@ -54,10 +54,11 @@ class DataManager : public Datastore {
 
     DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const override;
 
-    RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
-                                                    const DiseaseInfo &target) const override;
+    std::optional<RelativeRiskEntity>
+    get_relative_risk_to_disease(const DiseaseInfo &source,
+                                 const DiseaseInfo &target) const override;
 
-    RelativeRiskEntity
+    std::optional<RelativeRiskEntity>
     get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
                                      const core::Identifier &risk_factor_key) const override;
 
@@ -80,8 +81,6 @@ class DataManager : public Datastore {
     std::filesystem::path root_;
     VerboseMode verbosity_;
     nlohmann::json index_;
-
-    RelativeRiskEntity generate_default_relative_risk_to_disease() const;
 
     std::map<int, std::map<Gender, double>>
     load_cost_of_diseases(const Country &country, const nlohmann::json &node,

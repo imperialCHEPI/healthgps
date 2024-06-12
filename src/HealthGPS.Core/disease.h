@@ -70,9 +70,6 @@ struct DiseaseEntity {
 
 /// @brief Diseases relative risk effect table data structure
 struct RelativeRiskEntity {
-    /// @brief Value indicating whether the rows contain default value only.
-    bool is_default_value{};
-
     /// @brief The table column identifiers
     std::vector<std::string> columns;
 
