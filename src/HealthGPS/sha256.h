@@ -13,7 +13,7 @@ namespace hgps {
 /// @param buffer_size Size of the buffer for reading the file in chunks
 /// @return The SHA256 hash
 std::string compute_sha256_for_file(const std::filesystem::path &file_path,
-                                    size_t buffer_size = 1024 * 1024);
+                                    size_t buffer_size = static_cast<size_t>(1024 * 1024));
 
 //! An object for computing a SHA256 hash
 class SHA256Context {
