@@ -2,6 +2,8 @@
 
 #include "interval.h"
 #include "poco.h"
+
+#include <optional>
 #include <vector>
 
 namespace hgps::core {
@@ -49,35 +51,36 @@ class Datastore {
     /// @brief Gets a disease full definition by identifier for a country
     /// @param info The target disease information
     /// @param country The target country definition
-    /// @return The disease definition, check empty() = true for missing data.
+    /// @return The disease definition
     virtual DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const = 0;
 
     /// @brief Gets the relative risk effects for disease to disease interactions
     /// @param source The source disease information
     /// @param target The target disease information
-    /// @return The disease-disease effects, check empty() = true for missing data.
-    virtual RelativeRiskEntity get_relative_risk_to_disease(const DiseaseInfo &source,
-                                                            const DiseaseInfo &target) const = 0;
+    /// @return The disease-disease effects or std::nullopt if file doesn't exist or only contains
+    ///         default values
+    virtual std::optional<RelativeRiskEntity>
+    get_relative_risk_to_disease(const DiseaseInfo &source, const DiseaseInfo &target) const = 0;
 
     /// @brief Gets the relative risk effects for risk factor to disease interactions
     /// @param source The disease information
     /// @param gender The gender enumeration
     /// @param risk_factor_key The risk factor identifier
-    /// @return The risk factor-disease effects, check empty() = true for missing data.
-    virtual RelativeRiskEntity
+    /// @return The risk factor-disease effects or std::nullopt if data missing
+    virtual std::optional<RelativeRiskEntity>
     get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
                                      const Identifier &risk_factor_key) const = 0;
 
     /// @brief Gets the parameters required by cancer type diseases for a country
     /// @param info The disease of type cancer information
     /// @param country The target country definition
-    /// @return The cancer parameters, check empty() = true for missing data.
+    /// @return The cancer parameters
     virtual CancerParameterEntity get_disease_parameter(const DiseaseInfo &info,
                                                         const Country &country) const = 0;
 
     /// @brief Gets the Burden of Diseases (BoD) analysis dataset for a country
     /// @param country The target country definition
-    /// @return The BoD analysis data, check empty() = true for missing data.
+    /// @return The BoD analysis data
     virtual DiseaseAnalysisEntity get_disease_analysis(const Country &country) const = 0;
 
     /// @brief Gets the population birth indicators for a country filtered by time

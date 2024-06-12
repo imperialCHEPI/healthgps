@@ -78,26 +78,21 @@ RelativeRiskLookup StoreConverter::to_relative_risk_lookup(const core::RelativeR
 RelativeRisk create_relative_risk(const RelativeRiskInfo &info) {
     RelativeRisk result;
     for (const auto &item : info.inputs.diseases()) {
-        auto table = info.manager.get_relative_risk_to_disease(info.disease, item);
-        if (!table.empty() && !table.is_default_value) {
-            result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(table));
+        if (const auto table = info.manager.get_relative_risk_to_disease(info.disease, item)) {
+            result.diseases.emplace(item.code, StoreConverter::to_relative_risk_table(*table));
         }
     }
 
     for (auto &factor : info.risk_factors) {
-        auto table_male = info.manager.get_relative_risk_to_risk_factor(
-            info.disease, core::Gender::male, factor.key());
-        auto table_feme = info.manager.get_relative_risk_to_risk_factor(
-            info.disease, core::Gender::female, factor.key());
-
-        if (!table_male.empty()) {
+        if (const auto table_male = info.manager.get_relative_risk_to_risk_factor(
+                info.disease, core::Gender::male, factor.key())) {
             result.risk_factors[factor.key()].emplace(
-                core::Gender::male, StoreConverter::to_relative_risk_lookup(table_male));
+                core::Gender::male, StoreConverter::to_relative_risk_lookup(*table_male));
         }
-
-        if (!table_feme.empty()) {
+        if (const auto table_female = info.manager.get_relative_risk_to_risk_factor(
+                info.disease, core::Gender::female, factor.key())) {
             result.risk_factors[factor.key()].emplace(
-                core::Gender::female, StoreConverter::to_relative_risk_lookup(table_feme));
+                core::Gender::female, StoreConverter::to_relative_risk_lookup(*table_female));
         }
     }
 
