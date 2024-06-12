@@ -25,7 +25,7 @@ TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
 }
 
 TEST_F(DatastoreTest, CountryMissingThrowsException) {
-    ASSERT_THROW(manager.get_country("FAKE"), std::invalid_argument);
+    ASSERT_THROW(manager.get_country("FAKE"), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, CountryIsCaseInsensitive) {
@@ -137,7 +137,7 @@ TEST_F(DatastoreTest, GetDiseaseInfoMatchesGetDisases) {
 }
 
 TEST_F(DatastoreTest, GetDiseaseInfoMissingThrowsException) {
-    EXPECT_THROW(manager.get_disease_info("FAKE"), std::invalid_argument);
+    EXPECT_THROW(manager.get_disease_info("FAKE"), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, RetrieveDiseasesTypeInInfo) {
@@ -175,13 +175,7 @@ TEST_F(DatastoreTest, RetrieveDiseaseDefinitionIsEmpty) {
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
 
-    auto entity = manager.get_disease(info, india);
-
-    ASSERT_TRUE(entity.empty());
-    ASSERT_EQ(0, entity.items.size());
-    ASSERT_EQ(0, entity.measures.size());
-    EXPECT_EQ(info.code, entity.info.code);
-    EXPECT_EQ(india.code, entity.country.code);
+    EXPECT_THROW(manager.get_disease(info, india), std::runtime_error);
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
@@ -192,18 +186,18 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToDisease) {
     auto table_other = manager.get_relative_risk_to_disease(diabetes, asthma);
 
     // diabetes to diabetes files-based default values
-    ASSERT_EQ(3, table_self.columns.size());
-    ASSERT_GT(table_self.rows.size(), 0);
-    ASSERT_EQ(table_self.rows[0][1], table_self.rows[0][2]);
-    ASSERT_TRUE(table_self.is_default_value);
+    EXPECT_FALSE(table_self.has_value());
 
-    ASSERT_EQ(3, table_other.columns.size());
-    ASSERT_GT(table_other.rows.size(), 0);
-    ASSERT_EQ(table_other.rows[0][1], table_other.rows[0][2]);
-    ASSERT_FALSE(table_other.is_default_value);
+    ASSERT_TRUE(table_other.has_value());
+
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
+    EXPECT_EQ(3, table_other->columns.size());
+    EXPECT_GT(table_other->rows.size(), 0);
+    EXPECT_EQ(table_other->rows[0][1], table_other->rows[0][2]);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
-TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
+TEST_F(DatastoreTest, MissingDiseaseRelativeRiskToDisease) {
     using namespace hgps::core;
 
     auto diabetes = manager.get_disease_info("diabetes");
@@ -211,12 +205,7 @@ TEST_F(DatastoreTest, DefaultDiseaseRelativeRiskToDisease) {
                             .code = Identifier{"ghost369"},
                             .name = "Look at the flowers."};
 
-    auto default_table = manager.get_relative_risk_to_disease(diabetes, info);
-    ASSERT_EQ(3, default_table.columns.size());
-    ASSERT_GT(default_table.rows.size(), 0);
-    ASSERT_EQ(1.0, default_table.rows[0][1]);
-    ASSERT_EQ(1.0, default_table.rows[0][2]);
-    ASSERT_TRUE(default_table.is_default_value);
+    ASSERT_FALSE(manager.get_relative_risk_to_disease(diabetes, info).has_value());
 }
 
 TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
@@ -227,22 +216,24 @@ TEST_F(DatastoreTest, DiseaseRelativeRiskToRiskFactor) {
 
     auto col_size = 8;
 
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     auto table_male = manager.get_relative_risk_to_risk_factor(diabetes, Gender::male, risk_factor);
-    auto table_feme =
+    ASSERT_TRUE(table_male.has_value());
+
+    EXPECT_EQ(col_size, table_male->columns.size());
+    EXPECT_FALSE(table_male->rows.empty());
+    EXPECT_EQ(table_male->rows[0][1], table_male->rows[0][2]);
+    EXPECT_NE(table_male->rows[0][1], table_male->rows[0][3]);
+
+    auto table_female =
         manager.get_relative_risk_to_risk_factor(diabetes, Gender::female, risk_factor);
+    ASSERT_TRUE(table_female.has_value());
 
-    ASSERT_EQ(col_size, table_male.columns.size());
-    ASSERT_GT(table_male.rows.size(), 0);
-    ASSERT_EQ(table_male.rows[0][1], table_male.rows[0][2]);
-    ASSERT_NE(table_male.rows[0][1], table_male.rows[0][3]);
-
-    ASSERT_FALSE(table_male.is_default_value);
-
-    ASSERT_EQ(col_size, table_feme.columns.size());
-    ASSERT_GT(table_feme.rows.size(), 0);
-    ASSERT_EQ(table_feme.rows[0][1], table_feme.rows[0][2]);
-    ASSERT_NE(table_feme.rows[0][1], table_feme.rows[0][3]);
-    ASSERT_FALSE(table_feme.is_default_value);
+    EXPECT_EQ(col_size, table_female->columns.size());
+    EXPECT_FALSE(table_female->rows.empty());
+    EXPECT_EQ(table_female->rows[0][1], table_female->rows[0][2]);
+    EXPECT_NE(table_female->rows[0][1], table_female->rows[0][3]);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(DatastoreTest, RetrieveAnalysisEntity) {
