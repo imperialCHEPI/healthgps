@@ -34,14 +34,14 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     factor_bins.reserve(factors.size());
 
     for (const auto &factor : factors) {
-        auto min_max = std::ranges::minmax_element(
+        const auto [min, max] = std::ranges::minmax_element(
             context.population(), [&factor](const auto &entity1, const auto &entity2) {
                 return entity1.get_risk_factor_value(factor) <
                        entity2.get_risk_factor_value(factor);
             });
 
-        auto min_factor = min_max.first->get_risk_factor_value(factor);
-        auto max_factor = min_max.second->get_risk_factor_value(factor);
+        auto min_factor = min->get_risk_factor_value(factor);
+        auto max_factor = max->get_risk_factor_value(factor);
 
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
@@ -55,7 +55,8 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
     // The product of the number of bins for each factor can be used to calculate the size of the
     // `calculated_factors_` in the next step
-    auto total_num_bins = std::ranges::accumulate(factor_bins, 1, std::multiplies<int>());
+    auto total_num_bins = std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1,
+                                    std::multiplies<int>());
 
     // Set the vector size and initialise all values to 0.0
     calculated_factors_.resize(total_num_bins * num_factors_to_calc);
