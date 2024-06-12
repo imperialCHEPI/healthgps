@@ -34,9 +34,11 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     factor_bins.reserve(factors.size());
 
     for (const auto &factor : factors) {
-        auto min_max = std::ranges::minmax_element(context.population(), [&factor](const auto &entity1, const auto &entity2) {
-            return entity1.get_risk_factor_value(factor) < entity2.get_risk_factor_value(factor);
-        });
+        auto min_max = std::ranges::minmax_element(
+            context.population(), [&factor](const auto &entity1, const auto &entity2) {
+                return entity1.get_risk_factor_value(factor) <
+                       entity2.get_risk_factor_value(factor);
+            });
 
         auto min_factor = min_max.first->get_risk_factor_value(factor);
         auto max_factor = min_max.second->get_risk_factor_value(factor);
