@@ -26,8 +26,7 @@ class SHA256Context {
     /// @param range A container-like range of char data
     template <class R> void update(const R &range) {
         if (const auto size = std::distance(std::begin(range), std::end(range))) {
-            EVP_DigestUpdate(ctx_, &*std::begin(range),
-                            size);
+            EVP_DigestUpdate(ctx_, &*std::begin(range), size);
         }
     }
 
