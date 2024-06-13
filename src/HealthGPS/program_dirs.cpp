@@ -1,4 +1,4 @@
-#include "program_path.h"
+#include "program_dirs.h"
 
 #ifdef __linux__
 #include <climits>
@@ -10,9 +10,13 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <sago/platform_folders.h>
+
 #include <array>
 
 namespace {
+constexpr const char *program_name = "healthgps";
+
 void throw_path_error() { throw hgps::core::HgpsException("Could not get program path"); }
 } // anonymous namespace
 
@@ -35,5 +39,9 @@ std::filesystem::path get_program_path() {
 #endif
 
     return path.data();
+}
+
+std::filesystem::path get_cache_directory() {
+    return std::filesystem::path{sago::getCacheDir()} / program_name;
 }
 } // namespace hgps

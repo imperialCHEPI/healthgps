@@ -2,7 +2,7 @@
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS/nutrients.h"
-#include "HealthGPS/program_path.h"
+#include "HealthGPS/program_dirs.h"
 
 #include <filesystem>
 #include <sstream>
