@@ -26,6 +26,42 @@ SimulationModuleType AnalysisModule::type() const noexcept {
     return SimulationModuleType::Analysis;
 }
 
+void AnalysisModule::initialise_vector(RuntimeContext &context) {
+    // Set some arbitrary factors
+    std::vector<core::Identifier> factors{"Gender"_id, "Age"_id};
+
+    std::vector<int> factor_bins;
+    factor_bins.reserve(factors.size());
+
+    for (const auto &factor : factors) {
+        const auto [min, max] = std::ranges::minmax_element(
+            context.population(), [&factor](const auto &entity1, const auto &entity2) {
+                return entity1.get_risk_factor_value(factor) <
+                       entity2.get_risk_factor_value(factor);
+            });
+
+        auto min_factor = min->get_risk_factor_value(factor);
+        auto max_factor = max->get_risk_factor_value(factor);
+
+        // The number of bins to use for each factor is the number of integer values of the factor,
+        // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
+        // any other number depending on the desired resolution of the map)
+        factor_bins.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+    }
+
+    // The number of factors to calculate is the number of factors minus the length of the `factors`
+    // vector.
+    auto num_factors_to_calc = context.mapping().entries().size() - factors.size();
+
+    // The product of the number of bins for each factor can be used to calculate the size of the
+    // `calculated_factors_` in the next step
+    auto total_num_bins =
+        std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1, std::multiplies<>());
+
+    // Set the vector size and initialise all values to 0.0
+    calculated_factors_.resize(total_num_bins * num_factors_to_calc);
+}
+
 const std::string &AnalysisModule::name() const noexcept { return name_; }
 
 void AnalysisModule::initialise_population(RuntimeContext &context) {
@@ -66,7 +102,13 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     publish_result_message(context);
 }
 
-void AnalysisModule::update_population(RuntimeContext &context) { publish_result_message(context); }
+void AnalysisModule::update_population(RuntimeContext &context) {
+
+    // Reset the calculated factors vector to 0.0
+    std::ranges::fill(calculated_factors_, 0.0);
+
+    publish_result_message(context);
+}
 
 double
 AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender gender,
