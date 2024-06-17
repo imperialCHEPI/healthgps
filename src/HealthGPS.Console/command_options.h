@@ -20,7 +20,7 @@ struct CommandOptions {
     std::filesystem::path config_file{};
 
     /// @brief The back-end storage full path or URL argument value
-    std::string data_path_or_url{};
+    std::string data_path_or_url;
 
     /// @brief Indicates whether the application logging is verbose
     bool verbose{};
