@@ -60,7 +60,7 @@ class AnalysisModule final : public UpdatableModule {
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
     /// @param series The data series containing factor means
-    static void calculate_standard_deviation(RuntimeContext &context, DataSeries &series);
+    void calculate_standard_deviation(RuntimeContext &context, DataSeries &series) const;
 };
 
 /// @brief Builds a new instance of the AnalysisModule using the given data infrastructure

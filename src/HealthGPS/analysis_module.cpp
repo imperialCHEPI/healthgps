@@ -324,7 +324,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             if (!entity.is_alive() && entity.time_of_death() == current_time) {
                 series(gender, "deaths").at(age)++;
                 auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                series(gender, "yll").at(age) += std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                series(gender, "mean_yll").at(age) +=
+                    std::max(expcted_life - age, 0.0f) * DALY_UNITS;
             }
 
             if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
@@ -352,17 +353,19 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
         auto dw = calculate_disability_weight(entity);
         series(gender, "disability_weight").at(age) += dw;
-        series(gender, "yld").at(age) += (dw * DALY_UNITS);
+        series(gender, "mean_yld").at(age) += (dw * DALY_UNITS);
 
         classify_weight(series, entity);
     }
 
     // Calculate DALY
     for (int i = min_age; i <= max_age; i++) {
-        series(core::Gender::male, "daly").at(i) =
-            series(core::Gender::male, "yll").at(i) + series(core::Gender::male, "yld").at(i);
-        series(core::Gender::female, "daly").at(i) =
-            series(core::Gender::female, "yll").at(i) + series(core::Gender::female, "yld").at(i);
+        series(core::Gender::male, "mean_daly").at(i) =
+            series(core::Gender::male, "mean_yll").at(i) +
+            series(core::Gender::male, "mean_yld").at(i);
+        series(core::Gender::female, "mean_daly").at(i) =
+            series(core::Gender::female, "mean_yll").at(i) +
+            series(core::Gender::female, "mean_yld").at(i);
     }
 
     // Calculate in-place averages
@@ -385,43 +388,64 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
-void AnalysisModule::calculate_standard_deviation(RuntimeContext &context, DataSeries &series) {
-    const int min_age = context.age_range().lower();
-    const int max_age = context.age_range().upper();
+void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
+                                                  DataSeries &series) const {
 
+    // Accumulate squared deviations from mean.
+    auto accumulate_squared_diffs = [&series](const std::string &chan, core::Gender sex, int age,
+                                              double value) {
+        const double mean = series(sex, "mean_" + chan).at(age);
+        const double diff = value - mean;
+        series(sex, "std_" + chan).at(age) += diff * diff;
+    };
+
+    auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
+        unsigned int age = person.age;
+        core::Gender sex = person.gender;
+
         if (!person.is_active()) {
+            if (!person.is_alive() && person.time_of_death() == current_time) {
+                float expcted_life = definition_.life_expectancy().at(context.time_now(), sex);
+                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                accumulate_squared_diffs("yll", sex, age, yll);
+                accumulate_squared_diffs("daly", sex, age, yll);
+            }
+
             continue;
         }
 
-        const unsigned int age = person.age;
-        const core::Gender sex = person.gender;
+        double dw = calculate_disability_weight(person);
+        double yld = dw * DALY_UNITS;
+        accumulate_squared_diffs("yld", sex, age, yld);
+        accumulate_squared_diffs("daly", sex, age, yld);
+
         for (const auto &factor : context.mapping().entries()) {
             const double value = person.get_risk_factor_value(factor.key());
-            const double mean = series(sex, "mean_" + factor.key().to_string()).at(age);
-            const double diff = value - mean;
-            series(sex, "std_" + factor.key().to_string()).at(age) += diff * diff;
+            accumulate_squared_diffs(factor.key().to_string(), sex, age, value);
         }
     }
 
     // Calculate in-place standard deviation.
-    for (int i = min_age; i <= max_age; i++) {
+    auto divide_by_count = [&series](const std::string &chan, core::Gender sex, int age) {
+        const double count = series(sex, "count").at(age);
+        const double sum = series(sex, chan).at(age);
+        const double std = std::sqrt(sum / count);
+        series(sex, chan).at(age) = std;
+    };
+
+    const auto age_range = context.age_range();
+    for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         for (const auto &chan : series.channels()) {
             if (!chan.starts_with("std_")) {
                 continue;
             }
 
             // Factor standard deviation for females.
-            const double female_count = series(core::Gender::female, "count").at(i);
-            const double female_sum = series(core::Gender::female, chan).at(i);
-            const double female_std = std::sqrt(female_sum / female_count);
-            series(core::Gender::female, chan).at(i) = female_std;
+            divide_by_count(chan, core::Gender::female, age);
 
             // Factor standard deviation for males.
-            const double male_count = series(core::Gender::male, "count").at(i);
-            const double male_sum = series(core::Gender::male, chan).at(i);
-            const double male_std = std::sqrt(male_sum / male_count);
-            series(core::Gender::male, chan).at(i) = male_std;
+            divide_by_count(chan, core::Gender::male, age);
         }
     }
 }
@@ -470,9 +494,12 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("over_weight");
     channels_.emplace_back("obese_weight");
     channels_.emplace_back("above_weight");
-    channels_.emplace_back("yll");
-    channels_.emplace_back("yld");
-    channels_.emplace_back("daly");
+    channels_.emplace_back("mean_yll");
+    channels_.emplace_back("std_yll");
+    channels_.emplace_back("mean_yld");
+    channels_.emplace_back("std_yld");
+    channels_.emplace_back("mean_daly");
+    channels_.emplace_back("std_daly");
 }
 
 std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
