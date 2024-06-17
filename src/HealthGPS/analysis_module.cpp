@@ -323,9 +323,10 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         if (!entity.is_active()) {
             if (!entity.is_alive() && entity.time_of_death() == current_time) {
                 series(gender, "deaths").at(age)++;
-                auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                series(gender, "mean_yll").at(age) +=
-                    std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
+                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                series(gender, "mean_yll").at(age) += yll;
+                series(gender, "mean_daly").at(age) += yll;
             }
 
             if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
@@ -351,20 +352,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             }
         }
 
-        auto dw = calculate_disability_weight(entity);
-        series(gender, "mean_yld").at(age) += (dw * DALY_UNITS);
+        double dw = calculate_disability_weight(entity);
+        double yld = dw * DALY_UNITS;
+        series(gender, "mean_yld").at(age) += yld;
+        series(gender, "mean_daly").at(age) += yld;
 
         classify_weight(series, entity);
-    }
-
-    // Calculate DALY
-    for (int i = min_age; i <= max_age; i++) {
-        series(core::Gender::male, "mean_daly").at(i) =
-            series(core::Gender::male, "mean_yll").at(i) +
-            series(core::Gender::male, "mean_yld").at(i);
-        series(core::Gender::female, "mean_daly").at(i) =
-            series(core::Gender::female, "mean_yll").at(i) +
-            series(core::Gender::female, "mean_yld").at(i);
     }
 
     // Calculate in-place averages
