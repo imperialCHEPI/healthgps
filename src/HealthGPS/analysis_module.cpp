@@ -360,18 +360,26 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         classify_weight(series, entity);
     }
 
-    // Calculate in-place averages
-    for (auto i = min_age; i <= max_age; i++) {
-        for (const auto &chan : series.channels()) {
-            if (chan == "count" || chan.starts_with("std_")) {
-                continue;
-            }
+    // Calculate in-place factor averages.
+    for (int age = min_age; age <= max_age; age++) {
+        double male_count = series(core::Gender::male, "count").at(age);
+        double female_count = series(core::Gender::female, "count").at(age);
+        for (const auto &factor : context.mapping().entries()) {
+            std::string name = "mean_" + factor.key().to_string();
+            series(core::Gender::male, name).at(age) /= male_count;
+            series(core::Gender::female, name).at(age) /= female_count;
+        }
+    }
 
-            double male_count = series(core::Gender::male, "count").at(i);
-            series(core::Gender::male, chan).at(i) /= male_count;
-
-            double female_count = series(core::Gender::female, "count").at(i);
-            series(core::Gender::female, chan).at(i) /= female_count;
+    // Calculate in-place YLL/YLD/DALY averages.
+    for (auto age = min_age; age <= max_age; age++) {
+        double male_count = series(core::Gender::male, "count").at(age) +
+                            series(core::Gender::male, "deaths").at(age);
+        double female_count = series(core::Gender::female, "count").at(age) +
+                              series(core::Gender::female, "deaths").at(age);
+        for (const auto &name : {"mean_yll", "mean_yld", "mean_daly"}) {
+            series(core::Gender::male, name).at(age) /= male_count;
+            series(core::Gender::female, name).at(age) /= female_count;
         }
     }
 
