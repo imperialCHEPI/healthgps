@@ -352,7 +352,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         }
 
         auto dw = calculate_disability_weight(entity);
-        series(gender, "disability_weight").at(age) += dw;
         series(gender, "mean_yld").at(age) += (dw * DALY_UNITS);
 
         classify_weight(series, entity);
@@ -475,8 +474,6 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         return;
     }
 
-    channels_.emplace_back("count");
-
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back("mean_" + factor.key().to_string());
         channels_.emplace_back("std_" + factor.key().to_string());
@@ -487,7 +484,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         channels_.emplace_back("incidence_" + disease.code.to_string());
     }
 
-    channels_.emplace_back("disability_weight");
+    channels_.emplace_back("count");
     channels_.emplace_back("deaths");
     channels_.emplace_back("migrations");
     channels_.emplace_back("normal_weight");
