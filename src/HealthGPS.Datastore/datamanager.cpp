@@ -4,7 +4,7 @@
 
 #include "HealthGPS.Core/math_util.h"
 #include "HealthGPS.Core/string_util.h"
-#include "HealthGPS/program_path.h"
+#include "HealthGPS/program_dirs.h"
 
 #include <fmt/color.h>
 #include <rapidcsv.h>
@@ -51,8 +51,7 @@ DataManager::DataManager(std::filesystem::path path, VerboseMode verbosity)
     if (std::filesystem::is_directory(path)) {
         root_ = std::move(path);
     } else if (std::filesystem::is_regular_file(path) && path.extension() == ".zip") {
-        root_ = create_temporary_directory();
-        extract_zip_file(path, root_);
+        root_ = extract_zip_file_or_load_from_cache(path);
     } else {
         throw std::runtime_error(
             fmt::format("Path must either point to a zip file or a directory: {}", path.string()));
