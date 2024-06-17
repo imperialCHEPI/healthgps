@@ -427,7 +427,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     }
 
     // Calculate in-place standard deviation.
-    auto divide_by_count = [&series](const std::string &chan, core::Gender sex, int age) {
+    auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age) {
         const double count = series(sex, "count").at(age);
         const double sum = series(sex, chan).at(age);
         const double std = std::sqrt(sum / count);
@@ -442,10 +442,10 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
             }
 
             // Factor standard deviation for females.
-            divide_by_count(chan, core::Gender::female, age);
+            divide_by_count_sqrt(chan, core::Gender::female, age);
 
             // Factor standard deviation for males.
-            divide_by_count(chan, core::Gender::male, age);
+            divide_by_count_sqrt(chan, core::Gender::male, age);
         }
     }
 }
