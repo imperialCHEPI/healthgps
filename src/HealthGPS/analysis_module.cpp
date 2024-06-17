@@ -329,7 +329,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             }
 
             if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
-                series(gender, "migrations").at(age)++;
+                series(gender, "emigrations").at(age)++;
             }
 
             continue;
@@ -474,6 +474,10 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         return;
     }
 
+    channels_.emplace_back("count");
+    channels_.emplace_back("deaths");
+    channels_.emplace_back("emigrations");
+
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back("mean_" + factor.key().to_string());
         channels_.emplace_back("std_" + factor.key().to_string());
@@ -484,9 +488,6 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         channels_.emplace_back("incidence_" + disease.code.to_string());
     }
 
-    channels_.emplace_back("count");
-    channels_.emplace_back("deaths");
-    channels_.emplace_back("migrations");
     channels_.emplace_back("normal_weight");
     channels_.emplace_back("over_weight");
     channels_.emplace_back("obese_weight");
