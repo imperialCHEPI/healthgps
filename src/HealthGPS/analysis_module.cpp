@@ -27,13 +27,10 @@ SimulationModuleType AnalysisModule::type() const noexcept {
 }
 
 void AnalysisModule::initialise_vector(RuntimeContext &context) {
-    // Set some arbitrary factors
-    std::vector<core::Identifier> factors{"Gender"_id, "Age"_id};
+    factor_bins_.reserve(factors_to_calculate_.size());
+    factor_bin_widths_.reserve(factors_to_calculate_.size());
 
-    std::vector<int> factor_bins;
-    factor_bins.reserve(factors.size());
-
-    for (const auto &factor : factors) {
+    for (const auto &factor : factors_to_calculate_) {
         const auto [min, max] = std::ranges::minmax_element(
             context.population(), [&factor](const auto &entity1, const auto &entity2) {
                 return entity1.get_risk_factor_value(factor) <
@@ -46,17 +43,20 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
         // any other number depending on the desired resolution of the map)
-        factor_bins.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+        factor_bins_.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+
+        // The width of each bin is the range of the factor divided by the number of bins
+        factor_bin_widths_.push_back((max_factor - min_factor) / factor_bins_.back());
     }
 
     // The number of factors to calculate is the number of factors minus the length of the `factors`
     // vector.
-    auto num_factors_to_calc = context.mapping().entries().size() - factors.size();
+    auto num_factors_to_calc = context.mapping().entries().size() - factors_to_calculate_.size();
 
     // The product of the number of bins for each factor can be used to calculate the size of the
     // `calculated_factors_` in the next step
     auto total_num_bins =
-        std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1, std::multiplies<>());
+        std::accumulate(factor_bins_.cbegin(), factor_bins_.cend(), 1, std::multiplies<>());
 
     // Set the vector size and initialise all values to 0.0
     calculated_factors_.resize(total_num_bins * num_factors_to_calc);
@@ -138,6 +138,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
+    calculate_population_statistics(context, calculated_factors_);
     calculate_population_statistics(context, result.series);
     handle.get();
 
@@ -302,6 +303,40 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
     return DALYsIndicator{.years_of_life_lost = yll,
                           .years_lived_with_disability = yld,
                           .disability_adjusted_life_years = yll + yld};
+}
+
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
+                                                     std::vector<double> &calculated_factors) const {
+    auto num_factors_to_calculate = context.mapping().entries().size() - factors_to_calculate_.size();
+
+    for (const auto &entity : context.population()) {
+        // Get factors_to_calculate_ values for this entity
+        std::vector<double> entity_factors;
+        for (const auto &factor : factors_to_calculate_) {
+            entity_factors.push_back(entity.get_risk_factor_value(factor));
+        }
+        // Get the bin index for each factor
+        std::vector<int> bin_indices;
+        for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
+            auto factor_value = entity_factors[i];
+            auto bin_index = static_cast<int>((factor_value - factor_bin_widths_[i]) / factor_bin_widths_[i]);
+            bin_indices.push_back(bin_index);
+        }
+
+        // Calculate the index in the calculated_factors_ vector
+        auto index = 0;
+        for (size_t i = 0; i < bin_indices.size()-1; i++) {
+            index += bin_indices[i] * std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(), 1, std::multiplies<>()) * num_factors_to_calculate;
+        }
+        index += bin_indices.back() * num_factors_to_calculate;
+
+        // Now we can add the values of the factors that are not in factors_to_calculate_
+        for (const auto &factor : context.mapping().entries()) {
+            if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(), factor.key()) == factors_to_calculate_.cend()) {
+                calculated_factors[index++] += entity.get_risk_factor_value(factor.key());
+            }
+        }
+    }
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
