@@ -333,7 +333,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
                                                     factor_bins_.cend(), 1, std::multiplies<>())) *
                 static_cast<size_t>(num_factors_to_calculate);
         }
-        index += static_cast<size_t>(bin_indices.back()) * static_cast<size_t>(num_factors_to_calculate);
+        index +=
+            static_cast<size_t>(bin_indices.back()) * static_cast<size_t>(num_factors_to_calculate);
 
         // Now we can add the values of the factors that are not in factors_to_calculate_
         for (const auto &factor : context.mapping().entries()) {
