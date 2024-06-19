@@ -138,7 +138,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
-    calculate_population_statistics(context, calculated_factors_);
+    calculate_population_statistics(context);
     calculate_population_statistics(context, result.series);
     handle.get();
 
@@ -306,7 +306,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 }
 
 void AnalysisModule::calculate_population_statistics(
-    RuntimeContext &context, std::vector<double> &calculated_factors) const {
+    RuntimeContext &context) const {
     auto num_factors_to_calculate =
         context.mapping().entries().size() - factors_to_calculate_.size();
 
@@ -328,10 +328,10 @@ void AnalysisModule::calculate_population_statistics(
         // Calculate the index in the calculated_factors_ vector
         auto index = 0;
         for (size_t i = 0; i < bin_indices.size() - 1; i++) {
-            index += bin_indices[i] *
-                     std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(),
-                                     1, std::multiplies<>()) *
-                     num_factors_to_calculate;
+            index += static_cast<size_t>(bin_indices[i]) *
+                     static_cast<size_t>(std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(),
+                                     1, std::multiplies<>())) *
+                     static_cast<size_t>(num_factors_to_calculate);
         }
         index += bin_indices.back() * num_factors_to_calculate;
 
@@ -339,7 +339,7 @@ void AnalysisModule::calculate_population_statistics(
         for (const auto &factor : context.mapping().entries()) {
             if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(),
                           factor.key()) == factors_to_calculate_.cend()) {
-                calculated_factors[index++] += entity.get_risk_factor_value(factor.key());
+                calculated_factors_[index++] += entity.get_risk_factor_value(factor.key());
             }
         }
     }

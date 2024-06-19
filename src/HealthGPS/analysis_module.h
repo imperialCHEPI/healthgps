@@ -39,7 +39,7 @@ class AnalysisModule final : public UpdatableModule {
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
     std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
-    std::vector<double> calculated_factors_;
+    mutable std::vector<double> calculated_factors_;
     std::vector<int> factor_bins_;
     std::vector<double> factor_bin_widths_;
 
@@ -55,8 +55,7 @@ class AnalysisModule final : public UpdatableModule {
     DALYsIndicator calculate_dalys(Population &population, unsigned int max_age,
                                    unsigned int death_year) const;
 
-    void calculate_population_statistics(RuntimeContext &context,
-                                         std::vector<double> &calculated_factors) const;
+    void calculate_population_statistics(RuntimeContext &context) const;
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
