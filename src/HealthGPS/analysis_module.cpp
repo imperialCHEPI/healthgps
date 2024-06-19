@@ -305,8 +305,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
-void AnalysisModule::calculate_population_statistics(
-    RuntimeContext &context) const {
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context) const {
     auto num_factors_to_calculate =
         context.mapping().entries().size() - factors_to_calculate_.size();
 
@@ -328,10 +327,11 @@ void AnalysisModule::calculate_population_statistics(
         // Calculate the index in the calculated_factors_ vector
         auto index = 0;
         for (size_t i = 0; i < bin_indices.size() - 1; i++) {
-            index += static_cast<size_t>(bin_indices[i]) *
-                     static_cast<size_t>(std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(),
-                                     1, std::multiplies<>())) *
-                     static_cast<size_t>(num_factors_to_calculate);
+            index +=
+                static_cast<size_t>(bin_indices[i]) *
+                static_cast<size_t>(std::accumulate(std::next(factor_bins_.cbegin(), i + 1),
+                                                    factor_bins_.cend(), 1, std::multiplies<>())) *
+                static_cast<size_t>(num_factors_to_calculate);
         }
         index += bin_indices.back() * num_factors_to_calculate;
 
