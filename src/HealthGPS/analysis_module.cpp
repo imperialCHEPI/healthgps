@@ -360,40 +360,34 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         classify_weight(series, person);
     }
 
-    // Calculate in-place factor averages.
+    // For each age group in the analysis...
     for (int age = min_age; age <= max_age; age++) {
-        double female_count = series(core::Gender::female, "count").at(age);
-        double male_count = series(core::Gender::male, "count").at(age);
+        double count_F = series(core::Gender::female, "count").at(age);
+        double count_M = series(core::Gender::male, "count").at(age);
+        double deaths_F = series(core::Gender::female, "deaths").at(age);
+        double deaths_M = series(core::Gender::male, "deaths").at(age);
+
+        // Calculate in-place factor averages.
         for (const auto &factor : context.mapping().entries()) {
             std::string column = "mean_" + factor.key().to_string();
-            series(core::Gender::female, column).at(age) /= female_count;
-            series(core::Gender::male, column).at(age) /= male_count;
+            series(core::Gender::female, column).at(age) /= count_F;
+            series(core::Gender::male, column).at(age) /= count_M;
         }
-    }
 
-    // Calculate in-place disease prevalence and incidence rates.
-    for (int age = min_age; age <= max_age; age++) {
-        double female_count = series(core::Gender::female, "count").at(age);
-        double male_count = series(core::Gender::male, "count").at(age);
+        // Calculate in-place disease prevalence and incidence rates.
         for (const auto &disease : context.diseases()) {
             std::string column_prevalence = "prevalence_" + disease.code.to_string();
-            series(core::Gender::female, column_prevalence).at(age) /= female_count;
-            series(core::Gender::male, column_prevalence).at(age) /= male_count;
+            series(core::Gender::female, column_prevalence).at(age) /= count_F;
+            series(core::Gender::male, column_prevalence).at(age) /= count_M;
             std::string column_incidence = "incidence_" + disease.code.to_string();
-            series(core::Gender::female, column_incidence).at(age) /= female_count;
-            series(core::Gender::male, column_incidence).at(age) /= male_count;
+            series(core::Gender::female, column_incidence).at(age) /= count_F;
+            series(core::Gender::male, column_incidence).at(age) /= count_M;
         }
-    }
 
-    // Calculate in-place YLL/YLD/DALY averages.
-    for (int age = min_age; age <= max_age; age++) {
-        double female_count = series(core::Gender::female, "count").at(age) +
-                              series(core::Gender::female, "deaths").at(age);
-        double male_count = series(core::Gender::male, "count").at(age) +
-                            series(core::Gender::male, "deaths").at(age);
+        // Calculate in-place YLL/YLD/DALY averages.
         for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
-            series(core::Gender::female, column).at(age) /= female_count;
-            series(core::Gender::male, column).at(age) /= male_count;
+            series(core::Gender::female, column).at(age) /= (count_F + deaths_F);
+            series(core::Gender::male, column).at(age) /= (count_M + deaths_M);
         }
     }
 
@@ -441,8 +435,12 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     }
 
     // Calculate in-place standard deviation.
-    auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age) {
-        const double count = series(sex, "count").at(age);
+    auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
+                                          bool include_deaths) {
+        double count = series(sex, "count").at(age);
+        if (include_deaths) {
+            count += series(sex, "deaths").at(age);
+        }
         const double sum = series(sex, chan).at(age);
         const double std = std::sqrt(sum / count);
         series(sex, chan).at(age) = std;
@@ -456,10 +454,10 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
             }
 
             // Factor standard deviation for females.
-            divide_by_count_sqrt(chan, core::Gender::female, age);
+            divide_by_count_sqrt(chan, core::Gender::female, age, false);
 
             // Factor standard deviation for males.
-            divide_by_count_sqrt(chan, core::Gender::male, age);
+            divide_by_count_sqrt(chan, core::Gender::male, age, false);
         }
     }
 }
