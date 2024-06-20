@@ -307,8 +307,6 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
-    auto min_age = context.age_range().lower();
-    auto max_age = context.age_range().upper();
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
     }
@@ -361,7 +359,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     }
 
     // For each age group in the analysis...
-    for (int age = min_age; age <= max_age; age++) {
+    const auto age_range = context.age_range();
+    for (int age = age_range.lower(); age <= age_range.upper(); age++) {
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);
         double deaths_F = series(core::Gender::female, "deaths").at(age);
@@ -436,28 +435,30 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 
     // Calculate in-place standard deviation.
     auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
-                                          bool include_deaths) {
-        double count = series(sex, "count").at(age);
-        if (include_deaths) {
-            count += series(sex, "deaths").at(age);
-        }
-        const double sum = series(sex, chan).at(age);
+                                          double count) {
+        const double sum = series(sex, "std_" + chan).at(age);
         const double std = std::sqrt(sum / count);
-        series(sex, chan).at(age) = std;
+        series(sex, "std_" + chan).at(age) = std;
     };
 
+    // For each age group in the analysis...
     const auto age_range = context.age_range();
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-        for (const auto &chan : series.channels()) {
-            if (!chan.starts_with("std_")) {
-                continue;
-            }
+        double count_F = series(core::Gender::female, "count").at(age);
+        double count_M = series(core::Gender::male, "count").at(age);
+        double deaths_F = series(core::Gender::female, "deaths").at(age);
+        double deaths_M = series(core::Gender::male, "deaths").at(age);
 
-            // Factor standard deviation for females.
-            divide_by_count_sqrt(chan, core::Gender::female, age, false);
+        // Calculate in-place factor standard deviation.
+        for (const auto &factor : context.mapping().entries()) {
+            divide_by_count_sqrt(factor.key().to_string(), core::Gender::female, age, count_F);
+            divide_by_count_sqrt(factor.key().to_string(), core::Gender::male, age, count_M);
+        }
 
-            // Factor standard deviation for males.
-            divide_by_count_sqrt(chan, core::Gender::male, age, false);
+        // Calculate in-place YLL/YLD/DALY standard deviation.
+        for (const auto &column : {"yll", "yld", "daly"}) {
+            divide_by_count_sqrt(column, core::Gender::female, age, (count_F + deaths_F));
+            divide_by_count_sqrt(column, core::Gender::male, age, (count_M + deaths_M));
         }
     }
 }
