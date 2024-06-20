@@ -62,6 +62,17 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
 
         if (result.count("storage")) {
             cmd.data_path_or_url = result["storage"].as<std::string>();
+
+            if (!cmd.data_path_or_url.starts_with("http://") &&
+                !cmd.data_path_or_url.starts_with("https://")) {
+                const std::filesystem::path path = cmd.data_path_or_url;
+
+                if (path.is_relative()) {
+                    cmd.data_path_or_url = std::filesystem::absolute(path).string();
+                }
+            }
+
+            fmt::print("Data source: {}\n", cmd.data_path_or_url);
         }
 
         if (result.count("jobid")) {
