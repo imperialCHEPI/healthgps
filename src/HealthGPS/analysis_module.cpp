@@ -362,24 +362,38 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
     // Calculate in-place factor averages.
     for (int age = min_age; age <= max_age; age++) {
-        double male_count = series(core::Gender::male, "count").at(age);
         double female_count = series(core::Gender::female, "count").at(age);
+        double male_count = series(core::Gender::male, "count").at(age);
         for (const auto &factor : context.mapping().entries()) {
-            std::string column_name = "mean_" + factor.key().to_string();
-            series(core::Gender::male, column_name).at(age) /= male_count;
-            series(core::Gender::female, column_name).at(age) /= female_count;
+            std::string column = "mean_" + factor.key().to_string();
+            series(core::Gender::female, column).at(age) /= female_count;
+            series(core::Gender::male, column).at(age) /= male_count;
+        }
+    }
+
+    // Calculate in-place disease prevalence and incidence rates.
+    for (int age = min_age; age <= max_age; age++) {
+        double female_count = series(core::Gender::female, "count").at(age);
+        double male_count = series(core::Gender::male, "count").at(age);
+        for (const auto &disease : context.diseases()) {
+            std::string column_prevalence = "prevalence_" + disease.code.to_string();
+            series(core::Gender::female, column_prevalence).at(age) /= female_count;
+            series(core::Gender::male, column_prevalence).at(age) /= male_count;
+            std::string column_incidence = "incidence_" + disease.code.to_string();
+            series(core::Gender::female, column_incidence).at(age) /= female_count;
+            series(core::Gender::male, column_incidence).at(age) /= male_count;
         }
     }
 
     // Calculate in-place YLL/YLD/DALY averages.
     for (int age = min_age; age <= max_age; age++) {
-        double male_count = series(core::Gender::male, "count").at(age) +
-                            series(core::Gender::male, "deaths").at(age);
         double female_count = series(core::Gender::female, "count").at(age) +
                               series(core::Gender::female, "deaths").at(age);
-        for (const auto &column_name : {"mean_yll", "mean_yld", "mean_daly"}) {
-            series(core::Gender::male, column_name).at(age) /= male_count;
-            series(core::Gender::female, column_name).at(age) /= female_count;
+        double male_count = series(core::Gender::male, "count").at(age) +
+                            series(core::Gender::male, "deaths").at(age);
+        for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
+            series(core::Gender::female, column).at(age) /= female_count;
+            series(core::Gender::male, column).at(age) /= male_count;
         }
     }
 
