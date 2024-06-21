@@ -9,24 +9,6 @@
 #include <random>
 
 namespace hgps::data {
-std::filesystem::path create_temporary_directory() {
-    auto tmp_dir = std::filesystem::temp_directory_path();
-    std::random_device dev;
-    std::mt19937 prng(dev());
-    std::uniform_int_distribution<unsigned> rand;
-    std::filesystem::path path;
-
-    while (true) {
-        std::stringstream ss;
-        ss << std::hex << rand(prng);
-        path = tmp_dir / ss.str();
-        // true if the directory was created.
-        if (std::filesystem::create_directory(path)) {
-            return path;
-        }
-    }
-}
-
 std::filesystem::path get_zip_cache_directory(const std::string &file_hash) {
     if (file_hash.size() != 64) {
         throw std::invalid_argument("file_hash does not appear to be a valid SHA256 hash");
