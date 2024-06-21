@@ -44,4 +44,8 @@ std::filesystem::path get_program_path() {
 std::filesystem::path get_cache_directory() {
     return std::filesystem::path{sago::getCacheDir()} / program_name;
 }
+
+std::filesystem::path get_temporary_directory() {
+    return std::filesystem::temp_directory_path() / program_name;
+}
 } // namespace hgps
