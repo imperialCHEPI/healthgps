@@ -44,6 +44,7 @@ std::filesystem::path download_file(const std::string &url,
     // Our request to be sent
     curlpp::Easy request;
     request.setOpt<curlpp::options::Url>(url);
+    request.setOpt<curlpp::options::FollowLocation>(true);
     request.setOpt<curlpp::options::WriteStream>(&ofs);
 
     // Make request
