@@ -6,26 +6,35 @@
 #include <libzippp.h>
 
 #include <fstream>
+#include <random>
+#include <sstream>
 
 namespace {
 /// @brief Create a temporary directory for extracting a zip file into
 /// @param output_path The final output path where files will be moved to
 /// @return The path to the temporary directory
 std::filesystem::path create_temporary_extract_directory(const std::filesystem::path &output_path) {
-    // TODO: Randomise temp path
-    std::filesystem::path temp_path = output_path.string() + ".tmp";
+    // Randomise path in case other processes are also performing extraction
+    std::filesystem::path temp_path;
+    std::mt19937 rand(std::random_device{}());
+    while (true) {
+        std::stringstream ss;
+        ss << output_path.string() << '.' << std::hex << rand() << ".tmp";
+        temp_path = ss.str();
 
-    // Perhaps extraction was stopped halfway through? Delete it and start over
-    if (std::filesystem::exists(temp_path)) {
-        std::filesystem::remove_all(temp_path);
+        if (!std::filesystem::create_directories(temp_path)) {
+            // Path already exists; try again
+            if (std::filesystem::exists(temp_path)) {
+                continue;
+            }
+
+            // Something else went wrong
+            throw std::runtime_error(
+                fmt::format("Failed to create temporary directory: {}", temp_path.string()));
+        }
+
+        return temp_path;
     }
-
-    if (!std::filesystem::create_directories(temp_path)) {
-        throw std::runtime_error(
-            fmt::format("Failed to create temporary directory: {}", temp_path.string()));
-    }
-
-    return temp_path;
 }
 } // anonymous namespace
 
@@ -68,8 +77,20 @@ void extract_zip_file(const std::filesystem::path &file_path,
         }
     }
 
-    // This operation should be atomic
-    std::filesystem::rename(temp_output_directory, output_directory);
+    try {
+        // This operation should be atomic
+        std::filesystem::rename(temp_output_directory, output_directory);
+    } catch (const std::filesystem::filesystem_error &) {
+        // It is possible (albeit unlikely) that another process has successfully completed the
+        // extraction while we were attempting to do the same. In this case, we can just delete our
+        // temporary folder and carry on.
+        if (std::filesystem::exists(output_directory)) {
+            std::filesystem::remove_all(temp_output_directory);
+        } else {
+            // Something else went wrong
+            throw;
+        }
+    }
 }
 
 std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem::path &file_path) {
