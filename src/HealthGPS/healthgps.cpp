@@ -133,7 +133,7 @@ void HealthGPS::initialise_population() {
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     auto virtual_pop_size =
         static_cast<int>(definition_.inputs().settings().size_fraction() * total_year_pop_size);
-    context_.reset_population(virtual_pop_size, model_start_year);
+    context_.reset_population(virtual_pop_size);
 
     // Gender - Age, must be first
     demographic_->initialise_population(context_);

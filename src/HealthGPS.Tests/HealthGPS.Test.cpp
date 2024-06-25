@@ -306,7 +306,7 @@ TEST(TestHealthGPS, CreateSESNoiseModule) {
     auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
     auto context = RuntimeContext(bus, definition);
 
-    context.reset_population(10, 2021);
+    context.reset_population(10);
 
     auto ses_module = build_ses_noise_module(repository, config);
     ses_module->initialise_population(context);

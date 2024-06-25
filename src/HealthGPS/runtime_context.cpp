@@ -45,10 +45,9 @@ void RuntimeContext::set_current_run(const unsigned int run_number) noexcept {
     current_run_ = run_number;
 }
 
-void RuntimeContext::reset_population(const std::size_t initial_pop_size,
-                                      const int model_start_time) {
+void RuntimeContext::reset_population(const std::size_t initial_pop_size) {
     population_ = Population{initial_pop_size};
-    model_start_time_ = model_start_time;
+    model_start_time_ = definition_.get().inputs().start_time();
 }
 
 void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
