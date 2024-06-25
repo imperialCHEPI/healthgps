@@ -327,14 +327,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
         // Calculate the index in the calculated_factors_ vector
         auto index = 0;
         for (size_t i = 0; i < bin_indices.size() - 1; i++) {
+            auto accumulated_bins = std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(), 1, std::multiplies<>());
             index +=
-                static_cast<size_t>(bin_indices[i]) *
-                static_cast<size_t>(std::accumulate(std::next(factor_bins_.cbegin(), i + 1),
-                                                    factor_bins_.cend(), 1, std::multiplies<>())) *
-                static_cast<size_t>(num_factors_to_calculate);
+                static_cast<size_t>(bin_indices[i] *
+                accumulated_bins *
+                num_factors_to_calculate);
         }
         index +=
-            static_cast<size_t>(bin_indices.back()) * static_cast<size_t>(num_factors_to_calculate);
+            static_cast<size_t>(bin_indices.back() * num_factors_to_calculate);
 
         // Now we can add the values of the factors that are not in factors_to_calculate_
         for (const auto &factor : context.mapping().entries()) {
