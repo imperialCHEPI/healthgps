@@ -24,12 +24,11 @@ AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&cl
 
 // Overload constructor with additional parameter for calculated_factors_
 AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
-                               const core::IntegerInterval age_range, unsigned int comorbidities, std::vector<double> calculated_factors)
+                               const core::IntegerInterval age_range, unsigned int comorbidities,
+                               std::vector<double> calculated_factors)
     : definition_{std::move(definition)}, weight_classifier_{std::move(classifier)},
       residual_disability_weight_{create_age_gender_table<double>(age_range)},
-      comorbidities_{comorbidities},
-        calculated_factors_{std::move(calculated_factors)}
-{}
+      comorbidities_{comorbidities}, calculated_factors_{std::move(calculated_factors)} {}
 SimulationModuleType AnalysisModule::type() const noexcept {
     return SimulationModuleType::Analysis;
 }
@@ -338,14 +337,12 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
         // Calculate the index in the calculated_factors_ vector
         auto index = 0;
         for (size_t i = 0; i < bin_indices.size() - 1; i++) {
-            auto accumulated_bins = std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(), 1, std::multiplies<>());
+            auto accumulated_bins = std::accumulate(std::next(factor_bins_.cbegin(), i + 1),
+                                                    factor_bins_.cend(), 1, std::multiplies<>());
             index +=
-                static_cast<size_t>(bin_indices[i] *
-                accumulated_bins *
-                num_factors_to_calculate);
+                static_cast<size_t>(bin_indices[i] * accumulated_bins * num_factors_to_calculate);
         }
-        index +=
-            static_cast<size_t>(bin_indices.back() * num_factors_to_calculate);
+        index += static_cast<size_t>(bin_indices.back() * num_factors_to_calculate);
 
         // Now we can add the values of the factors that are not in factors_to_calculate_
         for (const auto &factor : context.mapping().entries()) {
