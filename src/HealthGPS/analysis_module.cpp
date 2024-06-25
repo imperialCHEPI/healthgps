@@ -22,6 +22,14 @@ AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&cl
       residual_disability_weight_{create_age_gender_table<double>(age_range)},
       comorbidities_{comorbidities} {}
 
+// Overload constructor with additional parameter for calculated_factors_
+AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
+                               const core::IntegerInterval age_range, unsigned int comorbidities, std::vector<double> calculated_factors)
+    : definition_{std::move(definition)}, weight_classifier_{std::move(classifier)},
+      residual_disability_weight_{create_age_gender_table<double>(age_range)},
+      comorbidities_{comorbidities},
+        calculated_factors_{std::move(calculated_factors)}
+{}
 SimulationModuleType AnalysisModule::type() const noexcept {
     return SimulationModuleType::Analysis;
 }

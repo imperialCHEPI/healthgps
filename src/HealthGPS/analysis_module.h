@@ -23,6 +23,15 @@ class AnalysisModule final : public UpdatableModule {
     AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
                    const core::IntegerInterval age_range, unsigned int comorbidities);
 
+    /// @brief Initialises a new instance of the AnalysisModule class.
+    /// @param definition The analysis module definition
+    /// @param classifier Body weight classifier model instance
+    /// @param age_range The experiment valid age range
+    /// @param comorbidities Maximum number of comorbidities to include
+    /// @param calculated_factors The calculated factors to include
+    AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
+                               const core::IntegerInterval age_range, unsigned int comorbidities, std::vector<double> calculated_factors);
+
     SimulationModuleType type() const noexcept override;
 
     const std::string &name() const noexcept override;
