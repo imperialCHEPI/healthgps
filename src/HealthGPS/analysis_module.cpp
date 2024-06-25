@@ -37,6 +37,7 @@ SimulationModuleType AnalysisModule::type() const noexcept {
 void AnalysisModule::initialise_vector(RuntimeContext &context) {
     factor_bins_.reserve(factors_to_calculate_.size());
     factor_bin_widths_.reserve(factors_to_calculate_.size());
+    factor_min_values_.reserve(factors_to_calculate_.size());
 
     for (const auto &factor : factors_to_calculate_) {
         const auto [min, max] = std::ranges::minmax_element(
@@ -47,6 +48,8 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
         auto min_factor = min->get_risk_factor_value(factor);
         auto max_factor = max->get_risk_factor_value(factor);
+
+        factor_min_values_.push_back(min_factor);
 
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
@@ -328,7 +331,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
         for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
             auto factor_value = person_factors[i];
             auto bin_index =
-                static_cast<int>((factor_value - factor_bin_widths_[i]) / factor_bin_widths_[i]);
+                static_cast<int>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
             bin_indices.push_back(bin_index);
         }
 

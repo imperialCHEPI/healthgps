@@ -51,6 +51,7 @@ class AnalysisModule final : public UpdatableModule {
     mutable std::vector<double> calculated_factors_;
     std::vector<int> factor_bins_;
     std::vector<double> factor_bin_widths_;
+    std::vector<double> factor_min_values_;
 
     void initialise_vector(RuntimeContext &context);
 
