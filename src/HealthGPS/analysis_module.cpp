@@ -317,16 +317,16 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
     auto num_factors_to_calculate =
         context.mapping().entries().size() - factors_to_calculate_.size();
 
-    for (const auto &entity : context.population()) {
+    for (const auto &person : context.population()) {
         // Get factors_to_calculate_ values for this entity
-        std::vector<double> entity_factors;
+        std::vector<double> person_factors;
         for (const auto &factor : factors_to_calculate_) {
-            entity_factors.push_back(entity.get_risk_factor_value(factor));
+            person_factors.push_back(person.get_risk_factor_value(factor));
         }
         // Get the bin index for each factor
         std::vector<int> bin_indices;
         for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
-            auto factor_value = entity_factors[i];
+            auto factor_value = person_factors[i];
             auto bin_index =
                 static_cast<int>((factor_value - factor_bin_widths_[i]) / factor_bin_widths_[i]);
             bin_indices.push_back(bin_index);
@@ -348,7 +348,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
         for (const auto &factor : context.mapping().entries()) {
             if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(),
                           factor.key()) == factors_to_calculate_.cend()) {
-                calculated_factors_[index++] += entity.get_risk_factor_value(factor.key());
+                calculated_factors_[index++] += person.get_risk_factor_value(factor.key());
             }
         }
     }
