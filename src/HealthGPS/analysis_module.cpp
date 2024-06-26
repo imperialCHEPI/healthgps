@@ -319,15 +319,10 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
         context.mapping().entries().size() - factors_to_calculate_.size();
 
     for (const auto &person : context.population()) {
-        // Get factors_to_calculate_ values for this entity
-        std::vector<double> person_factors;
-        for (const auto &factor : factors_to_calculate_) {
-            person_factors.push_back(person.get_risk_factor_value(factor));
-        }
         // Get the bin index for each factor
         std::vector<size_t> bin_indices;
         for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
-            auto factor_value = person_factors[i];
+            double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
             size_t bin_index =
                 static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
             bin_indices.push_back(bin_index);
