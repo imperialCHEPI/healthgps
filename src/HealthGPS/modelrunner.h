@@ -27,8 +27,8 @@ class ModelRunner {
 
     /// @brief Initialises a new instance of the ModelRunner class.
     /// @param bus The message bus instance to use for notification
-    /// @param generator Random number generator for runs management
-    ModelRunner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> generator) noexcept;
+    /// @param seed_generator Master RNG for RNG seed generation
+    ModelRunner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> seed_generator) noexcept;
 
     /// @brief Run an experiment for baseline scenario only
     /// @param baseline The simulation engine instance
@@ -55,7 +55,7 @@ class ModelRunner {
   private:
     std::atomic<bool> running_;
     std::reference_wrapper<EventAggregator> event_bus_;
-    std::unique_ptr<RandomBitGenerator> rnd_;
+    std::unique_ptr<RandomBitGenerator> seed_generator_;
     std::stop_source source_;
     std::string runner_id_{};
 

@@ -11,8 +11,8 @@ namespace hgps {
 using ElapsedTime = std::chrono::duration<double, std::milli>;
 
 ModelRunner::ModelRunner(EventAggregator &bus,
-                         std::unique_ptr<RandomBitGenerator> generator) noexcept
-    : running_{false}, event_bus_{bus}, rnd_{std::move(generator)} {}
+                         std::unique_ptr<RandomBitGenerator> seed_generator) noexcept
+    : running_{false}, event_bus_{bus}, seed_generator_{std::move(seed_generator)} {}
 
 double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     if (trial_runs < 1) {
@@ -39,7 +39,7 @@ double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     baseline.initialize();
 
     for (auto run = 1u; run <= trial_runs; run++) {
-        auto run_seed = std::optional<unsigned int>{rnd_->operator()()};
+        auto run_seed = std::optional<unsigned int>{seed_generator_->operator()()};
 
         auto worker = std::jthread(&ModelRunner::run_model_thread, this, source_.get_token(),
                                    std::ref(baseline), run, run_seed);
@@ -91,7 +91,7 @@ double ModelRunner::run(Simulation &baseline, Simulation &intervention,
     intervention.initialize();
 
     for (auto run = 1u; run <= trial_runs; run++) {
-        auto run_seed = std::optional<unsigned int>{rnd_->operator()()};
+        auto run_seed = std::optional<unsigned int>{seed_generator_->operator()()};
 
         auto base_worker = std::jthread(&ModelRunner::run_model_thread, this, source_.get_token(),
                                         std::ref(baseline), run, run_seed);
