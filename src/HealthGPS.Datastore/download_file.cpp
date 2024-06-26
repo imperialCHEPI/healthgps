@@ -32,30 +32,31 @@ std::filesystem::path get_temporary_file_path(const std::string &file_prefix,
 } // anonymous namespace
 
 namespace hgps::data {
-std::filesystem::path download_file(const std::string &url,
-                                    const std::filesystem::path &download_path) {
+void download_file(const std::string &url, const std::filesystem::path &download_path) {
     std::ofstream ofs{download_path};
     if (!ofs) {
         throw std::runtime_error(fmt::format("Failed to create file {}", download_path.string()));
     }
+
+    fmt::println("Downloading data from {}", url);
 
     curlpp::Cleanup cleanup;
 
     // Our request to be sent
     curlpp::Easy request;
     request.setOpt<curlpp::options::Url>(url);
+    request.setOpt<curlpp::options::FollowLocation>(true);
     request.setOpt<curlpp::options::WriteStream>(&ofs);
 
     // Make request
     request.perform();
-
-    return download_path;
 }
 
 std::filesystem::path download_file_to_temporary(const std::string &url,
                                                  const std::string &file_extension) {
     const auto download_path = get_temporary_file_path("data", file_extension);
-    return download_file(url, download_path);
+    download_file(url, download_path);
+    return download_path;
 }
 
 } // namespace hgps::data
