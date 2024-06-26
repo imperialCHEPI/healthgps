@@ -133,7 +133,6 @@ target_sources(
             "monotonic_vector.h"
             "randombit_generator.h"
             "scenario.h"
-            "simulation.h"
             "sync_message.h"
             "two_step_value.h"
             "version.h"

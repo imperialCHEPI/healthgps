@@ -25,7 +25,7 @@ namespace hgps {
 
 HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
                      EventAggregator &bus)
-    : Simulation(std::move(definition)), context_{bus, definition_} {
+    : definition_{std::move(definition)}, context_{bus, definition_} {
     // Create required modules, should change to shared_ptr
     auto ses_base = factory.create(SimulationModuleType::SES, definition_.inputs());
     auto dem_base = factory.create(SimulationModuleType::Demographic, definition_.inputs());

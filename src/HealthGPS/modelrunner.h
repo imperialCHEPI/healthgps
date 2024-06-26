@@ -1,6 +1,6 @@
 #pragma once
 #include "event_aggregator.h"
-#include "simulation.h"
+#include "healthgps.h"
 
 #include <atomic>
 #include <functional>
@@ -35,7 +35,7 @@ class ModelRunner {
     /// @param trial_runs Experiment number of runs
     /// @return The experiment total elapsed time, in milliseconds
     /// @throws std::invalid_argument for non-baseline scenario type or negative number of runs.
-    double run(Simulation &baseline, const unsigned int trial_runs);
+    double run(HealthGPS &baseline, const unsigned int trial_runs);
 
     /// @brief Run an experiment for baseline and intervention scenarios
     /// @param baseline The simulation engine instance for baseline scenario
@@ -43,7 +43,7 @@ class ModelRunner {
     /// @param trial_runs Experiment number of runs
     /// @return The experiment total elapsed time, in milliseconds
     /// @throws std::invalid_argument for scenario type mismatch or negative number of runs.
-    double run(Simulation &baseline, Simulation &intervention, const unsigned int trial_runs);
+    double run(HealthGPS &baseline, HealthGPS &intervention, const unsigned int trial_runs);
 
     /// @brief Gets a value indicating whether an experiment is current running.
     /// @return true, if a experiment is underway; otherwise, false.
@@ -59,7 +59,7 @@ class ModelRunner {
     std::stop_source source_;
     std::string runner_id_{};
 
-    void run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
+    void run_model_thread(const std::stop_token &token, HealthGPS &model, unsigned int run,
                           const std::optional<unsigned int> seed = std::nullopt);
 
     void notify(std::unique_ptr<hgps::EventMessage> message);

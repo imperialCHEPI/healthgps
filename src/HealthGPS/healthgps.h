@@ -5,9 +5,10 @@
 #include "event_aggregator.h"
 #include "gender_table.h"
 #include "runtime_context.h"
-#include "simulation.h"
+#include "simulation_definition.h"
 #include "simulation_module.h"
 
+#include <adevs/adevs.h>
 #include <vector>
 
 namespace hgps {
@@ -21,7 +22,7 @@ namespace hgps {
 /// library (https://sourceforge.net/projects/bdevs), which contain only four header
 /// files, but provides an intuitive modelling interface for agent-based models,
 /// without requiring familiarity with the full aspects of the DEVS formalism.
-class HealthGPS : public Simulation {
+class HealthGPS : public adevs::Model<int> {
   public:
     HealthGPS() = delete;
 
@@ -32,8 +33,14 @@ class HealthGPS : public Simulation {
     explicit HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
                        EventAggregator &bus);
 
-    void initialize() override;
-    void terminate() override;
+    /// @brief Destroys a simulation instance
+    virtual ~HealthGPS() = default;
+
+    /// @brief Initialises the simulation experiment.
+    void initialize();
+
+    /// @brief Terminates the simulation experiment.
+    void terminate();
 
     /// @brief Called when the model is added to the simulation executive
     /// @param env The simulation executive environment
@@ -61,11 +68,25 @@ class HealthGPS : public Simulation {
     /// @param clock The time at which the model no longer exists.
     void fini(adevs::Time clock) override;
 
-    void setup_run(unsigned int run_number) noexcept override;
+    /// @brief Set up a new simulation run with default seed.
+    /// @param run_number The run number
+    void setup_run(unsigned int run_number) noexcept;
 
-    void setup_run(unsigned int run_number, unsigned int seed) noexcept override;
+    /// @brief Set up a new simulation run.
+    /// @param run_number The run number
+    /// @param run_seed The custom seed for random number generation
+    void setup_run(unsigned int run_number, unsigned int seed) noexcept;
+
+    /// @brief Gets the simulation type
+    /// @return The intervention scenario type enumeration
+    ScenarioType type() noexcept { return definition_.scenario().type(); }
+
+    /// @brief Gets the simulation name
+    /// @return The intervention scenario name
+    std::string name() override { return definition_.identifier(); }
 
   private:
+    SimulationDefinition definition_;
     RuntimeContext context_;
     std::shared_ptr<UpdatableModule> ses_;
     std::shared_ptr<DemographicModule> demographic_;
