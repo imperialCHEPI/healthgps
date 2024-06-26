@@ -1,6 +1,6 @@
 #pragma once
 #include "event_aggregator.h"
-#include "healthgps.h"
+#include "simulation.h"
 
 #include <atomic>
 #include <functional>

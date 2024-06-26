@@ -11,10 +11,10 @@
 #include "poco.h"
 #include "version.h"
 
-#include "HealthGPS/healthgps.h"
 #include "HealthGPS/intervention_scenario.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/scenario.h"
+#include "HealthGPS/simulation.h"
 
 #include "HealthGPS.Core/api.h"
 
