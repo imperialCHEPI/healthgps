@@ -45,8 +45,8 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
                        entity2.get_risk_factor_value(factor);
             });
 
-        auto min_factor = min->get_risk_factor_value(factor);
-        auto max_factor = max->get_risk_factor_value(factor);
+        double min_factor = min->get_risk_factor_value(factor);
+        double max_factor = max->get_risk_factor_value(factor);
 
         factor_min_values_.push_back(min_factor);
 
@@ -61,11 +61,11 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
     // The number of factors to calculate is the number of factors minus the length of the `factors`
     // vector.
-    auto num_factors_to_calc = context.mapping().entries().size() - factors_to_calculate_.size();
+    size_t num_factors_to_calc = context.mapping().entries().size() - factors_to_calculate_.size();
 
     // The product of the number of bins for each factor can be used to calculate the size of the
     // `calculated_factors_` in the next step
-    auto total_num_bins =
+    size_t total_num_bins =
         std::accumulate(factor_bins_.cbegin(), factor_bins_.cend(), 1, std::multiplies<>());
 
     // Set the vector size and initialise all values to 0.0
@@ -315,7 +315,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 }
 
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
-    auto num_factors_to_calculate =
+    size_t num_factors_to_calculate =
         context.mapping().entries().size() - factors_to_calculate_.size();
 
     for (const auto &person : context.population()) {
@@ -325,23 +325,23 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
             person_factors.push_back(person.get_risk_factor_value(factor));
         }
         // Get the bin index for each factor
-        std::vector<int> bin_indices;
+        std::vector<size_t> bin_indices;
         for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
             auto factor_value = person_factors[i];
-            auto bin_index =
-                static_cast<int>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
+            size_t bin_index =
+                static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
             bin_indices.push_back(bin_index);
         }
 
         // Calculate the index in the calculated_factors_ vector
-        auto index = 0;
+        size_t index = 0;
         for (size_t i = 0; i < bin_indices.size() - 1; i++) {
-            auto accumulated_bins = std::accumulate(std::next(factor_bins_.cbegin(), i + 1),
+            size_t accumulated_bins = std::accumulate(std::next(factor_bins_.cbegin(), i + 1),
                                                     factor_bins_.cend(), 1, std::multiplies<>());
             index +=
-                static_cast<size_t>(bin_indices[i] * accumulated_bins * num_factors_to_calculate);
+                bin_indices[i] * accumulated_bins * num_factors_to_calculate;
         }
-        index += static_cast<size_t>(bin_indices.back() * num_factors_to_calculate);
+        index += bin_indices.back() * num_factors_to_calculate;
 
         // Now we can add the values of the factors that are not in factors_to_calculate_
         for (const auto &factor : context.mapping().entries()) {

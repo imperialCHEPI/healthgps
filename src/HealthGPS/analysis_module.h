@@ -50,7 +50,7 @@ class AnalysisModule final : public UpdatableModule {
     std::string name_{"Analysis"};
     std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
     std::vector<double> calculated_factors_;
-    std::vector<int> factor_bins_;
+    std::vector<size_t> factor_bins_;
     std::vector<double> factor_bin_widths_;
     std::vector<double> factor_min_values_;
 
