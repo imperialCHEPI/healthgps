@@ -315,7 +315,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
-void AnalysisModule::calculate_population_statistics(RuntimeContext &context) const {
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
     auto num_factors_to_calculate =
         context.mapping().entries().size() - factors_to_calculate_.size();
 
