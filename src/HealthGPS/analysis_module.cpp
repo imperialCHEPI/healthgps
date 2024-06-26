@@ -323,7 +323,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
         std::vector<size_t> bin_indices;
         for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
             double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
-            size_t bin_index =
+            auto bin_index =
                 static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
             bin_indices.push_back(bin_index);
         }

@@ -30,7 +30,7 @@ class AnalysisModule final : public UpdatableModule {
     /// @param comorbidities Maximum number of comorbidities to include
     /// @param calculated_factors The calculated factors to include
     AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
-                   const core::IntegerInterval age_range, unsigned int comorbidities,
+                   core::IntegerInterval age_range, unsigned int comorbidities,
                    std::vector<double> calculated_factors);
 
     SimulationModuleType type() const noexcept override;
