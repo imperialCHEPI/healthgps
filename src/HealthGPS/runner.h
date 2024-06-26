@@ -21,14 +21,14 @@ namespace hgps {
 /// library (https://sourceforge.net/projects/bdevs), which contain only four header
 /// files, but provides an intuitive modelling interface for agent-based models,
 /// without requiring familiarity with the full aspects of the DEVS formalism.
-class ModelRunner {
+class Runner {
   public:
-    ModelRunner() = delete;
+    Runner() = delete;
 
-    /// @brief Initialises a new instance of the ModelRunner class.
+    /// @brief Initialises a new instance of the Runner class.
     /// @param bus The message bus instance to use for notification
     /// @param seed_generator Master RNG for RNG seed generation
-    ModelRunner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> seed_generator) noexcept;
+    Runner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> seed_generator) noexcept;
 
     /// @brief Run an experiment for baseline scenario only
     /// @param baseline The simulation engine instance

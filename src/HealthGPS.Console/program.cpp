@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         if (const auto seed = model_input.seed()) {
             seed_generator->seed(seed.value());
         }
-        auto runner = ModelRunner(event_bus, std::move(seed_generator));
+        auto runner = Runner(event_bus, std::move(seed_generator));
 
         // Create communication channel, shared between the two scenarios.
         auto channel = SyncChannel{};
