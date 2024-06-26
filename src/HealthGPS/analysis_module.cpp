@@ -148,7 +148,6 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                   std::ref(context), std::ref(result));
 
-    calculate_population_statistics(context);
     calculate_population_statistics(context, result.series);
     handle.get();
 
