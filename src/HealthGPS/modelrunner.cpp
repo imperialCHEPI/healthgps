@@ -14,7 +14,7 @@ ModelRunner::ModelRunner(EventAggregator &bus,
                          std::unique_ptr<RandomBitGenerator> seed_generator) noexcept
     : running_{false}, event_bus_{bus}, seed_generator_{std::move(seed_generator)} {}
 
-double ModelRunner::run(HealthGPS &baseline, const unsigned int trial_runs) {
+double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     if (trial_runs < 1) {
         throw std::invalid_argument("The number of trial runs must not be less than one");
     }
@@ -61,7 +61,7 @@ double ModelRunner::run(HealthGPS &baseline, const unsigned int trial_runs) {
     return elapsed_ms;
 }
 
-double ModelRunner::run(HealthGPS &baseline, HealthGPS &intervention,
+double ModelRunner::run(Simulation &baseline, Simulation &intervention,
                         const unsigned int trial_runs) {
     if (trial_runs < 1) {
         throw std::invalid_argument("The number of trial runs must not be less than one.");
@@ -126,8 +126,8 @@ void ModelRunner::cancel() noexcept {
     }
 }
 
-void ModelRunner::run_model_thread(const std::stop_token &token, HealthGPS &model, unsigned int run,
-                                   const std::optional<unsigned int> seed) {
+void ModelRunner::run_model_thread(const std::stop_token &token, Simulation &model,
+                                   unsigned int run, const std::optional<unsigned int> seed) {
     auto run_start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_begin, run));

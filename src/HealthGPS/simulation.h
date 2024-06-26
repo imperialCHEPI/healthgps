@@ -22,19 +22,19 @@ namespace hgps {
 /// library (https://sourceforge.net/projects/bdevs), which contain only four header
 /// files, but provides an intuitive modelling interface for agent-based models,
 /// without requiring familiarity with the full aspects of the DEVS formalism.
-class HealthGPS : public adevs::Model<int> {
+class Simulation : public adevs::Model<int> {
   public:
-    HealthGPS() = delete;
+    Simulation() = delete;
 
-    /// @brief Initialises a new instance of the HealthGPS class
+    /// @brief Initialises a new instance of the Simulation class
     /// @param definition The simulation definition instance
     /// @param factory The simulation modules factory instance
     /// @param bus The message bus instance to use
-    explicit HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
-                       EventAggregator &bus);
+    explicit Simulation(SimulationDefinition &&definition, SimulationModuleFactory &factory,
+                        EventAggregator &bus);
 
     /// @brief Destroys a simulation instance
-    virtual ~HealthGPS() = default;
+    virtual ~Simulation() = default;
 
     /// @brief Initialises the simulation experiment.
     void initialize();

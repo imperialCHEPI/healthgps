@@ -78,7 +78,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
     return {data, settings, info, ses, mapping, diseases};
 }
 
-TEST(TestHealthGPS, RandomBitGenerator) {
+TEST(TestSimulation, RandomBitGenerator) {
     using namespace hgps;
 
     MTRandom32 rnd;
@@ -87,7 +87,7 @@ TEST(TestHealthGPS, RandomBitGenerator) {
     EXPECT_TRUE(rnd() > 0u);
 }
 
-TEST(TestHealthGPS, RandomBitGeneratorCopy) {
+TEST(TestSimulation, RandomBitGeneratorCopy) {
     using namespace hgps;
 
     MTRandom32 rnd(123456789);
@@ -103,7 +103,7 @@ TEST(TestHealthGPS, RandomBitGeneratorCopy) {
     EXPECT_NE(rnd(), copy());
 }
 
-TEST(TestHealthGPS, RandomAlgorithmStandalone) {
+TEST(TestSimulation, RandomAlgorithmStandalone) {
     using namespace hgps;
 
     auto rnd = MTRandom32(123456789);
@@ -117,7 +117,7 @@ TEST(TestHealthGPS, RandomAlgorithmStandalone) {
     }
 }
 
-TEST(TestHealthGPS, RandomAlgorithmInternal) {
+TEST(TestSimulation, RandomAlgorithmInternal) {
     using namespace hgps;
 
     auto engine = MTRandom32(123456789);
@@ -131,7 +131,7 @@ TEST(TestHealthGPS, RandomAlgorithmInternal) {
     }
 }
 
-TEST(TestHealthGPS, RandomNextIntRangeIsClosed) {
+TEST(TestSimulation, RandomNextIntRangeIsClosed) {
     using namespace hgps;
 
     auto engine = MTRandom32{123456789};
@@ -160,7 +160,7 @@ TEST(TestHealthGPS, RandomNextIntRangeIsClosed) {
     ASSERT_GT(summary_three.max(), sample_max);
 }
 
-TEST(TestHealthGPS, RandomNextNormal) {
+TEST(TestSimulation, RandomNextNormal) {
     using namespace hgps;
 
     auto engine = MTRandom32{123456789};
@@ -185,7 +185,7 @@ TEST(TestHealthGPS, RandomNextNormal) {
     ASSERT_NEAR(summary_two.std_deviation(), sample_stdev, tolerance);
 }
 
-TEST(TestHealthGPS, RandomEmpiricalDiscrete) {
+TEST(TestSimulation, RandomEmpiricalDiscrete) {
     using namespace hgps;
 
     auto engine = MTRandom32{123456789};
@@ -215,7 +215,7 @@ TEST(TestHealthGPS, RandomEmpiricalDiscrete) {
     ASSERT_EQ(9.0, summary.max());
 }
 
-TEST(TestHealthGPS, CreateRuntimeContext) {
+TEST(TestSimulation, CreateRuntimeContext) {
     using namespace hgps;
     using namespace hgps::data;
 
@@ -234,7 +234,7 @@ TEST(TestHealthGPS, CreateRuntimeContext) {
     ASSERT_EQ(0, context.time_now());
 }
 
-TEST(TestHealthGPS, ModuleFactoryRegistry) {
+TEST(TestSimulation, ModuleFactoryRegistry) {
     using namespace hgps;
     using namespace hgps::data;
 
@@ -287,7 +287,7 @@ TEST(TestHealthGPS, ModuleFactoryRegistry) {
     ASSERT_EQ("Country", country_mod->name());
 }
 
-TEST(TestHealthGPS, CreateSESNoiseModule) {
+TEST(TestSimulation, CreateSESNoiseModule) {
     using namespace hgps;
     using namespace hgps::data;
 
@@ -319,7 +319,7 @@ TEST(TestHealthGPS, CreateSESNoiseModule) {
     }
 }
 
-TEST(TestHealthGPS, CreateDemographicModule) {
+TEST(TestSimulation, CreateDemographicModule) {
     using namespace hgps;
     using namespace hgps::data;
 
@@ -345,7 +345,7 @@ TEST(TestHealthGPS, CreateDemographicModule) {
 }
 
 /*
-TEST(TestHealthGPS, CreateRiskFactorModule)
+TEST(TestSimulation, CreateRiskFactorModule)
 {
         using namespace hgps;
         using namespace hgps::data;
@@ -373,13 +373,13 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
 }
 */
 
-TEST(TestHealthGPS, CreateRiskFactorModuleFailWithEmpty) {
+TEST(TestSimulation, CreateRiskFactorModuleFailWithEmpty) {
     using namespace hgps;
     ASSERT_THROW(RiskFactorModule{{}}, std::invalid_argument);
 }
 
 /*
-TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutStatic)
+TEST(TestSimulation, CreateRiskFactorModuleFailWithoutStatic)
 {
         using namespace hgps;
 
@@ -392,7 +392,7 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
         ASSERT_THROW(auto x = RiskFactorModule(std::move(risk_models)), std::invalid_argument);
 }
 
-TEST(TestHealthGPS, CreateRiskFactorModuleFailWithoutDynamic)
+TEST(TestSimulation, CreateRiskFactorModuleFailWithoutDynamic)
 {
         using namespace hgps;
 
@@ -406,7 +406,7 @@ std::make_unique<StaticHierarchicalLinearModel>(static_definition));
 }
 */
 
-TEST(TestHealthGPS, CreateDiseaseModule) {
+TEST(TestSimulation, CreateDiseaseModule) {
     using namespace hgps;
     using namespace hgps::data;
 
@@ -433,7 +433,7 @@ TEST(TestHealthGPS, CreateDiseaseModule) {
     ASSERT_EQ(0.0, disease_module->get_excess_mortality(moonshot_key, test_person));
 }
 
-TEST(TestHealthGPS, CreateAnalysisModule) {
+TEST(TestSimulation, CreateAnalysisModule) {
     using namespace hgps;
     using namespace hgps::data;
 
