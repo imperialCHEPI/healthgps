@@ -54,10 +54,6 @@ void Simulation::terminate() {
     std::cout << "Microsimulation algorithm terminate: " << name() << '\n';
 }
 
-void Simulation::setup_run(unsigned int run_number) noexcept {
-    context_.set_current_run(run_number);
-}
-
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
     context_.set_current_run(run_number);
     definition_.rnd().seed(run_seed);

@@ -13,10 +13,6 @@ class RandomBitGenerator {
     /// @brief Destroys a RandomBitGenerator instance
     virtual ~RandomBitGenerator() = default;
 
-    /// @brief Generates the next random number
-    /// @return A pseudo-random number value in [\c min(), \c max()]
-    virtual unsigned int operator()() = 0;
-
     /// @brief Sets the current state of the generator engine
     /// @param seed The value to initialise the internal state
     virtual void seed(const unsigned int seed) = 0;
@@ -24,6 +20,10 @@ class RandomBitGenerator {
     /// @brief Advances the engine's state by a specified amount
     /// @param skip The number of times to advance the state
     virtual void discard(const unsigned long long skip) = 0;
+
+    /// @brief Generates the next random number
+    /// @return A pseudo-random number value in [\c min(), \c max()]
+    virtual unsigned int next() = 0;
 
     /// @brief Generates a random floating point number in range [0,1)
     /// @return A floating point value in range [0,1).

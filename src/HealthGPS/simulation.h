@@ -68,10 +68,6 @@ class Simulation : public adevs::Model<int> {
     /// @param clock The time at which the model no longer exists.
     void fini(adevs::Time clock) override;
 
-    /// @brief Set up a new simulation run with default seed.
-    /// @param run_number The run number
-    void setup_run(unsigned int run_number) noexcept;
-
     /// @brief Set up a new simulation run.
     /// @param run_number The run number
     /// @param run_seed The custom seed for random number generation

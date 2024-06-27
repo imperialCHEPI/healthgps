@@ -84,7 +84,7 @@ TEST(TestSimulation, RandomBitGenerator) {
     MTRandom32 rnd;
     EXPECT_EQ(RandomBitGenerator::min(), MTRandom32::min());
     EXPECT_EQ(RandomBitGenerator::max(), MTRandom32::max());
-    EXPECT_TRUE(rnd() > 0u);
+    EXPECT_TRUE(rnd.next() > 0u);
 }
 
 TEST(TestSimulation, RandomBitGeneratorCopy) {
@@ -94,13 +94,13 @@ TEST(TestSimulation, RandomBitGeneratorCopy) {
     auto copy = rnd;
 
     for (size_t i = 0; i < 10; i++) {
-        EXPECT_EQ(rnd(), copy());
+        EXPECT_EQ(rnd.next(), copy.next());
     }
 
     // C++ intentional discard of [[nodiscard]] return value
-    static_cast<void>(rnd());
+    static_cast<void>(rnd.next());
 
-    EXPECT_NE(rnd(), copy());
+    EXPECT_NE(rnd.next(), copy.next());
 }
 
 TEST(TestSimulation, RandomAlgorithmStandalone) {

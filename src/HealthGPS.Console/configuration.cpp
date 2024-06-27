@@ -353,7 +353,7 @@ std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned i
         auto rnd = hgps::MTRandom32{user_seed.value()};
         auto jump_size = static_cast<unsigned long>(1.618 * job_id * std::pow(2, 16));
         rnd.discard(jump_size);
-        return rnd();
+        return rnd.next();
     }
 
     return user_seed;

@@ -38,7 +38,7 @@ double Runner::run(Simulation &baseline, const unsigned int trial_runs) {
     baseline.initialize();
 
     for (auto run = 1u; run <= trial_runs; run++) {
-        auto run_seed = std::optional<unsigned int>{seed_generator_->operator()()};
+        unsigned int run_seed = seed_generator_->next();
 
         auto worker = std::jthread(&Runner::run_model_thread, this, source_.get_token(),
                                    std::ref(baseline), run, run_seed);
@@ -89,7 +89,7 @@ double Runner::run(Simulation &baseline, Simulation &intervention, const unsigne
     intervention.initialize();
 
     for (auto run = 1u; run <= trial_runs; run++) {
-        auto run_seed = std::optional<unsigned int>{seed_generator_->operator()()};
+        unsigned int run_seed = seed_generator_->next();
 
         auto base_worker = std::jthread(&Runner::run_model_thread, this, source_.get_token(),
                                         std::ref(baseline), run, run_seed);
@@ -125,7 +125,7 @@ void Runner::cancel() noexcept {
 }
 
 void Runner::run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
-                              const std::optional<unsigned int> seed) {
+                              const unsigned int seed) {
     auto run_start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_begin, run));
@@ -134,12 +134,7 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     adevs::Simulator<int> sim;
 
     /* Update model and add to engine */
-    if (seed.has_value()) {
-        model.setup_run(run, seed.value());
-    } else {
-        model.setup_run(run);
-    }
-
+    model.setup_run(run, seed);
     sim.add(&model);
 
     /* Run until the next event is at infinity */

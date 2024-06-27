@@ -60,7 +60,7 @@ class Runner {
     std::string runner_id_{};
 
     void run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
-                          const std::optional<unsigned int> seed = std::nullopt);
+                          unsigned int seed);
 
     void notify(std::unique_ptr<hgps::EventMessage> message);
 };
