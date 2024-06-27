@@ -88,7 +88,7 @@ class RuntimeContext {
 
     /// @brief Resets the virtual population to an initial size, with only new individuals.
     /// @param initial_pop_size Initial population size
-    void reset_population(const std::size_t initial_pop_size);
+    void reset_population(std::size_t initial_pop_size);
 
     /// @brief Publishes a polymorphic new message to the outside world synchronously.
     /// @param message The message instance to publish
