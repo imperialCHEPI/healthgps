@@ -41,11 +41,6 @@ Simulation::Simulation(SimulationDefinition &&definition, SimulationModuleFactor
 }
 
 void Simulation::initialize() {
-    // Reset random number generator
-    if (const auto seed = definition_.inputs().seed()) {
-        definition_.rnd().seed(seed.value());
-    }
-
     end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
     std::cout << "Microsimulation algorithm initialised: " << name() << '\n';
 }
