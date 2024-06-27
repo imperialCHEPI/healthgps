@@ -34,9 +34,6 @@ double Runner::run(Simulation &baseline, const unsigned int trial_runs) {
     auto start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(runner_id_, RunnerAction::start));
 
-    /* Initialise simulation */
-    baseline.initialize();
-
     for (auto run = 1u; run <= trial_runs; run++) {
         unsigned int run_seed = seed_generator_->next();
 
@@ -49,9 +46,6 @@ double Runner::run(Simulation &baseline, const unsigned int trial_runs) {
             break;
         }
     }
-
-    /* Terminate simulation */
-    baseline.terminate();
 
     ElapsedTime elapsed = std::chrono::steady_clock::now() - start;
     auto elapsed_ms = elapsed.count();
@@ -84,10 +78,6 @@ double Runner::run(Simulation &baseline, Simulation &intervention, const unsigne
     auto start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(runner_id_, RunnerAction::start));
 
-    /* Initialise simulation */
-    baseline.initialize();
-    intervention.initialize();
-
     for (auto run = 1u; run <= trial_runs; run++) {
         unsigned int run_seed = seed_generator_->next();
 
@@ -104,10 +94,6 @@ double Runner::run(Simulation &baseline, Simulation &intervention, const unsigne
             break;
         }
     }
-
-    /* Terminate simulation */
-    baseline.terminate();
-    intervention.terminate();
 
     ElapsedTime elapsed = std::chrono::steady_clock::now() - start;
     auto elapsed_ms = elapsed.count();

@@ -36,12 +36,6 @@ class Simulation : public adevs::Model<int> {
     /// @brief Destroys a simulation instance
     virtual ~Simulation() = default;
 
-    /// @brief Initialises the simulation experiment.
-    void initialize();
-
-    /// @brief Terminates the simulation experiment.
-    void terminate();
-
     /// @brief Called when the model is added to the simulation executive
     /// @param env The simulation executive environment
     /// @return The time of the next event

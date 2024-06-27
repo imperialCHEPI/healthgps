@@ -40,15 +40,6 @@ Simulation::Simulation(SimulationDefinition &&definition, SimulationModuleFactor
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
 }
 
-void Simulation::initialize() {
-    end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
-    std::cout << "Microsimulation algorithm initialised: " << name() << '\n';
-}
-
-void Simulation::terminate() {
-    std::cout << "Microsimulation algorithm terminate: " << name() << '\n';
-}
-
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
     context_.set_current_run(run_number);
     definition_.rnd().seed(run_seed);
@@ -60,6 +51,7 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.metrics().clear();
     context_.scenario().clear();
     context_.set_current_time(world_time);
+    end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
 
     initialise_population();
 
