@@ -34,7 +34,7 @@ jobs:
       VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
       # Update when there is a new version of gcc available
-      LATEST_GCC_VERSION: 13
+      LATEST_GCC_VERSION: 14
 
     steps:
       - uses: actions/checkout@v4
