@@ -189,7 +189,7 @@ An alternative to this design is to use a message broker, e.g., [RabbitMQ][broke
 
 # Simulation Executive
 
-The *simulation executive* creates the simulation running environment, instructs the *simulation engine* to evaluate the experiment scenarios for a pre-defined number of runs, manage master seeds generation, notify progress, and handle experiment for cancellation. The `ModelRunner` class shown below, implements the *Health-GPS simulation executive*.
+The *simulation executive* creates the simulation running environment, instructs the *simulation engine* to evaluate the experiment scenarios for a pre-defined number of runs, manage master seeds generation, notify progress, and handle experiment for cancellation. The `Runner` class shown below, implements the *Health-GPS simulation executive*.
 
 |![Health-GPS Runner Class Diagram](images/model_runner.png)|
 |:--:|

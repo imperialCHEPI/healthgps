@@ -15,11 +15,11 @@ class MTRandom32 final : public RandomBitGenerator {
     /// @param seed The value to initialise the internal state
     explicit MTRandom32(const unsigned int seed);
 
-    unsigned int operator()() override;
-
     void seed(const unsigned int) override;
 
     void discard(const unsigned long long skip) override;
+
+    unsigned int next() override;
 
     double next_double() noexcept override;
 

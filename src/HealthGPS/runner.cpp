@@ -1,4 +1,4 @@
-#include "modelrunner.h"
+#include "runner.h"
 #include "finally.h"
 #include "runner_message.h"
 
@@ -10,11 +10,10 @@ namespace hgps {
 
 using ElapsedTime = std::chrono::duration<double, std::milli>;
 
-ModelRunner::ModelRunner(EventAggregator &bus,
-                         std::unique_ptr<RandomBitGenerator> generator) noexcept
-    : running_{false}, event_bus_{bus}, rnd_{std::move(generator)} {}
+Runner::Runner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> seed_generator) noexcept
+    : running_{false}, event_bus_{bus}, seed_generator_{std::move(seed_generator)} {}
 
-double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
+double Runner::run(Simulation &baseline, const unsigned int trial_runs) {
     if (trial_runs < 1) {
         throw std::invalid_argument("The number of trial runs must not be less than one");
     }
@@ -35,13 +34,10 @@ double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     auto start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(runner_id_, RunnerAction::start));
 
-    /* Initialise simulation */
-    baseline.initialize();
-
     for (auto run = 1u; run <= trial_runs; run++) {
-        auto run_seed = std::optional<unsigned int>{rnd_->operator()()};
+        unsigned int run_seed = seed_generator_->next();
 
-        auto worker = std::jthread(&ModelRunner::run_model_thread, this, source_.get_token(),
+        auto worker = std::jthread(&Runner::run_model_thread, this, source_.get_token(),
                                    std::ref(baseline), run, run_seed);
 
         worker.join();
@@ -51,9 +47,6 @@ double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
         }
     }
 
-    /* Terminate simulation */
-    baseline.terminate();
-
     ElapsedTime elapsed = std::chrono::steady_clock::now() - start;
     auto elapsed_ms = elapsed.count();
     notify(std::make_unique<RunnerEventMessage>(runner_id_, RunnerAction::finish, elapsed_ms));
@@ -61,8 +54,7 @@ double ModelRunner::run(Simulation &baseline, const unsigned int trial_runs) {
     return elapsed_ms;
 }
 
-double ModelRunner::run(Simulation &baseline, Simulation &intervention,
-                        const unsigned int trial_runs) {
+double Runner::run(Simulation &baseline, Simulation &intervention, const unsigned int trial_runs) {
     if (trial_runs < 1) {
         throw std::invalid_argument("The number of trial runs must not be less than one.");
     }
@@ -86,17 +78,13 @@ double ModelRunner::run(Simulation &baseline, Simulation &intervention,
     auto start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(runner_id_, RunnerAction::start));
 
-    /* Initialise simulation */
-    baseline.initialize();
-    intervention.initialize();
-
     for (auto run = 1u; run <= trial_runs; run++) {
-        auto run_seed = std::optional<unsigned int>{rnd_->operator()()};
+        unsigned int run_seed = seed_generator_->next();
 
-        auto base_worker = std::jthread(&ModelRunner::run_model_thread, this, source_.get_token(),
+        auto base_worker = std::jthread(&Runner::run_model_thread, this, source_.get_token(),
                                         std::ref(baseline), run, run_seed);
 
-        auto policy_worker = std::jthread(&ModelRunner::run_model_thread, this, source_.get_token(),
+        auto policy_worker = std::jthread(&Runner::run_model_thread, this, source_.get_token(),
                                           std::ref(intervention), run, run_seed);
 
         base_worker.join();
@@ -107,10 +95,6 @@ double ModelRunner::run(Simulation &baseline, Simulation &intervention,
         }
     }
 
-    /* Terminate simulation */
-    baseline.terminate();
-    intervention.terminate();
-
     ElapsedTime elapsed = std::chrono::steady_clock::now() - start;
     auto elapsed_ms = elapsed.count();
 
@@ -118,16 +102,16 @@ double ModelRunner::run(Simulation &baseline, Simulation &intervention,
     return elapsed_ms;
 }
 
-bool ModelRunner::is_running() const noexcept { return running_.load(); }
+bool Runner::is_running() const noexcept { return running_.load(); }
 
-void ModelRunner::cancel() noexcept {
+void Runner::cancel() noexcept {
     if (is_running()) {
         source_.request_stop();
     }
 }
 
-void ModelRunner::run_model_thread(const std::stop_token &token, Simulation &model,
-                                   unsigned int run, const std::optional<unsigned int> seed) {
+void Runner::run_model_thread(const std::stop_token &token, Simulation &model, unsigned int run,
+                              const unsigned int seed) {
     auto run_start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_begin, run));
@@ -136,12 +120,7 @@ void ModelRunner::run_model_thread(const std::stop_token &token, Simulation &mod
     adevs::Simulator<int> sim;
 
     /* Update model and add to engine */
-    if (seed.has_value()) {
-        model.setup_run(run, seed.value());
-    } else {
-        model.setup_run(run);
-    }
-
+    model.setup_run(run, seed);
     sim.add(&model);
 
     /* Run until the next event is at infinity */
@@ -154,7 +133,7 @@ void ModelRunner::run_model_thread(const std::stop_token &token, Simulation &mod
                                                 RunnerAction::run_end, run, elapsed.count()));
 }
 
-void ModelRunner::notify(std::unique_ptr<hgps::EventMessage> message) {
+void Runner::notify(std::unique_ptr<hgps::EventMessage> message) {
     event_bus_.get().publish_async(std::move(message));
 }
 } // namespace hgps

@@ -226,7 +226,7 @@ The software application provides a Command Line Interface (CLI) for the user to
 
 ## Composing a Microsimulation
 
-To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and ModelRunner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
+To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and Runner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
 
 |![Composing Health-GPS](images/compose_simulation.svg)|
 |:--:|
@@ -259,7 +259,7 @@ try {
     if (model_input.seed().has_value()) {
         seed_generator->seed(model_input.seed().value());
     }
-    auto executive = ModelRunner(event_bus, std::move(seed_generator));
+    auto executive = Runner(event_bus, std::move(seed_generator));
 
     // Create baseline scenario with data sync channel
     auto channel = SyncChannel{};

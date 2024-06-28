@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         if (const auto seed = model_input.seed()) {
             seed_generator->seed(seed.value());
         }
-        auto executive = ModelRunner(event_bus, std::move(seed_generator));
+        auto runner = Runner(event_bus, std::move(seed_generator));
 
         // Create communication channel, shared between the two scenarios.
         auto channel = SyncChannel{};
@@ -154,11 +154,11 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
                        config.trial_runs);
             auto policy_sim = create_intervention_simulation(
                 channel, factory, event_bus, model_input, config.active_intervention.value());
-            runtime = executive.run(baseline_sim, policy_sim, config.trial_runs);
+            runtime = runner.run(baseline_sim, policy_sim, config.trial_runs);
         } else {
             // Baseline only, close channel not store any message
             channel.close();
-            runtime = executive.run(baseline_sim, config.trial_runs);
+            runtime = runner.run(baseline_sim, config.trial_runs);
         }
 
         fmt::print(fg(fmt::color::light_green), "\nCompleted, elapsed time : {}ms\n\n", runtime);

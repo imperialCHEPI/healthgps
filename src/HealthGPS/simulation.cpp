@@ -1,4 +1,4 @@
-#include "healthgps.h"
+#include "simulation.h"
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
 #include "converter.h"
@@ -23,9 +23,9 @@ using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>
 
 namespace hgps {
 
-HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory &factory,
-                     EventAggregator &bus)
-    : Simulation(std::move(definition)), context_{bus, definition_} {
+Simulation::Simulation(SimulationDefinition &&definition, SimulationModuleFactory &factory,
+                       EventAggregator &bus)
+    : definition_{std::move(definition)}, context_{bus, definition_} {
     // Create required modules, should change to shared_ptr
     auto ses_base = factory.create(SimulationModuleType::SES, definition_.inputs());
     auto dem_base = factory.create(SimulationModuleType::Demographic, definition_.inputs());
@@ -40,35 +40,18 @@ HealthGPS::HealthGPS(SimulationDefinition &&definition, SimulationModuleFactory 
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
 }
 
-void HealthGPS::initialize() {
-    // Reset random number generator
-    if (const auto seed = definition_.inputs().seed()) {
-        definition_.rnd().seed(seed.value());
-    }
-
-    end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
-    std::cout << "Microsimulation algorithm initialised: " << name() << '\n';
-}
-
-void HealthGPS::terminate() {
-    std::cout << "Microsimulation algorithm terminate: " << name() << '\n';
-}
-
-void HealthGPS::setup_run(unsigned int run_number) noexcept {
-    context_.set_current_run(run_number);
-}
-
-void HealthGPS::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
+void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
     context_.set_current_run(run_number);
     definition_.rnd().seed(run_seed);
 }
 
-adevs::Time HealthGPS::init(adevs::SimEnv<int> *env) {
+adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     auto start = std::chrono::steady_clock::now();
     auto world_time = definition_.inputs().start_time();
     context_.metrics().clear();
     context_.scenario().clear();
     context_.set_current_time(world_time);
+    end_time_ = adevs::Time(definition_.inputs().stop_time(), 0);
 
     initialise_population();
 
@@ -84,7 +67,7 @@ adevs::Time HealthGPS::init(adevs::SimEnv<int> *env) {
     return env->now() + adevs::Time(world_time, 0);
 }
 
-adevs::Time HealthGPS::update(adevs::SimEnv<int> *env) {
+adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -113,19 +96,19 @@ adevs::Time HealthGPS::update(adevs::SimEnv<int> *env) {
     return adevs_inf<adevs::Time>();
 }
 
-adevs::Time HealthGPS::update(adevs::SimEnv<int> * /*env*/, std::vector<int> & /*x*/) {
+adevs::Time Simulation::update(adevs::SimEnv<int> * /*env*/, std::vector<int> & /*x*/) {
     // This method is never called because nobody sends messages.
     return adevs_inf<adevs::Time>();
 }
 
-void HealthGPS::fini(adevs::Time clock) {
+void Simulation::fini(adevs::Time clock) {
     // risk_factor_->update_population(context_);
     auto message = fmt::format("[{:4},{}] clear up resources.", clock.real, clock.logical);
     context_.publish(std::make_unique<InfoEventMessage>(
         name(), ModelAction::stop, context_.current_run(), context_.time_now(), message));
 }
 
-void HealthGPS::initialise_population() {
+void Simulation::initialise_population() {
     /* Note: order is very important */
 
     // Create virtual population
@@ -133,7 +116,7 @@ void HealthGPS::initialise_population() {
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     auto virtual_pop_size =
         static_cast<int>(definition_.inputs().settings().size_fraction() * total_year_pop_size);
-    context_.reset_population(virtual_pop_size, model_start_year);
+    context_.reset_population(virtual_pop_size);
 
     // Gender - Age, must be first
     demographic_->initialise_population(context_);
@@ -153,7 +136,7 @@ void HealthGPS::initialise_population() {
     print_initial_population_statistics();
 }
 
-void HealthGPS::update_population() {
+void Simulation::update_population() {
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
@@ -175,7 +158,7 @@ void HealthGPS::update_population() {
     analysis_->update_population(context_);
 }
 
-void HealthGPS::update_net_immigration() {
+void Simulation::update_net_immigration() {
     auto net_immigration = get_net_migration();
 
     // Update population based on net immigration
@@ -195,7 +178,7 @@ void HealthGPS::update_net_immigration() {
     }
 }
 
-IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
+IntegerAgeGenderTable Simulation::get_current_expected_population() const {
     auto sim_start_time = context_.start_time();
     auto total_initial_population = demographic_->get_total_population_size(sim_start_time);
     auto start_population_size = static_cast<int>(definition_.inputs().settings().size_fraction() *
@@ -218,7 +201,7 @@ IntegerAgeGenderTable HealthGPS::get_current_expected_population() const {
     return expected_population;
 }
 
-IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
+IntegerAgeGenderTable Simulation::get_current_simulated_population() {
     auto simulated_population = create_age_gender_table<int>(context_.age_range());
     auto &pop = context_.population();
     auto count_mutex = std::mutex{};
@@ -234,7 +217,7 @@ IntegerAgeGenderTable HealthGPS::get_current_simulated_population() {
     return simulated_population;
 }
 
-void HealthGPS::apply_net_migration(int net_value, unsigned int age, const core::Gender &gender) {
+void Simulation::apply_net_migration(int net_value, unsigned int age, const core::Gender &gender) {
     if (net_value > 0) {
         auto &pop = context_.population();
         auto similar_indices = core::find_index_of_all(pop, [&](const Person &entity) {
@@ -270,7 +253,7 @@ void HealthGPS::apply_net_migration(int net_value, unsigned int age, const core:
     }
 }
 
-hgps::IntegerAgeGenderTable HealthGPS::get_net_migration() {
+hgps::IntegerAgeGenderTable Simulation::get_net_migration() {
     if (context_.scenario().type() == ScenarioType::baseline) {
         return create_net_migration();
     }
@@ -292,8 +275,8 @@ hgps::IntegerAgeGenderTable HealthGPS::get_net_migration() {
         context_.sync_timeout_millis()));
 }
 
-hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
-    auto expected_future = core::run_async(&HealthGPS::get_current_expected_population, this);
+hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
+    auto expected_future = core::run_async(&Simulation::get_current_expected_population, this);
     auto simulated_population = get_current_simulated_population();
     auto net_emigration = create_age_gender_table<int>(context_.age_range());
     auto start_age = context_.age_range().lower();
@@ -314,7 +297,7 @@ hgps::IntegerAgeGenderTable HealthGPS::create_net_migration() {
     return net_emigration;
 }
 
-Person HealthGPS::partial_clone_entity(const Person &source) noexcept {
+Person Simulation::partial_clone_entity(const Person &source) noexcept {
     auto clone = Person{};
     clone.age = source.age;
     clone.gender = source.gender;
@@ -332,7 +315,7 @@ Person HealthGPS::partial_clone_entity(const Person &source) noexcept {
     return clone;
 }
 
-std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summary() const {
+std::map<std::string, core::UnivariateSummary> Simulation::create_input_data_summary() const {
     auto visitor = UnivariateVisitor();
     auto summary = std::map<std::string, core::UnivariateSummary>();
     const auto &input_data = definition_.inputs().data();
@@ -348,13 +331,13 @@ std::map<std::string, core::UnivariateSummary> HealthGPS::create_input_data_summ
     return summary;
 }
 
-void hgps::HealthGPS::print_initial_population_statistics() {
+void hgps::Simulation::print_initial_population_statistics() {
     if (context_.current_run() > 1 &&
         definition_.inputs().run().verbosity == core::VerboseMode::none) {
         return;
     }
 
-    auto original_future = core::run_async(&HealthGPS::create_input_data_summary, this);
+    auto original_future = core::run_async(&Simulation::create_input_data_summary, this);
     std::string population = "Population";
     std::size_t longestColumnName = population.length();
     auto sim8_summary = std::map<std::string, core::UnivariateSummary>();

@@ -11,10 +11,10 @@
 #include "poco.h"
 #include "version.h"
 
-#include "HealthGPS/healthgps.h"
 #include "HealthGPS/intervention_scenario.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/scenario.h"
+#include "HealthGPS/simulation.h"
 
 #include "HealthGPS.Core/api.h"
 
@@ -131,10 +131,10 @@ std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &chan
 /// @param event_bus Shared event bus instance for streaming messages
 /// @param input Model inputs instance
 /// @return The respective simulation engine instance
-hgps::HealthGPS create_baseline_simulation(hgps::SyncChannel &channel,
-                                           hgps::SimulationModuleFactory &factory,
-                                           hgps::EventAggregator &event_bus,
-                                           hgps::ModelInput &input);
+hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
+                                            hgps::SimulationModuleFactory &factory,
+                                            hgps::EventAggregator &event_bus,
+                                            hgps::ModelInput &input);
 
 /// @brief Creates the intervention scenario instance
 /// @param channel Synchronization channel instance for data exchange
@@ -151,11 +151,11 @@ create_intervention_scenario(hgps::SyncChannel &channel, const poco::PolicyScena
 /// @param input Model inputs instance
 /// @param info Intervention policy definition
 /// @return The respective simulation engine instance
-hgps::HealthGPS create_intervention_simulation(hgps::SyncChannel &channel,
-                                               hgps::SimulationModuleFactory &factory,
-                                               hgps::EventAggregator &event_bus,
-                                               hgps::ModelInput &input,
-                                               const poco::PolicyScenarioInfo &info);
+hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
+                                                hgps::SimulationModuleFactory &factory,
+                                                hgps::EventAggregator &event_bus,
+                                                hgps::ModelInput &input,
+                                                const poco::PolicyScenarioInfo &info);
 
 /// @brief Expand environment variables in path to respective values
 /// @param path The source path to information

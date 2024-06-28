@@ -228,26 +228,27 @@ std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &chan
     return std::make_unique<BaselineScenario>(channel);
 }
 
-hgps::HealthGPS create_baseline_simulation(hgps::SyncChannel &channel,
-                                           hgps::SimulationModuleFactory &factory,
-                                           hgps::EventAggregator &event_bus,
-                                           hgps::ModelInput &input) {
+hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
+                                            hgps::SimulationModuleFactory &factory,
+                                            hgps::EventAggregator &event_bus,
+                                            hgps::ModelInput &input) {
     auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
     auto baseline_scenario = create_baseline_scenario(channel);
-    return HealthGPS{
+    return Simulation{
         SimulationDefinition{input, std::move(baseline_scenario), std::move(baseline_rnd)}, factory,
         event_bus};
 }
 
-hgps::HealthGPS create_intervention_simulation(hgps::SyncChannel &channel,
-                                               hgps::SimulationModuleFactory &factory,
-                                               hgps::EventAggregator &event_bus,
-                                               hgps::ModelInput &input,
-                                               const poco::PolicyScenarioInfo &info) {
+hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
+                                                hgps::SimulationModuleFactory &factory,
+                                                hgps::EventAggregator &event_bus,
+                                                hgps::ModelInput &input,
+                                                const poco::PolicyScenarioInfo &info) {
     auto policy_scenario = create_intervention_scenario(channel, info);
     auto policy_rnd = std::make_unique<hgps::MTRandom32>();
-    return HealthGPS{SimulationDefinition{input, std::move(policy_scenario), std::move(policy_rnd)},
-                     factory, event_bus};
+    return Simulation{
+        SimulationDefinition{input, std::move(policy_scenario), std::move(policy_rnd)}, factory,
+        event_bus};
 }
 
 std::unique_ptr<hgps::InterventionScenario>
@@ -352,7 +353,7 @@ std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned i
         auto rnd = hgps::MTRandom32{user_seed.value()};
         auto jump_size = static_cast<unsigned long>(1.618 * job_id * std::pow(2, 16));
         rnd.discard(jump_size);
-        return rnd();
+        return rnd.next();
     }
 
     return user_seed;
