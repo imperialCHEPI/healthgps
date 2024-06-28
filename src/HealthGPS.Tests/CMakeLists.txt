@@ -48,7 +48,7 @@ target_sources(
 target_link_libraries(
     HealthGPS.Tests
     PRIVATE HealthGPS.Core
-            HealthGPS.Datastore
+            HealthGPS.Input
             HealthGPS.LibConsole
             HealthGPS
             fmt::fmt

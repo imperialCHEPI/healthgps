@@ -3,7 +3,7 @@ add_compile_definitions(TBB_USE_ASSERT)
 
 # Include sub-projects.
 add_subdirectory(HealthGPS.Core)
-add_subdirectory(HealthGPS.Datastore)
+add_subdirectory(HealthGPS.Input)
 add_subdirectory(HealthGPS)
 add_subdirectory(HealthGPS.Console)
 
@@ -23,7 +23,7 @@ endif()
 
 # PUBLIC needed to make heathers and library available to other project
 target_include_directories(HealthGPS.Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(HealthGPS.Datastore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(HealthGPS.Input PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # External include directory

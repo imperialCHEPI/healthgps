@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "HealthGPS.Core/string_util.h"
-#include "HealthGPS.Datastore/api.h"
+#include "HealthGPS.Input/api.h"
 #include "HealthGPS/repository.h"
 
 #include <chrono>
@@ -12,7 +12,7 @@ class RepositoryTest : public ::testing::Test {
   protected:
     RepositoryTest() : manager_{test_datastore_path}, repository{manager_} {}
 
-    hgps::data::DataManager manager_;
+    hgps::input::DataManager manager_;
     hgps::CachedRepository repository;
 };
 

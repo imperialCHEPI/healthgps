@@ -45,7 +45,7 @@ target_include_directories(HealthGPS.LibConsole PUBLIC ${CMAKE_CURRENT_BINARY_DI
 target_link_libraries(
     HealthGPS.Console
     PRIVATE HealthGPS.Core
-            HealthGPS.Datastore
+            HealthGPS.Input
             HealthGPS.LibConsole
             HealthGPS
             fmt::fmt
@@ -57,7 +57,7 @@ target_link_libraries(
 target_link_libraries(
     HealthGPS.LibConsole
     PRIVATE HealthGPS.Core
-            HealthGPS.Datastore
+            HealthGPS.Input
             HealthGPS
             fmt::fmt
             Threads::Threads

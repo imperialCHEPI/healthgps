@@ -5,7 +5,7 @@
 #include "data_config.h"
 #include "pch.h"
 
-#include "HealthGPS.Datastore/api.h"
+#include "HealthGPS.Input/api.h"
 
 #include <array>
 
@@ -13,7 +13,7 @@ hgps::LmsDefinition lms_parameters;
 
 inline const hgps::core::Identifier bmi_key = hgps::core::Identifier{"bmi"};
 
-hgps::LmsModel create_lms_model(hgps::data::DataManager &manager) {
+hgps::LmsModel create_lms_model(hgps::input::DataManager &manager) {
     using namespace hgps;
 
     auto parameters = manager.get_lms_parameters();
@@ -36,7 +36,7 @@ class WeightModelTest : public ::testing::Test {
   protected:
     WeightModelTest() : manager{test_datastore_path} {}
 
-    hgps::data::DataManager manager;
+    hgps::input::DataManager manager;
 };
 
 TEST_F(WeightModelTest, CreateWeightModel) {

@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-namespace hgps::data {
+namespace hgps::input {
 /// @brief Get cache directory for extracting a file into
 /// @param file_hash The SHA256 hash of the file
 /// @return The path to the directory
@@ -18,4 +18,4 @@ void extract_zip_file(const std::filesystem::path &file_path,
 /// @param file_path Path to zip file
 /// @return The path to the cache folder where the contents were extracted
 std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem::path &file_path);
-} // namespace hgps::data
+} // namespace hgps::input

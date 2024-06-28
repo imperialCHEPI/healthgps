@@ -13,9 +13,9 @@
 //! The schema URL for the data index file
 #define HGPS_DATA_INDEX_SCHEMA_URL (HGPS_SCHEMA_URL_PREFIX HGPS_DATA_INDEX_SCHEMA_FILENAME)
 
-namespace hgps::data {
+namespace hgps::input {
 /// @brief Validate the index.json file
 /// @param schema_directory The root folder for JSON schemas
 /// @param index_stream The input stream for the index.json file
 void validate_index(const std::filesystem::path &schema_directory, std::istream &index_stream);
-} // namespace hgps::data
+} // namespace hgps::input

@@ -3,11 +3,11 @@ find_package(jsoncons CONFIG REQUIRED)
 find_package(libzippp CONFIG REQUIRED)
 find_package(unofficial-curlpp CONFIG REQUIRED)
 
-add_library(HealthGPS.Datastore STATIC "")
-target_compile_features(HealthGPS.Datastore PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
+add_library(HealthGPS.Input STATIC "")
+target_compile_features(HealthGPS.Input PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 target_sources(
-    HealthGPS.Datastore
+    HealthGPS.Input
     PRIVATE "api.h"
             "datamanager.cpp"
             "datamanager.h"
@@ -18,7 +18,7 @@ target_sources(
             "zip_file.cpp"
             "zip_file.h")
 
-target_link_libraries(HealthGPS.Datastore PRIVATE HealthGPS.Core fmt::fmt jsoncons
-                                                  libzippp::libzippp unofficial::curlpp::curlpp)
+target_link_libraries(HealthGPS.Input PRIVATE HealthGPS.Core fmt::fmt jsoncons libzippp::libzippp
+                                              unofficial::curlpp::curlpp)
 
-set(ROOT_NAMESPACE hgps::data)
+set(ROOT_NAMESPACE hgps::input)

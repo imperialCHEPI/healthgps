@@ -3,7 +3,7 @@
 #include "model_parser.h"
 
 #include "HealthGPS.Core/thread_util.h"
-#include "HealthGPS.Datastore/api.h"
+#include "HealthGPS.Input/api.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "event_monitor.h"
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     try {
 #endif
         // Create back-end data store, cached data repository wrapper
-        auto data_api = data::DataManager(cmd_args.data_path_or_url, config.verbosity);
+        auto data_api = input::DataManager(cmd_args.data_path_or_url, config.verbosity);
         auto data_repository = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions

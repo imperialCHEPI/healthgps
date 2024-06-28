@@ -38,7 +38,7 @@ std::filesystem::path create_temporary_extract_directory(const std::filesystem::
 }
 } // anonymous namespace
 
-namespace hgps::data {
+namespace hgps::input {
 std::filesystem::path get_zip_cache_directory(const std::string &file_hash) {
     if (file_hash.size() != 64) {
         throw std::invalid_argument("file_hash does not appear to be a valid SHA256 hash");
@@ -102,4 +102,4 @@ std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem:
 
     return cache_path;
 }
-} // namespace hgps::data
+} // namespace hgps::input
