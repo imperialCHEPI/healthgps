@@ -66,7 +66,7 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     // The product of the number of bins for each factor can be used to calculate the size of the
     // `calculated_factors_` in the next step
     size_t total_num_bins =
-        std::accumulate(factor_bins_.cbegin(), factor_bins_.cend(), 1, std::multiplies<>());
+        std::accumulate(factor_bins_.cbegin(), factor_bins_.cend(), 1u, std::multiplies<>());
 
     // Set the vector size and initialise all values to 0.0
     calculated_factors_.resize(total_num_bins * num_factors_to_calc);
