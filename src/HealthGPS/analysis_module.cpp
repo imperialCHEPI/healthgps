@@ -332,7 +332,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
         size_t index = 0;
         for (size_t i = 0; i < bin_indices.size() - 1; i++) {
             size_t accumulated_bins = std::accumulate(std::next(factor_bins_.cbegin(), i + 1),
-                                                      factor_bins_.cend(), 1, std::multiplies<>());
+                                                      factor_bins_.cend(), size_t{1}, std::multiplies<>());
             index += bin_indices[i] * accumulated_bins * num_factors_to_calculate;
         }
         index += bin_indices.back() * num_factors_to_calculate;
