@@ -1,4 +1,5 @@
 #include "datamanager.h"
+#include "download_file.h"
 #include "schema.h"
 #include "zip_file.h"
 
@@ -46,15 +47,22 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
 } // anonymous namespace
 
 namespace hgps::data {
-DataManager::DataManager(std::filesystem::path path, VerboseMode verbosity)
+DataManager::DataManager(const std::string &path_or_url, VerboseMode verbosity)
     : verbosity_{verbosity} {
-    if (std::filesystem::is_directory(path)) {
-        root_ = std::move(path);
-    } else if (std::filesystem::is_regular_file(path) && path.extension() == ".zip") {
+    if (path_or_url.starts_with("http:") || path_or_url.starts_with("https:")) {
+        // Download file to temporary folder and extract it
+        const auto path = download_file_to_temporary(path_or_url, ".zip");
         root_ = extract_zip_file_or_load_from_cache(path);
     } else {
-        throw std::runtime_error(
-            fmt::format("Path must either point to a zip file or a directory: {}", path.string()));
+        std::filesystem::path path = path_or_url;
+        if (std::filesystem::is_directory(path)) {
+            root_ = std::move(path);
+        } else if (std::filesystem::is_regular_file(path) && path.extension() == ".zip") {
+            root_ = extract_zip_file_or_load_from_cache(path);
+        } else {
+            throw std::runtime_error(fmt::format(
+                "Path must either point to a zip file or a directory: {}", path_or_url));
+        }
     }
 
     index_ = read_input_files_from_directory(root_);

@@ -7,26 +7,38 @@
 
 #include <fstream>
 #include <random>
+#include <sstream>
 
-namespace hgps::data {
-std::filesystem::path create_temporary_directory() {
-    auto tmp_dir = std::filesystem::temp_directory_path();
-    std::random_device dev;
-    std::mt19937 prng(dev());
-    std::uniform_int_distribution<unsigned> rand;
-    std::filesystem::path path;
-
+namespace {
+/// @brief Create a temporary directory for extracting a zip file into
+/// @param output_path The final output path where files will be moved to
+/// @return The path to the temporary directory
+std::filesystem::path create_temporary_extract_directory(const std::filesystem::path &output_path) {
+    // Randomise path in case other processes are also performing extraction
+    std::filesystem::path temp_path;
+    std::mt19937 rand(std::random_device{}());
     while (true) {
         std::stringstream ss;
-        ss << std::hex << rand(prng);
-        path = tmp_dir / ss.str();
-        // true if the directory was created.
-        if (std::filesystem::create_directory(path)) {
-            return path;
+        ss << output_path.string() << '.' << std::hex << rand() << ".tmp";
+        temp_path = ss.str();
+
+        if (!std::filesystem::create_directories(temp_path)) {
+            // Path already exists; try again
+            if (std::filesystem::exists(temp_path)) {
+                continue;
+            }
+
+            // Something else went wrong
+            throw std::runtime_error(
+                fmt::format("Failed to create temporary directory: {}", temp_path.string()));
         }
+
+        return temp_path;
     }
 }
+} // anonymous namespace
 
+namespace hgps::data {
 std::filesystem::path get_zip_cache_directory(const std::string &file_hash) {
     if (file_hash.size() != 64) {
         throw std::invalid_argument("file_hash does not appear to be a valid SHA256 hash");
@@ -43,9 +55,12 @@ void extract_zip_file(const std::filesystem::path &file_path,
     ZipArchive zf(file_path.string());
     zf.open();
 
+    // Extract to temporary folder first, so that the final extraction path should only exist if the
+    // operation completed successfully
+    const auto temp_output_directory = create_temporary_extract_directory(output_directory);
     std::filesystem::path out_path;
     for (const auto &entry : zf.getEntries()) {
-        out_path = output_directory / entry.getName();
+        out_path = temp_output_directory / entry.getName();
         if (entry.isDirectory()) {
             if (!std::filesystem::create_directories(out_path)) {
                 throw std::runtime_error{
@@ -61,21 +76,29 @@ void extract_zip_file(const std::filesystem::path &file_path,
             ofs << entry.readAsText();
         }
     }
+
+    try {
+        // This operation should be atomic
+        std::filesystem::rename(temp_output_directory, output_directory);
+    } catch (const std::filesystem::filesystem_error &) {
+        // It is possible (albeit unlikely) that another process has successfully completed the
+        // extraction while we were attempting to do the same. In this case, we can just delete our
+        // temporary folder and carry on.
+        if (std::filesystem::exists(output_directory)) {
+            std::filesystem::remove_all(temp_output_directory);
+        } else {
+            // Something else went wrong
+            throw;
+        }
+    }
 }
 
 std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem::path &file_path) {
     const auto file_hash = compute_sha256_for_file(file_path);
     auto cache_path = get_zip_cache_directory(file_hash);
-    if (std::filesystem::exists(cache_path)) {
-        return cache_path;
+    if (!std::filesystem::exists(cache_path)) {
+        extract_zip_file(file_path, cache_path);
     }
-
-    if (!std::filesystem::create_directories(cache_path)) {
-        throw std::runtime_error(
-            fmt::format("Failed to create cache directory: {}", cache_path.string()));
-    }
-
-    extract_zip_file(file_path, cache_path);
 
     return cache_path;
 }

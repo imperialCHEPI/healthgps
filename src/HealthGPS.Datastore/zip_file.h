@@ -3,9 +3,6 @@
 #include <filesystem>
 
 namespace hgps::data {
-//! Create a temporary directory with a unique path
-std::filesystem::path create_temporary_directory();
-
 /// @brief Get cache directory for extracting a file into
 /// @param file_hash The SHA256 hash of the file
 /// @return The path to the directory

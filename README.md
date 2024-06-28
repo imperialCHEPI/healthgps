@@ -55,6 +55,7 @@ The code in this repository is licensed under the [BSD 3-Clause](LICENSE.txt) li
 | [libzippp](https://github.com/ctabin/libzippp)                | MIT          |
 | [openssl](https://www.openssl.org)                            | Apache 2.0   |
 | [PlatformFolders](https://github.com/sago007/PlatformFolders) | MIT          |
+| [curlpp](http://www.curlpp.org)                               | MIT          |
 
 ### Tools and Frameworks
 

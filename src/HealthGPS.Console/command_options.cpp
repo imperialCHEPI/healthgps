@@ -61,17 +61,18 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
         }
 
         if (result.count("storage")) {
-            cmd.storage_folder = result["storage"].as<std::string>();
-            if (cmd.storage_folder.is_relative()) {
-                cmd.storage_folder = std::filesystem::absolute(cmd.storage_folder);
-                fmt::print("File storage folder.: {}\n", cmd.storage_folder.string());
-            }
-        }
+            cmd.data_path_or_url = result["storage"].as<std::string>();
 
-        if (!fs::exists(cmd.storage_folder)) {
-            fmt::print(fg(fmt::color::red), "\nFile storage folder: {} not found.\n",
-                       cmd.storage_folder.string());
-            cmd.exit_code = EXIT_FAILURE;
+            if (!cmd.data_path_or_url.starts_with("http://") &&
+                !cmd.data_path_or_url.starts_with("https://")) {
+                const std::filesystem::path path = cmd.data_path_or_url;
+
+                if (path.is_relative()) {
+                    cmd.data_path_or_url = std::filesystem::absolute(path).string();
+                }
+            }
+
+            fmt::print("Data source: {}\n", cmd.data_path_or_url);
         }
 
         if (result.count("jobid")) {

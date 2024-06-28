@@ -351,8 +351,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
-    auto min_age = context.age_range().lower();
-    auto max_age = context.age_range().upper();
     if (series.size() > 0) {
         throw std::logic_error("This should be a new object!");
     }
@@ -360,20 +358,21 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     series.add_channels(channels_);
 
     auto current_time = static_cast<unsigned int>(context.time_now());
-    for (const auto &entity : context.population()) {
-        auto age = entity.age;
-        auto gender = entity.gender;
+    for (const auto &person : context.population()) {
+        auto age = person.age;
+        auto gender = person.gender;
 
-        if (!entity.is_active()) {
-            if (!entity.is_alive() && entity.time_of_death() == current_time) {
+        if (!person.is_active()) {
+            if (!person.is_alive() && person.time_of_death() == current_time) {
                 series(gender, "deaths").at(age)++;
-                auto expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                series(gender, "mean_yll").at(age) +=
-                    std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
+                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                series(gender, "mean_yll").at(age) += yll;
+                series(gender, "mean_daly").at(age) += yll;
             }
 
-            if (entity.has_emigrated() && entity.time_of_migration() == current_time) {
-                series(gender, "migrations").at(age)++;
+            if (person.has_emigrated() && person.time_of_migration() == current_time) {
+                series(gender, "emigrations").at(age)++;
             }
 
             continue;
@@ -383,10 +382,10 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
         for (const auto &factor : context.mapping().entries()) {
             series(gender, "mean_" + factor.key().to_string()).at(age) +=
-                entity.get_risk_factor_value(factor.key());
+                person.get_risk_factor_value(factor.key());
         }
 
-        for (const auto &[disease_name, disease_state] : entity.diseases) {
+        for (const auto &[disease_name, disease_state] : person.diseases) {
             if (disease_state.status == DiseaseStatus::active) {
                 series(gender, "prevalence_" + disease_name.to_string()).at(age)++;
                 if (disease_state.start_time == context.time_now()) {
@@ -395,35 +394,43 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             }
         }
 
-        auto dw = calculate_disability_weight(entity);
-        series(gender, "disability_weight").at(age) += dw;
-        series(gender, "mean_yld").at(age) += (dw * DALY_UNITS);
+        double dw = calculate_disability_weight(person);
+        double yld = dw * DALY_UNITS;
+        series(gender, "mean_yld").at(age) += yld;
+        series(gender, "mean_daly").at(age) += yld;
 
-        classify_weight(series, entity);
+        classify_weight(series, person);
     }
 
-    // Calculate DALY
-    for (int i = min_age; i <= max_age; i++) {
-        series(core::Gender::male, "mean_daly").at(i) =
-            series(core::Gender::male, "mean_yll").at(i) +
-            series(core::Gender::male, "mean_yld").at(i);
-        series(core::Gender::female, "mean_daly").at(i) =
-            series(core::Gender::female, "mean_yll").at(i) +
-            series(core::Gender::female, "mean_yld").at(i);
-    }
+    // For each age group in the analysis...
+    const auto age_range = context.age_range();
+    for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+        double count_F = series(core::Gender::female, "count").at(age);
+        double count_M = series(core::Gender::male, "count").at(age);
+        double deaths_F = series(core::Gender::female, "deaths").at(age);
+        double deaths_M = series(core::Gender::male, "deaths").at(age);
 
-    // Calculate in-place averages
-    for (auto i = min_age; i <= max_age; i++) {
-        for (const auto &chan : series.channels()) {
-            if (chan == "count" || chan.starts_with("std_")) {
-                continue;
-            }
+        // Calculate in-place factor averages.
+        for (const auto &factor : context.mapping().entries()) {
+            std::string column = "mean_" + factor.key().to_string();
+            series(core::Gender::female, column).at(age) /= count_F;
+            series(core::Gender::male, column).at(age) /= count_M;
+        }
 
-            double male_count = series(core::Gender::male, "count").at(i);
-            series(core::Gender::male, chan).at(i) /= male_count;
+        // Calculate in-place disease prevalence and incidence rates.
+        for (const auto &disease : context.diseases()) {
+            std::string column_prevalence = "prevalence_" + disease.code.to_string();
+            series(core::Gender::female, column_prevalence).at(age) /= count_F;
+            series(core::Gender::male, column_prevalence).at(age) /= count_M;
+            std::string column_incidence = "incidence_" + disease.code.to_string();
+            series(core::Gender::female, column_incidence).at(age) /= count_F;
+            series(core::Gender::male, column_incidence).at(age) /= count_M;
+        }
 
-            double female_count = series(core::Gender::female, "count").at(i);
-            series(core::Gender::female, chan).at(i) /= female_count;
+        // Calculate in-place YLL/YLD/DALY averages.
+        for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
+            series(core::Gender::female, column).at(age) /= (count_F + deaths_F);
+            series(core::Gender::male, column).at(age) /= (count_M + deaths_M);
         }
     }
 
@@ -471,25 +478,31 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     }
 
     // Calculate in-place standard deviation.
-    auto divide_by_count = [&series](const std::string &chan, core::Gender sex, int age) {
-        const double count = series(sex, "count").at(age);
-        const double sum = series(sex, chan).at(age);
+    auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
+                                          double count) {
+        const double sum = series(sex, "std_" + chan).at(age);
         const double std = std::sqrt(sum / count);
-        series(sex, chan).at(age) = std;
+        series(sex, "std_" + chan).at(age) = std;
     };
 
+    // For each age group in the analysis...
     const auto age_range = context.age_range();
     for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-        for (const auto &chan : series.channels()) {
-            if (!chan.starts_with("std_")) {
-                continue;
-            }
+        double count_F = series(core::Gender::female, "count").at(age);
+        double count_M = series(core::Gender::male, "count").at(age);
+        double deaths_F = series(core::Gender::female, "deaths").at(age);
+        double deaths_M = series(core::Gender::male, "deaths").at(age);
 
-            // Factor standard deviation for females.
-            divide_by_count(chan, core::Gender::female, age);
+        // Calculate in-place factor standard deviation.
+        for (const auto &factor : context.mapping().entries()) {
+            divide_by_count_sqrt(factor.key().to_string(), core::Gender::female, age, count_F);
+            divide_by_count_sqrt(factor.key().to_string(), core::Gender::male, age, count_M);
+        }
 
-            // Factor standard deviation for males.
-            divide_by_count(chan, core::Gender::male, age);
+        // Calculate in-place YLL/YLD/DALY standard deviation.
+        for (const auto &column : {"yll", "yld", "daly"}) {
+            divide_by_count_sqrt(column, core::Gender::female, age, (count_F + deaths_F));
+            divide_by_count_sqrt(column, core::Gender::male, age, (count_M + deaths_M));
         }
     }
 }
@@ -520,6 +533,8 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     }
 
     channels_.emplace_back("count");
+    channels_.emplace_back("deaths");
+    channels_.emplace_back("emigrations");
 
     for (const auto &factor : context.mapping().entries()) {
         channels_.emplace_back("mean_" + factor.key().to_string());
@@ -531,9 +546,6 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         channels_.emplace_back("incidence_" + disease.code.to_string());
     }
 
-    channels_.emplace_back("disability_weight");
-    channels_.emplace_back("deaths");
-    channels_.emplace_back("migrations");
     channels_.emplace_back("normal_weight");
     channels_.emplace_back("over_weight");
     channels_.emplace_back("obese_weight");
