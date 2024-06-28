@@ -22,41 +22,51 @@ AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&cl
       residual_disability_weight_{create_age_gender_table<double>(age_range)},
       comorbidities_{comorbidities} {}
 
+// Overload constructor with additional parameter for calculated_factors_
+AnalysisModule::AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
+                               const core::IntegerInterval age_range, unsigned int comorbidities,
+                               std::vector<double> calculated_factors)
+    : definition_{std::move(definition)}, weight_classifier_{std::move(classifier)},
+      residual_disability_weight_{create_age_gender_table<double>(age_range)},
+      comorbidities_{comorbidities}, calculated_factors_{std::move(calculated_factors)} {}
 SimulationModuleType AnalysisModule::type() const noexcept {
     return SimulationModuleType::Analysis;
 }
 
 void AnalysisModule::initialise_vector(RuntimeContext &context) {
-    // Set some arbitrary factors
-    std::vector<core::Identifier> factors{"Gender"_id, "Age"_id};
+    factor_bins_.reserve(factors_to_calculate_.size());
+    factor_bin_widths_.reserve(factors_to_calculate_.size());
+    factor_min_values_.reserve(factors_to_calculate_.size());
 
-    std::vector<int> factor_bins;
-    factor_bins.reserve(factors.size());
-
-    for (const auto &factor : factors) {
+    for (const auto &factor : factors_to_calculate_) {
         const auto [min, max] = std::ranges::minmax_element(
             context.population(), [&factor](const auto &entity1, const auto &entity2) {
                 return entity1.get_risk_factor_value(factor) <
                        entity2.get_risk_factor_value(factor);
             });
 
-        auto min_factor = min->get_risk_factor_value(factor);
-        auto max_factor = max->get_risk_factor_value(factor);
+        double min_factor = min->get_risk_factor_value(factor);
+        double max_factor = max->get_risk_factor_value(factor);
+
+        factor_min_values_.push_back(min_factor);
 
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
         // any other number depending on the desired resolution of the map)
-        factor_bins.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+        factor_bins_.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+
+        // The width of each bin is the range of the factor divided by the number of bins
+        factor_bin_widths_.push_back((max_factor - min_factor) / factor_bins_.back());
     }
 
     // The number of factors to calculate is the number of factors minus the length of the `factors`
     // vector.
-    auto num_factors_to_calc = context.mapping().entries().size() - factors.size();
+    size_t num_factors_to_calc = context.mapping().entries().size() - factors_to_calculate_.size();
 
     // The product of the number of bins for each factor can be used to calculate the size of the
     // `calculated_factors_` in the next step
-    auto total_num_bins =
-        std::accumulate(factor_bins.cbegin(), factor_bins.cend(), 1, std::multiplies<>());
+    size_t total_num_bins =
+        std::accumulate(factor_bins_.cbegin(), factor_bins_.cend(), size_t{1}, std::multiplies<>());
 
     // Set the vector size and initialise all values to 0.0
     calculated_factors_.resize(total_num_bins * num_factors_to_calc);
@@ -302,6 +312,40 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
     return DALYsIndicator{.years_of_life_lost = yll,
                           .years_lived_with_disability = yld,
                           .disability_adjusted_life_years = yll + yld};
+}
+
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
+    size_t num_factors_to_calculate =
+        context.mapping().entries().size() - factors_to_calculate_.size();
+
+    for (const auto &person : context.population()) {
+        // Get the bin index for each factor
+        std::vector<size_t> bin_indices;
+        for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
+            double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
+            auto bin_index =
+                static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
+            bin_indices.push_back(bin_index);
+        }
+
+        // Calculate the index in the calculated_factors_ vector
+        size_t index = 0;
+        for (size_t i = 0; i < bin_indices.size() - 1; i++) {
+            size_t accumulated_bins =
+                std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(),
+                                size_t{1}, std::multiplies<>());
+            index += bin_indices[i] * accumulated_bins * num_factors_to_calculate;
+        }
+        index += bin_indices.back() * num_factors_to_calculate;
+
+        // Now we can add the values of the factors that are not in factors_to_calculate_
+        for (const auto &factor : context.mapping().entries()) {
+            if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(),
+                          factor.key()) == factors_to_calculate_.cend()) {
+                calculated_factors_[index++] += person.get_risk_factor_value(factor.key());
+            }
+        }
+    }
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
