@@ -23,6 +23,16 @@ class AnalysisModule final : public UpdatableModule {
     AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
                    const core::IntegerInterval age_range, unsigned int comorbidities);
 
+    /// @brief Initialises a new instance of the AnalysisModule class.
+    /// @param definition The analysis module definition
+    /// @param classifier Body weight classifier model instance
+    /// @param age_range The experiment valid age range
+    /// @param comorbidities Maximum number of comorbidities to include
+    /// @param calculated_factors The calculated factors to include
+    AnalysisModule(AnalysisDefinition &&definition, WeightModel &&classifier,
+                   core::IntegerInterval age_range, unsigned int comorbidities,
+                   std::vector<double> calculated_factors);
+
     SimulationModuleType type() const noexcept override;
 
     const std::string &name() const noexcept override;
@@ -38,7 +48,11 @@ class AnalysisModule final : public UpdatableModule {
     std::vector<std::string> channels_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
+    std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
     std::vector<double> calculated_factors_;
+    std::vector<size_t> factor_bins_;
+    std::vector<double> factor_bin_widths_;
+    std::vector<double> factor_min_values_;
 
     void initialise_vector(RuntimeContext &context);
 
@@ -52,6 +66,7 @@ class AnalysisModule final : public UpdatableModule {
     DALYsIndicator calculate_dalys(Population &population, unsigned int max_age,
                                    unsigned int death_year) const;
 
+    void calculate_population_statistics(RuntimeContext &context);
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
