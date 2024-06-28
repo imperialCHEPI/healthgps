@@ -83,9 +83,9 @@ hc::DoubleDataTableColumnBuilder parse_double_column(const std::string &name,
 
 } // namespace
 
-namespace host {
+namespace hgps::input {
 
-hgps::core::DataTable load_datatable_from_csv(const poco::FileInfo &file_info) {
+hgps::core::DataTable load_datatable_from_csv(const FileInfo &file_info) {
     MEASURE_FUNCTION();
     using namespace rapidcsv;
 
@@ -194,4 +194,4 @@ load_baseline_from_csv(const std::string &filename, const std::string &delimiter
     return result;
 }
 
-} // namespace host
+} // namespace hgps::input

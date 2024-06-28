@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace host::poco {
+namespace hgps::input {
 /*
  * POCO data types for models's JSON file parsing
  *
@@ -65,4 +65,4 @@ struct LiteHierarchicalModelInfo {
     std::vector<VariableInfo> variables;
     std::map<std::string, std::map<std::string, std::vector<FactorDynamicEquationInfo>>> equations;
 };
-} // namespace host::poco
+} // namespace hgps::input

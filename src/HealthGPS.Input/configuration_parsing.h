@@ -5,7 +5,7 @@
 #pragma once
 #include "configuration.h"
 
-namespace host {
+namespace hgps::input {
 /// @brief Check the schema version and throw if invalid
 /// @param j The root JSON object
 /// @throw ConfigurationError: If version attribute is not present or invalid
@@ -34,4 +34,4 @@ void load_running_info(const nlohmann::json &j, Configuration &config);
 /// @param config The config object to update
 /// @throw ConfigurationError: Could not load output info
 void load_output_info(const nlohmann::json &j, Configuration &config);
-} // namespace host
+} // namespace hgps::input

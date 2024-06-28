@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#include "command_options.h"
 #include "poco.h"
 #include "version.h"
 
@@ -18,12 +17,10 @@
 
 #include "HealthGPS.Core/api.h"
 
-#include "result_file_writer.h"
-
 #include <optional>
 #include <stdexcept>
 
-namespace host {
+namespace hgps::input {
 
 /// @brief Defines the application configuration data structure
 struct Configuration {
@@ -31,16 +28,16 @@ struct Configuration {
     std::filesystem::path root_path;
 
     /// @brief The input data file details
-    poco::FileInfo file;
+    FileInfo file;
 
     /// @brief Experiment population settings
-    poco::SettingsInfo settings;
+    SettingsInfo settings;
 
     /// @brief Socio-economic status (SES) model inputs
-    poco::SESInfo ses;
+    SESInfo ses;
 
     /// @brief User defined model and parameters information
-    poco::ModellingInfo modelling;
+    ModellingInfo modelling;
 
     /// @brief List of diseases to include in experiment
     std::vector<std::string> diseases;
@@ -61,10 +58,10 @@ struct Configuration {
     unsigned int sync_timeout_ms{};
 
     /// @brief The active intervention policy definition
-    std::optional<poco::PolicyScenarioInfo> active_intervention;
+    std::optional<PolicyScenarioInfo> active_intervention;
 
     /// @brief Experiment output folder and file information
-    poco::OutputInfo output;
+    OutputInfo output;
 
     /// @brief Application logging verbosity mode
     hgps::core::VerboseMode verbosity{};
@@ -86,9 +83,11 @@ class ConfigurationError : public std::runtime_error {
 };
 
 /// @brief Loads the input configuration file, *.json, information
-/// @param options User command-line options
+/// @param config_file Path to config file
+/// @param job_id Job ID (for HPC)
+/// @param verbose Set log verbosity for simulation
 /// @return The configuration file information
-Configuration get_configuration(CommandOptions &options);
+Configuration get_configuration(const std::filesystem::path &config_file, int job_id, bool verbose);
 
 /// @brief Gets the collection of diseases that matches the selected input list
 /// @param data_api The back-end data store instance to be used.
@@ -111,14 +110,7 @@ hgps::ModelInput create_model_input(hgps::core::DataTable &input_table, hgps::co
 /// @param info User output information, may contain relative path and environment variables
 /// @param job_id Simulation job identifier
 /// @return Output file full name
-std::string create_output_file_name(const poco::OutputInfo &info, int job_id);
-
-/// @brief Creates the simulation results file logger instance
-/// @param config User input configuration information
-/// @param input Model input instance
-/// @return The respective file writer instance
-ResultFileWriter create_results_file_logger(const Configuration &config,
-                                            const hgps::ModelInput &input);
+std::string create_output_file_name(const OutputInfo &info, int job_id);
 
 /// @brief Creates the baseline scenario instance
 /// @param channel Synchronization channel instance for data exchange
@@ -142,7 +134,7 @@ hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
 /// @return The respective intervention scenario instance
 /// @throws std::invalid_argument Thrown if intervention `identifier` is unknown.
 std::unique_ptr<hgps::InterventionScenario>
-create_intervention_scenario(hgps::SyncChannel &channel, const poco::PolicyScenarioInfo &info);
+create_intervention_scenario(hgps::SyncChannel &channel, const PolicyScenarioInfo &info);
 
 /// @brief Creates the intervention simulation engine instance
 /// @param channel Synchronization channel for data exchange instance
@@ -155,7 +147,7 @@ hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
                                                 hgps::SimulationModuleFactory &factory,
                                                 hgps::EventAggregator &event_bus,
                                                 hgps::ModelInput &input,
-                                                const poco::PolicyScenarioInfo &info);
+                                                const PolicyScenarioInfo &info);
 
 /// @brief Expand environment variables in path to respective values
 /// @param path The source path to information
@@ -167,4 +159,4 @@ std::string expand_environment_variables(const std::string &path);
 /// @param user_seed User input custom seed for experiment
 /// @return The experiment seed, if user provide a seed
 std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed);
-} // namespace host
+} // namespace hgps::input

@@ -10,7 +10,7 @@
 #include <sstream>
 #include <utility>
 
-namespace host {
+namespace hgps {
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
     : info_{std::move(info)} {
     stream_.open(file_name, std::ofstream::out | std::ofstream::app);
@@ -180,4 +180,4 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
         fss.clear();
     }
 }
-} // namespace host
+} // namespace hgps

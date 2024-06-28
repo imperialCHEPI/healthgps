@@ -16,7 +16,7 @@
 #include <filesystem>
 #include <string>
 
-namespace host {
+namespace hgps::input {
 /// @brief Load value from JSON, printing an error message if it fails
 /// @param j JSON object
 /// @param key Key to value
@@ -90,25 +90,24 @@ void rebase_valid_path_to(const nlohmann::json &j, const std::string &key,
 /// @param base_dir Base folder
 /// @return FileInfo
 /// @throw ConfigurationError: Invalid config file format
-poco::FileInfo get_file_info(const nlohmann::json &node, const std::filesystem::path &base_dir);
+FileInfo get_file_info(const nlohmann::json &node, const std::filesystem::path &base_dir);
 
 /// @brief Load settings section of JSON
 /// @param j Input JSON
 /// @return SettingsInfo
 /// @throw ConfigurationError: Could not load settings
-poco::SettingsInfo get_settings(const nlohmann::json &j);
+SettingsInfo get_settings(const nlohmann::json &j);
 
 /// @brief Load BaselineInfo from JSON
 /// @param j Input JSON
 /// @param base_dir Base folder
 /// @return BaselineInfo
 /// @throw ConfigurationError: One or more files could not be found
-poco::BaselineInfo get_baseline_info(const nlohmann::json &j,
-                                     const std::filesystem::path &base_dir);
+BaselineInfo get_baseline_info(const nlohmann::json &j, const std::filesystem::path &base_dir);
 
 /// @brief Load interventions from running section
 /// @param running Running section of JSON object
 /// @param config Config object to update
 /// @throw ConfigurationError: Could not load interventions
 void load_interventions(const nlohmann::json &running, Configuration &config);
-} // namespace host
+} // namespace hgps::input

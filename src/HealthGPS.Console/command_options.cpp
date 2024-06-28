@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace host {
+namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
@@ -95,4 +95,4 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
 
     return cmd;
 }
-} // namespace host
+} // namespace hgps

@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-namespace host {
+namespace hgps::input {
 using json = nlohmann::json;
 
 nlohmann::json get(const json &j, const std::string &key) {
@@ -55,9 +55,9 @@ void rebase_valid_path_to(const json &j, const std::string &key, std::filesystem
     }
 }
 
-poco::FileInfo get_file_info(const json &node, const std::filesystem::path &base_dir) {
+FileInfo get_file_info(const json &node, const std::filesystem::path &base_dir) {
     bool success = true;
-    poco::FileInfo info;
+    FileInfo info;
     rebase_valid_path_to(node, "name", info.name, base_dir, success);
     get_to(node, "format", info.format, success);
     get_to(node, "delimiter", info.delimiter, success);
@@ -69,8 +69,8 @@ poco::FileInfo get_file_info(const json &node, const std::filesystem::path &base
     return info;
 }
 
-poco::SettingsInfo get_settings(const json &j) {
-    poco::SettingsInfo info;
+SettingsInfo get_settings(const json &j) {
+    SettingsInfo info;
     if (!get_to(j, "settings", info)) {
         throw ConfigurationError{"Could not load settings info"};
     }
@@ -78,11 +78,11 @@ poco::SettingsInfo get_settings(const json &j) {
     return info;
 }
 
-poco::BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
+BaselineInfo get_baseline_info(const json &j, const std::filesystem::path &base_dir) {
     const auto &adj = get(j, "baseline_adjustments");
 
     bool success = true;
-    poco::BaselineInfo info;
+    BaselineInfo info;
     get_to(adj, "format", info.format, success);
     get_to(adj, "delimiter", info.delimiter, success);
     get_to(adj, "encoding", info.encoding, success);
@@ -121,7 +121,7 @@ void load_interventions(const json &running, Configuration &config) {
      * strictly speaking unnecessary, but it does mean that we can verify the data
      * format is correct.
      */
-    std::unordered_map<hgps::core::Identifier, poco::PolicyScenarioInfo> policy_types;
+    std::unordered_map<hgps::core::Identifier, PolicyScenarioInfo> policy_types;
     if (!get_to(interventions, "types", policy_types, success)) {
         fmt::print(fmt::fg(fmt::color::red),
                    "Could not load policy types from interventions section\n");
@@ -213,7 +213,7 @@ void load_modelling_info(const json &j, Configuration &config) {
     try {
         // SES mapping
         // TODO: Maybe this needs its own helper function
-        config.ses = get(modelling, "ses_model").get<poco::SESInfo>();
+        config.ses = get(modelling, "ses_model").get<SESInfo>();
     } catch (const std::exception &) {
         success = false;
         fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
@@ -264,4 +264,4 @@ void load_output_info(const json &j, Configuration &config) {
     config.output.folder = expand_environment_variables(config.output.folder);
 }
 
-} // namespace host
+} // namespace hgps::input

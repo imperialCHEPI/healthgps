@@ -1,16 +1,16 @@
 #include "pch.h"
 
-#include "HealthGPS.Console/configuration_parsing.h"
-#include "HealthGPS.Console/configuration_parsing_helpers.h"
-#include "HealthGPS.Console/jsonparser.h"
+#include "HealthGPS.Input/configuration_parsing.h"
+#include "HealthGPS.Input/configuration_parsing_helpers.h"
+#include "HealthGPS.Input/jsonparser.h"
 
 #include <fstream>
 #include <random>
 #include <type_traits>
 
 using json = nlohmann::json;
-using namespace host;
-using namespace poco;
+using namespace hgps;
+using namespace hgps::input;
 
 #define TYPE_OF(x) std::remove_cvref_t<decltype(x)>
 
@@ -132,7 +132,7 @@ class ConfigParsingFixture : public ::testing::Test {
     }
 
     auto create_config() const {
-        host::Configuration config;
+        hgps::input::Configuration config;
         config.root_path = dir_.path();
         return config;
     }
@@ -505,7 +505,7 @@ TEST_F(ConfigParsingFixture, LoadModellingInfo) {
         .delimiter = ",",
         .encoding = "UTF8",
         .file_names = {{"a", create_file_absolute()}, {"b", create_file_absolute()}}};
-    const poco::SESInfo ses_info{.function = "normal", .parameters = {0.0, 1.0}};
+    const SESInfo ses_info{.function = "normal", .parameters = {0.0, 1.0}};
 
     const json valid_modelling_info = [&]() {
         json j;

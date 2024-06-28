@@ -7,7 +7,7 @@
 
 #include <filesystem>
 
-namespace host {
+namespace hgps {
 /// @brief Defines the Command Line Interface (CLI) arguments options
 struct CommandOptions {
     /// @brief Indicates whether the argument parsing succeed
@@ -40,4 +40,4 @@ cxxopts::Options create_options();
 /// @return User command-line options
 CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]);
 
-} // namespace host
+} // namespace hgps

@@ -1,12 +1,14 @@
-#include "configuration.h"
-#include "csvparser.h"
-#include "model_parser.h"
-
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Input/api.h"
+#include "HealthGPS.Input/configuration.h"
+#include "HealthGPS.Input/csvparser.h"
+#include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
+#include "command_options.h"
 #include "event_monitor.h"
+#include "model_info.h"
+#include "result_file_writer.h"
 
 #include <fmt/chrono.h>
 #include <fmt/color.h>
@@ -15,6 +17,7 @@
 #include <cstdlib>
 #include <oneapi/tbb/global_control.h>
 
+namespace {
 /// @brief Get a string representation of current system time
 /// @return The system time as string
 std::string get_time_now_str() {
@@ -31,6 +34,18 @@ void print_app_title() {
                tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism));
 }
 
+hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configuration &config,
+                                                  const hgps::ModelInput &input) {
+    return {create_output_file_name(config.output, config.job_id),
+            hgps::ExperimentInfo{.model = config.app_name,
+                                 .version = config.app_version,
+                                 .intervention = config.active_intervention
+                                                     ? config.active_intervention->identifier
+                                                     : "",
+                                 .job_id = config.job_id,
+                                 .seed = input.seed().value_or(0u)}};
+}
+
 /// @brief Prints application exit message
 /// @param exit_code The application exit code
 /// @return The respective exit code
@@ -40,6 +55,7 @@ int exit_application(int exit_code) {
     fmt::print(" {}.\n\n", get_time_now_str());
     return exit_code;
 }
+} // anonymous namespace
 
 /// @brief Health-GPS host application entry point
 /// @param argc The number of command arguments
@@ -47,7 +63,7 @@ int exit_application(int exit_code) {
 /// @return The application exit code
 int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
-    using namespace host;
+    using namespace hgps::input;
 
     // Set thread limit from OMP_THREAD_LIMIT, if set in environment.
     char *env_threads = std::getenv("OMP_THREAD_LIMIT");
@@ -73,7 +89,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = get_configuration(cmd_args);
+        config = get_configuration(cmd_args.config_file, cmd_args.job_id, cmd_args.verbose);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);
@@ -178,8 +194,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
 // NOLINTBEGIN(modernize-concat-nested-namespaces)
 /// @brief Top-level namespace for Health-GPS Console host application
-namespace host {
+namespace hgps {
 /// @brief Internal details namespace for private data types and functions
 namespace detail {}
-} // namespace host
+} // namespace hgps
 // NOLINTEND(modernize-concat-nested-namespaces)

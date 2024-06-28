@@ -31,31 +31,29 @@
 #define MEASURE_FUNCTION()
 #endif
 
-namespace host {
+namespace hgps::input {
 using namespace hgps;
 using json = nlohmann::json;
 
 ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
 
-Configuration get_configuration(CommandOptions &options) {
+Configuration get_configuration(const std::filesystem::path &config_file, int job_id,
+                                bool verbose) {
     MEASURE_FUNCTION();
-    using namespace host::poco;
-
     bool success = true;
 
     Configuration config;
-    config.job_id = options.job_id;
+    config.job_id = job_id;
 
     // verbosity
     config.verbosity = core::VerboseMode::none;
-    if (options.verbose) {
+    if (verbose) {
         config.verbosity = core::VerboseMode::verbose;
     }
 
-    std::ifstream ifs(options.config_file, std::ifstream::in);
+    std::ifstream ifs(config_file, std::ifstream::in);
     if (!ifs) {
-        throw ConfigurationError(
-            fmt::format("File {} doesn't exist.", options.config_file.string()));
+        throw ConfigurationError(fmt::format("File {} doesn't exist.", config_file.string()));
     }
 
     const auto opt = [&ifs]() {
@@ -74,7 +72,7 @@ Configuration get_configuration(CommandOptions &options) {
     }
 
     // Base dir for relative paths
-    config.root_path = options.config_file.parent_path();
+    config.root_path = config_file.parent_path();
 
     // input dataset file
     try {
@@ -170,7 +168,7 @@ ModelInput create_model_input(core::DataTable &input_table, core::Country countr
             std::move(diseases)};
 }
 
-std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
+std::string create_output_file_name(const OutputInfo &info, int job_id) {
     namespace fs = std::filesystem;
 
     fs::path output_folder = expand_environment_variables(info.folder);
@@ -212,18 +210,6 @@ std::string create_output_file_name(const poco::OutputInfo &info, int job_id) {
     return log_file_name;
 }
 
-ResultFileWriter create_results_file_logger(const Configuration &config,
-                                            const hgps::ModelInput &input) {
-    return {create_output_file_name(config.output, config.job_id),
-            ExperimentInfo{.model = config.app_name,
-                           .version = config.app_version,
-                           .intervention = config.active_intervention
-                                               ? config.active_intervention->identifier
-                                               : "",
-                           .job_id = config.job_id,
-                           .seed = input.seed().value_or(0u)}};
-}
-
 std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &channel) {
     return std::make_unique<BaselineScenario>(channel);
 }
@@ -243,7 +229,7 @@ hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
                                                 hgps::SimulationModuleFactory &factory,
                                                 hgps::EventAggregator &event_bus,
                                                 hgps::ModelInput &input,
-                                                const poco::PolicyScenarioInfo &info) {
+                                                const PolicyScenarioInfo &info) {
     auto policy_scenario = create_intervention_scenario(channel, info);
     auto policy_rnd = std::make_unique<hgps::MTRandom32>();
     return Simulation{
@@ -252,7 +238,7 @@ hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
 }
 
 std::unique_ptr<hgps::InterventionScenario>
-create_intervention_scenario(SyncChannel &channel, const poco::PolicyScenarioInfo &info) {
+create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &info) {
     using namespace hgps;
 
     fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
@@ -358,4 +344,4 @@ std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned i
 
     return user_seed;
 }
-} // namespace host
+} // namespace hgps::input

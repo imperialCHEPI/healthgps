@@ -3,7 +3,7 @@
 #include <fmt/format.h>
 #include <string>
 
-namespace host {
+namespace hgps {
 /// @brief Simulation experiment run-time information for reproducibility.
 struct ExperimentInfo {
     /// @brief The model name
@@ -28,4 +28,4 @@ struct ExperimentInfo {
                            seed);
     }
 };
-} // namespace host
+} // namespace hgps

@@ -15,7 +15,7 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 
-namespace host::poco {
+namespace hgps::input {
 /// @brief JSON parser namespace alias.
 using json = nlohmann::json;
 
@@ -82,7 +82,7 @@ void from_json(const json &j, PolicyScenarioInfo &p);
 void to_json(json &j, const OutputInfo &p);
 void from_json(const json &j, OutputInfo &p);
 
-} // namespace host::poco
+} // namespace hgps::input
 
 namespace hgps::core {
 using json = nlohmann::json;
