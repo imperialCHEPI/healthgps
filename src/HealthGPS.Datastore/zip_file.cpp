@@ -96,11 +96,9 @@ void extract_zip_file(const std::filesystem::path &file_path,
 std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem::path &file_path) {
     const auto file_hash = compute_sha256_for_file(file_path);
     auto cache_path = get_zip_cache_directory(file_hash);
-    if (std::filesystem::exists(cache_path)) {
-        return cache_path;
+    if (!std::filesystem::exists(cache_path)) {
+        extract_zip_file(file_path, cache_path);
     }
-
-    extract_zip_file(file_path, cache_path);
 
     return cache_path;
 }
