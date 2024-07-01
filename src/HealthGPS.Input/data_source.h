@@ -23,9 +23,9 @@ class DataSource {
                         std::optional<std::string> file_hash);
 
     // Copy and move constructors
-    DataSource(DataSource &) noexcept = default;
+    DataSource(const DataSource &) noexcept = default;
     DataSource(DataSource &&) noexcept = default;
-    DataSource &operator=(DataSource &) noexcept = default;
+    DataSource &operator=(const DataSource &) noexcept = default;
     DataSource &operator=(DataSource &&) noexcept = default;
 
     /// @brief Get the path to a directory containing the data
