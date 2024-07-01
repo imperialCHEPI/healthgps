@@ -61,18 +61,18 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
         }
 
         if (result.count("storage")) {
-            cmd.data_path_or_url = result["storage"].as<std::string>();
+            cmd.data_source = result["storage"].as<std::string>();
 
-            if (!cmd.data_path_or_url.starts_with("http://") &&
-                !cmd.data_path_or_url.starts_with("https://")) {
-                const std::filesystem::path path = cmd.data_path_or_url;
+            if (!cmd.data_source.starts_with("http://") &&
+                !cmd.data_source.starts_with("https://")) {
+                const std::filesystem::path path = cmd.data_source;
 
                 if (path.is_relative()) {
-                    cmd.data_path_or_url = std::filesystem::absolute(path).string();
+                    cmd.data_source = std::filesystem::absolute(path).string();
                 }
             }
 
-            fmt::print("Data source: {}\n", cmd.data_path_or_url);
+            fmt::print("Data source: {}\n", cmd.data_source);
         }
 
         if (result.count("jobid")) {

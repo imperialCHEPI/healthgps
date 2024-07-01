@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     try {
 #endif
         // Create back-end data store, cached data repository wrapper
-        auto data_api = input::DataManager(cmd_args.data_path_or_url, config.verbosity);
+        auto data_api = input::DataManager(cmd_args.data_source, config.verbosity);
         auto data_repository = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions
