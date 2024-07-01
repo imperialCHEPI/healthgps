@@ -121,8 +121,11 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
                 "Must provide a data source via config file or command line, but not both\n");
             return exit_application(EXIT_FAILURE);
         }
+
+        // NOLINTBEGIN(bugprone-unchecked-optional-access)
         const auto &data_source =
             cmd_args.data_source.has_value() ? *cmd_args.data_source : *config.data_source;
+        // NOLINTEND(bugprone-unchecked-optional-access)
 
         // Create back-end data store, cached data repository wrapper
         auto data_api = input::DataManager(data_source.get_data_directory(), config.verbosity);

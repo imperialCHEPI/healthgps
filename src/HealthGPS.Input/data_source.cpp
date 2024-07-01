@@ -94,10 +94,14 @@ std::filesystem::path DataSource::get_data_directory() const {
         return source_;
     }
 
-    if (validate_checksum_) {
+    if (!validate_checksum_) {
+        return get_data_directory_without_validation(source_);
+    }
+
+    if (file_hash_) {
         return get_data_directory_with_validation(source_, *file_hash_);
     }
 
-    return get_data_directory_without_validation(source_);
+    throw std::runtime_error("Checksum must be supplied if data source is URL or zip file");
 }
 } // namespace hgps::input
