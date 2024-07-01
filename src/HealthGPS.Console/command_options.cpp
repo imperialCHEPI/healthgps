@@ -61,18 +61,15 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
         }
 
         if (result.count("storage")) {
-            cmd.data_source = result["storage"].as<std::string>();
+            auto source = result["storage"].as<std::string>();
 
-            if (!cmd.data_source.starts_with("http://") &&
-                !cmd.data_source.starts_with("https://")) {
-                const std::filesystem::path path = cmd.data_source;
+            fmt::print(fmt::fg(fmt::color::yellow),
+                       "WARNING: Path to data source specified with command-line argument. "
+                       "This functionality is deprecatated and will be removed in future. You "
+                       "should pass the data source via the config file.\n");
+            fmt::print("Data source: {}\n", source);
 
-                if (path.is_relative()) {
-                    cmd.data_source = std::filesystem::absolute(path).string();
-                }
-            }
-
-            fmt::print("Data source: {}\n", cmd.data_source);
+            cmd.data_source = hgps::input::DataSource(std::move(source));
         }
 
         if (result.count("jobid")) {

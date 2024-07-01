@@ -15,9 +15,11 @@
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
-#include <chrono>
 #include <fmt/chrono.h>
 #include <fmt/color.h>
+
+#include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <optional>
@@ -30,6 +32,23 @@
 #else
 #define MEASURE_FUNCTION()
 #endif
+
+namespace {
+using namespace hgps::input;
+
+DataSource get_data_source_from_json(const nlohmann::json &opt,
+                                     const std::filesystem::path &root_path) {
+    auto source = opt["source"].get<std::string>();
+
+    // Checksum is not required if source is a directory, else it is mandatory
+    std::optional<std::string> file_hash;
+    if (opt.contains("checksum")) {
+        file_hash = opt["checksum"].get<std::string>();
+    }
+
+    return DataSource(std::move(source), root_path, std::move(file_hash));
+}
+} // anonymous namespace
 
 namespace hgps::input {
 using namespace hgps;
@@ -73,6 +92,12 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
 
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
+
+    // Read data source from JSON file. For now, this is optional, but in future it will be
+    // mandatory.
+    if (opt.contains("data")) {
+        config.data_source = get_data_source_from_json(opt["data"], config.root_path);
+    }
 
     // input dataset file
     try {

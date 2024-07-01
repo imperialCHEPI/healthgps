@@ -112,8 +112,20 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 #ifdef CATCH_EXCEPTIONS
     try {
 #endif
+        // In future, we want users to supply the data source via the config file only, but for now
+        // we also allow passing it via a command line argument. Sanity check: Make sure they only
+        // do one of these things!
+        if (!(cmd_args.data_source.has_value() ^ config.data_source.has_value())) {
+            fmt::print(
+                fg(fmt::color::red),
+                "Must provide a data source via config file or command line, but not both\n");
+            return exit_application(EXIT_FAILURE);
+        }
+        const auto &data_source =
+            cmd_args.data_source.has_value() ? *cmd_args.data_source : *config.data_source;
+
         // Create back-end data store, cached data repository wrapper
-        auto data_api = input::DataManager(cmd_args.data_source, config.verbosity);
+        auto data_api = input::DataManager(data_source.get_data_directory(), config.verbosity);
         auto data_repository = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions

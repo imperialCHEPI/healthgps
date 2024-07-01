@@ -7,15 +7,15 @@
  */
 #pragma once
 
+#include "data_source.h"
 #include "poco.h"
 #include "version.h"
 
+#include "HealthGPS.Core/api.h"
 #include "HealthGPS/intervention_scenario.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/scenario.h"
 #include "HealthGPS/simulation.h"
-
-#include "HealthGPS.Core/api.h"
 
 #include <optional>
 #include <stdexcept>
@@ -26,6 +26,9 @@ namespace hgps::input {
 struct Configuration {
     /// @brief The root path for configuration files
     std::filesystem::path root_path;
+
+    /// @brief Static data source for the simulation (either URL or path)
+    std::optional<DataSource> data_source;
 
     /// @brief The input data file details
     FileInfo file;
