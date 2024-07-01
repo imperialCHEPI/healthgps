@@ -7,7 +7,7 @@
 #include <fmt/color.h>
 #include <fmt/core.h>
 
-namespace host {
+namespace hgps {
 EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer)
     : result_writer_{result_writer}, tg_{tg_context_} {
     handlers_.emplace_back(event_bus.subscribe(hgps::EventType::runner, [this](auto &&PH1) {
@@ -97,4 +97,4 @@ void EventMonitor::result_dispatch_thread() {
 
     fmt::print(fg(fmt::color::gray), "Result event thread exited.\n");
 }
-} // namespace host
+} // namespace hgps

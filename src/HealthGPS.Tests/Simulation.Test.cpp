@@ -1,7 +1,7 @@
 #include "data_config.h"
 #include "pch.h"
 
-#include "HealthGPS.Datastore/api.h"
+#include "HealthGPS.Input/api.h"
 #include "HealthGPS/api.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
@@ -217,7 +217,7 @@ TEST(TestSimulation, RandomEmpiricalDiscrete) {
 
 TEST(TestSimulation, CreateRuntimeContext) {
     using namespace hgps;
-    using namespace hgps::data;
+    using namespace hgps::input;
 
     DataTable data;
     create_test_datatable(data);
@@ -236,7 +236,7 @@ TEST(TestSimulation, CreateRuntimeContext) {
 
 TEST(TestSimulation, ModuleFactoryRegistry) {
     using namespace hgps;
-    using namespace hgps::data;
+    using namespace hgps::input;
 
     auto count = 10U;
     auto builder = core::FloatDataTableColumnBuilder("Test");
@@ -289,7 +289,7 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
 
 TEST(TestSimulation, CreateSESNoiseModule) {
     using namespace hgps;
-    using namespace hgps::data;
+    using namespace hgps::input;
 
     DataTable data;
     create_test_datatable(data);
@@ -321,7 +321,7 @@ TEST(TestSimulation, CreateSESNoiseModule) {
 
 TEST(TestSimulation, CreateDemographicModule) {
     using namespace hgps;
-    using namespace hgps::data;
+    using namespace hgps::input;
 
     DataTable data;
     create_test_datatable(data);
@@ -348,7 +348,7 @@ TEST(TestSimulation, CreateDemographicModule) {
 TEST(TestSimulation, CreateRiskFactorModule)
 {
         using namespace hgps;
-        using namespace hgps::data;
+        using namespace hgps::input;
 
         // Test data code generation via JSON model definition.
         //auto static_code = generate_test_code(
@@ -408,7 +408,7 @@ std::make_unique<StaticHierarchicalLinearModel>(static_definition));
 
 TEST(TestSimulation, CreateDiseaseModule) {
     using namespace hgps;
-    using namespace hgps::data;
+    using namespace hgps::input;
 
     DataTable data;
     create_test_datatable(data);
@@ -435,7 +435,7 @@ TEST(TestSimulation, CreateDiseaseModule) {
 
 TEST(TestSimulation, CreateAnalysisModule) {
     using namespace hgps;
-    using namespace hgps::data;
+    using namespace hgps::input;
 
     DataTable data;
     create_test_datatable(data);

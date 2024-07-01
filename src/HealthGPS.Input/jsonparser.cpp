@@ -1,6 +1,6 @@
 #include "jsonparser.h"
 
-namespace host::poco {
+namespace hgps::input {
 //--------------------------------------------------------
 // Risk Model JSON serialisation / de-serialisation
 //--------------------------------------------------------
@@ -220,4 +220,4 @@ void from_json(const json &j, OutputInfo &p) {
     j.at("file_name").get_to(p.file_name);
     j.at("comorbidities").get_to(p.comorbidities);
 }
-} // namespace host::poco
+} // namespace hgps::input

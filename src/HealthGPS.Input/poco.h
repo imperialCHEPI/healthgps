@@ -14,7 +14,7 @@
  * POCO stands for "plain old class object". These structs represent data structures
  * which are contained in JSON-formatted configuration files.
  */
-namespace host::poco {
+namespace hgps::input {
 //! Information about a data file to be loaded
 struct FileInfo {
     std::filesystem::path name;
@@ -149,4 +149,4 @@ struct PolicyScenarioInfo {
 
     auto operator<=>(const PolicyScenarioInfo &rhs) const = default;
 };
-} // namespace host::poco
+} // namespace hgps::input

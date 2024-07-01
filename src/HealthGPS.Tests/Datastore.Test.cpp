@@ -1,14 +1,14 @@
 #include "data_config.h"
 #include "pch.h"
 
-#include "HealthGPS.Datastore/api.h"
+#include "HealthGPS.Input/api.h"
 
 // The fixture for testing class Foo.
 class DatastoreTest : public ::testing::Test {
   protected:
     DatastoreTest() : manager{test_datastore_path} {}
 
-    hgps::data::DataManager manager;
+    hgps::input::DataManager manager;
     hgps::core::Country uk = manager.get_country("GB");
     hgps::core::Country india = manager.get_country("IN");
 };
@@ -19,9 +19,9 @@ TEST_F(DatastoreTest, CreateDataManager) {
 }
 
 TEST_F(DatastoreTest, CreateDataManagerFailWithWrongPath) {
-    EXPECT_THROW(hgps::data::DataManager{"C:\\x\\y"}, std::runtime_error);
-    EXPECT_THROW(hgps::data::DataManager{"C:/x/y"}, std::runtime_error);
-    EXPECT_THROW(hgps::data::DataManager{"/home/x/y/z"}, std::runtime_error);
+    EXPECT_THROW(hgps::input::DataManager{"C:\\x\\y"}, std::runtime_error);
+    EXPECT_THROW(hgps::input::DataManager{"C:/x/y"}, std::runtime_error);
+    EXPECT_THROW(hgps::input::DataManager{"/home/x/y/z"}, std::runtime_error);
 }
 
 TEST_F(DatastoreTest, CountryMissingThrowsException) {

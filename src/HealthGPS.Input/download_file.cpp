@@ -31,7 +31,7 @@ std::filesystem::path get_temporary_file_path(const std::string &file_prefix,
 }
 } // anonymous namespace
 
-namespace hgps::data {
+namespace hgps::input {
 void download_file(const std::string &url, const std::filesystem::path &download_path) {
     std::ofstream ofs{download_path};
     if (!ofs) {
@@ -59,4 +59,4 @@ std::filesystem::path download_file_to_temporary(const std::string &url,
     return download_path;
 }
 
-} // namespace hgps::data
+} // namespace hgps::input

@@ -8,21 +8,21 @@
 
 #include "result_writer.h"
 
-namespace host {
+namespace hgps {
 /// @brief Defined the event monitor class used for processing Health-GPS event messages
 ///
 /// All notification messages are written to the terminal, while the results messages are
-/// queued to be processed by the host::ResultWriter instance provide at construction.
+/// queued to be processed by the hgps::ResultWriter instance provide at construction.
 class EventMonitor final : public hgps::EventMessageVisitor {
   public:
     EventMonitor() = delete;
 
-    /// @brief Initialises a new instance of the host::EventMonitor class.
+    /// @brief Initialises a new instance of the hgps::EventMonitor class.
     /// @param event_bus The message bus instance to monitor
     /// @param result_writer The results message writer instance
     EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer);
 
-    /// @brief Destroys a host::EventMonitor instance
+    /// @brief Destroys a hgps::EventMonitor instance
     ~EventMonitor() noexcept;
 
     /// @brief Stops the monitor, no new messages are processed after stop
@@ -48,4 +48,4 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     void info_dispatch_thread();
     void result_dispatch_thread();
 };
-} // namespace host
+} // namespace hgps

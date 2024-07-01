@@ -22,9 +22,9 @@
 #define MEASURE_FUNCTION()
 #endif
 
-namespace host {
+namespace hgps::input {
 
-hgps::RiskFactorSexAgeTable load_risk_factor_expected(const host::Configuration &config) {
+hgps::RiskFactorSexAgeTable load_risk_factor_expected(const Configuration &config) {
     MEASURE_FUNCTION();
 
     const auto &info = config.modelling.baseline_adjustment;
@@ -60,7 +60,7 @@ hgps::RiskFactorSexAgeTable load_risk_factor_expected(const host::Configuration 
 }
 
 std::unique_ptr<hgps::DummyModelDefinition>
-load_dummy_model_definition(hgps::RiskFactorModelType type, const poco::json &opt) {
+load_dummy_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt) {
     MEASURE_FUNCTION();
 
     // Get dummy model parameters
@@ -80,8 +80,8 @@ load_dummy_model_definition(hgps::RiskFactorModelType type, const poco::json &op
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_static_risk_model_definition(const std::string &model_name, const poco::json &opt,
-                                  const host::Configuration &config) {
+load_static_risk_model_definition(const std::string &model_name, const nlohmann::json &opt,
+                                  const Configuration &config) {
     // Load this static model with the appropriate loader.
     if (model_name == "dummy") {
         return load_dummy_model_definition(hgps::RiskFactorModelType::Static, opt);
@@ -98,15 +98,14 @@ load_static_risk_model_definition(const std::string &model_name, const poco::jso
 }
 
 std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
-load_hlm_risk_model_definition(const poco::json &opt) {
+load_hlm_risk_model_definition(const nlohmann::json &opt) {
     MEASURE_FUNCTION();
     std::map<int, hgps::HierarchicalLevel> levels;
     std::unordered_map<hgps::core::Identifier, hgps::LinearModel> models;
 
-    poco::HierarchicalModelInfo model_info;
-    model_info.models = opt["models"].get<std::unordered_map<std::string, poco::LinearModelInfo>>();
-    model_info.levels =
-        opt["levels"].get<std::unordered_map<std::string, poco::HierarchicalLevelInfo>>();
+    HierarchicalModelInfo model_info;
+    model_info.models = opt["models"].get<std::unordered_map<std::string, LinearModelInfo>>();
+    model_info.levels = opt["levels"].get<std::unordered_map<std::string, HierarchicalLevelInfo>>();
 
     for (const auto &model_item : model_info.models) {
         const auto &at = model_item.second;
@@ -161,18 +160,18 @@ load_hlm_risk_model_definition(const poco::json &opt) {
 }
 
 std::unique_ptr<hgps::StaticLinearModelDefinition>
-load_staticlinear_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
     // Risk factor correlation matrix.
     const auto correlation_file_info =
-        host::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
+        hgps::input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
 
     // Policy covariance matrix.
     const auto policy_covariance_file_info =
-        host::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
+        hgps::input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
     const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
     Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                       policy_covariance_table.num_columns()};
@@ -335,8 +334,8 @@ load_staticlinear_risk_model_definition(const poco::json &opt, const host::Confi
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_dynamic_risk_model_definition(const std::string &model_name, const poco::json &opt,
-                                   const host::Configuration &config) {
+load_dynamic_risk_model_definition(const std::string &model_name, const nlohmann::json &opt,
+                                   const Configuration &config) {
     // Load this dynamic model with the appropriate loader.
     if (model_name == "dummy") {
         return load_dummy_model_definition(hgps::RiskFactorModelType::Dynamic, opt);
@@ -354,10 +353,10 @@ load_dynamic_risk_model_definition(const std::string &model_name, const poco::js
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
-load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
-    auto info = poco::LiteHierarchicalModelInfo{};
+    auto info = LiteHierarchicalModelInfo{};
 
     auto percentage = 0.05;
     opt["BoundaryPercentage"].get_to(info.percentage);
@@ -371,19 +370,18 @@ load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuratio
     std::map<hgps::core::IntegerInterval, hgps::AgeGroupGenderEquation> equations;
     for (const auto &it : opt["Equations"].items()) {
         const auto &age_key = it.key();
-        info.equations.emplace(
-            age_key, std::map<std::string, std::vector<poco::FactorDynamicEquationInfo>>());
+        info.equations.emplace(age_key,
+                               std::map<std::string, std::vector<FactorDynamicEquationInfo>>());
 
         for (const auto &sit : it.value().items()) {
             const auto &gender_key = sit.key();
-            const auto &gender_funcs =
-                sit.value().get<std::vector<poco::FactorDynamicEquationInfo>>();
+            const auto &gender_funcs = sit.value().get<std::vector<FactorDynamicEquationInfo>>();
             info.equations.at(age_key).emplace(gender_key, gender_funcs);
         }
     }
 
     std::map<hgps::core::Identifier, hgps::core::Identifier> variables;
-    info.variables = opt["Variables"].get<std::vector<poco::VariableInfo>>();
+    info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
     for (const auto &item : info.variables) {
         variables.emplace(hgps::core::Identifier{item.name}, hgps::core::Identifier{item.factor});
     }
@@ -435,7 +433,7 @@ load_ebhlm_risk_model_definition(const poco::json &opt, const host::Configuratio
 // NOLINTEND(readability-function-cognitive-complexity)
 
 std::unique_ptr<hgps::KevinHallModelDefinition>
-load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configuration &config) {
+load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
     // Risk factor expected values by sex and age.
@@ -471,9 +469,9 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     // Weight quantiles.
     const auto weight_quantiles_table_F = load_datatable_from_csv(
-        host::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
+        hgps::input::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
     const auto weight_quantiles_table_M = load_datatable_from_csv(
-        host::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
+        hgps::input::get_file_info(opt["WeightQuantiles"]["Male"], config.root_path));
     std::unordered_map<hgps::core::Gender, std::vector<double>> weight_quantiles = {
         {hgps::core::Gender::female, {}}, {hgps::core::Gender::male, {}}};
     weight_quantiles[hgps::core::Gender::female].reserve(weight_quantiles_table_F.num_rows());
@@ -492,7 +490,7 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 
     // Energy Physical Activity quantiles.
     const auto epa_quantiles_table = load_datatable_from_csv(
-        host::get_file_info(opt["EnergyPhysicalActivityQuantiles"], config.root_path));
+        hgps::input::get_file_info(opt["EnergyPhysicalActivityQuantiles"], config.root_path));
     std::vector<double> epa_quantiles;
     epa_quantiles.reserve(epa_quantiles_table.num_rows());
     for (size_t j = 0; j < epa_quantiles_table.num_rows(); j++) {
@@ -515,8 +513,8 @@ load_kevinhall_risk_model_definition(const poco::json &opt, const host::Configur
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
-load_risk_model_definition(const std::string &model_type, const poco::json &opt,
-                           const host::Configuration &config) {
+load_risk_model_definition(const std::string &model_type, const nlohmann::json &opt,
+                           const Configuration &config) {
     // Get model name from JSON
     const auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
 
@@ -533,18 +531,18 @@ load_risk_model_definition(const std::string &model_type, const poco::json &opt,
     throw hgps::core::HgpsException{fmt::format("Unknown model type: {}", model_type)};
 }
 
-poco::json load_json(const std::filesystem::path &model_path) {
+nlohmann::json load_json(const std::filesystem::path &model_path) {
     std::ifstream ifs(model_path, std::ifstream::in);
     if (!ifs.good()) {
         throw hgps::core::HgpsException{
             fmt::format("Model file: {} not found", model_path.string())};
     }
 
-    return poco::json::parse(ifs);
+    return nlohmann::json::parse(ifs);
 }
 
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
-                                            const host::Configuration &config) {
+                                            const Configuration &config) {
     MEASURE_FUNCTION();
 
     for (const auto &model : config.modelling.risk_factor_models) {
@@ -559,4 +557,4 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
     }
 }
 
-} // namespace host
+} // namespace hgps::input

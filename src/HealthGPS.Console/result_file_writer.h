@@ -7,7 +7,7 @@
 #include "model_info.h"
 #include "result_writer.h"
 
-namespace host {
+namespace hgps {
 /// @brief Defines the results message file stream writer class
 ///
 /// The message content are written to a JSON (JavaScript Object Notation) file,
@@ -17,7 +17,7 @@ namespace host {
 class ResultFileWriter final : public ResultWriter {
   public:
     ResultFileWriter() = delete;
-    /// @brief Initialises an instance of the host::ResultFileWriter class.
+    /// @brief Initialises an instance of the hgps::ResultFileWriter class.
     /// @param file_name The JSON output file full name
     /// @param info The associated experiment information
     ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info);
@@ -27,7 +27,7 @@ class ResultFileWriter final : public ResultWriter {
     ResultFileWriter(ResultFileWriter &&other) noexcept;
     ResultFileWriter &operator=(ResultFileWriter &&other) noexcept;
 
-    /// @brief Destroys a host::ResultFileWriter instance
+    /// @brief Destroys a hgps::ResultFileWriter instance
     ~ResultFileWriter();
     void write(const hgps::ResultEventMessage &message) override;
 
@@ -45,4 +45,4 @@ class ResultFileWriter final : public ResultWriter {
     void write_csv_channels(const hgps::ResultEventMessage &message);
     void write_csv_header(const hgps::ResultEventMessage &message);
 };
-} // namespace host
+} // namespace hgps

@@ -1,7 +1,7 @@
 #pragma once
 #include <fstream>
 
-#include "HealthGPS.Console/jsonparser.h"
+#include "HealthGPS.Input/jsonparser.h"
 #include "HealthGPS/riskfactor.h"
 
 template <typename TYPE>

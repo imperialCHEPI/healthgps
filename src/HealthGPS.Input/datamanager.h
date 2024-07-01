@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
-namespace hgps::data {
+namespace hgps::input {
 
 using namespace hgps::core;
 
@@ -25,7 +25,7 @@ class DataManager : public Datastore {
   public:
     DataManager() = delete;
 
-    /// @brief Initialises a new instance of the hgps::data::DataManager class.
+    /// @brief Initialises a new instance of the hgps::input::DataManager class.
     /// @param path_or_url The path or URL pointing to the input files.
     /// @param verbosity The terminal logging verbosity mode to use.
     /// @throws std::invalid_argument if the root directory or index.json is missing.
@@ -98,4 +98,4 @@ class DataManager : public Datastore {
     void notify_warning(std::string_view message) const;
 };
 
-} // namespace hgps::data
+} // namespace hgps::input

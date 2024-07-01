@@ -6,7 +6,7 @@
 
 #include <fstream>
 
-namespace hgps::data {
+namespace hgps::input {
 using namespace jsoncons;
 
 json resolve_uri(const jsoncons::uri &uri, const std::filesystem::path &schema_directory) {
@@ -45,4 +45,4 @@ void validate_index(const std::filesystem::path &schema_directory, std::istream 
     // Perform validation
     schema.validate(index);
 }
-} // namespace hgps::data
+} // namespace hgps::input

@@ -40,13 +40,13 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &root
     // Validate against schema
     ifs.seekg(0);
     const auto schema_directory = hgps::get_program_directory() / "schemas" / "v1";
-    hgps::data::validate_index(schema_directory, ifs);
+    hgps::input::validate_index(schema_directory, ifs);
 
     return index;
 }
 } // anonymous namespace
 
-namespace hgps::data {
+namespace hgps::input {
 DataManager::DataManager(const std::string &path_or_url, VerboseMode verbosity)
     : verbosity_{verbosity} {
     if (path_or_url.starts_with("http:") || path_or_url.starts_with("https:")) {
@@ -678,4 +678,4 @@ void DataManager::notify_warning(std::string_view message) const {
 
     fmt::print(fg(fmt::color::dark_salmon), "File-based store, {}\n", message);
 }
-} // namespace hgps::data
+} // namespace hgps::input
