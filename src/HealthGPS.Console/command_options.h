@@ -3,9 +3,13 @@
  * @brief Functionality for parsing console application's command-line arguments
  */
 #pragma once
+
 #include <cxxopts.hpp>
 
+#include "HealthGPS.Input/data_source.h"
+
 #include <filesystem>
+#include <optional>
 
 namespace hgps {
 /// @brief Defines the Command Line Interface (CLI) arguments options
@@ -20,7 +24,7 @@ struct CommandOptions {
     std::filesystem::path config_file{};
 
     /// @brief The back-end storage full path or URL argument value
-    std::string data_path_or_url;
+    std::optional<hgps::input::DataSource> data_source;
 
     /// @brief Indicates whether the application logging is verbose
     bool verbose{};

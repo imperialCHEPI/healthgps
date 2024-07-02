@@ -26,11 +26,12 @@ class DataManager : public Datastore {
     DataManager() = delete;
 
     /// @brief Initialises a new instance of the hgps::input::DataManager class.
-    /// @param path_or_url The path or URL pointing to the input files.
+    /// @param data_path The path to the directory containing the data.
     /// @param verbosity The terminal logging verbosity mode to use.
     /// @throws std::invalid_argument if the root directory or index.json is missing.
     /// @throws std::runtime_error for invalid or unsupported index.json file schema version.
-    explicit DataManager(const std::string &path_or_url, VerboseMode verbosity = VerboseMode::none);
+    explicit DataManager(std::filesystem::path data_path,
+                         VerboseMode verbosity = VerboseMode::none);
 
     std::vector<Country> get_countries() const override;
 
