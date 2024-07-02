@@ -65,7 +65,7 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
     // And for each factor, we calculate the stats described in `stats_to_calculate_`, so we
     // multiply the number of stats to calculate by the number of factors to calculate stats for.
-    num_stats_to_calc *= stats_to_calculate_.size();
+    num_stats_to_calc *= channels_.size();
 
     // The product of the number of bins for each factor can be used to calculate the size of the
     // `calculated_stats_` in the next step
@@ -560,37 +560,6 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("std_yld");
     channels_.emplace_back("mean_daly");
     channels_.emplace_back("std_daly");
-}
-
-void AnalysisModule::initialise_stats_to_calc(RuntimeContext &context) {
-    if (!stats_to_calculate_.empty()) {
-        return;
-    }
-
-    stats_to_calculate_.push_back("count");
-    stats_to_calculate_.push_back("deaths");
-    stats_to_calculate_.push_back("emigrations");
-
-    for (const auto &factor : context.mapping().entries()) {
-        stats_to_calculate_.push_back("mean_" + factor.key().to_string());
-        stats_to_calculate_.push_back("std_" + factor.key().to_string());
-    }
-
-    for (const auto &disease : context.diseases()) {
-        stats_to_calculate_.push_back("prevalence_" + disease.code.to_string());
-        stats_to_calculate_.push_back("incidence_" + disease.code.to_string());
-    }
-
-    stats_to_calculate_.push_back("normal_weight");
-    stats_to_calculate_.push_back("over_weight");
-    stats_to_calculate_.push_back("obese_weight");
-    stats_to_calculate_.push_back("above_weight");
-    stats_to_calculate_.push_back("mean_yll");
-    stats_to_calculate_.push_back("std_yll");
-    stats_to_calculate_.push_back("mean_yld");
-    stats_to_calculate_.push_back("std_yld");
-    stats_to_calculate_.push_back("mean_daly");
-    stats_to_calculate_.push_back("std_daly");
 }
 
 std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,

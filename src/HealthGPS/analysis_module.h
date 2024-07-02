@@ -46,7 +46,6 @@ class AnalysisModule final : public UpdatableModule {
     WeightModel weight_classifier_;
     DoubleAgeGenderTable residual_disability_weight_;
     std::vector<std::string> channels_;
-    std::vector<std::string> stats_to_calculate_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
     std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
