@@ -63,8 +63,8 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     // `factors` vector.
     size_t num_stats_to_calc = context.mapping().entries().size() - factors_to_calculate_.size();
 
-    // And for each factor, we calculate the stats described in `stats_to_calculate_`, so we
-    // multiply the number of stats to calculate by the number of factors to calculate stats for.
+    // And for each factor, we calculate the stats described in `channels_`, so we
+    // multiply the size of `channels_` by the number of factors to calculate stats for.
     num_stats_to_calc *= channels_.size();
 
     // The product of the number of bins for each factor can be used to calculate the size of the
