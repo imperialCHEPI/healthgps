@@ -46,6 +46,7 @@ class AnalysisModule final : public UpdatableModule {
     WeightModel weight_classifier_;
     DoubleAgeGenderTable residual_disability_weight_;
     std::vector<std::string> channels_;
+    std::unordered_map<std::string, int> channel_index_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
     std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
@@ -70,7 +71,23 @@ class AnalysisModule final : public UpdatableModule {
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
+    void classify_weight(const Person &person);
     void initialise_output_channels(RuntimeContext &context);
+
+    /// @brief Calculates the bin index in `calculated_stats_` for a given person
+    /// @param person The person to calculate the index for
+    /// @return The index in `calculated_stats_`
+    size_t calculate_index(const Person &person) const;
+
+    /// @brief Gets the index of the given channel name
+    /// @param channel The channel name
+    /// @return The channel index
+    size_t get_channel_index(const std::string &channel) const;
+
+    /// @brief Accumulates the squared differences between the given value and the mean
+    /// @param bin_index The index of the bin in `calculated_stats_`
+    /// @param channel_index The index of the channel in `channels_`
+    void accumulate_squared_diffs(size_t bin_index, size_t channel_index) const;
 
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
