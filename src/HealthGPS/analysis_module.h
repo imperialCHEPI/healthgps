@@ -84,11 +84,6 @@ class AnalysisModule final : public UpdatableModule {
     /// @return The channel index
     size_t get_channel_index(const std::string &channel) const;
 
-    /// @brief Accumulates the squared differences between the given value and the mean
-    /// @param bin_index The index of the bin in `calculated_stats_`
-    /// @param channel_index The index of the channel in `channels_`
-    void accumulate_squared_diffs(size_t bin_index, size_t channel_index) const;
-
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
     /// @param series The data series containing factor means

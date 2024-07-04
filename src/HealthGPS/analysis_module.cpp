@@ -672,13 +672,6 @@ size_t AnalysisModule::get_channel_index(const std::string &channel) const {
     return it->second;
 }
 
-void AnalysisModule::accumulate_squared_diffs(size_t bin_index, size_t channel_index) const {
-    for (const auto &factor : factors_to_calculate_) {
-        const double mean = calculated_stats_[bin_index + channel_index];
-        const double diff = value - mean;
-    }
-};
-
 std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
                                                       const ModelInput &config) {
     auto analysis_entity = repository.manager().get_disease_analysis(config.settings().country());
