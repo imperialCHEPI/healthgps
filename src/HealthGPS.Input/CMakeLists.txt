@@ -18,6 +18,8 @@ target_sources(
             "csvparser.h"
             "datamanager.cpp"
             "datamanager.h"
+            "data_source.cpp"
+            "data_source.h"
             "download_file.cpp"
             "download_file.h"
             "jsonparser.cpp"

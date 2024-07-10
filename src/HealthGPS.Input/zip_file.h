@@ -13,9 +13,4 @@ std::filesystem::path get_zip_cache_directory(const std::string &file_hash);
 /// @param output_directory The path to the output folder
 void extract_zip_file(const std::filesystem::path &file_path,
                       const std::filesystem::path &output_directory);
-
-/// @brief Load the contents of the zip file from cache or extract
-/// @param file_path Path to zip file
-/// @return The path to the cache folder where the contents were extracted
-std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem::path &file_path);
 } // namespace hgps::input
