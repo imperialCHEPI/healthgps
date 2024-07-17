@@ -605,7 +605,6 @@ void AnalysisModule::classify_weight(const Person &person) {
         break;
     default:
         throw std::logic_error("Unknown weight classification category.");
-        break;
     }
 }
 
