@@ -66,8 +66,10 @@ class AnalysisModule final : public UpdatableModule {
     double calculate_disability_weight(const Person &entity) const;
     DALYsIndicator calculate_dalys(Population &population, unsigned int max_age,
                                    unsigned int death_year) const;
-    void update_death_and_migration_stats(const Person &person, size_t index, RuntimeContext &context);
-    void update_calculated_stats_for_person(RuntimeContext &context, const Person &person, size_t index);
+    void update_death_and_migration_stats(const Person &person, size_t index,
+                                          RuntimeContext &context);
+    void update_calculated_stats_for_person(RuntimeContext &context, const Person &person,
+                                            size_t index);
 
     void calculate_population_statistics(RuntimeContext &context);
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;

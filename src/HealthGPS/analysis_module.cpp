@@ -318,13 +318,13 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
-void AnalysisModule::update_death_and_migration_stats(const Person &person, size_t index, RuntimeContext &context){
+void AnalysisModule::update_death_and_migration_stats(const Person &person, size_t index,
+                                                      RuntimeContext &context) {
     auto current_time = static_cast<unsigned int>(context.time_now());
 
     if (!person.is_alive() && person.time_of_death() == context.time_now()) {
         calculated_stats_[index + channel_index_.at("deaths")]++;
-        float expected_life =
-            definition_.life_expectancy().at(context.time_now(), person.gender);
+        float expected_life = definition_.life_expectancy().at(context.time_now(), person.gender);
         double yll = std::max(expected_life - person.age, 0.0f) * DALY_UNITS;
         calculated_stats_[index + channel_index_.at("mean_yll")] += yll;
         calculated_stats_[index + channel_index_.at("mean_daly")] += yll;
@@ -335,25 +335,25 @@ void AnalysisModule::update_death_and_migration_stats(const Person &person, size
     }
 }
 
-void AnalysisModule::update_calculated_stats_for_person(RuntimeContext &context, const Person &person, size_t index){
+void AnalysisModule::update_calculated_stats_for_person(RuntimeContext &context,
+                                                        const Person &person, size_t index) {
     calculated_stats_[index + channel_index_.at("count")]++;
 
     for (const auto &factor : context.mapping().entries()) {
         double value = person.get_risk_factor_value(factor.key());
-        calculated_stats_[index + channel_index_.at("mean_" + factor.key().to_string())] +=
-            value;
+        calculated_stats_[index + channel_index_.at("mean_" + factor.key().to_string())] += value;
     }
 
     for (const auto &[disease_name, disease_state] : person.diseases) {
         if (disease_state.status == DiseaseStatus::active) {
             calculated_stats_[index +
-                                channel_index_.at("prevalence_" + disease_name.to_string())]++;
+                              channel_index_.at("prevalence_" + disease_name.to_string())]++;
             if (disease_state.start_time == context.time_now()) {
                 calculated_stats_[index +
-                                    channel_index_.at("incidence_" + disease_name.to_string())]++;
+                                  channel_index_.at("incidence_" + disease_name.to_string())]++;
             }
         }
-    }    
+    }
 }
 
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
