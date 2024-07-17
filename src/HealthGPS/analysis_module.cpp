@@ -322,35 +322,35 @@ void AnalysisModule::update_death_and_migration_stats(const Person &person, size
     auto current_time = static_cast<unsigned int>(context.time_now());
 
     if (!person.is_alive() && person.time_of_death() == context.time_now()) {
-        calculated_stats_[index + get_channel_index("deaths")]++;
+        calculated_stats_[index + channel_index_.at("deaths")]++;
         float expected_life =
             definition_.life_expectancy().at(context.time_now(), person.gender);
         double yll = std::max(expected_life - person.age, 0.0f) * DALY_UNITS;
-        calculated_stats_[index + get_channel_index("mean_yll")] += yll;
-        calculated_stats_[index + get_channel_index("mean_daly")] += yll;
+        calculated_stats_[index + channel_index_.at("mean_yll")] += yll;
+        calculated_stats_[index + channel_index_.at("mean_daly")] += yll;
     }
 
     if (person.has_emigrated() && person.time_of_migration() == context.time_now()) {
-        calculated_stats_[index + get_channel_index("emigrations")]++;
+        calculated_stats_[index + channel_index_.at("emigrations")]++;
     }
 }
 
 void AnalysisModule::update_calculated_stats_for_person(RuntimeContext &context, const Person &person, size_t index){
-    calculated_stats_[index + get_channel_index("count")]++;
+    calculated_stats_[index + channel_index_.at("count")]++;
 
     for (const auto &factor : context.mapping().entries()) {
         double value = person.get_risk_factor_value(factor.key());
-        calculated_stats_[index + get_channel_index("mean_" + factor.key().to_string())] +=
+        calculated_stats_[index + channel_index_.at("mean_" + factor.key().to_string())] +=
             value;
     }
 
     for (const auto &[disease_name, disease_state] : person.diseases) {
         if (disease_state.status == DiseaseStatus::active) {
             calculated_stats_[index +
-                                get_channel_index("prevalence_" + disease_name.to_string())]++;
+                                channel_index_.at("prevalence_" + disease_name.to_string())]++;
             if (disease_state.start_time == context.time_now()) {
                 calculated_stats_[index +
-                                    get_channel_index("incidence_" + disease_name.to_string())]++;
+                                    channel_index_.at("incidence_" + disease_name.to_string())]++;
             }
         }
     }    
@@ -371,41 +371,41 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
 
         double dw = calculate_disability_weight(person);
         double yld = dw * DALY_UNITS;
-        calculated_stats_[index + get_channel_index("mean_yld")] += yld;
-        calculated_stats_[index + get_channel_index("mean_daly")] += yld;
+        calculated_stats_[index + channel_index_.at("mean_yld")] += yld;
+        calculated_stats_[index + channel_index_.at("mean_daly")] += yld;
 
         classify_weight(person);
     }
 
     // For each bin in the calculated stats...
     for (size_t i = 0; i < calculated_stats_.size(); i += channels_.size()) {
-        double count_F = calculated_stats_[i + get_channel_index("count")];
-        double count_M = calculated_stats_[i + get_channel_index("count")];
-        double deaths_F = calculated_stats_[i + get_channel_index("deaths")];
-        double deaths_M = calculated_stats_[i + get_channel_index("deaths")];
+        double count_F = calculated_stats_[i + channel_index_.at("count")];
+        double count_M = calculated_stats_[i + channel_index_.at("count")];
+        double deaths_F = calculated_stats_[i + channel_index_.at("deaths")];
+        double deaths_M = calculated_stats_[i + channel_index_.at("deaths")];
 
         // Calculate in-place factor averages.
         for (const auto &factor : context.mapping().entries()) {
-            calculated_stats_[i + get_channel_index("mean_" + factor.key().to_string())] /= count_F;
-            calculated_stats_[i + get_channel_index("mean_" + factor.key().to_string())] /= count_M;
+            calculated_stats_[i + channel_index_.at("mean_" + factor.key().to_string())] /= count_F;
+            calculated_stats_[i + channel_index_.at("mean_" + factor.key().to_string())] /= count_M;
         }
 
         // Calculate in-place disease prevalence and incidence rates.
         for (const auto &disease : context.diseases()) {
-            calculated_stats_[i + get_channel_index("prevalence_" + disease.code.to_string())] /=
+            calculated_stats_[i + channel_index_.at("prevalence_" + disease.code.to_string())] /=
                 count_F;
-            calculated_stats_[i + get_channel_index("prevalence_" + disease.code.to_string())] /=
+            calculated_stats_[i + channel_index_.at("prevalence_" + disease.code.to_string())] /=
                 count_M;
-            calculated_stats_[i + get_channel_index("incidence_" + disease.code.to_string())] /=
+            calculated_stats_[i + channel_index_.at("incidence_" + disease.code.to_string())] /=
                 count_F;
-            calculated_stats_[i + get_channel_index("incidence_" + disease.code.to_string())] /=
+            calculated_stats_[i + channel_index_.at("incidence_" + disease.code.to_string())] /=
                 count_M;
         }
 
         // Calculate in-place YLL/YLD/DALY averages.
         for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
-            calculated_stats_[i + get_channel_index(column)] /= (count_F + deaths_F);
-            calculated_stats_[i + get_channel_index(column)] /= (count_M + deaths_M);
+            calculated_stats_[i + channel_index_.at(column)] /= (count_F + deaths_F);
+            calculated_stats_[i + channel_index_.at(column)] /= (count_M + deaths_M);
         }
     }
 }
@@ -593,15 +593,15 @@ void AnalysisModule::classify_weight(const Person &person) {
     auto weight_class = weight_classifier_.classify_weight(person);
     switch (weight_class) {
     case WeightCategory::normal:
-        calculated_stats_[get_channel_index("normal_weight")]++;
+        calculated_stats_[channel_index_.at("normal_weight")]++;
         break;
     case WeightCategory::overweight:
-        calculated_stats_[get_channel_index("over_weight")]++;
-        calculated_stats_[get_channel_index("above_weight")]++;
+        calculated_stats_[channel_index_.at("over_weight")]++;
+        calculated_stats_[channel_index_.at("above_weight")]++;
         break;
     case WeightCategory::obese:
-        calculated_stats_[get_channel_index("obese_weight")]++;
-        calculated_stats_[get_channel_index("above_weight")]++;
+        calculated_stats_[channel_index_.at("obese_weight")]++;
+        calculated_stats_[channel_index_.at("above_weight")]++;
         break;
     default:
         throw std::logic_error("Unknown weight classification category.");
@@ -667,15 +667,6 @@ size_t AnalysisModule::calculate_index(const Person &person) const {
     index += bin_indices.back() * channels_.size();
 
     return index;
-}
-
-size_t AnalysisModule::get_channel_index(const std::string &channel) const {
-    auto it = channel_index_.find(channel);
-    if (it == channel_index_.end()) {
-        throw std::out_of_range("Unknown channel: " + channel);
-    }
-
-    return it->second;
 }
 
 std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,

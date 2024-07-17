@@ -81,11 +81,6 @@ class AnalysisModule final : public UpdatableModule {
     /// @return The index in `calculated_stats_`
     size_t calculate_index(const Person &person) const;
 
-    /// @brief Gets the index of the given channel name
-    /// @param channel The channel name
-    /// @return The channel index
-    size_t get_channel_index(const std::string &channel) const;
-
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
     /// @param series The data series containing factor means
