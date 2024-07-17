@@ -320,7 +320,6 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 
 void AnalysisModule::update_death_and_migration_stats(const Person &person, size_t index,
                                                       RuntimeContext &context) {
-    auto current_time = static_cast<unsigned int>(context.time_now());
 
     if (!person.is_alive() && person.time_of_death() == context.time_now()) {
         calculated_stats_[index + channel_index_.at("deaths")]++;
