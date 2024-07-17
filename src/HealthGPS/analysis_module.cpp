@@ -321,7 +321,9 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 void AnalysisModule::update_death_and_migration_stats(const Person &person, size_t index,
                                                       RuntimeContext &context) {
 
-    if (!person.is_alive() && person.time_of_death() == context.time_now()) {
+    auto current_time = static_cast<unsigned int>(context.time_now());
+
+    if (!person.is_alive() && person.time_of_death() == current_time) {
         calculated_stats_[index + channel_index_.at("deaths")]++;
         float expected_life = definition_.life_expectancy().at(context.time_now(), person.gender);
         double yll = std::max(expected_life - person.age, 0.0f) * DALY_UNITS;
@@ -329,7 +331,7 @@ void AnalysisModule::update_death_and_migration_stats(const Person &person, size
         calculated_stats_[index + channel_index_.at("mean_daly")] += yll;
     }
 
-    if (person.has_emigrated() && person.time_of_migration() == context.time_now()) {
+    if (person.has_emigrated() && person.time_of_migration() == current_time) {
         calculated_stats_[index + channel_index_.at("emigrations")]++;
     }
 }
