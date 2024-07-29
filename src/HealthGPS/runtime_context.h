@@ -24,7 +24,7 @@ class RuntimeContext {
     /// @brief Initialises a new instance of the RuntimeContext class.
     /// @param bus The message bus instance for communication with the outside world
     /// @param definition The simulation experiment definition.
-    RuntimeContext(EventAggregator &bus, SimulationDefinition &definition);
+    RuntimeContext(EventAggregator &bus, std::unique_ptr<SimulationDefinition> definition);
 
     /// @brief Gets the current simulation time
     /// @return Current simulation time
@@ -41,6 +41,14 @@ class RuntimeContext {
     /// @brief Gets the data synchronisation timeout in milliseconds
     /// @return Timeout in milliseconds
     int sync_timeout_millis() const noexcept;
+
+    /// @brief Gets a reference to the simulation definition
+    /// @return Simulation definition
+    SimulationDefinition &definition() noexcept;
+
+    /// @brief Gets a reference to the simulation definition
+    /// @return Simulation definition
+    const SimulationDefinition &definition() const noexcept;
 
     /// @brief Gets a reference to the virtual population container
     /// @return Virtual population
@@ -100,7 +108,7 @@ class RuntimeContext {
 
   private:
     std::reference_wrapper<EventAggregator> event_bus_;
-    std::reference_wrapper<SimulationDefinition> definition_;
+    std::unique_ptr<SimulationDefinition> definition_;
     Population population_;
     mutable Random random_{};
     RuntimeMetric metrics_{};

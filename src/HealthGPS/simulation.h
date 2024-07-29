@@ -30,8 +30,8 @@ class Simulation : public adevs::Model<int> {
     /// @param definition The simulation definition instance
     /// @param factory The simulation modules factory instance
     /// @param bus The message bus instance to use
-    explicit Simulation(SimulationDefinition &&definition, SimulationModuleFactory &factory,
-                        EventAggregator &bus);
+    explicit Simulation(std::unique_ptr<SimulationDefinition> definition,
+                        SimulationModuleFactory &factory, EventAggregator &bus);
 
     /// @brief Destroys a simulation instance
     virtual ~Simulation() = default;
@@ -69,14 +69,13 @@ class Simulation : public adevs::Model<int> {
 
     /// @brief Gets the simulation type
     /// @return The intervention scenario type enumeration
-    ScenarioType type() noexcept { return definition_.scenario().type(); }
+    ScenarioType type() noexcept { return context_.definition().scenario().type(); }
 
     /// @brief Gets the simulation name
     /// @return The intervention scenario name
-    std::string name() override { return definition_.identifier(); }
+    std::string name() override { return context_.definition().identifier(); }
 
   private:
-    SimulationDefinition definition_;
     RuntimeContext context_;
     std::shared_ptr<UpdatableModule> ses_;
     std::shared_ptr<DemographicModule> demographic_;

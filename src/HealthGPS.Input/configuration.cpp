@@ -243,11 +243,7 @@ hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
                                             hgps::EventAggregator &event_bus,
                                             hgps::ModelInput &input) {
     auto scenario = create_baseline_scenario(channel);
-
-    auto definition = SimulationDefinition{input, std::move(scenario)};
-
-    // TODO: USE MAKE UNIQUE FOR DEFINITION ALSO
-
+    auto definition = std::make_unique<SimulationDefinition>(input, std::move(scenario));
     return Simulation{std::move(definition), factory, event_bus};
 }
 
@@ -257,7 +253,7 @@ hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
                                                 hgps::ModelInput &input,
                                                 const PolicyScenarioInfo &info) {
     auto scenario = create_intervention_scenario(channel, info);
-    auto definition = SimulationDefinition{input, std::move(scenario)};
+    auto definition = std::make_unique<SimulationDefinition>(input, std::move(scenario));
     return Simulation{std::move(definition), factory, event_bus};
 }
 

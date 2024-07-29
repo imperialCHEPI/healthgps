@@ -226,10 +226,10 @@ TEST(TestSimulation, CreateRuntimeContext) {
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto config = create_test_configuration(data);
-    auto definition = SimulationDefinition(config, std::move(scenario));
+    auto model_input = create_test_configuration(data);
+    auto definition = std::make_unique<SimulationDefinition>(model_input, std::move(scenario));
 
-    auto context = RuntimeContext(bus, definition);
+    auto context = RuntimeContext(bus, std::move(definition));
     ASSERT_EQ(0, context.population().size());
     ASSERT_EQ(0, context.time_now());
 }
@@ -294,7 +294,7 @@ TEST(TestSimulation, CreateSESNoiseModule) {
     DataTable data;
     create_test_datatable(data);
 
-    auto config = create_test_configuration(data);
+    auto model_input = create_test_configuration(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -303,12 +303,12 @@ TEST(TestSimulation, CreateSESNoiseModule) {
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto definition = SimulationDefinition(config, std::move(scenario));
-    auto context = RuntimeContext(bus, definition);
+    auto definition = std::make_unique<SimulationDefinition>(model_input, std::move(scenario));
+    auto context = RuntimeContext(bus, std::move(definition));
 
     context.reset_population(10);
 
-    auto ses_module = build_ses_noise_module(repository, config);
+    auto ses_module = build_ses_noise_module(repository, model_input);
     ses_module->initialise_population(context);
 
     ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
