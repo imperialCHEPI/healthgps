@@ -1,9 +1,10 @@
 #include "runtime_context.h"
+#include "HealthGPS/mtrandom.h"
 
 namespace hgps {
 
 RuntimeContext::RuntimeContext(EventAggregator &bus, SimulationDefinition &definition)
-    : event_bus_{bus}, definition_{definition}, population_{0}, generator_{definition.rnd()} {}
+    : event_bus_{bus}, definition_{definition}, population_{0} {}
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
@@ -23,7 +24,7 @@ RuntimeMetric &RuntimeContext::metrics() noexcept { return metrics_; }
 
 Scenario &RuntimeContext::scenario() noexcept { return definition_.get().scenario(); }
 
-Random &RuntimeContext::random() const noexcept { return generator_; }
+Random &RuntimeContext::random() const noexcept { return random_; }
 
 const HierarchicalMapping &RuntimeContext::mapping() const noexcept {
     return definition_.get().inputs().risk_mapping();

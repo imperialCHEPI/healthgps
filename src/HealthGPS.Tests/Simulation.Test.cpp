@@ -106,13 +106,13 @@ TEST(TestSimulation, RandomBitGeneratorCopy) {
 TEST(TestSimulation, RandomAlgorithmStandalone) {
     using namespace hgps;
 
-    auto rnd = MTRandom32(123456789);
-    auto rnd_gen = Random(rnd);
-    auto value = rnd_gen.next_double();
+    auto random = Random{};
+    random.seed(123456789);
+    auto value = random.next_double();
     ASSERT_GT(value, 0.0);
 
     for (size_t i = 0; i < 10; i++) {
-        value = rnd_gen.next_double();
+        value = random.next_double();
         ASSERT_GT(value, 0.0);
     }
 }
@@ -120,13 +120,13 @@ TEST(TestSimulation, RandomAlgorithmStandalone) {
 TEST(TestSimulation, RandomAlgorithmInternal) {
     using namespace hgps;
 
-    auto engine = MTRandom32(123456789);
-    auto rnd_gen = Random(engine);
-    auto value = rnd_gen.next_double();
+    auto random = Random{};
+    random.seed(123456789);
+    auto value = random.next_double();
     ASSERT_GT(value, 0.0);
 
     for (size_t i = 0; i < 10; i++) {
-        value = rnd_gen.next_double();
+        value = random.next_double();
         ASSERT_GT(value, 0.0);
     }
 }
@@ -134,8 +134,8 @@ TEST(TestSimulation, RandomAlgorithmInternal) {
 TEST(TestSimulation, RandomNextIntRangeIsClosed) {
     using namespace hgps;
 
-    auto engine = MTRandom32{123456789};
-    auto rnd_gen = Random(engine);
+    auto random = Random{};
+    random.seed(123456789);
 
     auto summary_one = core::UnivariateSummary();
     auto summary_two = core::UnivariateSummary();
@@ -145,9 +145,9 @@ TEST(TestSimulation, RandomNextIntRangeIsClosed) {
     auto sample_max = 20;
     auto sample_size = 100;
     for (auto i = 0; i < sample_size; i++) {
-        summary_one.append(rnd_gen.next_int(sample_max));
-        summary_two.append(rnd_gen.next_int(sample_min, sample_max));
-        summary_three.append(rnd_gen.next_int());
+        summary_one.append(random.next_int(sample_max));
+        summary_two.append(random.next_int(sample_min, sample_max));
+        summary_three.append(random.next_int());
     }
 
     ASSERT_EQ(0.0, summary_one.min());
@@ -163,8 +163,8 @@ TEST(TestSimulation, RandomNextIntRangeIsClosed) {
 TEST(TestSimulation, RandomNextNormal) {
     using namespace hgps;
 
-    auto engine = MTRandom32{123456789};
-    auto rnd_gen = Random(engine);
+    auto random = Random{};
+    random.seed(123456789);
 
     auto summary_one = core::UnivariateSummary();
     auto summary_two = core::UnivariateSummary();
@@ -174,8 +174,8 @@ TEST(TestSimulation, RandomNextNormal) {
     auto sample_size = 500;
     auto tolerance = 0.15;
     for (auto i = 0; i < sample_size; i++) {
-        summary_one.append(rnd_gen.next_normal());
-        summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
+        summary_one.append(random.next_normal());
+        summary_two.append(random.next_normal(sample_mean, sample_stdev));
     }
 
     ASSERT_NEAR(summary_one.average(), 0.0, tolerance);
@@ -188,8 +188,8 @@ TEST(TestSimulation, RandomNextNormal) {
 TEST(TestSimulation, RandomEmpiricalDiscrete) {
     using namespace hgps;
 
-    auto engine = MTRandom32{123456789};
-    auto rnd_gen = Random(engine);
+    auto random = Random{};
+    random.seed(123456789);
 
     auto values = std::vector<int>{2, 3, 5, 7, 9};
     auto freq_pdf = std::vector<float>{0.2f, 0.4f, 0.1f, 0.2f, 0.1f};
@@ -208,7 +208,7 @@ TEST(TestSimulation, RandomEmpiricalDiscrete) {
     auto summary = core::UnivariateSummary();
     auto sample_size = 100;
     for (auto i = 0; i < sample_size; i++) {
-        summary.append(rnd_gen.next_empirical_discrete(values, cdf));
+        summary.append(random.next_empirical_discrete(values, cdf));
     }
 
     ASSERT_EQ(2.0, summary.min());
@@ -227,7 +227,7 @@ TEST(TestSimulation, CreateRuntimeContext) {
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
     auto config = create_test_configuration(data);
-    auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
+    auto definition = SimulationDefinition(config, std::move(scenario));
 
     auto context = RuntimeContext(bus, definition);
     ASSERT_EQ(0, context.population().size());
@@ -303,7 +303,7 @@ TEST(TestSimulation, CreateSESNoiseModule) {
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
+    auto definition = SimulationDefinition(config, std::move(scenario));
     auto context = RuntimeContext(bus, definition);
 
     context.reset_population(10);

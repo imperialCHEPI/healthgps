@@ -102,7 +102,7 @@ class RuntimeContext {
     std::reference_wrapper<EventAggregator> event_bus_;
     std::reference_wrapper<SimulationDefinition> definition_;
     Population population_;
-    mutable Random generator_;
+    mutable Random random_{};
     RuntimeMetric metrics_{};
     unsigned int current_run_{};
     int model_start_time_{};
