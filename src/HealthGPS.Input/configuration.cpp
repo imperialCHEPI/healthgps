@@ -243,11 +243,10 @@ hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
                                             hgps::SimulationModuleFactory &factory,
                                             hgps::EventAggregator &event_bus,
                                             hgps::ModelInput &input) {
-    auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
-    auto baseline_scenario = create_baseline_scenario(channel);
-    return Simulation{
-        SimulationDefinition{input, std::move(baseline_scenario), std::move(baseline_rnd)}, factory,
-        event_bus};
+    auto scenario = create_baseline_scenario(channel);
+    auto random = std::make_unique<hgps::MTRandom32>();
+    auto definition = SimulationDefinition{input, std::move(scenario), std::move(random)};
+    return Simulation{std::move(definition), factory, event_bus};
 }
 
 hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
@@ -255,11 +254,10 @@ hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
                                                 hgps::EventAggregator &event_bus,
                                                 hgps::ModelInput &input,
                                                 const PolicyScenarioInfo &info) {
-    auto policy_scenario = create_intervention_scenario(channel, info);
-    auto policy_rnd = std::make_unique<hgps::MTRandom32>();
-    return Simulation{
-        SimulationDefinition{input, std::move(policy_scenario), std::move(policy_rnd)}, factory,
-        event_bus};
+    auto scenario = create_intervention_scenario(channel, info);
+    auto random = std::make_unique<hgps::MTRandom32>();
+    auto definition = SimulationDefinition{input, std::move(scenario), std::move(random)};
+    return Simulation{std::move(definition), factory, event_bus};
 }
 
 std::unique_ptr<hgps::InterventionScenario>
