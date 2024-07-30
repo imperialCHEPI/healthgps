@@ -79,4 +79,5 @@ class DemographicModule final : public SimulationModule {
 /// @return A new DemographicModule instance
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
                                                            const ModelInput &config);
+
 } // namespace hgps

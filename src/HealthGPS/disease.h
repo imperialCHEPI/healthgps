@@ -6,9 +6,9 @@
 #include "runtime_context.h"
 
 namespace hgps {
+
 /// @brief Defines the disease module container to hold disease models
 class DiseaseModule final : public UpdatableModule {
-
   public:
     DiseaseModule() = delete;
 
@@ -72,4 +72,5 @@ class DiseaseModule final : public UpdatableModule {
 /// @throws std::out_of_range for unknown disease definition identifier
 std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
                                                     const ModelInput &config);
+
 } // namespace hgps
