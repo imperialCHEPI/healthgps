@@ -80,7 +80,7 @@ class Simulation : public adevs::Model<int> {
     std::shared_ptr<UpdatableModule> ses_;
     std::shared_ptr<DemographicModule> demographic_;
     std::shared_ptr<RiskFactorHostModule> risk_factor_;
-    std::shared_ptr<DiseaseHostModule> disease_;
+    std::shared_ptr<DiseaseModule> disease_;
     std::shared_ptr<UpdatableModule> analysis_;
     adevs::Time end_time_;
 

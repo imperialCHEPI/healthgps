@@ -27,10 +27,6 @@ Simulation::Simulation(std::unique_ptr<SimulationDefinition> definition,
                        SimulationModuleFactory &factory, EventAggregator &bus)
     : context_{bus, std::move(definition)} {
 
-    // TODO: CHANGE BELOW TO UNIQUE POINTER
-
-    // TODO: EVENTUALLY REMOVE MODELINPUT FROM CONTEXT
-
     // Create required modules, should change to shared_ptr
     auto &inputs = context_.definition().inputs();
     auto ses_base = factory.create(SimulationModuleType::SES, inputs);
@@ -42,7 +38,7 @@ Simulation::Simulation(std::unique_ptr<SimulationDefinition> definition,
     ses_ = std::static_pointer_cast<UpdatableModule>(ses_base);
     demographic_ = std::static_pointer_cast<DemographicModule>(dem_base);
     risk_factor_ = std::static_pointer_cast<RiskFactorHostModule>(risk_base);
-    disease_ = std::static_pointer_cast<DiseaseHostModule>(disease_base);
+    disease_ = std::static_pointer_cast<DiseaseModule>(disease_base);
     analysis_ = std::static_pointer_cast<UpdatableModule>(analysis_base);
 }
 

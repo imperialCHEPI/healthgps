@@ -7,7 +7,7 @@
 
 namespace hgps {
 /// @brief Defines the disease module container to hold disease models
-class DiseaseModule final : public DiseaseHostModule {
+class DiseaseModule final : public UpdatableModule {
 
   public:
     DiseaseModule() = delete;
@@ -19,9 +19,14 @@ class DiseaseModule final : public DiseaseHostModule {
 
     const std::string &name() const noexcept override;
 
-    std::size_t size() const noexcept override;
+    /// @brief Gets the number of diseases models hosted
+    /// @return Number of hosted diseases models
+    std::size_t size() const noexcept;
 
-    bool contains(const core::Identifier &disease_id) const noexcept override;
+    /// @brief Indicates whether the host contains an disease identified by code.
+    /// @param disease_id The disease unique identifier
+    /// @return true if the disease is found, otherwise false.
+    bool contains(const core::Identifier &disease_id) const noexcept;
 
     /// @brief Gets the model for a given disease
     /// @param disease_id The disease identifier
@@ -39,8 +44,12 @@ class DiseaseModule final : public DiseaseHostModule {
 
     void update_population(RuntimeContext &context) override;
 
+    /// @brief Gets the mortality rate associated with a disease for an individual
+    /// @param disease_code The disease unique identifier
+    /// @param entity The entity associated with the mortality value
+    /// @return the mortality rate value, if found, otherwise zero.
     double get_excess_mortality(const core::Identifier &disease_code,
-                                const Person &entity) const noexcept override;
+                                const Person &entity) const noexcept;
 
   private:
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> models_;

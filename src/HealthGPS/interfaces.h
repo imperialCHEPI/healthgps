@@ -54,26 +54,6 @@ class UpdatableModule : public SimulationModule {
     virtual void update_population(RuntimeContext &context) = 0;
 };
 
-/// @brief Generic disease module interface to host multiple disease models
-class DiseaseHostModule : public UpdatableModule {
-  public:
-    /// @brief Gets the number of diseases model hosted
-    /// @return Number of hosted diseases models
-    virtual std::size_t size() const noexcept = 0;
-
-    /// @brief Indicates whether the host contains an disease identified by code.
-    /// @param disease_id The disease unique identifier
-    /// @return true if the disease is found, otherwise false.
-    virtual bool contains(const core::Identifier &disease_id) const noexcept = 0;
-
-    /// @brief Gets the mortality rate associated with a disease for an individual
-    /// @param disease_id The disease unique identifier
-    /// @param entity The entity associated with the mortality value
-    /// @return the mortality rate value, if found, otherwise zero.
-    virtual double get_excess_mortality(const core::Identifier &disease_id,
-                                        const Person &entity) const noexcept = 0;
-};
-
 /// @brief Generic risk factors module interface to host risk factor models
 class RiskFactorHostModule : public UpdatableModule {
   public:
@@ -108,27 +88,6 @@ struct PopulationRecord {
     /// @brief Gets the total number at age
     /// @return Total number for age
     float total() const noexcept { return males + females; }
-};
-
-/// @brief Demographic prospects module interface
-class DemographicModule : public SimulationModule {
-  public:
-    /// @brief Gets the total population at a specific point in time
-    /// @param time_year The reference point in time (in year)
-    /// @return The respective total population size
-    virtual std::size_t get_total_population_size(int time_year) const noexcept = 0;
-
-    /// @brief Gets the population age distribution at a specific point in time
-    /// @param time_year The reference point in time (in year)
-    /// @return The respective population age distribution
-    virtual const std::map<int, PopulationRecord> &
-    get_population_distribution(int time_year) const = 0;
-
-    /// @brief Updates the virtual population status
-    /// @param context The simulation run-time context
-    /// @param disease_host The diseases host module instance
-    virtual void update_population(RuntimeContext &context,
-                                   const DiseaseHostModule &disease_host) = 0;
 };
 
 /// @brief Diseases model interface
