@@ -22,8 +22,12 @@ class DemographicModule final : public SimulationModule {
     DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
                       LifeTable &&life_table);
 
+    /// @brief Gets the module type identifier
+    /// @return The module type identifier
     SimulationModuleType type() const noexcept override;
 
+    /// @brief Gets the module name
+    /// @return The human-readable module name
     const std::string &name() const noexcept override;
 
     /// @brief Gets the total population at a specific point in time
