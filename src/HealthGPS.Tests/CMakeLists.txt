@@ -45,6 +45,16 @@ target_sources(
             "Interval.Test.cpp"
             "LoadNutrientTable.cpp")
 
+# Download and extract test data
+cmake_policy(SET CMP0135 NEW)
+include(FetchContent)
+FetchContent_Declare(
+    test_data
+    URL https://github.com/imperialCHEPI/healthgps-data/releases/download/20240624/data_20240624.zip
+    URL_HASH SHA256=b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c)
+FetchContent_MakeAvailable(test_data)
+target_compile_definitions(HealthGPS.Tests PRIVATE "-DTEST_DATA_PATH=\"${test_data_SOURCE_DIR}\"")
+
 target_link_libraries(
     HealthGPS.Tests
     PRIVATE HealthGPS.Core
