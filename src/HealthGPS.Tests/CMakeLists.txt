@@ -46,6 +46,7 @@ target_sources(
             "LoadNutrientTable.cpp")
 
 # Download and extract test data
+cmake_policy(SET CMP0135 NEW)
 include(FetchContent)
 FetchContent_Declare(
     test_data
