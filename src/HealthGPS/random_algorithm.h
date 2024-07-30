@@ -53,7 +53,7 @@ class Random {
     int next_empirical_discrete(const std::vector<int> &values, const std::vector<double> &cdf);
 
   private:
-    MTRandom32 engine_{};
+    MTRandom32 engine_;
 
     int next_int_internal(int min_value, int max_value);
     double next_uniform_internal(double min_value, double max_value);

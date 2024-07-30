@@ -28,7 +28,7 @@ Simulation::Simulation(std::unique_ptr<SimulationDefinition> definition,
     : context_{bus, std::move(definition)} {
 
     // Create required modules, should change to shared_ptr
-    auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.definition().inputs();
     auto ses_base = factory.create(SimulationModuleType::SES, inputs);
     auto dem_base = factory.create(SimulationModuleType::Demographic, inputs);
     auto risk_base = factory.create(SimulationModuleType::RiskFactor, inputs);
@@ -49,7 +49,7 @@ void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexc
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     auto start = std::chrono::steady_clock::now();
-    auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.definition().inputs();
     auto world_time = inputs.start_time();
     context_.metrics().clear();
     context_.scenario().clear();
@@ -115,7 +115,7 @@ void Simulation::initialise_population() {
     /* Note: order is very important */
 
     // Create virtual population
-    auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.definition().inputs();
     auto model_start_year = inputs.start_time();
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     float size_fraction = inputs.settings().size_fraction();
@@ -183,7 +183,7 @@ void Simulation::update_net_immigration() {
 }
 
 IntegerAgeGenderTable Simulation::get_current_expected_population() const {
-    auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.definition().inputs();
     auto sim_start_time = context_.start_time();
     auto total_initial_population = demographic_->get_total_population_size(sim_start_time);
     float size_fraction = inputs.settings().size_fraction();
