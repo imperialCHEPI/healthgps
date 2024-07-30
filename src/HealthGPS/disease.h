@@ -40,8 +40,12 @@ class DiseaseModule final : public UpdatableModule {
     /// @throws std::out_of_range if the module does not have a model for the specified disease.
     const std::shared_ptr<DiseaseModel> &operator[](const core::Identifier &disease_id) const;
 
+    /// @brief Initialises the virtual population status
+    /// @param context The simulation run-time context
     void initialise_population(RuntimeContext &context) override;
 
+    /// @brief Updates the virtual population status
+    /// @param context The simulation run-time context
     void update_population(RuntimeContext &context) override;
 
     /// @brief Gets the mortality rate associated with a disease for an individual
