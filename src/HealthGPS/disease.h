@@ -11,12 +11,17 @@ class DiseaseModule final : public UpdatableModule {
 
   public:
     DiseaseModule() = delete;
+
     /// @brief Initialises a new instance of the DiseaseModule class.
     /// @param models Collection of disease model instances
     DiseaseModule(std::map<core::Identifier, std::shared_ptr<DiseaseModel>> &&models);
 
+    /// @brief Gets the module type identifier
+    /// @return The module type identifier
     SimulationModuleType type() const noexcept override;
 
+    /// @brief Gets the module name
+    /// @return The human-readable module name
     const std::string &name() const noexcept override;
 
     /// @brief Gets the number of diseases models hosted
