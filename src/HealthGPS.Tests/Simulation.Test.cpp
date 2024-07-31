@@ -108,12 +108,11 @@ TEST(TestSimulation, RandomAlgorithmStandalone) {
 
     auto random = Random{};
     random.seed(123456789);
-    auto value = random.next_double();
-    ASSERT_GT(value, 0.0);
 
     for (size_t i = 0; i < 10; i++) {
-        value = random.next_double();
-        ASSERT_GT(value, 0.0);
+        double value = random.next_double();
+        ASSERT_GE(value, 0.0);
+        ASSERT_LT(value, 1.0);
     }
 }
 
