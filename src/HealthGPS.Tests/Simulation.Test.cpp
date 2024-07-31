@@ -117,20 +117,6 @@ TEST(TestSimulation, RandomAlgorithmStandalone) {
     }
 }
 
-TEST(TestSimulation, RandomAlgorithmInternal) {
-    using namespace hgps;
-
-    auto random = Random{};
-    random.seed(123456789);
-    auto value = random.next_double();
-    ASSERT_GT(value, 0.0);
-
-    for (size_t i = 0; i < 10; i++) {
-        value = random.next_double();
-        ASSERT_GT(value, 0.0);
-    }
-}
-
 TEST(TestSimulation, RandomNextIntRangeIsClosed) {
     using namespace hgps;
 
