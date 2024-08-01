@@ -46,6 +46,7 @@ class AnalysisModule final : public UpdatableModule {
     WeightModel weight_classifier_;
     DoubleAgeGenderTable residual_disability_weight_;
     std::vector<std::string> channels_;
+    std::unordered_map<std::string, size_t> channel_index_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
     std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
@@ -65,12 +66,22 @@ class AnalysisModule final : public UpdatableModule {
     double calculate_disability_weight(const Person &entity) const;
     DALYsIndicator calculate_dalys(Population &population, unsigned int max_age,
                                    unsigned int death_year) const;
+    void update_death_and_migration_stats(const Person &person, size_t index,
+                                          RuntimeContext &context);
+    void update_calculated_stats_for_person(RuntimeContext &context, const Person &person,
+                                            size_t index);
 
     void calculate_population_statistics(RuntimeContext &context);
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
+    void classify_weight(const Person &person);
     void initialise_output_channels(RuntimeContext &context);
+
+    /// @brief Calculates the bin index in `calculated_stats_` for a given person
+    /// @param person The person to calculate the index for
+    /// @return The index in `calculated_stats_`
+    size_t calculate_index(const Person &person) const;
 
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
