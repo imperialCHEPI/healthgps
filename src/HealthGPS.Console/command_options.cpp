@@ -46,12 +46,10 @@ CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[
             fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
         }
 
-        if (result.count("file")) {
-            cmd.config_file = result["file"].as<std::string>();
-            if (cmd.config_file.is_relative()) {
-                cmd.config_file = std::filesystem::absolute(cmd.config_file);
-                fmt::print("Configuration file..: {}\n", cmd.config_file.string());
-            }
+        cmd.config_file = result["file"].as<std::string>();
+        if (cmd.config_file.is_relative()) {
+            cmd.config_file = std::filesystem::absolute(cmd.config_file);
+            fmt::print("Configuration file..: {}\n", cmd.config_file.string());
         }
 
         if (!fs::exists(cmd.config_file)) {
