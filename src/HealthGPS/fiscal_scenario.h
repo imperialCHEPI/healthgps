@@ -26,8 +26,8 @@ struct FiscalPolicyDefinition {
     /// @param period The intervention implementation period
     /// @param sorted_impacts The impacts on risk factors
     FiscalPolicyDefinition(const FiscalImpactType type_of_impact, const PolicyInterval &period,
-                           const std::vector<PolicyImpact> &sorted_impacts)
-        : impact_type{type_of_impact}, active_period{period}, impacts{sorted_impacts} {}
+                           std::vector<PolicyImpact> sorted_impacts)
+        : impact_type{type_of_impact}, active_period{period}, impacts{std::move(sorted_impacts)} {}
 
     /// @brief The fiscal impact type
     FiscalImpactType impact_type;

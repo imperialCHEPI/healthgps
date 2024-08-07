@@ -25,9 +25,8 @@ struct SimplePolicyDefinition {
     /// @param sorted_impacts The impact on risk factors
     /// @param period The implementation period
     SimplePolicyDefinition(const PolicyImpactType &type_of_impact,
-                           const std::vector<PolicyImpact> &sorted_impacts,
-                           const PolicyInterval &period)
-        : impact_type{type_of_impact}, impacts{sorted_impacts}, active_period{period} {}
+                           std::vector<PolicyImpact> sorted_impacts, const PolicyInterval &period)
+        : impact_type{type_of_impact}, impacts{std::move(sorted_impacts)}, active_period{period} {}
 
     /// @brief Intervention impact type
     PolicyImpactType impact_type;
