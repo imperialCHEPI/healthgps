@@ -81,10 +81,22 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
     // Print application title and parse command line arguments
     print_app_title();
-    auto cmd_args = parse_arguments(options, argc, argv);
-    if (!cmd_args.success) {
-        return cmd_args.exit_code;
+
+    std::optional<CommandOptions> cmd_args_opt;
+    try {
+        cmd_args_opt = parse_arguments(options, argc, argv);
+
+        // We won't get a config if e.g. the user chooses the --help option
+        if (!cmd_args_opt) {
+            return exit_application(EXIT_SUCCESS);
+        }
+    } catch (const std::exception &ex) {
+        fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}\n", ex.what());
+        fmt::print("\n{}\n", options.help());
+        return exit_application(EXIT_FAILURE);
     }
+
+    const auto &cmd_args = cmd_args_opt.value();
 
     // Parse inputs configuration file, *.json.
     Configuration config;
