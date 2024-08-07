@@ -9,7 +9,8 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Configuration path.", cxxopts::value<std::string>())(
+    options.add_options()("c,config", "Configuration path.", cxxopts::value<std::string>())(
+        "f,file", "Configuration path.", cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
         cxxopts::value<int>())("verbose", "Print more information about progress",
@@ -41,7 +42,20 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
         fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
     }
 
-    std::filesystem::path config_path = result["file"].as<std::string>();
+    if (result.count("config") && result.count("file")) {
+        throw std::runtime_error("Cannot provide both -c/--config and -f/--file arguments.");
+    }
+
+    std::filesystem::path config_path;
+    if (result.count("file")) {
+        fmt::print(
+            fmt::fg(fmt::color::yellow),
+            "WARNING: The -f/--file options are deprecated. Please use -c/--config instead.\n");
+
+        config_path = result["file"].as<std::string>();
+    } else {
+        config_path = result["config"].as<std::string>();
+    }
     if (config_path.is_relative()) {
         config_path = std::filesystem::absolute(config_path);
     }
