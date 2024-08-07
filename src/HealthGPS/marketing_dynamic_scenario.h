@@ -17,7 +17,7 @@ struct MarketingDynamicDefinition {
     /// @param dynamic The population dynamic parameters
     MarketingDynamicDefinition(const PolicyInterval &period,
                                std::vector<PolicyImpact> sorted_impacts, PolicyDynamic dynamic)
-        : active_period{period}, impacts{std::move(sorted_impacts)}, dynamic{std::move(dynamic)} {}
+        : active_period{period}, impacts{std::move(sorted_impacts)}, dynamic{dynamic} {}
 
     /// @brief Intervention active period
     PolicyInterval active_period;
