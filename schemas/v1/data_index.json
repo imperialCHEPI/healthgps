@@ -12,8 +12,14 @@
                 },
                 {
                     "type": "object",
-                    "properties": { "file_name": { "type": "string" } },
-                    "required": ["file_name"]
+                    "properties": {
+                        "file_name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "file_name"
+                    ]
                 }
             ]
         },
@@ -28,8 +34,14 @@
                         "age_limits": {
                             "type": "array",
                             "prefixItems": [
-                                { "type": "integer", "minimum": 0 },
-                                { "type": "integer", "minimum": 0 }
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
                             ],
                             "minItems": 2,
                             "items": false
@@ -37,30 +49,58 @@
                         "time_limits": {
                             "type": "array",
                             "prefixItems": [
-                                { "type": "integer", "minimum": 1900 },
-                                { "type": "integer", "minimum": 1900 }
+                                {
+                                    "type": "integer",
+                                    "minimum": 1900
+                                },
+                                {
+                                    "type": "integer",
+                                    "minimum": 1900
+                                }
                             ],
                             "minItems": 2,
                             "items": false
                         },
-                        "projections": { "type": "integer" },
+                        "projections": {
+                            "type": "integer"
+                        },
                         "population": {
                             "type": "object",
                             "properties": {
-                                "description": { "type": "string" },
-                                "path": { "type": "string" },
-                                "file_name": { "type": "string" }
+                                "description": {
+                                    "type": "string"
+                                },
+                                "path": {
+                                    "type": "string"
+                                },
+                                "file_name": {
+                                    "type": "string"
+                                }
                             },
-                            "required": ["description", "path", "file_name"]
+                            "required": [
+                                "description",
+                                "path",
+                                "file_name"
+                            ]
                         },
                         "mortality": {
                             "type": "object",
                             "properties": {
-                                "description": { "type": "string" },
-                                "path": { "type": "string" },
-                                "file_name": { "type": "string" }
+                                "description": {
+                                    "type": "string"
+                                },
+                                "path": {
+                                    "type": "string"
+                                },
+                                "file_name": {
+                                    "type": "string"
+                                }
                             },
-                            "required": ["description", "path", "file_name"]
+                            "required": [
+                                "description",
+                                "path",
+                                "file_name"
+                            ]
                         }
                     },
                     "required": [
@@ -84,26 +124,43 @@
                         "age_limits": {
                             "type": "array",
                             "prefixItems": [
-                                { "type": "integer", "minimum": 0 },
-                                { "type": "integer", "minimum": 0 }
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
                             ],
                             "minItems": 2,
                             "items": false
                         },
-                        "time_year": { "type": "integer", "minimum": 1900 },
+                        "time_year": {
+                            "type": "integer",
+                            "minimum": 1900
+                        },
                         "disease": {
                             "type": "object",
                             "properties": {
-                                "path": { "type": "string" },
-                                "file_name": { "type": "string" },
+                                "path": {
+                                    "type": "string"
+                                },
+                                "file_name": {
+                                    "type": "string"
+                                },
                                 "relative_risk": {
                                     "type": "object",
                                     "properties": {
-                                        "path": { "type": "string" },
+                                        "path": {
+                                            "type": "string"
+                                        },
                                         "to_disease": {
                                             "type": "object",
                                             "properties": {
-                                                "path": { "type": "string" },
+                                                "path": {
+                                                    "type": "string"
+                                                },
                                                 "file_name": {
                                                     "type": "string"
                                                 },
@@ -120,12 +177,17 @@
                                         "to_risk_factor": {
                                             "type": "object",
                                             "properties": {
-                                                "path": { "type": "string" },
+                                                "path": {
+                                                    "type": "string"
+                                                },
                                                 "file_name": {
                                                     "type": "string"
                                                 }
                                             },
-                                            "required": ["path", "file_name"]
+                                            "required": [
+                                                "path",
+                                                "file_name"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -137,7 +199,9 @@
                                 "parameters": {
                                     "type": "object",
                                     "properties": {
-                                        "path": { "type": "string" },
+                                        "path": {
+                                            "type": "string"
+                                        },
                                         "files": {
                                             "type": "object",
                                             "properties": {
@@ -158,7 +222,10 @@
                                             ]
                                         }
                                     },
-                                    "required": ["path", "files"]
+                                    "required": [
+                                        "path",
+                                        "files"
+                                    ]
                                 }
                             },
                             "required": [
@@ -173,11 +240,24 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "group": { "enum": ["other", "cancer"] },
-                                    "id": { "type": "string" },
-                                    "name": { "type": "string" }
+                                    "group": {
+                                        "enum": [
+                                            "other",
+                                            "cancer"
+                                        ]
+                                    },
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
                                 },
-                                "required": ["group", "id", "name"]
+                                "required": [
+                                    "group",
+                                    "id",
+                                    "name"
+                                ]
                             }
                         }
                     },
@@ -201,22 +281,42 @@
                         "age_limits": {
                             "type": "array",
                             "prefixItems": [
-                                { "type": "integer", "minimum": 0 },
-                                { "type": "integer", "minimum": 0 }
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                {
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
                             ],
                             "minItems": 2,
                             "items": false
                         },
-                        "time_year": { "type": "integer", "minimum": 1900 },
-                        "disability_file_name": { "type": "string" },
-                        "lms_file_name": { "type": "string" },
+                        "time_year": {
+                            "type": "integer",
+                            "minimum": 1900
+                        },
+                        "disability_file_name": {
+                            "type": "string"
+                        },
+                        "lms_file_name": {
+                            "type": "string"
+                        },
                         "cost_of_disease": {
                             "type": "object",
                             "properties": {
-                                "path": { "type": "string" },
-                                "file_name": { "type": "string" }
+                                "path": {
+                                    "type": "string"
+                                },
+                                "file_name": {
+                                    "type": "string"
+                                }
                             },
-                            "required": ["path", "file_name"]
+                            "required": [
+                                "path",
+                                "file_name"
+                            ]
                         }
                     },
                     "required": [
@@ -230,5 +330,10 @@
             ]
         }
     },
-    "required": ["country", "demographic", "diseases", "analysis"]
+    "required": [
+        "country",
+        "demographic",
+        "diseases",
+        "analysis"
+    ]
 }
