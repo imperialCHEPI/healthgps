@@ -14,7 +14,7 @@
 namespace hgps {
 /// @brief Defines the Command Line Interface (CLI) arguments options
 struct CommandOptions {
-    /// @brief The configuration file argument value
+    /// @brief The path to the configuration file
     std::filesystem::path config_file;
 
     /// @brief The back-end storage full path or URL argument value

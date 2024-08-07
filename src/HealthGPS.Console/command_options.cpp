@@ -9,7 +9,7 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
+    options.add_options()("f,file", "Configuration path.", cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
         cxxopts::value<int>())("verbose", "Print more information about progress",
@@ -41,16 +41,30 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
         fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
     }
 
-    cmd.config_file = result["file"].as<std::string>();
-    if (cmd.config_file.is_relative()) {
-        cmd.config_file = std::filesystem::absolute(cmd.config_file);
-        fmt::print("Configuration file: {}\n", cmd.config_file.string());
+    std::filesystem::path config_path = result["file"].as<std::string>();
+    if (config_path.is_relative()) {
+        config_path = std::filesystem::absolute(config_path);
+    }
+
+    if (config_path.extension() == ".json") {
+        fmt::print(fmt::fg(fmt::color::yellow),
+                   "WARNING: Providing a path to a config file is deprecated. "
+                   "Please provide the path to the parent config directory instead.\n");
+        if (config_path.filename() != "config.json") {
+            fmt::print(fmt::fg(fmt::color::yellow),
+                       "WARNING: Config files should be named config.json.\n");
+        }
+
+        cmd.config_file = std::move(config_path);
+    } else {
+        cmd.config_file = config_path / "config.json";
     }
 
     if (!fs::exists(cmd.config_file)) {
         throw std::runtime_error(
             fmt::format("Configuration file: {} not found.", cmd.config_file.string()));
     }
+    fmt::print("Configuration file: {}\n", cmd.config_file.string());
 
     if (result.count("storage")) {
         auto source = result["storage"].as<std::string>();
