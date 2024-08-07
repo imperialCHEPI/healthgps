@@ -13,8 +13,8 @@ struct MarketingPolicyDefinition {
     /// @param period The implementation period
     /// @param sorted_impacts The impacts on risk factors
     MarketingPolicyDefinition(const PolicyInterval &period,
-                              const std::vector<PolicyImpact> &sorted_impacts)
-        : active_period{period}, impacts{sorted_impacts} {}
+                              std::vector<PolicyImpact> sorted_impacts)
+        : active_period{period}, impacts{std::move(sorted_impacts)} {}
 
     /// @brief Intervention active period
     PolicyInterval active_period;

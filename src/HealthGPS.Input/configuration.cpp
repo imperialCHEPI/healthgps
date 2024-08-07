@@ -278,18 +278,18 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
             throw std::logic_error(fmt::format("Unknown policy impact type: {}", info.impact_type));
         }
 
-        auto definition = SimplePolicyDefinition(impact_type, risk_impacts, period);
+        auto definition = SimplePolicyDefinition(impact_type, std::move(risk_impacts), period);
         return std::make_unique<SimplePolicyScenario>(channel, std::move(definition));
     }
 
     if (info.identifier == "marketing") {
-        auto definition = MarketingPolicyDefinition(period, risk_impacts);
+        auto definition = MarketingPolicyDefinition(period, std::move(risk_impacts));
         return std::make_unique<MarketingPolicyScenario>(channel, std::move(definition));
     }
 
     if (info.identifier == "dynamic_marketing") {
         auto dynamic = PolicyDynamic{info.dynamics};
-        auto definition = MarketingDynamicDefinition{period, risk_impacts, dynamic};
+        auto definition = MarketingDynamicDefinition{period, std::move(risk_impacts), dynamic};
         return std::make_unique<MarketingDynamicScenario>(channel, std::move(definition));
     }
 
@@ -303,7 +303,7 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
         const auto &adjustment = info.adjustments.at(0);
         auto definition = FoodLabellingDefinition{
             .active_period = period,
-            .impacts = risk_impacts,
+            .impacts = std::move(risk_impacts),
             .adjustment_risk_factor = AdjustmentFactor{adjustment.risk_factor, adjustment.value},
             .coverage = PolicyCoverage{info.coverage_rates, cutoff_time},
             .transfer_coefficient = TransferCoefficient{info.coefficients, cutoff_age}};
@@ -313,7 +313,7 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
 
     if (info.identifier == "physical_activity") {
         auto definition = PhysicalActivityDefinition{.active_period = period,
-                                                     .impacts = risk_impacts,
+                                                     .impacts = std::move(risk_impacts),
                                                      .coverage_rate = info.coverage_rates.at(0)};
 
         return std::make_unique<PhysicalActivityScenario>(channel, std::move(definition));
@@ -321,7 +321,7 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
 
     if (info.identifier == "fiscal") {
         auto impact_type = parse_fiscal_impact_type(info.impact_type);
-        auto definition = FiscalPolicyDefinition(impact_type, period, risk_impacts);
+        auto definition = FiscalPolicyDefinition(impact_type, period, std::move(risk_impacts));
         return std::make_unique<FiscalPolicyScenario>(channel, std::move(definition));
     }
 
