@@ -2,6 +2,7 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
+      - id: fix-byte-order-marker
       - id: check-merge-conflict
       - id: check-json
       - id: check-yaml
