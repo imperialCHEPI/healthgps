@@ -55,8 +55,6 @@ jobs:
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
         run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
           sudo apt-get install g++-$LATEST_GCC_VERSION
 
           # Use environment variable to tell CMake to compile with this version of gcc
