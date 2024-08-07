@@ -50,12 +50,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential ninja-build lcov
+          sudo apt install -y --no-install-recommends build-essential ninja-build lcov
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
         run: |
-          sudo apt-get install g++-$LATEST_GCC_VERSION
+          sudo apt-get install -y g++-$LATEST_GCC_VERSION
 
           # Use environment variable to tell CMake to compile with this version of gcc
           echo CXX=g++-$LATEST_GCC_VERSION >> "$GITHUB_ENV"
