@@ -14,14 +14,8 @@
 namespace hgps {
 /// @brief Defines the Command Line Interface (CLI) arguments options
 struct CommandOptions {
-    /// @brief Indicates whether the argument parsing succeed
-    bool success{};
-
-    /// @brief The exit code to return, in case of CLI arguments parsing failure
-    int exit_code{};
-
     /// @brief The configuration file argument value
-    std::filesystem::path config_file{};
+    std::filesystem::path config_file;
 
     /// @brief The back-end storage full path or URL argument value
     std::optional<hgps::input::DataSource> data_source;
@@ -41,7 +35,7 @@ cxxopts::Options create_options();
 /// @param options The valid CLI options
 /// @param argc Number of input arguments
 /// @param argv List of input arguments
-/// @return User command-line options
-CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]);
+/// @return User command-line options or std::nullopt if program should exit
+std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int argc, char **argv);
 
 } // namespace hgps
