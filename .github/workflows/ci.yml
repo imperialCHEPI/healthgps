@@ -50,7 +50,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install -y --no-install-recommends build-essential ninja-build lcov
+          sudo apt install -y --no-install-recommends build-essential cmake ninja-build lcov
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
