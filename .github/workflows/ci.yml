@@ -71,15 +71,7 @@ jobs:
         run: |
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
-          ./bootstrap-vcpkg.sh -disableMetrics || true
-
-          for file in vcpkg/buildtrees/detect_compiler/*.log; do
-            echo -------- $file ------------
-            cat $file
-            echo ---------------------------
-          done
-
-          exit 1
+          ./bootstrap-vcpkg.sh -disableMetrics
 
       - name: Configure HealthGPS (debug)
         run: |
