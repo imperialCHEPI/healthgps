@@ -16,18 +16,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: linux
-            os: ubuntu-22.04
-            compiler: gcc-default
-            is_main: true
+          # - platform: linux
+          #   os: ubuntu-22.04
+          #   compiler: gcc-default
+          #   is_main: true
           - platform: linux
             os: ubuntu-22.04
             compiler: gcc-latest
             is_main: false
-          - platform: windows
-            os: windows-2022
-            compiler: msvc
-            is_main: true
+          # - platform: windows
+          #   os: windows-2022
+          #   compiler: msvc
+          #   is_main: true
 
     env:
       VCPKG_ROOT: "vcpkg"
@@ -78,6 +78,9 @@ jobs:
           cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON || true
           echo CAAAAAAAAAAAAAAAAAAT
           cat /home/runner/work/healthgps/healthgps/out/build/linux-debug/vcpkg-manifest-install.log
+          echo ======================
+          cat   /home/runner/work/healthgps/healthgps/vcpkg/buildtrees/detect_compiler/config-x64-linux-rel-err.log
+          exit 1
 
       - uses: ZedThree/clang-tidy-review@v0.19.0
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]')
