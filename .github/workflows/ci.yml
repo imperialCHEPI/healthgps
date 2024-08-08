@@ -75,7 +75,9 @@ jobs:
 
       - name: Configure HealthGPS (debug)
         run: |
-          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON
+          cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON || true
+          echo CAAAAAAAAAAAAAAAAAAT
+          cat /home/runner/work/healthgps/healthgps/out/build/linux-debug/vcpkg-manifest-install.log
 
       - uses: ZedThree/clang-tidy-review@v0.19.0
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]')
