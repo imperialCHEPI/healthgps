@@ -22,10 +22,8 @@ json resolve_uri(const uri &uri, const std::filesystem::path &program_directory)
     }
 
     // Strip URL prefix and load file from local filesystem
-    const auto uri_path = std::filesystem::path{uri.path()};
-    const auto version_string = uri_path.parent_path().filename();
-    const auto schema_file_name = uri_path.filename();
-    const auto schema_path = program_directory / "schemas" / version_string / schema_file_name;
+    const auto uri_path = std::filesystem::path{uri_str.substr(strlen(SchemaURLPrefix))};
+    const auto schema_path = program_directory / "schemas" / uri_path;
     auto ifs = std::ifstream{schema_path};
     if (!ifs) {
         throw std::runtime_error("Failed to read schema file");

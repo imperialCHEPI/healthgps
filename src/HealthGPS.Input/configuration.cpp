@@ -1,6 +1,7 @@
 #include "configuration.h"
 #include "configuration_parsing.h"
 #include "jsonparser.h"
+#include "schema.h"
 #include "version.h"
 
 #include "HealthGPS/baseline_scenario.h"
@@ -34,6 +35,9 @@
 
 namespace {
 using namespace hgps::input;
+
+static constexpr const char *ConfigSchemaFileName = "config.json";
+static constexpr int ConfigSchemaVersion = 1;
 
 DataSource get_data_source_from_json(const nlohmann::json &opt,
                                      const std::filesystem::path &root_path) {
@@ -69,25 +73,7 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
         config.verbosity = core::VerboseMode::verbose;
     }
 
-    std::ifstream ifs(config_file, std::ifstream::in);
-    if (!ifs) {
-        throw ConfigurationError(fmt::format("File {} doesn't exist.", config_file.string()));
-    }
-
-    const auto opt = [&ifs]() {
-        try {
-            return json::parse(ifs);
-        } catch (const std::exception &e) {
-            throw ConfigurationError(fmt::format("Could not parse JSON: {}", e.what()));
-        }
-    }();
-
-    // Check the file format version
-    try {
-        check_version(opt);
-    } catch (const ConfigurationError &) {
-        success = false;
-    }
+    const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion);
 
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
