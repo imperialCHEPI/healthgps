@@ -68,29 +68,11 @@ nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
         throw std::runtime_error(fmt::format("File not found: {}", file_path.string()));
     }
 
-    // Read in JSON file
-    auto json = nlohmann::json::parse(ifs);
-
-    // Check that the file has a $schema property and that it matches the URL of the
-    // schema version we support
-    if (!json.contains("$schema")) {
-        throw std::runtime_error(
-            fmt::format("File missing required $schema property: {}", file_path.string()));
-    }
-
-    // Check $schema attribute is present and valid
-    const auto actual_schema_url = json.at("$schema").get<std::string>();
-    const auto expected_schema_url =
-        fmt::format("{}v{}/{}", SchemaURLPrefix, schema_version, schema_file_name);
-    if (actual_schema_url != expected_schema_url) {
-        throw std::runtime_error(fmt::format("Invalid schema URL provided: {} (expected: {})",
-                                             actual_schema_url, expected_schema_url));
-    }
-
     // Perform validation
-    ifs.seekg(0); // Seek to start of file so we can reload
     validate_json(ifs, schema_file_name, schema_version);
 
-    return json;
+    // Read in JSON file
+    ifs.seekg(0); // Seek to start of file so we can reload
+    return nlohmann::json::parse(ifs);
 }
 } // namespace hgps::input
