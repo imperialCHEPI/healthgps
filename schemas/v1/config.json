@@ -1,0 +1,337 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
+    "type": "object",
+    "properties": {
+        "version": {
+            "const": 2
+        },
+        "data": {
+            "type": "object",
+            "properties": {
+                "source": {
+                    "type": "string"
+                },
+                "checksum": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "source"
+            ],
+            "additionalProperties": false
+        },
+        "inputs": {
+            "type": "object",
+            "properties": {
+                "dataset": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "format": {
+                            "const": "csv"
+                        },
+                        "delimiter": {
+                            "const": ","
+                        },
+                        "encoding": {
+                            "const": "ASCII"
+                        },
+                        "columns": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "anyOf": [
+                                    {
+                                        "const": "integer"
+                                    },
+                                    {
+                                        "const": "double"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "format",
+                        "delimiter",
+                        "encoding",
+                        "columns"
+                    ],
+                    "additionalProperties": false
+                },
+                "settings": {
+                    "type": "object",
+                    "properties": {
+                        "country_code": {
+                            "type": "string"
+                        },
+                        "size_fraction": {
+                            "type": "number"
+                        },
+                        "age_range": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "required": [
+                        "country_code",
+                        "size_fraction",
+                        "age_range"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "dataset",
+                "settings"
+            ]
+        },
+        "modelling": {
+            "type": "object",
+            "properties": {
+                "ses_model": {
+                    "type": "object",
+                    "properties": {
+                        "function_name": {
+                            "type": "string"
+                        },
+                        "function_parameters": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "required": [
+                        "function_name",
+                        "function_parameters"
+                    ],
+                    "additionalProperties": false
+                },
+                "risk_factors": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "level": {
+                                "type": "integer"
+                            },
+                            "range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "level",
+                            "range"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "risk_factor_models": {
+                    "type": "object",
+                    "properties": {
+                        "static": {
+                            "type": "string"
+                        },
+                        "dynamic": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "static",
+                        "dynamic"
+                    ],
+                    "additionalProperties": false
+                },
+                "baseline_adjustments": {
+                    "type": "object",
+                    "properties": {
+                        "format": {
+                            "const": "csv"
+                        },
+                        "delimiter": {
+                            "const": ","
+                        },
+                        "encoding": {
+                            "const": "ASCII"
+                        },
+                        "file_names": {
+                            "type": "object",
+                            "properties": {
+                                "factorsmean_male": {
+                                    "type": "string"
+                                },
+                                "factorsmean_female": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "factorsmean_male",
+                                "factorsmean_female"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "format",
+                        "delimiter",
+                        "encoding",
+                        "file_names"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "ses_model",
+                "risk_factors",
+                "risk_factor_models",
+                "baseline_adjustments"
+            ],
+            "additionalProperties": false
+        },
+        "running": {
+            "type": "object",
+            "properties": {
+                "seed": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "start_time": {
+                    "type": "integer"
+                },
+                "stop_time": {
+                    "type": "integer"
+                },
+                "trial_runs": {
+                    "type": "integer"
+                },
+                "sync_timeout_ms": {
+                    "type": "integer"
+                },
+                "diseases": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "interventions": {
+                    "type": "object",
+                    "properties": {
+                        "active_type_id": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "types": {
+                            "type": "object",
+                            "properties": {
+                                "simple": {
+                                    "type": "object",
+                                    "properties": {
+                                        "active_period": {
+                                            "type": "object",
+                                            "properties": {
+                                                "start_time": {
+                                                    "type": "integer"
+                                                },
+                                                "finish_time": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "start_time",
+                                                "finish_time"
+                                            ]
+                                        },
+                                        "impact_type": {
+                                            "type": "string"
+                                        },
+                                        "impacts": {
+                                            "type": "array"
+                                        }
+                                    },
+                                    "required": [
+                                        "active_period",
+                                        "impact_type",
+                                        "impacts"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "simple"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "active_type_id",
+                        "types"
+                    ]
+                }
+            },
+            "required": [
+                "seed",
+                "start_time",
+                "stop_time",
+                "trial_runs",
+                "sync_timeout_ms",
+                "diseases",
+                "interventions"
+            ]
+        },
+        "output": {
+            "type": "object",
+            "properties": {
+                "comorbidities": {
+                    "type": "integer"
+                },
+                "folder": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "comorbidities",
+                "folder",
+                "file_name"
+            ]
+        }
+    },
+    "required": [
+        "version",
+        "data",
+        "inputs",
+        "modelling",
+        "running",
+        "output"
+    ]
+}
