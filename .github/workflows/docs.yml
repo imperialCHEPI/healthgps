@@ -16,7 +16,7 @@ permissions:
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
@@ -24,8 +24,8 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     env:
-      VCPKG_ROOT: "vcpkg"
-      VCPKG_BINARY_SOURCES: "clear;nuget,GitHub,readwrite"
+      VCPKG_ROOT: vcpkg
+      VCPKG_BINARY_SOURCES: clear;nuget,GitHub,readwrite
     steps:
       - name: Checkout
         uses: actions/checkout@v4
