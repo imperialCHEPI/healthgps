@@ -14,13 +14,13 @@
 
 namespace {
 //! The name of the index file
-static constexpr const char *IndexFileName = "index.json";
+constexpr const char *IndexFileName = "index.json";
 
 //! The name of the index.json schema file
-static constexpr const char *DataIndexSchemaFileName = "data_index.json";
+constexpr const char *DataIndexSchemaFileName = "data_index.json";
 
 //! The version of the index.json schema file
-static constexpr int DataIndexSchemaVersion = 1;
+constexpr int DataIndexSchemaVersion = 1;
 
 nlohmann::json read_input_files_from_directory(const std::filesystem::path &data_path) {
     return hgps::input::load_and_validate_json(data_path / IndexFileName, DataIndexSchemaFileName,

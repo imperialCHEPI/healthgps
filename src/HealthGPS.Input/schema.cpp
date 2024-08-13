@@ -12,7 +12,7 @@ namespace {
 using namespace jsoncons;
 
 //! The prefix for Health-GPS schema URLs
-static constexpr const char *SchemaURLPrefix =
+constexpr const char *SchemaURLPrefix =
     "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/";
 
 json resolve_uri(const uri &uri, const std::filesystem::path &program_directory) {
