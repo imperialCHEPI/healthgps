@@ -1,0 +1,145 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/running.json",
+    "type": "object",
+    "properties": {
+        "seed": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+                "type": "integer"
+            }
+        },
+        "start_time": {
+            "type": "integer"
+        },
+        "stop_time": {
+            "type": "integer"
+        },
+        "trial_runs": {
+            "type": "integer"
+        },
+        "sync_timeout_ms": {
+            "type": "integer"
+        },
+        "diseases": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "interventions": {
+            "type": "object",
+            "properties": {
+                "active_type_id": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "types": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                            "active_period": {
+                                "type": "object",
+                                "properties": {
+                                    "start_time": {
+                                        "type": "integer"
+                                    },
+                                    "finish_time": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "start_time",
+                                    "finish_time"
+                                ],
+                                "additionalProperties": false
+                            },
+                            "impacts": {
+                                "type": "array"
+                            },
+                            "impact_type": {
+                                "type": "string"
+                            },
+                            "dynamics": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                }
+                            },
+                            "coefficients": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                }
+                            },
+                            "coverage_rates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                }
+                            },
+                            "coverage_cutoff_time": {
+                                "type": "integer",
+                                "minValue": 0
+                            },
+                            "child_cutoff_age": {
+                                "type": "integer",
+                                "minValue": 0
+                            },
+                            "adjustments": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "risk_factor": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "required": [
+                            "active_period",
+                            "impacts"
+                        ],
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "required": [
+                "active_type_id",
+                "types"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "seed",
+        "start_time",
+        "stop_time",
+        "trial_runs",
+        "sync_timeout_ms",
+        "diseases",
+        "interventions"
+    ],
+    "additionalProperties": false
+}
