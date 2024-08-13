@@ -32,19 +32,7 @@
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                }
-                            ],
-                            "minItems": 2,
-                            "items": false
+                            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
                         },
                         "time_limits": {
                             "type": "array",
@@ -122,19 +110,7 @@
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                }
-                            ],
-                            "minItems": 2,
-                            "items": false
+                            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
                         },
                         "time_year": {
                             "type": "integer",
@@ -279,19 +255,7 @@
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                }
-                            ],
-                            "minItems": 2,
-                            "items": false
+                            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
                         },
                         "time_year": {
                             "type": "integer",
