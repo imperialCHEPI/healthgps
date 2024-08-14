@@ -248,7 +248,7 @@ void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
 KevinHallAdjustmentTable
 KevinHallModel::compute_weight_adjustments(Population &population,
                                            std::optional<unsigned> age) const {
-    const auto &expected = get_risk_factor_expected();
+    const auto &expected = get_expected();
     auto W_means = compute_mean_weight(population, std::nullopt, age);
 
     // Compute adjustments.
@@ -512,7 +512,7 @@ void KevinHallModel::compute_bmi(Person &person) const {
 }
 
 void KevinHallModel::initialise_weight(Person &person) const {
-    const auto &expected = get_risk_factor_expected();
+    const auto &expected = get_expected();
 
     // Compute E/PA expected.
     double ei_expected = expected.at(person.gender, "EnergyIntake"_id).at(person.age);
@@ -663,7 +663,7 @@ void KevinHallModel::initialise_height(Person &person, double W_power_mean, Rand
 
 void KevinHallModel::update_height(Person &person, double W_power_mean) const {
     double W = person.risk_factors.at("Weight"_id);
-    double H_expected = get_risk_factor_expected().at(person.gender, "Height"_id).at(person.age);
+    double H_expected = get_expected().at(person.gender, "Height"_id).at(person.age);
     double H_residual = person.risk_factors.at("Height_residual"_id);
     double stddev = height_stddev_.at(person.gender);
     double slope = height_slope_.at(person.gender);
@@ -717,8 +717,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    const auto &expected = get_risk_factor_expected();
-    return std::make_unique<KevinHallModel>(expected, energy_equation_, nutrient_ranges_,
+    return std::make_unique<KevinHallModel>(expected_, energy_equation_, nutrient_ranges_,
                                             nutrient_equations_, food_prices_, weight_quantiles_,
                                             epa_quantiles_, height_stddev_, height_slope_);
 }

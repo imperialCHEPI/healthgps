@@ -27,12 +27,12 @@ using RiskFactorSexAgeTable = UnorderedMap2d<core::Gender, core::Identifier, std
 class RiskFactorAdjustableModel : public RiskFactorModel {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModel instance
-    /// @param risk_factor_expected The risk factor expected values by sex and age
-    RiskFactorAdjustableModel(const RiskFactorSexAgeTable &risk_factor_expected);
+    /// @param expected The risk factor expected values by sex and age
+    RiskFactorAdjustableModel(const RiskFactorSexAgeTable &expected);
 
     /// @brief Gets the risk factor expected values by sex and age
     /// @returns The risk factor expected values by sex and age
-    const RiskFactorSexAgeTable &get_risk_factor_expected() const noexcept;
+    const RiskFactorSexAgeTable &get_expected() const noexcept;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -49,23 +49,24 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
                              const std::vector<core::Identifier> &factors);
 
-    const RiskFactorSexAgeTable &risk_factor_expected_;
+  protected:
+    const RiskFactorSexAgeTable &expected_;
 };
 
 /// @brief Risk factor adjustable model definition interface
 class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
-    /// @param risk_factor_expected The expected risk factor values by sex and age
+    /// @param expected The expected risk factor values by sex and age
     /// @throws HgpsException for invalid arguments
-    RiskFactorAdjustableModelDefinition(RiskFactorSexAgeTable risk_factor_expected);
+    RiskFactorAdjustableModelDefinition(RiskFactorSexAgeTable expected);
 
     /// @brief Gets the risk factor expected values by sex and age
     /// @returns The risk factor expected values by sex and age
-    const RiskFactorSexAgeTable &get_risk_factor_expected() const noexcept;
+    const RiskFactorSexAgeTable &get_expected() const noexcept;
 
-  private:
-    RiskFactorSexAgeTable risk_factor_expected_;
+  protected:
+    RiskFactorSexAgeTable expected_;
 };
 
 } // namespace hgps

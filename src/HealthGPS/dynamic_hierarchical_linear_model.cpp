@@ -152,8 +152,7 @@ DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefiniti
 }
 
 std::unique_ptr<RiskFactorModel> DynamicHierarchicalLinearModelDefinition::create_model() const {
-    const auto &expected = get_risk_factor_expected();
-    return std::make_unique<DynamicHierarchicalLinearModel>(expected, equations_, variables_,
+    return std::make_unique<DynamicHierarchicalLinearModel>(expected_, equations_, variables_,
                                                             boundary_percentage_);
 }
 
