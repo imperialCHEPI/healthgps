@@ -173,8 +173,4 @@ RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     }
 }
 
-const RiskFactorSexAgeTable &RiskFactorAdjustableModelDefinition::get_expected() const noexcept {
-    return expected_;
-}
-
 } // namespace hgps

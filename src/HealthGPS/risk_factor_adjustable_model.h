@@ -61,10 +61,6 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
     /// @throws HgpsException for invalid arguments
     RiskFactorAdjustableModelDefinition(RiskFactorSexAgeTable expected);
 
-    /// @brief Gets the risk factor expected values by sex and age
-    /// @returns The risk factor expected values by sex and age
-    const RiskFactorSexAgeTable &get_expected() const noexcept;
-
   protected:
     RiskFactorSexAgeTable expected_;
 };
