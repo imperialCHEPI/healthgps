@@ -33,8 +33,9 @@ namespace hgps {
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(const RiskFactorSexAgeTable &expected)
     : expected_{expected} {}
 
-const RiskFactorSexAgeTable &RiskFactorAdjustableModel::get_expected() const noexcept {
-    return expected_;
+double RiskFactorAdjustableModel::get_expected(const core::Gender sex, const int age,
+                                               const core::Identifier &factor) const noexcept {
+    return expected_.at(sex, factor).at(age);
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,

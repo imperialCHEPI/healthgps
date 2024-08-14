@@ -248,7 +248,6 @@ void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
 KevinHallAdjustmentTable
 KevinHallModel::compute_weight_adjustments(Population &population,
                                            std::optional<unsigned> age) const {
-    const auto &expected = get_expected();
     auto W_means = compute_mean_weight(population, std::nullopt, age);
 
     // Compute adjustments.
@@ -257,7 +256,7 @@ KevinHallModel::compute_weight_adjustments(Population &population,
         adjustments.emplace_row(W_mean_sex, std::unordered_map<int, double>{});
         for (const auto &[W_mean_age, W_mean] : W_means_by_sex) {
             // NOTE: we only have the ages we requested here.
-            double W_expected = expected.at(W_mean_sex, "Weight"_id).at(W_mean_age);
+            double W_expected = get_expected(W_mean_sex, W_mean_age, "Weight"_id);
             adjustments.at(W_mean_sex)[W_mean_age] = W_expected - W_mean;
         }
     }
@@ -512,11 +511,9 @@ void KevinHallModel::compute_bmi(Person &person) const {
 }
 
 void KevinHallModel::initialise_weight(Person &person) const {
-    const auto &expected = get_expected();
-
     // Compute E/PA expected.
-    double ei_expected = expected.at(person.gender, "EnergyIntake"_id).at(person.age);
-    double pa_expected = expected.at(person.gender, "PhysicalActivity"_id).at(person.age);
+    double ei_expected = get_expected(person.gender, person.age, "EnergyIntake"_id);
+    double pa_expected = get_expected(person.gender, person.age, "PhysicalActivity"_id);
     double epa_expected = ei_expected / pa_expected;
 
     // Compute E/PA actual.
@@ -528,7 +525,7 @@ void KevinHallModel::initialise_weight(Person &person) const {
     double epa_quantile = epa_actual / epa_expected;
 
     // Compute new weight.
-    double w_expected = expected.at(person.gender, "Weight"_id).at(person.age);
+    double w_expected = get_expected(person.gender, person.age, "Weight"_id);
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
@@ -663,7 +660,7 @@ void KevinHallModel::initialise_height(Person &person, double W_power_mean, Rand
 
 void KevinHallModel::update_height(Person &person, double W_power_mean) const {
     double W = person.risk_factors.at("Weight"_id);
-    double H_expected = get_expected().at(person.gender, "Height"_id).at(person.age);
+    double H_expected = get_expected(person.gender, person.age, "Height"_id);
     double H_residual = person.risk_factors.at("Height_residual"_id);
     double stddev = height_stddev_.at(person.gender);
     double slope = height_slope_.at(person.gender);
