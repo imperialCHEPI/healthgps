@@ -178,14 +178,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                       policy_covariance_table.num_columns()};
 
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
-    std::vector<hgps::core::Identifier> names;
-    std::vector<hgps::LinearModelParams> models;
-    std::vector<hgps::core::DoubleInterval> ranges;
+    std::vector<core::Identifier> names;
+    std::vector<LinearModelParams> models;
+    std::vector<core::DoubleInterval> ranges;
     std::vector<double> lambda;
     std::vector<double> stddev;
-    std::vector<hgps::LinearModelParams> policy_models;
-    std::vector<hgps::core::DoubleInterval> policy_ranges;
-    std::vector<double> expected_trend;
+    std::vector<LinearModelParams> policy_models;
+    std::vector<core::DoubleInterval> policy_ranges;
+    std::unordered_map<core::Identifier, double> expected_trend;
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -243,7 +243,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
 
         // Load expected value trends.
-        expected_trend.emplace_back(json_params["ExpectedTrend"].get<double>());
+        expected_trend[key] = json_params["ExpectedTrend"].get<double>();
 
         // Increment table column index.
         i++;
