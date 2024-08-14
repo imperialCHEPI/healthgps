@@ -185,6 +185,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::vector<double> stddev;
     std::vector<hgps::LinearModelParams> policy_models;
     std::vector<hgps::core::DoubleInterval> policy_ranges;
+    std::vector<double> expected_trend;
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -240,6 +241,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             policy_covariance(i, j) =
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
+
+        // Load expected value trends.
+        expected_trend.emplace_back(json_params["ExpectedTrend"].get<double>());
 
         // Increment table column index.
         i++;
