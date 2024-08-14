@@ -4,6 +4,7 @@
 #include "sync_message.h"
 
 #include <oneapi/tbb/parallel_for_each.h>
+#include <utility>
 
 namespace { // anonymous namespace
 
@@ -32,7 +33,7 @@ namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected)
-    : expected_{expected} {}
+    : expected_{std::move(expected)} {}
 
 double RiskFactorAdjustableModel::get_expected(core::Gender sex, int age,
                                                const core::Identifier &factor) const noexcept {
