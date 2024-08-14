@@ -23,7 +23,7 @@ using KevinHallAdjustmentMessage =
 namespace hgps {
 
 KevinHallModel::KevinHallModel(
-    const RiskFactorSexAgeTable &expected,
+    std::shared_ptr<RiskFactorSexAgeTable> expected,
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -674,7 +674,8 @@ void KevinHallModel::update_height(Person &person, double W_power_mean) const {
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
-    RiskFactorSexAgeTable expected, std::unordered_map<core::Identifier, double> energy_equation,
+    std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,

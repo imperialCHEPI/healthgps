@@ -28,15 +28,14 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModel instance
     /// @param expected The risk factor expected values by sex and age
-    RiskFactorAdjustableModel(const RiskFactorSexAgeTable &expected);
+    RiskFactorAdjustableModel(std::shared_ptr<RiskFactorSexAgeTable> expected);
 
     /// @brief Gets a person's expected risk factor value
     /// @param sex The sex key to get the expected value
     /// @param age The age key to get the expected value
     /// @param factor The risk factor to get the expected value
     /// @returns The person's expected risk factor value
-    double get_expected(const core::Gender sex, const int age,
-                        const core::Identifier &factor) const noexcept;
+    double get_expected(core::Gender sex, int age, const core::Identifier &factor) const noexcept;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -53,7 +52,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
                              const std::vector<core::Identifier> &factors);
 
-    const RiskFactorSexAgeTable &expected_;
+    std::shared_ptr<RiskFactorSexAgeTable> expected_;
 };
 
 /// @brief Risk factor adjustable model definition interface
@@ -62,10 +61,10 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
     /// @param expected The expected risk factor values by sex and age
     /// @throws HgpsException for invalid arguments
-    RiskFactorAdjustableModelDefinition(RiskFactorSexAgeTable expected);
+    RiskFactorAdjustableModelDefinition(std::unique_ptr<RiskFactorSexAgeTable> expected);
 
   protected:
-    RiskFactorSexAgeTable expected_;
+    std::shared_ptr<RiskFactorSexAgeTable> expected_;
 };
 
 } // namespace hgps

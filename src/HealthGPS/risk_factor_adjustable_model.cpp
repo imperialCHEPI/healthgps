@@ -30,12 +30,13 @@ struct FirstMoment {
 
 namespace hgps {
 
-RiskFactorAdjustableModel::RiskFactorAdjustableModel(const RiskFactorSexAgeTable &expected)
+RiskFactorAdjustableModel::RiskFactorAdjustableModel(
+    std::shared_ptr<RiskFactorSexAgeTable> expected)
     : expected_{expected} {}
 
-double RiskFactorAdjustableModel::get_expected(const core::Gender sex, const int age,
+double RiskFactorAdjustableModel::get_expected(core::Gender sex, int age,
                                                const core::Identifier &factor) const noexcept {
-    return expected_.at(sex, factor).at(age);
+    return expected_->at(sex, factor).at(age);
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
@@ -109,7 +110,7 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
         for (const auto &factor : factors) {
             adjustments.emplace(sex, factor, std::vector<double>(age_count));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                double expect = expected_.at(sex, factor).at(age);
+                double expect = expected_->at(sex, factor).at(age);
                 double sim_mean = simulated_means_by_sex.at(factor).at(age);
 
                 // Delta should remain zero if simulated mean is NaN.
@@ -166,10 +167,10 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 }
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
-    RiskFactorSexAgeTable expected)
+    std::unique_ptr<RiskFactorSexAgeTable> expected)
     : RiskFactorModelDefinition{}, expected_{std::move(expected)} {
 
-    if (expected_.empty()) {
+    if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");
     }
 }

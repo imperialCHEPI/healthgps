@@ -39,7 +39,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
-        const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
+        std::shared_ptr<RiskFactorSexAgeTable> expected, const std::vector<core::Identifier> &names,
         const std::vector<LinearModelParams> &models,
         const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
@@ -136,7 +136,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
-        RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
+        std::unique_ptr<RiskFactorSexAgeTable> expected, std::vector<core::Identifier> names,
         std::vector<LinearModelParams> models, std::vector<core::DoubleInterval> ranges,
         std::vector<double> lambda, std::vector<double> stddev, Eigen::MatrixXd cholesky,
         std::vector<LinearModelParams> policy_models,

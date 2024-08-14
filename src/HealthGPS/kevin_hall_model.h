@@ -31,7 +31,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param height_stddev The height model female/male standard deviations
     /// @param height_slope The height female/male model slopes
     KevinHallModel(
-        const RiskFactorSexAgeTable &expected,
+        std::shared_ptr<RiskFactorSexAgeTable> expected,
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -227,7 +227,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param height_slope The height model female/male slopes
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
-        RiskFactorSexAgeTable expected,
+        std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,

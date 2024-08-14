@@ -7,7 +7,7 @@
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
-    const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
+    std::shared_ptr<RiskFactorSexAgeTable> expected, const std::vector<core::Identifier> &names,
     const std::vector<LinearModelParams> &models, const std::vector<core::DoubleInterval> &ranges,
     const std::vector<double> &lambda, const std::vector<double> &stddev,
     const Eigen::MatrixXd &cholesky, const std::vector<LinearModelParams> &policy_models,
@@ -340,7 +340,7 @@ void StaticLinearModel::initialise_physical_activity(Person &person, Random &ran
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
+    std::unique_ptr<RiskFactorSexAgeTable> expected, std::vector<core::Identifier> names,
     std::vector<LinearModelParams> models, std::vector<core::DoubleInterval> ranges,
     std::vector<double> lambda, std::vector<double> stddev, Eigen::MatrixXd cholesky,
     std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,

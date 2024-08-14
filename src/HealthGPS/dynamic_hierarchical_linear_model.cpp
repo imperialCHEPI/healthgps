@@ -8,7 +8,7 @@
 namespace hgps {
 
 DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
-    const RiskFactorSexAgeTable &expected,
+    std::shared_ptr<RiskFactorSexAgeTable> expected,
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
     : RiskFactorAdjustableModel{expected}, equations_{equations}, variables_{variables},
@@ -137,7 +137,7 @@ double DynamicHierarchicalLinearModel::sample_normal_with_boundary(Random &rando
 }
 
 DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefinition(
-    RiskFactorSexAgeTable expected,
+    std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
     : RiskFactorAdjustableModelDefinition{std::move(expected)}, equations_{std::move(equations)},
