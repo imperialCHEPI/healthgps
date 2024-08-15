@@ -345,8 +345,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(names), std::move(models),
         std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
-        std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky), info_speed,
-        std::move(rural_prevalence), std::move(income_models), physical_activity_stddev);
+        std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
+        std::move(trend_models), std::move(trend_ranges), info_speed, std::move(rural_prevalence),
+        std::move(income_models), physical_activity_stddev);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
