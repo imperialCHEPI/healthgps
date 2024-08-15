@@ -431,9 +431,11 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 
     // Risk factor expected values by sex and age.
     std::unique_ptr<hgps::RiskFactorSexAgeTable> expected = load_risk_factor_expected(config);
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
-        std::move(expected), std::move(equations), std::move(variables), percentage);
+        std::move(expected), std::move(expected_trend), std::move(equations), std::move(variables),
+        percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
@@ -443,6 +445,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
 
     // Risk factor expected values by sex and age.
     std::unique_ptr<hgps::RiskFactorSexAgeTable> expected = load_risk_factor_expected(config);
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     // Nutrient groups.
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
@@ -512,9 +515,10 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
-        std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),
-        std::move(nutrient_equations), std::move(food_prices), std::move(weight_quantiles),
-        std::move(epa_quantiles), std::move(height_stddev), std::move(height_slope));
+        std::move(expected), std::move(expected_trend), std::move(energy_equation),
+        std::move(nutrient_ranges), std::move(nutrient_equations), std::move(food_prices),
+        std::move(weight_quantiles), std::move(epa_quantiles), std::move(height_stddev),
+        std::move(height_slope));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>

@@ -10,10 +10,11 @@ namespace hgps {
 
 DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
-    : RiskFactorAdjustableModel{std::move(expected)}, equations_{equations}, variables_{variables},
-      boundary_percentage_{boundary_percentage} {}
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
+      equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {}
 
 RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
     return RiskFactorModelType::Dynamic;
@@ -139,10 +140,12 @@ double DynamicHierarchicalLinearModel::sample_normal_with_boundary(Random &rando
 
 DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
-    : RiskFactorAdjustableModelDefinition{std::move(expected)}, equations_{std::move(equations)},
-      variables_{std::move(variables)}, boundary_percentage_{boundary_percentage} {
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
+      equations_{std::move(equations)}, variables_{std::move(variables)},
+      boundary_percentage_{boundary_percentage} {
 
     if (equations_.empty()) {
         throw core::HgpsException("The model equations definition must not be empty");
@@ -153,8 +156,8 @@ DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefiniti
 }
 
 std::unique_ptr<RiskFactorModel> DynamicHierarchicalLinearModelDefinition::create_model() const {
-    return std::make_unique<DynamicHierarchicalLinearModel>(expected_, equations_, variables_,
-                                                            boundary_percentage_);
+    return std::make_unique<DynamicHierarchicalLinearModel>(expected_, expected_trend_, equations_,
+                                                            variables_, boundary_percentage_);
 }
 
 } // namespace hgps

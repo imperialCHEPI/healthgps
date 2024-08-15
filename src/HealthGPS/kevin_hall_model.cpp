@@ -24,6 +24,7 @@ namespace hgps {
 
 KevinHallModel::KevinHallModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -33,9 +34,10 @@ KevinHallModel::KevinHallModel(
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
     const std::unordered_map<core::Gender, double> &height_slope)
-    : RiskFactorAdjustableModel{std::move(expected)}, energy_equation_{energy_equation},
-      nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
-      food_prices_{food_prices}, weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
+      energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
+      nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
+      weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
       height_stddev_{height_stddev}, height_slope_{height_slope} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
@@ -677,6 +679,7 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
 
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
@@ -684,7 +687,7 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
     std::unordered_map<core::Gender, double> height_slope)
-    : RiskFactorAdjustableModelDefinition{std::move(expected)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
@@ -717,9 +720,9 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, energy_equation_, nutrient_ranges_,
-                                            nutrient_equations_, food_prices_, weight_quantiles_,
-                                            epa_quantiles_, height_stddev_, height_slope_);
+    return std::make_unique<KevinHallModel>(
+        expected_, expected_trend_, energy_equation_, nutrient_ranges_, nutrient_equations_,
+        food_prices_, weight_quantiles_, epa_quantiles_, height_stddev_, height_slope_);
 }
 
 } // namespace hgps

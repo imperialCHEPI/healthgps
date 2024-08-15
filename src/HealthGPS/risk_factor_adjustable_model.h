@@ -31,7 +31,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param expected_trend The expected trend of risk factor values
     RiskFactorAdjustableModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend = {});
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend);
 
     /// @brief Gets a person's expected risk factor value
     /// @param context The simulation run-time context
@@ -70,7 +70,7 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
     /// @throws HgpsException for invalid arguments
     RiskFactorAdjustableModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend = {});
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend);
 
   protected:
     std::shared_ptr<RiskFactorSexAgeTable> expected_;

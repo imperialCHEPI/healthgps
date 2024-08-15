@@ -22,6 +22,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the KevinHallModel class
     /// @param expected The risk factor expected values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -32,6 +33,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param height_slope The height female/male model slopes
     KevinHallModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -221,6 +223,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
   public:
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
     /// @param expected The risk factor expected values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -232,6 +235,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
