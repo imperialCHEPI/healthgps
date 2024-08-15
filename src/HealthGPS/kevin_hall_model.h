@@ -124,8 +124,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void compute_bmi(Person &person) const;
 
     /// @brief Initialises the weight of a person.
+    /// @param context The runtime context
     /// @param person The person fo initialise the weight for.
-    void initialise_weight(Person &person) const;
+    void initialise_weight(RuntimeContext &context, Person &person) const;
 
     /// @brief  Initialise the Kevin Hall state variables of a person
     /// @param person The person to initialise
@@ -154,11 +155,11 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
                                  KevinHallAdjustmentTable &&adjustments) const;
 
     /// @brief Compute weight adjustments for sex and age
-    /// @param population The population to compute the adjustments for
+    /// @param context The runtime context
     /// @param age The (optional) age to compute the adjustments for (default all)
     /// @return The weight adjustments by sex and age
     KevinHallAdjustmentTable
-    compute_weight_adjustments(Population &population,
+    compute_weight_adjustments(RuntimeContext &context,
                                std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
@@ -177,15 +178,18 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Initialises the height of a person.
+    /// @param context The runtime context
     /// @param person The person fo initialise the height for.
     /// @param W_power_mean The mean hweight power for the person's sex and age
     /// @param random The random number generator
-    void initialise_height(Person &person, double W_power_mean, Random &random) const;
+    void initialise_height(RuntimeContext &context, Person &person, double W_power_mean,
+                           Random &random) const;
 
     /// @brief Updates the height of a person.
+    /// @param context The runtime context
     /// @param person The person fo update the height for.
     /// @param W_power_mean The mean hweight power for the person's sex and age
-    void update_height(Person &person, double W_power_mean) const;
+    void update_height(RuntimeContext &context, Person &person, double W_power_mean) const;
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;

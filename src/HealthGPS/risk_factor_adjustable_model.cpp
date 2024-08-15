@@ -36,9 +36,14 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     const std::unordered_map<core::Identifier, double> &expected_trend)
     : expected_{std::move(expected)}, expected_trend_{expected_trend} {}
 
-double RiskFactorAdjustableModel::get_expected(core::Gender sex, int age,
+double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor) const noexcept {
-    return expected_->at(sex, factor).at(age);
+    double expected = expected_->at(sex, factor).at(age);
+    if (expected_trend_.contains(factor)) {
+        int elapsed_time = context.time_now() - context.start_time();
+        expected *= pow(expected_trend_.at(factor), elapsed_time);
+    }
+    return expected;
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,

@@ -34,11 +34,13 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
         const std::unordered_map<core::Identifier, double> &expected_trend = {});
 
     /// @brief Gets a person's expected risk factor value
+    /// @param context The simulation run-time context
     /// @param sex The sex key to get the expected value
     /// @param age The age key to get the expected value
     /// @param factor The risk factor to get the expected value
     /// @returns The person's expected risk factor value
-    double get_expected(core::Gender sex, int age, const core::Identifier &factor) const noexcept;
+    double get_expected(RuntimeContext &context, core::Gender sex, int age,
+                        const core::Identifier &factor) const noexcept;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context

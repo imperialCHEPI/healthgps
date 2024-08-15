@@ -63,9 +63,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
   private:
     static double inverse_box_cox(double factor, double lambda);
 
-    void initialise_factors(Person &person, Random &random) const;
+    void initialise_factors(RuntimeContext &context, Person &person, Random &random) const;
 
-    void update_factors(Person &person, Random &random) const;
+    void update_factors(RuntimeContext &context, Person &person, Random &random) const;
 
     void initialise_policies(Person &person, Random &random, bool intervene) const;
 
@@ -99,7 +99,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Initialise the physical activity of a person
     /// @param person The person to initialise sector for
     /// @param random The random number generator from the runtime context
-    void initialise_physical_activity(Person &person, Random &random) const;
+    void initialise_physical_activity(RuntimeContext &context, Person &person,
+                                      Random &random) const;
 
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
