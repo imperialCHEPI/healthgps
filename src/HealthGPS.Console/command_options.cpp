@@ -57,7 +57,7 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
 
         fmt::print(fmt::fg(fmt::color::yellow),
                    "WARNING: Path to data source specified with command-line argument. "
-                   "This functionality is deprecatated and will be removed in future. You "
+                   "This functionality is deprecated and will be removed in future. You "
                    "should pass the data source via the config file.\n");
         fmt::print("Data source: {}\n", source);
 
