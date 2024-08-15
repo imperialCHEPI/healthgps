@@ -41,20 +41,19 @@ hgps::AnalysisModule create_test_analysis_module() {
 }
 
 class TestAnalysisModule : public ::testing::Test {
-    protected:
-        hgps::AnalysisModule analysis_module = create_test_analysis_module();
+  protected:
+    hgps::AnalysisModule analysis_module = create_test_analysis_module();
 
-        analysis_module.factor_bins_ = std::vector<size_t>{100};
-        analysis_module.factor_bin_widths = std::vector<double>{10.0};
-        analysis_module.factor_min_values = std::vector<double>{1.0};
-        analysis_module.channels_ = std::vector<std::string>{"test_channel_1", "test_channel_2", "test_channel_3"};
-        analysis_module.factors_to_calculate = std::vector<core::Identifier>{"Age"_id};
+    analysis_module.factor_bins_ = std::vector<size_t>{100};
+    analysis_module.factor_bin_widths = std::vector<double>{10.0};
+    analysis_module.factor_min_values = std::vector<double>{1.0};
+    analysis_module.channels_ =
+        std::vector<std::string>{"test_channel_1", "test_channel_2", "test_channel_3"};
+    analysis_module.factors_to_calculate = std::vector<core::Identifier>{"Age"_id};
 
-        hgps::Person test_person = create_test_person(20);
-    };
+    hgps::Person test_person = create_test_person(20);
+};
 
 TEST_F(TestAnalysisModule, CalculateIndex) {
     // Test that the index is calculated correctly
-
-    
 }
