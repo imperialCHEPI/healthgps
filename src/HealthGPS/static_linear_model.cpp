@@ -153,6 +153,52 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     }
 }
 
+void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
+
+    // Approximate risk factor values with linear models.
+    auto linear = compute_linear_models(person, trend_models_);
+
+    // Get elapsed time (years).
+    int elapsed_time = context.time_now() - context.start_time();
+
+    // Initialise and apply trends (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise trend.
+        auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
+        double trend = trend_ranges_[i].clamp(linear[i]);
+        person.risk_factors[trend_name] = trend;
+
+        // Apply trend to risk factor.
+        double factor = person.risk_factors.at(names_[i]);
+        factor *= pow(trend, elapsed_time);
+
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
+    }
+}
+
+void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) const {
+
+    // Get elapsed time (years).
+    int elapsed_time = context.time_now() - context.start_time();
+
+    // Apply trends (should exist).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Load time trend.
+        auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
+        double trend = person.risk_factors.at(trend_name);
+
+        // Apply trend to risk factor.
+        double factor = person.risk_factors.at(names_[i]);
+        factor *= pow(trend, elapsed_time);
+
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
+    }
+}
+
 void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
     // NOTE: we need to keep baseline and intervention scenario RNGs in sync.
 

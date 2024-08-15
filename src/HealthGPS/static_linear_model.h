@@ -70,6 +70,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void update_factors(RuntimeContext &context, Person &person, Random &random) const;
 
+    void initialise_trends(RuntimeContext &context, Person &person) const;
+
+    void update_trends(RuntimeContext &context, Person &person) const;
+
     void initialise_policies(Person &person, Random &random, bool intervene) const;
 
     void update_policies(Person &person, bool intervene) const;
