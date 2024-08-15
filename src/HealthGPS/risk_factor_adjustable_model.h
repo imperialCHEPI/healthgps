@@ -28,7 +28,10 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModel instance
     /// @param expected The risk factor expected values by sex and age
-    RiskFactorAdjustableModel(std::shared_ptr<RiskFactorSexAgeTable> expected);
+    /// @param expected_trend The expected trend of risk factor values
+    RiskFactorAdjustableModel(
+        std::shared_ptr<RiskFactorSexAgeTable> expected,
+        const std::unordered_map<core::Identifier, double> &expected_trend = {});
 
     /// @brief Gets a person's expected risk factor value
     /// @param sex The sex key to get the expected value
@@ -53,6 +56,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
                              const std::vector<core::Identifier> &factors);
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
+    const std::unordered_map<core::Identifier, double> &expected_trend_;
 };
 
 /// @brief Risk factor adjustable model definition interface
@@ -60,11 +64,15 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
   public:
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
     /// @param expected The expected risk factor values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @throws HgpsException for invalid arguments
-    RiskFactorAdjustableModelDefinition(std::unique_ptr<RiskFactorSexAgeTable> expected);
+    RiskFactorAdjustableModelDefinition(
+        std::unique_ptr<RiskFactorSexAgeTable> expected,
+        std::unordered_map<core::Identifier, double> expected_trend = {});
 
   protected:
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
+    std::unordered_map<core::Identifier, double> expected_trend_;
 };
 
 } // namespace hgps

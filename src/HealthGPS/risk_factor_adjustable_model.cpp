@@ -32,8 +32,9 @@ struct FirstMoment {
 namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
-    std::shared_ptr<RiskFactorSexAgeTable> expected)
-    : expected_{std::move(expected)} {}
+    std::shared_ptr<RiskFactorSexAgeTable> expected,
+    const std::unordered_map<core::Identifier, double> &expected_trend)
+    : expected_{std::move(expected)}, expected_trend_{expected_trend} {}
 
 double RiskFactorAdjustableModel::get_expected(core::Gender sex, int age,
                                                const core::Identifier &factor) const noexcept {
@@ -168,8 +169,9 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 }
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
-    std::unique_ptr<RiskFactorSexAgeTable> expected)
-    : RiskFactorModelDefinition{}, expected_{std::move(expected)} {
+    std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unordered_map<core::Identifier, double> expected_trend)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {
 
     if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");

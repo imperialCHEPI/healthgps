@@ -18,12 +18,12 @@ struct LinearModelParams {
 };
 
 /// @brief Implements the static linear model type
-///
 /// @details The static model is used to initialise the virtual population.
 class StaticLinearModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the StaticLinearModel class
-    /// @param expected The risk factor expected values by sex and age
+    /// @param expected The expected risk factor values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factor values
     /// @param ranges The value range of each risk factor
@@ -39,8 +39,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
-        std::shared_ptr<RiskFactorSexAgeTable> expected, const std::vector<core::Identifier> &names,
-        const std::vector<LinearModelParams> &models,
+        std::shared_ptr<RiskFactorSexAgeTable> expected,
+        const std::unordered_map<core::Identifier, double> &expected_trend,
+        const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
         const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
         const std::vector<LinearModelParams> &policy_models,
@@ -120,7 +121,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
   public:
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
-    /// @param expected The risk factor expected values by sex and age
+    /// @param expected The expected risk factor values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factors
     /// @param ranges The value range of each risk factor
@@ -136,9 +138,11 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
-        std::unique_ptr<RiskFactorSexAgeTable> expected, std::vector<core::Identifier> names,
-        std::vector<LinearModelParams> models, std::vector<core::DoubleInterval> ranges,
-        std::vector<double> lambda, std::vector<double> stddev, Eigen::MatrixXd cholesky,
+        std::unique_ptr<RiskFactorSexAgeTable> expected,
+        std::unordered_map<core::Identifier, double> expected_trend,
+        std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
+        std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
+        std::vector<double> stddev, Eigen::MatrixXd cholesky,
         std::vector<LinearModelParams> policy_models,
         std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
         double info_speed,
