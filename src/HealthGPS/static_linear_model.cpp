@@ -24,8 +24,9 @@ StaticLinearModel::StaticLinearModel(
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)}, names_{names},
       models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
-      policy_cholesky_{policy_cholesky}, trend_models_{trend_models}, trend_ranges_{trend_ranges},
-      info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
+      policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
+      trend_ranges_{std::move(trend_ranges)}, info_speed_{info_speed},
+      rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
