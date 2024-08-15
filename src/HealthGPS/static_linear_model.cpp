@@ -39,6 +39,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
+        initialise_trends(context, person);
         initialise_physical_activity(context, person, context.random());
     }
 
@@ -68,11 +69,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(context, person, context.random());
+            initialise_trends(context, person);
             initialise_physical_activity(context, person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
             update_factors(context, person, context.random());
+            update_trends(context, person);
         }
     }
 
