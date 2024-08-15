@@ -40,7 +40,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
-        const std::unordered_map<core::Identifier, double> &expected_trend,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
         const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
@@ -140,7 +140,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
-        std::unordered_map<core::Identifier, double> expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
         std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
         std::vector<double> stddev, Eigen::MatrixXd cholesky,

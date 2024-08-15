@@ -185,7 +185,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::vector<double> stddev;
     std::vector<LinearModelParams> policy_models;
     std::vector<core::DoubleInterval> policy_ranges;
-    std::unordered_map<core::Identifier, double> expected_trend;
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -243,7 +243,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         }
 
         // Load expected value trends.
-        expected_trend[key] = json_params["ExpectedTrend"].get<double>();
+        (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
 
         // Increment table column index.
         i++;

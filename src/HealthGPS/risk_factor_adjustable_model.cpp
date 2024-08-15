@@ -33,15 +33,15 @@ namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
-    const std::unordered_map<core::Identifier, double> &expected_trend)
-    : expected_{std::move(expected)}, expected_trend_{expected_trend} {}
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {}
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor) const noexcept {
     double expected = expected_->at(sex, factor).at(age);
-    if (expected_trend_.contains(factor)) {
+    if (expected_trend_->contains(factor)) {
         int elapsed_time = context.time_now() - context.start_time();
-        expected *= pow(expected_trend_.at(factor), elapsed_time);
+        expected *= pow(expected_trend_->at(factor), elapsed_time);
     }
     return expected;
 }
@@ -175,7 +175,7 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
-    std::unordered_map<core::Identifier, double> expected_trend)
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend)
     : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {
 
     if (expected_->empty()) {

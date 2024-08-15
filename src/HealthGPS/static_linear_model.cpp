@@ -9,7 +9,7 @@ namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
-    const std::unordered_map<core::Identifier, double> &expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
     const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
     const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
@@ -20,7 +20,7 @@ StaticLinearModel::StaticLinearModel(
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModel{std::move(expected), expected_trend}, names_{names},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)}, names_{names},
       models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
@@ -348,7 +348,7 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
-    std::unordered_map<core::Identifier, double> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,
@@ -399,7 +399,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
         throw core::HgpsException("Income models mapping is empty");
     }
     for (const auto &name : names_) {
-        if (!expected_trend_.contains(name)) {
+        if (!expected_trend_->contains(name)) {
             throw core::HgpsException("One or more risk factor expected trend value is missing");
         }
     }
