@@ -48,8 +48,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
         const std::vector<LinearModelParams> &policy_models,
         const std::vector<core::DoubleInterval> &policy_ranges,
-        const Eigen::MatrixXd &policy_cholesky, const std::vector<LinearModelParams> &trend_models,
-        const std::vector<core::DoubleInterval> &trend_ranges, double info_speed,
+        const Eigen::MatrixXd &policy_cholesky,
+        std::shared_ptr<std::vector<LinearModelParams>> trend_models,
+        std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
@@ -118,8 +119,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::vector<LinearModelParams> &policy_models_;
     const std::vector<core::DoubleInterval> &policy_ranges_;
     const Eigen::MatrixXd &policy_cholesky_;
-    const std::vector<LinearModelParams> &trend_models_;
-    const std::vector<core::DoubleInterval> &trend_ranges_;
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
     const double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
@@ -157,8 +158,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::vector<double> stddev, Eigen::MatrixXd cholesky,
         std::vector<LinearModelParams> policy_models,
         std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
-        std::vector<LinearModelParams> trend_models, std::vector<core::DoubleInterval> trend_ranges,
-        double info_speed,
+        std::unique_ptr<std::vector<LinearModelParams>> trend_models,
+        std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
@@ -178,8 +179,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::vector<LinearModelParams> policy_models_;
     std::vector<core::DoubleInterval> policy_ranges_;
     Eigen::MatrixXd policy_cholesky_;
-    std::vector<LinearModelParams> trend_models_;
-    std::vector<core::DoubleInterval> trend_ranges_;
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
     double info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;

@@ -15,8 +15,8 @@ StaticLinearModel::StaticLinearModel(
     const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
     const std::vector<LinearModelParams> &policy_models,
     const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
-    const std::vector<LinearModelParams> &trend_models,
-    const std::vector<core::DoubleInterval> &trend_ranges, double info_speed,
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models,
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
@@ -156,7 +156,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
 
     // Approximate risk factor values with linear models.
-    auto linear = compute_linear_models(person, trend_models_);
+    auto linear = compute_linear_models(person, *trend_models_);
 
     // Get elapsed time (years).
     int elapsed_time = context.time_now() - context.start_time();
@@ -166,7 +166,7 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
 
         // Initialise trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-        double trend = trend_ranges_[i].clamp(linear[i]);
+        double trend = (*trend_ranges_)[i].clamp(linear[i]);
         person.risk_factors[trend_name] = trend;
 
         // Apply trend to risk factor.
@@ -400,8 +400,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,
     std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,
-    Eigen::MatrixXd policy_cholesky, std::vector<LinearModelParams> trend_models,
-    std::vector<core::DoubleInterval> trend_ranges, double info_speed,
+    Eigen::MatrixXd policy_cholesky, std::unique_ptr<std::vector<LinearModelParams>> trend_models,
+    std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
@@ -441,10 +441,10 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
-    if (trend_models_.empty()) {
+    if (trend_models_->empty()) {
         throw core::HgpsException("Time trend model list is empty");
     }
-    if (trend_ranges_.empty()) {
+    if (trend_ranges_->empty()) {
         throw core::HgpsException("Time trend ranges list is empty");
     }
     if (rural_prevalence_.empty()) {

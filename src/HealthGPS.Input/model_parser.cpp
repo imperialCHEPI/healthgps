@@ -185,8 +185,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::vector<double> stddev;
     std::vector<LinearModelParams> policy_models;
     std::vector<core::DoubleInterval> policy_ranges;
-    std::vector<LinearModelParams> trend_models;
-    std::vector<core::DoubleInterval> trend_ranges;
+    auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
+    auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     size_t i = 0;
@@ -252,8 +252,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                            .get<std::unordered_map<core::Identifier, double>>();
 
         // Write time trend data structures.
-        trend_models.emplace_back(std::move(trend_model));
-        trend_ranges.emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+        trend_models->emplace_back(std::move(trend_model));
+        trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
 
         // Load expected value trends.
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
