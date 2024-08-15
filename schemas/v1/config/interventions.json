@@ -67,11 +67,11 @@
                     },
                     "coverage_cutoff_time": {
                         "type": "integer",
-                        "minValue": 0
+                        "minimum": 0
                     },
                     "child_cutoff_age": {
                         "type": "integer",
-                        "minValue": 0
+                        "minimum": 0
                     },
                     "adjustments": {
                         "type": "array",
