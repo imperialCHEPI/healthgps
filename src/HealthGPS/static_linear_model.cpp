@@ -3,6 +3,7 @@
 #include "runtime_context.h"
 
 #include <ranges>
+#include <utility>
 
 namespace hgps {
 
@@ -19,8 +20,8 @@ StaticLinearModel::StaticLinearModel(
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModel{expected, expected_trend}, names_{names}, models_{models},
-      ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
+    : RiskFactorAdjustableModel{std::move(expected), expected_trend}, names_{names},
+      models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},

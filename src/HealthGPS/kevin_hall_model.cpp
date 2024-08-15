@@ -33,7 +33,7 @@ KevinHallModel::KevinHallModel(
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
     const std::unordered_map<core::Gender, double> &height_slope)
-    : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
+    : RiskFactorAdjustableModel{std::move(expected)}, energy_equation_{energy_equation},
       nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
       food_prices_{food_prices}, weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
       height_stddev_{height_stddev}, height_slope_{height_slope} {}

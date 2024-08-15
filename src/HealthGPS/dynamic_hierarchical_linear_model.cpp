@@ -3,6 +3,7 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <utility>
 #include <vector>
 
 namespace hgps {
@@ -11,7 +12,7 @@ DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
-    : RiskFactorAdjustableModel{expected}, equations_{equations}, variables_{variables},
+    : RiskFactorAdjustableModel{std::move(expected)}, equations_{equations}, variables_{variables},
       boundary_percentage_{boundary_percentage} {}
 
 RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
