@@ -38,7 +38,7 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor,
-                                               OptionalRange expected_range) const noexcept {
+                                               OptionalRange range) const noexcept {
     double expected = expected_->at(sex, factor).at(age);
 
     // Apply trend to expected value.
@@ -48,9 +48,8 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     }
 
     // Clamp expected value to an optionally specified range.
-    if (expected_range.has_value()) {
-        const auto &range = expected_range.value().get();
-        expected = range.clamp(expected);
+    if (range.has_value()) {
+        expected = range.value().get().clamp(expected);
     }
 
     return expected;
@@ -63,7 +62,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = calculate_adjustments(context, factors);
+        adjustments = calculate_adjustments(context, factors, ranges);
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
@@ -113,8 +112,10 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     }
 }
 
-RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
-    RuntimeContext &context, const std::vector<core::Identifier> &factors) const {
+RiskFactorSexAgeTable
+RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
+                                                 const std::vector<core::Identifier> &factors,
+                                                 OptionalRanges ranges) const {
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
@@ -124,10 +125,17 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
-        for (const auto &factor : factors) {
+        for (size_t i = 0; i < factors.size(); i++) {
+            const core::Identifier &factor = factors[i];
+
+            OptionalRange range;
+            if (ranges.has_value()) {
+                range = OptionalRange{ranges.value().get().at(i)};
+            }
+
             adjustments.emplace(sex, factor, std::vector<double>(age_count));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                double expect = expected_->at(sex, factor).at(age);
+                double expect = get_expected(context, sex, age, factor, range);
                 double sim_mean = simulated_means_by_sex.at(factor).at(age);
 
                 // Delta should remain zero if simulated mean is NaN.
