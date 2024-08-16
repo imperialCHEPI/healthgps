@@ -13,6 +13,8 @@
 
 namespace { // anonymous namespace
 
+using OptionalRange = std::optional<std::reference_wrapper<const hgps::core::DoubleInterval>>;
+
 using OptionalRanges =
     std::optional<std::reference_wrapper<const std::vector<hgps::core::DoubleInterval>>>;
 
@@ -38,9 +40,11 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param sex The sex key to get the expected value
     /// @param age The age key to get the expected value
     /// @param factor The risk factor to get the expected value
+    /// @param range An optional expected value range
     /// @returns The person's expected risk factor value
     double get_expected(RuntimeContext &context, core::Gender sex, int age,
-                        const core::Identifier &factor) const noexcept;
+                        const core::Identifier &factor,
+                        OptionalRange range = std::nullopt) const noexcept;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
@@ -50,8 +54,13 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
                              OptionalRanges ranges = std::nullopt) const;
 
   private:
+    /// @brief Adjust risk factors such that mean sim value matches expected value
+    /// @param context The simulation run-time context
+    /// @param factors A list of risk factors to be adjusted
+    /// @param ranges An optional list of risk factor value boundaries
     RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context,
-                                                const std::vector<core::Identifier> &factors) const;
+                                                const std::vector<core::Identifier> &factors,
+                                                OptionalRanges ranges) const;
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
