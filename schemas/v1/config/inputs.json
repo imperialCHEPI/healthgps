@@ -51,7 +51,7 @@
                     "type": "number"
                 },
                 "age_range": {
-                    "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
+                    "$ref": "../age_range.json"
                 }
             },
             "required": [

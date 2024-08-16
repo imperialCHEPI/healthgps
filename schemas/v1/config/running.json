@@ -30,7 +30,7 @@
             }
         },
         "interventions": {
-            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/config/interventions.json"
+            "$ref": "interventions.json"
         }
     },
     "required": [

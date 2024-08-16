@@ -8,7 +8,7 @@
         "country": {
             "allOf": [
                 {
-                    "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
@@ -26,13 +26,13 @@
         "demographic": {
             "allOf": [
                 {
-                    "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
+                            "$ref": "age_range.json"
                         },
                         "time_limits": {
                             "type": "array",
@@ -104,13 +104,13 @@
         "diseases": {
             "allOf": [
                 {
-                    "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
+                            "$ref": "age_range.json"
                         },
                         "time_year": {
                             "type": "integer",
@@ -249,13 +249,13 @@
         "analysis": {
             "allOf": [
                 {
-                    "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/age_range.json"
+                            "$ref": "age_range.json"
                         },
                         "time_year": {
                             "type": "integer",

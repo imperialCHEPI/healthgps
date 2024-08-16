@@ -7,19 +7,19 @@
             "type": "string"
         },
         "data": {
-            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/config/data.json"
+            "$ref": "config/data.json"
         },
         "inputs": {
-            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/config/inputs.json"
+            "$ref": "config/inputs.json"
         },
         "modelling": {
-            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/config/modelling.json"
+            "$ref": "config/modelling.json"
         },
         "running": {
-            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/config/running.json"
+            "$ref": "config/running.json"
         },
         "output": {
-            "$ref": "/imperialCHEPI/healthgps/main/schemas/v1/config/output.json"
+            "$ref": "config/output.json"
         }
     },
     "required": [
