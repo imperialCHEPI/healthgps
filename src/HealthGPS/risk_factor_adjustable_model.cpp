@@ -37,12 +37,22 @@ RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {}
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
-                                               const core::Identifier &factor) const noexcept {
+                                               const core::Identifier &factor,
+                                               OptionalRange expected_range) const noexcept {
     double expected = expected_->at(sex, factor).at(age);
+
+    // Apply trend to expected value.
     if (expected_trend_->contains(factor)) {
         int elapsed_time = context.time_now() - context.start_time();
         expected *= pow(expected_trend_->at(factor), elapsed_time);
     }
+
+    // Clamp expected value to an optionally specified range.
+    if (expected_range.has_value()) {
+        const auto &range = expected_range.value().get();
+        expected = range.clamp(expected);
+    }
+
     return expected;
 }
 
