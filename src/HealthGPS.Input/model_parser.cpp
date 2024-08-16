@@ -24,7 +24,8 @@
 
 namespace hgps::input {
 
-hgps::RiskFactorSexAgeTable load_risk_factor_expected(const Configuration &config) {
+std::unique_ptr<hgps::RiskFactorSexAgeTable>
+load_risk_factor_expected(const Configuration &config) {
     MEASURE_FUNCTION();
 
     const auto &info = config.modelling.baseline_adjustment;
@@ -32,21 +33,21 @@ hgps::RiskFactorSexAgeTable load_risk_factor_expected(const Configuration &confi
         throw hgps::core::HgpsException{"Unsupported file format: " + info.format};
     }
 
-    auto table = hgps::RiskFactorSexAgeTable{};
+    auto table = std::make_unique<hgps::RiskFactorSexAgeTable>();
     const auto male_filename = info.file_names.at("factorsmean_male").string();
     const auto female_filename = info.file_names.at("factorsmean_female").string();
     try {
-        table.emplace_row(hgps::core::Gender::male,
-                          load_baseline_from_csv(male_filename, info.delimiter));
-        table.emplace_row(hgps::core::Gender::female,
-                          load_baseline_from_csv(female_filename, info.delimiter));
+        table->emplace_row(hgps::core::Gender::male,
+                           load_baseline_from_csv(male_filename, info.delimiter));
+        table->emplace_row(hgps::core::Gender::female,
+                           load_baseline_from_csv(female_filename, info.delimiter));
     } catch (const std::runtime_error &ex) {
         throw hgps::core::HgpsException{fmt::format("Failed to parse adjustment file: {} or {}. {}",
                                                     male_filename, female_filename, ex.what())};
     }
 
     const auto max_age = static_cast<std::size_t>(config.settings.age_range.upper());
-    for (const auto &sex : table) {
+    for (const auto &sex : *table) {
         for (const auto &factor : sex.second) {
             if (factor.second.size() <= max_age) {
                 throw hgps::core::HgpsException{
@@ -177,13 +178,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                       policy_covariance_table.num_columns()};
 
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
-    std::vector<hgps::core::Identifier> names;
-    std::vector<hgps::LinearModelParams> models;
-    std::vector<hgps::core::DoubleInterval> ranges;
+    std::vector<core::Identifier> names;
+    std::vector<LinearModelParams> models;
+    std::vector<core::DoubleInterval> ranges;
     std::vector<double> lambda;
     std::vector<double> stddev;
-    std::vector<hgps::LinearModelParams> policy_models;
-    std::vector<hgps::core::DoubleInterval> policy_ranges;
+    std::vector<LinearModelParams> policy_models;
+    std::vector<core::DoubleInterval> policy_ranges;
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -240,6 +242,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
 
+        // Load expected value trends.
+        (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
+
         // Increment table column index.
         i++;
     }
@@ -268,15 +273,15 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
 
     // Risk factor expected values by sex and age.
-    hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
+    auto expected = load_risk_factor_expected(config);
 
     // Check expected values are defined for all risk factors.
     for (const auto &name : names) {
-        if (!expected.at(hgps::core::Gender::male).contains(name)) {
+        if (!expected->at(hgps::core::Gender::male).contains(name)) {
             throw hgps::core::HgpsException{fmt::format(
                 "'{}' is not defined in male risk factor expected values.", name.to_string())};
         }
-        if (!expected.at(hgps::core::Gender::female).contains(name)) {
+        if (!expected->at(hgps::core::Gender::female).contains(name)) {
             throw hgps::core::HgpsException{fmt::format(
                 "'{}' is not defined in female risk factor expected values.", name.to_string())};
         }
@@ -327,9 +332,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(expected), std::move(names), std::move(models), std::move(ranges),
-        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
-        std::move(policy_ranges), std::move(policy_cholesky), info_speed,
+        std::move(expected), std::move(expected_trend), std::move(names), std::move(models),
+        std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
+        std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky), info_speed,
         std::move(rural_prevalence), std::move(income_models), physical_activity_stddev);
 }
 
@@ -425,10 +430,12 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
     }
 
     // Risk factor expected values by sex and age.
-    hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
+    auto expected = load_risk_factor_expected(config);
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
-        std::move(expected), std::move(equations), std::move(variables), percentage);
+        std::move(expected), std::move(expected_trend), std::move(equations), std::move(variables),
+        percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
@@ -437,7 +444,8 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     MEASURE_FUNCTION();
 
     // Risk factor expected values by sex and age.
-    hgps::RiskFactorSexAgeTable expected = load_risk_factor_expected(config);
+    auto expected = load_risk_factor_expected(config);
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     // Nutrient groups.
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
@@ -507,9 +515,10 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
-        std::move(expected), std::move(energy_equation), std::move(nutrient_ranges),
-        std::move(nutrient_equations), std::move(food_prices), std::move(weight_quantiles),
-        std::move(epa_quantiles), std::move(height_stddev), std::move(height_slope));
+        std::move(expected), std::move(expected_trend), std::move(energy_equation),
+        std::move(nutrient_ranges), std::move(nutrient_equations), std::move(food_prices),
+        std::move(weight_quantiles), std::move(epa_quantiles), std::move(height_stddev),
+        std::move(height_slope));
 }
 
 std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>

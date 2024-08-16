@@ -17,7 +17,7 @@ namespace hgps::input {
 /// @brief Loads risk factor expected values from a file
 /// @param config The model configuration
 /// @return An instance of the hgps::RiskFactorSexAgeTable type
-hgps::RiskFactorSexAgeTable load_risk_factor_expected(const Configuration &config);
+std::unique_ptr<hgps::RiskFactorSexAgeTable> load_risk_factor_expected(const Configuration &config);
 
 /// @brief Loads either a static or dynamic dummy risk factor model from a JSON file
 /// @param type Model type (static or dynamic)

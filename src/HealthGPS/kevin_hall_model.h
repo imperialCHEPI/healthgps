@@ -22,6 +22,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
   public:
     /// @brief Initialises a new instance of the KevinHallModel class
     /// @param expected The risk factor expected values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -31,7 +32,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param height_stddev The height model female/male standard deviations
     /// @param height_slope The height female/male model slopes
     KevinHallModel(
-        const RiskFactorSexAgeTable &expected,
+        std::shared_ptr<RiskFactorSexAgeTable> expected,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         const std::unordered_map<core::Identifier, double> &energy_equation,
         const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
         const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -124,8 +126,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void compute_bmi(Person &person) const;
 
     /// @brief Initialises the weight of a person.
+    /// @param context The runtime context
     /// @param person The person fo initialise the weight for.
-    void initialise_weight(Person &person) const;
+    void initialise_weight(RuntimeContext &context, Person &person) const;
 
     /// @brief  Initialise the Kevin Hall state variables of a person
     /// @param person The person to initialise
@@ -154,11 +157,11 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
                                  KevinHallAdjustmentTable &&adjustments) const;
 
     /// @brief Compute weight adjustments for sex and age
-    /// @param population The population to compute the adjustments for
+    /// @param context The runtime context
     /// @param age The (optional) age to compute the adjustments for (default all)
     /// @return The weight adjustments by sex and age
     KevinHallAdjustmentTable
-    compute_weight_adjustments(Population &population,
+    compute_weight_adjustments(RuntimeContext &context,
                                std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
@@ -177,15 +180,18 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         std::optional<unsigned> age = std::nullopt) const;
 
     /// @brief Initialises the height of a person.
+    /// @param context The runtime context
     /// @param person The person fo initialise the height for.
     /// @param W_power_mean The mean hweight power for the person's sex and age
     /// @param random The random number generator
-    void initialise_height(Person &person, double W_power_mean, Random &random) const;
+    void initialise_height(RuntimeContext &context, Person &person, double W_power_mean,
+                           Random &random) const;
 
     /// @brief Updates the height of a person.
+    /// @param context The runtime context
     /// @param person The person fo update the height for.
     /// @param W_power_mean The mean hweight power for the person's sex and age
-    void update_height(Person &person, double W_power_mean) const;
+    void update_height(RuntimeContext &context, Person &person, double W_power_mean) const;
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
@@ -217,6 +223,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
   public:
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
     /// @param expected The risk factor expected values by sex and age
+    /// @param expected_trend The expected trend of risk factor values
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -227,7 +234,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param height_slope The height model female/male slopes
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
-        RiskFactorSexAgeTable expected,
+        std::unique_ptr<RiskFactorSexAgeTable> expected,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
