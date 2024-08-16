@@ -23,7 +23,6 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
     namespace fs = std::filesystem;
 
     CommandOptions cmd;
-    cmd.verbose = false;
     auto result = options.parse(argc, argv);
 
     if (result.count("help")) {
