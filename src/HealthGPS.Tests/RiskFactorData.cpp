@@ -1,8 +1,7 @@
 #include "RiskFactorData.h"
 
 template <typename TYPE>
-std::string join_string(const std::vector<TYPE> &v, std::string_view delimiter,
-                        bool quoted) {
+std::string join_string(const std::vector<TYPE> &v, std::string_view delimiter, bool quoted) {
     std::stringstream s;
     if (!v.empty()) {
         std::string_view q = quoted ? "\"" : "";
