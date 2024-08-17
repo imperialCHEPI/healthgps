@@ -8,11 +8,16 @@
 #include "runtime_context.h"
 #include "weight_model.h"
 
+#include <gtest/gtest.h>
+
 namespace hgps {
 
 /// @brief Implements the burden of diseases (BoD) analysis module
 class AnalysisModule final : public UpdatableModule {
   public:
+    friend class TestAnalysisModule;
+    FRIEND_TEST(TestAnalysisModule, CalculateIndex);
+
     AnalysisModule() = delete;
 
     /// @brief Initialises a new instance of the AnalysisModule class.

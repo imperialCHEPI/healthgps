@@ -42,8 +42,12 @@ target_sources(
             "WeightModel.Test.cpp"
             "CountryModule.h"
             "RiskFactorData.h"
+            "RiskFactorData.cpp"
             "Interval.Test.cpp"
-            "LoadNutrientTable.cpp")
+            "LoadNutrientTable.cpp"
+            "AnalysisModule.Test.cpp"
+            "simulation.h"
+            "simulation.cpp")
 
 target_link_libraries(
     HealthGPS.Tests
