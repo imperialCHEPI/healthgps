@@ -40,28 +40,30 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
-        initialise_trends(context, person);
         initialise_physical_activity(context, person, context.random());
     }
 
-    // Adjust risk factors to match expected values.
-    adjust_risk_factors(context, names_, ranges_);
+    // Adjust such that risk factor means match expected values.
+    adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
+        initialise_trends(context, person);
     }
+
+    // Adjust such that trended risk factor means match trended expected values.
+    adjust_risk_factors(context, names_, ranges_, true);
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
-    // HACK: start intervening after 2 years from sim start.
+    // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
-        // Ignore if inactive.
         if (!person.is_active()) {
             continue;
         }
@@ -70,18 +72,16 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(context, person, context.random());
-            initialise_trends(context, person);
             initialise_physical_activity(context, person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
             update_factors(context, person, context.random());
-            update_trends(context, person);
         }
     }
 
-    // Adjust risk factors to match expected values.
-    adjust_risk_factors(context, names_, ranges_);
+    // Adjust such that risk factor means match expected values.
+    adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise newborns and update others.
     for (auto &person : context.population()) {
@@ -91,9 +91,23 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
+            initialise_trends(context, person);
         } else {
             update_policies(person, intervene);
+            update_trends(context, person);
         }
+    }
+
+    // Adjust such that trended risk factor means match trended expected values.
+    adjust_risk_factors(context, names_, ranges_, true);
+
+    // Apply policies if intervening.
+    for (auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
+
+        apply_policies(person, intervene);
     }
 }
 
@@ -107,7 +121,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
-    // Approximate risk factor values with linear models.
+    // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
 
     // Initialise residuals and risk factors (do not exist yet).
@@ -134,7 +148,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
-    // Approximate risk factor values with linear models.
+    // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
 
     // Update residuals and risk factors (should exist).
@@ -159,7 +173,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
 void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
 
-    // Approximate risk factor values with linear models.
+    // Approximate trends with linear models.
     auto linear = compute_linear_models(person, *trend_models_);
 
     // Get elapsed time (years).
@@ -190,7 +204,7 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
     // Apply trends (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
 
-        // Load time trend.
+        // Load trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
         double trend = person.risk_factors.at(trend_name);
 
@@ -204,7 +218,8 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
 }
 
 void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
-    // NOTE: we need to keep baseline and intervention scenario RNGs in sync.
+    // NOTE: we need to keep baseline and intervention scenario RNGs in sync,
+    //       so we compute residuals even though they are not used in baseline.
 
     // Intervention policy residual components.
     auto residuals = compute_residuals(random, policy_cholesky_);
@@ -215,49 +230,55 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
         person.risk_factors[residual_name] = residuals[i];
     }
 
-    // No-op if not intervening.
-    if (!intervene) {
-        return;
-    }
-
-    // Intervention policy linear components.
-    auto linear = compute_linear_models(person, policy_models_);
-
-    // Compute and apply all intervention policies.
-    for (size_t i = 0; i < names_.size(); i++) {
-
-        // Compute intervention policy.
-        double policy = linear[i] + residuals[i];
-        policy = policy_ranges_[i].clamp(policy);
-        double factor_old = person.risk_factors.at(names_[i]);
-        double factor = factor_old * (1.0 + policy / 100.0);
-
-        // Save clamped risk factor.
-        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
-    }
+    // Compute policies.
+    update_policies(person, intervene);
 }
 
 void StaticLinearModel::update_policies(Person &person, bool intervene) const {
-    // NOTE: we need to keep baseline and intervention scenario RNGs in sync.
 
-    // No-op if not intervening.
+    // Set zero policy if not intervening.
     if (!intervene) {
+        for (size_t i = 0; i < names_.size(); i++) {
+            auto policy_name = core::Identifier{names_[i].to_string() + "_policy"};
+            person.risk_factors[policy_name] = 0.0;
+        }
         return;
     }
 
     // Intervention policy linear components.
     auto linear = compute_linear_models(person, policy_models_);
 
-    // Compute and apply all intervention policies.
+    // Compute all intervention policies.
     for (size_t i = 0; i < names_.size(); i++) {
 
         // Load residual component.
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
         double residual = person.risk_factors.at(residual_name);
 
-        // Compute intervention policy.
+        // Compute policy.
+        auto policy_name = core::Identifier{names_[i].to_string() + "_policy"};
         double policy = linear[i] + residual;
-        policy = policy_ranges_[i].clamp(policy);
+
+        // Save clamped policy.
+        person.risk_factors[policy_name] = policy_ranges_[i].clamp(policy);
+    }
+}
+
+void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
+
+    // No-op if not intervening.
+    if (!intervene) {
+        return;
+    }
+
+    // Apply all intervention policies.
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Load policy.
+        auto policy_name = core::Identifier{names_[i].to_string() + "_policy"};
+        double policy = person.risk_factors.at(policy_name);
+
+        // Apply policy to risk factor.
         double factor_old = person.risk_factors.at(names_[i]);
         double factor = factor_old * (1.0 + policy / 100.0);
 
@@ -272,7 +293,7 @@ StaticLinearModel::compute_linear_models(Person &person,
     std::vector<double> linear{};
     linear.reserve(names_.size());
 
-    // Approximate risk factor values for person with linear models.
+    // Approximate risk factors with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
         auto name = names_[i];
         auto model = models[i];

@@ -79,6 +79,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void update_policies(Person &person, bool intervene) const;
 
+    void apply_policies(Person &person, bool intervene) const;
+
     std::vector<double> compute_linear_models(Person &person,
                                               const std::vector<LinearModelParams> &models) const;
 
