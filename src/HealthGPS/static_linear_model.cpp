@@ -240,8 +240,7 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
 
     // Set zero policy if not intervening.
     if (!intervene) {
-        for (size_t i = 0; i < names_.size(); i++) {
-        for (const auto & name : names_) {
+        for (const auto &name : names_) {
             auto policy_name = core::Identifier{name.to_string() + "_policy"};
             person.risk_factors[policy_name] = 0.0;
         }
