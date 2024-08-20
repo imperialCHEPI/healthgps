@@ -41,26 +41,29 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param age The age key to get the expected value
     /// @param factor The risk factor to get the expected value
     /// @param range An optional expected value range
+    /// @param apply_trend Whether to apply expected value time trend
     /// @returns The person's expected risk factor value
     double get_expected(RuntimeContext &context, core::Gender sex, int age,
-                        const core::Identifier &factor,
-                        OptionalRange range = std::nullopt) const noexcept;
+                        const core::Identifier &factor, OptionalRange range = std::nullopt,
+                        bool apply_trend = false) const noexcept;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
     /// @param factors A list of risk factors to be adjusted
     /// @param ranges An optional list of risk factor value boundaries
+    /// @param apply_trend Whether to apply expected value time trend
     void adjust_risk_factors(RuntimeContext &context, const std::vector<core::Identifier> &factors,
-                             OptionalRanges ranges = std::nullopt) const;
+                             OptionalRanges ranges = std::nullopt, bool apply_trend = false) const;
 
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
     /// @param factors A list of risk factors to be adjusted
     /// @param ranges An optional list of risk factor value boundaries
+    /// @param apply_trend Whether to apply expected value time trend
     RiskFactorSexAgeTable calculate_adjustments(RuntimeContext &context,
                                                 const std::vector<core::Identifier> &factors,
-                                                OptionalRanges ranges) const;
+                                                OptionalRanges ranges, bool apply_trend) const;
 
     static RiskFactorSexAgeTable
     calculate_simulated_mean(Population &population, core::IntegerInterval age_range,
