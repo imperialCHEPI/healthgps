@@ -24,7 +24,7 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
-      expected_trend_boxcox_{expected_trend_boxcox}, names_{names}, models_{models},
+      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
       ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
