@@ -188,6 +188,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
     auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+    auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -257,6 +258,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Load expected value trends.
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
+        (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
 
         // Increment table column index.
         i++;
@@ -343,11 +345,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
     return std::make_unique<StaticLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(names), std::move(models),
-        std::move(ranges), std::move(lambda), std::move(stddev), std::move(cholesky),
-        std::move(policy_models), std::move(policy_ranges), std::move(policy_cholesky),
-        std::move(trend_models), std::move(trend_ranges), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev);
+        std::move(expected), std::move(expected_trend), std::move(expected_trend_boxcox),
+        std::move(names), std::move(models), std::move(ranges), std::move(lambda),
+        std::move(stddev), std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
+        std::move(policy_cholesky), std::move(trend_models), std::move(trend_ranges), info_speed,
+        std::move(rural_prevalence), std::move(income_models), physical_activity_stddev);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
