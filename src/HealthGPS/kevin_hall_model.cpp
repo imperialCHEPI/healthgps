@@ -270,6 +270,19 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
                                     const core::Identifier &factor, OptionalRange range,
                                     bool apply_trend) const noexcept {
 
+    // Compute expected nutrient intakes from expected food intakes.
+    if (energy_equation_.contains(factor)) {
+        double nutrient_intake = 0.0;
+        for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+            double food_intake =
+                get_expected(context, sex, age, food_key, std::nullopt, apply_trend);
+            if (nutrient_coefficients.contains(factor)) {
+                nutrient_intake += food_intake * nutrient_coefficients.at(factor);
+            }
+        }
+        return nutrient_intake;
+    }
+
     // Compute expected energy intake from expected nutrient intakes.
     if (factor == "EnergyIntake"_id) {
         double energy_intake = 0.0;
