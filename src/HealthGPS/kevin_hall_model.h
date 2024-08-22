@@ -173,8 +173,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param apply_trend Whether to apply expected value time trend
     /// @returns The person's expected risk factor value
     double get_expected(RuntimeContext &context, core::Gender sex, int age,
-                        const core::Identifier &factor, OptionalRange range = std::nullopt,
-                        bool apply_trend = false) const noexcept override;
+                        const core::Identifier &factor, OptionalRange range,
+                        bool apply_trend) const noexcept override;
 
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.

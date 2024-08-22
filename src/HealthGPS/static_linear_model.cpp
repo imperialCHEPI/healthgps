@@ -138,7 +138,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
-        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -170,7 +171,8 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -420,7 +422,8 @@ void StaticLinearModel::update_income(Person &person, Random &random) const {
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
-    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id);
+    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
+                                   std::nullopt, false);
     double rand = random.next_normal(0.0, physical_activity_stddev_);
     double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
     person.risk_factors["PhysicalActivity"_id] = factor;
