@@ -479,6 +479,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
+        (*expected_trend)[food_key] = food["ExpectedTrend"].get<double>();
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
