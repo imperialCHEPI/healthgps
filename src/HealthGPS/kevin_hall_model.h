@@ -164,6 +164,18 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     compute_weight_adjustments(RuntimeContext &context,
                                std::optional<unsigned> age = std::nullopt) const;
 
+    /// @brief Gets a person's expected risk factor value
+    /// @param context The simulation run-time context
+    /// @param sex The sex key to get the expected value
+    /// @param age The age key to get the expected value
+    /// @param factor The risk factor to get the expected value
+    /// @param range An optional expected value range
+    /// @param apply_trend Whether to apply expected value time trend
+    /// @returns The person's expected risk factor value
+    double get_expected(RuntimeContext &context, core::Gender sex, int age,
+                        const core::Identifier &factor, OptionalRange range = std::nullopt,
+                        bool apply_trend = false) const noexcept override;
+
     /// @brief Returns the weight quantile for the given E overPA quantile and sex.
     /// @param epa_quantile The Energy / Physical Activity quantile.
     /// @param sex The sex of the person.

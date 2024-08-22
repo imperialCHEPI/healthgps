@@ -43,9 +43,9 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     /// @param range An optional expected value range
     /// @param apply_trend Whether to apply expected value time trend
     /// @returns The person's expected risk factor value
-    double get_expected(RuntimeContext &context, core::Gender sex, int age,
-                        const core::Identifier &factor, OptionalRange range = std::nullopt,
-                        bool apply_trend = false) const noexcept;
+    virtual double get_expected(RuntimeContext &context, core::Gender sex, int age,
+                                const core::Identifier &factor, OptionalRange range = std::nullopt,
+                                bool apply_trend = false) const noexcept;
 
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context

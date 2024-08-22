@@ -266,6 +266,36 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
     return adjustments;
 }
 
+double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
+                                    const core::Identifier &factor, OptionalRange range,
+                                    bool apply_trend) const noexcept {
+
+    // Compute expected energy intake from expected nutrient intakes.
+    if (factor == "EnergyIntake"_id) {
+        double energy_intake = 0.0;
+        for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
+            double nutrient_intake =
+                get_expected(context, sex, age, nutrient_key, std::nullopt, apply_trend);
+            energy_intake += nutrient_intake * energy_coefficient;
+        }
+        return energy_intake;
+    }
+
+    // Compute expected body weight.
+    if (factor == "Weight"_id) {
+        double weight = 16.1161;
+        weight +=
+            0.06256 * get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, apply_trend);
+        weight -= 0.6256 * get_expected(context, sex, age, "Height"_id, std::nullopt, false);
+        weight += 0.4925 * age;
+        weight -= 16.6166 * Person::gender_to_value(sex);
+        return weight;
+    }
+
+    // Fall back to base class implementation for other factors.
+    return RiskFactorAdjustableModel::get_expected(context, sex, age, factor, range, apply_trend);
+}
+
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
 
     // Initialise nutrient intakes.
