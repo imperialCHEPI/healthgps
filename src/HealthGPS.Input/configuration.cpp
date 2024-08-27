@@ -73,7 +73,8 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
         config.verbosity = core::VerboseMode::verbose;
     }
 
-    const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion);
+    const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion,
+                                            /*require_schema_property=*/false);
 
     // Base dir for relative paths
     config.root_path = config_file.parent_path();

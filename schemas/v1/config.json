@@ -23,7 +23,6 @@
         }
     },
     "required": [
-        "$schema",
         "inputs",
         "modelling",
         "running",
