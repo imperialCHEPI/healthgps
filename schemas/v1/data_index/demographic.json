@@ -2,52 +2,71 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/demographic.json",
     "type": "object",
-    "allOf": [
-        {
-            "$ref": "../file_info.json"
+    "properties": {
+        "format": {
+            "const": "csv"
         },
-        {
-            "type": "object",
-            "properties": {
-                "age_limits": {
-                    "$ref": "../age_range.json"
+        "delimiter": {
+            "const": ","
+        },
+        "encoding": {
+            "const": "UTF8"
+        },
+        "description": {
+            "type": "string"
+        },
+        "source": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string",
+            "format": "uri"
+        },
+        "license": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "age_limits": {
+            "$ref": "../age_range.json"
+        },
+        "time_limits": {
+            "type": "array",
+            "prefixItems": [
+                {
+                    "type": "integer",
+                    "minimum": 1900
                 },
-                "time_limits": {
-                    "type": "array",
-                    "prefixItems": [
-                        {
-                            "type": "integer",
-                            "minimum": 1900
-                        },
-                        {
-                            "type": "integer",
-                            "minimum": 1900
-                        }
-                    ],
-                    "minItems": 2,
-                    "items": false
-                },
-                "projections": {
-                    "type": "integer"
-                },
-                "population": {
-                    "$ref": "demographic_file_info.json"
-                },
-                "mortality": {
-                    "$ref": "demographic_file_info.json"
-                },
-                "indicators": {
-                    "$ref": "demographic_file_info.json"
+                {
+                    "type": "integer",
+                    "minimum": 1900
                 }
-            },
-            "required": [
-                "age_limits",
-                "time_limits",
-                "projections",
-                "population",
-                "mortality",
-                "indicators"
-            ]
+            ],
+            "minItems": 2,
+            "items": false
+        },
+        "projections": {
+            "type": "integer"
+        },
+        "population": {
+            "$ref": "demographic_file_info.json"
+        },
+        "mortality": {
+            "$ref": "demographic_file_info.json"
+        },
+        "indicators": {
+            "$ref": "demographic_file_info.json"
         }
-    ]
+    },
+    "required": [
+        "path",
+        "age_limits",
+        "time_limits",
+        "projections",
+        "population",
+        "mortality",
+        "indicators"
+    ],
+    "additionalProperties": false
 }

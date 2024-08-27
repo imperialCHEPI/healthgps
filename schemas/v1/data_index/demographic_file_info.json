@@ -17,5 +17,6 @@
         "description",
         "path",
         "file_name"
-    ]
+    ],
+    "additionalProperties": false
 }
