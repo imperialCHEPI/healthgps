@@ -1,0 +1,19 @@
+{
+    "[cpp]": {
+        "editor.formatOnSave": true,
+        "editor.rulers": [100],
+    },
+    "[cmake]": {
+        "editor.formatOnSave": true,
+        "editor.rulers": [100],
+    },
+    "[json]": {
+        "editor.formatOnSave": false
+    },
+    "[jsonc]": {
+        "editor.formatOnSave": false
+    },
+    "[yaml]": {
+        "editor.formatOnSave": false
+    }
+}
