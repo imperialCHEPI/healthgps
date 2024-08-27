@@ -2,6 +2,7 @@
 
 #include "HealthGPS/program_dirs.h"
 
+#include <fmt/color.h>
 #include <fmt/format.h>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
@@ -60,7 +61,8 @@ void validate_json(std::istream &json_stream, const char *schema_file_name, int 
 
 namespace hgps::input {
 nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
-                                      const char *schema_file_name, int schema_version) {
+                                      const char *schema_file_name, int schema_version,
+                                      bool require_schema_property) {
     auto ifs = std::ifstream{file_path};
     if (!ifs) {
         throw std::runtime_error(fmt::format("File not found: {}", file_path.string()));
@@ -72,17 +74,21 @@ nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
     // Check that the file has a $schema property and that it matches the URL of the
     // schema version we support
     if (!json.contains("$schema")) {
-        throw std::runtime_error(
-            fmt::format("File missing required $schema property: {}", file_path.string()));
-    }
-
-    // Check $schema attribute is present and valid
-    const auto actual_schema_url = json.at("$schema").get<std::string>();
-    const auto expected_schema_url =
-        fmt::format("{}v{}/{}", SchemaURLPrefix, schema_version, schema_file_name);
-    if (actual_schema_url != expected_schema_url) {
-        throw std::runtime_error(fmt::format("Invalid schema URL provided: {} (expected: {})",
-                                             actual_schema_url, expected_schema_url));
+        const auto message = fmt::format("File missing $schema property: {}", file_path.string());
+        if (require_schema_property) {
+            throw std::runtime_error(message);
+        } else {
+            fmt::print(fmt::fg(fmt::color::dark_salmon), "{}\n", message);
+        }
+    } else {
+        // Check $schema attribute is valid
+        const auto actual_schema_url = json.at("$schema").get<std::string>();
+        const auto expected_schema_url =
+            fmt::format("{}v{}/{}", SchemaURLPrefix, schema_version, schema_file_name);
+        if (actual_schema_url != expected_schema_url) {
+            throw std::runtime_error(fmt::format("Invalid schema URL provided: {} (expected: {})",
+                                                 actual_schema_url, expected_schema_url));
+        }
     }
 
     // Perform validation
