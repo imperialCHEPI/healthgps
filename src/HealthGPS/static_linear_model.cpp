@@ -15,7 +15,8 @@ StaticLinearModel::StaticLinearModel(
     const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
     const std::vector<LinearModelParams> &policy_models,
     const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
-    double info_speed,
+    std::shared_ptr<std::vector<LinearModelParams>> trend_models,
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
@@ -23,7 +24,8 @@ StaticLinearModel::StaticLinearModel(
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)}, names_{names},
       models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
-      policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
+      policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
+      trend_ranges_{std::move(trend_ranges)}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev} {}
 
@@ -38,6 +40,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
+        initialise_trends(context, person);
         initialise_physical_activity(context, person, context.random());
     }
 
@@ -67,11 +70,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(context, person, context.random());
+            initialise_trends(context, person);
             initialise_physical_activity(context, person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
             update_factors(context, person, context.random());
+            update_trends(context, person);
         }
     }
 
@@ -146,6 +151,52 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
+
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
+    }
+}
+
+void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
+
+    // Approximate risk factor values with linear models.
+    auto linear = compute_linear_models(person, *trend_models_);
+
+    // Get elapsed time (years).
+    int elapsed_time = context.time_now() - context.start_time();
+
+    // Initialise and apply trends (do not exist yet).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Initialise trend.
+        auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
+        double trend = (*trend_ranges_)[i].clamp(linear[i]);
+        person.risk_factors[trend_name] = trend;
+
+        // Apply trend to risk factor.
+        double factor = person.risk_factors.at(names_[i]);
+        factor *= pow(trend, elapsed_time);
+
+        // Save clamped risk factor.
+        person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
+    }
+}
+
+void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) const {
+
+    // Get elapsed time (years).
+    int elapsed_time = context.time_now() - context.start_time();
+
+    // Apply trends (should exist).
+    for (size_t i = 0; i < names_.size(); i++) {
+
+        // Load time trend.
+        auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
+        double trend = person.risk_factors.at(trend_name);
+
+        // Apply trend to risk factor.
+        double factor = person.risk_factors.at(names_[i]);
+        factor *= pow(trend, elapsed_time);
 
         // Save clamped risk factor.
         person.risk_factors.at(names_[i]) = ranges_[i].clamp(factor);
@@ -352,7 +403,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,
     std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,
-    Eigen::MatrixXd policy_cholesky, double info_speed,
+    Eigen::MatrixXd policy_cholesky, std::unique_ptr<std::vector<LinearModelParams>> trend_models,
+    std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
@@ -360,7 +412,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
       lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
-      policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
+      policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
+      trend_ranges_{std::move(trend_ranges)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
@@ -391,6 +444,12 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (!policy_cholesky_.allFinite()) {
         throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
     }
+    if (trend_models_->empty()) {
+        throw core::HgpsException("Time trend model list is empty");
+    }
+    if (trend_ranges_->empty()) {
+        throw core::HgpsException("Time trend ranges list is empty");
+    }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
@@ -407,8 +466,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(
         expected_, expected_trend_, names_, models_, ranges_, lambda_, stddev_, cholesky_,
-        policy_models_, policy_ranges_, policy_cholesky_, info_speed_, rural_prevalence_,
-        income_models_, physical_activity_stddev_);
+        policy_models_, policy_ranges_, policy_cholesky_, trend_models_, trend_ranges_, info_speed_,
+        rural_prevalence_, income_models_, physical_activity_stddev_);
 }
 
 } // namespace hgps
