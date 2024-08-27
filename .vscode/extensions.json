@@ -1,6 +1,7 @@
 {
     "recommendations": [
-        "ms-vscode.cpptools",
-        "davidanson.vscode-markdownlint"
+        "ms-vscode.cpptools-extension-pack",
+        "davidanson.vscode-markdownlint",
+        "streetsidesoftware.code-spell-checker"
     ]
 }
