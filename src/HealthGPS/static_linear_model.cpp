@@ -3,23 +3,27 @@
 #include "runtime_context.h"
 
 #include <ranges>
+#include <utility>
 
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
-    const RiskFactorSexAgeTable &expected, const std::vector<core::Identifier> &names,
-    const std::vector<LinearModelParams> &models, const std::vector<core::DoubleInterval> &ranges,
-    const std::vector<double> &lambda, const std::vector<double> &stddev,
-    const Eigen::MatrixXd &cholesky, const std::vector<LinearModelParams> &policy_models,
+    std::shared_ptr<RiskFactorSexAgeTable> expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
+    const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
+    const std::vector<LinearModelParams> &policy_models,
     const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
     double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModel{expected}, names_{names}, models_{models}, ranges_{ranges},
-      lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky}, policy_models_{policy_models},
-      policy_ranges_{policy_ranges}, policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)}, names_{names},
+      models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
+      policy_models_{policy_models}, policy_ranges_{policy_ranges},
+      policy_cholesky_{policy_cholesky}, info_speed_{info_speed},
       rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev} {}
 
@@ -33,8 +37,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
-        initialise_factors(person, context.random());
-        initialise_physical_activity(person, context.random());
+        initialise_factors(context, person, context.random());
+        initialise_physical_activity(context, person, context.random());
     }
 
     // Adjust risk factors to match expected values.
@@ -62,12 +66,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (person.age == 0) {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
-            initialise_factors(person, context.random());
-            initialise_physical_activity(person, context.random());
+            initialise_factors(context, person, context.random());
+            initialise_physical_activity(context, person, context.random());
         } else {
             update_sector(person, context.random());
             update_income(person, context.random());
-            update_factors(person, context.random());
+            update_factors(context, person, context.random());
         }
     }
 
@@ -92,7 +96,8 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
     return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
-void StaticLinearModel::initialise_factors(Person &person, Random &random) const {
+void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
+                                           Random &random) const {
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -109,7 +114,7 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
         person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
-        double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
 
@@ -118,7 +123,8 @@ void StaticLinearModel::initialise_factors(Person &person, Random &random) const
     }
 }
 
-void StaticLinearModel::update_factors(Person &person, Random &random) const {
+void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
+                                       Random &random) const {
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -137,7 +143,7 @@ void StaticLinearModel::update_factors(Person &person, Random &random) const {
         person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double expected = get_risk_factor_expected().at(person.gender, names_[i]).at(person.age);
+        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
 
@@ -331,26 +337,28 @@ void StaticLinearModel::update_income(Person &person, Random &random) const {
     }
 }
 
-void StaticLinearModel::initialise_physical_activity(Person &person, Random &random) const {
-    auto key = "PhysicalActivity"_id;
-    double expected = get_risk_factor_expected().at(person.gender, key).at(person.age);
+void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
+                                                     Random &random) const {
+    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id);
     double rand = random.next_normal(0.0, physical_activity_stddev_);
     double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
-    person.risk_factors[key] = factor;
+    person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
-    RiskFactorSexAgeTable expected, std::vector<core::Identifier> names,
-    std::vector<LinearModelParams> models, std::vector<core::DoubleInterval> ranges,
-    std::vector<double> lambda, std::vector<double> stddev, Eigen::MatrixXd cholesky,
+    std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
+    std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
+    std::vector<double> stddev, Eigen::MatrixXd cholesky,
     std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,
     Eigen::MatrixXd policy_cholesky, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModelDefinition{std::move(expected)}, names_{std::move(names)},
-      models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
-      stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
+      names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
+      lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
       policy_cholesky_{std::move(policy_cholesky)}, info_speed_{info_speed},
       rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
@@ -389,14 +397,18 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
+    for (const auto &name : names_) {
+        if (!expected_trend_->contains(name)) {
+            throw core::HgpsException("One or more risk factor expected trend value is missing");
+        }
+    }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
-    const auto &expected = get_risk_factor_expected();
-    return std::make_unique<StaticLinearModel>(expected, names_, models_, ranges_, lambda_, stddev_,
-                                               cholesky_, policy_models_, policy_ranges_,
-                                               policy_cholesky_, info_speed_, rural_prevalence_,
-                                               income_models_, physical_activity_stddev_);
+    return std::make_unique<StaticLinearModel>(
+        expected_, expected_trend_, names_, models_, ranges_, lambda_, stddev_, cholesky_,
+        policy_models_, policy_ranges_, policy_cholesky_, info_speed_, rural_prevalence_,
+        income_models_, physical_activity_stddev_);
 }
 
 } // namespace hgps
