@@ -1,21 +1,17 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
+
 #include <filesystem>
-#include <istream>
-
-//! The prefix for Health-GPS schema URLs
-#define HGPS_SCHEMA_URL_PREFIX                                                                     \
-    "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/"
-
-//! The name of the index.json schema file
-#define HGPS_DATA_INDEX_SCHEMA_FILENAME "data_index.json"
-
-//! The schema URL for the data index file
-#define HGPS_DATA_INDEX_SCHEMA_URL (HGPS_SCHEMA_URL_PREFIX HGPS_DATA_INDEX_SCHEMA_FILENAME)
 
 namespace hgps::input {
-/// @brief Validate the index.json file
-/// @param schema_directory The root folder for JSON schemas
-/// @param index_stream The input stream for the index.json file
-void validate_index(const std::filesystem::path &schema_directory, std::istream &index_stream);
+/// @brief Load a JSON file and validate against the specified schema
+/// @param file_path The path to the JSON file
+/// @param schema_file_name The name of the JSON schema file
+/// @param schema_version The version of the schema file
+/// @param require_schema_property Whether to raise an exception if the $schema property
+///                                is missing
+nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
+                                      const char *schema_file_name, int schema_version,
+                                      bool require_schema_property = true);
 } // namespace hgps::input

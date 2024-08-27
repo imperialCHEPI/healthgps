@@ -1,0 +1,35 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "version": {
+            "const": 2
+        },
+        "data": {
+            "$ref": "config/data.json"
+        },
+        "inputs": {
+            "$ref": "config/inputs.json"
+        },
+        "modelling": {
+            "$ref": "config/modelling.json"
+        },
+        "running": {
+            "$ref": "config/running.json"
+        },
+        "output": {
+            "$ref": "config/output.json"
+        }
+    },
+    "required": [
+        "inputs",
+        "modelling",
+        "running",
+        "output"
+    ],
+    "additionalProperties": false
+}

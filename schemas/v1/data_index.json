@@ -8,7 +8,7 @@
         "country": {
             "allOf": [
                 {
-                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
@@ -26,25 +26,13 @@
         "demographic": {
             "allOf": [
                 {
-                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                }
-                            ],
-                            "minItems": 2,
-                            "items": false
+                            "$ref": "age_range.json"
                         },
                         "time_limits": {
                             "type": "array",
@@ -116,25 +104,13 @@
         "diseases": {
             "allOf": [
                 {
-                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                }
-                            ],
-                            "minItems": 2,
-                            "items": false
+                            "$ref": "age_range.json"
                         },
                         "time_year": {
                             "type": "integer",
@@ -273,25 +249,13 @@
         "analysis": {
             "allOf": [
                 {
-                    "$ref": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json"
+                    "$ref": "file_info.json"
                 },
                 {
                     "type": "object",
                     "properties": {
                         "age_limits": {
-                            "type": "array",
-                            "prefixItems": [
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                },
-                                {
-                                    "type": "integer",
-                                    "minimum": 0
-                                }
-                            ],
-                            "minItems": 2,
-                            "items": false
+                            "$ref": "age_range.json"
                         },
                         "time_year": {
                             "type": "integer",
