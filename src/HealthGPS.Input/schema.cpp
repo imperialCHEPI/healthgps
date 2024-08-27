@@ -79,7 +79,8 @@ nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
             throw std::runtime_error(message);
         } else {
             fmt::print(fmt::fg(fmt::color::dark_salmon), "{}\n", message);
-        }
+        }             fmt::print(fmt::fg(fmt::color::dark_salmon), "{}\n", message);
+       
     } else {
         // Check $schema attribute is valid
         const auto actual_schema_url = json.at("$schema").get<std::string>();
