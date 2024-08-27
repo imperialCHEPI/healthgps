@@ -6,6 +6,9 @@
         "$schema": {
             "type": "string"
         },
+        "version": {
+            "const": 2
+        },
         "data": {
             "$ref": "config/data.json"
         },
