@@ -1,3 +1,5 @@
+cmake_policy(SET CMP0135 NEW)
+
 find_package(fmt CONFIG REQUIRED)
 find_package(cxxopts CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
@@ -6,6 +8,7 @@ find_package(Threads REQUIRED)
 
 include(CTest)
 include(GoogleTest)
+include(FetchContent)
 
 add_executable(HealthGPS.Tests "")
 target_compile_features(HealthGPS.Tests PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
@@ -43,17 +46,27 @@ target_sources(
             "CountryModule.h"
             "RiskFactorData.h"
             "Interval.Test.cpp"
-            "LoadNutrientTable.cpp")
+            "LoadNutrientTable.cpp"
+            $<$<BOOL:${TEST_EXAMPLES_PATH}>:ExamplesRegression.Test.cpp>)
 
 # Download and extract test data
-cmake_policy(SET CMP0135 NEW)
-include(FetchContent)
 FetchContent_Declare(
     test_data
     URL https://github.com/imperialCHEPI/healthgps-data/releases/download/20240624/data_20240624.zip
     URL_HASH SHA256=b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c)
 FetchContent_MakeAvailable(test_data)
 target_compile_definitions(HealthGPS.Tests PRIVATE "-DTEST_DATA_PATH=\"${test_data_SOURCE_DIR}\"")
+
+if(DEFINED TEST_EXAMPLES_PATH)
+    # There is seemingly no way to get the path from which CMake was invoked, which makes dealing
+    # with relative paths hard. Just assume the user invoked CMake with the top-level CMakeLists.txt
+    # file.
+    cmake_path(ABSOLUTE_PATH TEST_EXAMPLES_PATH BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+               NORMALIZE)
+
+    target_compile_definitions(HealthGPS.Tests
+                               PRIVATE "-DTEST_EXAMPLES_PATH=\"${TEST_EXAMPLES_PATH}\"")
+endif()
 
 target_link_libraries(
     HealthGPS.Tests
