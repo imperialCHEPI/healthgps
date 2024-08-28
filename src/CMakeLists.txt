@@ -8,7 +8,6 @@ add_subdirectory(HealthGPS)
 add_subdirectory(HealthGPS.Console)
 
 if(BUILD_TESTING)
-    enable_testing()
     message(STATUS "Building Tests ...")
     add_subdirectory(HealthGPS.Tests)
 endif()
