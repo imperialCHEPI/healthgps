@@ -131,6 +131,7 @@ jobs:
         env:
           fail_ci_if_error: true
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
 
       - name: Zip output folder
         if: startsWith(github.ref, 'refs/tags/') && matrix.is_main
