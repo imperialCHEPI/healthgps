@@ -31,42 +31,13 @@
                     "type": "integer"
                 },
                 "population": {
-                    "type": "object",
-                    "properties": {
-                        "description": {
-                            "type": "string"
-                        },
-                        "path": {
-                            "type": "string"
-                        },
-                        "file_name": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "description",
-                        "path",
-                        "file_name"
-                    ]
+                    "$ref": "demographic_file_info.json"
                 },
                 "mortality": {
-                    "type": "object",
-                    "properties": {
-                        "description": {
-                            "type": "string"
-                        },
-                        "path": {
-                            "type": "string"
-                        },
-                        "file_name": {
-                            "type": "string"
-                        }
-                    },
-                    "required": [
-                        "description",
-                        "path",
-                        "file_name"
-                    ]
+                    "$ref": "demographic_file_info.json"
+                },
+                "indicators": {
+                    "$ref": "demographic_file_info.json"
                 }
             },
             "required": [
@@ -74,7 +45,8 @@
                 "time_limits",
                 "projections",
                 "population",
-                "mortality"
+                "mortality",
+                "indicators"
             ]
         }
     ]

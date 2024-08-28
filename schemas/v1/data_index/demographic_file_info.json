@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/demographic_file_info.json",
+    "type": "object",
+    "properties": {
+        "description": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "file_name": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "description",
+        "path",
+        "file_name"
+    ]
+}
