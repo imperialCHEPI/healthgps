@@ -129,6 +129,7 @@ jobs:
         if: matrix.compiler == 'gcc-default'
         uses: codecov/codecov-action@v4
         env:
+          fail_ci_if_error: true
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Zip output folder
