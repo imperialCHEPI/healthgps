@@ -5,6 +5,7 @@
     },
     "[cmake]": {
         "editor.formatOnSave": true,
+        "editor.defaultFormatter": "cheshirekow.cmake-format",
         "editor.rulers": [100],
     },
     "[json]": {
