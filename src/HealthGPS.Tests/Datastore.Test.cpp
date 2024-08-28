@@ -3,7 +3,6 @@
 
 #include "HealthGPS.Input/api.h"
 
-// The fixture for testing class Foo.
 class DatastoreTest : public ::testing::Test {
   protected:
     DatastoreTest() : manager{test_datastore_path} {}
