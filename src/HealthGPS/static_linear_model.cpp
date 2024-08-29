@@ -192,7 +192,9 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
 
         // Initialise trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-        double trend = (*trend_ranges_)[i].clamp(linear[i]);
+        double expected = expected_trend_boxcox_->at(names_[i]);
+        double trend = expected * inverse_box_cox(linear[i], (*trend_lambda_)[i]);
+        trend = (*trend_ranges_)[i].clamp(trend);
 
         // Save trend.
         person.risk_factors[trend_name] = trend;
@@ -210,11 +212,9 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
     // Apply trends (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
 
-        // Load trend and apply inverse BoxCox transform.
-        double expected_trend_boxcox = expected_trend_boxcox_->at(names_[i]);
+        // Load trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
         double trend = person.risk_factors.at(trend_name);
-        trend = expected_trend_boxcox * inverse_box_cox(trend, (*trend_lambda_)[i]);
 
         // Apply trend to risk factor.
         double factor = person.risk_factors.at(names_[i]);
