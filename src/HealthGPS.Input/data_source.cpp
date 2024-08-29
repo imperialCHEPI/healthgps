@@ -6,9 +6,10 @@
 #include <fmt/format.h>
 
 namespace {
-// If source is a relative path to a directory, rebase it on root_path, else just return source
+// If source is a relative path, rebase it on root_path, else just return source
 std::string try_rebase_path(std::string source, const std::filesystem::path &root_path) {
-    if (!std::filesystem::is_directory(source)) {
+    // If source is a URL, leave it alone
+    if (source.starts_with("http://") || source.starts_with("https://")) {
         return source;
     }
 
@@ -17,7 +18,7 @@ std::string try_rebase_path(std::string source, const std::filesystem::path &roo
         return source;
     }
 
-    return (root_path / path).string();
+    return std::filesystem::absolute(root_path / path).string();
 }
 
 // Get a path to a zip file; if source is a URL it will be downloaded first

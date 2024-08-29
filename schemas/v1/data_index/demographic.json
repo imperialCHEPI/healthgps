@@ -1,0 +1,81 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/demographic.json",
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "../file_info.json"
+        },
+        {
+            "type": "object",
+            "properties": {
+                "age_limits": {
+                    "$ref": "../age_range.json"
+                },
+                "time_limits": {
+                    "type": "array",
+                    "prefixItems": [
+                        {
+                            "type": "integer",
+                            "minimum": 1900
+                        },
+                        {
+                            "type": "integer",
+                            "minimum": 1900
+                        }
+                    ],
+                    "minItems": 2,
+                    "items": false
+                },
+                "projections": {
+                    "type": "integer"
+                },
+                "population": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "file_name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "path",
+                        "file_name"
+                    ]
+                },
+                "mortality": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string"
+                        },
+                        "path": {
+                            "type": "string"
+                        },
+                        "file_name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "description",
+                        "path",
+                        "file_name"
+                    ]
+                }
+            },
+            "required": [
+                "age_limits",
+                "time_limits",
+                "projections",
+                "population",
+                "mortality"
+            ]
+        }
+    ]
+}
