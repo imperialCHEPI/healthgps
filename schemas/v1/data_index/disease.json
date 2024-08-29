@@ -32,7 +32,8 @@
                         "path",
                         "file_name",
                         "default_value"
-                    ]
+                    ],
+                    "additionalProperties": false
                 },
                 "to_risk_factor": {
                     "type": "object",
@@ -47,14 +48,16 @@
                     "required": [
                         "path",
                         "file_name"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             },
             "required": [
                 "path",
                 "to_disease",
                 "to_risk_factor"
-            ]
+            ],
+            "additionalProperties": false
         },
         "parameters": {
             "type": "object",
@@ -79,13 +82,15 @@
                         "distribution",
                         "survival_rate",
                         "death_weight"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             },
             "required": [
                 "path",
                 "files"
-            ]
+            ],
+            "additionalProperties": false
         }
     },
     "required": [
@@ -93,5 +98,6 @@
         "file_name",
         "relative_risk",
         "parameters"
-    ]
+    ],
+    "additionalProperties": false
 }
