@@ -1,0 +1,70 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/inputs.json",
+    "type": "object",
+    "properties": {
+        "dataset": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "format": {
+                    "const": "csv"
+                },
+                "delimiter": {
+                    "type": "string"
+                },
+                "encoding": {
+                    "type": "string"
+                },
+                "columns": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "const": "integer"
+                            },
+                            {
+                                "const": "double"
+                            }
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "name",
+                "format",
+                "delimiter",
+                "encoding",
+                "columns"
+            ],
+            "additionalProperties": false
+        },
+        "settings": {
+            "type": "object",
+            "properties": {
+                "country_code": {
+                    "type": "string"
+                },
+                "size_fraction": {
+                    "type": "number"
+                },
+                "age_range": {
+                    "$ref": "../age_range.json"
+                }
+            },
+            "required": [
+                "country_code",
+                "size_fraction",
+                "age_range"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "dataset",
+        "settings"
+    ],
+    "additionalProperties": false
+}

@@ -399,6 +399,7 @@ FodyWeavers.xsd
 # VS Code files for those working on multiple tools
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 *.code-workspace
 
 # Local History for Visual Studio Code

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/file_info.json",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/country.json",
     "type": "object",
     "properties": {
         "format": {
@@ -27,9 +27,14 @@
         },
         "path": {
             "type": "string"
+        },
+        "file_name": {
+            "type": "string"
         }
     },
     "required": [
-        "path"
-    ]
+        "path",
+        "file_name"
+    ],
+    "additionalProperties": false
 }

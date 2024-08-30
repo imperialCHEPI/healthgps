@@ -1,0 +1,70 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/analysis.json",
+    "type": "object",
+    "properties": {
+        "format": {
+            "const": "csv"
+        },
+        "delimiter": {
+            "const": ","
+        },
+        "encoding": {
+            "const": "UTF8"
+        },
+        "description": {
+            "type": "string"
+        },
+        "source": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string",
+            "format": "uri"
+        },
+        "license": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "age_limits": {
+            "$ref": "../age_range.json"
+        },
+        "time_year": {
+            "type": "integer",
+            "minimum": 1900
+        },
+        "disability_file_name": {
+            "type": "string"
+        },
+        "lms_file_name": {
+            "type": "string"
+        },
+        "cost_of_disease": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "path",
+                "file_name"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "path",
+        "age_limits",
+        "time_year",
+        "disability_file_name",
+        "lms_file_name",
+        "cost_of_disease"
+    ],
+    "additionalProperties": false
+}
