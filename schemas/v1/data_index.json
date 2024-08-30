@@ -5,6 +5,9 @@
     "description": "Metadata and paths for Health-GPS input files",
     "type": "object",
     "properties": {
+        "$schema": {
+            "type": "string"
+        },
         "country": {
             "$ref": "data_index/country.json"
         },
@@ -19,9 +22,11 @@
         }
     },
     "required": [
+        "$schema",
         "country",
         "demographic",
         "diseases",
         "analysis"
-    ]
+    ],
+    "additionalProperties": false
 }
