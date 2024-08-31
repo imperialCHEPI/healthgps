@@ -55,7 +55,7 @@ class AnalysisModule final : public UpdatableModule {
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
     std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id};
-    std::vector<double> calculated_stats_;
+    mutable std::vector<double> calculated_stats_;
     std::vector<size_t> factor_bins_;
     std::vector<double> factor_bin_widths_;
     std::vector<double> factor_min_values_;
@@ -72,15 +72,15 @@ class AnalysisModule final : public UpdatableModule {
     DALYsIndicator calculate_dalys(Population &population, unsigned int max_age,
                                    unsigned int death_year) const;
     void update_death_and_migration_stats(const Person &person, size_t index,
-                                          RuntimeContext &context);
+                                          RuntimeContext &context) const;
     void update_calculated_stats_for_person(RuntimeContext &context, const Person &person,
-                                            size_t index);
+                                            size_t index) const;
 
-    void calculate_population_statistics(RuntimeContext &context);
+    void calculate_population_statistics(RuntimeContext &context) const;
     void calculate_population_statistics(RuntimeContext &context, DataSeries &series) const;
 
     void classify_weight(hgps::DataSeries &series, const hgps::Person &entity) const;
-    void classify_weight(const Person &person);
+    void classify_weight(const Person &person) const;
     void initialise_output_channels(RuntimeContext &context);
 
     /// @brief Calculates the bin index in `calculated_stats_` for a given person

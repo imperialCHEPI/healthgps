@@ -50,17 +50,26 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
         factor_min_values_.push_back(min_factor);
 
+        int factor_range = static_cast<int>(max_factor - min_factor);
+
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
         // any other number depending on the desired resolution of the map)
-        factor_bins_.push_back(std::min(100, static_cast<int>(max_factor - min_factor)));
+        factor_bins_.push_back(std::min(100, factor_range+1));
 
-        // The width of each bin is the range of the factor divided by the number of bins
-        factor_bin_widths_.push_back((max_factor - min_factor) / factor_bins_.back());
+        // The width of each bin is the factor_range divided by the number of bins.
+        // We need a special case for when the factor_range is 0, in which case we set the bin width to 1.
+        // E.g. when entire population is male. This may never happen in practice, but it's probably
+        // better to handle it just in case.
+        if (factor_range == 0) {
+            factor_bin_widths_.push_back(1.0);
+        } else {
+            factor_bin_widths_.push_back((max_factor - min_factor) / factor_bins_.back());
+        }
     }
 
     // The number of factors to calculate stats for is the number of factors minus the length of the
-    // `factors` vector.
+    // `factors_to_calculate_` vector.
     size_t num_stats_to_calc = context.mapping().entries().size() - factors_to_calculate_.size();
 
     // And for each factor, we calculate the stats described in `channels_`, so we
@@ -112,7 +121,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     }
 
     initialise_output_channels(context);
-
+    initialise_vector(context);
     publish_result_message(context);
 }
 
@@ -149,11 +158,11 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
-    auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
-                                  std::ref(context), std::ref(result));
+    // auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
+    //                               std::ref(context), std::ref(result));
+    // handle.get();
 
-    calculate_population_statistics(context, result.series);
-    handle.get();
+    calculate_population_statistics(context);
 
     context.publish(std::make_unique<ResultEventMessage>(
         context.identifier(), context.current_run(), context.time_now(), result));
@@ -319,7 +328,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 }
 
 void AnalysisModule::update_death_and_migration_stats(const Person &person, size_t index,
-                                                      RuntimeContext &context) {
+                                                      RuntimeContext &context) const {
 
     auto current_time = static_cast<unsigned int>(context.time_now());
 
@@ -337,7 +346,7 @@ void AnalysisModule::update_death_and_migration_stats(const Person &person, size
 }
 
 void AnalysisModule::update_calculated_stats_for_person(RuntimeContext &context,
-                                                        const Person &person, size_t index) {
+                                                        const Person &person, size_t index) const {
     calculated_stats_[index + channel_index_.at("count")]++;
 
     for (const auto &factor : context.mapping().entries()) {
@@ -357,7 +366,7 @@ void AnalysisModule::update_calculated_stats_for_person(RuntimeContext &context,
     }
 }
 
-void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
+void AnalysisModule::calculate_population_statistics(RuntimeContext &context) const {
 
     for (const auto &person : context.population()) {
         // First let's fetch the correct `calculated_stats_` bin index for this person
@@ -590,7 +599,7 @@ void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) c
     }
 }
 
-void AnalysisModule::classify_weight(const Person &person) {
+void AnalysisModule::classify_weight(const Person &person) const {
     auto weight_class = weight_classifier_.classify_weight(person);
     switch (weight_class) {
     case WeightCategory::normal:
