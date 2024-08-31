@@ -31,13 +31,13 @@ class TestAnalysisModule : public ::testing::Test {
     hgps::SyncChannel channel = SyncChannel{};
     std::unique_ptr<hgps::MTRandom32> rnd = std::make_unique<MTRandom32>(123456789);
     std::unique_ptr<hgps::BaselineScenario> scenario = std::make_unique<BaselineScenario>(channel);
-    hgps::SimulationDefinition definition = SimulationDefinition(inputs, std::move(scenario), std::move(rnd));
+    hgps::SimulationDefinition definition =
+        SimulationDefinition(inputs, std::move(scenario), std::move(rnd));
 
     hgps::RuntimeContext context = RuntimeContext(bus, definition);
 
-    TestAnalysisModule() { 
+    TestAnalysisModule() {
         create_test_datatable(data);
-        
 
         auto config = create_test_configuration(data);
 
@@ -56,7 +56,7 @@ class TestAnalysisModule : public ::testing::Test {
         // For each person, we need to set the risk factors which we can get from channels_
         for (size_t i = 0; i < context.population().size(); i++) {
             for (const auto &factor : context.mapping().entries()) {
-                context.population()[i].risk_factors[factor.key()] = 1.0+i;
+                context.population()[i].risk_factors[factor.key()] = 1.0 + i;
             }
         }
 
@@ -64,7 +64,6 @@ class TestAnalysisModule : public ::testing::Test {
         ses_module->initialise_population(context);
 
         analysis_module->initialise_population(context);
-
     }
 };
 

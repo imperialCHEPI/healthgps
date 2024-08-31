@@ -55,12 +55,12 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
         // The number of bins to use for each factor is the number of integer values of the factor,
         // or 100 bins of equal size, whichever is smaller (100 is an arbitrary number, it could be
         // any other number depending on the desired resolution of the map)
-        factor_bins_.push_back(std::min(100, factor_range+1));
+        factor_bins_.push_back(std::min(100, factor_range + 1));
 
         // The width of each bin is the factor_range divided by the number of bins.
-        // We need a special case for when the factor_range is 0, in which case we set the bin width to 1.
-        // E.g. when entire population is male. This may never happen in practice, but it's probably
-        // better to handle it just in case.
+        // We need a special case for when the factor_range is 0, in which case we set the bin width
+        // to 1. E.g. when entire population is male. This may never happen in practice, but it's
+        // probably better to handle it just in case.
         if (factor_range == 0) {
             factor_bin_widths_.push_back(1.0);
         } else {
