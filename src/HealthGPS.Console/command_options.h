@@ -20,6 +20,9 @@ struct CommandOptions {
     /// @brief The back-end storage full path or URL argument value
     std::optional<hgps::input::DataSource> data_source;
 
+    /// @brief The output folder where results will be saved
+    std::optional<std::string> output_folder;
+
     /// @brief Indicates whether the application logging is verbose
     bool verbose{};
 
