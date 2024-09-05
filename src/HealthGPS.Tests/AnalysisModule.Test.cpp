@@ -49,7 +49,7 @@ class TestAnalysisModule : public ::testing::Test {
         }
 
         // Let's set the population gender to male
-        for (auto &person: context.population()){
+        for (auto &person : context.population()) {
             person.gender = core::Gender::male;
         }
 
