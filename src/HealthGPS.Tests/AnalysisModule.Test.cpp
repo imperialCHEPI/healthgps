@@ -28,7 +28,7 @@ class TestAnalysisModule : public ::testing::Test {
     hgps::Person test_person_1 = create_test_person(21, hgps::core::Gender::male);
     hgps::Person test_person_2 = create_test_person(22, hgps::core::Gender::male);
     hgps::DefaultEventBus bus = DefaultEventBus{};
-    hgps::SyncChannel channel = SyncChannel{};
+    hgps::SyncChannel channel;
     std::unique_ptr<hgps::MTRandom32> rnd = std::make_unique<MTRandom32>(123456789);
     std::unique_ptr<hgps::BaselineScenario> scenario = std::make_unique<BaselineScenario>(channel);
     hgps::SimulationDefinition definition =
@@ -49,8 +49,8 @@ class TestAnalysisModule : public ::testing::Test {
         }
 
         // Let's set the population gender to male
-        for (size_t i = 0; i < context.population().size(); i++) {
-            context.population()[i].gender = core::Gender::male;
+        for (auto &person: context.population()){
+            person.gender = core::Gender::male;
         }
 
         // For each person, we need to set the risk factors which we can get from channels_

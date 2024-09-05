@@ -8,9 +8,7 @@
 #include "HealthGPS/converter.h"
 #include "HealthGPS/event_bus.h"
 #include "HealthGPS/random_algorithm.h"
-
 #include "RiskFactorData.h"
-#include "simulation.h"
 
 #include <atomic>
 #include <map>
