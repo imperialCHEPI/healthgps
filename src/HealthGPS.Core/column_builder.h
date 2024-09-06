@@ -2,6 +2,7 @@
 #include <exception>
 #include <limits>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include "column.h"
