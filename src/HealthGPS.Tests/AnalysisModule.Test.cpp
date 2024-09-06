@@ -45,7 +45,7 @@ class TestAnalysisModule : public ::testing::Test {
 
         // Let's set some ages for the population
         for (size_t i = 0; i < context.population().size(); i++) {
-            context.population()[i].age = 20 + i;
+            context.population()[i].age = 20 + static_cast<unsigned int>(i);
         }
 
         // Let's set the population gender to male
