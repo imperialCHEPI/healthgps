@@ -8,22 +8,21 @@
 #include <fmt/core.h>
 
 namespace hgps {
-EventMonitor::EventMonitor(std::shared_ptr<hgps::EventAggregator> event_bus,
-                           ResultWriter &result_writer)
+EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer)
     : result_writer_{result_writer}, tg_{tg_context_} {
-    handlers_.emplace_back(event_bus->subscribe(hgps::EventType::runner, [this](auto &&PH1) {
+    handlers_.emplace_back(event_bus.subscribe(hgps::EventType::runner, [this](auto &&PH1) {
         info_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
-    handlers_.emplace_back(event_bus->subscribe(hgps::EventType::info, [this](auto &&PH1) {
+    handlers_.emplace_back(event_bus.subscribe(hgps::EventType::info, [this](auto &&PH1) {
         info_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
-    handlers_.emplace_back(event_bus->subscribe(hgps::EventType::result, [this](auto &&PH1) {
+    handlers_.emplace_back(event_bus.subscribe(hgps::EventType::result, [this](auto &&PH1) {
         result_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
-    handlers_.emplace_back(event_bus->subscribe(hgps::EventType::error, [this](auto &&PH1) {
+    handlers_.emplace_back(event_bus.subscribe(hgps::EventType::error, [this](auto &&PH1) {
         error_event_handler(std::forward<decltype(PH1)>(PH1));
     }));
 
