@@ -12,7 +12,7 @@ using ElapsedTime = std::chrono::duration<double, std::milli>;
 
 Runner::Runner(std::shared_ptr<EventAggregator> bus,
                std::unique_ptr<RandomBitGenerator> seed_generator) noexcept
-    : running_{false}, event_bus_{bus}, seed_generator_{std::move(seed_generator)} {}
+    : running_{false}, event_bus_{std::move(bus)}, seed_generator_{std::move(seed_generator)} {}
 
 double Runner::run(Simulation &baseline, const unsigned int trial_runs) {
     if (trial_runs < 1) {

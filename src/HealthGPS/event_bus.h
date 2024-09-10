@@ -36,7 +36,7 @@ class DefaultEventBus final : public EventAggregator {
     std::unordered_map<std::string, std::function<void(std::shared_ptr<EventMessage>)>>
         subscribers_;
 
-    template <typename Callable> void shared_access(Callable &&callable) const {
+    template <typename Callable> void shared_access(const Callable &callable) const {
         try {
             std::shared_lock<mutex_type> lock(subscribe_mutex_);
             callable();
@@ -45,7 +45,7 @@ class DefaultEventBus final : public EventAggregator {
         }
     }
 
-    template <typename Callable> void exclusive_access(Callable &&callable) const {
+    template <typename Callable> void exclusive_access(const Callable &callable) const {
         try {
             std::unique_lock<mutex_type> lock(subscribe_mutex_);
             callable();

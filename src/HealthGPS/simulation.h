@@ -33,7 +33,7 @@ class Simulation : public adevs::Model<int> {
     explicit Simulation(SimulationModuleFactory &factory,
                         std::shared_ptr<const EventAggregator> bus,
                         std::shared_ptr<const ModelInput> inputs,
-                        std::unique_ptr<Scenario> scenatio);
+                        std::unique_ptr<Scenario> scenario);
 
     /// @brief Destroys a simulation instance
     virtual ~Simulation() = default;
