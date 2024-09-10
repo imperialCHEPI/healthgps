@@ -23,17 +23,16 @@ using NetImmigrationMessage = hgps::SyncDataMessage<hgps::IntegerAgeGenderTable>
 
 namespace hgps {
 
-Simulation::Simulation(std::unique_ptr<SimulationDefinition> definition,
-                       SimulationModuleFactory &factory, EventAggregator &bus)
-    : context_{bus, std::move(definition)} {
+Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const EventAggregator> bus,
+                       std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario)
+    : context_{std::move(bus), std::move(inputs), std::move(scenario)} {
 
     // Create required modules, should change to shared_ptr
-    const auto &inputs = context_.definition().inputs();
-    auto ses_base = factory.create(SimulationModuleType::SES, inputs);
-    auto dem_base = factory.create(SimulationModuleType::Demographic, inputs);
-    auto risk_base = factory.create(SimulationModuleType::RiskFactor, inputs);
-    auto disease_base = factory.create(SimulationModuleType::Disease, inputs);
-    auto analysis_base = factory.create(SimulationModuleType::Analysis, inputs);
+    auto ses_base = factory.create(SimulationModuleType::SES, context_.inputs());
+    auto dem_base = factory.create(SimulationModuleType::Demographic, context_.inputs());
+    auto risk_base = factory.create(SimulationModuleType::RiskFactor, context_.inputs());
+    auto disease_base = factory.create(SimulationModuleType::Disease, context_.inputs());
+    auto analysis_base = factory.create(SimulationModuleType::Analysis, context_.inputs());
 
     ses_ = std::static_pointer_cast<UpdatableModule>(ses_base);
     demographic_ = std::static_pointer_cast<DemographicModule>(dem_base);
@@ -49,7 +48,7 @@ void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexc
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     auto start = std::chrono::steady_clock::now();
-    const auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
     context_.metrics().clear();
     context_.scenario().clear();
@@ -115,7 +114,7 @@ void Simulation::initialise_population() {
     /* Note: order is very important */
 
     // Create virtual population
-    const auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.inputs();
     auto model_start_year = inputs.start_time();
     auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
     float size_fraction = inputs.settings().size_fraction();
@@ -183,7 +182,7 @@ void Simulation::update_net_immigration() {
 }
 
 IntegerAgeGenderTable Simulation::get_current_expected_population() const {
-    const auto &inputs = context_.definition().inputs();
+    const auto &inputs = context_.inputs();
     auto sim_start_time = context_.start_time();
     auto total_initial_population = demographic_->get_total_population_size(sim_start_time);
     float size_fraction = inputs.settings().size_fraction();
@@ -323,7 +322,7 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
 std::map<std::string, core::UnivariateSummary> Simulation::create_input_data_summary() const {
     auto visitor = UnivariateVisitor();
     auto summary = std::map<std::string, core::UnivariateSummary>();
-    const auto &input_data = context_.definition().inputs().data();
+    const auto &input_data = context_.inputs().data();
 
     for (const auto &entry : context_.mapping()) {
         // HACK: Ignore missing columns.
@@ -337,7 +336,7 @@ std::map<std::string, core::UnivariateSummary> Simulation::create_input_data_sum
 }
 
 void hgps::Simulation::print_initial_population_statistics() {
-    auto verbosity = context_.definition().inputs().run().verbosity;
+    auto verbosity = context_.inputs().run().verbosity;
     if (context_.current_run() > 1 && verbosity == core::VerboseMode::none) {
         return;
     }
@@ -359,7 +358,7 @@ void hgps::Simulation::print_initial_population_statistics() {
 
     auto pad = longestColumnName + 2;
     auto width = pad + 70;
-    auto orig_pop = context_.definition().inputs().data().num_rows();
+    auto orig_pop = context_.inputs().data().num_rows();
     auto sim_pop = context_.population().size();
 
     std::stringstream ss;

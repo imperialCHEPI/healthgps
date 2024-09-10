@@ -2,10 +2,11 @@
 
 #include "event_aggregator.h"
 #include "mapping.h"
+#include "modelinput.h"
 #include "population.h"
 #include "random_algorithm.h"
 #include "runtime_metric.h"
-#include "simulation_definition.h"
+#include "scenario.h"
 
 #include <functional>
 #include <vector>
@@ -23,8 +24,10 @@ class RuntimeContext {
     RuntimeContext() = delete;
     /// @brief Initialises a new instance of the RuntimeContext class.
     /// @param bus The message bus instance for communication with the outside world
-    /// @param definition The simulation experiment definition.
-    RuntimeContext(EventAggregator &bus, std::unique_ptr<SimulationDefinition> definition);
+    /// @param inputs The simulation model inputs
+    /// @param scenario The scenario to simulate
+    RuntimeContext(std::shared_ptr<const EventAggregator> bus,
+                   std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario);
 
     /// @brief Gets the current simulation time
     /// @return Current simulation time
@@ -42,14 +45,6 @@ class RuntimeContext {
     /// @return Timeout in milliseconds
     int sync_timeout_millis() const noexcept;
 
-    /// @brief Gets a reference to the simulation definition
-    /// @return Simulation definition
-    SimulationDefinition &definition() noexcept;
-
-    /// @brief Gets a reference to the simulation definition
-    /// @return Simulation definition
-    const SimulationDefinition &definition() const noexcept;
-
     /// @brief Gets a reference to the virtual population container
     /// @return Virtual population
     Population &population() noexcept;
@@ -62,9 +57,13 @@ class RuntimeContext {
     /// @return Runtime metrics
     RuntimeMetric &metrics() noexcept;
 
-    /// @brief Gets a reference to the simulation experiment scenario
-    /// @return Experiment scenario
-    Scenario &scenario() noexcept;
+    /// @brief Gets a reference to the model inputs definition
+    /// @return The model inputs reference
+    const ModelInput &inputs() const noexcept;
+
+    /// @brief Gets a reference to the simulation scenario instance
+    /// @return Experiment Scenario reference
+    Scenario &scenario() const noexcept;
 
     /// @brief Gets a reference to the engine random number generator
     /// @return Random number generator
@@ -84,7 +83,7 @@ class RuntimeContext {
 
     /// @brief Gets the simulation identifier for outside world messages
     /// @return Simulation identifier
-    std::string identifier() const noexcept;
+    const std::string &identifier() const noexcept;
 
     /// @brief Sets the current simulation time value
     /// @param time_now The new simulation time
@@ -107,8 +106,9 @@ class RuntimeContext {
     void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
   private:
-    std::reference_wrapper<EventAggregator> event_bus_;
-    std::unique_ptr<SimulationDefinition> definition_;
+    std::shared_ptr<const EventAggregator> event_bus_;
+    std::shared_ptr<const ModelInput> inputs_;
+    std::unique_ptr<Scenario> scenario_;
     Population population_;
     mutable Random random_{};
     RuntimeMetric metrics_{};
@@ -116,4 +116,5 @@ class RuntimeContext {
     int model_start_time_{};
     int time_now_{};
 };
+
 } // namespace hgps

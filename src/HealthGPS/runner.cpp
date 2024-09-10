@@ -10,7 +10,8 @@ namespace hgps {
 
 using ElapsedTime = std::chrono::duration<double, std::milli>;
 
-Runner::Runner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> seed_generator) noexcept
+Runner::Runner(std::shared_ptr<EventAggregator> bus,
+               std::unique_ptr<RandomBitGenerator> seed_generator) noexcept
     : running_{false}, event_bus_{bus}, seed_generator_{std::move(seed_generator)} {}
 
 double Runner::run(Simulation &baseline, const unsigned int trial_runs) {
@@ -134,6 +135,7 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
 }
 
 void Runner::notify(std::unique_ptr<hgps::EventMessage> message) {
-    event_bus_.get().publish_async(std::move(message));
+    event_bus_->publish_async(std::move(message));
 }
+
 } // namespace hgps

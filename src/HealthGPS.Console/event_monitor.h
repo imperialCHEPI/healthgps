@@ -20,7 +20,7 @@ class EventMonitor final : public hgps::EventMessageVisitor {
     /// @brief Initialises a new instance of the hgps::EventMonitor class.
     /// @param event_bus The message bus instance to monitor
     /// @param result_writer The results message writer instance
-    EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer);
+    EventMonitor(std::shared_ptr<hgps::EventAggregator> event_bus, ResultWriter &result_writer);
 
     /// @brief Destroys a hgps::EventMonitor instance
     ~EventMonitor() noexcept;
