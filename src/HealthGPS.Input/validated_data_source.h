@@ -6,13 +6,11 @@
 #include <string>
 
 namespace hgps::input {
-/// @brief A data source which is validated with a checksum (unless it's a directory)
+/// @brief A data source which is validated with a checksum
 class ValidatedDataSource : public DataSource {
   public:
     /// @brief Create a new ValidatedDataSource
-    /// @details Note that the file hash is not required for directories, but is compulsory
-    ///          otherwise
-    /// @param source File/directory path or URL
+    /// @param source File path or URL
     /// @param root_path Path to use as root for relative paths
     /// @param file_hash SHA256 hash of file contents
     explicit ValidatedDataSource(std::string source, const std::filesystem::path &root_path,

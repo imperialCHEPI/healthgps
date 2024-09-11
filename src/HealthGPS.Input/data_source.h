@@ -9,9 +9,14 @@ namespace hgps::input {
 //! Represents a data source, a either file/directory path or a URL
 class DataSource {
   public:
-    /// @brief Create a new DataSource without checksum validatation
+    /// @brief Create a new DataSource
     /// @param source File/directory path or URL
     explicit DataSource(std::string source);
+
+    /// @brief Create a new DataSource, rebasing relative paths if needed
+    /// @param source File path or URL
+    /// @param root_path Path to use as root for relative paths
+    explicit DataSource(std::string source, const std::filesystem::path &root_path);
 
     virtual ~DataSource() = default;
 
