@@ -30,6 +30,8 @@ target_sources(
             "riskmodel.h"
             "schema.cpp"
             "schema.h"
+            "validated_data_source.cpp"
+            "validated_data_source.h"
             "zip_file.cpp"
             "zip_file.h")
 

@@ -17,6 +17,7 @@
 #include "HealthGPS/scenario.h"
 #include "HealthGPS/simulation.h"
 
+#include <memory>
 #include <optional>
 #include <stdexcept>
 
@@ -28,7 +29,7 @@ struct Configuration {
     std::filesystem::path root_path;
 
     /// @brief Static data source for the simulation (either URL or path)
-    std::optional<DataSource> data_source;
+    std::unique_ptr<DataSource> data_source;
 
     /// @brief The input data file details
     FileInfo file;

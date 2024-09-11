@@ -2,6 +2,7 @@
 #include "configuration_parsing.h"
 #include "jsonparser.h"
 #include "schema.h"
+#include "validated_data_source.h"
 #include "version.h"
 
 #include "HealthGPS/baseline_scenario.h"
@@ -22,6 +23,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <thread>
 #include <utility>
@@ -39,17 +41,21 @@ using namespace hgps::input;
 constexpr const char *ConfigSchemaFileName = "config.json";
 constexpr int ConfigSchemaVersion = 1;
 
-DataSource get_data_source_from_json(const nlohmann::json &opt,
-                                     const std::filesystem::path &root_path) {
+std::unique_ptr<DataSource> get_data_source_from_json(const nlohmann::json &opt,
+                                                      const std::filesystem::path &root_path) {
     auto source = opt["source"].get<std::string>();
 
     // Checksum is not required if source is a directory, else it is mandatory
-    std::optional<std::string> file_hash;
     if (opt.contains("checksum")) {
-        file_hash = opt["checksum"].get<std::string>();
+        auto file_hash = opt["checksum"].get<std::string>();
+        return std::make_unique<ValidatedDataSource>(std::move(source), root_path,
+                                                     std::move(file_hash));
     }
 
-    return DataSource(std::move(source), root_path, std::move(file_hash));
+    if (!std::filesystem::is_directory(source)) {
+        throw std::runtime_error("Missing checksum property for data source");
+    }
+    return std::make_unique<DataSource>(std::move(source));
 }
 } // anonymous namespace
 
