@@ -273,7 +273,7 @@ void load_output_info(const json &j, Configuration &config,
         config.output.folder = expand_environment_variables(config.output.folder);
         fmt::print(fmt::fg(fmt::color::dark_salmon),
                    "Providing output folder via config file is deprecated. Please use -o "
-                   "command-line argument instead.");
+                   "command-line argument instead.\n");
     }
 }
 
