@@ -256,12 +256,25 @@ void load_running_info(const json &j, Configuration &config) {
     }
 }
 
-void load_output_info(const json &j, Configuration &config) {
+void load_output_info(const json &j, Configuration &config,
+                      const std::optional<std::string> &output_folder) {
     if (!get_to(j, "output", config.output)) {
         throw ConfigurationError{"Could not load output info"};
     }
 
-    config.output.folder = expand_environment_variables(config.output.folder);
+    if (output_folder.has_value() != config.output.folder.empty()) {
+        throw ConfigurationError(
+            "Must specify output folder via command line argument or config file, but not both");
+    }
+
+    if (output_folder.has_value()) {
+        config.output.folder = output_folder.value();
+    } else {
+        config.output.folder = expand_environment_variables(config.output.folder);
+        fmt::print(fmt::fg(fmt::color::dark_salmon),
+                   "Providing output folder via config file is deprecated. Please use -o "
+                   "command-line argument instead.");
+    }
 }
 
 } // namespace hgps::input
