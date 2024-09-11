@@ -9,7 +9,8 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
+    options.add_options()("f,file", "Path to configuration file or folder.",
+                          cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
         "o,output", "Path to output folder", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
@@ -44,13 +45,16 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
     cmd.config_file = result["file"].as<std::string>();
     if (cmd.config_file.is_relative()) {
         cmd.config_file = std::filesystem::absolute(cmd.config_file);
-        fmt::print("Configuration file: {}\n", cmd.config_file.string());
     }
-
+    if (fs::is_directory(cmd.config_file)) {
+        // If users give path to directory, use standard config file name
+        cmd.config_file /= "config.json";
+    }
     if (!fs::exists(cmd.config_file)) {
         throw std::runtime_error(
             fmt::format("Configuration file: {} not found.", cmd.config_file.string()));
     }
+    fmt::print("Configuration file: {}\n", cmd.config_file.string());
 
     if (result.count("storage")) {
         auto source = result["storage"].as<std::string>();
