@@ -21,7 +21,7 @@ class ValidatedDataSource : public DataSource {
     /// @brief Compute the checksum for the file
     /// @param zip_file_path Path to zip file
     /// @return The calculated checksum
-    virtual std::string compute_file_hash(const std::filesystem::path &zip_file_path) const;
+    std::string compute_file_hash(const std::filesystem::path &zip_file_path) const override;
 
   private:
     std::string file_hash_;
