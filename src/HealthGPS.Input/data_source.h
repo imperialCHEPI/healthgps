@@ -13,6 +13,8 @@ class DataSource {
     /// @param source File/directory path or URL
     explicit DataSource(std::string source);
 
+    virtual ~DataSource() = default;
+
     // Copy and move constructors
     DataSource(const DataSource &) noexcept = default;
     DataSource(DataSource &&) noexcept = default;
