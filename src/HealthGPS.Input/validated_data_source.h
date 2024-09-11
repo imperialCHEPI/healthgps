@@ -18,7 +18,7 @@ class ValidatedDataSource : public DataSource {
     explicit ValidatedDataSource(std::string source, const std::filesystem::path &root_path,
                                  std::string file_hash);
 
-    virtual ~ValidatedDataSource() = default;
+    ~ValidatedDataSource() override = default;
 
     /// @brief Compute the checksum for the file
     /// @param zip_file_path Path to zip file
