@@ -57,6 +57,18 @@ std::unique_ptr<DataSource> get_data_source_from_json(const nlohmann::json &opt,
     }
     return std::make_unique<DataSource>(std::move(source));
 }
+
+// Get path to config file
+std::filesystem::path get_config_file_path(const std::string &config_source) {
+    // Config source is path to local JSON file
+    if (std::filesystem::is_regular_file(config_source) && config_source.ends_with(".json")) {
+        return config_source;
+    }
+
+    // Config source is path to directory, zip file or URL
+    return DataSource{config_source}.get_data_directory() / "config.json";
+}
+
 } // anonymous namespace
 
 namespace hgps::input {
@@ -65,7 +77,7 @@ using json = nlohmann::json;
 
 ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
 
-Configuration get_configuration(const std::filesystem::path &config_file,
+Configuration get_configuration(const std::string &config_source,
                                 const std::optional<std::string> &output_folder, int job_id,
                                 bool verbose) {
     MEASURE_FUNCTION();
@@ -79,6 +91,8 @@ Configuration get_configuration(const std::filesystem::path &config_file,
     if (verbose) {
         config.verbosity = core::VerboseMode::verbose;
     }
+
+    const auto config_file = get_config_file_path(config_source);
 
     const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion,
                                             /*require_schema_property=*/false);

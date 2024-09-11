@@ -8,14 +8,14 @@
 
 #include "HealthGPS.Input/data_source.h"
 
-#include <filesystem>
 #include <optional>
+#include <string>
 
 namespace hgps {
 /// @brief Defines the Command Line Interface (CLI) arguments options
 struct CommandOptions {
-    /// @brief The configuration file argument value
-    std::filesystem::path config_file;
+    /// @brief The configuration source (file, directory or URL)
+    std::string config_source;
 
     /// @brief The back-end storage full path or URL argument value
     std::optional<hgps::input::DataSource> data_source;

@@ -87,12 +87,12 @@ class ConfigurationError : public std::runtime_error {
 };
 
 /// @brief Loads the input configuration file, *.json, information
-/// @param config_file Path to config file
+/// @param config_source Path/URL for config source
 /// @param output_folder Path to output folder, if provided via command-line argument
 /// @param job_id Job ID (for HPC)
 /// @param verbose Set log verbosity for simulation
 /// @return The configuration file information
-Configuration get_configuration(const std::filesystem::path &config_file,
+Configuration get_configuration(const std::string &config_source,
                                 const std::optional<std::string> &output_folder, int job_id,
                                 bool verbose);
 
