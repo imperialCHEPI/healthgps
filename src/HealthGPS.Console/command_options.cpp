@@ -9,8 +9,9 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Path to configuration file, folder or URL.",
+    options.add_options()("f,file", "Path to configuration file, folder or URL (deprecated).",
                           cxxopts::value<std::string>())(
+        "c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
         "o,output", "Path to output folder", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
@@ -42,7 +43,14 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
         fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
     }
 
-    cmd.config_source = result["file"].as<std::string>();
+    if (result.count("file")) {
+        fmt::print(fg(fmt::color::dark_salmon),
+                   "The -f/--file option is deprecated. Use -c/--config instead.\n");
+        cmd.config_source = result["file"].as<std::string>();
+    }
+    if (result.count("config")) {
+        cmd.config_source = result["config"].as<std::string>();
+    }
     fmt::print("Configuration source: {}\n", cmd.config_source);
 
     if (result.count("storage")) {
