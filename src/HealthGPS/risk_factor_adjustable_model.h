@@ -7,6 +7,7 @@
 #include "risk_factor_model.h"
 #include "runtime_context.h"
 
+#include <fstream>
 #include <functional>
 #include <optional>
 #include <vector>
@@ -71,6 +72,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
 
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
+    mutable std::optional<std::ofstream> adjustments_ofs_;
 };
 
 /// @brief Risk factor adjustable model definition interface
