@@ -11,6 +11,7 @@ cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
     options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
+        "o,output", "Path to output folder", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
         cxxopts::value<int>())("verbose", "Print more information about progress",
                                cxxopts::value<bool>()->default_value("false"))(
@@ -61,6 +62,10 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
         fmt::print("Data source: {}\n", source);
 
         cmd.data_source = hgps::input::DataSource(std::move(source));
+    }
+
+    if (result.count("output")) {
+        cmd.output_folder = result["output"].as<std::string>();
     }
 
     if (result.count("jobid")) {
