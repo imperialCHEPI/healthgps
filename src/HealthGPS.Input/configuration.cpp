@@ -59,7 +59,8 @@ using json = nlohmann::json;
 
 ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
 
-Configuration get_configuration(const std::filesystem::path &config_file, int job_id,
+Configuration get_configuration(const std::filesystem::path &config_file,
+                                const std::optional<std::string> &output_folder, int job_id,
                                 bool verbose) {
     MEASURE_FUNCTION();
     bool success = true;
@@ -111,10 +112,10 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
     }
 
     try {
-        load_output_info(opt, config);
-    } catch (const ConfigurationError &) {
+        load_output_info(opt, config, output_folder);
+    } catch (const ConfigurationError &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load output info");
+        fmt::print(fg(fmt::color::red), e.what());
     }
 
     if (!success) {

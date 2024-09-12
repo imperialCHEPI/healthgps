@@ -644,7 +644,7 @@ TEST_F(ConfigParsingFixture, LoadOutputInfo) {
     // Valid info
     {
         auto config = create_config();
-        EXPECT_NO_THROW(load_output_info(valid_output_info, config));
+        EXPECT_NO_THROW(load_output_info(valid_output_info, config, std::nullopt));
         EXPECT_EQ(config.output, output_info);
     }
 
@@ -653,6 +653,6 @@ TEST_F(ConfigParsingFixture, LoadOutputInfo) {
         auto config = create_config();
         auto j = valid_output_info;
         j["output"][key] = nullptr; // None of the values should be null
-        EXPECT_THROW(load_output_info(j, config), ConfigurationError);
+        EXPECT_THROW(load_output_info(j, config, std::nullopt), ConfigurationError);
     }
 }

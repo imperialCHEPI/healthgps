@@ -101,7 +101,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = get_configuration(cmd_args.config_file, cmd_args.job_id, cmd_args.verbose);
+        config = get_configuration(cmd_args.config_file, cmd_args.output_folder, cmd_args.job_id,
+                                   cmd_args.verbose);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);

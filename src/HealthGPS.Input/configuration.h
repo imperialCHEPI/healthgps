@@ -87,10 +87,13 @@ class ConfigurationError : public std::runtime_error {
 
 /// @brief Loads the input configuration file, *.json, information
 /// @param config_file Path to config file
+/// @param output_folder Path to output folder, if provided via command-line argument
 /// @param job_id Job ID (for HPC)
 /// @param verbose Set log verbosity for simulation
 /// @return The configuration file information
-Configuration get_configuration(const std::filesystem::path &config_file, int job_id, bool verbose);
+Configuration get_configuration(const std::filesystem::path &config_file,
+                                const std::optional<std::string> &output_folder, int job_id,
+                                bool verbose);
 
 /// @brief Gets the collection of diseases that matches the selected input list
 /// @param data_api The back-end data store instance to be used.

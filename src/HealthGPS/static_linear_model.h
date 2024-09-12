@@ -24,6 +24,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Initialises a new instance of the StaticLinearModel class
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values
+    /// @param expected_trend_boxcox The expected boxcox factor
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factor values
     /// @param ranges The value range of each risk factor
@@ -35,6 +36,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param trend_models The linear models used to compute a person's risk factor trends
     /// @param trend_ranges The value range of each risk factor trend
+    /// @param trend_lambda The lambda values of the risk factor trends
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -43,6 +45,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
         const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
         const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
         const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
@@ -50,7 +53,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::vector<core::DoubleInterval> &policy_ranges,
         const Eigen::MatrixXd &policy_cholesky,
         std::shared_ptr<std::vector<LinearModelParams>> trend_models,
-        std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
+        std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges,
+        std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
@@ -112,6 +116,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
     const std::vector<core::DoubleInterval> &ranges_;
@@ -123,6 +128,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const Eigen::MatrixXd &policy_cholesky_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
+    std::shared_ptr<std::vector<double>> trend_lambda_;
     const double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
@@ -136,6 +142,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values
+    /// @param expected_trend_boxcox The expected boxcox factor
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factors
     /// @param ranges The value range of each risk factor
@@ -147,6 +154,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param policy_cholesky Cholesky decomposition of the intervention policy covariance matrix
     /// @param trend_models The linear models used to compute a person's risk factor trends
     /// @param trend_ranges The value range of each risk factor trend
+    /// @param trend_lambda The lambda values of the risk factor trends
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
@@ -155,13 +163,15 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
         std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
         std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
         std::vector<double> stddev, Eigen::MatrixXd cholesky,
         std::vector<LinearModelParams> policy_models,
         std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
         std::unique_ptr<std::vector<LinearModelParams>> trend_models,
-        std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
+        std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
+        std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
@@ -172,6 +182,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unique_ptr<RiskFactorModel> create_model() const override;
 
   private:
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::vector<core::Identifier> names_;
     std::vector<LinearModelParams> models_;
     std::vector<core::DoubleInterval> ranges_;
@@ -183,6 +194,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     Eigen::MatrixXd policy_cholesky_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
+    std::shared_ptr<std::vector<double>> trend_lambda_;
     double info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;

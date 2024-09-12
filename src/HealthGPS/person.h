@@ -103,6 +103,12 @@ struct Person {
     /// @throws HgpsException if gender is unknown
     float gender_to_value() const;
 
+    /// @brief Gets the gender enumeration as a number for analysis
+    /// @param gender The gender to convert to a value
+    /// @return The gender associated value
+    /// @throws HgpsException if gender is unknown
+    static float gender_to_value(core::Gender gender);
+
     /// @brief Gets the gender enumeration name string
     /// @return The gender name
     /// @throws HgpsException if gender is unknown
