@@ -169,17 +169,17 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         std::cout << input_table;
 
         // Create complete model input from configuration
-        auto model_input =
-            create_model_input(input_table, std::move(country), config, std::move(diseases));
+        auto model_input = std::make_shared<ModelInput>(
+            create_model_input(input_table, std::move(country), config, std::move(diseases)));
 
         // Create event bus and event monitor with a results file writer
-        auto event_bus = DefaultEventBus();
-        auto json_file_logger = create_results_file_logger(config, model_input);
-        auto event_monitor = EventMonitor{event_bus, json_file_logger};
+        auto event_bus = std::make_shared<DefaultEventBus>();
+        auto json_file_logger = create_results_file_logger(config, *model_input);
+        auto event_monitor = EventMonitor{*event_bus, json_file_logger};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
-        if (const auto seed = model_input.seed()) {
+        if (const auto seed = model_input->seed()) {
             seed_generator->seed(seed.value());
         }
         auto runner = Runner(event_bus, std::move(seed_generator));

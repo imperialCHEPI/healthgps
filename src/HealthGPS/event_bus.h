@@ -16,9 +16,9 @@ class DefaultEventBus final : public EventAggregator {
     subscribe(EventType event_id,
               std::function<void(std::shared_ptr<EventMessage> message)> function) override;
 
-    void publish(std::unique_ptr<EventMessage> message) override;
+    void publish(std::unique_ptr<EventMessage> message) const override;
 
-    void publish_async(std::unique_ptr<EventMessage> message) override;
+    void publish_async(std::unique_ptr<EventMessage> message) const override;
 
     bool unsubscribe(const EventSubscriber &subscriber) override;
 
@@ -36,7 +36,7 @@ class DefaultEventBus final : public EventAggregator {
     std::unordered_map<std::string, std::function<void(std::shared_ptr<EventMessage>)>>
         subscribers_;
 
-    template <typename Callable> void shared_access(Callable &&callable) {
+    template <typename Callable> void shared_access(const Callable &callable) const {
         try {
             std::shared_lock<mutex_type> lock(subscribe_mutex_);
             callable();
@@ -45,7 +45,7 @@ class DefaultEventBus final : public EventAggregator {
         }
     }
 
-    template <typename Callable> void exclusive_access(Callable &&callable) {
+    template <typename Callable> void exclusive_access(const Callable &callable) const {
         try {
             std::unique_lock<mutex_type> lock(subscribe_mutex_);
             callable();

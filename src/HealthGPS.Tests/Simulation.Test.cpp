@@ -49,7 +49,7 @@ void create_test_datatable(hgps::core::DataTable &data) {
     data.add(inc_builder.build());
 }
 
-hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
+std::shared_ptr<hgps::ModelInput> create_test_configuration(hgps::core::DataTable &data) {
     using namespace hgps;
     using namespace hgps::core;
 
@@ -75,7 +75,7 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
                     .name = "Colorectal cancer"},
     };
 
-    return {data, settings, info, ses, mapping, diseases};
+    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases);
 }
 
 TEST(TestSimulation, RandomBitGenerator) {
@@ -207,14 +207,13 @@ TEST(TestSimulation, CreateRuntimeContext) {
     DataTable data;
     create_test_datatable(data);
 
-    auto bus = DefaultEventBus{};
+    auto bus = std::make_shared<DefaultEventBus>();
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto model_input = create_test_configuration(data);
-    auto definition = std::make_unique<SimulationDefinition>(model_input, std::move(scenario));
+    auto inputs = create_test_configuration(data);
 
-    auto context = RuntimeContext(bus, std::move(definition));
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
     ASSERT_EQ(0, context.population().size());
     ASSERT_EQ(0, context.time_now());
 }
@@ -252,7 +251,7 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
                                                                .code = core::Identifier{"diabetes"},
                                                                .name = "Diabetes Mellitus"}};
 
-    auto config = ModelInput(data, settings, info, ses, mapping, diseases);
+    auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -264,7 +263,7 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
                                  return build_country_module(repository, config);
                              });
 
-    auto base_module = factory.create(SimulationModuleType::Analysis, config);
+    auto base_module = factory.create(SimulationModuleType::Analysis, *inputs);
     auto *country_mod = dynamic_cast<CountryModule *>(base_module.get());
     country_mod->execute("print");
 
@@ -279,21 +278,20 @@ TEST(TestSimulation, CreateSESNoiseModule) {
     DataTable data;
     create_test_datatable(data);
 
-    auto model_input = create_test_configuration(data);
+    auto inputs = create_test_configuration(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
 
-    auto bus = DefaultEventBus{};
+    auto bus = std::make_shared<DefaultEventBus>();
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto definition = std::make_unique<SimulationDefinition>(model_input, std::move(scenario));
-    auto context = RuntimeContext(bus, std::move(definition));
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
 
     context.reset_population(10);
 
-    auto ses_module = build_ses_noise_module(repository, model_input);
+    auto ses_module = build_ses_noise_module(repository, *inputs);
     ses_module->initialise_population(context);
 
     ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
@@ -311,14 +309,14 @@ TEST(TestSimulation, CreateDemographicModule) {
     DataTable data;
     create_test_datatable(data);
 
-    auto config = create_test_configuration(data);
+    auto inputs = create_test_configuration(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
 
-    auto pop_module = build_population_module(repository, config);
-    auto total_pop = pop_module->get_total_population_size(config.start_time());
-    const auto &pop_dist = pop_module->get_population_distribution(config.start_time());
+    auto pop_module = build_population_module(repository, *inputs);
+    auto total_pop = pop_module->get_total_population_size(inputs->start_time());
+    const auto &pop_dist = pop_module->get_population_distribution(inputs->start_time());
     auto sum_dist = 0.0f;
     for (const auto &pair : pop_dist) {
         sum_dist += pair.second.total();
@@ -408,7 +406,7 @@ TEST(TestSimulation, CreateDiseaseModule) {
     auto diabetes_key = core::Identifier{"diabetes"};
     auto moonshot_key = core::Identifier{"moonshot"};
 
-    auto disease_module = build_disease_module(repository, inputs);
+    auto disease_module = build_disease_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
     ASSERT_EQ("Disease", disease_module->name());
     ASSERT_GT(disease_module->size(), 0);
@@ -430,7 +428,7 @@ TEST(TestSimulation, CreateAnalysisModule) {
 
     auto inputs = create_test_configuration(data);
 
-    auto analysis_module = build_analysis_module(repository, inputs);
+    auto analysis_module = build_analysis_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
     ASSERT_EQ("Analysis", analysis_module->name());
 }

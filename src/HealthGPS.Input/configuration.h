@@ -131,16 +131,16 @@ std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &chan
 /// @return The respective simulation engine instance
 hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
                                             hgps::SimulationModuleFactory &factory,
-                                            hgps::EventAggregator &event_bus,
-                                            hgps::ModelInput &input);
+                                            std::shared_ptr<const hgps::EventAggregator> event_bus,
+                                            std::shared_ptr<const hgps::ModelInput> input);
 
 /// @brief Creates the intervention scenario instance
 /// @param channel Synchronization channel instance for data exchange
 /// @param info Intervention configuration information
 /// @return The respective intervention scenario instance
 /// @throws std::invalid_argument Thrown if intervention `identifier` is unknown.
-std::unique_ptr<hgps::InterventionScenario>
-create_intervention_scenario(hgps::SyncChannel &channel, const PolicyScenarioInfo &info);
+std::unique_ptr<hgps::Scenario> create_intervention_scenario(hgps::SyncChannel &channel,
+                                                             const PolicyScenarioInfo &info);
 
 /// @brief Creates the intervention simulation engine instance
 /// @param channel Synchronization channel for data exchange instance
@@ -149,11 +149,11 @@ create_intervention_scenario(hgps::SyncChannel &channel, const PolicyScenarioInf
 /// @param input Model inputs instance
 /// @param info Intervention policy definition
 /// @return The respective simulation engine instance
-hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
-                                                hgps::SimulationModuleFactory &factory,
-                                                hgps::EventAggregator &event_bus,
-                                                hgps::ModelInput &input,
-                                                const PolicyScenarioInfo &info);
+hgps::Simulation
+create_intervention_simulation(hgps::SyncChannel &channel, hgps::SimulationModuleFactory &factory,
+                               std::shared_ptr<const hgps::EventAggregator> event_bus,
+                               std::shared_ptr<const hgps::ModelInput> input,
+                               const PolicyScenarioInfo &info);
 
 /// @brief Expand environment variables in path to respective values
 /// @param path The source path to information
@@ -165,4 +165,5 @@ std::string expand_environment_variables(const std::string &path);
 /// @param user_seed User input custom seed for experiment
 /// @return The experiment seed, if user provide a seed
 std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed);
+
 } // namespace hgps::input
