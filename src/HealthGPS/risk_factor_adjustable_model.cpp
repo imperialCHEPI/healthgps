@@ -1,8 +1,10 @@
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Input/jsonparser.h"
 
 #include "risk_factor_adjustable_model.h"
 #include "sync_message.h"
 
+#include <iostream>
 #include <oneapi/tbb/parallel_for_each.h>
 #include <utility>
 
@@ -30,6 +32,45 @@ struct FirstMoment {
 } // anonymous namespace
 
 namespace hgps {
+
+const char *sex_to_str(core::Gender sex) {
+    switch (sex) {
+    case core::Gender::male:
+        return "male";
+    case core::Gender::female:
+        return "female";
+    case core::Gender::unknown:
+        break;
+    }
+
+    return "unknown";
+}
+
+void to_json(nlohmann::json &j, const RiskFactorSexAgeTable &table) {
+    for (const auto &[sex, row] : table) {
+        nlohmann::json jrow;
+        for (const auto &[id, values] : row) {
+            jrow[id.to_string()] = values;
+        }
+        j[sex_to_str(sex)] = std::move(jrow);
+    }
+}
+
+namespace core {
+void to_json(nlohmann::json &j, Gender gender) {
+    switch (gender) {
+    case Gender::unknown:
+        j = "unknown";
+        break;
+    case Gender::male:
+        j = "male";
+        break;
+    case Gender::female:
+        j = "female";
+        break;
+    }
+}
+} // namespace core
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -66,6 +107,14 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
+
+        if (!adjustments_ofs_) {
+            adjustments_ofs_.emplace("adjustments.txt");
+        }
+
+        nlohmann::json json = adjustments;
+        std::cout << "SAVING ADJUSTMENTS\n";
+        *adjustments_ofs_ << json << "\n";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
