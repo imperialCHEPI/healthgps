@@ -9,6 +9,7 @@
 #include "event_monitor.h"
 #include "model_info.h"
 #include "result_file_writer.h"
+#include "version.h"
 
 #include <fmt/chrono.h>
 #include <fmt/color.h>
@@ -16,6 +17,12 @@
 #include <chrono>
 #include <cstdlib>
 #include <oneapi/tbb/global_control.h>
+
+// // We may not have the current git ref (e.g. if HGPS was built from a tarball), in which case we
+// // provide a fallback
+// #ifndef HGPS_GIT_REF
+// #define HGPS_GIT_REF "v" PROJECT_VERSION " (unknown git commit)"
+// #endif
 
 namespace {
 /// @brief Get a string representation of current system time
@@ -28,7 +35,8 @@ std::string get_time_now_str() {
 /// @brief Prints application start-up messages
 void print_app_title() {
     fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
-               "\n# Health-GPS Microsimulation for Policy Options #\n\n");
+               "\n# Health-GPS Microsimulation for Policy Options #\n"
+               "# Version: " PROJECT_GIT_REF " #\n\n");
 
     fmt::print("Today: {}\nMaximum threads: {}\n\n", get_time_now_str(),
                tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism));

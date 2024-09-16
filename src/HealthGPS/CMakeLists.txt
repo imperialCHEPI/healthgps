@@ -6,6 +6,12 @@ find_package(platform_folders CONFIG REQUIRED)
 add_library(HealthGPS STATIC "")
 target_compile_features(HealthGPS PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
+include(../../cmake/GetVersionGit.cmake)
+get_version_git(PROJECT_GIT_REF)
+if(NOT DEFINED PROJECT_GIT_REF)
+    set(PROJECT_GIT_REF "${PROJECT_VERSION} (unknown git commit)")
+endif()
+
 configure_file("version.h.in" "version.h" ESCAPE_QUOTES)
 
 target_sources(
