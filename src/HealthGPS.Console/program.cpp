@@ -65,22 +65,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
 
-    // Set thread limit from OMP_THREAD_LIMIT, if set in environment.
-    char *env_threads = std::getenv("OMP_THREAD_LIMIT");
-    int threads =
-        env_threads != nullptr ? std::atoi(env_threads) : tbb::this_task_arena::max_concurrency();
-    auto thread_control =
-        tbb::global_control(tbb::global_control::max_allowed_parallelism, threads);
-
     // Create CLI options and validate minimum arguments
     auto options = create_options();
     if (argc < 2) {
         std::cout << options.help() << '\n';
         return exit_application(EXIT_FAILURE);
     }
-
-    // Print application title and parse command line arguments
-    print_app_title();
 
     std::optional<CommandOptions> cmd_args_opt;
     try {
@@ -97,6 +87,15 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     }
 
     const auto &cmd_args = cmd_args_opt.value();
+
+    // Set maximum number of threads, if requested
+    std::optional<tbb::global_control> thread_control;
+    if (cmd_args.num_threads != 0) {
+        thread_control.emplace(tbb::global_control::max_allowed_parallelism, cmd_args.num_threads);
+    }
+
+    // Print application title and parse command line arguments
+    print_app_title();
 
     // Parse inputs configuration file, *.json.
     Configuration config;
