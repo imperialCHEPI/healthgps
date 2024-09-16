@@ -91,10 +91,11 @@ class EventAggregator {
 
     /// @brief Publishes a message to all subscribers synchronous
     /// @param message The new message instance
-    virtual void publish(std::unique_ptr<EventMessage> message) = 0;
+    virtual void publish(std::unique_ptr<EventMessage> message) const = 0;
 
     /// @brief Publishes a message to all subscribers asynchronous
     /// @param message The new message instance
-    virtual void publish_async(std::unique_ptr<EventMessage> message) = 0;
+    virtual void publish_async(std::unique_ptr<EventMessage> message) const = 0;
 };
+
 } // namespace hgps

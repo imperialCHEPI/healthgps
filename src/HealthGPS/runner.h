@@ -28,7 +28,8 @@ class Runner {
     /// @brief Initialises a new instance of the Runner class.
     /// @param bus The message bus instance to use for notification
     /// @param seed_generator Master RNG for RNG seed generation
-    Runner(EventAggregator &bus, std::unique_ptr<RandomBitGenerator> seed_generator) noexcept;
+    Runner(std::shared_ptr<EventAggregator> bus,
+           std::unique_ptr<RandomBitGenerator> seed_generator) noexcept;
 
     /// @brief Run an experiment for baseline scenario only
     /// @param baseline The simulation engine instance
@@ -54,7 +55,7 @@ class Runner {
 
   private:
     std::atomic<bool> running_;
-    std::reference_wrapper<EventAggregator> event_bus_;
+    std::shared_ptr<EventAggregator> event_bus_;
     std::unique_ptr<RandomBitGenerator> seed_generator_;
     std::stop_source source_;
     std::string runner_id_{};
@@ -64,4 +65,5 @@ class Runner {
 
     void notify(std::unique_ptr<hgps::EventMessage> message);
 };
+
 } // namespace hgps

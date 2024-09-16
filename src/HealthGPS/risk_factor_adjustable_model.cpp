@@ -199,6 +199,9 @@ RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");
     }
+    if (expected_trend_->empty()) {
+        throw core::HgpsException("Risk factor expected trend mapping is empty");
+    }
 }
 
 } // namespace hgps

@@ -5,7 +5,6 @@ run-name: Publishing release ${{ github.ref_name }}
 on:
   release:
     types: [published]
-    branches: [main]
 jobs:
   sha256:
     name: sha256

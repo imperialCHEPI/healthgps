@@ -59,7 +59,8 @@ using json = nlohmann::json;
 
 ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
 
-Configuration get_configuration(const std::filesystem::path &config_file, int job_id,
+Configuration get_configuration(const std::filesystem::path &config_file,
+                                const std::optional<std::string> &output_folder, int job_id,
                                 bool verbose) {
     MEASURE_FUNCTION();
     bool success = true;
@@ -111,10 +112,10 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
     }
 
     try {
-        load_output_info(opt, config);
-    } catch (const ConfigurationError &) {
+        load_output_info(opt, config, output_folder);
+    } catch (const ConfigurationError &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load output info");
+        fmt::print(fg(fmt::color::red), e.what());
     }
 
     if (!success) {
@@ -227,25 +228,14 @@ std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &chan
 
 hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
                                             hgps::SimulationModuleFactory &factory,
-                                            hgps::EventAggregator &event_bus,
-                                            hgps::ModelInput &input) {
+                                            std::shared_ptr<const hgps::EventAggregator> event_bus,
+                                            std::shared_ptr<const hgps::ModelInput> input) {
     auto scenario = create_baseline_scenario(channel);
-    auto definition = std::make_unique<SimulationDefinition>(input, std::move(scenario));
-    return Simulation{std::move(definition), factory, event_bus};
+    return Simulation{factory, std::move(event_bus), std::move(input), std::move(scenario)};
 }
 
-hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
-                                                hgps::SimulationModuleFactory &factory,
-                                                hgps::EventAggregator &event_bus,
-                                                hgps::ModelInput &input,
-                                                const PolicyScenarioInfo &info) {
-    auto scenario = create_intervention_scenario(channel, info);
-    auto definition = std::make_unique<SimulationDefinition>(input, std::move(scenario));
-    return Simulation{std::move(definition), factory, event_bus};
-}
-
-std::unique_ptr<hgps::InterventionScenario>
-create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &info) {
+std::unique_ptr<hgps::Scenario> create_intervention_scenario(SyncChannel &channel,
+                                                             const PolicyScenarioInfo &info) {
     using namespace hgps;
 
     fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
@@ -316,6 +306,15 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
         fmt::format("Unknown intervention policy identifier: {}", info.identifier));
 }
 
+hgps::Simulation
+create_intervention_simulation(hgps::SyncChannel &channel, hgps::SimulationModuleFactory &factory,
+                               std::shared_ptr<const hgps::EventAggregator> event_bus,
+                               std::shared_ptr<const hgps::ModelInput> input,
+                               const PolicyScenarioInfo &info) {
+    auto scenario = create_intervention_scenario(channel, info);
+    return Simulation{factory, std::move(event_bus), std::move(input), std::move(scenario)};
+}
+
 #ifdef _WIN32
 #pragma warning(disable : 4996)
 #endif
@@ -351,4 +350,5 @@ std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned i
 
     return user_seed;
 }
+
 } // namespace hgps::input

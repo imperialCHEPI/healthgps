@@ -216,7 +216,9 @@ void to_json(json &j, const OutputInfo &p) {
 }
 
 void from_json(const json &j, OutputInfo &p) {
-    j.at("folder").get_to(p.folder);
+    if (j.contains("folder")) {
+        j.at("folder").get_to(p.folder);
+    }
     j.at("file_name").get_to(p.file_name);
     j.at("comorbidities").get_to(p.comorbidities);
 }

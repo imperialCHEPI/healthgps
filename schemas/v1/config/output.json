@@ -15,7 +15,6 @@
     },
     "required": [
         "comorbidities",
-        "folder",
         "file_name"
     ],
     "additionalProperties": false

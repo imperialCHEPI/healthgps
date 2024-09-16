@@ -17,11 +17,11 @@ jobs:
       matrix:
         include:
           - platform: linux
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             compiler: gcc-default
             is_main: true
           - platform: linux
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             compiler: gcc-latest
             is_main: false
           - platform: windows
@@ -34,7 +34,7 @@ jobs:
       VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
 
       # Update when there is a new version of gcc available
-      LATEST_GCC_VERSION: 13
+      LATEST_GCC_VERSION: 14
 
     steps:
       - uses: actions/checkout@v4
@@ -50,14 +50,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential ninja-build lcov
+          sudo apt install -y --no-install-recommends build-essential ninja-build lcov
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
         run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install g++-$LATEST_GCC_VERSION
+          sudo apt-get install -y g++-$LATEST_GCC_VERSION
 
           # Use environment variable to tell CMake to compile with this version of gcc
           echo CXX=g++-$LATEST_GCC_VERSION >> "$GITHUB_ENV"
