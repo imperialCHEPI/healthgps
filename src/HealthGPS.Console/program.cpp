@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = get_configuration(cmd_args.config_file, cmd_args.output_folder, cmd_args.job_id,
+        config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id,
                                    cmd_args.verbose);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // In future, we want users to supply the data source via the config file only, but for now
         // we also allow passing it via a command line argument. Sanity check: Make sure they only
         // do one of these things!
-        if (cmd_args.data_source.has_value() == config.data_source.has_value()) {
+        if (cmd_args.data_source.has_value() == (config.data_source != nullptr)) {
             fmt::print(
                 fg(fmt::color::red),
                 "Must provide a data source via config file or command line, but not both\n");
