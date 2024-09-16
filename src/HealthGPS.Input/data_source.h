@@ -6,7 +6,7 @@
 
 namespace hgps::input {
 
-//! Represents a data source, a either file/directory path or a URL
+//! Represents a data source, either a file/directory path or a URL
 class DataSource {
   public:
     /// @brief Create a new DataSource
