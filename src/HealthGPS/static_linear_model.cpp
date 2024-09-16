@@ -10,23 +10,26 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
     const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
     const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
     const std::vector<LinearModelParams> &policy_models,
     const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
     std::shared_ptr<std::vector<LinearModelParams>> trend_models,
-    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
+    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges,
+    std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)}, names_{names},
-      models_{models}, ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
+      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
+      ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
       policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, info_speed_{info_speed},
-      rural_prevalence_{rural_prevalence}, income_models_{income_models},
+      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
+      info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
       physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
@@ -135,7 +138,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
-        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -167,7 +171,8 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i]);
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -187,7 +192,9 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
 
         // Initialise trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-        double trend = (*trend_ranges_)[i].clamp(linear[i]);
+        double expected = expected_trend_boxcox_->at(names_[i]);
+        double trend = expected * inverse_box_cox(linear[i], (*trend_lambda_)[i]);
+        trend = (*trend_ranges_)[i].clamp(trend);
 
         // Save trend.
         person.risk_factors[trend_name] = trend;
@@ -415,7 +422,8 @@ void StaticLinearModel::update_income(Person &person, Random &random) const {
 
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
-    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id);
+    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
+                                   std::nullopt, false);
     double rand = random.next_normal(0.0, physical_activity_stddev_);
     double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
     person.risk_factors["PhysicalActivity"_id] = factor;
@@ -424,22 +432,26 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,
     std::vector<LinearModelParams> policy_models, std::vector<core::DoubleInterval> policy_ranges,
     Eigen::MatrixXd policy_cholesky, std::unique_ptr<std::vector<LinearModelParams>> trend_models,
-    std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges, double info_speed,
+    std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
+    std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
-      names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
-      lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
+      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
+      models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
+      stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
       policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, info_speed_{info_speed},
-      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
+      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
+      info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
+      income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
@@ -475,6 +487,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (trend_ranges_->empty()) {
         throw core::HgpsException("Time trend ranges list is empty");
     }
+    if (trend_lambda_->empty()) {
+        throw core::HgpsException("Time trend lambda list is empty");
+    }
     if (rural_prevalence_.empty()) {
         throw core::HgpsException("Rural prevalence mapping is empty");
     }
@@ -483,16 +498,20 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
     for (const auto &name : names_) {
         if (!expected_trend_->contains(name)) {
-            throw core::HgpsException("One or more risk factor expected trend value is missing");
+            throw core::HgpsException("One or more expected trend value is missing");
+        }
+        if (!expected_trend_boxcox_->contains(name)) {
+            throw core::HgpsException("One or more expected trend BoxCox value is missing");
         }
     }
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(
-        expected_, expected_trend_, names_, models_, ranges_, lambda_, stddev_, cholesky_,
-        policy_models_, policy_ranges_, policy_cholesky_, trend_models_, trend_ranges_, info_speed_,
-        rural_prevalence_, income_models_, physical_activity_stddev_);
+        expected_, expected_trend_, expected_trend_boxcox_, names_, models_, ranges_, lambda_,
+        stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_, trend_models_,
+        trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
+        physical_activity_stddev_);
 }
 
 } // namespace hgps

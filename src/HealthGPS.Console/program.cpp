@@ -65,22 +65,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
 
-    // Set thread limit from OMP_THREAD_LIMIT, if set in environment.
-    char *env_threads = std::getenv("OMP_THREAD_LIMIT");
-    int threads =
-        env_threads != nullptr ? std::atoi(env_threads) : tbb::this_task_arena::max_concurrency();
-    auto thread_control =
-        tbb::global_control(tbb::global_control::max_allowed_parallelism, threads);
-
     // Create CLI options and validate minimum arguments
     auto options = create_options();
     if (argc < 2) {
         std::cout << options.help() << '\n';
         return exit_application(EXIT_FAILURE);
     }
-
-    // Print application title and parse command line arguments
-    print_app_title();
 
     std::optional<CommandOptions> cmd_args_opt;
     try {
@@ -97,6 +87,15 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     }
 
     const auto &cmd_args = cmd_args_opt.value();
+
+    // Set maximum number of threads, if requested
+    std::optional<tbb::global_control> thread_control;
+    if (cmd_args.num_threads != 0) {
+        thread_control.emplace(tbb::global_control::max_allowed_parallelism, cmd_args.num_threads);
+    }
+
+    // Print application title and parse command line arguments
+    print_app_title();
 
     // Parse inputs configuration file, *.json.
     Configuration config;
@@ -169,17 +168,17 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         std::cout << input_table;
 
         // Create complete model input from configuration
-        auto model_input =
-            create_model_input(input_table, std::move(country), config, std::move(diseases));
+        auto model_input = std::make_shared<ModelInput>(
+            create_model_input(input_table, std::move(country), config, std::move(diseases)));
 
         // Create event bus and event monitor with a results file writer
-        auto event_bus = DefaultEventBus();
-        auto json_file_logger = create_results_file_logger(config, model_input);
-        auto event_monitor = EventMonitor{event_bus, json_file_logger};
+        auto event_bus = std::make_shared<DefaultEventBus>();
+        auto json_file_logger = create_results_file_logger(config, *model_input);
+        auto event_monitor = EventMonitor{*event_bus, json_file_logger};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
-        if (const auto seed = model_input.seed()) {
+        if (const auto seed = model_input->seed()) {
             seed_generator->seed(seed.value());
         }
         auto runner = Runner(event_bus, std::move(seed_generator));

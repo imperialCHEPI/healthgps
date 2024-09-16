@@ -109,8 +109,6 @@ target_sources(
             "simple_policy_scenario.h"
             "simulation.cpp"
             "simulation.h"
-            "simulation_definition.cpp"
-            "simulation_definition.h"
             "simulation_module.cpp"
             "simulation_module.h"
             "univariate_visitor.cpp"

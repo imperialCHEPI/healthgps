@@ -31,7 +31,7 @@ void DynamicHierarchicalLinearModel::generate_risk_factors(RuntimeContext &conte
         // factor.second contains the factor name.
         factor_keys.emplace_back(factor.second);
     }
-    adjust_risk_factors(context, factor_keys);
+    adjust_risk_factors(context, factor_keys, std::nullopt, false);
 }
 
 void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -65,7 +65,7 @@ void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context
         // factor.second contains the factor name.
         factor_keys.emplace_back(factor.second);
     }
-    adjust_risk_factors(context, factor_keys);
+    adjust_risk_factors(context, factor_keys, std::nullopt, false);
 }
 
 const AgeGroupGenderEquation &DynamicHierarchicalLinearModel::equations_at(int age) const {

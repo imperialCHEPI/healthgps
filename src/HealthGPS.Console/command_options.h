@@ -28,6 +28,9 @@ struct CommandOptions {
 
     /// @brief The batch job identifier value, optional.
     int job_id{};
+
+    /// @brief The maximum number of threads to use (0: no limit).
+    size_t num_threads{};
 };
 
 /// @brief Creates the command-line interface (CLI) options

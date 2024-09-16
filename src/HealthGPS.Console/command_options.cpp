@@ -13,11 +13,14 @@ cxxopts::Options create_options() {
                           cxxopts::value<std::string>())(
         "c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
-        "o,output", "Path to output folder", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
-        cxxopts::value<int>())("verbose", "Print more information about progress",
-                               cxxopts::value<bool>()->default_value("false"))(
-        "help", "Help about this application.")("version", "Print the application version number.");
+        cxxopts::value<int>())("o,output", "Path to output folder", cxxopts::value<std::string>())(
+        "T,threads", "The maximum number of threads to create (0: no limit, default).",
+        cxxopts::value<size_t>())
+
+        ("verbose", "Print more information about progress",
+         cxxopts::value<bool>()->default_value("false"))("help", "Help about this application.")(
+            "version", "Print the application version number.");
 
     return options;
 }
@@ -75,6 +78,10 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
             throw std::runtime_error(
                 fmt::format("Job identifier value outside range: (0 < x) given: {}.", cmd.job_id));
         }
+    }
+
+    if (result.count("threads")) {
+        cmd.num_threads = result["threads"].as<size_t>();
     }
 
     return cmd;

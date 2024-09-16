@@ -47,7 +47,9 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     throw std::out_of_range("Risk factor not found: " + key.to_string());
 }
 
-float Person::gender_to_value() const {
+float Person::gender_to_value() const { return gender_to_value(gender); }
+
+float Person::gender_to_value(core::Gender gender) {
     if (gender == core::Gender::unknown) {
         throw core::HgpsException("Gender is unknown.");
     }
