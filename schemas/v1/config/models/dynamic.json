@@ -7,6 +7,9 @@
         },
         {
             "$ref": "ebhlm.json"
+        },
+        {
+            "$ref": "kevinhall.json"
         }
     ]
 }
