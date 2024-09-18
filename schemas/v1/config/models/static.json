@@ -7,6 +7,9 @@
         },
         {
             "$ref": "hlm.json"
+        },
+        {
+            "$ref": "staticlinear.json"
         }
     ]
 }
