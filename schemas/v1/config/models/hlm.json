@@ -1,0 +1,157 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/hlm.json",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "ModelName": {
+            "const": "HLM"
+        },
+        "models": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "formula": {
+                        "type": "string"
+                    },
+                    "coefficients": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "type": "number"
+                                },
+                                "stdError": {
+                                    "type": "number"
+                                },
+                                "tValue": {
+                                    "type": "number"
+                                },
+                                "pValue": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "value",
+                                "stdError",
+                                "tValue",
+                                "pValue"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "residuals": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "fittedValues": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "residualsStandardDeviation": {
+                        "type": "number"
+                    },
+                    "rSquared": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "formula",
+                    "coefficients",
+                    "residuals",
+                    "fittedValues",
+                    "residualsStandardDeviation",
+                    "rSquared"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "levels": {
+            "type": "object",
+            "propertyNames": {
+                "pattern": "^[0-9]+$"
+            },
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "variables": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 1
+                    },
+                    "m": {
+                        "$ref": "#/$defs/variable"
+                    },
+                    "w": {
+                        "$ref": "#/$defs/variable"
+                    },
+                    "s": {
+                        "$ref": "#/$defs/variable"
+                    },
+                    "correlation": {
+                        "$ref": "#/$defs/variable"
+                    },
+                    "variances": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "required": [
+                    "variables",
+                    "m",
+                    "w",
+                    "s",
+                    "correlation",
+                    "variances"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "ModelName",
+        "models",
+        "levels"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+        "variable": {
+            "type": "object",
+            "properties": {
+                "rows": {
+                    "type": "number",
+                    "minimum": 1
+                },
+                "cols": {
+                    "type": "number",
+                    "minimum": 1
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "rows",
+                "cols",
+                "data"
+            ],
+            "additionalProperties": false
+        }
+    }
+}

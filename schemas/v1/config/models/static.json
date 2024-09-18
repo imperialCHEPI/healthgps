@@ -4,6 +4,9 @@
     "anyOf": [
         {
             "$ref": "dummy.json"
+        },
+        {
+            "$ref": "hlm.json"
         }
     ]
 }
