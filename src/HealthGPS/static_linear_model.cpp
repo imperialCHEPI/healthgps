@@ -10,6 +10,7 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
     const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
@@ -23,7 +24,8 @@ StaticLinearModel::StaticLinearModel(
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
+                                std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
       ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
@@ -510,9 +512,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(
-        expected_, expected_trend_, expected_trend_boxcox_, names_, models_, ranges_, lambda_,
-        stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_, trend_models_,
-        trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
+        expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
+        lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
+        trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
         physical_activity_stddev_);
 }
 

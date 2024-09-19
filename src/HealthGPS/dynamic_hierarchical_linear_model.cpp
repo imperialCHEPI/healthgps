@@ -11,9 +11,11 @@ namespace hgps {
 DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
     const std::map<core::Identifier, core::Identifier> &variables, double boundary_percentage)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
+                                std::move(trend_steps)},
       equations_{equations}, variables_{variables}, boundary_percentage_{boundary_percentage} {}
 
 RiskFactorModelType DynamicHierarchicalLinearModel::type() const noexcept {
@@ -158,8 +160,8 @@ DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefiniti
 }
 
 std::unique_ptr<RiskFactorModel> DynamicHierarchicalLinearModelDefinition::create_model() const {
-    return std::make_unique<DynamicHierarchicalLinearModel>(expected_, expected_trend_, equations_,
-                                                            variables_, boundary_percentage_);
+    return std::make_unique<DynamicHierarchicalLinearModel>(
+        expected_, expected_trend_, trend_steps_, equations_, variables_, boundary_percentage_);
 }
 
 } // namespace hgps

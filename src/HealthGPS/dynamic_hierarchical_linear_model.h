@@ -40,12 +40,14 @@ class DynamicHierarchicalLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Initialises a new instance of the DynamicHierarchicalLinearModel class
     /// @param expected The expected values
     /// @param expected_trend The expected trend of risk factor values
+    /// @param trend_steps The number of time steps to apply the trend
     /// @param equations The linear regression equations
     /// @param variables The factors delta variables mapping
     /// @param boundary_percentage The boundary percentage to sample
     DynamicHierarchicalLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+        std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
         const std::map<core::IntegerInterval, AgeGroupGenderEquation> &equations,
         const std::map<core::Identifier, core::Identifier> &variables,
         const double boundary_percentage);

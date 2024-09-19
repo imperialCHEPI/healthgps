@@ -33,8 +33,10 @@ namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend)
-    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {}
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+      trend_steps_{trend_steps} {}
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor, OptionalRange range,
