@@ -262,7 +262,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Load expected value trends.
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
         (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
-        (*trend_steps)[key] = trend_json_params["Steps"].get<int>();
+        (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
 
         // Increment table column index.
         i++;
