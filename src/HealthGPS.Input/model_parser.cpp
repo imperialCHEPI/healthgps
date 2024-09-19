@@ -188,6 +188,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
     auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
     auto trend_lambda = std::make_unique<std::vector<double>>();
+    auto trend_steps = std::make_unique<std::vector<int>>();
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
@@ -257,6 +258,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         trend_models->emplace_back(std::move(trend_model));
         trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
         trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
+        trend_steps->emplace_back(trend_json_params["Steps"].get<int>());
 
         // Load expected value trends.
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
@@ -464,6 +466,9 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     auto expected = load_risk_factor_expected(config);
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
 
+    // Number of steps to apply nutrient time trends.
+    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+
     // Nutrient groups.
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval> nutrient_ranges;
@@ -480,6 +485,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
         (*expected_trend)[food_key] = food["ExpectedTrend"].get<double>();
+        (*trend_steps)[food_key] = food["TrendSteps"].get<int>();
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
