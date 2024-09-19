@@ -114,6 +114,10 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     }
 }
 
+int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const noexcept {
+    return trend_steps_->at(factor);
+}
+
 RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,

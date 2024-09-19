@@ -57,6 +57,11 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     void adjust_risk_factors(RuntimeContext &context, const std::vector<core::Identifier> &factors,
                              OptionalRanges ranges, bool apply_trend) const;
 
+    /// @brief Gets the number of time steps to apply the trend
+    /// @param factor The risk factor to get the trend steps
+    /// @returns The number of time steps to apply the trend
+    int get_trend_steps(const core::Identifier &factor) const noexcept;
+
   private:
     /// @brief Adjust risk factors such that mean sim value matches expected value
     /// @param context The simulation run-time context
