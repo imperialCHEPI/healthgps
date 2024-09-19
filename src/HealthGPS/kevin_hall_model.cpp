@@ -200,10 +200,10 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
-    // Update: (no newborns or 19 and over).
+    // Update: (no newborns or at least the Kevin Hall minimum age).
     for (auto &person : context.population()) {
-        // Ignore if inactive or newborn or aged 19 and over.
-        if (!person.is_active() || ((person.age == 0) || (person.age >= 19))) {
+        // Ignore if inactive or newborn or at least the Kevin Hall minimum age.
+        if (!person.is_active() || ((person.age == 0) || (person.age >= kevin_hall_age_min))) {
             continue;
         }
 
@@ -286,10 +286,18 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 
     // Compute expected energy intake from expected nutrient intakes.
     if (factor == "EnergyIntake"_id) {
+
+        // Non-trend case.
+        if (!apply_trend) {
+            return RiskFactorAdjustableModel::get_expected(context, sex, age, "EnergyIntake"_id,
+                                                           std::nullopt, false);
+        }
+
+        // Trend case.
         double energy_intake = 0.0;
         for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
             double nutrient_intake =
-                get_expected(context, sex, age, nutrient_key, std::nullopt, apply_trend);
+                get_expected(context, sex, age, nutrient_key, std::nullopt, true);
             energy_intake += nutrient_intake * energy_coefficient;
         }
         return energy_intake;
@@ -297,9 +305,28 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
 
     // Compute expected body weight.
     if (factor == "Weight"_id) {
+
+        // Non-trend case.
+        if (!apply_trend) {
+            return RiskFactorAdjustableModel::get_expected(context, sex, age, "Weight"_id,
+                                                           std::nullopt, false);
+        }
+
+        // Child case.
+        if (age < kevin_hall_age_min) {
+            double weight = RiskFactorAdjustableModel::get_expected(context, sex, age, "Weight"_id,
+                                                                    std::nullopt, false);
+            double energy_without_trend =
+                get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, false);
+            double energy_with_trend =
+                get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
+            weight *= pow(energy_with_trend / energy_without_trend, 0.45);
+            return weight;
+        }
+
+        // Adult case.
         double weight = 16.1161;
-        weight +=
-            0.06256 * get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, apply_trend);
+        weight += 0.06256 * get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
         weight -= 0.6256 * get_expected(context, sex, age, "Height"_id, std::nullopt, false);
         weight += 0.4925 * age;
         weight -= 16.6166 * Person::gender_to_value(sex);

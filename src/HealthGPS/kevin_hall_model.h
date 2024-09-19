@@ -216,7 +216,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Gender, double> &height_slope_;
 
     // Model parameters.
-    static constexpr int kevin_hall_age_min = 19; // Minimum age for the model.
+    static constexpr int kevin_hall_age_min = 19; // Start age for the main Kevin Hall model.
     static constexpr double rho_F = 39.5e3;       // Energy content of fat (kJ/kg).
     static constexpr double rho_L = 7.6e3;        // Energy content of lean (kJ/kg).
     static constexpr double rho_G = 17.6e3;       // Energy content of glycogen (kJ/kg).
