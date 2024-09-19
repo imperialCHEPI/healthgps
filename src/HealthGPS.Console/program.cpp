@@ -65,22 +65,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
 
-    // Set thread limit from OMP_THREAD_LIMIT, if set in environment.
-    char *env_threads = std::getenv("OMP_THREAD_LIMIT");
-    int threads =
-        env_threads != nullptr ? std::atoi(env_threads) : tbb::this_task_arena::max_concurrency();
-    auto thread_control =
-        tbb::global_control(tbb::global_control::max_allowed_parallelism, threads);
-
     // Create CLI options and validate minimum arguments
     auto options = create_options();
     if (argc < 2) {
         std::cout << options.help() << '\n';
         return exit_application(EXIT_FAILURE);
     }
-
-    // Print application title and parse command line arguments
-    print_app_title();
 
     std::optional<CommandOptions> cmd_args_opt;
     try {
@@ -98,10 +88,19 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
     const auto &cmd_args = cmd_args_opt.value();
 
+    // Set maximum number of threads, if requested
+    std::optional<tbb::global_control> thread_control;
+    if (cmd_args.num_threads != 0) {
+        thread_control.emplace(tbb::global_control::max_allowed_parallelism, cmd_args.num_threads);
+    }
+
+    // Print application title and parse command line arguments
+    print_app_title();
+
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = get_configuration(cmd_args.config_file, cmd_args.output_folder, cmd_args.job_id,
+        config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id,
                                    cmd_args.verbose);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
@@ -128,7 +127,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // In future, we want users to supply the data source via the config file only, but for now
         // we also allow passing it via a command line argument. Sanity check: Make sure they only
         // do one of these things!
-        if (cmd_args.data_source.has_value() == config.data_source.has_value()) {
+        if (cmd_args.data_source.has_value() == (config.data_source != nullptr)) {
             fmt::print(
                 fg(fmt::color::red),
                 "Must provide a data source via config file or command line, but not both\n");

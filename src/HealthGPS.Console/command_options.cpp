@@ -9,13 +9,18 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
+    options.add_options()("f,file", "Path to configuration file, folder or URL (deprecated).",
+                          cxxopts::value<std::string>())(
+        "c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())(
         "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
-        "o,output", "Path to output folder", cxxopts::value<std::string>())(
         "j,jobid", "The batch execution job identifier.",
-        cxxopts::value<int>())("verbose", "Print more information about progress",
-                               cxxopts::value<bool>()->default_value("false"))(
-        "help", "Help about this application.")("version", "Print the application version number.");
+        cxxopts::value<int>())("o,output", "Path to output folder", cxxopts::value<std::string>())(
+        "T,threads", "The maximum number of threads to create (0: no limit, default).",
+        cxxopts::value<size_t>())
+
+        ("verbose", "Print more information about progress",
+         cxxopts::value<bool>()->default_value("false"))("help", "Help about this application.")(
+            "version", "Print the application version number.");
 
     return options;
 }
@@ -41,16 +46,15 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
         fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
     }
 
-    cmd.config_file = result["file"].as<std::string>();
-    if (cmd.config_file.is_relative()) {
-        cmd.config_file = std::filesystem::absolute(cmd.config_file);
-        fmt::print("Configuration file: {}\n", cmd.config_file.string());
+    if (result.count("file")) {
+        fmt::print(fg(fmt::color::dark_salmon),
+                   "The -f/--file option is deprecated. Use -c/--config instead.\n");
+        cmd.config_source = result["file"].as<std::string>();
     }
-
-    if (!fs::exists(cmd.config_file)) {
-        throw std::runtime_error(
-            fmt::format("Configuration file: {} not found.", cmd.config_file.string()));
+    if (result.count("config")) {
+        cmd.config_source = result["config"].as<std::string>();
     }
+    fmt::print("Configuration source: {}\n", cmd.config_source);
 
     if (result.count("storage")) {
         auto source = result["storage"].as<std::string>();
@@ -74,6 +78,10 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
             throw std::runtime_error(
                 fmt::format("Job identifier value outside range: (0 < x) given: {}.", cmd.job_id));
         }
+    }
+
+    if (result.count("threads")) {
+        cmd.num_threads = result["threads"].as<size_t>();
     }
 
     return cmd;

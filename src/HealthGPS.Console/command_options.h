@@ -8,14 +8,14 @@
 
 #include "HealthGPS.Input/data_source.h"
 
-#include <filesystem>
 #include <optional>
+#include <string>
 
 namespace hgps {
 /// @brief Defines the Command Line Interface (CLI) arguments options
 struct CommandOptions {
-    /// @brief The configuration file argument value
-    std::filesystem::path config_file;
+    /// @brief The configuration source (file, directory or URL)
+    std::string config_source;
 
     /// @brief The back-end storage full path or URL argument value
     std::optional<hgps::input::DataSource> data_source;
@@ -28,6 +28,9 @@ struct CommandOptions {
 
     /// @brief The batch job identifier value, optional.
     int job_id{};
+
+    /// @brief The maximum number of threads to use (0: no limit).
+    size_t num_threads{};
 };
 
 /// @brief Creates the command-line interface (CLI) options
