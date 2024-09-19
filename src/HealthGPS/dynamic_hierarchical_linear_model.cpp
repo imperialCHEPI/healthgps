@@ -141,9 +141,11 @@ double DynamicHierarchicalLinearModel::sample_normal_with_boundary(Random &rando
 DynamicHierarchicalLinearModelDefinition::DynamicHierarchicalLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     std::map<core::IntegerInterval, AgeGroupGenderEquation> equations,
     std::map<core::Identifier, core::Identifier> variables, const double boundary_percentage)
-    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
+                                          std::move(trend_steps)},
       equations_{std::move(equations)}, variables_{std::move(variables)},
       boundary_percentage_{boundary_percentage} {
 

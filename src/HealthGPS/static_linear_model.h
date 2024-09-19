@@ -142,6 +142,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @brief Initialises a new instance of the StaticLinearModelDefinition class
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values
+    /// @param trend_steps The number of time steps to apply the trend
     /// @param expected_trend_boxcox The expected boxcox factor
     /// @param names The risk factor names
     /// @param models The linear models used to compute a person's risk factors
@@ -163,6 +164,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
         std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
         std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,

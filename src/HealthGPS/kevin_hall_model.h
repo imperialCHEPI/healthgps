@@ -236,6 +236,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @brief Initialises a new instance of the KevinHallModelDefinition class
     /// @param expected The risk factor expected values by sex and age
     /// @param expected_trend The expected trend of risk factor values
+    /// @param trend_steps The number of time steps to apply the trend
     /// @param energy_equation The energy coefficients for each nutrient
     /// @param nutrient_ranges The interval boundaries for nutrient values
     /// @param nutrient_equations The nutrient coefficients for each food group
@@ -248,6 +249,7 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     KevinHallModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
         std::unordered_map<core::Identifier, double> energy_equation,
         std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
         std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,

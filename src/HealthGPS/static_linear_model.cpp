@@ -432,6 +432,7 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
@@ -443,7 +444,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
+                                          std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
       models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
       stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},

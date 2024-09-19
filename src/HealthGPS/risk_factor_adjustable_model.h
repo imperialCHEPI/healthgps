@@ -79,14 +79,17 @@ class RiskFactorAdjustableModelDefinition : public RiskFactorModelDefinition {
     /// @brief Constructs a new RiskFactorAdjustableModelDefinition instance
     /// @param expected The expected risk factor values by sex and age
     /// @param expected_trend The expected trend of risk factor values
+    /// @param trend_steps The number of time steps to apply the trend
     /// @throws HgpsException for invalid arguments
     RiskFactorAdjustableModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend);
+        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps);
 
   protected:
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
 };
 
 } // namespace hgps

@@ -193,14 +193,19 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend)
-    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+      trend_steps_{std::move(trend_steps)} {
 
     if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");
     }
     if (expected_trend_->empty()) {
         throw core::HgpsException("Risk factor expected trend mapping is empty");
+    }
+    if (trend_steps_->empty()) {
+        throw core::HgpsException("Risk factor trend steps mapping is empty");
     }
 }
 

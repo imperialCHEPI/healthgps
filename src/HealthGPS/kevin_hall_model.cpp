@@ -755,6 +755,7 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
@@ -762,7 +763,8 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
     std::unordered_map<core::Gender, double> height_slope)
-    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
+                                          std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
