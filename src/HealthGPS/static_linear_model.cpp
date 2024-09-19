@@ -220,7 +220,8 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
 
         // Apply trend to risk factor.
         double factor = person.risk_factors.at(names_[i]);
-        factor *= pow(trend, elapsed_time);
+        int t = std::min(elapsed_time, get_trend_steps(names_[i]));
+        factor *= pow(trend, t);
         factor = ranges_[i].clamp(factor);
 
         // Save risk factor.

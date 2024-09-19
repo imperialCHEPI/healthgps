@@ -46,7 +46,8 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     // Apply optional trend to expected value.
     if (apply_trend) {
         int elapsed_time = context.time_now() - context.start_time();
-        expected *= pow(expected_trend_->at(factor), elapsed_time);
+        int t = std::min(elapsed_time, get_trend_steps(factor));
+        expected *= pow(expected_trend_->at(factor), t);
     }
 
     // Clamp expected value to an optionally specified range.
