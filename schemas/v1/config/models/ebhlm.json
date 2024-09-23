@@ -1,0 +1,119 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/models/ebhlm.json",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "ModelName": {
+            "const": "EBHLM"
+        },
+        "Country": {
+            "type": "object",
+            "properties": {
+                "Code": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Alpha2": {
+                    "type": "string"
+                },
+                "Alpha3": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Code",
+                "Name",
+                "Alpha2",
+                "Alpha3"
+            ],
+            "additionalProperties": false
+        },
+        "BoundaryPercentage": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "exclusiveMaximum": 1.0
+        },
+        "Variables": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Factor": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "Name",
+                    "Factor"
+                ],
+                "additionalProperties": false
+            },
+            "minItems": 1
+        },
+        "Equations": {
+            "type": "object",
+            "propertyNames": {
+                "pattern": "^[0-9]+\\-[0-9]+$"
+            },
+            "additionalProperties": {
+                "type": "object",
+                "propertyNames": {
+                    "enum": [
+                        "Male",
+                        "Female"
+                    ]
+                },
+                "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "Name": {
+                                "type": "string"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "properties": {
+                                    "Intercept": {
+                                        "type": "number"
+                                    }
+                                },
+                                "additionalProperties": {
+                                    "type": "number"
+                                },
+                                "required": [
+                                    "Intercept"
+                                ]
+                            },
+                            "ResidualsStandardDeviation": {
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "Name",
+                            "Coefficients",
+                            "ResidualsStandardDeviation"
+                        ],
+                        "additionalProperties": false
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "ModelName",
+        "Country",
+        "BoundaryPercentage",
+        "Variables",
+        "Equations"
+    ],
+    "additionalProperties": false
+}
