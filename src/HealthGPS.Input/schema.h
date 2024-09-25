@@ -5,6 +5,12 @@
 #include <filesystem>
 
 namespace hgps::input {
+/// @brief Validate a JSON stream against the specified schema
+/// @param is The input stream for the JSON file
+/// @param schema_file_name The name of the JSON schema file
+/// @param schema_version The version of the schema file
+void validate_json(std::istream &is, const char *schema_file_name, int schema_version);
+
 /// @brief Load a JSON file and validate against the specified schema
 /// @param file_path The path to the JSON file
 /// @param schema_file_name The name of the JSON schema file

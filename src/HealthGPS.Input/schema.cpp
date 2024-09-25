@@ -32,15 +32,11 @@ json resolve_uri(const uri &uri, const std::filesystem::path &program_directory)
 
     return json::parse(ifs);
 }
+} // anonymous namespace
 
-/// @brief Validate a JSON file against the specified schema
-/// @param json_stream The input stream for the JSON file
-/// @param schema_file_name The name of the JSON schema file
-/// @param schema_version The version of the schema file
-void validate_json(std::istream &json_stream, const char *schema_file_name, int schema_version) {
-    // **YUCK**: We have to read in the data with jsoncons here rather than reusing the
-    // nlohmann-json representation :-(
-    const auto data = json::parse(json_stream);
+namespace hgps::input {
+void validate_json(std::istream &is, const char *schema_file_name, int schema_version) {
+    const auto data = json::parse(is);
 
     // Load schema
     const auto program_dir = hgps::get_program_directory();
@@ -57,9 +53,7 @@ void validate_json(std::istream &json_stream, const char *schema_file_name, int 
     // Perform validation
     schema.validate(data);
 }
-} // anonymous namespace
 
-namespace hgps::input {
 nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
                                       const char *schema_file_name, int schema_version,
                                       bool require_schema_property) {
@@ -93,7 +87,8 @@ nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
         }
     }
 
-    // Perform validation
+    // **YUCK**: We have to read in the data with jsoncons here rather than reusing the
+    // nlohmann-json representation :-(
     ifs.seekg(0); // Seek to start of file so we can reload
     validate_json(ifs, schema_file_name, schema_version);
 
