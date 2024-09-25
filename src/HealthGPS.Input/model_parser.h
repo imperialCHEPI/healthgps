@@ -10,6 +10,7 @@
 #include "configuration.h"
 #include "jsonparser.h"
 
+#include <filesystem>
 #include <utility>
 
 namespace hgps::input {
@@ -56,12 +57,12 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
 
 /// @brief Loads a risk model definition from a JSON file
 /// @param model_type The type of model to load
-/// @param opt The parsed model definition JSON file
+/// @param model_path The path to the model configuration file
 /// @param config The model configuration
 /// @return The model definition
 std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_risk_model_definition(hgps::RiskFactorModelType model_type, const nlohmann::json &opt,
-                           const Configuration &config);
+load_risk_model_definition(hgps::RiskFactorModelType model_type,
+                           const std::filesystem::path &model_path, const Configuration &config);
 
 /// @brief Load and parse a JSON model file
 /// @param model_path The path to the model file
