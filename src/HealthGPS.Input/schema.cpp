@@ -35,7 +35,7 @@ json resolve_uri(const uri &uri, const std::filesystem::path &program_directory)
 } // anonymous namespace
 
 namespace hgps::input {
-void validate_json(std::istream &is, const char *schema_file_name, int schema_version) {
+void validate_json(std::istream &is, const std::string &schema_file_name, int schema_version) {
     const auto data = json::parse(is);
 
     // Load schema
@@ -55,7 +55,7 @@ void validate_json(std::istream &is, const char *schema_file_name, int schema_ve
 }
 
 nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
-                                      const char *schema_file_name, int schema_version,
+                                      const std::string &schema_file_name, int schema_version,
                                       bool require_schema_property) {
     auto ifs = std::ifstream{file_path};
     if (!ifs) {
