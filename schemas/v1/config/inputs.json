@@ -4,42 +4,7 @@
     "type": "object",
     "properties": {
         "dataset": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "format": {
-                    "const": "csv"
-                },
-                "delimiter": {
-                    "type": "string"
-                },
-                "encoding": {
-                    "type": "string"
-                },
-                "columns": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "anyOf": [
-                            {
-                                "const": "integer"
-                            },
-                            {
-                                "const": "double"
-                            }
-                        ]
-                    }
-                }
-            },
-            "required": [
-                "name",
-                "format",
-                "delimiter",
-                "encoding",
-                "columns"
-            ],
-            "additionalProperties": false
+            "$ref": "csv_file.json"
         },
         "settings": {
             "type": "object",
