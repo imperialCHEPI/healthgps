@@ -61,7 +61,7 @@ load_risk_factor_expected(const Configuration &config) {
 }
 
 std::unique_ptr<hgps::DummyModelDefinition>
-load_dummy_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt) {
+load_dummy_risk_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt) {
     MEASURE_FUNCTION();
 
     // Get dummy model parameters
@@ -85,7 +85,7 @@ load_static_risk_model_definition(const std::string &model_name, const nlohmann:
                                   const Configuration &config) {
     // Load this static model with the appropriate loader.
     if (model_name == "dummy") {
-        return load_dummy_model_definition(hgps::RiskFactorModelType::Static, opt);
+        return load_dummy_risk_model_definition(hgps::RiskFactorModelType::Static, opt);
     }
     if (model_name == "hlm") {
         return load_hlm_risk_model_definition(opt);
@@ -360,7 +360,7 @@ load_dynamic_risk_model_definition(const std::string &model_name, const nlohmann
                                    const Configuration &config) {
     // Load this dynamic model with the appropriate loader.
     if (model_name == "dummy") {
-        return load_dummy_model_definition(hgps::RiskFactorModelType::Dynamic, opt);
+        return load_dummy_risk_model_definition(hgps::RiskFactorModelType::Dynamic, opt);
     }
     if (model_name == "ebhlm") {
         return load_ebhlm_risk_model_definition(opt, config);

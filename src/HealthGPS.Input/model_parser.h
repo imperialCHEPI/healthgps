@@ -25,7 +25,7 @@ std::unique_ptr<hgps::RiskFactorSexAgeTable> load_risk_factor_expected(const Con
 /// @return An instance of the hgps::DummyModelDefinition type
 /// @throw std::invalid_argument if error parsing model configuration file
 std::unique_ptr<hgps::DummyModelDefinition>
-load_dummy_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt);
+load_dummy_risk_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt);
 
 /// @brief Loads a static risk factor model from a JSON file
 /// @param model_name The name of the model to use
