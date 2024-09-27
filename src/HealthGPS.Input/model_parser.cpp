@@ -2,16 +2,18 @@
 #include "configuration_parsing_helpers.h"
 #include "csvparser.h"
 #include "jsonparser.h"
+#include "schema.h"
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
-#include <algorithm>
-#include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
+
+#include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <optional>
 
@@ -21,6 +23,56 @@
 #else
 #define MEASURE_FUNCTION()
 #endif
+
+namespace {
+// The latest schema version for each model
+constexpr int DummyModelSchemaVersion = 1;
+constexpr int EBHLMModelSchemaVersion = 1;
+constexpr int KevinHallModelSchemaVersion = 1;
+constexpr int HLMModelSchemaVersion = 1;
+constexpr int StaticLinearModelSchemaVersion = 2;
+
+//! Get the latest schema version for the given model
+int get_model_schema_version(const std::string &model_name) {
+    if (model_name == "dummy") {
+        return DummyModelSchemaVersion;
+    }
+    if (model_name == "ebhlm") {
+        return EBHLMModelSchemaVersion;
+    }
+    if (model_name == "kevinhall") {
+        return KevinHallModelSchemaVersion;
+    }
+    if (model_name == "hlm") {
+        return HLMModelSchemaVersion;
+    }
+    if (model_name == "staticlinear") {
+        return StaticLinearModelSchemaVersion;
+    }
+
+    throw std::invalid_argument(fmt::format("Unknown model: {}", model_name));
+}
+
+/// @brief Load the model's JSON config file and validate with the appropriate schema
+/// @param model_path The path to the model config file
+/// @return A pair including the name of the model and the JSON contents of the file
+std::pair<std::string, nlohmann::json>
+load_and_validate_model_json(const std::filesystem::path &model_path) {
+    std::ifstream ifs{model_path};
+    if (!ifs) {
+        throw std::runtime_error(fmt::format("Could not read file: {}", model_path.string()));
+    }
+
+    auto opt = nlohmann::json::parse(ifs);
+    auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
+    const auto model_schema_name = fmt::format("config/models/{}.json", model_name);
+
+    ifs.seekg(0); // Rewind to start
+    hgps::input::validate_json(ifs, model_schema_name, get_model_schema_version(model_name));
+
+    return std::make_pair(std::move(model_name), std::move(opt));
+}
+} // anonymous namespace
 
 namespace hgps::input {
 
@@ -61,7 +113,7 @@ load_risk_factor_expected(const Configuration &config) {
 }
 
 std::unique_ptr<hgps::DummyModelDefinition>
-load_dummy_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt) {
+load_dummy_risk_model_definition(hgps::RiskFactorModelType type, const nlohmann::json &opt) {
     MEASURE_FUNCTION();
 
     // Get dummy model parameters
@@ -78,24 +130,6 @@ load_dummy_model_definition(hgps::RiskFactorModelType type, const nlohmann::json
 
     return std::make_unique<hgps::DummyModelDefinition>(type, std::move(names), std::move(values),
                                                         std::move(policy), std::move(policy_start));
-}
-
-std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_static_risk_model_definition(const std::string &model_name, const nlohmann::json &opt,
-                                  const Configuration &config) {
-    // Load this static model with the appropriate loader.
-    if (model_name == "dummy") {
-        return load_dummy_model_definition(hgps::RiskFactorModelType::Static, opt);
-    }
-    if (model_name == "hlm") {
-        return load_hlm_risk_model_definition(opt);
-    }
-    if (model_name == "staticlinear") {
-        return load_staticlinear_risk_model_definition(opt, config);
-    }
-
-    throw hgps::core::HgpsException{
-        fmt::format("Static model name '{}' not recognised", model_name)};
 }
 
 std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition>
@@ -357,24 +391,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(income_models), physical_activity_stddev);
 }
 
-std::unique_ptr<hgps::RiskFactorModelDefinition>
-load_dynamic_risk_model_definition(const std::string &model_name, const nlohmann::json &opt,
-                                   const Configuration &config) {
-    // Load this dynamic model with the appropriate loader.
-    if (model_name == "dummy") {
-        return load_dummy_model_definition(hgps::RiskFactorModelType::Dynamic, opt);
-    }
-    if (model_name == "ebhlm") {
-        return load_ebhlm_risk_model_definition(opt, config);
-    }
-    if (model_name == "kevinhall") {
-        return load_kevinhall_risk_model_definition(opt, config);
-    }
-
-    throw hgps::core::HgpsException{
-        fmt::format("Dynamic model name '{}' is not recognised.", model_name)};
-}
-
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::DynamicHierarchicalLinearModelDefinition>
 load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
@@ -546,45 +562,61 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         std::move(height_stddev), std::move(height_slope));
 }
 
-std::pair<hgps::RiskFactorModelType, std::unique_ptr<hgps::RiskFactorModelDefinition>>
-load_risk_model_definition(const std::string &model_type, const nlohmann::json &opt,
-                           const Configuration &config) {
-    // Get model name from JSON
-    const auto model_name = hgps::core::to_lower(opt["ModelName"].get<std::string>());
+std::unique_ptr<hgps::RiskFactorModelDefinition>
+load_risk_model_definition(hgps::RiskFactorModelType model_type,
+                           const std::filesystem::path &model_path, const Configuration &config) {
+    const auto &[model_name, opt] = load_and_validate_model_json(model_path);
 
     // Load appropriate model
-    if (hgps::core::case_insensitive::equals(model_type, "static")) {
-        return std::make_pair(hgps::RiskFactorModelType::Static,
-                              load_static_risk_model_definition(model_name, opt, config));
-    }
-    if (hgps::core::case_insensitive::equals(model_type, "dynamic")) {
-        return std::make_pair(hgps::RiskFactorModelType::Dynamic,
-                              load_dynamic_risk_model_definition(model_name, opt, config));
+    if (model_name == "dummy") {
+        return load_dummy_risk_model_definition(model_type, opt);
     }
 
-    throw hgps::core::HgpsException{fmt::format("Unknown model type: {}", model_type)};
-}
+    switch (model_type) {
+    case hgps::RiskFactorModelType::Static:
+        // Load this static model with the appropriate loader.
+        if (model_name == "hlm") {
+            return load_hlm_risk_model_definition(opt);
+        }
+        if (model_name == "staticlinear") {
+            return load_staticlinear_risk_model_definition(opt, config);
+        }
 
-nlohmann::json load_json(const std::filesystem::path &model_path) {
-    std::ifstream ifs(model_path, std::ifstream::in);
-    if (!ifs.good()) {
         throw hgps::core::HgpsException{
-            fmt::format("Model file: {} not found", model_path.string())};
-    }
+            fmt::format("Static model name '{}' not recognised", model_name)};
+    case hgps::RiskFactorModelType::Dynamic:
+        // Load this dynamic model with the appropriate loader.
+        if (model_name == "ebhlm") {
+            return load_ebhlm_risk_model_definition(opt, config);
+        }
+        if (model_name == "kevinhall") {
+            return load_kevinhall_risk_model_definition(opt, config);
+        }
 
-    return nlohmann::json::parse(ifs);
+        throw hgps::core::HgpsException{
+            fmt::format("Dynamic model name '{}' is not recognised.", model_name)};
+    default:
+        throw hgps::core::HgpsException("Unknown risk factor model type");
+    }
 }
 
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                                             const Configuration &config) {
     MEASURE_FUNCTION();
 
-    for (const auto &model : config.modelling.risk_factor_models) {
-        // Load file and parse JSON
-        const auto opt = load_json(model.second);
+    for (const auto &[model_type_str, model_path] : config.modelling.risk_factor_models) {
+        RiskFactorModelType model_type;
+        if (model_type_str == "static") {
+            model_type = RiskFactorModelType::Static;
+        } else if (model_type_str == "dynamic") {
+            model_type = RiskFactorModelType::Dynamic;
+        } else {
+            throw hgps::core::HgpsException(
+                fmt::format("Unknown risk factor model type: {}", model_type_str));
+        }
 
         // Load appropriate dynamic/static model
-        auto [model_type, model_definition] = load_risk_model_definition(model.first, opt, config);
+        auto model_definition = load_risk_model_definition(model_type, model_path, config);
 
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
