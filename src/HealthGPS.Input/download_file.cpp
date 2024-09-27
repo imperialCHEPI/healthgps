@@ -33,7 +33,7 @@ std::filesystem::path get_temporary_file_path(const std::string &file_prefix,
 
 namespace hgps::input {
 void download_file(const std::string &url, const std::filesystem::path &download_path) {
-    std::ofstream ofs{download_path};
+    std::ofstream ofs{download_path, std::ios::binary};
     if (!ofs) {
         throw std::runtime_error(fmt::format("Failed to create file {}", download_path.string()));
     }

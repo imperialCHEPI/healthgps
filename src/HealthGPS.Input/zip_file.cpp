@@ -67,6 +67,7 @@ void extract_zip_file(const std::filesystem::path &file_path,
                     fmt::format("Failed to create directory: {}", out_path.string())};
             }
         } else {
+            // NB: We assume all files are text files
             std::ofstream ofs{out_path};
             if (!ofs) {
                 throw std::runtime_error{

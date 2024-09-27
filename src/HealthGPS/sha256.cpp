@@ -11,7 +11,7 @@
 
 namespace hgps {
 std::string compute_sha256_for_file(const std::filesystem::path &file_path, size_t buffer_size) {
-    std::ifstream ifs{file_path};
+    std::ifstream ifs{file_path, std::ios::binary};
     if (!ifs) {
         throw std::runtime_error(fmt::format("Could not read file: {}", file_path.string()));
     }
