@@ -64,10 +64,8 @@ void extract_zip_file(const std::filesystem::path &file_path,
         if (entry.isDirectory()) {
             // Names seem to have a trailing slash which confuses Windows, hence:
             out_path /= ".";
-            if (!std::filesystem::create_directories(out_path)) {
-                throw std::runtime_error{
-                    fmt::format("Failed to create directory: {}", out_path.string())};
-            }
+
+            std::filesystem::create_directories(out_path);
         } else {
             // NB: We assume all files are text files
             std::ofstream ofs{out_path};
