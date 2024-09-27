@@ -115,7 +115,7 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     }
 }
 
-int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const noexcept {
+int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
     return trend_steps_->at(factor);
 }
 
