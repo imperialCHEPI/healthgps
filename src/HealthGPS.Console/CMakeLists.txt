@@ -49,9 +49,28 @@ target_link_libraries(
             cxxopts::cxxopts
             TBB::tbb)
 
-install(TARGETS HealthGPS.Console DESTINATION "")
+install(
+    TARGETS HealthGPS.Console
+    RUNTIME
+    ARCHIVE
+    LIBRARY
+    RUNTIME
+    FRAMEWORK
+    BUNDLE
+    PUBLIC_HEADER
+    RESOURCE)
 if(WIN32)
-    install(IMPORTED_RUNTIME_ARTIFACTS fmt::fmt)
+    install(
+        TARGETS HealthGPS.Console
+        COMPONENT HealthGPS.Console
+        RUNTIME_DEPENDENCIES
+        PRE_EXCLUDE_REGEXES
+        "api-ms-"
+        "ext-ms-"
+        POST_EXCLUDE_REGEXES
+        ".*system32/.*\\.dll"
+        DIRECTORIES
+        $<TARGET_FILE_DIR:HealthGPS.Console>)
 endif()
 
 install(DIRECTORY ../../schemas DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
