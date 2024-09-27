@@ -1,0 +1,211 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/staticlinear.json",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "ModelName": {
+            "const": "StaticLinear"
+        },
+        "InformationSpeed": {
+            "type": "number"
+        },
+        "PhysicalActivityStdDev": {
+            "type": "number"
+        },
+        "RuralPrevalence": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Female": {
+                        "type": "number"
+                    },
+                    "Male": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "Name",
+                    "Female",
+                    "Male"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "IncomeModels": {
+            "type": "object",
+            "propertyNames": {
+                "enum": [
+                    "Low",
+                    "Middle",
+                    "High",
+                    "Unknown"
+                ]
+            },
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "Intercept": {
+                        "type": "number"
+                    },
+                    "Coefficients": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "required": [
+                    "Intercept",
+                    "Coefficients"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "RiskFactorModels": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "Lambda": {
+                        "type": "number"
+                    },
+                    "StdDev": {
+                        "type": "number"
+                    },
+                    "Intercept": {
+                        "type": "number"
+                    },
+                    "Range": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                    },
+                    "Coefficients": {
+                        "additionalProperties": {
+                            "type": "number"
+                        }
+                    },
+                    "Policy": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "Coefficients": {
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            },
+                            "LogCoefficients": {
+                                "additionalProperties": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "required": [
+                            "Intercept",
+                            "Range",
+                            "Coefficients",
+                            "LogCoefficients"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "Trend": {
+                        "type": "object",
+                        "properties": {
+                            "Intercept": {
+                                "type": "number"
+                            },
+                            "Coefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                },
+                                "minItems": 1
+                            },
+                            "LogCoefficients": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "number"
+                                },
+                                "minItems": 1
+                            },
+                            "Range": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "Lambda": {
+                                "type": "number"
+                            }
+                        },
+                        "required": [
+                            "Intercept",
+                            "Coefficients",
+                            "LogCoefficients",
+                            "Range",
+                            "Lambda"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "ExpectedTrend": {
+                        "type": "number"
+                    },
+                    "ExpectedTrendBoxCox": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "Lambda",
+                    "StdDev",
+                    "Intercept",
+                    "Range",
+                    "Coefficients",
+                    "Policy",
+                    "Trend",
+                    "ExpectedTrend",
+                    "ExpectedTrendBoxCox"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "RiskFactorCorrelationFile": {
+            "$ref": "../../../v1/config/csv_file.json"
+        },
+        "PolicyCovarianceFile": {
+            "$ref": "../../../v1/config/csv_file.json"
+        }
+    },
+    "required": [
+        "ModelName",
+        "InformationSpeed",
+        "PhysicalActivityStdDev",
+        "RuralPrevalence",
+        "IncomeModels",
+        "RiskFactorModels",
+        "RiskFactorCorrelationFile",
+        "PolicyCovarianceFile"
+    ],
+    "additionalProperties": false
+}
