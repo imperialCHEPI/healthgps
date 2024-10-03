@@ -63,12 +63,20 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "ExpectedTrend": {
+                        "type": "number"
+                    },
+                    "TrendSteps": {
+                        "type": "integer"
                     }
                 },
                 "required": [
                     "Name",
                     "Nutrients",
-                    "Price"
+                    "Price",
+                    "ExpectedTrend",
+                    "TrendSteps"
                 ],
                 "additionalProperties": false
             }

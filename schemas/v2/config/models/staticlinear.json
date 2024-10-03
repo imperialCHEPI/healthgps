@@ -174,6 +174,9 @@
                     },
                     "ExpectedTrendBoxCox": {
                         "type": "number"
+                    },
+                    "TrendSteps": {
+                        "type": "integer"
                     }
                 },
                 "required": [
@@ -185,7 +188,8 @@
                     "Policy",
                     "Trend",
                     "ExpectedTrend",
-                    "ExpectedTrendBoxCox"
+                    "ExpectedTrendBoxCox",
+                    "TrendSteps"
                 ],
                 "additionalProperties": false
             }
