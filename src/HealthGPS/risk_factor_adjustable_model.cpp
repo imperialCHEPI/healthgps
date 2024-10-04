@@ -33,8 +33,10 @@ namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend)
-    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {}
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+      trend_steps_{std::move(trend_steps)} {}
 
 double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
                                                const core::Identifier &factor, OptionalRange range,
@@ -44,7 +46,8 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
     // Apply optional trend to expected value.
     if (apply_trend) {
         int elapsed_time = context.time_now() - context.start_time();
-        expected *= pow(expected_trend_->at(factor), elapsed_time);
+        int t = std::min(elapsed_time, get_trend_steps(factor));
+        expected *= pow(expected_trend_->at(factor), t);
     }
 
     // Clamp expected value to an optionally specified range.
@@ -110,6 +113,10 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
     }
+}
+
+int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
+    return trend_steps_->at(factor);
 }
 
 RiskFactorSexAgeTable
@@ -193,14 +200,19 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend)
-    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)} {
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+      trend_steps_{std::move(trend_steps)} {
 
     if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");
     }
     if (expected_trend_->empty()) {
         throw core::HgpsException("Risk factor expected trend mapping is empty");
+    }
+    if (trend_steps_->empty()) {
+        throw core::HgpsException("Risk factor trend steps mapping is empty");
     }
 }
 
