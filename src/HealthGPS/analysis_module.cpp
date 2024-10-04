@@ -145,7 +145,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
 
     const char *env_var = std::getenv("HGPS_DUMP_TIMES");
     if (env_var == nullptr) {
-        std::cerr << "HGPS_DUMP_TIMES environment variable is not set.\n" << std::endl;
+        std::cerr << "HGPS_DUMP_TIMES environment variable is not set.\n" << '\n';
         std::exit(100);
     }
 
@@ -159,7 +159,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
         try {
             dump_times_.push_back(std::stoi(item));
         } catch (const std::invalid_argument &e) {
-            std::cerr << "Invalid number in HGPS_DUMP_TIMES: " << item << std::endl;
+            std::cerr << "Invalid number in HGPS_DUMP_TIMES: " << item << '\n';
             std::exit(101);
         }
     }
@@ -168,14 +168,14 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     for (const auto &time : dump_times_) {
         std::cout << time << " ";
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     // CHECK TO DUMP POPULATION
     const auto &scenario = context.scenario().name();
     int elapsed_time = context.time_now() - context.start_time();
     if (std::find(dump_times_.cbegin(), dump_times_.cend(), elapsed_time) != dump_times_.cend()) {
         std::cout << "Dumping initial " << scenario << " population at time " << elapsed_time
-                  << std::endl;
+                  << '\n';
         dump(context);
     }
 }
@@ -192,7 +192,7 @@ void AnalysisModule::update_population(RuntimeContext &context) {
     int elapsed_time = context.time_now() - context.start_time();
     if (std::find(dump_times_.cbegin(), dump_times_.cend(), elapsed_time) != dump_times_.cend()) {
         std::cout << "Dumping updated " << scenario << " population at time " << elapsed_time
-                  << std::endl;
+                  << '\n';
         dump(context);
     }
 }
