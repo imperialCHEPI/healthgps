@@ -158,7 +158,7 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
     while (std::getline(ss, item, ',')) {
         try {
             dump_times_.push_back(std::stoi(item));
-        } catch (const std::invalid_argument &e) {
+        } catch (const std::invalid_argument &) {
             std::cerr << "Invalid number in HGPS_DUMP_TIMES: " << item << '\n';
             std::exit(101);
         }
