@@ -11,6 +11,33 @@
 #include <future>
 #include <oneapi/tbb/parallel_for_each.h>
 
+#include <fstream>
+#include <iostream>
+
+void dump(hgps::RuntimeContext &context) {
+    const auto &scenario = context.scenario().name();
+    int elapsed_time = context.time_now() - context.start_time();
+
+    std::ofstream file(fmt::format("population_dump_{}_{}.csv", scenario, elapsed_time));
+
+    for (const auto &factor : context.mapping().entries()) {
+        file << factor.key().to_string() << ",";
+    }
+    file << "\n";
+
+    for (const auto &person : context.population()) {
+        if (!person.is_active()) {
+            continue;
+        }
+        for (const auto &factor : context.mapping().entries()) {
+            file << person.get_risk_factor_value(factor.key()) << ",";
+        }
+        file << "\n";
+    }
+
+    file.close();
+}
+
 namespace hgps {
 
 /// @brief DALYs result unit conversion constant.
@@ -79,49 +106,95 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 const std::string &AnalysisModule::name() const noexcept { return name_; }
 
 void AnalysisModule::initialise_population(RuntimeContext &context) {
-    const auto &age_range = context.age_range();
-    auto expected_sum = create_age_gender_table<double>(age_range);
-    auto expected_count = create_age_gender_table<int>(age_range);
-    auto &pop = context.population();
-    auto sum_mutex = std::mutex{};
-    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
-        if (!entity.is_active()) {
-            return;
-        }
+    // const auto &age_range = context.age_range();
+    // auto expected_sum = create_age_gender_table<double>(age_range);
+    // auto expected_count = create_age_gender_table<int>(age_range);
+    // auto &pop = context.population();
+    // auto sum_mutex = std::mutex{};
+    // tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
+    //     if (!entity.is_active()) {
+    //         return;
+    //     }
 
-        auto sum = 1.0;
-        for (const auto &disease : entity.diseases) {
-            if (disease.second.status == DiseaseStatus::active &&
-                definition_.disability_weights().contains(disease.first)) {
-                sum *= (1.0 - definition_.disability_weights().at(disease.first));
-            }
-        }
+    //     auto sum = 1.0;
+    //     for (const auto &disease : entity.diseases) {
+    //         if (disease.second.status == DiseaseStatus::active &&
+    //             definition_.disability_weights().contains(disease.first)) {
+    //             sum *= (1.0 - definition_.disability_weights().at(disease.first));
+    //         }
+    //     }
 
-        auto lock = std::unique_lock{sum_mutex};
-        expected_sum(entity.age, entity.gender) += sum;
-        expected_count(entity.age, entity.gender)++;
-    });
+    //     auto lock = std::unique_lock{sum_mutex};
+    //     expected_sum(entity.age, entity.gender) += sum;
+    //     expected_count(entity.age, entity.gender)++;
+    // });
 
-    for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-        residual_disability_weight_(age, core::Gender::male) = calculate_residual_disability_weight(
-            age, core::Gender::male, expected_sum, expected_count);
+    // for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+    //     residual_disability_weight_(age, core::Gender::male) =
+    //     calculate_residual_disability_weight(
+    //         age, core::Gender::male, expected_sum, expected_count);
 
-        residual_disability_weight_(age, core::Gender::female) =
-            calculate_residual_disability_weight(age, core::Gender::female, expected_sum,
-                                                 expected_count);
+    //     residual_disability_weight_(age, core::Gender::female) =
+    //         calculate_residual_disability_weight(age, core::Gender::female, expected_sum,
+    //                                              expected_count);
+    // }
+
+    // initialise_output_channels(context);
+
+    // publish_result_message(context);
+
+    const char *env_var = std::getenv("HGPS_DUMP_TIMES");
+    if (env_var == nullptr) {
+        std::cerr << "HGPS_DUMP_TIMES environment variable is not set.\n" << std::endl;
+        std::exit(100);
     }
 
-    initialise_output_channels(context);
+    // Convert the C-string to a C++ string for easier manipulation
+    std::string dumpTimesStr(env_var);
+    std::stringstream ss(dumpTimesStr);
+    std::string item;
 
-    publish_result_message(context);
+    // Parse the comma-separated values and convert to integers
+    while (std::getline(ss, item, ',')) {
+        try {
+            dump_times_.push_back(std::stoi(item));
+        } catch (const std::invalid_argument &e) {
+            std::cerr << "Invalid number in HGPS_DUMP_TIMES: " << item << std::endl;
+            std::exit(101);
+        }
+    }
+
+    std::cout << "HGPS_DUMP_TIMES: ";
+    for (const auto &time : dump_times_) {
+        std::cout << time << " ";
+    }
+    std::cout << std::endl;
+
+    // CHECK TO DUMP POPULATION
+    const auto &scenario = context.scenario().name();
+    int elapsed_time = context.time_now() - context.start_time();
+    if (std::find(dump_times_.cbegin(), dump_times_.cend(), elapsed_time) != dump_times_.cend()) {
+        std::cout << "Dumping initial " << scenario << " population at time " << elapsed_time
+                  << std::endl;
+        dump(context);
+    }
 }
 
 void AnalysisModule::update_population(RuntimeContext &context) {
 
-    // Reset the calculated factors vector to 0.0
-    std::ranges::fill(calculated_stats_, 0.0);
+    // // Reset the calculated factors vector to 0.0
+    // std::ranges::fill(calculated_stats_, 0.0);
 
-    publish_result_message(context);
+    // publish_result_message(context);
+
+    // CHECK TO DUMP POPULATION
+    const auto &scenario = context.scenario().name();
+    int elapsed_time = context.time_now() - context.start_time();
+    if (std::find(dump_times_.cbegin(), dump_times_.cend(), elapsed_time) != dump_times_.cend()) {
+        std::cout << "Dumping updated " << scenario << " population at time " << elapsed_time
+                  << std::endl;
+        dump(context);
+    }
 }
 
 double
