@@ -10,6 +10,7 @@ namespace hgps {
 StaticLinearModel::StaticLinearModel(
     std::shared_ptr<RiskFactorSexAgeTable> expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
     const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
@@ -23,7 +24,8 @@ StaticLinearModel::StaticLinearModel(
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
+                                std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
       ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
       policy_models_{policy_models}, policy_ranges_{policy_ranges},
@@ -218,7 +220,8 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
 
         // Apply trend to risk factor.
         double factor = person.risk_factors.at(names_[i]);
-        factor *= pow(trend, elapsed_time);
+        int t = std::min(elapsed_time, get_trend_steps(names_[i]));
+        factor *= pow(trend, t);
         factor = ranges_[i].clamp(factor);
 
         // Save risk factor.
@@ -432,6 +435,7 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
@@ -443,7 +447,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     double physical_activity_stddev)
-    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
+                                          std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
       models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
       stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
@@ -508,9 +513,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(
-        expected_, expected_trend_, expected_trend_boxcox_, names_, models_, ranges_, lambda_,
-        stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_, trend_models_,
-        trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
+        expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
+        lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
+        trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
         physical_activity_stddev_);
 }
 

@@ -224,6 +224,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto trend_lambda = std::make_unique<std::vector<double>>();
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
+    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
     size_t i = 0;
     for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
@@ -295,6 +296,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Load expected value trends.
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
         (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
+        (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
 
         // Increment table column index.
         i++;
@@ -381,12 +383,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
     return std::make_unique<StaticLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(expected_trend_boxcox),
-        std::move(names), std::move(models), std::move(ranges), std::move(lambda),
-        std::move(stddev), std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
-        std::move(policy_cholesky), std::move(trend_models), std::move(trend_ranges),
-        std::move(trend_lambda), info_speed, std::move(rural_prevalence), std::move(income_models),
-        physical_activity_stddev);
+        std::move(expected), std::move(expected_trend), std::move(trend_steps),
+        std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
+        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
+        std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
+        std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
+        std::move(income_models), physical_activity_stddev);
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -465,10 +467,11 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
     // Risk factor expected values by sex and age.
     auto expected = load_risk_factor_expected(config);
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
     return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(equations), std::move(variables),
-        percentage);
+        std::move(expected), std::move(expected_trend), std::move(trend_steps),
+        std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
 
@@ -479,6 +482,9 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     // Risk factor expected values by sex and age.
     auto expected = load_risk_factor_expected(config);
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+
+    // Number of steps to apply nutrient time trends.
+    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
     // Nutrient groups.
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
@@ -496,6 +502,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     for (const auto &food : opt["Foods"]) {
         auto food_key = food["Name"].get<hgps::core::Identifier>();
         (*expected_trend)[food_key] = food["ExpectedTrend"].get<double>();
+        (*trend_steps)[food_key] = food["TrendSteps"].get<int>();
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
         auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
 
@@ -549,10 +556,10 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
     return std::make_unique<hgps::KevinHallModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(energy_equation),
-        std::move(nutrient_ranges), std::move(nutrient_equations), std::move(food_prices),
-        std::move(weight_quantiles), std::move(epa_quantiles), std::move(height_stddev),
-        std::move(height_slope));
+        std::move(expected), std::move(expected_trend), std::move(trend_steps),
+        std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
+        std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
+        std::move(height_stddev), std::move(height_slope));
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
