@@ -28,7 +28,7 @@ namespace {
 // The latest schema version for each model
 constexpr int DummyModelSchemaVersion = 1;
 constexpr int EBHLMModelSchemaVersion = 1;
-constexpr int KevinHallModelSchemaVersion = 1;
+constexpr int KevinHallModelSchemaVersion = 2;
 constexpr int HLMModelSchemaVersion = 1;
 constexpr int StaticLinearModelSchemaVersion = 2;
 
