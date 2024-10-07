@@ -41,8 +41,6 @@ target_sources(
             "TestMain.cpp"
             "WeightModel.Test.cpp"
             "CountryModule.h"
-            "RiskFactorData.h"
-            "RiskFactorData.cpp"
             "Interval.Test.cpp"
             "LoadNutrientTable.cpp"
             "AnalysisModule.Test.cpp"
