@@ -398,6 +398,11 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 
     auto info = LiteHierarchicalModelInfo{};
 
+    // Risk factor expected values by sex and age.
+    auto expected = load_risk_factor_expected(config);
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+
     auto percentage = 0.05;
     opt["BoundaryPercentage"].get_to(info.percentage);
     if (info.percentage > 0.0 && info.percentage < 1.0) {
@@ -424,6 +429,10 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
     info.variables = opt["Variables"].get<std::vector<VariableInfo>>();
     for (const auto &item : info.variables) {
         variables.emplace(hgps::core::Identifier{item.name}, hgps::core::Identifier{item.factor});
+
+        // NOTE: variable trending is not used in this model.
+        expected_trend->emplace(hgps::core::Identifier{item.factor}, 1.0);
+        trend_steps->emplace(hgps::core::Identifier{item.factor}, 0);
     }
 
     for (const auto &age_grp : info.equations) {
@@ -463,11 +472,6 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 
         equations.emplace(age_key, std::move(age_equations));
     }
-
-    // Risk factor expected values by sex and age.
-    auto expected = load_risk_factor_expected(config);
-    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
-    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
     return std::make_unique<hgps::DynamicHierarchicalLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
