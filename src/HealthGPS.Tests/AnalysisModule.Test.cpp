@@ -25,8 +25,8 @@ class TestAnalysisModule : public ::testing::Test {
     std::unique_ptr<hgps::AnalysisModule> analysis_module =
         build_analysis_module(repository, inputs);
 
-    hgps::Person test_person_1 = create_test_person(21, hgps::core::Gender::male);
-    hgps::Person test_person_2 = create_test_person(22, hgps::core::Gender::male);
+    hgps::Person test_person_1 = create_test_person(16, hgps::core::Gender::male);
+    hgps::Person test_person_2 = create_test_person(19, hgps::core::Gender::male);
     hgps::DefaultEventBus bus = DefaultEventBus{};
     hgps::SyncChannel channel;
     std::unique_ptr<hgps::MTRandom32> rnd = std::make_unique<MTRandom32>(123456789);
@@ -41,11 +41,11 @@ class TestAnalysisModule : public ::testing::Test {
 
         auto config = create_test_configuration(data);
 
-        context.reset_population(3);
+        context.reset_population(6);
 
         // Let's set some ages for the population
         for (size_t i = 0; i < context.population().size(); i++) {
-            context.population()[i].age = 20 + static_cast<unsigned int>(i);
+            context.population()[i].age = 15 + static_cast<unsigned int>(i);
         }
 
         // Let's set the population gender to male
@@ -73,8 +73,10 @@ TEST_F(TestAnalysisModule, CalculateIndex) {
     // analysis_module->initialise_population(context);
 
     size_t index_1 = analysis_module->calculate_index(test_person_1);
+    size_t index_2 = analysis_module->calculate_index(test_person_2);
 
     ASSERT_EQ(index_1, 29);
+    ASSERT_EQ(index_2, 4*29);
 }
 
 } // namespace hgps
