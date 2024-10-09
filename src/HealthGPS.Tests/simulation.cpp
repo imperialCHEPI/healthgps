@@ -1,5 +1,10 @@
 #include "simulation.h"
 
+namespace {
+std::vector<hgps::MappingEntry> mapping_entries{
+    {{"Gender", 0}, {"Age", 0}, {"SmokingStatus", 1}, {"AlcoholConsumption", 1}, {"BMI", 2}}};
+} // anonymous namespace
+
 void create_test_datatable(hgps::core::DataTable &data) {
     using namespace hgps;
     using namespace hgps::core;

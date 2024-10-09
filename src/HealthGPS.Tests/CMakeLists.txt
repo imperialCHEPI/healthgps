@@ -44,7 +44,6 @@ target_sources(
             "Interval.Test.cpp"
             "LoadNutrientTable.cpp"
             "AnalysisModule.Test.cpp"
-            "simulation.h"
             "simulation.cpp")
 
 target_link_libraries(

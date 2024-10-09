@@ -70,13 +70,12 @@ class TestAnalysisModule : public ::testing::Test {
 TEST_F(TestAnalysisModule, CalculateIndex) {
     // Test that the index is calculated correctly
 
-    // analysis_module->initialise_population(context);
-
     size_t index_1 = analysis_module->calculate_index(test_person_1);
     size_t index_2 = analysis_module->calculate_index(test_person_2);
 
-    ASSERT_EQ(index_1, 29);
-    ASSERT_EQ(index_2, 4*29);
+    // 
+    ASSERT_EQ(index_1, 87);
+    ASSERT_EQ(index_2, 4*87);
 }
 
 } // namespace hgps

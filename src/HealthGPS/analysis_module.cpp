@@ -64,7 +64,7 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
         if (factor_range == 0) {
             factor_bin_widths_.push_back(1.0);
         } else {
-            factor_bin_widths_.push_back((max_factor - min_factor) / factor_bins_.back());
+            factor_bin_widths_.push_back((max_factor + 1 - min_factor) / factor_bins_.back());
         }
     }
 
@@ -83,6 +83,8 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
     // Set the vector size and initialise all values to 0.0
     calculated_stats_.resize(total_num_bins * num_stats_to_calc);
+
+    num_stats_to_calc_ = num_stats_to_calc;
 }
 
 const std::string &AnalysisModule::name() const noexcept { return name_; }
@@ -671,9 +673,9 @@ size_t AnalysisModule::calculate_index(const Person &person) const {
         size_t accumulated_bins =
             std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(), size_t{1},
                             std::multiplies<>());
-        index += bin_indices[i] * accumulated_bins * channels_.size();
+        index += bin_indices[i] * accumulated_bins * num_stats_to_calc_;
     }
-    index += bin_indices.back() * channels_.size();
+    index += bin_indices.back() * num_stats_to_calc_;
 
     return index;
 }
