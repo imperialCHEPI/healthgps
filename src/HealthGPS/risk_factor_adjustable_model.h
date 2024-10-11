@@ -80,7 +80,7 @@ class RiskFactorAdjustableModel : public RiskFactorModel {
     std::shared_ptr<RiskFactorSexAgeTable> expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
-    mutable std::optional<std::ofstream> adjustments_ofs_;
+    mutable std::ofstream adjustments_ofs_;
 };
 
 /// @brief Risk factor adjustable model definition interface

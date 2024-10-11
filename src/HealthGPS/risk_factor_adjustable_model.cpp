@@ -108,13 +108,13 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     if (context.scenario().type() == ScenarioType::baseline) {
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
 
-        if (!adjustments_ofs_) {
-            adjustments_ofs_.emplace("adjustments.txt");
+        if (!adjustments_ofs_.is_open()) {
+            adjustments_ofs_ = std::ofstream{"adjustments.txt"};
         }
 
         nlohmann::json json = adjustments;
         std::cout << "SAVING ADJUSTMENTS\n";
-        *adjustments_ofs_ << json << "\n";
+        adjustments_ofs_ << json << "\n";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
