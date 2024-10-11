@@ -160,6 +160,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         auto model_input = std::make_shared<ModelInput>(
             create_model_input(input_table, std::move(country), config, std::move(diseases)));
 
+        // If the user is just validating input files, abort here
+        if (cmd_args.dry_run) {
+            fmt::print(fg(fmt::color::yellow), "Dry run completed successfully.\n");
+            return exit_application(EXIT_SUCCESS);
+        }
+
         // Create output folder
         if (!std::filesystem::exists(config.output.folder)) {
             fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",

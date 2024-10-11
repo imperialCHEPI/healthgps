@@ -17,6 +17,8 @@ cxxopts::Options create_options() {
         ("c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())
         ("s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())
         ("j,jobid", "The batch execution job identifier.", cxxopts::value<int>())
+        ("dry-run",  "Check the input files without running a simulation",
+            cxxopts::value<bool>()->default_value("false"))
         ("o,output", "Path to output folder", cxxopts::value<std::string>())
         ("T,threads", "The maximum number of threads to create (0: no limit, default).",
             cxxopts::value<size_t>())
@@ -70,6 +72,11 @@ std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int arg
         fmt::print("Data source: {}\n", source);
 
         cmd.data_source = hgps::input::DataSource(std::move(source));
+    }
+
+    if (result.count("dry-run")) {
+        cmd.dry_run = true;
+        fmt::print(fmt::fg(fmt::color::yellow), "Performing dry run.\n");
     }
 
     if (result.count("output")) {
