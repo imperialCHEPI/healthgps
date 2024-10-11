@@ -107,17 +107,6 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         return exit_application(EXIT_FAILURE);
     }
 
-    // Create output folder
-    if (!std::filesystem::exists(config.output.folder)) {
-        fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
-                   config.output.folder);
-        if (!std::filesystem::create_directories(config.output.folder)) {
-            fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
-                       config.output.folder);
-            return exit_application(EXIT_FAILURE);
-        }
-    }
-
     // Load input data file into a datatable asynchronous
     auto table_future = core::run_async(load_datatable_from_csv, config.file);
 
@@ -170,6 +159,17 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // Create complete model input from configuration
         auto model_input = std::make_shared<ModelInput>(
             create_model_input(input_table, std::move(country), config, std::move(diseases)));
+
+        // Create output folder
+        if (!std::filesystem::exists(config.output.folder)) {
+            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
+                       config.output.folder);
+            if (!std::filesystem::create_directories(config.output.folder)) {
+                fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
+                           config.output.folder);
+                return exit_application(EXIT_FAILURE);
+            }
+        }
 
         // Create event bus and event monitor with a results file writer
         auto event_bus = std::make_shared<DefaultEventBus>();
