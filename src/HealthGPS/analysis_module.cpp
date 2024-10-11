@@ -160,9 +160,9 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     auto sample_size = context.age_range().upper() + 1u;
     auto result = ModelResult{sample_size};
-    // auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
-    //                               std::ref(context), std::ref(result));
-    // handle.get();
+    auto handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
+                                  std::ref(context), std::ref(result));
+    handle.get();
 
     calculate_population_statistics(context);
 

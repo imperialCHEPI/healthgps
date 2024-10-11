@@ -41,16 +41,21 @@ class TestAnalysisModule : public ::testing::Test {
 
         auto config = create_test_configuration(data);
 
-        context.reset_population(6);
+        context.set_current_time(2024);
 
-        // Let's set some ages for the population
-        for (size_t i = 0; i < context.population().size(); i++) {
-            context.population()[i].age = 15 + static_cast<unsigned int>(i);
+        context.reset_population(12);
+
+        // Let's set some ages for the population.
+        // We will create a pair of male and female persons with sequential ages
+        for (size_t i = 0, j=15; i < context.population().size(); i=i+2, j++) {
+            context.population()[i].age = j;
+            context.population()[i + 1].age = j;
         }
 
-        // Let's set the population gender to male
-        for (auto &person : context.population()) {
-            person.gender = core::Gender::male;
+        // Let's set half the population gender to male, and the other half to female
+        for (size_t i = 0; i < context.population().size(); i=i+2) {
+            context.population()[i].gender = core::Gender::male;
+            context.population()[i+1].gender = core::Gender::female;
         }
 
         // For each person, we need to set the risk factors which we can get from channels_
@@ -73,9 +78,8 @@ TEST_F(TestAnalysisModule, CalculateIndex) {
     size_t index_1 = analysis_module->calculate_index(test_person_1);
     size_t index_2 = analysis_module->calculate_index(test_person_2);
 
-    //
-    ASSERT_EQ(index_1, 87);
-    ASSERT_EQ(index_2, 4 * 87);
+    ASSERT_EQ(index_1, 7*87);
+    ASSERT_EQ(index_2, 10*87);
 }
 
 } // namespace hgps
