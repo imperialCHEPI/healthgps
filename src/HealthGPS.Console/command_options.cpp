@@ -9,18 +9,22 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Path to configuration file, folder or URL (deprecated).",
-                          cxxopts::value<std::string>())(
-        "c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())(
-        "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
-        "j,jobid", "The batch execution job identifier.",
-        cxxopts::value<int>())("o,output", "Path to output folder", cxxopts::value<std::string>())(
-        "T,threads", "The maximum number of threads to create (0: no limit, default).",
-        cxxopts::value<size_t>())
 
+    // clang-format off
+    options.add_options()
+        ("f,file", "Path to configuration file, folder or URL (deprecated).",
+            cxxopts::value<std::string>())
+        ("c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())
+        ("s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())
+        ("j,jobid", "The batch execution job identifier.", cxxopts::value<int>())
+        ("o,output", "Path to output folder", cxxopts::value<std::string>())
+        ("T,threads", "The maximum number of threads to create (0: no limit, default).",
+            cxxopts::value<size_t>())
         ("verbose", "Print more information about progress",
-         cxxopts::value<bool>()->default_value("false"))("help", "Help about this application.")(
-            "version", "Print the application version number.");
+            cxxopts::value<bool>()->default_value("false"))
+        ("help", "Help for this application.")
+        ("version", "Print the application version number.");
+    // clang-format on
 
     return options;
 }
