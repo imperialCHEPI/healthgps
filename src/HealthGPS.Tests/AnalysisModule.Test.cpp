@@ -48,8 +48,8 @@ class TestAnalysisModule : public ::testing::Test {
         // Let's set some ages for the population.
         // We will create a pair of male and female persons with sequential ages
         for (size_t i = 0, j = 15; i < context.population().size(); i = i + 2, j++) {
-            context.population()[i].age = j;
-            context.population()[i + 1].age = j;
+            context.population()[i].age = static_cast<unsigned>(j);
+            context.population()[i + 1].age = static_cast<unsigned>(j);
         }
 
         // Let's set half the population gender to male, and the other half to female
