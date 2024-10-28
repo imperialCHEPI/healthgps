@@ -31,6 +31,9 @@ struct CommandOptions {
 
     /// @brief The maximum number of threads to use (0: no limit).
     size_t num_threads{};
+
+    /// @brief Whether to check input files without actually running simulation
+    bool dry_run{};
 };
 
 /// @brief Creates the command-line interface (CLI) options
