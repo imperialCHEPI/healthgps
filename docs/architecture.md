@@ -117,7 +117,7 @@ The *Disease* type stores the diseases' value, status: *Active*, indicates that 
 
 Helper methods are provided for easy access, for instance the `is_active` method checks all the *status flags* to indicate whether an individual is current in the simulation; and the `get_risk_factor_value` method handle the complex access to the dynamic properties.
 
-# Simulation Engine
+## Simulation Engine
 
 The *simulation engine* is responsible for managing the simulation clock, events scheduling and simulation execution order. The Health-GPS engine is based on the *Discrete Event System Specification* ([DEVS][devs]) and provided by the [ADEVS][adevs] library. DEVS formalism is a system-theoretic concept that represents inputs, states, and outputs, like a *state machine*, but with the critical addition of a time-advance function. This combination enables DEVS models to represent discrete event systems, agent-based systems as well as hybrids with continuous components in a straightforward manner. Health-GPS describes a discrete event dynamic system, which can be advantageously represented as DEVS models for greater generality, clarity, and flexibility.
 
@@ -149,7 +149,7 @@ The *simulation engine* internal workflow shown below, highlights the main algor
 
 The order of execution of each module and provision of parameters for each call is the responsibility of the simulation engine algorithm. The same random number generator instance is used throughout the simulation, the generator is initialised during the *Initialise* step, users can optionally provide a fixed seed to initialise the generator for reproducibility. This initialisation is sufficient for experiment with only *baseline* scenario, however experiments with *baseline* and *intervention* scenarios being evaluated together, the random number generator is reset before each run by the simulation executive to ensure reproducibility. The simulation engine consists of two main algorithms to *initialise* and *update* the virtual population over time respectively.
 
-## Initialise Population
+### Initialise Population
 
 Creating and initialising the virtual population is the first step of a simulation run, below is the sequence diagram showing the events and order of activation of the different modules by the Health-GPS algorithm.
 
@@ -159,7 +159,7 @@ Creating and initialising the virtual population is the first step of a simulati
 
 The algorithm sets the simulation world clock, in years, to the user’s defined start time, and uses the simulation module interface to request each module to initialise the relevant properties of the virtual population individuals.
 
-## Update Population
+### Update Population
 
 The update population algorithm is the heart of the Health-GPS microsimulation, the sequence of events and order of activation for different modules during each time step update of the simulation is shown below. The algorithm moves the simulation clock, in years, forwards until the user’s defined end time is reached, at which point the algorithm terminates, finishing the run.
 
@@ -169,7 +169,7 @@ The update population algorithm is the heart of the Health-GPS microsimulation, 
 
 The empty squares in the Scenario timeline highlight data synchronisation points between the baseline and intervention scenarios, see next section for details.
 
-# Policy Scenarios
+## Policy Scenarios
 
 Each simulation instance must have a single policy scenario associated as part of the experiment, the scenarios common interface definition is shown below. There are wwo types of scenarios are supported: ***Baseline*** to define the trends in the observed population to measure outcomes against; and ***Intervention*** for policies designed to change the observed trends during a specific time frame.
 
@@ -187,7 +187,7 @@ The current modelling of intervention scenario requires data synchronisation bet
 
 An alternative to this design is to use a message broker, e.g., [RabbitMQ][broker], or a distributed event streaming platform such as [Apache Kafka][kafka] to distribute random generator seeds and messages over a network of computers running in pairs to scale-up the model’s virtual population size and throughput. This solution would allow for a single baseline scenario data to be shared by multiple intervention scenarios, marked reducing the requirement for simulation pair coupling.
 
-# Simulation Executive
+## Simulation Executive
 
 The *simulation executive* creates the simulation running environment, instructs the *simulation engine* to evaluate the experiment scenarios for a pre-defined number of runs, manage master seeds generation, notify progress, and handle experiment for cancellation. The `Runner` class shown below, implements the *Health-GPS simulation executive*.
 
@@ -205,7 +205,7 @@ Experiment scenarios are evaluated in parallel using multiple threads, however t
 
 The *message bus* mechanism decouples the sender from the receiver, typically one or more event monitors are used to subscriber for messages, receive, queue, and process the messages queue on its own pace and thread, common activities are display on screen, stream over the internet, summarise results and/or log to file.
 
-# Deployment
+## Deployment
 
 The various components of the Health-GPS ecosystem can be deployed to multiple computing platforms. The four components are packaged together into the *host application* executable, which is purpose built for each target platforms as shown below. The backend *data storage* is platform independent, but must be available, accessible, and properly configured for the application to work correctly at runtime.
 
