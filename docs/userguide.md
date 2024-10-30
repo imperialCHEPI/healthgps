@@ -6,9 +6,9 @@
 
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
-|![Health-GPS Workflow](images/workflow_diagram.svg)|
-|:--:|
-|*Health-GPS Workflow Diagram*|
+| ![Health-GPS Workflow](images/workflow_diagram.svg) |
+|:---------------------------------------------------:|
+|            *Health-GPS Workflow Diagram*            |
 
 As with any simulation model, the workflow starts with data, it is the user's responsibility to process and analyse the input data, define the model’s hierarchy, fit parameters to data, and design intervention. A *configuration* file is used to provide the user's datasets, model parameters, and control the simulation experiment runtime. The model is invoked via a *Command Line Interface* (CLI), which validates the configuration contents, loads associated files to create the model inputs, assembles the microsimulation with the required modules, evaluates the experiment, and writes the results to a chosen output *file* and *folder*. Likewise, it is the user's responsibility to analyse and quantify the model results and draw conclusions on the cost-effectiveness of the intervention.
 
@@ -402,9 +402,9 @@ Health-GPS by default uses a *file-based backend storage*, which implements the 
 
 As mentioned previously, the data store can be provided as a URL to ensure reproducibility. Different versions of the reference data set are available in the [Health-GPS data repository](https://github.com/imperialCHEPI/healthgps-data).
 
-|![File-based Datastore](images/file_based_storage.png)|
-|:--:|
-|*File-based Backend Datastore example*|
+| ![File-based Datastore](images/file_based_storage.png) |
+|:------------------------------------------------------:|
+|         *File-based Backend Datastore example*         |
 
 The *index file* defines schema version, data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The data is indexed and stored by country files taking advantage of the model's workflow, this minimises data reading time and enables the storage to scale with many countries.
 
@@ -606,9 +606,9 @@ View(data)
 
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
 
-|![Health-GPS Results](images/model_results.png)|
-|:--:|
-|*Health-GPS results in R data frame example*|
+| ![Health-GPS Results](images/model_results.png) |
+|:-----------------------------------------------:|
+|  *Health-GPS results in R data frame example*   |
 
 The results file contains the output of all simulations in the experiment, *baseline*, and *intervention* scenarios over one or more runs. The user should not assume data order during analysis of experiments with intervention scenarios, the results are published by both simulations running in parallel *asynchronously* via messages, the order in which the messages arrive at the destination queue, before being written to file is not guaranteed. A robust method to tabulate the results shown above, is to always group the data by: ```data.result(source, run, time)```, to ensure that the analysis algorithms work for both types of simulation experiments. For example, using the results data above in R, the following script will tabulate and plot the experiment's BMI projection.
 
@@ -653,9 +653,9 @@ p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
 show(p)
 ```
 
-|![Experiment BMI Projection](images/bmi_projection.svg)|
-|:--:|
-|*Experiment BMI projection example*|
+| ![Experiment BMI Projection](images/bmi_projection.svg) |
+|:-------------------------------------------------------:|
+|           *Experiment BMI projection example*           |
 
 In a similar manner, the resulting dataset *`df`*, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
@@ -681,14 +681,14 @@ Although Health-GPS is compatible with most High Performance Computing (HPC) sys
 
 Every software package installed in the HPC is called a **module**. The *module system* for centrally installed packages, must be used to find, load and unload installed modules and dependencies required to use a software package. The following *module commands* are essential to get started with Imperial HPC system:
 
-| Command             | Description                                            |
-|:---                 |:---                                                    |
-|module avail         | List all modules available                             |
-|module avail tools   | Find all available versions of a software module       |
-|module add tools/dev | Load a module to be used into the job or user own space|
-|module list          | List all loaded modules                                |
-|module rm tools/dev  | Remove a loaded module version                         |
-|module purge         | Unload all loaded modules, clear all modules           |
+| Command              | Description                                             |
+|:---------------------|:--------------------------------------------------------|
+| module avail         | List all modules available                              |
+| module avail tools   | Find all available versions of a software module        |
+| module add tools/dev | Load a module to be used into the job or user own space |
+| module list          | List all loaded modules                                 |
+| module rm tools/dev  | Remove a loaded module version                          |
+| module purge         | Unload all loaded modules, clear all modules            |
 
 > **Warning**
 > Modules name are *case sensitive* for both script and search.
@@ -701,13 +701,13 @@ Module packages can be installed *globally* within the HPC system, old style, or
 
 Furthermore, the [Portable Batch System](https://en.wikipedia.org/wiki/Portable_Batch_System) (PBS), a batch job and computer system resource management package, is used by the Imperial HPC for job scheduling and users also need learn the PBS commands. A list of useful PBS commands used to submit, monitor, modify, and delete jobs can be found below:
 
-| Command | Action | Example    | Description                                     |
-|:---     |:---    | :---       | :---                                            |
-| qsub    | Submit | qsub myjob | Submits the job "myjob" for the execution       |
-| qstat   | Monitor| qstat        | Show the status of all the jobs               |
-| ' '     | ' '    | qstat job_id | Show the status of single job                 |
-| qalter  | Modify | qalter -l ncpus = 4 job_id| Changes the attributes of the job|
-| qdel    | Delete | qdel job_id  | Deletes the job with job id = job_id          |
+| Command | Action  | Example                    | Description                               |
+|:--------|:--------|:---------------------------|:------------------------------------------|
+| qsub    | Submit  | qsub myjob                 | Submits the job "myjob" for the execution |
+| qstat   | Monitor | qstat                      | Show the status of all the jobs           |
+| ' '     | ' '     | qstat job_id               | Show the status of single job             |
+| qalter  | Modify  | qalter -l ncpus = 4 job_id | Changes the attributes of the job         |
+| qdel    | Delete  | qdel job_id                | Deletes the job with job id = job_id      |
 
 An introduction to the PBS is beyond this tutorial, users are encouraged to attend dedicated [courses](https://www.imperial.ac.uk/students/academic-support/graduate-school/students/doctoral/professional-development/research-computing-data-science/courses/) provided by Imperial's professional development programme to familiarise themselves with the HPC system and usage guidelines. *This tutorial provides the basic steps required for finding, loading, and using installed Health-GPS software within the Imperial HPC system*.
 
@@ -800,11 +800,11 @@ All computers in the Imperial HPC are connected to one parallel filesystem,
 
 In the case of the HPC user account, you get access to:
 
-| Command     | Description                                                          |
-|:---         |:---                                                                  |
-|$HOME        | Home directory, personal working space                               |
-|$EPHEMERAL   | Additional individual working space, files are deleted after 30 days |
-|$RDS_PROJECT | Allocated project shared space *if your project has any (paid for one)*  |
+| Command      | Description                                                             |
+|:-------------|:------------------------------------------------------------------------|
+| $HOME        | Home directory, personal working space                                  |
+| $EPHEMERAL   | Additional individual working space, files are deleted after 30 days    |
+| $RDS_PROJECT | Allocated project shared space *if your project has any (paid for one)* |
 
 The storages available for each user is usually printed during login to the HPC, to check your usage at any point, use command `quota -s`.
 

@@ -42,9 +42,9 @@ View(data)
 
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
 
-|![Health-GPS Results](images/model_results.png)|
-|:--:|
-|*Health-GPS results in R data frame example*|
+| ![Health-GPS Results](images/model_results.png) |
+|:-----------------------------------------------:|
+|  *Health-GPS results in R data frame example*   |
 
 The results file contains the output of all simulations in the experiment, *baseline*, and *intervention* scenarios over one or more runs. The user should not assume data order during analysis of experiments with intervention scenarios, the results are published by both simulations running in parallel *asynchronously* via messages, the order in which the messages arrive at the destination queue, before being written to file is not guaranteed. A robust method to tabulate the results shown above, is to always group the data by: ```data.result(source, run, time)```, to ensure that the analysis algorithms work for both types of simulation experiments. For example, using the results data above in R, the following script will tabulate and plot the experiment's BMI projection.
 
@@ -89,9 +89,9 @@ p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
 show(p)
 ```
 
-|![Experiment BMI Projection](images/bmi_projection.svg)|
-|:--:|
-|*Experiment BMI projection example*|
+| ![Experiment BMI Projection](images/bmi_projection.svg) |
+|:-------------------------------------------------------:|
+|           *Experiment BMI projection example*           |
 
 In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 

@@ -242,9 +242,9 @@ The software application provides a Command Line Interface (CLI) for the user to
 
 To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and Runner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
 
-|![Composing Health-GPS](images/compose_simulation.svg)|
-|:--:|
-|*Composing a Health-GPS Microsimulation*|
+| ![Composing Health-GPS](images/compose_simulation.svg) |
+|:------------------------------------------------------:|
+|        *Composing a Health-GPS Microsimulation*        |
 
 The simulation executive requires a RandomBitGenerator interface implementation for master seed generation and an implementation of the EventAggregator interface, in this example the DefaultEventBus class, which should be shared by the engines and executive to provide a centralised source of communication. The simulation engine must have its own random number generator instance as part of the simulation definition, the Mersenne Twister pseudorandom number generator algorithms is the default implementation, however other algorithms can easily be used.
 
@@ -338,20 +338,20 @@ event_monitor.stop();
 
 The simulation executive can run experiments for baseline scenario only, or baseline and intervention scenarios combination as shown above. The results message is a polymorphic type carrying a customisable data payload, table below shows the default implementation outputs.
 
-| Property     | Overall | Male  | Female | Description             |
-| :---         | :---:   | :---: | :---:  |:---                     |
-| Id           | ✓       | -     | -      | The message type identifier (results type) |
-| Source       | ✓       | -     | -      | The results experiment identification |
-| Run number   | ✓       | -     | -      | The results rum number identification |
-| Model time   | ✓       | -     | -      | The results model time identification |
-| Average Age  | -       | ✓     | ✓      | Average age of the population alive |
-| Prevalence   | -       | ✓     | ✓      | Prevalence for each disease in the population |
-| Risk factors | -       | ✓     | ✓      | Average risk factor values in the population |
-| Indicators (DALYs) | ✓ | - | - | YLL, YLD and DALY values per 100'000 people |
-| Population Counts | ✓ | - | - |  Total size, number alive, dead and emigrants |
-|Comorbidities | -       | ✓     | ✓      | Percentage of people with 0 to N+ diseases |
-| Metrics | ✓ | - | - | Custom key/value metrics for algorithms |
-| Series | - | ✓ | ✓ | Detailed time series by time, age, and gender |
+| Property           | Overall | Male | Female | Description                                   |
+|:-------------------|:-------:|:----:|:------:|:----------------------------------------------|
+| Id                 |    ✓    |  -   |   -    | The message type identifier (results type)    |
+| Source             |    ✓    |  -   |   -    | The results experiment identification         |
+| Run number         |    ✓    |  -   |   -    | The results rum number identification         |
+| Model time         |    ✓    |  -   |   -    | The results model time identification         |
+| Average Age        |    -    |  ✓   |   ✓    | Average age of the population alive           |
+| Prevalence         |    -    |  ✓   |   ✓    | Prevalence for each disease in the population |
+| Risk factors       |    -    |  ✓   |   ✓    | Average risk factor values in the population  |
+| Indicators (DALYs) |    ✓    |  -   |   -    | YLL, YLD and DALY values per 100'000 people   |
+| Population Counts  |    ✓    |  -   |   -    | Total size, number alive, dead and emigrants  |
+| Comorbidities      |    -    |  ✓   |   ✓    | Percentage of people with 0 to N+ diseases    |
+| Metrics            |    ✓    |  -   |   -    | Custom key/value metrics for algorithms       |
+| Series             |    -    |  ✓   |   ✓    | Detailed time series by time, age, and gender |
 
 These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
 
@@ -396,9 +396,9 @@ The factory must provide builder functions for all the required *module types* t
 
 Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health-GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health-GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
 
-|![Experiment reproducibility](images/batch_mode_seed.svg)|
-|:--:|
-|*Experiment reproducibility algorithm (seed management)*|
+| ![Experiment reproducibility](images/batch_mode_seed.svg) |
+|:---------------------------------------------------------:|
+| *Experiment reproducibility algorithm (seed management)*  |
 
 When running the simulation as a single experiment, the solution is trivial using the same seed, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](userguide#50-hpc-running) for an worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.
 
