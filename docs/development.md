@@ -405,4 +405,4 @@ When running the simulation as a single experiment, the solution is trivial usin
 ## GitHub flow
 
 Health-GPS uses the GitHub flow branching pattern for git. For more information, see the
-[GitHub flow guide](https://imperialchepi.github.io/healthgps/github_flow)
+[GitHub flow guide](github-flow)
