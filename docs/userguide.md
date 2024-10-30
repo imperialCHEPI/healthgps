@@ -400,6 +400,8 @@ The values in the adjustment files are *added* to the *model values*, therefore 
 
 Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
+As mentioned previously, the data store can be provided as a URL to ensure reproducibility. Different versions of the reference data set are available in the [Health-GPS data repository](https://github.com/imperialCHEPI/healthgps-data).
+
 |![File-based Datastore](images/file_based_storage.png)|
 |:--:|
 |*File-based Backend Datastore example*|
@@ -410,7 +412,7 @@ The data model defines many data hierarchies, which have been flatten for file-b
 
 ```json
 {
-    "version": 2,
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index.json",
     "country": {
         "format": "csv",
         "delimiter": ",",
@@ -425,12 +427,12 @@ The data model defines many data hierarchies, which have been flatten for file-b
     "demographic": {},
     "diseases": {
         "disease": {
-            "relative_risk":{ },
-            "parameters":{ },
+            "relative_risk": {},
+            "parameters": {},
         },
-        "registry":[ ]
+        "registry": []
     },
-    "analysis":{ }
+    "analysis": {}
 }
 ```
 
@@ -671,7 +673,7 @@ The column **count** gives the *number of individuals* in the *row group*, the r
 
 [configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
 
-[datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"
+[datastore]:https://github.com/imperialCHEPI/healthgps-data/blob/main/data/index.json "Backend file based data store index file"
 
 ### HPC Running
 
