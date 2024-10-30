@@ -16,17 +16,22 @@ As with any simulation model, the workflow starts with data, it is the user's re
 
 ## Configuration
 
-The high-level structure of the [configuration][configjson] file used to create the model inputs, in `JSON` format, is shown below. The structure defines the schema version, the user's dataset file, target country with respective virtual population settings, external models' definition with respective fitted parameters, simulation experiment options including diseases selection, and intervention scenario, and finally the results output location.
+The high-level structure of the [configuration][configjson] file used to create the model inputs, in JSON format, is shown below. The file should be called `config.json` and in the same folder as the other configuration files. The structure defines the schema version, the user's dataset file, target country with respective virtual population settings, external models' definition with respective fitted parameters, simulation experiment options including diseases selection, and intervention scenario, and finally the results output location.
 
 ```json
 {
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
     "version": 2,
+    "data": {
+        "source": "https://github.com/imperialCHEPI/healthgps-data/releases/download/20240624/data_20240624.zip",
+        "checksum": "b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c"
+    },
     "inputs": {
         "dataset": {},
         "settings": {
             "country_code": "FRA",
             "size_fraction": 0.0001,
-            "age_range": [ 0, 100 ]
+            "age_range": [0, 100]
         }
     },
     "modelling": {
@@ -55,6 +60,14 @@ The high-level structure of the [configuration][configjson] file used to create 
     }
 }
 ```
+
+### Schema
+
+The `$schema` property indicates the [JSON schema](https://json-schema.org/) which should be used for this model. *Health GPS* uses JSON schemas to validate various JSON input files. Where backwards compatibility is broken in the file format (i.e. for new versions of *Health GPS*), new versions of JSON schemas will be produced.
+
+### Data
+
+The ***data*** section tells *Health GPS* where the [backend data storage](#backend-storage) can be found. This can be provided as a URL (with SHA256 checksum) or as a path to a local directory. By using a URL, it ensures that anyone else using the model will also be using the same static data, which should help make model runs more reproducible.
 
 ### Inputs
 
@@ -656,7 +669,7 @@ The simulation detailed results file contains a dynamic number of columns, which
 
 The column **count** gives the *number of individuals* in the *row group*, the remaining columns contain average values for the group's data at each column. This result file can easily be used to construct pivot tables and plots. The column *count* can be combined with the averaged columns to estimate other statistical measures, such as *variance* and *standard deviation*.
 
-[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/model/France.Config.json "Configuration file example"
+[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
 
 [datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"
 
