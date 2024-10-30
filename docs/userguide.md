@@ -544,37 +544,7 @@ Defines the file storage for disease cost analysis for country specific data con
 
 ## Running Health-GPS
 
-Health-GPS has been designed to be portable, producing stable, and comparable results cross-platform. Only minor and insignificant rounding errors should be noticeable, these errors are attributed to the C++ application binary interface (ABI), which is not guaranteed to compatible between two binary programs cross-platform, or even on same platform when using different versions of the C++ standard library.
-
-The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health-GPS application on each platform using the include example model and reference dataset.
-
-## Windows OS
-
-You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2022 x64` version to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
-2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
-4. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
-`-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `C:/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
-
-## Linux OS
-
-You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
-2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
-4. Open a command terminal and navigate to the directory used in step 2 (xxx).
-5. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
-`-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `$HOME/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
-
-> See [Quick Start](getstarted) for details on the example dataset and known issues.
-
-The included model and dataset provide an complete exemplar of the files and procedures described in this document. Users should use this exemplar as a starting point when creating production environments to aid the design and testing of intervention policies.
+For instructions on how to install and run *Health GPS*, see [getting started](getstarted).
 
 ### Results
 
