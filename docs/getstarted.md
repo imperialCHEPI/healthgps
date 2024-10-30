@@ -30,6 +30,8 @@ Output data will be written to a subfolder of your home directory, `healthgps/re
 
 ## Results
 
+NB: For analysis and visualisation of *Health GPS* output data, we recommend the [`healthgpsrvis` R package](https://imperialchepi.github.io/healthgpsrvis/), but here we show how to do some analysis manually.
+
 The current model output format is JSON (JavaScript Object Notation), an open standard file format designed for data interchange in human-readable text. It is language-independent; however, all programming language and major data science tools supports JSON format because they have libraries and functions to read/write JSON structures. To read the model results in [R](https://www.r-project.org/), for example, you need the [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) package:
 
 ```R
