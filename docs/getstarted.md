@@ -4,40 +4,31 @@
 
 # Quick Start
 
-The **Health-GPS** application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
+The *Health GPS* application provides a *Command Line Interface* (CLI) and runs on *Windows 10 (and newer)* and *Linux* devices. All supported options are provided to the model via a [configuration][configjson] file (JSON format), including population size, intervention scenarios and number of runs. Users are encouraged to start exploring the model by using the included example dataset, changing the provided configuration file, and running the model.
 
-Pre-compiled binaries for `Windows` and `Linux` are available on the [releases page](https://github.com/imperialCHEPI/healthgps/) for generic x86-64 CPUs. If you want a version of the program tailored to your specific CPU (e.g. for HPC) or you wish to develop Health-GPS, read on for instructions on how to build from source.
-
-## Windows OS
-
-You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2022 x64` version to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
-2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
-4. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
-`-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `C:/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
-
-## Linux OS
-
-You may need to install the latest [GCC Compiler](https://gcc.gnu.org) in your system, the
-application requires `GCC 11.1` or newer to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
-2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
-4. Open a command terminal and navigate to the directory used in step 2 (xxx).
-5. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
-`-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `$HOME/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
-
-**NOTE:** *The development datasets provided in this example are limited to 2010-2050 time frame. It is provided for demonstration purpose to showcase the model's usage, input and output data formats. The backend data storage can be populated with new datasets, the [index.json][datastore] file defines the storage structure and file names, it also stores metadata to identify the data sources and respective limits for validation.*
+Pre-compiled binaries for `Windows` and `Linux` are available on the [releases page](https://github.com/imperialCHEPI/healthgps/) for generic x86-64 CPUs. If you want a version of the program tailored to your specific CPU (e.g. for HPC) or you wish to develop *Health GPS*, follow the instructions to build from source in the [developer guide](development). To use the binaries, you will need to unzip the downloaded file to a directory of your choice.
 
 ***Known Issue:*** `Windows 10` support for VT (Virtual Terminal) / ANSI escape sequences is turned OFF by default, this is required to display colours on console / shell terminals. You can enable this feature manually by editing windows [registry keys](https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1300251#1300251), however we recommend the use of [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), which is a modern terminal application for command-line tools, has no such limitation, and is now distributed as part of the `Windows 11` installation.
 
-# Results
+## Example usage
+
+*Health GPS* requires model configuration files in order to be able to run. These files can either be in a local directory or as a zip file on the local machine or on the web. Here, we will use a model available from the [Health-GPS examples repository]. (We are assuming that you have changed directories to wherever you have built or extracted the Health-GPS binaries.)
+
+For Windows:
+
+```cmd
+.\HealthGPS.Console.exe -c https://github.com/imperialCHEPI/healthgps-examples/releases/download/20240907/HLM_France.zip
+```
+
+For Linux:
+
+```sh
+./HealthGPS.Console -c https://github.com/imperialCHEPI/healthgps-examples/releases/download/20240907/HLM_France.zip
+```
+
+Output data will be written to a subfolder of your home directory, `healthgps/results/france`.
+
+## Results
 
 The current model output format is JSON (JavaScript Object Notation), an open standard file format designed for data interchange in human-readable text. It is language-independent; however, all programming language and major data science tools supports JSON format because they have libraries and functions to read/write JSON structures. To read the model results in [R](https://www.r-project.org/), for example, you need the [`jsonlite`](https://cran.r-project.org/web/packages/jsonlite/vignettes/json-aaquickstart.html) package:
 
@@ -103,5 +94,3 @@ show(p)
 In a similar manner, the resulting dataset `df`, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
 [configjson]:https://github.com/imperialCHEPI/healthgps/blob/main/example/France.Config.json "Configuration file example"
-
-[datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"
