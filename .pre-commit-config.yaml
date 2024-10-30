@@ -32,7 +32,6 @@ repos:
     rev: v0.42.0
     hooks:
       - id: markdownlint-fix
-        args: [--disable, MD013, MD041, --]
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:
