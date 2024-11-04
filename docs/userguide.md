@@ -6,27 +6,32 @@
 
 The **Health-GPS** microsimulation is a *data driven* modelling framework, combining many disconnected data sources to support the various interacting modules during a typical simulation experiment run. The framework provides a pre-populated *backend data storage* to minimise the learning curve for simple use cases, however advance users are likely to need a more in-depth knowledge of the full modelling workflow. A high-level representation of the microsimulation user workflow is shown below, it is crucial for users to have a good appreciation for the general dataflows and processes to better design experiments, configure the tool, and quantify the results.
 
-|![Health-GPS Workflow](images/workflow_diagram.svg)|
-|:--:|
-|*Health-GPS Workflow Diagram*|
+| ![Health-GPS Workflow](images/workflow_diagram.svg) |
+|:---------------------------------------------------:|
+|            *Health-GPS Workflow Diagram*            |
 
 As with any simulation model, the workflow starts with data, it is the user's responsibility to process and analyse the input data, define the model’s hierarchy, fit parameters to data, and design intervention. A *configuration* file is used to provide the user's datasets, model parameters, and control the simulation experiment runtime. The model is invoked via a *Command Line Interface* (CLI), which validates the configuration contents, loads associated files to create the model inputs, assembles the microsimulation with the required modules, evaluates the experiment, and writes the results to a chosen output *file* and *folder*. Likewise, it is the user's responsibility to analyse and quantify the model results and draw conclusions on the cost-effectiveness of the intervention.
 
 > See [Quick Start](getstarted) to get started using the microsimulation with a working example.
 
-# 1.0 Configuration
+## Configuration
 
-The high-level structure of the [configuration][configjson] file used to create the model inputs, in `JSON` format, is shown below. The structure defines the schema version, the user's dataset file, target country with respective virtual population settings, external models' definition with respective fitted parameters, simulation experiment options including diseases selection, and intervention scenario, and finally the results output location.
+The high-level structure of the [configuration][configjson] file used to create the model inputs, in JSON format, is shown below. The file should be called `config.json` and in the same folder as the other configuration files. The structure defines the schema version, the user's dataset file, target country with respective virtual population settings, external models' definition with respective fitted parameters, simulation experiment options including diseases selection, and intervention scenario, and finally the results output location.
 
 ```json
 {
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
     "version": 2,
+    "data": {
+        "source": "https://github.com/imperialCHEPI/healthgps-data/releases/download/20240624/data_20240624.zip",
+        "checksum": "b68abc8d40b937d377aa7357bff66a1f4f5196da5b867f7ca88d02b37d2ebb5c"
+    },
     "inputs": {
         "dataset": {},
         "settings": {
             "country_code": "FRA",
             "size_fraction": 0.0001,
-            "age_range": [ 0, 100 ]
+            "age_range": [0, 100]
         }
     },
     "modelling": {
@@ -56,7 +61,15 @@ The high-level structure of the [configuration][configjson] file used to create 
 }
 ```
 
-## 1.1 Inputs
+### Schema
+
+The `$schema` property indicates the [JSON schema](https://json-schema.org/) which should be used for this model. *Health GPS* uses JSON schemas to validate various JSON input files. Where backwards compatibility is broken in the file format (i.e. for new versions of *Health GPS*), new versions of JSON schemas will be produced.
+
+### Data
+
+The ***data*** section tells *Health GPS* where the [backend data storage](#backend-storage) can be found. This can be provided as a URL (with SHA256 checksum) or as a path to a local directory. By using a URL, it ensures that anyone else using the model will also be using the same static data, which should help make model runs more reproducible.
+
+### Inputs
 
 The ***inputs*** section sets the target country information, the *file* sub-section provides details of data used to fit the model, including file name, format, and variable data type mapping with the model internal types: *string, integer, float, double*. The user's data is required only to provide a visual validation of the initial virtual population created by the model, this feature should be made optional in the future, the following example illustrates the data file definition:
 
@@ -87,7 +100,7 @@ The ***inputs*** section sets the target country information, the *file* sub-sec
 ...
 ```
 
-## 1.2 Modelling
+### Modelling
 
 The ***modelling*** section, defines the *SES* model, and the *risk factor* model with factors identifiers, hierarchy level, data range and mapping with the model's virtual individual properties (proxy). The *risk_factor_models* sub-section provides the fitted parameters file, `JSON` format, for each hierarchical *model type*, the *dynamic risk factor*, if exists, can be identified by the respective property. Finally, the *baseline adjustments* sub-section provides the *adjustment files* for each hierarchical *model type* and *gender*.
 
@@ -131,7 +144,7 @@ The ***modelling*** section, defines the *SES* model, and the *risk factor* mode
 
 The *risk factor model* and *baseline adjustment* files have their own schemas and formats requirements, these files structure are defined separately below, after all the *configuration file* sections.
 
-## 1.3 Running
+### Running
 
 The ***running*** section defines simulation *run-time* period, *start/stop time* respectively in years, pseudorandom generator seed for reproducibility or empty for auto seeding, the number of *trials to run* for the experiment, and scenarios data synchronisation *timeout* in milliseconds. The model supports a dynamic list of diseases in the backend storage, the *diseases* array contains the selected *disease identifiers* to include in the experiment. The *interventions* sub-section defines zero or more *interventions types*, however, only *one intervention at most* can be *active* per configuration, the *active_type_id* property identifies the *active intervention*, leave it *empty* for a *baseline* scenario only experiment.
 
@@ -189,7 +202,7 @@ The ***running*** section defines simulation *run-time* period, *start/stop time
 
 Unlike the diseases *data driven* definition, *interventions* can have specific data requirements, rules for selecting the target population to intervening, intervention period transition, etc, consequently the definition usually require supporting code implementation. Health-GPS provides an *interface* abstraction for implementing new interventions and easily use at runtime, however the implementation must also handle the required input data.
 
-## 1.4 Output
+### Output
 
 Finally, ***output*** section repeated below, defines  the maximum number of *comorbidities* to include in the results, and the output *folder and file name*. The configuration parser can handle *folder* name with *environment variables* such as `HOME` on Linux shown below, however care must be taken when running the model cross-platform with same configuration file. Likewise, *file name* can have a `TIMESTAMP` *token*, to enable multiple experiments to write results to the same folder on disk without file name crashing.
 
@@ -205,13 +218,13 @@ Finally, ***output*** section repeated below, defines  the maximum number of *co
 
 The file name can have a *job_id*, passed as a CLI parameter, added to the end when running the simulation in batch mode, e.g., HPC cluster array. This feature enables the batch output files to be collated together to produce the complete results dataset for analysis.
 
-## 1.5 Risk Factor Models
+### Risk Factor Models
 
 Health-GPS requires *two types* of risk factor models to be externally created by the user, fitted to data, and provided via configuration: *static* and *dynamic* respective. The *first type* is used to *initialise* the virtual population with the current risk factor trends, the *second type* is used to *update* the population attributes, accounting for the dynamics of the risk factors as time progresses in the simulation and individual's age.
 
 The *risk factor* models definition adopts a semi-parametric approach based on a regression models with sampling from the residuals to conserve the original data distributions. Each risk factor model file contains the various fitted regression models' coefficients, residuals, and other related values, that must be provided in a consistent format independent of the fitting tool.
 
-### 1.5.1 Static
+#### Static
 
 Initialise the virtual population, created by the model, with risk factor trends like the real population in terms of statistical distributions of the modelled variables. In addition to the regression fitted values, the *static* model includes transition matrix, inverse transition matrix, and independent residuals for sampling to conserve the correlations.
 
@@ -294,7 +307,7 @@ The structure of a *static* model file is shown below, the size of the fitted re
 
 The file structure has been defined for completeness, not all values are used by the current model, for example, the coefficients goodness of fit (GoF) values, however, these values are negligible when compared with the large arrays and matrices of size N. The *levels* matrices calculated using Independent Component Analysis (ICA). are stored using *row-major* order, *m* is the transition matrix, *w* the inverse transition matrix, and *s* the independent residuals distribution for variables at each *level*.
 
-### 1.5.2 Dynamic
+#### Dynamic
 
 Having initialised the virtual population risk factors, the *dynamic model* projects individuals' risk factors over time using *delta* changes to current values. The structure of a *dynamic* model file is shown below, only the factors variable range, regression coefficients and residuals standard deviation are required, this model type definition is *lite* and can scale to any size datasets.
 
@@ -365,7 +378,7 @@ The first two properties document the model's target *country*, and the *percent
 
 The ***equations*** section contains the model's definition by *age group* and *gender*. The number of *age group* models is dynamic, the only constraint is that age groups must cover the *age range* required in the *configuration file* without any internal overlap.
 
-### 1.5.3 Baseline Adjustments
+#### Baseline Adjustments
 
 To manage unknown trends in risk factors affecting the choices of baseline scenario, users can define *adjustments* values to keep the distributions of risk factors by *gender* and *age* constant over time. Separated files are defined, in comma separated format (CSV), for each combination of *model type* and *gender*, the *adjustment files* content must cove the *age range* required by the configuration settings. The structure and contents of an *adjustment* file is illustrated below.
 
@@ -383,13 +396,15 @@ Age,Sodium,Protein,Fat,PA,Energy,BMI
 
 The values in the adjustment files are *added* to the *model values*, therefore a zero-adjustment value can be used to disable *baseline adjustments* for a specific *risk factor* variable.
 
-# 2.0 Backend Storage
+## Backend Storage
 
 Health-GPS by default uses a *file-based backend storage*, which implements the [Data Model](datamodel) to provides a reusable, *reference dataset* using a [standardised](datamodel) format for improved usability, the dataset can easily be expanded with new data without code changes. The contents of the file-based storage is defined using the [index.json][datastore] file, which must live at the *root* of the storage's *folder structure* as shown below.
 
-|![File-based Datastore](images/file_based_storage.png)|
-|:--:|
-|*File-based Backend Datastore example*|
+As mentioned previously, the data store can be provided as a URL to ensure reproducibility. Different versions of the reference data set are available in the [Health-GPS data repository](https://github.com/imperialCHEPI/healthgps-data).
+
+| ![File-based Datastore](images/file_based_storage.png) |
+|:------------------------------------------------------:|
+|         *File-based Backend Datastore example*         |
 
 The *index file* defines schema version, data groups, physical storage folders relative to the root folder, file names pattern, and stores metadata to identify the data sources, licences, and data limits for consistency validation. The data is indexed and stored by country files taking advantage of the model's workflow, this minimises data reading time and enables the storage to scale with many countries.
 
@@ -397,7 +412,7 @@ The data model defines many data hierarchies, which have been flatten for file-b
 
 ```json
 {
-    "version": 2,
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index.json",
     "country": {
         "format": "csv",
         "delimiter": ",",
@@ -412,12 +427,12 @@ The data model defines many data hierarchies, which have been flatten for file-b
     "demographic": {},
     "diseases": {
         "disease": {
-            "relative_risk":{ },
-            "parameters":{ },
+            "relative_risk": {},
+            "parameters": {},
         },
-        "registry":[ ]
+        "registry": []
     },
-    "analysis":{ }
+    "analysis": {}
 }
 ```
 
@@ -427,7 +442,7 @@ The ***country*** data file lives at the *root* of the folder structure as shown
 
 The file store definition make use of *tokenisation* to represent dynamic contents in *folders* and *files* name. *Tokens* are substituted by their respective values in the file storage contents, for example, tokens {COUNTRY_CODE} and {GENDER} represent a *country unique identifier* and the *gender value* respectively. At runtime, tokens maps back to the storage's *folders* and *files* name when replaced by the Data API calls parameters, dynamically reconstructing *paths* and *files* name.
 
-## 2.1 Demographic
+### Demographic
 
 Defines the file storage for country specific data containing historic estimates and projections for various demographics measures by *time, age* and *gender*. The datasets limits for *age* and *time* variables are stored for validation, the *projections* property marks the starting point, in time, for projected values. Data files are stored in separated folders for *population*, *mortality* and demographic *indicators* respectively as shown below, *file names* must include the *country's unique identifier* in place of the COUNTRY_CODE token.
 
@@ -461,7 +476,7 @@ Defines the file storage for country specific data containing historic estimates
 ...
 ```
 
-## 2.2 Diseases
+### Diseases
 
 Defines the file storage for country specific data containing cross-sectional estimates by *age* and *gender* for various diseases measures, disease relative risk to other diseases, risk factor relative risk to diseases, and cancer parameters. Each ***disease*** is defined in a separate folder named using the *disease identifier* in place of the {DISEASE_TYPE} token, estimates for disease incidence, prevalence, mortality and remission are stored in a single file per country, *files name* must include the *country's unique identifier* in place of the COUNTRY_CODE token as shown below. Cancer ***parameters*** are stored with same files name per country.
 
@@ -521,7 +536,7 @@ To add a new disease to the storage:
 
 The disease *id* value now can be used in the *configuration file* to select *diseases* to include in a given simulation experiment.
 
-## 2.3 Analysis
+### Analysis
 
 Defines the file storage for disease cost analysis for country specific data containing cross-sectional estimates by *age* for *burden of disease* measures. The datasets limit for the *age* variable is stored for validation, the *time_year* property identifies the cross-sectional data point for documentation purpose. The *disability weights* file provides global values for the disease analysis for all countries.
 
@@ -542,41 +557,11 @@ Defines the file storage for disease cost analysis for country specific data con
 ...
 ```
 
-# 4.0 Running
+## Running Health-GPS
 
-Health-GPS has been designed to be portable, producing stable, and comparable results cross-platform. Only minor and insignificant rounding errors should be noticeable, these errors are attributed to the C++ application binary interface (ABI), which is not guaranteed to compatible between two binary programs cross-platform, or even on same platform when using different versions of the C++ standard library.
+For instructions on how to install and run *Health GPS*, see [getting started](getstarted).
 
-The code repository provides `x64` binaries for `Windows` and `Linux` Operating Systems (OS), unfortunately, these binaries have been created using tools and libraries specific to each platform, and consequently have very different runtime requirements. The following step by step guide illustrates how to run the Health-GPS application on each platform using the include example model and reference dataset.
-
-## Windows OS
-
-You may need to install the latest [Visual C++ Redistributable](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160) on the machine, the application requires the `2022 x64` version to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Windows from the repository.
-2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
-4. Open a command terminal, e.g. [Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701?rtc=1&activetab=pivot:overviewtab), and navigate to the directory used in step 2 (xxx).
-5. Run: `X:\xxx> .\HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
-`-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `C:/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
-
-## Linux OS
-
-You may need to install the latest [GCC Compiler](https://gcc.gnu.org) and [Intel TBB](https://github.com/oneapi-src/oneTBB) runtime libraries in your system, the application requires `GCC 11.1` and `TBB 2018` or newer versions to be installed.
-
-1. Download the latest [release](https://github.com/imperialCHEPI/healthgps/releases) *source code* and *binaries* for Linux from the repository.
-2. Unzip both files content into a local directory of your choice (xxx).
-3. Download the [HLM_France](https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France) directory and extract it to a directory named `example` in your Health-GPS directory.
-4. Open a command terminal and navigate to the directory used in step 2 (xxx).
-5. Run: `user@machine:~/xxx$ ./HealthGPS.Console.exe -f healthgps/example/France.Config.json -s healthgps/data` where `-f` gives the *configuration file* full-name and
-`-s` the path to the root folder of the *backend storage* respectively.
-6. The default output folder is `$HOME/healthgps/results/france`, but this can be changed in the *configuration file* `(France.Config.json)`.
-
-> See [Quick Start](getstarted) for details on the example dataset and known issues.
-
-The included model and dataset provide an complete exemplar of the files and procedures described in this document. Users should use this exemplar as a starting point when creating production environments to aid the design and testing of intervention policies.
-
-## 4.1 Results
+### Results
 
 The model results file structure is composed of two parts: *experiment metadata* and *result array* respectively, each entry in the *result* array contains the *results* of a complete simulation run for a *scenario* as shown below. The simulation results are unique identified the source scenario, run number and time for each result row, the *id* property identifies the *message type* within the message bus implementation. The model also output a detailed results file in Comma Separated Values (.csv), this associated output file name is included in the global summary file as shown below.
 
@@ -621,9 +606,9 @@ View(data)
 
 The above script reads the results data from file and makes the data variable available in R for analysis as shown below, it is equally easy to write a R structure to a JSON string or file.
 
-|![Health-GPS Results](images/model_results.png)|
-|:--:|
-|*Health-GPS results in R data frame example*|
+| ![Health-GPS Results](images/model_results.png) |
+|:-----------------------------------------------:|
+|  *Health-GPS results in R data frame example*   |
 
 The results file contains the output of all simulations in the experiment, *baseline*, and *intervention* scenarios over one or more runs. The user should not assume data order during analysis of experiments with intervention scenarios, the results are published by both simulations running in parallel *asynchronously* via messages, the order in which the messages arrive at the destination queue, before being written to file is not guaranteed. A robust method to tabulate the results shown above, is to always group the data by: ```data.result(source, run, time)```, to ensure that the analysis algorithms work for both types of simulation experiments. For example, using the results data above in R, the following script will tabulate and plot the experiment's BMI projection.
 
@@ -668,13 +653,13 @@ p <- ggplot(data=df, aes(x=time, y=bmi, group=interaction(scenario, gender))) +
 show(p)
 ```
 
-|![Experiment BMI Projection](images/bmi_projection.svg)|
-|:--:|
-|*Experiment BMI projection example*|
+| ![Experiment BMI Projection](images/bmi_projection.svg) |
+|:-------------------------------------------------------:|
+|           *Experiment BMI projection example*           |
 
 In a similar manner, the resulting dataset *`df`*, can be re-created and expanded to summarise other variables of interest, create results tables and plots to better understand the experiment.
 
-### 4.1.1 Detailed Results
+#### Detailed Results
 
 The simulation detailed results file contains a dynamic number of columns, which depends on the risk factor model definition and diseases selection. The file's data is grouped by **sex** and **age**, each row in the file can be *unique identified* by the following columns:
 
@@ -686,24 +671,24 @@ The simulation detailed results file contains a dynamic number of columns, which
 
 The column **count** gives the *number of individuals* in the *row group*, the remaining columns contain average values for the group's data at each column. This result file can easily be used to construct pivot tables and plots. The column *count* can be combined with the averaged columns to estimate other statistical measures, such as *variance* and *standard deviation*.
 
-[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/model/France.Config.json "Configuration file example"
+[configjson]:https://github.com/imperialCHEPI/healthgps-examples/tree/main/HLM_France/config.json "Configuration file example"
 
-[datastore]:https://github.com/imperialCHEPI/healthgps/blob/main/data/index.json "Backend file based data store index file"
+[datastore]:https://github.com/imperialCHEPI/healthgps-data/blob/main/data/index.json "Backend file based data store index file"
 
-## 5.0 HPC Running
+### HPC Running
 
 Although Health-GPS is compatible with most High Performance Computing (HPC) system, this section contents are specific for using *Health-GPS software* at the *Imperial College London* [HPC system](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/), which users need to register to *get access* and support. This HPC is **Linux** based, therefore users *must* be familiar with *Unix command line* and *shell script* to properly navigate the file system, run programs, and automate repetitive tasks.
 
 Every software package installed in the HPC is called a **module**. The *module system* for centrally installed packages, must be used to find, load and unload installed modules and dependencies required to use a software package. The following *module commands* are essential to get started with Imperial HPC system:
 
-| Command             | Description                                            |
-|:---                 |:---                                                    |
-|module avail         | List all modules available                             |
-|module avail tools   | Find all available versions of a software module       |
-|module add tools/dev | Load a module to be used into the job or user own space|
-|module list          | List all loaded modules                                |
-|module rm tools/dev  | Remove a loaded module version                         |
-|module purge         | Unload all loaded modules, clear all modules           |
+| Command              | Description                                             |
+|:---------------------|:--------------------------------------------------------|
+| module avail         | List all modules available                              |
+| module avail tools   | Find all available versions of a software module        |
+| module add tools/dev | Load a module to be used into the job or user own space |
+| module list          | List all loaded modules                                 |
+| module rm tools/dev  | Remove a loaded module version                          |
+| module purge         | Unload all loaded modules, clear all modules            |
 
 > **Warning**
 > Modules name are *case sensitive* for both script and search.
@@ -716,13 +701,13 @@ Module packages can be installed *globally* within the HPC system, old style, or
 
 Furthermore, the [Portable Batch System](https://en.wikipedia.org/wiki/Portable_Batch_System) (PBS), a batch job and computer system resource management package, is used by the Imperial HPC for job scheduling and users also need learn the PBS commands. A list of useful PBS commands used to submit, monitor, modify, and delete jobs can be found below:
 
-| Command | Action | Example    | Description                                     |
-|:---     |:---    | :---       | :---                                            |
-| qsub    | Submit | qsub myjob | Submits the job "myjob" for the execution       |
-| qstat   | Monitor| qstat        | Show the status of all the jobs               |
-| ' '     | ' '    | qstat job_id | Show the status of single job                 |
-| qalter  | Modify | qalter -l ncpus = 4 job_id| Changes the attributes of the job|
-| qdel    | Delete | qdel job_id  | Deletes the job with job id = job_id          |
+| Command | Action  | Example                    | Description                               |
+|:--------|:--------|:---------------------------|:------------------------------------------|
+| qsub    | Submit  | qsub myjob                 | Submits the job "myjob" for the execution |
+| qstat   | Monitor | qstat                      | Show the status of all the jobs           |
+| ' '     | ' '     | qstat job_id               | Show the status of single job             |
+| qalter  | Modify  | qalter -l ncpus = 4 job_id | Changes the attributes of the job         |
+| qdel    | Delete  | qdel job_id                | Deletes the job with job id = job_id      |
 
 An introduction to the PBS is beyond this tutorial, users are encouraged to attend dedicated [courses](https://www.imperial.ac.uk/students/academic-support/graduate-school/students/doctoral/professional-development/research-computing-data-science/courses/) provided by Imperial's professional development programme to familiarise themselves with the HPC system and usage guidelines. *This tutorial provides the basic steps required for finding, loading, and using installed Health-GPS software within the Imperial HPC system*.
 
@@ -766,7 +751,7 @@ Every job produces two log files, by default alongside the submitted job script,
 
 Environment variable: `$PBS_O_WORKDIR` points to the submit directory and will exist while the job is running. This is where you submitted your job, usually a directory where your job script resides, and this variable can be used in a job script. The console output log file (`healthgps.pbs.txt`) is optional, it can be very useful when diagnosing Health-GPS configuration problem. This file also provides detailed simulation run-time information that can be harvested to quantify performance.
 
-## 5.1 Array job script
+### Array job script
 
 The above example runs a single Health-GPS configuration, like a desktop computer (sequential), however, to run experiments with thousands of simulations, parallelisation is required, and HPC system when used effectively, can make a huge difference. One way of parallelising Health-GPS experiments using Imperial HPC is to use *array job* instead of *single job* per script, this breaks down a large experiment into small batches to be evaluated as parallel jobs.
 
@@ -808,18 +793,18 @@ To repeat the full experiment, keep track of the configuration file, Health-GPS 
 
 **Important**: The HPC machine configuration can potentially influence the results due to floating-point calculation, Health-GPS will use shared libraries installed in the system such as C++ standard library, however the differences should be negligible within the machine numerical precision.
 
-### 5.2 HPC Data Store
+#### HPC Data Store
 
 All computers in the Imperial HPC are connected to one parallel filesystem,
 [Research Data Store](https://www.imperial.ac.uk/admin-services/ict/self-service/research-support/rcs/service-offering/rds/) (RDS) for storing large volume of non-sensitive or personally-identifiable research data. This service is available for non-HPC users too, but in both cases, users must register to get access to the RDS service.
 
 In the case of the HPC user account, you get access to:
 
-| Command     | Description                                                          |
-|:---         |:---                                                                  |
-|$HOME        | Home directory, personal working space                               |
-|$EPHEMERAL   | Additional individual working space, files are deleted after 30 days |
-|$RDS_PROJECT | Allocated project shared space *if your project has any (paid for one)*  |
+| Command      | Description                                                             |
+|:-------------|:------------------------------------------------------------------------|
+| $HOME        | Home directory, personal working space                                  |
+| $EPHEMERAL   | Additional individual working space, files are deleted after 30 days    |
+| $RDS_PROJECT | Allocated project shared space *if your project has any (paid for one)* |
 
 The storages available for each user is usually printed during login to the HPC, to check your usage at any point, use command `quota -s`.
 
@@ -846,7 +831,7 @@ scp -r username@login.hpc.ic.ac.uk:~/example local_target_folder
 
 You can use wildcards characters such as `*.txt` to refer to multiple files or folders at once from the `scp` command line.
 
-### 5.3 HPC Example
+#### HPC Example
 
 The [STOP project](https://www.stopchildobesity.eu/) has RDS allocated storage space for managing the research data, this example puts together the above information to illustrate how to use the Health-GPS software within the Imperial HPC and RDS services.
 

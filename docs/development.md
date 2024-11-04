@@ -6,42 +6,57 @@
 
 The *Health GPS* software is written in modern, standard ANSI C++, targeting the [C++20 version](https://en.cppreference.com/w/cpp/20) and using the C++ Standard Library. The project is fully managed by [CMake](https://cmake.org/) and [Microsoft Visual Studio](https://visualstudio.microsoft.com), the code base is portable but requires a C++20 compatible compiler to build. The development toolset users [Ninja](https://ninja-build.org/) for build, [vcpkg](https://github.com/microsoft/vcpkg) package manager for dependencies, [googletest](https://github.com/google/googletest) for unit testing and [GitHub Actions](https://docs.github.com/en/actions) for continuous integration (CI) builds and testing.
 
-To start working on the *Health GPS* code base, the suggested development machine needs:
+## Building from source
 
-1. Windows 10 or newer, [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/) enabled and Linux distribution of choice installed.
-2. [Git](https://git-scm.com/downloads) 2.3 or newer.
-3. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html).
-4. [Ninja](https://ninja-build.org/) 1.10 or newer.
-5. [Microsoft Visual Studio](https://visualstudio.microsoft.com) 2022 or newer with CMake presets integration.
-6. [GCC](https://gcc.gnu.org/) 11.1 or newer installed on *Linux* environment.
-7. The latest [vcpkg](https://github.com/microsoft/vcpkg) installed globally for Visual Studio projects, and the `VCPKG_ROOT` *environment variable* set to the installation directory.
-8. Internet connection.
+### Requirements
 
-Download the *Health GPS* source code to the local machine, like so:
+To build *Health GPS* from source, you will first need a C++ compiler compatible with the C++20 standard. We recommend that you use [`g++`](https://gcc.gnu.org) on Linux and [Microsoft Visual Studio](https://visualstudio.microsoft.com) on Windows (the Community edition is fine).
 
-```cmd
-> git clone https://github.com/imperialCHEPI/healthgps
+In addition, you will also need:
+
+1. [Git](https://git-scm.com/downloads)
+2. [CMake](https://cmake.org/) 3.20 or newer with support for [presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html) (included with Visual Studio)
+3. [Ninja](https://ninja-build.org/) (included with Visual Studio)
+
+### Installing vcpkg
+
+We use vcpkg for building and bundling this project's dependencies so you will need to install it. Follow [the instructions on the vcpkg website] to get started.
+
+Once you have installed vcpkg, you will also need to ensure that the `VCPKG_ROOT` environment variable is set to the installation directory.
+
+### Downloading the source code
+
+Download the *Health GPS* source code to your machine, like so:
+
+```sh
+git clone https://github.com/imperialCHEPI/healthgps
 ```
+
+By default, the version of the code that will be checked out is the latest version on the `main` branch. If you want to build another version, e.g. a release, you next need to change to the `healthgps` directory and run:
+
+```sh
+git checkout v1.2.2.0
+```
+
+(for example).
 
 Finally, open the `healthgps` folder in Visual Studio and hit build. The first build takes considerably longer than normal due to the initial work required by CMake and the package manager.
 
->**NOTE:** *This is the current toolset being used for developing the HealthGPS model,
->however CMake is supported by VS Code and many other IDE of choice, e.g. the model is
->current being compiled and built on Ubuntu Linux 22.04 LTS using only the CMake command
->line.*
+### Building Health-GPS
 
-## GitHub flow
+If you are using Visual Studio, you can just open the `healthgps` folder in your IDE and it should configure the project for building automatically.
 
-Health-GPS uses the GitHub flow branching pattern for git. For more information, see the
-[GitHub flow guide](https://imperialchepi.github.io/healthgps/github_flow)
+Otherwise, you will need to build it via the command line using [CMake](https://cmake.org) (which is also used for building tests and documentation).
 
-## CMake Build
+Several CMake presets are provided for different combinations of build type and operating system. To view the list, run:
 
-Health-GPS source code is configured to use [CMake](https://cmake.org/) by default for development, building and testing. The following steps are recommended for building and testing Health-GPS from source code without modification.
-
-```cmd
+```sh
 cmake --list-presets=all
+```
 
+The following commands will build the project in release mode on Windows and Linux, respectively:
+
+```sh
 # Windows
 cmake --preset='windows-release'
 cmake --build --preset='release-build-windows' --target install --config Release
@@ -51,11 +66,15 @@ cmake --preset='linux-release'
 cmake --build --preset='release-build-linux' --target install --config Release
 ```
 
+(Release mode produces more optimised code at the cost of longer build times and harder-to-debug binaries. You should primarily build in debug mode for development.)
+
 The `HealthGPS` binaries will now be inside the `healthgps/out/install/[preset]/bin` directory.
 
-To run the unit tests:
+## Building unit tests
 
-```cmd
+To build and execute the unit tests, run:
+
+```sh
 # Windows
 cmake --preset='windows-debug'
 cmake --build --preset='debug-build-windows'
@@ -67,22 +86,17 @@ cmake --build --preset='debug-build-linux'
 ctest --preset='core-test-linux'
 ```
 
-All available options are defined using CMake *presets* in the `CMakePresets.json` file, which also
-declare *build presets* and other options previously provided to [CMake](https://cmake.org/) via
-command line arguments. The use of *presets* provides consistent build scripts across development
-and CI/CD environments using source control for reproducibility.
+## Building API documentation
 
-## Building documentation
-
-Technical documentation for the latest version of Health-GPS [is available on the
-website](https://imperialchepi.github.io/healthgps/).
+API documentation for the latest version of Health-GPS [is available on the
+GitHub Pages site](https://imperialchepi.github.io/healthgps/).
 
 If you wish to build documentation locally, you need [Doxygen](https://www.doxygen.nl/) installed.
 
 You must enable the `BUILD_DOC` CMake option, e.g.:
 
-```cmd
-> cmake --preset=linux-debug -DBUILD_DOC=ON
+```sh
+cmake --preset=linux-debug -DBUILD_DOC=ON
 ```
 
 ## Running `pre-commit` hooks
@@ -94,8 +108,8 @@ repository. (Note that this step is only for Health-GPS developers, not end user
 Once you have [installed `pre-commit`](https://pre-commit.com/#installation), you should
 install the hooks into your local clone of the Health-GPS repository, like so:
 
-```cmd
-> pre-commit install
+```sh
+pre-commit install
 ```
 
 Now, every time attempt to make a git commit, your changes will be checked against the
@@ -110,8 +124,8 @@ allows you to run `clang-tidy` across your CPU cores.
 You need to tell it the path to the `compile_commands.json` file, which is generated by
 CMake, like so (on Linux):
 
-```cmd
-> run-clang-tidy -p out/build/linux-debug
+```sh
+run-clang-tidy -p out/build/linux-debug
 ```
 
 `clang-tidy` can automatically generate fixes for some problems. To do this, pass the
@@ -228,9 +242,9 @@ The software application provides a Command Line Interface (CLI) for the user to
 
 To run a microsimulation experiment, at least one simulation engine and one simulation executive must be created, the HealthGPS class implements the engine, and Runner class implements the executive respectively as shown below. To create a simulation engine instance, the user must provide a SimulationDefinition with the model configuration, the SimulationModuleFactory with builders for each module type registered, and one implementation of the EventAggregator interface for external communication.
 
-|![Composing Health-GPS](images/compose_simulation.svg)|
-|:--:|
-|*Composing a Health-GPS Microsimulation*|
+| ![Composing Health-GPS](images/compose_simulation.svg) |
+|:------------------------------------------------------:|
+|        *Composing a Health-GPS Microsimulation*        |
 
 The simulation executive requires a RandomBitGenerator interface implementation for master seed generation and an implementation of the EventAggregator interface, in this example the DefaultEventBus class, which should be shared by the engines and executive to provide a centralised source of communication. The simulation engine must have its own random number generator instance as part of the simulation definition, the Mersenne Twister pseudorandom number generator algorithms is the default implementation, however other algorithms can easily be used.
 
@@ -324,20 +338,20 @@ event_monitor.stop();
 
 The simulation executive can run experiments for baseline scenario only, or baseline and intervention scenarios combination as shown above. The results message is a polymorphic type carrying a customisable data payload, table below shows the default implementation outputs.
 
-| Property     | Overall | Male  | Female | Description             |
-| :---         | :---:   | :---: | :---:  |:---                     |
-| Id           | ✓       | -     | -      | The message type identifier (results type) |
-| Source       | ✓       | -     | -      | The results experiment identification |
-| Run number   | ✓       | -     | -      | The results rum number identification |
-| Model time   | ✓       | -     | -      | The results model time identification |
-| Average Age  | -       | ✓     | ✓      | Average age of the population alive |
-| Prevalence   | -       | ✓     | ✓      | Prevalence for each disease in the population |
-| Risk factors | -       | ✓     | ✓      | Average risk factor values in the population |
-| Indicators (DALYs) | ✓ | - | - | YLL, YLD and DALY values per 100'000 people |
-| Population Counts | ✓ | - | - |  Total size, number alive, dead and emigrants |
-|Comorbidities | -       | ✓     | ✓      | Percentage of people with 0 to N+ diseases |
-| Metrics | ✓ | - | - | Custom key/value metrics for algorithms |
-| Series | - | ✓ | ✓ | Detailed time series by time, age, and gender |
+| Property           | Overall | Male | Female | Description                                   |
+|:-------------------|:-------:|:----:|:------:|:----------------------------------------------|
+| Id                 |    ✓    |  -   |   -    | The message type identifier (results type)    |
+| Source             |    ✓    |  -   |   -    | The results experiment identification         |
+| Run number         |    ✓    |  -   |   -    | The results rum number identification         |
+| Model time         |    ✓    |  -   |   -    | The results model time identification         |
+| Average Age        |    -    |  ✓   |   ✓    | Average age of the population alive           |
+| Prevalence         |    -    |  ✓   |   ✓    | Prevalence for each disease in the population |
+| Risk factors       |    -    |  ✓   |   ✓    | Average risk factor values in the population  |
+| Indicators (DALYs) |    ✓    |  -   |   -    | YLL, YLD and DALY values per 100'000 people   |
+| Population Counts  |    ✓    |  -   |   -    | Total size, number alive, dead and emigrants  |
+| Comorbidities      |    -    |  ✓   |   ✓    | Percentage of people with 0 to N+ diseases    |
+| Metrics            |    ✓    |  -   |   -    | Custom key/value metrics for algorithms       |
+| Series             |    -    |  ✓   |   ✓    | Detailed time series by time, age, and gender |
 
 These measures are calculated and published by the analysis module at the end of each simulation time step, the combination of *source*, *run number* and *model time* is unique.
 
@@ -382,8 +396,13 @@ The factory must provide builder functions for all the required *module types* t
 
 Simulation experiment results reproducibility is a fundamental requirement for a rigorous scientific approach. Health-GPS defines mechanisms to enable  reproducibility of experiment run continuous run and batch mode typical of HPC environments. The core mechanism requires traceable inputs, Health-GPS version, and a custom random number seed, the following algorithm is used to manage the master seed for all experiments.
 
-|![Experiment reproducibility](images/batch_mode_seed.svg)|
-|:--:|
-|*Experiment reproducibility algorithm (seed management)*|
+| ![Experiment reproducibility](images/batch_mode_seed.svg) |
+|:---------------------------------------------------------:|
+| *Experiment reproducibility algorithm (seed management)*  |
 
 When running the simulation as a single experiment, the solution is trivial using the same seed, however in a cluster or HPC environment, reproducibility of parallel simulation is more challenging. See the [User Guide](userguide#50-hpc-running) for an worked example using *Health-GPS* on *HPC computer* arrays to evaluate the *same experiment* in parallel.
+
+## GitHub flow
+
+Health-GPS uses the GitHub flow branching pattern for git. For more information, see the
+[GitHub flow guide](github-flow)
