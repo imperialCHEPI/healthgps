@@ -23,7 +23,7 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    double physical_activity_stddev)
+    core::Income income_default, double physical_activity_stddev)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
@@ -32,7 +32,7 @@ StaticLinearModel::StaticLinearModel(
       policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {}
+      income_default_{income_default}, physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -516,7 +516,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
         lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
         trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
-        physical_activity_stddev_);
+        income_default_, physical_activity_stddev_);
 }
 
 } // namespace hgps
