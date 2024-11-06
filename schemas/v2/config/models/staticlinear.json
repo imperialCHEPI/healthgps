@@ -38,7 +38,7 @@
                 "additionalProperties": false
             }
         },
-        "IncomeFixed": {
+        "IncomeDefault": {
             "type": "string"
         },
         "IncomeModels": {

@@ -351,6 +351,22 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                             {core::Gender::male, age_group["Male"]}};
     }
 
+    // HACK: default income classification.
+    std::string income_default_string = opt["IncomeDefault"].get<std::string>();
+    hgps::core::Income income_default;
+    if (hgps::core::case_insensitive::equals(income_default_string, "Unknown")) {
+        income_default = hgps::core::Income::unknown;
+    } else if (hgps::core::case_insensitive::equals(income_default_string, "Low")) {
+        income_default = hgps::core::Income::low;
+    } else if (hgps::core::case_insensitive::equals(income_default_string, "Middle")) {
+        income_default = hgps::core::Income::middle;
+    } else if (hgps::core::case_insensitive::equals(income_default_string, "High")) {
+        income_default = hgps::core::Income::high;
+    } else {
+        throw hgps::core::HgpsException(
+            fmt::format("Income category {} is unrecognised.", income_default_string));
+    }
+
     // Income models for different income classifications.
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
