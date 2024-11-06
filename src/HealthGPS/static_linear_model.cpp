@@ -43,7 +43,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
-        initialise_income(person, context.random());
+        // initialise_income(person, context.random());
+        person.income = income_default_;
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
@@ -75,7 +76,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_sector(person, context.random());
-            initialise_income(person, context.random());
+            // initialise_income(person, context.random());
+            person.income = income_default_;
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
