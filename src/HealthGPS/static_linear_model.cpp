@@ -445,7 +445,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
     std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
-    std::unordered_map<core::Income, LinearModelParams> income_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models, core::Income income_default,
     double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
@@ -456,7 +456,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      income_models_{std::move(income_models)},
+      income_models_{std::move(income_models)}, income_default_{income_default},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {

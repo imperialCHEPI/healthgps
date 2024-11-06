@@ -404,7 +404,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), physical_activity_stddev);
+        std::move(income_models), income_default, physical_activity_stddev);
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
