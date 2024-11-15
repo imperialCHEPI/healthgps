@@ -1,6 +1,8 @@
 #include "configuration.h"
 #include "configuration_parsing.h"
 #include "jsonparser.h"
+#include "schema.h"
+#include "validated_data_source.h"
 #include "version.h"
 
 #include "HealthGPS/baseline_scenario.h"
@@ -8,18 +10,20 @@
 #include "HealthGPS/food_labelling_scenario.h"
 #include "HealthGPS/marketing_dynamic_scenario.h"
 #include "HealthGPS/marketing_scenario.h"
-#include "HealthGPS/mtrandom.h"
 #include "HealthGPS/physical_activity_scenario.h"
 #include "HealthGPS/simple_policy_scenario.h"
 
 #include "HealthGPS.Core/poco.h"
 #include "HealthGPS.Core/scoped_timer.h"
 
-#include <chrono>
 #include <fmt/chrono.h>
 #include <fmt/color.h>
+
+#include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <thread>
 #include <utility>
@@ -31,13 +35,50 @@
 #define MEASURE_FUNCTION()
 #endif
 
+namespace {
+using namespace hgps::input;
+
+constexpr const char *ConfigSchemaFileName = "config.json";
+constexpr int ConfigSchemaVersion = 1;
+
+std::unique_ptr<DataSource> get_data_source_from_json(const nlohmann::json &opt,
+                                                      const std::filesystem::path &root_path) {
+    auto source = opt["source"].get<std::string>();
+
+    // Checksum is not required if source is a directory, else it is mandatory
+    if (opt.contains("checksum")) {
+        auto file_hash = opt["checksum"].get<std::string>();
+        return std::make_unique<ValidatedDataSource>(std::move(source), root_path,
+                                                     std::move(file_hash));
+    }
+
+    if (!std::filesystem::is_directory(source)) {
+        throw std::runtime_error("Missing checksum property for data source");
+    }
+    return std::make_unique<DataSource>(std::move(source));
+}
+
+// Get path to config file
+std::filesystem::path get_config_file_path(const std::string &config_source) {
+    // Config source is path to local JSON file
+    if (std::filesystem::is_regular_file(config_source) && config_source.ends_with(".json")) {
+        return config_source;
+    }
+
+    // Config source is path to directory, zip file or URL
+    return DataSource{config_source}.get_data_directory() / "config.json";
+}
+
+} // anonymous namespace
+
 namespace hgps::input {
 using namespace hgps;
 using json = nlohmann::json;
 
 ConfigurationError::ConfigurationError(const std::string &msg) : std::runtime_error{msg} {}
 
-Configuration get_configuration(const std::filesystem::path &config_file, int job_id,
+Configuration get_configuration(const std::string &config_source,
+                                const std::optional<std::string> &output_folder, int job_id,
                                 bool verbose) {
     MEASURE_FUNCTION();
     bool success = true;
@@ -51,28 +92,19 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
         config.verbosity = core::VerboseMode::verbose;
     }
 
-    std::ifstream ifs(config_file, std::ifstream::in);
-    if (!ifs) {
-        throw ConfigurationError(fmt::format("File {} doesn't exist.", config_file.string()));
-    }
+    const auto config_file = get_config_file_path(config_source);
 
-    const auto opt = [&ifs]() {
-        try {
-            return json::parse(ifs);
-        } catch (const std::exception &e) {
-            throw ConfigurationError(fmt::format("Could not parse JSON: {}", e.what()));
-        }
-    }();
-
-    // Check the file format version
-    try {
-        check_version(opt);
-    } catch (const ConfigurationError &) {
-        success = false;
-    }
+    const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion,
+                                            /*require_schema_property=*/false);
 
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
+
+    // Read data source from JSON file. For now, this is optional, but in future it will be
+    // mandatory.
+    if (opt.contains("data")) {
+        config.data_source = get_data_source_from_json(opt["data"], config.root_path);
+    }
 
     // input dataset file
     try {
@@ -100,10 +132,10 @@ Configuration get_configuration(const std::filesystem::path &config_file, int jo
     }
 
     try {
-        load_output_info(opt, config);
-    } catch (const ConfigurationError &) {
+        load_output_info(opt, config, output_folder);
+    } catch (const ConfigurationError &e) {
         success = false;
-        fmt::print(fg(fmt::color::red), "Could not load output info");
+        fmt::print(fg(fmt::color::red), e.what());
     }
 
     if (!success) {
@@ -216,29 +248,14 @@ std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &chan
 
 hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
                                             hgps::SimulationModuleFactory &factory,
-                                            hgps::EventAggregator &event_bus,
-                                            hgps::ModelInput &input) {
-    auto baseline_rnd = std::make_unique<hgps::MTRandom32>();
-    auto baseline_scenario = create_baseline_scenario(channel);
-    return Simulation{
-        SimulationDefinition{input, std::move(baseline_scenario), std::move(baseline_rnd)}, factory,
-        event_bus};
+                                            std::shared_ptr<const hgps::EventAggregator> event_bus,
+                                            std::shared_ptr<const hgps::ModelInput> input) {
+    auto scenario = create_baseline_scenario(channel);
+    return Simulation{factory, std::move(event_bus), std::move(input), std::move(scenario)};
 }
 
-hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
-                                                hgps::SimulationModuleFactory &factory,
-                                                hgps::EventAggregator &event_bus,
-                                                hgps::ModelInput &input,
-                                                const PolicyScenarioInfo &info) {
-    auto policy_scenario = create_intervention_scenario(channel, info);
-    auto policy_rnd = std::make_unique<hgps::MTRandom32>();
-    return Simulation{
-        SimulationDefinition{input, std::move(policy_scenario), std::move(policy_rnd)}, factory,
-        event_bus};
-}
-
-std::unique_ptr<hgps::InterventionScenario>
-create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &info) {
+std::unique_ptr<hgps::Scenario> create_intervention_scenario(SyncChannel &channel,
+                                                             const PolicyScenarioInfo &info) {
     using namespace hgps;
 
     fmt::print(fg(fmt::color::light_coral), "\nIntervention policy: {}.\n\n", info.identifier);
@@ -258,18 +275,18 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
             throw std::logic_error(fmt::format("Unknown policy impact type: {}", info.impact_type));
         }
 
-        auto definition = SimplePolicyDefinition(impact_type, risk_impacts, period);
+        auto definition = SimplePolicyDefinition(impact_type, std::move(risk_impacts), period);
         return std::make_unique<SimplePolicyScenario>(channel, std::move(definition));
     }
 
     if (info.identifier == "marketing") {
-        auto definition = MarketingPolicyDefinition(period, risk_impacts);
+        auto definition = MarketingPolicyDefinition(period, std::move(risk_impacts));
         return std::make_unique<MarketingPolicyScenario>(channel, std::move(definition));
     }
 
     if (info.identifier == "dynamic_marketing") {
         auto dynamic = PolicyDynamic{info.dynamics};
-        auto definition = MarketingDynamicDefinition{period, risk_impacts, dynamic};
+        auto definition = MarketingDynamicDefinition{period, std::move(risk_impacts), dynamic};
         return std::make_unique<MarketingDynamicScenario>(channel, std::move(definition));
     }
 
@@ -283,7 +300,7 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
         const auto &adjustment = info.adjustments.at(0);
         auto definition = FoodLabellingDefinition{
             .active_period = period,
-            .impacts = risk_impacts,
+            .impacts = std::move(risk_impacts),
             .adjustment_risk_factor = AdjustmentFactor{adjustment.risk_factor, adjustment.value},
             .coverage = PolicyCoverage{info.coverage_rates, cutoff_time},
             .transfer_coefficient = TransferCoefficient{info.coefficients, cutoff_age}};
@@ -293,7 +310,7 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
 
     if (info.identifier == "physical_activity") {
         auto definition = PhysicalActivityDefinition{.active_period = period,
-                                                     .impacts = risk_impacts,
+                                                     .impacts = std::move(risk_impacts),
                                                      .coverage_rate = info.coverage_rates.at(0)};
 
         return std::make_unique<PhysicalActivityScenario>(channel, std::move(definition));
@@ -301,12 +318,21 @@ create_intervention_scenario(SyncChannel &channel, const PolicyScenarioInfo &inf
 
     if (info.identifier == "fiscal") {
         auto impact_type = parse_fiscal_impact_type(info.impact_type);
-        auto definition = FiscalPolicyDefinition(impact_type, period, risk_impacts);
+        auto definition = FiscalPolicyDefinition(impact_type, period, std::move(risk_impacts));
         return std::make_unique<FiscalPolicyScenario>(channel, std::move(definition));
     }
 
     throw std::invalid_argument(
         fmt::format("Unknown intervention policy identifier: {}", info.identifier));
+}
+
+hgps::Simulation
+create_intervention_simulation(hgps::SyncChannel &channel, hgps::SimulationModuleFactory &factory,
+                               std::shared_ptr<const hgps::EventAggregator> event_bus,
+                               std::shared_ptr<const hgps::ModelInput> input,
+                               const PolicyScenarioInfo &info) {
+    auto scenario = create_intervention_scenario(channel, info);
+    return Simulation{factory, std::move(event_bus), std::move(input), std::move(scenario)};
 }
 
 #ifdef _WIN32
@@ -344,4 +370,5 @@ std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned i
 
     return user_seed;
 }
+
 } // namespace hgps::input

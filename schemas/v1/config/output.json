@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
+    "type": "object",
+    "properties": {
+        "comorbidities": {
+            "type": "integer"
+        },
+        "folder": {
+            "type": "string"
+        },
+        "file_name": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "comorbidities",
+        "file_name"
+    ],
+    "additionalProperties": false
+}

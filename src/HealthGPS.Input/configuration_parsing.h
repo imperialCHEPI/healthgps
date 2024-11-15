@@ -5,6 +5,8 @@
 #pragma once
 #include "configuration.h"
 
+#include <optional>
+
 namespace hgps::input {
 /// @brief Check the schema version and throw if invalid
 /// @param j The root JSON object
@@ -32,6 +34,8 @@ void load_running_info(const nlohmann::json &j, Configuration &config);
 /// @brief Load output section of JSON object
 /// @param j The root JSON object
 /// @param config The config object to update
+/// @param output_folder Output folder, if provided via command-line argument
 /// @throw ConfigurationError: Could not load output info
-void load_output_info(const nlohmann::json &j, Configuration &config);
+void load_output_info(const nlohmann::json &j, Configuration &config,
+                      const std::optional<std::string> &output_folder);
 } // namespace hgps::input

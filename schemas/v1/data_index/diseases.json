@@ -1,0 +1,76 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/diseases.json",
+    "type": "object",
+    "properties": {
+        "format": {
+            "const": "csv"
+        },
+        "delimiter": {
+            "const": ","
+        },
+        "encoding": {
+            "const": "UTF8"
+        },
+        "description": {
+            "type": "string"
+        },
+        "source": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string",
+            "format": "uri"
+        },
+        "license": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "age_limits": {
+            "$ref": "../age_range.json"
+        },
+        "time_year": {
+            "type": "integer",
+            "minimum": 1900
+        },
+        "disease": {
+            "$ref": "disease.json"
+        },
+        "registry": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "group": {
+                        "enum": [
+                            "other",
+                            "cancer"
+                        ]
+                    },
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "group",
+                    "id",
+                    "name"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "path",
+        "age_limits",
+        "time_year",
+        "disease",
+        "registry"
+    ],
+    "additionalProperties": false
+}

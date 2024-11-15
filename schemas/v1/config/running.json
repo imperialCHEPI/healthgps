@@ -1,0 +1,46 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/running.json",
+    "type": "object",
+    "properties": {
+        "seed": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 1,
+            "items": {
+                "type": "integer"
+            }
+        },
+        "start_time": {
+            "type": "integer"
+        },
+        "stop_time": {
+            "type": "integer"
+        },
+        "trial_runs": {
+            "type": "integer"
+        },
+        "sync_timeout_ms": {
+            "type": "integer"
+        },
+        "diseases": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "interventions": {
+            "$ref": "interventions.json"
+        }
+    },
+    "required": [
+        "seed",
+        "start_time",
+        "stop_time",
+        "trial_runs",
+        "sync_timeout_ms",
+        "diseases",
+        "interventions"
+    ],
+    "additionalProperties": false
+}

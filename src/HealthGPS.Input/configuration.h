@@ -7,16 +7,17 @@
  */
 #pragma once
 
+#include "data_source.h"
 #include "poco.h"
 #include "version.h"
 
+#include "HealthGPS.Core/api.h"
 #include "HealthGPS/intervention_scenario.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/scenario.h"
 #include "HealthGPS/simulation.h"
 
-#include "HealthGPS.Core/api.h"
-
+#include <memory>
 #include <optional>
 #include <stdexcept>
 
@@ -26,6 +27,9 @@ namespace hgps::input {
 struct Configuration {
     /// @brief The root path for configuration files
     std::filesystem::path root_path;
+
+    /// @brief Static data source for the simulation (either URL or path)
+    std::unique_ptr<DataSource> data_source;
 
     /// @brief The input data file details
     FileInfo file;
@@ -83,11 +87,14 @@ class ConfigurationError : public std::runtime_error {
 };
 
 /// @brief Loads the input configuration file, *.json, information
-/// @param config_file Path to config file
+/// @param config_source Path/URL for config source
+/// @param output_folder Path to output folder, if provided via command-line argument
 /// @param job_id Job ID (for HPC)
 /// @param verbose Set log verbosity for simulation
 /// @return The configuration file information
-Configuration get_configuration(const std::filesystem::path &config_file, int job_id, bool verbose);
+Configuration get_configuration(const std::string &config_source,
+                                const std::optional<std::string> &output_folder, int job_id,
+                                bool verbose);
 
 /// @brief Gets the collection of diseases that matches the selected input list
 /// @param data_api The back-end data store instance to be used.
@@ -125,16 +132,16 @@ std::unique_ptr<hgps::Scenario> create_baseline_scenario(hgps::SyncChannel &chan
 /// @return The respective simulation engine instance
 hgps::Simulation create_baseline_simulation(hgps::SyncChannel &channel,
                                             hgps::SimulationModuleFactory &factory,
-                                            hgps::EventAggregator &event_bus,
-                                            hgps::ModelInput &input);
+                                            std::shared_ptr<const hgps::EventAggregator> event_bus,
+                                            std::shared_ptr<const hgps::ModelInput> input);
 
 /// @brief Creates the intervention scenario instance
 /// @param channel Synchronization channel instance for data exchange
 /// @param info Intervention configuration information
 /// @return The respective intervention scenario instance
 /// @throws std::invalid_argument Thrown if intervention `identifier` is unknown.
-std::unique_ptr<hgps::InterventionScenario>
-create_intervention_scenario(hgps::SyncChannel &channel, const PolicyScenarioInfo &info);
+std::unique_ptr<hgps::Scenario> create_intervention_scenario(hgps::SyncChannel &channel,
+                                                             const PolicyScenarioInfo &info);
 
 /// @brief Creates the intervention simulation engine instance
 /// @param channel Synchronization channel for data exchange instance
@@ -143,11 +150,11 @@ create_intervention_scenario(hgps::SyncChannel &channel, const PolicyScenarioInf
 /// @param input Model inputs instance
 /// @param info Intervention policy definition
 /// @return The respective simulation engine instance
-hgps::Simulation create_intervention_simulation(hgps::SyncChannel &channel,
-                                                hgps::SimulationModuleFactory &factory,
-                                                hgps::EventAggregator &event_bus,
-                                                hgps::ModelInput &input,
-                                                const PolicyScenarioInfo &info);
+hgps::Simulation
+create_intervention_simulation(hgps::SyncChannel &channel, hgps::SimulationModuleFactory &factory,
+                               std::shared_ptr<const hgps::EventAggregator> event_bus,
+                               std::shared_ptr<const hgps::ModelInput> input,
+                               const PolicyScenarioInfo &info);
 
 /// @brief Expand environment variables in path to respective values
 /// @param path The source path to information
@@ -159,4 +166,5 @@ std::string expand_environment_variables(const std::string &path);
 /// @param user_seed User input custom seed for experiment
 /// @return The experiment seed, if user provide a seed
 std::optional<unsigned int> create_job_seed(int job_id, std::optional<unsigned int> user_seed);
+
 } // namespace hgps::input

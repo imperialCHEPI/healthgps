@@ -1,0 +1,103 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/data_index/disease.json",
+    "type": "object",
+    "properties": {
+        "path": {
+            "type": "string"
+        },
+        "file_name": {
+            "type": "string"
+        },
+        "relative_risk": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string"
+                },
+                "to_disease": {
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string"
+                        },
+                        "file_name": {
+                            "type": "string"
+                        },
+                        "default_value": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "path",
+                        "file_name",
+                        "default_value"
+                    ],
+                    "additionalProperties": false
+                },
+                "to_risk_factor": {
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string"
+                        },
+                        "file_name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "path",
+                        "file_name"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "path",
+                "to_disease",
+                "to_risk_factor"
+            ],
+            "additionalProperties": false
+        },
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "object",
+                    "properties": {
+                        "distribution": {
+                            "type": "string"
+                        },
+                        "survival_rate": {
+                            "type": "string"
+                        },
+                        "death_weight": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "distribution",
+                        "survival_rate",
+                        "death_weight"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "path",
+                "files"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "path",
+        "file_name",
+        "relative_risk",
+        "parameters"
+    ],
+    "additionalProperties": false
+}

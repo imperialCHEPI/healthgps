@@ -62,11 +62,12 @@ void extract_zip_file(const std::filesystem::path &file_path,
     for (const auto &entry : zf.getEntries()) {
         out_path = temp_output_directory / entry.getName();
         if (entry.isDirectory()) {
-            if (!std::filesystem::create_directories(out_path)) {
-                throw std::runtime_error{
-                    fmt::format("Failed to create directory: {}", out_path.string())};
-            }
+            // Names seem to have a trailing slash which confuses Windows, hence:
+            out_path /= ".";
+
+            std::filesystem::create_directories(out_path);
         } else {
+            // NB: We assume all files are text files
             std::ofstream ofs{out_path};
             if (!ofs) {
                 throw std::runtime_error{
@@ -91,15 +92,5 @@ void extract_zip_file(const std::filesystem::path &file_path,
             throw;
         }
     }
-}
-
-std::filesystem::path extract_zip_file_or_load_from_cache(const std::filesystem::path &file_path) {
-    const auto file_hash = compute_sha256_for_file(file_path);
-    auto cache_path = get_zip_cache_directory(file_hash);
-    if (!std::filesystem::exists(cache_path)) {
-        extract_zip_file(file_path, cache_path);
-    }
-
-    return cache_path;
 }
 } // namespace hgps::input

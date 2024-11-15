@@ -2,8 +2,11 @@
 
 namespace hgps {
 
-RuntimeContext::RuntimeContext(EventAggregator &bus, SimulationDefinition &definition)
-    : event_bus_{bus}, definition_{definition}, population_{0}, generator_{definition.rnd()} {}
+RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
+                               std::shared_ptr<const ModelInput> inputs,
+                               std::unique_ptr<Scenario> scenario)
+    : event_bus_{std::move(bus)}, inputs_{std::move(inputs)}, scenario_{std::move(scenario)},
+      population_{0} {}
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
@@ -11,9 +14,7 @@ int RuntimeContext::start_time() const noexcept { return model_start_time_; }
 
 unsigned int RuntimeContext::current_run() const noexcept { return current_run_; }
 
-int RuntimeContext::sync_timeout_millis() const noexcept {
-    return definition_.get().inputs().sync_timeout_ms();
-}
+int RuntimeContext::sync_timeout_millis() const noexcept { return inputs_->sync_timeout_ms(); }
 
 Population &RuntimeContext::population() noexcept { return population_; }
 
@@ -21,23 +22,25 @@ const Population &RuntimeContext::population() const noexcept { return populatio
 
 RuntimeMetric &RuntimeContext::metrics() noexcept { return metrics_; }
 
-Scenario &RuntimeContext::scenario() noexcept { return definition_.get().scenario(); }
+const ModelInput &RuntimeContext::inputs() const noexcept { return *inputs_; }
 
-Random &RuntimeContext::random() const noexcept { return generator_; }
+Scenario &RuntimeContext::scenario() const noexcept { return *scenario_; }
+
+Random &RuntimeContext::random() const noexcept { return random_; }
 
 const HierarchicalMapping &RuntimeContext::mapping() const noexcept {
-    return definition_.get().inputs().risk_mapping();
+    return inputs_->risk_mapping();
 }
 
 const std::vector<core::DiseaseInfo> &RuntimeContext::diseases() const noexcept {
-    return definition_.get().inputs().diseases();
+    return inputs_->diseases();
 }
 
 const core::IntegerInterval &RuntimeContext::age_range() const noexcept {
-    return definition_.get().inputs().settings().age_range();
+    return inputs_->settings().age_range();
 }
 
-std::string RuntimeContext::identifier() const noexcept { return definition_.get().identifier(); }
+const std::string &RuntimeContext::identifier() const noexcept { return scenario_->name(); }
 
 void RuntimeContext::set_current_time(const int time_now) noexcept { time_now_ = time_now; }
 
@@ -47,14 +50,15 @@ void RuntimeContext::set_current_run(const unsigned int run_number) noexcept {
 
 void RuntimeContext::reset_population(const std::size_t initial_pop_size) {
     population_ = Population{initial_pop_size};
-    model_start_time_ = definition_.get().inputs().start_time();
+    model_start_time_ = inputs_->start_time();
 }
 
 void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
-    event_bus_.get().publish(std::move(message));
+    event_bus_->publish(std::move(message));
 }
 
 void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
-    event_bus_.get().publish_async(std::move(message));
+    event_bus_->publish_async(std::move(message));
 }
+
 } // namespace hgps

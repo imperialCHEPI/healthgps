@@ -36,7 +36,7 @@ void create_test_datatable(hgps::core::DataTable &data) {
     data.add(inc_builder.build());
 }
 
-hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
+std::shared_ptr<hgps::ModelInput> create_test_configuration(hgps::core::DataTable &data) {
     using namespace hgps;
     using namespace hgps::core;
 
@@ -62,5 +62,5 @@ hgps::ModelInput create_test_configuration(hgps::core::DataTable &data) {
                     .name = "Colorectal cancer"},
     };
 
-    return {data, settings, info, ses, mapping, diseases};
+    return std::make_shared<hgps::ModelInput>(data, settings, info, ses, mapping, diseases);
 }

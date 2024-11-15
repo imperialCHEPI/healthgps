@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
             storage_path = std::filesystem::absolute(storage_path);
         }
     } else {
-        storage_path = default_datastore_path();
+        storage_path = TEST_DATA_PATH;
         std::cout << "Using default test data store ...\n\n";
     }
 

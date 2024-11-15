@@ -4,6 +4,7 @@
 #include "sync_message.h"
 
 #include <oneapi/tbb/parallel_for_each.h>
+#include <utility>
 
 namespace { // anonymous namespace
 
@@ -31,21 +32,40 @@ struct FirstMoment {
 namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
-    const RiskFactorSexAgeTable &risk_factor_expected)
-    : risk_factor_expected_{risk_factor_expected} {}
+    std::shared_ptr<RiskFactorSexAgeTable> expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+      trend_steps_{std::move(trend_steps)} {}
 
-const RiskFactorSexAgeTable &RiskFactorAdjustableModel::get_risk_factor_expected() const noexcept {
-    return risk_factor_expected_;
+double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
+                                               const core::Identifier &factor, OptionalRange range,
+                                               bool apply_trend) const noexcept {
+    double expected = expected_->at(sex, factor).at(age);
+
+    // Apply optional trend to expected value.
+    if (apply_trend) {
+        int elapsed_time = context.time_now() - context.start_time();
+        int t = std::min(elapsed_time, get_trend_steps(factor));
+        expected *= pow(expected_trend_->at(factor), t);
+    }
+
+    // Clamp expected value to an optionally specified range.
+    if (range.has_value()) {
+        expected = range.value().get().clamp(expected);
+    }
+
+    return expected;
 }
 
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
-                                                    OptionalRanges ranges) const {
+                                                    OptionalRanges ranges, bool apply_trend) const {
     RiskFactorSexAgeTable adjustments;
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        adjustments = calculate_adjustments(context, factors);
+        adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
@@ -95,8 +115,14 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
     }
 }
 
-RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
-    RuntimeContext &context, const std::vector<core::Identifier> &factors) const {
+int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
+    return trend_steps_->at(factor);
+}
+
+RiskFactorSexAgeTable
+RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
+                                                 const std::vector<core::Identifier> &factors,
+                                                 OptionalRanges ranges, bool apply_trend) const {
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
@@ -106,10 +132,17 @@ RiskFactorSexAgeTable RiskFactorAdjustableModel::calculate_adjustments(
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
-        for (const auto &factor : factors) {
+        for (size_t i = 0; i < factors.size(); i++) {
+            const core::Identifier &factor = factors[i];
+
+            OptionalRange range;
+            if (ranges.has_value()) {
+                range = OptionalRange{ranges.value().get().at(i)};
+            }
+
             adjustments.emplace(sex, factor, std::vector<double>(age_count));
             for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                double expect = risk_factor_expected_.at(sex, factor).at(age);
+                double expect = get_expected(context, sex, age, factor, range, apply_trend);
                 double sim_mean = simulated_means_by_sex.at(factor).at(age);
 
                 // Delta should remain zero if simulated mean is NaN.
@@ -166,17 +199,21 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 }
 
 RiskFactorAdjustableModelDefinition::RiskFactorAdjustableModelDefinition(
-    RiskFactorSexAgeTable risk_factor_expected)
-    : RiskFactorModelDefinition{}, risk_factor_expected_{std::move(risk_factor_expected)} {
+    std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
+      trend_steps_{std::move(trend_steps)} {
 
-    if (risk_factor_expected_.empty()) {
+    if (expected_->empty()) {
         throw core::HgpsException("Risk factor expected value mapping is empty");
     }
-}
-
-const RiskFactorSexAgeTable &
-RiskFactorAdjustableModelDefinition::get_risk_factor_expected() const noexcept {
-    return risk_factor_expected_;
+    if (expected_trend_->empty()) {
+        throw core::HgpsException("Risk factor expected trend mapping is empty");
+    }
+    if (trend_steps_->empty()) {
+        throw core::HgpsException("Risk factor trend steps mapping is empty");
+    }
 }
 
 } // namespace hgps

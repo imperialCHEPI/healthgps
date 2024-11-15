@@ -15,4 +15,4 @@
 
 void create_test_datatable(hgps::core::DataTable &data);
 
-hgps::ModelInput create_test_configuration(hgps::core::DataTable &data);
+std::shared_ptr<hgps::ModelInput> create_test_configuration(hgps::core::DataTable &data);

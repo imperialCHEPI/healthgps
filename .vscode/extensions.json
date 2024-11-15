@@ -1,3 +1,8 @@
 {
-    "recommendations": ["ms-vscode.cpptools", "davidanson.vscode-markdownlint"]
+    "recommendations": [
+        "ms-vscode.cpptools-extension-pack",
+        "cheshirekow.cmake-format",
+        "davidanson.vscode-markdownlint",
+        "streetsidesoftware.code-spell-checker"
+    ]
 }

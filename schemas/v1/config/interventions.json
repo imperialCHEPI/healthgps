@@ -1,0 +1,104 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/interventions.json",
+    "type": "object",
+    "properties": {
+        "active_type_id": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "types": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "active_period": {
+                        "type": "object",
+                        "properties": {
+                            "start_time": {
+                                "type": "integer"
+                            },
+                            "finish_time": {
+                                "anyOf": [
+                                    {
+                                        "type": "integer"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "start_time",
+                            "finish_time"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "impacts": {
+                        "type": "array"
+                    },
+                    "impact_type": {
+                        "type": "string"
+                    },
+                    "dynamics": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "coefficients": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "coverage_rates": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    },
+                    "coverage_cutoff_time": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "child_cutoff_age": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "adjustments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "risk_factor": {
+                                    "type": "string"
+                                },
+                                "value": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "active_period",
+                    "impacts"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "active_type_id",
+        "types"
+    ],
+    "additionalProperties": false
+}

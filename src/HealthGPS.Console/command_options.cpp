@@ -9,88 +9,90 @@ namespace hgps {
 
 cxxopts::Options create_options() {
     cxxopts::Options options("HealthGPS.Console", "Health-GPS microsimulation for policy options.");
-    options.add_options()("f,file", "Configuration file full name.", cxxopts::value<std::string>())(
-        "s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())(
-        "j,jobid", "The batch execution job identifier.",
-        cxxopts::value<int>())("verbose", "Print more information about progress",
-                               cxxopts::value<bool>()->default_value("false"))(
-        "help", "Help about this application.")("version", "Print the application version number.");
+
+    // clang-format off
+    options.add_options()
+        ("f,file", "Path to configuration file, folder or URL (deprecated).",
+            cxxopts::value<std::string>())
+        ("c,config", "Path to configuration file, folder or URL.", cxxopts::value<std::string>())
+        ("s,storage", "Path to root folder of the data storage.", cxxopts::value<std::string>())
+        ("j,jobid", "The batch execution job identifier.", cxxopts::value<int>())
+        ("dry-run",  "Check the input files without running a simulation",
+            cxxopts::value<bool>()->default_value("false"))
+        ("o,output", "Path to output folder", cxxopts::value<std::string>())
+        ("T,threads", "The maximum number of threads to create (0: no limit, default).",
+            cxxopts::value<size_t>())
+        ("verbose", "Print more information about progress",
+            cxxopts::value<bool>()->default_value("false"))
+        ("help", "Help for this application.")
+        ("version", "Print the application version number.");
+    // clang-format on
 
     return options;
 }
 
-// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-CommandOptions parse_arguments(cxxopts::Options &options, int &argc, char *argv[]) {
+std::optional<CommandOptions> parse_arguments(cxxopts::Options &options, int argc, char **argv) {
     namespace fs = std::filesystem;
 
     CommandOptions cmd;
-    try {
-        cmd.success = true;
-        cmd.exit_code = EXIT_SUCCESS;
-        cmd.verbose = false;
-        auto result = options.parse(argc, argv);
-        if (result.count("help")) {
-            std::cout << options.help() << '\n';
-            cmd.success = false;
-            return cmd;
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << '\n';
+        return std::nullopt;
+    }
+
+    if (result.count("version")) {
+        fmt::print("Version {}\n\n", PROJECT_VERSION);
+        return std::nullopt;
+    }
+
+    cmd.verbose = result["verbose"].as<bool>();
+    if (cmd.verbose) {
+        fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
+    }
+
+    if (result.count("file")) {
+        fmt::print(fg(fmt::color::dark_salmon),
+                   "The -f/--file option is deprecated. Use -c/--config instead.\n");
+        cmd.config_source = result["file"].as<std::string>();
+    }
+    if (result.count("config")) {
+        cmd.config_source = result["config"].as<std::string>();
+    }
+    fmt::print("Configuration source: {}\n", cmd.config_source);
+
+    if (result.count("storage")) {
+        auto source = result["storage"].as<std::string>();
+
+        fmt::print(fmt::fg(fmt::color::yellow),
+                   "WARNING: Path to data source specified with command-line argument. "
+                   "This functionality is deprecated and will be removed in future. You "
+                   "should pass the data source via the config file.\n");
+        fmt::print("Data source: {}\n", source);
+
+        cmd.data_source = hgps::input::DataSource(std::move(source));
+    }
+
+    if (result.count("dry-run")) {
+        cmd.dry_run = true;
+        fmt::print(fmt::fg(fmt::color::yellow), "Performing dry run.\n");
+    }
+
+    if (result.count("output")) {
+        cmd.output_folder = result["output"].as<std::string>();
+    }
+
+    if (result.count("jobid")) {
+        cmd.job_id = result["jobid"].as<int>();
+        if (cmd.job_id < 1) {
+            throw std::runtime_error(
+                fmt::format("Job identifier value outside range: (0 < x) given: {}.", cmd.job_id));
         }
+    }
 
-        if (result.count("version")) {
-            fmt::print("Version {}\n\n", PROJECT_VERSION);
-            cmd.success = false;
-            return cmd;
-        }
-
-        cmd.verbose = result["verbose"].as<bool>();
-        if (cmd.verbose) {
-            fmt::print(fg(fmt::color::dark_salmon), "Verbose output enabled\n");
-        }
-
-        if (result.count("file")) {
-            cmd.config_file = result["file"].as<std::string>();
-            if (cmd.config_file.is_relative()) {
-                cmd.config_file = std::filesystem::absolute(cmd.config_file);
-                fmt::print("Configuration file..: {}\n", cmd.config_file.string());
-            }
-        }
-
-        if (!fs::exists(cmd.config_file)) {
-            fmt::print(fg(fmt::color::red), "\nConfiguration file: {} not found.\n",
-                       cmd.config_file.string());
-            cmd.exit_code = EXIT_FAILURE;
-        }
-
-        if (result.count("storage")) {
-            cmd.data_path_or_url = result["storage"].as<std::string>();
-
-            if (!cmd.data_path_or_url.starts_with("http://") &&
-                !cmd.data_path_or_url.starts_with("https://")) {
-                const std::filesystem::path path = cmd.data_path_or_url;
-
-                if (path.is_relative()) {
-                    cmd.data_path_or_url = std::filesystem::absolute(path).string();
-                }
-            }
-
-            fmt::print("Data source: {}\n", cmd.data_path_or_url);
-        }
-
-        if (result.count("jobid")) {
-            cmd.job_id = result["jobid"].as<int>();
-            if (cmd.job_id < 1) {
-                fmt::print(fg(fmt::color::red),
-                           "\nJob identifier value outside range: (0 < x) given: {}.\n",
-                           std::to_string(cmd.job_id));
-                cmd.exit_code = EXIT_FAILURE;
-            }
-        }
-
-        cmd.success = cmd.exit_code == EXIT_SUCCESS;
-    } catch (const cxxopts::exceptions::exception &ex) {
-        fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}.\n", ex.what());
-        fmt::print("\n{}\n", options.help());
-        cmd.success = false;
-        cmd.exit_code = EXIT_FAILURE;
+    if (result.count("threads")) {
+        cmd.num_threads = result["threads"].as<size_t>();
     }
 
     return cmd;

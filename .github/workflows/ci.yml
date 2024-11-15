@@ -17,11 +17,11 @@ jobs:
       matrix:
         include:
           - platform: linux
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             compiler: gcc-default
             is_main: true
           - platform: linux
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             compiler: gcc-latest
             is_main: false
           - platform: windows
@@ -30,11 +30,11 @@ jobs:
             is_main: true
 
     env:
-      VCPKG_ROOT: "vcpkg"
-      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+      VCPKG_ROOT: vcpkg
+      VCPKG_BINARY_SOURCES: clear;x-gha,readwrite
 
       # Update when there is a new version of gcc available
-      LATEST_GCC_VERSION: 13
+      LATEST_GCC_VERSION: 14
 
     steps:
       - uses: actions/checkout@v4
@@ -50,14 +50,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt upgrade -y
-          sudo apt install --no-install-recommends build-essential ninja-build lcov
+          sudo apt install -y --no-install-recommends build-essential ninja-build lcov
 
       - name: Install latest gcc (Linux)
         if: matrix.compiler == 'gcc-latest'
         run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt-get update
-          sudo apt-get install g++-$LATEST_GCC_VERSION
+          sudo apt-get install -y g++-$LATEST_GCC_VERSION
 
           # Use environment variable to tell CMake to compile with this version of gcc
           echo CXX=g++-$LATEST_GCC_VERSION >> "$GITHUB_ENV"
@@ -79,16 +77,16 @@ jobs:
         run: |
           cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON
 
-      - uses: ZedThree/clang-tidy-review@v0.19.0
+      - uses: ZedThree/clang-tidy-review@v0.20.0
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]')
         id: review
         with:
           build_dir: out/build/linux-debug
           config_file: .clang-tidy
-          lgtm_comment_body: ""
+          lgtm_comment_body: ''
 
       # Uploads an artefact containing clang_fixes.json
-      - uses: ZedThree/clang-tidy-review/upload@v0.19.0
+      - uses: ZedThree/clang-tidy-review/upload@v0.20.0
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]')
         id: upload-review
 
@@ -98,16 +96,23 @@ jobs:
 
       - uses: ammaraskar/gcc-problem-matcher@master
       - name: Build HealthGPS (debug)
-        if: "!cancelled()" # Run this step, even if the previous one fails
-        run: |
-          cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
+        if: '!cancelled()' # Run this step, even if the previous one fails
+        run: cmake --build --preset=debug-build-${{ matrix.platform }} --target=install
+
+      - name: Execute HealthGPS (debug)
+        if: '!cancelled()' # Run this step, even if the previous one fails
+        run: out/install/${{ matrix.platform }}-debug/bin/HealthGPS.Console --help
 
       - name: Build HealthGPS (release)
-        if: "!cancelled()" # Run this step, even if the previous one fails
+        if: '!cancelled()' # Run this step, even if the previous one fails
         run: |
           # Build documentation so we can show Doxygen warnings
           cmake --preset=${{ matrix.platform }}-release -DWARNINGS_AS_ERRORS=ON -DBUILD_DOC=ON
           cmake --build --preset=release-build-${{ matrix.platform }} --target=install
+
+      - name: Execute HealthGPS (release)
+        if: '!cancelled()' # Run this step, even if the previous one fails
+        run: out/install/${{ matrix.platform }}-release/bin/HealthGPS.Console --help
 
       - name: Upload artifacts
         if: matrix.is_main

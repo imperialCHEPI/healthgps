@@ -20,21 +20,19 @@ class TestAnalysisModule : public ::testing::Test {
     hgps::input::DataManager manager = hgps::input::DataManager(test_datastore_path);
     hgps::CachedRepository repository = hgps::CachedRepository(manager);
 
-    hgps::ModelInput inputs = create_test_configuration(data);
+    std::shared_ptr<hgps::ModelInput> inputs = create_test_configuration(data);
 
     std::unique_ptr<hgps::AnalysisModule> analysis_module =
-        build_analysis_module(repository, inputs);
+        build_analysis_module(repository, *inputs);
 
     hgps::Person test_person_1 = create_test_person(16, hgps::core::Gender::male);
     hgps::Person test_person_2 = create_test_person(19, hgps::core::Gender::male);
-    hgps::DefaultEventBus bus = DefaultEventBus{};
+    std::shared_ptr<hgps::DefaultEventBus> bus = std::make_shared<DefaultEventBus>();
     hgps::SyncChannel channel;
     std::unique_ptr<hgps::MTRandom32> rnd = std::make_unique<MTRandom32>(123456789);
     std::unique_ptr<hgps::BaselineScenario> scenario = std::make_unique<BaselineScenario>(channel);
-    hgps::SimulationDefinition definition =
-        SimulationDefinition(inputs, std::move(scenario), std::move(rnd));
 
-    hgps::RuntimeContext context = RuntimeContext(bus, definition);
+    hgps::RuntimeContext context = RuntimeContext(bus, inputs, std::move(scenario));
 
     TestAnalysisModule() {
         create_test_datatable(data);

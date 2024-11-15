@@ -23,7 +23,9 @@ using KevinHallAdjustmentMessage =
 namespace hgps {
 
 KevinHallModel::KevinHallModel(
-    const RiskFactorSexAgeTable &expected,
+    std::shared_ptr<RiskFactorSexAgeTable> expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
     const std::unordered_map<core::Identifier, double> &energy_equation,
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges,
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -33,9 +35,11 @@ KevinHallModel::KevinHallModel(
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
     const std::unordered_map<core::Gender, double> &height_slope)
-    : RiskFactorAdjustableModel{expected}, energy_equation_{energy_equation},
-      nutrient_ranges_{nutrient_ranges}, nutrient_equations_{nutrient_equations},
-      food_prices_{food_prices}, weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
+                                std::move(trend_steps)},
+      energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
+      nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
+      weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
       height_stddev_{height_stddev}, height_slope_{height_slope} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
@@ -48,11 +52,11 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     for (auto &person : context.population()) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
-        initialise_weight(person);
+        initialise_weight(context, person);
     }
 
     // Adjust weight mean to match expected.
-    adjust_risk_factors(context, {"Weight"_id});
+    adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -60,7 +64,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone.
     for (auto &person : context.population()) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
-        initialise_height(person, W_power_mean, context.random());
+        initialise_height(context, person, W_power_mean, context.random());
         initialise_kevin_hall_state(person);
         compute_bmi(person);
     }
@@ -96,7 +100,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
-        initialise_weight(person);
+        initialise_weight(context, person);
     }
 
     // TODO: This newborn adjustment needs sending to intervention scenario -- see #266.
@@ -112,7 +116,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     // can call this new method.
 
     // Adjust newborn weight to match expected.
-    auto adjustments = compute_weight_adjustments(context.population(), 0);
+    auto adjustments = compute_weight_adjustments(context, 0);
     for (auto &person : context.population()) {
         // Ignore if inactive or not newborn.
         if (!person.is_active() || (person.age != 0)) {
@@ -136,7 +140,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
         }
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
-        initialise_height(person, W_power_mean, context.random());
+        initialise_height(context, person, W_power_mean, context.random());
         initialise_kevin_hall_state(person);
     }
 }
@@ -162,7 +166,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         }
 
         if (person.age < kevin_hall_age_min) {
-            initialise_weight(person);
+            initialise_weight(context, person);
         } else {
             kevin_hall_run(person);
         }
@@ -198,15 +202,15 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
-    // Update: (no newborns or 19 and over).
+    // Update: (no newborns or at least the Kevin Hall minimum age).
     for (auto &person : context.population()) {
-        // Ignore if inactive or newborn or aged 19 and over.
-        if (!person.is_active() || ((person.age == 0) || (person.age >= 19))) {
+        // Ignore if inactive or newborn or at least the Kevin Hall minimum age.
+        if (!person.is_active() || ((person.age == 0) || (person.age >= kevin_hall_age_min))) {
             continue;
         }
 
         double W_power_mean = W_power_means.at(person.gender, person.age);
-        update_height(person, W_power_mean);
+        update_height(context, person, W_power_mean);
     }
 }
 
@@ -215,7 +219,7 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        return compute_weight_adjustments(context.population());
+        return compute_weight_adjustments(context);
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
@@ -246,10 +250,9 @@ void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
 }
 
 KevinHallAdjustmentTable
-KevinHallModel::compute_weight_adjustments(Population &population,
+KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
                                            std::optional<unsigned> age) const {
-    const auto &expected = get_risk_factor_expected();
-    auto W_means = compute_mean_weight(population, std::nullopt, age);
+    auto W_means = compute_mean_weight(context.population(), std::nullopt, age);
 
     // Compute adjustments.
     auto adjustments = KevinHallAdjustmentTable{};
@@ -257,12 +260,83 @@ KevinHallModel::compute_weight_adjustments(Population &population,
         adjustments.emplace_row(W_mean_sex, std::unordered_map<int, double>{});
         for (const auto &[W_mean_age, W_mean] : W_means_by_sex) {
             // NOTE: we only have the ages we requested here.
-            double W_expected = expected.at(W_mean_sex, "Weight"_id).at(W_mean_age);
+            double W_expected =
+                get_expected(context, W_mean_sex, W_mean_age, "Weight"_id, std::nullopt, true);
             adjustments.at(W_mean_sex)[W_mean_age] = W_expected - W_mean;
         }
     }
 
     return adjustments;
+}
+
+double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
+                                    const core::Identifier &factor, OptionalRange range,
+                                    bool apply_trend) const noexcept {
+
+    // Compute expected nutrient intakes from expected food intakes.
+    if (energy_equation_.contains(factor)) {
+        double nutrient_intake = 0.0;
+        for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
+            double food_intake =
+                get_expected(context, sex, age, food_key, std::nullopt, apply_trend);
+            if (nutrient_coefficients.contains(factor)) {
+                nutrient_intake += food_intake * nutrient_coefficients.at(factor);
+            }
+        }
+        return nutrient_intake;
+    }
+
+    // Compute expected energy intake from expected nutrient intakes.
+    if (factor == "EnergyIntake"_id) {
+
+        // Non-trend case.
+        if (!apply_trend) {
+            return RiskFactorAdjustableModel::get_expected(context, sex, age, "EnergyIntake"_id,
+                                                           std::nullopt, false);
+        }
+
+        // Trend case.
+        double energy_intake = 0.0;
+        for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
+            double nutrient_intake =
+                get_expected(context, sex, age, nutrient_key, std::nullopt, true);
+            energy_intake += nutrient_intake * energy_coefficient;
+        }
+        return energy_intake;
+    }
+
+    // Compute expected body weight.
+    if (factor == "Weight"_id) {
+
+        // Non-trend case.
+        if (!apply_trend) {
+            return RiskFactorAdjustableModel::get_expected(context, sex, age, "Weight"_id,
+                                                           std::nullopt, false);
+        }
+
+        // Child case.
+        if (age < kevin_hall_age_min) {
+            double weight = RiskFactorAdjustableModel::get_expected(context, sex, age, "Weight"_id,
+                                                                    std::nullopt, false);
+            double energy_without_trend =
+                get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, false);
+            double energy_with_trend =
+                get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
+            weight *= pow(energy_with_trend / energy_without_trend, 0.45);
+            return weight;
+        }
+
+        // Adult case.
+        double weight = 16.1161;
+        weight += 0.06256 * get_expected(context, sex, age, "EnergyIntake"_id, std::nullopt, true);
+        weight -= 0.6256 * get_expected(context, sex, age, "Height"_id, std::nullopt, false);
+        weight += 0.4925 * age;
+        weight -= 16.6166 * Person::gender_to_value(sex);
+        return weight;
+    }
+
+    // Fall back to base class implementation for other factors.
+    return RiskFactorAdjustableModel::get_expected(context, sex, age, factor, range, apply_trend);
 }
 
 void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
@@ -511,12 +585,12 @@ void KevinHallModel::compute_bmi(Person &person) const {
     person.risk_factors["BMI"_id] = w / (h * h);
 }
 
-void KevinHallModel::initialise_weight(Person &person) const {
-    const auto &expected = get_risk_factor_expected();
-
+void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) const {
     // Compute E/PA expected.
-    double ei_expected = expected.at(person.gender, "EnergyIntake"_id).at(person.age);
-    double pa_expected = expected.at(person.gender, "PhysicalActivity"_id).at(person.age);
+    double ei_expected =
+        get_expected(context, person.gender, person.age, "EnergyIntake"_id, std::nullopt, true);
+    double pa_expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
+                                      std::nullopt, false);
     double epa_expected = ei_expected / pa_expected;
 
     // Compute E/PA actual.
@@ -528,7 +602,8 @@ void KevinHallModel::initialise_weight(Person &person) const {
     double epa_quantile = epa_actual / epa_expected;
 
     // Compute new weight.
-    double w_expected = expected.at(person.gender, "Weight"_id).at(person.age);
+    double w_expected =
+        get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
     person.risk_factors["Weight"_id] = w_expected * w_quantile;
 }
@@ -651,19 +726,22 @@ KevinHallModel::compute_mean_weight(Population &population,
     return means;
 }
 
-void KevinHallModel::initialise_height(Person &person, double W_power_mean, Random &random) const {
+void KevinHallModel::initialise_height(RuntimeContext &context, Person &person, double W_power_mean,
+                                       Random &random) const {
 
     // Initialise lifelong height residual.
     double H_residual = random.next_normal(0, height_stddev_.at(person.gender));
     person.risk_factors["Height_residual"_id] = H_residual;
 
     // Initialise height.
-    update_height(person, W_power_mean);
+    update_height(context, person, W_power_mean);
 }
 
-void KevinHallModel::update_height(Person &person, double W_power_mean) const {
+void KevinHallModel::update_height(RuntimeContext &context, Person &person,
+                                   double W_power_mean) const {
     double W = person.risk_factors.at("Weight"_id);
-    double H_expected = get_risk_factor_expected().at(person.gender, "Height"_id).at(person.age);
+    double H_expected =
+        get_expected(context, person.gender, person.age, "Height"_id, std::nullopt, false);
     double H_residual = person.risk_factors.at("Height_residual"_id);
     double stddev = height_stddev_.at(person.gender);
     double slope = height_slope_.at(person.gender);
@@ -677,14 +755,18 @@ void KevinHallModel::update_height(Person &person, double W_power_mean) const {
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
-    RiskFactorSexAgeTable expected, std::unordered_map<core::Identifier, double> energy_equation,
+    std::unique_ptr<RiskFactorSexAgeTable> expected,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
+    std::unordered_map<core::Identifier, double> energy_equation,
     std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges,
     std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations,
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
     std::unordered_map<core::Gender, double> height_slope)
-    : RiskFactorAdjustableModelDefinition{std::move(expected)},
+    : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
+                                          std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
@@ -717,10 +799,10 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    const auto &expected = get_risk_factor_expected();
-    return std::make_unique<KevinHallModel>(expected, energy_equation_, nutrient_ranges_,
-                                            nutrient_equations_, food_prices_, weight_quantiles_,
-                                            epa_quantiles_, height_stddev_, height_slope_);
+    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
+                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
+                                            food_prices_, weight_quantiles_, epa_quantiles_,
+                                            height_stddev_, height_slope_);
 }
 
 } // namespace hgps

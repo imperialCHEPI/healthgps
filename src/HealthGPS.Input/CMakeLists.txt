@@ -18,6 +18,8 @@ target_sources(
             "csvparser.h"
             "datamanager.cpp"
             "datamanager.h"
+            "data_source.cpp"
+            "data_source.h"
             "download_file.cpp"
             "download_file.h"
             "jsonparser.cpp"
@@ -28,6 +30,8 @@ target_sources(
             "riskmodel.h"
             "schema.cpp"
             "schema.h"
+            "validated_data_source.cpp"
+            "validated_data_source.h"
             "zip_file.cpp"
             "zip_file.h")
 

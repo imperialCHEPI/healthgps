@@ -1,0 +1,112 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config/modelling.json",
+    "type": "object",
+    "properties": {
+        "ses_model": {
+            "type": "object",
+            "properties": {
+                "function_name": {
+                    "type": "string"
+                },
+                "function_parameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            },
+            "required": [
+                "function_name",
+                "function_parameters"
+            ],
+            "additionalProperties": false
+        },
+        "risk_factors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "level": {
+                        "type": "integer"
+                    },
+                    "range": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "level",
+                    "range"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "risk_factor_models": {
+            "type": "object",
+            "properties": {
+                "static": {
+                    "type": "string"
+                },
+                "dynamic": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "static",
+                "dynamic"
+            ],
+            "additionalProperties": false
+        },
+        "baseline_adjustments": {
+            "type": "object",
+            "properties": {
+                "format": {
+                    "const": "csv"
+                },
+                "delimiter": {
+                    "type": "string"
+                },
+                "encoding": {
+                    "type": "string"
+                },
+                "file_names": {
+                    "type": "object",
+                    "properties": {
+                        "factorsmean_male": {
+                            "type": "string"
+                        },
+                        "factorsmean_female": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "factorsmean_male",
+                        "factorsmean_female"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "format",
+                "delimiter",
+                "encoding",
+                "file_names"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "ses_model",
+        "risk_factors",
+        "risk_factor_models",
+        "baseline_adjustments"
+    ],
+    "additionalProperties": false
+}

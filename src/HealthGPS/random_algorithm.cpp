@@ -6,7 +6,8 @@
 #include <stdexcept>
 
 namespace hgps {
-Random::Random(RandomBitGenerator &generator) : engine_{generator} {}
+
+void Random::seed(unsigned int seed) noexcept { engine_.seed(seed); }
 
 int Random::next_int() { return next_int(0, std::numeric_limits<int>::max() - 1); }
 
@@ -24,7 +25,7 @@ int Random::next_int(int min_value, int max_value) {
     return next_int_internal(min_value, max_value);
 }
 
-double Random::next_double() noexcept { return engine_.get().next_double(); }
+double Random::next_double() noexcept { return engine_.next_double(); }
 
 double Random::next_normal() { return next_normal(0.0, 1.0); }
 
@@ -90,4 +91,5 @@ double Random::next_normal_internal(double mean, double standard_deviation) {
 
     return mean + standard_deviation * p1 * std::sqrt(-2.0 * std::log(p) / p);
 }
+
 } // namespace hgps

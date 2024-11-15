@@ -2,6 +2,7 @@
 #include "CountryModule.h"
 #include "pch.h"
 
+
 TEST(TestSimulation, RandomBitGenerator) {
     using namespace hgps;
 
@@ -30,36 +31,21 @@ TEST(TestSimulation, RandomBitGeneratorCopy) {
 TEST(TestSimulation, RandomAlgorithmStandalone) {
     using namespace hgps;
 
-    auto rnd = MTRandom32(123456789);
-    auto rnd_gen = Random(rnd);
-    auto value = rnd_gen.next_double();
-    ASSERT_GT(value, 0.0);
+    auto random = Random{};
+    random.seed(123456789);
 
     for (size_t i = 0; i < 10; i++) {
-        value = rnd_gen.next_double();
-        ASSERT_GT(value, 0.0);
-    }
-}
-
-TEST(TestSimulation, RandomAlgorithmInternal) {
-    using namespace hgps;
-
-    auto engine = MTRandom32(123456789);
-    auto rnd_gen = Random(engine);
-    auto value = rnd_gen.next_double();
-    ASSERT_GT(value, 0.0);
-
-    for (size_t i = 0; i < 10; i++) {
-        value = rnd_gen.next_double();
-        ASSERT_GT(value, 0.0);
+        double value = random.next_double();
+        ASSERT_GE(value, 0.0);
+        ASSERT_LT(value, 1.0);
     }
 }
 
 TEST(TestSimulation, RandomNextIntRangeIsClosed) {
     using namespace hgps;
 
-    auto engine = MTRandom32{123456789};
-    auto rnd_gen = Random(engine);
+    auto random = Random{};
+    random.seed(123456789);
 
     auto summary_one = core::UnivariateSummary();
     auto summary_two = core::UnivariateSummary();
@@ -69,9 +55,9 @@ TEST(TestSimulation, RandomNextIntRangeIsClosed) {
     auto sample_max = 20;
     auto sample_size = 100;
     for (auto i = 0; i < sample_size; i++) {
-        summary_one.append(rnd_gen.next_int(sample_max));
-        summary_two.append(rnd_gen.next_int(sample_min, sample_max));
-        summary_three.append(rnd_gen.next_int());
+        summary_one.append(random.next_int(sample_max));
+        summary_two.append(random.next_int(sample_min, sample_max));
+        summary_three.append(random.next_int());
     }
 
     ASSERT_EQ(0.0, summary_one.min());
@@ -87,8 +73,8 @@ TEST(TestSimulation, RandomNextIntRangeIsClosed) {
 TEST(TestSimulation, RandomNextNormal) {
     using namespace hgps;
 
-    auto engine = MTRandom32{123456789};
-    auto rnd_gen = Random(engine);
+    auto random = Random{};
+    random.seed(123456789);
 
     auto summary_one = core::UnivariateSummary();
     auto summary_two = core::UnivariateSummary();
@@ -98,8 +84,8 @@ TEST(TestSimulation, RandomNextNormal) {
     auto sample_size = 500;
     auto tolerance = 0.15;
     for (auto i = 0; i < sample_size; i++) {
-        summary_one.append(rnd_gen.next_normal());
-        summary_two.append(rnd_gen.next_normal(sample_mean, sample_stdev));
+        summary_one.append(random.next_normal());
+        summary_two.append(random.next_normal(sample_mean, sample_stdev));
     }
 
     ASSERT_NEAR(summary_one.average(), 0.0, tolerance);
@@ -112,8 +98,8 @@ TEST(TestSimulation, RandomNextNormal) {
 TEST(TestSimulation, RandomEmpiricalDiscrete) {
     using namespace hgps;
 
-    auto engine = MTRandom32{123456789};
-    auto rnd_gen = Random(engine);
+    auto random = Random{};
+    random.seed(123456789);
 
     auto values = std::vector<int>{2, 3, 5, 7, 9};
     auto freq_pdf = std::vector<float>{0.2f, 0.4f, 0.1f, 0.2f, 0.1f};
@@ -132,7 +118,7 @@ TEST(TestSimulation, RandomEmpiricalDiscrete) {
     auto summary = core::UnivariateSummary();
     auto sample_size = 100;
     for (auto i = 0; i < sample_size; i++) {
-        summary.append(rnd_gen.next_empirical_discrete(values, cdf));
+        summary.append(random.next_empirical_discrete(values, cdf));
     }
 
     ASSERT_EQ(2.0, summary.min());
@@ -146,14 +132,13 @@ TEST(TestSimulation, CreateRuntimeContext) {
     DataTable data;
     create_test_datatable(data);
 
-    auto bus = DefaultEventBus{};
+    auto bus = std::make_shared<DefaultEventBus>();
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto config = create_test_configuration(data);
-    auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
+    auto inputs = create_test_configuration(data);
 
-    auto context = RuntimeContext(bus, definition);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
     ASSERT_EQ(0, context.population().size());
     ASSERT_EQ(0, context.time_now());
 }
@@ -191,7 +176,7 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
                                                                .code = core::Identifier{"diabetes"},
                                                                .name = "Diabetes Mellitus"}};
 
-    auto config = ModelInput(data, settings, info, ses, mapping, diseases);
+    auto inputs = std::make_shared<ModelInput>(data, settings, info, ses, mapping, diseases);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
@@ -203,7 +188,7 @@ TEST(TestSimulation, ModuleFactoryRegistry) {
                                  return build_country_module(repository, config);
                              });
 
-    auto base_module = factory.create(SimulationModuleType::Analysis, config);
+    auto base_module = factory.create(SimulationModuleType::Analysis, *inputs);
     auto *country_mod = dynamic_cast<CountryModule *>(base_module.get());
     country_mod->execute("print");
 
@@ -218,21 +203,20 @@ TEST(TestSimulation, CreateSESNoiseModule) {
     DataTable data;
     create_test_datatable(data);
 
-    auto config = create_test_configuration(data);
+    auto inputs = create_test_configuration(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
 
-    auto bus = DefaultEventBus{};
+    auto bus = std::make_shared<DefaultEventBus>();
     auto channel = SyncChannel{};
     auto rnd = std::make_unique<MTRandom32>(123456789);
     auto scenario = std::make_unique<BaselineScenario>(channel);
-    auto definition = SimulationDefinition(config, std::move(scenario), std::move(rnd));
-    auto context = RuntimeContext(bus, definition);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
 
     context.reset_population(10);
 
-    auto ses_module = build_ses_noise_module(repository, config);
+    auto ses_module = build_ses_noise_module(repository, *inputs);
     ses_module->initialise_population(context);
 
     ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
@@ -250,14 +234,14 @@ TEST(TestSimulation, CreateDemographicModule) {
     DataTable data;
     create_test_datatable(data);
 
-    auto config = create_test_configuration(data);
+    auto inputs = create_test_configuration(data);
 
     auto manager = DataManager(test_datastore_path);
     auto repository = CachedRepository(manager);
 
-    auto pop_module = build_population_module(repository, config);
-    auto total_pop = pop_module->get_total_population_size(config.start_time());
-    const auto &pop_dist = pop_module->get_population_distribution(config.start_time());
+    auto pop_module = build_population_module(repository, *inputs);
+    auto total_pop = pop_module->get_total_population_size(inputs->start_time());
+    const auto &pop_dist = pop_module->get_population_distribution(inputs->start_time());
     auto sum_dist = 0.0f;
     for (const auto &pair : pop_dist) {
         sum_dist += pair.second.total();
@@ -347,7 +331,7 @@ TEST(TestSimulation, CreateDiseaseModule) {
     auto diabetes_key = core::Identifier{"diabetes"};
     auto moonshot_key = core::Identifier{"moonshot"};
 
-    auto disease_module = build_disease_module(repository, inputs);
+    auto disease_module = build_disease_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Disease, disease_module->type());
     ASSERT_EQ("Disease", disease_module->name());
     ASSERT_GT(disease_module->size(), 0);
@@ -369,7 +353,7 @@ TEST(TestSimulation, CreateAnalysisModule) {
 
     auto inputs = create_test_configuration(data);
 
-    auto analysis_module = build_analysis_module(repository, inputs);
+    auto analysis_module = build_analysis_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
     ASSERT_EQ("Analysis", analysis_module->name());
 }

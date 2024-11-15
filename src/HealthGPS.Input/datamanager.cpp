@@ -5,7 +5,6 @@
 
 #include "HealthGPS.Core/math_util.h"
 #include "HealthGPS.Core/string_util.h"
-#include "HealthGPS/program_dirs.h"
 
 #include <fmt/color.h>
 #include <rapidcsv.h>
@@ -14,59 +13,25 @@
 #include <utility>
 
 namespace {
-nlohmann::json read_input_files_from_directory(const std::filesystem::path &root_directory) {
-    auto full_filename = root_directory / "index.json";
-    auto ifs = std::ifstream{full_filename};
-    if (!ifs) {
-        throw std::runtime_error(
-            fmt::format("File-based store, index file: '{}' not found.", full_filename.string()));
-    }
+//! The name of the index file
+constexpr const char *IndexFileName = "index.json";
 
-    // Read in JSON file
-    auto index = nlohmann::json::parse(ifs);
+//! The name of the index.json schema file
+constexpr const char *DataIndexSchemaFileName = "data_index.json";
 
-    // Check that the file has a $schema property and that it matches the URL of the
-    // schema version we support
-    if (!index.contains("$schema")) {
-        throw std::runtime_error(fmt::format("Index file missing required $schema property: {}",
-                                             full_filename.string()));
-    }
-    const auto schema_url = index.at("$schema").get<std::string>();
-    if (schema_url != HGPS_DATA_INDEX_SCHEMA_URL) {
-        throw std::runtime_error(fmt::format("Invalid schema URL provided: {} (expected: {})",
-                                             schema_url, HGPS_DATA_INDEX_SCHEMA_URL));
-    }
+//! The version of the index.json schema file
+constexpr int DataIndexSchemaVersion = 1;
 
-    // Validate against schema
-    ifs.seekg(0);
-    const auto schema_directory = hgps::get_program_directory() / "schemas" / "v1";
-    hgps::input::validate_index(schema_directory, ifs);
-
-    return index;
+nlohmann::json read_input_files_from_directory(const std::filesystem::path &data_path) {
+    return hgps::input::load_and_validate_json(data_path / IndexFileName, DataIndexSchemaFileName,
+                                               DataIndexSchemaVersion);
 }
 } // anonymous namespace
 
 namespace hgps::input {
-DataManager::DataManager(const std::string &path_or_url, VerboseMode verbosity)
-    : verbosity_{verbosity} {
-    if (path_or_url.starts_with("http:") || path_or_url.starts_with("https:")) {
-        // Download file to temporary folder and extract it
-        const auto path = download_file_to_temporary(path_or_url, ".zip");
-        root_ = extract_zip_file_or_load_from_cache(path);
-    } else {
-        std::filesystem::path path = path_or_url;
-        if (std::filesystem::is_directory(path)) {
-            root_ = std::move(path);
-        } else if (std::filesystem::is_regular_file(path) && path.extension() == ".zip") {
-            root_ = extract_zip_file_or_load_from_cache(path);
-        } else {
-            throw std::runtime_error(fmt::format(
-                "Path must either point to a zip file or a directory: {}", path_or_url));
-        }
-    }
-
-    index_ = read_input_files_from_directory(root_);
-}
+DataManager::DataManager(std::filesystem::path data_path, VerboseMode verbosity)
+    : root_(std::move(data_path)), verbosity_(verbosity),
+      index_(read_input_files_from_directory(root_)) {}
 
 std::vector<Country> DataManager::get_countries() const {
     auto results = std::vector<Country>();

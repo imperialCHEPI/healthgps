@@ -65,13 +65,6 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
 
-    // Set thread limit from OMP_THREAD_LIMIT, if set in environment.
-    char *env_threads = std::getenv("OMP_THREAD_LIMIT");
-    int threads =
-        env_threads != nullptr ? std::atoi(env_threads) : tbb::this_task_arena::max_concurrency();
-    auto thread_control =
-        tbb::global_control(tbb::global_control::max_allowed_parallelism, threads);
-
     // Create CLI options and validate minimum arguments
     auto options = create_options();
     if (argc < 2) {
@@ -79,31 +72,39 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         return exit_application(EXIT_FAILURE);
     }
 
+    std::optional<CommandOptions> cmd_args_opt;
+    try {
+        cmd_args_opt = parse_arguments(options, argc, argv);
+
+        // We won't get a config if e.g. the user chooses the --help option
+        if (!cmd_args_opt) {
+            return exit_application(EXIT_SUCCESS);
+        }
+    } catch (const std::exception &ex) {
+        fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}\n", ex.what());
+        fmt::print("\n{}\n", options.help());
+        return exit_application(EXIT_FAILURE);
+    }
+
+    const auto &cmd_args = cmd_args_opt.value();
+
+    // Set maximum number of threads, if requested
+    std::optional<tbb::global_control> thread_control;
+    if (cmd_args.num_threads != 0) {
+        thread_control.emplace(tbb::global_control::max_allowed_parallelism, cmd_args.num_threads);
+    }
+
     // Print application title and parse command line arguments
     print_app_title();
-    auto cmd_args = parse_arguments(options, argc, argv);
-    if (!cmd_args.success) {
-        return cmd_args.exit_code;
-    }
 
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = get_configuration(cmd_args.config_file, cmd_args.job_id, cmd_args.verbose);
+        config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id,
+                                   cmd_args.verbose);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);
-    }
-
-    // Create output folder
-    if (!std::filesystem::exists(config.output.folder)) {
-        fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
-                   config.output.folder);
-        if (!std::filesystem::create_directories(config.output.folder)) {
-            fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
-                       config.output.folder);
-            return exit_application(EXIT_FAILURE);
-        }
     }
 
     // Load input data file into a datatable asynchronous
@@ -112,8 +113,23 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 #ifdef CATCH_EXCEPTIONS
     try {
 #endif
+        // In future, we want users to supply the data source via the config file only, but for now
+        // we also allow passing it via a command line argument. Sanity check: Make sure they only
+        // do one of these things!
+        if (cmd_args.data_source.has_value() == (config.data_source != nullptr)) {
+            fmt::print(
+                fg(fmt::color::red),
+                "Must provide a data source via config file or command line, but not both\n");
+            return exit_application(EXIT_FAILURE);
+        }
+
+        // NOLINTBEGIN(bugprone-unchecked-optional-access)
+        const auto &data_source =
+            cmd_args.data_source.has_value() ? *cmd_args.data_source : *config.data_source;
+        // NOLINTEND(bugprone-unchecked-optional-access)
+
         // Create back-end data store, cached data repository wrapper
-        auto data_api = input::DataManager(cmd_args.data_path_or_url, config.verbosity);
+        auto data_api = input::DataManager(data_source.get_data_directory(), config.verbosity);
         auto data_repository = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions
@@ -141,17 +157,34 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         std::cout << input_table;
 
         // Create complete model input from configuration
-        auto model_input =
-            create_model_input(input_table, std::move(country), config, std::move(diseases));
+        auto model_input = std::make_shared<ModelInput>(
+            create_model_input(input_table, std::move(country), config, std::move(diseases)));
+
+        // If the user is just validating input files, abort here
+        if (cmd_args.dry_run) {
+            fmt::print(fg(fmt::color::yellow), "Dry run completed successfully.\n");
+            return exit_application(EXIT_SUCCESS);
+        }
+
+        // Create output folder
+        if (!std::filesystem::exists(config.output.folder)) {
+            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
+                       config.output.folder);
+            if (!std::filesystem::create_directories(config.output.folder)) {
+                fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
+                           config.output.folder);
+                return exit_application(EXIT_FAILURE);
+            }
+        }
 
         // Create event bus and event monitor with a results file writer
-        auto event_bus = DefaultEventBus();
-        auto json_file_logger = create_results_file_logger(config, model_input);
-        auto event_monitor = EventMonitor{event_bus, json_file_logger};
+        auto event_bus = std::make_shared<DefaultEventBus>();
+        auto json_file_logger = create_results_file_logger(config, *model_input);
+        auto event_monitor = EventMonitor{*event_bus, json_file_logger};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
-        if (const auto seed = model_input.seed()) {
+        if (const auto seed = model_input->seed()) {
             seed_generator->seed(seed.value());
         }
         auto runner = Runner(event_bus, std::move(seed_generator));

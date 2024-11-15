@@ -1,16 +1,15 @@
 #pragma once
 
-#include "randombit_generator.h"
+#include "mtrandom.h"
 #include <functional>
 
 namespace hgps {
 /// @brief General purpose Random number generator algorithms
 class Random {
   public:
-    Random() = delete;
-    /// @brief Initialise a new instance of the Random class
-    /// @param generator Underline pseudo-random number engine instance
-    Random(RandomBitGenerator &generator);
+    /// @brief Set a new seed value for the random number generator
+    /// @param seed The new seed value
+    void seed(unsigned int seed) noexcept;
 
     /// @brief Generates the next random integer in the sequence
     /// @return A random integer value in range [\c min(), \c max())
@@ -54,7 +53,8 @@ class Random {
     int next_empirical_discrete(const std::vector<int> &values, const std::vector<double> &cdf);
 
   private:
-    std::reference_wrapper<RandomBitGenerator> engine_;
+    MTRandom32 engine_;
+
     int next_int_internal(int min_value, int max_value);
     double next_uniform_internal(double min_value, double max_value);
     double next_normal_internal(double mean, double standard_deviation);

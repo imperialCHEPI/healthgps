@@ -5,7 +5,6 @@
 #include "event_aggregator.h"
 #include "gender_table.h"
 #include "runtime_context.h"
-#include "simulation_definition.h"
 #include "simulation_module.h"
 
 #include <adevs/adevs.h>
@@ -27,11 +26,14 @@ class Simulation : public adevs::Model<int> {
     Simulation() = delete;
 
     /// @brief Initialises a new instance of the Simulation class
-    /// @param definition The simulation definition instance
     /// @param factory The simulation modules factory instance
     /// @param bus The message bus instance to use
-    explicit Simulation(SimulationDefinition &&definition, SimulationModuleFactory &factory,
-                        EventAggregator &bus);
+    /// @param inputs The simulation model inputs
+    /// @param scenario The scenario to simulate
+    explicit Simulation(SimulationModuleFactory &factory,
+                        std::shared_ptr<const EventAggregator> bus,
+                        std::shared_ptr<const ModelInput> inputs,
+                        std::unique_ptr<Scenario> scenario);
 
     /// @brief Destroys a simulation instance
     virtual ~Simulation() = default;
@@ -69,19 +71,18 @@ class Simulation : public adevs::Model<int> {
 
     /// @brief Gets the simulation type
     /// @return The intervention scenario type enumeration
-    ScenarioType type() noexcept { return definition_.scenario().type(); }
+    ScenarioType type() noexcept { return context_.scenario().type(); }
 
     /// @brief Gets the simulation name
     /// @return The intervention scenario name
-    std::string name() override { return definition_.identifier(); }
+    std::string name() override { return context_.identifier(); }
 
   private:
-    SimulationDefinition definition_;
     RuntimeContext context_;
     std::shared_ptr<UpdatableModule> ses_;
     std::shared_ptr<DemographicModule> demographic_;
     std::shared_ptr<RiskFactorHostModule> risk_factor_;
-    std::shared_ptr<DiseaseHostModule> disease_;
+    std::shared_ptr<DiseaseModule> disease_;
     std::shared_ptr<UpdatableModule> analysis_;
     adevs::Time end_time_;
 
@@ -100,4 +101,5 @@ class Simulation : public adevs::Model<int> {
 
     static Person partial_clone_entity(const Person &source) noexcept;
 };
+
 } // namespace hgps
