@@ -63,7 +63,7 @@ class TestAnalysisModule : public ::testing::Test {
             }
         }
 
-        auto ses_module = build_ses_noise_module(repository, config);
+        auto ses_module = build_ses_noise_module(repository, *config);
         ses_module->initialise_population(context);
 
         analysis_module->initialise_population(context);
