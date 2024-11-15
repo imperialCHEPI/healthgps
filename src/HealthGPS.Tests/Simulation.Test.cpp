@@ -2,7 +2,6 @@
 #include "CountryModule.h"
 #include "pch.h"
 
-
 TEST(TestSimulation, RandomBitGenerator) {
     using namespace hgps;
 
