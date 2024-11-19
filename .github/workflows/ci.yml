@@ -77,7 +77,7 @@ jobs:
         run: |
           cmake --preset=${{ matrix.platform }}-debug -DWARNINGS_AS_ERRORS=ON -DGENERATE_COVERAGE=ON
 
-      - uses: ZedThree/clang-tidy-review@v0.20.0
+      - uses: ZedThree/clang-tidy-review@v0.20.1
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]')
         id: review
         with:
@@ -86,7 +86,7 @@ jobs:
           lgtm_comment_body: ''
 
       # Uploads an artefact containing clang_fixes.json
-      - uses: ZedThree/clang-tidy-review/upload@v0.20.0
+      - uses: ZedThree/clang-tidy-review/upload@v0.20.1
         if: matrix.compiler == 'gcc-default' && github.event_name == 'pull_request' && !(github.actor == 'dependabot[bot]' || github.actor == 'pre-commit-ci[bot]')
         id: upload-review
 
