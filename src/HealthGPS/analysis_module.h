@@ -42,6 +42,7 @@ class AnalysisModule final : public UpdatableModule {
     void update_population(RuntimeContext &context) override;
 
   private:
+    std::vector<int> dump_times_;
     AnalysisDefinition definition_;
     WeightModel weight_classifier_;
     DoubleAgeGenderTable residual_disability_weight_;
