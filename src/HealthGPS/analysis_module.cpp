@@ -460,8 +460,8 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context) const
     }
 
     // Calculate in-place standard deviation.
-    auto divide_by_count_sqrt = [&](const std::string &chan, core::Gender sex, int age,
-                                    double count, std::vector<double> &factor_values) {
+    auto divide_by_count_sqrt = [&](const std::string &chan, double count,
+                                    std::vector<double> &factor_values) {
         const double sum =
             calculated_stats_[calculate_index(factor_values) + channel_index_.at("std_" + chan)];
         const double std = std::sqrt(sum / count);
@@ -484,10 +484,10 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context) const
 
         // Calculate in-place factor standard deviation.
         for (const auto &factor : context.mapping().entries()) {
-            divide_by_count_sqrt(factor.key().to_string(), core::Gender::female, age,
-                                 (count_F + deaths_F), factor_values_female);
-            divide_by_count_sqrt(factor.key().to_string(), core::Gender::male, age,
-                                 (count_M + deaths_M), factor_values_male);
+            divide_by_count_sqrt(factor.key().to_string(), (count_F + deaths_F),
+                                 factor_values_female);
+            divide_by_count_sqrt(factor.key().to_string(), (count_M + deaths_M),
+                                 factor_values_male);
         }
     }
 }
