@@ -422,6 +422,76 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context) co
     }
 }
 
+void AnalysisModule::calculate_standard_deviation(RuntimeContext &context) const {
+
+    // Accumulate squared deviations from mean.
+    auto accumulate_squared_diffs = [&](const std::string &chan, const auto &person, double value) {
+        size_t index = calculate_index(person);
+        const double mean = calculated_stats_[index + channel_index_.at("mean_" + chan)];
+        const double diff = value - mean;
+        calculated_stats_[index + channel_index_.at("std_" + chan)] += diff * diff;
+    };
+
+    auto current_time = static_cast<unsigned int>(context.time_now());
+    for (const auto &person : context.population()) {
+        unsigned int age = person.age;
+        core::Gender sex = person.gender;
+
+        if (!person.is_active()) {
+            if (!person.is_alive() && person.time_of_death() == current_time) {
+                float expcted_life = definition_.life_expectancy().at(context.time_now(), sex);
+                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                accumulate_squared_diffs("yll", person, yll);
+                accumulate_squared_diffs("daly", person, yll);
+            }
+
+            continue;
+        }
+
+        double dw = calculate_disability_weight(person);
+        double yld = dw * DALY_UNITS;
+        accumulate_squared_diffs("yld", person, yld);
+        accumulate_squared_diffs("daly", person, yld);
+
+        for (const auto &factor : context.mapping().entries()) {
+            const double value = person.get_risk_factor_value(factor.key());
+            accumulate_squared_diffs(factor.key().to_string(), person, value);
+        }
+    }
+
+    // Calculate in-place standard deviation.
+    auto divide_by_count_sqrt = [&](const std::string &chan, double count,
+                                    std::vector<double> &factor_values) {
+        const double sum =
+            calculated_stats_[calculate_index(factor_values) + channel_index_.at("std_" + chan)];
+        const double std = std::sqrt(sum / count);
+        calculated_stats_[calculate_index(factor_values) + channel_index_.at("std_" + chan)] = std;
+    };
+
+    // For each age group in the analysis...
+    const auto age_range = context.age_range();
+    for (int age = age_range.lower(); age <= age_range.upper(); age++) {
+        std::vector<double> factor_values_male = {1.0, static_cast<double>(age)};
+        std::vector<double> factor_values_female = {0.0, static_cast<double>(age)};
+        double count_F =
+            calculated_stats_[calculate_index(factor_values_female) + channel_index_.at("count")];
+        double count_M =
+            calculated_stats_[calculate_index(factor_values_male) + channel_index_.at("count")];
+        double deaths_F =
+            calculated_stats_[calculate_index(factor_values_female) + channel_index_.at("deaths")];
+        double deaths_M =
+            calculated_stats_[calculate_index(factor_values_male) + channel_index_.at("deaths")];
+
+        // Calculate in-place factor standard deviation.
+        for (const auto &factor : context.mapping().entries()) {
+            divide_by_count_sqrt(factor.key().to_string(), (count_F + deaths_F),
+                                 factor_values_female);
+            divide_by_count_sqrt(factor.key().to_string(), (count_M + deaths_M),
+                                 factor_values_male);
+        }
+    }
+}
+
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
@@ -662,6 +732,29 @@ size_t AnalysisModule::calculate_index(const Person &person) const {
     std::vector<size_t> bin_indices;
     for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
         double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
+        auto bin_index =
+            static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
+        bin_indices.push_back(bin_index);
+    }
+
+    // Calculate the index in the calculated_stats_ vector
+    size_t index = 0;
+    for (size_t i = 0; i < bin_indices.size() - 1; i++) {
+        size_t accumulated_bins =
+            std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(), size_t{1},
+                            std::multiplies<>());
+        index += bin_indices[i] * accumulated_bins * num_stats_to_calc_;
+    }
+    index += bin_indices.back() * num_stats_to_calc_;
+
+    return index;
+}
+
+size_t AnalysisModule::calculate_index(const std::vector<double> &factor_values) const {
+    // Get the bin index for each factor
+    std::vector<size_t> bin_indices;
+    for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
+        double factor_value = factor_values[i];
         auto bin_index =
             static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
         bin_indices.push_back(bin_index);

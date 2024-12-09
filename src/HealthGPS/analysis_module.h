@@ -89,6 +89,15 @@ class AnalysisModule final : public UpdatableModule {
     /// @return The index in `calculated_stats_`
     size_t calculate_index(const Person &person) const;
 
+    /// @brief Calculates the bin index in `calculated_stats_` for a given set of factor values
+    /// @param factor_values The factor values to calculate the index for
+    /// @return The index in `calculated_stats_`
+    size_t calculate_index(const std::vector<double> &factor_values) const;
+
+    /// @brief Calculates the standard deviation of factors given data series containing means
+    /// @param context The runtime context
+    void calculate_standard_deviation(RuntimeContext &context) const;
+
     /// @brief Calculates the standard deviation of factors given data series containing means
     /// @param context The runtime context
     /// @param series The data series containing factor means
