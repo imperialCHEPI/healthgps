@@ -16,8 +16,7 @@ class DefaultDiseaseModel final : public DiseaseModel {
     /// @param definition The disease definition instance
     /// @param classifier The body weight classification model instance
     /// @param age_range The valid age range for model dataset
-    DefaultDiseaseModel(DiseaseDefinition &definition, WeightModel &&classifier,
-                        const core::IntegerInterval &age_range);
+    DefaultDiseaseModel(DiseaseDefinition &definition, WeightModel &&classifier, const core::IntegerInterval &age_range);
 
     /// @brief Returns the disease group type (other).
     /// @return The disease group type (other).

@@ -100,8 +100,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     // Parse inputs configuration file, *.json.
     Configuration config;
     try {
-        config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id,
-                                   cmd_args.verbose);
+        // use command args to populate config structure.
+        config = get_configuration(cmd_args.config_source, cmd_args.output_folder, cmd_args.job_id, cmd_args.verbose);
     } catch (const std::exception &ex) {
         fmt::print(fg(fmt::color::red), "\n\nInvalid configuration - {}.\n", ex.what());
         return exit_application(EXIT_FAILURE);
@@ -157,8 +157,7 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         std::cout << input_table;
 
         // Create complete model input from configuration
-        auto model_input = std::make_shared<ModelInput>(
-            create_model_input(input_table, std::move(country), config, std::move(diseases)));
+        auto model_input = std::make_shared<ModelInput>(create_model_input(input_table, std::move(country), config, std::move(diseases)));
 
         // If the user is just validating input files, abort here
         if (cmd_args.dry_run) {

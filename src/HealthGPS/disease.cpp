@@ -52,8 +52,8 @@ void DiseaseModule::update_population(RuntimeContext &context) {
     }
 }
 
-double DiseaseModule::get_excess_mortality(const core::Identifier &disease_code,
-                                           const Person &entity) const noexcept {
+// wrapper of two functions: i) default disease model's get_excess_mortality and ii) default_cancer model's get_excess_mortality
+double DiseaseModule::get_excess_mortality(const core::Identifier &disease_code, const Person &entity) const noexcept {
     if (!models_.contains(disease_code)) {
         return 0.0;
     }
@@ -72,9 +72,8 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
     tbb::parallel_for_each(std::begin(diseases), std::end(diseases), [&](auto &info) {
         auto info_code_str = info.code.to_string();
         auto other = repository.get_disease_info(info_code_str);
-        if (!registry.contains(info.group) || !other.has_value()) {
+        if (!registry.contains(info.group) || !other.has_value()) 
             throw std::out_of_range("Unknown disease definition: " + info_code_str);
-        }
 
         auto &disease_definition = repository.get_disease_definition(info, config);
         auto &lms_definition = repository.get_lms_definition();
@@ -82,9 +81,7 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
 
         // Sync region
         std::scoped_lock lock(m);
-        models.emplace(core::Identifier{info.code},
-                       registry.at(info.group)(disease_definition, std::move(classifier),
-                                               config.settings().age_range()));
+        models.emplace(core::Identifier{info.code}, registry.at(info.group)(disease_definition, std::move(classifier), config.settings().age_range()));
     });
 
     return std::make_unique<DiseaseModule>(std::move(models));

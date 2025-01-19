@@ -48,8 +48,7 @@ class DiseaseDefinition final {
     /// @param measures_table The disease measures table
     /// @param diseases The diseases to disease relative risk table
     /// @param risk_factors The risk-factors to diseases relative risk values
-    DiseaseDefinition(DiseaseTable &&measures_table, RelativeRiskTableMap &&diseases,
-                      RelativeRiskLookupMap &&risk_factors)
+    DiseaseDefinition(DiseaseTable &&measures_table, RelativeRiskTableMap &&diseases,RelativeRiskLookupMap &&risk_factors)
         : measures_table_{std::move(measures_table)}, relative_risk_diseases_{std::move(diseases)},
           relative_risk_factors_{std::move(risk_factors)}, parameters_{} {}
 
