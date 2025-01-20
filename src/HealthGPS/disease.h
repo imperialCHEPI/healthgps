@@ -61,8 +61,8 @@ class DiseaseModule final : public UpdatableModule {
                                 const Person &entity) const noexcept;
 
   private:
-    std::map<core::Identifier, std::shared_ptr<DiseaseModel>> models_;
-    std::string name_{"Disease"};
+    std::map<core::Identifier, std::shared_ptr<DiseaseModel>>   models_;
+    std::string                                                 name_{"Disease"};
 };
 
 /// @brief Builds a new instance of the DiseaseModule using the given data infrastructure
@@ -70,7 +70,6 @@ class DiseaseModule final : public UpdatableModule {
 /// @param config The model inputs instance
 /// @return A new DiseaseModule instance
 /// @throws std::out_of_range for unknown disease definition identifier
-std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
-                                                    const ModelInput &config);
+std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository, const ModelInput &config);
 
 } // namespace hgps

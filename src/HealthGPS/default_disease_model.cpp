@@ -9,8 +9,8 @@ namespace hgps {
 DefaultDiseaseModel::DefaultDiseaseModel(DiseaseDefinition &definition, WeightModel &&classifier, const core::IntegerInterval &age_range)
     : definition_{definition}, weight_classifier_{std::move(classifier)}, average_relative_risk_{create_age_gender_table<double>(age_range)} 
 {
-        if (definition_.get().identifier().group == core::DiseaseGroup::cancer) 
-            throw std::invalid_argument("Disease definition group mismatch, must not be 'cancer'.");
+    if (definition_.get().identifier().group == core::DiseaseGroup::cancer) 
+        throw std::invalid_argument("Disease definition group mismatch, must not be 'cancer'.");
 }
 
 core::DiseaseGroup DefaultDiseaseModel::group() const noexcept 
@@ -28,6 +28,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context)
     int prevalence_id           = definition_.get().table().at(MeasureKey::prevalence);
     auto relative_risk_table    = calculate_average_relative_risk(context);
 
+    // not parallelized
     for (auto &person : context.population()) 
     {
         if (!person.is_active() || !definition_.get().table().contains(person.age))     continue;

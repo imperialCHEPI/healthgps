@@ -12,6 +12,7 @@ using ParameterLookup = const std::map<int, DoubleGenderValue>;
 
 /// @brief Defines the cancer disease parameters data type
 struct DiseaseParameter final {
+
     /// @brief Initialises a new instance of the DiseaseParameter data structure
     DiseaseParameter() = default;
 
@@ -20,8 +21,7 @@ struct DiseaseParameter final {
     /// @param prevalence The cancer prevalence distribution
     /// @param survival The cancer survivalist rates
     /// @param deaths The cancer death weights
-    DiseaseParameter(int data_time, const ParameterLookup &prevalence,
-                     const ParameterLookup &survival, const ParameterLookup &deaths)
+    DiseaseParameter(int data_time, const ParameterLookup &prevalence, const ParameterLookup &survival, const ParameterLookup &deaths)
         : time_year{data_time}, prevalence_distribution{prevalence}, survival_rate{survival},
           death_weight{deaths}, max_time_since_onset{prevalence.rbegin()->first + 1} {}
 
@@ -41,6 +41,7 @@ struct DiseaseParameter final {
     int max_time_since_onset{};
 };
 
+
 /// @brief Implements the disease full definition data type.
 class DiseaseDefinition final {
   public:
@@ -57,8 +58,7 @@ class DiseaseDefinition final {
     /// @param diseases The diseases to disease relative risk table
     /// @param risk_factors The risk-factors to diseases relative risk values
     /// @param parameter The cancer disease parameter
-    DiseaseDefinition(DiseaseTable &&measures_table, RelativeRiskTableMap &&diseases,
-                      RelativeRiskLookupMap &&risk_factors, DiseaseParameter &&parameter)
+    DiseaseDefinition(DiseaseTable &&measures_table, RelativeRiskTableMap &&diseases, RelativeRiskLookupMap &&risk_factors, DiseaseParameter &&parameter)
         : measures_table_{std::move(measures_table)}, relative_risk_diseases_{std::move(diseases)},
           relative_risk_factors_{std::move(risk_factors)}, parameters_{std::move(parameter)} {}
 
@@ -72,24 +72,20 @@ class DiseaseDefinition final {
 
     /// @brief Gets the diseases relative risk to disease table
     /// @return The disease-disease relative risk table
-    const RelativeRiskTableMap &relative_risk_diseases() const noexcept {
-        return relative_risk_diseases_;
-    }
+    const RelativeRiskTableMap &relative_risk_diseases() const noexcept {   return relative_risk_diseases_;   }
 
     /// @brief Gets the risk factors relative risk to disease table
     /// @return The risk factors to disease relative risk values
-    const RelativeRiskLookupMap &relative_risk_factors() const noexcept {
-        return relative_risk_factors_;
-    }
+    const RelativeRiskLookupMap &relative_risk_factors() const noexcept {   return relative_risk_factors_;    }
 
     /// @brief Gets the cancer disease parameters
     /// @return The cancer parameters
     const DiseaseParameter &parameters() const noexcept { return parameters_; }
 
   private:
-    DiseaseTable measures_table_;
-    RelativeRiskTableMap relative_risk_diseases_;
-    RelativeRiskLookupMap relative_risk_factors_;
-    DiseaseParameter parameters_;
+    DiseaseTable            measures_table_;
+    RelativeRiskTableMap    relative_risk_diseases_;
+    RelativeRiskLookupMap   relative_risk_factors_;
+    DiseaseParameter        parameters_;
 };
 } // namespace hgps

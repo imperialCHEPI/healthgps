@@ -20,28 +20,25 @@
 namespace {
 /// @brief Get a string representation of current system time
 /// @return The system time as string
-std::string get_time_now_str() {
+std::string get_time_now_str() 
+{
     auto tp = std::chrono::system_clock::now();
     return fmt::format("{0:%F %H:%M:}{1:%S} {0:%Z}", tp, tp.time_since_epoch());
 }
 
 /// @brief Prints application start-up messages
-void print_app_title() {
-    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold,
-               "\n# Health-GPS Microsimulation for Policy Options #\n\n");
-
-    fmt::print("Today: {}\nMaximum threads: {}\n\n", get_time_now_str(),
-               tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism));
+void print_app_title() 
+{
+    fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "\n# Health-GPS Microsimulation for Policy Options #\n\n");
+    fmt::print("Today: {}\nMaximum threads: {}\n\n", get_time_now_str(), tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism));
 }
 
-hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configuration &config,
-                                                  const hgps::ModelInput &input) {
+hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configuration &config, const hgps::ModelInput &input) 
+{
     return {create_output_file_name(config.output, config.job_id),
             hgps::ExperimentInfo{.model = config.app_name,
                                  .version = config.app_version,
-                                 .intervention = config.active_intervention
-                                                     ? config.active_intervention->identifier
-                                                     : "",
+                                 .intervention = config.active_intervention ? config.active_intervention->identifier : "",
                                  .job_id = config.job_id,
                                  .seed = input.seed().value_or(0u)}};
 }
@@ -49,7 +46,8 @@ hgps::ResultFileWriter create_results_file_logger(const hgps::input::Configurati
 /// @brief Prints application exit message
 /// @param exit_code The application exit code
 /// @return The respective exit code
-int exit_application(int exit_code) {
+int exit_application(int exit_code) 
+{
     fmt::print("\n\n");
     fmt::print(fg(fmt::color::yellow) | fmt::emphasis::bold, "Goodbye.");
     fmt::print(" {}.\n\n", get_time_now_str());
@@ -61,26 +59,30 @@ int exit_application(int exit_code) {
 /// @param argc The number of command arguments
 /// @param argv The list of arguments provided
 /// @return The application exit code
-int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
+int main(int argc, char *argv[]) 
+{ 
+    // NOLINT(bugprone-exception-escape)
     using namespace hgps;
     using namespace hgps::input;
 
     // Create CLI options and validate minimum arguments
     auto options = create_options();
-    if (argc < 2) {
+    if (argc < 2) 
+    {
         std::cout << options.help() << '\n';
         return exit_application(EXIT_FAILURE);
     }
 
     std::optional<CommandOptions> cmd_args_opt;
-    try {
+    try 
+    {
         cmd_args_opt = parse_arguments(options, argc, argv);
 
         // We won't get a config if e.g. the user chooses the --help option
-        if (!cmd_args_opt) {
-            return exit_application(EXIT_SUCCESS);
-        }
-    } catch (const std::exception &ex) {
+        if (!cmd_args_opt) return exit_application(EXIT_SUCCESS);
+    } 
+    catch (const std::exception &ex) 
+    {
         fmt::print(fg(fmt::color::red), "\nInvalid command line argument: {}\n", ex.what());
         fmt::print("\n{}\n", options.help());
         return exit_application(EXIT_FAILURE);
@@ -90,7 +92,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
     // Set maximum number of threads, if requested
     std::optional<tbb::global_control> thread_control;
-    if (cmd_args.num_threads != 0) {
+    if (cmd_args.num_threads != 0) 
+    {
         thread_control.emplace(tbb::global_control::max_allowed_parallelism, cmd_args.num_threads);
     }
 
@@ -116,21 +119,19 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         // In future, we want users to supply the data source via the config file only, but for now
         // we also allow passing it via a command line argument. Sanity check: Make sure they only
         // do one of these things!
-        if (cmd_args.data_source.has_value() == (config.data_source != nullptr)) {
-            fmt::print(
-                fg(fmt::color::red),
-                "Must provide a data source via config file or command line, but not both\n");
+        if (cmd_args.data_source.has_value() == (config.data_source != nullptr)) 
+        {
+            fmt::print(fg(fmt::color::red), "Must provide a data source via config file or command line, but not both\n");
             return exit_application(EXIT_FAILURE);
         }
 
         // NOLINTBEGIN(bugprone-unchecked-optional-access)
-        const auto &data_source =
-            cmd_args.data_source.has_value() ? *cmd_args.data_source : *config.data_source;
+        const auto &data_source = cmd_args.data_source.has_value() ? *cmd_args.data_source : *config.data_source;
         // NOLINTEND(bugprone-unchecked-optional-access)
 
         // Create back-end data store, cached data repository wrapper
-        auto data_api = input::DataManager(data_source.get_data_directory(), config.verbosity);
-        auto data_repository = hgps::CachedRepository{data_api};
+        auto data_api           = input::DataManager(data_source.get_data_directory(), config.verbosity);
+        auto data_repository    = hgps::CachedRepository{data_api};
 
         // Register the input risk factors model definitions
         register_risk_factor_model_definitions(data_repository, config);
@@ -140,12 +141,12 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         // Validate the configuration's target country for the simulation
         auto country = data_api.get_country(config.settings.country);
-        fmt::print("Target country: {} - {}, population: {:0.3g}%.\n", country.code, country.name,
-                   config.settings.size_fraction * 100.0f);
+        fmt::print("Target country: {} - {}, population: {:0.3g}%.\n", country.code, country.name, config.settings.size_fraction * 100.0f);
 
         // Validate the configuration diseases list, must exists in back-end data store
         auto diseases = get_diseases_info(data_api, config);
-        if (diseases.size() != config.diseases.size()) {
+        if (diseases.size() != config.diseases.size()) 
+        {
             fmt::print(fg(fmt::color::red), "\nInvalid list of diseases in configuration.\n");
             return exit_application(EXIT_FAILURE);
         }
@@ -160,32 +161,33 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
         auto model_input = std::make_shared<ModelInput>(create_model_input(input_table, std::move(country), config, std::move(diseases)));
 
         // If the user is just validating input files, abort here
-        if (cmd_args.dry_run) {
+        if (cmd_args.dry_run) 
+        {
             fmt::print(fg(fmt::color::yellow), "Dry run completed successfully.\n");
             return exit_application(EXIT_SUCCESS);
         }
 
         // Create output folder
-        if (!std::filesystem::exists(config.output.folder)) {
-            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n",
-                       config.output.folder);
-            if (!std::filesystem::create_directories(config.output.folder)) {
-                fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n",
-                           config.output.folder);
+        if (!std::filesystem::exists(config.output.folder)) 
+        {
+            fmt::print(fg(fmt::color::dark_salmon), "\nCreating output folder: {} ...\n", config.output.folder);
+
+            if (!std::filesystem::create_directories(config.output.folder)) 
+            {
+                fmt::print(fg(fmt::color::red), "Failed to create output folder: {}\n", config.output.folder);
                 return exit_application(EXIT_FAILURE);
             }
         }
 
         // Create event bus and event monitor with a results file writer
-        auto event_bus = std::make_shared<DefaultEventBus>();
-        auto json_file_logger = create_results_file_logger(config, *model_input);
-        auto event_monitor = EventMonitor{*event_bus, json_file_logger};
+        auto event_bus          = std::make_shared<DefaultEventBus>();
+        auto json_file_logger   = create_results_file_logger(config, *model_input);
+        auto event_monitor      = EventMonitor{*event_bus, json_file_logger};
 
         // Create simulation executive instance with master seed generator
         auto seed_generator = std::make_unique<hgps::MTRandom32>();
-        if (const auto seed = model_input->seed()) {
-            seed_generator->seed(seed.value());
-        }
+        if (const auto seed = model_input->seed()) seed_generator->seed(seed.value());
+        
         auto runner = Runner(event_bus, std::move(seed_generator));
 
         // Create communication channel, shared between the two scenarios.
@@ -193,17 +195,17 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
 
         // Create simulation engine for each scenario, baseline is always simulated.
         auto runtime = 0.0;
-        fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n",
-                   config.trial_runs);
+        fmt::print(fg(fmt::color::cyan), "\nStarting baseline simulation with {} trials ...\n\n", config.trial_runs);
         auto baseline_sim = create_baseline_simulation(channel, factory, event_bus, model_input);
-        if (config.active_intervention.has_value()) {
-            fmt::print(fg(fmt::color::cyan),
-                       "\nStarting intervention simulation with {} trials ...\n",
-                       config.trial_runs);
-            auto policy_sim = create_intervention_simulation(
-                channel, factory, event_bus, model_input, config.active_intervention.value());
+
+        if (config.active_intervention.has_value()) 
+        {
+            fmt::print(fg(fmt::color::cyan), "\nStarting intervention simulation with {} trials ...\n", config.trial_runs);
+            auto policy_sim = create_intervention_simulation(channel, factory, event_bus, model_input, config.active_intervention.value());
             runtime = runner.run(baseline_sim, policy_sim, config.trial_runs);
-        } else {
+
+        } else 
+        {
             // Baseline only, close channel not store any message
             channel.close();
             runtime = runner.run(baseline_sim, config.trial_runs);
