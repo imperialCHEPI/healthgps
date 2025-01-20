@@ -23,7 +23,7 @@ const core::Identifier &DefaultDiseaseModel::disease_type() const noexcept
     return definition_.get().identifier().code;
 }
 
-void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) 
+void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) /// called for each disease in disease.cpp::initialise_population
 {
     int prevalence_id           = definition_.get().table().at(MeasureKey::prevalence);
     auto relative_risk_table    = calculate_average_relative_risk(context);
@@ -39,8 +39,9 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context)
         double average_relative_risk = relative_risk_table(person.age, person.gender);
 
         double prevalence   = definition_.get().table()(person.age, person.gender).at(prevalence_id);
-        double probability  = prevalence * relative_risk / average_relative_risk;
+        double probability  = prevalence * relative_risk / average_relative_risk; //// is this always between 0 and 1?
         double hazard       = context.random().next_double(); // not a hazard.
+
         if (hazard < probability) 
         {
             // start_time = 0 means the disease existed before the simulation started.
@@ -116,8 +117,8 @@ double DefaultDiseaseModel::get_excess_mortality(const Person &person) const noe
 DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(RuntimeContext &context) 
 {
     const auto &age_range   = context.age_range();
-    auto sum                = create_age_gender_table<double>(age_range);
-    auto count              = create_age_gender_table<double>(age_range);
+    auto sum                = create_age_gender_table<double>(age_range); //// create table of sums     for various strata
+    auto count              = create_age_gender_table<double>(age_range); //// create table of counts   for various strata
     auto &pop               = context.population();
     auto sum_mutex          = std::mutex{};
 
@@ -126,7 +127,7 @@ DoubleAgeGenderTable DefaultDiseaseModel::calculate_average_relative_risk(Runtim
             if (!person.is_active()) return;
 
             double relative_risk = 1.0;
-            relative_risk       *= calculate_relative_risk_for_risk_factors(person);
+            relative_risk       *= calculate_relative_risk_for_risk_factors(person); // calculate relative risk for various risk factors (but not other diseases).
 
             auto lock = std::unique_lock{sum_mutex};
             sum     (person.age, person.gender) += relative_risk;

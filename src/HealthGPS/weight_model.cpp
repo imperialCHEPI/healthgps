@@ -2,6 +2,7 @@
 
 namespace hgps {
 std::string weight_category_to_string(WeightCategory value) {
+
     switch (value) {
     case WeightCategory::normal:
         return "normal";

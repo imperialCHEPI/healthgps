@@ -19,6 +19,7 @@ enum struct DiseaseStatus : uint8_t {
 
 /// @brief Defines the disease history data type
 struct Disease {
+
     /// @brief The disease current status
     DiseaseStatus status{};
 
@@ -30,9 +31,9 @@ struct Disease {
 
     /// @brief Clone a disease history entry
     /// @return A new instance of the Disease class
-    Disease clone() const noexcept {
-        return Disease{
-            .status = status, .start_time = start_time, .time_since_onset = time_since_onset};
+    Disease clone() const noexcept 
+    {
+        return Disease{.status = status, .start_time = start_time, .time_since_onset = time_since_onset};
     }
 };
 

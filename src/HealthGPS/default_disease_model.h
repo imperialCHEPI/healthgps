@@ -23,13 +23,13 @@ class DefaultDiseaseModel final : public DiseaseModel {
     core::DiseaseGroup group() const noexcept override;
 
     /// @brief Returns the disease type identifier.
-    /// @return The disease type identifier
+    /// @return The disease type identifier (identical to namesake in default_cancer_model)
     const core::Identifier &disease_type() const noexcept override;
 
-    /// @brief Initialises the disease status of the population (from prevalence).
+    /// @brief Initialises the disease status of each person in the population (from prevalence).
     /// Disease start_time = 0 disambiguates from incidence cases on start year.
     /// Must be followed by:
-    ///   * initialise_average_relative_risk (used to preserve distribution)
+    ///   * initialise_average_relative_risk (used to preserve distribution OF WHAT?)
     ///   * update_disease_status (to simulate incidence cases on start year)
     /// @param context The runtime context instance
     void initialise_disease_status(RuntimeContext &context) override;
@@ -56,12 +56,11 @@ class DefaultDiseaseModel final : public DiseaseModel {
   private:
     std::reference_wrapper<DiseaseDefinition>   definition_;
     WeightModel                                 weight_classifier_;
-    DoubleAgeGenderTable                        average_relative_risk_;
+    DoubleAgeGenderTable                        average_relative_risk_;  // indexed by age and sex.
 
     /// @brief Initialise average relative risk for disease model on start year.
-    /// This method is similar to initialise_average_relative_risk, and used internally
-    /// by initialise_disease_status.
-    ///
+    /// This method is similar to initialise_average_relative_risk, and used internally by initialise_disease_status.
+    
     /// Since disease status is not yet initialised, this method only considers
     /// relative risk from risk factors. We can eventualy bootstrap the final average
     /// relative risk once initialise_disease_status has finished initialising by calling
@@ -69,12 +68,12 @@ class DefaultDiseaseModel final : public DiseaseModel {
     /// @param context The runtime context instance
     DoubleAgeGenderTable calculate_average_relative_risk(RuntimeContext &context);
 
-    /// @brief Caculates the relative risk for this disease given other diseases.
+    /// @brief Calculates the relative risk for this disease given other diseases.
     /// @param person The person to calculate the relative risk
     /// @return The relative risk for this disease given other diseases
     double calculate_relative_risk_for_diseases(const Person &person) const;
 
-    /// @brief Caculates the relative risk for this disease given risk factors.
+    /// @brief Calculates the relative risk for this disease given risk factors.
     /// @param person The person to calculate the relative risk
     /// @return The relative risk for this disease given risk factors
     double calculate_relative_risk_for_risk_factors(const Person &person) const;
