@@ -54,9 +54,9 @@ class DefaultDiseaseModel final : public DiseaseModel {
     double get_excess_mortality(const Person &person) const noexcept override;
 
   private:
-    std::reference_wrapper<DiseaseDefinition> definition_;
-    WeightModel weight_classifier_;
-    DoubleAgeGenderTable average_relative_risk_;
+    std::reference_wrapper<DiseaseDefinition>   definition_;
+    WeightModel                                 weight_classifier_;
+    DoubleAgeGenderTable                        average_relative_risk_;
 
     /// @brief Initialise average relative risk for disease model on start year.
     /// This method is similar to initialise_average_relative_risk, and used internally

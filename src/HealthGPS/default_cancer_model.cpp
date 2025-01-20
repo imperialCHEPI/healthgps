@@ -176,46 +176,45 @@ double DefaultCancerModel::calculate_relative_risk_for_risk_factors(const Person
     return relative_risk;
 }
 
-double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &person) const {
+double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &person) const 
+{
     const auto &relative_risk_tables = definition_.get().relative_risk_diseases();
 
     double relative_risk = 1.0;
-    for (const auto &[disease_name, disease_state] : person.diseases) {
-        if (!relative_risk_tables.contains(disease_name)) {
-            continue;
-        }
+    for (const auto &[disease_name, disease_state] : person.diseases) 
+    {
+        if (!relative_risk_tables.contains(disease_name)) continue;
 
         // Only include existing diseases
-        if (disease_state.status == DiseaseStatus::active) {
+        if (disease_state.status == DiseaseStatus::active) 
+        {
             const auto &rr_table = relative_risk_tables.at(disease_name);
             relative_risk *= rr_table(person.age, person.gender);
         }
     }
-
     return relative_risk;
 }
 
-void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
+void DefaultCancerModel::update_remission_cases(RuntimeContext &context) 
+{
     int max_onset = definition_.get().parameters().max_time_since_onset;
 
-    for (auto &person : context.population()) {
+    // not parallelized
+    for (auto &person : context.population()) 
+    {
         // Skip if person is inactive or newborn.
-        if (!person.is_active() || person.age == 0) {
-            continue;
-        }
+        if (!person.is_active() || person.age == 0)    continue;
 
         // Skip if person does not have the disease.
-        if (!person.diseases.contains(disease_type()) ||
-            person.diseases.at(disease_type()).status != DiseaseStatus::active) {
-            continue;
-        }
+        if (!person.diseases.contains(disease_type()) || person.diseases.at(disease_type()).status != DiseaseStatus::active)     continue;
 
         // Increment duration by one year
         auto &disease = person.diseases.at(disease_type());
         disease.time_since_onset++;
-        if (disease.time_since_onset >= max_onset) {
-            disease.status = DiseaseStatus::free;
-            disease.time_since_onset = -1;
+        if (disease.time_since_onset >= max_onset) 
+        {
+            disease.status              = DiseaseStatus::free;
+            disease.time_since_onset    = -1;
         }
     }
 }
@@ -229,7 +228,6 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context)
     {
         // Skip if person is inactive.
         if (!person.is_active())  continue;
-       
 
         // Clear newborn diseases.
         if (person.age == 0) 
@@ -249,7 +247,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context)
 
         double incidence    = definition_.get().table()(person.age, person.gender).at(incidence_id);
         double probability  = incidence * relative_risk / average_relative_risk;
-        double hazard       = context.random().next_double();
+        double hazard       = context.random().next_double(); // not a hazard
 
         if (hazard < probability) 
             person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active, .start_time = context.time_now(), .time_since_onset = 0};
@@ -258,10 +256,13 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context)
 
 int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context, const core::Gender &gender) const 
 {
+    //// this function is odd. It is basically copying values already contained in definition_.get().parameters().prevalence_distribution.
+    //// Also it calculates the cumulative distribution. How many times is this called? Does the value ever change? If not then could be very wasteful.
     const auto &pdf = definition_.get().parameters().prevalence_distribution;
-    auto values = std::vector<int>{};
+    auto values     = std::vector<int>{};
     auto cumulative = std::vector<double>{};
     double sum = 0.0;
+
     for (const auto &item : pdf)
     {
         double p = (gender == core::Gender::male) ? item.second.males : item.second.females;

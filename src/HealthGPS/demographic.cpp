@@ -10,52 +10,51 @@
 
 namespace { // anonymous namespace
 
-/// @brief Defines the residual mortality synchronisation message
-using ResidualMortalityMessage = hgps::SyncDataMessage<hgps::GenderTable<int, double>>;
+    /// @brief Defines the residual mortality synchronisation message
+    using ResidualMortalityMessage = hgps::SyncDataMessage<hgps::GenderTable<int, double>>;
 
 } // anonymous namespace
 
 namespace hgps {
 
-DemographicModule::DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
-                                     LifeTable &&life_table)
-    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)} {
-    if (pop_data_.empty()) {
-        if (!life_table_.empty()) {
+DemographicModule::DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data, LifeTable &&life_table)
+    : pop_data_{std::move(pop_data)}, life_table_{std::move(life_table)} 
+{
+    if (pop_data_.empty()) 
+    {
+        if (!life_table_.empty()) 
             throw std::invalid_argument("empty population and life table content mismatch.");
-        }
-
         return;
     }
 
-    if (life_table_.empty()) {
+    if (life_table_.empty()) 
         throw std::invalid_argument("population and empty life table content mismatch.");
-    }
 
-    auto first_entry = pop_data_.begin();
-    auto time_range = core::IntegerInterval(first_entry->first, pop_data_.rbegin()->first);
+    auto first_entry    = pop_data_.begin();
+    auto time_range     = core::IntegerInterval(first_entry->first, pop_data_.rbegin()->first);
     core::IntegerInterval age_range{};
-    if (!first_entry->second.empty()) {
-        age_range = core::IntegerInterval(first_entry->second.begin()->first,
-                                          first_entry->second.rbegin()->first);
-    }
 
-    if (time_range != life_table_.time_limits()) {
+    if (!first_entry->second.empty()) 
+        age_range = core::IntegerInterval(first_entry->second.begin()->first, first_entry->second.rbegin()->first);
+
+    if (time_range != life_table_.time_limits())
         throw std::invalid_argument("Population and life table time limits mismatch.");
-    }
 
-    if (age_range != life_table_.age_limits()) {
+    if (age_range != life_table_.age_limits())
         throw std::invalid_argument("Population and life table age limits mismatch.");
-    }
 
     initialise_birth_rates();
 }
 
-SimulationModuleType DemographicModule::type() const noexcept {
+SimulationModuleType DemographicModule::type() const noexcept 
+{
     return SimulationModuleType::Demographic;
 }
 
-const std::string &DemographicModule::name() const noexcept { return name_; }
+const std::string &DemographicModule::name() const noexcept 
+{ 
+    return name_; 
+}
 
 std::size_t DemographicModule::get_total_population_size(int time_year) const noexcept {
     auto total = 0.0f;
@@ -78,8 +77,8 @@ double DemographicModule::get_total_deaths(int time_year) const noexcept {
     return 0.0;
 }
 
-const std::map<int, PopulationRecord> &
-DemographicModule::get_population_distribution(int time_year) const {
+const std::map<int, PopulationRecord> & DemographicModule::get_population_distribution(int time_year) const 
+{
     return pop_data_.at(time_year);
 }
 
@@ -89,6 +88,7 @@ std::map<int, DoubleGenderValue> DemographicModule::get_age_gender_distribution(
     if (!pop_data_.contains(time_year)) return result;
 
     const auto &year_data = pop_data_.at(time_year);
+
     if (!year_data.empty()) 
     {
         double total_ratio = 1.0 / get_total_population_size(time_year);
@@ -99,26 +99,25 @@ std::map<int, DoubleGenderValue> DemographicModule::get_age_gender_distribution(
     return result;
 }
 
-DoubleGenderValue DemographicModule::get_birth_rate(int time_year) const noexcept {
-    if (birth_rates_.contains(time_year)) {
-        return DoubleGenderValue{birth_rates_(time_year, core::Gender::male),
-                                 birth_rates_(time_year, core::Gender::female)};
-    }
+DoubleGenderValue DemographicModule::get_birth_rate(int time_year) const noexcept 
+{
+    if (birth_rates_.contains(time_year)) 
+        return DoubleGenderValue{birth_rates_(time_year, core::Gender::male), birth_rates_(time_year, core::Gender::female)};
 
     return DoubleGenderValue{0.0, 0.0};
 }
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
-double DemographicModule::get_residual_death_rate(int age, core::Gender gender) const noexcept {
-    if (residual_death_rates_.contains(age)) {
-        return residual_death_rates_.at(age, gender);
-    }
-
+double DemographicModule::get_residual_death_rate(int age, core::Gender gender) const noexcept 
+{
+    if (residual_death_rates_.contains(age))     return residual_death_rates_.at(age, gender);
     return 0.0;
 }
 
 void DemographicModule::initialise_population(RuntimeContext &context) 
 {
+    /// not parallelized - probably can be.
+
     auto age_gender_dist    = get_age_gender_distribution(context.start_time());
     auto index              = 0;
     auto pop_size           = static_cast<int>(context.population().size());
@@ -135,8 +134,9 @@ void DemographicModule::initialise_population(RuntimeContext &context)
         if (entry_count == entry_total && pop_diff > 0) 
         {
             auto half_diff = pop_diff / 2;
-            num_males += half_diff;
+            num_males   += half_diff;
             num_females += half_diff;
+
             if (entry.second.males > entry.second.females)  num_males   += pop_diff - (half_diff * 2);
             else                                            num_females += pop_diff - (half_diff * 2);
 
@@ -157,7 +157,7 @@ void DemographicModule::initialise_population(RuntimeContext &context)
                 if (num_males < 0) num_females += num_males;
             }
 
-            num_males = std::max(0, num_males);
+            num_males   = std::max(0, num_males);
             num_females = std::max(0, num_females);
 
             [[maybe_unused]] auto pop_diff_new = pop_size - (index + num_males + num_females);
@@ -239,30 +239,35 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,  cons
     }
 }
 
-void DemographicModule::initialise_birth_rates() {
-    birth_rates_ = create_integer_gender_table<double>(life_table_.time_limits());
+void DemographicModule::initialise_birth_rates() 
+{
+    birth_rates_    = create_integer_gender_table<double>(life_table_.time_limits());
     auto start_time = life_table_.time_limits().lower();
-    auto end_time = life_table_.time_limits().upper();
-    for (int year = start_time; year <= end_time; year++) {
-        const auto &births = life_table_.get_births_at(year);
-        auto population_size = get_total_population_size(year);
+    auto end_time   = life_table_.time_limits().upper();
 
-        double male_birth_rate =
-            births.number * births.sex_ratio / (1.0f + births.sex_ratio) / population_size;
-        double female_birth_rate = births.number / (1.0f + births.sex_ratio) / population_size;
+    for (int year = start_time; year <= end_time; year++) 
+    {
+        const auto &births      = life_table_.get_births_at(year);
+        auto population_size    = get_total_population_size(year);
 
-        birth_rates_.at(year, core::Gender::male) = male_birth_rate;
+        double male_birth_rate      = births.number * births.sex_ratio / (1.0f + births.sex_ratio) / population_size;
+        double female_birth_rate    = births.number / (1.0f + births.sex_ratio) / population_size;
+
+        birth_rates_.at(year, core::Gender::male)   = male_birth_rate;
         birth_rates_.at(year, core::Gender::female) = female_birth_rate;
     }
 }
 
-GenderTable<int, double> DemographicModule::create_death_rates_table(int time_year) {
-    auto &population = pop_data_.at(time_year);
-    const auto &mortality = life_table_.get_mortalities_at(time_year);
-    auto death_rates = create_integer_gender_table<double>(life_table_.age_limits());
-    auto start_age = life_table_.age_limits().lower();
-    auto end_age = life_table_.age_limits().upper();
-    for (int age = start_age; age <= end_age; age++) {
+GenderTable<int, double> DemographicModule::create_death_rates_table(int time_year) 
+{
+    auto &population        = pop_data_.at(time_year);
+    const auto &mortality   = life_table_.get_mortalities_at(time_year);
+    auto death_rates        = create_integer_gender_table<double>(life_table_.age_limits());
+    auto start_age          = life_table_.age_limits().lower();
+    auto end_age            = life_table_.age_limits().upper();
+
+    for (int age = start_age; age <= end_age; age++) 
+    {
         auto male_rate = std::min(mortality.at(age).males / population.at(age).males, 1.0f);
         auto feme_rate = std::min(mortality.at(age).females / population.at(age).females, 1.0f);
         death_rates.at(age, core::Gender::male) = male_rate;
@@ -272,58 +277,55 @@ GenderTable<int, double> DemographicModule::create_death_rates_table(int time_ye
     return death_rates;
 }
 
-GenderTable<int, double>
-DemographicModule::calculate_residual_mortality(RuntimeContext &context,
-                                                const DiseaseModule &disease_host) {
+GenderTable<int, double> DemographicModule::calculate_residual_mortality(RuntimeContext &context, const DiseaseModule &disease_host) 
+{
     // create (empty) tables of excess mortality by age and sex. 1 for products (see below), another for counts.
-    auto excess_mortality_product = create_integer_gender_table<double>(life_table_.age_limits());
-    auto excess_mortality_count = create_integer_gender_table<int>(life_table_.age_limits());
+    auto excess_mortality_product   = create_integer_gender_table<double>(life_table_.age_limits());
+    auto excess_mortality_count     = create_integer_gender_table<int>(life_table_.age_limits());
+
     // create pointer to population
     auto &pop = context.population();
     auto sum_mutex = std::mutex{};
-    // loop over people, adding up each active individual's product prod_{i=1}^D (1-p_i*f_i), then adding it to the tables of excess 
-    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
-        if (!entity.is_active()) {
-            return;
-        }
 
-        auto product = calculate_excess_mortality_product(entity, disease_host);
-        auto lock = std::unique_lock{sum_mutex};
+    // loop over people, adding up each active individual's product prod_{i=1}^D (1-p_i*f_i), then adding it to the tables of excess 
+    tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) 
+    {
+        if (!entity.is_active()) return;
+
+        auto product    = calculate_excess_mortality_product(entity, disease_host);
+        auto lock       = std::unique_lock{sum_mutex};
+
         // add product to relevant sex and gender stratum
         excess_mortality_product.at(entity.age, entity.gender) += product;
+
         // add count  to relevant sex and gender stratum
         excess_mortality_count.at(entity.age, entity.gender)++;
     });
 
     // post-process the table 
-    auto death_rates = create_death_rates_table(context.time_now()); // also populates the death rate table for this year by age and sex
+    auto death_rates        = create_death_rates_table(context.time_now()); // also populates the death rate table for this year by age and sex
     auto residual_mortality = create_integer_gender_table<double>(life_table_.age_limits());
-    auto start_age = life_table_.age_limits().lower();
-    auto end_age = life_table_.age_limits().upper();
+    auto start_age          = life_table_.age_limits().lower();
+    auto end_age            = life_table_.age_limits().upper();
+
     auto default_average = 1.0;
-    for (int age = start_age; age <= end_age; age++) {
+    for (int age = start_age; age <= end_age; age++) 
+    {
         auto male_average_product   = default_average;
         auto female_average_product = default_average;
         auto male_count     = excess_mortality_count.at(age, core::Gender::male);
         auto female_count   = excess_mortality_count.at(age, core::Gender::female);
-        if (male_count > 0) {
-            male_average_product =
-                excess_mortality_product.at(age, core::Gender::male) / male_count;
-        }
 
-        if (female_count > 0) {
-            female_average_product =
-                excess_mortality_product.at(age, core::Gender::female) / female_count;
-        }
+        if (male_count > 0)     male_average_product   = excess_mortality_product.at(age, core::Gender::male) / male_count;
 
-        auto male_mortality =
-            1.0 - (1.0 - death_rates.at(age, core::Gender::male)) / male_average_product;
-        auto feme_mortality =
-            1.0 - (1.0 - death_rates.at(age, core::Gender::female)) / female_average_product;
+        if (female_count > 0)   female_average_product = excess_mortality_product.at(age, core::Gender::female) / female_count;
+
+        auto male_mortality = 1.0 - (1.0 - death_rates.at(age, core::Gender::male))     / male_average_product;
+        auto feme_mortality = 1.0 - (1.0 - death_rates.at(age, core::Gender::female))   / female_average_product;
+
         residual_mortality.at(age, core::Gender::male  ) = std::max(std::min(male_mortality, 1.0), 0.0);
         residual_mortality.at(age, core::Gender::female) = std::max(std::min(feme_mortality, 1.0), 0.0);
     }
-
     return residual_mortality;
 }
 
@@ -344,26 +346,30 @@ double DemographicModule::calculate_excess_mortality_product(const Person &entit
     return std::max(std::min(product, 1.0), 0.0);
 }
 
-int DemographicModule::update_age_and_death_events(RuntimeContext &context,
-                                                   const DiseaseModule &disease_host) {
+int DemographicModule::update_age_and_death_events(RuntimeContext &context, const DiseaseModule &disease_host) 
+{
     auto max_age = static_cast<unsigned int>(context.age_range().upper());
     auto number_of_deaths = 0;
-    // not parallelized 
-    for (auto &entity : context.population()) {
-        if (!entity.is_active()) {
-            continue;
-        }
 
-        if (entity.age >= max_age) {
+    // not parallelized 
+    for (auto &entity : context.population()) 
+    {
+        if (!entity.is_active()) continue;
+
+        if (entity.age >= max_age) 
+        {
             entity.die(context.time_now());
             number_of_deaths++;
-        } else {
-
+        } 
+        else 
+        {
             // Calculate death probability based on the health status
             auto residual_death_rate = get_residual_death_rate(entity.age, entity.gender);
             auto product = 1.0 - residual_death_rate;
-            for (const auto &item : entity.diseases) {
-                if (item.second.status == DiseaseStatus::active) {
+            for (const auto &item : entity.diseases) 
+            {
+                if (item.second.status == DiseaseStatus::active) 
+                {
                     auto excess_mortality = disease_host.get_excess_mortality(item.first, entity);
                     product *= (1.0 - excess_mortality);
                 }
@@ -371,40 +377,38 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
             auto death_probability = 1.0 - product;
             auto hazard = context.random().next_double();
-            if (hazard < death_probability) {
+            
+            if (hazard < death_probability) 
+            {
                 entity.die(context.time_now());
                 number_of_deaths++;
             }
         }
 
-        if (entity.is_active()) {
-            entity.age = entity.age + 1;
-        }
+        if (entity.is_active()) entity.age = entity.age + 1;
     }
 
     return number_of_deaths;
 }
 
-std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
-                                                           const ModelInput &config) {
+std::unique_ptr<DemographicModule> build_population_module(Repository &repository, const ModelInput &config) 
+{
     // year => age [age, male, female]
     auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
 
-    auto min_time = config.start_time();
-    auto max_time = config.stop_time();
-    auto time_filter = [&min_time, &max_time](unsigned int value) {
-        return value >= min_time && value <= max_time;
-    };
+    auto min_time       = config.start_time();
+    auto max_time       = config.stop_time();
+    auto time_filter    = [&min_time, &max_time](unsigned int value) 
+        {
+            return value >= min_time && value <= max_time;
+        };
 
     auto pop = repository.manager().get_population(config.settings().country(), time_filter);
-    for (auto &item : pop) {
-        pop_data[item.at_time].emplace(item.with_age,
-                                       PopulationRecord(item.with_age, item.males, item.females));
-    }
+    for (auto &item : pop) 
+        pop_data[item.at_time].emplace(item.with_age, PopulationRecord(item.with_age, item.males, item.females));
 
-    auto births =
-        repository.manager().get_birth_indicators(config.settings().country(), time_filter);
-    auto deaths = repository.manager().get_mortality(config.settings().country(), time_filter);
+    auto births     = repository.manager().get_birth_indicators(config.settings().country(), time_filter);
+    auto deaths     = repository.manager().get_mortality(config.settings().country(), time_filter);
     auto life_table = detail::StoreConverter::to_life_table(births, deaths);
 
     return std::make_unique<DemographicModule>(std::move(pop_data), std::move(life_table));
