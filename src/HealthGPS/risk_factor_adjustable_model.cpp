@@ -84,41 +84,40 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context, con
 
     // All scenarios: apply adjustments to population.
     auto &pop = context.population();
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
-        if (!person.is_active()) {
-            return;
-        }
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
+        {
+            if (!person.is_active())    return;
 
-        for (size_t i = 0; i < factors.size(); i++) {
-            double delta = adjustments.at(person.gender, factors[i]).at(person.age);
-            double value = person.risk_factors.at(factors[i]) + delta;
+            for (size_t i = 0; i < factors.size(); i++) 
+            {
+                double delta = adjustments.at(person.gender, factors[i]).at(person.age);
+                double value = person.risk_factors.at(factors[i]) + delta;
 
-            // Clamp value to an optionally specified range.
-            if (ranges.has_value()) {
-                const auto &range = ranges.value().get()[i];
-                value = range.clamp(value);
+                // Clamp value to an optionally specified range.
+                if (ranges.has_value()) 
+                {
+                    const auto &range = ranges.value().get()[i];
+                    value = range.clamp(value);
+                }
+
+                // Set the adjusted value.
+                person.risk_factors.at(factors[i]) = value;
             }
-
-            // Set the adjusted value.
-            person.risk_factors.at(factors[i]) = value;
-        }
-    });
+        });
 
     // Baseline scenario: send adjustments to intervention scenario.
-    if (context.scenario().type() == ScenarioType::baseline) {
-        context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
-            context.current_run(), context.time_now(), std::move(adjustments)));
-    }
+    if (context.scenario().type() == ScenarioType::baseline)
+        context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(context.current_run(), context.time_now(), std::move(adjustments)));
 }
 
-int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
+int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const 
+{
     return trend_steps_->at(factor);
 }
 
 RiskFactorSexAgeTable
-RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
-                                                 const std::vector<core::Identifier> &factors,
-                                                 OptionalRanges ranges, bool apply_trend) const {
+RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges, bool apply_trend) const 
+{
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
@@ -127,27 +126,28 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
 
     // Compute adjustments.
     auto adjustments = RiskFactorSexAgeTable{};
-    for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
-        for (size_t i = 0; i < factors.size(); i++) {
+    for (const auto &[sex, simulated_means_by_sex] : simulated_means) 
+    {
+        for (size_t i = 0; i < factors.size(); i++) 
+        {
             const core::Identifier &factor = factors[i];
 
             OptionalRange range;
-            if (ranges.has_value()) {
+            if (ranges.has_value()) 
                 range = OptionalRange{ranges.value().get().at(i)};
-            }
 
             adjustments.emplace(sex, factor, std::vector<double>(age_count));
-            for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
-                double expect = get_expected(context, sex, age, factor, range, apply_trend);
+
+            for (auto age = age_range.lower(); age <= age_range.upper(); age++) 
+            {
+                double expect   = get_expected(context, sex, age, factor, range, apply_trend);
                 double sim_mean = simulated_means_by_sex.at(factor).at(age);
 
                 // Delta should remain zero if simulated mean is NaN.
                 double delta = 0.0;
 
                 // Else, delta is the distance from expected value.
-                if (!std::isnan(sim_mean)) {
-                    delta = expect - sim_mean;
-                }
+                if (!std::isnan(sim_mean)) delta = expect - sim_mean;
 
                 adjustments.at(sex, factor).at(age) = delta;
             }
@@ -165,15 +165,17 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
     // Compute first moments.
     auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{};
-    for (const auto &person : population) {
-        if (!person.is_active()) {
-            continue;
-        }
+    
+    // not parallelized
+    for (const auto &person : population) 
+    {
+        if (!person.is_active())    continue;
 
-        for (const auto &factor : factors) {
-            if (!moments.contains(person.gender, factor)) {
+        for (const auto &factor : factors) 
+        {
+            if (!moments.contains(person.gender, factor))
                 moments.emplace(person.gender, factor, std::vector<FirstMoment>(age_count));
-            }
+
             double value = person.risk_factors.at(factor);
             moments.at(person.gender, factor).at(person.age).append(value);
         }
@@ -181,15 +183,16 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
 
     // Compute means.
     auto means = RiskFactorSexAgeTable{};
-    for (const auto &[sex, moments_by_sex] : moments) {
-        for (const auto &factor : factors) {
+    for (const auto &[sex, moments_by_sex] : moments) 
+        for (const auto &factor : factors) 
+        {
             means.emplace(sex, factor, std::vector<double>(age_count));
-            for (auto age = age_range.lower(); age <= age_range.upper(); age++) {
+            for (auto age = age_range.lower(); age <= age_range.upper(); age++) 
+            {
                 double value = moments_by_sex.at(factor).at(age).mean();
                 means.at(sex, factor).at(age) = value;
             }
         }
-    }
 
     return means;
 }
