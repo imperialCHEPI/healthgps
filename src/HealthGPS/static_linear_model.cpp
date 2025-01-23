@@ -8,31 +8,47 @@
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
-    std::shared_ptr<RiskFactorSexAgeTable> expected,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
-    const std::vector<core::Identifier> &names, const std::vector<LinearModelParams> &models,
-    const std::vector<core::DoubleInterval> &ranges, const std::vector<double> &lambda,
-    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
-    const std::vector<LinearModelParams> &policy_models,
-    const std::vector<core::DoubleInterval> &policy_ranges, const Eigen::MatrixXd &policy_cholesky,
-    std::shared_ptr<std::vector<LinearModelParams>> trend_models,
-    std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges,
-    std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
-        &rural_prevalence,
-    const std::unordered_map<core::Income, LinearModelParams> &income_models,
-    double physical_activity_stddev)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
-                                std::move(trend_steps)},
-      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
-      ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
-      policy_models_{policy_models}, policy_ranges_{policy_ranges},
-      policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
-      info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {}
+    std::shared_ptr<RiskFactorSexAgeTable>                                              expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>>                       expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>>                          trend_steps,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>>                       expected_trend_boxcox,
+    const std::vector<core::Identifier>                                                 &names, 
+    const std::vector<LinearModelParams>                                                &models,
+    const std::vector<core::DoubleInterval>                                             &ranges, 
+    const std::vector<double>                                                           &lambda,
+    const std::vector<double>                                                           &stddev, 
+    const Eigen::MatrixXd                                                               &cholesky,
+    const std::vector<LinearModelParams>                                                &policy_models,
+    const std::vector<core::DoubleInterval>                                             &policy_ranges, 
+    const Eigen::MatrixXd                                                               &policy_cholesky,
+    std::shared_ptr<std::vector<LinearModelParams>>                                     trend_models,
+    std::shared_ptr<std::vector<core::DoubleInterval>>                                  trend_ranges,
+    std::shared_ptr<std::vector<double>>                                                trend_lambda, 
+    double                                                                              info_speed,
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> &rural_prevalence,
+    const std::unordered_map<core::Income, LinearModelParams>                           &income_models,
+    double                                                                              physical_activity_stddev)
+    : 
+    RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend), std::move(trend_steps)}, expected_trend_boxcox_{std::move(expected_trend_boxcox)}, 
+      names_{names}, 
+      models_{models},
+      ranges_{ranges}, 
+      lambda_{lambda}, 
+      stddev_{stddev}, 
+      cholesky_{cholesky},
+      policy_models_{policy_models}, 
+      policy_ranges_{policy_ranges},
+      policy_cholesky_{policy_cholesky}, 
+      trend_models_{std::move(trend_models)},
+      trend_ranges_{std::move(trend_ranges)}, 
+      trend_lambda_{std::move(trend_lambda)},
+      info_speed_{info_speed}, 
+      rural_prevalence_{rural_prevalence}, 
+      income_models_{income_models},
+      physical_activity_stddev_{physical_activity_stddev} 
+{
+
+}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -40,8 +56,11 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
+    /// none of these are parallelized
+
     // Initialise everyone.
-    for (auto &person : context.population()) {
+    for (auto &person : context.population()) 
+    {
         initialise_sector(person, context.random());
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
@@ -52,33 +71,39 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise everyone.
-    for (auto &person : context.population()) {
-        initialise_policies(person, context.random(), false);
-        initialise_trends(context, person);
+    for (auto &person : context.population()) 
+    {
+        initialise_policies (person, context.random(), false);
+        initialise_trends   (context, person);
     }
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
 }
 
-void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
+void StaticLinearModel::update_risk_factors(RuntimeContext &context) 
+{
+    /// none of these are parallelized
 
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
+    // not parallelized
     // Initialise newborns and update others.
-    for (auto &person : context.population()) {
-        if (!person.is_active()) {
-            continue;
-        }
+    for (auto &person : context.population()) 
+    {
+        if (!person.is_active())    continue;
 
-        if (person.age == 0) {
+        if (person.age == 0) 
+        {
             initialise_sector(person, context.random());
             initialise_income(person, context.random());
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
-        } else {
+        } 
+        else 
+        {
             update_sector(person, context.random());
             update_income(person, context.random());
             update_factors(context, person, context.random());
@@ -89,7 +114,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise newborns and update others.
-    for (auto &person : context.population()) {
+    for (auto &person : context.population()) 
+    {
         if (!person.is_active()) {
             continue;
         }
@@ -116,12 +142,12 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     }
 }
 
-double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
+double StaticLinearModel::inverse_box_cox(double factor, double lambda) 
+{
     return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
-void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
-                                           Random &random) const {
+void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person, Random &random) const {
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
@@ -130,8 +156,8 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
     auto linear = compute_linear_models(person, models_);
 
     // Initialise residuals and risk factors (do not exist yet).
-    for (size_t i = 0; i < names_.size(); i++) {
-
+    for (size_t i = 0; i < names_.size(); i++) 
+    {
         // Initialise residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual = residuals[i];
@@ -140,20 +166,18 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         person.risk_factors[residual_name] = residual;
 
         // Initialise risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
+        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        double factor   = linear[i] + residual * stddev_[i];
+        factor          = expected * inverse_box_cox(factor, lambda_[i]);
+        factor          = ranges_[i].clamp(factor);
 
         // Save risk factor.
         person.risk_factors[names_[i]] = factor;
     }
 }
 
-void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
-                                       Random &random) const {
-
+void StaticLinearModel::update_factors(RuntimeContext &context, Person &person, Random &random) const 
+{
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
@@ -161,42 +185,41 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     auto linear = compute_linear_models(person, models_);
 
     // Update residuals and risk factors (should exist).
-    for (size_t i = 0; i < names_.size(); i++) {
-
+    for (size_t i = 0; i < names_.size(); i++) 
+    {
         // Update residual.
-        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        auto residual_name  = core::Identifier{names_[i].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
-        residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
+        double residual     = residuals[i] * info_speed_;
+        residual            += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
         // Save residual.
         person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
+        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        double factor   = linear[i] + residual * stddev_[i];
+        factor          = expected * inverse_box_cox(factor, lambda_[i]);
+        factor          = ranges_[i].clamp(factor);
 
         // Save risk factor.
         person.risk_factors.at(names_[i]) = factor;
     }
 }
 
-void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const {
-
+void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &person) const 
+{
     // Approximate trends with linear models.
     auto linear = compute_linear_models(person, *trend_models_);
 
     // Initialise and apply trends (do not exist yet).
-    for (size_t i = 0; i < names_.size(); i++) {
-
+    for (size_t i = 0; i < names_.size(); i++) 
+    {
         // Initialise trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
         double expected = expected_trend_boxcox_->at(names_[i]);
-        double trend = expected * inverse_box_cox(linear[i], (*trend_lambda_)[i]);
-        trend = (*trend_ranges_)[i].clamp(trend);
+        double trend    = expected * inverse_box_cox(linear[i], (*trend_lambda_)[i]);
+        trend           = (*trend_ranges_)[i].clamp(trend);
 
         // Save trend.
         person.risk_factors[trend_name] = trend;
@@ -206,30 +229,31 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
     update_trends(context, person);
 }
 
-void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) const {
-
+void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) const 
+{
     // Get elapsed time (years).
     int elapsed_time = context.time_now() - context.start_time();
 
     // Apply trends (should exist).
-    for (size_t i = 0; i < names_.size(); i++) {
-
+    for (size_t i = 0; i < names_.size(); i++) 
+    {
         // Load trend.
         auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-        double trend = person.risk_factors.at(trend_name);
+        double trend    = person.risk_factors.at(trend_name);
 
         // Apply trend to risk factor.
-        double factor = person.risk_factors.at(names_[i]);
-        int t = std::min(elapsed_time, get_trend_steps(names_[i]));
-        factor *= pow(trend, t);
-        factor = ranges_[i].clamp(factor);
+        double factor   = person.risk_factors.at(names_[i]);
+        int t           = std::min(elapsed_time, get_trend_steps(names_[i]));
+        factor          *= pow(trend, t);
+        factor          = ranges_[i].clamp(factor);
 
         // Save risk factor.
         person.risk_factors.at(names_[i]) = factor;
     }
 }
 
-void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const {
+void StaticLinearModel::initialise_policies(Person &person, Random &random, bool intervene) const 
+{
     // NOTE: we need to keep baseline and intervention scenario RNGs in sync,
     //       so we compute residuals even though they are not used in baseline.
 
@@ -237,11 +261,11 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     auto residuals = compute_residuals(random, policy_cholesky_);
 
     // Save residuals (never updated in lifetime).
-    for (size_t i = 0; i < names_.size(); i++) {
+    for (size_t i = 0; i < names_.size(); i++) 
+    {
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
         person.risk_factors[residual_name] = residuals[i];
     }
-
     // Compute policies.
     update_policies(person, intervene);
 }
@@ -249,8 +273,10 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
 void StaticLinearModel::update_policies(Person &person, bool intervene) const {
 
     // Set zero policy if not intervening.
-    if (!intervene) {
-        for (const auto &name : names_) {
+    if (!intervene) 
+    {
+        for (const auto &name : names_) 
+        {
             auto policy_name = core::Identifier{name.to_string() + "_policy"};
             person.risk_factors[policy_name] = 0.0;
         }

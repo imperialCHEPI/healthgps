@@ -5,10 +5,12 @@
 
 namespace hgps {
 namespace detail {
-/// @brief Defines the disease model builder function signature and required parameters type
-using DiseaseModelBuilder = std::function<std::shared_ptr<DiseaseModel>(
-    DiseaseDefinition &definition, WeightModel &&classifier,
-    const core::IntegerInterval &age_range)>;
+
+    /// @brief Defines the disease model builder function signature and required parameters type
+    using DiseaseModelBuilder = std::function<
+        std::shared_ptr<DiseaseModel>(DiseaseDefinition &definition, WeightModel &&classifier, const core::IntegerInterval &age_range)
+    >;
+
 } // namespace detail
 
 /// @brief Create the default disease model builder registry for disease group.
@@ -27,7 +29,7 @@ std::map<core::DiseaseGroup, detail::DiseaseModelBuilder> get_default_disease_mo
         {core::DiseaseGroup::cancer,
          [](DiseaseDefinition &definition, WeightModel &&classifier, const core::IntegerInterval &age_range) 
             {
-                   return std::make_shared<DefaultCancerModel>(definition, std::move(classifier), age_range);
+                return std::make_shared<DefaultCancerModel>(definition, std::move(classifier), age_range);
             }},
     };
 

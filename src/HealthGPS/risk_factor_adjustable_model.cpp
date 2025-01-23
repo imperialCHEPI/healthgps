@@ -32,56 +32,52 @@ struct FirstMoment {
 namespace hgps {
 
 RiskFactorAdjustableModel::RiskFactorAdjustableModel(
-    std::shared_ptr<RiskFactorSexAgeTable> expected,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps)
-    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)},
-      trend_steps_{std::move(trend_steps)} {}
+    std::shared_ptr<RiskFactorSexAgeTable>                          expected,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>>   expected_trend,
+    std::shared_ptr<std::unordered_map<core::Identifier, int>>      trend_steps)
+    : expected_{std::move(expected)}, expected_trend_{std::move(expected_trend)}, trend_steps_{std::move(trend_steps)} 
+{
 
-double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age,
-                                               const core::Identifier &factor, OptionalRange range,
-                                               bool apply_trend) const noexcept {
+}
+
+double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Gender sex, int age, const core::Identifier &factor, OptionalRange range, bool apply_trend) const noexcept 
+{
     double expected = expected_->at(sex, factor).at(age);
 
     // Apply optional trend to expected value.
-    if (apply_trend) {
-        int elapsed_time = context.time_now() - context.start_time();
-        int t = std::min(elapsed_time, get_trend_steps(factor));
-        expected *= pow(expected_trend_->at(factor), t);
+    if (apply_trend) 
+    {
+        int elapsed_time    = context.time_now() - context.start_time();
+        int t               = std::min(elapsed_time, get_trend_steps(factor));
+        expected            *= pow(expected_trend_->at(factor), t);
     }
 
     // Clamp expected value to an optionally specified range.
-    if (range.has_value()) {
-        expected = range.value().get().clamp(expected);
-    }
+    if (range.has_value())    expected = range.value().get().clamp(expected);
 
     return expected;
 }
 
-void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
-                                                    const std::vector<core::Identifier> &factors,
-                                                    OptionalRanges ranges, bool apply_trend) const {
+void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context, const std::vector<core::Identifier> &factors, OptionalRanges ranges, bool apply_trend) const 
+{
     RiskFactorSexAgeTable adjustments;
 
     // Baseline scenatio: compute adjustments.
-    if (context.scenario().type() == ScenarioType::baseline) {
+    if (context.scenario().type() == ScenarioType::baseline) 
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
-    }
-
-    // Intervention scenario: receive adjustments from baseline scenario.
-    else {
+    else 
+    { 
+        // Intervention scenario: receive adjustments from baseline scenario.
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (!message.has_value()) {
+        if (!message.has_value()) 
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
-        }
 
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
-        if (!messagePrt) {
+        if (!messagePrt) 
             throw core::HgpsException(
                 "Simulation out of sync, failed to receive a baseline adjustments message");
-        }
 
         adjustments = messagePrt->data();
     }

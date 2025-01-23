@@ -35,8 +35,7 @@ KevinHallModel::KevinHallModel(
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
     const std::unordered_map<core::Gender, double> &height_slope)
-    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
-                                std::move(trend_steps)},
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend), std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
@@ -79,11 +78,10 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     update_non_newborns(context);
 
     // Compute BMI values for everyone.
-    for (auto &person : context.population()) {
+    for (auto &person : context.population()) 
+    {
         // Ignore if inactive.
-        if (!person.is_active()) {
-            continue;
-        }
+        if (!person.is_active())    continue;
 
         compute_bmi(person);
     }

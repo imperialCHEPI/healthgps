@@ -194,7 +194,7 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &p
     return relative_risk;
 }
 
-void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) 
+void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) //// need to check this - think remission probability is set to zero for all non-cancers. In which case this is extremely wasteful as it does nothing but repeatedly loop over millions of inviduals.
 {
     int remission_id = definition_.get().table().at(MeasureKey::remission);
 
@@ -239,7 +239,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context)
 
         double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
-        double incidence    = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        double incidence    = definition_.get().table()(person.age, person.gender).at(incidence_id); // where is time?
         double probability  = incidence * relative_risk / average_relative_risk;
         double hazard       = context.random().next_double();
 

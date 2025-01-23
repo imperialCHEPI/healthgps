@@ -26,8 +26,7 @@ class RuntimeContext {
     /// @param bus The message bus instance for communication with the outside world
     /// @param inputs The simulation model inputs
     /// @param scenario The scenario to simulate
-    RuntimeContext(std::shared_ptr<const EventAggregator> bus,
-                   std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario);
+    RuntimeContext(std::shared_ptr<const EventAggregator> bus, std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario);
 
     /// @brief Gets the current simulation time
     /// @return Current simulation time
@@ -106,15 +105,15 @@ class RuntimeContext {
     void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
   private:
-    std::shared_ptr<const EventAggregator> event_bus_;
-    std::shared_ptr<const ModelInput> inputs_;
-    std::unique_ptr<Scenario> scenario_;
-    Population population_;
-    mutable Random random_{};
-    RuntimeMetric metrics_{};
-    unsigned int current_run_{};
-    int model_start_time_{};
-    int time_now_{};
+    std::shared_ptr<const EventAggregator>  event_bus_;
+    std::shared_ptr<const ModelInput>       inputs_;
+    std::unique_ptr<Scenario>               scenario_;
+    Population                              population_;
+    mutable Random                          random_{};
+    RuntimeMetric                           metrics_{};
+    unsigned int                            current_run_{};
+    int                                     model_start_time_{};
+    int                                     time_now_{};
 };
 
 } // namespace hgps
