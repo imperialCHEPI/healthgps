@@ -94,7 +94,6 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context)
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const 
 {
-
     // Initialise nutrient and energy intake and weight for newborns.
     // not parallelized
     for (auto &person : context.population()) 
@@ -124,11 +123,11 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const
     auto adjustments = compute_weight_adjustments(context, 0);
 
     // not parallelized
-    for (auto &person : context.population()) {
+    for (auto &person : context.population()) 
+    {
         // Ignore if inactive or not newborn.
-        if (!person.is_active() || (person.age != 0)) {
+        if (!person.is_active() || (person.age != 0)) 
             continue;
-        }
 
         double adjustment = adjustments.at(person.gender, person.age);
         person.risk_factors.at("Weight"_id) += adjustment;
@@ -152,15 +151,14 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const
     }
 }
 
-void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
-
+void KevinHallModel::update_non_newborns(RuntimeContext &context) const 
+{
     // Update nutrient and energy intake for non-newborns.
     // not parallelized
-    for (auto &person : context.population()) {
+    for (auto &person : context.population()) 
+    {
         // Ignore if inactive or newborn.
-        if (!person.is_active() || (person.age == 0)) {
-            continue;
-        }
+        if (!person.is_active() || (person.age == 0)) continue;
 
         update_nutrient_intakes(person);
         update_energy_intake(person);
@@ -168,17 +166,13 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
 
     // Update weight for non-newborns.
     // not parallelized
-    for (auto &person : context.population()) {
+    for (auto &person : context.population()) 
+    {
         // Ignore if inactive or newborn.
-        if (!person.is_active() || (person.age == 0)) {
-            continue;
-        }
+        if (!person.is_active() || (person.age == 0)) continue;
 
-        if (person.age < kevin_hall_age_min) {
-            initialise_weight(context, person);
-        } else {
-            kevin_hall_run(person);
-        }
+        if (person.age < kevin_hall_age_min)    initialise_weight(context, person);
+        else                                    kevin_hall_run(person);
     }
 
     // Compute (baseline) or receive (intervention) weight adjustments from baseline scenario.
@@ -192,17 +186,11 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         if (!person.is_active() || (person.age == 0))    continue;
 
         double adjustment;
-        if (adjustments.contains(person.gender, person.age)) {
-            adjustment = adjustments.at(person.gender, person.age);
-        } else {
-            adjustment = 0.0;
-        }
+        if (adjustments.contains(person.gender, person.age))    adjustment = adjustments.at(person.gender, person.age);
+        else                                                    adjustment = 0.0;
 
-        if (person.age < kevin_hall_age_min) {
-            initialise_kevin_hall_state(person, adjustment);
-        } else {
-            adjust_weight(person, adjustment);
-        }
+        if (person.age < kevin_hall_age_min)    initialise_kevin_hall_state(person, adjustment);
+        else                                    adjust_weight(person, adjustment);
     }
 
     // Send (baseline) weight adjustments to intervention scenario.
@@ -421,8 +409,7 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
 void KevinHallModel::initialise_kevin_hall_state(Person &person, std::optional<double> adjustment) const 
 {
     // Apply optional weight adjustment.
-    if (adjustment.has_value()) 
-        person.risk_factors.at("Weight"_id) += adjustment.value();
+    if (adjustment.has_value())  person.risk_factors.at("Weight"_id) += adjustment.value();
 
     // Get already computed values.
     double H    = person.risk_factors.at("Height"_id);
@@ -432,63 +419,56 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person, std::optional<d
 
     // Body fat.
     double F;
-    if (person.gender == core::Gender::female) {
-        F = BW * (0.14 * person.age + 39.96 * log(BW / pow(H / 100, 2.0)) - 102.01) / 100.0;
-    } else if (person.gender == core::Gender::male) {
-        F = BW * (0.14 * person.age + 37.31 * log(BW / pow(H / 100, 2.0)) - 103.94) / 100.0;
-    } else {
-        throw core::HgpsException("Unknown gender");
-    }
+         if (person.gender == core::Gender::female)     F = BW * (0.14 * person.age + 39.96 * log(BW / pow(H / 100, 2.0)) - 102.01) / 100.0;
+    else if (person.gender == core::Gender::male)       F = BW * (0.14 * person.age + 37.31 * log(BW / pow(H / 100, 2.0)) - 103.94) / 100.0;
+    else throw core::HgpsException("Unknown gender");   /// this is overkill.
 
-    if (F < 0.0) {
-        // HACK: deal with negative body fat.
-        F = 0.2 * BW;
-    }
-
+    if (F < 0.0)     F = 0.2 * BW;        // HACK: deal with negative body fat.
+    
     // Glycogen, water and extracellular fluid.
-    double G = 0.01 * BW;
-    double W = 2.7 * G;
-    double ECF = 0.7 * 0.235 * BW;
+    double G        = 0.01 * BW;
+    double W        = 2.7 * G;
+    double ECF      = 0.7 * 0.235 * BW;
 
     // Lean tissue.
-    double L = BW - F - G - W - ECF;
+    double L        = BW - F - G - W - ECF;
 
     // Model intercept value.
-    double delta = compute_delta(person.age, person.gender, PAL, BW, H);
-    double K = EI - (gamma_F * F + gamma_L * L + delta * BW);
+    double delta    = compute_delta(person.age, person.gender, PAL, BW, H);
+    double K        = EI - (gamma_F * F + gamma_L * L + delta * BW);
 
     // Compute energy expenditure.
-    double C = 10.4 * rho_L / rho_F;
-    double p = C / (C + F);
-    double x = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
-    double EE = compute_EE(BW, F, L, EI, K, delta, x);
+    double C    = 10.4 * rho_L / rho_F;
+    double p    = C / (C + F);
+    double x    = p * eta_L / rho_L + (1.0 - p) * eta_F / rho_F;
+    double EE   = compute_EE(BW, F, L, EI, K, delta, x);
 
     // Set new state.
-    person.risk_factors["BodyFat"_id] = F;
-    person.risk_factors["LeanTissue"_id] = L;
-    person.risk_factors["Glycogen"_id] = G;
-    person.risk_factors["ExtracellularFluid"_id] = ECF;
-    person.risk_factors["Intercept_K"_id] = K;
+    person.risk_factors["BodyFat"_id]               = F;
+    person.risk_factors["LeanTissue"_id]            = L;
+    person.risk_factors["Glycogen"_id]              = G;
+    person.risk_factors["ExtracellularFluid"_id]    = ECF;
+    person.risk_factors["Intercept_K"_id]           = K;
 
     // Set new energy expenditure (may not exist yet).
-    person.risk_factors["EnergyExpenditure"_id] = EE;
+    person.risk_factors["EnergyExpenditure"_id]     = EE;
 }
 
-void KevinHallModel::kevin_hall_run(Person &person) const {
-
+void KevinHallModel::kevin_hall_run(Person &person) const 
+{
     // Get initial body weight.
-    double BW_0 = person.risk_factors.at("Weight"_id);
+    double BW_0     = person.risk_factors.at("Weight"_id);
 
     // Compute energy cost per unit body weight.
-    double PAL = person.risk_factors.at("PhysicalActivity"_id);
-    double H = person.risk_factors.at("Height"_id);
-    double delta = compute_delta(person.age, person.gender, PAL, BW_0, H);
+    double PAL      = person.risk_factors.at("PhysicalActivity"_id);
+    double H        = person.risk_factors.at("Height"_id);
+    double delta    = compute_delta(person.age, person.gender, PAL, BW_0, H);
 
     // Get carbohydrate intake and energy intake.
-    double CI_0 = person.risk_factors.at("Carbohydrate_previous"_id);
-    double CI = person.risk_factors.at("Carbohydrate"_id);
-    double EI_0 = person.risk_factors.at("EnergyIntake_previous"_id);
-    double EI = person.risk_factors.at("EnergyIntake"_id);
+    double CI_0     = person.risk_factors.at("Carbohydrate_previous"_id);
+    double CI       = person.risk_factors.at("Carbohydrate"_id);
+    double EI_0     = person.risk_factors.at("EnergyIntake_previous"_id);
+    double EI       = person.risk_factors.at("EnergyIntake"_id);
     double delta_EI = EI - EI_0;
 
     // Compute thermic effect of food.
@@ -498,23 +478,23 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double AT = beta_AT * delta_EI;
 
     // Compute glycogen and water.
-    double G_0 = person.risk_factors.at("Glycogen"_id);
-    double G = compute_G(CI, CI_0, G_0);
-    double W = 2.7 * G;
+    double G_0  = person.risk_factors.at("Glycogen"_id);
+    double G    = compute_G(CI, CI_0, G_0);
+    double W    = 2.7 * G;
 
     // Compute extracellular fluid.
-    double Na_0 = person.risk_factors.at("Sodium_previous"_id);
-    double Na = person.risk_factors.at("Sodium"_id);
+    double Na_0     = person.risk_factors.at("Sodium_previous"_id);
+    double Na       = person.risk_factors.at("Sodium"_id);
     double delta_Na = Na - Na_0;
-    double ECF_0 = person.risk_factors.at("ExtracellularFluid"_id);
-    double ECF = compute_ECF(delta_Na, CI, CI_0, ECF_0);
+    double ECF_0    = person.risk_factors.at("ExtracellularFluid"_id);
+    double ECF      = compute_ECF(delta_Na, CI, CI_0, ECF_0);
 
     // Get initial body fat and lean tissue.
-    double F_0 = person.risk_factors.at("BodyFat"_id);
-    double L_0 = person.risk_factors.at("LeanTissue"_id);
+    double F_0      = person.risk_factors.at("BodyFat"_id);
+    double L_0      = person.risk_factors.at("LeanTissue"_id);
 
     // Get intercept value.
-    double K = person.risk_factors.at("Intercept_K"_id);
+    double K        = person.risk_factors.at("Intercept_K"_id);
 
     // Energy partitioning.
     double C = 10.4 * rho_L / rho_F;
@@ -536,8 +516,7 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
     // Compute time constant.
-    double tau = rho_L * rho_F * (1.0 + x) /
-                 ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
+    double tau = rho_L * rho_F * (1.0 + x) / ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
 
     // Compute body fat and lean tissue.
     double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
@@ -547,11 +526,11 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double BW = F + L + G + W + ECF;
 
     // Set new state.
-    person.risk_factors.at("Glycogen"_id) = G;
+    person.risk_factors.at("Glycogen"_id)           = G;
     person.risk_factors.at("ExtracellularFluid"_id) = ECF;
-    person.risk_factors.at("BodyFat"_id) = F;
-    person.risk_factors.at("LeanTissue"_id) = L;
-    person.risk_factors.at("Weight"_id) = BW;
+    person.risk_factors.at("BodyFat"_id)            = F;
+    person.risk_factors.at("LeanTissue"_id)         = L;
+    person.risk_factors.at("Weight"_id)             = BW;
 }
 
 double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
@@ -559,12 +538,13 @@ double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
     return sqrt(CI / k_G);
 }
 
-double KevinHallModel::compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const {
+double KevinHallModel::compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const 
+{
     return ECF_0 + (delta_Na - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
 }
 
-double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, double BW,
-                                     double H) const {
+double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, double BW, double H) const 
+{
     // Resting metabolic rate (Mifflin-St Jeor).
     double RMR = 9.99 * BW + 6.25 * H - 4.92 * age;
     RMR += sex == core::Gender::male ? 5.0 : -161.0;

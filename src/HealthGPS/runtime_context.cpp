@@ -53,7 +53,8 @@ void RuntimeContext::reset_population(const std::size_t initial_pop_size) {
     model_start_time_ = inputs_->start_time();
 }
 
-void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
+void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept 
+{
     event_bus_->publish(std::move(message));
 }
 

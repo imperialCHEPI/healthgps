@@ -16,7 +16,8 @@ namespace hgps::core {
 /// @param action The action to run
 /// @param ...params The action parameters
 /// @return The std::future referring to the function call.
-template <class F, class... Ts> auto run_async(F &&action, Ts &&...params) {
+template <class F, class... Ts> auto run_async(F &&action, Ts &&...params) 
+{
     return std::async(std::launch::async, std::forward<F>(action), std::forward<Ts>(params)...);
 };
 

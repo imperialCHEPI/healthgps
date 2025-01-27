@@ -59,14 +59,12 @@ void RiskFactorModule::update_population(RuntimeContext &context) {
     dynamic_model->update_risk_factors(context);
 }
 
-std::unique_ptr<RiskFactorModule>
-build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInput &config) {
-
+std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository &repository, [[maybe_unused]] const ModelInput &config) 
+{
     auto models = std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>>{};
 
     // Static (initialisation) model
-    const auto &static_definition =
-        repository.get_risk_factor_model_definition(RiskFactorModelType::Static);
+    const auto &static_definition = repository.get_risk_factor_model_definition(RiskFactorModelType::Static);
     auto static_model = static_definition.create_model();
     models.emplace(RiskFactorModelType::Static, std::move(static_model));
 

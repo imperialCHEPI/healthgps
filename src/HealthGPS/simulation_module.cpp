@@ -2,13 +2,15 @@
 
 namespace hgps {
 
-SimulationModuleFactory get_default_simulation_module_factory(Repository &manager) {
+SimulationModuleFactory get_default_simulation_module_factory(Repository &manager) 
+{
     auto factory = SimulationModuleFactory(manager);
+
     factory.register_builder(SimulationModuleType::SES,
-                             [](Repository &repository,
-                                const ModelInput &config) -> SimulationModuleFactory::ModuleType {
-                                 return build_ses_noise_module(repository, config);
-                             });
+                             [](Repository &repository, const ModelInput &config) -> SimulationModuleFactory::ModuleType 
+                                {
+                                    return build_ses_noise_module(repository, config);
+                                });
 
     factory.register_builder(SimulationModuleType::Demographic,
                              [](Repository &repository,

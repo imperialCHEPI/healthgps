@@ -87,12 +87,14 @@ void AnalysisModule::initialise_population(RuntimeContext &context)
     auto &pop               = context.population();
     auto sum_mutex          = std::mutex{};
 
-    //// loop over each person, adding the value of the product of the complement of their disability weights to expected_sum, as well as the number of people in that strata expected_count
+    //// loop over each person to populate expected_sum and expected_count...
+    //// ... adding the value of the product of the complement of their disability weights to expected_sum, as well as the number of people in that strata expected_count
     tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) 
         {
             if (!entity.is_active()) return;
 
             auto Product = 1.0;
+            //// loop over each person's disease weights
             for (const auto &disease : entity.diseases) 
                 if (disease.second.status == DiseaseStatus::active && definition_.disability_weights().contains(disease.first)) 
                     Product *= (1.0 - definition_.disability_weights().at(disease.first));
@@ -121,8 +123,8 @@ void AnalysisModule::update_population(RuntimeContext &context)
     publish_result_message(context);
 }
 
-double AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender gender, const DoubleAgeGenderTable &expected_sum, const IntegerAgeGenderTable &expected_count) {
-   
+double AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender gender, const DoubleAgeGenderTable &expected_sum, const IntegerAgeGenderTable &expected_count) 
+{
     auto residual_value = 0.0;
     if (!expected_sum.contains(age) || !definition_.observed_YLD().contains(age))    return residual_value;
 
@@ -145,9 +147,11 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const
     auto handle         = core::run_async(&AnalysisModule::calculate_historical_statistics, this, std::ref(context), std::ref(result));
 
     calculate_population_statistics(context, result.series);
-    handle.get();
+    handle.get(); // can't figure out where handle is used. perhaps it isn't.
 
-    context.publish(std::make_unique<ResultEventMessage>(context.identifier(), context.current_run(), context.time_now(), result));
+    context.publish(
+        std::make_unique<ResultEventMessage>(context.identifier(), context.current_run(), context.time_now(), result) 
+    );
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -174,9 +178,9 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context, Mo
 
     auto daly_handle        = core::run_async(&AnalysisModule::calculate_dalys, this, std::ref(context.population()), age_upper_bound, analysis_time);
 
-    auto population_size = static_cast<int>(context.population().size());
-    auto population_dead = 0;
-    auto population_migrated = 0;
+    auto population_size        = static_cast<int>(context.population().size());
+    auto population_dead        = 0;
+    auto population_migrated    = 0;
     
     // not parallelized
     for (const auto &entity : context.population()) 
@@ -256,17 +260,17 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context, Mo
 
 double AnalysisModule::calculate_disability_weight(const Person &entity) const 
 {
-    auto sum = 1.0;
+    auto Product = 1.0;
     for (const auto &disease : entity.diseases) 
         if (disease.second.status == DiseaseStatus::active) 
             if (definition_.disability_weights().contains(disease.first)) 
-                sum *= (1.0 - definition_.disability_weights().at(disease.first));
+                Product *= (1.0 - definition_.disability_weights().at(disease.first));
 
     auto residual_dw    = residual_disability_weight_.at(entity.age, entity.gender);
     residual_dw         = std::min(1.0, std::max(residual_dw, 0.0));
-    sum                 *= (1.0 - residual_dw);
+    Product             *= (1.0 - residual_dw);
 
-    return 1.0 - sum;
+    return 1.0 - Product;
 }
 
 DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned int max_age, unsigned int death_year) const 
@@ -296,7 +300,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
         }
     }
 
-    auto yll = yll_sum * DALY_UNITS / count;
+    auto yll = yll_sum * DALY_UNITS / count;    // is it right here that count is only incremented in YLD calculation, but not YLL calculation? Depends on when is_active() would change during runtime
     auto yld = yld_sum * DALY_UNITS / count;
 
     return DALYsIndicator{.years_of_life_lost               = yll,
@@ -356,9 +360,9 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context, Da
             if (!person.is_alive() && person.time_of_death() == current_time) 
             {
                 series(gender, "deaths").at(age)++;
-                float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
-                double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
-                series(gender, "mean_yll").at(age) += yll;
+                float expcted_life                  = definition_.life_expectancy().at(context.time_now(), gender);
+                double yll                          = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
+                series(gender, "mean_yll").at(age)  += yll;
                 series(gender, "mean_daly").at(age) += yll;
             }
 
@@ -383,8 +387,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context, Da
         double dw   = calculate_disability_weight(person);
         double yld  = dw * DALY_UNITS;
 
-        series(gender, "mean_yld").at(age)  += yld;
-        series(gender, "mean_daly").at(age) += yld;
+        series(gender, "mean_yld"   ).at(age) += yld;
+        series(gender, "mean_daly"  ).at(age) += yld;
 
         classify_weight(series, person);
     }
