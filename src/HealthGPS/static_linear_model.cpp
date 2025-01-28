@@ -449,12 +449,11 @@ void StaticLinearModel::update_income(Person &person, Random &random) const {
     }
 }
 
-void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
-                                                     Random &random) const {
-    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
-                                   std::nullopt, false);
-    double rand = random.next_normal(0.0, physical_activity_stddev_);
-    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
+void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person, Random &random) const 
+{
+    double expected     = get_expected(context, person.gender, person.age, "PhysicalActivity"_id, std::nullopt, false);
+    double rand         = random.next_normal(0.0, physical_activity_stddev_);
+    double factor       = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
