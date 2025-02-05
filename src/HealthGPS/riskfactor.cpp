@@ -57,8 +57,8 @@ std::unique_ptr<RiskFactorModule> build_risk_factor_module(Repository &repositor
     models.emplace(RiskFactorModelType::Static, std::move(static_model));
 
     // Dynamic (update) model
-    const auto &dynamic_definition = repository.get_risk_factor_model_definition(RiskFactorModelType::Dynamic);
-    auto dynamic_model = dynamic_definition.create_model();
+    const auto &dynamic_definition  = repository.get_risk_factor_model_definition(RiskFactorModelType::Dynamic);
+    auto dynamic_model              = dynamic_definition.create_model();
     models.emplace(RiskFactorModelType::Dynamic, std::move(dynamic_model));
 
     return std::make_unique<RiskFactorModule>(std::move(models));

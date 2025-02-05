@@ -318,7 +318,7 @@ hgps::IntegerAgeGenderTable Simulation::create_net_migration()
 
 Person Simulation::partial_clone_entity(const Person &source) noexcept 
 {
-    auto clone = Person{};
+    auto clone      = Person{};
     clone.age       = source.age;
     clone.gender    = source.gender;
     clone.ses       = source.ses;

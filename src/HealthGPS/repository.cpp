@@ -8,13 +8,12 @@ namespace hgps {
 
 CachedRepository::CachedRepository(core::Datastore &manager) : data_manager_{manager} {}
 
-void CachedRepository::register_risk_factor_model_definition(
-    const RiskFactorModelType &model_type, std::unique_ptr<RiskFactorModelDefinition> definition) {
+void CachedRepository::register_risk_factor_model_definition(const RiskFactorModelType &model_type, std::unique_ptr<RiskFactorModelDefinition> definition) 
+{
     std::unique_lock<std::mutex> lock(mutex_);
 
-    if (rf_model_definition_.contains(model_type)) {
+    if (rf_model_definition_.contains(model_type)) 
         rf_model_definition_.erase(model_type);
-    }
 
     rf_model_definition_.emplace(model_type, std::move(definition));
 }
@@ -48,11 +47,11 @@ std::optional<core::DiseaseInfo> CachedRepository::get_disease_info(core::Identi
     return {};
 }
 
-DiseaseDefinition &CachedRepository::get_disease_definition(const core::DiseaseInfo &info,
-                                                            const ModelInput &config) {
-
+DiseaseDefinition &CachedRepository::get_disease_definition(const core::DiseaseInfo &info, const ModelInput &config) 
+{
     // lock-free multiple readers
-    if (diseases_.contains(info.code)) {
+    if (diseases_.contains(info.code)) 
+    {
         return diseases_.at(info.code);
     }
 

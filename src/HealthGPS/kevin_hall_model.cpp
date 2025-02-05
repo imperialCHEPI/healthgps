@@ -34,18 +34,15 @@ KevinHallModel::KevinHallModel(
     const std::vector<double>                                                       &epa_quantiles,
     const std::unordered_map<core::Gender, double>                                  &height_stddev,
     const std::unordered_map<core::Gender, double>                                  &height_slope       )
-    : RiskFactorAdjustableModel{
-        std::move(expected), 
-        std::move(expected_trend), 
-        std::move(trend_steps)},
-        energy_equation_{energy_equation},
-        nutrient_ranges_{nutrient_ranges},
-        nutrient_equations_{nutrient_equations},
-        food_prices_{food_prices},
-        weight_quantiles_{weight_quantiles}, 
-        epa_quantiles_{epa_quantiles},
-        height_stddev_{height_stddev}, 
-        height_slope_{height_slope} {}
+    : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend), std::move(trend_steps)},
+      energy_equation_{energy_equation}, 
+      nutrient_ranges_{nutrient_ranges},
+      nutrient_equations_{nutrient_equations},
+      food_prices_{food_prices},
+      weight_quantiles_{weight_quantiles}, 
+      epa_quantiles_{epa_quantiles},
+      height_stddev_{height_stddev}, 
+      height_slope_{height_slope} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
@@ -95,7 +92,6 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context)
     {
         // Ignore if inactive.
         if (!person.is_active())    continue;
-
         compute_bmi(person);
     }
 }
@@ -223,9 +219,7 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
     // Baseline scenatio: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) 
-    {
         return compute_weight_adjustments(context);
-    }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
