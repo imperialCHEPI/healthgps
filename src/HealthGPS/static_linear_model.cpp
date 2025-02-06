@@ -477,41 +477,25 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       income_models_{std::move(income_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
-    if (names_.empty()) 
-        throw core::HgpsException("Risk factor names list is empty");
-    if (models_.empty()) 
-        throw core::HgpsException("Risk factor model list is empty");
-    if (ranges_.empty()) 
-        throw core::HgpsException("Risk factor ranges list is empty");
-    if (lambda_.empty()) 
-        throw core::HgpsException("Risk factor lambda list is empty");
-    if (stddev_.empty()) 
-        throw core::HgpsException("Risk factor standard deviation list is empty");
-    if (!cholesky_.allFinite()) 
-        throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
-    if (policy_models_.empty()) 
-        throw core::HgpsException("Intervention policy model list is empty");
-    if (policy_ranges_.empty()) 
-        throw core::HgpsException("Intervention policy ranges list is empty");
-    if (!policy_cholesky_.allFinite()) 
-        throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
-    if (trend_models_->empty()) 
-        throw core::HgpsException("Time trend model list is empty");
-    if (trend_ranges_->empty()) 
-        throw core::HgpsException("Time trend ranges list is empty");
-    if (trend_lambda_->empty()) 
-        throw core::HgpsException("Time trend lambda list is empty");
-    if (rural_prevalence_.empty()) 
-        throw core::HgpsException("Rural prevalence mapping is empty");
-    if (income_models_.empty()) 
-        throw core::HgpsException("Income models mapping is empty");
+    if (names_.empty())                 throw core::HgpsException("Risk factor names list is empty");
+    if (models_.empty())                throw core::HgpsException("Risk factor model list is empty");
+    if (ranges_.empty())                throw core::HgpsException("Risk factor ranges list is empty");
+    if (lambda_.empty())                throw core::HgpsException("Risk factor lambda list is empty");
+    if (stddev_.empty())                throw core::HgpsException("Risk factor standard deviation list is empty");
+    if (!cholesky_.allFinite())         throw core::HgpsException("Risk factor Cholesky matrix contains non-finite values");
+    if (policy_models_.empty())         throw core::HgpsException("Intervention policy model list is empty");
+    if (policy_ranges_.empty())         throw core::HgpsException("Intervention policy ranges list is empty");
+    if (!policy_cholesky_.allFinite())  throw core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
+    if (trend_models_->empty())         throw core::HgpsException("Time trend model list is empty");
+    if (trend_ranges_->empty())         throw core::HgpsException("Time trend ranges list is empty");
+    if (trend_lambda_->empty())         throw core::HgpsException("Time trend lambda list is empty");
+    if (rural_prevalence_.empty())      throw core::HgpsException("Rural prevalence mapping is empty");
+    if (income_models_.empty())         throw core::HgpsException("Income models mapping is empty");
     
     for (const auto &name : names_) 
     {
-        if (!expected_trend_->contains(name)) 
-            throw core::HgpsException("One or more expected trend value is missing");
-        if (!expected_trend_boxcox_->contains(name)) 
-            throw core::HgpsException("One or more expected trend BoxCox value is missing");
+        if (!expected_trend_->contains(name))           throw core::HgpsException("One or more expected trend value is missing");
+        if (!expected_trend_boxcox_->contains(name))    throw core::HgpsException("One or more expected trend BoxCox value is missing");
     }
 }
 

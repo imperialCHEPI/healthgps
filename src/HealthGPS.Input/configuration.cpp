@@ -346,17 +346,17 @@ hgps::Simulation create_intervention_simulation(hgps::SyncChannel               
 #endif
 std::string expand_environment_variables(const std::string &path) 
 {
-    if (path.find("${") == std::string::npos) 
-        return path;
+    if (path.find("${") == std::string::npos)     return path;
 
-    std::string pre     = path.substr(0, path.find("${"));
-    std::string post    = path.substr(path.find("${") + 2);
+    std::string pre         = path.substr(0, path.find("${"));
+    std::string post        = path.substr(path.find("${") + 2);
+
     if (post.find('}') == std::string::npos) return path;
     
-    std::string variable = post.substr(0, post.find('}'));
+    std::string variable    = post.substr(0, post.find('}'));
     std::string value;
 
-    post = post.substr(post.find('}') + 1);
+    post                    = post.substr(post.find('}') + 1);
     if (const char *v = std::getenv(variable.c_str())) value = v; // C4996, but safe here.
        
     return expand_environment_variables(pre + value + post);
