@@ -65,6 +65,9 @@ struct Person {
     /// @brief Social-economic status (SES) assigned value
     double ses{};
 
+    /// @brief Region assigned value
+    core::Region region{core::Region::unknown};
+
     /// @brief Current risk factors values
     std::map<core::Identifier, double> risk_factors;
 
@@ -124,7 +127,7 @@ struct Person {
     float sector_to_value() const;
 
     /// @brief Gets the income enumeration as a number
-    /// @return The income value (low = 1, middle = 2, high = 3)
+    /// @return The income value (low = 1, lowermiddle = 2, uppermiddle = 3, high = 4)
     /// @throws HgpsException if income is unknown
     float income_to_value() const;
 
@@ -140,6 +143,11 @@ struct Person {
 
     /// @brief Resets the unique identifier sequence to zero.
     static void reset_id();
+
+    /// @brief Gets the region enumeration as a number
+    /// @return The region value (england = 1, wales = 2, scotland = 3, northernireland = 4)
+    /// @throws HgpsException if region is unknown
+    float region_to_value() const;
 
   private:
     std::size_t id_{};

@@ -223,3 +223,23 @@ TEST(TestHealthGPS_Population, AddMultipleNewEntities) {
     ASSERT_TRUE(p[midpoint].is_active());
     ASSERT_TRUE(p[start_size].is_active());
 }
+
+TEST(TestHealthGPS_Population, PersonIncomeValues) {
+    using namespace hgps;
+
+    auto p = Person{};
+    p.income = core::Income::low;
+    ASSERT_EQ(1.0f, p.income_to_value());
+
+    p.income = core::Income::lowermiddle;
+    ASSERT_EQ(2.0f, p.income_to_value());
+
+    p.income = core::Income::uppermiddle;
+    ASSERT_EQ(3.0f, p.income_to_value());
+
+    p.income = core::Income::high;
+    ASSERT_EQ(4.0f, p.income_to_value());
+
+    p.income = core::Income::unknown;
+    ASSERT_THROW(p.income_to_value(), core::HgpsException);
+}

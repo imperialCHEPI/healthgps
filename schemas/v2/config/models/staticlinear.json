@@ -43,7 +43,8 @@
             "propertyNames": {
                 "enum": [
                     "Low",
-                    "Middle",
+                    "LowerMiddle",
+                    "UpperMiddle",
                     "High",
                     "Unknown"
                 ]

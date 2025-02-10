@@ -113,10 +113,20 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void update_income(Person &person, Random &random) const;
 
     /// @brief Initialise the physical activity of a person
-    /// @param person The person to initialise sector for
+    /// @param person The person to initialise PAL for
     /// @param random The random number generator from the runtime context
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
+
+    // @brief Initialise the region of a person
+    /// @param person The person to initialise region for
+    /// @param random The random number generator from the runtime context
+    void initialise_region(Person &person, Random &random) const;
+
+    // @brief update the region of a person
+    /// @param person The person to update the region for
+    /// @param random The random number generator from the runtime context
+    void update_region(Person &person, Random &random) const;
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
