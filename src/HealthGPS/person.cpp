@@ -67,13 +67,12 @@ bool Person::over_18() const noexcept { return age >= 18; }
 
 float Person::sector_to_value() const 
 {
-    switch (sector) {
-    case core::Sector::urban:
-        return 0.0f;
-    case core::Sector::rural:
-        return 1.0f;
-    default:
-        throw core::HgpsException("Sector is unknown.");
+    switch (sector) 
+    {
+        case core::Sector::urban: return 0.0f;
+        case core::Sector::rural: return 1.0f;
+        default:
+            throw core::HgpsException("Sector is unknown.");
     }
 }
 

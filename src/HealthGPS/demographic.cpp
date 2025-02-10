@@ -364,19 +364,17 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context, cons
         else 
         {
             // Calculate death probability based on the health status
-            auto residual_death_rate = get_residual_death_rate(entity.age, entity.gender);
-            auto product = 1.0 - residual_death_rate;
+            auto residual_death_rate    = get_residual_death_rate(entity.age, entity.gender);
+            auto product                = 1.0 - residual_death_rate;
             for (const auto &item : entity.diseases) 
-            {
                 if (item.second.status == DiseaseStatus::active) 
                 {
                     auto excess_mortality = disease_host.get_excess_mortality(item.first, entity);
                     product *= (1.0 - excess_mortality);
                 }
-            }
 
-            auto death_probability = 1.0 - product;
-            auto hazard = context.random().next_double();
+            auto death_probability  = 1.0 - product;
+            auto hazard             = context.random().next_double();
             
             if (hazard < death_probability) 
             {
