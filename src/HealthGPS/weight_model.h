@@ -54,38 +54,40 @@ class WeightModel {
     /// @param value The amount of adjustment value
     /// @return The adjusted risk factor value
     /// @throws std::out_of_range for unknown weight category definition
-    double adjust_risk_factor_value(const Person &entity, const core::Identifier &risk_factor_key,
-                                    double value) const {
+    double adjust_risk_factor_value(const Person &entity, const core::Identifier &risk_factor_key, double value) const 
+    {
         return pimpl_->adjust_risk_factor_value(entity, risk_factor_key, value);
     }
 
   private:
     struct Concept {
         virtual ~Concept() {}
-        virtual std::unique_ptr<Concept> clone() const = 0;
-        virtual unsigned int child_cutoff_age() const noexcept = 0;
-        virtual WeightCategory classify_weight(const Person &entity) const = 0;
-        virtual double adjust_risk_factor_value(const Person &entity,
-                                                const core::Identifier &risk_factor_key,
-                                                double value) const = 0;
+        virtual std::unique_ptr<Concept>    clone() const = 0;
+        virtual unsigned int                child_cutoff_age() const noexcept = 0;
+        virtual WeightCategory              classify_weight(const Person &entity) const = 0;
+        virtual double                      adjust_risk_factor_value(const Person &entity, const core::Identifier &risk_factor_key, double value) const = 0;
     };
 
     template <typename T> struct Model : Concept {
+
         Model(T &&value) : object_{std::forward<T>(value)} {}
 
         std::unique_ptr<Concept> clone() const override { return std::make_unique<Model>(*this); }
 
-        unsigned int child_cutoff_age() const noexcept override {
+        unsigned int child_cutoff_age() const noexcept override 
+        {
             return object_.child_cutoff_age();
         }
 
-        WeightCategory classify_weight(const Person &entity) const override {
+        WeightCategory classify_weight(const Person &entity) const override 
+        {
             return object_.classify_weight(entity);
         }
 
         double adjust_risk_factor_value(const Person &entity,
                                         const core::Identifier &risk_factor_key,
-                                        double value) const override {
+                                        double value) const override 
+        {
             return object_.adjust_risk_factor_value(entity, risk_factor_key, value);
         }
 

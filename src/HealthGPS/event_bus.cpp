@@ -18,16 +18,17 @@ DefaultEventBus::subscribe(EventType event_id,
     return std::make_unique<EventSubscriberHandler>(handle_id, this);
 }
 
-void DefaultEventBus::publish(std::unique_ptr<EventMessage> message) const {
-    shared_access([&]() {
-        std::shared_ptr<EventMessage> shared_message = std::move(message);
+void DefaultEventBus::publish(std::unique_ptr<EventMessage> message) const 
+{
+    shared_access([&]() 
+        {
+            std::shared_ptr<EventMessage> shared_message = std::move(message);
 
-        // Only call the functions we need for the event type
-        auto [begin_id, end_id] = registry_.equal_range(shared_message->id());
-        for (; begin_id != end_id; ++begin_id) {
-            subscribers_.at(begin_id->second)(shared_message);
-        }
-    });
+            // Only call the functions we need for the event type
+            auto [begin_id, end_id] = registry_.equal_range(shared_message->id());
+            for (; begin_id != end_id; ++begin_id) 
+                subscribers_.at(begin_id->second)(shared_message);
+        });
 }
 
 void DefaultEventBus::publish_async(std::unique_ptr<EventMessage> message) const {

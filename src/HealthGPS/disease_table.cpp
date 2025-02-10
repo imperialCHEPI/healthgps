@@ -17,26 +17,20 @@ double DiseaseMeasure::operator[](const int measure_id) const { return measures_
 
 /* --------------------   Disease Table Implementation ----------------- */
 
-DiseaseTable::DiseaseTable(const core::DiseaseInfo &info, std::map<std::string, int> &&measures,
-                           std::map<int, std::map<core::Gender, DiseaseMeasure>> &&data)
-    : info_{info}, measures_{std::move(measures)}, data_{std::move(data)} {
+DiseaseTable::DiseaseTable(const core::DiseaseInfo &info, std::map<std::string, int> &&measures, std::map<int, std::map<core::Gender, DiseaseMeasure>> &&data)
+    : info_{info}, measures_{std::move(measures)}, data_{std::move(data)} 
+{
 
-    if (info.code.is_empty()) {
+    if (info.code.is_empty()) 
         throw std::invalid_argument("Invalid disease information with empty identifier");
-    }
-    if (data_.empty()) {
+    if (data_.empty()) 
         return; // empty table
-    }
 
     // Consistence checks, otherwise number of columns is wrong.
     auto col_size = data_.begin()->second.size();
-    for (const auto &age : data_) {
-        if (age.second.size() != col_size) {
-            throw std::invalid_argument(
-                fmt::format("Number of columns mismatch at age: {} ({} vs {}).", age.first,
-                            age.second.size(), col_size));
-        }
-    }
+    for (const auto &age : data_) 
+        if (age.second.size() != col_size) 
+            throw std::invalid_argument(fmt::format("Number of columns mismatch at age: {} ({} vs {}).", age.first, age.second.size(), col_size));
 }
 
 const core::DiseaseInfo &DiseaseTable::info() const noexcept { return info_; }
@@ -45,11 +39,9 @@ std::size_t DiseaseTable::size() const noexcept { return rows() * cols(); }
 
 std::size_t DiseaseTable::rows() const noexcept { return data_.size(); }
 
-std::size_t DiseaseTable::cols() const noexcept {
-    if (data_.empty()) {
-        return 0;
-    }
-
+std::size_t DiseaseTable::cols() const noexcept 
+{
+    if (data_.empty())     return 0;
     return data_.begin()->second.size();
 }
 
@@ -61,11 +53,13 @@ int DiseaseTable::at(const std::string &measure) const { return measures_.at(mea
 
 int DiseaseTable::operator[](const std::string &measure) const { return measures_.at(measure); }
 
-DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) {
+DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) 
+{
     return data_.at(age).at(gender);
 }
 
-const DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) const {
+const DiseaseMeasure &DiseaseTable::operator()(const int age, const core::Gender gender) const 
+{
     return data_.at(age).at(gender);
 }
 
