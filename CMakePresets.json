@@ -78,14 +78,14 @@
             }
         },
         {
-        "name": "windows-relwithdebinfo",
-        "displayName": "Windows RelWithDebInfo",
-        "description": "Build on Windows with debug symbols for profiling.",
-        "inherits": "windows-debug",
-        "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-           }
-       }
+            "name": "windows-relwithdebinfo",
+            "displayName": "Windows RelWithDebInfo",
+            "description": "Build on Windows with debug symbols for profiling.",
+            "inherits": "windows-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        }
     ],
     "buildPresets": [
         {
@@ -111,7 +111,7 @@
             "displayName": "Release",
             "configurePreset": "windows-release",
             "description": "Windows release build"
-        }, 
+        },
         {
             "name": "relwithdebinfo-build-windows",
             "displayName": "Windows RelWithDebInfo",
