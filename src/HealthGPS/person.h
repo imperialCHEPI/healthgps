@@ -145,7 +145,7 @@ struct Person {
     static void reset_id();
 
     /// @brief Gets the region enumeration as a number
-    /// @return The region value (england = 1, wales = 2, scotland = 3, northernireland = 4)
+    /// @return The region value (England = 1, Wales = 2, Scotland = 3, NorthernIreland = 4)
     /// @throws HgpsException if region is unknown
     float region_to_value() const;
 

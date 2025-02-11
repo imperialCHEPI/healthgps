@@ -243,3 +243,23 @@ TEST(TestHealthGPS_Population, PersonIncomeValues) {
     p.income = core::Income::unknown;
     ASSERT_THROW(p.income_to_value(), core::HgpsException);
 }
+
+TEST(TestHealthGPS_Population, PersonRegionValues) {
+    using namespace hgps;
+
+    auto p = Person{};
+    p.region = core::Region::England;
+    ASSERT_EQ(1.0f, p.region_to_value());
+
+    p.region = core::Region::Wales;
+    ASSERT_EQ(2.0f, p.region_to_value());
+
+    p.region = core::Region::Scotland;
+    ASSERT_EQ(3.0f, p.region_to_value());
+
+    p.region = core::Region::NorthernIreland;
+    ASSERT_EQ(4.0f, p.region_to_value());
+
+    p.region = core::Region::unknown;
+    ASSERT_THROW(p.region_to_value(), core::HgpsException);
+}

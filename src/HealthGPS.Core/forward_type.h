@@ -71,16 +71,16 @@ enum class Region : uint8_t {
     unknown,
 
     /// @brief England
-    england,
+    England,
 
     /// @brief Wales
-    wales,
+    Wales,
 
     /// @brief Scotland
-    scotland,
+    Scotland,
 
     /// @brief Northern Ireland
-    northernireland
+    NorthernIreland
 };
 
 /// @brief C++20 concept for numeric columns types

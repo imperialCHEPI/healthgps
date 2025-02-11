@@ -92,13 +92,13 @@ float Person::income_to_value() const {
 }
 float Person::region_to_value() const {
     switch (region) {
-    case core::Region::england:
+    case core::Region::England:
         return 1.0f;
-    case core::Region::wales:
+    case core::Region::Wales:
         return 2.0f;
-    case core::Region::scotland:
+    case core::Region::Scotland:
         return 3.0f;
-    case core::Region::northernireland:
+    case core::Region::NorthernIreland:
         return 4.0f;
     case core::Region::unknown:
     default:

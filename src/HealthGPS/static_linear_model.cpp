@@ -23,6 +23,7 @@ StaticLinearModel::StaticLinearModel(
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
+    const std::unordered_map<core::Region, LinearModelParams> &region_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
@@ -32,7 +33,7 @@ StaticLinearModel::StaticLinearModel(
       policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      physical_activity_stddev_{physical_activity_stddev} {}
+      region_models_{region_models}, physical_activity_stddev_{physical_activity_stddev} {}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
@@ -43,6 +44,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone.
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
+        initialise_region(person, context.random()); // added region for FINCH
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
@@ -75,6 +77,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_sector(person, context.random());
+            initialise_region(person, context.random()); // added region for FINCH
             initialise_income(person, context.random());
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
@@ -432,6 +435,50 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
     person.risk_factors["PhysicalActivity"_id] = factor;
 }
 
+void StaticLinearModel::initialise_region(Person &person, Random &random) const {
+    // Compute logits for each region category
+    auto logits = std::unordered_map<core::Region, double>{};
+    for (const auto &[region, params] : region_models_) {
+        logits[region] = params.intercept;
+        for (const auto &[factor, coefficient] : params.coefficients) {
+            logits.at(region) += coefficient * person.get_risk_factor_value(factor);
+        }
+    }
+
+    // Compute softmax probabilities for each region
+    auto e_logits = std::unordered_map<core::Region, double>{};
+    double e_logits_sum = 0.0;
+    for (const auto &[region, logit] : logits) {
+        e_logits[region] = exp(logit);
+        e_logits_sum += e_logits.at(region);
+    }
+
+    // Compute region probabilities for each region
+    auto probabilities = std::unordered_map<core::Region, double>{};
+    for (const auto &[region, e_logit] : e_logits) {
+        probabilities[region] = e_logit / e_logits_sum;
+    }
+
+    // Sample region need to do this for each person (TO VERIFY)
+    double rand = random.next_double();
+    for (const auto &[region, probability] : probabilities) {
+        if (rand < probability) {
+            person.region = region;
+            return;
+        }
+        rand -= probability;
+    }
+
+    throw core::HgpsException("Logic Error: failed to initialise region category");
+}
+
+void StaticLinearModel::update_region(Person &person, Random &random) const {
+    // Only update 18 year olds
+    if (person.age == 18) {
+        initialise_region(person, random);
+    }
+}
+
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -446,6 +493,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
+    std::unordered_map<core::Region, LinearModelParams> region_models,
     double physical_activity_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
@@ -456,7 +504,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      income_models_{std::move(income_models)},
+      income_models_{std::move(income_models)}, region_models_{std::move(region_models)},
       physical_activity_stddev_{physical_activity_stddev} {
 
     if (names_.empty()) {
@@ -501,6 +549,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
+    if (region_models_.empty()) {
+        throw core::HgpsException("Region models mapping is empty");
+    }
     for (const auto &name : names_) {
         if (!expected_trend_->contains(name)) {
             throw core::HgpsException("One or more expected trend value is missing");
@@ -513,10 +564,13 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(
-        expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
-        lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
-        trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
-        physical_activity_stddev_);
+        std::make_shared<RiskFactorSexAgeTable>(*expected_),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_),
+        std::make_shared<std::unordered_map<core::Identifier, int>>(*trend_steps_),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox_),
+        names_, models_, ranges_, lambda_, stddev_, cholesky_, policy_models_, policy_ranges_,
+        policy_cholesky_, trend_models_, trend_ranges_, trend_lambda_, info_speed_,
+        rural_prevalence_, income_models_, region_models_, physical_activity_stddev_);
 }
 
 } // namespace hgps

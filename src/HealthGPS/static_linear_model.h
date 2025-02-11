@@ -42,6 +42,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @param phycical_activity_stddev The standard deviation of the physical activity
+    /// @param region_models The region models for each region
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -60,6 +61,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
+        const std::unordered_map<core::Region, LinearModelParams>
+            &region_models, // added region for FINCH
         double physical_activity_stddev);
 
     RiskFactorModelType type() const noexcept override;
@@ -145,6 +148,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
+    const std::unordered_map<core::Region, LinearModelParams> &region_models_;
     const double physical_activity_stddev_;
 };
 
@@ -172,6 +176,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
     /// @param income_models The income models for each income category
     /// @param phycical_activity_stddev The standard deviation of the physical activity
+    /// @param region_models The region models for each region
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -189,6 +194,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
+        std::unordered_map<core::Region, LinearModelParams> region_models,
         double physical_activity_stddev);
 
     /// @brief Construct a new StaticLinearModel from this definition
@@ -213,6 +219,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
+    std::unordered_map<core::Region, LinearModelParams> region_models_;
     double physical_activity_stddev_;
 };
 
