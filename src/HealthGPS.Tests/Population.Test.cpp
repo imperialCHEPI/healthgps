@@ -1,7 +1,11 @@
 #include "pch.h"
 
+#include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
+#include "HealthGPS/person.h"
+#include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
+#include <gtest/gtest.h>
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson) {
     using namespace hgps;
@@ -244,7 +248,7 @@ TEST(TestHealthGPS_Population, PersonIncomeValues) {
     ASSERT_THROW(p.income_to_value(), core::HgpsException);
 }
 
-TEST(TestHealthGPS_Population, PersonRegionValues) {
+TEST(TestHealthGPS_Population, RegionModelOperations) {
     using namespace hgps;
 
     auto p = Person{};
@@ -262,4 +266,43 @@ TEST(TestHealthGPS_Population, PersonRegionValues) {
 
     p.region = core::Region::unknown;
     ASSERT_THROW(p.region_to_value(), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, RegionModelParsing) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    ASSERT_EQ(core::Region::England, parse_region("England"));
+    ASSERT_EQ(core::Region::Wales, parse_region("Wales"));
+    ASSERT_EQ(core::Region::Scotland, parse_region("Scotland"));
+    ASSERT_EQ(core::Region::NorthernIreland, parse_region("NorthernIreland"));
+    ASSERT_THROW(parse_region("Invalid"), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, PersonRegionCloning) {
+    using namespace hgps;
+
+    auto source = Person{};
+    source.region = core::Region::England;
+    source.age = 25;
+    source.gender = core::Gender::male;
+    source.ses = 0.5;
+    source.sector = core::Sector::urban;
+    source.income = core::Income::high;
+
+    auto clone = Person{};
+    clone.region = source.region;
+    clone.age = source.age;
+    clone.gender = source.gender;
+    clone.ses = source.ses;
+    clone.sector = source.sector;
+    clone.income = source.income;
+
+    ASSERT_EQ(clone.region, source.region);
+    ASSERT_EQ(clone.region_to_value(), source.region_to_value());
+    ASSERT_EQ(clone.age, source.age);
+    ASSERT_EQ(clone.gender, source.gender);
+    ASSERT_EQ(clone.ses, source.ses);
+    ASSERT_EQ(clone.sector, source.sector);
+    ASSERT_EQ(clone.income, source.income);
 }
