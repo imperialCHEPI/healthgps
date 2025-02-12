@@ -61,9 +61,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
-        const std::unordered_map<core::Region, LinearModelParams>
-            &region_models, // added region for FINCH
-        double physical_activity_stddev);
+        const std::unordered_map<core::Region, LinearModelParams> &region_models,
+        double physical_activity_stddev); // added region for FINCH
 
     RiskFactorModelType type() const noexcept override;
 
