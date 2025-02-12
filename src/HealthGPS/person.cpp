@@ -86,10 +86,12 @@ float Person::income_to_value() const {
         return 3.0f;
     case core::Income::high:
         return 4.0f;
+    case core::Income::unknown:
     default:
-        throw core::HgpsException("Income is unknown.");
+        throw core::HgpsException("Unknown income category");
     }
 }
+
 float Person::region_to_value() const {
     switch (region) {
     case core::Region::England:
