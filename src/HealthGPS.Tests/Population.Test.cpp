@@ -1,7 +1,11 @@
 #include "pch.h"
 
+#include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
+#include "HealthGPS/person.h"
+#include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
+#include <gtest/gtest.h>
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson) {
     using namespace hgps;
@@ -222,4 +226,83 @@ TEST(TestHealthGPS_Population, AddMultipleNewEntities) {
     ASSERT_EQ(expected_size, p.size());
     ASSERT_TRUE(p[midpoint].is_active());
     ASSERT_TRUE(p[start_size].is_active());
+}
+
+TEST(TestHealthGPS_Population, PersonIncomeValues) {
+    using namespace hgps;
+
+    auto p = Person{};
+    p.income = core::Income::low;
+    ASSERT_EQ(1.0f, p.income_to_value());
+
+    p.income = core::Income::lowermiddle;
+    ASSERT_EQ(2.0f, p.income_to_value());
+
+    p.income = core::Income::uppermiddle;
+    ASSERT_EQ(3.0f, p.income_to_value());
+
+    p.income = core::Income::high;
+    ASSERT_EQ(4.0f, p.income_to_value());
+
+    p.income = core::Income::unknown;
+    ASSERT_THROW(p.income_to_value(), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, RegionModelOperations) {
+    using namespace hgps;
+
+    auto p = Person{};
+    p.region = core::Region::England;
+    ASSERT_EQ(1.0f, p.region_to_value());
+
+    p.region = core::Region::Wales;
+    ASSERT_EQ(2.0f, p.region_to_value());
+
+    p.region = core::Region::Scotland;
+    ASSERT_EQ(3.0f, p.region_to_value());
+
+    p.region = core::Region::NorthernIreland;
+    ASSERT_EQ(4.0f, p.region_to_value());
+
+    p.region = core::Region::unknown;
+    ASSERT_THROW(p.region_to_value(), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, RegionModelParsing) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    ASSERT_EQ(core::Region::England, parse_region("England"));
+    ASSERT_EQ(core::Region::Wales, parse_region("Wales"));
+    ASSERT_EQ(core::Region::Scotland, parse_region("Scotland"));
+    ASSERT_EQ(core::Region::NorthernIreland, parse_region("NorthernIreland"));
+    ASSERT_THROW(parse_region("Invalid"), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, PersonRegionCloning) {
+    using namespace hgps;
+
+    auto source = Person{};
+    source.region = core::Region::England;
+    source.age = 25;
+    source.gender = core::Gender::male;
+    source.ses = 0.5;
+    source.sector = core::Sector::urban;
+    source.income = core::Income::high;
+
+    auto clone = Person{};
+    clone.region = source.region;
+    clone.age = source.age;
+    clone.gender = source.gender;
+    clone.ses = source.ses;
+    clone.sector = source.sector;
+    clone.income = source.income;
+
+    ASSERT_EQ(clone.region, source.region);
+    ASSERT_EQ(clone.region_to_value(), source.region_to_value());
+    ASSERT_EQ(clone.age, source.age);
+    ASSERT_EQ(clone.gender, source.gender);
+    ASSERT_EQ(clone.ses, source.ses);
+    ASSERT_EQ(clone.sector, source.sector);
+    ASSERT_EQ(clone.income, source.income);
 }

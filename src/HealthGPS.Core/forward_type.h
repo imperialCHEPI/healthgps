@@ -55,11 +55,32 @@ enum class Income : uint8_t {
     /// @brief Low income
     low,
 
-    /// @brief Middle income
-    middle,
+    /// @brief Lower middle income
+    lowermiddle,
+
+    /// @brief Upper middle income
+    uppermiddle,
 
     /// @brief High income
     high
+};
+
+/// @brief Enumerates region categories
+enum class Region : uint8_t {
+    /// @brief Unknown region
+    unknown,
+
+    /// @brief England
+    England,
+
+    /// @brief Wales
+    Wales,
+
+    /// @brief Scotland
+    Scotland,
+
+    /// @brief Northern Ireland
+    NorthernIreland
 };
 
 /// @brief C++20 concept for numeric columns types
