@@ -307,6 +307,7 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
     clone.gender = source.gender;
     clone.ses = source.ses;
     clone.sector = source.sector;
+    clone.region = source.region; // added region for FINCH
     clone.income = source.income;
     for (const auto &item : source.risk_factors) {
         clone.risk_factors.emplace(item.first, item.second);

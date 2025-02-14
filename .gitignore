@@ -422,3 +422,5 @@ compile_commands.json
 
 # Python venv
 .venv
+results/
+vtune_results/
