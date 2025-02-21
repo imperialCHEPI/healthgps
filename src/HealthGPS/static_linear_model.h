@@ -164,22 +164,26 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
-        std::unique_ptr<RiskFactorSexAgeTable> expected,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
-        std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-        std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
-        std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
-        std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
-        std::vector<double> stddev, Eigen::MatrixXd cholesky,
-        std::vector<LinearModelParams> policy_models,
-        std::vector<core::DoubleInterval> policy_ranges, Eigen::MatrixXd policy_cholesky,
-        std::unique_ptr<std::vector<LinearModelParams>> trend_models,
-        std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
-        std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
-        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
-            rural_prevalence,
-        std::unordered_map<core::Income, LinearModelParams> income_models,
-        double physical_activity_stddev);
+        std::unique_ptr<RiskFactorSexAgeTable>                                          expected,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>>                   expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, int>>                      trend_steps,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>>                   expected_trend_boxcox,
+        std::vector<core::Identifier>                                                   names, 
+        std::vector<LinearModelParams>                                                  models,
+        std::vector<core::DoubleInterval>                                               ranges, 
+        std::vector<double>                                                             lambda,
+        std::vector<double>                                                             stddev, 
+        Eigen::MatrixXd                                                                 cholesky,
+        std::vector<LinearModelParams>                                                  policy_models,
+        std::vector<core::DoubleInterval>                                               policy_ranges, 
+        Eigen::MatrixXd                                                                 policy_cholesky,
+        std::unique_ptr<std::vector<LinearModelParams>>                                 trend_models,
+        std::unique_ptr<std::vector<core::DoubleInterval>>                              trend_ranges,
+        std::unique_ptr<std::vector<double>>                                            trend_lambda, 
+        double                                                                          info_speed,
+        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>  rural_prevalence,
+        std::unordered_map<core::Income, LinearModelParams>                             income_models,
+        double                                                                          physical_activity_stddev);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance

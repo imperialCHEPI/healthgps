@@ -12,6 +12,12 @@
 #include <fstream>
 #include <utility>
 
+// structure of many of the functions below basically the same.
+// create a vector of structs of whatever data type / class we're loading (e.g. Country, PopulationItem). Name this vector "results". 
+// Define the file path (with reference to index.json) and file name for each data source. Load this data.
+// Select the columns (variables) that are required. Each row will form one entry into the results vector. 
+// And each variable selected will have a counterpart in whatever data type / class we're loading 
+
 namespace {
 //! The name of the index file
 constexpr const char *IndexFileName = "index.json";
@@ -30,32 +36,36 @@ nlohmann::json read_input_files_from_directory(const std::filesystem::path &data
 
 namespace hgps::input {
 
-DataManager::DataManager(std::filesystem::path data_path, VerboseMode verbosity)
-    : root_(std::move(data_path)), verbosity_(verbosity),
-      index_(read_input_files_from_directory(root_)) {}
+DataManager::DataManager(std::filesystem::path data_path, VerboseMode verbosity) /// called in program.cpp to create data_api.
+    :   root_(std::move(data_path)),                        // i.e. root_ = data_path
+        verbosity_(verbosity), 
+        index_(read_input_files_from_directory(root_)) {}   // i.e. initialize "index_" json using read_input_files_from_directory with argument root_
 
 std::vector<Country> DataManager::get_countries() const 
 {
-    auto results    = std::vector<Country>();
-    auto filepath   = index_["country"]["path"].get<std::string>();
-    auto filename   = index_["country"]["file_name"].get<std::string>();
-    filename = (root_ / filepath / filename).string();
+    auto results    = std::vector<Country>();                               // create a vector of structs of type Country, named "results". 
+    auto filepath   = index_["country"]["path"].get<std::string>();         // get file path from index.json / "country" / "path" (which in that file amounts to a simple "", i.e. not a subfolder within root directory.)
+    auto filename   = index_["country"]["file_name"].get<std::string>();    // get file name from index.json / "country" / "file_name" (which in that file amounts to "countries.csv")
+    filename        = (root_ / filepath / filename).string();               // append file name with root and file path, hence filename = [rootdirectory]/countries.csv
 
     if (!std::filesystem::exists(filename)) 
         throw std::runtime_error(fmt::format("countries file: '{}' not found.", filename));
 
-    rapidcsv::Document doc(filename);
-    auto mapping = create_fields_index_mapping(doc.GetColumnNames(), {"Code", "Name", "Alpha2", "Alpha3"});
+    rapidcsv::Document doc(filename); // load file. 
+    auto mapping = create_fields_index_mapping(doc.GetColumnNames(), {"Code", "Name", "Alpha2", "Alpha3"}); //// create mapping between column names and the varaibles listed here (e.g. "Code" may be third column, "Alpha2" may be fourth, it is arbitrary)
     
-    for (size_t i = 0; i < doc.GetRowCount(); i++) 
+    //// for each row of data, extract relevant variables defined above. 
+    //// place them firstly in the corresponding varibles in the Country strucutre
+    //// Secondly make another instance of the Country structure as the next entry of results vector.
+    for (size_t i = 0; i < doc.GetRowCount(); i++) /// loop over rows
     {
-        auto row = doc.GetRow<std::string>(i);
-        results.push_back(Country{.code     = std::stoi(row[mapping["Code"]]),
-                                  .name     = row[mapping["Name"]],
-                                  .alpha2   = row[mapping["Alpha2"]],
-                                  .alpha3   = row[mapping["Alpha3"]]});
+        auto row = doc.GetRow<std::string>(i); // get row i
+        results.push_back(Country{.code     = std::stoi(row[mapping["Code"]]),  // extract "Code"   to .code    member of Country
+                                  .name     = row[mapping["Name"]],             // extract "Name"   to .name    member of Country
+                                  .alpha2   = row[mapping["Alpha2"]],           // extract "Alpha2" to .alpha2  member of Country
+                                  .alpha3   = row[mapping["Alpha3"]]});         // extract "Alpha3" to .alpha3  member of Country... and therefore create new instance of Country to be pushed back to results.
     }
-    std::sort(results.begin(), results.end());
+    std::sort(results.begin(), results.end()); // don't understand why this is being sorted, or indeed which variable within Country class is being sorted on.
 
     return results;
 }
@@ -80,29 +90,29 @@ std::vector<PopulationItem> DataManager::get_population(const Country &country) 
     return DataManager::get_population(country, [](unsigned int) { return true; });
 }
 
-std::vector<PopulationItem>
-DataManager::get_population(const Country &country,
-                            std::function<bool(unsigned int)> time_filter) const {
-    auto results = std::vector<PopulationItem>();
-
-    auto nodepath = index_["demographic"]["path"].get<std::string>();
-    auto filepath = index_["demographic"]["population"]["path"].get<std::string>();
-    auto filename = index_["demographic"]["population"]["file_name"].get<std::string>();
-
-    // Tokenized file names X{country.code}X.xxx
-    filename = replace_string_tokens(filename, {std::to_string(country.code)});
-    filename = (root_ / nodepath / filepath / filename).string();
+std::vector<PopulationItem> DataManager::get_population(const Country &country, std::function<bool(unsigned int)> time_filter) const 
+{
+    auto results    = std::vector<PopulationItem>();                                        // create a vector of structs of type PopulationItem, named "results". 
+    auto nodepath   = index_["demographic"]["path"].get<std::string>();                     // get nodepath path from index.json / "demographic" / "path" (which in that file amounts to the "undb" subfolder within root directory.)
+    auto filepath   = index_["demographic"]["population"]["path"].get<std::string>();       // get filepath path from index.json / "demographic" / "population" / "path" (which in that file amounts to the "population" subfolder within undb sub directory.)
+    auto filename   = index_["demographic"]["population"]["file_name"].get<std::string>();  // get file name from index.json / "demographic" / "population" / "file_name" (which in that file amounts to "P{COUNTRY_CODE}.csv")
+    
+    filename = replace_string_tokens(filename, {std::to_string(country.code)});             // Tokenized file names X{country.code}X.xxx
+    filename = (root_ / nodepath / filepath / filename).string();                           // append file name with root, node path and file path, hence filename = "[rootdirectory]/undb/population/P{COUNTRY_CODE}.csv"
 
     // LocID,Location,VarID,Variant,Time,MidPeriod,AgeGrp,AgeGrpStart,AgeGrpSpan,PopMale,PopFemale,PopTotal
     if (!std::filesystem::exists(filename)) 
         throw std::runtime_error(fmt::format("{} population file: '{}' not found.", country.name, filename));
 
     rapidcsv::Document doc(filename);
-    auto mapping = create_fields_index_mapping(doc.GetColumnNames(), {"LocID", "Time", "Age", "PopMale", "PopFemale", "PopTotal"});
+    auto mapping = create_fields_index_mapping(doc.GetColumnNames(), {"LocID", "Time", "Age", "PopMale", "PopFemale", "PopTotal"});  //// create mapping between column names and the varaibles listed here
 
-    for (size_t i = 0; i < doc.GetRowCount(); i++) 
+   //// for each row of data, extract relevant variables defined above. 
+   //// place them firstly in the corresponding varibles in the PopulationItem strucutre
+   //// Secondly make another instance of the PopulationItem structure as the next entry of results vector.
+   for (size_t i = 0; i < doc.GetRowCount(); i++) 
     {
-        auto row        = doc.GetRow<std::string>(i);
+        auto row        = doc.GetRow<std::string>(i); // get row i
         auto row_time   = std::stoi(row[mapping["Time"]]);
 
         if (!time_filter(row_time))     continue;
@@ -125,6 +135,7 @@ std::vector<MortalityItem> DataManager::get_mortality(const Country &country) co
 
 std::vector<MortalityItem> DataManager::get_mortality(const Country &country, std::function<bool(unsigned int)> time_filter) const 
 {
+    //// See previous functions get_population and get_countries where logic is the same
     auto results    = std::vector<MortalityItem>();
     auto nodepath   = index_["demographic"]["path"].get<std::string>();
     auto filepath   = index_["demographic"]["mortality"]["path"].get<std::string>();
@@ -160,16 +171,18 @@ std::vector<MortalityItem> DataManager::get_mortality(const Country &country, st
 
 std::vector<DiseaseInfo> DataManager::get_diseases() const 
 {
-    auto result = std::vector<DiseaseInfo>();
+    auto result = std::vector<DiseaseInfo>();   // create a vector of structs of type DiseaseInfo, named "result". 
 
-    const auto &registry = index_["diseases"]["registry"];
+    const auto &registry = index_["diseases"]["registry"]; // Import part of index (diseases/registry) and store it as a json, named registry.
 
-    for (const auto &item : registry) 
+    for (const auto &item : registry) // loop through each item (list) within registry
     {
-        auto info       = DiseaseInfo{};
-        auto group_str  = std::string{};
-        auto code_srt   = std::string{};
+        // declare (empty) variables that will be added to result vector, 
+        auto info       = DiseaseInfo{}; //// Not sure why this syntax is preferred to "DiseaseInfo info;" 
+        auto group_str  = std::string{}; //// Likewise, not sure why this syntax is preferred to "std::string group_str;" 
+        auto code_srt   = std::string{}; //// ditto
 
+        // extract variables from registry item to variables declared above.
         item["group"].get_to(group_str);
         item["id"].get_to(code_srt);
         item["name"].get_to(info.name);
@@ -180,7 +193,7 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const
         if (core::case_insensitive::equals(group_str, "cancer")) 
             info.group = DiseaseGroup::cancer;
 
-        result.emplace_back(info);
+        result.emplace_back(info); //// add new instance of DiseaseInfo (named "info") to result vector.
     }
 
     std::sort(result.begin(), result.end());
@@ -190,14 +203,21 @@ std::vector<DiseaseInfo> DataManager::get_diseases() const
 
 DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const 
 {
-    const auto &registry            = index_["diseases"]["registry"];
-    const auto &disease_code_str    = code.to_string();
-    auto info                       = DiseaseInfo{};
+    /// THIS FUNCTION GETS DISEASE METADATA (very little actually there) from index.json, whereas "get_disease" actually loads disease data (e.g. mortaility, prevalence etc. into Cpp). 
 
+    // gets the info (essentially whether it's a cancer or not) for a given disease from the registry. 
+    // appears very similar to both DataManager::get_diseases above and to CachedRepository::get_disease_info and DataManager::get_disease() below. not sure what difference is.
+
+    const auto &registry            = index_["diseases"]["registry"]; // Import part of index (diseases/registry) and store it as a json, named registry.
+    const auto &disease_code_str    = code.to_string(); // code/ string for this disease
+    auto info                       = DiseaseInfo{}; // create empty instance of DiseaseInfo structure
+
+    /// loop over all diseases in (sub) registry, but only do anything for the disease that matches disease_code_str above, at which point stop.
     for (const auto &item : registry) 
     {
         auto item_code_str = std::string{};
         item["id"].get_to(item_code_str);
+
         if (item_code_str == disease_code_str) 
         {
             auto group_str = std::string{};
@@ -213,26 +233,28 @@ DiseaseInfo DataManager::get_disease_info(const core::Identifier &code) const
             return info;
         }
     }
-    throw std::runtime_error(fmt::format("Disease code: '{}' not found.", code.to_string()));
+    throw std::runtime_error(fmt::format("Disease code: '{}' not found.", code.to_string())); /// throw an error if loop finishes without internal if statement having been satisfied.
 }
 
 DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &country) const 
 {
-    DiseaseEntity result;
-    result.info     = info;
-    result.country  = country;
+    /// this function will load data (i.e. prevalence, incidence, mortality and remission) for a particular disease (specified by function argument "DiseaseInfo info") 
+    /// and store it in a DiseaseEntity structure
 
-    auto diseases_path  = index_["diseases"]["path"].get<std::string>();
-    auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
-    auto filename       = index_["diseases"]["disease"]["file_name"].get<std::string>();
+    DiseaseEntity result;       // create empty instance of DiseaseEntity structure named result
+    result.info     = info;     // put info argument into result (DiseaseInfo subclass of DiseaseEntity)
+    result.country  = country;  // put country argument into result (DiseaseInfo subclass of DiseaseEntity)
+
+    auto diseases_path  = index_["diseases"]["path"].get<std::string>();                    // get subfolder containing all disease data
+    auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();         // get subfolder for this disease
+    auto filename       = index_["diseases"]["disease"]["file_name"].get<std::string>();    // get filename of dataset D{COUNTRY_CODE}.csv
 
     // Tokenized folder name X{info.code}X
     disease_folder  = replace_string_tokens(disease_folder, {info.code.to_string()});
 
     // Tokenized file names X{country.code}X.xxx
     filename        = replace_string_tokens(filename, {std::to_string(country.code)});
-
-    filename = (root_ / diseases_path / disease_folder / filename).string();
+    filename        = (root_ / diseases_path / disease_folder / filename).string();         // concatenate to get full file name and directory
     if (!std::filesystem::exists(filename)) 
         throw std::runtime_error(fmt::format("{}, {} file: '{}' not found.", country.name, info.name, filename));
 
@@ -243,7 +265,8 @@ DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &c
 
     for (size_t i = 0; i < doc.GetRowCount(); i++) 
     {
-        auto row            = doc.GetRow<std::string>(i);
+        auto row            = doc.GetRow<std::string>(i);  // get row i
+
         auto age            = std::stoi(row[mapping["age"]]);
         auto gender         = static_cast<core::Gender>(std::stoi(row[mapping["gender_id"]]));
         auto measure_id     = std::stoi(row[mapping["measure_id"]]);
@@ -270,6 +293,7 @@ DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &c
 
 std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(const DiseaseInfo &source, const DiseaseInfo &target) const 
 {
+    //// lines below get filenames, file paths etc.
     auto diseases_path      = index_["diseases"]["path"].get<std::string>();
     auto disease_folder     = index_["diseases"]["disease"]["path"].get<std::string>();
     const auto &risk_node   = index_["diseases"]["disease"]["relative_risk"];
@@ -288,7 +312,7 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(cons
     auto tokens             = {source_code_str, target_code_str};
     filename                = replace_string_tokens(filename, tokens);
 
-    filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
+    filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string(); // concatenate to get full file name and directory
     if (!std::filesystem::exists(filename)) 
     {
         notify_warning(fmt::format("{} to {} relative risk file not found", source_code_str, target_code_str));
@@ -296,7 +320,7 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(cons
     }
     rapidcsv::Document doc(filename);
 
-    auto table      = RelativeRiskEntity();
+    auto table      = RelativeRiskEntity();  // create empty instance of RelativeRiskEntity structure
     table.columns   = doc.GetColumnNames();
 
     auto row_size           = table.columns.size();

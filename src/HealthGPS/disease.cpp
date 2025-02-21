@@ -81,6 +81,8 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository, cons
 
     const auto &diseases = config.diseases();
     std::mutex m;
+
+    // probably not a good place to parallelize - fine if doesn't interfere with anything else, but otherwise not needed.
     tbb::parallel_for_each(std::begin(diseases), std::end(diseases), [&](auto &info) 
     {
         auto info_code_str  = info.code.to_string();

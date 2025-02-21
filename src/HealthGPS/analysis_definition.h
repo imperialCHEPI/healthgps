@@ -14,11 +14,11 @@ class AnalysisDefinition {
     /// @param life_expectancy Population life expectancy table
     /// @param observed_YLD Observed years lived with disability (YLD) table
     /// @param disability_weights Diseases disability weights
-    AnalysisDefinition(GenderTable<int, float> &&life_expectancy,
-                       DoubleAgeGenderTable &&observed_YLD,
-                       std::map<core::Identifier, float> &&disability_weights)
-        : life_expectancy_{std::move(life_expectancy)}, observed_YLD_{std::move(observed_YLD)},
-          disability_weights_{std::move(disability_weights)} {}
+    AnalysisDefinition(GenderTable<int, float> &&life_expectancy, DoubleAgeGenderTable &&observed_YLD, std::map<core::Identifier, float> &&disability_weights)
+        : 
+        life_expectancy_{std::move(life_expectancy)}, 
+        observed_YLD_{std::move(observed_YLD)},
+        disability_weights_{std::move(disability_weights)} {}
 
     /// @brief Gets the population life expectancy table
     /// @return Life expectancy table

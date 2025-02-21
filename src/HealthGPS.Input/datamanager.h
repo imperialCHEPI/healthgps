@@ -30,8 +30,7 @@ class DataManager : public Datastore {
     /// @param verbosity The terminal logging verbosity mode to use.
     /// @throws std::invalid_argument if the root directory or index.json is missing.
     /// @throws std::runtime_error for invalid or unsupported index.json file schema version.
-    explicit DataManager(std::filesystem::path data_path,
-                         VerboseMode verbosity = VerboseMode::none);
+    explicit DataManager(std::filesystem::path data_path, VerboseMode verbosity = VerboseMode::none);
 
     std::vector<Country> get_countries() const override;
 
@@ -39,15 +38,11 @@ class DataManager : public Datastore {
 
     std::vector<PopulationItem> get_population(const Country &country) const;
 
-    std::vector<PopulationItem>
-    get_population(const Country &country,
-                   std::function<bool(unsigned int)> time_filter) const override;
+    std::vector<PopulationItem> get_population(const Country &country, std::function<bool(unsigned int)> time_filter) const override;
 
     std::vector<MortalityItem> get_mortality(const Country &country) const;
 
-    std::vector<MortalityItem>
-    get_mortality(const Country &country,
-                  std::function<bool(unsigned int)> time_filter) const override;
+    std::vector<MortalityItem> get_mortality(const Country &country, std::function<bool(unsigned int)> time_filter) const override;
 
     std::vector<DiseaseInfo> get_diseases() const override;
 
@@ -55,26 +50,19 @@ class DataManager : public Datastore {
 
     DiseaseEntity get_disease(const DiseaseInfo &info, const Country &country) const override;
 
-    std::optional<RelativeRiskEntity>
-    get_relative_risk_to_disease(const DiseaseInfo &source,
-                                 const DiseaseInfo &target) const override;
+    std::optional<RelativeRiskEntity> get_relative_risk_to_disease(const DiseaseInfo &source, const DiseaseInfo &target) const override;
 
-    std::optional<RelativeRiskEntity>
-    get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender,
-                                     const core::Identifier &risk_factor_key) const override;
+    std::optional<RelativeRiskEntity> get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender, const core::Identifier &risk_factor_key) const override;
 
     /// @copydoc core::Datastore::get_disease_parameter
     /// @throws std::out_of_range for unknown disease parameter file type.
-    CancerParameterEntity get_disease_parameter(const DiseaseInfo &info,
-                                                const Country &country) const override;
+    CancerParameterEntity get_disease_parameter(const DiseaseInfo &info, const Country &country) const override;
 
     DiseaseAnalysisEntity get_disease_analysis(const Country &country) const override;
 
     std::vector<BirthItem> get_birth_indicators(const Country &country) const;
 
-    std::vector<BirthItem>
-    get_birth_indicators(const Country &country,
-                         std::function<bool(unsigned int)> time_filter) const override;
+    std::vector<BirthItem> get_birth_indicators(const Country &country, std::function<bool(unsigned int)> time_filter) const override;
 
     std::vector<LmsDataRow> get_lms_parameters() const override;
 
@@ -83,18 +71,13 @@ class DataManager : public Datastore {
     VerboseMode verbosity_;
     nlohmann::json index_;
 
-    std::map<int, std::map<Gender, double>>
-    load_cost_of_diseases(const Country &country, const nlohmann::json &node,
-                          const std::filesystem::path &parent_path) const;
+    std::map<int, std::map<Gender, double>> load_cost_of_diseases(const Country &country, const nlohmann::json &node, const std::filesystem::path &parent_path) const;
 
     std::vector<LifeExpectancyItem> load_life_expectancy(const Country &country) const;
 
-    static std::string replace_string_tokens(const std::string &source,
-                                             const std::vector<std::string> &tokens);
+    static std::string replace_string_tokens(const std::string &source, const std::vector<std::string> &tokens);
 
-    static std::map<std::string, std::size_t>
-    create_fields_index_mapping(const std::vector<std::string> &column_names,
-                                const std::vector<std::string> &fields);
+    static std::map<std::string, std::size_t> create_fields_index_mapping(const std::vector<std::string> &column_names, const std::vector<std::string> &fields);
 
     void notify_warning(std::string_view message) const;
 };

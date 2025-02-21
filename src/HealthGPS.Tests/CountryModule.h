@@ -32,9 +32,7 @@ class CountryModule : public hgps::SimulationModule {
     std::string name_{"Country"};
 };
 
-static std::unique_ptr<CountryModule> build_country_module(hgps::Repository &repository,
-                                                           const hgps::ModelInput &config) {
-
-    return std::make_unique<CountryModule>(repository.manager().get_countries(),
-                                           config.settings().country());
+static std::unique_ptr<CountryModule> build_country_module(hgps::Repository &repository, const hgps::ModelInput &config) 
+{
+    return std::make_unique<CountryModule>(repository.manager().get_countries(), config.settings().country());
 }

@@ -11,7 +11,7 @@ namespace hgps::core {
 
 /// @brief Disease information structure
 struct DiseaseInfo {
-    /// @brief The disease group
+    /// @brief The disease group (i.e. cancer or non-cancer)
     DiseaseGroup group{};
 
     /// @brief Unique identifier
