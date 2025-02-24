@@ -11,7 +11,7 @@ struct BirthItem {
     /// @brief The total number of births
     float number;
 
-    /// @brief Sex Ratio at Birth (males per 100 female births)
+    /// @brief Sex Ratio at Birth (males per 100 female births - update: not per 100)
     float sex_ratio;
 };
 } // namespace hgps::core

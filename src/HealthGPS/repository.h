@@ -18,11 +18,11 @@ namespace hgps {
 class Repository {
   public:
     /// @brief Initialises a new instance of the Repository class.
-    Repository() = default;
-    Repository(Repository &&) = delete;
-    Repository(const Repository &) = delete;
-    Repository &operator=(Repository &&) = delete;
-    Repository &operator=(const Repository &) = delete;
+    Repository()                                = default;
+    Repository(Repository &&)                   = delete;
+    Repository(const Repository &)              = delete;
+    Repository &operator=(Repository &&)        = delete;
+    Repository &operator=(const Repository &)   = delete;
 
     /// @brief Destroys a Repository instance
     virtual ~Repository() = default;
@@ -34,8 +34,7 @@ class Repository {
     /// @brief Gets a user-provided risk factor model definition
     /// @param model_type Static or Dynamic
     /// @return The risk factor model definition
-    virtual const RiskFactorModelDefinition &
-    get_risk_factor_model_definition(const RiskFactorModelType &model_type) const = 0;
+    virtual const RiskFactorModelDefinition & get_risk_factor_model_definition(const RiskFactorModelType &model_type) const = 0;
 
     /// @brief Gets the collection of all diseases available in the back-end storage
     /// @return Collection of diseases information
@@ -51,8 +50,7 @@ class Repository {
     /// @param config The user inputs instance
     /// @return The disease definition
     /// @throws std::runtime_error for failure to load disease definition.
-    virtual DiseaseDefinition &get_disease_definition(const core::DiseaseInfo &info,
-                                                      const ModelInput &config) = 0;
+    virtual DiseaseDefinition &get_disease_definition(const core::DiseaseInfo &info, const ModelInput &config) = 0;
 
     /// @brief Gets the LMS (lambda-mu-sigma) definition
     /// @return The LMS definition
@@ -75,8 +73,7 @@ class CachedRepository final : public Repository {
     /// @param model_type Static or Dynamic
     /// @param definition The risk factor model definition instance
     void
-    register_risk_factor_model_definition(const RiskFactorModelType &model_type,
-                                          std::unique_ptr<RiskFactorModelDefinition> definition);
+    register_risk_factor_model_definition(const RiskFactorModelType &model_type, std::unique_ptr<RiskFactorModelDefinition> definition);
 
     core::Datastore &manager() noexcept override;
 
@@ -87,20 +84,19 @@ class CachedRepository final : public Repository {
 
     std::optional<core::DiseaseInfo> get_disease_info(core::Identifier code) override;
 
-    DiseaseDefinition &get_disease_definition(const core::DiseaseInfo &info,
-                                              const ModelInput &config) override;
+    DiseaseDefinition &get_disease_definition(const core::DiseaseInfo &info, const ModelInput &config) override;
 
     LmsDefinition &get_lms_definition() override;
 
     void clear_cache() noexcept;
 
   private:
-    mutable std::mutex mutex_;
-    std::reference_wrapper<core::Datastore> data_manager_;
-    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModelDefinition>> rf_model_definition_;
-    std::vector<core::DiseaseInfo> diseases_info_;
-    std::map<core::Identifier, DiseaseDefinition> diseases_;
-    LmsDefinition lms_parameters_;
+    mutable std::mutex                                                          mutex_;
+    std::reference_wrapper<core::Datastore>                                     data_manager_;
+    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModelDefinition>>   rf_model_definition_;
+    std::vector<core::DiseaseInfo>                                              diseases_info_;
+    std::map<core::Identifier, DiseaseDefinition>                               diseases_;
+    LmsDefinition                                                               lms_parameters_;
 
     void load_disease_definition(const core::DiseaseInfo &info, const ModelInput &config);
 };

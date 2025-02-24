@@ -4,10 +4,12 @@ namespace hgps {
 
 SimulationModuleFactory get_default_simulation_module_factory(Repository &manager) 
 {
-    auto factory = SimulationModuleFactory(manager);
+    // Function creates and configures a SimulationModuleFactory object.
+
+    auto factory = SimulationModuleFactory(manager); //This creates a SimulationModuleFactory object named factory, passing the manager object to its constructor.  This likely initializes the factory with the necessary dependencies.
 
     factory.register_builder(SimulationModuleType::SES,
-                             [](Repository &repository, const ModelInput &config) -> SimulationModuleFactory::ModuleType 
+                             [](Repository &repository, const ModelInput &config) -> SimulationModuleFactory::ModuleType // Lambda expressions acts as a builder function for a specific module type. They take a Repository and a ModelInput object as input and return a SimulationModuleFactory::ModuleType object.
                                 {
                                     return build_ses_noise_module(repository, config);
                                 });

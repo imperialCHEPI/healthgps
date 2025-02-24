@@ -103,7 +103,6 @@ void CachedRepository::load_disease_definition(const core::DiseaseInfo &info, co
                                                                                 .manager        = data_manager_.get(),
                                                                                 .inputs         = config,
                                                                                 .risk_factors   = risk_factors});
-
     if (info.group != core::DiseaseGroup::cancer) 
     {
         auto definition = DiseaseDefinition(std::move(disease_table), std::move(relative_risks.diseases), std::move(relative_risks.risk_factors));

@@ -293,6 +293,8 @@ DiseaseEntity DataManager::get_disease(const DiseaseInfo &info, const Country &c
 
 std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(const DiseaseInfo &source, const DiseaseInfo &target) const 
 {
+    //// This function imports relative risk of one disease (specified by argument "target) given presence of another (specified by argument "source") 
+
     //// lines below get filenames, file paths etc.
     auto diseases_path      = index_["diseases"]["path"].get<std::string>();
     auto disease_folder     = index_["diseases"]["disease"]["path"].get<std::string>();
@@ -320,7 +322,7 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(cons
     }
     rapidcsv::Document doc(filename);
 
-    auto table      = RelativeRiskEntity();  // create empty instance of RelativeRiskEntity structure
+    auto table      = RelativeRiskEntity();  // create empty instance of RelativeRiskEntity structure called table
     table.columns   = doc.GetColumnNames();
 
     auto row_size           = table.columns.size();
@@ -328,8 +330,8 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(cons
 
     for (size_t i = 0; i < doc.GetRowCount(); i++) 
     {
-        auto row        = doc.GetRow<std::string>(i);
-        auto row_data   = std::vector<float>(row_size);
+        auto row        = doc.GetRow<std::string>(i); // get row i
+        auto row_data   = std::vector<float>(row_size); // don't need to allocate this vector for all rows of this loop - can instead overwrite or even zero out.
 
         for (size_t col = 0; col < row_size; col++) 
             row_data[col] = std::stof(row[col]);
@@ -352,6 +354,9 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_disease(cons
 
 std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_risk_factor(const DiseaseInfo &source, Gender gender, const core::Identifier &risk_factor_key) const 
 {
+    //// This function imports relative risk of one disease (specified by argument "source") given presence of a particular risk factor (specified by argument risk_factor_key)
+
+    //// lines below get filenames, file paths etc.
     auto diseases_path      = index_["diseases"]["path"].get<std::string>();
     auto disease_folder     = index_["diseases"]["disease"]["path"].get<std::string>();
     const auto &risk_node   = index_["diseases"]["disease"]["relative_risk"];
@@ -370,7 +375,8 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_risk_factor(
     auto tokens             = {gender_name, source_code_str, factor_key_str};
     
     filename = replace_string_tokens(filename, tokens);
-    filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string();
+    filename = (root_ / diseases_path / disease_folder / risk_folder / file_folder / filename).string(); // concatenate to get full file name and directory
+
     if (!std::filesystem::exists(filename)) 
     {
         notify_warning(fmt::format("{} to {} relative risk file not found, disabled.", source_code_str, factor_key_str));
@@ -378,7 +384,7 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_risk_factor(
     }
 
     rapidcsv::Document doc(filename);
-    auto table      = RelativeRiskEntity{.columns = doc.GetColumnNames(), .rows = {}};
+    auto table      = RelativeRiskEntity{.columns = doc.GetColumnNames(), .rows = {}};  // create empty instance of RelativeRiskEntity structure called table
     auto row_size   = table.columns.size();
 
     for (size_t i = 0; i < doc.GetRowCount(); i++) 
@@ -399,6 +405,12 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_risk_factor(
 
 CancerParameterEntity DataManager::get_disease_parameter(const DiseaseInfo &info, const Country &country) const 
 {
+    //// THis function is called for cancers, which have extra subfolders for each country containing three files: 
+    ////    i) prevalence_distribution.csv (guessing this is the prevalence of people with this cancer currently in stages 1,2,3 and 4); 
+    ////    ii) survival_rate_parameters.csv (appears to be the coefficients of the polynomials used to fit survival rates); iii) 
+    ////    iii) death_weights.csv (guessing this is the proportion of deaths that occur in each cancer stage seeing as they sum to 1 for each sex)
+    //// The function then loops over each file and imports them alll into one CancerParameterEntity structure named table, which is the return value.
+
     // Creates full file name from store configuration
     auto disease_path   = index_["diseases"]["path"].get<std::string>();
     auto disease_folder = index_["diseases"]["disease"]["path"].get<std::string>();
@@ -418,10 +430,12 @@ CancerParameterEntity DataManager::get_disease_parameter(const DiseaseInfo &info
     if (!std::filesystem::exists(files_folder)) 
         throw std::runtime_error(fmt::format("{}, {} parameters folder: '{}' not found.", info_code_str, country.name, files_folder.string()));
 
-    auto table = CancerParameterEntity();
+    auto table = CancerParameterEntity();  // create empty instance of CancerParameterEntity structure called table, into which we import the various files.
+
     for (const auto &file : params_files.items()) 
     {
         auto file_name = (files_folder / file.value().get<std::string>());
+
         if (!std::filesystem::exists(file_name)) 
             throw std::runtime_error(fmt::format("{}, {} parameters file: '{}' not found.", info_code_str, country.name, file_name.string()));
 
@@ -470,7 +484,7 @@ std::vector<BirthItem> DataManager::get_birth_indicators(const Country &country,
         throw std::runtime_error(fmt::format("{}, demographic indicators file: '{}' not found.", country.name, filename));
 
     rapidcsv::Document doc(filename);
-    auto mapping = create_fields_index_mapping(doc.GetColumnNames(), {"Time", "Births", "SRB"});
+    auto mapping = create_fields_index_mapping(doc.GetColumnNames(), {"Time", "Births", "SRB"}); //// year, births that year, sex ratio at birth (male:female)
 
     std::vector<BirthItem> result;
     for (size_t i = 0; i < doc.GetRowCount(); i++) 
@@ -489,6 +503,8 @@ std::vector<BirthItem> DataManager::get_birth_indicators(const Country &country,
 
 std::vector<LmsDataRow> DataManager::get_lms_parameters() const 
 {
+    // imports and stores the Lambda-Mu-Sigma (LMS) model parameters, which is used to convert BMI risk factor values to z-scores for children.
+
     auto analysis_folder    = index_["analysis"]["path"].get<std::string>();
     auto lms_filename       = index_["analysis"]["lms_file_name"].get<std::string>();
     auto full_filename      = (root_ / analysis_folder / lms_filename);
@@ -512,7 +528,6 @@ std::vector<LmsDataRow> DataManager::get_lms_parameters() const
                        .mu      = std::stod(row[mapping["mu"]]),
                        .sigma   = std::stod(row[mapping["sigma"]])});
     }
-
     return parameters;
 }
 
@@ -528,6 +543,7 @@ DiseaseAnalysisEntity DataManager::get_disease_analysis(const Country &country) 
         throw std::runtime_error(fmt::format("Disease disability weights file: '{}' not found.", disability_filename));
 
     rapidcsv::Document doc(disability_filename);
+
     DiseaseAnalysisEntity entity;
     for (size_t i = 0; i < doc.GetRowCount(); i++) 
     {
@@ -574,6 +590,8 @@ std::map<int, std::map<Gender, double>> DataManager::load_cost_of_diseases(const
 
 std::vector<LifeExpectancyItem> DataManager::load_life_expectancy(const Country &country) const 
 {
+    //// Imports the life expectancy by year (1950-2100) and sex
+
     auto nodepath   = index_["demographic"]["path"].get<std::string>();
     auto filefolder = index_["demographic"]["indicators"]["path"].get<std::string>();
     auto filename   = index_["demographic"]["indicators"]["file_name"].get<std::string>();

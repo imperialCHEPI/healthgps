@@ -256,18 +256,23 @@ void Simulator<DataType, TimeType>::exec_until(TimeType t) {
 }
 
 template <typename DataType, typename TimeType>
-void Simulator<DataType, TimeType>::exec_next_event() {
+void Simulator<DataType, TimeType>::exec_next_event() 
+{
     // If the heap is empty then there is nothing to do
-    if (heap.size() == 1)
-        return;
+    if (heap.size() == 1) return;
+
     // The current time will be the time of the next event
     m_now = heap[1]->priority;
+
     // Update everyone that is imminent
-    while ((heap.size() > 1) && (heap[1]->priority == m_now)) {
+    while ((heap.size() > 1) && (heap[1]->priority == m_now)) 
+    {
         // Get the model at the top
         Model<DataType, TimeType> *model = heap[1];
+        
         // If this is a model to remove, then chuck it
-        if (model->remove) {
+        if (model->remove)
+        {
             percolate_away(model);
             replace_message_list(model->msgs);
             replace_message_list(model->defer);
@@ -276,39 +281,48 @@ void Simulator<DataType, TimeType>::exec_next_event() {
             // Do this last because the model might delete itself
             model->fini(m_now);
         }
+        
         // Update its state and get the time advance
-        else {
-            if (model->msgs != NULL) {
+        else 
+        {
+            if (model->msgs != NULL) 
+            {
                 model->priority = model->update(this, *(model->msgs));
                 // Time must advance!
                 ADEVS_ERROR_CHECK(m_now < model->priority, model, "update(x) <= now()")
-            } else {
+            } 
+            else 
+            {
                 model->priority = model->update(this);
                 // Time must advance!
                 ADEVS_ERROR_CHECK(m_now < model->priority, model, "update() <= now()")
             }
+
             // Clear the message list
             replace_message_list(model->msgs);
+
             // If we have messages for now + adevs_epsilon() get those ready
             model->msgs = model->defer;
+
             // Now those messages are not defered
             model->defer = NULL;
+
             // Models to be removed or to receive input go at the next
             // logical instant of time
             if (model->msgs != NULL || model->remove)
                 model->priority = m_now + adevs_epsilon<TimeType>();
+
             assert(m_now < model->priority);
             // Put it into the schedule
-            if (model->priority < adevs_inf<TimeType>())
-                percolate_down(model);
-            else
-                percolate_away(model);
+            if (model->priority < adevs_inf<TimeType>())    percolate_down(model);
+            else                                            percolate_away(model);
         }
     }
 }
 
 template <typename DataType, typename TimeType>
-void Simulator<DataType, TimeType>::add(Model<DataType, TimeType> *model) {
+void Simulator<DataType, TimeType>::add(Model<DataType, TimeType> *model) 
+{
     // Assign the model a state
     TimeType priority = model->init(this);
     ADEVS_ERROR_CHECK(m_now < priority, model, "init() <= now()")
@@ -316,7 +330,9 @@ void Simulator<DataType, TimeType>::add(Model<DataType, TimeType> *model) {
         (model->msgs != NULL && model->priority == m_now + adevs_epsilon<TimeType>()) ||
             model->heap_pos == 0,
         model, "new model is already active")
-    if (model->msgs == NULL) {
+
+    if (model->msgs == NULL) 
+    {
         model->priority = priority;
         if (model->priority < adevs_inf<TimeType>())
             percolate_in(model);

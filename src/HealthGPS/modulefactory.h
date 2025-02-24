@@ -27,6 +27,7 @@ class SimulationModuleFactory {
     using ConcreteBuilder = ModuleType (*)(Repository &, const ModelInput &);
 
     SimulationModuleFactory() = delete;
+
     /// @brief Initialises a new instance of the SimulationModuleFactory class.
     /// @param data_repository The back-end data repository instance to use
     SimulationModuleFactory(Repository &data_repository);
