@@ -21,17 +21,38 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
 };
 
 Person::Person()
-    : age{0}, gender{core::Gender::unknown}, // Changed from female to unknown
+    : id_{++newUID}, // Must be first
+                     // Step 1: Core demographics
+      age{}, gender{core::Gender::unknown},
+      // Step 2: Geographic and ethnic characteristics
       region{core::Region::unknown}, ethnicity{core::Ethnicity::unknown},
-      sector{core::Sector::urban}, income_continuous{0.0}, income_category{core::Income::low},
-      ses{0.0}, is_alive_{true}, has_emigrated_{false}, time_of_death_{0}, time_of_migration_{0},
-      id_{++Person::newUID} {}
+      // Step 3-4: Income characteristics
+      income_continuous{}, income_category{core::Income::unknown},
+      // Step 5-6: Other characteristics
+      sector{core::Sector::unknown}, ses{},
+      // Risk factors and diseases
+      risk_factors{}, diseases{},
+      // Migration tracking
+      time_of_migration_{},
+      // Private members
+      is_alive_{true}, has_emigrated_{false}, time_of_death_{} {}
 
 Person::Person(const core::Gender birth_gender) noexcept
-    : age{0}, gender{birth_gender}, region{core::Region::unknown},
-      ethnicity{core::Ethnicity::unknown}, sector{core::Sector::urban}, income_continuous{0.0},
-      income_category{core::Income::low}, ses{0.0}, is_alive_{true}, has_emigrated_{false},
-      time_of_death_{0}, time_of_migration_{0}, id_{++Person::newUID} {}
+    : id_{++newUID}, // Must be first
+                     // Step 1: Core demographics
+      age{}, gender{birth_gender},
+      // Step 2: Geographic and ethnic characteristics
+      region{core::Region::unknown}, ethnicity{core::Ethnicity::unknown},
+      // Step 3-4: Income characteristics
+      income_continuous{}, income_category{core::Income::unknown},
+      // Step 5-6: Other characteristics
+      sector{core::Sector::unknown}, ses{},
+      // Risk factors and diseases
+      risk_factors{}, diseases{},
+      // Migration tracking
+      time_of_migration_{},
+      // Private members
+      is_alive_{true}, has_emigrated_{false}, time_of_death_{} {}
 
 std::size_t Person::id() const noexcept { return id_; }
 
@@ -159,9 +180,11 @@ void Person::copy_from(const Person &other) {
     gender = other.gender;
     region = other.region;
     ethnicity = other.ethnicity;
-    sector = other.sector;
     income_continuous = other.income_continuous;
     income_category = other.income_category;
+    sector = other.sector;
+    ses = other.ses;
     risk_factors = other.risk_factors;
+    diseases = other.diseases;
 }
 } // namespace hgps
