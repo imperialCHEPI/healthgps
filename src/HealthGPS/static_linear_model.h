@@ -44,6 +44,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param physical_activity_stddev The standard deviation of the physical activity
     /// @param region_models The region models for each region
     /// @param ethnicity_models The ethnicity models for each ethnicity
+    /// @param income_continuous_stddev The standard deviation of the continuous income
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -63,7 +64,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
             &rural_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
         std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
-        double physical_activity_stddev,
+        double physical_activity_stddev, double income_continuous_stddev,
         std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models);
 
     RiskFactorModelType type() const noexcept override;
@@ -171,7 +172,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>>
         region_models_; // made a shared pointer
     const double physical_activity_stddev_;
-    static constexpr double income_continuous_stddev_ = 0.5;
+    const double income_continuous_stddev_;
     std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
 };
 
