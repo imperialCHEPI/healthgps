@@ -26,7 +26,7 @@ RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                                std::shared_ptr<const ModelInput> inputs,
                                std::unique_ptr<Scenario> scenario)
     : event_bus_{std::move(bus)}, inputs_{std::move(inputs)}, scenario_{std::move(scenario)},
-      population_{0} {}
+      population_{0}, age_range_{inputs_->settings().age_range()} {}
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
@@ -56,9 +56,7 @@ const std::vector<core::DiseaseInfo> &RuntimeContext::diseases() const noexcept 
     return inputs_->diseases();
 }
 
-const core::IntegerInterval &RuntimeContext::age_range() const noexcept {
-    return inputs_->settings().age_range();
-}
+const core::IntegerInterval &RuntimeContext::age_range() const noexcept { return age_range_; }
 
 const std::string &RuntimeContext::identifier() const noexcept { return scenario_->name(); }
 

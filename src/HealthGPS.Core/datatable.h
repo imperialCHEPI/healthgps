@@ -1,20 +1,29 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <ostream>
 #include <unordered_map>
 #include <vector>
 
 #include "column.h"
+#include "forward_type.h"
 
 namespace hgps::core {
 
-/// @brief Defines a Datatable for in memory data class
 class DataTable {
   public:
+    // Define the struct inside the class
+    struct DemographicCoefficients {
+        double age_coefficient{0.0};
+        std::unordered_map<Gender, double> gender_coefficients;
+        std::unordered_map<Region, double> region_coefficients;
+    };
+
     /// @brief DataTable columns iterator type
     using IteratorType = std::vector<std::unique_ptr<DataTableColumn>>::const_iterator;
 
@@ -65,7 +74,19 @@ class DataTable {
     /// @return The structure string representation
     std::string to_string() const noexcept;
 
+    DemographicCoefficients get_demographic_coefficients(const std::string &model_type) const;
+    double calculate_probability(const DemographicCoefficients &coeffs, int age, Gender gender,
+                                 Region region,
+                                 std::optional<Ethnicity> ethnicity = std::nullopt) const;
+    void load_demographic_coefficients(const nlohmann::json &config);
+    std::unordered_map<Region, double> get_region_distribution(int age, Gender gender) const;
+    std::unordered_map<Ethnicity, double> get_ethnicity_distribution(int age, Gender gender,
+                                                                     Region region) const;
+
   private:
+    // Add member variable to store the demographic coefficients
+    std::unordered_map<std::string, DemographicCoefficients> demographic_coefficients_;
+
     std::unique_ptr<std::mutex> sync_mtx_{std::make_unique<std::mutex>()};
     std::vector<std::string> names_{};
     std::unordered_map<std::string, std::size_t> index_{};
