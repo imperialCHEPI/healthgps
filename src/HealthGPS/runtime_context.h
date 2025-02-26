@@ -9,6 +9,9 @@
 #include "scenario.h"
 
 #include <functional>
+#include <map>
+#include <tuple>
+#include <unordered_map>
 #include <vector>
 
 namespace hgps {
@@ -104,6 +107,21 @@ class RuntimeContext {
     /// @brief Publishes a polymorphic new message to the outside world asynchronously
     /// @param message The message instance to publish
     void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
+
+    /// @brief Get region probabilities for specific age and gender stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @return Map of region to probability for this stratum
+    std::unordered_map<core::Region, double> get_region_probabilities(int age,
+                                                                      core::Gender gender) const;
+
+    /// @brief Get ethnicity probabilities for specific age, gender, and region stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @param region The region stratum
+    /// @return Map of ethnicity to probability for this stratum
+    std::unordered_map<core::Ethnicity, double>
+    get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const;
 
   private:
     std::shared_ptr<const EventAggregator> event_bus_;

@@ -34,34 +34,71 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
-    const std::unordered_map<core::Gender, double> &height_slope)
+    const std::unordered_map<core::Gender, double> &height_slope,
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double income_continuous_stddev)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_stddev_{height_stddev}, height_slope_{height_slope},
+      region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
+// Modified: Mahima 25/02/2025
+// Ensuring correct initialization order for population characteristics
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
-    // Initialise everyone.
+    // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
+    // also in person.cpp, the person class maintains a deep copy of it
+
+    // Step 2: Initialize fixed characteristics (region and ethnicity)
+    for (auto &person : context.population()) {
+        // Region depends on the age/gender probabilities 
+        initialise_region(context, person, context.random());
+        //Ethnicity depends on age/gender/region probabilities
+        initialise_ethnicity(context, person, context.random());
+    }
+
+    // Step 3: Initialize continuous income (depends on age, gender, region, ethnicity)
+    for (auto &person : context.population()) {
+        initialise_income_continuous(person, context.random());
+    }
+
+    // Step 4: Initialize income category based on income_continuous quartiles
+    // initialized at the start and then updated every 5 years
+    for (auto &person : context.population()) {
+        initialise_income_category(person, context.population());
+    }
+
+    // Step 5: Initialize physical activity (depends on age, gender, region, ethnicity, income)
+    for (auto &person : context.population()) {
+        initialise_physical_activity(context, person, context.random());
+    }
+
+    // Step 6: Initialize weight-related factors
     for (auto &person : context.population()) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
 
-    // Adjust weight mean to match expected.
+    // Adjust weight mean to match expected
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
 
-    // Compute weight power means by sex and age.
+    // Compute weight power means by sex and age
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
-    // Initialise everyone.
+    // Step 7: Initialize height (depends on weight)
+    // Step 8: Calculate BMI (depends on weight and height)
     for (auto &person : context.population()) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
@@ -71,6 +108,8 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+    // Update income categories every 5 years
+    update_income_category(context);
 
     // Update (initialise) newborns.
     update_newborns(context);
@@ -86,6 +125,9 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
 
         compute_bmi(person);
+        if (person.age == 18) {
+            update_region(context, person, context.random());
+        }
     }
 }
 
@@ -754,6 +796,166 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
     person.risk_factors["Height"_id] = H;
 }
 
+// Modified: Mahima 25/02/2025
+// Region is initialised using the CDF of the region probabilities along with age/gender strata
+void KevinHallModel::initialise_region(RuntimeContext &context, Person &person,
+                                       Random &random) const {
+    // Get probabilities for this age/sex stratum
+    auto region_probs = context.get_region_probabilities(person.age, person.gender);
+
+    // Use CDF for assignment
+    double rand_value = random.next_double(); // next_double is always between 0,1
+    double cumulative_prob = 0.0;
+
+    for (const auto &[region, prob] : region_probs) {
+        cumulative_prob += prob;
+        if (rand_value <= cumulative_prob) {
+            person.region = region;
+            return;
+        }
+    }
+
+    // Fallback to first region if no match (shouldn't happen with proper probabilities)
+    person.region = region_models_->begin()->first;
+}
+// NOTE: Might need to change this if region updates are happeining differently
+void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                                   Random &random) const {
+    if (person.age == 18) {
+        initialise_region(context, person, random);
+    }
+}
+
+// Modified: Mahima 25/02/2025
+// Ethnicity is initialised using the CDF of the ethnicity probabilities along with age/gender/region strata
+void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &person,
+                                          Random &random) const {
+    // Get probabilities for this age/sex/region stratum
+    auto ethnicity_probs =
+        context.get_ethnicity_probabilities(person.age, person.gender, person.region);
+
+    double rand_value = random.next_double(); //next_double is between 0,1
+    double cumulative_prob = 0.0;
+
+    for (const auto &[ethnicity, prob] : ethnicity_probs) {
+        cumulative_prob += prob;
+        if (rand_value <= cumulative_prob) {
+            person.ethnicity = ethnicity;
+            return;
+        }
+    }
+
+    // Fallback to first ethnicity if no match which is "unknown"
+    person.ethnicity = ethnicity_models_->begin()->first;
+}
+//NOTE: No update ethnicity as it is fixed throughout once assigned
+
+// Modified: Mahima 25/02/2025
+// Physical activity is initialised using the expected value of physical activity based on age,
+// gender, region, ethnicity and income
+void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Person &person,
+                                                  Random &random) const {
+    // Get base expected PA value
+    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
+                                   std::nullopt, false);
+
+    // Apply modifiers based on region and ethnicity
+    double region_effect = region_models_->at(person.region).coefficients.at("PhysicalActivity");
+    double ethnicity_effect =
+        ethnicity_models_->at(person.ethnicity).coefficients.at("PhysicalActivity");
+
+    // Apply income effect using continuous income
+    double income_effect =
+        income_models_.at(core::Income::lowermiddle).coefficients.at("PhysicalActivity") *
+        person.income_continuous;
+
+    expected *= (1.0 + region_effect + ethnicity_effect + income_effect);
+
+    // Add random variation using normal distribution
+    // here mean is 0 and physical_activity_stddev is 0.5 (initialized in kevin hall model.h)
+    double rand = random.next_normal(0.0, physical_activity_stddev_);
+    person.risk_factors["PhysicalActivity"_id] = expected * (1.0 + rand);
+}
+
+// Modified: Mahima 25/02/2025
+// Income is initialised using the softmax of the income probabilities based on age, gender, region,
+// ethnicity
+// this uses a logistic regression model to predict the income category
+void KevinHallModel::initialise_income_continuous(Person &person, Random &random) const {
+    // Base value from age
+    double income_base =
+        income_models_.at(core::Income::lowermiddle).coefficients.at("Age") * person.age;
+
+    // Add gender effect (0 for female, 1 for male)
+    double gender_effect = (person.gender == core::Gender::male) ? 1.0 : 0.0;
+    income_base +=
+        income_models_.at(core::Income::lowermiddle).coefficients.at("Gender") * gender_effect;
+
+    // Add region and ethnicity effects
+    income_base += region_models_->at(person.region).coefficients.at("Income");
+    income_base += ethnicity_models_->at(person.ethnicity).coefficients.at("Income");
+
+    // Add random variation with standard deviation 0.5
+    double rand = random.next_normal(0.0, income_continuous_stddev_);
+    // Ensure income is positive
+    person.income_continuous = std::max(0.1, income_base * (1.0 + rand));
+}
+
+void KevinHallModel::update_income_continuous(Person &person, Random &random) const {
+    if (person.age == 18) {
+        initialise_income_continuous(person, random);
+    }
+}
+
+// Modified: Mahima 25/02/2025
+// Income category is initialised using the quartiles of the income_continuous values
+// This is done every 5 years
+void KevinHallModel::initialise_income_category(Person &person,
+                                                const Population &population) const {
+    std::vector<double> sorted_incomes;
+    sorted_incomes.reserve(population.size());
+
+    for (const auto &p : population) {
+        if (p.income_continuous > 0) {
+            sorted_incomes.push_back(p.income_continuous);
+        }
+    }
+
+    std::sort(sorted_incomes.begin(), sorted_incomes.end());
+
+    // Calculate quartile thresholds
+    size_t n = sorted_incomes.size();
+    double q1_threshold = sorted_incomes[n / 4];
+    double q2_threshold = sorted_incomes[n / 2];
+    double q3_threshold = sorted_incomes[3 * n / 4];
+
+    // Assign income category based on quartiles
+    if (person.income_continuous <= q1_threshold) {
+        person.income_category = core::Income::low;
+    } else if (person.income_continuous <= q2_threshold) {
+        person.income_category = core::Income::lowermiddle;
+    } else if (person.income_continuous <= q3_threshold) {
+        person.income_category = core::Income::uppermiddle;
+    } else {
+        person.income_category = core::Income::high;
+    }
+}
+
+void KevinHallModel::update_income_category(RuntimeContext &context) const {
+    static int last_update_year = 0;
+    int current_year = context.time_now();
+
+    // Update quartiles every 5 years
+    if (current_year - last_update_year >= 5) {
+        for (auto &person : context.population()) {
+            if (person.is_active()) {
+                initialise_income_category(person, context.population());
+            }
+        }
+        last_update_year = current_year;
+    }
+}
+
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -764,13 +966,20 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    std::unordered_map<core::Gender, double> height_slope)
+    std::unordered_map<core::Gender, double> height_slope,
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double income_continuous_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
+      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)},
+      region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -799,10 +1008,13 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_);
+    return std::make_unique<KevinHallModel>(
+        std::make_shared<RiskFactorSexAgeTable>(*expected_),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_),
+        std::make_shared<std::unordered_map<core::Identifier, int>>(*trend_steps_),
+        energy_equation_, nutrient_ranges_, nutrient_equations_, food_prices_, weight_quantiles_,
+        epa_quantiles_, height_stddev_, height_slope_, region_models_, ethnicity_models_,
+        income_models_, income_continuous_stddev_);
 }
 
 } // namespace hgps
