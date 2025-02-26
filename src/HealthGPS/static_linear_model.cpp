@@ -27,7 +27,7 @@ StaticLinearModel::StaticLinearModel(
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
-    double physical_activity_stddev,
+    double physical_activity_stddev, double income_continuous_stddev,
     std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
@@ -37,8 +37,9 @@ StaticLinearModel::StaticLinearModel(
       policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      region_models_{region_models}, physical_activity_stddev_{physical_activity_stddev},
-      ethnicity_models_{ethnicity_models} {
+      region_models_{std::move(region_models)}, physical_activity_stddev_{physical_activity_stddev},
+      income_continuous_stddev_{income_continuous_stddev},
+      ethnicity_models_{std::move(ethnicity_models)} {
     if (!region_models_) {
         throw core::HgpsException("Region models pointer is null");
     }
@@ -58,9 +59,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
     // also in person.cpp, the person class maintains a deep copy of it
 
-    // Step 2: Initialize region and ethnicity (fixed characteristics)
+    // Step 2: Initialize fixed characteristics (region and ethnicity)
     for (auto &person : context.population()) {
+        // Region depends on the age/gender probabilities
         initialise_region(context, person, context.random());
+        // Ethnicity depends on age/gender/region probabilities
         initialise_ethnicity(context, person, context.random());
     }
 
@@ -70,6 +73,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Step 4: Initialize income category based on income_continuous quartiles
+    // initialized at the start and then updated every 5 years
     for (auto &person : context.population()) {
         initialise_income_category(person, context.population());
     }
@@ -79,7 +83,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_physical_activity(context, person, context.random());
     }
 
-    // Step 6: Initialize remaining risk factors and policies
+    // Step 6: Initialize remaining risk factors
     for (auto &person : context.population()) {
         initialise_sector(person, context.random());
         initialise_factors(context, person, context.random());
@@ -679,7 +683,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
         std::make_shared<std::vector<double>>(*trend_lambda_), info_speed_, rural_prevalence_,
         income_models_,
         std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(*region_models_),
-        physical_activity_stddev_,
+        physical_activity_stddev_, income_continuous_stddev_,
         std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(
             *ethnicity_models_));
 }

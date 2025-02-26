@@ -38,7 +38,8 @@ struct Disease {
 };
 
 /// @brief Defines a virtual population person data type.
-struct Person {
+class Person {
+  public:
     /// @brief Initialise a new instance of the Person structure
     Person();
 
@@ -50,36 +51,6 @@ struct Person {
     /// @note The identifier is unique within a virtual population only, not global unique.
     /// @return Unique identifier
     std::size_t id() const noexcept;
-
-    /// @brief The assigned gender
-    core::Gender gender{core::Gender::unknown};
-
-    /// @brief Current age in years
-    unsigned int age{};
-
-    /// @brief Sector (region) assigned value
-    core::Sector sector{core::Sector::unknown};
-
-    /// @brief Income category
-    core::Income income_category{core::Income::unknown};
-
-    /// @brief Social-economic status (SES) assigned value
-    double ses{};
-
-    /// @brief Region assigned value
-    core::Region region{core::Region::unknown};
-
-    /// @brief Ethnicity assigned value
-    core::Ethnicity ethnicity{core::Ethnicity::unknown};
-
-    /// @brief Current risk factors values
-    std::unordered_map<core::Identifier, double> risk_factors;
-
-    /// @brief Diseases history and current status
-    std::map<core::Identifier, Disease> diseases;
-
-    /// @brief Continuous income variable
-    double income_continuous;
 
     /// @brief Determine if a Person is current alive
     /// @return true for alive; otherwise, false
@@ -173,12 +144,38 @@ struct Person {
     /// @param other The source Person instance
     void copy_from(const Person &other);
 
+    // Member variables in logical initialization order
+    std::size_t id_{}; // Must be first as it's used to identify the person
+
+    // Step 1: Core demographics (initialized by population generator)
+    unsigned int age{};
+    core::Gender gender{core::Gender::unknown};
+
+    // Step 2: Geographic and ethnic characteristics
+    core::Region region{core::Region::unknown};
+    core::Ethnicity ethnicity{core::Ethnicity::unknown};
+
+    // Step 3-4: Income characteristics
+    double income_continuous{};
+    core::Income income_category{core::Income::unknown};
+
+    // Step 5-6: Other characteristics
+    core::Sector sector{core::Sector::unknown};
+
+    // Socioeconomic status
+    double ses{};
+
+    // Risk factors and diseases
+    std::unordered_map<core::Identifier, double> risk_factors;
+    std::map<core::Identifier, Disease> diseases;
+
+    // Migration tracking
+    unsigned int time_of_migration_{};
+
   private:
-    std::size_t id_{};
     bool is_alive_{true};
     bool has_emigrated_{false};
     unsigned int time_of_death_{};
-    unsigned int time_of_migration_{};
 
     static std::atomic<std::size_t> newUID;
     static std::map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
