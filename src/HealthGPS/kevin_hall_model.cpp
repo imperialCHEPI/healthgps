@@ -62,9 +62,9 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 2: Initialize fixed characteristics (region and ethnicity)
     for (auto &person : context.population()) {
-        // Region depends on the age/gender probabilities 
+        // Region depends on the age/gender probabilities
         initialise_region(context, person, context.random());
-        //Ethnicity depends on age/gender/region probabilities
+        // Ethnicity depends on age/gender/region probabilities
         initialise_ethnicity(context, person, context.random());
     }
 
@@ -827,14 +827,15 @@ void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Per
 }
 
 // Modified: Mahima 25/02/2025
-// Ethnicity is initialised using the CDF of the ethnicity probabilities along with age/gender/region strata
+// Ethnicity is initialised using the CDF of the ethnicity probabilities along with
+// age/gender/region strata
 void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &person,
                                           Random &random) const {
     // Get probabilities for this age/sex/region stratum
     auto ethnicity_probs =
         context.get_ethnicity_probabilities(person.age, person.gender, person.region);
 
-    double rand_value = random.next_double(); //next_double is between 0,1
+    double rand_value = random.next_double(); // next_double is between 0,1
     double cumulative_prob = 0.0;
 
     for (const auto &[ethnicity, prob] : ethnicity_probs) {
@@ -848,7 +849,7 @@ void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &perso
     // Fallback to first ethnicity if no match which is "unknown"
     person.ethnicity = ethnicity_models_->begin()->first;
 }
-//NOTE: No update ethnicity as it is fixed throughout once assigned
+// NOTE: No update ethnicity as it is fixed throughout once assigned
 
 // Modified: Mahima 25/02/2025
 // Physical activity is initialised using the expected value of physical activity based on age,
