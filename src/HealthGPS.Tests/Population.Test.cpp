@@ -352,7 +352,7 @@ class TestScenario : public Scenario {
     std::string name() override { return "Test"; }
     SyncChannel &channel() override { return channel_; }
     void clear() noexcept override {}
-    double apply(Random &generator, Person &entity, int time,
+    double apply(Random & /*generator*/, Person &entity, int time,
                  const core::Identifier &risk_factor_key, double value) override {
         return value;
     }
