@@ -351,8 +351,9 @@ class TestScenario : public Scenario {
     std::string name() override { return "Test"; }
     SyncChannel &channel() override { return channel_; }
     void clear() noexcept override {}
-    double apply(Random &generator, Person &entity, int time,
-                 const core::Identifier &risk_factor_key, double value) override {
+    double apply([[maybe_unused]] Random &generator, [[maybe_unused]] Person &entity,
+                 [[maybe_unused]] int time,
+                 [[maybe_unused]] const core::Identifier &risk_factor_key, double value) override {
         return value;
     }
 
