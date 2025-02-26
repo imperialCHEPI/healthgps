@@ -1,5 +1,25 @@
 #include "runtime_context.h"
 
+namespace {
+// Hash function for RegionKey tuple
+struct RegionKeyHash {
+    std::size_t operator()(const std::tuple<int, hgps::core::Gender> &key) const {
+        auto [age, gender] = key;
+        return std::hash<int>()(age) ^ std::hash<int>()(static_cast<int>(gender));
+    }
+};
+
+// Hash function for EthnicityKey tuple
+struct EthnicityKeyHash {
+    std::size_t
+    operator()(const std::tuple<int, hgps::core::Gender, hgps::core::Region> &key) const {
+        auto [age, gender, region] = key;
+        return std::hash<int>()(age) ^ std::hash<int>()(static_cast<int>(gender)) ^
+               std::hash<int>()(static_cast<int>(region));
+    }
+};
+} // namespace
+
 namespace hgps {
 
 RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
@@ -54,11 +74,22 @@ void RuntimeContext::reset_population(const std::size_t initial_pop_size) {
 }
 
 void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
-    event_bus_->publish(std::move(message));
+    const_cast<EventAggregator *>(event_bus_.get())->publish(std::move(message));
 }
 
 void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
-    event_bus_->publish_async(std::move(message));
+    const_cast<EventAggregator *>(event_bus_.get())->publish_async(std::move(message));
+}
+
+std::unordered_map<core::Region, double>
+RuntimeContext::get_region_probabilities(int age, core::Gender gender) const {
+    return inputs_->get_region_probabilities(age, gender);
+}
+
+std::unordered_map<core::Ethnicity, double>
+RuntimeContext::get_ethnicity_probabilities(int age, core::Gender gender,
+                                            core::Region region) const {
+    return inputs_->get_ethnicity_probabilities(age, gender, region);
 }
 
 } // namespace hgps

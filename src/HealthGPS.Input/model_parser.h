@@ -81,4 +81,9 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 /// @return The parsed region
 core::Region parse_region(const std::string &value);
 
+/// @brief Parses an ethnicity from a string
+/// @param value The string representation of the ethnicity
+/// @return The parsed ethnicity
+core::Ethnicity parse_ethnicity(const std::string &value);
+
 } // namespace hgps::input

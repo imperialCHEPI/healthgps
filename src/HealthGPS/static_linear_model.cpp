@@ -1,6 +1,9 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
+#include "HealthGPS.Core/forward_type.h"
+#include "person.h"
 #include "runtime_context.h"
+#include <random>
 
 #include <ranges>
 #include <utility>
@@ -24,7 +27,8 @@ StaticLinearModel::StaticLinearModel(
         &rural_prevalence,
     const std::unordered_map<core::Income, LinearModelParams> &income_models,
     std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
-    double physical_activity_stddev)
+    double physical_activity_stddev,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
@@ -33,34 +37,64 @@ StaticLinearModel::StaticLinearModel(
       policy_cholesky_{policy_cholesky}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{rural_prevalence}, income_models_{income_models},
-      region_models_{std::move(region_models)},
-      physical_activity_stddev_{physical_activity_stddev} {}
+      region_models_{region_models}, physical_activity_stddev_{physical_activity_stddev},
+      ethnicity_models_{ethnicity_models} {
+    if (!region_models_) {
+        throw core::HgpsException("Region models pointer is null");
+    }
+    if (!ethnicity_models_) {
+        throw core::HgpsException("Ethnicity models pointer is null");
+    }
+}
 
 RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactorModelType::Static; }
 
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
+// Modified: Mahima 25/02/2025
+// Ensuring correct initialization order for population characteristics
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
-    // Initialise everyone.
+    // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
+    // also in person.cpp, the person class maintains a deep copy of it
+
+    // Step 2: Initialize region and ethnicity (fixed characteristics)
     for (auto &person : context.population()) {
-        initialise_sector(person, context.random());
-        initialise_region(person, context.random()); // added region for FINCH
-        initialise_income(person, context.random());
-        initialise_factors(context, person, context.random());
+        initialise_region(context, person, context.random());
+        initialise_ethnicity(context, person, context.random());
+    }
+
+    // Step 3: Initialize continuous income (depends on age, gender, region, ethnicity)
+    for (auto &person : context.population()) {
+        initialise_income_continuous(person, context.random());
+    }
+
+    // Step 4: Initialize income category based on income_continuous quartiles
+    for (auto &person : context.population()) {
+        initialise_income_category(person, context.population());
+    }
+
+    // Step 5: Initialize physical activity (depends on age, gender, region, ethnicity, income)
+    for (auto &person : context.population()) {
         initialise_physical_activity(context, person, context.random());
     }
 
-    // Adjust such that risk factor means match expected values.
+    // Step 6: Initialize remaining risk factors and policies
+    for (auto &person : context.population()) {
+        initialise_sector(person, context.random());
+        initialise_factors(context, person, context.random());
+    }
+
+    // Adjust such that risk factor means match expected values
     adjust_risk_factors(context, names_, ranges_, false);
 
-    // Initialise everyone.
+    // Initialize trends
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
 
-    // Adjust such that trended risk factor means match trended expected values.
+    // Adjust such that trended risk factor means match trended expected values
     adjust_risk_factors(context, names_, ranges_, true);
 }
 
@@ -78,13 +112,16 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         if (person.age == 0) {
             initialise_sector(person, context.random());
-            initialise_region(person, context.random()); // added region for FINCH
-            initialise_income(person, context.random());
+            initialise_region(context, person, context.random());
+            initialise_ethnicity(context, person, context.random());
+            initialise_income_continuous(person, context.random());
+            initialise_income_category(person, context.population());
             initialise_factors(context, person, context.random());
-            initialise_physical_activity(context, person, context.random());
         } else {
             update_sector(person, context.random());
-            update_income(person, context.random());
+            update_region(context, person, context.random());
+            update_income_continuous(person, context.random());
+            update_income_category(context);
             update_factors(context, person, context.random());
         }
     }
@@ -381,102 +418,158 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
     }
 }
 
-void StaticLinearModel::initialise_income(Person &person, Random &random) const {
-
-    // Compute logits for each income category.
-    auto logits = std::unordered_map<core::Income, double>{};
-    for (const auto &[income, params] : income_models_) {
-        logits[income] = params.intercept;
-        for (const auto &[factor, coefficient] : params.coefficients) {
-            logits.at(income) += coefficient * person.get_risk_factor_value(factor);
-        }
-    }
-
-    // Compute softmax probabilities for each income category.
-    auto e_logits = std::unordered_map<core::Income, double>{};
-    double e_logits_sum = 0.0;
-    for (const auto &[income, logit] : logits) {
-        e_logits[income] = exp(logit);
-        e_logits_sum += e_logits.at(income);
-    }
-
-    // Compute income category probabilities.
-    auto probabilities = std::unordered_map<core::Income, double>{};
-    for (const auto &[income, e_logit] : e_logits) {
-        probabilities[income] = e_logit / e_logits_sum;
-    }
-
-    // Compute income category.
-    double rand = random.next_double();
-    for (const auto &[income, probability] : probabilities) {
-        if (rand < probability) {
-            person.income = income;
-            return;
-        }
-        rand -= probability;
-    }
-
-    throw core::HgpsException("Logic Error: failed to initialise income category");
-}
-
-void StaticLinearModel::update_income(Person &person, Random &random) const {
-
-    // Only update 18 year olds.
-    if (person.age == 18) {
-        initialise_income(person, random);
-    }
-}
-
+// Modified: Mahima 25/02/2025
+// Physical activity is initialised using the expected value of physical activity based on age,
+// gender, region, ethnicity and income
 void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                      Random &random) const {
+    // Calculate base expected PA value for age and gender
     double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
                                    std::nullopt, false);
+
+    // Apply modifiers based on region
+    const auto &region_params = region_models_->at(person.region);
+    double region_effect = region_params.coefficients.at("PhysicalActivity"_id);
+    expected *= (1.0 + region_effect);
+
+    // Apply modifiers based on ethnicity
+    const auto &ethnicity_params = ethnicity_models_->at(person.ethnicity);
+    double ethnicity_effect = ethnicity_params.coefficients.at("PhysicalActivity"_id);
+    expected *= (1.0 + ethnicity_effect);
+
+    // Apply modifiers based on continuous income
+    double income_effect =
+        income_models_.at(core::Income::lowermiddle).coefficients.at("PhysicalActivity") *
+        person.income_continuous;
+    expected *= (1.0 + income_effect);
+
+    // Add random variation using normal distribution
     double rand = random.next_normal(0.0, physical_activity_stddev_);
-    double factor = expected * exp(rand - 0.5 * pow(physical_activity_stddev_, 2));
-    person.risk_factors["PhysicalActivity"_id] = factor;
+
+    // Set the physical activity value
+    person.risk_factors["PhysicalActivity"_id] = expected * (1.0 + rand);
 }
+// Modified: Mahima 25/02/2025
+// Region is initialised using the CDF of the region probabilities along with age/gender strata
+void StaticLinearModel::initialise_region(RuntimeContext &context, Person &person,
+                                          Random &random) const {
+    // Get probabilities for this age/sex stratum
+    auto region_probs = context.get_region_probabilities(person.age, person.gender);
 
-void StaticLinearModel::initialise_region(Person &person, Random &random) const {
-    // Compute logits for each region category
-    auto logits = std::unordered_map<core::Region, double>{};
-    for (const auto &[region, params] : *region_models_) {
-        logits[region] = params.intercept;
-        for (const auto &[factor, coefficient] : params.coefficients) {
-            logits.at(region) += coefficient * person.get_risk_factor_value(factor);
-        }
-    }
+    double rand_value = random.next_double();
+    double cumulative_prob = 0.0;
 
-    // Compute softmax probabilities for each region
-    auto e_logits = std::unordered_map<core::Region, double>{};
-    double e_logits_sum = 0.0;
-    for (const auto &[region, logit] : logits) {
-        e_logits[region] = exp(logit);
-        e_logits_sum += e_logits.at(region);
-    }
-
-    // Compute region probabilities for each region
-    auto probabilities = std::unordered_map<core::Region, double>{};
-    for (const auto &[region, e_logit] : e_logits) {
-        probabilities[region] = e_logit / e_logits_sum;
-    }
-
-    // Sample region need to do this for each person (TO VERIFY)
-    double rand = random.next_double();
-    for (const auto &[region, probability] : probabilities) {
-        if (rand < probability) {
+    for (const auto &[region, prob] : region_probs) {
+        cumulative_prob += prob;
+        if (rand_value <= cumulative_prob) {
             person.region = region;
             return;
         }
-        rand -= probability;
     }
 
-    throw core::HgpsException("Logic Error: failed to initialise region category");
+    // Fallback to first region if no match (which is "unknown")
+    //This should not be happening if the probabilties are correct
+    person.region = region_models_->begin()->first;
+}
+// NOTE: Might need to change how region is being updated later
+void StaticLinearModel::update_region(RuntimeContext &context, Person &person,
+                                      Random &random) const {
+    if (person.age == 18) {
+        initialise_region(context, person, random);
+    }
 }
 
-void StaticLinearModel::update_region(Person &person, Random &random) const {
-    // Only update 18 year olds
+// Modified: Mahima 25/02/2025
+// Ethnicity is initialised using the CDF of the ethnicity probabilities along with age/gender/region strata
+void StaticLinearModel::initialise_ethnicity(RuntimeContext &context, Person &person,
+                                             Random &random) const {
+    // Get probabilities for this age/sex/region stratum
+    auto ethnicity_probs =
+        context.get_ethnicity_probabilities(person.age, person.gender, person.region);
+
+    double rand_value = random.next_double();
+    double cumulative_prob = 0.0;
+
+    for (const auto &[ethnicity, prob] : ethnicity_probs) {
+        cumulative_prob += prob;
+        if (rand_value <= cumulative_prob) {
+            person.ethnicity = ethnicity;
+            return;
+        }
+    }
+
+    // Fallback to first ethnicity if no match which is "unknown" ethnicity
+    person.ethnicity = ethnicity_models_->begin()->first;
+}
+//NOTE: Ethnicity has no update ethnicity coz it is fixed after assignment throughout
+
+void StaticLinearModel::initialise_income_continuous(Person &person, Random &random) const {
+    // Base value from age
+    double income_base =
+        income_models_.at(core::Income::lowermiddle).coefficients.at("Age") * person.age;
+
+    // Add gender effect (0 for female, 1 for male)
+    double gender_effect = (person.gender == core::Gender::male) ? 1.0 : 0.0;
+    income_base +=
+        income_models_.at(core::Income::lowermiddle).coefficients.at("Gender") * gender_effect;
+
+    // Add region and ethnicity effects
+    income_base += region_models_->at(person.region).coefficients.at("Income");
+    income_base += ethnicity_models_->at(person.ethnicity).coefficients.at("Income");
+
+    // Add random variation with standard deviation 0.5
+    double rand = random.next_normal(0.0, income_continuous_stddev_);
+    // Ensure income is positive
+    person.income_continuous = std::max(0.1, income_base * (1.0 + rand));
+}
+
+void StaticLinearModel::update_income_continuous(Person &person, Random &random) const {
     if (person.age == 18) {
-        initialise_region(person, random);
+        initialise_income_continuous(person, random);
+    }
+}
+
+void StaticLinearModel::initialise_income_category(Person &person,
+                                                   const Population &population) const {
+    // Same implementation as Kevin Hall Model
+    std::vector<double> sorted_incomes;
+    sorted_incomes.reserve(population.size());
+
+    for (const auto &p : population) {
+        if (p.income_continuous > 0) {
+            sorted_incomes.push_back(p.income_continuous);
+        }
+    }
+
+    std::sort(sorted_incomes.begin(), sorted_incomes.end());
+
+    size_t n = sorted_incomes.size();
+    double q1_threshold = sorted_incomes[n / 4];
+    double q2_threshold = sorted_incomes[n / 2];
+    double q3_threshold = sorted_incomes[3 * n / 4];
+
+    if (person.income_continuous <= q1_threshold) {
+        person.income_category = core::Income::low;
+    } else if (person.income_continuous <= q2_threshold) {
+        person.income_category = core::Income::lowermiddle;
+    } else if (person.income_continuous <= q3_threshold) {
+        person.income_category = core::Income::uppermiddle;
+    } else {
+        person.income_category = core::Income::high;
+    }
+}
+// done at the start and then every 5 years
+void StaticLinearModel::update_income_category(RuntimeContext &context) const {
+    static int last_update_year = 0;
+    int current_year = context.time_now();
+
+    if (current_year - last_update_year >= 5) {
+        for (auto &person : context.population()) {
+            if (person.is_active()) {
+                initialise_income_category(person, context.population());
+            }
+        }
+        last_update_year = current_year;
     }
 }
 
@@ -484,7 +577,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-    std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,
@@ -495,19 +588,26 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     std::unordered_map<core::Region, LinearModelParams> region_models,
-    double physical_activity_stddev)
+    double physical_activity_stddev, double income_continuous_stddev,
+    std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
-      expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{std::move(names)},
-      models_{std::move(models)}, ranges_{std::move(ranges)}, lambda_{std::move(lambda)},
-      stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
+      expected_trend_boxcox_{
+          std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox)},
+      names_{std::move(names)}, models_{std::move(models)}, ranges_{std::move(ranges)},
+      lambda_{std::move(lambda)}, stddev_{std::move(stddev)}, cholesky_{std::move(cholesky)},
       policy_models_{std::move(policy_models)}, policy_ranges_{std::move(policy_ranges)},
-      policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
-      trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
-      info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      income_models_{std::move(income_models)}, region_models_{std::move(region_models)},
-      physical_activity_stddev_{physical_activity_stddev} {
-
+      policy_cholesky_{std::move(policy_cholesky)},
+      trend_models_{std::make_shared<std::vector<LinearModelParams>>(*trend_models)},
+      trend_ranges_{std::make_shared<std::vector<core::DoubleInterval>>(*trend_ranges)},
+      trend_lambda_{std::make_shared<std::vector<double>>(*trend_lambda)}, info_speed_{info_speed},
+      rural_prevalence_{std::move(rural_prevalence)}, income_models_{std::move(income_models)},
+      region_models_{std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(
+          std::move(region_models))},
+      physical_activity_stddev_{physical_activity_stddev},
+      income_continuous_stddev_{income_continuous_stddev},
+      ethnicity_models_{std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(
+          std::move(ethnicity_models))} {
     if (names_.empty()) {
         throw core::HgpsException("Risk factor names list is empty");
     }
@@ -550,12 +650,15 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (income_models_.empty()) {
         throw core::HgpsException("Income models mapping is empty");
     }
-    if (region_models_.empty()) {
+    if (region_models_->empty()) {
         throw core::HgpsException("Region models mapping is empty");
     }
     for (const auto &name : names_) {
         if (!expected_trend_->contains(name)) {
             throw core::HgpsException("One or more expected trend value is missing");
+        }
+        if (!trend_steps_->contains(name)) {
+            throw core::HgpsException("One or more trend steps value is missing");
         }
         if (!expected_trend_boxcox_->contains(name)) {
             throw core::HgpsException("One or more expected trend BoxCox value is missing");
@@ -565,11 +668,19 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     return std::make_unique<StaticLinearModel>(
-        expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
-        lambda_, stddev_, cholesky_, policy_models_, policy_ranges_, policy_cholesky_,
-        trend_models_, trend_ranges_, trend_lambda_, info_speed_, rural_prevalence_, income_models_,
-        std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(region_models_),
-        physical_activity_stddev_);
+        std::make_shared<RiskFactorSexAgeTable>(*expected_),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_),
+        std::make_shared<std::unordered_map<core::Identifier, int>>(*trend_steps_),
+        expected_trend_boxcox_, names_, models_, ranges_, lambda_, stddev_, cholesky_,
+        policy_models_, policy_ranges_, policy_cholesky_,
+        std::make_shared<std::vector<LinearModelParams>>(*trend_models_),
+        std::make_shared<std::vector<core::DoubleInterval>>(*trend_ranges_),
+        std::make_shared<std::vector<double>>(*trend_lambda_), info_speed_, rural_prevalence_,
+        income_models_,
+        std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(*region_models_),
+        physical_activity_stddev_,
+        std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(
+            *ethnicity_models_));
 }
 
 } // namespace hgps

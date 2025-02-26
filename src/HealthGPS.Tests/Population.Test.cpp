@@ -1,11 +1,18 @@
 #include "pch.h"
 
+#include "../../out/build/windows-debug/vcpkg_installed/x64-windows/include/gtest/gtest.h"
+#include "HealthGPS.Core/datatable.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
+#include "HealthGPS/event_aggregator.h"
+#include "HealthGPS/modelinput.h"
 #include "HealthGPS/person.h"
+#include "HealthGPS/runtime_context.h"
+#include "HealthGPS/scenario.h"
 #include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
 #include <gtest/gtest.h>
+using namespace hgps;
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson) {
     using namespace hgps;
@@ -232,19 +239,19 @@ TEST(TestHealthGPS_Population, PersonIncomeValues) {
     using namespace hgps;
 
     auto p = Person{};
-    p.income = core::Income::low;
+    p.income_category = core::Income::low;
     ASSERT_EQ(1.0f, p.income_to_value());
 
-    p.income = core::Income::lowermiddle;
+    p.income_category = core::Income::lowermiddle;
     ASSERT_EQ(2.0f, p.income_to_value());
 
-    p.income = core::Income::uppermiddle;
+    p.income_category = core::Income::uppermiddle;
     ASSERT_EQ(3.0f, p.income_to_value());
 
-    p.income = core::Income::high;
+    p.income_category = core::Income::high;
     ASSERT_EQ(4.0f, p.income_to_value());
 
-    p.income = core::Income::unknown;
+    p.income_category = core::Income::unknown;
     ASSERT_THROW(p.income_to_value(), core::HgpsException);
 }
 
@@ -288,7 +295,7 @@ TEST(TestHealthGPS_Population, PersonRegionCloning) {
     source.gender = core::Gender::male;
     source.ses = 0.5;
     source.sector = core::Sector::urban;
-    source.income = core::Income::high;
+    source.income_category = core::Income::high;
 
     auto clone = Person{};
     clone.region = source.region;
@@ -296,7 +303,7 @@ TEST(TestHealthGPS_Population, PersonRegionCloning) {
     clone.gender = source.gender;
     clone.ses = source.ses;
     clone.sector = source.sector;
-    clone.income = source.income;
+    clone.income_category = source.income_category;
 
     ASSERT_EQ(clone.region, source.region);
     ASSERT_EQ(clone.region_to_value(), source.region_to_value());
@@ -304,5 +311,139 @@ TEST(TestHealthGPS_Population, PersonRegionCloning) {
     ASSERT_EQ(clone.gender, source.gender);
     ASSERT_EQ(clone.ses, source.ses);
     ASSERT_EQ(clone.sector, source.sector);
-    ASSERT_EQ(clone.income, source.income);
+    ASSERT_EQ(clone.income_category, source.income_category);
+}
+
+TEST(TestHealthGPS_Population, PersonEthnicityValues) {
+    using namespace hgps;
+
+    auto p = Person{};
+    p.ethnicity = core::Ethnicity::White;
+    ASSERT_EQ(1.0f, p.ethnicity_to_value());
+
+    p.ethnicity = core::Ethnicity::Asian;
+    ASSERT_EQ(2.0f, p.ethnicity_to_value());
+
+    p.ethnicity = core::Ethnicity::Black;
+    ASSERT_EQ(3.0f, p.ethnicity_to_value());
+
+    p.ethnicity = core::Ethnicity::Others;
+    ASSERT_EQ(4.0f, p.ethnicity_to_value());
+
+    p.ethnicity = core::Ethnicity::unknown;
+    ASSERT_THROW(p.ethnicity_to_value(), core::HgpsException);
+}
+
+TEST(TestHealthGPS_Population, EthnicityModelParsing) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    ASSERT_EQ(core::Ethnicity::White, parse_ethnicity("White"));
+    ASSERT_EQ(core::Ethnicity::Asian, parse_ethnicity("Asian"));
+    ASSERT_EQ(core::Ethnicity::Black, parse_ethnicity("Black"));
+    ASSERT_EQ(core::Ethnicity::Others, parse_ethnicity("Others"));
+    ASSERT_THROW(parse_ethnicity("Invalid"), core::HgpsException);
+}
+
+// Add this test implementation:
+class TestScenario : public Scenario {
+  public:
+    ScenarioType type() noexcept override { return ScenarioType::baseline; }
+    std::string name() override { return "Test"; }
+    SyncChannel &channel() override { return channel_; }
+    void clear() noexcept override {}
+    double apply(Random &generator, Person &entity, int time,
+                 const core::Identifier &risk_factor_key, double value) override {
+        return value;
+    }
+
+  private:
+    SyncChannel channel_;
+};
+
+std::shared_ptr<ModelInput> create_test_modelinput() {
+    auto data = core::DataTable{};
+    auto uk = core::Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
+    auto age_range = core::IntegerInterval(0, 100);
+    auto settings = Settings(uk, 0.1f, age_range);
+    auto run_info = RunInfo{};
+    auto ses_info = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
+    auto risk_mapping = HierarchicalMapping({{"Year", 0}, {"Gender", 0}, {"Age", 0}});
+    auto diseases = std::vector<core::DiseaseInfo>{};
+
+    return std::make_shared<ModelInput>(data, settings, run_info, ses_info, risk_mapping, diseases);
+}
+
+TEST(TestHealthGPS_Population, RegionProbabilities) {
+    using namespace hgps;
+
+    // Create mock objects needed for RuntimeContext
+    class TestEventAggregator : public EventAggregator {
+      public:
+        void publish(std::unique_ptr<EventMessage> message) override {}
+        void publish_async(std::unique_ptr<EventMessage> message) override {}
+        std::unique_ptr<EventSubscriber>
+        subscribe(EventType event_id,
+                  std::function<void(std::shared_ptr<EventMessage>)> handler) override {
+            return nullptr;
+        }
+        bool unsubscribe(const EventSubscriber &subscriber) override { return true; }
+    };
+
+    auto bus = std::make_shared<TestEventAggregator>();
+    auto inputs = create_test_modelinput();
+    auto scenario = std::make_unique<TestScenario>();
+
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    auto probs = context.get_region_probabilities(30, core::Gender::male);
+
+    // Check probabilities sum to 1.0
+    double sum = 0.0;
+    for (const auto &[region, prob] : probs) {
+        sum += prob;
+    }
+    ASSERT_NEAR(1.0, sum, 0.0001);
+
+    // Check all regions have valid probabilities
+    for (const auto &[region, prob] : probs) {
+        ASSERT_GE(prob, 0.0);
+        ASSERT_LE(prob, 1.0);
+    }
+}
+
+TEST(TestHealthGPS_Population, EthnicityProbabilities) {
+    using namespace hgps;
+
+    // Create mock objects needed for RuntimeContext
+    class TestEventAggregator : public EventAggregator {
+      public:
+        void publish(std::unique_ptr<EventMessage> message) override {}
+        void publish_async(std::unique_ptr<EventMessage> message) override {}
+        std::unique_ptr<EventSubscriber>
+        subscribe(EventType event_id,
+                  std::function<void(std::shared_ptr<EventMessage>)> handler) override {
+            return nullptr;
+        }
+        bool unsubscribe(const EventSubscriber &subscriber) override { return true; }
+    };
+
+    auto bus = std::make_shared<TestEventAggregator>();
+    auto inputs = create_test_modelinput();
+    auto scenario = std::make_unique<TestScenario>();
+
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    auto probs = context.get_ethnicity_probabilities(30, core::Gender::male, core::Region::England);
+
+    // Check probabilities sum to 1.0
+    double sum = 0.0;
+    for (const auto &[ethnicity, prob] : probs) {
+        sum += prob;
+    }
+    ASSERT_NEAR(1.0, sum, 0.0001);
+
+    // Check all ethnicities have valid probabilities
+    for (const auto &[ethnicity, prob] : probs) {
+        ASSERT_GE(prob, 0.0);
+        ASSERT_LE(prob, 1.0);
+    }
 }

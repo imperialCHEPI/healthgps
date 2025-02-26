@@ -414,13 +414,29 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
 
-    return std::make_unique<StaticLinearModelDefinition>(
+    // Ethnicity models for different ethnicity classifications.
+    std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
+    for (const auto &model : opt["EthnicityModels"]) {
+        auto ethnicity = parse_ethnicity(model["Ethnicity"].get<std::string>());
+        auto params = LinearModelParams{};
+        params.intercept = model["Intercept"].get<double>();
+
+        for (const auto &coef : model["Coefficients"]) {
+            auto name = coef["Name"].get<core::Identifier>();
+            params.coefficients[name] = coef["Value"].get<double>();
+        }
+        // insert ethnicity model with try_emplace to avoid copying the params
+        ethnicity_models.try_emplace(ethnicity, std::move(params));
+    }
+
+    return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), std::move(region_models), physical_activity_stddev);
+        std::move(income_models), std::move(region_models), physical_activity_stddev, 0.5,
+        std::move(ethnicity_models));
 }
 
 // Added to handle region parsing since income was made quartile, and region was added
@@ -442,6 +458,26 @@ core::Region parse_region(const std::string &value) {
     }
 
     throw core::HgpsException(fmt::format("Unknown region value: {}", value));
+}
+
+core::Ethnicity parse_ethnicity(const std::string &value) {
+    if (value == "White") {
+        return core::Ethnicity::White;
+    }
+    if (value == "Asian") {
+        return core::Ethnicity::Asian;
+    }
+    if (value == "Black") {
+        return core::Ethnicity::Black;
+    }
+    if (value == "Others") {
+        return core::Ethnicity::Others;
+    }
+    if (value == "unknown") {
+        return core::Ethnicity::unknown;
+    }
+
+    throw core::HgpsException(fmt::format("Unknown ethnicity value: {}", value));
 }
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
@@ -612,11 +648,77 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         {hgps::core::Gender::female, opt["HeightSlope"]["Female"].get<double>()},
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
+    // Region models for different region classifications.
+    std::unordered_map<core::Region, LinearModelParams> region_models;
+    for (const auto &model : opt["RegionModels"]) {
+        auto region = parse_region(model["Region"].get<std::string>());
+        auto params = LinearModelParams{};
+        params.intercept = model["Intercept"].get<double>();
+
+        for (const auto &coef : model["Coefficients"]) {
+            auto name = coef["Name"].get<core::Identifier>();
+            params.coefficients[name] = coef["Value"].get<double>();
+        }
+        // insert region model with try_emplace to avoid copying the params
+        region_models.try_emplace(region, std::move(params));
+    }
+
+    // Ethnicity models for different ethnicity classifications.
+    std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
+    for (const auto &model : opt["EthnicityModels"]) {
+        auto ethnicity = parse_ethnicity(model["Ethnicity"].get<std::string>());
+        auto params = LinearModelParams{};
+        params.intercept = model["Intercept"].get<double>();
+
+        for (const auto &coef : model["Coefficients"]) {
+            auto name = coef["Name"].get<core::Identifier>();
+            params.coefficients[name] = coef["Value"].get<double>();
+        }
+        // insert ethnicity model with try_emplace to avoid copying the params
+        ethnicity_models.try_emplace(ethnicity, std::move(params));
+    }
+
+    // Income models for different income classifications.
+    std::unordered_map<core::Income, LinearModelParams> income_models;
+    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+
+        // Get income category.
+        // Added New income category (Low, LowerMiddle, UpperMiddle & High)
+        core::Income category;
+        if (core::case_insensitive::equals(key, "Unknown")) {
+            category = core::Income::unknown;
+        } else if (core::case_insensitive::equals(key, "Low")) {
+            category = core::Income::low;
+        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
+            category = core::Income::lowermiddle;
+        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
+            category = core::Income::uppermiddle;
+        } else if (core::case_insensitive::equals(key, "High")) {
+            category = core::Income::high;
+        } else {
+            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
+        }
+
+        // Get income model parameters.
+        LinearModelParams model;
+        model.intercept = json_params["Intercept"].get<double>();
+        model.coefficients =
+            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+
+        // Insert income model.
+        income_models.emplace(category, std::move(model));
+    }
+
     return std::make_unique<hgps::KevinHallModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
         std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
-        std::move(height_stddev), std::move(height_slope));
+        std::move(height_stddev), std::move(height_slope),
+        std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(
+            std::move(region_models)),
+        std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(
+            std::move(ethnicity_models)),
+        std::move(income_models), 0.5);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>

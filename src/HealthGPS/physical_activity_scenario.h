@@ -42,6 +42,8 @@ class PhysicalActivityScenario final : public InterventionScenario {
 
     const std::vector<PolicyImpact> &impacts() const noexcept override;
 
+    std::string name() override { return "Physical Activity"; }
+
   private:
     std::reference_wrapper<SyncChannel> channel_;
     PhysicalActivityDefinition definition_;

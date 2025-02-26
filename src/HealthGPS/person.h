@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <map>
+#include <unordered_map>
 
 namespace hgps {
 
@@ -60,7 +61,7 @@ struct Person {
     core::Sector sector{core::Sector::unknown};
 
     /// @brief Income category
-    core::Income income{core::Income::unknown};
+    core::Income income_category{core::Income::unknown};
 
     /// @brief Social-economic status (SES) assigned value
     double ses{};
@@ -68,11 +69,17 @@ struct Person {
     /// @brief Region assigned value
     core::Region region{core::Region::unknown};
 
+    /// @brief Ethnicity assigned value
+    core::Ethnicity ethnicity{core::Ethnicity::unknown};
+
     /// @brief Current risk factors values
-    std::map<core::Identifier, double> risk_factors;
+    std::unordered_map<core::Identifier, double> risk_factors;
 
     /// @brief Diseases history and current status
     std::map<core::Identifier, Disease> diseases;
+
+    /// @brief Continuous income variable
+    double income_continuous;
 
     /// @brief Determine if a Person is current alive
     /// @return true for alive; otherwise, false
@@ -148,6 +155,23 @@ struct Person {
     /// @return The region value (England = 1, Wales = 2, Scotland = 3, NorthernIreland = 4)
     /// @throws HgpsException if region is unknown
     float region_to_value() const;
+
+    /// @brief Gets the ethnicity assigned value
+    /// @return The ethnicity assigned value
+    core::Ethnicity get_ethnicity() const { return ethnicity; }
+
+    /// @brief Sets the ethnicity assigned value
+    /// @param value The new ethnicity assigned value
+    void set_ethnicity(core::Ethnicity value) { ethnicity = value; }
+
+    /// @brief Gets the ethnicity enumeration as a number
+    /// @return The ethnicity associated value
+    /// @throws HgpsException if ethnicity is unknown
+    float ethnicity_to_value() const;
+
+    /// @brief Copies the data from another Person instance
+    /// @param other The source Person instance
+    void copy_from(const Person &other);
 
   private:
     std::size_t id_{};

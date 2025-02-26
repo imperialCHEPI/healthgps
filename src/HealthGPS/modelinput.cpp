@@ -30,4 +30,16 @@ const SESDefinition &ModelInput::ses_definition() const noexcept { return ses_de
 const HierarchicalMapping &ModelInput::risk_mapping() const noexcept { return risk_mapping_; }
 
 const std::vector<core::DiseaseInfo> &ModelInput::diseases() const noexcept { return diseases_; }
+
+std::unordered_map<core::Region, double>
+ModelInput::get_region_probabilities(int age, core::Gender gender) const {
+    // TODO: Implement actual probability lookup
+    return std::unordered_map<core::Region, double>{};
+}
+
+std::unordered_map<core::Ethnicity, double>
+ModelInput::get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const {
+    // TODO: Implement actual probability lookup
+    return std::unordered_map<core::Ethnicity, double>{};
+}
 } // namespace hgps
