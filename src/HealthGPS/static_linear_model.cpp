@@ -468,7 +468,7 @@ void StaticLinearModel::initialise_region(RuntimeContext &context, Person &perso
     }
 
     // Fallback to first region if no match (which is "unknown")
-    //This should not be happening if the probabilties are correct
+    // This should not be happening if the probabilties are correct
     person.region = region_models_->begin()->first;
 }
 // NOTE: Might need to change how region is being updated later
@@ -480,7 +480,8 @@ void StaticLinearModel::update_region(RuntimeContext &context, Person &person,
 }
 
 // Modified: Mahima 25/02/2025
-// Ethnicity is initialised using the CDF of the ethnicity probabilities along with age/gender/region strata
+// Ethnicity is initialised using the CDF of the ethnicity probabilities along with
+// age/gender/region strata
 void StaticLinearModel::initialise_ethnicity(RuntimeContext &context, Person &person,
                                              Random &random) const {
     // Get probabilities for this age/sex/region stratum
@@ -501,7 +502,7 @@ void StaticLinearModel::initialise_ethnicity(RuntimeContext &context, Person &pe
     // Fallback to first ethnicity if no match which is "unknown" ethnicity
     person.ethnicity = ethnicity_models_->begin()->first;
 }
-//NOTE: Ethnicity has no update ethnicity coz it is fixed after assignment throughout
+// NOTE: Ethnicity has no update ethnicity coz it is fixed after assignment throughout
 
 void StaticLinearModel::initialise_income_continuous(Person &person, Random &random) const {
     // Base value from age
