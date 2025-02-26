@@ -33,13 +33,13 @@ const std::vector<core::DiseaseInfo> &ModelInput::diseases() const noexcept { re
 
 std::unordered_map<core::Region, double>
 ModelInput::get_region_probabilities(int age, core::Gender gender) const {
-    // TODO: Implement actual probability lookup
-    return std::unordered_map<core::Region, double>{};
+    // Get probabilities from the input data table
+    return input_data_.get().get_region_distribution(age, gender);
 }
 
 std::unordered_map<core::Ethnicity, double>
 ModelInput::get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const {
-    // TODO: Implement actual probability lookup
-    return std::unordered_map<core::Ethnicity, double>{};
+    // Get probabilities from the input data table
+    return input_data_.get().get_ethnicity_distribution(age, gender, region);
 }
 } // namespace hgps

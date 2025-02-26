@@ -133,6 +133,7 @@ class RuntimeContext {
     unsigned int current_run_{};
     int model_start_time_{};
     int time_now_{};
+    core::IntegerInterval age_range_;
 };
 
 } // namespace hgps

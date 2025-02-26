@@ -80,6 +80,118 @@ std::string DataTable::to_string() const noexcept {
     return ss.str();
 }
 
+std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
+                                                                      Gender gender) const {
+    // Get coefficients from demographic models
+    const auto &coeffs = get_demographic_coefficients("region.probabilities");
+
+    // Calculate probabilities based on age and gender using the coefficients
+    std::unordered_map<Region, double> probabilities;
+    double total = 0.0;
+
+    // Use the coefficients to calculate probability for each region
+    for (const auto &region :
+         {Region::England, Region::Wales, Region::Scotland, Region::NorthernIreland}) {
+        double prob = calculate_probability(coeffs, age, gender, region);
+        probabilities[region] = prob;
+        total += prob;
+    }
+
+    // Normalize probabilities to sum to 1
+    for (auto &[region, prob] : probabilities) {
+        prob /= total;
+    }
+
+    return probabilities;
+}
+
+std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int age, Gender gender,
+                                                                            Region region) const {
+    // Similar implementation but using ethnicity coefficients
+    const auto &coeffs = get_demographic_coefficients("ethnicity.probabilities");
+
+    std::unordered_map<Ethnicity, double> probabilities;
+    double total = 0.0;
+
+    for (const auto &ethnicity :
+         {Ethnicity::White, Ethnicity::Asian, Ethnicity::Black, Ethnicity::Others}) {
+        double prob = calculate_probability(coeffs, age, gender, region, ethnicity);
+        probabilities[ethnicity] = prob;
+        total += prob;
+    }
+
+    // Normalize
+    for (auto &[ethnicity, prob] : probabilities) {
+        prob /= total;
+    }
+
+    return probabilities;
+}
+
+DataTable::DemographicCoefficients
+DataTable::get_demographic_coefficients(const std::string &model_type) const {
+    auto it = demographic_coefficients_.find(model_type);
+    if (it != demographic_coefficients_.end()) {
+        return it->second;
+    }
+
+    throw std::runtime_error(
+        fmt::format("Demographic coefficients not found for model type: {}", model_type));
+}
+
+double DataTable::calculate_probability(const DemographicCoefficients &coeffs, int age,
+                                        Gender gender, Region region,
+                                        std::optional<Ethnicity> ethnicity) const {
+    // Calculate base probability using continuous age
+    double prob = age * coeffs.age_coefficient;
+
+    // Add gender effect
+    prob += coeffs.gender_coefficients.at(gender);
+
+    // Add region effect if calculating ethnicity probability
+    if (ethnicity.has_value()) {
+        prob += coeffs.region_coefficients.at(region);
+    }
+
+    // Convert to probability using logistic function
+    return 1.0 / (1.0 + std::exp(-prob));
+}
+
+void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
+    // Load region probabilities
+    DemographicCoefficients region_coeffs{};
+    const auto &region_config =
+        config["modelling"]["demographic_models"]["region"]["probabilities"]["coefficients"];
+
+    region_coeffs.age_coefficient = region_config["age"].get<double>();
+    region_coeffs.gender_coefficients[Gender::male] = region_config["gender"]["male"].get<double>();
+    region_coeffs.gender_coefficients[Gender::female] =
+        region_config["gender"]["female"].get<double>();
+
+    demographic_coefficients_["region.probabilities"] = std::move(region_coeffs);
+
+    // Load ethnicity probabilities
+    DemographicCoefficients ethnicity_coeffs{};
+    const auto &ethnicity_config =
+        config["modelling"]["demographic_models"]["ethnicity"]["probabilities"]["coefficients"];
+
+    ethnicity_coeffs.age_coefficient = ethnicity_config["age"].get<double>();
+    ethnicity_coeffs.gender_coefficients[Gender::male] =
+        ethnicity_config["gender"]["male"].get<double>();
+    ethnicity_coeffs.gender_coefficients[Gender::female] =
+        ethnicity_config["gender"]["female"].get<double>();
+
+    // Load region coefficients for ethnicity
+    const auto &region_probs = ethnicity_config["region"];
+    ethnicity_coeffs.region_coefficients[Region::England] = region_probs["England"].get<double>();
+    ethnicity_coeffs.region_coefficients[Region::Wales] = region_probs["Wales"].get<double>();
+    ethnicity_coeffs.region_coefficients[Region::Scotland] = region_probs["Scotland"].get<double>();
+    ethnicity_coeffs.region_coefficients[Region::NorthernIreland] =
+        region_probs["NorthernIreland"].get<double>();
+
+    demographic_coefficients_["ethnicity.probabilities"] = std::move(ethnicity_coeffs);
+}
+
 } // namespace hgps::core
 
 std::ostream &operator<<(std::ostream &stream, const hgps::core::DataTable &table) {

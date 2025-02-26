@@ -1,6 +1,6 @@
 #include "pch.h"
+#include <gtest/gtest.h>
 
-#include "../../out/build/windows-debug/vcpkg_installed/x64-windows/include/gtest/gtest.h"
 #include "HealthGPS.Core/datatable.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
@@ -11,7 +11,6 @@
 #include "HealthGPS/scenario.h"
 #include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
-#include <gtest/gtest.h>
 using namespace hgps;
 
 TEST(TestHealthGPS_Population, CreateDefaultPerson) {
@@ -352,7 +351,7 @@ class TestScenario : public Scenario {
     std::string name() override { return "Test"; }
     SyncChannel &channel() override { return channel_; }
     void clear() noexcept override {}
-    double apply(Random & /*generator*/, Person &entity, int time,
+    double apply(Random &generator, Person &entity, int time,
                  const core::Identifier &risk_factor_key, double value) override {
         return value;
     }
@@ -380,14 +379,14 @@ TEST(TestHealthGPS_Population, RegionProbabilities) {
     // Create mock objects needed for RuntimeContext
     class TestEventAggregator : public EventAggregator {
       public:
-        void publish(std::unique_ptr<EventMessage> message) override {}
-        void publish_async(std::unique_ptr<EventMessage> message) override {}
+        void publish(std::unique_ptr<EventMessage> /*message*/) override {}
+        void publish_async(std::unique_ptr<EventMessage> /*message*/) override {}
         std::unique_ptr<EventSubscriber>
-        subscribe(EventType event_id,
-                  std::function<void(std::shared_ptr<EventMessage>)> handler) override {
+        subscribe(EventType /*event_id*/,
+                  std::function<void(std::shared_ptr<EventMessage>)> /*handler*/) override {
             return nullptr;
         }
-        bool unsubscribe(const EventSubscriber &subscriber) override { return true; }
+        bool unsubscribe(const EventSubscriber & /*subscriber*/) override { return true; }
     };
 
     auto bus = std::make_shared<TestEventAggregator>();
@@ -417,14 +416,14 @@ TEST(TestHealthGPS_Population, EthnicityProbabilities) {
     // Create mock objects needed for RuntimeContext
     class TestEventAggregator : public EventAggregator {
       public:
-        void publish(std::unique_ptr<EventMessage> message) override {}
-        void publish_async(std::unique_ptr<EventMessage> message) override {}
+        void publish(std::unique_ptr<EventMessage> /*message*/) override {}
+        void publish_async(std::unique_ptr<EventMessage> /*message*/) override {}
         std::unique_ptr<EventSubscriber>
-        subscribe(EventType event_id,
-                  std::function<void(std::shared_ptr<EventMessage>)> handler) override {
+        subscribe(EventType /*event_id*/,
+                  std::function<void(std::shared_ptr<EventMessage>)> /*handler*/) override {
             return nullptr;
         }
-        bool unsubscribe(const EventSubscriber &subscriber) override { return true; }
+        bool unsubscribe(const EventSubscriber & /*subscriber*/) override { return true; }
     };
 
     auto bus = std::make_shared<TestEventAggregator>();
