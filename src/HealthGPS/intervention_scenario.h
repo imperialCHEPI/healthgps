@@ -18,7 +18,7 @@ struct PolicyDynamic;
 /// common intervention properties: active period and impacts.
 class InterventionScenario : public Scenario {
   public:
-    virtual ~InterventionScenario() = default;
+    virtual ~InterventionScenario() override = default;
 
     /// @brief Gets the intervention active period
     /// @return Intervention period

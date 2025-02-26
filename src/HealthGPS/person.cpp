@@ -20,10 +20,18 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"SES"_id, [](const Person &p) { return p.ses; }},
 };
 
-Person::Person() : id_{++Person::newUID} {}
+Person::Person()
+    : age{0}, gender{core::Gender::unknown}, // Changed from female to unknown
+      region{core::Region::unknown}, ethnicity{core::Ethnicity::unknown},
+      sector{core::Sector::urban}, income_continuous{0.0}, income_category{core::Income::low},
+      ses{0.0}, is_alive_{true}, has_emigrated_{false}, time_of_death_{0}, time_of_migration_{0},
+      id_{++Person::newUID} {}
 
 Person::Person(const core::Gender birth_gender) noexcept
-    : gender{birth_gender}, id_{++Person::newUID} {}
+    : age{0}, gender{birth_gender}, region{core::Region::unknown},
+      ethnicity{core::Ethnicity::unknown}, sector{core::Sector::urban}, income_continuous{0.0},
+      income_category{core::Income::low}, ses{0.0}, is_alive_{true}, has_emigrated_{false},
+      time_of_death_{0}, time_of_migration_{0}, id_{++Person::newUID} {}
 
 std::size_t Person::id() const noexcept { return id_; }
 

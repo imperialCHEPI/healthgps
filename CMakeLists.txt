@@ -55,6 +55,8 @@ if(MSVC)
 
     # Suppress warnings about std::getenv
     add_compile_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+    add_compile_options(/wd26495 /wd6255 /wd26498 /wd6285 /wd26819)
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 
