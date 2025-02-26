@@ -6,6 +6,7 @@
 #include "map2d.h"
 #include "mapping.h"
 #include "risk_factor_adjustable_model.h"
+#include "static_linear_model.h"
 
 #include <optional>
 #include <vector>
@@ -32,6 +33,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @param height_stddev The height model female/male standard deviations
     /// @param height_slope The height female/male model slopes
+    /// @param region_models The region models for the model
+    /// @param ethnicity_models The ethnicity models for the model
+    /// @param income_models The income models for the model
+    /// @param income_continuous_stddev The standard deviation for continuous income
     KevinHallModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
         std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -44,7 +49,11 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
         const std::vector<double> &epa_quantiles,
         const std::unordered_map<core::Gender, double> &height_stddev,
-        const std::unordered_map<core::Gender, double> &height_slope);
+        const std::unordered_map<core::Gender, double> &height_slope,
+        std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+        std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+        std::unordered_map<core::Income, LinearModelParams> income_models,
+        double income_continuous_stddev);
 
     RiskFactorModelType type() const noexcept override;
 
@@ -53,6 +62,25 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void generate_risk_factors(RuntimeContext &context) override;
 
     void update_risk_factors(RuntimeContext &context) override;
+
+    /// @brief Initialize the continuous income value for a person
+    /// @param person The person to initialize continuous income for
+    /// @param random The random number generator
+    void initialise_income_continuous(Person &person, Random &random) const;
+
+    /// @brief Update the continuous income value for a person
+    /// @param person The person to update continuous income for
+    /// @param random The random number generator
+    void update_income_continuous(Person &person, Random &random) const;
+
+    /// @brief Initialize the income category for a person
+    /// @param person The person to initialize income for
+    /// @param population The population to use for income category initialization
+    void initialise_income_category(Person &person, const Population &population) const;
+
+    /// @brief Update the income category for a person
+    /// @param context The runtime context
+    void update_income_category(RuntimeContext &context) const;
 
   private:
     /// @brief Handle the update (initialisation) of newborns separately
@@ -196,7 +224,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Initialises the height of a person.
     /// @param context The runtime context
     /// @param person The person fo initialise the height for.
-    /// @param W_power_mean The mean hweight power for the person's sex and age
+    /// @param W_power_mean The mean height power for the person's sex and age
     /// @param random The random number generator
     void initialise_height(RuntimeContext &context, Person &person, double W_power_mean,
                            Random &random) const;
@@ -204,9 +232,35 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Updates the height of a person.
     /// @param context The runtime context
     /// @param person The person fo update the height for.
-    /// @param W_power_mean The mean hweight power for the person's sex and age
+    /// @param W_power_mean The mean height power for the person's sex and age
     void update_height(RuntimeContext &context, Person &person, double W_power_mean) const;
 
+    /// @brief Initialises the ethnicity of a person.
+    /// @param context The runtime context
+    /// @param person The person to initialise the ethnicity for
+    /// @param random The random number generator
+    void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random) const;
+
+    /// @brief Initialises the region of a person.
+    /// @param context The runtime context
+    /// @param person The person to initialise the region for
+    /// @param random The random number generator
+    void initialise_region(RuntimeContext &context, Person &person, Random &random) const;
+
+    /// @brief Updates the region of a person.
+    /// @param context The runtime context
+    /// @param person The person to update the region for
+    /// @param random The random number generator
+    void update_region(RuntimeContext &context, Person &person, Random &random) const;
+
+    /// @brief Initialize physical activity level for a person
+    /// @param context The runtime context
+    /// @param person The person to initialize PA for
+    /// @param random The random number generator
+    void initialise_physical_activity(RuntimeContext &context, Person &person,
+                                      Random &random) const;
+
+    // Add after existing member variables
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
     const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
@@ -216,6 +270,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     const std::vector<double> &epa_quantiles_;
     const std::unordered_map<core::Gender, double> &height_stddev_;
     const std::unordered_map<core::Gender, double> &height_slope_;
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models_;
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
 
     // Model parameters.
     static constexpr int kevin_hall_age_min = 19; // Start age for the main Kevin Hall model.
@@ -230,6 +287,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     static constexpr double beta_AT = 0.14;       // AT from energy intake (unitless).
     static constexpr double xi_Na = 3000.0;       // Na from ECF changes (mg/L/day).
     static constexpr double xi_CI = 4000.0;       // Na from carbohydrate changes (mg/day).
+
+    // Add after existing member variables
+    const double physical_activity_stddev_ = 0.5;
+    const double income_continuous_stddev_;
 };
 
 /// @brief Defines the energy balance model data type
@@ -247,6 +308,10 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
     /// @param height_stddev The height model female/male standard deviations
     /// @param height_slope The height model female/male slopes
+    /// @param region_models The region models for the model
+    /// @param ethnicity_models The ethnicity models for the model
+    /// @param income_models The income models for the model
+    /// @param income_continuous_stddev The standard deviation for continuous income
     /// @throws std::invalid_argument for empty arguments
     KevinHallModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -258,7 +323,11 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
         std::unordered_map<core::Identifier, std::optional<double>> food_prices,
         std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
         std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-        std::unordered_map<core::Gender, double> height_slope);
+        std::unordered_map<core::Gender, double> height_slope,
+        std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+        std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+        std::unordered_map<core::Income, LinearModelParams> income_models,
+        double income_continuous_stddev);
 
     /// @brief Construct a new KevinHallModel from this definition
     /// @return A unique pointer to the new KevinHallModel instance
@@ -273,6 +342,10 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     std::vector<double> epa_quantiles_;
     std::unordered_map<core::Gender, double> height_stddev_;
     std::unordered_map<core::Gender, double> height_slope_;
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models_;
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
+    double income_continuous_stddev_;
 };
 
 } // namespace hgps

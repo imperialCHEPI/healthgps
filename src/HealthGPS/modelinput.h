@@ -95,6 +95,21 @@ class ModelInput {
     /// @return Diseases to include in experiment
     const std::vector<core::DiseaseInfo> &diseases() const noexcept;
 
+    /// @brief Get region probabilities for specific age and gender stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @return Map of region to probability for this stratum
+    std::unordered_map<core::Region, double> get_region_probabilities(int age,
+                                                                      core::Gender gender) const;
+
+    /// @brief Get ethnicity probabilities for specific age, gender, and region stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @param region The region stratum
+    /// @return Map of ethnicity to probability for this stratum
+    std::unordered_map<core::Ethnicity, double>
+    get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const;
+
   private:
     std::reference_wrapper<core::DataTable> input_data_;
     Settings settings_;

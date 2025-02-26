@@ -145,6 +145,8 @@ class FoodLabellingScenario final : public InterventionScenario {
 
     const std::vector<PolicyImpact> &impacts() const noexcept override;
 
+    std::string name() override { return "Food Labelling"; }
+
   private:
     std::reference_wrapper<SyncChannel> channel_;
     FoodLabellingDefinition definition_;

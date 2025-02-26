@@ -49,6 +49,8 @@ class MarketingPolicyScenario final : public InterventionScenario {
 
     const std::vector<PolicyImpact> &impacts() const noexcept override;
 
+    std::string name() override { return "Marketing Policy"; }
+
   private:
     std::reference_wrapper<SyncChannel> channel_;
     MarketingPolicyDefinition definition_;
