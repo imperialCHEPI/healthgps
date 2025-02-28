@@ -131,13 +131,18 @@ TEST(TestCore, TableColumnIterator) {
     auto dbl_col = DoubleDataTableColumn("double", {1.5, 3.5, 2.0, 0.0, 3.0, 0.0, 5.0},
                                          {true, true, true, false, true, false, true});
 
-    double loop_sum = 0.0;
-    for (const auto &item : dbl_col) {
-        loop_sum += item.value_or(0.0);
-    }
+    ASSERT_TRUE(dbl_col.size() > 0);               // Ensure the column is not empty
+    ASSERT_TRUE(dbl_col.begin() != dbl_col.end()); // Ensure we can iterate
 
-    auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0,
-                               [](auto a, auto b) { return b.has_value() ? a + b.value() : a; });
+    double loop_sum = 0.0;
+    size_t count = 0;
+    for (const auto v : dbl_col) {
+        loop_sum += v;
+        count++;
+    }
+    ASSERT_EQ(count, dbl_col.size()); // Ensure we iterated through all elements
+
+    auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0);
 
     ASSERT_EQ(7, dbl_col.size());
     ASSERT_EQ(2, dbl_col.null_count());
@@ -157,6 +162,9 @@ TEST(TestCore, CreateDataTable) {
     auto dbl_builder = DoubleDataTableColumnBuilder{"Doubles"};
     auto int_builder = IntegerDataTableColumnBuilder{"Integer"};
 
+    ASSERT_EQ(str_values.size(), flt_values.size());
+    ASSERT_EQ(flt_values.size(), int_values.size());
+
     for (size_t i = 0; i < flt_values.size(); i++) {
         str_values[i].empty() ? str_builder.append_null() : str_builder.append(str_values[i]);
         flt_values[i] == float{} ? ftl_builder.append_null() : ftl_builder.append(flt_values[i]);
@@ -173,17 +181,22 @@ TEST(TestCore, CreateDataTable) {
 
     // Casting to columns type
     const auto &col = table.column("Integer");
-    const auto &int_col = dynamic_cast<const IntegerDataTableColumn &>(col);
+    ASSERT_TRUE(&col != nullptr);
+    const auto *int_col_ptr = dynamic_cast<const IntegerDataTableColumn *>(&col);
+    ASSERT_TRUE(int_col_ptr != nullptr);
+    const auto &int_col = *int_col_ptr;
 
+    ASSERT_TRUE(col.size() > 1); // Ensure we have at least 2 elements before accessing index 1
     auto slow_value = std::any_cast<int>(col.value(1));
     auto safe_value = int_col.value_safe(1);
+    ASSERT_TRUE(safe_value.has_value()); // Check if the value exists before using it
     auto fast_value = int_col.value_unsafe(1);
 
     ASSERT_EQ(4, table.num_columns());
     ASSERT_EQ(5, table.num_rows());
     ASSERT_EQ(table.num_rows(), int_col.size());
     ASSERT_EQ(78, slow_value);
-    ASSERT_EQ(slow_value, *safe_value); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(slow_value, *safe_value);
     ASSERT_EQ(slow_value, fast_value);
 }
 

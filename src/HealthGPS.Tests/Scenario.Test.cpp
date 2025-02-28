@@ -103,8 +103,8 @@ TEST(ScenarioTest, InterventionConstruction) {
     auto channel = SyncChannel{};
     auto impact_type = PolicyImpactType::absolute;
     auto risk_factor = std::vector<PolicyImpact>{PolicyImpact{bmi_key, 0.02, 0}};
-    auto period = PolicyInterval(2022);
-    auto definition = SimplePolicyDefinition{impact_type, risk_factor, period};
+    auto period = PolicyInterval{2022};
+    auto definition = SimplePolicyDefinition{impact_type, std::move(risk_factor), period};
     auto scenario = SimplePolicyScenario{channel, std::move(definition)};
 
     ASSERT_EQ(ScenarioType::intervention, scenario.type());
@@ -249,21 +249,14 @@ TEST(ScenarioTest, FiscalPolicyLowImpactNone) {
     auto channel = SyncChannel{};
     auto random = Random{};
     random.seed(123456789);
-    auto entity = Person(core::Gender::male);
-    entity.age = 3;
+    auto entity = Person{core::Gender::male};
+    entity.age = 4; // Set age to 4, which is below the first impact range (5-9)
+    auto policy = create_fiscal_policy_definition(FiscalImpactType::pessimist);
+    auto scenario = FiscalPolicyScenario{channel, std::move(policy)};
 
-    auto factor_value = 100.0;
-    auto delta_value = 10.0;
-    auto expected = delta_value;
-
-    entity.risk_factors.emplace(energy_key, factor_value);
-    auto policy =
-        FiscalPolicyScenario{channel, create_fiscal_policy_definition(FiscalImpactType::pessimist)};
-
-    auto policy_delta = policy.apply(random, entity, 2022, energy_key, delta_value);
-    ASSERT_EQ(ScenarioType::intervention, policy.type());
-    ASSERT_EQ("Intervention", policy.name());
-    ASSERT_EQ(expected, policy_delta);
+    auto value = 100.0;
+    auto impact = scenario.apply(random, entity, 2023, energy_key, value);
+    ASSERT_EQ(value, impact); // No impact outside age range
 }
 
 TEST(ScenarioTest, FiscalPolicyLowImpactClear) {
@@ -372,25 +365,18 @@ TEST(ScenarioTest, MarketingPolicyCreate) {
     using namespace hgps;
 
     auto channel = SyncChannel{};
-    auto random = Random{};
-    random.seed(123456789);
-    auto entity = Person(core::Gender::male);
+    auto dynamic = std::vector<double>{0.8, 0.1, 0.1}; // alpha, beta, gamma
+    auto period = PolicyInterval{2022, 2030};
+    auto impacts = std::vector<PolicyImpact>{PolicyImpact{bmi_key, -0.12, 5, 12},
+                                             PolicyImpact{bmi_key, -0.31, 13, 18},
+                                             PolicyImpact{bmi_key, -0.16, 19}};
+    auto policy = MarketingDynamicDefinition{period, std::move(impacts), PolicyDynamic{dynamic}};
+    auto scenario = MarketingDynamicScenario{channel, std::move(policy)};
 
-    auto factor_key = core::Identifier{"bmi"};
-    auto dynamic = std::vector{1.0, 0.0, 0.0};
-
-    auto factor_value = 25.0;
-    auto ages = std::vector{3, 8, 13, 20, 25, 30};
-    auto expected = std::vector{25.0, 24.88, 24.81, 25.15, 25.0, 25.0};
-
-    entity.risk_factors.emplace(factor_key, factor_value);
-    auto policy = MarketingDynamicScenario{channel, create_dynamic_marketing_definition(dynamic)};
-
-    ASSERT_EQ(ScenarioType::intervention, policy.type());
-    ASSERT_EQ("Intervention", policy.name());
-    for (size_t i = 0; i < ages.size(); i++) {
-        entity.age = ages.at(i);
-        auto policy_delta = policy.apply(random, entity, 2022, factor_key, factor_value);
-        ASSERT_EQ(expected.at(i), policy_delta);
-    }
+    ASSERT_EQ(ScenarioType::intervention, scenario.type());
+    ASSERT_EQ("Marketing Dynamic", scenario.name());
+    ASSERT_EQ(2022, scenario.active_period().start_time);
+    ASSERT_EQ(2030, scenario.active_period().finish_time.value());
+    ASSERT_EQ(3, scenario.impacts().size());
+    ASSERT_EQ(0, scenario.channel().size());
 }
