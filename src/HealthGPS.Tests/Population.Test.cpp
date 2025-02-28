@@ -1,4 +1,6 @@
+#ifdef _MSC_VER
 #pragma warning(disable : 26439) // This kind of function should not throw. Declare it 'noexcept'
+#endif
 
 #include "pch.h"
 #include <gtest/gtest.h>
