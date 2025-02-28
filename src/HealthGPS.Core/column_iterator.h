@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iterator>
+#include <optional>
 
 namespace hgps::core {
 
@@ -10,14 +11,17 @@ namespace detail {
 /// @tparam ColumnType The column type
 template <typename ColumnType> struct DefaultValueAccessor {
     /// @brief The column value type
-    using ValueType = decltype(std::declval<ColumnType>().value_safe(0));
+    using ValueType =
+        typename std::remove_reference_t<decltype(std::declval<ColumnType>().value_safe(
+            0))>::value_type;
 
     /// @brief Gets a value from the target column
     /// @param column The column instance
     /// @param index The value index
     /// @return The respective column value
     ValueType operator()(const ColumnType &column, std::size_t index) {
-        return column.value_safe(index);
+        auto val = column.value_safe(index);
+        return val.has_value() ? val.value() : ValueType{};
     }
 };
 } // namespace detail
@@ -30,7 +34,8 @@ class DataTableColumnIterator {
   public:
     using value_type = typename ValueAccessor::ValueType;
     using difference_type = std::size_t;
-    using reference = value_type &;
+    using pointer = const value_type *;
+    using reference = const value_type &;
     using iterator_category = std::random_access_iterator_tag;
 
     /// @brief Initialise a new instance of the DataTableColumnIterator{ColumnType, ValueAccessor}
@@ -129,6 +134,7 @@ struct iterator_traits<::hgps::core::DataTableColumnIterator<ColumnType>> {
     using IteratorType = ::hgps::core::DataTableColumnIterator<ColumnType>;
     using difference_type = typename IteratorType::difference_type;
     using value_type = typename IteratorType::value_type;
+    using pointer = typename IteratorType::pointer;
     using reference = typename IteratorType::reference;
     using iterator_category = typename IteratorType::iterator_category;
 };

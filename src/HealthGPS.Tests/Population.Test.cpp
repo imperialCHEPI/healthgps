@@ -1,6 +1,10 @@
+#pragma warning(disable : 26439) // This kind of function should not throw. Declare it 'noexcept'
+
 #include "pch.h"
 #include <gtest/gtest.h>
+#include <memory>
 
+#include "HealthGPS.Core/column.h"
 #include "HealthGPS.Core/datatable.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "HealthGPS/api.h"
@@ -362,16 +366,64 @@ class TestScenario : public Scenario {
 };
 
 std::shared_ptr<ModelInput> create_test_modelinput() {
-    auto data = core::DataTable{};
-    auto uk = core::Country{.code = 826, .name = "United Kingdom", .alpha2 = "GB", .alpha3 = "GBR"};
-    auto age_range = core::IntegerInterval(0, 100);
-    auto settings = Settings(uk, 0.1f, age_range);
-    auto run_info = RunInfo{};
-    auto ses_info = SESDefinition{.fuction_name = "normal", .parameters = {0.0, 1.0}};
-    auto risk_mapping = HierarchicalMapping({{"Year", 0}, {"Gender", 0}, {"Age", 0}});
-    auto diseases = std::vector<core::DiseaseInfo>{};
+    // Create data table with required columns
+    core::DataTable data;
 
-    return std::make_shared<ModelInput>(data, settings, run_info, ses_info, risk_mapping, diseases);
+    // Add region column and probabilities
+    std::vector<std::string> region_data{"England", "Wales", "Scotland", "NorthernIreland"};
+    auto region_col = std::make_unique<hgps::core::PrimitiveDataTableColumn<std::string>>(
+        "region", std::move(region_data));
+    data.add(std::move(region_col));
+
+    std::vector<double> region_prob_data{0.5, 0.2, 0.2, 0.1};
+    auto region_prob_col = std::make_unique<hgps::core::PrimitiveDataTableColumn<double>>(
+        "region_prob", std::move(region_prob_data));
+    data.add(std::move(region_prob_col));
+
+    // Add ethnicity column and probabilities
+    std::vector<std::string> ethnicity_data{"White", "Asian", "Black", "Others"};
+    auto ethnicity_col = std::make_unique<hgps::core::PrimitiveDataTableColumn<std::string>>(
+        "ethnicity", std::move(ethnicity_data));
+    data.add(std::move(ethnicity_col));
+
+    std::vector<double> ethnicity_prob_data{0.5, 0.25, 0.15, 0.1};
+    auto ethnicity_prob_col = std::make_unique<hgps::core::PrimitiveDataTableColumn<double>>(
+        "ethnicity_prob", std::move(ethnicity_prob_data));
+    data.add(std::move(ethnicity_prob_col));
+
+    // Create JSON configuration for demographic coefficients
+    nlohmann::json config = {
+        {"modelling",
+         {{"demographic_models",
+           {{"region",
+             {{"probabilities",
+               {{"coefficients", {{"age", 0.0}, {"gender", {{"male", 0.0}, {"female", 0.0}}}}}}}}},
+            {"ethnicity",
+             {{"probabilities",
+               {{"coefficients",
+                 {{"age", 0.0},
+                  {"gender", {{"male", 0.0}, {"female", 0.0}}},
+                  {"region",
+                   {{"England", 0.0}, {"Wales", 0.0}, {"Scotland", 0.0}, {"NorthernIreland", 0.0}}},
+                  {"ethnicity",
+                   {{"White", 0.0}, {"Asian", 0.0}, {"Black", 0.0}, {"Others", 0.0}}}}}}}}}}}}}};
+
+    // Load demographic coefficients
+    data.load_demographic_coefficients(config);
+
+    // Create model input with the initialized data table
+    core::IntegerInterval age_range{0, 100};
+    Settings settings{static_cast<core::Country>(0), 1.0f, age_range};
+    RunInfo run_info;
+    SESDefinition ses_info{"linear", {1.0}};
+    std::vector<MappingEntry> entries;
+    entries.emplace_back("test", 0, std::nullopt);
+    HierarchicalMapping risk_mapping{std::move(entries)};
+    std::vector<core::DiseaseInfo> diseases;
+
+    return std::make_shared<ModelInput>(std::move(data), std::move(settings), run_info,
+                                        std::move(ses_info), std::move(risk_mapping),
+                                        std::move(diseases));
 }
 
 TEST(TestHealthGPS_Population, RegionProbabilities) {

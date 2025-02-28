@@ -9,7 +9,6 @@
 
 #include "data_source.h"
 #include "poco.h"
-#include "version.h"
 
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS/intervention_scenario.h"
@@ -20,6 +19,7 @@
 #include <memory>
 #include <optional>
 #include <stdexcept>
+#include <version.h>
 
 namespace hgps::input {
 

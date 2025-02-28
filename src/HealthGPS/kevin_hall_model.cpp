@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <random>
 #include <utility>
 
 namespace { // anonymous namespace
@@ -62,31 +63,31 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 2: Initialize fixed characteristics (region and ethnicity)
     for (auto &person : context.population()) {
-        // Region depends on the age/gender probabilities
+        // Region depends on age/gender probabilities
         initialise_region(context, person, context.random());
+
         // Ethnicity depends on age/gender/region probabilities
         initialise_ethnicity(context, person, context.random());
     }
 
-    // Step 3: Initialize continuous income (depends on age, gender, region, ethnicity)
+    // Step 3: Initialize continuous income
     for (auto &person : context.population()) {
         initialise_income_continuous(person, context.random());
     }
 
-    // Step 4: Initialize income category based on income_continuous quartiles
-    // initialized at the start and then updated every 5 years
+    // Step 4: Initialize income category
     for (auto &person : context.population()) {
         initialise_income_category(person, context.population());
     }
 
-    // Step 5: Initialize physical activity (depends on age, gender, region, ethnicity, income)
+    // Step 5: Initialize physical activity
     for (auto &person : context.population()) {
         initialise_physical_activity(context, person, context.random());
     }
 
-    // Step 6: Initialize weight-related factors
+    // Step 6: Initialize nutrient-related factors
     for (auto &person : context.population()) {
-        initialise_nutrient_intakes(person);
+        initialise_nutrient_intakes(person, context.random());
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
@@ -140,7 +141,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
             continue;
         }
 
-        initialise_nutrient_intakes(person);
+        initialise_nutrient_intakes(person, context.random());
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
@@ -381,15 +382,33 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
     return RiskFactorAdjustableModel::get_expected(context, sex, age, factor, range, apply_trend);
 }
 
-void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
-
-    // Initialise nutrient intakes.
+void KevinHallModel::initialise_nutrient_intakes(Person &person, Random &random) const {
+    // Initialise base nutrient intakes
     compute_nutrient_intakes(person);
 
-    // Start with previous = current.
+    // Get current values
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
-    person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
     double sodium = person.risk_factors.at("Sodium"_id);
+
+    // Add random variations to match population distributions
+    // Using normal distribution with mean=0.0 and standard deviation=0.1
+    // Using a mean of 1.0 means that on average, the original values will stay the same because
+    // adding by 0 doesn't change the value
+    // This preserves the base nutrient intake values while allowing for variation
+
+    // A small standard deviation of 0.1 means that about:
+    // 68% of values will be between 0.9 and 1.1 (±1 std dev)
+    // 95% of values will be between 0.8 and 1.2 (±2 std dev)
+    // 99.7% of values will be between 0.7 and 1.3 (±3 std dev)
+    // This creates modest variations (±10% for most cases) in nutrient intakes to reflect
+    // real-world population variability
+    carbohydrate += random.next_normal(0.0, 0.1);
+    sodium += random.next_normal(0.0, 0.1);
+
+    // Store values with random variations
+    person.risk_factors.at("Carbohydrate"_id) = carbohydrate;
+    person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
+    person.risk_factors.at("Sodium"_id) = sodium;
     person.risk_factors["Sodium_previous"_id] = sodium;
 }
 
@@ -809,16 +828,18 @@ void KevinHallModel::initialise_region(RuntimeContext &context, Person &person,
 
     for (const auto &[region, prob] : region_probs) {
         cumulative_prob += prob;
-        if (rand_value <= cumulative_prob) {
+        if (rand_value < cumulative_prob) { // Changed from <= to < for correct CDF sampling
             person.region = region;
             return;
         }
     }
 
-    // Fallback to first region if no match (shouldn't happen with proper probabilities)
-    person.region = region_models_->begin()->first;
+    // If we reach here, no region was assigned - this indicates an error in probability
+    // distribution
+    throw core::HgpsException("Failed to assign region: cumulative probabilities do not sum to 1.0 "
+                              "or are incorrectly distributed");
 }
-// NOTE: Might need to change this if region updates are happeining differently
+// NOTE: Might need to change this if region updates are happening differently
 void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                    Random &random) const {
     if (person.age == 18) {
@@ -831,7 +852,7 @@ void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Per
 // age/gender/region strata
 void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &person,
                                           Random &random) const {
-    // Get probabilities for this age/sex/region stratum
+    // Get probabilities for this age/gender/region stratum
     auto ethnicity_probs =
         context.get_ethnicity_probabilities(person.age, person.gender, person.region);
 
@@ -840,14 +861,17 @@ void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &perso
 
     for (const auto &[ethnicity, prob] : ethnicity_probs) {
         cumulative_prob += prob;
-        if (rand_value <= cumulative_prob) {
+        if (rand_value < cumulative_prob) {
             person.ethnicity = ethnicity;
             return;
         }
     }
 
-    // Fallback to first ethnicity if no match which is "unknown"
-    person.ethnicity = ethnicity_models_->begin()->first;
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability
+    // distribution
+    throw core::HgpsException(
+        "Failed to assign ethnicity: cumulative probabilities do not sum to 1.0 "
+        "or are incorrectly distributed");
 }
 // NOTE: No update ethnicity as it is fixed throughout once assigned
 
@@ -883,22 +907,33 @@ void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Perso
 // ethnicity
 // this uses a logistic regression model to predict the income category
 void KevinHallModel::initialise_income_continuous(Person &person, Random &random) const {
-    // Base value from age
-    double income_base =
-        income_models_.at(core::Income::lowermiddle).coefficients.at("Age") * person.age;
+    // Initialize base income value
+    double income_base = 0.0;
 
-    // Add gender effect (0 for female, 1 for male)
-    double gender_effect = (person.gender == core::Gender::male) ? 1.0 : 0.0;
+    // Add age effect - apply coefficient to actual age
+    for (const auto &[income_level, model] : income_models_) {
+        income_base += model.coefficients.at("Age") * person.age;
+    }
+
+    // Add gender effect - apply coefficient to binary gender value
+    double gender_value = (person.gender == core::Gender::male) ? 1.0 : 0.0;
+    for (const auto &[income_level, model] : income_models_) {
+        income_base += model.coefficients.at("Gender") * gender_value;
+    }
+
+    // Add region effect - apply coefficient to region value
+    double region_value = person.region_to_value();
+    income_base += region_models_->at(person.region).coefficients.at("Income") * region_value;
+
+    // Add ethnicity effect - apply coefficient to ethnicity value
+    double ethnicity_value = person.ethnicity_to_value();
     income_base +=
-        income_models_.at(core::Income::lowermiddle).coefficients.at("Gender") * gender_effect;
+        ethnicity_models_->at(person.ethnicity).coefficients.at("Income") * ethnicity_value;
 
-    // Add region and ethnicity effects
-    income_base += region_models_->at(person.region).coefficients.at("Income");
-    income_base += ethnicity_models_->at(person.ethnicity).coefficients.at("Income");
-
-    // Add random variation with standard deviation 0.5
+    // Add random variation with specified standard deviation
     double rand = random.next_normal(0.0, income_continuous_stddev_);
-    // Ensure income is positive
+
+    // Ensure income is positive and apply the random variation
     person.income_continuous = std::max(0.1, income_base * (1.0 + rand));
 }
 

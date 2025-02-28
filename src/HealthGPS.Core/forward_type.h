@@ -120,11 +120,12 @@ struct LookupGenderValue {
 class DataTable;
 class DataTableColumn;
 
+class DataTableColumnVisitor;
+
+// Forward declarations for specialized column types
 class StringDataTableColumn;
 class FloatDataTableColumn;
 class DoubleDataTableColumn;
 class IntegerDataTableColumn;
-
-class DataTableColumnVisitor;
 
 } // namespace hgps::core

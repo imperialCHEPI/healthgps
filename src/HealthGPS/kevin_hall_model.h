@@ -93,7 +93,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     /// @brief Initialise total nutrient intakes from food intakes
     /// @param person The person to initialise
-    void initialise_nutrient_intakes(Person &person) const;
+    /// @param random The random number generator
+    void initialise_nutrient_intakes(Person &person, Random &random) const;
 
     /// @brief Update total nutrient intakes from food intakes
     /// @param person The person to update
