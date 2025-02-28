@@ -441,10 +441,11 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
     double ethnicity_effect = ethnicity_params.coefficients.at("PhysicalActivity"_id);
     expected *= (1.0 + ethnicity_effect);
 
-    // Apply modifiers based on continuous income
-    double income_effect =
-        income_models_.at(core::Income::lowermiddle).coefficients.at("PhysicalActivity") *
-        person.income_continuous;
+    // Apply modifiers based on continuous income - using all income models
+    double income_effect = 0.0;
+    for (const auto &[income_level, model] : income_models_) {
+        income_effect += model.coefficients.at("PhysicalActivity") * person.income_continuous;
+    }
     expected *= (1.0 + income_effect);
 
     // Add random variation using normal distribution
@@ -465,15 +466,16 @@ void StaticLinearModel::initialise_region(RuntimeContext &context, Person &perso
 
     for (const auto &[region, prob] : region_probs) {
         cumulative_prob += prob;
-        if (rand_value <= cumulative_prob) {
+        if (rand_value < cumulative_prob) {
             person.region = region;
             return;
         }
     }
 
-    // Fallback to first region if no match (which is "unknown")
-    // This should not be happening if the probabilties are correct
-    person.region = region_models_->begin()->first;
+    // If we reach here, no region was assigned - this indicates an error in probability
+    // distribution
+    throw core::HgpsException("Failed to assign region: cumulative probabilities do not sum to 1.0 "
+                              "or are incorrectly distributed");
 }
 // NOTE: Might need to change how region is being updated later
 void StaticLinearModel::update_region(RuntimeContext &context, Person &person,
@@ -497,34 +499,48 @@ void StaticLinearModel::initialise_ethnicity(RuntimeContext &context, Person &pe
 
     for (const auto &[ethnicity, prob] : ethnicity_probs) {
         cumulative_prob += prob;
-        if (rand_value <= cumulative_prob) {
+        if (rand_value < cumulative_prob) {
             person.ethnicity = ethnicity;
             return;
         }
     }
 
-    // Fallback to first ethnicity if no match which is "unknown" ethnicity
-    person.ethnicity = ethnicity_models_->begin()->first;
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability
+    // distribution
+    throw core::HgpsException(
+        "Failed to assign ethnicity: cumulative probabilities do not sum to 1.0 "
+        "or are incorrectly distributed");
 }
 // NOTE: Ethnicity has no update ethnicity coz it is fixed after assignment throughout
 
 void StaticLinearModel::initialise_income_continuous(Person &person, Random &random) const {
-    // Base value from age
-    double income_base =
-        income_models_.at(core::Income::lowermiddle).coefficients.at("Age") * person.age;
+    // Initialize base income value
+    double income_base = 0.0;
 
-    // Add gender effect (0 for female, 1 for male)
-    double gender_effect = (person.gender == core::Gender::male) ? 1.0 : 0.0;
+    // Add age effect - apply coefficient to actual age
+    for (const auto &[income_level, model] : income_models_) {
+        income_base += model.coefficients.at("Age") * person.age;
+    }
+
+    // Add gender effect - apply coefficient to binary gender value
+    double gender_value = (person.gender == core::Gender::male) ? 1.0 : 0.0;
+    for (const auto &[income_level, model] : income_models_) {
+        income_base += model.coefficients.at("Gender") * gender_value;
+    }
+
+    // Add region effect - apply coefficient to region value
+    double region_value = person.region_to_value();
+    income_base += region_models_->at(person.region).coefficients.at("Income") * region_value;
+
+    // Add ethnicity effect - apply coefficient to ethnicity value
+    double ethnicity_value = person.ethnicity_to_value();
     income_base +=
-        income_models_.at(core::Income::lowermiddle).coefficients.at("Gender") * gender_effect;
+        ethnicity_models_->at(person.ethnicity).coefficients.at("Income") * ethnicity_value;
 
-    // Add region and ethnicity effects
-    income_base += region_models_->at(person.region).coefficients.at("Income");
-    income_base += ethnicity_models_->at(person.ethnicity).coefficients.at("Income");
-
-    // Add random variation with standard deviation 0.5
+    // Add random variation with specified standard deviation
     double rand = random.next_normal(0.0, income_continuous_stddev_);
-    // Ensure income is positive
+
+    // Ensure income is positive and apply the random variation
     person.income_continuous = std::max(0.1, income_base * (1.0 + rand));
 }
 

@@ -1,13 +1,39 @@
 cmake_minimum_required(VERSION 3.20)
 
-option(BUILD_DOC "Build API documentation" OFF)
-option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
-option(GENERATE_COVERAGE "Generate code coverage information" OFF)
+# Use vcpkg toolchain file if not specified
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VCPKG_ROOT})
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+endif()
 
-# minimum default standard
+project(HealthGPS VERSION 1.0.0 LANGUAGES CXX)
+
+# Project options
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Set version string
+set(PROJECT_VERSION_STRING "${PROJECT_VERSION}")
+
+# Set version components explicitly as integers
+set(PROJECT_VERSION_MAJOR 1)
+set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_PATCH 0)
+
+include(FetchContent)
+
+# Configure version.h
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/HealthGPS/version.h.in" 
+               "${CMAKE_CURRENT_BINARY_DIR}/include/version.h" 
+               @ONLY)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
+
+# Include directories
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/external")
+
+option(BUILD_DOC "Build API documentation" OFF)
+option(WARNINGS_AS_ERRORS "Make the build fail if the compiler gives a warning" OFF)
+option(GENERATE_COVERAGE "Generate code coverage information" OFF)
 
 if(NOT DEFINED CATCH_EXCEPTIONS)
     # By default, catch all exceptions for release builds only
@@ -22,14 +48,6 @@ if(CATCH_EXCEPTIONS)
     add_definitions(-DCATCH_EXCEPTIONS)
 endif()
 
-project(
-    Health-GPS
-    VERSION 1.2.2.0
-    DESCRIPTION "Global Health Policy Simulation model (Health-GPS)"
-    HOMEPAGE_URL "https://github.com/imperialCHEPI/healthgps"
-    LANGUAGES CXX)
-
-include(FetchContent)
 include(cmake/PreventInSourceBuilds.cmake)
 include(cmake/Doxygen.cmake)
 

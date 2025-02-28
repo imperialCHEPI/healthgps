@@ -176,6 +176,7 @@ void Person::reset_id() { Person::newUID = 0; }
 
 // Copy constructor because of unordered_map in Person class hence deep copy is needed
 void Person::copy_from(const Person &other) {
+    // Make sure all demographics are properly copied
     age = other.age;
     gender = other.gender;
     region = other.region;
@@ -186,5 +187,6 @@ void Person::copy_from(const Person &other) {
     ses = other.ses;
     risk_factors = other.risk_factors;
     diseases = other.diseases;
+    // Don't copy private members like is_alive_, has_emigrated_, etc.
 }
 } // namespace hgps
