@@ -24,7 +24,7 @@ if(WIN32)
     # compiler, not a C++ compiler
     set_source_files_properties(versioninfo.rc LANGUAGE RC)
     target_sources(HealthGPS.Console PRIVATE versioninfo.rc)
-    
+
     # Add include path for version.h
     target_include_directories(HealthGPS.Console PRIVATE ${CMAKE_BINARY_DIR}/include)
 endif(WIN32)

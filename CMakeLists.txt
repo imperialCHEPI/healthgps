@@ -5,7 +5,10 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VCPKG_ROOT})
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 endif()
 
-project(HealthGPS VERSION 1.0.0 LANGUAGES CXX)
+project(
+    HealthGPS
+    VERSION 1.0.0
+    LANGUAGES CXX)
 
 # Project options
 set(CMAKE_CXX_STANDARD 20)
@@ -23,9 +26,8 @@ set(PROJECT_VERSION_PATCH 0)
 include(FetchContent)
 
 # Configure version.h
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/HealthGPS/version.h.in" 
-               "${CMAKE_CURRENT_BINARY_DIR}/include/version.h" 
-               @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/HealthGPS/version.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/version.h" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # Include directories
