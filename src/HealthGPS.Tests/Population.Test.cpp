@@ -350,21 +350,32 @@ TEST(TestHealthGPS_Population, EthnicityModelParsing) {
     ASSERT_THROW(parse_ethnicity("Invalid"), core::HgpsException);
 }
 
-// Add this test implementation:
-class TestScenario : public Scenario {
+class TestScenario final : public Scenario {
   public:
-    ScenarioType type() noexcept override { return ScenarioType::baseline; }
-    std::string name() override { return "Test"; }
-    SyncChannel &channel() override { return channel_; }
+    TestScenario() = default;
+    ~TestScenario() override = default;
+
+    // Prevent copying
+    TestScenario(const TestScenario &) = delete;
+    TestScenario &operator=(const TestScenario &) = delete;
+
+    // Allow moving
+    TestScenario(TestScenario &&) noexcept = default;
+    TestScenario &operator=(TestScenario &&) noexcept = default;
+
+    [[nodiscard]] ScenarioType type() noexcept override { return ScenarioType::baseline; }
+    [[nodiscard]] std::string name() override { return "Test"; }
+    [[nodiscard]] SyncChannel &channel() override { return channel_; }
     void clear() noexcept override {}
-    double apply([[maybe_unused]] Random &generator, [[maybe_unused]] Person &entity,
-                 [[maybe_unused]] int time,
-                 [[maybe_unused]] const core::Identifier &risk_factor_key, double value) override {
+    [[nodiscard]] double apply([[maybe_unused]] Random &generator, [[maybe_unused]] Person &entity,
+                               [[maybe_unused]] int time,
+                               [[maybe_unused]] const core::Identifier &risk_factor_key,
+                               double value) override {
         return value;
     }
 
   private:
-    SyncChannel channel_;
+    SyncChannel channel_{};
 };
 
 std::shared_ptr<ModelInput> create_test_modelinput() {
@@ -432,16 +443,29 @@ TEST(TestHealthGPS_Population, RegionProbabilities) {
     using namespace hgps;
 
     // Create mock objects needed for RuntimeContext
-    class TestEventAggregator : public EventAggregator {
+    class TestEventAggregator final : public EventAggregator {
       public:
+        TestEventAggregator() = default;
+        ~TestEventAggregator() override = default;
+
+        // Prevent copying
+        TestEventAggregator(const TestEventAggregator &) = delete;
+        TestEventAggregator &operator=(const TestEventAggregator &) = delete;
+
+        // Allow moving
+        TestEventAggregator(TestEventAggregator &&) noexcept = default;
+        TestEventAggregator &operator=(TestEventAggregator &&) noexcept = default;
+
         void publish(std::unique_ptr<EventMessage> /*message*/) override {}
         void publish_async(std::unique_ptr<EventMessage> /*message*/) override {}
-        std::unique_ptr<EventSubscriber>
+        [[nodiscard]] std::unique_ptr<EventSubscriber>
         subscribe(EventType /*event_id*/,
                   std::function<void(std::shared_ptr<EventMessage>)> /*handler*/) override {
             return nullptr;
         }
-        bool unsubscribe(const EventSubscriber & /*subscriber*/) override { return true; }
+        [[nodiscard]] bool unsubscribe(const EventSubscriber & /*subscriber*/) noexcept override {
+            return true;
+        }
     };
 
     auto bus = std::make_shared<TestEventAggregator>();
@@ -469,16 +493,29 @@ TEST(TestHealthGPS_Population, EthnicityProbabilities) {
     using namespace hgps;
 
     // Create mock objects needed for RuntimeContext
-    class TestEventAggregator : public EventAggregator {
+    class TestEventAggregator final : public EventAggregator {
       public:
+        TestEventAggregator() = default;
+        ~TestEventAggregator() override = default;
+
+        // Prevent copying
+        TestEventAggregator(const TestEventAggregator &) = delete;
+        TestEventAggregator &operator=(const TestEventAggregator &) = delete;
+
+        // Allow moving
+        TestEventAggregator(TestEventAggregator &&) noexcept = default;
+        TestEventAggregator &operator=(TestEventAggregator &&) noexcept = default;
+
         void publish(std::unique_ptr<EventMessage> /*message*/) override {}
         void publish_async(std::unique_ptr<EventMessage> /*message*/) override {}
-        std::unique_ptr<EventSubscriber>
+        [[nodiscard]] std::unique_ptr<EventSubscriber>
         subscribe(EventType /*event_id*/,
                   std::function<void(std::shared_ptr<EventMessage>)> /*handler*/) override {
             return nullptr;
         }
-        bool unsubscribe(const EventSubscriber & /*subscriber*/) override { return true; }
+        [[nodiscard]] bool unsubscribe(const EventSubscriber & /*subscriber*/) noexcept override {
+            return true;
+        }
     };
 
     auto bus = std::make_shared<TestEventAggregator>();
