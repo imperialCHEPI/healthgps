@@ -76,17 +76,17 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
 
     bool is_null(std::size_t index) const noexcept override {
         if (index >= size())
-        if (index >= size()) {
-            return true;
-}
+            if (index >= size()) {
+                return true;
+            }
         return !null_bitmap_.empty() && !null_bitmap_[index];
     }
 
     bool is_valid(std::size_t index) const noexcept override {
         if (index >= size())
-        if (index >= size()) {
-            return false;
-}
+            if (index >= size()) {
+                return false;
+            }
         return null_bitmap_.empty() || null_bitmap_[index];
     }
 
