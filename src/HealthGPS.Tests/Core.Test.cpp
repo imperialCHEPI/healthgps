@@ -326,21 +326,21 @@ TEST(TestCore, SplitDelimitedString) {
 // These tests verify the basic operations of numeric data table columns
 TEST(TestCore, FloatDataTableColumnOperations) {
     using namespace hgps::core;
-    
+
     FloatDataTableColumn column("test_float", std::vector<float>{}, std::vector<bool>{});
     ASSERT_EQ("float", column.type());
 }
 
 TEST(TestCore, DoubleDataTableColumnOperations) {
     using namespace hgps::core;
-    
+
     DoubleDataTableColumn column("test_double", std::vector<double>{}, std::vector<bool>{});
     ASSERT_EQ("double", column.type());
 }
 
 TEST(TestCore, IntegerDataTableColumnOperations) {
     using namespace hgps::core;
-    
+
     IntegerDataTableColumn column("test_int", std::vector<int>{}, std::vector<bool>{});
     ASSERT_EQ("integer", column.type());
 }
@@ -349,27 +349,27 @@ TEST(TestCore, IntegerDataTableColumnOperations) {
 // Verifies primitive data table column operations including iterators and value access
 TEST(TestCore, PrimitiveDataTableColumnOperations) {
     using namespace hgps::core;
-    
+
     std::vector<int> data{42};
     std::vector<bool> validity{true};
     IntegerDataTableColumn column("test_primitive", data, validity);
-    
+
     // Test basic operations
     ASSERT_EQ(1, column.size());
     ASSERT_EQ(42, column.value_unsafe(0));
     ASSERT_TRUE(column.is_valid(0));
     ASSERT_FALSE(column.is_null(0));
-    
+
     // Test value_safe
     auto value = column.value_safe(0);
     ASSERT_TRUE(value.has_value());
     ASSERT_EQ(42, *value);
-    
+
     // Test iterator operations
     const std::vector<int> iter_data{1, 2, 3};
     const std::vector<bool> iter_validity{true, true, true};
     IntegerDataTableColumn iter_column("test_iter", iter_data, iter_validity);
-    
+
     auto it = iter_column.begin();
     ASSERT_EQ(1, *it);
     ++it;
@@ -384,34 +384,35 @@ TEST(TestCore, PrimitiveDataTableColumnOperations) {
 // Comprehensive tests for DataTable class operations including column management
 TEST(TestCore, DataTableComprehensiveOperations) {
     using namespace hgps::core;
-    
+
     DataTable table;
-    
+
     // Test construction and basic operations
     ASSERT_EQ(0, table.num_rows());
     ASSERT_EQ(0, table.num_columns());
-    
+
     // Add columns
-    table.add(std::make_unique<IntegerDataTableColumn>("id", std::vector<int>{}, std::vector<bool>{}));
-    table.add(std::make_unique<DoubleDataTableColumn>("value", std::vector<double>{}, std::vector<bool>{}));
-    
+    table.add(
+        std::make_unique<IntegerDataTableColumn>("id", std::vector<int>{}, std::vector<bool>{}));
+    table.add(std::make_unique<DoubleDataTableColumn>("value", std::vector<double>{},
+                                                      std::vector<bool>{}));
+
     ASSERT_EQ(0, table.num_rows());
     ASSERT_EQ(2, table.num_columns());
-    
+
     // Test column access
-    const auto& id_col = table.column("id");
-    const auto& value_col = table.column("value");
-    
+    const auto &id_col = table.column("id");
+    const auto &value_col = table.column("value");
+
     ASSERT_EQ("id", id_col.name());
     ASSERT_EQ("value", value_col.name());
-    
+
     // Test column existence
     ASSERT_NO_THROW(table.column("id"));
     ASSERT_THROW(table.column("nonexistent"), std::out_of_range);
-    
+
     // Test duplicate column
-    ASSERT_THROW(
-        table.add(std::make_unique<IntegerDataTableColumn>("id", std::vector<int>{}, std::vector<bool>{})), 
-        std::invalid_argument
-    );
+    ASSERT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("id", std::vector<int>{},
+                                                                    std::vector<bool>{})),
+                 std::invalid_argument);
 }
