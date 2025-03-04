@@ -4,16 +4,17 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 // Eigen warnings
-#pragma warning(disable: 26495) // Variable 'xxx' is uninitialized (from Eigen SIMD optimizations)
+#pragma warning(disable : 26495) // Variable 'xxx' is uninitialized (from Eigen SIMD optimizations)
 
 // fmt library warnings
-#pragma warning(disable: 26498) // Variable 'xxx' is constexpr, mark variable constexpr (from fmt)
+#pragma warning(disable : 26498) // Variable 'xxx' is constexpr, mark variable constexpr (from fmt)
 
 // lexer warnings
-#pragma warning(disable: 26819) // Unannotated fallthrough between switch labels (from lexer)
+#pragma warning(disable : 26819) // Unannotated fallthrough between switch labels (from lexer)
 
 // Low-level bitwise operations
-#pragma warning(disable: 6285)  // Non-zero constant in bitwise-and operation (from core bit manipulation)
+#pragma warning(                                                                                   \
+    disable : 6285) // Non-zero constant in bitwise-and operation (from core bit manipulation)
 #endif
 
 #include "kevin_hall_model.h"
@@ -67,8 +68,7 @@ KevinHallModel::KevinHallModel(
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
       height_stddev_{height_stddev}, height_slope_{height_slope},
       region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
-      income_models_{std::move(income_models)},
-      income_continuous_stddev_{income_continuous_stddev},
+      income_models_{std::move(income_models)}, income_continuous_stddev_{income_continuous_stddev},
       physical_activity_stddev_{0.5} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
