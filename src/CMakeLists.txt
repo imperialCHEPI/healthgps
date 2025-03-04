@@ -26,7 +26,11 @@ target_include_directories(HealthGPS.Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(HealthGPS.Input PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Add binary dir for version.h
+target_include_directories(HealthGPS.Core PUBLIC ${CMAKE_BINARY_DIR}/src/HealthGPS)
+
 # External include directory
+target_include_directories(HealthGPS.Core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external)
 target_include_directories(HealthGPS PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 # Set the start-up project for the "play" button in MSVC
