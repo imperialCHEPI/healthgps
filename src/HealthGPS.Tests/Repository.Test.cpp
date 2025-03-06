@@ -1,9 +1,17 @@
-#include "HealthGPS/repository.h"
-#include "HealthGPS.Core/datastore.h"
+#ifdef _MSC_VER
+#pragma warning(disable : 26439) // This kind of function should not throw. Declare it 'noexcept'
+#pragma warning(disable : 26495) // Variable is uninitialized
+#pragma warning(disable : 26498) // The function is constexpr, mark variable constexpr if compile-time evaluation is desired
+#pragma warning(disable : 26819) // Unannotated fallthrough between switch labels
+#pragma warning(disable : 6285) // (<non-zero constant> || <non-zero constant>) is always a non-zero constant
+#endif
+
 #include "data_config.h"
-#include "mock_repository.h"
 #include "pch.h"
 #include <gtest/gtest.h>
+#include "HealthGPS/repository.h"
+#include "HealthGPS.Core/datastore.h"
+#include "mock_repository.h"
 
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Input/api.h"
@@ -13,7 +21,11 @@
 using namespace hgps;
 using namespace hgps::testing;
 
-// The fixture for testing class Foo.
+//Created- Mahima
+// To check that the repository can be created, 
+// disease information is not cached initially, 
+// and that disease information retrieval is case-insensitive.
+// The fixture for testing class Repository.cpp
 class RepositoryTest : public ::testing::Test {
   protected:
     RepositoryTest() : manager_{test_datastore_path}, repository{manager_} {}
