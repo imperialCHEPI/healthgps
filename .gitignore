@@ -424,3 +424,5 @@ compile_commands.json
 .venv
 results/
 vtune_results/
+.vscode/
+vcpkg/
