@@ -4,7 +4,7 @@
 #include "HealthGPS/dummy_model.h"
 #include "HealthGPS/repository.h"
 
-//Created- Mahima
+// Created- Mahima
 namespace hgps {
 namespace testing {
 
@@ -109,7 +109,7 @@ class MockRepository final : public Repository {
         static std::vector<core::DiseaseInfo> diseases;
         return diseases;
     }
-    
+
     std::optional<core::DiseaseInfo> get_disease_info(core::Identifier /*code*/) override {
         return std::nullopt;
     }
