@@ -13,11 +13,10 @@ namespace hgps {
 /// @brief Defines the gender column lookup table data type
 /// @tparam ROW The rows value type
 /// @tparam TYPE The cell value type
-template <core::Numerical ROW, core::Numerical TYPE>
-class GenderTable {
+template <core::Numerical ROW, core::Numerical TYPE> class GenderTable {
   public:
     /// @brief Initialises a new instance of the GenderTable class
-    GenderTable() = default; 
+    GenderTable() = default;
 
     /// @brief Initialises a new instance of the GenderTable class
     /// @param rows The monotonic rows lookup breakpoints
@@ -97,7 +96,9 @@ class GenderTable {
     /// @brief Determines whether the lookup contains a row
     /// @param row The row breakpoint value
     /// @return true, if the lookup contains the row; otherwise, false
-    bool contains(const ROW row) const noexcept { return rows_index_.find(row) != rows_index_.end(); }
+    bool contains(const ROW row) const noexcept {
+        return rows_index_.find(row) != rows_index_.end();
+    }
 
     /// @brief Determines whether the lookup contains a value
     /// @param row The row breakpoint value
@@ -119,8 +120,7 @@ class GenderTable {
 
 /// @brief Defines the age and gender lookup table data type
 /// @tparam TYPE The cell value type
-template <core::Numerical TYPE>
-class AgeGenderTable : public GenderTable<int, TYPE> {
+template <core::Numerical TYPE> class AgeGenderTable : public GenderTable<int, TYPE> {
   public:
     /// @brief Initialises a new instance of the AgeGenderTable class
     AgeGenderTable() = default;

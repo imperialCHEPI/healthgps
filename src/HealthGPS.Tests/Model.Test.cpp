@@ -1,16 +1,16 @@
 #include "HealthGPS.Core/api.h"
 #include "HealthGPS.Core/datatable.h"
 #include "HealthGPS.Input/model_parser.h"
+#include "HealthGPS/dummy_model.h"
 #include "HealthGPS/kevin_hall_model.h"
 #include "HealthGPS/person.h"
 #include "HealthGPS/population.h"
 #include "HealthGPS/runtime_context.h"
 #include "HealthGPS/static_linear_model.h"
-#include "HealthGPS/dummy_model.h"
 #include "pch.h"
 
 // Include test helper files
-#include "Population.Test.cpp"  // Contains TestEventAggregator and TestScenario definitions
+#include "Population.Test.cpp" // Contains TestEventAggregator and TestScenario definitions
 
 #include <map>
 #include <memory>
@@ -18,8 +18,8 @@
 
 using namespace hgps;
 
-//Tests for KevinHall model implementation- Mahima 
-// This tests the basic properties, initialisation, and operations of the KevinHall model
+// Tests for KevinHall model implementation- Mahima
+//  This tests the basic properties, initialisation, and operations of the KevinHall model
 class TestKevinHallModel : public ::testing::Test {
   protected:
     void SetUp() override {
@@ -27,10 +27,10 @@ class TestKevinHallModel : public ::testing::Test {
         auto bus = std::make_shared<TestEventAggregator>();
         auto inputs = create_test_modelinput();
         auto scenario = std::make_unique<TestScenario>();
-        
+
         // Create context with proper initialization
         context = std::make_shared<RuntimeContext>(bus, inputs, std::move(scenario));
-        
+
         // Create person with proper initialization
         person = std::make_shared<Person>(core::Gender::male);
         person->age = 25;
@@ -46,13 +46,13 @@ class TestKevinHallModel : public ::testing::Test {
             std::vector<double> values = {1.0};
             std::vector<double> policy = {0.0};
             std::vector<int> policy_start = {2020};
-            auto model_def = DummyModelDefinition(RiskFactorModelType::Static, 
-                std::move(names), std::move(values), std::move(policy), std::move(policy_start));
+            auto model_def =
+                DummyModelDefinition(RiskFactorModelType::Static, std::move(names),
+                                     std::move(values), std::move(policy), std::move(policy_start));
 
             // Create Kevin Hall model with the test definition
             model = std::make_unique<KevinHallModel>(model_def);
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             FAIL() << "Failed to initialize KevinHallModel: " << e.what();
         }
     }
@@ -153,7 +153,7 @@ TEST_F(TestKevinHallModel, BasicOperations) {
     ASSERT_NE(nullptr, model);
     ASSERT_NE(nullptr, person);
     ASSERT_NE(nullptr, context);
-    
+
     // Test that the person has the expected initial values
     ASSERT_EQ(core::Gender::male, person->gender);
     ASSERT_EQ(25, person->age);
@@ -175,10 +175,10 @@ class TestStaticLinearModel : public ::testing::Test {
         auto bus = std::make_shared<TestEventAggregator>();
         auto inputs = create_test_modelinput();
         auto scenario = std::make_unique<TestScenario>();
-        
+
         // Create context with proper initialization
         context = RuntimeContext(bus, inputs, std::move(scenario));
-        
+
         // Setup test person with proper initialization
         person = Person(core::Gender::male);
         person.age = 30;
@@ -204,8 +204,10 @@ class TestStaticLinearModel : public ::testing::Test {
 
             auto region_models =
                 std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
-            (*region_models)[core::Region::England] = LinearModelParams{0.0, {{"age", 0.1}, {"gender", 0.2}}};
-            (*region_models)[core::Region::Wales] = LinearModelParams{0.1, {{"age", 0.15}, {"gender", 0.25}}};
+            (*region_models)[core::Region::England] =
+                LinearModelParams{0.0, {{"age", 0.1}, {"gender", 0.2}}};
+            (*region_models)[core::Region::Wales] =
+                LinearModelParams{0.1, {{"age", 0.15}, {"gender", 0.25}}};
 
             auto ethnicity_models =
                 std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
@@ -220,26 +222,25 @@ class TestStaticLinearModel : public ::testing::Test {
                      0.0, {{"age", 0.1}, {"gender", 0.2}, {"region", 0.3}, {"ethnicity", 0.4}}}},
                 {core::Income::high,
                  LinearModelParams{
-                     0.1, {{"age", 0.15}, {"gender", 0.25}, {"region", 0.35}, {"ethnicity", 0.45}}}}};
+                     0.1,
+                     {{"age", 0.15}, {"gender", 0.25}, {"region", 0.35}, {"ethnicity", 0.45}}}}};
 
-            auto model_def = DummyModelDefinition(RiskFactorModelType::Static, 
-                std::move(test_names), std::move(test_values), std::move(test_policy), std::move(test_policy_start));
+            auto model_def = DummyModelDefinition(
+                RiskFactorModelType::Static, std::move(test_names), std::move(test_values),
+                std::move(test_policy), std::move(test_policy_start));
 
             model = std::unique_ptr<StaticLinearModel>(
-                dynamic_cast<StaticLinearModel*>(model_def.create_model().release()));
-            
+                dynamic_cast<StaticLinearModel *>(model_def.create_model().release()));
+
             if (!model) {
                 throw std::runtime_error("Failed to create StaticLinearModel");
             }
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             FAIL() << "Failed to initialize StaticLinearModel: " << e.what();
         }
     }
 
-    void TearDown() override {
-        model.reset();
-    }
+    void TearDown() override { model.reset(); }
 
     RuntimeContext context;
     Person person;
@@ -306,7 +307,7 @@ TEST(TestStaticLinearModel, IncomeCategoryOperations) {
     auto inputs = create_test_modelinput();
     auto scenario = std::make_unique<TestScenario>();
     auto context = RuntimeContext(bus, inputs, std::move(scenario));
-    
+
     // Add test persons with different incomes
     for (int i = 0; i < 10; i++) {
         Person person;
@@ -319,12 +320,13 @@ TEST(TestStaticLinearModel, IncomeCategoryOperations) {
     std::vector<double> test_values = {1.0};
     std::vector<double> test_policy = {0.0};
     std::vector<int> test_policy_start = {2020};
-    
-    auto model_def = DummyModelDefinition(RiskFactorModelType::Static, 
-        std::move(test_names), std::move(test_values), std::move(test_policy), std::move(test_policy_start));
+
+    auto model_def = DummyModelDefinition(RiskFactorModelType::Static, std::move(test_names),
+                                          std::move(test_values), std::move(test_policy),
+                                          std::move(test_policy_start));
 
     auto model_ptr = model_def.create_model();
-    auto* static_model = dynamic_cast<StaticLinearModel*>(model_ptr.get());
+    auto *static_model = dynamic_cast<StaticLinearModel *>(model_ptr.get());
     if (!static_model) {
         FAIL() << "Failed to create StaticLinearModel";
     }
@@ -336,7 +338,7 @@ TEST(TestStaticLinearModel, IncomeCategoryOperations) {
 
 TEST_F(TestStaticLinearModel, BasicOperations) {
     ASSERT_NE(nullptr, model);
-    
+
     // Test that the person has the expected initial values
     ASSERT_EQ(core::Gender::male, person.gender);
     ASSERT_EQ(30, person.age);

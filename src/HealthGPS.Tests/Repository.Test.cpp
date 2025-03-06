@@ -1,9 +1,9 @@
-#include "data_config.h"
-#include "pch.h"
-#include <gtest/gtest.h>
 #include "HealthGPS/repository.h"
 #include "HealthGPS.Core/datastore.h"
+#include "data_config.h"
 #include "mock_repository.h"
+#include "pch.h"
+#include <gtest/gtest.h>
 
 #include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Input/api.h"
