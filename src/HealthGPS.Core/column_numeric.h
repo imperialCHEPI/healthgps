@@ -43,11 +43,34 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
 /// @brief DataTable column for storing integer data type
 class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
   public:
-    using PrimitiveDataTableColumn<int>::PrimitiveDataTableColumn;
+    IntegerDataTableColumn(const std::string &name, const std::vector<int> &data,
+                          const std::vector<bool> &validity = {})
+        : PrimitiveDataTableColumn<int>(name, data, validity) {
+        // Validate column name
+        if (name.empty()) {
+            throw std::invalid_argument("Column name cannot be empty");
+        }
+        if (std::all_of(name.begin(), name.end(), ::isspace)) {
+            throw std::invalid_argument("Column name cannot be whitespace-only");
+        }
+        if (std::any_of(name.begin(), name.end(), [](char c) {
+                return c == ' ' || c == '-' || c == '@' || c == '#' || c == '$' || c == '%' || c == '^' || c == '&' || c == '*';
+            })) {
+            throw std::invalid_argument("Column name cannot contain spaces or special characters");
+        }
+    }
 
     std::string type() const noexcept override { return "integer"; }
 
   protected:
     DataTableColumn *clone_impl() const override { return new IntegerDataTableColumn(*this); }
 };
+
+inline bool is_valid_column_name(const std::string& name) {
+    if (name.empty()) return false;
+    if (std::all_of(name.begin(), name.end(), ::isspace)) return false;
+    return !std::any_of(name.begin(), name.end(), [](char c) {
+        return c == ' ' || c == '-' || c == '@' || c == '#' || c == '$' || c == '%' || c == '^' || c == '&' || c == '*';
+    });
+}
 } // namespace hgps::core
