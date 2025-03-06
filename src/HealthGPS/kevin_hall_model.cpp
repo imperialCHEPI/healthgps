@@ -901,34 +901,35 @@ void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &perso
 // gender, region, ethnicity and income
 void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                   Random &random) const {
-        // Calculate base expected PA value for age and gender
-        double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
-                                       std::nullopt, false);
+    // Calculate base expected PA value for age and gender
+    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
+                                   std::nullopt, false);
 
-        // Apply modifiers based on region
-        const auto &region_params = region_models_->at(person.region);
-        double region_effect = region_params.coefficients.at("PhysicalActivity"_id);
-        expected *= (1.0 + region_effect);
+    // Apply modifiers based on region
+    const auto &region_params = region_models_->at(person.region);
+    double region_effect = region_params.coefficients.at("PhysicalActivity"_id);
+    expected *= (1.0 + region_effect);
 
-        // Apply modifiers based on ethnicity
-        const auto &ethnicity_params = ethnicity_models_->at(person.ethnicity);
-        double ethnicity_effect = ethnicity_params.coefficients.at("PhysicalActivity"_id);
-        expected *= (1.0 + ethnicity_effect);
+    // Apply modifiers based on ethnicity
+    const auto &ethnicity_params = ethnicity_models_->at(person.ethnicity);
+    double ethnicity_effect = ethnicity_params.coefficients.at("PhysicalActivity"_id);
+    expected *= (1.0 + ethnicity_effect);
 
-        // Apply modifiers based on continuous income - using all income models
-       // Adjusts physical activity based on the income effect using the coefficient for PhysicalActivityfrom config.json
-        double income_effect = 0.0;
-        for (const auto &[income_level, model] : income_models_) {
-            income_effect += model.coefficients.at("PhysicalActivity") * person.income_continuous;
-        }
-        expected *= (1.0 + income_effect);
-
-        // Add random variation using normal distribution
-        double rand = random.next_normal(0.0, physical_activity_stddev_);
-
-        // Set the physical activity value
-        person.risk_factors["PhysicalActivity"_id] = expected * (1.0 + rand);
+    // Apply modifiers based on continuous income - using all income models
+    // Adjusts physical activity based on the income effect using the coefficient for
+    // PhysicalActivityfrom config.json
+    double income_effect = 0.0;
+    for (const auto &[income_level, model] : income_models_) {
+        income_effect += model.coefficients.at("PhysicalActivity") * person.income_continuous;
     }
+    expected *= (1.0 + income_effect);
+
+    // Add random variation using normal distribution
+    double rand = random.next_normal(0.0, physical_activity_stddev_);
+
+    // Set the physical activity value
+    person.risk_factors["PhysicalActivity"_id] = expected * (1.0 + rand);
+}
 
 // Modified: Mahima 25/02/2025
 // Income is initialised using the softmax of the income probabilities based on age, gender, region,
@@ -943,17 +944,18 @@ void KevinHallModel::initialise_income_continuous(Person &person, Random &random
 
     // Add gender - apply coefficient to binary gender value using one model
     double gender_value = (person.gender == core::Gender::male) ? 1.0 : 0.0;
-    income_base += income_models_.begin()->second.coefficients.at("Gender") * gender_value; 
+    income_base += income_models_.begin()->second.coefficients.at("Gender") * gender_value;
 
     // Add region - apply coefficient to region value
-   // Convert the person's region to a value using person.region_to_value()
-   // Add the product of the region coefficient for "Income" and the region value to income_base
+    // Convert the person's region to a value using person.region_to_value()
+    // Add the product of the region coefficient for "Income" and the region value to income_base
     double region_value = person.region_to_value();
     income_base += region_models_->at(person.region).coefficients.at("Income") * region_value;
 
     // Add ethnicity - apply coefficient to ethnicity value
-    //Convert the person's ethnicity to a value using person.ethnicity_to_value().
-    // Add the product of the ethnicity coefficient for "Income" and the ethnicity value to income_base.
+    // Convert the person's ethnicity to a value using person.ethnicity_to_value().
+    // Add the product of the ethnicity coefficient for "Income" and the ethnicity value to
+    // income_base.
     double ethnicity_value = person.ethnicity_to_value();
     income_base +=
         ethnicity_models_->at(person.ethnicity).coefficients.at("Income") * ethnicity_value;
@@ -976,7 +978,7 @@ void KevinHallModel::update_income_continuous(Person &person, Random &random) co
 // This is done at the start and then every 5 years
 void KevinHallModel::initialise_income_category(Person &person,
                                                 const Population &population) const {
-    std::vector<double> sorted_incomes; //sorting for each person not ideal FIXXXXXX!!!
+    std::vector<double> sorted_incomes; // sorting for each person not ideal FIXXXXXX!!!
     sorted_incomes.reserve(population.size());
 
     for (const auto &p : population) {

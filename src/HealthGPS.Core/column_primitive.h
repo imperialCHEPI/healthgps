@@ -66,7 +66,7 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
 
     /// @brief Protected virtual clone implementation
     /// @return A pointer to the cloned object
-    virtual DataTableColumn* clone_impl() const = 0;
+    virtual DataTableColumn *clone_impl() const = 0;
 
     virtual std::string type() const noexcept override = 0;
 

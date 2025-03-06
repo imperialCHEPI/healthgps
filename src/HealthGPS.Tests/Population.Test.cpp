@@ -4,7 +4,8 @@
 #pragma warning(disable : 26819) // Unannotated fallthrough between switch labels
 #pragma warning(disable : 26498) // The function is constexpr, mark variable constexpr if
                                  // compile-time evaluation is desired
-#pragma warning(disable : 6285) // (<non-zero constant> || <non-zero constant>) is always a non-zero constant
+#pragma warning(                                                                                   \
+    disable : 6285) // (<non-zero constant> || <non-zero constant>) is always a non-zero constant
 #endif
 
 #include "pch.h"
@@ -12,31 +13,31 @@
 #include <memory>
 #include <numeric>
 
+#include "HealthGPS.Core/array2d.h"
 #include "HealthGPS.Core/column.h"
 #include "HealthGPS.Core/column_numeric.h"
 #include "HealthGPS.Core/datatable.h"
-#include "HealthGPS.Core/interval.h"
 #include "HealthGPS.Core/forward_type.h"
-#include "HealthGPS.Core/array2d.h"
+#include "HealthGPS.Core/interval.h"
 #include "HealthGPS.Input/datamanager.h"
 #include "HealthGPS.Input/model_parser.h"
-#include "HealthGPS/gender_table.h"
+#include "HealthGPS/analysis_module.h"
 #include "HealthGPS/api.h"
+#include "HealthGPS/demographic.h"
+#include "HealthGPS/disease.h"
 #include "HealthGPS/event_aggregator.h"
+#include "HealthGPS/gender_table.h"
+#include "HealthGPS/lms_model.h"
 #include "HealthGPS/modelinput.h"
 #include "HealthGPS/monotonic_vector.h"
 #include "HealthGPS/person.h"
+#include "HealthGPS/riskfactor.h"
 #include "HealthGPS/runtime_context.h"
 #include "HealthGPS/scenario.h"
+#include "HealthGPS/ses_noise_module.h"
 #include "HealthGPS/static_linear_model.h"
 #include "HealthGPS/two_step_value.h"
 #include "HealthGPS/univariate_visitor.h"
-#include "HealthGPS/ses_noise_module.h"
-#include "HealthGPS/demographic.h"
-#include "HealthGPS/riskfactor.h"
-#include "HealthGPS/disease.h"
-#include "HealthGPS/analysis_module.h"
-#include "HealthGPS/lms_model.h"
 #include "data_config.h"
 #include "mock_repository.h"
 
@@ -443,19 +444,19 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
 
     // Add region column and probabilities
     std::vector<std::string> region_data{"England", "Wales", "Scotland", "NorthernIreland"};
-    auto region_col = std::make_unique<core::StringDataTableColumn>(
-        "region", std::move(region_data));
+    auto region_col =
+        std::make_unique<core::StringDataTableColumn>("region", std::move(region_data));
     data.add(std::move(region_col));
 
     std::vector<double> region_prob_data{0.5, 0.2, 0.2, 0.1};
-    auto region_prob_col = std::make_unique<core::DoubleDataTableColumn>(
-        "region_prob", std::move(region_prob_data));
+    auto region_prob_col =
+        std::make_unique<core::DoubleDataTableColumn>("region_prob", std::move(region_prob_data));
     data.add(std::move(region_prob_col));
 
     // Add ethnicity column and probabilities
     std::vector<std::string> ethnicity_data{"White", "Asian", "Black", "Others"};
-    auto ethnicity_col = std::make_unique<core::StringDataTableColumn>(
-        "ethnicity", std::move(ethnicity_data));
+    auto ethnicity_col =
+        std::make_unique<core::StringDataTableColumn>("ethnicity", std::move(ethnicity_data));
     data.add(std::move(ethnicity_col));
 
     std::vector<double> ethnicity_prob_data{0.5, 0.25, 0.15, 0.1};
@@ -485,15 +486,16 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
 
     // Create model input with the initialized data table
     core::IntegerInterval age_range{0, 100};
-    auto country = core::Country{826, std::string("United Kingdom"), std::string("GB"), std::string("GBR")};
+    auto country =
+        core::Country{826, std::string("United Kingdom"), std::string("GB"), std::string("GBR")};
     Settings settings(country, 1.0f, age_range);
     RunInfo run_info{};
     run_info.start_time = 2018;
     run_info.stop_time = 2025;
-    run_info.sync_timeout_ms = 1000;  // Default 1 second timeout
+    run_info.sync_timeout_ms = 1000; // Default 1 second timeout
     run_info.seed = std::nullopt;
     run_info.verbosity = core::VerboseMode::none;
-    run_info.comorbidities = 2;  // Default value for max comorbidities
+    run_info.comorbidities = 2; // Default value for max comorbidities
     SESDefinition ses_info{};
     ses_info.fuction_name = "linear";
     ses_info.parameters = {1.0};
@@ -508,29 +510,30 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
 }
 
 // Overloaded version that accepts a DataManager parameter
-static std::shared_ptr<ModelInput> create_test_modelinput(const input::DataManager& /*manager*/) {
+static std::shared_ptr<ModelInput> create_test_modelinput(const input::DataManager & /*manager*/) {
     // This version simply calls the original implementation
     // We could use the manager if needed in a more complex implementation
     return create_test_modelinput();
 }
 
 // Helper function to create a population with the provided modules
-Population create_population(std::shared_ptr<ModelInput> input, 
-                         const std::map<SimulationModuleType, std::shared_ptr<SimulationModule>>& modules) {
+Population create_population(
+    std::shared_ptr<ModelInput> input,
+    const std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> &modules) {
     // Initialize the runtime context
     auto bus = std::make_shared<TestEventAggregator>();
     auto scenario = std::make_unique<TestScenario>();
     RuntimeContext context(bus, input, std::move(scenario));
-    
+
     // Reset population with size 1 and set the current time to 60
     context.reset_population(1);
     context.set_current_time(60);
-    
+
     // Initialize the population with each module
-    for (const auto& [type, module] : modules) {
+    for (const auto &[type, module] : modules) {
         module->initialise_population(context);
     }
-    
+
     // Return a copy of the population from the context
     return context.population();
 }
@@ -780,36 +783,37 @@ TEST(TestSimulation, BasicSetup) {
 
     // Create mock modules
     auto ses_module = std::make_shared<SESNoiseModule>();
-    
+
     // Create mock demographic module with minimal required parameters
     std::map<int, std::map<int, PopulationRecord>> pop_data;
     pop_data[2020].emplace(0, PopulationRecord(0, 1000.0f, 1000.0f));
-    
+
     std::map<int, Birth> births;
     births.emplace(2020, Birth(200.0f, 105.0f));
-    
+
     std::map<int, std::map<int, Mortality>> deaths;
     deaths[2020][0] = Mortality(0.01f, 0.01f);
     auto life_table = std::make_shared<LifeTable>(std::move(births), std::move(deaths));
-    auto demographic_module = std::make_shared<DemographicModule>(std::move(pop_data), std::move(*life_table));
-    
+    auto demographic_module =
+        std::make_shared<DemographicModule>(std::move(pop_data), std::move(*life_table));
+
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> risk_models;
     auto risk_module = std::make_shared<RiskFactorModule>(std::move(risk_models));
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> disease_models;
     auto disease_module = std::make_shared<DiseaseModule>(std::move(disease_models));
-    
+
     // Create mock analysis module with minimal required parameters
     // Create life expectancy table with proper initialization
     auto age_range = core::IntegerInterval(0, 100);
     auto life_expectancy = hgps::create_integer_gender_table<float>(age_range);
     life_expectancy(0, core::Gender::male) = 80.0f;
     life_expectancy(0, core::Gender::female) = 85.0f;
-    
+
     // Create observed YLD table with proper initialization
     auto observed_yld = hgps::create_age_gender_table<double>(age_range);
     observed_yld(0, core::Gender::male) = 0.05;
     observed_yld(0, core::Gender::female) = 0.05;
-    
+
     std::map<core::Identifier, float> disability_weights;
     disability_weights[core::Identifier("test")] = 0.1f;
 
@@ -820,100 +824,97 @@ TEST(TestSimulation, BasicSetup) {
     LmsDefinition lms_def(std::move(lms_dataset));
 
     // Create analysis definition
-    auto analysis_def = AnalysisDefinition(
-        std::move(life_expectancy),
-        std::move(observed_yld),
-        std::move(disability_weights)
-    );
+    auto analysis_def = AnalysisDefinition(std::move(life_expectancy), std::move(observed_yld),
+                                           std::move(disability_weights));
 
     // Create LMS model and weight classifier
     LmsModel lms_model(lms_def);
     WeightModel weight_classifier(std::move(lms_model));
 
     // Create and return analysis module
-    auto analysis_module = std::make_shared<AnalysisModule>(
-        std::move(analysis_def),
-        std::move(weight_classifier),
-        age_range,
-        2  // Max comorbidities
+    auto analysis_module = std::make_shared<AnalysisModule>(std::move(analysis_def),
+                                                            std::move(weight_classifier), age_range,
+                                                            2 // Max comorbidities
     );
 
     // Create mock factory
     class MockFactory : public SimulationModuleFactory {
-    public:
+      public:
         explicit MockFactory(Repository &repo) : SimulationModuleFactory(repo) {
-            register_builder(SimulationModuleType::SES, [](Repository &, const ModelInput &) -> ModuleType {
-                return std::make_shared<SESNoiseModule>();
-            });
-            register_builder(SimulationModuleType::Demographic, [](Repository &, const ModelInput &) -> ModuleType {
-                // Create mock demographic module with minimal required parameters
-                std::map<int, std::map<int, PopulationRecord>> pop_data;
-                pop_data[2020].emplace(0, PopulationRecord(0, 1000.0f, 1000.0f));
-                
-                // Create life table with birth and death data
-                std::map<int, Birth> births;
-                births.emplace(2020, Birth(200.0f, 105.0f));
-                
-                std::map<int, std::map<int, Mortality>> deaths;
-                deaths[2020][0] = Mortality(0.01f, 0.01f);
-                
-                // Create and return demographic module
-                return std::make_shared<DemographicModule>(
-                    std::move(pop_data),  // Population data
-                    LifeTable(std::move(births), std::move(deaths))  // Life table
-                );
-            });
-            register_builder(SimulationModuleType::RiskFactor, [](Repository &, const ModelInput &) -> ModuleType {
-                std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> risk_models;
-                return std::make_shared<RiskFactorModule>(std::move(risk_models));
-            });
-            register_builder(SimulationModuleType::Disease, [](Repository &, const ModelInput &) -> ModuleType {
-                std::map<core::Identifier, std::shared_ptr<DiseaseModel>> disease_models;
-                return std::make_shared<DiseaseModule>(std::move(disease_models));
-            });
-            register_builder(SimulationModuleType::Analysis, [](Repository &, const ModelInput &) -> ModuleType {
-                // Create analysis module components
-                auto age_range = core::IntegerInterval(0, 100);
-                
-                // Create life expectancy table
-                auto life_expectancy = hgps::create_integer_gender_table<float>(age_range);
-                life_expectancy(0, core::Gender::male) = 80.0f;
-                life_expectancy(0, core::Gender::female) = 85.0f;
-                
-                // Create observed YLD table
-                auto observed_yld = hgps::create_age_gender_table<double>(age_range);
-                observed_yld(0, core::Gender::male) = 0.05;
-                observed_yld(0, core::Gender::female) = 0.05;
-                
-                // Create disability weights
-                std::map<core::Identifier, float> disability_weights;
-                disability_weights[core::Identifier("test")] = 0.1f;
-                
-                // Create analysis definition
-                auto analysis_def = AnalysisDefinition(
-                    std::move(life_expectancy),
-                    std::move(observed_yld),
-                    std::move(disability_weights)
-                );
-                
-                // Create LMS dataset and model
-                LmsDataset lms_dataset;
-                lms_dataset[18][core::Gender::male] = LmsRecord{1.0, 22.0, 3.0};
-                lms_dataset[18][core::Gender::female] = LmsRecord{1.0, 21.0, 3.0};
-                
-                // Create LMS definition and model
-                LmsDefinition lms_def(std::move(lms_dataset));
-                LmsModel lms_model(lms_def);
-                WeightModel weight_classifier(std::move(lms_model));
-                
-                // Create and return analysis module
-                return std::make_shared<AnalysisModule>(
-                    std::move(analysis_def),
-                    std::move(weight_classifier),
-                    age_range,
-                    2  // Max comorbidities
-                );
-            });
+            register_builder(SimulationModuleType::SES,
+                             [](Repository &, const ModelInput &) -> ModuleType {
+                                 return std::make_shared<SESNoiseModule>();
+                             });
+            register_builder(SimulationModuleType::Demographic,
+                             [](Repository &, const ModelInput &) -> ModuleType {
+                                 // Create mock demographic module with minimal required parameters
+                                 std::map<int, std::map<int, PopulationRecord>> pop_data;
+                                 pop_data[2020].emplace(0, PopulationRecord(0, 1000.0f, 1000.0f));
+
+                                 // Create life table with birth and death data
+                                 std::map<int, Birth> births;
+                                 births.emplace(2020, Birth(200.0f, 105.0f));
+
+                                 std::map<int, std::map<int, Mortality>> deaths;
+                                 deaths[2020][0] = Mortality(0.01f, 0.01f);
+
+                                 // Create and return demographic module
+                                 return std::make_shared<DemographicModule>(
+                                     std::move(pop_data), // Population data
+                                     LifeTable(std::move(births), std::move(deaths)) // Life table
+                                 );
+                             });
+            register_builder(
+                SimulationModuleType::RiskFactor,
+                [](Repository &, const ModelInput &) -> ModuleType {
+                    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> risk_models;
+                    return std::make_shared<RiskFactorModule>(std::move(risk_models));
+                });
+            register_builder(
+                SimulationModuleType::Disease, [](Repository &, const ModelInput &) -> ModuleType {
+                    std::map<core::Identifier, std::shared_ptr<DiseaseModel>> disease_models;
+                    return std::make_shared<DiseaseModule>(std::move(disease_models));
+                });
+            register_builder(
+                SimulationModuleType::Analysis, [](Repository &, const ModelInput &) -> ModuleType {
+                    // Create analysis module components
+                    auto age_range = core::IntegerInterval(0, 100);
+
+                    // Create life expectancy table
+                    auto life_expectancy = hgps::create_integer_gender_table<float>(age_range);
+                    life_expectancy(0, core::Gender::male) = 80.0f;
+                    life_expectancy(0, core::Gender::female) = 85.0f;
+
+                    // Create observed YLD table
+                    auto observed_yld = hgps::create_age_gender_table<double>(age_range);
+                    observed_yld(0, core::Gender::male) = 0.05;
+                    observed_yld(0, core::Gender::female) = 0.05;
+
+                    // Create disability weights
+                    std::map<core::Identifier, float> disability_weights;
+                    disability_weights[core::Identifier("test")] = 0.1f;
+
+                    // Create analysis definition
+                    auto analysis_def =
+                        AnalysisDefinition(std::move(life_expectancy), std::move(observed_yld),
+                                           std::move(disability_weights));
+
+                    // Create LMS dataset and model
+                    LmsDataset lms_dataset;
+                    lms_dataset[18][core::Gender::male] = LmsRecord{1.0, 22.0, 3.0};
+                    lms_dataset[18][core::Gender::female] = LmsRecord{1.0, 21.0, 3.0};
+
+                    // Create LMS definition and model
+                    LmsDefinition lms_def(std::move(lms_dataset));
+                    LmsModel lms_model(lms_def);
+                    WeightModel weight_classifier(std::move(lms_model));
+
+                    // Create and return analysis module
+                    return std::make_shared<AnalysisModule>(std::move(analysis_def),
+                                                            std::move(weight_classifier), age_range,
+                                                            2 // Max comorbidities
+                    );
+                });
         }
     };
 

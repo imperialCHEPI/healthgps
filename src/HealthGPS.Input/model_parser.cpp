@@ -678,7 +678,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         ethnicity_models.try_emplace(ethnicity, std::move(params));
     }
 
-    // Income models for different income classifications- Mahima 
+    // Income models for different income classifications- Mahima
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 

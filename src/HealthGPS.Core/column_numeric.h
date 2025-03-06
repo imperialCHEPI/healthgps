@@ -15,9 +15,7 @@ class StringDataTableColumn final : public PrimitiveDataTableColumn<std::string>
     std::string type() const noexcept override { return "string"; }
 
   protected:
-    DataTableColumn* clone_impl() const override {
-        return new StringDataTableColumn(*this);
-    }
+    DataTableColumn *clone_impl() const override { return new StringDataTableColumn(*this); }
 };
 
 /// @brief DataTable column for storing float data type
@@ -28,9 +26,7 @@ class FloatDataTableColumn final : public PrimitiveDataTableColumn<float> {
     std::string type() const noexcept override { return "float"; }
 
   protected:
-    DataTableColumn* clone_impl() const override {
-        return new FloatDataTableColumn(*this);
-    }
+    DataTableColumn *clone_impl() const override { return new FloatDataTableColumn(*this); }
 };
 
 /// @brief DataTable column for storing double data type
@@ -41,9 +37,7 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
     std::string type() const noexcept override { return "double"; }
 
   protected:
-    DataTableColumn* clone_impl() const override {
-        return new DoubleDataTableColumn(*this);
-    }
+    DataTableColumn *clone_impl() const override { return new DoubleDataTableColumn(*this); }
 };
 
 /// @brief DataTable column for storing integer data type
@@ -54,8 +48,6 @@ class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
     std::string type() const noexcept override { return "integer"; }
 
   protected:
-    DataTableColumn* clone_impl() const override {
-        return new IntegerDataTableColumn(*this);
-    }
+    DataTableColumn *clone_impl() const override { return new IntegerDataTableColumn(*this); }
 };
 } // namespace hgps::core
