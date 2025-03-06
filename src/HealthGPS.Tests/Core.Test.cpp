@@ -121,7 +121,7 @@ TEST(TestCore, CreateTableColumnFailWithShortName) {
 TEST(TestCore, CreateTableColumnFailWithInvalidName) {
     using namespace hgps::core;
 
-    ASSERT_THROW(IntegerDataTableColumn("5nteger", {15, 0, 20}, {true, false, true}),
+    ASSERT_THROW(IntegerDataTableColumn("Integer", {15, 0, 20}, {true, false, true}),
                  std::invalid_argument);
 }
 

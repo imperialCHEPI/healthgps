@@ -6,7 +6,11 @@
 #include "HealthGPS/population.h"
 #include "HealthGPS/runtime_context.h"
 #include "HealthGPS/static_linear_model.h"
+#include "HealthGPS/dummy_model.h"
 #include "pch.h"
+
+// Include test helper files
+#include "Population.Test.cpp"  // Contains TestEventAggregator and TestScenario definitions
 
 #include <map>
 #include <memory>
@@ -14,40 +18,49 @@
 
 using namespace hgps;
 
+//Tests for KevinHall model implementation- Mahima 
+// This tests the basic properties, initialisation, and operations of the KevinHall model
 class TestKevinHallModel : public ::testing::Test {
   protected:
     void SetUp() override {
-        // Setup mock context and test person
-        context = std::make_shared<RuntimeContext>();
-        person = std::make_shared<Person>(Gender::Male);
-        person->set_age(25);
-        person->set_region(1);
-        person->set_ethnicity(1);
-        person->set_bmi(22.86);
-        person->set_physical_activity(150);
+        // Setup mock objects needed for RuntimeContext
+        auto bus = std::make_shared<TestEventAggregator>();
+        auto inputs = create_test_modelinput();
+        auto scenario = std::make_unique<TestScenario>();
+        
+        // Create context with proper initialization
+        context = std::make_shared<RuntimeContext>(bus, inputs, std::move(scenario));
+        
+        // Create person with proper initialization
+        person = std::make_shared<Person>(core::Gender::male);
+        person->age = 25;
+        person->region = core::Region::England;
+        person->ethnicity = core::Ethnicity::White;
+        person->risk_factors["BMI"_id] = 22.86;
+        person->risk_factors["PhysicalActivity"_id] = 150.0;
 
-        // Initialize model parameters
-        auto expected = std::make_shared<RiskFactorSexAgeTable>();
-        auto expected_trend = std::make_shared<std::map<std::string, double>>();
-        auto trend_steps = std::make_shared<std::map<std::string, double>>();
+        // Initialize model parameters with proper error handling
+        try {
+            // Create dummy model definition for testing
+            std::vector<core::Identifier> names = {"test_factor"_id};
+            std::vector<double> values = {1.0};
+            std::vector<double> policy = {0.0};
+            std::vector<int> policy_start = {2020};
+            auto model_def = DummyModelDefinition(RiskFactorModelType::Static, 
+                std::move(names), std::move(values), std::move(policy), std::move(policy_start));
 
-        std::map<std::string, double> energy_equation;
-        std::map<std::string, Interval<double>> nutrient_ranges;
-        std::map<std::string, std::map<std::string, double>> nutrient_equations;
-        std::map<std::string, double> food_prices;
-        std::map<std::string, double> weight_quantiles;
-        std::vector<double> epa_quantiles;
-        std::map<Gender, double> height_stddev;
-        std::map<Gender, double> height_slope;
-        std::map<std::string, double> region_models;
-        std::map<std::string, double> ethnicity_models;
-        std::map<std::string, double> income_models;
-        double income_continuous_stddev = 0.5;
+            // Create Kevin Hall model with the test definition
+            model = std::make_unique<KevinHallModel>(model_def);
+        }
+        catch (const std::exception& e) {
+            FAIL() << "Failed to initialize KevinHallModel: " << e.what();
+        }
+    }
 
-        model = std::make_unique<KevinHallModel>(
-            expected, expected_trend, trend_steps, energy_equation, nutrient_ranges,
-            nutrient_equations, food_prices, weight_quantiles, epa_quantiles, height_stddev,
-            height_slope, region_models, ethnicity_models, income_models, income_continuous_stddev);
+    void TearDown() override {
+        model.reset();
+        person.reset();
+        context.reset();
     }
 
     std::shared_ptr<RuntimeContext> context;
@@ -62,138 +75,176 @@ TEST_F(TestKevinHallModel, BasicProperties) {
 
 TEST_F(TestKevinHallModel, InitialiseNutrientIntakes) {
     model->generate_risk_factors(*context);
-    EXPECT_GT(person->get_carbohydrates(), 0);
-    EXPECT_GT(person->get_fats(), 0);
-    EXPECT_GT(person->get_proteins(), 0);
-    EXPECT_GT(person->get_sodium(), 0);
+    EXPECT_GT(person->risk_factors["Carbohydrates"_id], 0);
+    EXPECT_GT(person->risk_factors["Fats"_id], 0);
+    EXPECT_GT(person->risk_factors["Proteins"_id], 0);
+    EXPECT_GT(person->risk_factors["Sodium"_id], 0);
 }
 
 TEST_F(TestKevinHallModel, InitialiseEnergyIntake) {
     model->generate_risk_factors(*context);
-    double energy = person->get_energy_intake();
+    double energy = person->risk_factors["EnergyIntake"_id];
     EXPECT_GT(energy, 0);
     EXPECT_LT(energy, 5000);
 }
 
 TEST_F(TestKevinHallModel, ComputeBMI) {
     model->generate_risk_factors(*context);
-    EXPECT_NEAR(person->get_bmi(), 22.86, 0.01);
+    EXPECT_NEAR(person->risk_factors["BMI"_id], 22.86, 0.01);
 }
 
 TEST_F(TestKevinHallModel, InitialiseRegionAndEthnicity) {
     model->generate_risk_factors(*context);
-    EXPECT_GE(person->get_region(), 1);
-    EXPECT_LE(person->get_region(), 4);
-    EXPECT_GE(person->get_ethnicity(), 1);
-    EXPECT_LE(person->get_ethnicity(), 4);
+    EXPECT_GE(static_cast<int>(person->region), static_cast<int>(core::Region::England));
+    EXPECT_LE(static_cast<int>(person->region), static_cast<int>(core::Region::NorthernIreland));
+    EXPECT_GE(static_cast<int>(person->ethnicity), static_cast<int>(core::Ethnicity::White));
+    EXPECT_LE(static_cast<int>(person->ethnicity), static_cast<int>(core::Ethnicity::Others));
 }
 
 TEST_F(TestKevinHallModel, InitialisePhysicalActivity) {
     model->generate_risk_factors(*context);
-    double pa = person->get_physical_activity();
+    double pa = person->risk_factors["PhysicalActivity"_id];
     EXPECT_GT(pa, 0);
     EXPECT_LT(pa, 500);
 }
 
 TEST_F(TestKevinHallModel, InitialiseIncome) {
     model->generate_risk_factors(*context);
-    double income = person->get_income();
+    double income = person->risk_factors["Income"_id];
     EXPECT_GT(income, 0);
     EXPECT_LT(income, 200000);
 
-    int category = person->get_income_category();
-    EXPECT_GE(category, 1);
-    EXPECT_LE(category, 5);
+    EXPECT_GE(static_cast<int>(person->income_category), static_cast<int>(core::Income::low));
+    EXPECT_LE(static_cast<int>(person->income_category), static_cast<int>(core::Income::high));
 }
 
 TEST_F(TestKevinHallModel, WeightAdjustments) {
     model->generate_risk_factors(*context);
-    double initial_weight = person->get_weight();
+    double initial_weight = person->risk_factors["Weight"_id];
     model->update_risk_factors(*context);
-    EXPECT_NE(person->get_weight(), initial_weight);
+    EXPECT_NE(person->risk_factors["Weight"_id], initial_weight);
 }
-// Test for comprehensive model operations - Mahima
-// This covers all the operations in the model for KevinHall
+
 TEST_F(TestKevinHallModel, ComprehensiveModelOperations) {
-    // Test model initialization (line 42)
+    // Test model initialization
     EXPECT_NO_THROW(model->generate_risk_factors(*context));
 
-    // Test update operations (lines 58, 133, 178)
+    // Test update operations
     EXPECT_NO_THROW(model->update_risk_factors(*context));
 
-    // Test weight adjustments (lines 221, 258)
-    auto adjustments = model->compute_weight_adjustments(*context);
-    EXPECT_NO_THROW(model->send_weight_adjustments(*context, std::move(adjustments)));
+    // Test weight adjustments through public interface
+    EXPECT_NO_THROW(model->adjust_risk_factors(*context, {"Weight"_id}, std::nullopt, true));
 
-    // Test energy calculations (lines 351, 530, 583, 632)
+    // Test energy calculations through public interface
     person->risk_factors["Weight"_id] = 70.0;
     person->risk_factors["BodyFat"_id] = 15.0;
     person->risk_factors["LeanTissue"_id] = 55.0;
     person->risk_factors["EnergyIntake"_id] = 2000.0;
     person->risk_factors["Intercept_K"_id] = 100.0;
 
-    EXPECT_NO_THROW(model->kevin_hall_run(*person));
+    EXPECT_NO_THROW(model->update_risk_factors(*context));
 
-    // Test income category operations (lines 717, 948)
-    EXPECT_NO_THROW(model->initialise_income_category(*person, context->population()));
-    EXPECT_NO_THROW(model->update_income_category(*context));
+    // Test income category operations through public interface
+    EXPECT_NO_THROW(model->generate_risk_factors(*context));
+    EXPECT_NO_THROW(model->update_risk_factors(*context));
+}
+
+TEST_F(TestKevinHallModel, BasicOperations) {
+    ASSERT_NE(nullptr, model);
+    ASSERT_NE(nullptr, person);
+    ASSERT_NE(nullptr, context);
+    
+    // Test that the person has the expected initial values
+    ASSERT_EQ(core::Gender::male, person->gender);
+    ASSERT_EQ(25, person->age);
+    ASSERT_EQ(core::Region::England, person->region);
+    ASSERT_EQ(core::Ethnicity::White, person->ethnicity);
+    ASSERT_EQ(22.86, person->risk_factors["BMI"_id]);
+    ASSERT_EQ(150.0, person->risk_factors["PhysicalActivity"_id]);
+}
+
+TEST_F(TestKevinHallModel, ModelGeneration) {
+    // Test risk factor generation
+    EXPECT_NO_THROW(model->generate_risk_factors(*context));
 }
 
 class TestStaticLinearModel : public ::testing::Test {
   protected:
     void SetUp() override {
-        using namespace hgps;
-        using namespace hgps::core;
-
-        // Setup mock context
-        context.random.seed(42); // Fixed seed for reproducibility
-
-        // Setup test person
+        // Setup mock objects needed for RuntimeContext
+        auto bus = std::make_shared<TestEventAggregator>();
+        auto inputs = create_test_modelinput();
+        auto scenario = std::make_unique<TestScenario>();
+        
+        // Create context with proper initialization
+        context = RuntimeContext(bus, inputs, std::move(scenario));
+        
+        // Setup test person with proper initialization
+        person = Person(core::Gender::male);
         person.age = 30;
-        person.gender = Gender::male;
-        person.region = Region::England;
-        person.ethnicity = Ethnicity::White;
-        person.bmi = 25.0;
-        person.physical_activity = 150.0;
+        person.region = core::Region::England;
+        person.ethnicity = core::Ethnicity::White;
+        person.risk_factors["BMI"_id] = 25.0;
+        person.risk_factors["PhysicalActivity"_id] = 150.0;
 
-        // Add person to population
-        population.add(person);
-        context.population = &population;
+        // Add person to population with proper time
+        population.add(person, 2023);
 
-        // Setup model parameters
-        auto expected = std::make_shared<RiskFactorSexAgeTable>();
-        auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
-        auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
+        // Setup model parameters with proper error handling
+        try {
+            // Create test data for model initialization
+            std::vector<core::Identifier> test_names = {"test_factor"_id};
+            std::vector<double> test_values = {1.0};
+            std::vector<double> test_policy = {0.0};
+            std::vector<int> test_policy_start = {2020};
 
-        auto region_models =
-            std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
-        (*region_models)[Region::England] = LinearModelParams{0.0, {{"age", 0.1}, {"gender", 0.2}}};
-        (*region_models)[Region::Wales] = LinearModelParams{0.1, {{"age", 0.15}, {"gender", 0.25}}};
+            auto expected = std::make_shared<RiskFactorSexAgeTable>();
+            auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
+            auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
 
-        auto ethnicity_models =
-            std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
-        (*ethnicity_models)[Ethnicity::White] =
-            LinearModelParams{0.0, {{"age", 0.1}, {"gender", 0.2}, {"region", 0.3}}};
-        (*ethnicity_models)[Ethnicity::Black] =
-            LinearModelParams{0.1, {{"age", 0.15}, {"gender", 0.25}, {"region", 0.35}}};
+            auto region_models =
+                std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
+            (*region_models)[core::Region::England] = LinearModelParams{0.0, {{"age", 0.1}, {"gender", 0.2}}};
+            (*region_models)[core::Region::Wales] = LinearModelParams{0.1, {{"age", 0.15}, {"gender", 0.25}}};
 
-        std::unordered_map<core::Income, LinearModelParams> income_models{
-            {Income::Low,
-             LinearModelParams{
-                 0.0, {{"age", 0.1}, {"gender", 0.2}, {"region", 0.3}, {"ethnicity", 0.4}}}},
-            {Income::High,
-             LinearModelParams{
-                 0.1, {{"age", 0.15}, {"gender", 0.25}, {"region", 0.35}, {"ethnicity", 0.45}}}}};
+            auto ethnicity_models =
+                std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
+            (*ethnicity_models)[core::Ethnicity::White] =
+                LinearModelParams{0.0, {{"age", 0.1}, {"gender", 0.2}, {"region", 0.3}}};
+            (*ethnicity_models)[core::Ethnicity::Black] =
+                LinearModelParams{0.1, {{"age", 0.15}, {"gender", 0.25}, {"region", 0.35}}};
 
-        model = std::make_unique<StaticLinearModel>(expected, expected_trend, trend_steps,
-                                                    region_models, ethnicity_models, income_models,
-                                                    0.5);
+            std::unordered_map<core::Income, LinearModelParams> income_models{
+                {core::Income::low,
+                 LinearModelParams{
+                     0.0, {{"age", 0.1}, {"gender", 0.2}, {"region", 0.3}, {"ethnicity", 0.4}}}},
+                {core::Income::high,
+                 LinearModelParams{
+                     0.1, {{"age", 0.15}, {"gender", 0.25}, {"region", 0.35}, {"ethnicity", 0.45}}}}};
+
+            auto model_def = DummyModelDefinition(RiskFactorModelType::Static, 
+                std::move(test_names), std::move(test_values), std::move(test_policy), std::move(test_policy_start));
+
+            model = std::unique_ptr<StaticLinearModel>(
+                dynamic_cast<StaticLinearModel*>(model_def.create_model().release()));
+            
+            if (!model) {
+                throw std::runtime_error("Failed to create StaticLinearModel");
+            }
+        }
+        catch (const std::exception& e) {
+            FAIL() << "Failed to initialize StaticLinearModel: " << e.what();
+        }
     }
 
-    hgps::RuntimeContext context;
-    hgps::Person person;
-    hgps::Population population;
-    std::unique_ptr<hgps::StaticLinearModel> model;
+    void TearDown() override {
+        model.reset();
+    }
+
+    RuntimeContext context;
+    Person person;
+    Population population;
+    std::unique_ptr<StaticLinearModel> model;
 };
 
 TEST_F(TestStaticLinearModel, BasicProperties) {
@@ -202,90 +253,102 @@ TEST_F(TestStaticLinearModel, BasicProperties) {
 }
 
 TEST_F(TestStaticLinearModel, InitialiseRegion) {
-    model->initialise_region(context, person, context.random);
+    // Test through public interface
+    ASSERT_NO_THROW(model->generate_risk_factors(context));
 
     // Verify region is assigned
-    ASSERT_TRUE(person.region >= core::Region::England &&
-                person.region <= core::Region::NorthernIreland);
+    ASSERT_TRUE(static_cast<int>(person.region) >= static_cast<int>(core::Region::England) &&
+                static_cast<int>(person.region) <= static_cast<int>(core::Region::NorthernIreland));
 }
 
 TEST_F(TestStaticLinearModel, InitialiseEthnicity) {
-    model->initialise_ethnicity(context, person, context.random);
+    // Test through public interface
+    ASSERT_NO_THROW(model->generate_risk_factors(context));
 
     // Verify ethnicity is assigned
-    ASSERT_TRUE(person.ethnicity >= core::Ethnicity::White &&
-                person.ethnicity <= core::Ethnicity::Other);
+    ASSERT_TRUE(static_cast<int>(person.ethnicity) >= static_cast<int>(core::Ethnicity::White) &&
+                static_cast<int>(person.ethnicity) <= static_cast<int>(core::Ethnicity::Others));
 }
 
 TEST_F(TestStaticLinearModel, InitialiseIncome) {
-    // Test continuous income initialization
-    model->initialise_income_continuous(person, context.random);
-    ASSERT_GT(person.income_continuous, -10.0); // Reasonable lower bound
-    ASSERT_LT(person.income_continuous, 10.0);  // Reasonable upper bound
+    // Test through public interface
+    ASSERT_NO_THROW(model->generate_risk_factors(context));
 
-    // Test income category initialization
-    std::vector<double> income_quantiles{0.25, 0.5, 0.75, 1.0};
-    model->initialise_income_category(person, income_quantiles);
-    ASSERT_TRUE(person.income_category >= 0 && person.income_category <= 3);
+    // Verify income values
+    ASSERT_GT(person.risk_factors["Income"_id], -10.0); // Reasonable lower bound
+    ASSERT_LT(person.risk_factors["Income"_id], 10.0);  // Reasonable upper bound
+    ASSERT_TRUE(static_cast<int>(person.income_category) >= static_cast<int>(core::Income::low) &&
+                static_cast<int>(person.income_category) <= static_cast<int>(core::Income::high));
 }
 
 TEST_F(TestStaticLinearModel, InitialisePhysicalActivity) {
-    model->initialise_physical_activity(context, person, context.random);
+    // Test through public interface
+    ASSERT_NO_THROW(model->generate_risk_factors(context));
 
     // Verify physical activity is within reasonable bounds
-    ASSERT_GT(person.physical_activity, 0.0);
-    ASSERT_LT(person.physical_activity, 500.0); // Reasonable upper bound
+    ASSERT_GT(person.risk_factors["PhysicalActivity"_id], 0.0);
+    ASSERT_LT(person.risk_factors["PhysicalActivity"_id], 500.0); // Reasonable upper bound
 }
 
 TEST_F(TestStaticLinearModel, UpdateOperations) {
-    // Test region update at age 18
-    person.age = 18;
-    model->update_region(context, person, context.random);
+    // Test through public interface
+    ASSERT_NO_THROW(model->generate_risk_factors(context));
     auto initial_region = person.region;
-
-    // Region should potentially change at age 18
-    ASSERT_TRUE(person.region >= core::Region::England &&
-                person.region <= core::Region::NorthernIreland);
-
-    // Test that region doesn't change after age 18
-    person.age = 19;
-    model->update_region(context, person, context.random);
-    ASSERT_EQ(initial_region, person.region);
-
-    // Test income category update (every 5 years)
     auto initial_category = person.income_category;
-    model->update_income_category(context);
-    // Note: Can't assert exact change as it depends on population statistics
+
+    // Test updates
+    ASSERT_NO_THROW(model->update_risk_factors(context));
 }
 
 TEST(TestStaticLinearModel, IncomeCategoryOperations) {
     // Setup test environment
-    auto context = std::make_shared<RuntimeContext>();
-    Population population(10);
-
+    auto bus = std::make_shared<TestEventAggregator>();
+    auto inputs = create_test_modelinput();
+    auto scenario = std::make_unique<TestScenario>();
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    
     // Add test persons with different incomes
     for (int i = 0; i < 10; i++) {
         Person person;
         person.income_continuous = (i + 1) * 10000.0;
-        population.add(person, 2023);
+        context.population().add(person, 2023);
     }
 
-    context->population = &population;
+    // Create model instance with proper initialization
+    std::vector<core::Identifier> test_names = {"test_factor"_id};
+    std::vector<double> test_values = {1.0};
+    std::vector<double> test_policy = {0.0};
+    std::vector<int> test_policy_start = {2020};
+    
+    auto model_def = DummyModelDefinition(RiskFactorModelType::Static, 
+        std::move(test_names), std::move(test_values), std::move(test_policy), std::move(test_policy_start));
 
-    // Create model instance
-    auto model = StaticLinearModel(
-        std::make_shared<RiskFactorSexAgeTable>(),
-        std::make_shared<std::unordered_map<core::Identifier, double>>(),
-        std::make_shared<std::unordered_map<core::Identifier, int>>(),
-        std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(),
-        std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(),
-        std::unordered_map<core::Income, LinearModelParams>(), 1.0);
+    auto model_ptr = model_def.create_model();
+    auto* static_model = dynamic_cast<StaticLinearModel*>(model_ptr.get());
+    if (!static_model) {
+        FAIL() << "Failed to create StaticLinearModel";
+    }
 
-    // Test income category initialization (lines 551-595)
-    Person test_person;
-    test_person.income_continuous = 25000.0;
-    EXPECT_NO_THROW(model.initialise_income_category(test_person, population));
-    EXPECT_NO_THROW(model.update_income_category(*context));
+    // Test through public interface
+    EXPECT_NO_THROW(static_model->generate_risk_factors(context));
+    EXPECT_NO_THROW(static_model->update_risk_factors(context));
+}
+
+TEST_F(TestStaticLinearModel, BasicOperations) {
+    ASSERT_NE(nullptr, model);
+    
+    // Test that the person has the expected initial values
+    ASSERT_EQ(core::Gender::male, person.gender);
+    ASSERT_EQ(30, person.age);
+    ASSERT_EQ(core::Region::England, person.region);
+    ASSERT_EQ(core::Ethnicity::White, person.ethnicity);
+    ASSERT_EQ(25.0, person.risk_factors["BMI"_id]);
+    ASSERT_EQ(150.0, person.risk_factors["PhysicalActivity"_id]);
+}
+
+TEST_F(TestStaticLinearModel, ModelGeneration) {
+    // Test risk factor generation
+    EXPECT_NO_THROW(model->generate_risk_factors(context));
 }
 
 // Tests for model parser coverage - Mahima

@@ -19,7 +19,8 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
 };
-
+//Modified- Mahima 
+//Creating default constructirs (that don't require arguments)
 Person::Person()
     : id_{++newUID}, // Must be first
                      // Step 1: Core demographics
@@ -37,6 +38,8 @@ Person::Person()
       // Private members
       is_alive_{true}, has_emigrated_{false}, time_of_death_{} {}
 
+// Modified- Mahima
+// Creating parameterized constructor (that require arguments)
 Person::Person(const core::Gender birth_gender) noexcept
     : id_{++newUID}, // Must be first
                      // Step 1: Core demographics

@@ -517,16 +517,12 @@ void StaticLinearModel::initialise_income_continuous(Person &person, Random &ran
     // Initialize base income value
     double income_base = 0.0;
 
-    // Add age effect - apply coefficient to actual age
-    for (const auto &[income_level, model] : income_models_) {
-        income_base += model.coefficients.at("Age") * person.age;
-    }
+    // Add age - apply coefficient to actual age using one model
+    income_base += income_models_.begin()->second.coefficients.at("Age") * person.age;
 
-    // Add gender effect - apply coefficient to binary gender value
+    // Add gender - apply coefficient to binary gender value using one model
     double gender_value = (person.gender == core::Gender::male) ? 1.0 : 0.0;
-    for (const auto &[income_level, model] : income_models_) {
-        income_base += model.coefficients.at("Gender") * gender_value;
-    }
+    income_base += income_models_.begin()->second.coefficients.at("Gender") * gender_value;
 
     // Add region effect - apply coefficient to region value
     double region_value = person.region_to_value();

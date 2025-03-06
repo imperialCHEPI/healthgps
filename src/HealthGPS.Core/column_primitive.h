@@ -60,13 +60,15 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
     /// @brief Creates a deep copy of this column
     /// @return A unique pointer to the new column copy
     std::unique_ptr<DataTableColumn> clone() const override {
-        if (null_bitmap_.empty()) {
-            return std::make_unique<PrimitiveDataTableColumn<TYPE>>(name_, data_);
-        }
-        return std::make_unique<PrimitiveDataTableColumn<TYPE>>(name_, data_, null_bitmap_);
+        // Create a copy of this object using its actual type
+        return std::unique_ptr<DataTableColumn>(this->clone_impl());
     }
 
-    std::string type() const noexcept override { return typeid(TYPE).name(); }
+    /// @brief Protected virtual clone implementation
+    /// @return A pointer to the cloned object
+    virtual DataTableColumn* clone_impl() const = 0;
+
+    virtual std::string type() const noexcept override = 0;
 
     std::string name() const noexcept override { return name_; }
 
