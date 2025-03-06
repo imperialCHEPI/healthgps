@@ -439,7 +439,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(ethnicity_models));
 }
 
-// Added to handle region parsing since income was made quartile, and region was added
+// Added to handle region parsing since income was made quartile, and region was added- Mahima
 core::Region parse_region(const std::string &value) {
     if (value == "England") {
         return core::Region::England;
@@ -459,7 +459,7 @@ core::Region parse_region(const std::string &value) {
 
     throw core::HgpsException(fmt::format("Unknown region value: {}", value));
 }
-
+// Added to parse ethnicity - Mahima
 core::Ethnicity parse_ethnicity(const std::string &value) {
     if (value == "White") {
         return core::Ethnicity::White;
@@ -648,7 +648,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         {hgps::core::Gender::female, opt["HeightSlope"]["Female"].get<double>()},
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
 
-    // Region models for different region classifications.
+    // Region models for different region classifications- Mahima
     std::unordered_map<core::Region, LinearModelParams> region_models;
     for (const auto &model : opt["RegionModels"]) {
         auto region = parse_region(model["Region"].get<std::string>());
@@ -663,7 +663,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         region_models.try_emplace(region, std::move(params));
     }
 
-    // Ethnicity models for different ethnicity classifications.
+    // Ethnicity models for different ethnicity classifications- Mahima
     std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
     for (const auto &model : opt["EthnicityModels"]) {
         auto ethnicity = parse_ethnicity(model["Ethnicity"].get<std::string>());
@@ -678,7 +678,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         ethnicity_models.try_emplace(ethnicity, std::move(params));
     }
 
-    // Income models for different income classifications.
+    // Income models for different income classifications- Mahima 
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
 
