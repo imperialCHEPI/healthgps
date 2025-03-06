@@ -5,6 +5,15 @@
 #include <numeric>
 #include <sstream>
 
+#ifdef _MSC_VER
+#pragma warning(disable : 26439) // This kind of function should not throw. Declare it 'noexcept'
+#pragma warning(disable : 26495) // Variable is uninitialized
+#pragma warning(disable : 26819) // Unannotated fallthrough between switch labels
+#pragma warning(disable : 26498) // The function is constexpr, mark variable constexpr if
+                                 // compile-time evaluation is desired
+#pragma warning(disable : 6285) // (<non-zero constant> || <non-zero constant>) is always a non-zero constant
+#endif
+
 TEST(TestCore, CreateCountry) {
     using namespace hgps::core;
 
@@ -119,10 +128,18 @@ TEST(TestCore, CreateTableColumnFailWithShortName) {
 }
 
 TEST(TestCore, CreateTableColumnFailWithInvalidName) {
-    using namespace hgps::core;
-
-    ASSERT_THROW(IntegerDataTableColumn("Integer", {15, 0, 20}, {true, false, true}),
-                 std::invalid_argument);
+    try {
+        // This should throw an exception since the name contains invalid characters
+        hgps::core::IntegerDataTableColumn col("invalid name with spaces", {1, 2, 3});
+        FAIL() << "Expected an exception for invalid column name, but none was thrown";
+    }
+    catch (const std::invalid_argument& e) {
+        // Expected exception
+        ASSERT_STREQ("Column name cannot contain spaces or special characters", e.what());
+    }
+    catch (...) {
+        FAIL() << "Expected std::invalid_argument exception, but a different exception was thrown";
+    }
 }
 
 TEST(TestCore, TableColumnIterator) {
