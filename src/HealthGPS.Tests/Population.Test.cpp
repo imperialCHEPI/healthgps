@@ -775,27 +775,28 @@ TEST(TestRuntimeContext, DemographicModels) {
 TEST(TestSimulation, BasicSetup) {
     // Create basic test model input
     auto input = create_test_modelinput();
-
+    
     // Create simulation module map with mock implementations
     auto repo = std::make_shared<MockRepository>();
     ASSERT_NE(nullptr, repo);
-
+    
     // Create modules map
     std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> modules;
-
+    
     // Create basic modules for simulation with proper constructor parameters
     // Population data with valid age range (must be > 0 and < upper bound)
     std::map<int, std::map<int, PopulationRecord>> pop_data;
-    pop_data[2020].emplace(
-        1, PopulationRecord(1, 1000.0f,
-                            1000.0f)); // Use 1 for age to match model input (age_range is {1, 100})
-
+    // Important: Use age 1 to satisfy "range lower must be greater than zero"
+    pop_data[2020].emplace(1, PopulationRecord(1, 1000.0f, 1000.0f));
+    
     std::map<int, Birth> births;
     births.emplace(2020, Birth(200.0f, 105.0f));
-
+    
     std::map<int, std::map<int, Mortality>> deaths;
-    deaths[2020][1] = Mortality(0.01f, 0.01f); // Use 1 for age to match model input
-
+    // Important: Use age 1 to match the age used in pop_data
+    deaths[2020][1] = Mortality(0.01f, 0.01f);
+    
+    // Create life table with matching age range (must have same lower bound as pop_data)
     auto life_table = LifeTable(std::move(births), std::move(deaths));
     auto demographic =
         std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
