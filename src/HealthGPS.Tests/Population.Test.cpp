@@ -784,36 +784,36 @@ TEST(TestSimulation, BasicSetup) {
     // Set up variables explicitly to track their values
     int start_year = 2018;
     int end_year = 2025;
-    
+
     // Create basic test model input
     auto input = create_test_modelinput();
     ASSERT_NE(nullptr, input);
-    ASSERT_EQ(1, input->settings().age_range().lower()); // Verify age range lower is 1
+    ASSERT_EQ(1, input->settings().age_range().lower());   // Verify age range lower is 1
     ASSERT_EQ(100, input->settings().age_range().upper()); // Verify age range upper is 100
-    
+
     // Create simulation module map with mock implementations
     auto repo = std::make_shared<MockRepository>();
     ASSERT_NE(nullptr, repo);
-    
+
     // Create modules map
     std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> modules;
-    
+
     // Create population data with valid age range for all years
     std::map<int, std::map<int, PopulationRecord>> pop_data;
-    
+
     // Create a complete age range from 1 to 100 to match the model input for all years
     for (int year = start_year; year <= end_year; year++) {
         for (int age = 1; age <= 100; age++) {
             pop_data[year].emplace(age, PopulationRecord(age, 1000.0f, 1000.0f));
         }
     }
-    
+
     // Create births data for all years
     std::map<int, Birth> births;
     for (int year = start_year; year <= end_year; year++) {
         births.emplace(year, Birth(200.0f, 105.0f));
     }
-    
+
     // Create mortality data for all ages and all years
     std::map<int, std::map<int, Mortality>> deaths;
     for (int year = start_year; year <= end_year; year++) {
@@ -821,65 +821,66 @@ TEST(TestSimulation, BasicSetup) {
             deaths[year][age] = Mortality(0.01f, 0.01f);
         }
     }
-    
+
     // Initialize runtime context first to verify there's no issue
     auto bus = std::make_shared<TestEventAggregator>();
     auto scenario = std::make_unique<TestScenario>();
     RuntimeContext context(bus, input, std::move(scenario));
     ASSERT_NO_THROW(context.age_range()); // Verify age range can be accessed
-    
+
     // Create life table with complete age range
     auto life_table = LifeTable(std::move(births), std::move(deaths));
-    
+
     // Verify life table time and age limits
     auto time_limits = life_table.time_limits();
     ASSERT_EQ(start_year, time_limits.lower());
     ASSERT_EQ(end_year, time_limits.upper());
-    
+
     auto age_limits = life_table.age_limits();
-    ASSERT_EQ(1, age_limits.lower());  // We start at age 1
+    ASSERT_EQ(1, age_limits.lower());   // We start at age 1
     ASSERT_EQ(100, age_limits.upper()); // We end at age 100
-    
+
     // Create demographic module
-    auto demographic = std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
+    auto demographic =
+        std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
     ASSERT_NE(nullptr, demographic);
-    
+
     // Add to modules map
     modules[SimulationModuleType::Demographic] = demographic;
-    
+
     // Create risk factor models with required types (static and dynamic)
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> risk_models;
-    
+
     // Create a mock static risk factor model
     class MockStaticRiskFactorModel : public RiskFactorModel {
-    public:
+      public:
         RiskFactorModelType type() const noexcept override { return RiskFactorModelType::Static; }
         std::string name() const noexcept override { return "MockStatic"; }
-        void generate_risk_factors(RuntimeContext&) override {}
-        void update_risk_factors(RuntimeContext&) override {}
+        void generate_risk_factors(RuntimeContext &) override {}
+        void update_risk_factors(RuntimeContext &) override {}
     };
-    
+
     // Create a mock dynamic risk factor model
     class MockDynamicRiskFactorModel : public RiskFactorModel {
-    public:
+      public:
         RiskFactorModelType type() const noexcept override { return RiskFactorModelType::Dynamic; }
         std::string name() const noexcept override { return "MockDynamic"; }
-        void generate_risk_factors(RuntimeContext&) override {}
-        void update_risk_factors(RuntimeContext&) override {}
+        void generate_risk_factors(RuntimeContext &) override {}
+        void update_risk_factors(RuntimeContext &) override {}
     };
-    
+
     // Add both required model types
     risk_models[RiskFactorModelType::Static] = std::make_unique<MockStaticRiskFactorModel>();
     risk_models[RiskFactorModelType::Dynamic] = std::make_unique<MockDynamicRiskFactorModel>();
-    
+
     auto riskfactor = std::make_shared<RiskFactorModule>(std::move(risk_models));
     modules[SimulationModuleType::RiskFactor] = riskfactor;
-    
+
     // Create minimal disease module with empty models
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> disease_models;
     auto disease = std::make_shared<DiseaseModule>(std::move(disease_models));
     modules[SimulationModuleType::Disease] = disease;
-    
+
     // Create population and verify it succeeds
     auto population = create_population(input, modules);
     ASSERT_EQ(1, population.size());
