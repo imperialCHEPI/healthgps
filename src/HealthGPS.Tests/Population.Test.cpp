@@ -491,7 +491,7 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     data.load_demographic_coefficients(config);
 
     // Create model input with the initialized data table
-    core::IntegerInterval age_range{0, 100};
+    core::IntegerInterval age_range{1, 100};
     auto country =
         core::Country{826, std::string("United Kingdom"), std::string("GB"), std::string("GBR")};
     Settings settings(country, 1.0f, age_range);
