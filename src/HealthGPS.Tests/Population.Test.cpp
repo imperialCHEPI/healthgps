@@ -786,13 +786,13 @@ TEST(TestSimulation, BasicSetup) {
     // Create basic modules for simulation with proper constructor parameters
     // Population data with valid age range (must be > 0 and < upper bound)
     std::map<int, std::map<int, PopulationRecord>> pop_data;
-    pop_data[2020].emplace(0, PopulationRecord(0, 1000.0f, 1000.0f)); // Use 0 for age to match model input
+    pop_data[2020].emplace(1, PopulationRecord(1, 1000.0f, 1000.0f)); // Use 1 for age to match model input (age_range is {1, 100})
     
     std::map<int, Birth> births;
     births.emplace(2020, Birth(200.0f, 105.0f));
     
     std::map<int, std::map<int, Mortality>> deaths;
-    deaths[2020][0] = Mortality(0.01f, 0.01f); // Use 0 for age to match model input
+    deaths[2020][1] = Mortality(0.01f, 0.01f); // Use 1 for age to match model input
     
     auto life_table = LifeTable(std::move(births), std::move(deaths));
     auto demographic = std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
