@@ -512,9 +512,10 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     HierarchicalMapping risk_mapping{std::move(entries)};
     std::vector<core::DiseaseInfo> diseases;
 
-    return std::make_shared<ModelInput>(std::move(data), std::move(settings), run_info,
-                                        std::move(ses_info), std::move(risk_mapping),
-                                        std::move(diseases));
+    auto model_input = std::make_shared<ModelInput>(std::move(data), std::move(settings),
+                                                   std::move(run_info), std::move(ses_info),
+                                                   std::move(risk_mapping), std::move(diseases));
+    return model_input;
 }
 
 // Helper function to create a population with the provided modules
@@ -774,45 +775,44 @@ TEST(TestRuntimeContext, DemographicModels) {
 TEST(TestSimulation, BasicSetup) {
     // Create basic test model input
     auto input = create_test_modelinput();
-
+    
     // Create simulation module map with mock implementations
     auto repo = std::make_shared<MockRepository>();
     ASSERT_NE(nullptr, repo);
-
+    
     // Create modules map
     std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> modules;
-
+    
     // Create basic modules for simulation with proper constructor parameters
     // Population data with valid age range (must be > 0 and < upper bound)
     std::map<int, std::map<int, PopulationRecord>> pop_data;
-    pop_data[2020].emplace(1, PopulationRecord(1, 1000.0f, 1000.0f)); // Use 1 instead of 0 for age
-
+    pop_data[2020].emplace(0, PopulationRecord(0, 1000.0f, 1000.0f)); // Use 0 for age to match model input
+    
     std::map<int, Birth> births;
     births.emplace(2020, Birth(200.0f, 105.0f));
-
+    
     std::map<int, std::map<int, Mortality>> deaths;
-    deaths[2020][1] = Mortality(0.01f, 0.01f); // Use 1 instead of 0 for age
-
+    deaths[2020][0] = Mortality(0.01f, 0.01f); // Use 0 for age to match model input
+    
     auto life_table = LifeTable(std::move(births), std::move(deaths));
-    auto demographic =
-        std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
+    auto demographic = std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
     modules[SimulationModuleType::Demographic] = demographic;
-
+    
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> risk_models;
     auto riskfactor = std::make_shared<RiskFactorModule>(std::move(risk_models));
     modules[SimulationModuleType::RiskFactor] = riskfactor;
-
+    
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> disease_models;
     auto disease = std::make_shared<DiseaseModule>(std::move(disease_models));
     modules[SimulationModuleType::Disease] = disease;
-
+    
     // Initialize population with modules
     auto population = create_population(input, modules);
     ASSERT_EQ(1, population.size());
-
+    
     // Test simulation setup - verify components can be created
     auto bus = std::make_shared<TestEventAggregator>();
-
+    
     // Since Simulation constructor is problematic, verify components instead
     ASSERT_NE(nullptr, input);
     ASSERT_NE(nullptr, bus);
