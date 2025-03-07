@@ -1,6 +1,6 @@
 #include "HealthGPS.Core/api.h"
-#include "HealthGPS.Core/string_util.h"
 #include "HealthGPS.Core/datatable.h"
+#include "HealthGPS.Core/string_util.h"
 #include "pch.h"
 
 #include <numeric>
@@ -131,23 +131,36 @@ TEST(TestCore, CreateTableColumnFailWithShortName) {
 
 TEST(TestCore, CreateTableColumnFailWithInvalidName) {
     using namespace hgps::core;
-    
+
     DataTable table;
-    
+
     // Test with empty column name
-    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("", std::vector<int>{}, std::vector<bool>{})), std::invalid_argument);
-    
+    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("", std::vector<int>{},
+                                                                    std::vector<bool>{})),
+                 std::invalid_argument);
+
     // Test with whitespace-only column name
-    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("   ", std::vector<int>{}, std::vector<bool>{})), std::invalid_argument);
-    
+    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("   ", std::vector<int>{},
+                                                                    std::vector<bool>{})),
+                 std::invalid_argument);
+
     // Test with column name containing invalid characters
-    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("column name", std::vector<int>{}, std::vector<bool>{})), std::invalid_argument);
-    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("column-name", std::vector<int>{}, std::vector<bool>{})), std::invalid_argument);
-    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("column@name", std::vector<int>{}, std::vector<bool>{})), std::invalid_argument);
-    
+    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>(
+                     "column name", std::vector<int>{}, std::vector<bool>{})),
+                 std::invalid_argument);
+    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>(
+                     "column-name", std::vector<int>{}, std::vector<bool>{})),
+                 std::invalid_argument);
+    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>(
+                     "column@name", std::vector<int>{}, std::vector<bool>{})),
+                 std::invalid_argument);
+
     // Test with duplicate column name
-    table.add(std::make_unique<IntegerDataTableColumn>("valid_column", std::vector<int>{}, std::vector<bool>{}));
-    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>("valid_column", std::vector<int>{}, std::vector<bool>{})), std::invalid_argument);
+    table.add(std::make_unique<IntegerDataTableColumn>("valid_column", std::vector<int>{},
+                                                       std::vector<bool>{}));
+    EXPECT_THROW(table.add(std::make_unique<IntegerDataTableColumn>(
+                     "valid_column", std::vector<int>{}, std::vector<bool>{})),
+                 std::invalid_argument);
 }
 
 TEST(TestCore, TableColumnIterator) {
@@ -444,11 +457,11 @@ TEST(TestCore, DataTableComprehensiveOperations) {
 
 TEST(TestCore, ColumnNameValidation) {
     using namespace hgps::core;
-    
+
     EXPECT_TRUE(is_valid_column_name("valid_name"));
     EXPECT_TRUE(is_valid_column_name("validName"));
     EXPECT_TRUE(is_valid_column_name("valid_name_123"));
-    
+
     EXPECT_FALSE(is_valid_column_name(""));
     EXPECT_FALSE(is_valid_column_name("   "));
     EXPECT_FALSE(is_valid_column_name("invalid name"));
