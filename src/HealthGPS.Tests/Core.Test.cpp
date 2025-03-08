@@ -43,12 +43,12 @@ TEST(TestCore, CreateTableColumnWithNulls) {
     // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_EQ(3, str_col.size());
     ASSERT_EQ(1, str_col.null_count());
-    
+
     // Get the value_safe return and check it
     auto safe_value = str_col.value_safe(1);
     ASSERT_TRUE(safe_value.has_value());
     ASSERT_EQ("Dog", safe_value.value());
-    
+
     // Check that the appropriate row is marked as null
     ASSERT_TRUE(str_col.is_null(2));
     ASSERT_FALSE(str_col.is_valid(2));
@@ -66,12 +66,12 @@ TEST(TestCore, CreateTableColumnWithoutNulls) {
     // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_EQ(3, str_col.size());
     ASSERT_EQ(0, str_col.null_count());
-    
+
     // Get the value_safe return and check it
     auto safe_value = str_col.value_safe(1);
     ASSERT_TRUE(safe_value.has_value());
     ASSERT_EQ("Dog", safe_value.value());
-    
+
     // Check validity flags
     ASSERT_TRUE(str_col.is_valid(0));
     ASSERT_FALSE(str_col.is_null(0));
@@ -147,7 +147,7 @@ TEST(TestCore, TableColumnIterator) {
             }
         }
     }
-    
+
     // Calculate using the iterator - the iterator should only visit valid values
     double loop_sum = 0.0;
     size_t count = 0;
@@ -155,10 +155,10 @@ TEST(TestCore, TableColumnIterator) {
         loop_sum += v;
         count++;
     }
-    
+
     // Verify the count matches the valid data count
     ASSERT_EQ(valid_count, dbl_col.size() - dbl_col.null_count());
-    
+
     // The iterator might not skip nulls but return default values instead - adjust expectations
     if (count == valid_count) {
         // Iterator skips nulls entirely
@@ -215,18 +215,18 @@ TEST(TestCore, CreateDataTable) {
     table.add(int_builder.build());
 
     // Casting to columns type
-    const auto& col = table.column("Integer");
-    const auto* int_col_ptr = dynamic_cast<const IntegerDataTableColumn*>(&col);
+    const auto &col = table.column("Integer");
+    const auto *int_col_ptr = dynamic_cast<const IntegerDataTableColumn *>(&col);
     ASSERT_TRUE(int_col_ptr != nullptr);
-    const auto& int_col = *int_col_ptr;
+    const auto &int_col = *int_col_ptr;
 
     ASSERT_TRUE(col.size() > 1); // Ensure we have at least 2 elements before accessing index 1
-    
+
     // Use proper try/catch for std::any_cast
     int slow_value = 0;
     try {
         slow_value = std::any_cast<int>(col.value(1));
-    } catch (const std::bad_any_cast& e) {
+    } catch (const std::bad_any_cast &e) {
         FAIL() << "Bad any_cast: " << e.what() << ". Type info: " << col.value(1).type().name();
     }
 
