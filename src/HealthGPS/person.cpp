@@ -21,16 +21,15 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
 };
 // Modified- Mahima
 // Creating default constructors (that don't require arguments)
-// Pointed out by Clang-Tidy hence removed 
-Person::Person()
-    : id_{++newUID} {} // Only initialize id_, other members use class defaults
+// Pointed out by Clang-Tidy hence removed
+Person::Person() : id_{++newUID} {} // Only initialize id_, other members use class defaults
 
 // Modified- Mahima
 // Creating parameterized constructor (that require arguments)
 // Removed the default constructor as it was not being used in the code
-// Pointed out by Clang-Tidy 
+// Pointed out by Clang-Tidy
 Person::Person(const core::Gender birth_gender) noexcept
-    : id_{++newUID}, // Must be first
+    : id_{++newUID},          // Must be first
       gender{birth_gender} {} // Only initialize id_ and gender
 
 std::size_t Person::id() const noexcept { return id_; }

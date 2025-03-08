@@ -46,69 +46,68 @@ class TestKevinHallModel : public ::testing::Test {
             auto expected = std::make_shared<RiskFactorSexAgeTable>();
             auto expected_trend = std::make_shared<std::unordered_map<core::Identifier, double>>();
             auto trend_steps = std::make_shared<std::unordered_map<core::Identifier, int>>();
-            
+
             // Energy equation - minimum required parameters
             std::unordered_map<core::Identifier, double> energy_equation{
-                {"Carbohydrate"_id, 4.0},
-                {"Protein"_id, 4.0},
-                {"Fat"_id, 9.0}
-            };
-            
+                {"Carbohydrate"_id, 4.0}, {"Protein"_id, 4.0}, {"Fat"_id, 9.0}};
+
             // Nutrient ranges - minimum required parameters
             std::unordered_map<core::Identifier, core::DoubleInterval> nutrient_ranges;
             nutrient_ranges["Carbohydrate"_id] = core::DoubleInterval(0.0, 500.0);
             nutrient_ranges["Protein"_id] = core::DoubleInterval(0.0, 200.0);
             nutrient_ranges["Fat"_id] = core::DoubleInterval(0.0, 200.0);
-            
+
             // Nutrient equations - minimum required parameters
-            std::unordered_map<core::Identifier, std::map<core::Identifier, double>> nutrient_equations;
+            std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
+                nutrient_equations;
             nutrient_equations["Carbohydrate"_id]["BaseFood"_id] = 1.0;
             nutrient_equations["Protein"_id]["BaseFood"_id] = 1.0;
             nutrient_equations["Fat"_id]["BaseFood"_id] = 1.0;
-            
+
             // Food prices - can be empty
             std::unordered_map<core::Identifier, std::optional<double>> food_prices;
             food_prices["BaseFood"_id] = 1.0;
-            
+
             // Weight quantiles - minimum required parameters
             std::unordered_map<core::Gender, std::vector<double>> weight_quantiles;
             weight_quantiles[core::Gender::male] = {60.0, 70.0, 80.0, 90.0, 100.0};
             weight_quantiles[core::Gender::female] = {50.0, 60.0, 70.0, 80.0, 90.0};
-            
+
             // EPA quantiles - must match weight quantiles size
             std::vector<double> epa_quantiles = {0.2, 0.4, 0.6, 0.8, 1.0};
-            
+
             // Height model parameters
             std::unordered_map<core::Gender, double> height_stddev;
             height_stddev[core::Gender::male] = 0.07;
             height_stddev[core::Gender::female] = 0.06;
-            
+
             std::unordered_map<core::Gender, double> height_slope;
             height_slope[core::Gender::male] = 0.4;
             height_slope[core::Gender::female] = 0.35;
-            
+
             // Region models
-            auto region_models = std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
+            auto region_models =
+                std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
             (*region_models)[core::Region::England] = LinearModelParams{0.0, {{"age", 0.1}}};
-            
+
             // Ethnicity models
-            auto ethnicity_models = std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
+            auto ethnicity_models =
+                std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
             (*ethnicity_models)[core::Ethnicity::White] = LinearModelParams{0.0, {{"age", 0.1}}};
-            
+
             // Income models
             std::unordered_map<core::Income, LinearModelParams> income_models;
             income_models[core::Income::low] = LinearModelParams{0.0, {{"age", 0.1}}};
-            
+
             // Income continuous stddev
             double income_continuous_stddev = 0.2;
-            
+
             // Create Kevin Hall model with all required parameters
             model = std::unique_ptr<KevinHallModel>(new KevinHallModel(
-                expected, expected_trend, trend_steps,
-                energy_equation, nutrient_ranges, nutrient_equations, food_prices,
-                weight_quantiles, epa_quantiles, height_stddev, height_slope,
-                region_models, ethnicity_models, income_models, income_continuous_stddev
-            ));
+                expected, expected_trend, trend_steps, energy_equation, nutrient_ranges,
+                nutrient_equations, food_prices, weight_quantiles, epa_quantiles, height_stddev,
+                height_slope, region_models, ethnicity_models, income_models,
+                income_continuous_stddev));
         } catch (const std::exception &e) {
             FAIL() << "Failed to initialize KevinHallModel: " << e.what();
         }
@@ -376,8 +375,8 @@ TEST(TestStaticLinearModel, IncomeCategoryOperations) {
     std::vector<int> test_policy_start = {2020};
 
     auto model_def = DummyModelDefinition(RiskFactorModelType::Static, std::move(test_names),
-                                         std::move(test_values), std::move(test_policy),
-                                         std::move(test_policy_start));
+                                          std::move(test_values), std::move(test_policy),
+                                          std::move(test_policy_start));
 
     auto model_ptr = model_def.create_model();
     auto *static_model = dynamic_cast<StaticLinearModel *>(model_ptr.get());

@@ -68,7 +68,8 @@ KevinHallModel::KevinHallModel(
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
       height_stddev_{height_stddev}, height_slope_{height_slope},
       region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
-      income_models_{std::move(income_models)}, income_continuous_stddev_{income_continuous_stddev} {}
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 

@@ -30,4 +30,4 @@ class RepositoryTest_DiseaseInfoIsCaseInsensitive_Test : public RepositoryTest {
     void TestBody() override; // Declaration only
 };
 
-} // namespace testing
+} // namespace hgps::testing
