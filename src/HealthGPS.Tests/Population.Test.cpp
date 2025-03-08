@@ -465,7 +465,8 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     data.add(std::move(region_col));
 
     std::vector<double> region_prob_data{0.5, 0.2, 0.2, 0.1};
-    auto region_prob_col = std::make_unique<core::DoubleDataTableColumn>("region_prob", region_prob_data);
+    auto region_prob_col =
+        std::make_unique<core::DoubleDataTableColumn>("region_prob", region_prob_data);
     data.add(std::move(region_prob_col));
 
     // Add ethnicity column and probabilities
@@ -474,7 +475,8 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     data.add(std::move(ethnicity_col));
 
     std::vector<double> ethnicity_prob_data{0.5, 0.25, 0.15, 0.1};
-    auto ethnicity_prob_col = std::make_unique<core::DoubleDataTableColumn>("ethnicity_prob", ethnicity_prob_data);
+    auto ethnicity_prob_col =
+        std::make_unique<core::DoubleDataTableColumn>("ethnicity_prob", ethnicity_prob_data);
     data.add(std::move(ethnicity_prob_col));
 
     // Create JSON configuration for demographic coefficients
@@ -513,26 +515,16 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     entries.emplace_back("test", 0, std::nullopt);
     HierarchicalMapping risk_mapping{std::move(entries)};
     std::vector<core::DiseaseInfo> diseases;
+    diseases.push_back(core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                                         .code = core::Identifier{"CHD"},
+                                         .name = "Coronary heart disease"});
     diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"CHD"},
-        .name = "Coronary heart disease"
-    });
+        .group = core::DiseaseGroup::other, .code = core::Identifier{"STR"}, .name = "Stroke"});
     diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"STR"},
-        .name = "Stroke"
-    });
-    diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"T2DM"},
-        .name = "Diabetes"
-    });
-    diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::cancer,
-        .code = core::Identifier{"CRC"},
-        .name = "Colorectal cancer"
-    });
+        .group = core::DiseaseGroup::other, .code = core::Identifier{"T2DM"}, .name = "Diabetes"});
+    diseases.push_back(core::DiseaseInfo{.group = core::DiseaseGroup::cancer,
+                                         .code = core::Identifier{"CRC"},
+                                         .name = "Colorectal cancer"});
 
     // Don't attempt to load demographic coefficients which may be causing issues
     // Create the model input directly
@@ -579,10 +571,10 @@ TEST(TestHealthGPS_Population, RegionProbabilities) {
     auto bus = std::make_shared<TestEventAggregator>();
     auto inputs = create_test_modelinput();
     auto scenario = std::make_unique<TestScenario>();
-    
+
     // Create context
     RuntimeContext context(bus, inputs, std::move(scenario));
-    
+
     // Just check we can get probabilities without error
     ASSERT_NO_THROW({
         auto probs = context.get_region_probabilities(30, core::Gender::male);
@@ -597,13 +589,14 @@ TEST(TestHealthGPS_Population, EthnicityProbabilities) {
     auto bus = std::make_shared<TestEventAggregator>();
     auto inputs = create_test_modelinput();
     auto scenario = std::make_unique<TestScenario>();
-    
+
     // Create context
     RuntimeContext context(bus, inputs, std::move(scenario));
-    
+
     // Just check we can get probabilities without error
     ASSERT_NO_THROW({
-        auto probs = context.get_ethnicity_probabilities(30, core::Gender::male, core::Region::England);
+        auto probs =
+            context.get_ethnicity_probabilities(30, core::Gender::male, core::Region::England);
         ASSERT_FALSE(probs.empty());
     });
 }
@@ -780,18 +773,19 @@ TEST(TestRuntimeContext, DemographicModels) {
     // Simple verification of context creation and basic operations
     ASSERT_NO_THROW({
         RuntimeContext context(bus, inputs, std::move(scenario));
-        
+
         // Just check we can access these methods without error
         auto age_range = context.age_range();
         ASSERT_EQ(20, age_range.lower());
         ASSERT_EQ(65, age_range.upper());
-        
+
         // Basic region probability test
         auto region_probs = context.get_region_probabilities(25, core::Gender::male);
         ASSERT_FALSE(region_probs.empty());
-        
+
         // Basic ethnicity probability test
-        auto ethnicity_probs = context.get_ethnicity_probabilities(25, core::Gender::male, core::Region::England);
+        auto ethnicity_probs =
+            context.get_ethnicity_probabilities(25, core::Gender::male, core::Region::England);
         ASSERT_FALSE(ethnicity_probs.empty());
     });
 }
