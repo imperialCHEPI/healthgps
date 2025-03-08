@@ -43,12 +43,12 @@ TEST(TestCore, CreateTableColumnWithNulls) {
     // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_EQ(3, str_col.size());
     ASSERT_EQ(1, str_col.null_count());
-    
+
     // Get the value_safe return and check it
     auto safe_value = str_col.value_safe(1);
     ASSERT_TRUE(safe_value.has_value());
     ASSERT_EQ("Dog", safe_value.value());
-    
+
     // Check unsafe access too
     ASSERT_EQ("Dog", str_col.value_unsafe(1));
     // NOLINTEND(bugprone-unchecked-optional-access)
@@ -66,12 +66,12 @@ TEST(TestCore, CreateTableColumnWithoutNulls) {
     // NOLINTBEGIN(bugprone-unchecked-optional-access)
     ASSERT_EQ(3, str_col.size());
     ASSERT_EQ(0, str_col.null_count());
-    
+
     // Get the value_safe return and check it
     auto safe_value = str_col.value_safe(1);
     ASSERT_TRUE(safe_value.has_value());
     ASSERT_EQ("Dog", safe_value.value());
-    
+
     // Check unsafe access too
     ASSERT_EQ("Dog", str_col.value_unsafe(1));
     ASSERT_TRUE(str_col.is_valid(0));
@@ -143,7 +143,7 @@ TEST(TestCore, TableColumnIterator) {
             manual_sum += dbl_col.value_unsafe(i);
         }
     }
-    
+
     // Calculate using the iterator
     double loop_sum = 0.0;
     size_t count = 0;
@@ -151,7 +151,8 @@ TEST(TestCore, TableColumnIterator) {
         loop_sum += v;
         count++;
     }
-    ASSERT_EQ(count, dbl_col.size() - dbl_col.null_count()); // Ensure we iterated through valid elements only
+    ASSERT_EQ(count, dbl_col.size() -
+                         dbl_col.null_count()); // Ensure we iterated through valid elements only
 
     // Calculate using standard algorithm
     auto sum = std::accumulate(dbl_col.begin(), dbl_col.end(), 0.0);
@@ -199,15 +200,15 @@ TEST(TestCore, CreateDataTable) {
     const auto &int_col = *int_col_ptr;
 
     ASSERT_TRUE(col.size() > 1); // Ensure we have at least 2 elements before accessing index 1
-    
+
     // Use proper try/catch for std::any_cast
     int slow_value = 0;
     try {
         slow_value = std::any_cast<int>(col.value(1));
-    } catch (const std::bad_any_cast& e) {
+    } catch (const std::bad_any_cast &e) {
         FAIL() << "Bad any_cast: " << e.what() << ". Type info: " << col.value(1).type().name();
     }
-    
+
     auto safe_value = int_col.value_safe(1);
     ASSERT_TRUE(safe_value.has_value()); // Check if the value exists before using it
     auto fast_value = int_col.value_unsafe(1);
@@ -374,14 +375,15 @@ TEST(TestCore, PrimitiveDataTableColumnOperations) {
     // Create a test column with known values
     std::vector<int> data = {42, 7, 13};
     // Explicitly set all values as valid (not null)
-    std::vector<bool> validity = {false, false, false};  // false means NOT NULL in the bitmap
+    std::vector<bool> validity = {false, false, false}; // false means NOT NULL in the bitmap
     IntegerDataTableColumn column("test", data, validity);
 
     // Test basic properties
     ASSERT_EQ(3, column.size());
     ASSERT_EQ(0, column.null_count());
-    ASSERT_TRUE(column.is_valid(0));  // This should pass because we set all validity values to false (not null)
-    ASSERT_FALSE(column.is_null(0));  // Similarly, is_null should return false
+    ASSERT_TRUE(column.is_valid(
+        0)); // This should pass because we set all validity values to false (not null)
+    ASSERT_FALSE(column.is_null(0)); // Similarly, is_null should return false
 
     // Test value accessors
     ASSERT_EQ(42, column.value_unsafe(0));

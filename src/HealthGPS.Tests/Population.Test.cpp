@@ -520,26 +520,16 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     entries.emplace_back("test", 0, std::nullopt);
     HierarchicalMapping risk_mapping{std::move(entries)};
     std::vector<core::DiseaseInfo> diseases;
+    diseases.push_back(core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                                         .code = core::Identifier{"CHD"},
+                                         .name = "Coronary heart disease"});
     diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"CHD"},
-        .name = "Coronary heart disease"
-    });
+        .group = core::DiseaseGroup::other, .code = core::Identifier{"STR"}, .name = "Stroke"});
     diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"STR"},
-        .name = "Stroke"
-    });
-    diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"T2DM"},
-        .name = "Diabetes"
-    });
-    diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::cancer,
-        .code = core::Identifier{"CRC"},
-        .name = "Colorectal cancer"
-    });
+        .group = core::DiseaseGroup::other, .code = core::Identifier{"T2DM"}, .name = "Diabetes"});
+    diseases.push_back(core::DiseaseInfo{.group = core::DiseaseGroup::cancer,
+                                         .code = core::Identifier{"CRC"},
+                                         .name = "Colorectal cancer"});
 
     // NOLINTNEXTLINE(performance-move-const-arg)
     // run_info is a trivially-copyable type, so std::move has no effect and is removed
@@ -803,16 +793,16 @@ TEST(TestRuntimeContext, DemographicModels) {
     // Test region probabilities
     auto region_probs = context.get_region_probabilities(25, core::Gender::male);
     ASSERT_FALSE(region_probs.empty());
-    
+
     // Verify all expected regions are present with appropriate probabilities
     ASSERT_TRUE(region_probs.find(core::Region::England) != region_probs.end());
     ASSERT_TRUE(region_probs.find(core::Region::Wales) != region_probs.end());
     ASSERT_TRUE(region_probs.find(core::Region::Scotland) != region_probs.end());
     ASSERT_TRUE(region_probs.find(core::Region::NorthernIreland) != region_probs.end());
-    
+
     // Probabilities should sum to 1.0
     double sum = 0.0;
-    for (const auto& [region, prob] : region_probs) {
+    for (const auto &[region, prob] : region_probs) {
         sum += prob;
         ASSERT_GE(prob, 0.0);
         ASSERT_LE(prob, 1.0);
@@ -823,16 +813,16 @@ TEST(TestRuntimeContext, DemographicModels) {
     auto ethnicity_probs =
         context.get_ethnicity_probabilities(25, core::Gender::male, core::Region::England);
     ASSERT_FALSE(ethnicity_probs.empty());
-    
+
     // Verify all expected ethnicities are present with appropriate probabilities
     ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::White) != ethnicity_probs.end());
     ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::Asian) != ethnicity_probs.end());
     ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::Black) != ethnicity_probs.end());
     ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::Others) != ethnicity_probs.end());
-    
+
     // Probabilities should sum to 1.0
     sum = 0.0;
-    for (const auto& [ethnicity, prob] : ethnicity_probs) {
+    for (const auto &[ethnicity, prob] : ethnicity_probs) {
         sum += prob;
         ASSERT_GE(prob, 0.0);
         ASSERT_LE(prob, 1.0);
