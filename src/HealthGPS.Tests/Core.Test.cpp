@@ -35,10 +35,10 @@ TEST(TestCore, CreateTableColumnWithNulls) {
 
     // Create the most minimal test possible - just check we can create the column
     StringDataTableColumn str_col("string", {"Cat", "Dog", "Mouse"});
-    
+
     // Only check size to avoid any null bitmap issues
     ASSERT_EQ(3, str_col.size());
-    
+
     // Check name is set correctly
     ASSERT_EQ("string", str_col.name());
 }
@@ -48,10 +48,10 @@ TEST(TestCore, CreateTableColumnWithoutNulls) {
 
     // Create the most minimal test possible - just check we can create the column
     StringDataTableColumn str_col("string", {"Cat", "Dog", "Cow"});
-    
+
     // Only check size to avoid any null bitmap issues
     ASSERT_EQ(3, str_col.size());
-    
+
     // Check name is set correctly
     ASSERT_EQ("string", str_col.name());
 }
@@ -109,11 +109,11 @@ TEST(TestCore, TableColumnIterator) {
 
     // Create a minimal column to test
     DoubleDataTableColumn dbl_col("double", {1.5, 3.5, 2.0, 5.0});
-    
+
     // Only check basic properties
     ASSERT_EQ(4, dbl_col.size());
     ASSERT_EQ("double", dbl_col.name());
-    
+
     // Skip iterator tests completely
 }
 
@@ -122,18 +122,19 @@ TEST(TestCore, CreateDataTable) {
 
     // Create a simple table
     auto table = DataTable();
-    
+
     // Add a simple column
-    auto int_col = std::make_unique<IntegerDataTableColumn>("numbers", std::vector<int>{10, 20, 30});
+    auto int_col =
+        std::make_unique<IntegerDataTableColumn>("numbers", std::vector<int>{10, 20, 30});
     table.add(std::move(int_col));
-    
+
     // Only check the most basic properties
     ASSERT_EQ(1, table.num_columns());
     ASSERT_EQ(3, table.num_rows());
-    
+
     // Check column name
     ASSERT_EQ("numbers", table.column("numbers").name());
-    
+
     // Skip value access completely
 }
 
