@@ -456,8 +456,10 @@ void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Pe
 }
 // Modified: Mahima 25/02/2025
 // Region is initialised using the CDF of the region probabilities along with age/gender strata
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+// This method doesn't use any class members, so it can be static
 void StaticLinearModel::initialise_region(RuntimeContext &context, Person &person,
-                                          Random &random) const {
+                                          Random &random) {
     // Get probabilities for this age/sex stratum
     auto region_probs = context.get_region_probabilities(person.age, person.gender);
 
@@ -488,8 +490,10 @@ void StaticLinearModel::update_region(RuntimeContext &context, Person &person,
 // Modified: Mahima 25/02/2025
 // Ethnicity is initialised using the CDF of the ethnicity probabilities along with
 // age/gender/region strata
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+// This method doesn't use any class members, so it can be static
 void StaticLinearModel::initialise_ethnicity(RuntimeContext &context, Person &person,
-                                             Random &random) const {
+                                             Random &random) {
     // Get probabilities for this age/sex/region stratum
     auto ethnicity_probs =
         context.get_ethnicity_probabilities(person.age, person.gender, person.region);
@@ -546,8 +550,10 @@ void StaticLinearModel::update_income_continuous(Person &person, Random &random)
     }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+// This method doesn't use any class members, so it can be static
 void StaticLinearModel::initialise_income_category(Person &person,
-                                                   const Population &population) const {
+                                                    const Population &population) {
     // Same implementation as Kevin Hall Model
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
@@ -575,6 +581,7 @@ void StaticLinearModel::initialise_income_category(Person &person,
         person.income_category = core::Income::high;
     }
 }
+
 // done at the start and then every 5 years
 void StaticLinearModel::update_income_category(RuntimeContext &context) const {
     static int last_update_year = 0;
@@ -594,7 +601,9 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
+    // NOLINTNEXTLINE(performance-unnecessary-value-param)
+    // Using const reference instead of value for better performance
+    const std::shared_ptr<std::unordered_map<core::Identifier, double>>& expected_trend_boxcox,
     std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
     std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
     std::vector<double> stddev, Eigen::MatrixXd cholesky,

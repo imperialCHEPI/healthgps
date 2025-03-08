@@ -219,7 +219,6 @@ TEST(TestCore, CreateDataTable) {
 
     // Casting to columns type
     const auto &col = table.column("Integer");
-    ASSERT_TRUE(&col != nullptr);
     const auto *int_col_ptr = dynamic_cast<const IntegerDataTableColumn *>(&col);
     ASSERT_TRUE(int_col_ptr != nullptr);
     const auto &int_col = *int_col_ptr;
@@ -234,7 +233,8 @@ TEST(TestCore, CreateDataTable) {
     ASSERT_EQ(5, table.num_rows());
     ASSERT_EQ(table.num_rows(), int_col.size());
     ASSERT_EQ(78, slow_value);
-    ASSERT_EQ(slow_value, *safe_value);
+    ASSERT_TRUE(safe_value.has_value());
+    ASSERT_EQ(slow_value, safe_value.value());
     ASSERT_EQ(slow_value, fast_value);
 }
 
@@ -401,7 +401,7 @@ TEST(TestCore, PrimitiveDataTableColumnOperations) {
     // Test value_safe
     auto value = column.value_safe(0);
     ASSERT_TRUE(value.has_value());
-    ASSERT_EQ(42, *value);
+    ASSERT_EQ(42, value.value());
 
     // Test iterator operations
     const std::vector<int> iter_data{1, 2, 3};

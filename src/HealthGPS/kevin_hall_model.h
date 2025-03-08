@@ -290,8 +290,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     static constexpr double xi_CI = 4000.0;       // Na from carbohydrate changes (mg/day).
 
     // Member variables in correct initialization order
-    const double income_continuous_stddev_;
-    const double physical_activity_stddev_ = 0.5;
+    double income_continuous_stddev_;
+    double physical_activity_stddev_ = 0.5;
 };
 
 /// @brief Defines the energy balance model data type

@@ -48,7 +48,7 @@ using namespace hgps::testing;
 //  Forward declarations of helper functions
 std::shared_ptr<ModelInput> create_test_modelinput();
 Population
-create_population(std::shared_ptr<ModelInput> input,
+create_population(const std::shared_ptr<ModelInput>& input,
                   const std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> &modules);
 
 // Test event aggregator for mocking
@@ -417,32 +417,41 @@ TEST(TestHealthGPS_Population, EthnicityModelParsing) {
     ASSERT_THROW(parse_ethnicity("Invalid"), core::HgpsException);
 }
 
+// Fix move operations for TestScenario
 class TestScenario final : public Scenario {
   public:
+    // Default constructor
     TestScenario() = default;
     ~TestScenario() override = default;
 
-    // Prevent copying
+    // Copy operations - deleted
     TestScenario(const TestScenario &) = delete;
     TestScenario &operator=(const TestScenario &) = delete;
 
-    // Allow moving
-    TestScenario(TestScenario &&) noexcept = default;
-    TestScenario &operator=(TestScenario &&) noexcept = default;
+    // Move operations - need to be deleted because SyncChannel is not movable
+    // NOLINTNEXTLINE(clang-diagnostic-defaulted-function-deleted)
+    // Explicitly deleted because member channel_ has a deleted move constructor
+    TestScenario(TestScenario &&) noexcept = delete;
+    // NOLINTNEXTLINE(clang-diagnostic-defaulted-function-deleted)
+    // Explicitly deleted because member channel_ has a deleted move assignment operator
+    TestScenario &operator=(TestScenario &&) noexcept = delete;
 
     [[nodiscard]] ScenarioType type() noexcept override { return ScenarioType::baseline; }
     [[nodiscard]] std::string name() override { return "Test"; }
     [[nodiscard]] SyncChannel &channel() override { return channel_; }
+
     void clear() noexcept override {}
     [[nodiscard]] double apply([[maybe_unused]] Random &generator, [[maybe_unused]] Person &entity,
                                [[maybe_unused]] int time,
-                               [[maybe_unused]] const core::Identifier &risk_factor_key,
+                               [[maybe_unused]] const core::Identifier &factor,
                                double value) override {
         return value;
     }
 
   private:
-    SyncChannel channel_{};
+    // Removed redundant initializer
+    // NOLINTNEXTLINE(readability-redundant-member-init)
+    SyncChannel channel_; // Member without redundant initializer
 };
 
 // Standard implementation that doesn't need a DataManager
@@ -512,15 +521,17 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     HierarchicalMapping risk_mapping{std::move(entries)};
     std::vector<core::DiseaseInfo> diseases;
 
+    // NOLINTNEXTLINE(performance-move-const-arg)
+    // run_info is a trivially-copyable type, so std::move has no effect and is removed
     auto model_input = std::make_shared<ModelInput>(std::move(data), std::move(settings),
-                                                    std::move(run_info), std::move(ses_info),
+                                                    run_info, std::move(ses_info),
                                                     std::move(risk_mapping), std::move(diseases));
     return model_input;
 }
 
 // Helper function to create a population with the provided modules
 Population create_population(
-    std::shared_ptr<ModelInput> input,
+    const std::shared_ptr<ModelInput>& input,
     const std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> &modules) {
     // Initialize the runtime context
     auto bus = std::make_shared<TestEventAggregator>();
@@ -852,21 +863,30 @@ TEST(TestSimulation, BasicSetup) {
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> risk_models;
 
     // Create a mock static risk factor model
+    // Fix unnamed parameters in MockStaticRiskFactorModel
     class MockStaticRiskFactorModel : public RiskFactorModel {
       public:
         RiskFactorModelType type() const noexcept override { return RiskFactorModelType::Static; }
         std::string name() const noexcept override { return "MockStatic"; }
-        void generate_risk_factors(RuntimeContext &) override {}
-        void update_risk_factors(RuntimeContext &) override {}
+        // Parameter name is commented out to avoid unreferenced parameter warning
+        // while still satisfying clang-tidy named parameter requirement
+        // NOLINTNEXTLINE(readability-named-parameter)
+        void generate_risk_factors(RuntimeContext& /*context*/) override {}
+        // NOLINTNEXTLINE(readability-named-parameter)
+        void update_risk_factors(RuntimeContext& /*context*/) override {}
     };
 
-    // Create a mock dynamic risk factor model
+    // Fix unnamed parameters in MockDynamicRiskFactorModel
     class MockDynamicRiskFactorModel : public RiskFactorModel {
       public:
         RiskFactorModelType type() const noexcept override { return RiskFactorModelType::Dynamic; }
         std::string name() const noexcept override { return "MockDynamic"; }
-        void generate_risk_factors(RuntimeContext &) override {}
-        void update_risk_factors(RuntimeContext &) override {}
+        // Parameter name is commented out to avoid unreferenced parameter warning
+        // while still satisfying clang-tidy named parameter requirement
+        // NOLINTNEXTLINE(readability-named-parameter)
+        void generate_risk_factors(RuntimeContext& /*context*/) override {}
+        // NOLINTNEXTLINE(readability-named-parameter)
+        void update_risk_factors(RuntimeContext& /*context*/) override {}
     };
 
     // Add both required model types

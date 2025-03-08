@@ -20,42 +20,18 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"SES"_id, [](const Person &p) { return p.ses; }},
 };
 // Modified- Mahima
-// Creating default constructirs (that don't require arguments)
+// Creating default constructors (that don't require arguments)
+// Pointed out by Clang-Tidy hence removed 
 Person::Person()
-    : id_{++newUID}, // Must be first
-                     // Step 1: Core demographics
-      age{}, gender{core::Gender::unknown},
-      // Step 2: Geographic and ethnic characteristics
-      region{core::Region::unknown}, ethnicity{core::Ethnicity::unknown},
-      // Step 3-4: Income characteristics
-      income_continuous{}, income_category{core::Income::unknown},
-      // Step 5-6: Other characteristics
-      sector{core::Sector::unknown}, ses{},
-      // Risk factors and diseases
-      risk_factors{}, diseases{},
-      // Migration tracking
-      time_of_migration_{},
-      // Private members
-      is_alive_{true}, has_emigrated_{false}, time_of_death_{} {}
+    : id_{++newUID} {} // Only initialize id_, other members use class defaults
 
 // Modified- Mahima
 // Creating parameterized constructor (that require arguments)
+// Removed the default constructor as it was not being used in the code
+// Pointed out by Clang-Tidy 
 Person::Person(const core::Gender birth_gender) noexcept
     : id_{++newUID}, // Must be first
-                     // Step 1: Core demographics
-      age{}, gender{birth_gender},
-      // Step 2: Geographic and ethnic characteristics
-      region{core::Region::unknown}, ethnicity{core::Ethnicity::unknown},
-      // Step 3-4: Income characteristics
-      income_continuous{}, income_category{core::Income::unknown},
-      // Step 5-6: Other characteristics
-      sector{core::Sector::unknown}, ses{},
-      // Risk factors and diseases
-      risk_factors{}, diseases{},
-      // Migration tracking
-      time_of_migration_{},
-      // Private members
-      is_alive_{true}, has_emigrated_{false}, time_of_death_{} {}
+      gender{birth_gender} {} // Only initialize id_ and gender
 
 std::size_t Person::id() const noexcept { return id_; }
 

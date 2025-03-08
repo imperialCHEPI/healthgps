@@ -5,8 +5,7 @@
 #include "mock_repository.h"
 #include <gtest/gtest.h>
 
-namespace hgps {
-namespace testing {
+namespace hgps::testing {
 
 // Base test fixture class
 class RepositoryTest : public ::testing::Test {
@@ -32,4 +31,3 @@ class RepositoryTest_DiseaseInfoIsCaseInsensitive_Test : public RepositoryTest {
 };
 
 } // namespace testing
-} // namespace hgps

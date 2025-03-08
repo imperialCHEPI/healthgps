@@ -1,12 +1,16 @@
 #pragma once
 
 #include "HealthGPS.Core/datastore.h"
+#include "HealthGPS.Core/disease.h"
+#include "HealthGPS/population.h"
 #include "HealthGPS/dummy_model.h"
 #include "HealthGPS/repository.h"
+#include <functional>
+#include <string>
+#include <vector>
 
 // Created- Mahima
-namespace hgps {
-namespace testing {
+namespace hgps::testing {
 
 // Forward declarations
 class MockDatastore;
@@ -27,49 +31,53 @@ class MockDatastore final : public core::Datastore {
     MockDatastore &operator=(MockDatastore &&) noexcept = default;
 
     std::vector<core::Country> get_countries() const override { return {}; }
-    core::Country get_country(const std::string &) const override { return {}; }
+    core::Country get_country([[maybe_unused]] const std::string &alpha) const override { return {}; }
 
     std::vector<core::PopulationItem>
-    get_population(const core::Country &, std::function<bool(unsigned int)>) const override {
+    get_population([[maybe_unused]] const core::Country &country, 
+                  [[maybe_unused]] std::function<bool(unsigned int)> time_filter) const override {
         return {};
     }
 
     std::vector<core::MortalityItem>
-    get_mortality(const core::Country &, std::function<bool(unsigned int)>) const override {
+    get_mortality([[maybe_unused]] const core::Country &country, 
+                  [[maybe_unused]] std::function<bool(unsigned int)> time_filter) const override {
         return {};
     }
 
     std::vector<core::DiseaseInfo> get_diseases() const override { return {}; }
-    core::DiseaseInfo get_disease_info(const core::Identifier &) const override { return {}; }
+    core::DiseaseInfo get_disease_info([[maybe_unused]] const core::Identifier &code) const override { return {}; }
 
-    core::DiseaseEntity get_disease(const core::DiseaseInfo &,
-                                    const core::Country &) const override {
+    core::DiseaseEntity get_disease([[maybe_unused]] const core::DiseaseInfo &info,
+                                   [[maybe_unused]] const core::Country &country) const override {
         return {};
     }
 
     std::optional<core::RelativeRiskEntity>
-    get_relative_risk_to_disease(const core::DiseaseInfo &,
-                                 const core::DiseaseInfo &) const override {
+    get_relative_risk_to_disease([[maybe_unused]] const core::DiseaseInfo &source,
+                                [[maybe_unused]] const core::DiseaseInfo &target) const override {
         return std::nullopt;
     }
 
     std::optional<core::RelativeRiskEntity>
-    get_relative_risk_to_risk_factor(const core::DiseaseInfo &, core::Gender,
-                                     const core::Identifier &) const override {
+    get_relative_risk_to_risk_factor([[maybe_unused]] const core::DiseaseInfo &source, 
+                                    [[maybe_unused]] core::Gender gender,
+                                    [[maybe_unused]] const core::Identifier &risk_factor_key) const override {
         return std::nullopt;
     }
 
-    core::CancerParameterEntity get_disease_parameter(const core::DiseaseInfo &,
-                                                      const core::Country &) const override {
+    core::CancerParameterEntity get_disease_parameter([[maybe_unused]] const core::DiseaseInfo &info,
+                                                     [[maybe_unused]] const core::Country &country) const override {
         return {};
     }
 
-    core::DiseaseAnalysisEntity get_disease_analysis(const core::Country &) const override {
+    core::DiseaseAnalysisEntity get_disease_analysis([[maybe_unused]] const core::Country &country) const override {
         return {};
     }
 
     std::vector<core::BirthItem>
-    get_birth_indicators(const core::Country &, std::function<bool(unsigned int)>) const override {
+    get_birth_indicators([[maybe_unused]] const core::Country &country, 
+                        [[maybe_unused]] std::function<bool(unsigned int)> time_filter) const override {
         return {};
     }
 
@@ -85,9 +93,9 @@ class MockRepository final : public Repository {
     MockRepository(const MockRepository &) = delete;
     MockRepository &operator=(const MockRepository &) = delete;
 
-    // Allow moving
-    MockRepository(MockRepository &&) noexcept = default;
-    MockRepository &operator=(MockRepository &&) noexcept = default;
+    // Prevent moving (since base class prevents it)
+    MockRepository(MockRepository &&) noexcept = delete;
+    MockRepository &operator=(MockRepository &&) noexcept = delete;
 
     core::Datastore &manager() noexcept override {
         static MockDatastore store;
@@ -110,12 +118,12 @@ class MockRepository final : public Repository {
         return diseases;
     }
 
-    std::optional<core::DiseaseInfo> get_disease_info(core::Identifier /*code*/) override {
+    std::optional<core::DiseaseInfo> get_disease_info([[maybe_unused]] core::Identifier code) override {
         return std::nullopt;
     }
 
     DiseaseDefinition &get_disease_definition(const core::DiseaseInfo &info,
-                                              const ModelInput & /*config*/) override {
+                                             [[maybe_unused]] const ModelInput &config) override {
         static std::map<std::string, int> measures = {{MeasureKey::prevalence, 0},
                                                       {MeasureKey::mortality, 1},
                                                       {MeasureKey::remission, 2},
@@ -147,5 +155,4 @@ class MockRepository final : public Repository {
     }
 };
 
-} // namespace testing
-} // namespace hgps
+} // namespace hgps::testing

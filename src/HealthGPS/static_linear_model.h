@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 #include <unordered_map>
 #include <vector>
+#include <functional>
 
 namespace hgps {
 
@@ -88,7 +89,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Initialize the income category for a person
     /// @param person The person to initialize income category for
     /// @param population The population to use for income category initialization
-    void initialise_income_category(Person &person, const Population &population) const;
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    // This method does not use any class members and can be static
+    static void initialise_income_category(Person &person, const Population &population);
 
     /// @brief Update the income category for a person
     /// @param context The runtime context to use for income category updates
@@ -111,9 +114,21 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void apply_policies(Person &person, bool intervene) const;
 
-    void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random) const;
+    /// @brief Initialize the region for a person
+    /// @param context The runtime context to use for region initialization
+    /// @param person The person to initialize region for
+    /// @param random The random number generator
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    // This method does not use any class members and can be static
+    static void initialise_region(RuntimeContext &context, Person &person, Random &random);
 
-    void initialise_region(RuntimeContext &context, Person &person, Random &random) const;
+    /// @brief Initialize the ethnicity for a person
+    /// @param context The runtime context to use for ethnicity initialization
+    /// @param person The person to initialize ethnicity for
+    /// @param random The random number generator
+    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+    // This method does not use any class members and can be static
+    static void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
 
     std::vector<double> compute_linear_models(Person &person,
                                               const std::vector<LinearModelParams> &models) const;
@@ -165,14 +180,13 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
     std::shared_ptr<std::vector<double>> trend_lambda_;
-    const double info_speed_;
+    double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
-    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>>
-        region_models_; // made a shared pointer
-    const double physical_activity_stddev_;
-    const double income_continuous_stddev_;
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models_;
+    double physical_activity_stddev_;
+    double income_continuous_stddev_;
     std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
 };
 
@@ -208,7 +222,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-        std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox,
+        const std::shared_ptr<std::unordered_map<core::Identifier, double>>& expected_trend_boxcox,
         std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
         std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
         std::vector<double> stddev, Eigen::MatrixXd cholesky,
@@ -230,25 +244,24 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
   private:
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
-    const std::vector<core::Identifier> names_;
-    const std::vector<LinearModelParams> models_;
-    const std::vector<core::DoubleInterval> ranges_;
-    const std::vector<double> lambda_;
-    const std::vector<double> stddev_;
-    const Eigen::MatrixXd cholesky_;
-    const std::vector<LinearModelParams> policy_models_;
-    const std::vector<core::DoubleInterval> policy_ranges_;
-    const Eigen::MatrixXd policy_cholesky_;
+    std::vector<core::Identifier> names_;
+    std::vector<LinearModelParams> models_;
+    std::vector<core::DoubleInterval> ranges_;
+    std::vector<double> lambda_;
+    std::vector<double> stddev_;
+    Eigen::MatrixXd cholesky_;
+    std::vector<LinearModelParams> policy_models_;
+    std::vector<core::DoubleInterval> policy_ranges_;
+    Eigen::MatrixXd policy_cholesky_;
     std::shared_ptr<std::vector<LinearModelParams>> trend_models_;
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
     std::shared_ptr<std::vector<double>> trend_lambda_;
-    const double info_speed_;
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
-        rural_prevalence_;
-    const std::unordered_map<core::Income, LinearModelParams> income_models_;
+    double info_speed_;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
     std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models_;
-    const double physical_activity_stddev_;
-    const double income_continuous_stddev_;
+    double physical_activity_stddev_;
+    double income_continuous_stddev_;
     std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
 };
 
