@@ -466,7 +466,8 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
 
     // Add region_prob column
     std::vector<double> region_prob_data{0.5, 0.2, 0.2, 0.1};
-    auto region_prob_col = std::make_unique<core::DoubleDataTableColumn>("region_prob", region_prob_data);
+    auto region_prob_col =
+        std::make_unique<core::DoubleDataTableColumn>("region_prob", region_prob_data);
     data.add(std::move(region_prob_col));
 
     // Add ethnicity column
@@ -476,48 +477,42 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
 
     // Add ethnicity_prob column
     std::vector<double> ethnicity_prob_data{0.5, 0.25, 0.15, 0.1};
-    auto ethnicity_prob_col = std::make_unique<core::DoubleDataTableColumn>("ethnicity_prob", ethnicity_prob_data);
+    auto ethnicity_prob_col =
+        std::make_unique<core::DoubleDataTableColumn>("ethnicity_prob", ethnicity_prob_data);
     data.add(std::move(ethnicity_prob_col));
 
     // Create minimal model input
     core::IntegerInterval age_range{20, 65};
     core::Country country{826, "United Kingdom", "GB", "GBR"};
     Settings settings(country, 1.0f, age_range);
-    
+
     // Create minimal run info
     RunInfo run_info{};
     run_info.start_time = 2018;
     run_info.stop_time = 2025;
     run_info.sync_timeout_ms = 1000;
     run_info.verbosity = core::VerboseMode::none;
-    
+
     // Create minimal SES definition
     SESDefinition ses_info{};
     ses_info.fuction_name = "linear";
     ses_info.parameters = {1.0};
-    
+
     // Create minimal risk mapping
     std::vector<MappingEntry> entries;
     entries.emplace_back("test", 0, std::nullopt);
     HierarchicalMapping risk_mapping{std::move(entries)};
-    
+
     // Create diseases list
     std::vector<core::DiseaseInfo> diseases;
-    diseases.push_back(core::DiseaseInfo{
-        .group = core::DiseaseGroup::other,
-        .code = core::Identifier{"CHD"},
-        .name = "Coronary heart disease"
-    });
+    diseases.push_back(core::DiseaseInfo{.group = core::DiseaseGroup::other,
+                                         .code = core::Identifier{"CHD"},
+                                         .name = "Coronary heart disease"});
 
     // Return the model input
-    return std::make_shared<ModelInput>(
-        std::move(data), 
-        std::move(settings), 
-        run_info, 
-        std::move(ses_info), 
-        std::move(risk_mapping), 
-        std::move(diseases)
-    );
+    return std::make_shared<ModelInput>(std::move(data), std::move(settings), run_info,
+                                        std::move(ses_info), std::move(risk_mapping),
+                                        std::move(diseases));
 }
 
 // Helper function to create a population with the provided modules
@@ -557,7 +552,7 @@ TEST(TestHealthGPS_Population, RegionProbabilities) {
     // Just verify we can create the test model input
     auto inputs = create_test_modelinput();
     ASSERT_NE(nullptr, inputs);
-    
+
     // Verify basic properties
     ASSERT_EQ(20, inputs->settings().age_range().lower());
     ASSERT_EQ(65, inputs->settings().age_range().upper());
@@ -570,9 +565,9 @@ TEST(TestHealthGPS_Population, EthnicityProbabilities) {
     // Just verify we can create the test model input
     auto inputs = create_test_modelinput();
     ASSERT_NE(nullptr, inputs);
-    
+
     // Test something else about the model input that's accessible
-    const auto& settings = inputs->settings();
+    const auto &settings = inputs->settings();
     ASSERT_EQ(core::IntegerInterval(20, 65), settings.age_range());
 }
 
@@ -748,7 +743,7 @@ TEST(TestRuntimeContext, DemographicModels) {
     // Just verify we can create the context object (don't try to use it)
     ASSERT_NO_THROW({
         RuntimeContext context(bus, inputs, std::move(scenario));
-        
+
         // Verify age range only
         auto age_range = context.age_range();
         ASSERT_EQ(20, age_range.lower());
