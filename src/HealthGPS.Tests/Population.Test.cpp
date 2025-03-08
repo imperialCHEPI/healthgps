@@ -502,7 +502,7 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     data.load_demographic_coefficients(config);
 
     // Create model input with the initialized data table
-    core::IntegerInterval age_range{1, 100};
+    core::IntegerInterval age_range{20, 65};
     auto country =
         core::Country{826, std::string("United Kingdom"), std::string("GB"), std::string("GBR")};
     Settings settings(country, 1.0f, age_range);
@@ -520,13 +520,31 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
     entries.emplace_back("test", 0, std::nullopt);
     HierarchicalMapping risk_mapping{std::move(entries)};
     std::vector<core::DiseaseInfo> diseases;
+    diseases.push_back(core::DiseaseInfo{
+        .group = core::DiseaseGroup::other,
+        .code = core::Identifier{"CHD"},
+        .name = "Coronary heart disease"
+    });
+    diseases.push_back(core::DiseaseInfo{
+        .group = core::DiseaseGroup::other,
+        .code = core::Identifier{"STR"},
+        .name = "Stroke"
+    });
+    diseases.push_back(core::DiseaseInfo{
+        .group = core::DiseaseGroup::other,
+        .code = core::Identifier{"T2DM"},
+        .name = "Diabetes"
+    });
+    diseases.push_back(core::DiseaseInfo{
+        .group = core::DiseaseGroup::cancer,
+        .code = core::Identifier{"CRC"},
+        .name = "Colorectal cancer"
+    });
 
-    // NOLINTNEXTLINE(performance-move-const-arg)
-    // run_info is a trivially-copyable type, so std::move has no effect and is removed
-    auto model_input = std::make_shared<ModelInput>(std::move(data), std::move(settings),
-                                                    run_info, std::move(ses_info),
-                                                    std::move(risk_mapping), std::move(diseases));
-    return model_input;
+    // Return a new ModelInput with the configured data
+    return std::make_shared<ModelInput>(std::move(data), std::move(settings), run_info,
+                                         std::move(ses_info), std::move(risk_mapping),
+                                         std::move(diseases));
 }
 
 // Helper function to create a population with the provided modules
@@ -773,6 +791,7 @@ TEST(TestRuntimeContext, BasicOperations) {
 TEST(TestRuntimeContext, DemographicModels) {
     using namespace hgps;
 
+    // Create the test context
     auto bus = std::make_shared<TestEventAggregator>();
     auto inputs = create_test_modelinput();
     auto scenario = std::make_unique<TestScenario>();
@@ -782,11 +801,41 @@ TEST(TestRuntimeContext, DemographicModels) {
     // Test region probabilities
     auto region_probs = context.get_region_probabilities(25, core::Gender::male);
     ASSERT_FALSE(region_probs.empty());
+    
+    // Verify all expected regions are present with appropriate probabilities
+    ASSERT_TRUE(region_probs.find(core::Region::England) != region_probs.end());
+    ASSERT_TRUE(region_probs.find(core::Region::Wales) != region_probs.end());
+    ASSERT_TRUE(region_probs.find(core::Region::Scotland) != region_probs.end());
+    ASSERT_TRUE(region_probs.find(core::Region::NorthernIreland) != region_probs.end());
+    
+    // Probabilities should sum to 1.0
+    double sum = 0.0;
+    for (const auto& [region, prob] : region_probs) {
+        sum += prob;
+        ASSERT_GE(prob, 0.0);
+        ASSERT_LE(prob, 1.0);
+    }
+    ASSERT_NEAR(sum, 1.0, 0.0001);
 
     // Test ethnicity probabilities
     auto ethnicity_probs =
         context.get_ethnicity_probabilities(25, core::Gender::male, core::Region::England);
     ASSERT_FALSE(ethnicity_probs.empty());
+    
+    // Verify all expected ethnicities are present with appropriate probabilities
+    ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::White) != ethnicity_probs.end());
+    ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::Asian) != ethnicity_probs.end());
+    ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::Black) != ethnicity_probs.end());
+    ASSERT_TRUE(ethnicity_probs.find(core::Ethnicity::Others) != ethnicity_probs.end());
+    
+    // Probabilities should sum to 1.0
+    sum = 0.0;
+    for (const auto& [ethnicity, prob] : ethnicity_probs) {
+        sum += prob;
+        ASSERT_GE(prob, 0.0);
+        ASSERT_LE(prob, 1.0);
+    }
+    ASSERT_NEAR(sum, 1.0, 0.0001);
 }
 
 // Tests for simulation.cpp - Mahima
