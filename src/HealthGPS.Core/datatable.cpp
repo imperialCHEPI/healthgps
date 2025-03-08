@@ -337,7 +337,7 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
     }
 
     const auto &demographic_models = config["modelling"]["demographic_models"];
-    
+
     // Load coefficients using helper methods
     load_region_coefficients(demographic_models);
     load_ethnicity_coefficients(demographic_models);
@@ -407,19 +407,19 @@ void DataTable::load_ethnicity_coefficients(const nlohmann::json &demographic_mo
     if (ethnicity_config.contains("region")) {
         const auto &region_probs = ethnicity_config["region"];
         if (region_probs.contains("England")) {
-            ethnicity_coeffs.region_coefficients[Region::England] = 
+            ethnicity_coeffs.region_coefficients[Region::England] =
                 region_probs["England"].get<double>();
         }
         if (region_probs.contains("Wales")) {
-            ethnicity_coeffs.region_coefficients[Region::Wales] = 
+            ethnicity_coeffs.region_coefficients[Region::Wales] =
                 region_probs["Wales"].get<double>();
         }
         if (region_probs.contains("Scotland")) {
-            ethnicity_coeffs.region_coefficients[Region::Scotland] = 
+            ethnicity_coeffs.region_coefficients[Region::Scotland] =
                 region_probs["Scotland"].get<double>();
         }
         if (region_probs.contains("NorthernIreland")) {
-            ethnicity_coeffs.region_coefficients[Region::NorthernIreland] = 
+            ethnicity_coeffs.region_coefficients[Region::NorthernIreland] =
                 region_probs["NorthernIreland"].get<double>();
         }
     }
@@ -428,19 +428,19 @@ void DataTable::load_ethnicity_coefficients(const nlohmann::json &demographic_mo
     if (ethnicity_config.contains("ethnicity")) {
         const auto &ethnicity_probs = ethnicity_config["ethnicity"];
         if (ethnicity_probs.contains("White")) {
-            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::White] = 
+            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::White] =
                 ethnicity_probs["White"].get<double>();
         }
         if (ethnicity_probs.contains("Asian")) {
-            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Asian] = 
+            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Asian] =
                 ethnicity_probs["Asian"].get<double>();
         }
         if (ethnicity_probs.contains("Black")) {
-            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Black] = 
+            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Black] =
                 ethnicity_probs["Black"].get<double>();
         }
         if (ethnicity_probs.contains("Others")) {
-            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Others] = 
+            ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Others] =
                 ethnicity_probs["Others"].get<double>();
         }
     }

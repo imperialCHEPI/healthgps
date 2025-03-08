@@ -5,9 +5,9 @@
 #include "risk_factor_adjustable_model.h"
 
 #include <Eigen/Dense>
+#include <functional>
 #include <unordered_map>
 #include <vector>
-#include <functional>
 
 namespace hgps {
 
@@ -222,7 +222,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<RiskFactorSexAgeTable> expected,
         std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
         std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
-        const std::shared_ptr<std::unordered_map<core::Identifier, double>>& expected_trend_boxcox,
+        const std::shared_ptr<std::unordered_map<core::Identifier, double>> &expected_trend_boxcox,
         std::vector<core::Identifier> names, std::vector<LinearModelParams> models,
         std::vector<core::DoubleInterval> ranges, std::vector<double> lambda,
         std::vector<double> stddev, Eigen::MatrixXd cholesky,
@@ -257,7 +257,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::shared_ptr<std::vector<core::DoubleInterval>> trend_ranges_;
     std::shared_ptr<std::vector<double>> trend_lambda_;
     double info_speed_;
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence_;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
+        rural_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models_;
     double physical_activity_stddev_;

@@ -48,7 +48,7 @@ using namespace hgps::testing;
 //  Forward declarations of helper functions
 std::shared_ptr<ModelInput> create_test_modelinput();
 Population
-create_population(const std::shared_ptr<ModelInput>& input,
+create_population(const std::shared_ptr<ModelInput> &input,
                   const std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> &modules);
 
 // Test event aggregator for mocking
@@ -541,15 +541,17 @@ std::shared_ptr<ModelInput> create_test_modelinput() {
         .name = "Colorectal cancer"
     });
 
-    // Return a new ModelInput with the configured data
-    return std::make_shared<ModelInput>(std::move(data), std::move(settings), run_info,
-                                         std::move(ses_info), std::move(risk_mapping),
-                                         std::move(diseases));
+    // NOLINTNEXTLINE(performance-move-const-arg)
+    // run_info is a trivially-copyable type, so std::move has no effect and is removed
+    auto model_input = std::make_shared<ModelInput>(std::move(data), std::move(settings), run_info,
+                                                    std::move(ses_info), std::move(risk_mapping),
+                                                    std::move(diseases));
+    return model_input;
 }
 
 // Helper function to create a population with the provided modules
 Population create_population(
-    const std::shared_ptr<ModelInput>& input,
+    const std::shared_ptr<ModelInput> &input,
     const std::map<SimulationModuleType, std::shared_ptr<SimulationModule>> &modules) {
     // Initialize the runtime context
     auto bus = std::make_shared<TestEventAggregator>();
@@ -920,9 +922,9 @@ TEST(TestSimulation, BasicSetup) {
         // Parameter name is commented out to avoid unreferenced parameter warning
         // while still satisfying clang-tidy named parameter requirement
         // NOLINTNEXTLINE(readability-named-parameter)
-        void generate_risk_factors(RuntimeContext& /*context*/) override {}
+        void generate_risk_factors(RuntimeContext & /*context*/) override {}
         // NOLINTNEXTLINE(readability-named-parameter)
-        void update_risk_factors(RuntimeContext& /*context*/) override {}
+        void update_risk_factors(RuntimeContext & /*context*/) override {}
     };
 
     // Fix unnamed parameters in MockDynamicRiskFactorModel
@@ -933,9 +935,9 @@ TEST(TestSimulation, BasicSetup) {
         // Parameter name is commented out to avoid unreferenced parameter warning
         // while still satisfying clang-tidy named parameter requirement
         // NOLINTNEXTLINE(readability-named-parameter)
-        void generate_risk_factors(RuntimeContext& /*context*/) override {}
+        void generate_risk_factors(RuntimeContext & /*context*/) override {}
         // NOLINTNEXTLINE(readability-named-parameter)
-        void update_risk_factors(RuntimeContext& /*context*/) override {}
+        void update_risk_factors(RuntimeContext & /*context*/) override {}
     };
 
     // Add both required model types

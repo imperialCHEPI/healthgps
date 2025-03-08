@@ -84,8 +84,8 @@ void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const 
     // Modified- Mahima
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     // const_cast is needed here because we have a const method publishing to a non-const bus
-    // This is safe because publish_async() doesn't modify the bus itself, only sends a message through it
-    // Pointed out by Clang-Tidy
+    // This is safe because publish_async() doesn't modify the bus itself, only sends a message
+    // through it Pointed out by Clang-Tidy
     const_cast<EventAggregator *>(event_bus_.get())->publish_async(std::move(message));
 }
 
