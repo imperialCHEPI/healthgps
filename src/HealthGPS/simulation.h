@@ -106,7 +106,7 @@ class Simulation : public adevs::Model<int> {
     // because the person data is stored in an unordered_map, we need to iterate through the map and
     // write the data to the stream
     void write_person_data(std::ostream &stream, const Person &person,
-                           const unsigned int time) const;
+                           unsigned int time) const;
     void write_header(std::ostream &stream) const;
 
     static constexpr char separator_ = ',';           // Add separator for CSV output

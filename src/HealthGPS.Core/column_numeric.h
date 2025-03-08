@@ -15,6 +15,7 @@ class StringDataTableColumn final : public PrimitiveDataTableColumn<std::string>
     std::string type() const noexcept override { return "string"; }
 
   protected:
+    // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override { return new StringDataTableColumn(*this); }
 };
 
@@ -26,6 +27,7 @@ class FloatDataTableColumn final : public PrimitiveDataTableColumn<float> {
     std::string type() const noexcept override { return "float"; }
 
   protected:
+    // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override { return new FloatDataTableColumn(*this); }
 };
 
@@ -37,6 +39,7 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
     std::string type() const noexcept override { return "double"; }
 
   protected:
+    // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override { return new DoubleDataTableColumn(*this); }
 };
 
@@ -64,14 +67,17 @@ class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
     std::string type() const noexcept override { return "integer"; }
 
   protected:
+    // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override { return new IntegerDataTableColumn(*this); }
 };
 
 inline bool is_valid_column_name(const std::string &name) {
-    if (name.empty())
+    if (name.empty()) {
         return false;
-    if (std::all_of(name.begin(), name.end(), ::isspace))
+    }
+    if (std::all_of(name.begin(), name.end(), ::isspace)) {
         return false;
+    }
     return !std::any_of(name.begin(), name.end(), [](char c) {
         return c == ' ' || c == '-' || c == '@' || c == '#' || c == '$' || c == '%' || c == '^' ||
                c == '&' || c == '*';

@@ -18,7 +18,7 @@ struct PolicyDynamic;
 /// common intervention properties: active period and impacts.
 class InterventionScenario : public Scenario {
   public:
-    virtual ~InterventionScenario() override = default;
+    ~InterventionScenario() override = default;
 
     /// @brief Gets the intervention active period
     /// @return Intervention period
@@ -32,16 +32,15 @@ class InterventionScenario : public Scenario {
 
     std::string name() override = 0;
 
-    virtual SyncChannel &channel() override = 0;
+    SyncChannel &channel() override = 0;
 
-    virtual void clear() noexcept override = 0;
+    void clear() noexcept override = 0;
 
-    virtual double apply(Random &generator, Person &entity, int time,
-                         const core::Identifier &risk_factor_key, double value) override = 0;
+    double apply(Random &generator, Person &entity, int time,
+                 const core::Identifier &risk_factor_key, double value) override = 0;
 };
 
 /// @brief Health-GPS dynamic intervention policy scenario interface
-///
 /// @details The dynamic intervention scenario adds support for System Dynamic
 /// equations to smooth the population effected by the intervention over-time.
 class DynamicInterventionScenario : public InterventionScenario {

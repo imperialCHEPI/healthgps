@@ -208,40 +208,30 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
                                                                            std::move(levels));
 }
 
-std::unique_ptr<hgps::StaticLinearModelDefinition>
-load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
-    MEASURE_FUNCTION();
+namespace detail {
 
-    // Risk factor correlation matrix.
-    const auto correlation_file_info =
-        input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
-    const auto correlation_table = load_datatable_from_csv(correlation_file_info);
-    Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
-
-    // Policy covariance matrix.
-    const auto policy_covariance_file_info =
-        input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
-    const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
-    Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
-                                      policy_covariance_table.num_columns()};
-
-    // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
-    std::vector<core::Identifier> names;
-    std::vector<LinearModelParams> models;
-    std::vector<core::DoubleInterval> ranges;
-    std::vector<double> lambda;
-    std::vector<double> stddev;
-    std::vector<LinearModelParams> policy_models;
-    std::vector<core::DoubleInterval> policy_ranges;
-    auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
-    auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
-    auto trend_lambda = std::make_unique<std::vector<double>>();
-    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
-    auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
-    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
-
+void process_risk_factor_models(
+    const nlohmann::json& models_json,
+    const core::DataTable& correlation_table,
+    const core::DataTable& policy_covariance_table,
+    std::vector<core::Identifier>& names,
+    std::vector<LinearModelParams>& models,
+    std::vector<core::DoubleInterval>& ranges,
+    std::vector<double>& lambda,
+    std::vector<double>& stddev,
+    std::vector<LinearModelParams>& policy_models,
+    std::vector<core::DoubleInterval>& policy_ranges,
+    std::unique_ptr<std::vector<LinearModelParams>>& trend_models,
+    std::unique_ptr<std::vector<core::DoubleInterval>>& trend_ranges,
+    std::unique_ptr<std::vector<double>>& trend_lambda,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>>& expected_trend,
+    std::unique_ptr<std::unordered_map<core::Identifier, double>>& expected_trend_boxcox,
+    std::unique_ptr<std::unordered_map<core::Identifier, int>>& trend_steps,
+    Eigen::MatrixXd& correlation,
+    Eigen::MatrixXd& policy_covariance) {
+    
     size_t i = 0;
-    for (const auto &[key, json_params] : opt["RiskFactorModels"].items()) {
+    for (const auto &[key, json_params] : models_json.items()) {
         names.emplace_back(key);
 
         // Risk factor model parameters.
@@ -254,8 +244,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         auto column_name = correlation_table.column(i).name();
         if (!core::case_insensitive::equals(key, column_name)) {
             throw core::HgpsException{fmt::format("Risk factor {} name ({}) does not match risk "
-                                                  "factor correlation matrix column {} name ({})",
-                                                  i, key, i, column_name)};
+                                                "factor correlation matrix column {} name ({})",
+                                                i, key, i, column_name)};
         }
 
         // Write risk factor data structures.
@@ -300,7 +290,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         trend_model.coefficients =
             trend_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
         trend_model.log_coefficients = trend_json_params["LogCoefficients"]
-                                           .get<std::unordered_map<core::Identifier, double>>();
+                                        .get<std::unordered_map<core::Identifier, double>>();
 
         // Write time trend data structures.
         trend_models->emplace_back(std::move(trend_model));
@@ -315,62 +305,30 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Increment table column index.
         i++;
     }
-
+    
     // Check risk factor correlation matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != correlation_table.num_columns()) {
+    if (models_json.size() != correlation_table.num_columns()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match risk "
-                                              "factor correlation matrix column count ({})",
-                                              opt["RiskFactorModels"].size(),
-                                              correlation_table.num_columns())};
+                                            "factor correlation matrix column count ({})",
+                                            models_json.size(),
+                                            correlation_table.num_columns())};
     }
-
-    // Compute Cholesky decomposition of the risk factor correlation matrix.
-    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
-
+    
     // Check intervention policy covariance matrix column count matches risk factor count.
-    if (opt["RiskFactorModels"].size() != policy_covariance_table.num_columns()) {
+    if (models_json.size() != policy_covariance_table.num_columns()) {
         throw core::HgpsException{fmt::format("Risk factor count ({}) does not match intervention "
-                                              "policy covariance matrix column count ({})",
-                                              opt["RiskFactorModels"].size(),
-                                              policy_covariance_table.num_columns())};
+                                            "policy covariance matrix column count ({})",
+                                            models_json.size(),
+                                            policy_covariance_table.num_columns())};
     }
+}
 
-    // Compute Cholesky decomposition of the intervention policy covariance matrix.
-    auto policy_cholesky =
-        Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
-
-    // Risk factor expected values by sex and age.
-    auto expected = load_risk_factor_expected(config);
-
-    // Check expected values are defined for all risk factors.
-    for (const auto &name : names) {
-        if (!expected->at(core::Gender::male).contains(name)) {
-            throw core::HgpsException{fmt::format(
-                "'{}' is not defined in male risk factor expected values.", name.to_string())};
-        }
-        if (!expected->at(core::Gender::female).contains(name)) {
-            throw core::HgpsException{fmt::format(
-                "'{}' is not defined in female risk factor expected values.", name.to_string())};
-        }
-    }
-
-    // Information speed of risk factor update.
-    const double info_speed = opt["InformationSpeed"].get<double>();
-
-    // Rural sector prevalence for age groups and sex.
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
-    for (const auto &age_group : opt["RuralPrevalence"]) {
-        auto age_group_name = age_group["Name"].get<core::Identifier>();
-        rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
-                                            {core::Gender::male, age_group["Male"]}};
-    }
-
-    // Income models for different income classifications.
+std::unordered_map<core::Income, LinearModelParams> process_income_models(
+    const nlohmann::json& income_models_json) {
+    
     std::unordered_map<core::Income, LinearModelParams> income_models;
-    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
-
+    for (const auto &[key, json_params] : income_models_json.items()) {
         // Get income category.
-        // Added New income category (Low, LowerMiddle, UpperMiddle & High)
         core::Income category;
         if (core::case_insensitive::equals(key, "Unknown")) {
             category = core::Income::unknown;
@@ -395,10 +353,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Insert income model.
         income_models.emplace(category, std::move(model));
     }
+    return income_models;
+}
 
-    // Region models for different region classifications.
+std::unordered_map<core::Region, LinearModelParams> process_region_models(
+    const nlohmann::json& region_models_json) {
+    
     std::unordered_map<core::Region, LinearModelParams> region_models;
-    for (const auto &model : opt["RegionModels"]) {
+    for (const auto &model : region_models_json) {
         auto region = parse_region(model["Region"].get<std::string>());
         auto params = LinearModelParams{};
         params.intercept = model["Intercept"].get<double>();
@@ -410,13 +372,14 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // insert region model with try_emplace to avoid copying the params
         region_models.try_emplace(region, std::move(params));
     }
+    return region_models;
+}
 
-    // Standard deviation of physical activity.
-    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
-
-    // Ethnicity models for different ethnicity classifications.
+std::unordered_map<core::Ethnicity, LinearModelParams> process_ethnicity_models(
+    const nlohmann::json& ethnicity_models_json) {
+    
     std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
-    for (const auto &model : opt["EthnicityModels"]) {
+    for (const auto &model : ethnicity_models_json) {
         auto ethnicity = parse_ethnicity(model["Ethnicity"].get<std::string>());
         auto params = LinearModelParams{};
         params.intercept = model["Intercept"].get<double>();
@@ -428,6 +391,107 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // insert ethnicity model with try_emplace to avoid copying the params
         ethnicity_models.try_emplace(ethnicity, std::move(params));
     }
+    return ethnicity_models;
+}
+
+std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> 
+process_rural_prevalence(const nlohmann::json& rural_prevalence_json) {
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
+    for (const auto &age_group : rural_prevalence_json) {
+        auto age_group_name = age_group["Name"].get<core::Identifier>();
+        rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
+                                          {core::Gender::male, age_group["Male"]}};
+    }
+    return rural_prevalence;
+}
+
+void validate_expected_values(
+    const std::vector<core::Identifier>& names,
+    const std::unique_ptr<hgps::RiskFactorSexAgeTable>& expected) {
+    
+    for (const auto &name : names) {
+        if (!expected->at(core::Gender::male).contains(name)) {
+            throw core::HgpsException{fmt::format(
+                "'{}' is not defined in male risk factor expected values.", name.to_string())};
+        }
+        if (!expected->at(core::Gender::female).contains(name)) {
+            throw core::HgpsException{fmt::format(
+                "'{}' is not defined in female risk factor expected values.", name.to_string())};
+        }
+    }
+}
+
+} // namespace detail
+
+std::unique_ptr<hgps::StaticLinearModelDefinition>
+load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
+    MEASURE_FUNCTION();
+
+    // Risk factor correlation matrix.
+    const auto correlation_file_info =
+        input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
+    const auto correlation_table = load_datatable_from_csv(correlation_file_info);
+    Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+
+    // Policy covariance matrix.
+    const auto policy_covariance_file_info =
+        input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
+    const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
+    Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
+                                     policy_covariance_table.num_columns()};
+
+    // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
+    std::vector<core::Identifier> names;
+    std::vector<LinearModelParams> models;
+    std::vector<core::DoubleInterval> ranges;
+    std::vector<double> lambda;
+    std::vector<double> stddev;
+    std::vector<LinearModelParams> policy_models;
+    std::vector<core::DoubleInterval> policy_ranges;
+    auto trend_models = std::make_unique<std::vector<LinearModelParams>>();
+    auto trend_ranges = std::make_unique<std::vector<core::DoubleInterval>>();
+    auto trend_lambda = std::make_unique<std::vector<double>>();
+    auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
+    auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
+    auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
+
+    // Process risk factor models
+    detail::process_risk_factor_models(
+        opt["RiskFactorModels"], correlation_table, policy_covariance_table,
+        names, models, ranges, lambda, stddev, policy_models, policy_ranges,
+        trend_models, trend_ranges, trend_lambda, expected_trend, expected_trend_boxcox, trend_steps,
+        correlation, policy_covariance);
+
+    // Compute Cholesky decomposition of the risk factor correlation matrix.
+    auto cholesky = Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{correlation}.matrixL()};
+
+    // Compute Cholesky decomposition of the intervention policy covariance matrix.
+    auto policy_cholesky =
+        Eigen::MatrixXd{Eigen::LLT<Eigen::MatrixXd>{policy_covariance}.matrixL()};
+
+    // Risk factor expected values by sex and age.
+    auto expected = load_risk_factor_expected(config);
+
+    // Check expected values are defined for all risk factors.
+    detail::validate_expected_values(names, expected);
+
+    // Information speed of risk factor update.
+    const double info_speed = opt["InformationSpeed"].get<double>();
+
+    // Rural sector prevalence for age groups and sex.
+    auto rural_prevalence = detail::process_rural_prevalence(opt["RuralPrevalence"]);
+
+    // Income models for different income classifications.
+    auto income_models = detail::process_income_models(opt["IncomeModels"]);
+
+    // Region models for different region classifications.
+    auto region_models = detail::process_region_models(opt["RegionModels"]);
+
+    // Standard deviation of physical activity.
+    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+
+    // Ethnicity models for different ethnicity classifications.
+    auto ethnicity_models = detail::process_ethnicity_models(opt["EthnicityModels"]);
 
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),

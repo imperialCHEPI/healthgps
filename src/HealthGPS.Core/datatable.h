@@ -131,9 +131,9 @@ class DataTable {
     void set_demographic_coefficients(const std::string &model_type,
                                       const DemographicCoefficients &coeffs);
 
-    double calculate_probability(const DemographicCoefficients &coeffs, int age, Gender gender,
+    static double calculate_probability(const DemographicCoefficients &coeffs, int age, Gender gender,
                                  Region region,
-                                 std::optional<Ethnicity> ethnicity = std::nullopt) const;
+                                 std::optional<Ethnicity> ethnicity = std::nullopt);
     std::unordered_map<Region, double> get_region_distribution(int age, Gender gender) const;
     std::unordered_map<Ethnicity, double> get_ethnicity_distribution(int age, Gender gender,
                                                                      Region region) const;
@@ -147,6 +147,10 @@ class DataTable {
     std::unordered_map<std::string, std::size_t> index_{};
     std::vector<std::unique_ptr<DataTableColumn>> columns_{};
     size_t rows_count_ = 0;
+    
+    // Helper methods for loading demographic coefficients
+    void load_region_coefficients(const nlohmann::json &demographic_models);
+    void load_ethnicity_coefficients(const nlohmann::json &demographic_models);
 };
 
 } // namespace hgps::core

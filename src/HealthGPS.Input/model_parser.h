@@ -86,4 +86,49 @@ core::Region parse_region(const std::string &value);
 /// @return The parsed ethnicity
 core::Ethnicity parse_ethnicity(const std::string &value);
 
+// Helper functions for loading static linear model definition
+namespace detail {
+    // Processes risk factor models from JSON and populates data structures
+    void process_risk_factor_models(
+        const nlohmann::json& models_json,
+        const core::DataTable& correlation_table,
+        const core::DataTable& policy_covariance_table,
+        std::vector<core::Identifier>& names,
+        std::vector<LinearModelParams>& models,
+        std::vector<core::DoubleInterval>& ranges,
+        std::vector<double>& lambda,
+        std::vector<double>& stddev,
+        std::vector<LinearModelParams>& policy_models,
+        std::vector<core::DoubleInterval>& policy_ranges,
+        std::unique_ptr<std::vector<LinearModelParams>>& trend_models,
+        std::unique_ptr<std::vector<core::DoubleInterval>>& trend_ranges,
+        std::unique_ptr<std::vector<double>>& trend_lambda,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>>& expected_trend,
+        std::unique_ptr<std::unordered_map<core::Identifier, double>>& expected_trend_boxcox,
+        std::unique_ptr<std::unordered_map<core::Identifier, int>>& trend_steps,
+        Eigen::MatrixXd& correlation,
+        Eigen::MatrixXd& policy_covariance);
+
+    // Processes income models from JSON
+    std::unordered_map<core::Income, LinearModelParams> process_income_models(
+        const nlohmann::json& income_models_json);
+
+    // Processes region models from JSON
+    std::unordered_map<core::Region, LinearModelParams> process_region_models(
+        const nlohmann::json& region_models_json);
+
+    // Processes ethnicity models from JSON
+    std::unordered_map<core::Ethnicity, LinearModelParams> process_ethnicity_models(
+        const nlohmann::json& ethnicity_models_json);
+
+    // Processes rural prevalence data from JSON
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> 
+    process_rural_prevalence(const nlohmann::json& rural_prevalence_json);
+
+    // Validates that expected values exist for all risk factors
+    void validate_expected_values(
+        const std::vector<core::Identifier>& names,
+        const std::unique_ptr<hgps::RiskFactorSexAgeTable>& expected);
+}
+
 } // namespace hgps::input

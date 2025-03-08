@@ -68,7 +68,8 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
     /// @return A pointer to the cloned object
     virtual DataTableColumn *clone_impl() const = 0;
 
-    virtual std::string type() const noexcept override = 0;
+    /// @brief Get the column data type name
+    std::string type() const noexcept override = 0;
 
     std::string name() const noexcept override { return name_; }
 
@@ -77,15 +78,17 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
     std::size_t size() const noexcept override { return data_.size(); }
 
     bool is_null(std::size_t index) const noexcept override {
-        if (index >= size())
+        if (index >= size()) {
             return true;
-        return !null_bitmap_.empty() && !null_bitmap_[index];
+        }
+        return null_bitmap_[index];
     }
 
     bool is_valid(std::size_t index) const noexcept override {
-        if (index >= size())
+        if (index >= size()) {
             return false;
-        return null_bitmap_.empty() || null_bitmap_[index];
+        }
+        return !null_bitmap_.empty() && !null_bitmap_[index];
     }
 
     const std::any value(std::size_t index) const noexcept override {
@@ -135,6 +138,13 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
                 std::is_same_v<TYPE, void>,
                 "PrimitiveDataTableColumn only supports string, int, float, and double types");
         }
+    }
+
+    bool has_value(std::size_t index) const noexcept {
+        if (index >= size()) {
+            return false;
+        }
+        return !null_bitmap_[index];
     }
 
   protected:
