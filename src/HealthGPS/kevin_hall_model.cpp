@@ -980,7 +980,8 @@ void KevinHallModel::update_income_continuous(Person &person, Random &random) co
 // Modified: Mahima 25/02/2025
 // Income category is initialised using the quartiles of the income_continuous values
 // This is done at the start and then every 5 years
-void KevinHallModel::initialise_income_category(Person &person, const Population &population) const {
+void KevinHallModel::initialise_income_category(Person &person,
+                                                const Population &population) const {
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
 
