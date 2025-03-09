@@ -406,9 +406,9 @@ std::optional<RelativeRiskEntity> DataManager::get_relative_risk_to_risk_factor(
 CancerParameterEntity DataManager::get_disease_parameter(const DiseaseInfo &info, const Country &country) const 
 {
     //// THis function is called for cancers, which have extra subfolders for each country containing three files: 
-    ////    i) prevalence_distribution.csv (guessing this is the prevalence of people with this cancer currently in stages 1,2,3 and 4); 
-    ////    ii) survival_rate_parameters.csv (appears to be the coefficients of the polynomials used to fit survival rates); iii) 
-    ////    iii) death_weights.csv (guessing this is the proportion of deaths that occur in each cancer stage seeing as they sum to 1 for each sex)
+    ////    i) prevalence_distribution.csv (this is the prevalence of people with this cancer currently in 0,1,2,3 and 4 years since onset); 
+    ////    ii) survival_rate_parameters.csv (the coefficients of the polynomials used to fit survival rates); 
+    ////    iii) death_weights.csv (proportions of deaths that occur after 0,1,2,3 and 4 years post onset)
     //// The function then loops over each file and imports them alll into one CancerParameterEntity structure named table, which is the return value.
 
     // Creates full file name from store configuration

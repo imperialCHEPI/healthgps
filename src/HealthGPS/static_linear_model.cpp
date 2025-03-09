@@ -7,7 +7,7 @@
 
 namespace hgps {
 
-StaticLinearModel::StaticLinearModel(
+StaticLinearModel::StaticLinearModel( 
     std::shared_ptr<RiskFactorSexAgeTable>                                              expected,
     std::shared_ptr<std::unordered_map<core::Identifier, double>>                       expected_trend,
     std::shared_ptr<std::unordered_map<core::Identifier, int>>                          trend_steps,
@@ -149,8 +149,8 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda)
     return pow(lambda * factor + 1.0, 1.0 / lambda);
 }
 
-void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person, Random &random) const {
-
+void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person, Random &random) const 
+{
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 

@@ -209,8 +209,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     const std::unordered_map<core::Identifier, double> &energy_equation_;
     const std::unordered_map<core::Identifier, core::DoubleInterval> &nutrient_ranges_;
-    const std::unordered_map<core::Identifier, std::map<core::Identifier, double>>
-        &nutrient_equations_;
+    const std::unordered_map<core::Identifier, std::map<core::Identifier, double>> &nutrient_equations_;
     const std::unordered_map<core::Identifier, std::optional<double>> &food_prices_;
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles_;
     const std::vector<double> &epa_quantiles_;

@@ -108,9 +108,9 @@ double DefaultCancerModel::get_excess_mortality(const Person &person) const noex
 
     if (disease_info.time_since_onset < 0 || disease_info.time_since_onset >= max_onset) return 0.0;
 
-    double excess_mortality         = definition_.get().table()(person.age, person.gender).at(mortality_id);
-    const auto &sex_death_weights   = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);
-    double death_weight             = (person.gender == core::Gender::male) ? sex_death_weights.males : sex_death_weights.females;
+    double excess_mortality         = definition_.get().table()(person.age, person.gender).at(mortality_id); // get excess mortality associated with this cancer
+    const auto &sex_death_weights   = definition_.get().parameters().death_weight.at(disease_info.time_since_onset);    // get both male and female disease weights (proportions of deaths that occur this many years post onset). 
+    double death_weight             = (person.gender == core::Gender::male) ? sex_death_weights.males : sex_death_weights.females; // choose correct weight for this person's sex.
 
     return excess_mortality * death_weight;
 }
@@ -211,6 +211,7 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context)
         // Increment duration by one year
         auto &disease = person.diseases.at(disease_type());
         disease.time_since_onset++;
+
         if (disease.time_since_onset >= max_onset) 
         {
             disease.status              = DiseaseStatus::free;
@@ -257,7 +258,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context)
 int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context, const core::Gender &gender) const 
 {
     //// this function is odd. It is basically copying values already contained in definition_.get().parameters().prevalence_distribution.
-    //// Also it calculates the cumulative distribution. How many times is this called? Does the value ever change? If not then could be very wasteful.
+    //// Also it calculates the cumulative distribution. Only called during initialise_disease_status
     const auto &pdf = definition_.get().parameters().prevalence_distribution;
     auto values     = std::vector<int>{};
     auto cumulative = std::vector<double>{};

@@ -56,7 +56,8 @@ const std::string &DemographicModule::name() const noexcept
     return name_; 
 }
 
-std::size_t DemographicModule::get_total_population_size(int time_year) const noexcept {
+std::size_t DemographicModule::get_total_population_size(int time_year) const noexcept 
+{
     auto total = 0.0f;
     if (pop_data_.contains(time_year)) {
         const auto &year_data = pop_data_.at(time_year);
@@ -65,15 +66,13 @@ std::size_t DemographicModule::get_total_population_size(int time_year) const no
                                     return previous + element.second.total();
                                 });
     }
-
     return static_cast<std::size_t>(total);
 }
 
-double DemographicModule::get_total_deaths(int time_year) const noexcept {
-    if (life_table_.contains_time(time_year)) {
+double DemographicModule::get_total_deaths(int time_year) const noexcept 
+{
+    if (life_table_.contains_time(time_year)) 
         return life_table_.get_total_deaths_at(time_year);
-    }
-
     return 0.0;
 }
 
@@ -366,6 +365,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context, cons
             // Calculate death probability based on the health status
             auto residual_death_rate    = get_residual_death_rate(entity.age, entity.gender);
             auto product                = 1.0 - residual_death_rate;
+
             for (const auto &item : entity.diseases) 
                 if (item.second.status == DiseaseStatus::active) 
                 {
