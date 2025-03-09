@@ -556,12 +556,13 @@ void StaticLinearModel::initialise_income_category(Person &person, const Populat
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
 
+    // collect all the income_continuous values
     for (const auto &p : population) {
         if (p.income_continuous > 0) {
             sorted_incomes.push_back(p.income_continuous);
         }
     }
-
+    // sort just once (reduces time complexity)
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
 
     size_t n = sorted_incomes.size();

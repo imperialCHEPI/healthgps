@@ -410,6 +410,7 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person, Random &random)
     // Get current values
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
     double sodium = person.risk_factors.at("Sodium"_id);
+    double alcohol = person.risk_factors.at("Alcohol"_id); // added alcohol
 
     // Add random variations to match population distributions
     // Using normal distribution with mean=0.0 and standard deviation=0.1
@@ -425,28 +426,31 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person, Random &random)
     // real-world population variability
     carbohydrate += random.next_normal(0.0, 0.1);
     sodium += random.next_normal(0.0, 0.1);
+    alcohol += random.next_normal(0.0, 0.1);
 
     // Store values with random variations
     person.risk_factors.at("Carbohydrate"_id) = carbohydrate;
     person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
     person.risk_factors.at("Sodium"_id) = sodium;
     person.risk_factors["Sodium_previous"_id] = sodium;
+    person.risk_factors.at("Alcohol"_id) = alcohol;
+    person.risk_factors["Alcohol_previous"_id] = alcohol;
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
-
     // Set previous nutrient intakes.
     double previous_carbohydrate = person.risk_factors.at("Carbohydrate"_id);
     person.risk_factors.at("Carbohydrate_previous"_id) = previous_carbohydrate;
     double previous_sodium = person.risk_factors.at("Sodium"_id);
     person.risk_factors.at("Sodium_previous"_id) = previous_sodium;
+    double previous_alcohol = person.risk_factors.at("Alcohol"_id);
+    person.risk_factors.at("Alcohol_previous"_id) = previous_alcohol;
 
     // Update nutrient intakes.
     compute_nutrient_intakes(person);
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-
     // Reset nutrient intakes to zero.
     for (const auto &[nutrient_key, unused] : energy_equation_) {
         person.risk_factors[nutrient_key] = 0.0;
@@ -932,7 +936,7 @@ void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Perso
 }
 
 // Modified: Mahima 25/02/2025
-// Income is initialised using the softmax of the income probabilities based on age, gender, region,
+// Income is initialised using the SoftMax of the income probabilities based on age, gender, region,
 // ethnicity
 // this uses a logistic regression model to predict the income category
 void KevinHallModel::initialise_income_continuous(Person &person, Random &random) const {
@@ -976,17 +980,18 @@ void KevinHallModel::update_income_continuous(Person &person, Random &random) co
 // Modified: Mahima 25/02/2025
 // Income category is initialised using the quartiles of the income_continuous values
 // This is done at the start and then every 5 years
-void KevinHallModel::initialise_income_category(Person &person,
-                                                const Population &population) const {
-    std::vector<double> sorted_incomes; // sorting for each person not ideal FIXXXXXX!!!
+void KevinHallModel::initialise_income_category(Person &person, const Population &population) const {
+    std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
 
+    // Collect all income values
     for (const auto &p : population) {
         if (p.income_continuous > 0) {
             sorted_incomes.push_back(p.income_continuous);
         }
     }
 
+    // Sort once (reduce time complexity)
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
 
     // Calculate quartile thresholds
@@ -995,7 +1000,7 @@ void KevinHallModel::initialise_income_category(Person &person,
     double q2_threshold = sorted_incomes[n / 2];
     double q3_threshold = sorted_incomes[3 * n / 4];
 
-    // Assign income category based on quartiles
+    // Assign income categories based on quartiles
     if (person.income_continuous <= q1_threshold) {
         person.income_category = core::Income::low;
     } else if (person.income_continuous <= q2_threshold) {
