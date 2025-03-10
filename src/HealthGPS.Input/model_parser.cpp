@@ -170,6 +170,7 @@ std::unique_ptr<hgps::StaticHierarchicalLinearModelDefinition> load_hlm_risk_mod
 
 std::unique_ptr<hgps::StaticLinearModelDefinition> load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) 
 {
+    //// This function cycles through static_model.json and extracts relevant parameters values to an instance of the StaticLinearModelDefinition class, which this function returns
     MEASURE_FUNCTION();
 
     // Risk factor correlation matrix.
@@ -554,6 +555,13 @@ std::unique_ptr<hgps::RiskFactorModelDefinition> load_risk_model_definition(hgps
 
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository, const Configuration &config)
 {
+    // this function goes through the top-level config file (where config.modelling.risk_factor_models has been set previously), and calls...
+    // ... the function load_risk_model_definition as many times as there are models listed in ["modelling"]["risk_factor_models"] (so once for static_model.json and another for dynamic_model.json). 
+    // load_risk_model_definition then looks at ["ModelName"] argument (in either static_model.json or another for dynamic_model.json) to determine whether...
+    // ... e.g. static_model.json refers to "hlm" (in which case function load_hlm_risk_model_definition is called) or "staticlinear" (in which case function load_staticlinear_risk_model_definition is called) 
+    // .... Similarly, whether dynamic_model.json refers to "ebhlm" (in which case function load_ebhlm_risk_model_definition is called) or "kevinhall" (in which case function load_kevinhall_risk_model_definition is called) 
+    // these functions then populate the various classes they refer to with values from the dynamic_model.json or static_model.json.
+
     MEASURE_FUNCTION();
 
     for (const auto &[model_type_str, model_path] : config.modelling.risk_factor_models) 
