@@ -34,12 +34,18 @@
                                 "coefficients": {
                                     "type": "object",
                                     "properties": {
-                                        "age": { "type": "string" },
+                                        "age": {
+                                            "type": "string"
+                                        },
                                         "gender": {
                                             "type": "object",
                                             "properties": {
-                                                "male": { "type": "number" },
-                                                "female": { "type": "number" }
+                                                "male": {
+                                                    "type": "number"
+                                                },
+                                                "female": {
+                                                    "type": "number"
+                                                }
                                             },
                                             "additionalProperties": false
                                         }
@@ -51,7 +57,9 @@
                         },
                         "coefficients": {
                             "type": "object",
-                            "additionalProperties": { "type": "string" }
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "additionalProperties": false
@@ -65,18 +73,26 @@
                                 "coefficients": {
                                     "type": "object",
                                     "properties": {
-                                        "age": { "type": "string" },
+                                        "age": {
+                                            "type": "string"
+                                        },
                                         "gender": {
                                             "type": "object",
                                             "properties": {
-                                                "male": { "type": "number" },
-                                                "female": { "type": "number" }
+                                                "male": {
+                                                    "type": "number"
+                                                },
+                                                "female": {
+                                                    "type": "number"
+                                                }
                                             },
                                             "additionalProperties": false
                                         },
                                         "region": {
                                             "type": "object",
-                                            "additionalProperties": { "type": "string" }
+                                            "additionalProperties": {
+                                                "type": "string"
+                                            }
                                         }
                                     },
                                     "additionalProperties": false
@@ -86,7 +102,9 @@
                         },
                         "coefficients": {
                             "type": "object",
-                            "additionalProperties": { "type": "string" }
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "additionalProperties": false
@@ -101,16 +119,24 @@
                                     "type": "object",
                                     "additionalProperties": true
                                 },
-                                "standard_deviation": { "type": "number" },
-                                "update_frequency": { "type": "integer" }
+                                "standard_deviation": {
+                                    "type": "number"
+                                },
+                                "update_frequency": {
+                                    "type": "integer"
+                                }
                             },
                             "additionalProperties": false
                         },
                         "categories": {
                             "type": "object",
                             "properties": {
-                                "method": { "type": "string" },
-                                "update_frequency": { "type": "integer" }
+                                "method": {
+                                    "type": "string"
+                                },
+                                "update_frequency": {
+                                    "type": "integer"
+                                }
                             },
                             "additionalProperties": false
                         }
@@ -123,19 +149,27 @@
                         "coefficients": {
                             "type": "object",
                             "properties": {
-                                "age": { "type": "string" },
+                                "age": {
+                                    "type": "string"
+                                },
                                 "gender": {
                                     "type": "object",
                                     "properties": {
-                                        "male": { "type": "number" },
-                                        "female": { "type": "number" }
+                                        "male": {
+                                            "type": "number"
+                                        },
+                                        "female": {
+                                            "type": "number"
+                                        }
                                     },
                                     "additionalProperties": false
                                 }
                             },
                             "additionalProperties": false
                         },
-                        "standard_deviation": { "type": "number" }
+                        "standard_deviation": {
+                            "type": "number"
+                        }
                     },
                     "additionalProperties": false
                 }
