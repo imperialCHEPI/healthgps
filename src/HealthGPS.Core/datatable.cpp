@@ -331,7 +331,7 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
     // Store the coefficients in the map first with default values
     demographic_coefficients_["region.probabilities"] = region_coeffs;
     demographic_coefficients_["ethnicity.probabilities"] = ethnicity_coeffs;
-
+    // Here it loads the coefficients from the config file
     if (!config.contains("modelling") || !config["modelling"].contains("demographic_models")) {
         return; // Return early with default values if no configuration
     }
