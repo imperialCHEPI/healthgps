@@ -236,23 +236,24 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
         if (gender != Gender::unknown && coeffs.gender_coefficients.contains(gender)) {
             gender_effect = coeffs.gender_coefficients.at(gender);
         }
-        
+
         double region_effect = 0.0;
         if (region != Region::unknown && coeffs.region_coefficients.contains(region)) {
             region_effect = coeffs.region_coefficients.at(region);
         }
-        
+
         // Calculate and apply ethnicity-specific effects
         for (auto &[ethnicity, prob] : probabilities) {
             // Basic adjustment factor incorporating age, gender, and region effects
             double base_adjustment = 1.0 + (age_effect + gender_effect + region_effect) * 0.1;
-            
+
             // Add ethnicity-specific adjustment
             double ethnicity_effect = 0.0;
-            if (ethnicity != Ethnicity::unknown && coeffs.ethnicity_coefficients.contains(ethnicity)) {
+            if (ethnicity != Ethnicity::unknown &&
+                coeffs.ethnicity_coefficients.contains(ethnicity)) {
                 ethnicity_effect = coeffs.ethnicity_coefficients.at(ethnicity);
             }
-            
+
             // Apply the combined adjustment
             prob *= (base_adjustment + ethnicity_effect * 0.1);
         }
@@ -401,7 +402,8 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
             region_coeffs.region_coefficients[Region::Scotland] = region["Scotland"].get<double>();
         }
         if (region.contains("NorthernIreland")) {
-            region_coeffs.region_coefficients[Region::NorthernIreland] = region["NorthernIreland"].get<double>();
+            region_coeffs.region_coefficients[Region::NorthernIreland] =
+                region["NorthernIreland"].get<double>();
         }
     }
 
@@ -411,7 +413,7 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
 
 // Implement the helper methods before load_ethnicity_coefficients
 void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethnicity_coeffs,
-                                                  const nlohmann::json &region_probs) {
+                                                   const nlohmann::json &region_probs) {
     // Process England
     if (region_probs.contains("England")) {
         ethnicity_coeffs.region_coefficients[Region::England] =
@@ -420,8 +422,7 @@ void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethn
 
     // Process Wales
     if (region_probs.contains("Wales")) {
-        ethnicity_coeffs.region_coefficients[Region::Wales] =
-            region_probs["Wales"].get<double>();
+        ethnicity_coeffs.region_coefficients[Region::Wales] = region_probs["Wales"].get<double>();
     }
 
     // Process Scotland
@@ -438,7 +439,7 @@ void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethn
 }
 
 void DataTable::load_ethnicity_type_coefficients(DemographicCoefficients &ethnicity_coeffs,
-                                               const nlohmann::json &ethnicity_probs) {
+                                                 const nlohmann::json &ethnicity_probs) {
     // Process White ethnicity
     if (ethnicity_probs.contains("White")) {
         ethnicity_coeffs.ethnicity_coefficients[Ethnicity::White] =
@@ -464,7 +465,8 @@ void DataTable::load_ethnicity_type_coefficients(DemographicCoefficients &ethnic
     }
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Complexity has been reduced with helper methods
+// NOLINTNEXTLINE(readability-function-cognitive-complexity) - Complexity has been reduced with
+// helper methods
 void DataTable::load_ethnicity_coefficients(const nlohmann::json &demographic_models) {
     // Exit early if required sections don't exist
     if (!demographic_models.contains("ethnicity") ||
