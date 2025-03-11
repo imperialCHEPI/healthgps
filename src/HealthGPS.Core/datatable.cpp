@@ -236,26 +236,27 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
         if (gender != Gender::unknown && coeffs.gender_coefficients.contains(gender)) {
             gender_effect = coeffs.gender_coefficients.at(gender);
         }
-        
+
         double region_effect = 0.0;
         if (region != Region::unknown && coeffs.region_coefficients.contains(region)) {
             region_effect = coeffs.region_coefficients.at(region);
         }
-        
+
         // Calculate and apply ethnicity-specific effects
         for (auto &[ethnicity, prob] : probabilities) {
             // Basic adjustment factor incorporating age, gender, and region effects
             double base_adjustment = 1.0 + (age_effect + gender_effect + region_effect) * 0.1;
-            
+
             // Add ethnicity-specific adjustment
             double ethnicity_effect = 0.0;
-            if (ethnicity != Ethnicity::unknown && coeffs.ethnicity_coefficients.contains(ethnicity)) {
+            if (ethnicity != Ethnicity::unknown &&
+                coeffs.ethnicity_coefficients.contains(ethnicity)) {
                 ethnicity_effect = coeffs.ethnicity_coefficients.at(ethnicity);
             }
-            
+
             // Apply the combined adjustment
             prob *= (base_adjustment + ethnicity_effect * 0.1);
-            
+
             // Ensure we don't have negative probabilities
             if (prob < 0.0) {
                 prob = 0.0;
