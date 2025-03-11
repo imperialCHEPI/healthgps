@@ -138,9 +138,17 @@ class DataTable {
     std::unordered_map<Ethnicity, double> get_ethnicity_distribution(int age, Gender gender,
                                                                      Region region) const;
 
+    /// @brief Load ethnicity coefficients from the demographic models config
+    /// @param demographic_models The demographic models configuration
+    void load_ethnicity_coefficients(const nlohmann::json &demographic_models);
+
   private:
     // Add member variable to store the demographic coefficients
     std::unordered_map<std::string, DemographicCoefficients> demographic_coefficients_;
+
+    /// @brief Load region coefficients from the demographic models config
+    /// @param demographic_models The demographic models configuration
+    void load_region_coefficients(const nlohmann::json &demographic_models);
 
     std::unique_ptr<std::mutex> sync_mtx_{std::make_unique<std::mutex>()};
     std::vector<std::string> names_{};
@@ -148,9 +156,17 @@ class DataTable {
     std::vector<std::unique_ptr<DataTableColumn>> columns_{};
     size_t rows_count_ = 0;
 
-    // Helper methods for loading demographic coefficients
-    void load_region_coefficients(const nlohmann::json &demographic_models);
-    void load_ethnicity_coefficients(const nlohmann::json &demographic_models);
+    /// @brief Load ethnicity region coefficients from the configuration 
+    /// @param ethnicity_coeffs Ethnicity coefficients to update
+    /// @param region_probs JSON containing region probability coefficients
+    void load_ethnicity_region_coefficients(DemographicCoefficients &ethnicity_coeffs, 
+                                           const nlohmann::json &region_probs);
+
+    /// @brief Load ethnicity type coefficients from the configuration
+    /// @param ethnicity_coeffs Ethnicity coefficients to update
+    /// @param ethnicity_probs JSON containing ethnicity probability coefficients
+    void load_ethnicity_type_coefficients(DemographicCoefficients &ethnicity_coeffs,
+                                         const nlohmann::json &ethnicity_probs);
 };
 
 } // namespace hgps::core

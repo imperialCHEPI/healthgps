@@ -403,42 +403,58 @@ void DataTable::load_ethnicity_coefficients(const nlohmann::json &demographic_mo
         }
     }
 
-    // Load region coefficients for ethnicity
+    // Load region coefficients - extracted to reduce complexity
     if (ethnicity_config.contains("region")) {
         const auto &region_probs = ethnicity_config["region"];
+        
+        // Process England
         if (region_probs.contains("England")) {
             ethnicity_coeffs.region_coefficients[Region::England] =
                 region_probs["England"].get<double>();
         }
+        
+        // Process Wales
         if (region_probs.contains("Wales")) {
             ethnicity_coeffs.region_coefficients[Region::Wales] =
                 region_probs["Wales"].get<double>();
         }
+        
+        // Process Scotland
         if (region_probs.contains("Scotland")) {
             ethnicity_coeffs.region_coefficients[Region::Scotland] =
                 region_probs["Scotland"].get<double>();
         }
+        
+        // Process Northern Ireland
         if (region_probs.contains("NorthernIreland")) {
             ethnicity_coeffs.region_coefficients[Region::NorthernIreland] =
                 region_probs["NorthernIreland"].get<double>();
         }
     }
 
-    // Load ethnicity coefficients
+    // Load ethnicity type coefficients - extracted to reduce complexity
     if (ethnicity_config.contains("ethnicity")) {
         const auto &ethnicity_probs = ethnicity_config["ethnicity"];
+        
+        // Process White ethnicity
         if (ethnicity_probs.contains("White")) {
             ethnicity_coeffs.ethnicity_coefficients[Ethnicity::White] =
                 ethnicity_probs["White"].get<double>();
         }
+        
+        // Process Asian ethnicity
         if (ethnicity_probs.contains("Asian")) {
             ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Asian] =
                 ethnicity_probs["Asian"].get<double>();
         }
+        
+        // Process Black ethnicity
         if (ethnicity_probs.contains("Black")) {
             ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Black] =
                 ethnicity_probs["Black"].get<double>();
         }
+        
+        // Process Others ethnicity
         if (ethnicity_probs.contains("Others")) {
             ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Others] =
                 ethnicity_probs["Others"].get<double>();

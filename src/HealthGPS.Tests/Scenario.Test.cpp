@@ -377,7 +377,9 @@ TEST(ScenarioTest, MarketingPolicyCreate) {
     ASSERT_EQ("Marketing Dynamic", scenario.name());
     ASSERT_EQ(2022, scenario.active_period().start_time);
     ASSERT_TRUE(scenario.active_period().finish_time.has_value());
-    ASSERT_EQ(2030, scenario.active_period().finish_time.value());
+    if (scenario.active_period().finish_time.has_value()) {
+        ASSERT_EQ(2030, scenario.active_period().finish_time.value());
+    }
     ASSERT_EQ(3, scenario.impacts().size());
     ASSERT_EQ(0, scenario.channel().size());
 }

@@ -95,7 +95,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     /// @brief Update the income category for a person
     /// @param context The runtime context to use for income category updates
-    void update_income_category(RuntimeContext &context) const;
+    static void update_income_category(RuntimeContext &context);
 
   private:
     static double inverse_box_cox(double factor, double lambda);
@@ -165,7 +165,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param context The runtime context to use for region updates
     /// @param person The person to update the region for
     /// @param random The random number generator from the runtime context
-    void update_region(RuntimeContext &context, Person &person, Random &random) const;
+    static void update_region(RuntimeContext &context, Person &person, Random &random);
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;

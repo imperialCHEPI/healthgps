@@ -77,7 +77,7 @@ void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexce
     // const_cast is needed here because we have a const method publishing to a non-const bus
     // This is safe because publish() doesn't modify the bus itself, only sends a message through it
     // Pointed out by Clang-Tidy
-    const_cast<EventAggregator *>(event_bus_.get())->publish(std::move(message));
+    const_cast<EventAggregator *>(event_bus_.get())->publish(std::move(message)); // NOLINT(cppcoreguidelines-pro-type-const-cast)
 }
 
 void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
@@ -86,7 +86,7 @@ void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const 
     // const_cast is needed here because we have a const method publishing to a non-const bus
     // This is safe because publish_async() doesn't modify the bus itself, only sends a message
     // through it Pointed out by Clang-Tidy
-    const_cast<EventAggregator *>(event_bus_.get())->publish_async(std::move(message));
+    const_cast<EventAggregator *>(event_bus_.get())->publish_async(std::move(message)); // NOLINT(cppcoreguidelines-pro-type-const-cast)
 }
 
 std::unordered_map<core::Region, double>

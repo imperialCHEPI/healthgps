@@ -103,7 +103,7 @@ class TestKevinHallModel : public ::testing::Test {
             double income_continuous_stddev = 0.2;
 
             // Create Kevin Hall model with all required parameters
-            model = std::unique_ptr<KevinHallModel>(new KevinHallModel(
+            model.reset(new KevinHallModel(
                 expected, expected_trend, trend_steps, energy_equation, nutrient_ranges,
                 nutrient_equations, food_prices, weight_quantiles, epa_quantiles, height_stddev,
                 height_slope, region_models, ethnicity_models, income_models,
@@ -221,10 +221,11 @@ TEST_F(TestKevinHallModel, ModelGeneration) {
 }
 
 class TestStaticLinearModel : public ::testing::Test {
-  protected:
-    // Explicitly delete default constructor since RuntimeContext has no default constructor
-    TestStaticLinearModel() = delete;
+  public:
+    // Initialize all member variables in the constructor
+    TestStaticLinearModel() : context(nullptr), model(nullptr), population(0), person(core::Gender::male) {}
 
+  protected:
     void SetUp() override {
         // Setup mock objects needed for RuntimeContext
         auto bus = std::make_shared<TestEventAggregator>();
