@@ -258,6 +258,7 @@
     },
     "required": [
         "ses_model",
+        "demographic_models",
         "risk_factors",
         "risk_factor_models",
         "baseline_adjustments"
