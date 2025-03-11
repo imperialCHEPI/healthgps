@@ -480,7 +480,7 @@ void StaticLinearModel::initialise_region(RuntimeContext &context, Person &perso
 }
 // NOTE: Might need to change how region is being updated later
 void StaticLinearModel::update_region(RuntimeContext &context, Person &person,
-                                      Random &random) const {
+                                      Random &random) {
     if (person.age == 18) {
         initialise_region(context, person, random);
     }
@@ -582,7 +582,7 @@ void StaticLinearModel::initialise_income_category(Person &person, const Populat
 }
 
 // done at the start and then every 5 years
-void StaticLinearModel::update_income_category(RuntimeContext &context) const {
+void StaticLinearModel::update_income_category(RuntimeContext &context) {
     static int last_update_year = 0;
     int current_year = context.time_now();
 
