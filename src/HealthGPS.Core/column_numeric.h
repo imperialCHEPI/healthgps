@@ -18,7 +18,8 @@ class StringDataTableColumn final : public PrimitiveDataTableColumn<std::string>
   protected:
     // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+        // pattern
         return new StringDataTableColumn(*this);
     }
 };
@@ -33,7 +34,8 @@ class FloatDataTableColumn final : public PrimitiveDataTableColumn<float> {
   protected:
     // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+        // pattern
         return new FloatDataTableColumn(*this);
     }
 };
@@ -48,7 +50,8 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
   protected:
     // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+        // pattern
         return new DoubleDataTableColumn(*this);
     }
 };
@@ -79,7 +82,8 @@ class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
   protected:
     // Returns owned pointer that must be deleted by caller
     DataTableColumn *clone_impl() const override {
-        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
+        // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+        // pattern
         return new IntegerDataTableColumn(*this);
     }
 };
