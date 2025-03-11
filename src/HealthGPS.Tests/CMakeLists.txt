@@ -23,6 +23,8 @@ target_sources(
             "Core.Test.cpp"
             "Core.UnivariateSummary.Test.cpp"
             "Core.MathHelper.Test.cpp"
+            "DataTableColumn.Test.cpp"
+            "DataTable.Test.cpp"
             "Sha256.Test.cpp"
             "Datastore.Test.cpp"
             "Repository.Test.cpp"
