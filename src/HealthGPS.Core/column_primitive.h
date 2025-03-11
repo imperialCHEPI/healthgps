@@ -40,13 +40,15 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
     PrimitiveDataTableColumn(std::string name, std::vector<TYPE> data)
         : name_(std::move(name)), data_(std::move(data)) {
         validate_name();
+        // Initialize an empty null_bitmap where all values are valid (not null)
+        null_bitmap_.resize(data_.size(), false);
         null_count_ = 0;
     }
 
     /// @brief Initialises a new instance with name, data and null bitmap
     /// @param name Column name
     /// @param data Column data
-    /// @param null_bitmap Column null values index
+    /// @param null_bitmap Column null values index (true means value is null)
     /// @throws std::invalid_argument for invalid column name
     /// @throws std::out_of_range for size mismatch
     PrimitiveDataTableColumn(std::string name, std::vector<TYPE> data,
@@ -54,7 +56,12 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
         : name_(std::move(name)), data_(std::move(data)), null_bitmap_(std::move(null_bitmap)) {
         validate_name();
         validate_sizes();
-        null_count_ = std::count(null_bitmap_.begin(), null_bitmap_.end(), false);
+        // Count null values (true in the bitmap means null)
+        null_count_ = std::count(null_bitmap_.begin(), null_bitmap_.end(), true);
+        // If null_bitmap is empty, initialize it with all values valid
+        if (null_bitmap_.empty()) {
+            null_bitmap_.resize(data_.size(), false);
+        }
     }
 
     /// @brief Creates a deep copy of this column
@@ -79,33 +86,36 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
 
     bool is_null(std::size_t index) const noexcept override {
         if (index >= size()) {
-            return true;
+            return true; // Out of bounds indices are treated as null
         }
         return null_bitmap_[index];
     }
 
     bool is_valid(std::size_t index) const noexcept override {
         if (index >= size()) {
-            return false;
+            return false; // Out of bounds indices are not valid
         }
-        return !null_bitmap_.empty() && !null_bitmap_[index];
+        return !null_bitmap_[index];
     }
 
     const std::any value(std::size_t index) const noexcept override {
-        if (is_valid(index)) {
-            return data_[index];
+        if (index >= size()) {
+            return std::any(); // Return empty for out of bounds
         }
-        return std::any();
+        if (null_bitmap_[index]) {
+            return std::any(); // Return empty for null values
+        }
+        return data_[index];
     }
 
     /// @brief Gets the column value at a given index.
     /// @param index Column index
     /// @return The value at index, if inside bounds; otherwise empty
     const std::optional<value_type> value_safe(const std::size_t index) const noexcept {
-        if (is_valid(index)) {
-            return data_[index];
+        if (index >= size() || null_bitmap_[index]) {
+            return std::nullopt;
         }
-        return std::nullopt;
+        return data_[index];
     }
 
     /// @brief Gets the column value at a given index, unsafe without boundary checks.
@@ -140,6 +150,9 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
         }
     }
 
+    /// @brief Check if column has a value at the given index
+    /// @param index Index to check
+    /// @return True if index is in bounds and value is not null
     bool has_value(std::size_t index) const noexcept {
         if (index >= size()) {
             return false;
