@@ -103,11 +103,11 @@ class TestKevinHallModel : public ::testing::Test {
             double income_continuous_stddev = 0.2;
 
             // Create Kevin Hall model with all required parameters
-            model.reset(new KevinHallModel(
-                expected, expected_trend, trend_steps, energy_equation, nutrient_ranges,
-                nutrient_equations, food_prices, weight_quantiles, epa_quantiles, height_stddev,
-                height_slope, region_models, ethnicity_models, income_models,
-                income_continuous_stddev));
+            model.reset(new KevinHallModel(expected, expected_trend, trend_steps, energy_equation,
+                                           nutrient_ranges, nutrient_equations, food_prices,
+                                           weight_quantiles, epa_quantiles, height_stddev,
+                                           height_slope, region_models, ethnicity_models,
+                                           income_models, income_continuous_stddev));
         } catch (const std::exception &e) {
             FAIL() << "Failed to initialize KevinHallModel: " << e.what();
         }
@@ -223,7 +223,8 @@ TEST_F(TestKevinHallModel, ModelGeneration) {
 class TestStaticLinearModel : public ::testing::Test {
   public:
     // Initialize all member variables in the constructor
-    TestStaticLinearModel() : context(nullptr), model(nullptr), population(0), person(core::Gender::male) {}
+    TestStaticLinearModel()
+        : context(nullptr), model(nullptr), population(0), person(core::Gender::male) {}
 
   protected:
     void SetUp() override {

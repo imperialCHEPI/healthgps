@@ -479,8 +479,7 @@ void StaticLinearModel::initialise_region(RuntimeContext &context, Person &perso
                               "or are incorrectly distributed");
 }
 // NOTE: Might need to change how region is being updated later
-void StaticLinearModel::update_region(RuntimeContext &context, Person &person,
-                                      Random &random) {
+void StaticLinearModel::update_region(RuntimeContext &context, Person &person, Random &random) {
     if (person.age == 18) {
         initialise_region(context, person, random);
     }
