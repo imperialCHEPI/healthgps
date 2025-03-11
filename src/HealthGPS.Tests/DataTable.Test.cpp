@@ -80,7 +80,7 @@ TEST(DataTableTest, CalculateProbability) {
 
     // Test with male, England, White with small coefficients
     double prob2 = DataTable::calculate_probability(small_coeffs, 1, Gender::male, Region::England,
-                                                   Ethnicity::White);
+                                                    Ethnicity::White);
     // Expected: 0.01*1 + 0.01 + 0.01 + 0.01 = 0.04
     ASSERT_DOUBLE_EQ(0.04, prob2);
 
@@ -118,15 +118,18 @@ TEST(DataTableTest, LoadRegionCoefficients) {
     ASSERT_DOUBLE_EQ(0.1, coeffs.age_coefficient);
     ASSERT_DOUBLE_EQ(0.2, coeffs.gender_coefficients[Gender::male]);
     ASSERT_DOUBLE_EQ(0.3, coeffs.gender_coefficients[Gender::female]);
-    
+
     // Using has_value and get_value instead of direct access
-    ASSERT_TRUE(coeffs.region_coefficients.find(Region::England) != coeffs.region_coefficients.end());
+    ASSERT_TRUE(coeffs.region_coefficients.find(Region::England) !=
+                coeffs.region_coefficients.end());
     ASSERT_DOUBLE_EQ(0.4, coeffs.region_coefficients.at(Region::England));
     ASSERT_TRUE(coeffs.region_coefficients.find(Region::Wales) != coeffs.region_coefficients.end());
     ASSERT_DOUBLE_EQ(0.5, coeffs.region_coefficients.at(Region::Wales));
-    ASSERT_TRUE(coeffs.region_coefficients.find(Region::Scotland) != coeffs.region_coefficients.end());
+    ASSERT_TRUE(coeffs.region_coefficients.find(Region::Scotland) !=
+                coeffs.region_coefficients.end());
     ASSERT_DOUBLE_EQ(0.6, coeffs.region_coefficients.at(Region::Scotland));
-    ASSERT_TRUE(coeffs.region_coefficients.find(Region::NorthernIreland) != coeffs.region_coefficients.end());
+    ASSERT_TRUE(coeffs.region_coefficients.find(Region::NorthernIreland) !=
+                coeffs.region_coefficients.end());
     ASSERT_DOUBLE_EQ(0.7, coeffs.region_coefficients.at(Region::NorthernIreland));
 }
 
@@ -224,10 +227,10 @@ TEST(DataTableTest, GetRegionDistribution) {
     ASSERT_GT(distribution[Region::England], distribution[Region::Wales]);
     ASSERT_GT(distribution[Region::England], distribution[Region::Scotland]);
     ASSERT_GT(distribution[Region::England], distribution[Region::NorthernIreland]);
-    
+
     // Wales and Scotland should have approximately equal probability
     ASSERT_NEAR(distribution[Region::Wales], distribution[Region::Scotland], 0.01);
-    
+
     // Wales/Scotland should have higher probability than NI
     ASSERT_GT(distribution[Region::Wales], distribution[Region::NorthernIreland]);
     ASSERT_GT(distribution[Region::Scotland], distribution[Region::NorthernIreland]);
@@ -275,14 +278,14 @@ TEST(DataTableTest, GetEthnicityDistribution) {
     ASSERT_GT(distribution[Ethnicity::White], distribution[Ethnicity::Asian]);
     ASSERT_GT(distribution[Ethnicity::White], distribution[Ethnicity::Black]);
     ASSERT_GT(distribution[Ethnicity::White], distribution[Ethnicity::Others]);
-    
+
     // The probabilities for the others should reflect the coefficients
     // Others has coefficient 0.8, Black has 0.7, Asian has 0.6
     ASSERT_GT(distribution[Ethnicity::Others], distribution[Ethnicity::Asian]);
-    
+
     // Black should have higher probability than Asian due to higher coefficient (0.7 vs 0.6)
     ASSERT_GT(distribution[Ethnicity::Black], distribution[Ethnicity::Asian]);
-    
+
     // Verify Others (coefficient 0.8) has higher probability than Black (coefficient 0.7)
     ASSERT_GT(distribution[Ethnicity::Others], distribution[Ethnicity::Black]);
 
@@ -293,15 +296,15 @@ TEST(DataTableTest, GetEthnicityDistribution) {
 
     // Test with Wales region to ensure different region coefficient works
     auto distribution2 = table.get_ethnicity_distribution(30, Gender::male, Region::Wales);
-    
+
     // Verify White still has the highest probability
     ASSERT_GT(distribution2[Ethnicity::White], distribution2[Ethnicity::Asian]);
     ASSERT_GT(distribution2[Ethnicity::White], distribution2[Ethnicity::Black]);
     ASSERT_GT(distribution2[Ethnicity::White], distribution2[Ethnicity::Others]);
-    
+
     // Verify Others still has higher probability than Black
     ASSERT_GT(distribution2[Ethnicity::Others], distribution2[Ethnicity::Black]);
-    
+
     // Verify the sum is still 1.0
     sum = distribution2[Ethnicity::White] + distribution2[Ethnicity::Asian] +
           distribution2[Ethnicity::Black] + distribution2[Ethnicity::Others];
@@ -309,12 +312,12 @@ TEST(DataTableTest, GetEthnicityDistribution) {
 
     // Test with female to ensure different gender coefficient works
     auto distribution3 = table.get_ethnicity_distribution(30, Gender::female, Region::England);
-    
+
     // Verify White still has the highest probability
     ASSERT_GT(distribution3[Ethnicity::White], distribution3[Ethnicity::Asian]);
     ASSERT_GT(distribution3[Ethnicity::White], distribution3[Ethnicity::Black]);
     ASSERT_GT(distribution3[Ethnicity::White], distribution3[Ethnicity::Others]);
-    
+
     // Verify the sum is still 1.0
     sum = distribution3[Ethnicity::White] + distribution3[Ethnicity::Asian] +
           distribution3[Ethnicity::Black] + distribution3[Ethnicity::Others];
@@ -336,7 +339,8 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
         // Test with small values (not clamped)
         coeffs.age_coefficient = 0.01;
         prob = DataTable::calculate_probability(coeffs, 10, Gender::male, Region::England);
-        ASSERT_NEAR(0.1, prob, 0.001); // 0.01*10 = 0.1, ensure we test what the implementation actually does
+        ASSERT_NEAR(0.1, prob,
+                    0.001); // 0.01*10 = 0.1, ensure we test what the implementation actually does
 
         // Test with negative age coefficient (clamped to 0.0)
         coeffs.age_coefficient = -0.1;
@@ -433,13 +437,13 @@ TEST(DataTableTest, DemographicCoefficientErrors) {
         // while our ethnicity and ethnicity_prob columns need 4 rows.
         // The DataTable class requires all columns to have the same number of rows.
         DataTable ethnicity_table;
-        
+
         // Add columns with consistent sizes (4 elements) to the new table
         ethnicity_table.add(std::make_unique<StringDataTableColumn>(
             "ethnicity", std::vector<std::string>{"White", "Asian", "Black", "Others"}));
-        ethnicity_table.add(std::make_unique<DoubleDataTableColumn>("ethnicity_prob",
-                                                          std::vector<double>{0.7, 0.1, 0.1, 0.1}));
-        
+        ethnicity_table.add(std::make_unique<DoubleDataTableColumn>(
+            "ethnicity_prob", std::vector<double>{0.7, 0.1, 0.1, 0.1}));
+
         // Set up coefficients where all probabilities would be zero
         DataTable::DemographicCoefficients coeffs;
         coeffs.gender_coefficients[Gender::male] = -0.5; // Creates negative probability
@@ -573,21 +577,21 @@ TEST(DataTableTest, CalculateProbabilityWithSmallCoefficients) {
     // Test with the specific coefficients from the failing test
     DataTable::DemographicCoefficients coeffs;
     coeffs.age_coefficient = 0.01;
-    
+
     // Test with age 10, should yield 0.01*10 = 0.1
     double prob = DataTable::calculate_probability(coeffs, 10, Gender::male, Region::England);
-    
+
     // Use multiple assertion types to ensure one passes
-    
+
     // Method 1: Use near assertion with wide tolerance
-    ASSERT_NEAR(0.1, prob, 0.01); 
-    
+    ASSERT_NEAR(0.1, prob, 0.01);
+
     // Method 2: Use near assertion with tighter tolerance
     ASSERT_NEAR(0.1, prob, 0.001);
-    
+
     // Method 3: Test if the value is in the range we expect
     ASSERT_TRUE(prob >= 0.09 && prob <= 0.11);
-    
+
     // Method 4: If multiplicative model is used (1 + 0.01*10 = 1.1)
     // but we want to test for additive model
     if (prob > 1.0) {
