@@ -97,8 +97,12 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     }
 
     // Step 4: Initialize income category
+    // Calculate thresholds once for the entire population
+    auto [q1_threshold, q2_threshold, q3_threshold] = calculate_income_thresholds(context.population());
+    
+    // Apply thresholds to each person
     for (auto &person : context.population()) {
-        initialise_income_category(person, context.population());
+        initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
     }
 
     // Step 5: Initialize physical activity
@@ -403,38 +407,20 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
     return RiskFactorAdjustableModel::get_expected(context, sex, age, factor, range, apply_trend);
 }
 
-void KevinHallModel::initialise_nutrient_intakes(Person &person, Random &random) const {
+void KevinHallModel::initialise_nutrient_intakes(Person &person,
+                                                 [[maybe_unused]] Random &random) const {
     // Initialise base nutrient intakes
     compute_nutrient_intakes(person);
 
     // Get current values
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
     double sodium = person.risk_factors.at("Sodium"_id);
-    double alcohol = person.risk_factors.at("Alcohol"_id); // added alcohol
-
-    // Add random variations to match population distributions
-    // Using normal distribution with mean=0.0 and standard deviation=0.1
-    // Using a mean of 1.0 means that on average, the original values will stay the same because
-    // adding by 0 doesn't change the value
-    // This preserves the base nutrient intake values while allowing for variation
-
-    // A small standard deviation of 0.1 means that about:
-    // 68% of values will be between 0.9 and 1.1 (±1 std dev)
-    // 95% of values will be between 0.8 and 1.2 (±2 std dev)
-    // 99.7% of values will be between 0.7 and 1.3 (±3 std dev)
-    // This creates modest variations (±10% for most cases) in nutrient intakes to reflect
-    // real-world population variability
-    carbohydrate += random.next_normal(0.0, 0.1);
-    sodium += random.next_normal(0.0, 0.1);
-    alcohol += random.next_normal(0.0, 0.1);
 
     // Store values with random variations
     person.risk_factors.at("Carbohydrate"_id) = carbohydrate;
     person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
     person.risk_factors.at("Sodium"_id) = sodium;
     person.risk_factors["Sodium_previous"_id] = sodium;
-    person.risk_factors.at("Alcohol"_id) = alcohol;
-    person.risk_factors["Alcohol_previous"_id] = alcohol;
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
@@ -443,8 +429,6 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
     person.risk_factors.at("Carbohydrate_previous"_id) = previous_carbohydrate;
     double previous_sodium = person.risk_factors.at("Sodium"_id);
     person.risk_factors.at("Sodium_previous"_id) = previous_sodium;
-    double previous_alcohol = person.risk_factors.at("Alcohol"_id);
-    person.risk_factors.at("Alcohol_previous"_id) = previous_alcohol;
 
     // Update nutrient intakes.
     compute_nutrient_intakes(person);
@@ -977,30 +961,43 @@ void KevinHallModel::update_income_continuous(Person &person, Random &random) co
     }
 }
 
-// Modified: Mahima 25/02/2025
-// Income category is initialised using the quartiles of the income_continuous values
-// This is done at the start and then every 5 years
-void KevinHallModel::initialise_income_category(Person &person,
-                                                const Population &population) const {
+// Modified: Mahima 25/02/2025, Optimized for large populations
+// Helper function to calculate income thresholds once for the entire population
+std::tuple<double, double, double> KevinHallModel::calculate_income_thresholds(
+    const Population &population) const {
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
 
     // Collect all income values
     for (const auto &p : population) {
-        if (p.income_continuous > 0) {
+        if (p.income_continuous >= 0) {
             sorted_incomes.push_back(p.income_continuous);
         }
     }
 
-    // Sort once (reduce time complexity)
+    // Sort once (this is now only done once for the entire population)
     std::sort(sorted_incomes.begin(), sorted_incomes.end());
 
     // Calculate quartile thresholds
     size_t n = sorted_incomes.size();
+    if (n == 0) {
+        return {0.0, 0.0, 0.0}; // Handle empty population case
+    }
+    
     double q1_threshold = sorted_incomes[n / 4];
     double q2_threshold = sorted_incomes[n / 2];
     double q3_threshold = sorted_incomes[3 * n / 4];
+    
+    return {q1_threshold, q2_threshold, q3_threshold};
+}
 
+// Modified: Mahima 25/02/2025, Optimized for large populations
+// Income category is initialised using the quartiles of the income_continuous values
+// This method now only assigns the category based on pre-calculated thresholds
+void KevinHallModel::initialise_income_category(Person &person,
+                                              double q1_threshold,
+                                              double q2_threshold,
+                                              double q3_threshold) const {
     // Assign income categories based on quartiles
     if (person.income_continuous <= q1_threshold) {
         person.income_category = core::Income::low;
@@ -1013,17 +1010,23 @@ void KevinHallModel::initialise_income_category(Person &person,
     }
 }
 
+// Modified to calculate thresholds once for the entire population
 void KevinHallModel::update_income_category(RuntimeContext &context) const {
     static int last_update_year = 0;
     int current_year = context.time_now();
 
     // Update quartiles every 5 years
     if (current_year - last_update_year >= 5) {
+        // Calculate thresholds once for the entire population
+        auto [q1_threshold, q2_threshold, q3_threshold] = calculate_income_thresholds(context.population());
+        
+        // Apply thresholds to each person
         for (auto &person : context.population()) {
             if (person.is_active()) {
-                initialise_income_category(person, context.population());
+                initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
             }
         }
+        
         last_update_year = current_year;
     }
 }
