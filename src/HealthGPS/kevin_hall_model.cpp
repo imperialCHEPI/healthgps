@@ -98,8 +98,9 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 4: Initialize income category
     // Calculate thresholds once for the entire population
-    auto [q1_threshold, q2_threshold, q3_threshold] = calculate_income_thresholds(context.population());
-    
+    auto [q1_threshold, q2_threshold, q3_threshold] =
+        calculate_income_thresholds(context.population());
+
     // Apply thresholds to each person
     for (auto &person : context.population()) {
         initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
@@ -963,8 +964,8 @@ void KevinHallModel::update_income_continuous(Person &person, Random &random) co
 
 // Modified: Mahima 25/02/2025, Optimized for large populations
 // Helper function to calculate income thresholds once for the entire population
-std::tuple<double, double, double> KevinHallModel::calculate_income_thresholds(
-    const Population &population) const {
+std::tuple<double, double, double>
+KevinHallModel::calculate_income_thresholds(const Population &population) const {
     std::vector<double> sorted_incomes;
     sorted_incomes.reserve(population.size());
 
@@ -983,21 +984,19 @@ std::tuple<double, double, double> KevinHallModel::calculate_income_thresholds(
     if (n == 0) {
         return {0.0, 0.0, 0.0}; // Handle empty population case
     }
-    
+
     double q1_threshold = sorted_incomes[n / 4];
     double q2_threshold = sorted_incomes[n / 2];
     double q3_threshold = sorted_incomes[3 * n / 4];
-    
+
     return {q1_threshold, q2_threshold, q3_threshold};
 }
 
 // Modified: Mahima 25/02/2025, Optimized for large populations
 // Income category is initialised using the quartiles of the income_continuous values
 // This method now only assigns the category based on pre-calculated thresholds
-void KevinHallModel::initialise_income_category(Person &person,
-                                              double q1_threshold,
-                                              double q2_threshold,
-                                              double q3_threshold) const {
+void KevinHallModel::initialise_income_category(Person &person, double q1_threshold,
+                                                double q2_threshold, double q3_threshold) const {
     // Assign income categories based on quartiles
     if (person.income_continuous <= q1_threshold) {
         person.income_category = core::Income::low;
@@ -1018,15 +1017,16 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
     // Update quartiles every 5 years
     if (current_year - last_update_year >= 5) {
         // Calculate thresholds once for the entire population
-        auto [q1_threshold, q2_threshold, q3_threshold] = calculate_income_thresholds(context.population());
-        
+        auto [q1_threshold, q2_threshold, q3_threshold] =
+            calculate_income_thresholds(context.population());
+
         // Apply thresholds to each person
         for (auto &person : context.population()) {
             if (person.is_active()) {
                 initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
             }
         }
-        
+
         last_update_year = current_year;
     }
 }

@@ -9,8 +9,8 @@
 #include "static_linear_model.h"
 
 #include <optional>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 namespace hgps {
 
@@ -77,17 +77,16 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Calculate income quartile thresholds for the entire population
     /// @param population The population to calculate thresholds for
     /// @return A tuple containing the three quartile thresholds (Q1, Q2, Q3)
-    std::tuple<double, double, double> calculate_income_thresholds(const Population &population) const;
+    std::tuple<double, double, double>
+    calculate_income_thresholds(const Population &population) const;
 
     /// @brief Initialize the income category for a person based on pre-calculated thresholds
     /// @param person The person to initialize income for
     /// @param q1_threshold The first quartile threshold
     /// @param q2_threshold The second quartile threshold
     /// @param q3_threshold The third quartile threshold
-    void initialise_income_category(Person &person, 
-                                   double q1_threshold,
-                                   double q2_threshold,
-                                   double q3_threshold) const;
+    void initialise_income_category(Person &person, double q1_threshold, double q2_threshold,
+                                    double q3_threshold) const;
 
     /// @brief Update the income category for a person
     /// @param context The runtime context
