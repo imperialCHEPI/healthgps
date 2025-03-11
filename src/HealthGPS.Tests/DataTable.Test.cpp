@@ -71,7 +71,7 @@ TEST(DataTableTest, CalculateProbability) {
 
     // Test with very small values to stay under 1.0
     DataTable::DemographicCoefficients small_coeffs;
-    small_coeffs.age_coefficient = 0.01; 
+    small_coeffs.age_coefficient = 0.01;
     small_coeffs.gender_coefficients[Gender::male] = 0.01;
     small_coeffs.gender_coefficients[Gender::female] = 0.01;
     small_coeffs.region_coefficients[Region::England] = 0.01;
@@ -97,18 +97,18 @@ TEST(DataTableTest, LoadRegionCoefficients) {
     DataTable table = create_test_table();
 
     // Create a test JSON with region coefficients
-    nlohmann::json test_json = {{"modelling", 
-                               {{"demographic_models",
-                                 {{"region",
-                                   {{"probabilities",
-                                     {{"coefficients",
-                                       {{"age", 0.1},
-                                        {"gender", {{"male", 0.2}, {"female", 0.3}}},
-                                        {"region",
-                                         {{"England", 0.4},
-                                          {"Wales", 0.5},
-                                          {"Scotland", 0.6},
-                                          {"NorthernIreland", 0.7}}}}}}}}}}}}}};
+    nlohmann::json test_json = {{"modelling",
+                                 {{"demographic_models",
+                                   {{"region",
+                                     {{"probabilities",
+                                       {{"coefficients",
+                                         {{"age", 0.1},
+                                          {"gender", {{"male", 0.2}, {"female", 0.3}}},
+                                          {"region",
+                                           {{"England", 0.4},
+                                            {"Wales", 0.5},
+                                            {"Scotland", 0.6},
+                                            {"NorthernIreland", 0.7}}}}}}}}}}}}}};
 
     // Load the coefficients
     table.load_demographic_coefficients(test_json);
@@ -188,10 +188,10 @@ TEST(DataTableTest, LoadEthnicityCoefficientsMissingData) {
 TEST(DataTableTest, GetRegionDistribution) {
     // Create a table with region and region_prob columns
     DataTable table;
-    table.add(std::make_unique<StringDataTableColumn>("region", 
-        std::vector<std::string>{"England", "Wales", "Scotland", "NorthernIreland"}));
-    table.add(std::make_unique<DoubleDataTableColumn>("region_prob", 
-        std::vector<double>{0.5, 0.2, 0.2, 0.1}));
+    table.add(std::make_unique<StringDataTableColumn>(
+        "region", std::vector<std::string>{"England", "Wales", "Scotland", "NorthernIreland"}));
+    table.add(std::make_unique<DoubleDataTableColumn>("region_prob",
+                                                      std::vector<double>{0.5, 0.2, 0.2, 0.1}));
 
     // Set up region coefficients
     DataTable::DemographicCoefficients coeffs;
@@ -237,10 +237,10 @@ TEST(DataTableTest, GetRegionDistribution) {
 TEST(DataTableTest, GetEthnicityDistribution) {
     // Create a table with ethnicity and ethnicity_prob columns
     DataTable table;
-    table.add(std::make_unique<StringDataTableColumn>("ethnicity", 
-        std::vector<std::string>{"White", "Asian", "Black", "Others"}));
-    table.add(std::make_unique<DoubleDataTableColumn>("ethnicity_prob", 
-        std::vector<double>{0.7, 0.1, 0.1, 0.1}));
+    table.add(std::make_unique<StringDataTableColumn>(
+        "ethnicity", std::vector<std::string>{"White", "Asian", "Black", "Others"}));
+    table.add(std::make_unique<DoubleDataTableColumn>("ethnicity_prob",
+                                                      std::vector<double>{0.7, 0.1, 0.1, 0.1}));
 
     // Set up ethnicity coefficients
     DataTable::DemographicCoefficients coeffs;
@@ -317,7 +317,7 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
     {
         DataTable::DemographicCoefficients coeffs;
         coeffs.age_coefficient = 0.05; // With age 20, this gives 1.0 effect when multiplied
-        
+
         // Test with high values (clamped to 1.0)
         double prob = DataTable::calculate_probability(coeffs, 20, Gender::male, Region::England);
         ASSERT_DOUBLE_EQ(1.0, prob); // (1 + 0.05*20) = 2.0 clamped to 1.0
@@ -326,7 +326,7 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
         coeffs.age_coefficient = 0.01;
         prob = DataTable::calculate_probability(coeffs, 10, Gender::male, Region::England);
         ASSERT_NEAR(1.1, prob, 0.01); // (1 + 0.01*10) = 1.1
-        
+
         // Test with negative age coefficient (clamped to 0.0)
         coeffs.age_coefficient = -0.1;
         prob = DataTable::calculate_probability(coeffs, 20, Gender::male, Region::England);
@@ -356,7 +356,7 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
         // Test normal case (not clamped)
         double prob = DataTable::calculate_probability(coeffs, 0, Gender::unknown, Region::England);
         ASSERT_DOUBLE_EQ(1.0, prob); // (1 + 0.5) = 1.5 clamped to 1.0
-        
+
         // Test with small value
         coeffs.region_coefficients[Region::England] = 0.2;
         prob = DataTable::calculate_probability(coeffs, 0, Gender::unknown, Region::England);
@@ -377,7 +377,7 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
         double prob = DataTable::calculate_probability(coeffs, 0, Gender::unknown, Region::unknown,
                                                        Ethnicity::White);
         ASSERT_DOUBLE_EQ(1.0, prob); // (1 + 0.5) = 1.5 clamped to 1.0
-        
+
         // Test with small value
         coeffs.ethnicity_coefficients[Ethnicity::White] = 0.2;
         prob = DataTable::calculate_probability(coeffs, 0, Gender::unknown, Region::unknown,
@@ -395,13 +395,13 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
     {
         DataTable::DemographicCoefficients coeffs;
         // Combined effect of 0.4
-        coeffs.age_coefficient = 0.01;            // 0.01 * 10 = 0.1
+        coeffs.age_coefficient = 0.01; // 0.01 * 10 = 0.1
         coeffs.gender_coefficients[Gender::male] = 0.1;
         coeffs.region_coefficients[Region::England] = 0.1;
         coeffs.ethnicity_coefficients[Ethnicity::White] = 0.1;
-        
-        double prob = DataTable::calculate_probability(coeffs, 10, Gender::male, Region::England, 
-                                                      Ethnicity::White);
+
+        double prob = DataTable::calculate_probability(coeffs, 10, Gender::male, Region::England,
+                                                       Ethnicity::White);
         // (1 + 0.1 + 0.1 + 0.1 + 0.1) = 1.4
         ASSERT_NEAR(1.4, prob, 0.01);
     }
@@ -412,7 +412,7 @@ TEST(DataTableTest, CalculateProbabilityBoundaries) {
 TEST(DataTableTest, DemographicCoefficientErrors) {
     DataTable table = create_test_table();
 
-    // Test getting non-existent demographic coefficients 
+    // Test getting non-existent demographic coefficients
     ASSERT_THROW(table.get_demographic_coefficients("nonexistent"), std::runtime_error);
 
     // Test zero total probability error in ethnicity distribution
@@ -423,14 +423,14 @@ TEST(DataTableTest, DemographicCoefficientErrors) {
         table.set_demographic_coefficients("ethnicity.probabilities", coeffs);
 
         // Add required columns for ethnicity distribution
-        table.add(std::make_unique<StringDataTableColumn>("ethnicity", 
-            std::vector<std::string>{"White", "Asian", "Black", "Others"}));
-        table.add(std::make_unique<DoubleDataTableColumn>("ethnicity_prob", 
-            std::vector<double>{0.7, 0.1, 0.1, 0.1}));
+        table.add(std::make_unique<StringDataTableColumn>(
+            "ethnicity", std::vector<std::string>{"White", "Asian", "Black", "Others"}));
+        table.add(std::make_unique<DoubleDataTableColumn>("ethnicity_prob",
+                                                          std::vector<double>{0.7, 0.1, 0.1, 0.1}));
 
         // Trying to get distribution should throw due to zero total probability
         ASSERT_THROW(table.get_ethnicity_distribution(0, Gender::male, Region::England),
-                    std::runtime_error);
+                     std::runtime_error);
     }
 }
 

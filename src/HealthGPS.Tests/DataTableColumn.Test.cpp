@@ -119,11 +119,11 @@ TEST(DataTableColumnTest, DoubleDataTableColumnCompleteTest) {
     ASSERT_DOUBLE_EQ(1.1, std::any_cast<double>(column.value(0)));
     ASSERT_DOUBLE_EQ(2.2, std::any_cast<double>(column.value(1)));
     ASSERT_DOUBLE_EQ(3.3, std::any_cast<double>(column.value(2)));
-    
+
     // Test null checking
     ASSERT_FALSE(column.is_null(0));
     ASSERT_TRUE(column.is_valid(0));
-    
+
     // Test out of bounds
     ASSERT_TRUE(column.is_null(100));
     ASSERT_FALSE(column.is_valid(100));
@@ -236,11 +236,11 @@ TEST(DataTableColumnTest, FloatDataTableColumnCompleteTest) {
     ASSERT_FLOAT_EQ(1.1f, std::any_cast<float>(column.value(0)));
     ASSERT_FLOAT_EQ(2.2f, std::any_cast<float>(column.value(1)));
     ASSERT_FLOAT_EQ(3.3f, std::any_cast<float>(column.value(2)));
-    
+
     // Test null checking
     ASSERT_FALSE(column.is_null(0));
     ASSERT_TRUE(column.is_valid(0));
-    
+
     // Test out of bounds
     ASSERT_TRUE(column.is_null(100));
     ASSERT_FALSE(column.is_valid(100));
