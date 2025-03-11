@@ -17,7 +17,9 @@ class StringDataTableColumn final : public PrimitiveDataTableColumn<std::string>
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    DataTableColumn *clone_impl() const override { return new StringDataTableColumn(*this); } // NOLINT(cppcoreguidelines-owning-memory)
+    DataTableColumn *clone_impl() const override {
+        return new StringDataTableColumn(*this);
+    } // NOLINT(cppcoreguidelines-owning-memory)
 };
 
 /// @brief DataTable column for storing float data type
@@ -29,7 +31,9 @@ class FloatDataTableColumn final : public PrimitiveDataTableColumn<float> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    DataTableColumn *clone_impl() const override { return new FloatDataTableColumn(*this); } // NOLINT(cppcoreguidelines-owning-memory)
+    DataTableColumn *clone_impl() const override {
+        return new FloatDataTableColumn(*this);
+    } // NOLINT(cppcoreguidelines-owning-memory)
 };
 
 /// @brief DataTable column for storing double data type
@@ -41,7 +45,9 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    DataTableColumn *clone_impl() const override { return new DoubleDataTableColumn(*this); } // NOLINT(cppcoreguidelines-owning-memory)
+    DataTableColumn *clone_impl() const override {
+        return new DoubleDataTableColumn(*this);
+    } // NOLINT(cppcoreguidelines-owning-memory)
 };
 
 /// @brief DataTable column for storing integer data type
@@ -69,7 +75,9 @@ class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    DataTableColumn *clone_impl() const override { return new IntegerDataTableColumn(*this); } // NOLINT(cppcoreguidelines-owning-memory)
+    DataTableColumn *clone_impl() const override {
+        return new IntegerDataTableColumn(*this);
+    } // NOLINT(cppcoreguidelines-owning-memory)
 };
 
 inline bool is_valid_column_name(const std::string &name) {

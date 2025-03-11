@@ -156,17 +156,17 @@ class DataTable {
     std::vector<std::unique_ptr<DataTableColumn>> columns_{};
     size_t rows_count_ = 0;
 
-    /// @brief Load ethnicity region coefficients from the configuration 
+    /// @brief Load ethnicity region coefficients from the configuration
     /// @param ethnicity_coeffs Ethnicity coefficients to update
     /// @param region_probs JSON containing region probability coefficients
-    void load_ethnicity_region_coefficients(DemographicCoefficients &ethnicity_coeffs, 
-                                           const nlohmann::json &region_probs);
+    void load_ethnicity_region_coefficients(DemographicCoefficients &ethnicity_coeffs,
+                                            const nlohmann::json &region_probs);
 
     /// @brief Load ethnicity type coefficients from the configuration
     /// @param ethnicity_coeffs Ethnicity coefficients to update
     /// @param ethnicity_probs JSON containing ethnicity probability coefficients
     void load_ethnicity_type_coefficients(DemographicCoefficients &ethnicity_coeffs,
-                                         const nlohmann::json &ethnicity_probs);
+                                          const nlohmann::json &ethnicity_probs);
 };
 
 } // namespace hgps::core
