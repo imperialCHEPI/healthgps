@@ -272,19 +272,18 @@ DataTable::get_demographic_coefficients(const std::string &model_type) const {
 double DataTable::calculate_probability(const DemographicCoefficients &coeffs, int age,
                                         Gender gender, Region region,
                                         std::optional<Ethnicity> ethnicity) {
-    // Start with base probability of 1.0
-    double prob = 1.0;
+    // Start with base probability of 0.0 for adding effects
+    double prob = 0.0;
 
-    // Apply age effect (using multiplicative adjustment)
-    double age_effect = std::clamp(coeffs.age_coefficient * age, -0.5, 0.5);
-    prob *= (1.0 + age_effect);
+    // Apply age effect (using additive adjustment)
+    double age_effect = coeffs.age_coefficient * age;
+    prob += age_effect;
 
     // Apply gender effect if coefficients exist and gender is valid
     if (gender != Gender::unknown && !coeffs.gender_coefficients.empty()) {
         auto gender_it = coeffs.gender_coefficients.find(gender);
         if (gender_it != coeffs.gender_coefficients.end()) {
-            double gender_effect = std::clamp(gender_it->second, -0.5, 0.5);
-            prob *= (1.0 + gender_effect);
+            prob += gender_it->second;
         }
     }
 
@@ -294,8 +293,7 @@ double DataTable::calculate_probability(const DemographicCoefficients &coeffs, i
         if (region != Region::unknown && !coeffs.region_coefficients.empty()) {
             auto region_it = coeffs.region_coefficients.find(region);
             if (region_it != coeffs.region_coefficients.end()) {
-                double region_effect = std::clamp(region_it->second, -0.5, 0.5);
-                prob *= (1.0 + region_effect);
+                prob += region_it->second;
             }
         }
 
@@ -303,8 +301,7 @@ double DataTable::calculate_probability(const DemographicCoefficients &coeffs, i
         if (ethnicity.value() != Ethnicity::unknown && !coeffs.ethnicity_coefficients.empty()) {
             auto ethnicity_it = coeffs.ethnicity_coefficients.find(ethnicity.value());
             if (ethnicity_it != coeffs.ethnicity_coefficients.end()) {
-                double ethnicity_effect = std::clamp(ethnicity_it->second, -0.5, 0.5);
-                prob *= (1.0 + ethnicity_effect);
+                prob += ethnicity_it->second;
             }
         }
     }
@@ -312,8 +309,7 @@ double DataTable::calculate_probability(const DemographicCoefficients &coeffs, i
     else if (region != Region::unknown && !coeffs.region_coefficients.empty()) {
         auto region_it = coeffs.region_coefficients.find(region);
         if (region_it != coeffs.region_coefficients.end()) {
-            double region_effect = std::clamp(region_it->second, -0.5, 0.5);
-            prob *= (1.0 + region_effect);
+            prob += region_it->second;
         }
     }
 

@@ -24,20 +24,21 @@ TEST(DataTableColumnTest, StringDataTableColumnOperations) {
     ASSERT_EQ("test_string", column.name());
 
     // Test clone operation (tests clone_impl)
-    auto clone = column.clone();
-    ASSERT_NE(nullptr, clone);
-    ASSERT_EQ("string", clone->type());
-    ASSERT_EQ(3, clone->size());
-    ASSERT_EQ("test_string", clone->name());
+    auto clone_ptr = column.clone();
+    ASSERT_NE(nullptr, clone_ptr);
+    ASSERT_EQ("string", clone_ptr->type());
+    ASSERT_EQ(3, clone_ptr->size());
+    ASSERT_EQ("test_string", clone_ptr->name());
 
     // Test value access
     ASSERT_EQ("A", std::any_cast<std::string>(column.value(0)));
     ASSERT_EQ("B", std::any_cast<std::string>(column.value(1)));
     ASSERT_EQ("C", std::any_cast<std::string>(column.value(2)));
 
-    // Test out of bounds
-    ASSERT_FALSE(column.is_valid(100));
+    // Test out of bounds - is_null should return true for out of bounds
     ASSERT_TRUE(column.is_null(100));
+    // Test out of bounds - is_valid should return false for out of bounds
+    ASSERT_FALSE(column.is_valid(100));
 }
 
 // Test column name validation in IntegerDataTableColumn - lines 61, 64
@@ -109,15 +110,23 @@ TEST(DataTableColumnTest, DoubleDataTableColumnCompleteTest) {
     ASSERT_EQ(3, column.size());
 
     // Test clone operation
-    auto clone = column.clone();
-    ASSERT_NE(nullptr, clone);
-    ASSERT_EQ("double", clone->type());
-    ASSERT_EQ(3, clone->size());
+    auto clone_ptr = column.clone();
+    ASSERT_NE(nullptr, clone_ptr);
+    ASSERT_EQ("double", clone_ptr->type());
+    ASSERT_EQ(3, clone_ptr->size());
 
     // Test value access
     ASSERT_DOUBLE_EQ(1.1, std::any_cast<double>(column.value(0)));
     ASSERT_DOUBLE_EQ(2.2, std::any_cast<double>(column.value(1)));
     ASSERT_DOUBLE_EQ(3.3, std::any_cast<double>(column.value(2)));
+    
+    // Test null checking
+    ASSERT_FALSE(column.is_null(0));
+    ASSERT_TRUE(column.is_valid(0));
+    
+    // Test out of bounds
+    ASSERT_TRUE(column.is_null(100));
+    ASSERT_FALSE(column.is_valid(100));
 }
 
 // Test visitor pattern implementation - lines 126, 128, 130, 132, 134
@@ -182,7 +191,7 @@ TEST(DataTableColumnTest, ColumnIterators) {
     ASSERT_NE(it, end);
     ASSERT_EQ(10, *it);
 
-    // Iterate through data and verify values
+    // Iterate through data and verify values using range-based for loop
     std::vector<int> collected_values;
     for (const auto &value : column) {
         collected_values.push_back(value);
@@ -193,8 +202,9 @@ TEST(DataTableColumnTest, ColumnIterators) {
         ASSERT_EQ(data[i], collected_values[i]);
     }
 
-    // Test iterator arithmetic
+    // Test iterator increment
     auto it2 = column.begin();
+    ASSERT_EQ(10, *it2);
     ++it2;
     ASSERT_EQ(20, *it2);
     ++it2;
@@ -217,13 +227,21 @@ TEST(DataTableColumnTest, FloatDataTableColumnCompleteTest) {
     ASSERT_EQ(3, column.size());
 
     // Test clone operation
-    auto clone = column.clone();
-    ASSERT_NE(nullptr, clone);
-    ASSERT_EQ("float", clone->type());
-    ASSERT_EQ(3, clone->size());
+    auto clone_ptr = column.clone();
+    ASSERT_NE(nullptr, clone_ptr);
+    ASSERT_EQ("float", clone_ptr->type());
+    ASSERT_EQ(3, clone_ptr->size());
 
     // Test value access
     ASSERT_FLOAT_EQ(1.1f, std::any_cast<float>(column.value(0)));
     ASSERT_FLOAT_EQ(2.2f, std::any_cast<float>(column.value(1)));
     ASSERT_FLOAT_EQ(3.3f, std::any_cast<float>(column.value(2)));
+    
+    // Test null checking
+    ASSERT_FALSE(column.is_null(0));
+    ASSERT_TRUE(column.is_valid(0));
+    
+    // Test out of bounds
+    ASSERT_TRUE(column.is_null(100));
+    ASSERT_FALSE(column.is_valid(100));
 }
