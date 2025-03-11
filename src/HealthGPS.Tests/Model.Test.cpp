@@ -103,6 +103,7 @@ class TestKevinHallModel : public ::testing::Test {
             double income_continuous_stddev = 0.2;
 
             // Create Kevin Hall model with all required parameters
+            // NOLINTNEXTLINE(modernize-make-unique, cppcoreguidelines-owning-memory)
             model.reset(new KevinHallModel(expected, expected_trend, trend_steps, energy_equation,
                                            nutrient_ranges, nutrient_equations, food_prices,
                                            weight_quantiles, epa_quantiles, height_stddev,
@@ -224,7 +225,7 @@ class TestStaticLinearModel : public ::testing::Test {
   public:
     // Initialize all member variables in the constructor
     TestStaticLinearModel()
-        : context(nullptr), model(nullptr), population(0), person(core::Gender::male) {}
+        : person(core::Gender::male), population(0), model(nullptr), context(nullptr) {}
 
   protected:
     void SetUp() override {
