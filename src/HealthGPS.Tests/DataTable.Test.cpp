@@ -446,7 +446,7 @@ TEST(DataTableTest, DemographicCoefficientErrors) {
 
         // Set up coefficients where all probabilities would be zero
         DataTable::DemographicCoefficients coeffs;
-        coeffs.gender_coefficients[Gender::male] = -0.5; // Creates negative probability
+        coeffs.gender_coefficients[Gender::male] = -1.0; // Creates zero probability
         ethnicity_table.set_demographic_coefficients("ethnicity.probabilities", coeffs);
 
         // Trying to get distribution should throw due to zero total probability

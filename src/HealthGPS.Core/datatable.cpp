@@ -245,8 +245,8 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
         // Calculate and apply ethnicity-specific effects
         for (auto &[ethnicity, prob] : probabilities) {
             // Basic adjustment factor incorporating age, gender, and region effects
-            double base_adjustment = 1.0 + (age_effect + gender_effect + region_effect) * 0.1;
-
+            double base_adjustment = 1.0 + (age_effect + gender_effect + region_effect);
+            
             // Add ethnicity-specific adjustment
             double ethnicity_effect = 0.0;
             if (ethnicity != Ethnicity::unknown &&
@@ -255,7 +255,7 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
             }
 
             // Apply the combined adjustment
-            prob *= (base_adjustment + ethnicity_effect * 0.1);
+            prob *= (base_adjustment + ethnicity_effect);
         }
 
         // Check for zero total probability before normalization
