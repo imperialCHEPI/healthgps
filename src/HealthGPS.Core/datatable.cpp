@@ -8,7 +8,7 @@
 
 namespace hgps::core {
 
-//Added- Mahima
+// Added- Mahima
 namespace {
 Region parse_region_internal(const std::string &value) {
     if (value == "England") {
@@ -29,7 +29,7 @@ Region parse_region_internal(const std::string &value) {
     throw HgpsException(fmt::format("Unknown region value: {}", value));
 }
 
-//Added- Mahima
+// Added- Mahima
 Ethnicity parse_ethnicity_internal(const std::string &value) {
     if (value == "White") {
         return Ethnicity::White;
@@ -123,7 +123,7 @@ std::string DataTable::to_string() const noexcept {
     return ss.str();
 }
 
-// Added- Mahima 
+// Added- Mahima
 // To get the region distribution data
 std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
                                                                       Gender gender) const {
@@ -193,8 +193,8 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
     return probabilities;
 }
 
-//Added- Mahima
-// To get the ethnicity distribution data
+// Added- Mahima
+//  To get the ethnicity distribution data
 std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int age, Gender gender,
                                                                             Region region) const {
     // Check if required columns exist
@@ -288,7 +288,7 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
 }
 
 // Added- Mahima
-//Demographic Coefficients refer to Region and Ethnicity models
+// Demographic Coefficients refer to Region and Ethnicity models
 DataTable::DemographicCoefficients
 DataTable::get_demographic_coefficients(const std::string &model_type) const {
     auto it = demographic_coefficients_.find(model_type);
@@ -348,8 +348,8 @@ double DataTable::calculate_probability(const DemographicCoefficients &coeffs, i
     return std::clamp(prob, 0.0, 1.0);
 }
 
-//Added- Mahima
-// Loads the coefficients from the config.json
+// Added- Mahima
+//  Loads the coefficients from the config.json
 void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
     // Initialize coefficients with default values
     DemographicCoefficients region_coeffs{};
