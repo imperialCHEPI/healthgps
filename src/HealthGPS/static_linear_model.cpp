@@ -69,7 +69,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 3: Initialize continuous income (depends on age, gender, region, ethnicity)
     for (auto &person : context.population()) {
-        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+        if (person.is_active()) { // Only initialize for active (alive and not emigrated) persons
             initialise_income_continuous(person, context.random());
         }
     }
@@ -77,7 +77,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Step 4: Initialize income category based on income_continuous quartiles
     // initialized at the start and then updated every 5 years
     for (auto &person : context.population()) {
-        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+        if (person.is_active()) { // Only initialize for active (alive and not emigrated) persons
             initialise_income_category(person, context.population());
         }
     }
