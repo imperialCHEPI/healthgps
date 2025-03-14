@@ -93,7 +93,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 3: Initialize continuous income
     for (auto &person : context.population()) {
-        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+        if (person.is_active()) { // Only initialize for active (alive and not emigrated) persons
             initialise_income_continuous(person, context.random());
         }
     }
@@ -105,7 +105,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Apply thresholds to each person
     for (auto &person : context.population()) {
-        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+        if (person.is_active()) { // Only initialize for active (alive and not emigrated) persons
             initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
         }
     }
