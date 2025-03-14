@@ -69,13 +69,17 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 3: Initialize continuous income (depends on age, gender, region, ethnicity)
     for (auto &person : context.population()) {
-        initialise_income_continuous(person, context.random());
+        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+            initialise_income_continuous(person, context.random());
+        }
     }
 
     // Step 4: Initialize income category based on income_continuous quartiles
     // initialized at the start and then updated every 5 years
     for (auto &person : context.population()) {
-        initialise_income_category(person, context.population());
+        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+            initialise_income_category(person, context.population());
+        }
     }
 
     // Step 5: Initialize physical activity (depends on age, gender, region, ethnicity, income)
@@ -124,6 +128,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         } else {
             update_sector(person, context.random());
             update_region(context, person, context.random());
+            // Update income_continuous for all individuals regardless of age (household income)
             update_income_continuous(person, context.random());
             update_income_category(context);
             update_factors(context, person, context.random());
@@ -543,9 +548,9 @@ void StaticLinearModel::initialise_income_continuous(Person &person, Random &ran
 }
 
 void StaticLinearModel::update_income_continuous(Person &person, Random &random) const {
-    if (person.age == 18) {
-        initialise_income_continuous(person, random);
-    }
+    // Removing age check to ensure income is updated for all individuals regardless of age
+    // This treats income as household income rather than individual income
+    initialise_income_continuous(person, random);
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
