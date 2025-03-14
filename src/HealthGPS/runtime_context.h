@@ -9,6 +9,9 @@
 #include "scenario.h"
 
 #include <functional>
+#include <map>
+#include <tuple>
+#include <unordered_map>
 #include <vector>
 
 namespace hgps {
@@ -83,7 +86,7 @@ class RuntimeContext {
 
     /// @brief Gets the simulation identifier for outside world messages
     /// @return Simulation identifier
-    const std::string &identifier() const noexcept;
+    std::string identifier() const noexcept;
 
     /// @brief Sets the current simulation time value
     /// @param time_now The new simulation time
@@ -105,6 +108,21 @@ class RuntimeContext {
     /// @param message The message instance to publish
     void publish_async(std::unique_ptr<EventMessage> message) const noexcept;
 
+    /// @brief Get region probabilities for specific age and gender stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @return Map of region to probability for this stratum
+    std::unordered_map<core::Region, double> get_region_probabilities(int age,
+                                                                      core::Gender gender) const;
+
+    /// @brief Get ethnicity probabilities for specific age, gender, and region stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @param region The region stratum
+    /// @return Map of ethnicity to probability for this stratum
+    std::unordered_map<core::Ethnicity, double>
+    get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const;
+
   private:
     std::shared_ptr<const EventAggregator> event_bus_;
     std::shared_ptr<const ModelInput> inputs_;
@@ -115,6 +133,8 @@ class RuntimeContext {
     unsigned int current_run_{};
     int model_start_time_{};
     int time_now_{};
+    core::IntegerInterval age_range_;
+    mutable std::string cached_name_;
 };
 
 } // namespace hgps

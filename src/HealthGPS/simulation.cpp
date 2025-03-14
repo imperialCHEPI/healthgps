@@ -307,8 +307,9 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
     clone.gender = source.gender;
     clone.ses = source.ses;
     clone.sector = source.sector;
-    clone.region = source.region; // added region for FINCH
-    clone.income = source.income;
+    clone.region = source.region;                   // added region for FINCH
+    clone.income_category = source.income_category; // added income_category for FINCH
+    clone.ethnicity = source.ethnicity;             // added ethnicity for FINCH
     for (const auto &item : source.risk_factors) {
         clone.risk_factors.emplace(item.first, item.second);
     }
@@ -382,6 +383,44 @@ void hgps::Simulation::print_initial_population_statistics() {
 
     ss << fmt::format("|{:_<{}}|\n\n", '_', width);
     std::cout << ss.str();
+}
+
+// Write person data to a stream
+// This function writes the person data to a stream in a CSV format
+// because the person data is stored in an unordered_map, we need to iterate through the map and
+// write the data to the stream
+void Simulation::write_person_data(std::ostream &stream, const Person &person,
+                                   const unsigned int time) const {
+    stream << time << separator_ << person.id() << separator_ << person.age << separator_
+           << person.gender_to_string() << separator_ << person.sector_to_value() << separator_
+           << person.income_continuous << separator_ // Add continuous income
+           << person.income_to_value() << separator_ // This now returns income_category value
+           << person.region_to_value() << separator_ << person.ethnicity_to_value();
+
+    // Write risk factors
+    for (const auto &name : risk_factor_names_) {
+        stream << separator_;
+        if (person.risk_factors.contains(name)) {
+            stream << person.risk_factors.at(name);
+        } else {
+            stream << "NA";
+        }
+    }
+    stream << '\n';
+}
+
+void Simulation::write_header(std::ostream &stream) const {
+    stream << "Time" << separator_ << "ID" << separator_ << "Age" << separator_ << "Gender"
+           << separator_ << "Sector" << separator_ << "Income_Continuous"
+           << separator_                      // Add continuous income header
+           << "Income_Category" << separator_ // Rename to be explicit
+           << "Region" << separator_ << "Ethnicity";
+
+    // Write risk factor names
+    for (const auto &name : risk_factor_names_) {
+        stream << separator_ << name.to_string();
+    }
+    stream << '\n';
 }
 
 } // namespace hgps

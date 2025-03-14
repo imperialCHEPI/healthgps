@@ -54,6 +54,8 @@ class MarketingDynamicScenario final : public DynamicInterventionScenario {
 
     const PolicyDynamic &dynamic() const noexcept override;
 
+    std::string name() override { return "Marketing Dynamic"; }
+
   private:
     std::reference_wrapper<SyncChannel> channel_;
     MarketingDynamicDefinition definition_;
