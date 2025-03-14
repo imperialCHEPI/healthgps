@@ -35,7 +35,7 @@
                                     "type": "object",
                                     "properties": {
                                         "age": {
-                                            "type": "string"
+                                            "type": "number"
                                         },
                                         "gender": {
                                             "type": "object",
@@ -58,7 +58,7 @@
                         "coefficients": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "number"
                             }
                         }
                     },
@@ -74,7 +74,7 @@
                                     "type": "object",
                                     "properties": {
                                         "age": {
-                                            "type": "string"
+                                            "type": "number"
                                         },
                                         "gender": {
                                             "type": "object",
@@ -91,7 +91,7 @@
                                         "region": {
                                             "type": "object",
                                             "additionalProperties": {
-                                                "type": "string"
+                                                "type": "number"
                                             }
                                         }
                                     },
@@ -103,7 +103,7 @@
                         "coefficients": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "type": "number"
                             }
                         }
                     },
@@ -150,7 +150,7 @@
                             "type": "object",
                             "properties": {
                                 "age": {
-                                    "type": "string"
+                                    "type": "number"
                                 },
                                 "gender": {
                                     "type": "object",
