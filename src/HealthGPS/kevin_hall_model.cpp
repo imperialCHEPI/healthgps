@@ -93,7 +93,9 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 3: Initialize continuous income
     for (auto &person : context.population()) {
-        initialise_income_continuous(person, context.random());
+        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+            initialise_income_continuous(person, context.random());
+        }
     }
 
     // Step 4: Initialize income category
@@ -103,7 +105,9 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Apply thresholds to each person
     for (auto &person : context.population()) {
-        initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+        if (person.is_active()) {  // Only initialize for active (alive and not emigrated) persons
+            initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+        }
     }
 
     // Step 5: Initialize physical activity
@@ -957,9 +961,9 @@ void KevinHallModel::initialise_income_continuous(Person &person, Random &random
 }
 
 void KevinHallModel::update_income_continuous(Person &person, Random &random) const {
-    if (person.age == 18) {
-        initialise_income_continuous(person, random);
-    }
+    // Removing age check to ensure income is updated for all individuals regardless of age
+    // This treats income as household income rather than individual income
+    initialise_income_continuous(person, random);
 }
 
 // Modified: Mahima 25/02/2025, Optimized for large populations
