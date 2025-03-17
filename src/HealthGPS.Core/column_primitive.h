@@ -73,7 +73,8 @@ template <typename TYPE> class PrimitiveDataTableColumn : public DataTableColumn
 
     /// @brief Protected virtual clone implementation
     /// @return A pointer to the cloned object
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+    // pattern
     virtual DataTableColumn *clone_impl() const = 0;
 
     /// @brief Get the column data type name
