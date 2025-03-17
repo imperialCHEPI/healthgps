@@ -225,7 +225,7 @@ class TestStaticLinearModel : public ::testing::Test {
   public:
     // Initialize all member variables in the constructor
     TestStaticLinearModel()
-        : person(core::Gender::male), population(0), model(nullptr), context(nullptr) {}
+        : context(nullptr), person(core::Gender::male), population(0), model(nullptr) {}
 
   protected:
     void SetUp() override {

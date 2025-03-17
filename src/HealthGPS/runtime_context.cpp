@@ -25,8 +25,16 @@ namespace hgps {
 RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                                std::shared_ptr<const ModelInput> inputs,
                                std::unique_ptr<Scenario> scenario)
-    : event_bus_{std::move(bus)}, inputs_{std::move(inputs)}, scenario_{std::move(scenario)},
-      population_{0}, age_range_{inputs_->settings().age_range()} {}
+    : event_bus_{std::const_pointer_cast<EventAggregator>(bus)},
+      inputs_{std::move(inputs)},
+      scenario_{std::move(scenario)},
+      population_{0},
+      random_{},
+      metrics_{},
+      time_now_{},
+      current_run_{},
+      model_start_time_{},
+      age_range_{inputs_->settings().age_range()} {}
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
@@ -73,17 +81,12 @@ void RuntimeContext::reset_population(const std::size_t initial_pop_size) {
 
 void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    // const_cast is needed here because we have a const method publishing to a non-const bus
-    // This is safe because publish() doesn't modify the bus itself, only sends a message through it
-    const_cast<EventAggregator *>(event_bus_.get())->publish(std::move(message));
+    const_cast<EventAggregator*>(event_bus_.get())->publish(std::move(message));
 }
 
 void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-    // const_cast is needed here because we have a const method publishing to a non-const bus
-    // This is safe because publish_async() doesn't modify the bus itself, only sends a message
-    // through it
-    const_cast<EventAggregator *>(event_bus_.get())->publish_async(std::move(message));
+    const_cast<EventAggregator*>(event_bus_.get())->publish_async(std::move(message));
 }
 
 std::unordered_map<core::Region, double>
