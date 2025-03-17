@@ -25,9 +25,19 @@ namespace hgps {
 RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                                std::shared_ptr<const ModelInput> inputs,
                                std::unique_ptr<Scenario> scenario)
-    : event_bus_{std::const_pointer_cast<EventAggregator>(bus)}, inputs_{std::move(inputs)},
-      scenario_{std::move(scenario)}, population_{0}, random_{}, metrics_{}, time_now_{},
-      current_run_{}, model_start_time_{}, age_range_{inputs_->settings().age_range()} {}
+    : event_bus_{std::const_pointer_cast<EventAggregator>(bus)},
+      inputs_{std::move(inputs)},
+      scenario_{std::move(scenario)},
+      population_{0},
+      random_{},
+      metrics_{},
+      // NOLINTNEXTLINE(cppcoreguidelines-use-default-member-init)
+      time_now_{},
+      // NOLINTNEXTLINE(cppcoreguidelines-use-default-member-init)
+      current_run_{},
+      // NOLINTNEXTLINE(cppcoreguidelines-use-default-member-init)
+      model_start_time_{},
+      age_range_{inputs_->settings().age_range()} {}
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
