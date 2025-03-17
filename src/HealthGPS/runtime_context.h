@@ -30,7 +30,8 @@ class RuntimeContext {
     /// @param inputs The simulation model inputs
     /// @param scenario The scenario to simulate
     RuntimeContext(std::shared_ptr<const EventAggregator> bus,
-                   std::shared_ptr<const ModelInput> inputs, std::unique_ptr<Scenario> scenario);
+                   std::shared_ptr<const ModelInput> inputs,
+                   std::unique_ptr<Scenario> scenario);
 
     /// @brief Gets the current simulation time
     /// @return Current simulation time
@@ -124,15 +125,15 @@ class RuntimeContext {
     get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const;
 
   private:
-    std::shared_ptr<const EventAggregator> event_bus_;
+    mutable std::shared_ptr<EventAggregator> event_bus_;  // NOLINT(cppcoreguidelines-pro-type-const-cast)
     std::shared_ptr<const ModelInput> inputs_;
     std::unique_ptr<Scenario> scenario_;
     Population population_;
     mutable Random random_{};
-    RuntimeMetric metrics_{};
+    RuntimeMetric metrics_;
+    int time_now_{};
     unsigned int current_run_{};
     int model_start_time_{};
-    int time_now_{};
     core::IntegerInterval age_range_;
     mutable std::string cached_name_;
 };
