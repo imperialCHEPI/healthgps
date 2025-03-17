@@ -450,7 +450,7 @@ void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethn
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity) - Complexity has been reduced with
-// helper methods 
+// helper methods
 void DataTable::load_ethnicity_type_coefficients(DemographicCoefficients &ethnicity_coeffs,
                                                  const nlohmann::json &ethnicity_probs) {
     // Process White ethnicity

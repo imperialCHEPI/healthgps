@@ -17,10 +17,9 @@ class StringDataTableColumn final : public PrimitiveDataTableColumn<std::string>
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
-    DataTableColumn *clone_impl() const override {
-        return new StringDataTableColumn(*this);
-    }
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+    // pattern
+    DataTableColumn *clone_impl() const override { return new StringDataTableColumn(*this); }
 };
 
 /// @brief DataTable column for storing float data type
@@ -32,10 +31,9 @@ class FloatDataTableColumn final : public PrimitiveDataTableColumn<float> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
-    DataTableColumn *clone_impl() const override {
-        return new FloatDataTableColumn(*this);
-    }
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+    // pattern
+    DataTableColumn *clone_impl() const override { return new FloatDataTableColumn(*this); }
 };
 
 /// @brief DataTable column for storing double data type
@@ -47,10 +45,9 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
-    DataTableColumn *clone_impl() const override {
-        return new DoubleDataTableColumn(*this);
-    }
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+    // pattern
+    DataTableColumn *clone_impl() const override { return new DoubleDataTableColumn(*this); }
 };
 
 /// @brief DataTable column for storing integer data type
@@ -78,10 +75,9 @@ class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone pattern
-    DataTableColumn *clone_impl() const override {
-        return new IntegerDataTableColumn(*this);
-    }
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+    // pattern
+    DataTableColumn *clone_impl() const override { return new IntegerDataTableColumn(*this); }
 };
 
 inline bool is_valid_column_name(const std::string &name) {
