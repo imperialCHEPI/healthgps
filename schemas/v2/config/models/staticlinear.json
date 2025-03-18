@@ -73,7 +73,9 @@
         "PhysicalActivityModels": {
             "type": "object",
             "propertyNames": {
-                "enum": ["continuous"]
+                "enum": [
+                    "continuous"
+                ]
             },
             "additionalProperties": {
                 "type": "object",
