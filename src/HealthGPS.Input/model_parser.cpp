@@ -186,18 +186,17 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 
         hgps::HierarchicalLevel level;
         level.variables = std::move(col_names);
-        level.transition = hgps::core::DoubleArray2D(at.transition.rows, at.transition.cols,
-                                                    at.transition.data);
-        level.inverse_transition = hgps::core::DoubleArray2D(at.inverse_transition.rows,
-                                                            at.inverse_transition.cols,
-                                                            at.inverse_transition.data);
-        level.residual_distribution = hgps::core::DoubleArray2D(at.residual_distribution.rows,
-                                                               at.residual_distribution.cols,
-                                                               at.residual_distribution.data);
+        level.transition =
+            hgps::core::DoubleArray2D(at.transition.rows, at.transition.cols, at.transition.data);
+        level.inverse_transition = hgps::core::DoubleArray2D(
+            at.inverse_transition.rows, at.inverse_transition.cols, at.inverse_transition.data);
+        level.residual_distribution =
+            hgps::core::DoubleArray2D(at.residual_distribution.rows, at.residual_distribution.cols,
+                                      at.residual_distribution.data);
         level.correlation = hgps::core::DoubleArray2D(at.correlation.rows, at.correlation.cols,
-                                                     at.correlation.data);
+                                                      at.correlation.data);
         level.variances = at.variances;
-        
+
         levels.emplace(std::stoi(level_item.first), std::move(level));
     }
 
@@ -387,11 +386,13 @@ process_region_prevalence(const nlohmann::json &region_prevalence_json) {
         fmt::print("Processing age group in region prevalence\n");
         for (const auto &[gender_str, regions] : age_group.items()) {
             fmt::print("Processing gender: {}\n", gender_str);
-            if (gender_str == "Name") continue;
-            
-            core::Gender gender = core::case_insensitive::equals(gender_str, "Female") ? 
-                core::Gender::female : core::Gender::male;
-            
+            if (gender_str == "Name")
+                continue;
+
+            core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
+                                      ? core::Gender::female
+                                      : core::Gender::male;
+
             for (const auto &[region_str, value] : regions.items()) {
                 fmt::print("Processing region: {}\n", region_str);
                 auto region = parse_region(region_str);
@@ -406,16 +407,19 @@ process_region_prevalence(const nlohmann::json &region_prevalence_json) {
 std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>>
 process_ethnicity_prevalence(const nlohmann::json &ethnicity_prevalence_json) {
     fmt::print("Starting to process ethnicity prevalence\n");
-    std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>> ethnicity_prevalence;
+    std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>>
+        ethnicity_prevalence;
     for (const auto &age_group : ethnicity_prevalence_json) {
         fmt::print("Processing age group in ethnicity prevalence\n");
         for (const auto &[gender_str, ethnicities] : age_group.items()) {
             fmt::print("Processing gender: {}\n", gender_str);
-            if (gender_str == "Name") continue;
-            
-            core::Gender gender = core::case_insensitive::equals(gender_str, "Female") ? 
-                core::Gender::female : core::Gender::male;
-            
+            if (gender_str == "Name")
+                continue;
+
+            core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
+                                      ? core::Gender::female
+                                      : core::Gender::male;
+
             for (const auto &[ethnicity_str, value] : ethnicities.items()) {
                 fmt::print("Processing ethnicity: {}\n", ethnicity_str);
                 auto ethnicity = parse_ethnicity(ethnicity_str);
@@ -435,11 +439,13 @@ process_rural_prevalence(const nlohmann::json &rural_prevalence_json) {
         fmt::print("Processing age group in rural prevalence\n");
         for (const auto &[gender_str, sectors] : age_group.items()) {
             fmt::print("Processing gender: {}\n", gender_str);
-            if (gender_str == "Name") continue;
-            
-            core::Gender gender = core::case_insensitive::equals(gender_str, "Female") ? 
-                core::Gender::female : core::Gender::male;
-            
+            if (gender_str == "Name")
+                continue;
+
+            core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
+                                      ? core::Gender::female
+                                      : core::Gender::male;
+
             for (const auto &[sector_str, value] : sectors.items()) {
                 fmt::print("Processing sector: {}\n", sector_str);
                 core::Identifier sector(sector_str);
@@ -459,7 +465,8 @@ void validate_expected_values(const std::vector<core::Identifier> &names,
             throw core::HgpsException{fmt::format(
                 "'{}' is not defined in male risk factor expected values.", name.to_string())};
         }
-        if (expected->at(core::Gender::female).find(name) == expected->at(core::Gender::female).end()) {
+        if (expected->at(core::Gender::female).find(name) ==
+            expected->at(core::Gender::female).end()) {
             throw core::HgpsException{fmt::format(
                 "'{}' is not defined in female risk factor expected values.", name.to_string())};
         }
@@ -535,7 +542,9 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         LinearModelParams params;
         params.intercept = 0.0; // Default intercept
         for (const auto &[gender, value] : gender_prevalence) {
-            params.coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] = value;
+            params
+                .coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] =
+                value;
         }
         region_models[region] = std::move(params);
     }
@@ -547,27 +556,28 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         LinearModelParams params;
         params.intercept = 0.0; // Default intercept
         for (const auto &[gender, value] : gender_prevalence) {
-            params.coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] = value;
+            params
+                .coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] =
+                value;
         }
         ethnicity_models[ethnicity] = std::move(params);
     }
 
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
-    
+
     // Standard deviation of continuous income
     const double income_continuous_stddev = opt["IncomeContinuousStdDev"].get<double>();
 
-    return std::unique_ptr<hgps::StaticLinearModelDefinition>(
-        new hgps::StaticLinearModelDefinition(
-            std::move(expected), std::move(expected_trend), std::move(trend_steps),
-            std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox),
-            std::move(names), std::move(models), std::move(ranges), std::move(lambda), std::move(stddev),
-            std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
-            std::move(policy_cholesky), std::move(trend_models), std::move(trend_ranges),
-            std::move(trend_lambda), info_speed, std::move(rural_prevalence), std::move(income_models),
-            std::move(region_models), physical_activity_stddev, income_continuous_stddev,
-            std::move(ethnicity_models)));
+    return std::unique_ptr<hgps::StaticLinearModelDefinition>(new hgps::StaticLinearModelDefinition(
+        std::move(expected), std::move(expected_trend), std::move(trend_steps),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox),
+        std::move(names), std::move(models), std::move(ranges), std::move(lambda),
+        std::move(stddev), std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
+        std::move(policy_cholesky), std::move(trend_models), std::move(trend_ranges),
+        std::move(trend_lambda), info_speed, std::move(rural_prevalence), std::move(income_models),
+        std::move(region_models), physical_activity_stddev, income_continuous_stddev,
+        std::move(ethnicity_models)));
 }
 
 // Added to handle region parsing since income was made quartile, and region was added- Mahima

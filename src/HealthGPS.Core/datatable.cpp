@@ -360,22 +360,22 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
     // Store the coefficients in the map first with default values
     demographic_coefficients_["region.probabilities"] = region_coeffs;
     demographic_coefficients_["ethnicity.probabilities"] = ethnicity_coeffs;
-    
+
     // Here it loads the coefficients from the config file - with more defensive checks
     if (!config.is_object()) {
         return; // Return early if config is not an object
     }
-    
+
     // Use value() with defaults to avoid exceptions when keys don't exist
     if (!config.contains("modelling")) {
         return; // Return early with default values if no modelling configuration
     }
-    
+
     const auto &modelling = config["modelling"];
     if (!modelling.is_object() || !modelling.contains("demographic_models")) {
         return; // Return early with default values if no demographic_models
     }
-    
+
     const auto &demographic_models = modelling["demographic_models"];
     if (!demographic_models.is_object()) {
         return; // Return early if demographic_models is not an object
@@ -391,12 +391,12 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
     if (!demographic_models.is_object() || !demographic_models.contains("region")) {
         return;
     }
-    
+
     const auto &region = demographic_models["region"];
     if (!region.is_object() || !region.contains("probabilities")) {
         return;
     }
-    
+
     const auto &probabilities = region["probabilities"];
     if (!probabilities.is_object() || !probabilities.contains("coefficients")) {
         return;
@@ -453,7 +453,7 @@ void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethn
     if (!region_probs.is_object()) {
         return;
     }
-    
+
     // Process England
     if (region_probs.contains("England") && region_probs["England"].is_number()) {
         ethnicity_coeffs.region_coefficients[Region::England] =
@@ -485,7 +485,7 @@ void DataTable::load_ethnicity_type_coefficients(DemographicCoefficients &ethnic
     if (!ethnicity_probs.is_object()) {
         return;
     }
-    
+
     // Process White ethnicity
     if (ethnicity_probs.contains("White") && ethnicity_probs["White"].is_number()) {
         ethnicity_coeffs.ethnicity_coefficients[Ethnicity::White] =
@@ -518,12 +518,12 @@ void DataTable::load_ethnicity_coefficients(const nlohmann::json &demographic_mo
     if (!demographic_models.is_object() || !demographic_models.contains("ethnicity")) {
         return;
     }
-    
+
     const auto &ethnicity = demographic_models["ethnicity"];
     if (!ethnicity.is_object() || !ethnicity.contains("probabilities")) {
         return;
     }
-    
+
     const auto &probabilities = ethnicity["probabilities"];
     if (!probabilities.is_object() || !probabilities.contains("coefficients")) {
         return;
