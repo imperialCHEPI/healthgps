@@ -46,7 +46,8 @@
                     "LowerMiddle",
                     "UpperMiddle",
                     "High",
-                    "Unknown"
+                    "Unknown",
+                    "continuous"
                 ]
             },
             "additionalProperties": {
@@ -65,6 +66,35 @@
                 "required": [
                     "Intercept",
                     "Coefficients"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "PhysicalActivityModels": {
+            "type": "object",
+            "propertyNames": {
+                "enum": ["continuous"]
+            },
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "Intercept": {
+                        "type": "number"
+                    },
+                    "Coefficients": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "number"
+                        }
+                    },
+                    "StandardDeviation": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "Intercept",
+                    "Coefficients",
+                    "StandardDeviation"
                 ],
                 "additionalProperties": false
             }
@@ -208,6 +238,7 @@
         "PhysicalActivityStdDev",
         "RuralPrevalence",
         "IncomeModels",
+        "PhysicalActivityModels",
         "RiskFactorModels",
         "RiskFactorCorrelationFile",
         "PolicyCovarianceFile"
