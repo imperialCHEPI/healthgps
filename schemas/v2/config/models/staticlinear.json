@@ -245,5 +245,5 @@
         "RiskFactorCorrelationFile",
         "PolicyCovarianceFile"
     ],
-    "additionalProperties": false
+    "additionalProperties": true
 }
