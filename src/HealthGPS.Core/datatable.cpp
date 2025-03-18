@@ -360,12 +360,26 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
     // Store the coefficients in the map first with default values
     demographic_coefficients_["region.probabilities"] = region_coeffs;
     demographic_coefficients_["ethnicity.probabilities"] = ethnicity_coeffs;
-    // Here it loads the coefficients from the config file
-    if (!config.contains("modelling") || !config["modelling"].contains("demographic_models")) {
-        return; // Return early with default values if no configuration
+    
+    // Here it loads the coefficients from the config file - with more defensive checks
+    if (!config.is_object()) {
+        return; // Return early if config is not an object
     }
-
-    const auto &demographic_models = config["modelling"]["demographic_models"];
+    
+    // Use value() with defaults to avoid exceptions when keys don't exist
+    if (!config.contains("modelling")) {
+        return; // Return early with default values if no modelling configuration
+    }
+    
+    const auto &modelling = config["modelling"];
+    if (!modelling.is_object() || !modelling.contains("demographic_models")) {
+        return; // Return early with default values if no demographic_models
+    }
+    
+    const auto &demographic_models = modelling["demographic_models"];
+    if (!demographic_models.is_object()) {
+        return; // Return early if demographic_models is not an object
+    }
 
     // Load coefficients using helper methods
     load_region_coefficients(demographic_models);
@@ -373,46 +387,57 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
 }
 
 void DataTable::load_region_coefficients(const nlohmann::json &demographic_models) {
-    // Exit early if required sections don't exist
-    if (!demographic_models.contains("region") ||
-        !demographic_models["region"].contains("probabilities") ||
-        !demographic_models["region"]["probabilities"].contains("coefficients")) {
+    // Exit early if required sections don't exist or aren't the right type
+    if (!demographic_models.is_object() || !demographic_models.contains("region")) {
+        return;
+    }
+    
+    const auto &region = demographic_models["region"];
+    if (!region.is_object() || !region.contains("probabilities")) {
+        return;
+    }
+    
+    const auto &probabilities = region["probabilities"];
+    if (!probabilities.is_object() || !probabilities.contains("coefficients")) {
         return;
     }
 
     // Get current region coefficients
     auto region_coeffs = demographic_coefficients_["region.probabilities"];
-    const auto &region_config = demographic_models["region"]["probabilities"]["coefficients"];
+    const auto &region_config = probabilities["coefficients"];
+    if (!region_config.is_object()) {
+        return;
+    }
 
     // Load age coefficient
-    if (region_config.contains("age")) {
+    if (region_config.contains("age") && region_config["age"].is_number()) {
         region_coeffs.age_coefficient = region_config["age"].get<double>();
     }
 
     // Load gender coefficients
-    if (region_config.contains("gender")) {
+    if (region_config.contains("gender") && region_config["gender"].is_object()) {
         const auto &gender = region_config["gender"];
-        if (gender.contains("male")) {
+        if (gender.contains("male") && gender["male"].is_number()) {
             region_coeffs.gender_coefficients[Gender::male] = gender["male"].get<double>();
         }
-        if (gender.contains("female")) {
+        if (gender.contains("female") && gender["female"].is_number()) {
             region_coeffs.gender_coefficients[Gender::female] = gender["female"].get<double>();
         }
     }
 
     // Load region-specific coefficients
-    if (region_config.contains("region")) {
+    if (region_config.contains("region") && region_config["region"].is_object()) {
         const auto &region = region_config["region"];
-        if (region.contains("England")) {
+        if (region.contains("England") && region["England"].is_number()) {
             region_coeffs.region_coefficients[Region::England] = region["England"].get<double>();
         }
-        if (region.contains("Wales")) {
+        if (region.contains("Wales") && region["Wales"].is_number()) {
             region_coeffs.region_coefficients[Region::Wales] = region["Wales"].get<double>();
         }
-        if (region.contains("Scotland")) {
+        if (region.contains("Scotland") && region["Scotland"].is_number()) {
             region_coeffs.region_coefficients[Region::Scotland] = region["Scotland"].get<double>();
         }
-        if (region.contains("NorthernIreland")) {
+        if (region.contains("NorthernIreland") && region["NorthernIreland"].is_number()) {
             region_coeffs.region_coefficients[Region::NorthernIreland] =
                 region["NorthernIreland"].get<double>();
         }
@@ -425,25 +450,29 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
 // Implement the helper methods before load_ethnicity_coefficients
 void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethnicity_coeffs,
                                                    const nlohmann::json &region_probs) {
+    if (!region_probs.is_object()) {
+        return;
+    }
+    
     // Process England
-    if (region_probs.contains("England")) {
+    if (region_probs.contains("England") && region_probs["England"].is_number()) {
         ethnicity_coeffs.region_coefficients[Region::England] =
             region_probs["England"].get<double>();
     }
 
     // Process Wales
-    if (region_probs.contains("Wales")) {
+    if (region_probs.contains("Wales") && region_probs["Wales"].is_number()) {
         ethnicity_coeffs.region_coefficients[Region::Wales] = region_probs["Wales"].get<double>();
     }
 
     // Process Scotland
-    if (region_probs.contains("Scotland")) {
+    if (region_probs.contains("Scotland") && region_probs["Scotland"].is_number()) {
         ethnicity_coeffs.region_coefficients[Region::Scotland] =
             region_probs["Scotland"].get<double>();
     }
 
     // Process Northern Ireland
-    if (region_probs.contains("NorthernIreland")) {
+    if (region_probs.contains("NorthernIreland") && region_probs["NorthernIreland"].is_number()) {
         ethnicity_coeffs.region_coefficients[Region::NorthernIreland] =
             region_probs["NorthernIreland"].get<double>();
     }
@@ -453,26 +482,30 @@ void DataTable::load_ethnicity_region_coefficients(DemographicCoefficients &ethn
 // helper methods
 void DataTable::load_ethnicity_type_coefficients(DemographicCoefficients &ethnicity_coeffs,
                                                  const nlohmann::json &ethnicity_probs) {
+    if (!ethnicity_probs.is_object()) {
+        return;
+    }
+    
     // Process White ethnicity
-    if (ethnicity_probs.contains("White")) {
+    if (ethnicity_probs.contains("White") && ethnicity_probs["White"].is_number()) {
         ethnicity_coeffs.ethnicity_coefficients[Ethnicity::White] =
             ethnicity_probs["White"].get<double>();
     }
 
     // Process Asian ethnicity
-    if (ethnicity_probs.contains("Asian")) {
+    if (ethnicity_probs.contains("Asian") && ethnicity_probs["Asian"].is_number()) {
         ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Asian] =
             ethnicity_probs["Asian"].get<double>();
     }
 
     // Process Black ethnicity
-    if (ethnicity_probs.contains("Black")) {
+    if (ethnicity_probs.contains("Black") && ethnicity_probs["Black"].is_number()) {
         ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Black] =
             ethnicity_probs["Black"].get<double>();
     }
 
     // Process Others ethnicity
-    if (ethnicity_probs.contains("Others")) {
+    if (ethnicity_probs.contains("Others") && ethnicity_probs["Others"].is_number()) {
         ethnicity_coeffs.ethnicity_coefficients[Ethnicity::Others] =
             ethnicity_probs["Others"].get<double>();
     }
@@ -481,39 +514,50 @@ void DataTable::load_ethnicity_type_coefficients(DemographicCoefficients &ethnic
 // NOLINTNEXTLINE(readability-function-cognitive-complexity) - Complexity has been reduced with
 // helper methods
 void DataTable::load_ethnicity_coefficients(const nlohmann::json &demographic_models) {
-    // Exit early if required sections don't exist
-    if (!demographic_models.contains("ethnicity") ||
-        !demographic_models["ethnicity"].contains("probabilities") ||
-        !demographic_models["ethnicity"]["probabilities"].contains("coefficients")) {
+    // Exit early if required sections don't exist or aren't the right type
+    if (!demographic_models.is_object() || !demographic_models.contains("ethnicity")) {
+        return;
+    }
+    
+    const auto &ethnicity = demographic_models["ethnicity"];
+    if (!ethnicity.is_object() || !ethnicity.contains("probabilities")) {
+        return;
+    }
+    
+    const auto &probabilities = ethnicity["probabilities"];
+    if (!probabilities.is_object() || !probabilities.contains("coefficients")) {
         return;
     }
 
     // Get current ethnicity coefficients
     auto ethnicity_coeffs = demographic_coefficients_["ethnicity.probabilities"];
-    const auto &ethnicity_config = demographic_models["ethnicity"]["probabilities"]["coefficients"];
+    const auto &ethnicity_config = probabilities["coefficients"];
+    if (!ethnicity_config.is_object()) {
+        return;
+    }
 
     // Load age coefficient
-    if (ethnicity_config.contains("age")) {
+    if (ethnicity_config.contains("age") && ethnicity_config["age"].is_number()) {
         ethnicity_coeffs.age_coefficient = ethnicity_config["age"].get<double>();
     }
 
     // Load gender coefficients
-    if (ethnicity_config.contains("gender")) {
+    if (ethnicity_config.contains("gender") && ethnicity_config["gender"].is_object()) {
         const auto &gender = ethnicity_config["gender"];
-        if (gender.contains("male")) {
+        if (gender.contains("male") && gender["male"].is_number()) {
             ethnicity_coeffs.gender_coefficients[Gender::male] = gender["male"].get<double>();
         }
-        if (gender.contains("female")) {
+        if (gender.contains("female") && gender["female"].is_number()) {
             ethnicity_coeffs.gender_coefficients[Gender::female] = gender["female"].get<double>();
         }
     }
 
     // Use helper methods to load region and ethnicity coefficients
-    if (ethnicity_config.contains("region")) {
+    if (ethnicity_config.contains("region") && ethnicity_config["region"].is_object()) {
         load_ethnicity_region_coefficients(ethnicity_coeffs, ethnicity_config["region"]);
     }
 
-    if (ethnicity_config.contains("ethnicity")) {
+    if (ethnicity_config.contains("ethnicity") && ethnicity_config["ethnicity"].is_object()) {
         load_ethnicity_type_coefficients(ethnicity_coeffs, ethnicity_config["ethnicity"]);
     }
 

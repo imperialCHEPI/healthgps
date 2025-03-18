@@ -161,18 +161,19 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 
         std::unordered_map<hgps::core::Identifier, hgps::Coefficient> coeffs;
         for (const auto &pair : at.coefficients) {
-            coeffs.emplace(hgps::core::Identifier(pair.first),
-                           hgps::Coefficient{.value = pair.second.value,
-                                             .pvalue = pair.second.pvalue,
-                                             .tvalue = pair.second.tvalue,
-                                             .std_error = pair.second.std_error});
+            hgps::Coefficient coeff;
+            coeff.value = pair.second.value;
+            coeff.pvalue = pair.second.pvalue;
+            coeff.tvalue = pair.second.tvalue;
+            coeff.std_error = pair.second.std_error;
+            coeffs.emplace(hgps::core::Identifier(pair.first), std::move(coeff));
         }
 
-        models.emplace(
-            hgps::core::Identifier(model_item.first),
-            hgps::LinearModel{.coefficients = std::move(coeffs),
-                              .residuals_standard_deviation = at.residuals_standard_deviation,
-                              .rsquared = at.rsquared});
+        hgps::LinearModel model;
+        model.coefficients = std::move(coeffs);
+        model.residuals_standard_deviation = at.residuals_standard_deviation;
+        model.rsquared = at.rsquared;
+        models.emplace(hgps::core::Identifier(model_item.first), std::move(model));
     }
 
     for (auto &level_item : model_info.levels) {
@@ -183,25 +184,21 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
             col_names.emplace(hgps::core::Identifier{at.variables[i]}, i);
         }
 
-        levels.emplace(
-            std::stoi(level_item.first),
-            hgps::HierarchicalLevel{
-                .variables = std::move(col_names),
-                .transition = hgps::core::DoubleArray2D(at.transition.rows, at.transition.cols,
-                                                        at.transition.data),
-
-                .inverse_transition = hgps::core::DoubleArray2D(at.inverse_transition.rows,
-                                                                at.inverse_transition.cols,
-                                                                at.inverse_transition.data),
-
-                .residual_distribution = hgps::core::DoubleArray2D(at.residual_distribution.rows,
-                                                                   at.residual_distribution.cols,
-                                                                   at.residual_distribution.data),
-
-                .correlation = hgps::core::DoubleArray2D(at.correlation.rows, at.correlation.cols,
-                                                         at.correlation.data),
-
-                .variances = at.variances});
+        hgps::HierarchicalLevel level;
+        level.variables = std::move(col_names);
+        level.transition = hgps::core::DoubleArray2D(at.transition.rows, at.transition.cols,
+                                                    at.transition.data);
+        level.inverse_transition = hgps::core::DoubleArray2D(at.inverse_transition.rows,
+                                                            at.inverse_transition.cols,
+                                                            at.inverse_transition.data);
+        level.residual_distribution = hgps::core::DoubleArray2D(at.residual_distribution.rows,
+                                                               at.residual_distribution.cols,
+                                                               at.residual_distribution.data);
+        level.correlation = hgps::core::DoubleArray2D(at.correlation.rows, at.correlation.cols,
+                                                     at.correlation.data);
+        level.variances = at.variances;
+        
+        levels.emplace(std::stoi(level_item.first), std::move(level));
     }
 
     return std::make_unique<hgps::StaticHierarchicalLinearModelDefinition>(std::move(models),
@@ -224,13 +221,18 @@ void process_risk_factor_models(
     std::unique_ptr<std::unordered_map<core::Identifier, int>> &trend_steps,
     Eigen::MatrixXd &correlation, Eigen::MatrixXd &policy_covariance) {
 
+    fmt::print("Starting to process risk factor models\n");
     size_t i = 0;
     for (const auto &[key, json_params] : models_json.items()) {
+        fmt::print("Processing risk factor: {}\n", key);
         names.emplace_back(key);
 
         // Risk factor model parameters.
+        fmt::print("Accessing Intercept for {}\n", key);
         LinearModelParams model;
         model.intercept = json_params["Intercept"].get<double>();
+
+        fmt::print("Accessing Coefficients for {}\n", key);
         model.coefficients =
             json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
@@ -244,19 +246,29 @@ void process_risk_factor_models(
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
-        ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
+        fmt::print("Accessing Range for {}\n", key);
+        auto lower = json_params["Range"][0].get<double>();
+        auto upper = json_params["Range"][1].get<double>();
+        ranges.emplace_back(core::DoubleInterval(lower, upper));
+        fmt::print("Accessing Lambda for {}\n", key);
         lambda.emplace_back(json_params["Lambda"].get<double>());
+        fmt::print("Accessing StdDev for {}\n", key);
         stddev.emplace_back(json_params["StdDev"].get<double>());
+
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
             correlation(i, j) = std::any_cast<double>(correlation_table.column(i).value(j));
         }
 
         // Intervention policy model parameters.
+        fmt::print("Accessing Policy for {}\n", key);
         const auto &policy_json_params = json_params["Policy"];
         LinearModelParams policy_model;
+        fmt::print("Accessing Policy Intercept for {}\n", key);
         policy_model.intercept = policy_json_params["Intercept"].get<double>();
+        fmt::print("Accessing Policy Coefficients for {}\n", key);
         policy_model.coefficients =
             policy_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+        fmt::print("Accessing Policy LogCoefficients for {}\n", key);
         policy_model.log_coefficients = policy_json_params["LogCoefficients"]
                                             .get<std::unordered_map<core::Identifier, double>>();
 
@@ -271,32 +283,46 @@ void process_risk_factor_models(
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
-        policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
+        fmt::print("Accessing Policy Range for {}\n", key);
+        auto policy_lower = policy_json_params["Range"][0].get<double>();
+        auto policy_upper = policy_json_params["Range"][1].get<double>();
+        policy_ranges.emplace_back(core::DoubleInterval(policy_lower, policy_upper));
         for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
             policy_covariance(i, j) =
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
         }
 
         // Time trend model parameters.
+        fmt::print("Accessing Trend for {}\n", key);
         const auto &trend_json_params = json_params["Trend"];
         LinearModelParams trend_model;
+        fmt::print("Accessing Trend Intercept for {}\n", key);
         trend_model.intercept = trend_json_params["Intercept"].get<double>();
+        fmt::print("Accessing Trend Coefficients for {}\n", key);
         trend_model.coefficients =
             trend_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+        fmt::print("Accessing Trend LogCoefficients for {}\n", key);
         trend_model.log_coefficients = trend_json_params["LogCoefficients"]
                                            .get<std::unordered_map<core::Identifier, double>>();
 
         // Write time trend data structures.
         trend_models->emplace_back(std::move(trend_model));
-        trend_ranges->emplace_back(trend_json_params["Range"].get<core::DoubleInterval>());
+        fmt::print("Accessing Trend Range for {}\n", key);
+        auto trend_lower = trend_json_params["Range"][0].get<double>();
+        auto trend_upper = trend_json_params["Range"][1].get<double>();
+        trend_ranges->emplace_back(core::DoubleInterval(trend_lower, trend_upper));
+        fmt::print("Accessing Trend Lambda for {}\n", key);
         trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
         // Load expected value trends.
+        fmt::print("Accessing ExpectedTrend for {}\n", key);
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
+        fmt::print("Accessing ExpectedTrendBoxCox for {}\n", key);
         (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
+        fmt::print("Accessing TrendSteps for {}\n", key);
         (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
 
-        // Increment table column index.
+        fmt::print("Finished processing risk factor: {}\n", key);
         i++;
     }
 
@@ -318,9 +344,10 @@ void process_risk_factor_models(
 
 std::unordered_map<core::Income, LinearModelParams>
 process_income_models(const nlohmann::json &income_models_json) {
-
+    fmt::print("Starting to process income models\n");
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : income_models_json.items()) {
+        fmt::print("Processing income model: {}\n", key);
         // Get income category.
         core::Income category;
         if (core::case_insensitive::equals(key, "Unknown")) {
@@ -338,63 +365,89 @@ process_income_models(const nlohmann::json &income_models_json) {
         }
 
         // Get income model parameters.
+        fmt::print("Accessing Intercept for income model: {}\n", key);
         LinearModelParams model;
         model.intercept = json_params["Intercept"].get<double>();
+        fmt::print("Accessing Coefficients for income model: {}\n", key);
         model.coefficients =
             json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
         // Insert income model.
         income_models.emplace(category, std::move(model));
+        fmt::print("Finished processing income model: {}\n", key);
     }
     return income_models;
 }
 
-std::unordered_map<core::Region, LinearModelParams>
-process_region_models(const nlohmann::json &region_models_json) {
-
-    std::unordered_map<core::Region, LinearModelParams> region_models;
-    for (const auto &model : region_models_json) {
-        auto region = parse_region(model["Region"].get<std::string>());
-        auto params = LinearModelParams{};
-        params.intercept = model["Intercept"].get<double>();
-
-        for (const auto &coef : model["Coefficients"]) {
-            auto name = coef["Name"].get<core::Identifier>();
-            params.coefficients[name] = coef["Value"].get<double>();
+std::unordered_map<core::Region, std::unordered_map<core::Gender, double>>
+process_region_prevalence(const nlohmann::json &region_prevalence_json) {
+    fmt::print("Starting to process region prevalence\n");
+    std::unordered_map<core::Region, std::unordered_map<core::Gender, double>> region_prevalence;
+    for (const auto &age_group : region_prevalence_json) {
+        fmt::print("Processing age group in region prevalence\n");
+        for (const auto &[gender_str, regions] : age_group.items()) {
+            fmt::print("Processing gender: {}\n", gender_str);
+            if (gender_str == "Name") continue;
+            
+            core::Gender gender = core::case_insensitive::equals(gender_str, "Female") ? 
+                core::Gender::female : core::Gender::male;
+            
+            for (const auto &[region_str, value] : regions.items()) {
+                fmt::print("Processing region: {}\n", region_str);
+                auto region = parse_region(region_str);
+                region_prevalence[region][gender] = value.get<double>();
+            }
         }
-        // insert region model with try_emplace to avoid copying the params
-        region_models.try_emplace(region, std::move(params));
     }
-    return region_models;
+    fmt::print("Finished processing region prevalence\n");
+    return region_prevalence;
 }
 
-std::unordered_map<core::Ethnicity, LinearModelParams>
-process_ethnicity_models(const nlohmann::json &ethnicity_models_json) {
-
-    std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
-    for (const auto &model : ethnicity_models_json) {
-        auto ethnicity = parse_ethnicity(model["Ethnicity"].get<std::string>());
-        auto params = LinearModelParams{};
-        params.intercept = model["Intercept"].get<double>();
-
-        for (const auto &coef : model["Coefficients"]) {
-            auto name = coef["Name"].get<core::Identifier>();
-            params.coefficients[name] = coef["Value"].get<double>();
+std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>>
+process_ethnicity_prevalence(const nlohmann::json &ethnicity_prevalence_json) {
+    fmt::print("Starting to process ethnicity prevalence\n");
+    std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>> ethnicity_prevalence;
+    for (const auto &age_group : ethnicity_prevalence_json) {
+        fmt::print("Processing age group in ethnicity prevalence\n");
+        for (const auto &[gender_str, ethnicities] : age_group.items()) {
+            fmt::print("Processing gender: {}\n", gender_str);
+            if (gender_str == "Name") continue;
+            
+            core::Gender gender = core::case_insensitive::equals(gender_str, "Female") ? 
+                core::Gender::female : core::Gender::male;
+            
+            for (const auto &[ethnicity_str, value] : ethnicities.items()) {
+                fmt::print("Processing ethnicity: {}\n", ethnicity_str);
+                auto ethnicity = parse_ethnicity(ethnicity_str);
+                ethnicity_prevalence[ethnicity][gender] = value.get<double>();
+            }
         }
-        // insert ethnicity model with try_emplace to avoid copying the params
-        ethnicity_models.try_emplace(ethnicity, std::move(params));
     }
-    return ethnicity_models;
+    fmt::print("Finished processing ethnicity prevalence\n");
+    return ethnicity_prevalence;
 }
 
 std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
 process_rural_prevalence(const nlohmann::json &rural_prevalence_json) {
+    fmt::print("Starting to process rural prevalence\n");
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
     for (const auto &age_group : rural_prevalence_json) {
-        auto age_group_name = age_group["Name"].get<core::Identifier>();
-        rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
-                                            {core::Gender::male, age_group["Male"]}};
+        fmt::print("Processing age group in rural prevalence\n");
+        for (const auto &[gender_str, sectors] : age_group.items()) {
+            fmt::print("Processing gender: {}\n", gender_str);
+            if (gender_str == "Name") continue;
+            
+            core::Gender gender = core::case_insensitive::equals(gender_str, "Female") ? 
+                core::Gender::female : core::Gender::male;
+            
+            for (const auto &[sector_str, value] : sectors.items()) {
+                fmt::print("Processing sector: {}\n", sector_str);
+                core::Identifier sector(sector_str);
+                rural_prevalence[sector][gender] = value.get<double>();
+            }
+        }
     }
+    fmt::print("Finished processing rural prevalence\n");
     return rural_prevalence;
 }
 
@@ -402,11 +455,11 @@ void validate_expected_values(const std::vector<core::Identifier> &names,
                               const std::unique_ptr<hgps::RiskFactorSexAgeTable> &expected) {
 
     for (const auto &name : names) {
-        if (!expected->at(core::Gender::male).contains(name)) {
+        if (expected->at(core::Gender::male).find(name) == expected->at(core::Gender::male).end()) {
             throw core::HgpsException{fmt::format(
                 "'{}' is not defined in male risk factor expected values.", name.to_string())};
         }
-        if (!expected->at(core::Gender::female).contains(name)) {
+        if (expected->at(core::Gender::female).find(name) == expected->at(core::Gender::female).end()) {
             throw core::HgpsException{fmt::format(
                 "'{}' is not defined in female risk factor expected values.", name.to_string())};
         }
@@ -475,23 +528,46 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Income models for different income classifications.
     auto income_models = detail::process_income_models(opt["IncomeModels"]);
 
-    // Region models for different region classifications.
-    auto region_models = detail::process_region_models(opt["RegionModels"]);
+    // Convert region prevalence to model parameters
+    std::unordered_map<core::Region, LinearModelParams> region_models;
+    auto region_prevalence = detail::process_region_prevalence(opt["RegionPrevalence"]);
+    for (const auto &[region, gender_prevalence] : region_prevalence) {
+        LinearModelParams params;
+        params.intercept = 0.0; // Default intercept
+        for (const auto &[gender, value] : gender_prevalence) {
+            params.coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] = value;
+        }
+        region_models[region] = std::move(params);
+    }
+
+    // Convert ethnicity prevalence to model parameters
+    std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
+    auto ethnicity_prevalence = detail::process_ethnicity_prevalence(opt["EthnicityPrevalence"]);
+    for (const auto &[ethnicity, gender_prevalence] : ethnicity_prevalence) {
+        LinearModelParams params;
+        params.intercept = 0.0; // Default intercept
+        for (const auto &[gender, value] : gender_prevalence) {
+            params.coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] = value;
+        }
+        ethnicity_models[ethnicity] = std::move(params);
+    }
 
     // Standard deviation of physical activity.
     const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+    
+    // Standard deviation of continuous income
+    const double income_continuous_stddev = opt["IncomeContinuousStdDev"].get<double>();
 
-    // Ethnicity models for different ethnicity classifications.
-    auto ethnicity_models = detail::process_ethnicity_models(opt["EthnicityModels"]);
-
-    return std::make_unique<hgps::StaticLinearModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(trend_steps),
-        std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
-        std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
-        std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
-        std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), std::move(region_models), physical_activity_stddev, 0.5,
-        std::move(ethnicity_models));
+    return std::unique_ptr<hgps::StaticLinearModelDefinition>(
+        new hgps::StaticLinearModelDefinition(
+            std::move(expected), std::move(expected_trend), std::move(trend_steps),
+            std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox),
+            std::move(names), std::move(models), std::move(ranges), std::move(lambda), std::move(stddev),
+            std::move(cholesky), std::move(policy_models), std::move(policy_ranges),
+            std::move(policy_cholesky), std::move(trend_models), std::move(trend_ranges),
+            std::move(trend_lambda), info_speed, std::move(rural_prevalence), std::move(income_models),
+            std::move(region_models), physical_activity_stddev, income_continuous_stddev,
+            std::move(ethnicity_models)));
 }
 
 // Added to handle region parsing since income was made quartile, and region was added- Mahima
@@ -639,7 +715,9 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval> nutrient_ranges;
     for (const auto &nutrient : opt["Nutrients"]) {
         auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
-        nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
+        auto range_lower = nutrient["Range"][0].get<double>();
+        auto range_upper = nutrient["Range"][1].get<double>();
+        nutrient_ranges[nutrient_key] = hgps::core::DoubleInterval(range_lower, range_upper);
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
 
@@ -657,7 +735,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         for (const auto &nutrient : opt["Nutrients"]) {
             auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
 
-            if (food_nutrients.contains(nutrient_key.to_string())) {
+            if (food_nutrients.find(nutrient_key.to_string()) != food_nutrients.end()) {
                 double val = food_nutrients.at(nutrient_key.to_string());
                 nutrient_equations[food_key][nutrient_key] = val;
             }

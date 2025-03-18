@@ -31,8 +31,9 @@ class FloatDataTableColumn final : public PrimitiveDataTableColumn<float> {
 
   protected:
     // Returns owned pointer that must be deleted by caller
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
+    // Ownership transfer is part of the clone
     // pattern, handled by public clone() method wrapping in unique_ptr
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     DataTableColumn *clone_impl() const override { return new FloatDataTableColumn(*this); }
 };
 
@@ -47,6 +48,7 @@ class DoubleDataTableColumn final : public PrimitiveDataTableColumn<double> {
     // Returns owned pointer that must be deleted by caller
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
     // pattern, handled by public clone() method wrapping in unique_ptr
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     DataTableColumn *clone_impl() const override { return new DoubleDataTableColumn(*this); }
 };
 
