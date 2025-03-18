@@ -429,15 +429,18 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
     if (region_config.contains("region") && region_config["region"].is_object()) {
         const auto &region_values = region_config["region"];
         if (region_values.contains("England") && region_values["England"].is_number()) {
-            region_coeffs.region_coefficients[Region::England] = region_values["England"].get<double>();
+            region_coeffs.region_coefficients[Region::England] =
+                region_values["England"].get<double>();
         }
         if (region_values.contains("Wales") && region_values["Wales"].is_number()) {
             region_coeffs.region_coefficients[Region::Wales] = region_values["Wales"].get<double>();
         }
         if (region_values.contains("Scotland") && region_values["Scotland"].is_number()) {
-            region_coeffs.region_coefficients[Region::Scotland] = region_values["Scotland"].get<double>();
+            region_coeffs.region_coefficients[Region::Scotland] =
+                region_values["Scotland"].get<double>();
         }
-        if (region_values.contains("NorthernIreland") && region_values["NorthernIreland"].is_number()) {
+        if (region_values.contains("NorthernIreland") &&
+            region_values["NorthernIreland"].is_number()) {
             region_coeffs.region_coefficients[Region::NorthernIreland] =
                 region_values["NorthernIreland"].get<double>();
         }
