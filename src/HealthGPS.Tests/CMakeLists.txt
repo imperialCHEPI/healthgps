@@ -23,6 +23,8 @@ target_sources(
             "Core.Test.cpp"
             "Core.UnivariateSummary.Test.cpp"
             "Core.MathHelper.Test.cpp"
+            "DataTableColumn.Test.cpp"
+            "DataTable.Test.cpp"
             "Sha256.Test.cpp"
             "Datastore.Test.cpp"
             "Repository.Test.cpp"
@@ -72,7 +74,6 @@ gtest_discover_tests(HealthGPS.Tests DISCOVERY_TIMEOUT 30)
 
 install(TARGETS HealthGPS.Tests DESTINATION "")
 if(WIN32)
-    install(IMPORTED_RUNTIME_ARTIFACTS fmt::fmt)
     install(IMPORTED_RUNTIME_ARTIFACTS GTest::gtest)
 endif()
 
