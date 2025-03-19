@@ -387,8 +387,8 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
 }
 
 // Helper function to load gender coefficients from JSON
-void load_gender_coefficients(const nlohmann::json &gender_config, 
-                             std::unordered_map<Gender, double> &gender_coefficients) {
+void load_gender_coefficients(const nlohmann::json &gender_config,
+                              std::unordered_map<Gender, double> &gender_coefficients) {
     if (gender_config.contains("male") && gender_config["male"].is_number()) {
         gender_coefficients[Gender::male] = gender_config["male"].get<double>();
     }
@@ -410,7 +410,8 @@ void load_region_specific_coefficients(const nlohmann::json &region_values,
         region_coefficients[Region::Scotland] = region_values["Scotland"].get<double>();
     }
     if (region_values.contains("NorthernIreland") && region_values["NorthernIreland"].is_number()) {
-        region_coefficients[Region::NorthernIreland] = region_values["NorthernIreland"].get<double>();
+        region_coefficients[Region::NorthernIreland] =
+            region_values["NorthernIreland"].get<double>();
     }
 }
 
@@ -449,7 +450,8 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
 
     // Load region-specific coefficients
     if (region_config.contains("region") && region_config["region"].is_object()) {
-        load_region_specific_coefficients(region_config["region"], region_coeffs.region_coefficients);
+        load_region_specific_coefficients(region_config["region"],
+                                          region_coeffs.region_coefficients);
     }
 
     // Update region coefficients in the map
