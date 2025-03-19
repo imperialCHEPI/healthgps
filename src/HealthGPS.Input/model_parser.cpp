@@ -166,7 +166,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
             coeff.pvalue = pair.second.pvalue;
             coeff.tvalue = pair.second.tvalue;
             coeff.std_error = pair.second.std_error;
-            coeffs.emplace(hgps::core::Identifier(pair.first), std::move(coeff));
+            coeffs.emplace(hgps::core::Identifier(pair.first), coeff);
         }
 
         hgps::LinearModel model;
@@ -246,9 +246,7 @@ void process_risk_factor_models(
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
         fmt::print("Accessing Range for {}\n", key);
-        auto lower = json_params["Range"][0].get<double>();
-        auto upper = json_params["Range"][1].get<double>();
-        ranges.emplace_back(core::DoubleInterval(lower, upper));
+        ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
         fmt::print("Accessing Lambda for {}\n", key);
         lambda.emplace_back(json_params["Lambda"].get<double>());
         fmt::print("Accessing StdDev for {}\n", key);
@@ -283,9 +281,7 @@ void process_risk_factor_models(
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
         fmt::print("Accessing Policy Range for {}\n", key);
-        auto policy_lower = policy_json_params["Range"][0].get<double>();
-        auto policy_upper = policy_json_params["Range"][1].get<double>();
-        policy_ranges.emplace_back(core::DoubleInterval(policy_lower, policy_upper));
+        policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
         for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
             policy_covariance(i, j) =
                 std::any_cast<double>(policy_covariance_table.column(i).value(j));
@@ -386,8 +382,9 @@ process_region_prevalence(const nlohmann::json &region_prevalence_json) {
         fmt::print("Processing age group in region prevalence\n");
         for (const auto &[gender_str, regions] : age_group.items()) {
             fmt::print("Processing gender: {}\n", gender_str);
-            if (gender_str == "Name")
+            if (gender_str == "Name") {
                 continue;
+            }
 
             core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
                                       ? core::Gender::female
@@ -413,8 +410,9 @@ process_ethnicity_prevalence(const nlohmann::json &ethnicity_prevalence_json) {
         fmt::print("Processing age group in ethnicity prevalence\n");
         for (const auto &[gender_str, ethnicities] : age_group.items()) {
             fmt::print("Processing gender: {}\n", gender_str);
-            if (gender_str == "Name")
+            if (gender_str == "Name") {
                 continue;
+            }
 
             core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
                                       ? core::Gender::female
@@ -439,8 +437,9 @@ process_rural_prevalence(const nlohmann::json &rural_prevalence_json) {
         fmt::print("Processing age group in rural prevalence\n");
         for (const auto &[gender_str, sectors] : age_group.items()) {
             fmt::print("Processing gender: {}\n", gender_str);
-            if (gender_str == "Name")
+            if (gender_str == "Name") {
                 continue;
+            }
 
             core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
                                       ? core::Gender::female
@@ -569,7 +568,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Standard deviation of continuous income
     const double income_continuous_stddev = opt["IncomeContinuousStdDev"].get<double>();
 
-    return std::unique_ptr<hgps::StaticLinearModelDefinition>(new hgps::StaticLinearModelDefinition(
+    return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox),
         std::move(names), std::move(models), std::move(ranges), std::move(lambda),
@@ -577,7 +576,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(policy_cholesky), std::move(trend_models), std::move(trend_ranges),
         std::move(trend_lambda), info_speed, std::move(rural_prevalence), std::move(income_models),
         std::move(region_models), physical_activity_stddev, income_continuous_stddev,
-        std::move(ethnicity_models)));
+        std::move(ethnicity_models));
 }
 
 // Added to handle region parsing since income was made quartile, and region was added- Mahima

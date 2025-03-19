@@ -386,6 +386,34 @@ void DataTable::load_demographic_coefficients(const nlohmann::json &config) {
     load_ethnicity_coefficients(demographic_models);
 }
 
+// Helper function to load gender coefficients from JSON
+void load_gender_coefficients(const nlohmann::json &gender_config, 
+                             std::unordered_map<Gender, double> &gender_coefficients) {
+    if (gender_config.contains("male") && gender_config["male"].is_number()) {
+        gender_coefficients[Gender::male] = gender_config["male"].get<double>();
+    }
+    if (gender_config.contains("female") && gender_config["female"].is_number()) {
+        gender_coefficients[Gender::female] = gender_config["female"].get<double>();
+    }
+}
+
+// Helper function to load region-specific coefficients from JSON
+void load_region_specific_coefficients(const nlohmann::json &region_values,
+                                       std::unordered_map<Region, double> &region_coefficients) {
+    if (region_values.contains("England") && region_values["England"].is_number()) {
+        region_coefficients[Region::England] = region_values["England"].get<double>();
+    }
+    if (region_values.contains("Wales") && region_values["Wales"].is_number()) {
+        region_coefficients[Region::Wales] = region_values["Wales"].get<double>();
+    }
+    if (region_values.contains("Scotland") && region_values["Scotland"].is_number()) {
+        region_coefficients[Region::Scotland] = region_values["Scotland"].get<double>();
+    }
+    if (region_values.contains("NorthernIreland") && region_values["NorthernIreland"].is_number()) {
+        region_coefficients[Region::NorthernIreland] = region_values["NorthernIreland"].get<double>();
+    }
+}
+
 void DataTable::load_region_coefficients(const nlohmann::json &demographic_models) {
     // Exit early if required sections don't exist or aren't the right type
     if (!demographic_models.is_object() || !demographic_models.contains("region")) {
@@ -416,34 +444,12 @@ void DataTable::load_region_coefficients(const nlohmann::json &demographic_model
 
     // Load gender coefficients
     if (region_config.contains("gender") && region_config["gender"].is_object()) {
-        const auto &gender = region_config["gender"];
-        if (gender.contains("male") && gender["male"].is_number()) {
-            region_coeffs.gender_coefficients[Gender::male] = gender["male"].get<double>();
-        }
-        if (gender.contains("female") && gender["female"].is_number()) {
-            region_coeffs.gender_coefficients[Gender::female] = gender["female"].get<double>();
-        }
+        load_gender_coefficients(region_config["gender"], region_coeffs.gender_coefficients);
     }
 
     // Load region-specific coefficients
     if (region_config.contains("region") && region_config["region"].is_object()) {
-        const auto &region_values = region_config["region"];
-        if (region_values.contains("England") && region_values["England"].is_number()) {
-            region_coeffs.region_coefficients[Region::England] =
-                region_values["England"].get<double>();
-        }
-        if (region_values.contains("Wales") && region_values["Wales"].is_number()) {
-            region_coeffs.region_coefficients[Region::Wales] = region_values["Wales"].get<double>();
-        }
-        if (region_values.contains("Scotland") && region_values["Scotland"].is_number()) {
-            region_coeffs.region_coefficients[Region::Scotland] =
-                region_values["Scotland"].get<double>();
-        }
-        if (region_values.contains("NorthernIreland") &&
-            region_values["NorthernIreland"].is_number()) {
-            region_coeffs.region_coefficients[Region::NorthernIreland] =
-                region_values["NorthernIreland"].get<double>();
-        }
+        load_region_specific_coefficients(region_config["region"], region_coeffs.region_coefficients);
     }
 
     // Update region coefficients in the map
