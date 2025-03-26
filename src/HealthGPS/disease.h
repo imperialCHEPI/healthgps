@@ -22,7 +22,7 @@ class DiseaseModule final : public UpdatableModule {
 
     /// @brief Gets the module name
     /// @return The human-readable module name
-    const std::string &name() const noexcept override;
+    std::string name() const noexcept override;
 
     /// @brief Gets the number of diseases models hosted
     /// @return Number of hosted diseases models
@@ -47,7 +47,7 @@ class DiseaseModule final : public UpdatableModule {
 
     /// @brief Initialises the virtual population status
     /// @param context The simulation run-time context
-    void initialise_population(RuntimeContext &context) override;
+    void initialise_population(RuntimeContext &context, Population &population, Random &random) override;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context

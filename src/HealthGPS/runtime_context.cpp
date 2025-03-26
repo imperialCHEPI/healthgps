@@ -1,4 +1,5 @@
 #include "runtime_context.h"
+#include "demographic.h"
 
 namespace {
 // Hash function for RegionKey tuple
@@ -96,6 +97,17 @@ std::unordered_map<core::Ethnicity, double>
 RuntimeContext::get_ethnicity_probabilities(int age, core::Gender gender,
                                             core::Region region) const {
     return inputs_->get_ethnicity_probabilities(age, gender, region);
+}
+
+void RuntimeContext::set_demographic_module(std::shared_ptr<DemographicModule> demographic_module) {
+    demographic_module_ = std::move(demographic_module);
+}
+
+DemographicModule& RuntimeContext::demographic_module() const {
+    if (!demographic_module_) {
+        throw core::HgpsException("Demographic module not set in RuntimeContext");
+    }
+    return *demographic_module_;
 }
 
 } // namespace hgps

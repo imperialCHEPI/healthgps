@@ -62,7 +62,14 @@ enum class Income : uint8_t {
     uppermiddle,
 
     /// @brief High income
-    high
+    high,
+
+    /// @brief Continuous income value
+    /// @note This is a placeholder for continuous income values
+    /// @note This is not used in the current implementation
+    /// @note This is used in the static model to generate income values
+    /// @note JUST A HACK TO GET THE MODEL TO RUN
+    Continuous
 };
 
 /// @brief Enumerates region categories

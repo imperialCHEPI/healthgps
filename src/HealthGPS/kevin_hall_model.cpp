@@ -20,6 +20,7 @@
 #include "kevin_hall_model.h"
 #include "runtime_context.h"
 #include "sync_message.h"
+#include "demographic.h"
 
 #include <algorithm>
 #include <iterator>
@@ -78,44 +79,24 @@ std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 // Modified: Mahima 25/02/2025
 // Ensuring correct initialization order for population characteristics
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
-
+    context_ = &context; // Store reference to the context
+    
     // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
     // also in person.cpp, the person class maintains a deep copy of it
 
     // Step 2: Initialize fixed characteristics (region and ethnicity)
-    for (auto &person : context.population()) {
-        // Region depends on age/gender probabilities
-        initialise_region(context, person, context.random());
-
-        // Ethnicity depends on age/gender/region probabilities
-        initialise_ethnicity(context, person, context.random());
-    }
+    // These are now initialized in demographic.cpp
 
     // Step 3: Initialize continuous income
-    for (auto &person : context.population()) {
-        if (person.is_active()) { // Only initialize for active (alive and not emigrated) persons
-            initialise_income_continuous(person, context.random());
-        }
-    }
+    // This is now initialized in demographic.cpp
 
     // Step 4: Initialize income category
-    // Calculate thresholds once for the entire population
-    auto [q1_threshold, q2_threshold, q3_threshold] =
-        calculate_income_thresholds(context.population());
-
-    // Apply thresholds to each person
-    for (auto &person : context.population()) {
-        if (person.is_active()) { // Only initialize for active (alive and not emigrated) persons
-            initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
-        }
-    }
+    // This is now initialized in demographic.cpp
 
     // Step 5: Initialize physical activity
-    for (auto &person : context.population()) {
-        initialise_physical_activity(context, person, context.random());
-    }
+    // This is now initialized in demographic.cpp
 
-    // Step 6: Initialize nutrient-related factors
+    // Step 6: Initialize remaining risk factors
     for (auto &person : context.population()) {
         initialise_nutrient_intakes(person, context.random());
         initialise_energy_intake(person);
@@ -139,6 +120,8 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+    context_ = &context; // Store reference to the context
+    
     // Update income categories every 5 years
     update_income_category(context);
 
@@ -833,26 +816,10 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
 // Region is initialised using the CDF of the region probabilities along with age/gender strata
 void KevinHallModel::initialise_region(RuntimeContext &context, Person &person,
                                        Random &random) const {
-    // Get probabilities for this age/sex stratum
-    auto region_probs = context.get_region_probabilities(person.age, person.gender);
-
-    // Use CDF for assignment
-    double rand_value = random.next_double(); // next_double is always between 0,1
-    double cumulative_prob = 0.0;
-
-    for (const auto &[region, prob] : region_probs) {
-        cumulative_prob += prob;
-        if (rand_value < cumulative_prob) { // Changed from <= to < for correct CDF sampling
-            person.region = region;
-            return;
-        }
-    }
-
-    // If we reach here, no region was assigned - this indicates an error in probability
-    // distribution
-    throw core::HgpsException("Failed to assign region: cumulative probabilities do not sum to 1.0 "
-                              "or are incorrectly distributed");
+    // Delegate to demographic module
+    context.demographic_module().initialise_region(context, person, random);
 }
+
 // NOTE: Might need to change this if region updates are happening differently
 void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                    Random &random) const {
@@ -866,26 +833,8 @@ void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Per
 // age/gender/region strata
 void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &person,
                                           Random &random) const {
-    // Get probabilities for this age/gender/region stratum
-    auto ethnicity_probs =
-        context.get_ethnicity_probabilities(person.age, person.gender, person.region);
-
-    double rand_value = random.next_double(); // next_double is between 0,1
-    double cumulative_prob = 0.0;
-
-    for (const auto &[ethnicity, prob] : ethnicity_probs) {
-        cumulative_prob += prob;
-        if (rand_value < cumulative_prob) {
-            person.ethnicity = ethnicity;
-            return;
-        }
-    }
-
-    // If we reach here, no ethnicity was assigned - this indicates an error in probability
-    // distribution
-    throw core::HgpsException(
-        "Failed to assign ethnicity: cumulative probabilities do not sum to 1.0 "
-        "or are incorrectly distributed");
+    // Delegate to demographic module
+    context.demographic_module().initialise_ethnicity(context, person, random);
 }
 // NOTE: No update ethnicity as it is fixed throughout once assigned
 
@@ -894,34 +843,8 @@ void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &perso
 // gender, region, ethnicity and income
 void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Person &person,
                                                   Random &random) const {
-    // Calculate base expected PA value for age and gender
-    double expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
-                                   std::nullopt, false);
-
-    // Apply modifiers based on region
-    const auto &region_params = region_models_->at(person.region);
-    double region_effect = region_params.coefficients.at("PhysicalActivity"_id);
-    expected *= (1.0 + region_effect);
-
-    // Apply modifiers based on ethnicity
-    const auto &ethnicity_params = ethnicity_models_->at(person.ethnicity);
-    double ethnicity_effect = ethnicity_params.coefficients.at("PhysicalActivity"_id);
-    expected *= (1.0 + ethnicity_effect);
-
-    // Apply modifiers based on continuous income - using all income models
-    // Adjusts physical activity based on the income effect using the coefficient for
-    // PhysicalActivityfrom config.json
-    double income_effect = 0.0;
-    for (const auto &[income_level, model] : income_models_) {
-        income_effect += model.coefficients.at("PhysicalActivity") * person.income_continuous;
-    }
-    expected *= (1.0 + income_effect);
-
-    // Add random variation using normal distribution
-    double rand = random.next_normal(0.0, physical_activity_stddev_);
-
-    // Set the physical activity value
-    person.risk_factors["PhysicalActivity"_id] = expected * (1.0 + rand);
+    // Delegate to demographic module
+    context.demographic_module().initialise_physical_activity(context, person, random);
 }
 
 // Modified: Mahima 25/02/2025
@@ -929,35 +852,8 @@ void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Perso
 // ethnicity
 // this uses a logistic regression model to predict the income category
 void KevinHallModel::initialise_income_continuous(Person &person, Random &random) const {
-    // Initialize base income value
-    double income_base = 0.0;
-
-    // Add age - apply coefficient to actual age using one model
-    income_base += income_models_.begin()->second.coefficients.at("Age") * person.age;
-
-    // Add gender - apply coefficient to binary gender value using one model
-    double gender_value = (person.gender == core::Gender::male) ? 1.0 : 0.0;
-    income_base += income_models_.begin()->second.coefficients.at("Gender") * gender_value;
-
-    // Add region - apply coefficient to region value
-    // Convert the person's region to a value using person.region_to_value()
-    // Add the product of the region coefficient for "Income" and the region value to income_base
-    double region_value = person.region_to_value();
-    income_base += region_models_->at(person.region).coefficients.at("Income") * region_value;
-
-    // Add ethnicity - apply coefficient to ethnicity value
-    // Convert the person's ethnicity to a value using person.ethnicity_to_value().
-    // Add the product of the ethnicity coefficient for "Income" and the ethnicity value to
-    // income_base.
-    double ethnicity_value = person.ethnicity_to_value();
-    income_base +=
-        ethnicity_models_->at(person.ethnicity).coefficients.at("Income") * ethnicity_value;
-
-    // Add random variation with specified standard deviation
-    double rand = random.next_normal(0.0, income_continuous_stddev_);
-
-    // Ensure income is positive and apply the random variation
-    person.income_continuous = std::max(0.1, income_base * (1.0 + rand));
+    // Delegate to demographic module
+    context_->demographic_module().initialise_income_continuous(person, random);
 }
 
 void KevinHallModel::update_income_continuous(Person &person, Random &random) const {
@@ -970,30 +866,7 @@ void KevinHallModel::update_income_continuous(Person &person, Random &random) co
 // Helper function to calculate income thresholds once for the entire population
 std::tuple<double, double, double>
 KevinHallModel::calculate_income_thresholds(const Population &population) const {
-    std::vector<double> sorted_incomes;
-    sorted_incomes.reserve(population.size());
-
-    // Collect all income values
-    for (const auto &p : population) {
-        if (p.income_continuous >= 0) {
-            sorted_incomes.push_back(p.income_continuous);
-        }
-    }
-
-    // Sort once (this is now only done once for the entire population)
-    std::sort(sorted_incomes.begin(), sorted_incomes.end());
-
-    // Calculate quartile thresholds
-    size_t n = sorted_incomes.size();
-    if (n == 0) {
-        return {0.0, 0.0, 0.0}; // Handle empty population case
-    }
-
-    double q1_threshold = sorted_incomes[n / 4];
-    double q2_threshold = sorted_incomes[n / 2];
-    double q3_threshold = sorted_incomes[3 * n / 4];
-
-    return {q1_threshold, q2_threshold, q3_threshold};
+    return context_->demographic_module().calculate_income_thresholds(population);
 }
 
 // Modified: Mahima 25/02/2025, Optimized for large populations
@@ -1001,16 +874,8 @@ KevinHallModel::calculate_income_thresholds(const Population &population) const 
 // This method now only assigns the category based on pre-calculated thresholds
 void KevinHallModel::initialise_income_category(Person &person, double q1_threshold,
                                                 double q2_threshold, double q3_threshold) const {
-    // Assign income categories based on quartiles
-    if (person.income_continuous <= q1_threshold) {
-        person.income_category = core::Income::low;
-    } else if (person.income_continuous <= q2_threshold) {
-        person.income_category = core::Income::lowermiddle;
-    } else if (person.income_continuous <= q3_threshold) {
-        person.income_category = core::Income::uppermiddle;
-    } else {
-        person.income_category = core::Income::high;
-    }
+    // Delegate to demographic module
+    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
 }
 
 // Modified to calculate thresholds once for the entire population
@@ -1030,7 +895,7 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
                 initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
             }
         }
-
+        
         last_update_year = current_year;
     }
 }

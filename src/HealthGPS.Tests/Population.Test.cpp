@@ -436,7 +436,7 @@ class TestScenario final : public Scenario {
     // Explicitly deleted because member channel_ has a deleted move assignment operator
     TestScenario &operator=(TestScenario &&) noexcept = delete;
 
-    [[nodiscard]] ScenarioType type() noexcept override { return ScenarioType::baseline; }
+    [[nodiscard]] ScenarioType type() const noexcept override { return ScenarioType::baseline; }
     [[nodiscard]] std::string name() override { return "Test"; }
     [[nodiscard]] SyncChannel &channel() override { return channel_; }
 
@@ -538,7 +538,7 @@ Population create_population(
     // Initialize the population with each module
     for (const auto &[type, module] : modules) {
         assert(module != nullptr);
-        module->initialise_population(context);
+        module->initialise_population(context, context.population(), context.random());
     }
 
     // Return a copy of the population from the context
@@ -824,9 +824,19 @@ TEST(TestSimulation, BasicSetup) {
     ASSERT_EQ(age_range.lower(), age_limits.lower());
     ASSERT_EQ(age_range.upper(), age_limits.upper());
 
-    // Create demographic module
-    auto demographic =
-        std::make_shared<DemographicModule>(std::move(pop_data), std::move(life_table));
+    // Create demographic module with all required parameters
+    auto income_models = std::unordered_map<core::Income, LinearModelParams>();
+    auto region_models = std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
+    auto ethnicity_models = std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
+    auto demographic = std::make_shared<DemographicModule>(
+        std::move(pop_data),
+        std::move(life_table),
+        std::move(income_models),
+        std::move(region_models),
+        std::move(ethnicity_models),
+        0.5,  // income_continuous_stddev
+        0.5   // physical_activity_stddev
+    );
     ASSERT_NE(nullptr, demographic);
 
     // Add to modules map

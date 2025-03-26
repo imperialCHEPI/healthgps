@@ -89,9 +89,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @brief Initialize the income category for a person
     /// @param person The person to initialize income category for
     /// @param population The population to use for income category initialization
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    // This method does not use any class members and can be static
-    static void initialise_income_category(Person &person, const Population &population);
+    void initialise_income_category(Person &person, const Population &population);
 
     /// @brief Update the income category for a person
     /// @param context The runtime context to use for income category updates
@@ -114,20 +112,20 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
 
     void apply_policies(Person &person, bool intervene) const;
 
+    /// @brief Ensures all people have valid demographic values
+    /// @param context The runtime context to use for demographic initialization
+    void ensure_demographic_values(RuntimeContext &context);
+
     /// @brief Initialize the region for a person
     /// @param context The runtime context to use for region initialization
     /// @param person The person to initialize region for
     /// @param random The random number generator
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    // This method does not use any class members and can be static
     static void initialise_region(RuntimeContext &context, Person &person, Random &random);
 
     /// @brief Initialize the ethnicity for a person
     /// @param context The runtime context to use for ethnicity initialization
     /// @param person The person to initialize ethnicity for
     /// @param random The random number generator
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    // This method does not use any class members and can be static
     static void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
 
     std::vector<double> compute_linear_models(Person &person,
@@ -167,6 +165,10 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     static void update_region(RuntimeContext &context, Person &person, Random &random);
 
+    /// @brief Validates that all required model components are present
+    /// @throws HgpsException if any required component is missing
+    void validate() const;
+
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
@@ -188,6 +190,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     double physical_activity_stddev_;
     double income_continuous_stddev_;
     std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
+    RuntimeContext* context_; // Pointer to the RuntimeContext
 };
 
 /// @brief Defines the static linear model data type
@@ -241,6 +244,16 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
     std::unique_ptr<RiskFactorModel> create_model() const override;
+
+    /// @brief Gets the income models
+    /// @return A reference to the income models map
+    const std::unordered_map<core::Income, LinearModelParams>& income_models() const noexcept {
+        return income_models_;
+    }
+
+    /// @brief Validates that all required model components are present
+    /// @throws HgpsException if any required component is missing
+    void validate() const;
 
   private:
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;

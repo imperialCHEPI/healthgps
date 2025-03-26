@@ -93,6 +93,9 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     void update_income_category(RuntimeContext &context) const;
 
   private:
+    /// @brief Runtime context pointer for accessing demographic module
+    RuntimeContext* context_{nullptr};
+
     /// @brief Handle the update (initialisation) of newborns separately
     /// @param context The runtime context
     void update_newborns(RuntimeContext &context) const;

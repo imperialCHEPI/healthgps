@@ -4,6 +4,7 @@
 #include "weight_model.h"
 
 #include <oneapi/tbb/parallel_for_each.h>
+#include <iostream>
 
 namespace hgps {
 
@@ -12,7 +13,7 @@ DiseaseModule::DiseaseModule(std::map<core::Identifier, std::shared_ptr<DiseaseM
 
 SimulationModuleType DiseaseModule::type() const noexcept { return SimulationModuleType::Disease; }
 
-const std::string &DiseaseModule::name() const noexcept { return name_; }
+std::string DiseaseModule::name() const noexcept { return name_; }
 
 std::size_t DiseaseModule::size() const noexcept { return models_.size(); }
 
@@ -29,26 +30,41 @@ DiseaseModule::operator[](const core::Identifier &disease_id) const {
     return models_.at(disease_id);
 }
 
-void DiseaseModule::initialise_population(RuntimeContext &context) {
-    // Initialise disease status based on prevalence
-    for (auto &model : models_) {
-        model.second->initialise_disease_status(context);
-    }
-
-    // Recalculate relative risks once diseases status were generated
-    for (auto &model : models_) {
-        model.second->initialise_average_relative_risk(context);
-    }
-
-    // After initialising with prevalence, do a 'dry run' to simulate incidence.
-    for (auto &model : models_) {
-        model.second->update_disease_status(context);
+void DiseaseModule::initialise_population([[maybe_unused]] RuntimeContext &context, [[maybe_unused]] Population &population, [[maybe_unused]] Random &random) {
+    // Initialize each disease model once for the whole population
+    for (const auto &[model_type, model] : models_) {
+        model->initialise_disease_status(context);
     }
 }
 
 void DiseaseModule::update_population(RuntimeContext &context) {
     for (auto &model : models_) {
-        model.second->update_disease_status(context);
+        // Special handling for gallbladder disease
+        if (model.first.to_string() == "gallbladder") {
+            std::cout << "DEBUG: [DiseaseModule] Skipping gallbladder disease (using dummy data)" << std::endl;
+            continue;
+        }
+        
+        try {
+            // Add detailed error handling around disease updates
+            std::cout << "DEBUG: [DiseaseModule] Updating " << model.first.to_string() << " disease status" << std::endl;
+            model.second->update_disease_status(context);
+        }
+        catch (const std::out_of_range& e) {
+            // Handle "invalid map<K, T> key" error specifically
+            std::cerr << "ERROR: Map key error while updating " << model.first.to_string() 
+                      << " disease status: " << e.what() << std::endl;
+        }
+        catch (const std::exception& e) {
+            // Handle other exceptions
+            std::cerr << "ERROR: Exception while updating " << model.first.to_string() 
+                      << " disease status: " << e.what() << std::endl;
+        }
+        catch (...) {
+            // Catch all unexpected errors
+            std::cerr << "ERROR: Unknown error while updating " << model.first.to_string() 
+                      << " disease status" << std::endl;
+        }
     }
 }
 

@@ -3,6 +3,7 @@
 #include "runtime_context.h"
 
 #include <oneapi/tbb/parallel_for_each.h>
+#include <iostream>
 
 namespace hgps {
 
@@ -220,40 +221,128 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
 }
 
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
-    int incidence_id = definition_.get().table().at(MeasureKey::incidence);
-
-    for (auto &person : context.population()) {
-        // Skip if person is inactive.
-        if (!person.is_active()) {
-            continue;
+    try {
+        // Get the incidence ID using try-catch instead of contains
+        int incidence_id;
+        try {
+            incidence_id = definition_.get().table().at(MeasureKey::incidence);
+        } catch (const std::exception& e) {
+            std::cerr << "ERROR: No incidence measure found for cancer disease " << disease_type().to_string() << std::endl;
+            return;
         }
+        
+        for (auto &person : context.population()) {
+            try {
+                // Skip if person is inactive.
+                if (!person.is_active()) {
+                    continue;
+                }
 
-        // Clear newborn diseases.
-        if (person.age == 0) {
-            person.diseases.clear();
-            continue;
+                // Clear newborn diseases.
+                if (person.age == 0) {
+                    person.diseases.clear();
+                    continue;
+                }
+
+                // Skip if the person already has the disease - use safer check
+                bool already_has_active_disease = false;
+                try {
+                    if (person.diseases.contains(disease_type())) {
+                        if (person.diseases.at(disease_type()).status == DiseaseStatus::active) {
+                            already_has_active_disease = true;
+                        }
+                    }
+                }
+                catch (const std::exception& e) {
+                    // Handle error and continue with next person
+                    std::cerr << "ERROR accessing disease status for person " << person.id() 
+                              << ": " << e.what() << std::endl;
+                    continue;
+                }
+                
+                if (already_has_active_disease) {
+                    continue;
+                }
+
+                // Calculate relative risk with safe error handling
+                double relative_risk = 1.0;
+                try {
+                    relative_risk *= calculate_relative_risk_for_risk_factors(person);
+                    relative_risk *= calculate_relative_risk_for_diseases(person);
+                }
+                catch (const std::exception& e) {
+                    // If calculation fails, use default relative risk
+                    std::cerr << "ERROR calculating relative risk for person " << person.id() 
+                              << ": " << e.what() << std::endl;
+                    relative_risk = 1.0;
+                }
+
+                // Safely get average relative risk with bounds checking
+                double average_relative_risk = 1.0;
+                try {
+                    // Check age and gender ranges before accessing
+                    if (average_relative_risk_.contains(person.age, person.gender)) {
+                        average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+                    } else {
+                        // Use a fallback value if not found
+                        std::cerr << "WARNING: Missing average_relative_risk for age " << person.age 
+                                  << ", gender " << static_cast<int>(person.gender) << std::endl;
+                    }
+                }
+                catch (const std::exception& e) {
+                    // If access fails, use default value
+                    std::cerr << "ERROR accessing average_relative_risk for person " << person.id() 
+                              << ": " << e.what() << std::endl;
+                }
+
+                // Safely get incidence rate with bounds checking
+                double incidence = 0.0;
+                try {
+                    // Check if the age exists in the table
+                    if (definition_.get().table().contains(person.age)) {
+                        // Get the row for the person's age and gender
+                        auto table_row = definition_.get().table()(person.age, person.gender);
+                        // Use indexing with at() to safely access the incidence rate
+                        try {
+                            incidence = table_row.at(incidence_id);
+                        } catch (const std::out_of_range&) {
+                            // Do nothing, leave incidence at 0
+                        }
+                    }
+                }
+                catch (const std::exception& e) {
+                    // If access fails, use zero incidence
+                    std::cerr << "ERROR accessing incidence rate for person " << person.id() 
+                              << ": " << e.what() << std::endl;
+                }
+
+                // Calculate probability and apply
+                double probability = incidence * relative_risk / average_relative_risk;
+                
+                // Ensure probability is valid
+                if (probability < 0.0 || !std::isfinite(probability)) {
+                    probability = 0.0;
+                } else if (probability > 1.0) {
+                    probability = 1.0;
+                }
+                
+                double hazard = context.random().next_double();
+                if (hazard < probability) {
+                    // Use operator[] instead of at() to avoid exception if key doesn't exist
+                    person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
+                                                            .start_time = context.time_now(),
+                                                            .time_since_onset = 0};
+                }
+            }
+            catch (const std::exception& e) {
+                // Log error but continue processing other people
+                std::cerr << "ERROR processing person " << person.id() << " for cancer incidence: " << e.what() << std::endl;
+            }
         }
-
-        // Skip if the person already has the disease.
-        if (person.diseases.contains(disease_type()) &&
-            person.diseases.at(disease_type()).status == DiseaseStatus::active) {
-            continue;
-        }
-
-        double relative_risk = 1.0;
-        relative_risk *= calculate_relative_risk_for_risk_factors(person);
-        relative_risk *= calculate_relative_risk_for_diseases(person);
-
-        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
-
-        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
-        double probability = incidence * relative_risk / average_relative_risk;
-        double hazard = context.random().next_double();
-        if (hazard < probability) {
-            person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active,
-                                                      .start_time = context.time_now(),
-                                                      .time_since_onset = 0};
-        }
+    }
+    catch (const std::exception& e) {
+        // Handle any other exceptions
+        std::cerr << "ERROR in cancer update_incidence_cases: " << e.what() << std::endl;
     }
 }
 

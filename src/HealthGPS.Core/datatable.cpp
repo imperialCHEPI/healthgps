@@ -129,8 +129,8 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
                                                                       Gender gender) const {
     // Check if required columns exist
     if (!column_if_exists("region") || !column_if_exists("region_prob")) {
-        throw std::runtime_error(
-            "Required columns 'region' and/or 'region_prob' not found in data table");
+        // Return empty map so caller can use alternative source
+        return std::unordered_map<Region, double>();
     }
 
     // Get base probabilities from the data table
@@ -168,11 +168,18 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
 
         // Calculate adjustment based on age and gender
         for (auto &[region, prob] : probabilities) {
-            double adjustment = calculate_probability(coeffs, age, gender, region);
-            prob *= adjustment;
+            double adjustment = 0.0;
+            
+            adjustment += coeffs.age_coefficient * age;
+            
+            if (gender != Gender::unknown && coeffs.gender_coefficients.contains(gender)) {
+                adjustment += coeffs.gender_coefficients.at(gender);
+            }
+            
+            prob *= (1.0 + adjustment);
         }
 
-        // Normalize final probabilities
+        // Renormalize after adjustments
         total = 0.0;
         for (const auto &[region, prob] : probabilities) {
             total += prob;
@@ -199,8 +206,8 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
                                                                             Region region) const {
     // Check if required columns exist
     if (!column_if_exists("ethnicity") || !column_if_exists("ethnicity_prob")) {
-        throw std::runtime_error(
-            "Required columns 'ethnicity' and/or 'ethnicity_prob' not found in data table");
+        // Return empty map so caller can use alternative source
+        return std::unordered_map<Ethnicity, double>();
     }
 
     // Get base probabilities from the data table

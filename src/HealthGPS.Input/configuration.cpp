@@ -93,13 +93,11 @@ Configuration get_configuration(const std::string &config_source,
     }
 
     const auto config_file = get_config_file_path(config_source);
-
     const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion,
                                             /*require_schema_property=*/false);
-
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
-
+    
     // Read data source from JSON file. For now, this is optional, but in future it will be
     // mandatory.
     if (opt.contains("data")) {
@@ -118,7 +116,7 @@ Configuration get_configuration(const std::string &config_source,
     // Modelling information
     try {
         load_modelling_info(opt, config);
-    } catch (const std::exception &e) {
+        } catch (const std::exception &e) {
         success = false;
         fmt::print(fg(fmt::color::red), "Could not load modelling info: {}\n", e.what());
     }
@@ -126,7 +124,7 @@ Configuration get_configuration(const std::string &config_source,
     // Run-time info
     try {
         load_running_info(opt, config);
-    } catch (const std::exception &e) {
+        } catch (const std::exception &e) {
         success = false;
         fmt::print(fg(fmt::color::red), "Could not load running info: {}\n", e.what());
     }

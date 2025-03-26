@@ -1,12 +1,15 @@
 #include "baseline_scenario.h"
+#include <iostream>
 
 namespace hgps {
 
 BaselineScenario::BaselineScenario(SyncChannel &data_sync) : channel_{data_sync} {}
 
-SyncChannel &BaselineScenario::channel() { return channel_; }
-
 void BaselineScenario::clear() noexcept {}
+
+SyncChannel &BaselineScenario::channel() {
+    return channel_.get();
+}
 
 double BaselineScenario::apply([[maybe_unused]] Random &generator, [[maybe_unused]] Person &entity,
                                [[maybe_unused]] int time,

@@ -28,7 +28,7 @@ class InterventionScenario : public Scenario {
     /// @return Intervention impact on risk factors
     virtual const std::vector<PolicyImpact> &impacts() const noexcept = 0;
 
-    ScenarioType type() noexcept override { return ScenarioType::intervention; }
+    ScenarioType type() const noexcept override { return ScenarioType::intervention; }
 
     std::string name() override = 0;
 

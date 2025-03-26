@@ -8,6 +8,7 @@
 #include "modelinput.h"
 #include "repository.h"
 #include "runtime_context.h"
+#include "static_linear_model.h"
 
 namespace hgps {
 
@@ -19,8 +20,18 @@ class DemographicModule final : public SimulationModule {
     /// @brief Initialise a new instance of the DemographicModule class.
     /// @param pop_data Population demographic trends table with year and age lookup
     /// @param life_table Population life trends table with births and deaths
+    /// @param income_models Income models for different income levels
+    /// @param region_models Region models for different regions
+    /// @param ethnicity_models Ethnicity models for different ethnicities
+    /// @param income_continuous_stddev Standard deviation for continuous income
+    /// @param physical_activity_stddev Standard deviation for physical activity
     DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
-                      LifeTable &&life_table);
+                      LifeTable &&life_table,
+                      std::unordered_map<core::Income, LinearModelParams> &&income_models,
+                      std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> &&region_models,
+                      std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> &&ethnicity_models,
+                      double income_continuous_stddev,
+                      double physical_activity_stddev);
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier
@@ -28,7 +39,7 @@ class DemographicModule final : public SimulationModule {
 
     /// @brief Gets the module name
     /// @return The human-readable module name
-    const std::string &name() const noexcept override;
+    std::string name() const noexcept override;
 
     /// @brief Gets the total population at a specific point in time
     /// @param time_year The reference point in time (in year)
@@ -42,12 +53,23 @@ class DemographicModule final : public SimulationModule {
 
     /// @brief Initialises the virtual population status
     /// @param context The simulation run-time context
-    void initialise_population(RuntimeContext &context) override;
+    void initialise_population(RuntimeContext &context, Population &population, Random &random);
+
+    /// @brief Updates the virtual population status
+    /// @param context The simulation run-time context
+    void update_population(RuntimeContext &context) override;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context
     /// @param disease_host The diseases host module instance
     void update_population(RuntimeContext &context, const DiseaseModule &disease_host);
+
+    void initialise_region(RuntimeContext &context, Person &person, Random &random);
+    void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
+    void initialise_income_continuous(Person &person, Random &random);
+    void initialise_income_category(Person &person, double q1_threshold, double q2_threshold, double q3_threshold);
+    void initialise_physical_activity(RuntimeContext &context, Person &person, Random &random);
+    std::tuple<double, double, double> calculate_income_thresholds(const Population &population);
 
   private:
     std::map<int, std::map<int, PopulationRecord>> pop_data_;
@@ -56,7 +78,22 @@ class DemographicModule final : public SimulationModule {
     GenderTable<int, double> residual_death_rates_;
     std::string name_{"Demographic"};
 
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models_;
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
+    double income_continuous_stddev_;
+    double physical_activity_stddev_;
+
+    // Risk factor tables
+    std::shared_ptr<UnorderedMap2d<core::Gender, core::Identifier, std::map<int, double>>> expected_;
+    std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
+    std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
+
     void initialise_birth_rates();
+    void initialise_age_gender(RuntimeContext &context, Population &population, Random &random);
+    double get_expected(RuntimeContext &context, core::Gender gender, int age,
+                       const core::Identifier &factor, std::optional<core::DoubleInterval> range,
+                       bool apply_trend) const noexcept;
 
     double get_total_deaths(int time_year) const noexcept;
     std::map<int, DoubleGenderValue> get_age_gender_distribution(int time_year) const noexcept;
@@ -71,6 +108,7 @@ class DemographicModule final : public SimulationModule {
     static double calculate_excess_mortality_product(const Person &entity,
                                                      const DiseaseModule &disease_host);
     int update_age_and_death_events(RuntimeContext &context, const DiseaseModule &disease_host);
+    int get_trend_steps(const core::Identifier &factor) const noexcept;
 };
 
 /// @brief Builds a new instance of the DemographicModule using the given data infrastructure

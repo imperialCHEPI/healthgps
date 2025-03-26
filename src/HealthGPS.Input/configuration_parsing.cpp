@@ -205,7 +205,7 @@ void load_modelling_info(const json &j, Configuration &config) {
 
     try {
         info.baseline_adjustment = get_baseline_info(modelling, config.root_path);
-    } catch (const std::exception &e) {
+        } catch (const std::exception &e) {
         success = false;
         fmt::print(fmt::fg(fmt::color::red), "Could not load baseline adjustment: {}\n", e.what());
     }
@@ -214,7 +214,7 @@ void load_modelling_info(const json &j, Configuration &config) {
         // SES mapping
         // TODO: Maybe this needs its own helper function
         config.ses = get(modelling, "ses_model").get<SESInfo>();
-    } catch (const std::exception &) {
+        } catch (const std::exception &) {
         success = false;
         fmt::print(fmt::fg(fmt::color::red), "Could not load SES mappings");
     }

@@ -85,6 +85,7 @@ class Simulation : public adevs::Model<int> {
     std::shared_ptr<DiseaseModule> disease_;
     std::shared_ptr<UpdatableModule> analysis_;
     adevs::Time end_time_;
+    bool is_intervention_{false}; // Flag to identify if this is an intervention simulation
 
     void initialise_population();
     void update_population();

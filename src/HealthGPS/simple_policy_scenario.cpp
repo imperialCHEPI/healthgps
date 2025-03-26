@@ -1,5 +1,6 @@
 #include "simple_policy_scenario.h"
 #include "HealthGPS.Core/string_util.h"
+#include <iostream>
 
 namespace hgps {
 
@@ -11,7 +12,9 @@ SimplePolicyScenario::SimplePolicyScenario(SyncChannel &data_sync,
     }
 }
 
-SyncChannel &SimplePolicyScenario::channel() { return channel_; }
+SyncChannel &SimplePolicyScenario::channel() {
+    return channel_.get();
+}
 
 void SimplePolicyScenario::clear() noexcept {}
 

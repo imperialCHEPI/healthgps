@@ -1,4 +1,3 @@
-
 #include "HealthGPS.Core/thread_util.h"
 
 #include "analysis_module.h"
@@ -10,6 +9,8 @@
 #include <functional>
 #include <future>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <iostream>
+#include <iomanip>
 
 namespace hgps {
 
@@ -76,9 +77,9 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
     calculated_stats_.resize(total_num_bins * num_stats_to_calc);
 }
 
-const std::string &AnalysisModule::name() const noexcept { return name_; }
+std::string AnalysisModule::name() const noexcept { return name_; }
 
-void AnalysisModule::initialise_population(RuntimeContext &context) {
+void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &context, [[maybe_unused]] Population &population, [[maybe_unused]] Random &random) {
     const auto &age_range = context.age_range();
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
@@ -117,10 +118,11 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
 }
 
 void AnalysisModule::update_population(RuntimeContext &context) {
-
-    // Reset the calculated factors vector to 0.0
-    std::ranges::fill(calculated_stats_, 0.0);
-
+    // CRITICAL: DO NOT reset calculated_stats_ to zeros
+    // Previously this was: std::ranges::fill(calculated_stats_, 0.0);
+    // Resetting to zeros was causing all reported data to be zeros
+    
+    // Instead let publish_result_message calculate actual statistics
     publish_result_message(context);
 }
 
@@ -318,41 +320,6 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
                           .disability_adjusted_life_years = yll + yld};
 }
 
-void AnalysisModule::calculate_population_statistics(RuntimeContext &context) {
-    size_t num_factors_to_calculate =
-        context.mapping().entries().size() - factors_to_calculate_.size();
-
-    for (const auto &person : context.population()) {
-        // Get the bin index for each factor
-        std::vector<size_t> bin_indices;
-        for (size_t i = 0; i < factors_to_calculate_.size(); i++) {
-            double factor_value = person.get_risk_factor_value(factors_to_calculate_[i]);
-            auto bin_index =
-                static_cast<size_t>((factor_value - factor_min_values_[i]) / factor_bin_widths_[i]);
-            bin_indices.push_back(bin_index);
-        }
-
-        // Calculate the index in the calculated_stats_ vector
-        size_t index = 0;
-        for (size_t i = 0; i < bin_indices.size() - 1; i++) {
-            size_t accumulated_bins =
-                std::accumulate(std::next(factor_bins_.cbegin(), i + 1), factor_bins_.cend(),
-                                size_t{1}, std::multiplies<>());
-            index += bin_indices[i] * accumulated_bins * num_factors_to_calculate;
-        }
-        index += bin_indices.back() * num_factors_to_calculate;
-
-        // Now we can add the values of the factors that are not in factors_to_calculate_
-        for (const auto &factor : context.mapping().entries()) {
-            if (std::find(factors_to_calculate_.cbegin(), factors_to_calculate_.cend(),
-                          factor.key()) == factors_to_calculate_.cend()) {
-                calculated_stats_[index++] += person.get_risk_factor_value(factor.key());
-            }
-        }
-    }
-}
-
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
     if (series.size() > 0) {
@@ -361,7 +328,22 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
     series.add_channels(channels_);
 
+    // Debug information - count population size and active members
+    int total_population = 0;
+    int active_population = 0;
+    for (const auto &person : context.population()) {
+        total_population++;
+        if (person.is_active()) {
+            active_population++;
+        }
+    }
+    
+    // Print debug information to console
+    std::cout << "DEBUG: Total population size: " << total_population << std::endl;
+    std::cout << "DEBUG: Active population size: " << active_population << std::endl;
+    
     auto current_time = static_cast<unsigned int>(context.time_now());
+    int debug_count = 0;
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
@@ -380,6 +362,51 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             }
 
             continue;
+        }
+
+        // Debug information for first 5 active people
+        if (debug_count < 5) {
+            // Convert region to string
+            std::string regionStr;
+            switch (person.region) {
+                case core::Region::England: regionStr = "England"; break;
+                case core::Region::Wales: regionStr = "Wales"; break;
+                case core::Region::Scotland: regionStr = "Scotland"; break;
+                case core::Region::NorthernIreland: regionStr = "Northern Ireland"; break;
+                default: regionStr = "Unknown";
+            }
+            
+            // Convert ethnicity to string
+            std::string ethnicityStr;
+            switch (person.ethnicity) {
+                case core::Ethnicity::White: ethnicityStr = "White"; break;
+                case core::Ethnicity::Asian: ethnicityStr = "Asian"; break;
+                case core::Ethnicity::Black: ethnicityStr = "Black"; break;
+                case core::Ethnicity::Others: ethnicityStr = "Others"; break;
+                default: ethnicityStr = "Unknown";
+            }
+            
+            // Convert income category to string
+            std::string incomeStr;
+            switch (person.income_category) {
+                case core::Income::low: incomeStr = "Low"; break;
+                case core::Income::lowermiddle: incomeStr = "Lower Middle"; break;
+                case core::Income::uppermiddle: incomeStr = "Upper Middle"; break;
+                case core::Income::high: incomeStr = "High"; break;
+                case core::Income::Continuous: incomeStr = "Continuous"; break;
+                default: incomeStr = "Unknown";
+            }
+            
+            std::cout << "DEBUG: Person " << debug_count 
+                      << " - Age: " << age 
+                      << ", Gender: " << (gender == core::Gender::male ? "Male" : "Female")
+                      << ", Region: " << regionStr
+                      << ", Ethnicity: " << ethnicityStr
+                      << ", Income Category: " << incomeStr
+                      << ", Income: " << std::fixed << std::setprecision(2) << person.income_continuous
+                      << ", PhysicalActivity: " << person.get_risk_factor_value("PhysicalActivity"_id)
+                      << std::endl;
+            debug_count++;
         }
 
         series(gender, "count").at(age)++;
@@ -417,24 +444,48 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // Calculate in-place factor averages.
         for (const auto &factor : context.mapping().entries()) {
             std::string column = "mean_" + factor.key().to_string();
-            series(core::Gender::female, column).at(age) /= count_F;
-            series(core::Gender::male, column).at(age) /= count_M;
+            if (count_F > 0) {
+                series(core::Gender::female, column).at(age) /= count_F;
+            }
+            
+            if (count_M > 0) {
+                series(core::Gender::male, column).at(age) /= count_M;
+            }
         }
 
         // Calculate in-place disease prevalence and incidence rates.
         for (const auto &disease : context.diseases()) {
             std::string column_prevalence = "prevalence_" + disease.code.to_string();
-            series(core::Gender::female, column_prevalence).at(age) /= count_F;
-            series(core::Gender::male, column_prevalence).at(age) /= count_M;
+            if (count_F > 0) {
+                series(core::Gender::female, column_prevalence).at(age) /= count_F;
+            }
+            
+            if (count_M > 0) {
+                series(core::Gender::male, column_prevalence).at(age) /= count_M;
+            }
+
             std::string column_incidence = "incidence_" + disease.code.to_string();
-            series(core::Gender::female, column_incidence).at(age) /= count_F;
-            series(core::Gender::male, column_incidence).at(age) /= count_M;
+            if (count_F > 0) {
+                series(core::Gender::female, column_incidence).at(age) /= count_F;
+            }
+            
+            if (count_M > 0) {
+                series(core::Gender::male, column_incidence).at(age) /= count_M;
+            }
         }
 
         // Calculate in-place YLL/YLD/DALY averages.
         for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
-            series(core::Gender::female, column).at(age) /= (count_F + deaths_F);
-            series(core::Gender::male, column).at(age) /= (count_M + deaths_M);
+            double denominator_F = count_F + deaths_F;
+            double denominator_M = count_M + deaths_M;
+            
+            if (denominator_F > 0) {
+                series(core::Gender::female, column).at(age) /= denominator_F;
+            }
+            
+            if (denominator_M > 0) {
+                series(core::Gender::male, column).at(age) /= denominator_M;
+            }
         }
     }
 
@@ -442,7 +493,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     calculate_standard_deviation(context, series);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
-
 void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
                                                   DataSeries &series) const {
 
@@ -485,8 +535,11 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
                                           double count) {
         const double sum = series(sex, "std_" + chan).at(age);
-        const double std = std::sqrt(sum / count);
-        series(sex, "std_" + chan).at(age) = std;
+        
+        if (count > 0) {
+            const double std_dev = std::sqrt(sum / count);
+            series(sex, "std_" + chan).at(age) = std_dev;
+        }
     };
 
     // For each age group in the analysis...
@@ -510,7 +563,6 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         }
     }
 }
-
 void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {

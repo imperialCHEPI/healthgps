@@ -18,7 +18,7 @@ struct RunInfo {
     unsigned int stop_time{};
 
     /// @brief Scenarios data synchronisation timeout in milliseconds
-    unsigned int sync_timeout_ms{};
+    unsigned int sync_timeout_ms{120000};
 
     /// @brief Custom seed to initialise the pseudo-number generator engine
     std::optional<unsigned int> seed{};

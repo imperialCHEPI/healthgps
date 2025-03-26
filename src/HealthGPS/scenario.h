@@ -34,7 +34,7 @@ class Scenario {
 
     /// @brief Gets the scenario type identifier
     /// @return The scenario type
-    virtual ScenarioType type() noexcept = 0;
+    virtual ScenarioType type() const noexcept = 0;
 
     /// @brief Gets the scenario type name
     /// @return Scenario type name

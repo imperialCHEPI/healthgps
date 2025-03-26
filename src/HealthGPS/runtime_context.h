@@ -16,6 +16,9 @@
 
 namespace hgps {
 
+// Forward declaration
+class DemographicModule;
+
 /// @brief Defines the Simulation runtime context data type
 ///
 /// @details The context holds the simulation runtime information,
@@ -123,6 +126,14 @@ class RuntimeContext {
     std::unordered_map<core::Ethnicity, double>
     get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const;
 
+    /// @brief Sets the demographic module
+    /// @param demographic_module Pointer to the demographic module
+    void set_demographic_module(std::shared_ptr<DemographicModule> demographic_module);
+
+    /// @brief Gets the demographic module
+    /// @return Reference to the demographic module
+    DemographicModule& demographic_module() const;
+
   private:
     mutable std::shared_ptr<EventAggregator>
         event_bus_; // NOLINT(cppcoreguidelines-pro-type-const-cast)
@@ -136,6 +147,7 @@ class RuntimeContext {
     int model_start_time_{};
     core::IntegerInterval age_range_;
     mutable std::string cached_name_;
+    std::shared_ptr<DemographicModule> demographic_module_{};
 };
 
 } // namespace hgps

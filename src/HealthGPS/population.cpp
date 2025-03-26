@@ -1,5 +1,6 @@
 #include "population.h"
 #include <execution>
+#include <iostream>
 
 namespace hgps {
 Population::Population(const std::size_t size) : initial_size_{size}, people_(size) {}
@@ -34,37 +35,52 @@ void Population::add(Person person, unsigned int time) noexcept {
 
 void Population::add_newborn_babies(std::size_t number, core::Gender gender,
                                     unsigned int time) noexcept {
+    std::cout << "DEBUG: add_newborn_babies called with " << number << " babies, gender: " 
+              << (gender == core::Gender::male ? "Male" : "Female") << std::endl;
+    
     auto recycle = find_index_of_recyclables(time, number);
     auto remaining = number;
+    
     if (!recycle.empty()) {
         auto replacebles = std::min(number, recycle.size());
         for (auto index = std::size_t{0}; index < replacebles; index++) {
+            // Replace only inactive individuals - should be safe because find_index_of_recyclables
+            // only returns indices of inactive people
             people_.at(recycle.at(index)) = Person{gender};
             remaining--;
         }
     }
 
+    // Add the remaining new babies
     for (auto i = std::size_t{0}; i < remaining; i++) {
         people_.emplace_back(gender);
     }
+    
+    std::cout << "DEBUG: After add_newborn_babies, active population: " 
+              << current_active_size() << " of " << people_.size() << std::endl;
 }
 
 std::vector<int> Population::find_index_of_recyclables(unsigned int time,
                                                        std::size_t top) const noexcept {
     auto indices = std::vector<int>{};
     indices.reserve(top);
+    
+    int checked = 0;
+    int inactive_count = 0;
+    
     for (auto index = 0; const auto &entity : people_) {
-        if (!entity.is_active() && entity.time_of_death() < time &&
-            entity.time_of_migration() < time) {
-            indices.emplace_back(index);
-            if (top > 0 && indices.size() >= top) {
-                break;
+        checked++;
+        if (!entity.is_active()) {
+            inactive_count++;
+            if (entity.time_of_death() < time && entity.time_of_migration() < time) {
+                indices.emplace_back(index);
+                if (top > 0 && indices.size() >= top) {
+                    break;
+                }
             }
         }
-
         index++;
     }
-
     return indices;
 }
 } // namespace hgps

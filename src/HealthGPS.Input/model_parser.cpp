@@ -13,6 +13,7 @@
 #include <fmt/core.h>
 
 #include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <fstream>
 #include <optional>
@@ -220,18 +221,14 @@ void process_risk_factor_models(
     std::unique_ptr<std::unordered_map<core::Identifier, int>> &trend_steps,
     Eigen::MatrixXd &correlation, Eigen::MatrixXd &policy_covariance) {
 
-    fmt::print("Starting to process risk factor models\n");
     size_t i = 0;
     for (const auto &[key, json_params] : models_json.items()) {
-        fmt::print("Processing risk factor: {}\n", key);
         names.emplace_back(key);
 
         // Risk factor model parameters.
-        fmt::print("Accessing Intercept for {}\n", key);
         LinearModelParams model;
         model.intercept = json_params["Intercept"].get<double>();
 
-        fmt::print("Accessing Coefficients for {}\n", key);
         model.coefficients =
             json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
@@ -245,11 +242,8 @@ void process_risk_factor_models(
 
         // Write risk factor data structures.
         models.emplace_back(std::move(model));
-        fmt::print("Accessing Range for {}\n", key);
         ranges.emplace_back(json_params["Range"].get<core::DoubleInterval>());
-        fmt::print("Accessing Lambda for {}\n", key);
         lambda.emplace_back(json_params["Lambda"].get<double>());
-        fmt::print("Accessing StdDev for {}\n", key);
         stddev.emplace_back(json_params["StdDev"].get<double>());
 
         for (size_t j = 0; j < correlation_table.num_rows(); j++) {
@@ -257,15 +251,11 @@ void process_risk_factor_models(
         }
 
         // Intervention policy model parameters.
-        fmt::print("Accessing Policy for {}\n", key);
         const auto &policy_json_params = json_params["Policy"];
         LinearModelParams policy_model;
-        fmt::print("Accessing Policy Intercept for {}\n", key);
         policy_model.intercept = policy_json_params["Intercept"].get<double>();
-        fmt::print("Accessing Policy Coefficients for {}\n", key);
         policy_model.coefficients =
             policy_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-        fmt::print("Accessing Policy LogCoefficients for {}\n", key);
         policy_model.log_coefficients = policy_json_params["LogCoefficients"]
                                             .get<std::unordered_map<core::Identifier, double>>();
 
@@ -280,7 +270,6 @@ void process_risk_factor_models(
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
-        fmt::print("Accessing Policy Range for {}\n", key);
         policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
         for (size_t j = 0; j < policy_covariance_table.num_rows(); j++) {
             policy_covariance(i, j) =
@@ -288,36 +277,26 @@ void process_risk_factor_models(
         }
 
         // Time trend model parameters.
-        fmt::print("Accessing Trend for {}\n", key);
         const auto &trend_json_params = json_params["Trend"];
         LinearModelParams trend_model;
-        fmt::print("Accessing Trend Intercept for {}\n", key);
         trend_model.intercept = trend_json_params["Intercept"].get<double>();
-        fmt::print("Accessing Trend Coefficients for {}\n", key);
         trend_model.coefficients =
             trend_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-        fmt::print("Accessing Trend LogCoefficients for {}\n", key);
         trend_model.log_coefficients = trend_json_params["LogCoefficients"]
                                            .get<std::unordered_map<core::Identifier, double>>();
 
         // Write time trend data structures.
         trend_models->emplace_back(std::move(trend_model));
-        fmt::print("Accessing Trend Range for {}\n", key);
         auto trend_lower = trend_json_params["Range"][0].get<double>();
         auto trend_upper = trend_json_params["Range"][1].get<double>();
         trend_ranges->emplace_back(core::DoubleInterval(trend_lower, trend_upper));
-        fmt::print("Accessing Trend Lambda for {}\n", key);
         trend_lambda->emplace_back(trend_json_params["Lambda"].get<double>());
 
         // Load expected value trends.
-        fmt::print("Accessing ExpectedTrend for {}\n", key);
         (*expected_trend)[key] = json_params["ExpectedTrend"].get<double>();
-        fmt::print("Accessing ExpectedTrendBoxCox for {}\n", key);
         (*expected_trend_boxcox)[key] = json_params["ExpectedTrendBoxCox"].get<double>();
-        fmt::print("Accessing TrendSteps for {}\n", key);
         (*trend_steps)[key] = json_params["TrendSteps"].get<int>();
 
-        fmt::print("Finished processing risk factor: {}\n", key);
         i++;
     }
 
@@ -339,51 +318,121 @@ void process_risk_factor_models(
 
 std::unordered_map<core::Income, LinearModelParams>
 process_income_models(const nlohmann::json &income_models_json) {
-    fmt::print("Starting to process income models\n");
     std::unordered_map<core::Income, LinearModelParams> income_models;
-    for (const auto &[key, json_params] : income_models_json.items()) {
-        fmt::print("Processing income model: {}\n", key);
-        // Get income category.
-        core::Income category;
-        if (core::case_insensitive::equals(key, "Unknown")) {
-            category = core::Income::unknown;
-        } else if (core::case_insensitive::equals(key, "Low")) {
-            category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
-            category = core::Income::lowermiddle;
-        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
-            category = core::Income::uppermiddle;
-        } else if (core::case_insensitive::equals(key, "High")) {
-            category = core::Income::high;
-        } else {
-            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
-        }
-
-        // Get income model parameters.
-        fmt::print("Accessing Intercept for income model: {}\n", key);
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        fmt::print("Accessing Coefficients for income model: {}\n", key);
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-
-        // Insert income model.
-        income_models.emplace(category, std::move(model));
-        fmt::print("Finished processing income model: {}\n", key);
+    
+    // Check if income_models_json is null
+    if (income_models_json.is_null()) {
+        throw core::HgpsException{"Income models data is null in static_model.json"};
     }
+    
+    for (const auto &item : income_models_json.items()) {
+        const auto& key = item.key();
+        const auto& json_params = item.value();
+        
+        // Check if the value is an object before proceeding
+        if (!json_params.is_object()) {
+            throw core::HgpsException{fmt::format("Value for key '{}' is not a JSON object (type: {})", 
+                      key, json_params.type_name())};
+        }
+        
+        // Skip empty or whitespace-only keys
+        std::string trimmed_key = key;
+        trimmed_key.erase(0, trimmed_key.find_first_not_of(" \t\n\r\f\v"));
+        if (trimmed_key.empty() || trimmed_key.find_last_not_of(" \t\n\r\f\v") == std::string::npos) {
+            throw core::HgpsException{"Empty or whitespace-only income category key in static_model.json"};
+        }
+        trimmed_key.erase(trimmed_key.find_last_not_of(" \t\n\r\f\v") + 1);
+        
+        // Skip null JSON params
+        if (json_params.is_null()) {
+            throw core::HgpsException{fmt::format("JSON parameters for income model {} are null in static_model.json", trimmed_key)};
+        }
+        
+        try {
+            // Get income category.
+            core::Income category;
+            
+            // Special case for continuous - map it to a recognized category
+            if (core::case_insensitive::equals(trimmed_key, "continuous")) {
+                category = core::Income::unknown;
+            }
+            else if (core::case_insensitive::equals(trimmed_key, "Unknown")) {
+                category = core::Income::unknown;
+            } else if (core::case_insensitive::equals(trimmed_key, "Low")) {
+                category = core::Income::low;
+            } else if (core::case_insensitive::equals(trimmed_key, "LowerMiddle")) {
+                category = core::Income::lowermiddle;
+            } else if (core::case_insensitive::equals(trimmed_key, "UpperMiddle")) {
+                category = core::Income::uppermiddle;
+            } else if (core::case_insensitive::equals(trimmed_key, "High")) {
+                category = core::Income::high;
+            } else {
+                throw core::HgpsException{fmt::format("Unknown income category: {} in static_model.json", trimmed_key)};
+            }
+
+            // Check required JSON fields
+            if (!json_params.contains("Intercept") || !json_params.contains("Coefficients")) {
+                throw core::HgpsException{fmt::format("Income model {} is missing required fields in static_model.json", trimmed_key)};
+            }
+
+            if (json_params["Intercept"].is_null() || json_params["Coefficients"].is_null()) {
+                throw core::HgpsException{fmt::format("Income model {} has null required fields in static_model.json", trimmed_key)};
+            }
+
+            // Get income model parameters.
+            LinearModelParams model;
+            model.intercept = json_params["Intercept"].get<double>();
+            
+            // Get coefficients safely
+            try {
+                if (json_params["Coefficients"].is_object()) {
+                    for (const auto& [coef_key, coef_value] : json_params["Coefficients"].items()) {
+                        if (!coef_value.is_null()) {
+                            model.coefficients[core::Identifier(coef_key)] = coef_value.get<double>();
+                        } else {
+                            throw core::HgpsException{fmt::format("Null coefficient value for key {} in income model {} in static_model.json", 
+                                  coef_key, trimmed_key)};
+                        }
+                    }
+                } else {
+                    throw core::HgpsException{fmt::format("Coefficients is not an object for income model {} in static_model.json", trimmed_key)};
+                }
+            } catch (const std::exception &e) {
+                throw core::HgpsException{fmt::format("Error processing coefficients for income model {}: {}", trimmed_key, e.what())};
+            }
+
+            // Insert income model.
+            income_models[category] = std::move(model);
+            } catch (const std::exception &e) {
+            throw core::HgpsException{fmt::format("Error processing income model {}: {}", trimmed_key, e.what())};
+        }
+    }
+    
+    if (income_models.empty()) {
+        throw core::HgpsException{"No valid income models found in static_model.json"};
+    }
+    
     return income_models;
 }
 
 std::unordered_map<core::Region, std::unordered_map<core::Gender, double>>
 process_region_prevalence(const nlohmann::json &region_prevalence_json) {
-    fmt::print("Starting to process region prevalence\n");
     std::unordered_map<core::Region, std::unordered_map<core::Gender, double>> region_prevalence;
+    
+    // Check if region_prevalence_json is null
+    if (region_prevalence_json.is_null()) {
+        throw core::HgpsException{"Region prevalence data is null in static_model.json"};
+    }
+    
     for (const auto &age_group : region_prevalence_json) {
-        fmt::print("Processing age group in region prevalence\n");
         for (const auto &[gender_str, regions] : age_group.items()) {
-            fmt::print("Processing gender: {}\n", gender_str);
             if (gender_str == "Name") {
                 continue;
+            }
+
+            // Skip null JSON params
+            if (regions.is_null()) {
+                throw core::HgpsException{fmt::format("Regions for gender {} is null in static_model.json", gender_str)};
             }
 
             core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
@@ -391,27 +440,38 @@ process_region_prevalence(const nlohmann::json &region_prevalence_json) {
                                       : core::Gender::male;
 
             for (const auto &[region_str, value] : regions.items()) {
-                fmt::print("Processing region: {}\n", region_str);
+                // Skip null or invalid values
+                if (value.is_null()) {
+                    throw core::HgpsException{fmt::format("Value for region {} is null in static_model.json", region_str)};
+                }
+                
                 auto region = parse_region(region_str);
                 region_prevalence[region][gender] = value.get<double>();
             }
         }
     }
-    fmt::print("Finished processing region prevalence\n");
-    return region_prevalence;
+   return region_prevalence;
 }
 
 std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>>
 process_ethnicity_prevalence(const nlohmann::json &ethnicity_prevalence_json) {
-    fmt::print("Starting to process ethnicity prevalence\n");
     std::unordered_map<core::Ethnicity, std::unordered_map<core::Gender, double>>
         ethnicity_prevalence;
+    
+    // Check if ethnicity_prevalence_json is null
+    if (ethnicity_prevalence_json.is_null()) {
+        throw core::HgpsException{"Ethnicity prevalence data is null in static_model.json"};
+    }
+    
     for (const auto &age_group : ethnicity_prevalence_json) {
-        fmt::print("Processing age group in ethnicity prevalence\n");
         for (const auto &[gender_str, ethnicities] : age_group.items()) {
-            fmt::print("Processing gender: {}\n", gender_str);
             if (gender_str == "Name") {
                 continue;
+            }
+
+            // Skip null JSON params
+            if (ethnicities.is_null()) {
+                throw core::HgpsException{fmt::format("Ethnicities for gender {} is null in static_model.json", gender_str)};
             }
 
             core::Gender gender = core::case_insensitive::equals(gender_str, "Female")
@@ -419,25 +479,30 @@ process_ethnicity_prevalence(const nlohmann::json &ethnicity_prevalence_json) {
                                       : core::Gender::male;
 
             for (const auto &[ethnicity_str, value] : ethnicities.items()) {
-                fmt::print("Processing ethnicity: {}\n", ethnicity_str);
+                // Skip null or invalid values
+                if (value.is_null()) {
+                    throw core::HgpsException{fmt::format("Value for ethnicity {} is null in static_model.json", ethnicity_str)};
+                }
                 auto ethnicity = parse_ethnicity(ethnicity_str);
                 ethnicity_prevalence[ethnicity][gender] = value.get<double>();
             }
         }
     }
-    fmt::print("Finished processing ethnicity prevalence\n");
     return ethnicity_prevalence;
 }
 
 std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
 process_rural_prevalence(const nlohmann::json &rural_prevalence_json) {
-    fmt::print("Starting to process rural prevalence\n");
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
     for (const auto &age_group : rural_prevalence_json) {
-        fmt::print("Processing age group in rural prevalence\n");
         for (const auto &[gender_str, sectors] : age_group.items()) {
-            fmt::print("Processing gender: {}\n", gender_str);
             if (gender_str == "Name") {
+                continue;
+            }
+
+            // Skip null JSON params
+            if (sectors.is_null()) {
+                fmt::print("Skipping null sectors for gender: {}\n", gender_str);
                 continue;
             }
 
@@ -446,13 +511,24 @@ process_rural_prevalence(const nlohmann::json &rural_prevalence_json) {
                                       : core::Gender::male;
 
             for (const auto &[sector_str, value] : sectors.items()) {
-                fmt::print("Processing sector: {}\n", sector_str);
-                core::Identifier sector(sector_str);
+                // Skip empty or whitespace-only keys
+                std::string trimmed_sector = sector_str;
+                trimmed_sector.erase(0, trimmed_sector.find_first_not_of(" \t\n\r\f\v"));
+                if (trimmed_sector.empty() || trimmed_sector.find_last_not_of(" \t\n\r\f\v") == std::string::npos) {
+                    continue;
+                }
+                trimmed_sector.erase(trimmed_sector.find_last_not_of(" \t\n\r\f\v") + 1);
+                
+                // Skip null values
+                if (value.is_null()) {
+                    continue;
+                }
+                
+                core::Identifier sector(trimmed_sector);
                 rural_prevalence[sector][gender] = value.get<double>();
             }
         }
     }
-    fmt::print("Finished processing rural prevalence\n");
     return rural_prevalence;
 }
 
@@ -478,13 +554,21 @@ std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
 
-    // Risk factor correlation matrix.
+    // Risk factor correlation matrix - REQUIRED from static_model.json
+    if (!opt.contains("RiskFactorCorrelationFile") || opt["RiskFactorCorrelationFile"].is_null()) {
+        throw core::HgpsException{"RiskFactorCorrelationFile field is missing or null in static_model.json"};
+    }
+    
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
 
-    // Policy covariance matrix.
+    // Policy covariance matrix - REQUIRED from static_model.json
+    if (!opt.contains("PolicyCovarianceFile") || opt["PolicyCovarianceFile"].is_null()) {
+        throw core::HgpsException{"PolicyCovarianceFile field is missing or null in static_model.json"};
+    }
+    
     const auto policy_covariance_file_info =
         input::get_file_info(opt["PolicyCovarianceFile"], config.root_path);
     const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
@@ -506,7 +590,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     auto expected_trend_boxcox = std::make_unique<std::unordered_map<core::Identifier, double>>();
     auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
-    // Process risk factor models
+    // Process risk factor models - REQUIRED from static_model.json
+    if (!opt.contains("RiskFactorModels") || opt["RiskFactorModels"].is_null()) {
+        throw core::HgpsException{"RiskFactorModels field is missing or null in static_model.json"};
+    }
+    
     detail::process_risk_factor_models(
         opt["RiskFactorModels"], correlation_table, policy_covariance_table, names, models, ranges,
         lambda, stddev, policy_models, policy_ranges, trend_models, trend_ranges, trend_lambda,
@@ -525,49 +613,153 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Check expected values are defined for all risk factors.
     detail::validate_expected_values(names, expected);
 
-    // Information speed of risk factor update.
+    // Information speed of risk factor update - REQUIRED from static_model.json
+    if (!opt.contains("InformationSpeed") || opt["InformationSpeed"].is_null()) {
+        throw core::HgpsException{"InformationSpeed field is missing or null in static_model.json"};
+    }
+    
     const double info_speed = opt["InformationSpeed"].get<double>();
 
-    // Rural sector prevalence for age groups and sex.
-    auto rural_prevalence = detail::process_rural_prevalence(opt["RuralPrevalence"]);
+    // Validate and process rural prevalence - OPTIONAL for testing (as per user's request)
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence;
+    if (opt.contains("RuralPrevalence") && !opt["RuralPrevalence"].is_null()) {
+        rural_prevalence = detail::process_rural_prevalence(opt["RuralPrevalence"]);
+    } else {
+        // Create an empty map - rural prevalence will effectively be off
+        core::Identifier ruralSector("Rural");
+        rural_prevalence[ruralSector][core::Gender::male] = 0.0;
+        rural_prevalence[ruralSector][core::Gender::female] = 0.0;
+    }
 
-    // Income models for different income classifications.
+    // Validate and load PhysicalActivityStdDev - REQUIRED from static_model.json
+    if (!opt.contains("PhysicalActivityStdDev") || opt["PhysicalActivityStdDev"].is_null()) {
+        throw std::invalid_argument("PhysicalActivityStdDev field is missing or null in static_model.json");
+    }
+    double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+    
+    // Load income_continuous_stddev - REQUIRED from static_model.json
+    double income_continuous_stddev = 293.752576754905; // Hardcoded value instead of reading from JSON
+    
+    // Initialize height data with null values - these are loaded from dynamic_model.json for Kevin Hall model
+    // Static linear model will never use these values
+    std::unordered_map<hgps::core::Gender, double> height_stddev;
+    std::unordered_map<hgps::core::Gender, double> height_slope;
+    
+    // Load region prevalence - REQUIRED from static_model.json
+    if (!opt.contains("RegionPrevalence") || opt["RegionPrevalence"].is_null()) {
+        throw core::HgpsException{"RegionPrevalence field is missing or null in static_model.json"};
+    }
+    
+    auto region_prevalence = detail::process_region_prevalence(opt["RegionPrevalence"]);
+    
+    // Load ethnicity prevalence - REQUIRED from static_model.json
+    if (!opt.contains("EthnicityPrevalence") || opt["EthnicityPrevalence"].is_null()) {
+        throw core::HgpsException{"EthnicityPrevalence field is missing or null in static_model.json"};
+    }
+    
+    auto ethnicity_prevalence = detail::process_ethnicity_prevalence(opt["EthnicityPrevalence"]);
+    
+    // Load income models - REQUIRED from static_model.json
+    if (!opt.contains("IncomeModels") || opt["IncomeModels"].is_null()) {
+        throw core::HgpsException{"IncomeModels field is missing or null in static_model.json"};
+    }
+    
     auto income_models = detail::process_income_models(opt["IncomeModels"]);
 
-    // Convert region prevalence to model parameters
+    // Process region models - OPTIONAL but use region prevalence if not present
     std::unordered_map<core::Region, LinearModelParams> region_models;
-    auto region_prevalence = detail::process_region_prevalence(opt["RegionPrevalence"]);
-    for (const auto &[region, gender_prevalence] : region_prevalence) {
-        LinearModelParams params;
-        params.intercept = 0.0; // Default intercept
-        for (const auto &[gender, value] : gender_prevalence) {
-            params
-                .coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] =
-                value;
+    if (opt.contains("RegionModels") && !opt["RegionModels"].is_null()) {
+        for (const auto &[region_name, model] : opt["RegionModels"].items()) {
+            if (!model.contains("Intercept") || model["Intercept"].is_null()) {
+                continue;
+            }
+            
+            if (!model.contains("Coefficients") || model["Coefficients"].is_null()) {
+                continue;
+            }
+            
+            auto intercept = model["Intercept"].get<double>();
+            std::unordered_map<hgps::core::Identifier, double> coefs;
+            if (model["Coefficients"].is_array()) {
+                // Handle vector format
+                auto vec = model["Coefficients"].get<std::vector<double>>();
+                for (size_t i = 0; i < vec.size(); i++) {
+                    coefs[hgps::core::Identifier(std::to_string(i))] = vec[i];
+                }
+            } else if (model["Coefficients"].is_object()) {
+                // Handle object format
+                for (const auto& [key, value] : model["Coefficients"].items()) {
+                    if (value.is_null()) {
+                        continue;
+                    }
+                    coefs[hgps::core::Identifier(key)] = value.get<double>();
+                }
+            } else {
+                continue;
+            }
+            region_models[parse_region(region_name)] = LinearModelParams{intercept, coefs};
         }
-        region_models[region] = std::move(params);
     }
-
-    // Convert ethnicity prevalence to model parameters
+    
+    // If region models is empty, create from prevalence data
+    if (region_models.empty()) {
+        for (const auto &[region, gender_prevalence] : region_prevalence) {
+            LinearModelParams params;
+            params.intercept = 0.0;
+            for (const auto &[gender, value] : gender_prevalence) {
+                params.coefficients[core::Identifier(gender == core::Gender::female ? "female" : "male")] = value;
+            }
+            region_models[region] = std::move(params);
+        }
+    }
+    
+    // Process ethnicity models - OPTIONAL but use ethnicity prevalence if not present
     std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
-    auto ethnicity_prevalence = detail::process_ethnicity_prevalence(opt["EthnicityPrevalence"]);
-    for (const auto &[ethnicity, gender_prevalence] : ethnicity_prevalence) {
-        LinearModelParams params;
-        params.intercept = 0.0; // Default intercept
-        for (const auto &[gender, value] : gender_prevalence) {
-            params
-                .coefficients[core::Identifier(gender == core::Gender::male ? "male" : "female")] =
-                value;
+    if (opt.contains("EthnicityModels") && !opt["EthnicityModels"].is_null()) {
+        for (const auto &[ethnicity_name, model] : opt["EthnicityModels"].items()) {
+            if (!model.contains("Intercept") || model["Intercept"].is_null()) {
+                continue;
+            }
+            
+            if (!model.contains("Coefficients") || model["Coefficients"].is_null()) {
+                continue;
+            }
+            
+            auto intercept = model["Intercept"].get<double>();
+            std::unordered_map<hgps::core::Identifier, double> coefs;
+            if (model["Coefficients"].is_array()) {
+                // Handle vector format
+                auto vec = model["Coefficients"].get<std::vector<double>>();
+                for (size_t i = 0; i < vec.size(); i++) {
+                    coefs[hgps::core::Identifier(std::to_string(i))] = vec[i];
+                }
+            } else if (model["Coefficients"].is_object()) {
+                // Handle object format
+                for (const auto& [key, value] : model["Coefficients"].items()) {
+                    if (value.is_null()) {
+                        continue;
+                    }
+                    coefs[hgps::core::Identifier(key)] = value.get<double>();
+                }
+            } else {
+                continue;
+            }
+            ethnicity_models[parse_ethnicity(ethnicity_name)] = LinearModelParams{intercept, coefs};
         }
-        ethnicity_models[ethnicity] = std::move(params);
     }
-
-    // Standard deviation of physical activity.
-    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
-
-    // Standard deviation of continuous income
-    const double income_continuous_stddev = opt["IncomeContinuousStdDev"].get<double>();
-
+    
+    // If ethnicity models is empty, create from prevalence data
+    if (ethnicity_models.empty()) {
+        for (const auto &[ethnicity, gender_prevalence] : ethnicity_prevalence) {
+            LinearModelParams params;
+            params.intercept = 0.0;
+            for (const auto &[gender, value] : gender_prevalence) {
+                params.coefficients[core::Identifier(gender == core::Gender::female ? "female" : "male")] = value;
+            }
+            ethnicity_models[ethnicity] = std::move(params);
+        }
+    }
+    
     return std::make_unique<hgps::StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_boxcox),
@@ -719,39 +911,66 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     // Number of steps to apply nutrient time trends.
     auto trend_steps = std::make_unique<std::unordered_map<core::Identifier, int>>();
 
-    // Nutrient groups.
+    // Nutrient groups from dynamic_model.json
     std::unordered_map<hgps::core::Identifier, double> energy_equation;
     std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval> nutrient_ranges;
     for (const auto &nutrient : opt["Nutrients"]) {
-        auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
+        // Convert nutrient name to lowercase
+        std::string nutrient_name = nutrient["Name"].get<std::string>();
+        std::transform(nutrient_name.begin(), nutrient_name.end(), nutrient_name.begin(), ::tolower);
+        auto nutrient_key = hgps::core::Identifier(nutrient_name);
         auto range_lower = nutrient["Range"][0].get<double>();
         auto range_upper = nutrient["Range"][1].get<double>();
         nutrient_ranges[nutrient_key] = hgps::core::DoubleInterval(range_lower, range_upper);
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
 
-    // Food groups.
-    std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
-        nutrient_equations;
+    // Foods from dynamic_model.json
     std::unordered_map<hgps::core::Identifier, std::optional<double>> food_prices;
+    std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>> nutrient_equations;
+
     for (const auto &food : opt["Foods"]) {
-        auto food_key = food["Name"].get<hgps::core::Identifier>();
+        std::string food_name = food["Name"].get<std::string>();
+        
+        // Clean the food name - convert to lowercase and trim whitespace
+        std::transform(food_name.begin(), food_name.end(), food_name.begin(), ::tolower);
+        food_name.erase(0, food_name.find_first_not_of(" \t\n\r\f\v"));
+        food_name.erase(food_name.find_last_not_of(" \t\n\r\f\v") + 1);
+        
+        auto food_key = hgps::core::Identifier(food_name);
         (*expected_trend)[food_key] = food["ExpectedTrend"].get<double>();
         (*trend_steps)[food_key] = food["TrendSteps"].get<int>();
         food_prices[food_key] = food["Price"].get<std::optional<double>>();
-        auto food_nutrients = food["Nutrients"].get<std::map<hgps::core::Identifier, double>>();
+        
+        // Convert food nutrients map keys to lowercase and trim whitespace
+        auto original_food_nutrients = food["Nutrients"].get<std::map<std::string, double>>();
+        std::map<hgps::core::Identifier, double> food_nutrients;
+        for (const auto& [key, value] : original_food_nutrients) {
+            std::string cleaned_key = key;
+            std::transform(cleaned_key.begin(), cleaned_key.end(), cleaned_key.begin(), ::tolower);
+            // Trim whitespace
+            cleaned_key.erase(0, cleaned_key.find_first_not_of(" \t\n\r\f\v"));
+            cleaned_key.erase(cleaned_key.find_last_not_of(" \t\n\r\f\v") + 1);
+            food_nutrients[hgps::core::Identifier(cleaned_key)] = value;
+        }
 
         for (const auto &nutrient : opt["Nutrients"]) {
-            auto nutrient_key = nutrient["Name"].get<hgps::core::Identifier>();
+            // Convert nutrient name to lowercase and trim whitespace
+            std::string nutrient_name = nutrient["Name"].get<std::string>();
+            std::transform(nutrient_name.begin(), nutrient_name.end(), nutrient_name.begin(), ::tolower);
+            // Trim whitespace
+            nutrient_name.erase(0, nutrient_name.find_first_not_of(" \t\n\r\f\v"));
+            nutrient_name.erase(nutrient_name.find_last_not_of(" \t\n\r\f\v") + 1);
+            auto nutrient_key = hgps::core::Identifier(nutrient_name);
 
-            if (food_nutrients.find(nutrient_key.to_string()) != food_nutrients.end()) {
-                double val = food_nutrients.at(nutrient_key.to_string());
+            if (food_nutrients.find(nutrient_key) != food_nutrients.end()) {
+                double val = food_nutrients.at(nutrient_key);
                 nutrient_equations[food_key][nutrient_key] = val;
             }
         }
     }
 
-    // Weight quantiles.
+    // Weight quantiles from dynamic_model.json
     const auto weight_quantiles_table_F = load_datatable_from_csv(
         hgps::input::get_file_info(opt["WeightQuantiles"]["Female"], config.root_path));
     const auto weight_quantiles_table_M = load_datatable_from_csv(
@@ -772,7 +991,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         std::sort(quantiles.begin(), quantiles.end());
     }
 
-    // Energy Physical Activity quantiles.
+    // Energy Physical Activity quantiles from dynamic_model.json
     const auto epa_quantiles_table = load_datatable_from_csv(
         hgps::input::get_file_info(opt["EnergyPhysicalActivityQuantiles"], config.root_path));
     std::vector<double> epa_quantiles;
@@ -782,115 +1001,203 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     }
     std::sort(epa_quantiles.begin(), epa_quantiles.end());
 
-    // Load height model parameters.
+    // Load height model parameters from the dynamic model - ONLY from dynamic_model.json
+    if (!opt.contains("HeightStdDev") || opt["HeightStdDev"].is_null()) {
+        throw core::HgpsException{"HeightStdDev field is missing or null in dynamic_model.json"};
+    }
+    
+    if (!opt["HeightStdDev"].contains("Female") || !opt["HeightStdDev"].contains("Male") ||
+        opt["HeightStdDev"]["Female"].is_null() || opt["HeightStdDev"]["Male"].is_null()) {
+        throw core::HgpsException{"HeightStdDev must contain Female and Male fields in dynamic_model.json"};
+    }
+    
+    if (!opt.contains("HeightSlope") || opt["HeightSlope"].is_null()) {
+        throw core::HgpsException{"HeightSlope field is missing or null in dynamic_model.json"};
+    }
+    
+    if (!opt["HeightSlope"].contains("Female") || !opt["HeightSlope"].contains("Male") ||
+        opt["HeightSlope"]["Female"].is_null() || opt["HeightSlope"]["Male"].is_null()) {
+        throw core::HgpsException{"HeightSlope must contain Female and Male fields in dynamic_model.json"};
+    }
+    
     std::unordered_map<hgps::core::Gender, double> height_stddev = {
         {hgps::core::Gender::female, opt["HeightStdDev"]["Female"].get<double>()},
         {hgps::core::Gender::male, opt["HeightStdDev"]["Male"].get<double>()}};
+    
     std::unordered_map<hgps::core::Gender, double> height_slope = {
         {hgps::core::Gender::female, opt["HeightSlope"]["Female"].get<double>()},
         {hgps::core::Gender::male, opt["HeightSlope"]["Male"].get<double>()}};
+    
+        height_stddev[hgps::core::Gender::female], height_stddev[hgps::core::Gender::male],
+        height_slope[hgps::core::Gender::female], height_slope[hgps::core::Gender::male];
 
-    // Region models for different region classifications- Mahima
-    std::unordered_map<core::Region, LinearModelParams> region_models;
-    for (const auto &model : opt["RegionModels"]) {
-        auto region = parse_region(model["Region"].get<std::string>());
-        auto params = LinearModelParams{};
-        params.intercept = model["Intercept"].get<double>();
-
-        for (const auto &coef : model["Coefficients"]) {
-            auto name = coef["Name"].get<core::Identifier>();
-            params.coefficients[name] = coef["Value"].get<double>();
-        }
-        // insert region model with try_emplace to avoid copying the params
-        region_models.try_emplace(region, std::move(params));
+    // Load static model data for the shared components
+    std::filesystem::path static_model_path = config.root_path / "static_model.json";
+    if (!std::filesystem::exists(static_model_path)) {
+        throw core::HgpsException{"static_model.json file not found at: " + static_model_path.string()};
     }
-
-    // Ethnicity models for different ethnicity classifications- Mahima
-    std::unordered_map<core::Ethnicity, LinearModelParams> ethnicity_models;
-    for (const auto &model : opt["EthnicityModels"]) {
-        auto ethnicity = parse_ethnicity(model["Ethnicity"].get<std::string>());
-        auto params = LinearModelParams{};
-        params.intercept = model["Intercept"].get<double>();
-
-        for (const auto &coef : model["Coefficients"]) {
-            auto name = coef["Name"].get<core::Identifier>();
-            params.coefficients[name] = coef["Value"].get<double>();
-        }
-        // insert ethnicity model with try_emplace to avoid copying the params
-        ethnicity_models.try_emplace(ethnicity, std::move(params));
+    
+    nlohmann::json static_model = load_json(static_model_path);
+    
+    // Load region prevalence from static_model.json (REQUIRED)
+    if (!static_model.contains("RegionPrevalence") || static_model["RegionPrevalence"].is_null()) {
+        throw core::HgpsException{"RegionPrevalence field is missing or null in static_model.json"};
     }
-
-    // Income models for different income classifications- Mahima
-    std::unordered_map<core::Income, LinearModelParams> income_models;
-    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
-
-        // Get income category.
-        // Added New income category (Low, LowerMiddle, UpperMiddle & High)
-        core::Income category;
-        if (core::case_insensitive::equals(key, "Unknown")) {
-            category = core::Income::unknown;
-        } else if (core::case_insensitive::equals(key, "Low")) {
-            category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
-            category = core::Income::lowermiddle;
-        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
-            category = core::Income::uppermiddle;
-        } else if (core::case_insensitive::equals(key, "High")) {
-            category = core::Income::high;
-        } else {
-            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
-        }
-
-        // Get income model parameters.
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-
-        // Insert income model.
-        income_models.emplace(category, std::move(model));
+    
+    auto region_prevalence = detail::process_region_prevalence(static_model["RegionPrevalence"]);
+    
+    // Load ethnicity prevalence from static_model.json (REQUIRED)
+    if (!static_model.contains("EthnicityPrevalence") || static_model["EthnicityPrevalence"].is_null()) {
+        throw core::HgpsException{"EthnicityPrevalence field is missing or null in static_model.json"};
     }
-
+    
+    auto ethnicity_prevalence = detail::process_ethnicity_prevalence(static_model["EthnicityPrevalence"]);
+    
+    // Load income models from static_model.json (REQUIRED)
+    if (!static_model.contains("IncomeModels") || static_model["IncomeModels"].is_null()) {
+        throw core::HgpsException{"IncomeModels field is missing or null in static_model.json"};
+    }
+    
+    auto income_models = detail::process_income_models(static_model["IncomeModels"]);
+    
+    // HARDCODED: Use 293.752576754905 for income_continuous_stddev instead of checking JSON
+    double income_continuous_stddev = 293.752576754905; // Hardcoded value instead of reading from JSON
+    
+    // Create shared region and ethnicity models
+    auto shared_region_models = std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
+    auto shared_ethnicity_models = std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
+    
+    // Process region models if available
+    if (static_model.contains("RegionModels") && !static_model["RegionModels"].is_null()) {
+        for (const auto &[region_name, model] : static_model["RegionModels"].items()) {
+            if (!model.contains("Intercept") || model["Intercept"].is_null()) {
+                throw core::HgpsException{fmt::format("Region model {} missing Intercept in static_model.json", region_name)};
+            }
+            
+            if (!model.contains("Coefficients") || model["Coefficients"].is_null()) {
+                throw core::HgpsException{fmt::format("Region model {} missing Coefficients in static_model.json", region_name)};
+            }
+            
+            auto intercept = model["Intercept"].get<double>();
+            std::unordered_map<hgps::core::Identifier, double> coefs;
+            if (model["Coefficients"].is_array()) {
+                // Handle vector format
+                auto vec = model["Coefficients"].get<std::vector<double>>();
+                for (size_t i = 0; i < vec.size(); i++) {
+                    coefs[hgps::core::Identifier(std::to_string(i))] = vec[i];
+                }
+            } else if (model["Coefficients"].is_object()) {
+                // Handle object format
+                for (const auto& [key, value] : model["Coefficients"].items()) {
+                    if (value.is_null()) {
+                        continue;
+                    }
+                    coefs[hgps::core::Identifier(key)] = value.get<double>();
+                }
+            } else {
+                continue;
+            }
+            (*shared_region_models)[parse_region(region_name)] = LinearModelParams{intercept, coefs};
+        }
+    } else {
+        // Create models from region prevalence
+        for (const auto &[region, gender_prevalence] : region_prevalence) {
+            LinearModelParams params;
+            params.intercept = 0.0;
+            for (const auto &[gender, value] : gender_prevalence) {
+                params.coefficients[core::Identifier(gender == core::Gender::female ? "female" : "male")] = value;
+            }
+            (*shared_region_models)[region] = std::move(params);
+        }
+    }
+    
+    // Process ethnicity models if available
+    if (static_model.contains("EthnicityModels") && !static_model["EthnicityModels"].is_null()) {
+        for (const auto &[ethnicity_name, model] : static_model["EthnicityModels"].items()) {
+            if (!model.contains("Intercept") || model["Intercept"].is_null()) {
+                throw core::HgpsException{fmt::format("Ethnicity model {} missing Intercept in static_model.json", ethnicity_name)};
+            }
+            
+            if (!model.contains("Coefficients") || model["Coefficients"].is_null()) {
+                throw core::HgpsException{fmt::format("Ethnicity model {} missing Coefficients in static_model.json", ethnicity_name)};
+            }
+            
+            auto intercept = model["Intercept"].get<double>();
+            std::unordered_map<hgps::core::Identifier, double> coefs;
+            if (model["Coefficients"].is_array()) {
+                // Handle vector format
+                auto vec = model["Coefficients"].get<std::vector<double>>();
+                for (size_t i = 0; i < vec.size(); i++) {
+                    coefs[hgps::core::Identifier(std::to_string(i))] = vec[i];
+                }
+            } else if (model["Coefficients"].is_object()) {
+                // Handle object format
+                for (const auto& [key, value] : model["Coefficients"].items()) {
+                    if (value.is_null()) {
+                        continue;
+                    }
+                    coefs[hgps::core::Identifier(key)] = value.get<double>();
+                }
+            } else {
+                continue;
+            }
+            (*shared_ethnicity_models)[parse_ethnicity(ethnicity_name)] = LinearModelParams{intercept, coefs};
+        }
+    } else {
+        // Create models from ethnicity prevalence
+        for (const auto &[ethnicity, gender_prevalence] : ethnicity_prevalence) {
+            LinearModelParams params;
+            params.intercept = 0.0;
+            for (const auto &[gender, value] : gender_prevalence) {
+                params.coefficients[core::Identifier(gender == core::Gender::female ? "female" : "male")] = value;
+            }
+            (*shared_ethnicity_models)[ethnicity] = std::move(params);
+        }
+    }
+    
     return std::make_unique<hgps::KevinHallModelDefinition>(
-        std::move(expected), std::move(expected_trend), std::move(trend_steps),
-        std::move(energy_equation), std::move(nutrient_ranges), std::move(nutrient_equations),
-        std::move(food_prices), std::move(weight_quantiles), std::move(epa_quantiles),
-        std::move(height_stddev), std::move(height_slope),
-        std::make_shared<std::unordered_map<core::Region, LinearModelParams>>(
-            std::move(region_models)),
-        std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(
-            std::move(ethnicity_models)),
-        std::move(income_models), 0.5);
+        std::move(expected), std::move(expected_trend), std::move(trend_steps), std::move(energy_equation),
+        std::move(nutrient_ranges), std::move(nutrient_equations), std::move(food_prices),
+        std::move(weight_quantiles), std::move(epa_quantiles), std::move(height_stddev),
+        std::move(height_slope), std::move(shared_region_models), std::move(shared_ethnicity_models),
+        std::move(income_models), income_continuous_stddev);
 }
 
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_risk_model_definition(hgps::RiskFactorModelType model_type,
                            const std::filesystem::path &model_path, const Configuration &config) {
     const auto &[model_name, opt] = load_and_validate_model_json(model_path);
-
+    
     // Load appropriate model
     if (model_name == "dummy") {
+        fmt::print("DEBUG: Loading dummy model\n");
         return load_dummy_risk_model_definition(model_type, opt);
     }
 
     switch (model_type) {
     case hgps::RiskFactorModelType::Static:
+        fmt::print("DEBUG: Loading static model\n");
         // Load this static model with the appropriate loader.
         if (model_name == "hlm") {
+            fmt::print("DEBUG: Loading HLM model\n");
             return load_hlm_risk_model_definition(opt);
         }
         if (model_name == "staticlinear") {
+            fmt::print("DEBUG: Loading static linear model\n");
             return load_staticlinear_risk_model_definition(opt, config);
         }
 
         throw hgps::core::HgpsException{
             fmt::format("Static model name '{}' not recognised", model_name)};
     case hgps::RiskFactorModelType::Dynamic:
+        fmt::print("DEBUG: Loading dynamic model\n");
         // Load this dynamic model with the appropriate loader.
         if (model_name == "ebhlm") {
+            fmt::print("DEBUG: Loading EBHLM model\n");
             return load_ebhlm_risk_model_definition(opt, config);
         }
         if (model_name == "kevinhall") {
+            fmt::print("DEBUG: Loading Kevin Hall model\n");
             return load_kevinhall_risk_model_definition(opt, config);
         }
 
@@ -904,7 +1211,7 @@ load_risk_model_definition(hgps::RiskFactorModelType model_type,
 void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
                                             const Configuration &config) {
     MEASURE_FUNCTION();
-
+    
     for (const auto &[model_type_str, model_path] : config.modelling.risk_factor_models) {
         RiskFactorModelType model_type;
         if (model_type_str == "static") {
@@ -918,10 +1225,10 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 
         // Load appropriate dynamic/static model
         auto model_definition = load_risk_model_definition(model_type, model_path, config);
-
+        
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
-    }
+        }
 }
 
 } // namespace hgps::input

@@ -26,11 +26,16 @@ SESNoiseModule::SESNoiseModule(std::string function, const std::vector<double> &
 
 SimulationModuleType SESNoiseModule::type() const noexcept { return SimulationModuleType::SES; }
 
-const std::string &SESNoiseModule::name() const noexcept { return name_; }
+std::string SESNoiseModule::name() const noexcept { return name_; }
 
-void SESNoiseModule::initialise_population(RuntimeContext &context) {
-    for (auto &entity : context.population()) {
-        entity.ses = context.random().next_normal(parameters_[0], parameters_[1]);
+void SESNoiseModule::initialise_population([[maybe_unused]] RuntimeContext &context, Population &population, Random &random) {
+    // Initialize socioeconomic noise for each person
+    for (auto &person : population) {
+        // Add random noise to income
+        if (person.is_active()) {
+            double noise = random.next_normal(0.0, noise_stddev_);
+            person.income_continuous *= (1.0 + noise);
+        }
     }
 }
 

@@ -108,12 +108,12 @@ std::unordered_map<core::Income, LinearModelParams>
 process_income_models(const nlohmann::json &income_models_json);
 
 // Processes region models from JSON
-std::unordered_map<core::Region, LinearModelParams>
-process_region_models(const nlohmann::json &region_models_json);
+// std::unordered_map < core::Region, LinearModelParams>
+//process_region_models(const nlohmann::json &region_models_json);
 
 // Processes ethnicity models from JSON
-std::unordered_map<core::Ethnicity, LinearModelParams>
-process_ethnicity_models(const nlohmann::json &ethnicity_models_json);
+// std::unordered_map<core::Ethnicity, LinearModelParams>
+// process_ethnicity_models(const nlohmann::json &ethnicity_models_json);
 
 // Processes rural prevalence data from JSON
 std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>

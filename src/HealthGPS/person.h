@@ -58,7 +58,7 @@ class Person {
 
     /// @brief Determine if a Person has emigrated from the population
     /// @return true for current emigrated; otherwise, false.
-    bool has_emigrated() const noexcept;
+    [[nodiscard]] bool has_emigrated() const noexcept { return has_emigrated_; }
 
     /// @brief Gets the time of death, for dead, non-alive individuals only
     /// @return Time of death value
@@ -71,7 +71,7 @@ class Person {
     /// @brief Gets a value indicating whether a Person is current active in the population
     /// @note A person is active only if still alive and has not emigrated.
     /// @return true for active; otherwise, false.
-    bool is_active() const noexcept;
+    [[nodiscard]] bool is_active() const noexcept { return is_alive_ && !has_emigrated_; }
 
     /// @brief Gets a risk factor current value
     /// @param key The risk factor identifier
@@ -109,6 +109,9 @@ class Person {
     /// @throws HgpsException if income is unknown
     float income_to_value() const;
 
+    /// Returns the continuous income value directly
+    double get_income_continuous() const;
+
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time
     /// @throws std::logic_error for attempting to set to non-active individuals.
@@ -119,6 +122,17 @@ class Person {
     /// @throws std::logic_error for attempting to set to non-active individuals.
     void die(const unsigned int time);
 
+    /// @brief Reactivate a person who was incorrectly marked as inactive
+    /// @return True if the person was successfully reactivated
+    [[nodiscard]] bool reactivate();
+
+    /// @brief Clears all diseases
+    void clear_diseases();
+
+    /// @brief Copies the data from another Person instance
+    /// @param other The source Person instance
+    void copy_from(const Person &other);
+
     /// @brief Resets the unique identifier sequence to zero.
     static void reset_id();
 
@@ -126,6 +140,11 @@ class Person {
     /// @return The region value (England = 1, Wales = 2, Scotland = 3, NorthernIreland = 4)
     /// @throws HgpsException if region is unknown
     float region_to_value() const;
+
+    /// @brief Gets the region enumeration name string
+    /// @return The region name
+    /// @throws HgpsException if region is unknown
+    std::string region_to_string() const;
 
     /// @brief Gets the ethnicity assigned value
     /// @return The ethnicity assigned value
@@ -139,10 +158,16 @@ class Person {
     /// @return The ethnicity associated value
     /// @throws HgpsException if ethnicity is unknown
     float ethnicity_to_value() const;
-
-    /// @brief Copies the data from another Person instance
-    /// @param other The source Person instance
-    void copy_from(const Person &other);
+    
+    /// @brief Gets the ethnicity enumeration name string
+    /// @return The ethnicity name
+    /// @throws HgpsException if ethnicity is unknown
+    std::string ethnicity_to_string() const;
+    
+    /// @brief Gets the income category enumeration name string
+    /// @return The income category name
+    /// @throws HgpsException if income category is unknown
+    std::string income_category_to_string() const;
 
     // Member variables in logical initialization order
     std::size_t id_{}; // Must be first as it's used to identify the person
