@@ -2,8 +2,8 @@
 #include "person.h"
 #include "runtime_context.h"
 
-#include <oneapi/tbb/parallel_for_each.h>
 #include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -214,11 +214,12 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         int incidence_id;
         try {
             incidence_id = definition_.get().table().at(MeasureKey::incidence);
-        } catch (const std::exception& e) {
-            std::cerr << "ERROR: No incidence measure found for disease " << disease_type().to_string() << std::endl;
+        } catch (const std::exception &e) {
+            std::cerr << "ERROR: No incidence measure found for disease "
+                      << disease_type().to_string() << std::endl;
             return;
         }
-        
+
         for (auto &person : context.population()) {
             try {
                 // Skip if person is inactive.
@@ -240,14 +241,13 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                             already_has_active_disease = true;
                         }
                     }
-                }
-                catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     // Handle error and continue with next person
-                    std::cerr << "ERROR accessing disease status for person " << person.id() 
-                              << ": " << e.what() << std::endl;
+                    std::cerr << "ERROR accessing disease status for person " << person.id() << ": "
+                              << e.what() << std::endl;
                     continue;
                 }
-                
+
                 if (already_has_active_disease) {
                     continue;
                 }
@@ -257,10 +257,9 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 try {
                     relative_risk *= calculate_relative_risk_for_risk_factors(person);
                     relative_risk *= calculate_relative_risk_for_diseases(person);
-                }
-                catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     // If calculation fails, use default relative risk
-                    std::cerr << "ERROR calculating relative risk for person " << person.id() 
+                    std::cerr << "ERROR calculating relative risk for person " << person.id()
                               << ": " << e.what() << std::endl;
                     relative_risk = 1.0;
                 }
@@ -270,16 +269,16 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 try {
                     // Check age and gender ranges before accessing
                     if (average_relative_risk_.contains(person.age, person.gender)) {
-                        average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+                        average_relative_risk =
+                            average_relative_risk_.at(person.age, person.gender);
                     } else {
                         // Use a fallback value if not found
-                        std::cerr << "WARNING: Missing average_relative_risk for age " << person.age 
+                        std::cerr << "WARNING: Missing average_relative_risk for age " << person.age
                                   << ", gender " << static_cast<int>(person.gender) << std::endl;
                     }
-                }
-                catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     // If access fails, use default value
-                    std::cerr << "ERROR accessing average_relative_risk for person " << person.id() 
+                    std::cerr << "ERROR accessing average_relative_risk for person " << person.id()
                               << ": " << e.what() << std::endl;
                 }
 
@@ -293,41 +292,39 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                         // Use indexing with at() to safely access the incidence rate
                         try {
                             incidence = table_row.at(incidence_id);
-                        } catch (const std::out_of_range&) {
+                        } catch (const std::out_of_range &) {
                             // Do nothing, leave incidence at 0
                         }
                     }
-                }
-                catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     // If access fails, use zero incidence
-                    std::cerr << "ERROR accessing incidence rate for person " << person.id() 
-                              << ": " << e.what() << std::endl;
+                    std::cerr << "ERROR accessing incidence rate for person " << person.id() << ": "
+                              << e.what() << std::endl;
                 }
 
                 // Calculate probability and apply
                 double probability = incidence * relative_risk / average_relative_risk;
-                
+
                 // Ensure probability is valid
                 if (probability < 0.0 || !std::isfinite(probability)) {
                     probability = 0.0;
                 } else if (probability > 1.0) {
                     probability = 1.0;
                 }
-                
+
                 double hazard = context.random().next_double();
                 if (hazard < probability) {
                     // Use operator[] instead of at() to avoid exception if key doesn't exist
                     person.diseases[disease_type()] =
                         Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
                 }
-            }
-            catch (const std::exception& e) {
+            } catch (const std::exception &e) {
                 // Log error but continue processing other people
-                std::cerr << "ERROR processing person " << person.id() << " for incidence: " << e.what() << std::endl;
+                std::cerr << "ERROR processing person " << person.id()
+                          << " for incidence: " << e.what() << std::endl;
             }
         }
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         // Handle any other exceptions
         std::cerr << "ERROR in update_incidence_cases: " << e.what() << std::endl;
     }

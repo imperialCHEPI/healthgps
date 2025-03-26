@@ -28,7 +28,8 @@ SimulationModuleType SESNoiseModule::type() const noexcept { return SimulationMo
 
 std::string SESNoiseModule::name() const noexcept { return name_; }
 
-void SESNoiseModule::initialise_population([[maybe_unused]] RuntimeContext &context, Population &population, Random &random) {
+void SESNoiseModule::initialise_population([[maybe_unused]] RuntimeContext &context,
+                                           Population &population, Random &random) {
     // Initialize socioeconomic noise for each person
     for (auto &person : population) {
         // Add random noise to income

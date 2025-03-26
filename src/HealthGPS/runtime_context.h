@@ -132,7 +132,7 @@ class RuntimeContext {
 
     /// @brief Gets the demographic module
     /// @return Reference to the demographic module
-    DemographicModule& demographic_module() const;
+    DemographicModule &demographic_module() const;
 
   private:
     mutable std::shared_ptr<EventAggregator>

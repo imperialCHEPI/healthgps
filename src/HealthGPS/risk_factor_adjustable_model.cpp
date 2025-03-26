@@ -3,11 +3,11 @@
 #include "risk_factor_adjustable_model.h"
 #include "sync_message.h"
 
-#include <oneapi/tbb/parallel_for_each.h>
-#include <utility>
-#include <iostream>
-#include <thread>
 #include <chrono>
+#include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
+#include <thread>
+#include <utility>
 
 namespace { // anonymous namespace
 
@@ -76,13 +76,14 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         // More robust retry mechanism for receiving messages
         int retry_count = 0;
         const int max_retries = 5;
-        
+
         while (retry_count < max_retries) {
             // Exponential backoff wait between retries (100ms, 200ms, 400ms, 800ms, 1600ms)
             if (retry_count > 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100 * (1 << (retry_count - 1))));
+                std::this_thread::sleep_for(
+                    std::chrono::milliseconds(100 * (1 << (retry_count - 1))));
             }
-            
+
             auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
             if (message.has_value()) {
                 auto &basePtr = message.value();
@@ -90,26 +91,27 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                 if (messagePrt) {
                     // Success
                     adjustments = messagePrt->data();
-                    break;  // Exit the retry loop
+                    break; // Exit the retry loop
                 }
-                
+
                 // Wrong message type
-                std::cerr << "Warning: Received wrong adjustment message type, retrying (" 
+                std::cerr << "Warning: Received wrong adjustment message type, retrying ("
                           << retry_count + 1 << "/" << max_retries << ")" << std::endl;
             } else {
                 // Timeout
-                std::cerr << "Warning: Adjustment message receive timed out, retrying (" 
+                std::cerr << "Warning: Adjustment message receive timed out, retrying ("
                           << retry_count + 1 << "/" << max_retries << ")" << std::endl;
             }
-            
+
             retry_count++;
         }
-        
+
         // Check if we successfully got the adjustments
         if (retry_count >= max_retries) {
             throw core::HgpsException(
-                fmt::format("Simulation out of sync, receive baseline adjustments message has timed out after {} retries.",
-                max_retries));
+                fmt::format("Simulation out of sync, receive baseline adjustments message has "
+                            "timed out after {} retries.",
+                            max_retries));
         }
     }
 
@@ -147,13 +149,13 @@ int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) c
         if (trend_steps_ && trend_steps_->count(factor) > 0) {
             return trend_steps_->at(factor);
         } else {
-            std::cout << "[WARNING-RFAM] No trend steps found for " << factor.to_string() 
+            std::cout << "[WARNING-RFAM] No trend steps found for " << factor.to_string()
                       << ", using default of 5 years" << std::endl;
             return 5; // Default trend steps if not specified
         }
     } catch (const std::exception &e) {
-        std::cout << "[ERROR-RFAM] Exception in get_trend_steps for " << factor.to_string() 
-                  << ": " << e.what() << ", using default of 5 years" << std::endl;
+        std::cout << "[ERROR-RFAM] Exception in get_trend_steps for " << factor.to_string() << ": "
+                  << e.what() << ", using default of 5 years" << std::endl;
         return 5; // Default trend steps in case of error
     }
 }

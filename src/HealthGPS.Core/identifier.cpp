@@ -2,8 +2,8 @@
 #include "string_util.h"
 
 #include <algorithm>
-#include <stdexcept>
 #include <fmt/format.h>
+#include <stdexcept>
 
 namespace hgps {
 namespace core {
@@ -17,10 +17,10 @@ Identifier::Identifier(const std::string &value) : value_{to_lower(value)} {
         // Trim leading and trailing whitespace
         value_.erase(0, value_.find_first_not_of(" \t\n\r\f\v"));
         value_.erase(value_.find_last_not_of(" \t\n\r\f\v") + 1);
-        
+
         try {
             validate_identifier();
-        } catch (const std::invalid_argument& e) {
+        } catch (const std::invalid_argument &e) {
             fmt::print("ERROR: Invalid identifier '{}': {}\n", value, e.what());
             throw;
         }
@@ -69,14 +69,14 @@ std::ostream &operator<<(std::ostream &stream, const Identifier &identifier) {
 
 void from_json(const nlohmann::json &j, Identifier &id) {
     std::string value = j.get<std::string>();
-    
+
     // Convert to lowercase before creating identifier
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-    
+
     // Trim leading and trailing whitespace
     value.erase(0, value.find_first_not_of(" \t\n\r\f\v"));
     value.erase(value.find_last_not_of(" \t\n\r\f\v") + 1);
-    
+
     id = Identifier{value};
 }
 

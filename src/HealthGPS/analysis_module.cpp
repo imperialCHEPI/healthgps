@@ -8,9 +8,9 @@
 #include <cmath>
 #include <functional>
 #include <future>
-#include <oneapi/tbb/parallel_for_each.h>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -79,7 +79,9 @@ void AnalysisModule::initialise_vector(RuntimeContext &context) {
 
 std::string AnalysisModule::name() const noexcept { return name_; }
 
-void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &context, [[maybe_unused]] Population &population, [[maybe_unused]] Random &random) {
+void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &context,
+                                           [[maybe_unused]] Population &population,
+                                           [[maybe_unused]] Random &random) {
     const auto &age_range = context.age_range();
     auto expected_sum = create_age_gender_table<double>(age_range);
     auto expected_count = create_age_gender_table<int>(age_range);
@@ -121,7 +123,7 @@ void AnalysisModule::update_population(RuntimeContext &context) {
     // CRITICAL: DO NOT reset calculated_stats_ to zeros
     // Previously this was: std::ranges::fill(calculated_stats_, 0.0);
     // Resetting to zeros was causing all reported data to be zeros
-    
+
     // Instead let publish_result_message calculate actual statistics
     publish_result_message(context);
 }
@@ -337,11 +339,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             active_population++;
         }
     }
-    
+
     // Print debug information to console
     std::cout << "DEBUG: Total population size: " << total_population << std::endl;
     std::cout << "DEBUG: Active population size: " << active_population << std::endl;
-    
+
     auto current_time = static_cast<unsigned int>(context.time_now());
     int debug_count = 0;
     for (const auto &person : context.population()) {
@@ -369,43 +371,69 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             // Convert region to string
             std::string regionStr;
             switch (person.region) {
-                case core::Region::England: regionStr = "England"; break;
-                case core::Region::Wales: regionStr = "Wales"; break;
-                case core::Region::Scotland: regionStr = "Scotland"; break;
-                case core::Region::NorthernIreland: regionStr = "Northern Ireland"; break;
-                default: regionStr = "Unknown";
+            case core::Region::England:
+                regionStr = "England";
+                break;
+            case core::Region::Wales:
+                regionStr = "Wales";
+                break;
+            case core::Region::Scotland:
+                regionStr = "Scotland";
+                break;
+            case core::Region::NorthernIreland:
+                regionStr = "Northern Ireland";
+                break;
+            default:
+                regionStr = "Unknown";
             }
-            
+
             // Convert ethnicity to string
             std::string ethnicityStr;
             switch (person.ethnicity) {
-                case core::Ethnicity::White: ethnicityStr = "White"; break;
-                case core::Ethnicity::Asian: ethnicityStr = "Asian"; break;
-                case core::Ethnicity::Black: ethnicityStr = "Black"; break;
-                case core::Ethnicity::Others: ethnicityStr = "Others"; break;
-                default: ethnicityStr = "Unknown";
+            case core::Ethnicity::White:
+                ethnicityStr = "White";
+                break;
+            case core::Ethnicity::Asian:
+                ethnicityStr = "Asian";
+                break;
+            case core::Ethnicity::Black:
+                ethnicityStr = "Black";
+                break;
+            case core::Ethnicity::Others:
+                ethnicityStr = "Others";
+                break;
+            default:
+                ethnicityStr = "Unknown";
             }
-            
+
             // Convert income category to string
             std::string incomeStr;
             switch (person.income_category) {
-                case core::Income::low: incomeStr = "Low"; break;
-                case core::Income::lowermiddle: incomeStr = "Lower Middle"; break;
-                case core::Income::uppermiddle: incomeStr = "Upper Middle"; break;
-                case core::Income::high: incomeStr = "High"; break;
-                case core::Income::Continuous: incomeStr = "Continuous"; break;
-                default: incomeStr = "Unknown";
+            case core::Income::low:
+                incomeStr = "Low";
+                break;
+            case core::Income::lowermiddle:
+                incomeStr = "Lower Middle";
+                break;
+            case core::Income::uppermiddle:
+                incomeStr = "Upper Middle";
+                break;
+            case core::Income::high:
+                incomeStr = "High";
+                break;
+            case core::Income::Continuous:
+                incomeStr = "Continuous";
+                break;
+            default:
+                incomeStr = "Unknown";
             }
-            
-            std::cout << "DEBUG: Person " << debug_count 
-                      << " - Age: " << age 
+
+            std::cout << "DEBUG: Person " << debug_count << " - Age: " << age
                       << ", Gender: " << (gender == core::Gender::male ? "Male" : "Female")
-                      << ", Region: " << regionStr
-                      << ", Ethnicity: " << ethnicityStr
-                      << ", Income Category: " << incomeStr
-                      << ", Income: " << std::fixed << std::setprecision(2) << person.income_continuous
-                      << ", PhysicalActivity: " << person.get_risk_factor_value("PhysicalActivity"_id)
-                      << std::endl;
+                      << ", Region: " << regionStr << ", Ethnicity: " << ethnicityStr
+                      << ", Income Category: " << incomeStr << ", Income: " << std::fixed
+                      << std::setprecision(2) << person.income_continuous << ", PhysicalActivity: "
+                      << person.get_risk_factor_value("PhysicalActivity"_id) << std::endl;
             debug_count++;
         }
 
@@ -447,7 +475,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             if (count_F > 0) {
                 series(core::Gender::female, column).at(age) /= count_F;
             }
-            
+
             if (count_M > 0) {
                 series(core::Gender::male, column).at(age) /= count_M;
             }
@@ -459,7 +487,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             if (count_F > 0) {
                 series(core::Gender::female, column_prevalence).at(age) /= count_F;
             }
-            
+
             if (count_M > 0) {
                 series(core::Gender::male, column_prevalence).at(age) /= count_M;
             }
@@ -468,7 +496,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             if (count_F > 0) {
                 series(core::Gender::female, column_incidence).at(age) /= count_F;
             }
-            
+
             if (count_M > 0) {
                 series(core::Gender::male, column_incidence).at(age) /= count_M;
             }
@@ -478,11 +506,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
             double denominator_F = count_F + deaths_F;
             double denominator_M = count_M + deaths_M;
-            
+
             if (denominator_F > 0) {
                 series(core::Gender::female, column).at(age) /= denominator_F;
             }
-            
+
             if (denominator_M > 0) {
                 series(core::Gender::male, column).at(age) /= denominator_M;
             }
@@ -535,7 +563,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
                                           double count) {
         const double sum = series(sex, "std_" + chan).at(age);
-        
+
         if (count > 0) {
             const double std_dev = std::sqrt(sum / count);
             series(sex, "std_" + chan).at(age) = std_dev;

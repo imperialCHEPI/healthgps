@@ -3,8 +3,8 @@
 #include "lms_model.h"
 #include "weight_model.h"
 
-#include <oneapi/tbb/parallel_for_each.h>
 #include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -30,7 +30,9 @@ DiseaseModule::operator[](const core::Identifier &disease_id) const {
     return models_.at(disease_id);
 }
 
-void DiseaseModule::initialise_population([[maybe_unused]] RuntimeContext &context, [[maybe_unused]] Population &population, [[maybe_unused]] Random &random) {
+void DiseaseModule::initialise_population([[maybe_unused]] RuntimeContext &context,
+                                          [[maybe_unused]] Population &population,
+                                          [[maybe_unused]] Random &random) {
     // Initialize each disease model once for the whole population
     for (const auto &[model_type, model] : models_) {
         model->initialise_disease_status(context);
@@ -41,28 +43,27 @@ void DiseaseModule::update_population(RuntimeContext &context) {
     for (auto &model : models_) {
         // Special handling for gallbladder disease
         if (model.first.to_string() == "gallbladder") {
-            std::cout << "DEBUG: [DiseaseModule] Skipping gallbladder disease (using dummy data)" << std::endl;
+            std::cout << "DEBUG: [DiseaseModule] Skipping gallbladder disease (using dummy data)"
+                      << std::endl;
             continue;
         }
-        
+
         try {
             // Add detailed error handling around disease updates
-            std::cout << "DEBUG: [DiseaseModule] Updating " << model.first.to_string() << " disease status" << std::endl;
+            std::cout << "DEBUG: [DiseaseModule] Updating " << model.first.to_string()
+                      << " disease status" << std::endl;
             model.second->update_disease_status(context);
-        }
-        catch (const std::out_of_range& e) {
+        } catch (const std::out_of_range &e) {
             // Handle "invalid map<K, T> key" error specifically
-            std::cerr << "ERROR: Map key error while updating " << model.first.to_string() 
+            std::cerr << "ERROR: Map key error while updating " << model.first.to_string()
                       << " disease status: " << e.what() << std::endl;
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             // Handle other exceptions
-            std::cerr << "ERROR: Exception while updating " << model.first.to_string() 
+            std::cerr << "ERROR: Exception while updating " << model.first.to_string()
                       << " disease status: " << e.what() << std::endl;
-        }
-        catch (...) {
+        } catch (...) {
             // Catch all unexpected errors
-            std::cerr << "ERROR: Unknown error while updating " << model.first.to_string() 
+            std::cerr << "ERROR: Unknown error while updating " << model.first.to_string()
                       << " disease status" << std::endl;
         }
     }

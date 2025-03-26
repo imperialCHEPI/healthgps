@@ -37,7 +37,8 @@ class AnalysisModule final : public UpdatableModule {
 
     std::string name() const noexcept override;
 
-    void initialise_population(RuntimeContext &context, Population &population, Random &random) override;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
     void update_population(RuntimeContext &context) override;
 
@@ -48,7 +49,8 @@ class AnalysisModule final : public UpdatableModule {
     std::vector<std::string> channels_;
     unsigned int comorbidities_;
     std::string name_{"Analysis"};
-    std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id, "income_category"_id};
+    std::vector<core::Identifier> factors_to_calculate_ = {"Gender"_id, "Age"_id,
+                                                           "income_category"_id};
     std::vector<double> calculated_stats_;
     std::vector<size_t> factor_bins_;
     std::vector<double> factor_bin_widths_;

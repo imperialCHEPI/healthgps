@@ -1,36 +1,35 @@
 #include "static_linear_model.h"
-#include "demographic.h"
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/forward_type.h"
+#include "demographic.h"
 #include "person.h"
 #include "runtime_context.h"
 #include <random>
 
+#include <functional>
+#include <iostream>
 #include <ranges>
 #include <utility>
-#include <iostream>
-#include <functional>
 
 namespace {
 // Common validation function to avoid code duplication
 void validate_model_components(
-    const std::vector<hgps::core::Identifier>& names,
-    const std::vector<hgps::LinearModelParams>& models,
-    const std::vector<hgps::core::DoubleInterval>& ranges,
-    const std::vector<double>& lambda,
-    const std::vector<double>& stddev,
-    const Eigen::MatrixXd& cholesky,
-    const std::vector<hgps::LinearModelParams>& policy_models,
-    const std::vector<hgps::core::DoubleInterval>& policy_ranges,
-    const Eigen::MatrixXd& policy_cholesky,
-    const std::shared_ptr<std::vector<hgps::LinearModelParams>>& trend_models,
-    const std::shared_ptr<std::vector<hgps::core::DoubleInterval>>& trend_ranges,
-    const std::shared_ptr<std::vector<double>>& trend_lambda,
-    const std::unordered_map<hgps::core::Income, hgps::LinearModelParams>& income_models,
-    const std::shared_ptr<std::unordered_map<hgps::core::Identifier, double>>& expected_trend_boxcox,
-    const std::function<bool(const hgps::core::Identifier&)>& expected_trend_checker,
-    const std::function<bool(const hgps::core::Identifier&)>& trend_steps_checker) {
-    
+    const std::vector<hgps::core::Identifier> &names,
+    const std::vector<hgps::LinearModelParams> &models,
+    const std::vector<hgps::core::DoubleInterval> &ranges, const std::vector<double> &lambda,
+    const std::vector<double> &stddev, const Eigen::MatrixXd &cholesky,
+    const std::vector<hgps::LinearModelParams> &policy_models,
+    const std::vector<hgps::core::DoubleInterval> &policy_ranges,
+    const Eigen::MatrixXd &policy_cholesky,
+    const std::shared_ptr<std::vector<hgps::LinearModelParams>> &trend_models,
+    const std::shared_ptr<std::vector<hgps::core::DoubleInterval>> &trend_ranges,
+    const std::shared_ptr<std::vector<double>> &trend_lambda,
+    const std::unordered_map<hgps::core::Income, hgps::LinearModelParams> &income_models,
+    const std::shared_ptr<std::unordered_map<hgps::core::Identifier, double>>
+        &expected_trend_boxcox,
+    const std::function<bool(const hgps::core::Identifier &)> &expected_trend_checker,
+    const std::function<bool(const hgps::core::Identifier &)> &trend_steps_checker) {
+
     if (names.empty()) {
         throw hgps::core::HgpsException("Risk factor names list is empty");
     }
@@ -56,7 +55,8 @@ void validate_model_components(
         throw hgps::core::HgpsException("Intervention policy ranges list is empty");
     }
     if (!policy_cholesky.allFinite()) {
-        throw hgps::core::HgpsException("Intervention policy Cholesky matrix contains non-finite values");
+        throw hgps::core::HgpsException(
+            "Intervention policy Cholesky matrix contains non-finite values");
     }
     if (trend_models->empty()) {
         throw hgps::core::HgpsException("Time trend model list is empty");
@@ -72,7 +72,7 @@ void validate_model_components(
         throw hgps::core::HgpsException("Income models mapping is empty");
     }
     // Region models can be empty, we'll use defaults if needed
-    
+
     for (const auto &name : names) {
         // Check expected_trend and trend_steps using the provided checker function
         if (expected_trend_checker(name)) {
@@ -120,7 +120,7 @@ StaticLinearModel::StaticLinearModel(
       region_models_{std::move(region_models)}, physical_activity_stddev_{physical_activity_stddev},
       income_continuous_stddev_{income_continuous_stddev},
       ethnicity_models_{std::move(ethnicity_models)} {
-    
+
     // Check for null pointers
     if (!expected_trend_boxcox_) {
         throw core::HgpsException("Expected trend BoxCox pointer is null");
@@ -129,23 +129,23 @@ StaticLinearModel::StaticLinearModel(
     if (!trend_models_) {
         throw core::HgpsException("Trend models pointer is null");
     }
-    
+
     if (!trend_ranges_) {
         throw core::HgpsException("Trend ranges pointer is null");
     }
-    
+
     if (!trend_lambda_) {
         throw core::HgpsException("Trend lambda pointer is null");
     }
-    
+
     if (!region_models_) {
         throw core::HgpsException("Region models pointer is null");
     }
-    
+
     if (!ethnicity_models_) {
         throw core::HgpsException("Ethnicity models pointer is null");
     }
-    
+
     validate();
 }
 
@@ -212,20 +212,21 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // Add counters to track progress
     int persons_processed = 0;
     int total_persons = context.population().current_active_size();
-    
+
     // First, ensure all people have valid demographic values from configuration
     ensure_demographic_values(context);
-    
+
     // Initialise newborns and update others.
     try {
-        std::cout << "DEBUG: [StaticLinearModel] Processing " << total_persons << " individuals" << std::endl;
-        
+        std::cout << "DEBUG: [StaticLinearModel] Processing " << total_persons << " individuals"
+                  << std::endl;
+
         for (auto &person : context.population()) {
             try {
                 if (!person.is_active()) {
                     continue;
                 }
-    
+
                 if (person.age == 0) {
                     // Initialize all demographics for newborns
                     initialise_sector(person, context.random());
@@ -242,46 +243,45 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     update_income_category(context);
                     update_factors(context, person, context.random());
                 }
-                
+
                 // Track progress
                 persons_processed++;
                 if (persons_processed % 1000 == 0 || persons_processed == total_persons) {
-                    std::cout << "DEBUG: [StaticLinearModel] Processed " << persons_processed << "/" 
+                    std::cout << "DEBUG: [StaticLinearModel] Processed " << persons_processed << "/"
                               << total_persons << " individuals" << std::endl;
                 }
-            }
-            catch (const std::exception& e) {
-                std::cerr << "ERROR processing individual in StaticLinearModel::update_risk_factors: " 
-                          << e.what() << std::endl;
+            } catch (const std::exception &e) {
+                std::cerr
+                    << "ERROR processing individual in StaticLinearModel::update_risk_factors: "
+                    << e.what() << std::endl;
                 // Continue with next person
             }
         }
-    
+
         std::cout << "DEBUG: [StaticLinearModel] Beginning adjust_risk_factors" << std::endl;
-        
+
         try {
             // Adjust such that risk factor means match expected values.
             adjust_risk_factors(context, names_, ranges_, false);
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cerr << "ERROR in first adjust_risk_factors: " << e.what() << std::endl;
         }
-        
+
         std::cout << "DEBUG: [StaticLinearModel] Finished adjust_risk_factors" << std::endl;
-        
+
         // Reset for second phase
         persons_processed = 0;
-    
+
         // Initialise newborns and update others.
-        std::cout << "DEBUG: [StaticLinearModel] Starting policy and trend updates for " 
+        std::cout << "DEBUG: [StaticLinearModel] Starting policy and trend updates for "
                   << total_persons << " individuals" << std::endl;
-                  
+
         for (auto &person : context.population()) {
             try {
                 if (!person.is_active()) {
                     continue;
                 }
-    
+
                 if (person.age == 0) {
                     initialise_policies(person, context.random(), intervene);
                     initialise_trends(context, person);
@@ -289,67 +289,65 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     update_policies(person, intervene);
                     update_trends(context, person);
                 }
-                
+
                 // Track progress
                 persons_processed++;
                 if (persons_processed % 1000 == 0 || persons_processed == total_persons) {
-                    std::cout << "DEBUG: [StaticLinearModel] Policy updates: " << persons_processed << "/" 
-                              << total_persons << " individuals" << std::endl;
+                    std::cout << "DEBUG: [StaticLinearModel] Policy updates: " << persons_processed
+                              << "/" << total_persons << " individuals" << std::endl;
                 }
-            }
-            catch (const std::exception& e) {
+            } catch (const std::exception &e) {
                 std::cerr << "ERROR in policy updates: " << e.what() << std::endl;
                 // Continue with next person
             }
         }
-    
+
         std::cout << "DEBUG: [StaticLinearModel] Beginning second adjust_risk_factors" << std::endl;
-        
+
         try {
             // Adjust such that trended risk factor means match trended expected values.
             adjust_risk_factors(context, names_, ranges_, true);
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             std::cerr << "ERROR in second adjust_risk_factors: " << e.what() << std::endl;
         }
-        
+
         std::cout << "DEBUG: [StaticLinearModel] Finished second adjust_risk_factors" << std::endl;
-    
+
         // Apply policies if intervening.
         if (intervene) {
             std::cout << "DEBUG: [StaticLinearModel] Starting policy application" << std::endl;
             persons_processed = 0;
-            
+
             for (auto &person : context.population()) {
                 try {
                     if (!person.is_active()) {
                         continue;
                     }
-            
+
                     apply_policies(person, intervene);
-                    
+
                     // Track progress
                     persons_processed++;
                     if (persons_processed % 1000 == 0 || persons_processed == total_persons) {
-                        std::cout << "DEBUG: [StaticLinearModel] Policy application: " << persons_processed << "/" 
-                                << total_persons << " individuals" << std::endl;
+                        std::cout << "DEBUG: [StaticLinearModel] Policy application: "
+                                  << persons_processed << "/" << total_persons << " individuals"
+                                  << std::endl;
                     }
-                }
-                catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     std::cerr << "ERROR applying policies: " << e.what() << std::endl;
                     // Continue with next person
                 }
             }
             std::cout << "DEBUG: [StaticLinearModel] Finished policy application" << std::endl;
         }
+    } catch (const std::exception &e) {
+        std::cerr << "CRITICAL ERROR in StaticLinearModel::update_risk_factors: " << e.what()
+                  << std::endl;
+    } catch (...) {
+        std::cerr << "CRITICAL ERROR: Unknown exception in StaticLinearModel::update_risk_factors"
+                  << std::endl;
     }
-    catch (const std::exception& e) {
-        std::cerr << "CRITICAL ERROR in StaticLinearModel::update_risk_factors: " << e.what() << std::endl;
-    }
-    catch (...) {
-        std::cerr << "CRITICAL ERROR: Unknown exception in StaticLinearModel::update_risk_factors" << std::endl;
-    }
-    
+
     std::cout << "DEBUG: [StaticLinearModel] Completed all risk factor updates" << std::endl;
 }
 
@@ -359,13 +357,13 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
         // As lambda approaches 0, the Box-Cox transform approaches log
         return std::exp(factor);
     }
-    
+
     // Ensure the value inside the power function is positive
     double value = lambda * factor + 1.0;
     if (value <= 0.0) {
         value = 0.001; // Use a small positive value instead of negative
     }
-    
+
     return std::pow(value, 1.0 / lambda);
 }
 
@@ -391,20 +389,20 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                 // Initialise risk factor.
                 double expected =
                     get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-                
+
                 // If expected value is zero or negative, use a small positive value
                 if (expected <= 0.0) {
                     expected = 0.01;
                 }
-                
+
                 // Prevent NaN or infinity values in calculation
                 double factor = linear[i] + residual * stddev_[i];
                 if (!std::isfinite(factor)) {
                     factor = 0;
                 }
-                
+
                 factor = expected * inverse_box_cox(factor, lambda_[i]);
-                
+
                 // Check for NaN or infinity after calculation
                 if (!std::isfinite(factor)) {
                     factor = ranges_[i].clamp(expected); // Fall back to expected value
@@ -418,15 +416,13 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                 } else {
                     person.risk_factors[names_[i]] = factor;
                 }
-            }
-            catch (const std::exception&) {
+            } catch (const std::exception &) {
                 person.risk_factors[names_[i]] = ranges_[i].clamp(1.0);
                 auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
                 person.risk_factors[residual_name] = 0.0;
             }
         }
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
         for (size_t i = 0; i < names_.size(); i++) {
             auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
             person.risk_factors[residual_name] = 0.0;
@@ -449,13 +445,13 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
             try {
                 // Update residual.
                 auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
-                
+
                 // Check if the residual exists
                 double residual_old = 0.0;
                 if (person.risk_factors.count(residual_name) > 0) {
                     residual_old = person.risk_factors.at(residual_name);
                 }
-                
+
                 double residual = residuals[i] * info_speed_;
                 residual += std::sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
@@ -469,20 +465,20 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                 // Update risk factor.
                 double expected =
                     get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-                
+
                 // If expected value is zero or negative, use a small positive value
                 if (expected <= 0.0) {
                     expected = 0.01;
                 }
-                
+
                 // Prevent NaN or infinity values in calculation
                 double factor = linear[i] + residual * stddev_[i];
                 if (!std::isfinite(factor)) {
                     factor = 0;
                 }
-                
+
                 factor = expected * inverse_box_cox(factor, lambda_[i]);
-                
+
                 // Check for NaN or infinity after calculation
                 if (!std::isfinite(factor)) {
                     factor = ranges_[i].clamp(expected); // Fall back to expected value
@@ -496,15 +492,13 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                 } else {
                     person.risk_factors[names_[i]] = factor;
                 }
-            }
-            catch (const std::exception&) {
+            } catch (const std::exception &) {
                 person.risk_factors[names_[i]] = ranges_[i].clamp(1.0);
                 auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
                 person.risk_factors[residual_name] = 0.0;
             }
         }
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
         for (size_t i = 0; i < names_.size(); i++) {
             auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
             person.risk_factors[residual_name] = 0.0;
@@ -523,9 +517,9 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
             try {
                 // Initialise trend.
                 auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-                
+
                 // Check if the trend name exists in expected_trend_boxcox_
-                double expected = 1.0;  // Default value of 1.0 (no trend)
+                double expected = 1.0; // Default value of 1.0 (no trend)
                 if (expected_trend_boxcox_->count(names_[i]) > 0) {
                     expected = expected_trend_boxcox_->at(names_[i]);
                     // Ensure expected is valid
@@ -533,15 +527,15 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
                         expected = 1.0;
                     }
                 }
-                
+
                 // Prevent NaN or infinity values in calculation
                 double trend_factor = linear[i];
                 if (!std::isfinite(trend_factor)) {
                     trend_factor = 0;
                 }
-                
+
                 double trend = expected * inverse_box_cox(trend_factor, (*trend_lambda_)[i]);
-                
+
                 // Check for NaN or infinity after calculation
                 if (!std::isfinite(trend)) {
                     trend = 1.0; // Default to no trend if calculation fails
@@ -551,21 +545,19 @@ void StaticLinearModel::initialise_trends(RuntimeContext &context, Person &perso
 
                 // Save trend.
                 person.risk_factors[trend_name] = trend;
-                
-            }
-            catch (const std::exception&) {
+
+            } catch (const std::exception &) {
                 auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-                person.risk_factors[trend_name] = 1.0;  // No trend
+                person.risk_factors[trend_name] = 1.0; // No trend
             }
         }
 
         // Apply trends.
         update_trends(context, person);
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
         for (size_t i = 0; i < names_.size(); i++) {
             auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-            person.risk_factors[trend_name] = 1.0;  // No trend
+            person.risk_factors[trend_name] = 1.0; // No trend
         }
     }
 }
@@ -580,12 +572,12 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
             try {
                 // Load trend.
                 auto trend_name = core::Identifier{names_[i].to_string() + "_trend"};
-                
+
                 // Check if trend factor exists
                 if (person.risk_factors.count(trend_name) == 0) {
                     person.risk_factors[trend_name] = 1.0; // No trend
                 }
-                
+
                 double trend = person.risk_factors.at(trend_name);
                 // Ensure trend is valid
                 if (!std::isfinite(trend) || trend <= 0.0) {
@@ -596,20 +588,20 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
                 if (person.risk_factors.count(names_[i]) == 0) {
                     continue;
                 }
-                
+
                 // Apply trend to risk factor.
                 double factor = person.risk_factors.at(names_[i]);
                 if (!std::isfinite(factor)) {
                     factor = ranges_[i].clamp(1.0);
                 }
-                
+
                 // Get trend steps safely
                 int trend_steps = get_trend_steps(names_[i]);
                 int t = std::min(elapsed_time, trend_steps);
-                
+
                 // Apply trend with check for valid values
                 factor *= std::pow(std::max(0.01, trend), t);
-                
+
                 // Check for NaN or infinity after calculation
                 if (!std::isfinite(factor)) {
                     factor = ranges_[i].clamp(factor); // Fall back to range clamp
@@ -619,15 +611,13 @@ void StaticLinearModel::update_trends(RuntimeContext &context, Person &person) c
 
                 // Save risk factor.
                 person.risk_factors.at(names_[i]) = factor;
-                
-            }
-            catch (const std::exception&) {
+
+            } catch (const std::exception &) {
                 // If an error occurs for this risk factor, just continue to the next one
                 continue;
             }
         }
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
         // If an overall error occurs, just return without making changes
     }
 }
@@ -715,7 +705,7 @@ StaticLinearModel::compute_linear_models(Person &person,
         auto name = names_[i];
         auto model = models[i];
         double factor = model.intercept;
-        
+
         try {
             // Add regular coefficients if they exist
             for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
@@ -725,12 +715,11 @@ StaticLinearModel::compute_linear_models(Person &person,
                     if (std::isfinite(value)) {
                         factor += coefficient_value * value;
                     }
-                }
-                catch (const std::exception&) {
+                } catch (const std::exception &) {
                     // Skip this coefficient
                 }
             }
-            
+
             // Add log coefficients if they exist
             for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
                 try {
@@ -740,21 +729,19 @@ StaticLinearModel::compute_linear_models(Person &person,
                         value = 0.01; // Use a small positive value to avoid log(0)
                     }
                     factor += coefficient_value * std::log(value);
-                }
-                catch (const std::exception&) {
+                } catch (const std::exception &) {
                     // Skip this coefficient
                 }
             }
-        }
-        catch (const std::exception&) {
+        } catch (const std::exception &) {
             // Keep the intercept as the factor
         }
-        
+
         // Final check for valid result
         if (!std::isfinite(factor)) {
             factor = model.intercept; // Fall back to intercept
         }
-        
+
         linear.emplace_back(factor);
     }
 
@@ -770,13 +757,13 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
         // Correlated samples using Cholesky decomposition.
         Eigen::VectorXd residuals{names_.size()};
         std::ranges::generate(residuals, [&random] { return random.next_normal(0.0, 1.0); });
-        
-        if (static_cast<size_t>(cholesky.rows()) != names_.size() || static_cast<size_t>(cholesky.cols()) != names_.size()) {
+
+        if (static_cast<size_t>(cholesky.rows()) != names_.size() ||
+            static_cast<size_t>(cholesky.cols()) != names_.size()) {
             for (size_t i = 0; i < names_.size(); i++) {
                 correlated_residuals.emplace_back(residuals[i]);
             }
-        }
-        else {
+        } else {
             residuals = cholesky * residuals;
 
             // Save correlated residuals.
@@ -786,15 +773,14 @@ std::vector<double> StaticLinearModel::compute_residuals(Random &random,
         }
 
         return correlated_residuals;
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
         std::vector<double> uncorrelated_residuals;
         uncorrelated_residuals.reserve(names_.size());
-        
+
         for (size_t i = 0; i < names_.size(); i++) {
             uncorrelated_residuals.emplace_back(random.next_normal(0.0, 1.0));
         }
-        
+
         return uncorrelated_residuals;
     }
 }
@@ -803,7 +789,7 @@ void StaticLinearModel::initialise_sector(Person &person, Random &random) const 
     try {
         // Get rural prevalence for age group and sex.
         double prevalence = 0.5; // Default prevalence value of 50%
-        
+
         if (person.age < 18) {
             // Check if Under18 exists in the map
             if (rural_prevalence_.count("Under18"_id) > 0) {
@@ -826,8 +812,7 @@ void StaticLinearModel::initialise_sector(Person &person, Random &random) const 
         double rand = random.next_double();
         auto sector = rand < prevalence ? core::Sector::rural : core::Sector::urban;
         person.sector = sector;
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
         person.sector = core::Sector::urban;
     }
 }
@@ -840,9 +825,9 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
         }
 
         // Get rural prevalence for age group and sex.
-        double prevalence_under18 = 0.5;  // Default value
-        double prevalence_over18 = 0.5;   // Default value
-        
+        double prevalence_under18 = 0.5; // Default value
+        double prevalence_over18 = 0.5;  // Default value
+
         // Check if the Under18 age group exists in the map
         if (rural_prevalence_.count("Under18"_id) > 0) {
             // Check if the gender exists in the inner map
@@ -850,7 +835,7 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
                 prevalence_under18 = rural_prevalence_.at("Under18"_id).at(person.gender);
             }
         }
-        
+
         // Check if the Over18 age group exists in the map
         if (rural_prevalence_.count("Over18"_id) > 0) {
             // Check if the gender exists in the inner map
@@ -861,26 +846,25 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 
         // Compute random rural to urban transition.
         double rand = random.next_double();
-        
+
         // Avoid division by zero or very small numbers
         if (prevalence_under18 < 0.01) {
             prevalence_under18 = 0.01;
         }
-        
+
         double p_rural_to_urban = 1.0 - prevalence_over18 / prevalence_under18;
-        
+
         // Ensure probability is valid (between 0 and 1)
         if (p_rural_to_urban < 0.0 || std::isnan(p_rural_to_urban)) {
             p_rural_to_urban = 0.0;
         } else if (p_rural_to_urban > 1.0) {
             p_rural_to_urban = 1.0;
         }
-        
+
         if (rand < p_rural_to_urban) {
             person.sector = core::Sector::urban;
         }
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception &) {
     }
 }
 
@@ -896,7 +880,7 @@ void StaticLinearModel::update_region(RuntimeContext &context, Person &person, R
 }
 
 void StaticLinearModel::initialise_ethnicity(RuntimeContext &context, Person &person,
-                                           Random &random) {
+                                             Random &random) {
     // Always use the demographic module for ethnicity initialization
     context.demographic_module().initialise_ethnicity(context, person, random);
 }
@@ -914,10 +898,12 @@ void StaticLinearModel::update_income_continuous(Person &person, Random &random)
 
 void StaticLinearModel::initialise_income_category(Person &person, const Population &population) {
     // Get thresholds from population
-    auto [q1_threshold, q2_threshold, q3_threshold] = context_->demographic_module().calculate_income_thresholds(population);
-    
+    auto [q1_threshold, q2_threshold, q3_threshold] =
+        context_->demographic_module().calculate_income_thresholds(population);
+
     // Forward to demographic module
-    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold,
+                                                              q3_threshold);
 }
 
 // done at the start and then every 5 years
@@ -927,33 +913,36 @@ void StaticLinearModel::update_income_category(RuntimeContext &context) {
 
     if (current_year - last_update_year >= 5) {
         // Calculate income thresholds once for the entire population
-        auto [q1_threshold, q2_threshold, q3_threshold] = context.demographic_module().calculate_income_thresholds(context.population());
-        
+        auto [q1_threshold, q2_threshold, q3_threshold] =
+            context.demographic_module().calculate_income_thresholds(context.population());
+
         for (auto &person : context.population()) {
             if (person.is_active()) {
-                context.demographic_module().initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+                context.demographic_module().initialise_income_category(person, q1_threshold,
+                                                                        q2_threshold, q3_threshold);
             }
         }
-        
+
         last_update_year = current_year;
     }
 }
 
-void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person, Random &random) const {
+void StaticLinearModel::initialise_physical_activity(RuntimeContext &context, Person &person,
+                                                     Random &random) const {
     context.demographic_module().initialise_physical_activity(context, person, random);
 }
 
 void StaticLinearModel::validate() const {
     // Define checkers that always return false since we can't access these in this class
-    std::function<bool(const core::Identifier&)> expected_trend_checker = [](const core::Identifier&) { return false; };
-    std::function<bool(const core::Identifier&)> trend_steps_checker = [](const core::Identifier&) { return false; };
-    
-    validate_model_components(
-        names_, models_, ranges_, lambda_, stddev_, cholesky_,
-        policy_models_, policy_ranges_, policy_cholesky_,
-        trend_models_, trend_ranges_, trend_lambda_,
-        income_models_, expected_trend_boxcox_,
-        expected_trend_checker, trend_steps_checker);
+    std::function<bool(const core::Identifier &)> expected_trend_checker =
+        [](const core::Identifier &) { return false; };
+    std::function<bool(const core::Identifier &)> trend_steps_checker =
+        [](const core::Identifier &) { return false; };
+
+    validate_model_components(names_, models_, ranges_, lambda_, stddev_, cholesky_, policy_models_,
+                              policy_ranges_, policy_cholesky_, trend_models_, trend_ranges_,
+                              trend_lambda_, income_models_, expected_trend_boxcox_,
+                              expected_trend_checker, trend_steps_checker);
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
@@ -993,26 +982,22 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       income_continuous_stddev_{income_continuous_stddev},
       ethnicity_models_{std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>(
           std::move(ethnicity_models))} {
-    
+
     // Validate in constructor using the validate method to avoid duplication
     validate();
 }
 
 void StaticLinearModelDefinition::validate() const {
     // Define checkers that check expected_trend_ and trend_steps_
-    std::function<bool(const core::Identifier&)> expected_trend_checker = [this](const core::Identifier& name) { 
-        return !expected_trend_->contains(name); 
-    };
-    std::function<bool(const core::Identifier&)> trend_steps_checker = [this](const core::Identifier& name) { 
-        return !trend_steps_->contains(name); 
-    };
-    
-    validate_model_components(
-        names_, models_, ranges_, lambda_, stddev_, cholesky_,
-        policy_models_, policy_ranges_, policy_cholesky_,
-        trend_models_, trend_ranges_, trend_lambda_,
-        income_models_, expected_trend_boxcox_,
-        expected_trend_checker, trend_steps_checker);
+    std::function<bool(const core::Identifier &)> expected_trend_checker =
+        [this](const core::Identifier &name) { return !expected_trend_->contains(name); };
+    std::function<bool(const core::Identifier &)> trend_steps_checker =
+        [this](const core::Identifier &name) { return !trend_steps_->contains(name); };
+
+    validate_model_components(names_, models_, ranges_, lambda_, stddev_, cholesky_, policy_models_,
+                              policy_ranges_, policy_cholesky_, trend_models_, trend_ranges_,
+                              trend_lambda_, income_models_, expected_trend_boxcox_,
+                              expected_trend_checker, trend_steps_checker);
 }
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
@@ -1033,73 +1018,82 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 }
 
 void StaticLinearModel::ensure_demographic_values(RuntimeContext &context) {
-    std::cout << "DEBUG: [StaticLinearModel] Checking if people have valid demographic values" << std::endl;
-    
+    std::cout << "DEBUG: [StaticLinearModel] Checking if people have valid demographic values"
+              << std::endl;
+
     // Track counts of missing values that we'll fix
     int ethnicity_fixed = 0;
     int region_fixed = 0;
     int income_fixed = 0;
     int physical_activity_fixed = 0;
-    
+
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-        
+
         // Fix unknown ethnicity using the proper demographic module initialization
         if (person.ethnicity == core::Ethnicity::unknown) {
             try {
-                context.demographic_module().initialise_ethnicity(context, person, context.random());
+                context.demographic_module().initialise_ethnicity(context, person,
+                                                                  context.random());
                 ethnicity_fixed++;
-            } catch (const std::exception& e) {
+            } catch (const std::exception &e) {
                 std::cerr << "ERROR: Failed to initialize ethnicity: " << e.what() << std::endl;
             }
         }
-        
+
         // Fix unknown region - we can set this to England as specified
         if (person.region == core::Region::unknown) {
             person.region = core::Region::England; // Set default
             region_fixed++;
         }
-        
+
         // Fix missing income_continuous using the proper demographic module initialization
         if (!person.risk_factors.contains("income_continuous"_id)) {
             try {
                 context.demographic_module().initialise_income_continuous(person, context.random());
                 income_fixed++;
-                
+
                 // After initializing income_continuous, update the category
-                auto [q1_threshold, q2_threshold, q3_threshold] = 
+                auto [q1_threshold, q2_threshold, q3_threshold] =
                     context.demographic_module().calculate_income_thresholds(context.population());
-                context.demographic_module().initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
-            } catch (const std::exception& e) {
+                context.demographic_module().initialise_income_category(person, q1_threshold,
+                                                                        q2_threshold, q3_threshold);
+            } catch (const std::exception &e) {
                 std::cerr << "ERROR: Failed to initialize income: " << e.what() << std::endl;
             }
         }
-        
+
         // Fix missing physical activity using the proper demographic module initialization
         if (!person.risk_factors.contains("PhysicalActivity"_id)) {
             try {
-                context.demographic_module().initialise_physical_activity(context, person, context.random());
+                context.demographic_module().initialise_physical_activity(context, person,
+                                                                          context.random());
                 physical_activity_fixed++;
-            } catch (const std::exception& e) {
-                std::cerr << "ERROR: Failed to initialize physical activity: " << e.what() << std::endl;
+            } catch (const std::exception &e) {
+                std::cerr << "ERROR: Failed to initialize physical activity: " << e.what()
+                          << std::endl;
             }
         }
     }
-    
+
     // Log how many values we fixed
     if (ethnicity_fixed > 0) {
-        std::cout << "DEBUG: [StaticLinearModel] Fixed ethnicity for " << ethnicity_fixed << " people using demographic module" << std::endl;
+        std::cout << "DEBUG: [StaticLinearModel] Fixed ethnicity for " << ethnicity_fixed
+                  << " people using demographic module" << std::endl;
     }
     if (region_fixed > 0) {
-        std::cout << "DEBUG: [StaticLinearModel] Fixed region for " << region_fixed << " people (set to England)" << std::endl;
+        std::cout << "DEBUG: [StaticLinearModel] Fixed region for " << region_fixed
+                  << " people (set to England)" << std::endl;
     }
     if (income_fixed > 0) {
-        std::cout << "DEBUG: [StaticLinearModel] Fixed income_continuous for " << income_fixed << " people using demographic module" << std::endl;
+        std::cout << "DEBUG: [StaticLinearModel] Fixed income_continuous for " << income_fixed
+                  << " people using demographic module" << std::endl;
     }
     if (physical_activity_fixed > 0) {
-        std::cout << "DEBUG: [StaticLinearModel] Fixed PhysicalActivity for " << physical_activity_fixed << " people using demographic module" << std::endl;
+        std::cout << "DEBUG: [StaticLinearModel] Fixed PhysicalActivity for "
+                  << physical_activity_fixed << " people using demographic module" << std::endl;
     }
 }
 

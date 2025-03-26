@@ -18,9 +18,9 @@ class CountryModule : public hgps::SimulationModule {
 
     std::string name() const noexcept override { return name_; }
 
-    void initialise_population([[maybe_unused]] hgps::RuntimeContext &context, 
-                             [[maybe_unused]] hgps::Population &population, 
-                             [[maybe_unused]] hgps::Random &random) override {
+    void initialise_population([[maybe_unused]] hgps::RuntimeContext &context,
+                               [[maybe_unused]] hgps::Population &population,
+                               [[maybe_unused]] hgps::Random &random) override {
         std::cout << "There are: " << countries_.size() << " countries, current: " << current_.name
                   << std::endl;
     }

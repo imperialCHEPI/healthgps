@@ -30,7 +30,8 @@ class RiskFactorModule final : public RiskFactorHostModule {
 
     void update_population(RuntimeContext &context);
 
-    void initialise_population(RuntimeContext &context, Population &population, Random &random) override;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
   private:
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> models_;

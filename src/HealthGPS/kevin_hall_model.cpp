@@ -17,10 +17,10 @@
     disable : 6285) // Non-zero constant in bitwise-and operation (from core bit manipulation)
 #endif
 
+#include "demographic.h"
 #include "kevin_hall_model.h"
 #include "runtime_context.h"
 #include "sync_message.h"
-#include "demographic.h"
 
 #include <algorithm>
 #include <iterator>
@@ -80,7 +80,7 @@ std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 // Ensuring correct initialization order for population characteristics
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
     context_ = &context; // Store reference to the context
-    
+
     // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
     // also in person.cpp, the person class maintains a deep copy of it
 
@@ -121,7 +121,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
     context_ = &context; // Store reference to the context
-    
+
     // Update income categories every 5 years
     update_income_category(context);
 
@@ -875,7 +875,8 @@ KevinHallModel::calculate_income_thresholds(const Population &population) const 
 void KevinHallModel::initialise_income_category(Person &person, double q1_threshold,
                                                 double q2_threshold, double q3_threshold) const {
     // Delegate to demographic module
-    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold,
+                                                              q3_threshold);
 }
 
 // Modified to calculate thresholds once for the entire population
@@ -895,7 +896,7 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
                 initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
             }
         }
-        
+
         last_update_year = current_year;
     }
 }

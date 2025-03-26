@@ -827,15 +827,13 @@ TEST(TestSimulation, BasicSetup) {
     // Create demographic module with all required parameters
     auto income_models = std::unordered_map<core::Income, LinearModelParams>();
     auto region_models = std::make_shared<std::unordered_map<core::Region, LinearModelParams>>();
-    auto ethnicity_models = std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
+    auto ethnicity_models =
+        std::make_shared<std::unordered_map<core::Ethnicity, LinearModelParams>>();
     auto demographic = std::make_shared<DemographicModule>(
-        std::move(pop_data),
-        std::move(life_table),
-        std::move(income_models),
-        std::move(region_models),
-        std::move(ethnicity_models),
-        0.5,  // income_continuous_stddev
-        0.5   // physical_activity_stddev
+        std::move(pop_data), std::move(life_table), std::move(income_models),
+        std::move(region_models), std::move(ethnicity_models),
+        0.5, // income_continuous_stddev
+        0.5  // physical_activity_stddev
     );
     ASSERT_NE(nullptr, demographic);
 

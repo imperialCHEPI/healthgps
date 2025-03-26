@@ -45,7 +45,8 @@ class SimulationModule {
     /// @param context The simulation shared runtime context instance
     /// @param population The virtual population
     /// @param random The random number generator
-    virtual void initialise_population(RuntimeContext &context, Population &population, Random &random) = 0;
+    virtual void initialise_population(RuntimeContext &context, Population &population,
+                                       Random &random) = 0;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context
@@ -62,7 +63,8 @@ class UpdatableModule : public SimulationModule {
     /// @param context The simulation shared runtime context instance
     /// @param population The virtual population
     /// @param random The random number generator
-    virtual void initialise_population(RuntimeContext &context, Population &population, Random &random) override = 0;
+    virtual void initialise_population(RuntimeContext &context, Population &population,
+                                       Random &random) override = 0;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context
@@ -88,7 +90,8 @@ class RiskFactorHostModule : public UpdatableModule {
     /// @param context The simulation shared runtime context instance
     /// @param population The virtual population
     /// @param random The random number generator
-    void initialise_population(RuntimeContext &context, Population &population, Random &random) override = 0;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override = 0;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context

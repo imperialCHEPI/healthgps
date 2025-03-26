@@ -55,7 +55,8 @@ class StoreConverter {
     /// @brief Converts population items to a map of population records
     /// @param items The population items to convert
     /// @return The population records map
-    static std::map<int, std::map<int, PopulationRecord>> to_population_records(const std::vector<core::PopulationItem> &items);
+    static std::map<int, std::map<int, PopulationRecord>>
+    to_population_records(const std::vector<core::PopulationItem> &items);
 };
 
 /// @brief Creates the relative risk definition for a disease

@@ -169,13 +169,13 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
         // Calculate adjustment based on age and gender
         for (auto &[region, prob] : probabilities) {
             double adjustment = 0.0;
-            
+
             adjustment += coeffs.age_coefficient * age;
-            
+
             if (gender != Gender::unknown && coeffs.gender_coefficients.contains(gender)) {
                 adjustment += coeffs.gender_coefficients.at(gender);
             }
-            
+
             prob *= (1.0 + adjustment);
         }
 

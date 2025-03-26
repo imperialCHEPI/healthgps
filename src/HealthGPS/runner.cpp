@@ -4,8 +4,8 @@
 
 #include <chrono>
 #include <fmt/format.h>
-#include <thread>
 #include <iostream>
+#include <thread>
 
 namespace hgps {
 
@@ -128,44 +128,49 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     /* Run until the next event is at infinity */
     int step_count = 0;
     int max_steps = 100; // Safety limit to prevent infinite loops
-    std::cout << "\n********** STARTING " << model.name() << " SIMULATION RUN #" << run << " **********" << std::endl;
-    
+    std::cout << "\n********** STARTING " << model.name() << " SIMULATION RUN #" << run
+              << " **********" << std::endl;
+
     // Get initial next event time
     auto next_time = sim.next_event_time();
-    
-    while (!token.stop_requested() && 
-           sim.next_event_time() < adevs_inf<adevs::Time>() && 
+
+    while (!token.stop_requested() && sim.next_event_time() < adevs_inf<adevs::Time>() &&
            step_count < max_steps) {
-        
+
         next_time = sim.next_event_time();
-        
+
         // Execute the next event
         sim.exec_next_event();
         step_count++;
-        
+
         // Get next event time after execution to check if we need to continue
         auto new_next_time = sim.next_event_time();
-        
+
         // Verify that the next event time is changing
         if (!(new_next_time < adevs_inf<adevs::Time>())) {
-            std::cout << "\n********** " << model.name() << " SIMULATION COMPLETE AFTER " << step_count << " STEPS **********" << std::endl;
+            std::cout << "\n********** " << model.name() << " SIMULATION COMPLETE AFTER "
+                      << step_count << " STEPS **********" << std::endl;
             break;
         }
-        
+
         // Safety check: if we're stuck at the same time, break out
         if (step_count > 1 && new_next_time.real == next_time.real) {
-            std::cout << "WARNING: [" << model.name() << "] Event time not advancing, possible infinite loop. Breaking out." << std::endl;
+            std::cout << "WARNING: [" << model.name()
+                      << "] Event time not advancing, possible infinite loop. Breaking out."
+                      << std::endl;
             break;
         }
     }
-    
+
     // Show final reason for exiting loop
     if (token.stop_requested()) {
-        std::cout << "SIMULATION CANCELLED: User requested stop after " << step_count << " steps" << std::endl;
+        std::cout << "SIMULATION CANCELLED: User requested stop after " << step_count << " steps"
+                  << std::endl;
     } else if (!(sim.next_event_time() < adevs_inf<adevs::Time>())) {
         // This is the normal completion case - already printed above
     } else if (step_count >= max_steps) {
-        std::cout << "WARNING: " << model.name() << " reached maximum step count (" << max_steps << ")" << std::endl;
+        std::cout << "WARNING: " << model.name() << " reached maximum step count (" << max_steps
+                  << ")" << std::endl;
     }
 
     ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;

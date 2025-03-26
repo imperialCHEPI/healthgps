@@ -97,9 +97,7 @@ float Person::income_to_value() const {
     }
 }
 
-double Person::get_income_continuous() const {
-    return income_continuous;
-}
+double Person::get_income_continuous() const { return income_continuous; }
 
 float Person::region_to_value() const {
     switch (region) {
@@ -221,18 +219,16 @@ void Person::copy_from(const Person &other) {
     income_category = other.income_category;
     sector = other.sector;
     ses = other.ses;
-    
+
     // Copy risk factors and diseases
     risk_factors = other.risk_factors;
     diseases = other.diseases;
-    
+
     // Do not copy identity, life status or migration status
     // The id_ remains unchanged
     // is_alive_, has_emigrated_, time_of_death_, time_of_migration_ remain unchanged
 }
 
-void Person::clear_diseases() {
-    diseases.clear();
-}
+void Person::clear_diseases() { diseases.clear(); }
 
 } // namespace hgps

@@ -103,7 +103,7 @@ void RuntimeContext::set_demographic_module(std::shared_ptr<DemographicModule> d
     demographic_module_ = std::move(demographic_module);
 }
 
-DemographicModule& RuntimeContext::demographic_module() const {
+DemographicModule &RuntimeContext::demographic_module() const {
     if (!demographic_module_) {
         throw core::HgpsException("Demographic module not set in RuntimeContext");
     }

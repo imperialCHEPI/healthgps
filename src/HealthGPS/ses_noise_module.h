@@ -27,7 +27,8 @@ class SESNoiseModule final : public UpdatableModule {
 
     std::string name() const noexcept override;
 
-    void initialise_population(RuntimeContext &context, Population &population, Random &random) override;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
     void update_population(RuntimeContext &context) override;
 

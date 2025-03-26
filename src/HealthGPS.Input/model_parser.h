@@ -109,7 +109,7 @@ process_income_models(const nlohmann::json &income_models_json);
 
 // Processes region models from JSON
 // std::unordered_map < core::Region, LinearModelParams>
-//process_region_models(const nlohmann::json &region_models_json);
+// process_region_models(const nlohmann::json &region_models_json);
 
 // Processes ethnicity models from JSON
 // std::unordered_map<core::Ethnicity, LinearModelParams>

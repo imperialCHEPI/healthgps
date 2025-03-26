@@ -190,7 +190,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     double physical_activity_stddev_;
     double income_continuous_stddev_;
     std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models_;
-    RuntimeContext* context_; // Pointer to the RuntimeContext
+    RuntimeContext *context_; // Pointer to the RuntimeContext
 };
 
 /// @brief Defines the static linear model data type
@@ -247,7 +247,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
     /// @brief Gets the income models
     /// @return A reference to the income models map
-    const std::unordered_map<core::Income, LinearModelParams>& income_models() const noexcept {
+    const std::unordered_map<core::Income, LinearModelParams> &income_models() const noexcept {
         return income_models_;
     }
 

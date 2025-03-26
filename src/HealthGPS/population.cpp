@@ -35,12 +35,13 @@ void Population::add(Person person, unsigned int time) noexcept {
 
 void Population::add_newborn_babies(std::size_t number, core::Gender gender,
                                     unsigned int time) noexcept {
-    std::cout << "DEBUG: add_newborn_babies called with " << number << " babies, gender: " 
-              << (gender == core::Gender::male ? "Male" : "Female") << std::endl;
-    
+    std::cout << "DEBUG: add_newborn_babies called with " << number
+              << " babies, gender: " << (gender == core::Gender::male ? "Male" : "Female")
+              << std::endl;
+
     auto recycle = find_index_of_recyclables(time, number);
     auto remaining = number;
-    
+
     if (!recycle.empty()) {
         auto replacebles = std::min(number, recycle.size());
         for (auto index = std::size_t{0}; index < replacebles; index++) {
@@ -55,19 +56,19 @@ void Population::add_newborn_babies(std::size_t number, core::Gender gender,
     for (auto i = std::size_t{0}; i < remaining; i++) {
         people_.emplace_back(gender);
     }
-    
-    std::cout << "DEBUG: After add_newborn_babies, active population: " 
-              << current_active_size() << " of " << people_.size() << std::endl;
+
+    std::cout << "DEBUG: After add_newborn_babies, active population: " << current_active_size()
+              << " of " << people_.size() << std::endl;
 }
 
 std::vector<int> Population::find_index_of_recyclables(unsigned int time,
                                                        std::size_t top) const noexcept {
     auto indices = std::vector<int>{};
     indices.reserve(top);
-    
+
     int checked = 0;
     int inactive_count = 0;
-    
+
     for (auto index = 0; const auto &entity : people_) {
         checked++;
         if (!entity.is_active()) {

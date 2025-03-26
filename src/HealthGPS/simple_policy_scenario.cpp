@@ -12,9 +12,7 @@ SimplePolicyScenario::SimplePolicyScenario(SyncChannel &data_sync,
     }
 }
 
-SyncChannel &SimplePolicyScenario::channel() {
-    return channel_.get();
-}
+SyncChannel &SimplePolicyScenario::channel() { return channel_.get(); }
 
 void SimplePolicyScenario::clear() noexcept {}
 

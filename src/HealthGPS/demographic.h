@@ -25,13 +25,12 @@ class DemographicModule final : public SimulationModule {
     /// @param ethnicity_models Ethnicity models for different ethnicities
     /// @param income_continuous_stddev Standard deviation for continuous income
     /// @param physical_activity_stddev Standard deviation for physical activity
-    DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
-                      LifeTable &&life_table,
-                      std::unordered_map<core::Income, LinearModelParams> &&income_models,
-                      std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> &&region_models,
-                      std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> &&ethnicity_models,
-                      double income_continuous_stddev,
-                      double physical_activity_stddev);
+    DemographicModule(
+        std::map<int, std::map<int, PopulationRecord>> &&pop_data, LifeTable &&life_table,
+        std::unordered_map<core::Income, LinearModelParams> &&income_models,
+        std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> &&region_models,
+        std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> &&ethnicity_models,
+        double income_continuous_stddev, double physical_activity_stddev);
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier
@@ -67,7 +66,8 @@ class DemographicModule final : public SimulationModule {
     void initialise_region(RuntimeContext &context, Person &person, Random &random);
     void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
     void initialise_income_continuous(Person &person, Random &random);
-    void initialise_income_category(Person &person, double q1_threshold, double q2_threshold, double q3_threshold);
+    void initialise_income_category(Person &person, double q1_threshold, double q2_threshold,
+                                    double q3_threshold);
     void initialise_physical_activity(RuntimeContext &context, Person &person, Random &random);
     std::tuple<double, double, double> calculate_income_thresholds(const Population &population);
 
@@ -85,15 +85,16 @@ class DemographicModule final : public SimulationModule {
     double physical_activity_stddev_;
 
     // Risk factor tables
-    std::shared_ptr<UnorderedMap2d<core::Gender, core::Identifier, std::map<int, double>>> expected_;
+    std::shared_ptr<UnorderedMap2d<core::Gender, core::Identifier, std::map<int, double>>>
+        expected_;
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_;
     std::shared_ptr<std::unordered_map<core::Identifier, int>> trend_steps_;
 
     void initialise_birth_rates();
     void initialise_age_gender(RuntimeContext &context, Population &population, Random &random);
     double get_expected(RuntimeContext &context, core::Gender gender, int age,
-                       const core::Identifier &factor, std::optional<core::DoubleInterval> range,
-                       bool apply_trend) const noexcept;
+                        const core::Identifier &factor, std::optional<core::DoubleInterval> range,
+                        bool apply_trend) const noexcept;
 
     double get_total_deaths(int time_year) const noexcept;
     std::map<int, DoubleGenderValue> get_age_gender_distribution(int time_year) const noexcept;

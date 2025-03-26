@@ -47,7 +47,8 @@ class DiseaseModule final : public UpdatableModule {
 
     /// @brief Initialises the virtual population status
     /// @param context The simulation run-time context
-    void initialise_population(RuntimeContext &context, Population &population, Random &random) override;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context

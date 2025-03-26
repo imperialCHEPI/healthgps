@@ -158,12 +158,12 @@ class Person {
     /// @return The ethnicity associated value
     /// @throws HgpsException if ethnicity is unknown
     float ethnicity_to_value() const;
-    
+
     /// @brief Gets the ethnicity enumeration name string
     /// @return The ethnicity name
     /// @throws HgpsException if ethnicity is unknown
     std::string ethnicity_to_string() const;
-    
+
     /// @brief Gets the income category enumeration name string
     /// @return The income category name
     /// @throws HgpsException if income category is unknown

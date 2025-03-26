@@ -1,7 +1,7 @@
 #include "modelinput.h"
 
-#include <utility>
 #include <iostream>
+#include <utility>
 
 namespace hgps {
 
