@@ -59,6 +59,9 @@ class DefaultDiseaseModel final : public DiseaseModel {
     WeightModel weight_classifier_;
     DoubleAgeGenderTable average_relative_risk_;
 
+    /// Cache of the maximum age available in the disease table
+    int max_table_age_ = 0;
+
     /// @brief Initialise average relative risk for disease model on start year.
     /// This method is similar to initialise_average_relative_risk, and used internally
     /// by initialise_disease_status.
@@ -90,6 +93,12 @@ class DefaultDiseaseModel final : public DiseaseModel {
     /// and relative risks from their risk risk factors and other diseases.
     /// @param context The runtime context instance
     void update_incidence_cases(RuntimeContext &context);
+
+    /// @brief Calculates the probability of developing this disease for a given person.
+    /// @param person The person to calculate the disease probability for
+    /// @param context The runtime context instance
+    /// @return The probability (between 0 and 1) of the person developing the disease
+    double calculate_disease_probability(const Person &person, RuntimeContext &context);
 };
 
 } // namespace hgps

@@ -251,6 +251,30 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         return income_models_;
     }
 
+    /// @brief Gets the region models
+    /// @return A shared pointer to the region models map
+    const std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> &region_models() const noexcept {
+        return region_models_;
+    }
+
+    /// @brief Gets the ethnicity models
+    /// @return A shared pointer to the ethnicity models map
+    const std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> &ethnicity_models() const noexcept {
+        return ethnicity_models_;
+    }
+
+    /// @brief Gets the income continuous standard deviation
+    /// @return The income continuous standard deviation value
+    double income_continuous_stddev() const noexcept {
+        return income_continuous_stddev_;
+    }
+
+    /// @brief Gets the physical activity standard deviation
+    /// @return The physical activity standard deviation value
+    double physical_activity_stddev() const noexcept {
+        return physical_activity_stddev_;
+    }
+
     /// @brief Validates that all required model components are present
     /// @throws HgpsException if any required component is missing
     void validate() const;

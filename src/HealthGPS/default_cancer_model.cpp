@@ -226,7 +226,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
         int incidence_id;
         try {
             incidence_id = definition_.get().table().at(MeasureKey::incidence);
-        } catch (const std::exception &e) {
+        } catch (const std::exception&) {
             std::cerr << "ERROR: No incidence measure found for cancer disease "
                       << disease_type().to_string() << std::endl;
             return;

@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <utility>
+#include <iostream>
 
 namespace hgps {
 ResultFileWriter::ResultFileWriter(const std::filesystem::path &file_name, ExperimentInfo info)
@@ -45,29 +46,89 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
 }
 
 ResultFileWriter::~ResultFileWriter() {
+    std::cout << "DEBUG: [ResultFileWriter] Destructor called, closing files" << std::endl;
+    
     if (stream_.is_open()) {
-        write_json_end();
-        stream_.flush();
-        stream_.close();
+        std::cout << "DEBUG: [ResultFileWriter] Closing JSON file" << std::endl;
+        try {
+            write_json_end();
+            stream_.flush();
+            stream_.close();
+            std::cout << "DEBUG: [ResultFileWriter] JSON file closed successfully" << std::endl;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "ERROR: [ResultFileWriter] Exception while closing JSON file: " << e.what() << std::endl;
+        }
     }
 
     if (csvstream_.is_open()) {
-        csvstream_.flush();
-        csvstream_.close();
+        std::cout << "DEBUG: [ResultFileWriter] Closing CSV file" << std::endl;
+        try {
+            csvstream_.flush();
+            csvstream_.close();
+            std::cout << "DEBUG: [ResultFileWriter] CSV file closed successfully" << std::endl;
+        }
+        catch (const std::exception& e) {
+            std::cerr << "ERROR: [ResultFileWriter] Exception while closing CSV file: " << e.what() << std::endl;
+        }
     }
 }
 
 void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
-    std::scoped_lock lock(lock_mutex_);
-    if (first_row_.load()) {
-        first_row_ = false;
-        write_csv_header(message);
-    } else {
-        stream_ << ",";
-    }
+    std::cout << "DEBUG: [ResultFileWriter] Starting to write message for time " << message.model_time << std::endl;
+    
+    try {
+        std::scoped_lock lock(lock_mutex_);
+        
+        // Check if streams are still good
+        if (!stream_.is_open() || !stream_.good()) {
+            std::cerr << "ERROR: [ResultFileWriter] JSON output stream is not open or in bad state" << std::endl;
+            return;
+        }
+        
+        if (!csvstream_.is_open() || !csvstream_.good()) {
+            std::cerr << "ERROR: [ResultFileWriter] CSV output stream is not open or in bad state" << std::endl;
+            return;
+        }
+        
+        std::cout << "DEBUG: [ResultFileWriter] Output streams are open and in good state" << std::endl;
+        
+        if (first_row_.load()) {
+            std::cout << "DEBUG: [ResultFileWriter] Writing CSV header for first row" << std::endl;
+            first_row_ = false;
+            write_csv_header(message);
+        } else {
+            stream_ << ",";
+        }
 
-    stream_ << to_json_string(message);
-    write_csv_channels(message);
+        std::string json = to_json_string(message);
+        std::cout << "DEBUG: [ResultFileWriter] Writing JSON data of length " << json.size() << std::endl;
+        stream_ << json;
+        
+        std::cout << "DEBUG: [ResultFileWriter] Writing CSV channels" << std::endl;
+        write_csv_channels(message);
+        
+        // Explicitly flush after each write for safety
+        stream_.flush();
+        csvstream_.flush();
+        
+        if (stream_.fail()) {
+            std::cerr << "ERROR: [ResultFileWriter] JSON stream failed after write" << std::endl;
+        }
+        
+        if (csvstream_.fail()) {
+            std::cerr << "ERROR: [ResultFileWriter] CSV stream failed after write" << std::endl;
+        }
+        
+        std::cout << "DEBUG: [ResultFileWriter] Successfully wrote and flushed data for time " 
+                  << message.model_time << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "ERROR: [ResultFileWriter] Exception while writing results: " << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "ERROR: [ResultFileWriter] Unknown exception while writing results" << std::endl;
+    }
 }
 
 void ResultFileWriter::write_json_begin(const std::filesystem::path &output) {
@@ -155,6 +216,21 @@ void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message)
 void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &message) {
     using namespace hgps::core;
 
+    std::cout << "DEBUG: [ResultFileWriter] Writing CSV data for " << message.content.series.sample_size() 
+              << " samples and " << message.content.series.channels().size() << " channels" << std::endl;
+    
+    // Debug: List all available channels
+    std::cout << "DEBUG: [ResultFileWriter] Available channels: ";
+    for (const auto &chan : message.content.series.channels()) {
+        std::cout << chan << ", ";
+    }
+    std::cout << std::endl;
+    
+    if (message.content.series.channels().empty()) {
+        std::cerr << "ERROR: [ResultFileWriter] No channels available in series data!" << std::endl;
+        return;
+    }
+    
     const auto *sep = ",";
     const auto &series = message.content.series;
     std::stringstream mss;
@@ -165,9 +241,37 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
             << "male" << sep << index;
         fss << message.source << sep << message.run_number << sep << message.model_time << sep
             << "female" << sep << index;
-        for (const auto &key : series.channels()) {
-            mss << sep << series.at(Gender::male, key).at(index);
-            fss << sep << series.at(Gender::female, key).at(index);
+            
+        // Track number of channels actually added for debugging
+        int channels_added = 0;
+        
+        try {
+            for (const auto &key : series.channels()) {
+                try {
+                    double male_value = series.at(Gender::male, key).at(index);
+                    double female_value = series.at(Gender::female, key).at(index);
+                    
+                    mss << sep << male_value;
+                    fss << sep << female_value;
+                    channels_added++;
+                }
+                catch (const std::exception &e) {
+                    std::cerr << "ERROR: [ResultFileWriter] Failed to access data for channel '" 
+                              << key << "' at index " << index << ": " << e.what() << std::endl;
+                    // Add 0 values to maintain column alignment
+                    mss << sep << "0";
+                    fss << sep << "0";
+                }
+            }
+            
+            // Log if channels were added for the first few rows
+            if (index < 3) {
+                std::cout << "DEBUG: [ResultFileWriter] Added " << channels_added 
+                          << " channel values to row " << index << std::endl;
+            }
+        }
+        catch (const std::exception &e) {
+            std::cerr << "ERROR: [ResultFileWriter] Exception in channel processing: " << e.what() << std::endl;
         }
 
         csvstream_ << mss.str() << '\n' << fss.str() << '\n';
@@ -179,5 +283,10 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
         fss.str(std::string{});
         fss.clear();
     }
+    
+    // Explicitly flush the CSV file after writing all rows
+    csvstream_.flush();
+    
+    std::cout << "DEBUG: [ResultFileWriter] Finished writing CSV data rows" << std::endl;
 }
 } // namespace hgps

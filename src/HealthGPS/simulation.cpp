@@ -48,11 +48,16 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
 }
 
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
+    // Reset disease caches before starting a new run to ensure clean state
+    reset_disease_caches();
+    
+    // Set up the run with run number and seed
     context_.set_current_run(run_number);
     context_.random().seed(run_seed);
 }
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
+    std::cout << "DEBUG: [Simulation] Starting init method" << std::endl;
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -62,18 +67,31 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     end_time_ = adevs::Time(inputs.stop_time(), 0);
 
     // Add debug output for start and end time configuration
-    std::cout << "DEBUG: Simulation start time: " << world_time
+    std::cout << "DEBUG: [Simulation] Simulation start time: " << world_time
               << ", end time: " << inputs.stop_time()
               << ", duration: " << (inputs.stop_time() - world_time) << " years" << std::endl;
+    std::cout << "DEBUG: [Simulation] ADEVS end_time value: real=" << end_time_.real 
+              << ", logical=" << end_time_.logical << std::endl;
 
     // Force the end time to be at least one year after start time to ensure multiple steps
-    if (end_time_.real <= world_time) {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4018) // Disable signed/unsigned mismatch warning
+#endif
+    if (end_time_.real <= static_cast<unsigned int>(world_time)) {
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
         std::cout << "WARNING: End time <= start time, forcing end time to be start time + 5"
                   << std::endl;
         end_time_ = adevs::Time(world_time + 5, 0);
+        std::cout << "DEBUG: [Simulation] Updated ADEVS end_time value: real=" << end_time_.real 
+                  << ", logical=" << end_time_.logical << std::endl;
     }
 
+    std::cout << "DEBUG: [Simulation] About to call initialise_population()" << std::endl;
     initialise_population();
+    std::cout << "DEBUG: [Simulation] Successfully returned from initialise_population()" << std::endl;
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -81,39 +99,55 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     auto message =
         fmt::format("[{:4},{}] population size: {}, elapsed: {}ms", env->now().real,
                     env->now().logical, context_.population().initial_size(), elapsed.count());
+    std::cout << "DEBUG: [Simulation] About to publish InfoEventMessage" << std::endl;
     context_.publish(std::make_unique<InfoEventMessage>(
         name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
+    std::cout << "DEBUG: [Simulation] Successfully published InfoEventMessage" << std::endl;
 
     // Initialize the simulation with the first event
-    return adevs::Time(world_time, 0);
+    auto initial_time = adevs::Time(world_time, 0);
+    std::cout << "DEBUG: [Simulation] Returning initial time from init: real=" << initial_time.real 
+              << ", logical=" << initial_time.logical << std::endl;
+    std::cout << "DEBUG: [Simulation] Next expected time should be: real=" << (world_time + 1)
+              << ", logical=0" << std::endl;
+              
+    return initial_time;
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
     // Clear progress indicator
+    std::cout << "\nDEBUG: [Simulation::update] ====== STARTING UPDATE METHOD ======" << std::endl;
     std::cout << "====== PROCESSING YEAR " << env->now().real << " ======" << std::endl;
 
+    // Store starting time for comparison later
+    auto starting_time = env->now();
+    
     if (env->now() < end_time_) {
-        std::cout << "DEBUG: [update] Setting up for year processing" << std::endl;
+        std::cout << "DEBUG: [Simulation::update] Current time (" << env->now().real 
+                  << ") is less than end time (" << end_time_.real << ")" << std::endl;
+        std::cout << "DEBUG: [Simulation::update] Setting up for year processing" << std::endl;
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
 
         // Now move world clock to time t + 1
         auto world_time = env->now() + adevs::Time(1, 0);
         auto time_year = world_time.real;
+        std::cout << "DEBUG: [Simulation::update] Moving world clock to " << time_year << std::endl;
         context_.set_current_time(time_year);
 
-        std::cout << "DEBUG: [update] About to call update_population()" << std::endl;
+        std::cout << "DEBUG: [Simulation::update] About to call update_population()" << std::endl;
         update_population();
-        std::cout << "DEBUG: [update] Completed update_population() successfully" << std::endl;
+        std::cout << "DEBUG: [Simulation::update] Completed update_population() successfully" << std::endl;
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
         auto message = fmt::format("[{:4},{}], elapsed: {}ms", env->now().real, env->now().logical,
                                    elapsed.count());
-        std::cout << "DEBUG: [update] Publishing completion message" << std::endl;
+        std::cout << "DEBUG: [Simulation::update] Publishing completion message" << std::endl;
         context_.publish(std::make_unique<InfoEventMessage>(
             name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
+        std::cout << "DEBUG: [Simulation::update] Published completion message" << std::endl;
 
         // Mark year completion for tracking
         std::cout << "====== COMPLETED YEAR " << env->now().real << " ======" << std::endl;
@@ -121,22 +155,42 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         // CRITICAL FIX: Ensure we return a valid time for the next event
         // The simulation will stop if we don't return a valid time less than infinity
         if (world_time < end_time_) {
-            std::cout << "DEBUG: [update] Scheduling next year: " << world_time.real << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Next time (" << world_time.real 
+                      << ") is less than end time (" << end_time_.real 
+                      << "), scheduling next year" << std::endl;
+            
+            // CRITICAL: Verify we are not returning the same time we started with
+            if (world_time.real == starting_time.real) {
+                std::cout << "WARNING: [Simulation::update] Detected potential time advancement issue - " 
+                          << "would return same time as current: " << world_time.real << std::endl;
+                
+                // Force time advancement to avoid infinite loop
+                world_time = adevs::Time(world_time.real + 1, 0);
+                std::cout << "DEBUG: [Simulation::update] Forced time advancement to " << world_time.real << std::endl;
+            }
+            
+            std::cout << "DEBUG: [Simulation::update] Scheduling next year: " << world_time.real << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Returning time real=" << world_time.real 
+                      << ", logical=" << world_time.logical << std::endl;
             return world_time;
         } else {
+            std::cout << "DEBUG: [Simulation::update] Reached end year " << world_time.real
+                      << ", returning infinity" << std::endl;
             std::cout << "===== SIMULATION END: Reached end year " << world_time.real
                       << " =====" << std::endl;
-            std::cout << "DEBUG: [update] Removing simulation model and returning infinity"
-                      << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Removing model before returning infinity" << std::endl;
             env->remove(this);               // Properly remove the model before returning infinity
+            std::cout << "DEBUG: [Simulation::update] Returning infinity" << std::endl;
             return adevs_inf<adevs::Time>(); // Return infinity to signal end of simulation
         }
     }
 
     // We have reached the end, remove the model and return infinite time for next event.
+    std::cout << "DEBUG: [Simulation::update] End time already reached at start of update" << std::endl;
     std::cout << "===== SIMULATION END: Final year reached =====" << std::endl;
-    std::cout << "DEBUG: [update] End time reached, removing simulation model" << std::endl;
+    std::cout << "DEBUG: [Simulation::update] End time reached, removing simulation model" << std::endl;
     env->remove(this);
+    std::cout << "DEBUG: [Simulation::update] Returning infinity" << std::endl;
     return adevs_inf<adevs::Time>();
 }
 
@@ -154,31 +208,68 @@ void Simulation::fini(adevs::Time clock) {
 
 void Simulation::initialise_population() {
     /* Note: order is very important */
+    std::cout << "\n=== STARTING SIMULATION POPULATION INITIALIZATION ===" << std::endl;
 
-    // Create virtual population
-    const auto &inputs = context_.inputs();
-    auto model_start_year = inputs.start_time();
-    auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
-    float size_fraction = inputs.settings().size_fraction();
-    auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
-    context_.reset_population(virtual_pop_size);
+    try {
+        // Create virtual population
+        const auto &inputs = context_.inputs();
+        auto model_start_year = inputs.start_time();
+        auto total_year_pop_size = demographic_->get_total_population_size(model_start_year);
+        float size_fraction = inputs.settings().size_fraction();
+        auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
+        context_.reset_population(virtual_pop_size);
+        
+        std::cout << "DEBUG: Created virtual population with size " << virtual_pop_size << std::endl;
 
-    // Gender - Age, must be first, followed by region, ethnicity, income, physical activity
-    demographic_->initialise_population(context_, context_.population(), context_.random());
+        // Gender - Age, must be first, followed by region, ethnicity, income, physical activity
+        std::cout << "DEBUG: Initializing demographic module..." << std::endl;
+        demographic_->initialise_population(context_, context_.population(), context_.random());
+        std::cout << "DEBUG: Demographic module initialization completed" << std::endl;
 
-    // Social economics status
-    ses_->initialise_population(context_, context_.population(), context_.random());
+        // Social economics status
+        std::cout << "DEBUG: Initializing socio-economic status module..." << std::endl;
+        ses_->initialise_population(context_, context_.population(), context_.random());
+        std::cout << "DEBUG: Socio-economic status module initialization completed" << std::endl;
 
-    // Generate risk factors
-    risk_factor_->initialise_population(context_, context_.population(), context_.random());
+        // Generate risk factors
+        std::cout << "DEBUG: Initializing risk factor module..." << std::endl;
+        risk_factor_->initialise_population(context_, context_.population(), context_.random());
+        std::cout << "DEBUG: Risk factor module initialization completed" << std::endl;
 
-    // Initialise diseases
-    disease_->initialise_population(context_, context_.population(), context_.random());
+        // Ensure disease caches are fresh before initializing diseases
+        std::cout << "DEBUG: Resetting disease caches..." << std::endl;
+        reset_disease_caches();
+        std::cout << "DEBUG: Disease caches reset completed" << std::endl;
+        
+        // Initialise diseases
+        std::cout << "DEBUG: Initializing disease module..." << std::endl;
+        disease_->initialise_population(context_, context_.population(), context_.random());
+        std::cout << "DEBUG: Disease module initialization completed" << std::endl;
 
-    // Initialise analysis
-    analysis_->initialise_population(context_, context_.population(), context_.random());
+        // Check active population after disease initialization
+        std::cout << "DEBUG: Active population after disease initialization: " 
+                  << context_.population().current_active_size() << std::endl;
 
-    print_initial_population_statistics();
+        // Initialise analysis
+        std::cout << "DEBUG: Initializing analysis module..." << std::endl;
+        analysis_->initialise_population(context_, context_.population(), context_.random());
+        std::cout << "DEBUG: Analysis module initialization completed" << std::endl;
+
+        print_initial_population_statistics();
+
+        // Add more detailed logging at critical transition points
+        std::cout << "\n====== TRANSITION FROM DISEASE TO ANALYSIS STAGE ======\n" << std::endl;
+        std::cout << "DEBUG: Disease initialization and updates completed successfully" << std::endl;
+        std::cout << "DEBUG: Current simulation time: " << context_.time_now() << std::endl;
+        std::cout << "DEBUG: Active population size: " << context_.population().current_active_size() << std::endl;
+        std::cout << "DEBUG: About to proceed to analysis stage" << std::endl;
+        
+        std::cout << "=== SIMULATION POPULATION INITIALIZATION COMPLETED SUCCESSFULLY ===" << std::endl;
+    } catch (const std::exception &e) {
+        std::cerr << "ERROR in Simulation::initialise_population: " << e.what() << std::endl;
+    } catch (...) {
+        std::cerr << "UNKNOWN ERROR in Simulation::initialise_population" << std::endl;
+    }
 }
 
 void Simulation::update_population() {
@@ -431,9 +522,9 @@ void Simulation::update_net_immigration() {
                 try {
                     // Make sure we're creating a new copy of the data to avoid issues
                     auto net_migration_copy = create_age_gender_table<int>(context_.age_range());
-                    auto start_age = context_.age_range().lower();
-                    auto end_age = context_.age_range().upper();
-                    for (int age = start_age; age <= end_age; age++) {
+                    auto target_start_age = context_.age_range().lower();
+                    auto target_end_age = context_.age_range().upper();
+                    for (int age = target_start_age; age <= target_end_age; age++) {
                         // Check if the keys exist before using at()
                         if (net_immigration.contains(age, core::Gender::male)) {
                             net_migration_copy.at(age, core::Gender::male) =
@@ -534,7 +625,7 @@ IntegerAgeGenderTable Simulation::get_current_expected_population() const {
         for (int age = start_age; age <= end_age; age++) {
             try {
                 // Test if this age exists in the table
-                current_population_table.at(age);
+                // current_population_table.at(age);
                 highest_available_age = age;
             } catch (const std::exception &) {
                 // Age not found, keep the last highest age
@@ -570,9 +661,7 @@ IntegerAgeGenderTable Simulation::get_current_expected_population() const {
                         std::round(highest_age_info.females * start_population_size /
                                    total_initial_population));
                 }
-            } catch (const std::exception &e) {
-                std::cerr << "ERROR processing age " << age << " in population table: " << e.what()
-                          << std::endl;
+            } catch (const std::exception&) {
                 // Use neighboring age data if available or set to minimal values
                 if (age > start_age) {
                     // Use previous age data if available
@@ -631,7 +720,7 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
                 if (similar_indices.size() <= 1) {
                     // If only one element, use index 0
                     const auto &source = pop.at(similar_indices.at(0));
-                    context_.population().add(partial_clone_entity(source), context_.time_now());
+                    static_cast<void>(context_.population().add(partial_clone_entity(source), context_.time_now()));
                 } else {
                     // Cast to int safely and ensure bounds are respected
                     int max_index = static_cast<int>(similar_indices.size()) - 1;
@@ -640,7 +729,7 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
 
                     int index = context_.random().next_int(max_index);
                     const auto &source = pop.at(similar_indices.at(index));
-                    context_.population().add(partial_clone_entity(source), context_.time_now());
+                    static_cast<void>(context_.population().add(partial_clone_entity(source), context_.time_now()));
                 }
             }
         }

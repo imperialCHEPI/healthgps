@@ -56,12 +56,12 @@ class DemographicModule final : public SimulationModule {
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context
-    void update_population(RuntimeContext &context) override;
-
-    /// @brief Updates the virtual population status
-    /// @param context The simulation run-time context
     /// @param disease_host The diseases host module instance
     void update_population(RuntimeContext &context, const DiseaseModule &disease_host);
+
+    /// @brief Updates the virtual population status (overriding base class method)
+    /// @param context The simulation run-time context
+    void update_population(RuntimeContext &context) override;
 
     void initialise_region(RuntimeContext &context, Person &person, Random &random);
     void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
@@ -70,6 +70,31 @@ class DemographicModule final : public SimulationModule {
                                     double q3_threshold);
     void initialise_physical_activity(RuntimeContext &context, Person &person, Random &random);
     std::tuple<double, double, double> calculate_income_thresholds(const Population &population);
+
+    void update_residual_mortality(RuntimeContext &context, const DiseaseModule &disease_host);
+    static double calculate_excess_mortality_product(const Person &entity,
+                                                     const DiseaseModule &disease_host);
+    int update_age_and_death_events(RuntimeContext &context, const DiseaseModule &disease_host);
+    int get_trend_steps(const core::Identifier &factor) const noexcept;
+    
+    // Process the death of a person and update relevant statistics
+    void die(RuntimeContext &context, int person_id, bool track_death);
+    
+    // Helper method to count active population
+    size_t count_active_population(const Population &population) const;
+    
+    // Get cause of death for a person
+    std::string get_cause_of_death(const Person &person) const;
+    
+    // Process birth events
+    void process_births(RuntimeContext &context);
+    
+    // Process death events evaluation
+    bool process_death(RuntimeContext &context, const Person &person, const DiseaseModule &disease_host);
+    
+    // Deaths statistics
+    std::vector<std::string> mortality_causes_;
+    std::map<int, std::vector<size_t>> deaths_;
 
   private:
     std::map<int, std::map<int, PopulationRecord>> pop_data_;
@@ -101,15 +126,9 @@ class DemographicModule final : public SimulationModule {
     DoubleGenderValue get_birth_rate(int time_year) const noexcept;
     double get_residual_death_rate(int age, core::Gender gender) const noexcept;
 
-    GenderTable<int, double> create_death_rates_table(int time_year);
+    DoubleAgeGenderTable create_death_rates_table(const int time_now) const;
     GenderTable<int, double> calculate_residual_mortality(RuntimeContext &context,
                                                           const DiseaseModule &disease_host);
-
-    void update_residual_mortality(RuntimeContext &context, const DiseaseModule &disease_host);
-    static double calculate_excess_mortality_product(const Person &entity,
-                                                     const DiseaseModule &disease_host);
-    int update_age_and_death_events(RuntimeContext &context, const DiseaseModule &disease_host);
-    int get_trend_steps(const core::Identifier &factor) const noexcept;
 };
 
 /// @brief Builds a new instance of the DemographicModule using the given data infrastructure
