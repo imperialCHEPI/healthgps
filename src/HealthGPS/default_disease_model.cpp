@@ -610,10 +610,8 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 try {
                     relative_risk *= calculate_relative_risk_for_risk_factors(person);
                     relative_risk *= calculate_relative_risk_for_diseases(person);
-                } catch (const std::exception &e) {
+                } catch (const std::exception&) {
                     // If calculation fails, use default relative risk
-                    std::cerr << "ERROR calculating relative risk for person " << person.id()
-                              << ": " << e.what() << std::endl;
                     error_count++;
                     relative_risk = 1.0;
                 }
@@ -626,14 +624,9 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                         average_relative_risk =
                             average_relative_risk_.at(person.age, person.gender);
                     } else {
-                        // Use a fallback value if not found
-                        std::cerr << "WARNING: Missing average_relative_risk for age " << person.age
-                                  << ", gender " << static_cast<int>(person.gender) << std::endl;
-                    }
-                } catch (const std::exception &e) {
+                        }
+                } catch (const std::exception&) {
                     // If access fails, use default value
-                    std::cerr << "ERROR accessing average_relative_risk for person " << person.id()
-                              << ": " << e.what() << std::endl;
                     error_count++;
                 }
 
@@ -783,10 +776,7 @@ double DefaultDiseaseModel::calculate_disease_probability(const Person &person,
         double incidence;
         try {
             incidence = definition_.get().table()(reference_age, person.gender).at(incidence_id);
-        } catch (const std::exception &e) {
-            std::cerr << "WARNING: Failed to get incidence rate for person " << person.id()
-                      << " with reference age " << reference_age << " and gender "
-                      << static_cast<int>(person.gender) << ": " << e.what() << std::endl;
+        } catch (const std::exception&) {
             return 0.0;
         }
 

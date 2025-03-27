@@ -271,8 +271,6 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                     relative_risk *= calculate_relative_risk_for_diseases(person);
                 } catch (const std::exception &e) {
                     // If calculation fails, use default relative risk
-                    std::cerr << "ERROR calculating relative risk for person " << person.id()
-                              << ": " << e.what() << std::endl;
                     relative_risk = 1.0;
                 }
 
@@ -285,14 +283,10 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                             average_relative_risk_.at(person.age, person.gender);
                     } else {
                         // Use a fallback value if not found
-                        std::cerr << "WARNING: Missing average_relative_risk for age " << person.age
-                                  << ", gender " << static_cast<int>(person.gender) << std::endl;
-                    }
+                        }
                 } catch (const std::exception &e) {
                     // If access fails, use default value
-                    std::cerr << "ERROR accessing average_relative_risk for person " << person.id()
-                              << ": " << e.what() << std::endl;
-                }
+                    }
 
                 // Safely get incidence rate with bounds checking
                 double incidence = 0.0;
@@ -308,11 +302,9 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                             // Do nothing, leave incidence at 0
                         }
                     }
-                } catch (const std::exception &e) {
+                } catch (const std::exception&) {
                     // If access fails, use zero incidence
-                    std::cerr << "ERROR accessing incidence rate for person " << person.id() << ": "
-                              << e.what() << std::endl;
-                }
+                    }
 
                 // Calculate probability and apply
                 double probability = incidence * relative_risk / average_relative_risk;

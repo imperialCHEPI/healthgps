@@ -265,10 +265,6 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         auto max_supported_age = 110u;
         auto sample_size = std::max(context.age_range().upper() + 1u, max_supported_age + 1u);
 
-        std::cout << "DEBUG: Using sample size " << sample_size << " to support ages up to "
-                  << max_supported_age << " (age range upper is " << context.age_range().upper()
-                  << ")" << std::endl;
-
         auto result = ModelResult{sample_size};
 
         // Check if channels are initialized - we can't initialize them here because this is a const
@@ -603,21 +599,10 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &person : context.population()) {
             if (person.is_active() && person.age > 100 && person.age <= 110) {
                 if (!has_high_ages) {
-                    std::cout << "DEBUG: Found people in the 101-110 age range:" << std::endl;
                     has_high_ages = true;
                 }
-                std::cout << "DEBUG: Person ID " << person.id() << " with age " << person.age
-                          << " gender " << (person.gender == core::Gender::male ? "male" : "female")
-                          << std::endl;
             }
         }
-
-        if (!has_high_ages) {
-            std::cout << "WARNING: No people found in ages 101-110. Will simulate some placeholder "
-                         "values."
-                      << std::endl;
-        }
-
         auto current_time = static_cast<unsigned int>(context.time_now());
 
         // Process each person in the population

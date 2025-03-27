@@ -732,10 +732,7 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
                     residual_death_rates_.at(age, core::Gender::male) = 0.001;
                     residual_death_rates_.at(age, core::Gender::female) = 0.001;
                 }
-                std::cout << "INFO: Created emergency fallback mortality values" << std::endl;
             } catch (...) {
-                std::cerr << "CRITICAL ERROR: Could not create even emergency fallback values"
-                          << std::endl;
                 // At this point, we can only hope the simulation can continue with whatever values
                 // are there
             }
@@ -896,8 +893,6 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
                     product = calculate_excess_mortality_product(entity, disease_host);
                 } catch (const std::exception &e) {
                     auto lock = std::unique_lock{sum_mutex};
-                    errors.push_back(std::string("Error calculating excess mortality: ") +
-                                     e.what());
                     error_count++;
                     product = 1.0; // Default value
                 }
@@ -912,25 +907,6 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
                 error_count++;
             }
         });
-
-        // Report any errors (limit to first 10)
-        if (!errors.empty()) {
-            for (size_t i = 0; i < std::min(errors.size(), static_cast<size_t>(10)); i++) {
-            }
-            if (errors.size() > 10) {
-            }
-
-            // Print summary statistics
-            std::cout << "INFO: Residual mortality calculation processed " << processed_count
-                      << " people with " << error_count << " errors ("
-                      << (error_count * 100.0 / std::max(1, processed_count.load())) << "%)"
-                      << std::endl;
-
-            // Check if error rate is too high
-            if (error_count > processed_count / 2) {
-                throw std::runtime_error("Too many errors in residual mortality calculation");
-            }
-        }
 
         // Create death rates and calculate residual mortality with error handling
         try {
@@ -1109,20 +1085,14 @@ double DemographicModule::calculate_excess_mortality_product(const Person &entit
                     continue;
                 }
             }
-        } catch (const std::exception &e) {
-            std::cerr << "WARNING: Error accessing diseases for person " << entity.id() << ": "
-                      << e.what() << std::endl;
+        } catch (const std::exception&) {
             return product; // Return default value on error
         } catch (...) {
-            std::cerr << "WARNING: Unknown error accessing diseases for person " << entity.id()
-                      << std::endl;
             return product; // Return default value on error
         }
 
         // Safety check - don't process unreasonable number of diseases
         if (disease_keys.size() > 50) { // Arbitrary reasonable limit
-            std::cerr << "WARNING: Person " << entity.id() << " has " << disease_keys.size()
-                      << " diseases, which seems excessive. Using default mortality." << std::endl;
             return product;
         }
 
@@ -1157,19 +1127,12 @@ double DemographicModule::calculate_excess_mortality_product(const Person &entit
                 product *= (1.0 - excess_mortality);
 
             } catch (const std::exception &e) {
-                // Log error but continue with other diseases
-                std::cerr << "ERROR: Failed to process disease ID " << disease_id.to_string()
-                          << " for person " << entity.id() << ": " << e.what() << std::endl;
+                
             } catch (...) {
-                // Catch any other errors
-                std::cerr << "ERROR: Unknown exception processing disease ID "
-                          << disease_id.to_string() << " for person " << entity.id() << std::endl;
             }
         }
-    } catch (const std::exception &e) {
-        std::cerr << "ERROR in calculate_excess_mortality_product: " << e.what() << std::endl;
+    } catch (const std::exception&) {
     } catch (...) {
-        std::cerr << "ERROR: Unknown exception in calculate_excess_mortality_product" << std::endl;
     }
 
     // Ensure valid range [0, 1]
@@ -1220,16 +1183,6 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
                                  [](int sum, const auto &pair) { return sum + pair.second; })
               << " people" << std::endl;
 
-    // Print specific counts for elderly population
-    std::cout << "  Age 91-100: "
-              << std::accumulate(age_counts.lower_bound(91), age_counts.upper_bound(100), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 101-110: "
-              << std::accumulate(age_counts.lower_bound(101), age_counts.upper_bound(110), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-
     // For debugging death probabilities - sample a few individuals
     std::cout << "DEBUG: Death probability samples:" << std::endl;
     int samples_shown = 0;
@@ -1259,19 +1212,11 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
             // Ensure residual_death_rate is valid and not excessive
             if (std::isnan(residual_death_rate) || !std::isfinite(residual_death_rate)) {
-                std::cout << "WARNING: Invalid residual death rate for Age " << entity.age
-                          << ", Gender: "
-                          << (entity.gender == core::Gender::male ? "Male" : "Female")
-                          << ". Using default value of 0.001" << std::endl;
                 residual_death_rate = 0.001; // Safe default value
             }
 
             // Cap excessively high death rates to prevent everyone from dying
             if (residual_death_rate > 0.5) {
-                std::cout << "WARNING: Unusually high residual death rate " << residual_death_rate
-                          << " for Age " << entity.age << ", Gender: "
-                          << (entity.gender == core::Gender::male ? "Male" : "Female")
-                          << ". Capping at 0.5" << std::endl;
                 residual_death_rate = 0.5;
             }
 
@@ -1287,12 +1232,8 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
                     }
                 }
             } catch (const std::exception &e) {
-                std::cerr << "WARNING: Error accessing diseases in death calculation for person "
-                          << entity.id() << ": " << e.what() << std::endl;
-            } catch (...) {
-                std::cerr << "WARNING: Unknown error accessing diseases in death calculation"
-                          << std::endl;
-            }
+                } catch (...) {
+                }
 
             // Process each disease using the copied keys
             for (const auto &disease_id : disease_keys) {
@@ -1338,10 +1279,6 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
             // Sanity check the death probability
             if (death_probability < 0.0 || death_probability > 1.0 ||
                 std::isnan(death_probability) || !std::isfinite(death_probability)) {
-                std::cout << "WARNING: Invalid death probability " << death_probability
-                          << " for Age " << entity.age << ", Gender: "
-                          << (entity.gender == core::Gender::male ? "Male" : "Female")
-                          << ". Using default value of 0.001" << std::endl;
                 death_probability = 0.001;
             }
 

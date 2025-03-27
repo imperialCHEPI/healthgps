@@ -179,25 +179,18 @@ void DiseaseModule::update_population(RuntimeContext &context) {
                       << " disease status" << std::endl;
 
         } catch (const std::out_of_range &e) {
-            // Handle "invalid map<K, T> key" error specifically - keep this critical error
-            std::cerr << "ERROR: Map key error while updating " << disease_name
-                      << " disease status: " << e.what() << std::endl;
             error_count++;
 
             // Mark as failed but give it another chance next time
             disease_update_failures[disease_name] = true;
         } catch (const std::exception &e) {
             // Handle other exceptions - keep this critical error
-            std::cerr << "ERROR: Exception while updating " << disease_name
-                      << " disease status: " << e.what() << std::endl;
             error_count++;
 
             // Mark as failed but give it another chance next time
             disease_update_failures[disease_name] = true;
         } catch (...) {
             // Catch all unexpected errors - keep this critical error
-            std::cerr << "ERROR: Unknown exception while updating " << disease_name
-                      << " disease status" << std::endl;
             error_count++;
 
             // Mark as failed but give it another chance next time

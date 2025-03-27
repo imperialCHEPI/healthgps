@@ -130,7 +130,7 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
     // Check if required columns exist
     if (!column_if_exists("region") || !column_if_exists("region_prob")) {
         // Return empty map so caller can use alternative source
-        return std::unordered_map<Region, double>();
+        return {};
     }
 
     // Get base probabilities from the data table
@@ -178,6 +178,7 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
 
             prob *= (1.0 + adjustment);
         }
+        std::cout << "Hello Mahima"<< std::endl;
 
         // Renormalize after adjustments
         total = 0.0;
@@ -207,7 +208,7 @@ std::unordered_map<Ethnicity, double> DataTable::get_ethnicity_distribution(int 
     // Check if required columns exist
     if (!column_if_exists("ethnicity") || !column_if_exists("ethnicity_prob")) {
         // Return empty map so caller can use alternative source
-        return std::unordered_map<Ethnicity, double>();
+        return {}; // pointed out by clang-tidy
     }
 
     // Get base probabilities from the data table
