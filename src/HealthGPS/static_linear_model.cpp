@@ -893,7 +893,7 @@ void StaticLinearModel::initialise_income_continuous(Person &person, Random &ran
 void StaticLinearModel::update_income_continuous(Person &person, Random &random) const {
     // Removing age check to ensure income is updated for all individuals regardless of age
     // This treats income as household income rather than individual income
-    
+
     // Call initialization to update the income
     initialise_income_continuous(person, random);
 }
@@ -917,10 +917,12 @@ void StaticLinearModel::update_income_category(RuntimeContext &context) {
         // Calculate income thresholds once for the entire population
         auto [q1_threshold, q2_threshold, q3_threshold] =
             context.demographic_module().calculate_income_thresholds(context.population());
-            
+
         // Validate thresholds are properly ordered
         if (q1_threshold > q2_threshold || q2_threshold > q3_threshold) {
-            std::cerr << "ERROR: Income thresholds are incorrectly ordered in StaticLinearModel::update_income_category" << std::endl;
+            std::cerr << "ERROR: Income thresholds are incorrectly ordered in "
+                         "StaticLinearModel::update_income_category"
+                      << std::endl;
             // Fix by using percentages of range
             double min_income = 23.0;
             double max_income = 2375.0;
@@ -928,7 +930,7 @@ void StaticLinearModel::update_income_category(RuntimeContext &context) {
             q1_threshold = min_income + range * 0.25;
             q2_threshold = min_income + range * 0.5;
             q3_threshold = min_income + range * 0.75;
-            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold 
+            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold
                       << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
         }
 
@@ -940,42 +942,41 @@ void StaticLinearModel::update_income_category(RuntimeContext &context) {
             if (person.is_active()) {
                 // Store original category for comparison
                 auto original_category = person.income_category;
-                
+
                 // Get income value and ensure it's within valid range
                 double income_value = std::max(23.0, std::min(2375.0, person.income_continuous));
-                
+
                 // Check if income continuous and category are consistent
                 bool is_consistent = true;
                 if ((person.income_category == core::Income::low && income_value >= q1_threshold) ||
-                    (person.income_category == core::Income::lowermiddle && 
+                    (person.income_category == core::Income::lowermiddle &&
                      (income_value < q1_threshold || income_value >= q2_threshold)) ||
-                    (person.income_category == core::Income::uppermiddle && 
+                    (person.income_category == core::Income::uppermiddle &&
                      (income_value < q2_threshold || income_value >= q3_threshold)) ||
                     (person.income_category == core::Income::high && income_value < q3_threshold)) {
                     is_consistent = false;
                     inconsistency_count++;
-                    
+
                     // Option: Resynchronize by fixing the category
-                    context.demographic_module().initialise_income_category(person, q1_threshold,
-                                                                      q2_threshold, q3_threshold);
+                    context.demographic_module().initialise_income_category(
+                        person, q1_threshold, q2_threshold, q3_threshold);
                     fixed_count++;
-                }
-                else {
+                } else {
                     // Already consistent, no action needed
                 }
-                
+
                 // Special rule for edge cases - very low income should never be High
                 if (income_value <= 30.0 && person.income_category == core::Income::high) {
                     person.income_category = core::Income::low;
                 }
-                
+
                 // Special rule for edge cases - very high income should never be Low
                 if (income_value >= 2300.0 && person.income_category == core::Income::low) {
                     person.income_category = core::Income::high;
                 }
             }
         }
-        
+
         last_update_year = current_year;
     }
 }

@@ -68,7 +68,7 @@ class DiseaseModule final : public UpdatableModule {
 
     /// @brief Checks if a person has a specific disease
     /// @param disease_code The disease identifier
-    /// @param entity The person instance 
+    /// @param entity The person instance
     /// @return True if the person has the disease, false otherwise
     bool has_disease(const core::Identifier &disease_code, const Person &entity) const noexcept;
 
@@ -76,7 +76,8 @@ class DiseaseModule final : public UpdatableModule {
     /// @param disease_code The disease identifier
     /// @param entity The person instance
     /// @return The disease status if found, or DiseaseStatus::inactive if not found
-    DiseaseStatus get_disease_status(const core::Identifier &disease_code, const Person &entity) const noexcept;
+    DiseaseStatus get_disease_status(const core::Identifier &disease_code,
+                                     const Person &entity) const noexcept;
 
   private:
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> models_;

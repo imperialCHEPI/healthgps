@@ -76,22 +76,23 @@ class DemographicModule final : public SimulationModule {
                                                      const DiseaseModule &disease_host);
     int update_age_and_death_events(RuntimeContext &context, const DiseaseModule &disease_host);
     int get_trend_steps(const core::Identifier &factor) const noexcept;
-    
+
     // Process the death of a person and update relevant statistics
     void die(RuntimeContext &context, int person_id, bool track_death);
-    
+
     // Helper method to count active population
     size_t count_active_population(const Population &population) const;
-    
+
     // Get cause of death for a person
     std::string get_cause_of_death(const Person &person) const;
-    
+
     // Process birth events
     void process_births(RuntimeContext &context);
-    
+
     // Process death events evaluation
-    bool process_death(RuntimeContext &context, const Person &person, const DiseaseModule &disease_host);
-    
+    bool process_death(RuntimeContext &context, const Person &person,
+                       const DiseaseModule &disease_host);
+
     // Deaths statistics
     std::vector<std::string> mortality_causes_;
     std::map<int, std::vector<size_t>> deaths_;

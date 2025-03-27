@@ -5,12 +5,12 @@
 #include "lms_model.h"
 #include "weight_model.h"
 
+#include <algorithm> // For std::find
 #include <cmath>
 #include <functional>
 #include <future>
 #include <iomanip>
 #include <iostream>
-#include <algorithm> // For std::find
 #include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
@@ -90,18 +90,19 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
                                            [[maybe_unused]] Population &population,
                                            [[maybe_unused]] Random &random) {
     std::cout << "DEBUG: Starting analysis module initialization..." << std::endl;
-    
+
     try {
         const auto &age_range = context.age_range();
-        std::cout << "DEBUG: Analysis age range is " << age_range.lower() << " to " << age_range.upper() << std::endl;
-        
+        std::cout << "DEBUG: Analysis age range is " << age_range.lower() << " to "
+                  << age_range.upper() << std::endl;
+
         auto expected_sum = create_age_gender_table<double>(age_range);
         auto expected_count = create_age_gender_table<int>(age_range);
         auto &pop = context.population();
-        
-        std::cout << "DEBUG: Population size for analysis: " << pop.size() 
+
+        std::cout << "DEBUG: Population size for analysis: " << pop.size()
                   << ", active: " << pop.current_active_size() << std::endl;
-        
+
         auto sum_mutex = std::mutex{};
         tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &entity) {
             if (!entity.is_active()) {
@@ -121,15 +122,17 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
             expected_count(entity.age, entity.gender)++;
         });
 
-        std::cout << "DEBUG: Calculated expected disability weights for age-gender groups" << std::endl;
+        std::cout << "DEBUG: Calculated expected disability weights for age-gender groups"
+                  << std::endl;
 
         for (int age = age_range.lower(); age <= age_range.upper(); age++) {
-            residual_disability_weight_(age, core::Gender::male) = calculate_residual_disability_weight(
-                age, core::Gender::male, expected_sum, expected_count);
+            residual_disability_weight_(age, core::Gender::male) =
+                calculate_residual_disability_weight(age, core::Gender::male, expected_sum,
+                                                     expected_count);
 
             residual_disability_weight_(age, core::Gender::female) =
                 calculate_residual_disability_weight(age, core::Gender::female, expected_sum,
-                                                    expected_count);
+                                                     expected_count);
         }
 
         std::cout << "DEBUG: Calculated residual disability weights" << std::endl;
@@ -142,11 +145,11 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
         // Extract factor identifiers that need to be calculated
         factors_to_calculate_.clear();
         for (const auto &factor : context.mapping().entries()) {
-            if (factor.level() > 0) {  // Only add factors with level > 0
+            if (factor.level() > 0) { // Only add factors with level > 0
                 factors_to_calculate_.push_back(factor.key());
             }
         }
-        
+
         // Initialize factor statistics vectors if needed
         if (factor_bins_.empty() && !factors_to_calculate_.empty()) {
             initialise_vector(context);
@@ -154,34 +157,37 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
 
         std::cout << "DEBUG: Number of channels initialized: " << channels_.size() << std::endl;
         if (channels_.empty()) {
-            std::cerr << "ERROR: No channels were initialized! Output file will be empty." << std::endl;
-            
+            std::cerr << "ERROR: No channels were initialized! Output file will be empty."
+                      << std::endl;
+
             // Force initialization of some essential channels as fallback
             if (channels_.empty()) {
-                std::cout << "DEBUG: Forcing initialization of essential channels as fallback" << std::endl;
+                std::cout << "DEBUG: Forcing initialization of essential channels as fallback"
+                          << std::endl;
                 channels_.emplace_back("count");
                 channels_.emplace_back("deaths");
                 channels_.emplace_back("emigrations");
                 channels_.emplace_back("mean_yll");
                 channels_.emplace_back("mean_yld");
                 channels_.emplace_back("mean_daly");
-                
+
                 // Add channels for each disease in context
                 for (const auto &disease : context.diseases()) {
                     channels_.emplace_back("prevalence_" + disease.code.to_string());
                     channels_.emplace_back("incidence_" + disease.code.to_string());
                 }
-                
+
                 // Add channels for factors from context mapping
                 for (const auto &factor : context.mapping().entries()) {
                     channels_.emplace_back("mean_" + factor.key().to_string());
                     channels_.emplace_back("std_" + factor.key().to_string());
                 }
-                
-                std::cout << "DEBUG: Fallback initialization added " << channels_.size() << " channels" << std::endl;
+
+                std::cout << "DEBUG: Fallback initialization added " << channels_.size()
+                          << " channels" << std::endl;
             }
         } else if (channels_.size() < 10) {
-            std::cerr << "WARNING: Very few channels initialized (" << channels_.size() 
+            std::cerr << "WARNING: Very few channels initialized (" << channels_.size()
                       << "). This may cause incomplete results!" << std::endl;
         }
 
@@ -235,74 +241,86 @@ AnalysisModule::calculate_residual_disability_weight(int age, const core::Gender
 
 void AnalysisModule::publish_result_message(RuntimeContext &context) const {
     std::cout << "DEBUG: Starting publish_result_message in analysis module..." << std::endl;
-    
+
     try {
         // Make sure channels are initialized - this would normally be done in initialise_population
         // but we'll check again here for safety
         if (channels_.empty()) {
-            std::cout << "WARNING: Channels are empty in publish_result_message. Attempting to initialize..." << std::endl;
-            const_cast<AnalysisModule*>(this)->initialise_output_channels(context);
+            std::cout << "WARNING: Channels are empty in publish_result_message. Attempting to "
+                         "initialize..."
+                      << std::endl;
+            const_cast<AnalysisModule *>(this)->initialise_output_channels(context);
             if (channels_.empty()) {
-                std::cerr << "ERROR: Failed to initialize channels in publish_result_message! Output will be empty." << std::endl;
+                std::cerr << "ERROR: Failed to initialize channels in publish_result_message! "
+                             "Output will be empty."
+                          << std::endl;
             } else {
-                std::cout << "DEBUG: Successfully initialized " << channels_.size() << " channels" << std::endl;
+                std::cout << "DEBUG: Successfully initialized " << channels_.size() << " channels"
+                          << std::endl;
             }
         }
-        
+
         // Modify sample size to support ages up to 110 regardless of age_range.upper()
         // This ensures we process all possible ages, not just those in the defined range
         auto max_supported_age = 110u;
         auto sample_size = std::max(context.age_range().upper() + 1u, max_supported_age + 1u);
-        
-        std::cout << "DEBUG: Using sample size " << sample_size << " to support ages up to " 
-                  << max_supported_age << " (age range upper is " << context.age_range().upper() << ")" << std::endl;
-        
+
+        std::cout << "DEBUG: Using sample size " << sample_size << " to support ages up to "
+                  << max_supported_age << " (age range upper is " << context.age_range().upper()
+                  << ")" << std::endl;
+
         auto result = ModelResult{sample_size};
-        
-        // Check if channels are initialized - we can't initialize them here because this is a const method
+
+        // Check if channels are initialized - we can't initialize them here because this is a const
+        // method
         if (channels_.empty()) {
-            std::cerr << "ERROR: Output channels are empty, results will be incomplete!" << std::endl;
-            std::cerr << "       Channels should be initialized in initialise_population" << std::endl;
+            std::cerr << "ERROR: Output channels are empty, results will be incomplete!"
+                      << std::endl;
+            std::cerr << "       Channels should be initialized in initialise_population"
+                      << std::endl;
         }
-        
+
         // Debug channels count
         std::cout << "DEBUG: Number of channels available: " << channels_.size() << std::endl;
         if (!channels_.empty()) {
             std::cout << "DEBUG: First few channels: ";
             int count = 0;
-            for (const auto& channel : channels_) {
-                if (count++ < 5) std::cout << channel << ", ";
+            for (const auto &channel : channels_) {
+                if (count++ < 5)
+                    std::cout << channel << ", ";
             }
             std::cout << "..." << std::endl;
         }
-        
-        std::cout << "DEBUG: Created model result object with sample size " << sample_size << std::endl;
+
+        std::cout << "DEBUG: Created model result object with sample size " << sample_size
+                  << std::endl;
         std::cout << "DEBUG: Starting historical statistics calculation..." << std::endl;
-        
+
         // Store a flag to track if historical calculation succeeded
         bool historical_stats_success = true;
         std::future<void> handle;
-        
+
         try {
             handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
-                                    std::ref(context), std::ref(result));
-            
+                                     std::ref(context), std::ref(result));
+
             std::cout << "DEBUG: Started async calculation of historical statistics" << std::endl;
         } catch (const std::exception &e) {
-            std::cerr << "ERROR starting historical statistics calculation: " << e.what() << std::endl;
+            std::cerr << "ERROR starting historical statistics calculation: " << e.what()
+                      << std::endl;
             historical_stats_success = false;
         }
-        
+
         std::cout << "DEBUG: Starting population statistics calculation..." << std::endl;
-        
+
         try {
             calculate_population_statistics(context, result.series);
             std::cout << "DEBUG: Completed population statistics calculation" << std::endl;
-            
+
             // Verify series has data
-            std::cout << "DEBUG: After calculation - series has " << result.series.size() << " channels and "
-                      << result.series.sample_size() << " samples" << std::endl;
-            
+            std::cout << "DEBUG: After calculation - series has " << result.series.size()
+                      << " channels and " << result.series.sample_size() << " samples" << std::endl;
+
             // Check for data
             if (!result.series.channels().empty()) {
                 try {
@@ -310,47 +328,50 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
                     auto &firstChannel = result.series.channels()[0];
                     auto maleValue = result.series.at(core::Gender::male, firstChannel).at(0);
                     auto femaleValue = result.series.at(core::Gender::female, firstChannel).at(0);
-                    std::cout << "DEBUG: First channel '" << firstChannel << "' sample values - male: " 
-                              << maleValue << ", female: " << femaleValue << std::endl;
+                    std::cout << "DEBUG: First channel '" << firstChannel
+                              << "' sample values - male: " << maleValue
+                              << ", female: " << femaleValue << std::endl;
                 } catch (const std::exception &e) {
                     std::cerr << "ERROR accessing series data: " << e.what() << std::endl;
                 }
             }
         } catch (const std::out_of_range &e) {
             // Continue execution - we still want to publish whatever data we have
-            std::cerr << "ERROR in population statistics calculation - out of range: " << e.what() << std::endl;
+            std::cerr << "ERROR in population statistics calculation - out of range: " << e.what()
+                      << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "ERROR in population statistics calculation: " << e.what() << std::endl;
         }
-        
+
         if (historical_stats_success) {
             try {
-                std::cout << "DEBUG: Waiting for historical statistics calculation to complete..." << std::endl;
+                std::cout << "DEBUG: Waiting for historical statistics calculation to complete..."
+                          << std::endl;
                 handle.get();
                 std::cout << "DEBUG: Historical statistics calculation completed" << std::endl;
             } catch (const std::out_of_range &e) {
-                std::cerr << "ERROR in historical statistics calculation - map key error: " << e.what() << std::endl;
+                std::cerr << "ERROR in historical statistics calculation - map key error: "
+                          << e.what() << std::endl;
                 // Set default values for any statistics that couldn't be calculated
-                result.indicators = DALYsIndicator{};  // Set to default values
-                
+                result.indicators = DALYsIndicator{}; // Set to default values
+
                 // Set any other missing values to defaults
                 if (result.risk_ractor_average.empty()) {
                     for (const auto &factor : context.mapping().entries()) {
                         result.risk_ractor_average.emplace(
-                            factor.key().to_string(), 
-                            ResultByGender{.male = 0.0, .female = 0.0});
+                            factor.key().to_string(), ResultByGender{.male = 0.0, .female = 0.0});
                     }
                 }
-                
+
                 if (result.disease_prevalence.empty()) {
                     for (const auto &disease : context.diseases()) {
                         result.disease_prevalence.emplace(
-                            disease.code.to_string(),
-                            ResultByGender{.male = 0.0, .female = 0.0});
+                            disease.code.to_string(), ResultByGender{.male = 0.0, .female = 0.0});
                     }
                 }
             } catch (const std::exception &e) {
-                std::cerr << "ERROR in historical statistics calculation: " << e.what() << std::endl;
+                std::cerr << "ERROR in historical statistics calculation: " << e.what()
+                          << std::endl;
                 // Use defaults as with the map key error
                 result.indicators = DALYsIndicator{};
             }
@@ -358,7 +379,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
             // If we couldn't start the calculation, set defaults here
             result.indicators = DALYsIndicator{};
         }
-            
+
         std::cout << "DEBUG: Publishing result event message..." << std::endl;
 
         try {
@@ -369,7 +390,8 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
             std::cerr << "ERROR publishing result message: " << e.what() << std::endl;
         }
     } catch (const std::out_of_range &e) {
-        std::cerr << "ERROR in AnalysisModule::publish_result_message - map key error: " << e.what() << std::endl;
+        std::cerr << "ERROR in AnalysisModule::publish_result_message - map key error: " << e.what()
+                  << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR in AnalysisModule::publish_result_message: " << e.what() << std::endl;
     } catch (...) {
@@ -540,19 +562,22 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
     try {
         std::cout << "DEBUG: Starting calculate_population_statistics" << std::endl;
-        
+
         // Check for empty channels list
         if (channels_.empty()) {
-            std::cerr << "ERROR: No channels available in calculate_population_statistics!" << std::endl;
+            std::cerr << "ERROR: No channels available in calculate_population_statistics!"
+                      << std::endl;
             throw std::runtime_error("No channels available for population statistics");
         }
-        
+
         if (series.size() > 0) {
-            std::cout << "DEBUG: Data series already has " << series.size() << " channels" << std::endl;
+            std::cout << "DEBUG: Data series already has " << series.size() << " channels"
+                      << std::endl;
         } else {
-            std::cout << "DEBUG: Adding " << channels_.size() << " channels to data series" << std::endl;
+            std::cout << "DEBUG: Adding " << channels_.size() << " channels to data series"
+                      << std::endl;
             series.add_channels(channels_);
-            
+
             if (series.size() == 0) {
                 std::cerr << "ERROR: Failed to add channels to data series!" << std::endl;
                 throw std::runtime_error("Failed to add channels to data series");
@@ -581,17 +606,20 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                     std::cout << "DEBUG: Found people in the 101-110 age range:" << std::endl;
                     has_high_ages = true;
                 }
-                std::cout << "DEBUG: Person ID " << person.id() << " with age " << person.age 
-                          << " gender " << (person.gender == core::Gender::male ? "male" : "female") << std::endl;
+                std::cout << "DEBUG: Person ID " << person.id() << " with age " << person.age
+                          << " gender " << (person.gender == core::Gender::male ? "male" : "female")
+                          << std::endl;
             }
         }
-        
+
         if (!has_high_ages) {
-            std::cout << "WARNING: No people found in ages 101-110. Will simulate some placeholder values." << std::endl;
+            std::cout << "WARNING: No people found in ages 101-110. Will simulate some placeholder "
+                         "values."
+                      << std::endl;
         }
 
         auto current_time = static_cast<unsigned int>(context.time_now());
-        
+
         // Process each person in the population
         int persons_processed = 0;
         try {
@@ -601,14 +629,16 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
 
                 // Debug check for invalid ages
                 if (age > 110 || age < 0) {
-                    std::cerr << "WARNING: Person with invalid age " << age << ", skipping" << std::endl;
+                    std::cerr << "WARNING: Person with invalid age " << age << ", skipping"
+                              << std::endl;
                     continue;
                 }
 
                 if (!person.is_active()) {
                     if (!person.is_alive() && person.time_of_death() == current_time) {
                         series(gender, "deaths").at(age)++;
-                        float expcted_life = definition_.life_expectancy().at(context.time_now(), gender);
+                        float expcted_life =
+                            definition_.life_expectancy().at(context.time_now(), gender);
                         double yll = std::max(expcted_life - age, 0.0f) * DALY_UNITS;
                         series(gender, "mean_yll").at(age) += yll;
                         series(gender, "mean_daly").at(age) += yll;
@@ -627,20 +657,22 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 for (const auto &factor : context.mapping().entries()) {
                     const std::string column = "mean_" + factor.key().to_string();
                     if (has_channel(series, column)) {
-                        series(gender, column).at(age) += person.get_risk_factor_value(factor.key());
+                        series(gender, column).at(age) +=
+                            person.get_risk_factor_value(factor.key());
                     }
                 }
 
                 for (const auto &[disease_name, disease_state] : person.diseases) {
                     const std::string prevalence_column = "prevalence_" + disease_name.to_string();
                     const std::string incidence_column = "incidence_" + disease_name.to_string();
-                    
+
                     if (disease_state.status == DiseaseStatus::active) {
                         if (has_channel(series, prevalence_column)) {
                             series(gender, prevalence_column).at(age)++;
                         }
-                        
-                        if (disease_state.start_time == context.time_now() && has_channel(series, incidence_column)) {
+
+                        if (disease_state.start_time == context.time_now() &&
+                            has_channel(series, incidence_column)) {
                             series(gender, incidence_column).at(age)++;
                         }
                     }
@@ -657,7 +689,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                     std::cerr << "ERROR classifying weight for person: " << e.what() << std::endl;
                 }
             }
-            
+
             std::cout << "DEBUG: Processed " << persons_processed << " active persons" << std::endl;
         } catch (const std::out_of_range &e) {
             std::cerr << "ERROR during person processing - out of range: " << e.what() << std::endl;
@@ -670,7 +702,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // For each age group in the analysis...
         const auto age_range = context.age_range();
         const unsigned int max_supported_age = 110u;
-        
+
         try {
             for (int age = 0; age <= max_supported_age; age++) {
                 double count_F = series(core::Gender::female, "count").at(age);
@@ -708,9 +740,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                     std::string column_incidence = "incidence_" + disease.code.to_string();
                     if (has_channel(series, column_incidence)) {
                         // Remove debugging to show raw incidence counts before division
-                        double raw_incidence_F = series(core::Gender::female, column_incidence).at(age);
-                        double raw_incidence_M = series(core::Gender::male, column_incidence).at(age);
-                        
+                        double raw_incidence_F =
+                            series(core::Gender::female, column_incidence).at(age);
+                        double raw_incidence_M =
+                            series(core::Gender::male, column_incidence).at(age);
+
                         if (count_F > 0) {
                             series(core::Gender::female, column_incidence).at(age) /= count_F;
                         }
@@ -752,18 +786,20 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         } catch (const std::exception &e) {
             std::cerr << "ERROR calculating standard deviations: " << e.what() << std::endl;
         }
-        
+
         // Add placeholder values for ages 101-110 if none were processed
         if (!has_high_ages) {
             std::cout << "DEBUG: Adding placeholder values for ages 101-110" << std::endl;
-            
+
             // Get values from age 100 to use as reference
             for (int age = 101; age <= 110; age++) {
-                // For each channel, copy from age 100 but reduced by a small factor for each year over 100
+                // For each channel, copy from age 100 but reduced by a small factor for each year
+                // over 100
                 for (const auto &channel : series.channels()) {
                     // Skip count channel - we'll set these explicitly
-                    if (channel == "count") continue;
-                    
+                    if (channel == "count")
+                        continue;
+
                     // For all metrics, use age 100 value * exp(-0.1 * (age-100))
                     // This creates a reasonable exponential decay
                     for (auto gender : {core::Gender::male, core::Gender::female}) {
@@ -772,7 +808,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                         series(gender, channel).at(age) = age_100_value * decay_factor;
                     }
                 }
-                
+
                 // Set count and deaths to small values to avoid divide-by-zero
                 series(core::Gender::male, "count").at(age) = 5;
                 series(core::Gender::female, "count").at(age) = 5;
@@ -780,13 +816,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 series(core::Gender::female, "deaths").at(age) = 1;
             }
         }
-        
+
         // Final verification of data
-        std::cout << "DEBUG: Final data series contains " << series.size() << " channels" << std::endl;
+        std::cout << "DEBUG: Final data series contains " << series.size() << " channels"
+                  << std::endl;
         if (series.size() > 0) {
             std::cout << "DEBUG: First few channels in final data: ";
             int channel_count = 0;
-            for (const auto& channel : series.channels()) {
+            for (const auto &channel : series.channels()) {
                 if (channel_count++ < 5) {
                     std::cout << channel << ", ";
                 }
@@ -852,7 +889,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     // For each age group in the analysis...
     const auto age_range = context.age_range();
     const unsigned int max_supported_age = 110u;
-    
+
     for (int age = 0; age <= max_supported_age; age++) {
         double count_F = series(core::Gender::female, "count").at(age);
         double count_M = series(core::Gender::male, "count").at(age);

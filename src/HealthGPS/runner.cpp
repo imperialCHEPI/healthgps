@@ -118,8 +118,9 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_begin, run));
 
-    std::cout << "\nDEBUG: [Runner] Starting run_model_thread for " << model.name() << " run #" << run << std::endl;
-    
+    std::cout << "\nDEBUG: [Runner] Starting run_model_thread for " << model.name() << " run #"
+              << run << std::endl;
+
     /* Create the simulation engine */
     adevs::Simulator<int> sim;
     std::cout << "DEBUG: [Runner] Created simulation engine" << std::endl;
@@ -128,7 +129,7 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     std::cout << "DEBUG: [Runner] About to call setup_run with seed " << seed << std::endl;
     model.setup_run(run, seed);
     std::cout << "DEBUG: [Runner] Completed setup_run" << std::endl;
-    
+
     std::cout << "DEBUG: [Runner] About to add model to simulation engine" << std::endl;
     sim.add(&model);
     std::cout << "DEBUG: [Runner] Model added to simulation engine" << std::endl;
@@ -142,7 +143,7 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     // Get initial next event time
     std::cout << "DEBUG: [Runner] Getting initial next_event_time" << std::endl;
     auto next_time = sim.next_event_time();
-    std::cout << "DEBUG: [Runner] Initial next_event_time: real=" << next_time.real 
+    std::cout << "DEBUG: [Runner] Initial next_event_time: real=" << next_time.real
               << ", logical=" << next_time.logical << std::endl;
 
     std::cout << "DEBUG: [Runner] Entering main simulation loop" << std::endl;
@@ -150,8 +151,8 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
            step_count < max_steps) {
 
         next_time = sim.next_event_time();
-        std::cout << "DEBUG: [Runner] Loop iteration " << step_count+1 
-                  << ", next_event_time: real=" << next_time.real 
+        std::cout << "DEBUG: [Runner] Loop iteration " << step_count + 1
+                  << ", next_event_time: real=" << next_time.real
                   << ", logical=" << next_time.logical << std::endl;
 
         // Execute the next event
@@ -163,7 +164,7 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
         // Get next event time after execution to check if we need to continue
         std::cout << "DEBUG: [Runner] Checking for new next_event_time" << std::endl;
         auto new_next_time = sim.next_event_time();
-        std::cout << "DEBUG: [Runner] New next_event_time: real=" << new_next_time.real 
+        std::cout << "DEBUG: [Runner] New next_event_time: real=" << new_next_time.real
                   << ", logical=" << new_next_time.logical << std::endl;
 
         // Verify that the next event time is changing
@@ -176,17 +177,19 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
 
         // Safety check: if we're stuck at the same time, break out
         if (step_count > 1 && new_next_time.real == next_time.real) {
-            std::cout << "DEBUG: [Runner] Time not advancing - checking for additional conditions" << std::endl;
+            std::cout << "DEBUG: [Runner] Time not advancing - checking for additional conditions"
+                      << std::endl;
             std::cout << "WARNING: [" << model.name()
                       << "] Event time not advancing, possible infinite loop. Breaking out."
                       << std::endl;
             break;
         }
-        
+
         std::cout << "DEBUG: [Runner] Completed loop iteration " << step_count << std::endl;
     }
 
-    std::cout << "DEBUG: [Runner] Exited main simulation loop after " << step_count << " steps" << std::endl;
+    std::cout << "DEBUG: [Runner] Exited main simulation loop after " << step_count << " steps"
+              << std::endl;
 
     // Show final reason for exiting loop
     if (token.stop_requested()) {
@@ -194,21 +197,24 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
                   << std::endl;
     } else if (!(sim.next_event_time() < adevs_inf<adevs::Time>())) {
         // This is the normal completion case - already printed above
-        std::cout << "DEBUG: [Runner] Final check confirmed next_event_time is infinity (normal completion)" << std::endl;
+        std::cout << "DEBUG: [Runner] Final check confirmed next_event_time is infinity (normal "
+                     "completion)"
+                  << std::endl;
     } else if (step_count >= max_steps) {
         std::cout << "WARNING: " << model.name() << " reached maximum step count (" << max_steps
                   << ")" << std::endl;
     } else {
         std::cout << "DEBUG: [Runner] Simulation stopped for unknown reason" << std::endl;
         auto final_time = sim.next_event_time();
-        std::cout << "DEBUG: [Runner] Final next_event_time: real=" << final_time.real 
+        std::cout << "DEBUG: [Runner] Final next_event_time: real=" << final_time.real
                   << ", logical=" << final_time.logical << std::endl;
     }
 
     ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_end, run, elapsed.count()));
-    std::cout << "DEBUG: [Runner] Completed run_model_thread for " << model.name() << " run #" << run << std::endl;
+    std::cout << "DEBUG: [Runner] Completed run_model_thread for " << model.name() << " run #"
+              << run << std::endl;
 }
 
 void Runner::notify(std::unique_ptr<hgps::EventMessage> message) {

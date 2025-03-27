@@ -860,7 +860,7 @@ void KevinHallModel::initialise_income_continuous(Person &person, Random &random
 void KevinHallModel::update_income_continuous(Person &person, Random &random) const {
     // Removing age check to ensure income is updated for all individuals regardless of age
     // This treats income as household income rather than individual income
-    
+
     // Call the income initialization function
     initialise_income_continuous(person, random);
 }
@@ -892,13 +892,15 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
         // Calculate thresholds once for the entire population
         auto [q1_threshold, q2_threshold, q3_threshold] =
             calculate_income_thresholds(context.population());
-            
-        std::cout << "INFO: Updating income categories with thresholds Q1=" << q1_threshold 
+
+        std::cout << "INFO: Updating income categories with thresholds Q1=" << q1_threshold
                   << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
 
         // Validate thresholds are properly ordered
         if (q1_threshold > q2_threshold || q2_threshold > q3_threshold) {
-            std::cerr << "ERROR: Income thresholds are incorrectly ordered in update_income_category" << std::endl;
+            std::cerr
+                << "ERROR: Income thresholds are incorrectly ordered in update_income_category"
+                << std::endl;
             // Fix by using percentages of range
             double min_income = 23.0;
             double max_income = 2375.0;
@@ -906,87 +908,103 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
             q1_threshold = min_income + range * 0.25;
             q2_threshold = min_income + range * 0.5;
             q3_threshold = min_income + range * 0.75;
-            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold 
+            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold
                       << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
         }
 
         // Track inconsistencies during update
         int inconsistency_count = 0;
         int fixed_count = 0;
-        
+
         // Apply thresholds to each person
         for (auto &person : context.population()) {
             if (person.is_active()) {
                 // Store original category for comparison
                 auto original_category = person.income_category;
-                
+
                 // Get income value and ensure it's within valid range
                 double income_value = std::max(23.0, std::min(2375.0, person.income_continuous));
-                
+
                 // Check if income continuous and category are consistent
                 bool is_consistent = true;
                 if ((person.income_category == core::Income::low && income_value >= q1_threshold) ||
-                    (person.income_category == core::Income::lowermiddle && 
+                    (person.income_category == core::Income::lowermiddle &&
                      (income_value < q1_threshold || income_value >= q2_threshold)) ||
-                    (person.income_category == core::Income::uppermiddle && 
+                    (person.income_category == core::Income::uppermiddle &&
                      (income_value < q2_threshold || income_value >= q3_threshold)) ||
                     (person.income_category == core::Income::high && income_value < q3_threshold)) {
                     is_consistent = false;
                     inconsistency_count++;
-                    
+
                     // Resynchronize by updating the category based on income value
                     initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
                     fixed_count++;
-                    
+
                     // Debug specific cases for first few inconsistencies
                     if (inconsistency_count <= 5) {
-                        std::cout << "FIXED: Person " << person.id() 
-                                  << " Income=" << income_value;
-                                  
+                        std::cout << "FIXED: Person " << person.id() << " Income=" << income_value;
+
                         std::cout << ", Category changed from ";
                         switch (original_category) {
-                            case core::Income::low: std::cout << "Low"; break;
-                            case core::Income::lowermiddle: std::cout << "Lower Middle"; break;
-                            case core::Income::uppermiddle: std::cout << "Upper Middle"; break;
-                            case core::Income::high: std::cout << "High"; break;
-                            default: std::cout << "Unknown";
+                        case core::Income::low:
+                            std::cout << "Low";
+                            break;
+                        case core::Income::lowermiddle:
+                            std::cout << "Lower Middle";
+                            break;
+                        case core::Income::uppermiddle:
+                            std::cout << "Upper Middle";
+                            break;
+                        case core::Income::high:
+                            std::cout << "High";
+                            break;
+                        default:
+                            std::cout << "Unknown";
                         }
-                        
+
                         std::cout << " to ";
                         switch (person.income_category) {
-                            case core::Income::low: std::cout << "Low"; break;
-                            case core::Income::lowermiddle: std::cout << "Lower Middle"; break;
-                            case core::Income::uppermiddle: std::cout << "Upper Middle"; break;
-                            case core::Income::high: std::cout << "High"; break;
-                            default: std::cout << "Unknown";
+                        case core::Income::low:
+                            std::cout << "Low";
+                            break;
+                        case core::Income::lowermiddle:
+                            std::cout << "Lower Middle";
+                            break;
+                        case core::Income::uppermiddle:
+                            std::cout << "Upper Middle";
+                            break;
+                        case core::Income::high:
+                            std::cout << "High";
+                            break;
+                        default:
+                            std::cout << "Unknown";
                         }
                         std::cout << std::endl;
                     }
-                }
-                else {
+                } else {
                     // Already consistent, no action needed
                 }
-                
+
                 // Special rule for edge cases - very low income should never be High
                 if (income_value <= 30.0 && person.income_category == core::Income::high) {
                     person.income_category = core::Income::low;
-                    std::cout << "OVERRIDE: Forcing Low category for very low income (" 
+                    std::cout << "OVERRIDE: Forcing Low category for very low income ("
                               << income_value << ") for person " << person.id() << std::endl;
                 }
-                
+
                 // Special rule for edge cases - very high income should never be Low
                 if (income_value >= 2300.0 && person.income_category == core::Income::low) {
                     person.income_category = core::Income::high;
-                    std::cout << "OVERRIDE: Forcing High category for very high income (" 
+                    std::cout << "OVERRIDE: Forcing High category for very high income ("
                               << income_value << ") for person " << person.id() << std::endl;
                 }
             }
         }
-        
+
         if (inconsistency_count > 0) {
-            std::cout << "INFO: Fixed " << fixed_count << " of " << inconsistency_count 
-                      << " income category inconsistencies (" 
-                      << (100.0 * inconsistency_count / context.population().current_active_size()) 
+            std::cout << "INFO: Fixed " << fixed_count << " of " << inconsistency_count
+                      << " income category inconsistencies ("
+                      << (100.0 * inconsistency_count / context.population().current_active_size())
                       << "% of active population)" << std::endl;
         }
 
