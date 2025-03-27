@@ -1085,7 +1085,7 @@ double DemographicModule::calculate_excess_mortality_product(const Person &entit
                     continue;
                 }
             }
-        } catch (const std::exception&) {
+        } catch (const std::exception &) {
             return product; // Return default value on error
         } catch (...) {
             return product; // Return default value on error
@@ -1127,11 +1127,11 @@ double DemographicModule::calculate_excess_mortality_product(const Person &entit
                 product *= (1.0 - excess_mortality);
 
             } catch (const std::exception &e) {
-                
+
             } catch (...) {
             }
         }
-    } catch (const std::exception&) {
+    } catch (const std::exception &) {
     } catch (...) {
     }
 
@@ -1232,8 +1232,8 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
                     }
                 }
             } catch (const std::exception &e) {
-                } catch (...) {
-                }
+            } catch (...) {
+            }
 
             // Process each disease using the copied keys
             for (const auto &disease_id : disease_keys) {

@@ -610,7 +610,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                 try {
                     relative_risk *= calculate_relative_risk_for_risk_factors(person);
                     relative_risk *= calculate_relative_risk_for_diseases(person);
-                } catch (const std::exception&) {
+                } catch (const std::exception &) {
                     // If calculation fails, use default relative risk
                     error_count++;
                     relative_risk = 1.0;
@@ -624,8 +624,8 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
                         average_relative_risk =
                             average_relative_risk_.at(person.age, person.gender);
                     } else {
-                        }
-                } catch (const std::exception&) {
+                    }
+                } catch (const std::exception &) {
                     // If access fails, use default value
                     error_count++;
                 }
@@ -776,7 +776,7 @@ double DefaultDiseaseModel::calculate_disease_probability(const Person &person,
         double incidence;
         try {
             incidence = definition_.get().table()(reference_age, person.gender).at(incidence_id);
-        } catch (const std::exception&) {
+        } catch (const std::exception &) {
             return 0.0;
         }
 

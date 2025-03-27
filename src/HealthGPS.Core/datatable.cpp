@@ -178,7 +178,7 @@ std::unordered_map<Region, double> DataTable::get_region_distribution(int age,
 
             prob *= (1.0 + adjustment);
         }
-        std::cout << "Hello Mahima"<< std::endl;
+        std::cout << "Hello Mahima" << std::endl;
 
         // Renormalize after adjustments
         total = 0.0;

@@ -283,10 +283,10 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                             average_relative_risk_.at(person.age, person.gender);
                     } else {
                         // Use a fallback value if not found
-                        }
+                    }
                 } catch (const std::exception &e) {
                     // If access fails, use default value
-                    }
+                }
 
                 // Safely get incidence rate with bounds checking
                 double incidence = 0.0;
@@ -302,9 +302,9 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                             // Do nothing, leave incidence at 0
                         }
                     }
-                } catch (const std::exception&) {
+                } catch (const std::exception &) {
                     // If access fails, use zero incidence
-                    }
+                }
 
                 // Calculate probability and apply
                 double probability = incidence * relative_risk / average_relative_risk;

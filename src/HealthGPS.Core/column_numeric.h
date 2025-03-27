@@ -19,7 +19,7 @@ class StringDataTableColumn final : public PrimitiveDataTableColumn<std::string>
     // Returns owned pointer that must be deleted by caller
     // Ownership transfer is part of the clone
     // pattern, handled by public clone() method wrapping in unique_ptr
-   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     DataTableColumn *clone_impl() const override { return new StringDataTableColumn(*this); }
 };
 
@@ -80,7 +80,7 @@ class IntegerDataTableColumn final : public PrimitiveDataTableColumn<int> {
     // Returns owned pointer that must be deleted by caller
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) - Ownership transfer is part of the clone
     // pattern, handled by public clone() method wrapping in unique_ptr
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory) 
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     DataTableColumn *clone_impl() const override { return new IntegerDataTableColumn(*this); }
 };
 
