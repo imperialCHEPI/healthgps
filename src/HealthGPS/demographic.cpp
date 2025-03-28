@@ -930,8 +930,7 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
 
         std::cout << "DEBUG: [update_residual_mortality] Calculation completed successfully"
                   << std::endl;
-    } catch (const std::exception &e) {
-        std::cerr << "ERROR in update_residual_mortality: " << e.what() << std::endl;
+    } catch (const std::exception&) {
 
         // Create default values
         auto start_age = life_table_.age_limits().lower();
