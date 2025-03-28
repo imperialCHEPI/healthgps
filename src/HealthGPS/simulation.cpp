@@ -277,7 +277,7 @@ void Simulation::initialise_population() {
 
         std::cout << "=== SIMULATION POPULATION INITIALIZATION COMPLETED SUCCESSFULLY ==="
                   << std::endl;
-    } catch (const std::exception&) {
+    } catch (const std::exception &) {
     } catch (...) {
         std::cerr << "UNKNOWN ERROR in Simulation::initialise_population" << std::endl;
     }
