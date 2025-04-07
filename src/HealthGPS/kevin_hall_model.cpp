@@ -1,17 +1,74 @@
 #include "HealthGPS.Core/exception.h"
+#include <fstream> // Add for file output
+#include <iostream>
 
+// Disable specific warnings from external dependencies
+#ifdef _MSC_VER
+#pragma warning(push)
+// Eigen warnings
+#pragma warning(disable : 26495) // Variable 'xxx' is uninitialized (from Eigen SIMD optimizations)
+
+// fmt library warnings
+#pragma warning(disable : 26498) // Variable 'xxx' is constexpr, mark variable constexpr (from fmt)
+
+// lexer warnings
+#pragma warning(disable : 26819) // Unannotated fallthrough between switch labels (from lexer)
+
+// Low-level bitwise operations
+#pragma warning(                                                                                   \
+    disable : 6285) // Non-zero constant in bitwise-and operation (from core bit manipulation)
+#endif
+
+#include "demographic.h"
 #include "kevin_hall_model.h"
 #include "runtime_context.h"
 #include "sync_message.h"
 
 #include <algorithm>
 #include <iterator>
+#include <random>
 #include <utility>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 namespace { // anonymous namespace
 
 using KevinHallAdjustmentMessage =
     hgps::SyncDataMessage<hgps::UnorderedMap2d<hgps::core::Gender, int, double>>;
+
+// Helper function to create a debug CSV for invalid BMI calculations
+void log_invalid_bmi_to_csv(const hgps::Person &person, double w, double h, double bmi,
+                            const std::string &reason, bool create_header = false) {
+    static std::ofstream debug_file;
+    static bool file_initialized = false;
+
+    // Initialize file if needed
+    if (!file_initialized) {
+        debug_file.open("invalid_bmi_debug.csv");
+        file_initialized = true;
+
+        // Write header
+        debug_file << "PersonID,Age,Gender,BMI,Weight,Height,BodyFat,LeanTissue,Glycogen,ECF,";
+        debug_file << "EnergyIntake,EnergyIntake_previous,PhysicalActivity,";
+        debug_file << "Carbohydrate,Carbohydrate_previous,Sodium,Sodium_previous,";
+        debug_file << "Intercept_K,Height_residual,Reason" << std::endl;
+    }
+
+    // Record gender as string
+    std::string gender_str = (person.gender == hgps::core::Gender::male) ? "M" : "F";
+
+    // Start with basic person info
+    debug_file << person.id() << "," << person.age << "," << gender_str << "," << bmi << "," << w
+               << "," << h << ",";
+
+    // Add reason for invalid BMI
+    debug_file << reason << std::endl;
+
+    // Flush to ensure data is written immediately
+    debug_file.flush();
+}
 
 } // anonymous namespace
 
@@ -34,34 +91,64 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
-    const std::unordered_map<core::Gender, double> &height_slope)
+    const std::unordered_map<core::Gender, double> &height_slope,
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double income_continuous_stddev)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_stddev_{height_stddev}, height_slope_{height_slope},
+      region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
+// Modified: Mahima 25/02/2025
+// Ensuring correct initialization order for population characteristics
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
+    context_ = &context; // Store reference to the context
 
-    // Initialise everyone.
+    // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
+    // also in person.cpp, the person class maintains a deep copy of it
+
+    // Step 2: Initialize fixed characteristics (region and ethnicity)
+    // These are now initialized in demographic.cpp
+
+    // Step 3: Initialize continuous income
+    // This is now initialized in demographic.cpp
+
+    // Step 4: Initialize income category
+    // This is now initialized in demographic.cpp
+
+    // Step 5: Initialize physical activity
+    // This is now initialized in demographic.cpp
+
+    // Step 6: Initialize remaining risk factors
     for (auto &person : context.population()) {
-        initialise_nutrient_intakes(person);
+        initialise_nutrient_intakes(person, context.random());
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
 
-    // Adjust weight mean to match expected.
+    // Adjust weight mean to match expected
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
 
-    // Compute weight power means by sex and age.
+    // Added for FINCH- Mahima
+    //  Adjust physical activity mean to match expected
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
+
+    // Compute weight power means by sex and age
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
-    // Initialise everyone.
+    // Step 7: Initialize height (depends on weight)
+    // Step 8: Calculate BMI (depends on weight and height)
     for (auto &person : context.population()) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
@@ -71,6 +158,10 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+    context_ = &context; // Store reference to the context
+
+    // Update income categories every 5 years
+    update_income_category(context);
 
     // Update (initialise) newborns.
     update_newborns(context);
@@ -86,7 +177,13 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
 
         compute_bmi(person);
+        if (person.age == 18) {
+            update_region(context, person, context.random());
+        }
     }
+
+    // Adjust physical activity mean to match expected
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
@@ -98,7 +195,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
             continue;
         }
 
-        initialise_nutrient_intakes(person);
+        initialise_nutrient_intakes(person, context.random());
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
@@ -128,6 +225,22 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     }
 
     // NOTE: FOR REFACTORING: End of semi-redundant block.
+
+    // Adjust physical activity for newborns to match expected
+    for (auto &person : context.population()) {
+        // Ignore if inactive or not newborn.
+        if (!person.is_active() || (person.age != 0)) {
+            continue;
+        }
+
+        // Initialize physical activity if not already done
+        if (!person.risk_factors.contains("PhysicalActivity"_id)) {
+            initialise_physical_activity(context, person, context.random());
+        }
+    }
+
+    // Adjust physical activity mean to match expected for newborns
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
 
     // Compute newborn weight power means by sex.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
@@ -339,20 +452,23 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
     return RiskFactorAdjustableModel::get_expected(context, sex, age, factor, range, apply_trend);
 }
 
-void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
-
-    // Initialise nutrient intakes.
+void KevinHallModel::initialise_nutrient_intakes(Person &person,
+                                                 [[maybe_unused]] Random &random) const {
+    // Initialise base nutrient intakes
     compute_nutrient_intakes(person);
 
-    // Start with previous = current.
+    // Get current values
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
-    person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
     double sodium = person.risk_factors.at("Sodium"_id);
+
+    // Store values with random variations
+    person.risk_factors.at("Carbohydrate"_id) = carbohydrate;
+    person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
+    person.risk_factors.at("Sodium"_id) = sodium;
     person.risk_factors["Sodium_previous"_id] = sodium;
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
-
     // Set previous nutrient intakes.
     double previous_carbohydrate = person.risk_factors.at("Carbohydrate"_id);
     person.risk_factors.at("Carbohydrate_previous"_id) = previous_carbohydrate;
@@ -364,7 +480,6 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-
     // Reset nutrient intakes to zero.
     for (const auto &[nutrient_key, unused] : energy_equation_) {
         person.risk_factors[nutrient_key] = 0.0;
@@ -527,13 +642,59 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double b2 = gamma_L + delta;
     double c2 = EI - K - TEF - AT - delta * (G + W + ECF);
 
+    // Log intermediate values to detect division by zero or other issues
+    if (std::abs(a1 * b2 - a2 * b1) < 1e-10) {
+        // We're about to divide by a near-zero value, which will cause instability
+        std::ofstream debug_file("kevin_hall_division_error.csv", std::ios_base::app);
+        debug_file << person.id() << "," << person.age << ","
+                   << (person.gender == core::Gender::male ? "M" : "F") << ","
+                   << "Near-zero denominator,"
+                   << "a1=" << a1 << ",b2=" << b2 << ",a2=" << a2 << ",b1=" << b1 << ","
+                   << "denom=" << (a1 * b2 - a2 * b1) << ","
+                   << "F_0=" << F_0 << ",L_0=" << L_0 << ","
+                   << "BW_0=" << BW_0 << ",delta=" << delta << std::endl;
+
+        // Set weight to expected value and return early to avoid division by zero
+        double expected_weight =
+            get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
+        person.risk_factors.at("Weight"_id) = expected_weight;
+        return;
+    }
+
     // Compute body fat and lean tissue steady state.
     double steady_F = -(b1 * c2 - b2 * c1) / (a1 * b2 - a2 * b1);
     double steady_L = -(c1 * a2 - c2 * a1) / (a1 * b2 - a2 * b1);
 
+    // Check for unreasonable steady state values
+    if (steady_F < 0 || steady_F > 150 || steady_L < 0 || steady_L > 200) {
+        // Log extreme steady state values
+        std::ofstream debug_file("kevin_hall_extreme_steady_state.csv", std::ios_base::app);
+        debug_file << person.id() << "," << person.age << ","
+                   << (person.gender == core::Gender::male ? "M" : "F") << ","
+                   << "Extreme steady state,"
+                   << "steady_F=" << steady_F << ",steady_L=" << steady_L << ","
+                   << "a1=" << a1 << ",b1=" << b1 << ",c1=" << c1 << ","
+                   << "a2=" << a2 << ",b2=" << b2 << ",c2=" << c2 << ","
+                   << "F_0=" << F_0 << ",L_0=" << L_0 << std::endl;
+    }
+
     // Compute time constant.
     double tau = rho_L * rho_F * (1.0 + x) /
                  ((gamma_F + delta) * (1.0 - p) * rho_L + (gamma_L + delta) * p * rho_F);
+
+    // Check for unreasonable time constant
+    if (tau <= 0 || tau > 10000) {
+        // Log extreme time constant values
+        std::ofstream debug_file("kevin_hall_extreme_tau.csv", std::ios_base::app);
+        debug_file << person.id() << "," << person.age << ","
+                   << (person.gender == core::Gender::male ? "M" : "F") << ","
+                   << "Extreme tau value,"
+                   << "tau=" << tau << ",p=" << p << ",x=" << x << ","
+                   << "delta=" << delta << std::endl;
+
+        // Clamp tau to reasonable range
+        tau = std::max(1.0, std::min(2000.0, tau));
+    }
 
     // Compute body fat and lean tissue.
     double F = steady_F - (steady_F - F_0) * exp(-365.0 / tau);
@@ -541,6 +702,89 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
 
     // Compute body weight.
     double BW = F + L + G + W + ECF;
+
+    // Get weight range from config
+    double MIN_WEIGHT = 1.0;   // Default minimum weight (kg)
+    double MAX_WEIGHT = 210.0; // Default maximum weight (kg)
+
+    // Get actual ranges from config if available
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
+        MIN_WEIGHT = weight_range.lower();
+        MAX_WEIGHT = weight_range.upper();
+    }
+
+    // Check for unreasonable or invalid weight calculation
+    if (std::isnan(BW) || std::isinf(BW) || BW < MIN_WEIGHT || BW > MAX_WEIGHT) {
+        // Create a detailed diagnostic log
+        std::ofstream debug_file("kevin_hall_invalid_weight.csv", std::ios_base::app);
+
+        // Add header if file is newly created
+        if (debug_file.tellp() == 0) {
+            debug_file << "PersonID,Age,Gender,Reason,Initial_Weight,Calculated_Weight,"
+                       << "F,L,G,W,ECF,PAL,EI,CI,Na,delta,tau,"
+                       << "steady_F,steady_L,F_0,L_0" << std::endl;
+        }
+
+        // Prepare reason string
+        std::string reason;
+        if (std::isnan(BW))
+            reason = "NaN weight";
+        else if (std::isinf(BW))
+            reason = "Infinite weight";
+        else if (BW < MIN_WEIGHT)
+            reason = "Too low weight";
+        else if (BW > MAX_WEIGHT)
+            reason = "Too high weight";
+
+        // Write diagnostic info
+        debug_file << person.id() << "," << person.age << ","
+                   << (person.gender == core::Gender::male ? "M" : "F") << "," << reason << ","
+                   << BW_0 << "," << BW << "," << F << "," << L << "," << G << "," << W << ","
+                   << ECF << "," << PAL << "," << EI << "," << CI << "," << Na << "," << delta
+                   << "," << tau << "," << steady_F << "," << steady_L << "," << F_0 << "," << L_0
+                   << std::endl;
+
+        // Clamp to valid range
+        if (std::isnan(BW) || std::isinf(BW)) {
+            // Use expected value from table
+            BW =
+                get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
+            // Also reset component values proportionally
+            double ratio = BW / (F_0 + L_0 + G + W + ECF_0);
+            F = F_0 * ratio;
+            L = L_0 * ratio;
+        } else {
+            // For out-of-range values, use capping with age adjustment
+            if (person.age > 80) {
+                // Older people naturally have lower BMI - adjust max weight down
+                double age_factor = 1.0 - std::min(0.3, (person.age - 80) * 0.015);
+                MAX_WEIGHT *= age_factor;
+            }
+            BW = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, BW));
+
+            // Adjust F and L proportionally if needed
+            if (F < 0)
+                F = 0.2 * BW; // Minimum healthy body fat
+            if (L < 0)
+                L = 0.6 * BW; // Minimum lean mass
+
+            // Ensure components sum to BW
+            double components_sum = F + L + G + W + ECF;
+            if (components_sum > 0) {
+                double ratio = BW / components_sum;
+                F *= ratio;
+                L *= ratio;
+            } else {
+                // Fallback if components are invalid
+                F = 0.2 * BW;
+                L = 0.6 * BW;
+                G = 0.01 * BW;
+                W = 2.7 * G;
+                ECF = 0.7 * 0.235 * BW;
+            }
+        }
+    }
 
     // Set new state.
     person.risk_factors.at("Glycogen"_id) = G;
@@ -556,7 +800,8 @@ double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
 }
 
 double KevinHallModel::compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const {
-    return ECF_0 + (delta_Na - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
+    // Add minimum threshold 1.0 to prevent division by near-zero values- Mahima
+    return ECF_0 + (delta_Na - xi_CI * (1.0 - CI / std::max(CI_0, 1.0))) / xi_Na;
 }
 
 double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, double BW,
@@ -580,32 +825,289 @@ double KevinHallModel::compute_EE(double BW, double F, double L, double EI, doub
 }
 
 void KevinHallModel::compute_bmi(Person &person) const {
-    auto w = person.risk_factors.at("Weight"_id);
-    auto h = person.risk_factors.at("Height"_id) / 100;
-    person.risk_factors["BMI"_id] = w / (h * h);
+    // Use ranges from the configuration (factors in the static_linear_model.cpp contains these
+    // values) Just hard coding in to make sure- MAHIMA Don't worry the code will only use the
+    // config values
+    double MIN_WEIGHT = 1.0;   // Default minimum weight (kg)
+    double MAX_WEIGHT = 210.0; // Default maximum weight (kg)
+    double MIN_HEIGHT = 44.0;  // Default minimum height (cm)
+    double MAX_HEIGHT = 203.2; // Default maximum height (cm)
+    double MIN_BMI = 14.26126; // Default minimum BMI
+    double MAX_BMI = 45.84575; // Default maximum BMI
+
+    // Get actual ranges from config if available
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
+        MIN_WEIGHT = weight_range.lower();
+        MAX_WEIGHT = weight_range.upper();
+    }
+
+    if (nutrient_ranges_.contains("Height"_id)) {
+        const auto &height_range = nutrient_ranges_.at("Height"_id);
+        MIN_HEIGHT = height_range.lower();
+        MAX_HEIGHT = height_range.upper();
+    }
+
+    if (nutrient_ranges_.contains("BMI"_id)) {
+        const auto &bmi_range = nutrient_ranges_.at("BMI"_id);
+        MIN_BMI = bmi_range.lower();
+        MAX_BMI = bmi_range.upper();
+    }
+
+    // Get weight and height, with validation
+    double w = person.risk_factors.at("Weight"_id);
+    double h = person.risk_factors.at("Height"_id);
+
+    // Log extreme values
+    bool logged = false;
+    std::string reason;
+
+    if (std::isnan(w) || std::isinf(w) || w < MIN_WEIGHT || w > MAX_WEIGHT) {
+        reason = "Invalid weight: " + std::to_string(w);
+        std::cerr << "WARNING: Invalid weight " << w << " for person " << person.id() << " (age "
+                  << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F")
+                  << ")" << std::endl;
+        logged = true;
+
+        // Clamp to valid range
+        if (std::isnan(w) || std::isinf(w)) {
+            // Use expected value from table
+            w = get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
+        } else {
+            w = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, w));
+        }
+
+        // Update the person's weight
+        person.risk_factors["Weight"_id] = w;
+    }
+
+    if (std::isnan(h) || std::isinf(h) || h < MIN_HEIGHT || h > MAX_HEIGHT) {
+        reason = reason.empty() ? "" : reason + "; ";
+        reason += "Invalid height: " + std::to_string(h);
+        std::cerr << "WARNING: Invalid height " << h << " for person " << person.id() << " (age "
+                  << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F")
+                  << ")" << std::endl;
+        logged = true;
+
+        // Clamp to valid range
+        if (std::isnan(h) || std::isinf(h)) {
+            // Use expected value from table
+            h = get_expected(*context_, person.gender, person.age, "Height"_id, std::nullopt,
+                             false);
+        } else {
+            h = std::max(MIN_HEIGHT, std::min(MAX_HEIGHT, h));
+        }
+
+        // Update the person's height
+        person.risk_factors["Height"_id] = h;
+    }
+
+    // Calculate BMI with validated values
+    double bmi = w / pow(h / 100.0, 2);
+
+    // Validate BMI result
+    if (std::isnan(bmi) || std::isinf(bmi) || bmi < MIN_BMI || bmi > MAX_BMI) {
+        reason = reason.empty() ? "" : reason + "; ";
+        reason += "Invalid BMI: " + std::to_string(bmi) + " (w/h²=" + std::to_string(w) + "/" +
+                  std::to_string(h) + "²)";
+
+        // Set to a reasonable value based on age, sex- ONLY FOR WORST CASE SCENARIO
+        bmi = 24.0; // Default reasonable BMI
+
+        if (person.gender == core::Gender::male) {
+            if (person.age < 18)
+                bmi = 19.0;
+            else if (person.age > 65)
+                bmi = 24.0;
+        } else {
+            if (person.age < 18)
+                bmi = 18.0;
+            else if (person.age > 65)
+                bmi = 25.0;
+        }
+
+        // Ensure BMI is within range
+        bmi = std::max(MIN_BMI, std::min(MAX_BMI, bmi));
+
+        // Log details to CSV for debugging
+        log_invalid_bmi_to_csv(person, w, h, bmi, reason);
+    }
+
+    // Set validated BMI
+    person.risk_factors["BMI"_id] = bmi;
 }
 
 void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) const {
-    // Compute E/PA expected.
-    double ei_expected =
-        get_expected(context, person.gender, person.age, "EnergyIntake"_id, std::nullopt, true);
-    double pa_expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
-                                      std::nullopt, false);
-    double epa_expected = ei_expected / pa_expected;
+    // Get weight range from config
+    double MIN_WEIGHT = 1.0;   // Default minimum weight (kg)
+    double MAX_WEIGHT = 210.0; // Default maximum weight (kg)
 
-    // Compute E/PA actual.
-    double ei_actual = person.risk_factors.at("EnergyIntake"_id);
-    double pa_actual = person.risk_factors.at("PhysicalActivity"_id);
-    double epa_actual = ei_actual / pa_actual;
+    // Get actual ranges from config if available
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
+        MIN_WEIGHT = weight_range.lower();
+        MAX_WEIGHT = weight_range.upper();
+    }
 
-    // Compute E/PA quantile.
-    double epa_quantile = epa_actual / epa_expected;
+    try {
+        // Compute E/PA expected.
+        double ei_expected =
+            get_expected(context, person.gender, person.age, "EnergyIntake"_id, std::nullopt, true);
+        double pa_expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
+                                          std::nullopt, false);
 
-    // Compute new weight.
-    double w_expected =
-        get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
-    double w_quantile = get_weight_quantile(epa_quantile, person.gender);
-    person.risk_factors["Weight"_id] = w_expected * w_quantile;
+        // Safety check for physical activity
+        if (pa_expected <= 0.01 || std::isnan(pa_expected) || std::isinf(pa_expected)) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(pa_expected) || std::isinf(pa_expected)) {
+                std::cerr << "WARNING: Invalid physical activity value detected" << std::endl;
+            }
+            pa_expected = 1.5; // Reasonable default value
+        }
+
+        double epa_expected = ei_expected / pa_expected;
+
+        // Safety check for expected energy intake
+        if (std::isnan(ei_expected) || std::isinf(ei_expected) || ei_expected <= 0) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(ei_expected) || std::isinf(ei_expected)) {
+                std::cerr << "WARNING: Invalid energy intake value detected" << std::endl;
+            }
+
+            // Use reasonable defaults based on age and gender
+            if (person.age < 2) {
+                ei_expected = 800.0; // Infant
+            } else if (person.age < 10) {
+                ei_expected = 1500.0; // Child
+            } else if (person.age < 18) {
+                ei_expected = person.gender == core::Gender::male ? 2500.0 : 2000.0; // Teenager
+            } else {
+                ei_expected = person.gender == core::Gender::male ? 2600.0 : 2000.0; // Adult
+            }
+            epa_expected = ei_expected / pa_expected;
+        }
+
+        // Compute E/PA actual.
+        double ei_actual = person.risk_factors.at("EnergyIntake"_id);
+        double pa_actual = person.risk_factors.at("PhysicalActivity"_id);
+
+        // Safety check for actual physical activity
+        if (pa_actual <= 0.01 || std::isnan(pa_actual) || std::isinf(pa_actual)) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(pa_actual) || std::isinf(pa_actual)) {
+                std::cerr << "WARNING: Invalid physical activity value detected" << std::endl;
+            }
+            pa_actual = pa_expected; // Use expected value as fallback
+            person.risk_factors["PhysicalActivity"_id] = pa_actual;
+        }
+
+        // Safety check for actual energy intake
+        if (std::isnan(ei_actual) || std::isinf(ei_actual) || ei_actual <= 0) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(ei_actual) || std::isinf(ei_actual)) {
+                std::cerr << "WARNING: Invalid energy intake value detected" << std::endl;
+            }
+            ei_actual = ei_expected; // Use expected value as fallback
+            person.risk_factors["EnergyIntake"_id] = ei_actual;
+        }
+
+        double epa_actual = ei_actual / pa_actual;
+
+        // Compute E/PA quantile with safety check
+        double epa_quantile = epa_actual / epa_expected;
+        if (std::isnan(epa_quantile) || std::isinf(epa_quantile) || epa_quantile <= 0 ||
+            epa_quantile > 10) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(epa_quantile) || std::isinf(epa_quantile)) {
+                std::cerr << "WARNING: Invalid EPA quantile value detected" << std::endl;
+            }
+            epa_quantile = 1.0; // Use neutral quantile as fallback
+        }
+
+        // Compute new weight.
+        double w_expected =
+            get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
+
+        // Safety check for expected weight
+        if (std::isnan(w_expected) || std::isinf(w_expected) || w_expected < MIN_WEIGHT ||
+            w_expected > MAX_WEIGHT) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(w_expected) || std::isinf(w_expected)) {
+                std::cerr << "WARNING: Invalid expected weight value detected" << std::endl;
+            }
+
+            // Use reasonable defaults based on age and gender
+            if (person.age < 1) {
+                w_expected = 4.0 + (person.age * 6.0); // Infant (grows from ~4kg to ~10kg)
+            } else if (person.age < 10) {
+                w_expected = 10.0 + ((person.age - 1) * 3.0); // Child (grows ~3kg per year)
+            } else if (person.age < 18) {
+                if (person.gender == core::Gender::male) {
+                    w_expected =
+                        30.0 + ((person.age - 10) * 5.0); // Male teen (grows ~5kg per year)
+                } else {
+                    w_expected =
+                        30.0 + ((person.age - 10) * 4.0); // Female teen (grows ~4kg per year)
+                }
+            } else {
+                // Adult
+                w_expected = person.gender == core::Gender::male ? 70.0 : 60.0;
+            }
+
+            // Ensure within range
+            w_expected = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, w_expected));
+        }
+
+        double w_quantile = get_weight_quantile(epa_quantile, person.gender);
+
+        // Safety check for weight quantile
+        if (std::isnan(w_quantile) || std::isinf(w_quantile) || w_quantile <= 0 || w_quantile > 5) {
+            // Only log truly invalid values, not just out-of-range ones
+            if (std::isnan(w_quantile) || std::isinf(w_quantile)) {
+                std::cerr << "WARNING: Invalid weight quantile value detected" << std::endl;
+            }
+            w_quantile = 1.0; // Use neutral quantile as fallback
+        }
+
+        double final_weight = w_expected * w_quantile;
+
+        // Final safety check on calculated weight - silently clamp out-of-range values
+        if (std::isnan(final_weight) || std::isinf(final_weight)) {
+            // Only log truly invalid values
+            std::cerr << "WARNING: Invalid weight calculation (NaN or infinity)" << std::endl;
+            final_weight = w_expected; // Fallback to expected weight
+        } else if (final_weight < MIN_WEIGHT || final_weight > MAX_WEIGHT) {
+            // Silently clamp to range without warning messages
+            final_weight = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, w_expected));
+        }
+
+        person.risk_factors["Weight"_id] = final_weight;
+    } catch (const std::exception &e) {
+        // Handle any exceptions during weight calculation
+        std::cerr << "ERROR: Exception in initialise_weight: " << e.what() << std::endl;
+
+        // Set a reasonable default weight based on age and gender
+        double default_weight;
+        if (person.age < 1) {
+            default_weight = 4.0 + (person.age * 6.0); // Infant
+        } else if (person.age < 10) {
+            default_weight = 10.0 + ((person.age - 1) * 3.0); // Child
+        } else if (person.age < 18) {
+            if (person.gender == core::Gender::male) {
+                default_weight = 30.0 + ((person.age - 10) * 5.0); // Male teen
+            } else {
+                default_weight = 30.0 + ((person.age - 10) * 4.0); // Female teen
+            }
+        } else {
+            // Adult
+            default_weight = person.gender == core::Gender::male ? 70.0 : 60.0;
+        }
+
+        // Ensure within range
+        default_weight = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, default_weight));
+
+        person.risk_factors["Weight"_id] = default_weight;
+    }
 }
 
 void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
@@ -739,19 +1241,407 @@ void KevinHallModel::initialise_height(RuntimeContext &context, Person &person, 
 
 void KevinHallModel::update_height(RuntimeContext &context, Person &person,
                                    double W_power_mean) const {
-    double W = person.risk_factors.at("Weight"_id);
-    double H_expected =
-        get_expected(context, person.gender, person.age, "Height"_id, std::nullopt, false);
-    double H_residual = person.risk_factors.at("Height_residual"_id);
-    double stddev = height_stddev_.at(person.gender);
-    double slope = height_slope_.at(person.gender);
+    // Get height range from config
+    double MIN_HEIGHT = 44.0;  // Default minimum height (cm)
+    double MAX_HEIGHT = 203.2; // Default maximum height (cm)
 
-    // Compute height.
-    double exp_norm_mean = exp(0.5 * stddev * stddev);
-    double H = H_expected * (pow(W, slope) / W_power_mean) * (exp(H_residual) / exp_norm_mean);
+    // Get actual ranges from config if available
+    if (nutrient_ranges_.contains("Height"_id)) {
+        const auto &height_range = nutrient_ranges_.at("Height"_id);
+        MIN_HEIGHT = height_range.lower();
+        MAX_HEIGHT = height_range.upper();
+    }
 
-    // Set height (may not exist yet).
-    person.risk_factors["Height"_id] = H;
+    // Get weight range from config
+    double MIN_WEIGHT = 1.0;   // Default
+    double MAX_WEIGHT = 210.0; // Default
+
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
+        MIN_WEIGHT = weight_range.lower();
+        MAX_WEIGHT = weight_range.upper();
+    }
+
+    try {
+        // Check weight is valid
+        double W = person.risk_factors.at("Weight"_id);
+        if (std::isnan(W) || std::isinf(W) || W < MIN_WEIGHT || W > MAX_WEIGHT) {
+            std::cerr << "WARNING: Invalid weight (" << W << ") for person " << person.id()
+                      << " in update_height, using expected value" << std::endl;
+            // Use expected value from table
+            W = get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
+            // Ensure within range
+            W = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, W));
+            // Update the person's weight
+            person.risk_factors["Weight"_id] = W;
+        }
+
+        // Validate W_power_mean
+        if (std::isnan(W_power_mean) || std::isinf(W_power_mean) || W_power_mean <= 0) {
+            std::cerr << "WARNING: Invalid W_power_mean (" << W_power_mean << ") for person "
+                      << person.id() << " in update_height, using weight directly" << std::endl;
+            // Use a fallback calculation
+            W_power_mean = W;
+        }
+
+        double H_expected =
+            get_expected(context, person.gender, person.age, "Height"_id, std::nullopt, false);
+
+        // Validate H_expected
+        if (std::isnan(H_expected) || std::isinf(H_expected) || H_expected < MIN_HEIGHT ||
+            H_expected > MAX_HEIGHT) {
+            std::cerr << "WARNING: Invalid expected height (" << H_expected << ") for person "
+                      << person.id() << " in update_height, using default value" << std::endl;
+
+            // Use reasonable defaults based on age and gender
+            if (person.age < 1) {
+                H_expected = 50.0 + (person.age * 20.0); // Infant (50-70cm)
+            } else if (person.age < 10) {
+                H_expected = 70.0 + ((person.age - 1) * 8.0); // Child (~8cm per year)
+            } else if (person.age < 18) {
+                if (person.gender == core::Gender::male) {
+                    H_expected = 140.0 + ((person.age - 10) * 6.0); // Male teen (~6cm per year)
+                } else {
+                    H_expected = 140.0 + ((person.age - 10) * 5.0); // Female teen (~5cm per year)
+                }
+            } else {
+                // Adult
+                H_expected = person.gender == core::Gender::male ? 175.0 : 163.0;
+            }
+
+            // Ensure within range
+            H_expected = std::max(MIN_HEIGHT, std::min(MAX_HEIGHT, H_expected));
+        }
+
+        // Rest of the function remains the same
+        double H_residual = 0.0;
+        if (person.risk_factors.contains("Height_residual"_id)) {
+            H_residual = person.risk_factors.at("Height_residual"_id);
+            // Validate H_residual
+            if (std::isnan(H_residual) || std::isinf(H_residual) || H_residual < -5.0 ||
+                H_residual > 5.0) {
+                std::cerr << "WARNING: Invalid height residual (" << H_residual << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
+                H_residual = 0.0;
+                person.risk_factors["Height_residual"_id] = H_residual;
+            }
+        } else {
+            // If Height_residual doesn't exist, initialize it
+            std::cerr << "WARNING: Missing Height_residual for person " << person.id()
+                      << " in update_height, using default value" << std::endl;
+            H_residual = 0.0;
+            person.risk_factors["Height_residual"_id] = H_residual;
+        }
+
+        // Safely get stddev and slope
+        double stddev = 0.01; // Default value
+        double slope = 0.01;  // Default value
+
+        try {
+            stddev = height_stddev_.at(person.gender);
+            slope = height_slope_.at(person.gender);
+
+            // Validate stddev and slope
+            if (std::isnan(stddev) || std::isinf(stddev) || stddev <= 0) {
+                std::cerr << "WARNING: Invalid height stddev (" << stddev << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
+                stddev = 0.01;
+            }
+
+            if (std::isnan(slope) || std::isinf(slope) || slope <= 0) {
+                std::cerr << "WARNING: Invalid height slope (" << slope << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
+                slope = 0.01;
+            }
+        } catch (const std::out_of_range &) {
+            std::cerr << "ERROR: Missing height stddev/slope for gender "
+                      << (person.gender == core::Gender::male ? "male" : "female")
+                      << " in update_height, using default values" << std::endl;
+        }
+
+        // Safely compute height
+        double exp_norm_mean = exp(0.5 * stddev * stddev);
+
+        // Safety check for exp_norm_mean
+        if (std::isnan(exp_norm_mean) || std::isinf(exp_norm_mean) || exp_norm_mean <= 0) {
+            std::cerr << "WARNING: Invalid exp_norm_mean (" << exp_norm_mean << ") for person "
+                      << person.id() << " in update_height, using default value" << std::endl;
+            exp_norm_mean = 1.0;
+        }
+
+        // Safely compute power term
+        double power_term = 1.0;
+        try {
+            power_term = pow(W, slope) / W_power_mean;
+
+            // Safety check for power term
+            if (std::isnan(power_term) || std::isinf(power_term) || power_term <= 0 ||
+                power_term > 10.0) {
+                std::cerr << "WARNING: Invalid power term (" << power_term << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
+                power_term = 1.0;
+            }
+        } catch (const std::exception &e) {
+            std::cerr << "ERROR: Exception computing power term in update_height for person "
+                      << person.id() << ": " << e.what() << ", using default value" << std::endl;
+        }
+
+        // Safely compute residual term
+        double residual_term = 1.0;
+        try {
+            residual_term = exp(H_residual) / exp_norm_mean;
+
+            // Safety check for residual term
+            if (std::isnan(residual_term) || std::isinf(residual_term) || residual_term <= 0 ||
+                residual_term > 10.0) {
+                std::cerr << "WARNING: Invalid residual term (" << residual_term << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
+                residual_term = 1.0;
+            }
+        } catch (const std::exception &e) {
+            std::cerr << "ERROR: Exception computing residual term in update_height for person "
+                      << person.id() << ": " << e.what() << ", using default value" << std::endl;
+        }
+
+        // Compute final height
+        double H = H_expected * power_term * residual_term;
+
+        // Final validation of height
+        if (std::isnan(H) || std::isinf(H) || H < MIN_HEIGHT || H > MAX_HEIGHT) {
+            std::cerr << "WARNING: Final height calculation invalid (" << H << ") for person "
+                      << person.id() << " in update_height, using expected height" << std::endl;
+            H = H_expected;
+        }
+
+        // Set height
+        person.risk_factors["Height"_id] = H;
+
+    } catch (const std::exception &e) {
+        // Handle any unexpected exceptions
+        std::cerr << "ERROR: Exception in update_height for person " << person.id() << ": "
+                  << e.what() << std::endl;
+
+        // Set a reasonable default height based on age and gender
+        double default_height;
+        if (person.age < 1) {
+            default_height = 50.0 + (person.age * 20.0); // Infant
+        } else if (person.age < 10) {
+            default_height = 70.0 + ((person.age - 1) * 8.0); // Child
+        } else if (person.age < 18) {
+            if (person.gender == core::Gender::male) {
+                default_height = 140.0 + ((person.age - 10) * 6.0); // Male teen
+            } else {
+                default_height = 140.0 + ((person.age - 10) * 5.0); // Female teen
+            }
+        } else {
+            // Adult
+            default_height = person.gender == core::Gender::male ? 175.0 : 163.0;
+        }
+
+        // Ensure within range
+        default_height = std::max(MIN_HEIGHT, std::min(MAX_HEIGHT, default_height));
+
+        person.risk_factors["Height"_id] = default_height;
+    }
+}
+
+// Modified: Mahima 25/02/2025
+// Region is initialised using the CDF of the region probabilities along with age/gender strata
+void KevinHallModel::initialise_region(RuntimeContext &context, Person &person,
+                                       Random &random) const {
+    // Delegate to demographic module
+    context.demographic_module().initialise_region(context, person, random);
+}
+
+// NOTE: Might need to change this if region updates are happening differently
+void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                                   Random &random) const {
+    if (person.age == 18) {
+        initialise_region(context, person, random);
+    }
+}
+
+// Modified: Mahima 25/02/2025
+// Ethnicity is initialised using the CDF of the ethnicity probabilities along with
+// age/gender/region strata
+void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &person,
+                                          Random &random) const {
+    // Delegate to demographic module
+    context.demographic_module().initialise_ethnicity(context, person, random);
+}
+// NOTE: No update ethnicity as it is fixed throughout once assigned
+
+// Modified: Mahima 25/02/2025
+// Physical activity is initialised using the expected value of physical activity based on age,
+// gender, region, ethnicity and income
+void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Person &person,
+                                                  Random &random) const {
+    // Delegate to demographic module
+    context.demographic_module().initialise_physical_activity(context, person, random);
+}
+
+// Modified: Mahima 25/02/2025
+// Income is initialised using the SoftMax of the income probabilities based on age, gender, region,
+// ethnicity
+// this uses a logistic regression model to predict the income category
+void KevinHallModel::initialise_income_continuous(Person &person, Random &random) const {
+    // Delegate to demographic module
+    context_->demographic_module().initialise_income_continuous(person, random);
+}
+
+void KevinHallModel::update_income_continuous(Person &person, Random &random) const {
+    // Removing age check to ensure income is updated for all individuals regardless of age
+    // This treats income as household income rather than individual income
+
+    // Call the income initialization function
+    initialise_income_continuous(person, random);
+}
+
+// Modified: Mahima 25/02/2025, Optimized for large populations
+// Helper function to calculate income thresholds once for the entire population
+std::tuple<double, double, double>
+KevinHallModel::calculate_income_thresholds(const Population &population) const {
+    return context_->demographic_module().calculate_income_thresholds(population);
+}
+
+// Modified: Mahima 25/02/2025, Optimized for large populations
+// Income category is initialised using the quartiles of the income_continuous values
+// This method now only assigns the category based on pre-calculated thresholds
+void KevinHallModel::initialise_income_category(Person &person, double q1_threshold,
+                                                double q2_threshold, double q3_threshold) const {
+    // Delegate to demographic module
+    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold,
+                                                              q3_threshold);
+}
+
+// Modified to calculate thresholds once for the entire population
+void KevinHallModel::update_income_category(RuntimeContext &context) const {
+    static int last_update_year = 0;
+    int current_year = context.time_now();
+
+    // Update quartiles every 5 years
+    if (current_year - last_update_year >= 5) {
+        // Calculate thresholds once for the entire population
+        auto [q1_threshold, q2_threshold, q3_threshold] =
+            calculate_income_thresholds(context.population());
+
+        std::cout << "INFO: Updating income categories with thresholds Q1=" << q1_threshold
+                  << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+
+        // Validate thresholds are properly ordered
+        if (q1_threshold > q2_threshold || q2_threshold > q3_threshold) {
+            std::cerr
+                << "ERROR: Income thresholds are incorrectly ordered in update_income_category"
+                << std::endl;
+            // Fix by using percentages of range
+            double min_income = 23.0;
+            double max_income = 2375.0;
+            double range = max_income - min_income;
+            q1_threshold = min_income + range * 0.25;
+            q2_threshold = min_income + range * 0.5;
+            q3_threshold = min_income + range * 0.75;
+            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold
+                      << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+        }
+
+        // Track inconsistencies during update
+        int inconsistency_count = 0;
+        int fixed_count = 0;
+
+        // Apply thresholds to each person
+        for (auto &person : context.population()) {
+            if (person.is_active()) {
+                // Store original category for comparison
+                auto original_category = person.income_category;
+
+                // Get income value and ensure it's within valid range
+                double income_value = std::max(23.0, std::min(2375.0, person.income_continuous));
+
+                // Check if income continuous and category are consistent
+                bool is_consistent = true;
+                if ((person.income_category == core::Income::low && income_value >= q1_threshold) ||
+                    (person.income_category == core::Income::lowermiddle &&
+                     (income_value < q1_threshold || income_value >= q2_threshold)) ||
+                    (person.income_category == core::Income::uppermiddle &&
+                     (income_value < q2_threshold || income_value >= q3_threshold)) ||
+                    (person.income_category == core::Income::high && income_value < q3_threshold)) {
+                    is_consistent = false;
+                    inconsistency_count++;
+
+                    // Resynchronize by updating the category based on income value
+                    initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+                    fixed_count++;
+
+                    // Debug specific cases for first few inconsistencies
+                    if (inconsistency_count <= 5) {
+                        std::cout << "FIXED: Person " << person.id() << " Income=" << income_value;
+
+                        std::cout << ", Category changed from ";
+                        switch (original_category) {
+                        case core::Income::low:
+                            std::cout << "Low";
+                            break;
+                        case core::Income::lowermiddle:
+                            std::cout << "Lower Middle";
+                            break;
+                        case core::Income::uppermiddle:
+                            std::cout << "Upper Middle";
+                            break;
+                        case core::Income::high:
+                            std::cout << "High";
+                            break;
+                        default:
+                            std::cout << "Unknown";
+                        }
+
+                        std::cout << " to ";
+                        switch (person.income_category) {
+                        case core::Income::low:
+                            std::cout << "Low";
+                            break;
+                        case core::Income::lowermiddle:
+                            std::cout << "Lower Middle";
+                            break;
+                        case core::Income::uppermiddle:
+                            std::cout << "Upper Middle";
+                            break;
+                        case core::Income::high:
+                            std::cout << "High";
+                            break;
+                        default:
+                            std::cout << "Unknown";
+                        }
+                        std::cout << std::endl;
+                    }
+                } else {
+                    // Already consistent, no action needed
+                }
+
+                // Special rule for edge cases - very low income should never be High
+                if (income_value <= 30.0 && person.income_category == core::Income::high) {
+                    person.income_category = core::Income::low;
+                    std::cout << "OVERRIDE: Forcing Low category for very low income ("
+                              << income_value << ") for person " << person.id() << std::endl;
+                }
+
+                // Special rule for edge cases - very high income should never be Low
+                if (income_value >= 2300.0 && person.income_category == core::Income::low) {
+                    person.income_category = core::Income::high;
+                    std::cout << "OVERRIDE: Forcing High category for very high income ("
+                              << income_value << ") for person " << person.id() << std::endl;
+                }
+            }
+        }
+
+        if (inconsistency_count > 0) {
+            std::cout << "INFO: Fixed " << fixed_count << " of " << inconsistency_count
+                      << " income category inconsistencies ("
+                      << (100.0 * inconsistency_count / context.population().current_active_size())
+                      << "% of active population)" << std::endl;
+        }
+
+        last_update_year = current_year;
+    }
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
@@ -764,13 +1654,20 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    std::unordered_map<core::Gender, double> height_slope)
+    std::unordered_map<core::Gender, double> height_slope,
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double income_continuous_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
+      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)},
+      region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -799,10 +1696,13 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_);
+    return std::make_unique<KevinHallModel>(
+        std::make_shared<RiskFactorSexAgeTable>(*expected_),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_),
+        std::make_shared<std::unordered_map<core::Identifier, int>>(*trend_steps_),
+        energy_equation_, nutrient_ranges_, nutrient_equations_, food_prices_, weight_quantiles_,
+        epa_quantiles_, height_stddev_, height_slope_, region_models_, ethnicity_models_,
+        income_models_, income_continuous_stddev_);
 }
 
 } // namespace hgps

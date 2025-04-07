@@ -1,5 +1,6 @@
 #pragma once
 #include <any>
+#include <memory>
 #include <string>
 #include <typeinfo>
 
@@ -13,14 +14,18 @@ class DataTableColumn {
     /// @brief Initialises a new instance of the DataTableColumn class.
     DataTableColumn() = default;
 
-    DataTableColumn(const DataTableColumn &) = delete;
-    DataTableColumn &operator=(const DataTableColumn &) = delete;
-
-    DataTableColumn(DataTableColumn &&) = delete;
-    DataTableColumn &operator=(DataTableColumn &&) = delete;
-
-    /// @brief Destroys a DataTableColumn instance
+    /// @brief Virtual destructor
     virtual ~DataTableColumn() = default;
+
+    /// @brief Copy constructor
+    DataTableColumn(const DataTableColumn &) = default;
+    /// @brief Copy assignment operator
+    DataTableColumn &operator=(const DataTableColumn &) = default;
+
+    /// @brief Move constructor
+    DataTableColumn(DataTableColumn &&) = default;
+    /// @brief Move assignment operator
+    DataTableColumn &operator=(DataTableColumn &&) = default;
 
     /// @brief Gets the column type name
     /// @return Column type name
@@ -56,5 +61,9 @@ class DataTableColumn {
     /// @brief Double dispatch the column using a visitor implementation
     /// @param visitor The visitor instance to accept
     virtual void accept(DataTableColumnVisitor &visitor) const = 0;
+
+    /// @brief Creates a deep copy of this column
+    /// @return A unique pointer to the new column copy
+    virtual std::unique_ptr<DataTableColumn> clone() const = 0;
 };
 } // namespace hgps::core

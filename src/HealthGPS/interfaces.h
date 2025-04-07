@@ -35,20 +35,37 @@ class SimulationModule {
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier
-    virtual SimulationModuleType type() const noexcept = 0;
+    virtual SimulationModuleType type() const = 0;
 
     /// @brief Gets the module name
     /// @return The human-readable module name
-    virtual const std::string &name() const noexcept = 0;
+    virtual std::string name() const = 0;
 
     /// @brief Initialises the virtual population
     /// @param context The simulation shared runtime context instance
-    virtual void initialise_population(RuntimeContext &context) = 0;
+    /// @param population The virtual population
+    /// @param random The random number generator
+    virtual void initialise_population(RuntimeContext &context, Population &population,
+                                       Random &random) = 0;
+
+    /// @brief Updates the virtual population status
+    /// @param context The simulation run-time context
+    virtual void update_population(RuntimeContext &context) = 0;
 };
 
 /// @brief Generic disease module interface to host multiple diseases model
 class UpdatableModule : public SimulationModule {
   public:
+    /// @brief Destroys a UpdatableModule instance
+    virtual ~UpdatableModule() override = default;
+
+    /// @brief Initialises the virtual population
+    /// @param context The simulation shared runtime context instance
+    /// @param population The virtual population
+    /// @param random The random number generator
+    virtual void initialise_population(RuntimeContext &context, Population &population,
+                                       Random &random) override = 0;
+
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context
     virtual void update_population(RuntimeContext &context) = 0;
@@ -57,6 +74,9 @@ class UpdatableModule : public SimulationModule {
 /// @brief Generic risk factors module interface to host risk factor models
 class RiskFactorHostModule : public UpdatableModule {
   public:
+    /// @brief Destroys a RiskFactorHostModule instance
+    ~RiskFactorHostModule() override = default;
+
     /// @brief Gets the number of diseases model hosted
     /// @return Number of hosted diseases models
     virtual std::size_t size() const noexcept = 0;
@@ -65,6 +85,17 @@ class RiskFactorHostModule : public UpdatableModule {
     /// @param modelType The model type identifier
     /// @return true if the model is found, otherwise false.
     virtual bool contains(const RiskFactorModelType &modelType) const noexcept = 0;
+
+    /// @brief Initialises the virtual population
+    /// @param context The simulation shared runtime context instance
+    /// @param population The virtual population
+    /// @param random The random number generator
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override = 0;
+
+    /// @brief Updates the virtual population status
+    /// @param context The simulation run-time context
+    virtual void update_population(RuntimeContext &context) = 0;
 };
 
 /// @brief Define the population record data type for the demographic dataset

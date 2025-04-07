@@ -61,6 +61,8 @@ class SimplePolicyScenario final : public InterventionScenario {
 
     const std::vector<PolicyImpact> &impacts() const noexcept override;
 
+    std::string name() override { return "Intervention"; }
+
   private:
     std::reference_wrapper<SyncChannel> channel_;
     SimplePolicyDefinition definition_;

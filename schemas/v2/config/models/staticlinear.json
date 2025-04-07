@@ -67,7 +67,7 @@
                     "Intercept",
                     "Coefficients"
                 ],
-                "additionalProperties": false
+                "additionalProperties": true
             }
         },
         "PhysicalActivityModels": {

@@ -25,9 +25,10 @@ class SESNoiseModule final : public UpdatableModule {
 
     SimulationModuleType type() const noexcept override;
 
-    const std::string &name() const noexcept override;
+    std::string name() const noexcept override;
 
-    void initialise_population(RuntimeContext &context) override;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
     void update_population(RuntimeContext &context) override;
 
@@ -35,6 +36,7 @@ class SESNoiseModule final : public UpdatableModule {
     std::string function_;
     std::vector<double> parameters_;
     std::string name_{"SES"};
+    double noise_stddev_{0.1}; // Standard deviation for income noise
 };
 
 /// @brief Builds a new instance of the SESNoiseModule using the given data infrastructure
