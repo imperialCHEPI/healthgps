@@ -800,7 +800,8 @@ double KevinHallModel::compute_G(double CI, double CI_0, double G_0) const {
 }
 
 double KevinHallModel::compute_ECF(double delta_Na, double CI, double CI_0, double ECF_0) const {
-    return ECF_0 + (delta_Na - xi_CI * (1.0 - CI / CI_0)) / xi_Na;
+    // Add minimum threshold 1.0 to prevent division by near-zero values- Mahima
+    return ECF_0 + (delta_Na - xi_CI * (1.0 - CI / std::max(CI_0, 1.0))) / xi_Na;
 }
 
 double KevinHallModel::compute_delta(int age, core::Gender sex, double PAL, double BW,
@@ -910,15 +911,8 @@ void KevinHallModel::compute_bmi(Person &person) const {
         reason += "Invalid BMI: " + std::to_string(bmi) + " (w/h²=" + std::to_string(w) + "/" +
                   std::to_string(h) + "²)";
 
-        if (!logged) {
-            std::cerr << "WARNING: Invalid BMI " << bmi << " calculated for person " << person.id()
-                      << " (age " << person.age << ", gender "
-                      << (person.gender == core::Gender::male ? "M" : "F") << ", weight " << w
-                      << ", height " << h << ")" << std::endl;
-        }
-
-        // Set to a reasonable value based on age, sex
-        bmi = 22.0; // Default reasonable BMI
+        // Set to a reasonable value based on age, sex- ONLY FOR WORST CASE SCENARIO
+        bmi = 24.0; // Default reasonable BMI
 
         if (person.gender == core::Gender::male) {
             if (person.age < 18)
