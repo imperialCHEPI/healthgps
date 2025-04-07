@@ -106,6 +106,10 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust weight mean to match expected
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    
+    //Added for FINCH- Mahima
+    // Adjust physical activity mean to match expected
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
 
     // Compute weight power means by sex and age
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -144,6 +148,9 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
             update_region(context, person, context.random());
         }
     }
+    
+    // Adjust physical activity mean to match expected
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
@@ -185,6 +192,22 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     }
 
     // NOTE: FOR REFACTORING: End of semi-redundant block.
+
+    // Adjust physical activity for newborns to match expected
+    for (auto &person : context.population()) {
+        // Ignore if inactive or not newborn.
+        if (!person.is_active() || (person.age != 0)) {
+            continue;
+        }
+        
+        // Initialize physical activity if not already done
+        if (!person.risk_factors.contains("PhysicalActivity"_id)) {
+            initialise_physical_activity(context, person, context.random());
+        }
+    }
+    
+    // Adjust physical activity mean to match expected for newborns
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
 
     // Compute newborn weight power means by sex.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
