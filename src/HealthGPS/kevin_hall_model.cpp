@@ -1,6 +1,6 @@
 #include "HealthGPS.Core/exception.h"
+#include <fstream> // Add for file output
 #include <iostream>
-#include <fstream>  // Add for file output
 
 // Disable specific warnings from external dependencies
 #ifdef _MSC_VER
@@ -39,37 +39,33 @@ using KevinHallAdjustmentMessage =
     hgps::SyncDataMessage<hgps::UnorderedMap2d<hgps::core::Gender, int, double>>;
 
 // Helper function to create a debug CSV for invalid BMI calculations
-void log_invalid_bmi_to_csv(
-    const hgps::Person& person, 
-    double w, double h, double bmi, 
-    const std::string& reason, 
-    bool create_header = false) 
-{
+void log_invalid_bmi_to_csv(const hgps::Person &person, double w, double h, double bmi,
+                            const std::string &reason, bool create_header = false) {
     static std::ofstream debug_file;
     static bool file_initialized = false;
-    
+
     // Initialize file if needed
     if (!file_initialized) {
         debug_file.open("invalid_bmi_debug.csv");
         file_initialized = true;
-        
+
         // Write header
         debug_file << "PersonID,Age,Gender,BMI,Weight,Height,BodyFat,LeanTissue,Glycogen,ECF,";
         debug_file << "EnergyIntake,EnergyIntake_previous,PhysicalActivity,";
         debug_file << "Carbohydrate,Carbohydrate_previous,Sodium,Sodium_previous,";
         debug_file << "Intercept_K,Height_residual,Reason" << std::endl;
     }
-    
+
     // Record gender as string
     std::string gender_str = (person.gender == hgps::core::Gender::male) ? "M" : "F";
-    
+
     // Start with basic person info
-    debug_file << person.id() << "," << person.age << "," << gender_str << ","
-               << bmi << "," << w << "," << h << ",";
-    
+    debug_file << person.id() << "," << person.age << "," << gender_str << "," << bmi << "," << w
+               << "," << h << ",";
+
     // Add reason for invalid BMI
     debug_file << reason << std::endl;
-    
+
     // Flush to ensure data is written immediately
     debug_file.flush();
 }
@@ -650,16 +646,17 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     if (std::abs(a1 * b2 - a2 * b1) < 1e-10) {
         // We're about to divide by a near-zero value, which will cause instability
         std::ofstream debug_file("kevin_hall_division_error.csv", std::ios_base::app);
-        debug_file << person.id() << "," << person.age << "," 
+        debug_file << person.id() << "," << person.age << ","
                    << (person.gender == core::Gender::male ? "M" : "F") << ","
-                   << "Near-zero denominator," 
+                   << "Near-zero denominator,"
                    << "a1=" << a1 << ",b2=" << b2 << ",a2=" << a2 << ",b1=" << b1 << ","
                    << "denom=" << (a1 * b2 - a2 * b1) << ","
                    << "F_0=" << F_0 << ",L_0=" << L_0 << ","
                    << "BW_0=" << BW_0 << ",delta=" << delta << std::endl;
-        
+
         // Set weight to expected value and return early to avoid division by zero
-        double expected_weight = get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
+        double expected_weight =
+            get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
         person.risk_factors.at("Weight"_id) = expected_weight;
         return;
     }
@@ -672,9 +669,9 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     if (steady_F < 0 || steady_F > 150 || steady_L < 0 || steady_L > 200) {
         // Log extreme steady state values
         std::ofstream debug_file("kevin_hall_extreme_steady_state.csv", std::ios_base::app);
-        debug_file << person.id() << "," << person.age << "," 
+        debug_file << person.id() << "," << person.age << ","
                    << (person.gender == core::Gender::male ? "M" : "F") << ","
-                   << "Extreme steady state," 
+                   << "Extreme steady state,"
                    << "steady_F=" << steady_F << ",steady_L=" << steady_L << ","
                    << "a1=" << a1 << ",b1=" << b1 << ",c1=" << c1 << ","
                    << "a2=" << a2 << ",b2=" << b2 << ",c2=" << c2 << ","
@@ -689,12 +686,12 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     if (tau <= 0 || tau > 10000) {
         // Log extreme time constant values
         std::ofstream debug_file("kevin_hall_extreme_tau.csv", std::ios_base::app);
-        debug_file << person.id() << "," << person.age << "," 
+        debug_file << person.id() << "," << person.age << ","
                    << (person.gender == core::Gender::male ? "M" : "F") << ","
-                   << "Extreme tau value," 
+                   << "Extreme tau value,"
                    << "tau=" << tau << ",p=" << p << ",x=" << x << ","
                    << "delta=" << delta << std::endl;
-        
+
         // Clamp tau to reasonable range
         tau = std::max(1.0, std::min(2000.0, tau));
     }
@@ -707,12 +704,12 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     double BW = F + L + G + W + ECF;
 
     // Get weight range from config
-    double MIN_WEIGHT = 1.0;    // Default minimum weight (kg)
-    double MAX_WEIGHT = 210.0;  // Default maximum weight (kg)
-    
+    double MIN_WEIGHT = 1.0;   // Default minimum weight (kg)
+    double MAX_WEIGHT = 210.0; // Default maximum weight (kg)
+
     // Get actual ranges from config if available
     if (nutrient_ranges_.contains("Weight"_id)) {
-        const auto& weight_range = nutrient_ranges_.at("Weight"_id);
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
         MIN_WEIGHT = weight_range.lower();
         MAX_WEIGHT = weight_range.upper();
     }
@@ -721,34 +718,38 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
     if (std::isnan(BW) || std::isinf(BW) || BW < MIN_WEIGHT || BW > MAX_WEIGHT) {
         // Create a detailed diagnostic log
         std::ofstream debug_file("kevin_hall_invalid_weight.csv", std::ios_base::app);
-        
+
         // Add header if file is newly created
         if (debug_file.tellp() == 0) {
             debug_file << "PersonID,Age,Gender,Reason,Initial_Weight,Calculated_Weight,"
                        << "F,L,G,W,ECF,PAL,EI,CI,Na,delta,tau,"
                        << "steady_F,steady_L,F_0,L_0" << std::endl;
         }
-        
+
         // Prepare reason string
         std::string reason;
-        if (std::isnan(BW)) reason = "NaN weight";
-        else if (std::isinf(BW)) reason = "Infinite weight";
-        else if (BW < MIN_WEIGHT) reason = "Too low weight";
-        else if (BW > MAX_WEIGHT) reason = "Too high weight";
-        
+        if (std::isnan(BW))
+            reason = "NaN weight";
+        else if (std::isinf(BW))
+            reason = "Infinite weight";
+        else if (BW < MIN_WEIGHT)
+            reason = "Too low weight";
+        else if (BW > MAX_WEIGHT)
+            reason = "Too high weight";
+
         // Write diagnostic info
-        debug_file << person.id() << "," << person.age << "," 
-                   << (person.gender == core::Gender::male ? "M" : "F") << ","
-                   << reason << "," << BW_0 << "," << BW << ","
-                   << F << "," << L << "," << G << "," << W << "," << ECF << ","
-                   << PAL << "," << EI << "," << CI << "," << Na << "," 
-                   << delta << "," << tau << ","
-                   << steady_F << "," << steady_L << "," << F_0 << "," << L_0 << std::endl;
-        
+        debug_file << person.id() << "," << person.age << ","
+                   << (person.gender == core::Gender::male ? "M" : "F") << "," << reason << ","
+                   << BW_0 << "," << BW << "," << F << "," << L << "," << G << "," << W << ","
+                   << ECF << "," << PAL << "," << EI << "," << CI << "," << Na << "," << delta
+                   << "," << tau << "," << steady_F << "," << steady_L << "," << F_0 << "," << L_0
+                   << std::endl;
+
         // Clamp to valid range
         if (std::isnan(BW) || std::isinf(BW)) {
             // Use expected value from table
-            BW = get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
+            BW =
+                get_expected(*context_, person.gender, person.age, "Weight"_id, std::nullopt, true);
             // Also reset component values proportionally
             double ratio = BW / (F_0 + L_0 + G + W + ECF_0);
             F = F_0 * ratio;
@@ -761,11 +762,13 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
                 MAX_WEIGHT *= age_factor;
             }
             BW = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, BW));
-            
+
             // Adjust F and L proportionally if needed
-            if (F < 0) F = 0.2 * BW; // Minimum healthy body fat
-            if (L < 0) L = 0.6 * BW; // Minimum lean mass
-            
+            if (F < 0)
+                F = 0.2 * BW; // Minimum healthy body fat
+            if (L < 0)
+                L = 0.6 * BW; // Minimum lean mass
+
             // Ensure components sum to BW
             double components_sum = F + L + G + W + ECF;
             if (components_sum > 0) {
@@ -821,31 +824,31 @@ double KevinHallModel::compute_EE(double BW, double F, double L, double EI, doub
 }
 
 void KevinHallModel::compute_bmi(Person &person) const {
-    // Use ranges from the configuration (factors in the static_linear_model.cpp contains these values)
-    // Just hard coding in to make sure- MAHIMA
-    // Don't worry the code will only use the config values
-    double MIN_WEIGHT = 1.0;    // Default minimum weight (kg)
-    double MAX_WEIGHT = 210.0;  // Default maximum weight (kg)
-    double MIN_HEIGHT = 44.0;   // Default minimum height (cm)
-    double MAX_HEIGHT = 203.2;  // Default maximum height (cm)
-    double MIN_BMI = 14.26126;  // Default minimum BMI
-    double MAX_BMI = 45.84575;  // Default maximum BMI
+    // Use ranges from the configuration (factors in the static_linear_model.cpp contains these
+    // values) Just hard coding in to make sure- MAHIMA Don't worry the code will only use the
+    // config values
+    double MIN_WEIGHT = 1.0;   // Default minimum weight (kg)
+    double MAX_WEIGHT = 210.0; // Default maximum weight (kg)
+    double MIN_HEIGHT = 44.0;  // Default minimum height (cm)
+    double MAX_HEIGHT = 203.2; // Default maximum height (cm)
+    double MIN_BMI = 14.26126; // Default minimum BMI
+    double MAX_BMI = 45.84575; // Default maximum BMI
 
     // Get actual ranges from config if available
     if (nutrient_ranges_.contains("Weight"_id)) {
-        const auto& weight_range = nutrient_ranges_.at("Weight"_id);
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
         MIN_WEIGHT = weight_range.lower();
         MAX_WEIGHT = weight_range.upper();
     }
-    
+
     if (nutrient_ranges_.contains("Height"_id)) {
-        const auto& height_range = nutrient_ranges_.at("Height"_id);
+        const auto &height_range = nutrient_ranges_.at("Height"_id);
         MIN_HEIGHT = height_range.lower();
         MAX_HEIGHT = height_range.upper();
     }
-    
+
     if (nutrient_ranges_.contains("BMI"_id)) {
-        const auto& bmi_range = nutrient_ranges_.at("BMI"_id);
+        const auto &bmi_range = nutrient_ranges_.at("BMI"_id);
         MIN_BMI = bmi_range.lower();
         MAX_BMI = bmi_range.upper();
     }
@@ -853,17 +856,18 @@ void KevinHallModel::compute_bmi(Person &person) const {
     // Get weight and height, with validation
     double w = person.risk_factors.at("Weight"_id);
     double h = person.risk_factors.at("Height"_id);
-    
+
     // Log extreme values
     bool logged = false;
     std::string reason;
-    
+
     if (std::isnan(w) || std::isinf(w) || w < MIN_WEIGHT || w > MAX_WEIGHT) {
         reason = "Invalid weight: " + std::to_string(w);
-        std::cerr << "WARNING: Invalid weight " << w << " for person " << person.id() 
-                  << " (age " << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F") << ")" << std::endl;
+        std::cerr << "WARNING: Invalid weight " << w << " for person " << person.id() << " (age "
+                  << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F")
+                  << ")" << std::endl;
         logged = true;
-        
+
         // Clamp to valid range
         if (std::isnan(w) || std::isinf(w)) {
             // Use expected value from table
@@ -871,74 +875,82 @@ void KevinHallModel::compute_bmi(Person &person) const {
         } else {
             w = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, w));
         }
-        
+
         // Update the person's weight
         person.risk_factors["Weight"_id] = w;
     }
-    
+
     if (std::isnan(h) || std::isinf(h) || h < MIN_HEIGHT || h > MAX_HEIGHT) {
         reason = reason.empty() ? "" : reason + "; ";
         reason += "Invalid height: " + std::to_string(h);
-        std::cerr << "WARNING: Invalid height " << h << " for person " << person.id() 
-                  << " (age " << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F") << ")" << std::endl;
+        std::cerr << "WARNING: Invalid height " << h << " for person " << person.id() << " (age "
+                  << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F")
+                  << ")" << std::endl;
         logged = true;
-        
+
         // Clamp to valid range
         if (std::isnan(h) || std::isinf(h)) {
             // Use expected value from table
-            h = get_expected(*context_, person.gender, person.age, "Height"_id, std::nullopt, false);
+            h = get_expected(*context_, person.gender, person.age, "Height"_id, std::nullopt,
+                             false);
         } else {
             h = std::max(MIN_HEIGHT, std::min(MAX_HEIGHT, h));
         }
-        
+
         // Update the person's height
         person.risk_factors["Height"_id] = h;
     }
 
     // Calculate BMI with validated values
-    double bmi = w / pow(h/100.0, 2);
-    
+    double bmi = w / pow(h / 100.0, 2);
+
     // Validate BMI result
     if (std::isnan(bmi) || std::isinf(bmi) || bmi < MIN_BMI || bmi > MAX_BMI) {
         reason = reason.empty() ? "" : reason + "; ";
-        reason += "Invalid BMI: " + std::to_string(bmi) + " (w/h²=" + std::to_string(w) + "/" + std::to_string(h) + "²)";
-        
+        reason += "Invalid BMI: " + std::to_string(bmi) + " (w/h²=" + std::to_string(w) + "/" +
+                  std::to_string(h) + "²)";
+
         if (!logged) {
-            std::cerr << "WARNING: Invalid BMI " << bmi << " calculated for person " << person.id() 
-                      << " (age " << person.age << ", gender " << (person.gender == core::Gender::male ? "M" : "F") 
-                      << ", weight " << w << ", height " << h << ")" << std::endl;
+            std::cerr << "WARNING: Invalid BMI " << bmi << " calculated for person " << person.id()
+                      << " (age " << person.age << ", gender "
+                      << (person.gender == core::Gender::male ? "M" : "F") << ", weight " << w
+                      << ", height " << h << ")" << std::endl;
         }
-        
+
         // Set to a reasonable value based on age, sex
         bmi = 22.0; // Default reasonable BMI
-        
+
         if (person.gender == core::Gender::male) {
-            if (person.age < 18) bmi = 19.0;
-            else if (person.age > 65) bmi = 24.0;
+            if (person.age < 18)
+                bmi = 19.0;
+            else if (person.age > 65)
+                bmi = 24.0;
         } else {
-            if (person.age < 18) bmi = 18.0;
-            else if (person.age > 65) bmi = 25.0;
+            if (person.age < 18)
+                bmi = 18.0;
+            else if (person.age > 65)
+                bmi = 25.0;
         }
-        
+
         // Ensure BMI is within range
         bmi = std::max(MIN_BMI, std::min(MAX_BMI, bmi));
-        
+
         // Log details to CSV for debugging
         log_invalid_bmi_to_csv(person, w, h, bmi, reason);
     }
-    
+
     // Set validated BMI
     person.risk_factors["BMI"_id] = bmi;
 }
 
 void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) const {
     // Get weight range from config
-    double MIN_WEIGHT = 1.0;  // Default minimum weight (kg)
-    double MAX_WEIGHT = 210.0;  // Default maximum weight (kg)
-    
+    double MIN_WEIGHT = 1.0;   // Default minimum weight (kg)
+    double MAX_WEIGHT = 210.0; // Default maximum weight (kg)
+
     // Get actual ranges from config if available
     if (nutrient_ranges_.contains("Weight"_id)) {
-        const auto& weight_range = nutrient_ranges_.at("Weight"_id);
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
         MIN_WEIGHT = weight_range.lower();
         MAX_WEIGHT = weight_range.upper();
     }
@@ -948,8 +960,8 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
         double ei_expected =
             get_expected(context, person.gender, person.age, "EnergyIntake"_id, std::nullopt, true);
         double pa_expected = get_expected(context, person.gender, person.age, "PhysicalActivity"_id,
-                                        std::nullopt, false);
-        
+                                          std::nullopt, false);
+
         // Safety check for physical activity
         if (pa_expected <= 0.01 || std::isnan(pa_expected) || std::isinf(pa_expected)) {
             // Only log truly invalid values, not just out-of-range ones
@@ -958,21 +970,21 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             }
             pa_expected = 1.5; // Reasonable default value
         }
-        
+
         double epa_expected = ei_expected / pa_expected;
-        
+
         // Safety check for expected energy intake
         if (std::isnan(ei_expected) || std::isinf(ei_expected) || ei_expected <= 0) {
             // Only log truly invalid values, not just out-of-range ones
             if (std::isnan(ei_expected) || std::isinf(ei_expected)) {
                 std::cerr << "WARNING: Invalid energy intake value detected" << std::endl;
             }
-            
+
             // Use reasonable defaults based on age and gender
             if (person.age < 2) {
                 ei_expected = 800.0; // Infant
             } else if (person.age < 10) {
-                ei_expected = 1500.0; // Child 
+                ei_expected = 1500.0; // Child
             } else if (person.age < 18) {
                 ei_expected = person.gender == core::Gender::male ? 2500.0 : 2000.0; // Teenager
             } else {
@@ -980,11 +992,11 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             }
             epa_expected = ei_expected / pa_expected;
         }
-    
+
         // Compute E/PA actual.
         double ei_actual = person.risk_factors.at("EnergyIntake"_id);
         double pa_actual = person.risk_factors.at("PhysicalActivity"_id);
-        
+
         // Safety check for actual physical activity
         if (pa_actual <= 0.01 || std::isnan(pa_actual) || std::isinf(pa_actual)) {
             // Only log truly invalid values, not just out-of-range ones
@@ -994,7 +1006,7 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             pa_actual = pa_expected; // Use expected value as fallback
             person.risk_factors["PhysicalActivity"_id] = pa_actual;
         }
-        
+
         // Safety check for actual energy intake
         if (std::isnan(ei_actual) || std::isinf(ei_actual) || ei_actual <= 0) {
             // Only log truly invalid values, not just out-of-range ones
@@ -1004,30 +1016,32 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             ei_actual = ei_expected; // Use expected value as fallback
             person.risk_factors["EnergyIntake"_id] = ei_actual;
         }
-        
+
         double epa_actual = ei_actual / pa_actual;
-    
+
         // Compute E/PA quantile with safety check
         double epa_quantile = epa_actual / epa_expected;
-        if (std::isnan(epa_quantile) || std::isinf(epa_quantile) || epa_quantile <= 0 || epa_quantile > 10) {
+        if (std::isnan(epa_quantile) || std::isinf(epa_quantile) || epa_quantile <= 0 ||
+            epa_quantile > 10) {
             // Only log truly invalid values, not just out-of-range ones
             if (std::isnan(epa_quantile) || std::isinf(epa_quantile)) {
                 std::cerr << "WARNING: Invalid EPA quantile value detected" << std::endl;
             }
             epa_quantile = 1.0; // Use neutral quantile as fallback
         }
-    
+
         // Compute new weight.
         double w_expected =
             get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
-            
+
         // Safety check for expected weight
-        if (std::isnan(w_expected) || std::isinf(w_expected) || w_expected < MIN_WEIGHT || w_expected > MAX_WEIGHT) {
+        if (std::isnan(w_expected) || std::isinf(w_expected) || w_expected < MIN_WEIGHT ||
+            w_expected > MAX_WEIGHT) {
             // Only log truly invalid values, not just out-of-range ones
             if (std::isnan(w_expected) || std::isinf(w_expected)) {
                 std::cerr << "WARNING: Invalid expected weight value detected" << std::endl;
             }
-                      
+
             // Use reasonable defaults based on age and gender
             if (person.age < 1) {
                 w_expected = 4.0 + (person.age * 6.0); // Infant (grows from ~4kg to ~10kg)
@@ -1035,21 +1049,23 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
                 w_expected = 10.0 + ((person.age - 1) * 3.0); // Child (grows ~3kg per year)
             } else if (person.age < 18) {
                 if (person.gender == core::Gender::male) {
-                    w_expected = 30.0 + ((person.age - 10) * 5.0); // Male teen (grows ~5kg per year)
+                    w_expected =
+                        30.0 + ((person.age - 10) * 5.0); // Male teen (grows ~5kg per year)
                 } else {
-                    w_expected = 30.0 + ((person.age - 10) * 4.0); // Female teen (grows ~4kg per year)
+                    w_expected =
+                        30.0 + ((person.age - 10) * 4.0); // Female teen (grows ~4kg per year)
                 }
             } else {
                 // Adult
                 w_expected = person.gender == core::Gender::male ? 70.0 : 60.0;
             }
-            
+
             // Ensure within range
             w_expected = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, w_expected));
         }
-        
+
         double w_quantile = get_weight_quantile(epa_quantile, person.gender);
-        
+
         // Safety check for weight quantile
         if (std::isnan(w_quantile) || std::isinf(w_quantile) || w_quantile <= 0 || w_quantile > 5) {
             // Only log truly invalid values, not just out-of-range ones
@@ -1058,9 +1074,9 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             }
             w_quantile = 1.0; // Use neutral quantile as fallback
         }
-        
+
         double final_weight = w_expected * w_quantile;
-        
+
         // Final safety check on calculated weight - silently clamp out-of-range values
         if (std::isnan(final_weight) || std::isinf(final_weight)) {
             // Only log truly invalid values
@@ -1070,12 +1086,12 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             // Silently clamp to range without warning messages
             final_weight = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, w_expected));
         }
-        
+
         person.risk_factors["Weight"_id] = final_weight;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         // Handle any exceptions during weight calculation
         std::cerr << "ERROR: Exception in initialise_weight: " << e.what() << std::endl;
-                  
+
         // Set a reasonable default weight based on age and gender
         double default_weight;
         if (person.age < 1) {
@@ -1092,10 +1108,10 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
             // Adult
             default_weight = person.gender == core::Gender::male ? 70.0 : 60.0;
         }
-        
+
         // Ensure within range
         default_weight = std::max(MIN_WEIGHT, std::min(MAX_WEIGHT, default_weight));
-        
+
         person.risk_factors["Weight"_id] = default_weight;
     }
 }
@@ -1229,24 +1245,25 @@ void KevinHallModel::initialise_height(RuntimeContext &context, Person &person, 
     update_height(context, person, W_power_mean);
 }
 
-void KevinHallModel::update_height(RuntimeContext &context, Person &person, double W_power_mean) const {
+void KevinHallModel::update_height(RuntimeContext &context, Person &person,
+                                   double W_power_mean) const {
     // Get height range from config
     double MIN_HEIGHT = 44.0;  // Default minimum height (cm)
-    double MAX_HEIGHT = 203.2;  // Default maximum height (cm)
-    
+    double MAX_HEIGHT = 203.2; // Default maximum height (cm)
+
     // Get actual ranges from config if available
     if (nutrient_ranges_.contains("Height"_id)) {
-        const auto& height_range = nutrient_ranges_.at("Height"_id);
+        const auto &height_range = nutrient_ranges_.at("Height"_id);
         MIN_HEIGHT = height_range.lower();
         MAX_HEIGHT = height_range.upper();
     }
-    
+
     // Get weight range from config
-    double MIN_WEIGHT = 1.0;  // Default
-    double MAX_WEIGHT = 210.0;  // Default
-    
+    double MIN_WEIGHT = 1.0;   // Default
+    double MAX_WEIGHT = 210.0; // Default
+
     if (nutrient_ranges_.contains("Weight"_id)) {
-        const auto& weight_range = nutrient_ranges_.at("Weight"_id);
+        const auto &weight_range = nutrient_ranges_.at("Weight"_id);
         MIN_WEIGHT = weight_range.lower();
         MAX_WEIGHT = weight_range.upper();
     }
@@ -1255,7 +1272,7 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person, doub
         // Check weight is valid
         double W = person.risk_factors.at("Weight"_id);
         if (std::isnan(W) || std::isinf(W) || W < MIN_WEIGHT || W > MAX_WEIGHT) {
-            std::cerr << "WARNING: Invalid weight (" << W << ") for person " << person.id() 
+            std::cerr << "WARNING: Invalid weight (" << W << ") for person " << person.id()
                       << " in update_height, using expected value" << std::endl;
             // Use expected value from table
             W = get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
@@ -1264,23 +1281,24 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person, doub
             // Update the person's weight
             person.risk_factors["Weight"_id] = W;
         }
-        
+
         // Validate W_power_mean
         if (std::isnan(W_power_mean) || std::isinf(W_power_mean) || W_power_mean <= 0) {
-            std::cerr << "WARNING: Invalid W_power_mean (" << W_power_mean << ") for person " << person.id() 
-                      << " in update_height, using weight directly" << std::endl;
+            std::cerr << "WARNING: Invalid W_power_mean (" << W_power_mean << ") for person "
+                      << person.id() << " in update_height, using weight directly" << std::endl;
             // Use a fallback calculation
             W_power_mean = W;
         }
-        
+
         double H_expected =
             get_expected(context, person.gender, person.age, "Height"_id, std::nullopt, false);
-            
+
         // Validate H_expected
-        if (std::isnan(H_expected) || std::isinf(H_expected) || H_expected < MIN_HEIGHT || H_expected > MAX_HEIGHT) {
-            std::cerr << "WARNING: Invalid expected height (" << H_expected << ") for person " << person.id() 
-                      << " in update_height, using default value" << std::endl;
-            
+        if (std::isnan(H_expected) || std::isinf(H_expected) || H_expected < MIN_HEIGHT ||
+            H_expected > MAX_HEIGHT) {
+            std::cerr << "WARNING: Invalid expected height (" << H_expected << ") for person "
+                      << person.id() << " in update_height, using default value" << std::endl;
+
             // Use reasonable defaults based on age and gender
             if (person.age < 1) {
                 H_expected = 50.0 + (person.age * 20.0); // Infant (50-70cm)
@@ -1296,116 +1314,119 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person, doub
                 // Adult
                 H_expected = person.gender == core::Gender::male ? 175.0 : 163.0;
             }
-            
+
             // Ensure within range
             H_expected = std::max(MIN_HEIGHT, std::min(MAX_HEIGHT, H_expected));
         }
-        
+
         // Rest of the function remains the same
         double H_residual = 0.0;
         if (person.risk_factors.contains("Height_residual"_id)) {
             H_residual = person.risk_factors.at("Height_residual"_id);
             // Validate H_residual
-            if (std::isnan(H_residual) || std::isinf(H_residual) || H_residual < -5.0 || H_residual > 5.0) {
-                std::cerr << "WARNING: Invalid height residual (" << H_residual << ") for person " << person.id() 
-                          << " in update_height, using default value" << std::endl;
+            if (std::isnan(H_residual) || std::isinf(H_residual) || H_residual < -5.0 ||
+                H_residual > 5.0) {
+                std::cerr << "WARNING: Invalid height residual (" << H_residual << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
                 H_residual = 0.0;
                 person.risk_factors["Height_residual"_id] = H_residual;
             }
         } else {
             // If Height_residual doesn't exist, initialize it
-            std::cerr << "WARNING: Missing Height_residual for person " << person.id() 
+            std::cerr << "WARNING: Missing Height_residual for person " << person.id()
                       << " in update_height, using default value" << std::endl;
             H_residual = 0.0;
             person.risk_factors["Height_residual"_id] = H_residual;
         }
-        
+
         // Safely get stddev and slope
         double stddev = 0.01; // Default value
         double slope = 0.01;  // Default value
-        
+
         try {
             stddev = height_stddev_.at(person.gender);
             slope = height_slope_.at(person.gender);
-            
+
             // Validate stddev and slope
             if (std::isnan(stddev) || std::isinf(stddev) || stddev <= 0) {
-                std::cerr << "WARNING: Invalid height stddev (" << stddev << ") for person " << person.id() 
-                          << " in update_height, using default value" << std::endl;
+                std::cerr << "WARNING: Invalid height stddev (" << stddev << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
                 stddev = 0.01;
             }
-            
+
             if (std::isnan(slope) || std::isinf(slope) || slope <= 0) {
-                std::cerr << "WARNING: Invalid height slope (" << slope << ") for person " << person.id() 
-                          << " in update_height, using default value" << std::endl;
+                std::cerr << "WARNING: Invalid height slope (" << slope << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
                 slope = 0.01;
             }
-        } catch (const std::out_of_range& ) {
-            std::cerr << "ERROR: Missing height stddev/slope for gender " 
-                      << (person.gender == core::Gender::male ? "male" : "female") 
+        } catch (const std::out_of_range &) {
+            std::cerr << "ERROR: Missing height stddev/slope for gender "
+                      << (person.gender == core::Gender::male ? "male" : "female")
                       << " in update_height, using default values" << std::endl;
         }
-    
+
         // Safely compute height
         double exp_norm_mean = exp(0.5 * stddev * stddev);
-        
+
         // Safety check for exp_norm_mean
         if (std::isnan(exp_norm_mean) || std::isinf(exp_norm_mean) || exp_norm_mean <= 0) {
-            std::cerr << "WARNING: Invalid exp_norm_mean (" << exp_norm_mean << ") for person " << person.id() 
-                      << " in update_height, using default value" << std::endl;
+            std::cerr << "WARNING: Invalid exp_norm_mean (" << exp_norm_mean << ") for person "
+                      << person.id() << " in update_height, using default value" << std::endl;
             exp_norm_mean = 1.0;
         }
-        
+
         // Safely compute power term
         double power_term = 1.0;
         try {
             power_term = pow(W, slope) / W_power_mean;
-            
+
             // Safety check for power term
-            if (std::isnan(power_term) || std::isinf(power_term) || power_term <= 0 || power_term > 10.0) {
-                std::cerr << "WARNING: Invalid power term (" << power_term << ") for person " << person.id() 
-                          << " in update_height, using default value" << std::endl;
+            if (std::isnan(power_term) || std::isinf(power_term) || power_term <= 0 ||
+                power_term > 10.0) {
+                std::cerr << "WARNING: Invalid power term (" << power_term << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
                 power_term = 1.0;
             }
-        } catch (const std::exception& e) {
-            std::cerr << "ERROR: Exception computing power term in update_height for person " 
+        } catch (const std::exception &e) {
+            std::cerr << "ERROR: Exception computing power term in update_height for person "
                       << person.id() << ": " << e.what() << ", using default value" << std::endl;
         }
-        
+
         // Safely compute residual term
         double residual_term = 1.0;
         try {
             residual_term = exp(H_residual) / exp_norm_mean;
-            
+
             // Safety check for residual term
-            if (std::isnan(residual_term) || std::isinf(residual_term) || residual_term <= 0 || residual_term > 10.0) {
-                std::cerr << "WARNING: Invalid residual term (" << residual_term << ") for person " << person.id() 
-                          << " in update_height, using default value" << std::endl;
+            if (std::isnan(residual_term) || std::isinf(residual_term) || residual_term <= 0 ||
+                residual_term > 10.0) {
+                std::cerr << "WARNING: Invalid residual term (" << residual_term << ") for person "
+                          << person.id() << " in update_height, using default value" << std::endl;
                 residual_term = 1.0;
             }
-        } catch (const std::exception& e) {
-            std::cerr << "ERROR: Exception computing residual term in update_height for person " 
+        } catch (const std::exception &e) {
+            std::cerr << "ERROR: Exception computing residual term in update_height for person "
                       << person.id() << ": " << e.what() << ", using default value" << std::endl;
         }
-    
+
         // Compute final height
         double H = H_expected * power_term * residual_term;
-    
+
         // Final validation of height
         if (std::isnan(H) || std::isinf(H) || H < MIN_HEIGHT || H > MAX_HEIGHT) {
-            std::cerr << "WARNING: Final height calculation invalid (" << H << ") for person " << person.id() 
-                      << " in update_height, using expected height" << std::endl;
+            std::cerr << "WARNING: Final height calculation invalid (" << H << ") for person "
+                      << person.id() << " in update_height, using expected height" << std::endl;
             H = H_expected;
         }
-    
+
         // Set height
         person.risk_factors["Height"_id] = H;
-        
-    } catch (const std::exception& e) {
+
+    } catch (const std::exception &e) {
         // Handle any unexpected exceptions
-        std::cerr << "ERROR: Exception in update_height for person " << person.id() 
-                  << ": " << e.what() << std::endl;
-                  
+        std::cerr << "ERROR: Exception in update_height for person " << person.id() << ": "
+                  << e.what() << std::endl;
+
         // Set a reasonable default height based on age and gender
         double default_height;
         if (person.age < 1) {
@@ -1422,10 +1443,10 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person, doub
             // Adult
             default_height = person.gender == core::Gender::male ? 175.0 : 163.0;
         }
-        
+
         // Ensure within range
         default_height = std::max(MIN_HEIGHT, std::min(MAX_HEIGHT, default_height));
-        
+
         person.risk_factors["Height"_id] = default_height;
     }
 }

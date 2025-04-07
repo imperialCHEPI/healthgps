@@ -320,8 +320,8 @@ class KevinHallModelDefinition final : public RiskFactorAdjustableModelDefinitio
     /// @param food_prices The unit price for each food group
     /// @param weight_quantiles The weight quantiles (must be sorted)
     /// @param epa_quantiles The Energy / Physical Activity quantiles (must be sorted)
-    /// @param height_stddev The 
-    /// 
+    /// @param height_stddev The
+    ///
     /// model female/male standard deviations
     /// @param height_slope The height model female/male slopes
     /// @param region_models The region models for the model

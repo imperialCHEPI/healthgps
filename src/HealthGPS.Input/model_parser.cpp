@@ -1031,10 +1031,10 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
     }
     std::sort(epa_quantiles.begin(), epa_quantiles.end());
 
-    // Load 
-    // 
-    // 
-    // 
+    // Load
+    //
+    //
+    //
     // model parameters from the dynamic model - ONLY from dynamic_model.json
     if (!opt.contains("HeightStdDev") || opt["HeightStdDev"].is_null()) {
         throw core::HgpsException{"HeightStdDev field is missing or null in dynamic_model.json"};
