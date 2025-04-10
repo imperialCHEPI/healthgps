@@ -228,7 +228,9 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
     if (age_gender_dist.empty() ||
         (age_gender_dist.size() == 1 && age_gender_dist.begin()->first == 100) ||
         (population.size() < 200)) { // Add small population check to ensure full age range
-        std::cout << "WARNING: Missing, invalid, or small age distribution. Creating a realistic distribution." << std::endl;
+        std::cout << "WARNING: Missing, invalid, or small age distribution. Creating a realistic "
+                     "distribution."
+                  << std::endl;
 
         // Create a realistic age distribution from 0 to 110 (extended from 100)
         age_gender_dist.clear();
@@ -265,17 +267,18 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
             value.females /= total_weight;
         }
 
-        std::cout << "INFO: Created synthetic age distribution with realistic age curve" << std::endl;
+        std::cout << "INFO: Created synthetic age distribution with realistic age curve"
+                  << std::endl;
     }
 
     auto pop_size = static_cast<int>(population.size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
 
-
     // ONLY FOR TESTING WHEN USING A SMALL POPULATION
     // For small populations, ensure at least one person in each decade
     if (pop_size < 100) {
-        std::cout << "Small population detected, ensuring representation across age groups" << std::endl;
+        std::cout << "Small population detected, ensuring representation across age groups"
+                  << std::endl;
 
         // Create a distribution of ages to explicitly include
         std::vector<int> required_ages = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
@@ -502,7 +505,8 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
 
 void DemographicModule::update_population([[maybe_unused]] RuntimeContext &context,
                                           const DiseaseModule &disease_host) {
-    std::cout << "DEBUG: Starting update_population, active size: " << context.population().current_active_size() << std::endl;
+    std::cout << "DEBUG: Starting update_population, active size: "
+              << context.population().current_active_size() << std::endl;
 
     // Start the residual mortality calculation asynchronously with additional safety mechanisms
     std::future<void> residual_future;
@@ -658,24 +662,28 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
                   << context.population().current_active_size() << " active members." << std::endl;
     }
 
-    //std::cout << "DEBUG: After residual_future.get(), active size: " << context.population().current_active_size() << std::endl;
+    // std::cout << "DEBUG: After residual_future.get(), active size: " <<
+    // context.population().current_active_size() << std::endl;
 
     auto number_of_deaths = update_age_and_death_events(context, disease_host);
 
-    //std::cout << "DEBUG: After update_age_and_death_events, active size: " << context.population().current_active_size() << std::endl;
+    // std::cout << "DEBUG: After update_age_and_death_events, active size: " <<
+    // context.population().current_active_size() << std::endl;
 
     // apply births events
     auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
     auto number_of_boys = static_cast<int>(last_year_births_rate.males * initial_pop_size);
     auto number_of_girls = static_cast<int>(last_year_births_rate.females * initial_pop_size);
 
-    //std::cout << "DEBUG: Before adding newborns, active size: " << context.population().current_active_size() << std::endl;
+    // std::cout << "DEBUG: Before adding newborns, active size: " <<
+    // context.population().current_active_size() << std::endl;
 
     context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
 
-    //std::cout << "DEBUG: After adding newborns, active size: " << context.population().current_active_size() << std::endl;
+    // std::cout << "DEBUG: After adding newborns, active size: " <<
+    // context.population().current_active_size() << std::endl;
 
     // Calculate statistics.
     if (initial_pop_size <= 0) {
@@ -1061,7 +1069,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     }
 
     // For debugging death probabilities - sample a few individuals
-    //std::cout << "DEBUG: Death probability samples:" << std::endl;
+    // std::cout << "DEBUG: Death probability samples:" << std::endl;
     int samples_shown = 0;
 
     for (auto &entity : context.population()) {
@@ -1079,7 +1087,8 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
             // Debug first few deaths
             if (samples_shown < 3) {
-                //std::cout << "  Person died (max age): Age " << entity.age << ", Gender: " << (entity.gender == core::Gender::male ? "Male" : "Female") << std::endl;
+                // std::cout << "  Person died (max age): Age " << entity.age << ", Gender: " <<
+                // (entity.gender == core::Gender::male ? "Male" : "Female") << std::endl;
                 samples_shown++;
             }
         } else {
@@ -1167,7 +1176,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
                           << ", Death prob: " << death_probability << ", Hazard: " << hazard
                           << ", Residual rate: " << residual_death_rate << std::endl;
                 samples_shown++;
-            }*/ 
+            }*/
 
             if (hazard < death_probability) {
                 will_die = true;
@@ -1199,7 +1208,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     /*std::cout << "DEBUG: Deaths summary - Total: " << number_of_deaths
               << ", Age-related: " << age_deaths << ", Probability-based: " << probability_deaths
               << ", Active before: " << context.population().current_active_size()
-              << ", Active after: " << active_after << std::endl;*/ 
+              << ", Active after: " << active_after << std::endl;*/
 
     return number_of_deaths;
 }
@@ -1286,7 +1295,7 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
         std::cout << "ETHNICITY LOG [Person " << person.id() << "]: age=" << person.age
                   << ", gender=" << (person.gender == core::Gender::male ? "Male" : "Female")
                   << ", region=" << static_cast<int>(person.region) << std::endl;
-    }*/ 
+    }*/
 
     // Try to use ethnicity models from static_model.json if they exist
     bool using_model_data = false;
@@ -1332,8 +1341,9 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
                 }
 
                 if (log_for_this_person) {
-                    //std::cout << "  Using ethnicity prevalence data, total prob: " << total << std::endl;
-                    // Print top 3 ethnicity probabilities
+                    // std::cout << "  Using ethnicity prevalence data, total prob: " << total <<
+                    // std::endl;
+                    //  Print top 3 ethnicity probabilities
                     int count = 0;
                 }
             } else {
@@ -1397,7 +1407,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
             income_base = income_models_.begin()->second.intercept;
             /*if (log_for_this_person) {
                 std::cout << "  Base intercept: " << income_base << std::endl;
-            }*/ 
+            }*/
         }
 
         // Add age effect
@@ -1410,7 +1420,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
                 std::cout << "  Age effect: " << age_effect
                           << " (coef: " << income_models_.begin()->second.coefficients.at("Age")
                           << " * age: " << person.age << ")" << std::endl;
-            }*/ 
+            }*/
         }
 
         // Add gender - apply coefficient to binary gender value using one model
@@ -1424,7 +1434,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
                 std::cout << "  Gender effect: " << gender_effect
                           << " (coef: " << income_models_.begin()->second.coefficients.at("Gender")
                           << " * gender_value: " << gender_value << ")" << std::endl;
-            }*/ 
+            }*/
         }
 
         // Add region effect - apply coefficient to region value
@@ -1439,7 +1449,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
                     std::cout << "  Region effect: " << region_effect
                               << " (coef: " << region_model.coefficients.at("Income")
                               << " * region_value: " << region_value << ")" << std::endl;
-                }*/ 
+                }*/
             }
         }
 
@@ -1455,7 +1465,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
                     std::cout << "  Ethnicity effect: " << ethnicity_effect
                               << " (coef: " << ethnicity_model.coefficients.at("Income")
                               << " * ethnicity_value: " << ethnicity_value << ")" << std::endl;
-                }*/ 
+                }*/
             }
         }
 
@@ -1564,7 +1574,8 @@ void DemographicModule::initialise_income_category(Person &person, double q1_thr
         q3_threshold = min_income + (income_range * 0.75); // 75th percentile
 
         if (log_for_this_person) {
-            std::cout << "  Using fixed thresholds due to inconsistencies: Q1=" << q1_threshold << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+            std::cout << "  Using fixed thresholds due to inconsistencies: Q1=" << q1_threshold
+                      << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
         }
         use_fixed_thresholds = true;
     }
@@ -1663,7 +1674,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
                   << ", region=" << static_cast<int>(person.region)
                   << ", ethnicity=" << static_cast<int>(person.ethnicity)
                   << ", income=" << person.income_continuous << std::endl;
-    }*/ 
+    }*/
 
     try {
         // Use the intercept directly from PhysicalActivityModels
@@ -1687,7 +1698,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
                     std::cout << "  Region effect: " << region_effect << " for region "
                               << static_cast<int>(person.region) << " (new value: " << expected
                               << ")" << std::endl;
-                }*/ 
+                }*/
             }
         }
 
@@ -1702,7 +1713,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
                     std::cout << "  Ethnicity effect: " << ethnicity_effect << " for ethnicity "
                               << static_cast<int>(person.ethnicity) << " (new value: " << expected
                               << ")" << std::endl;
-                }*/ 
+                }*/
             }
         }
 
@@ -1718,7 +1729,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
                               << " effect: " << this_effect
                               << " (coef: " << model.coefficients.at("PhysicalActivity")
                               << " * income: " << person.income_continuous << ")" << std::endl;
-                }*/ 
+                }*/
             }
         }
         expected += (income_effect);
@@ -1734,7 +1745,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
             std::cout << "  Random variation: " << rand << " using stddev "
                       << physical_activity_stddev_
                       << " (value with random: " << expected_with_random << ")" << std::endl;
-        }*/ 
+        }*/
 
         // Clamp the final value to a reasonable range
         core::DoubleInterval pa_range(1.4, 2.5);
@@ -1745,7 +1756,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
                               ? " (clamped from " + std::to_string(expected_with_random) + ")"
                               : "")
                       << std::endl;
-        }*/ 
+        }*/
 
         // Set the physical activity value
         person.risk_factors["PhysicalActivity"_id] = final_value;

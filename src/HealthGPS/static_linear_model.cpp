@@ -218,7 +218,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
     // Initialise newborns and update others.
     try {
-        //std::cout << "DEBUG: [StaticLinearModel] Processing " << total_persons << " individuals" << std::endl;
+        // std::cout << "DEBUG: [StaticLinearModel] Processing " << total_persons << " individuals"
+        // << std::endl;
 
         for (auto &person : context.population()) {
             try {
@@ -246,11 +247,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 // Track progress
                 persons_processed++;
                 if (persons_processed % 1000 == 0 || persons_processed == total_persons) {
-                   // std::cout << "DEBUG: [StaticLinearModel] Processed " << persons_processed << "/" << total_persons << " individuals" << std::endl;
+                    // std::cout << "DEBUG: [StaticLinearModel] Processed " << persons_processed <<
+                    // "/" << total_persons << " individuals" << std::endl;
                 }
             } catch (const std::exception &e) {
                 std::cerr
-                    << "ERROR processing individual in StaticLinearModel::update_risk_factors: " << e.what() << std::endl;
+                    << "ERROR processing individual in StaticLinearModel::update_risk_factors: "
+                    << e.what() << std::endl;
                 // Continue with next person
             }
         }
@@ -270,7 +273,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         persons_processed = 0;
 
         // Initialise newborns and update others.
-       // std::cout << "DEBUG: [StaticLinearModel] Starting policy and trend updates for " << total_persons << " individuals" << std::endl;
+        // std::cout << "DEBUG: [StaticLinearModel] Starting policy and trend updates for " <<
+        // total_persons << " individuals" << std::endl;
 
         for (auto &person : context.population()) {
             try {
@@ -289,7 +293,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                 // Track progress
                 persons_processed++;
                 if (persons_processed % 1000 == 0 || persons_processed == total_persons) {
-                    //std::cout << "DEBUG: [StaticLinearModel] Policy updates: " << persons_processed  << "/" << total_persons << " individuals" << std::endl;
+                    // std::cout << "DEBUG: [StaticLinearModel] Policy updates: " <<
+                    // persons_processed  << "/" << total_persons << " individuals" << std::endl;
                 }
             } catch (const std::exception &e) {
                 std::cerr << "ERROR in policy updates: " << e.what() << std::endl;
@@ -324,7 +329,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                     // Track progress
                     persons_processed++;
                     if (persons_processed % 1000 == 0 || persons_processed == total_persons) {
-                        //std::cout << "DEBUG: [StaticLinearModel] Policy application: " << persons_processed << "/" << total_persons << " individuals" << std::endl;
+                        // std::cout << "DEBUG: [StaticLinearModel] Policy application: " <<
+                        // persons_processed << "/" << total_persons << " individuals" << std::endl;
                     }
                 } catch (const std::exception &e) {
                     std::cerr << "ERROR applying policies: " << e.what() << std::endl;
@@ -913,7 +919,9 @@ void StaticLinearModel::update_income_category(RuntimeContext &context) {
 
         // Validate thresholds are properly ordered
         if (q1_threshold > q2_threshold || q2_threshold > q3_threshold) {
-            std::cerr << "ERROR: Income thresholds are incorrectly ordered in StaticLinearModel::update_income_category" << std::endl;
+            std::cerr << "ERROR: Income thresholds are incorrectly ordered in "
+                         "StaticLinearModel::update_income_category"
+                      << std::endl;
             // Fix by using percentages of range
             double min_income = 23.0;
             double max_income = 2375.0;
@@ -921,7 +929,8 @@ void StaticLinearModel::update_income_category(RuntimeContext &context) {
             q1_threshold = min_income + range * 0.25;
             q2_threshold = min_income + range * 0.5;
             q3_threshold = min_income + range * 0.75;
-            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold
+                      << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
         }
 
         // Track inconsistencies during update
@@ -1062,7 +1071,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 }
 
 void StaticLinearModel::ensure_demographic_values(RuntimeContext &context) {
-    std::cout << "DEBUG: [StaticLinearModel] Checking if people have valid demographic values" << std::endl;
+    std::cout << "DEBUG: [StaticLinearModel] Checking if people have valid demographic values"
+              << std::endl;
 
     // Track counts of missing values that we'll fix
     int ethnicity_fixed = 0;

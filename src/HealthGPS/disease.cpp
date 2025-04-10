@@ -103,7 +103,7 @@ void DiseaseModule::update_population(RuntimeContext &context) {
             std::cout << " (NULL MODEL - ERROR)";
         }
         std::cout << std::endl;
-    }*/ 
+    }*/
 
     // Track successful and failed updates
     size_t success_count = 0;
@@ -175,7 +175,8 @@ void DiseaseModule::update_population(RuntimeContext &context) {
             disease_update_failures[disease_name] = false;
 
             // Log successful update
-            std::cout << "DEBUG: [DiseaseModule] Successfully updated " << disease_name << " disease status" << std::endl;
+            std::cout << "DEBUG: [DiseaseModule] Successfully updated " << disease_name
+                      << " disease status" << std::endl;
 
         } catch (const std::out_of_range &e) {
             error_count++;
@@ -198,7 +199,8 @@ void DiseaseModule::update_population(RuntimeContext &context) {
     }
 
     // Log summary of disease updates
-    std::cout << "INFO: [DiseaseModule] Updated " << success_count << " disease models successfully, " << error_count << " failures" << std::endl;
+    std::cout << "INFO: [DiseaseModule] Updated " << success_count
+              << " disease models successfully, " << error_count << " failures" << std::endl;
 
     // Print summary for each disease
     if (success_count > 0) {
@@ -208,7 +210,8 @@ void DiseaseModule::update_population(RuntimeContext &context) {
             if (!disease_update_failures[disease_id.to_string()]) {
                 // Only print successful diseases
                 int pop_size = context.population().current_active_size();
-                //std::cout << "INFO: [Year " << year << "] " << disease_id.to_string() << " successfully processed for " << pop_size << " people with 0 errors" << std::endl;
+                // std::cout << "INFO: [Year " << year << "] " << disease_id.to_string() << "
+                // successfully processed for " << pop_size << " people with 0 errors" << std::endl;
             }
         }
     }
@@ -218,7 +221,7 @@ void DiseaseModule::update_population(RuntimeContext &context) {
               << context.population().current_active_size() << " active people ("
               << (success_count * 100.0 /
                   std::max(1, static_cast<int>(context.population().current_active_size())))
-              << "%), with " << error_count << " errors" << std::endl;*/ 
+              << "%), with " << error_count << " errors" << std::endl;*/
 
     // Warn if no diseases were initialized
     if (success_count == 0) {
@@ -514,7 +517,8 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
         });
 
     // Log final statistics
-    std::cout << "INFO: Disease initialization complete: " << successful_count << " successful, " << failed_count << " failed" << std::endl;
+    std::cout << "INFO: Disease initialization complete: " << successful_count << " successful, "
+              << failed_count << " failed" << std::endl;
 
     return std::make_unique<DiseaseModule>(std::move(models));
 }

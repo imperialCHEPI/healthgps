@@ -916,7 +916,8 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
         auto [q1_threshold, q2_threshold, q3_threshold] =
             calculate_income_thresholds(context.population());
 
-        //std::cout << "INFO: Updating income categories with thresholds Q1=" << q1_threshold << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+        // std::cout << "INFO: Updating income categories with thresholds Q1=" << q1_threshold << ",
+        // Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
 
         // Validate thresholds are properly ordered
         if (q1_threshold > q2_threshold || q2_threshold > q3_threshold) {
@@ -930,7 +931,8 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
             q1_threshold = min_income + range * 0.25;
             q2_threshold = min_income + range * 0.5;
             q3_threshold = min_income + range * 0.75;
-            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold
+                      << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
         }
 
         // Track inconsistencies during update
@@ -1009,13 +1011,15 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
                 // Special rule for edge cases - very low income should never be High
                 if (income_value <= 30.0 && person.income_category == core::Income::high) {
                     person.income_category = core::Income::low;
-                    std::cout << "OVERRIDE: Forcing Low category for very low income (" << income_value << ") for person " << person.id() << std::endl;
+                    std::cout << "OVERRIDE: Forcing Low category for very low income ("
+                              << income_value << ") for person " << person.id() << std::endl;
                 }
 
                 // Special rule for edge cases - very high income should never be Low
                 if (income_value >= 2300.0 && person.income_category == core::Income::low) {
                     person.income_category = core::Income::high;
-                    std::cout << "OVERRIDE: Forcing High category for very high income (" << income_value << ") for person " << person.id() << std::endl;
+                    std::cout << "OVERRIDE: Forcing High category for very high income ("
+                              << income_value << ") for person " << person.id() << std::endl;
                 }
             }
         }
@@ -1024,7 +1028,7 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
             /*std::cout << "INFO: Fixed " << fixed_count << " of " << inconsistency_count
                       << " income category inconsistencies ("
                       << (100.0 * inconsistency_count / context.population().current_active_size())
-                      << "% of active population)" << std::endl;*/ 
+                      << "% of active population)" << std::endl;*/
         }
 
         last_update_year = current_year;
