@@ -228,9 +228,7 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
     if (age_gender_dist.empty() ||
         (age_gender_dist.size() == 1 && age_gender_dist.begin()->first == 100) ||
         (population.size() < 200)) { // Add small population check to ensure full age range
-        std::cout << "WARNING: Missing, invalid, or small age distribution. Creating a realistic "
-                     "distribution."
-                  << std::endl;
+        std::cout << "WARNING: Missing, invalid, or small age distribution. Creating a realistic distribution." << std::endl;
 
         // Create a realistic age distribution from 0 to 110 (extended from 100)
         age_gender_dist.clear();
@@ -267,37 +265,17 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
             value.females /= total_weight;
         }
 
-        std::cout << "INFO: Created synthetic age distribution with realistic age curve"
-                  << std::endl;
+        std::cout << "INFO: Created synthetic age distribution with realistic age curve" << std::endl;
     }
 
     auto pop_size = static_cast<int>(population.size());
     auto entry_total = static_cast<int>(age_gender_dist.size());
 
-    // Debug information
-    std::cout << "Age distribution contains " << entry_total << " age groups" << std::endl;
-    if (entry_total > 0) {
-        std::cout << "Age range: " << age_gender_dist.begin()->first << " to "
-                  << age_gender_dist.rbegin()->first << std::endl;
-
-        // Debug: Print first few age distribution entries to verify
-        int count = 0;
-        for (const auto &[age, value] : age_gender_dist) {
-            if (count < 5) {
-                std::cout << "DEBUG: Age " << age << " - Males: " << value.males
-                          << ", Females: " << value.females << std::endl;
-                count++;
-            } else {
-                break;
-            }
-        }
-    }
 
     // ONLY FOR TESTING WHEN USING A SMALL POPULATION
     // For small populations, ensure at least one person in each decade
     if (pop_size < 100) {
-        std::cout << "Small population detected, ensuring representation across age groups"
-                  << std::endl;
+        std::cout << "Small population detected, ensuring representation across age groups" << std::endl;
 
         // Create a distribution of ages to explicitly include
         std::vector<int> required_ages = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
@@ -440,42 +418,6 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
     for (const auto &person : population) {
         age_count[person.age]++;
     }
-
-    // Check if we have representation in each age group
-    std::cout << "Final age distribution:" << std::endl;
-    std::cout << "  Age 0-20: "
-              << std::accumulate(age_count.begin(),
-                                 std::upper_bound(age_count.begin(), age_count.end(), 20,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 21-40: "
-              << std::accumulate(std::lower_bound(age_count.begin(), age_count.end(), 21,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 std::upper_bound(age_count.begin(), age_count.end(), 40,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 41-60: "
-              << std::accumulate(std::lower_bound(age_count.begin(), age_count.end(), 41,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 std::upper_bound(age_count.begin(), age_count.end(), 60,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 61-80: "
-              << std::accumulate(std::lower_bound(age_count.begin(), age_count.end(), 61,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 std::upper_bound(age_count.begin(), age_count.end(), 80,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 81+: "
-              << std::accumulate(std::lower_bound(age_count.begin(), age_count.end(), 81,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 age_count.end(), 0,
-                                 [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
 }
 
 // Modified and updated- Mahima
@@ -503,42 +445,6 @@ void DemographicModule::initialise_population(RuntimeContext &context, Populatio
             age_groups[person.age]++;
         }
     }
-
-    // Print summary
-    std::cout << "DEBUG: Population age distribution after initialization:" << std::endl;
-    std::cout << "  Age 0-20: "
-              << std::accumulate(age_groups.begin(),
-                                 std::upper_bound(age_groups.begin(), age_groups.end(), 20,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 21-40: "
-              << std::accumulate(std::lower_bound(age_groups.begin(), age_groups.end(), 21,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 std::upper_bound(age_groups.begin(), age_groups.end(), 40,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 41-60: "
-              << std::accumulate(std::lower_bound(age_groups.begin(), age_groups.end(), 41,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 std::upper_bound(age_groups.begin(), age_groups.end(), 60,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 61-80: "
-              << std::accumulate(std::lower_bound(age_groups.begin(), age_groups.end(), 61,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 std::upper_bound(age_groups.begin(), age_groups.end(), 80,
-                                                  [](int v, const auto &p) { return v < p.first; }),
-                                 0, [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 81+: "
-              << std::accumulate(std::lower_bound(age_groups.begin(), age_groups.end(), 81,
-                                                  [](const auto &p, int v) { return p.first < v; }),
-                                 age_groups.end(), 0,
-                                 [](int sum, const auto &p) { return sum + p.second; })
-              << " people" << std::endl;
 
     // Step 2: Initialize region and ethnicity for each person
     for (auto &person : population) {
@@ -596,8 +502,7 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
 
 void DemographicModule::update_population([[maybe_unused]] RuntimeContext &context,
                                           const DiseaseModule &disease_host) {
-    std::cout << "DEBUG: Starting update_population, active size: "
-              << context.population().current_active_size() << std::endl;
+    std::cout << "DEBUG: Starting update_population, active size: " << context.population().current_active_size() << std::endl;
 
     // Start the residual mortality calculation asynchronously with additional safety mechanisms
     std::future<void> residual_future;
@@ -753,28 +658,24 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
                   << context.population().current_active_size() << " active members." << std::endl;
     }
 
-    std::cout << "DEBUG: After residual_future.get(), active size: "
-              << context.population().current_active_size() << std::endl;
+    //std::cout << "DEBUG: After residual_future.get(), active size: " << context.population().current_active_size() << std::endl;
 
     auto number_of_deaths = update_age_and_death_events(context, disease_host);
 
-    std::cout << "DEBUG: After update_age_and_death_events, active size: "
-              << context.population().current_active_size() << std::endl;
+    //std::cout << "DEBUG: After update_age_and_death_events, active size: " << context.population().current_active_size() << std::endl;
 
     // apply births events
     auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
     auto number_of_boys = static_cast<int>(last_year_births_rate.males * initial_pop_size);
     auto number_of_girls = static_cast<int>(last_year_births_rate.females * initial_pop_size);
 
-    std::cout << "DEBUG: Before adding newborns, active size: "
-              << context.population().current_active_size() << std::endl;
+    //std::cout << "DEBUG: Before adding newborns, active size: " << context.population().current_active_size() << std::endl;
 
     context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
 
-    std::cout << "DEBUG: After adding newborns, active size: "
-              << context.population().current_active_size() << std::endl;
+    //std::cout << "DEBUG: After adding newborns, active size: " << context.population().current_active_size() << std::endl;
 
     // Calculate statistics.
     if (initial_pop_size <= 0) {
@@ -1159,31 +1060,8 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
         }
     }
 
-    // Print age distribution summary
-    std::cout << "DEBUG: Age distribution before update:" << std::endl;
-    std::cout << "  Age 0-20: "
-              << std::accumulate(age_counts.begin(), age_counts.upper_bound(20), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 21-40: "
-              << std::accumulate(age_counts.lower_bound(21), age_counts.upper_bound(40), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 41-60: "
-              << std::accumulate(age_counts.lower_bound(41), age_counts.upper_bound(60), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 61-80: "
-              << std::accumulate(age_counts.lower_bound(61), age_counts.upper_bound(80), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-    std::cout << "  Age 81+: "
-              << std::accumulate(age_counts.lower_bound(81), age_counts.end(), 0,
-                                 [](int sum, const auto &pair) { return sum + pair.second; })
-              << " people" << std::endl;
-
     // For debugging death probabilities - sample a few individuals
-    std::cout << "DEBUG: Death probability samples:" << std::endl;
+    //std::cout << "DEBUG: Death probability samples:" << std::endl;
     int samples_shown = 0;
 
     for (auto &entity : context.population()) {
@@ -1201,8 +1079,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
             // Debug first few deaths
             if (samples_shown < 3) {
-                std::cout << "  Person died (max age): Age " << entity.age << ", Gender: "
-                          << (entity.gender == core::Gender::male ? "Male" : "Female") << std::endl;
+                //std::cout << "  Person died (max age): Age " << entity.age << ", Gender: " << (entity.gender == core::Gender::male ? "Male" : "Female") << std::endl;
                 samples_shown++;
             }
         } else {
@@ -1284,13 +1161,13 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
             auto hazard = context.random().next_double();
 
             // Debug first few people regardless of outcome
-            if (samples_shown < 5) {
+            /*if (samples_shown < 5) {
                 std::cout << "  Person check: Age " << entity.age << ", Gender: "
                           << (entity.gender == core::Gender::male ? "Male" : "Female")
                           << ", Death prob: " << death_probability << ", Hazard: " << hazard
                           << ", Residual rate: " << residual_death_rate << std::endl;
                 samples_shown++;
-            }
+            }*/ 
 
             if (hazard < death_probability) {
                 will_die = true;
@@ -1319,10 +1196,10 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
         }
     }
 
-    std::cout << "DEBUG: Deaths summary - Total: " << number_of_deaths
+    /*std::cout << "DEBUG: Deaths summary - Total: " << number_of_deaths
               << ", Age-related: " << age_deaths << ", Probability-based: " << probability_deaths
               << ", Active before: " << context.population().current_active_size()
-              << ", Active after: " << active_after << std::endl;
+              << ", Active after: " << active_after << std::endl;*/ 
 
     return number_of_deaths;
 }
@@ -1405,11 +1282,11 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
     // Log for a sample of people
     bool log_for_this_person = (person.id() % 1000 == 0) && (person.id() < 5000);
 
-    if (log_for_this_person) {
+    /*if (log_for_this_person) {
         std::cout << "ETHNICITY LOG [Person " << person.id() << "]: age=" << person.age
                   << ", gender=" << (person.gender == core::Gender::male ? "Male" : "Female")
                   << ", region=" << static_cast<int>(person.region) << std::endl;
-    }
+    }*/ 
 
     // Try to use ethnicity models from static_model.json if they exist
     bool using_model_data = false;
@@ -1428,19 +1305,6 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
                 prob /= total;
             }
             using_model_data = true;
-
-            if (log_for_this_person) {
-                std::cout << "  Using ethnicity models from static_model.json" << std::endl;
-                // Print top 3 ethnicity probabilities
-                int count = 0;
-                for (const auto &[ethnicity, prob] : ethnicity_probs) {
-                    if (count < 3) {
-                        std::cout << "  Ethnicity " << static_cast<int>(ethnicity)
-                                  << " prob: " << prob << std::endl;
-                        count++;
-                    }
-                }
-            }
         }
     }
 
@@ -1468,17 +1332,9 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
                 }
 
                 if (log_for_this_person) {
-                    std::cout << "  Using ethnicity prevalence data, total prob: " << total
-                              << std::endl;
+                    //std::cout << "  Using ethnicity prevalence data, total prob: " << total << std::endl;
                     // Print top 3 ethnicity probabilities
                     int count = 0;
-                    for (const auto &[ethnicity, prob] : ethnicity_probs) {
-                        if (count < 3) {
-                            std::cout << "  Ethnicity " << static_cast<int>(ethnicity)
-                                      << " prob: " << prob << std::endl;
-                            count++;
-                        }
-                    }
                 }
             } else {
                 if (log_for_this_person) {
@@ -1508,11 +1364,6 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
         cumulative_prob += prob;
         if (rand_value < cumulative_prob) {
             person.ethnicity = ethnicity;
-            if (log_for_this_person) {
-                std::cout << "  Assigned ethnicity: " << static_cast<int>(ethnicity)
-                          << " (random value: " << rand_value
-                          << " < cumulative prob: " << cumulative_prob << ")" << std::endl;
-            }
             return;
         }
     }
@@ -1533,13 +1384,6 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
     // Add logging for a sample of people
     bool log_for_this_person = (person.id() % 1000 == 0) && (person.id() < 5000);
 
-    if (log_for_this_person) {
-        std::cout << "INCOME CONTINUOUS LOG [Person " << person.id() << "]: age=" << person.age
-                  << ", gender=" << (person.gender == core::Gender::male ? "Male" : "Female")
-                  << ", region=" << static_cast<int>(person.region)
-                  << ", ethnicity=" << static_cast<int>(person.ethnicity) << std::endl;
-    }
-
     // Initialize base income value - Start with intercept
     double income_base = 0.0;
     double min_income = 23.0;
@@ -1551,9 +1395,9 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
         if (!income_models_.empty()) {
             // Start with the intercept value
             income_base = income_models_.begin()->second.intercept;
-            if (log_for_this_person) {
+            /*if (log_for_this_person) {
                 std::cout << "  Base intercept: " << income_base << std::endl;
-            }
+            }*/ 
         }
 
         // Add age effect
@@ -1562,11 +1406,11 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
             income_models_.begin()->second.coefficients.count("Age") > 0) {
             age_effect = income_models_.begin()->second.coefficients.at("Age") * person.age;
             income_base += age_effect;
-            if (log_for_this_person) {
+            /*if (log_for_this_person) {
                 std::cout << "  Age effect: " << age_effect
                           << " (coef: " << income_models_.begin()->second.coefficients.at("Age")
                           << " * age: " << person.age << ")" << std::endl;
-            }
+            }*/ 
         }
 
         // Add gender - apply coefficient to binary gender value using one model
@@ -1576,11 +1420,11 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
             income_models_.begin()->second.coefficients.count("Gender") > 0) {
             gender_effect = income_models_.begin()->second.coefficients.at("Gender") * gender_value;
             income_base += gender_effect;
-            if (log_for_this_person) {
+            /*if (log_for_this_person) {
                 std::cout << "  Gender effect: " << gender_effect
                           << " (coef: " << income_models_.begin()->second.coefficients.at("Gender")
                           << " * gender_value: " << gender_value << ")" << std::endl;
-            }
+            }*/ 
         }
 
         // Add region effect - apply coefficient to region value
@@ -1591,11 +1435,11 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
             if (region_model.coefficients.count("Income") > 0) {
                 region_effect = region_model.coefficients.at("Income") * region_value;
                 income_base += region_effect;
-                if (log_for_this_person) {
+                /*if (log_for_this_person) {
                     std::cout << "  Region effect: " << region_effect
                               << " (coef: " << region_model.coefficients.at("Income")
                               << " * region_value: " << region_value << ")" << std::endl;
-                }
+                }*/ 
             }
         }
 
@@ -1607,11 +1451,11 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
             if (ethnicity_model.coefficients.count("Income") > 0) {
                 ethnicity_effect = ethnicity_model.coefficients.at("Income") * ethnicity_value;
                 income_base += ethnicity_effect;
-                if (log_for_this_person) {
+                /*if (log_for_this_person) {
                     std::cout << "  Ethnicity effect: " << ethnicity_effect
                               << " (coef: " << ethnicity_model.coefficients.at("Income")
                               << " * ethnicity_value: " << ethnicity_value << ")" << std::endl;
-                }
+                }*/ 
             }
         }
 
@@ -1626,7 +1470,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
         }
 
         // Check if the value is at risk of being at the min or max extremes
-        if (income_with_random < min_income + (income_range * 0.05) ||
+        /* if (income_with_random < min_income + (income_range * 0.05) ||
             income_with_random > max_income - (income_range * 0.05)) {
 
             // Add a smoothing function to avoid clumping at extremes
@@ -1650,15 +1494,15 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
                               << std::endl;
                 }
             }
-        }
+        }*/
 
         // Ensure income is within valid range [23, 2375]
         person.income_continuous = std::max(min_income, income_with_random);
         person.income_continuous = std::min(max_income, person.income_continuous);
 
-        if (log_for_this_person) {
+        /* if (log_for_this_person) {
             std::cout << "  Final income_continuous: " << person.income_continuous << std::endl;
-        }
+        }*/
 
     } catch (const std::exception &) {
         // Fallback - use a more evenly distributed random value rather than just the minimum
@@ -1682,7 +1526,7 @@ void DemographicModule::initialise_income_category(Person &person, double q1_thr
     // Add logging for a sample of people
     bool log_for_this_person = (person.id() % 1000 == 0) && (person.id() < 5000);
 
-    if (log_for_this_person) {
+    /* if (log_for_this_person) {
         std::cout << "INCOME CATEGORY LOG [Person " << person.id()
                   << "]: income_continuous=" << person.income_continuous << std::endl;
         std::cout << "  Thresholds: Q1=" << q1_threshold << ", Q2=" << q2_threshold
@@ -1694,7 +1538,7 @@ void DemographicModule::initialise_income_category(Person &person, double q1_thr
                       << std::endl;
             std::cerr << "  Thresholds should be in ascending order: Q1 < Q2 < Q3" << std::endl;
         }
-    }
+    }*/
 
     // Store original income for validation
     double original_income = person.income_continuous;
@@ -1720,8 +1564,7 @@ void DemographicModule::initialise_income_category(Person &person, double q1_thr
         q3_threshold = min_income + (income_range * 0.75); // 75th percentile
 
         if (log_for_this_person) {
-            std::cout << "  Using fixed thresholds due to inconsistencies: Q1=" << q1_threshold
-                      << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+            std::cout << "  Using fixed thresholds due to inconsistencies: Q1=" << q1_threshold << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
         }
         use_fixed_thresholds = true;
     }
@@ -1814,13 +1657,13 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
     // Add logging for a sample of people
     bool log_for_this_person = (person.id() % 1000 == 0) && (person.id() < 5000);
 
-    if (log_for_this_person) {
+    /*if (log_for_this_person) {
         std::cout << "PHYSICAL ACTIVITY LOG [Person " << person.id() << "]: age=" << person.age
                   << ", gender=" << (person.gender == core::Gender::male ? "Male" : "Female")
                   << ", region=" << static_cast<int>(person.region)
                   << ", ethnicity=" << static_cast<int>(person.ethnicity)
                   << ", income=" << person.income_continuous << std::endl;
-    }
+    }*/ 
 
     try {
         // Use the intercept directly from PhysicalActivityModels
@@ -1840,11 +1683,11 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
             if (region_params.coefficients.count("PhysicalActivity") > 0) {
                 region_effect = region_params.coefficients.at("PhysicalActivity");
                 expected += (region_effect);
-                if (log_for_this_person) {
+                /*if (log_for_this_person) {
                     std::cout << "  Region effect: " << region_effect << " for region "
                               << static_cast<int>(person.region) << " (new value: " << expected
                               << ")" << std::endl;
-                }
+                }*/ 
             }
         }
 
@@ -1855,11 +1698,11 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
             if (ethnicity_params.coefficients.count("PhysicalActivity") > 0) {
                 ethnicity_effect = ethnicity_params.coefficients.at("PhysicalActivity");
                 expected += (ethnicity_effect);
-                if (log_for_this_person) {
+                /*if (log_for_this_person) {
                     std::cout << "  Ethnicity effect: " << ethnicity_effect << " for ethnicity "
                               << static_cast<int>(person.ethnicity) << " (new value: " << expected
                               << ")" << std::endl;
-                }
+                }*/ 
             }
         }
 
@@ -1870,12 +1713,12 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
                 double this_effect =
                     model.coefficients.at("PhysicalActivity") * person.income_continuous;
                 income_effect += this_effect;
-                if (log_for_this_person) {
+                /*if (log_for_this_person) {
                     std::cout << "  Income level " << static_cast<int>(income_level)
                               << " effect: " << this_effect
                               << " (coef: " << model.coefficients.at("PhysicalActivity")
                               << " * income: " << person.income_continuous << ")" << std::endl;
-                }
+                }*/ 
             }
         }
         expected += (income_effect);
@@ -1887,22 +1730,22 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
         // Add random variation using normal distribution
         double rand = random.next_normal(0.0, physical_activity_stddev_);
         double expected_with_random = expected * (1.0 + rand);
-        if (log_for_this_person) {
+        /*if (log_for_this_person) {
             std::cout << "  Random variation: " << rand << " using stddev "
                       << physical_activity_stddev_
                       << " (value with random: " << expected_with_random << ")" << std::endl;
-        }
+        }*/ 
 
         // Clamp the final value to a reasonable range
         core::DoubleInterval pa_range(1.4, 2.5);
         double final_value = pa_range.clamp(expected_with_random);
-        if (log_for_this_person) {
+        /*if (log_for_this_person) {
             std::cout << "  Final PA value: " << final_value
                       << (final_value != expected_with_random
                               ? " (clamped from " + std::to_string(expected_with_random) + ")"
                               : "")
                       << std::endl;
-        }
+        }*/ 
 
         // Set the physical activity value
         person.risk_factors["PhysicalActivity"_id] = final_value;

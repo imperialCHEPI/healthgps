@@ -57,7 +57,7 @@ void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexc
 }
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
-    std::cout << "DEBUG: [Simulation] Starting init method" << std::endl;
+   // std::cout << "DEBUG: [Simulation] Starting init method" << std::endl;
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -67,11 +67,8 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     end_time_ = adevs::Time(inputs.stop_time(), 0);
 
     // Add debug output for start and end time configuration
-    std::cout << "DEBUG: [Simulation] Simulation start time: " << world_time
-              << ", end time: " << inputs.stop_time()
-              << ", duration: " << (inputs.stop_time() - world_time) << " years" << std::endl;
-    std::cout << "DEBUG: [Simulation] ADEVS end_time value: real=" << end_time_.real
-              << ", logical=" << end_time_.logical << std::endl;
+    //std::cout << "DEBUG: [Simulation] Simulation start time: " << world_time << ", end time: " << inputs.stop_time() << ", duration: " << (inputs.stop_time() - world_time) << " years" << std::endl;
+    //std::cout << "DEBUG: [Simulation] ADEVS end_time value: real=" << end_time_.real << ", logical=" << end_time_.logical << std::endl;
 
     // Force the end time to be at least one year after start time to ensure multiple steps
 #ifdef _MSC_VER
@@ -82,17 +79,14 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-        std::cout << "WARNING: End time <= start time, forcing end time to be start time + 5"
-                  << std::endl;
+        //std::cout << "WARNING: End time <= start time, forcing end time to be start time + 5" << std::endl;
         end_time_ = adevs::Time(world_time + 5, 0);
-        std::cout << "DEBUG: [Simulation] Updated ADEVS end_time value: real=" << end_time_.real
-                  << ", logical=" << end_time_.logical << std::endl;
+        //std::cout << "DEBUG: [Simulation] Updated ADEVS end_time value: real=" << end_time_.real << ", logical=" << end_time_.logical << std::endl;
     }
 
-    std::cout << "DEBUG: [Simulation] About to call initialise_population()" << std::endl;
+    //std::cout << "DEBUG: [Simulation] About to call initialise_population()" << std::endl;
     initialise_population();
-    std::cout << "DEBUG: [Simulation] Successfully returned from initialise_population()"
-              << std::endl;
+    std::cout << "DEBUG: [Simulation] Successfully returned from initialise_population()"<< std::endl;
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -100,17 +94,15 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     auto message =
         fmt::format("[{:4},{}] population size: {}, elapsed: {}ms", env->now().real,
                     env->now().logical, context_.population().initial_size(), elapsed.count());
-    std::cout << "DEBUG: [Simulation] About to publish InfoEventMessage" << std::endl;
+    //std::cout << "DEBUG: [Simulation] About to publish InfoEventMessage" << std::endl;
     context_.publish(std::make_unique<InfoEventMessage>(
         name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
-    std::cout << "DEBUG: [Simulation] Successfully published InfoEventMessage" << std::endl;
+    //std::cout << "DEBUG: [Simulation] Successfully published InfoEventMessage" << std::endl;
 
     // Initialize the simulation with the first event
     auto initial_time = adevs::Time(world_time, 0);
-    std::cout << "DEBUG: [Simulation] Returning initial time from init: real=" << initial_time.real
-              << ", logical=" << initial_time.logical << std::endl;
-    std::cout << "DEBUG: [Simulation] Next expected time should be: real=" << (world_time + 1)
-              << ", logical=0" << std::endl;
+    //std::cout << "DEBUG: [Simulation] Returning initial time from init: real=" << initial_time.real << ", logical=" << initial_time.logical << std::endl;
+    //std::cout << "DEBUG: [Simulation] Next expected time should be: real=" << (world_time + 1) << ", logical=0" << std::endl;
 
     return initial_time;
 }
@@ -124,32 +116,30 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
     auto starting_time = env->now();
 
     if (env->now() < end_time_) {
-        std::cout << "DEBUG: [Simulation::update] Current time (" << env->now().real
-                  << ") is less than end time (" << end_time_.real << ")" << std::endl;
-        std::cout << "DEBUG: [Simulation::update] Setting up for year processing" << std::endl;
+        //std::cout << "DEBUG: [Simulation::update] Current time (" << env->now().real << ") is less than end time (" << end_time_.real << ")" << std::endl;
+        //std::cout << "DEBUG: [Simulation::update] Setting up for year processing" << std::endl;
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
 
         // Now move world clock to time t + 1
         auto world_time = env->now() + adevs::Time(1, 0);
         auto time_year = world_time.real;
-        std::cout << "DEBUG: [Simulation::update] Moving world clock to " << time_year << std::endl;
+        //std::cout << "DEBUG: [Simulation::update] Moving world clock to " << time_year << std::endl;
         context_.set_current_time(time_year);
 
-        std::cout << "DEBUG: [Simulation::update] About to call update_population()" << std::endl;
+       // std::cout << "DEBUG: [Simulation::update] About to call update_population()" << std::endl;
         update_population();
-        std::cout << "DEBUG: [Simulation::update] Completed update_population() successfully"
-                  << std::endl;
+        std::cout << "DEBUG: [Simulation::update] Completed update_population() successfully" << std::endl;
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
 
         auto message = fmt::format("[{:4},{}], elapsed: {}ms", env->now().real, env->now().logical,
                                    elapsed.count());
-        std::cout << "DEBUG: [Simulation::update] Publishing completion message" << std::endl;
+        //std::cout << "DEBUG: [Simulation::update] Publishing completion message" << std::endl;
         context_.publish(std::make_unique<InfoEventMessage>(
             name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
-        std::cout << "DEBUG: [Simulation::update] Published completion message" << std::endl;
+        //std::cout << "DEBUG: [Simulation::update] Published completion message" << std::endl;
 
         // Mark year completion for tracking
         std::cout << "====== COMPLETED YEAR " << env->now().real << " ======" << std::endl;
@@ -157,9 +147,7 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         // CRITICAL FIX: Ensure we return a valid time for the next event
         // The simulation will stop if we don't return a valid time less than infinity
         if (world_time < end_time_) {
-            std::cout << "DEBUG: [Simulation::update] Next time (" << world_time.real
-                      << ") is less than end time (" << end_time_.real << "), scheduling next year"
-                      << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Next time (" << world_time.real << ") is less than end time (" << end_time_.real << "), scheduling next year"<< std::endl;
 
             // CRITICAL: Verify we are not returning the same time we started with
             if (world_time.real == starting_time.real) {
@@ -169,36 +157,28 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
 
                 // Force time advancement to avoid infinite loop
                 world_time = adevs::Time(world_time.real + 1, 0);
-                std::cout << "DEBUG: [Simulation::update] Forced time advancement to "
-                          << world_time.real << std::endl;
+                std::cout << "DEBUG: [Simulation::update] Forced time advancement to "<< world_time.real << std::endl;
             }
 
-            std::cout << "DEBUG: [Simulation::update] Scheduling next year: " << world_time.real
-                      << std::endl;
-            std::cout << "DEBUG: [Simulation::update] Returning time real=" << world_time.real
-                      << ", logical=" << world_time.logical << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Scheduling next year: " << world_time.real << std::endl;
+            //std::cout << "DEBUG: [Simulation::update] Returning time real=" << world_time.real << ", logical=" << world_time.logical << std::endl;
             return world_time;
         } else {
-            std::cout << "DEBUG: [Simulation::update] Reached end year " << world_time.real
-                      << ", returning infinity" << std::endl;
-            std::cout << "===== SIMULATION END: Reached end year " << world_time.real
-                      << " =====" << std::endl;
-            std::cout << "DEBUG: [Simulation::update] Removing model before returning infinity"
-                      << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Reached end year " << world_time.real << "" << std::endl;
+            std::cout << "===== SIMULATION END: Reached end year " << world_time.real << " =====" << std::endl;
+            //std::cout << "DEBUG: [Simulation::update] Removing model before returning infinity" << std::endl;
             env->remove(this); // Properly remove the model before returning infinity
-            std::cout << "DEBUG: [Simulation::update] Returning infinity" << std::endl;
+            //std::cout << "DEBUG: [Simulation::update] Returning infinity" << std::endl;
             return adevs_inf<adevs::Time>(); // Return infinity to signal end of simulation
         }
     }
 
     // We have reached the end, remove the model and return infinite time for next event.
-    std::cout << "DEBUG: [Simulation::update] End time already reached at start of update"
-              << std::endl;
+    std::cout << "DEBUG: [Simulation::update] End time already reached at start of update" << std::endl;
     std::cout << "===== SIMULATION END: Final year reached =====" << std::endl;
-    std::cout << "DEBUG: [Simulation::update] End time reached, removing simulation model"
-              << std::endl;
+    std::cout << "DEBUG: [Simulation::update] End time reached, removing simulation model" << std::endl;
     env->remove(this);
-    std::cout << "DEBUG: [Simulation::update] Returning infinity" << std::endl;
+    //std::cout << "DEBUG: [Simulation::update] Returning infinity" << std::endl;
     return adevs_inf<adevs::Time>();
 }
 
@@ -227,8 +207,7 @@ void Simulation::initialise_population() {
         auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
         context_.reset_population(virtual_pop_size);
 
-        std::cout << "DEBUG: Created virtual population with size " << virtual_pop_size
-                  << std::endl;
+        std::cout << "DEBUG: Created virtual population with size " << virtual_pop_size << std::endl;
 
         // Gender - Age, must be first, followed by region, ethnicity, income, physical activity
         std::cout << "DEBUG: Initializing demographic module..." << std::endl;
@@ -340,8 +319,7 @@ void Simulation::update_population() {
         }
 
         // Additional safety check on population after updates
-        std::cout << "DEBUG: [Risk Factor] Population active size after update: "
-                  << context_.population().current_active_size() << std::endl;
+        //std::cout << "DEBUG: [Risk Factor] Population active size after update: " << context_.population().current_active_size() << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR in risk factor update: " << e.what() << std::endl;
     } catch (...) {
@@ -420,8 +398,7 @@ void Simulation::update_population() {
         }
 
         if (skipped_count > 0) {
-            std::cerr << "WARNING: Skipped " << skipped_count
-                      << " people with unknown ethnicity for analysis" << std::endl;
+            std::cerr << "WARNING: Skipped " << skipped_count << " people with unknown ethnicity for analysis" << std::endl;
         }
 
         // Now run the analysis with improved error handling
@@ -552,8 +529,7 @@ void Simulation::update_net_immigration() {
                         try {
                             // Safe send with logging
                             std::cout
-                                << "DEBUG: [Baseline] Sending migration data to intervention..."
-                                << std::endl;
+                                << "DEBUG: [Baseline] Sending migration data to intervention..."  << std::endl;
 
                             // Create a message and add verification info
                             auto message = std::make_unique<NetImmigrationMessage>(
@@ -563,8 +539,7 @@ void Simulation::update_net_immigration() {
                             // Send the message
                             context_.scenario().channel().send(std::move(message));
 
-                            std::cout << "DEBUG: [Baseline] Migration data sent successfully"
-                                      << std::endl;
+                            std::cout << "DEBUG: [Baseline] Migration data sent successfully" << std::endl;
                             return true;
                         } catch (const std::exception &e) {
                             std::cerr << "ERROR during async send: " << e.what() << std::endl;
@@ -771,19 +746,14 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
     // For baseline, create and return the migration data directly
     if (context_.scenario().type() == ScenarioType::baseline) {
         try {
-            std::cout << "DEBUG: [get_net_migration] Baseline scenario - creating migration data"
-                      << std::endl;
+            //std::cout << "DEBUG: [get_net_migration] Baseline scenario - creating migration data" << std::endl;
             auto data = create_net_migration();
-            std::cout << "DEBUG: [get_net_migration] Baseline scenario - created migration data "
-                         "successfully"
-                      << std::endl;
+            std::cout << "DEBUG: [get_net_migration] Baseline scenario - created migration data successfully" << std::endl;
             return data;
         } catch (const std::exception &e) {
             std::cerr << "ERROR in baseline get_net_migration: " << e.what() << std::endl;
             // Create an empty fallback with zeros
-            std::cout << "DEBUG: [get_net_migration] Baseline scenario - creating fallback "
-                         "migration data with zeros"
-                      << std::endl;
+            //std::cout << "DEBUG: [get_net_migration] Baseline scenario - creating fallback migration data with zeros" << std::endl;
             auto fallback = create_age_gender_table<int>(context_.age_range());
             auto start_age = context_.age_range().lower();
             auto end_age = context_.age_range().upper();
@@ -796,9 +766,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
     }
 
     // For intervention, try to receive the migration data with significantly more patience
-    std::cout
-        << "DEBUG: [get_net_migration] Intervention scenario - attempting to receive migration data"
-        << std::endl;
+    std::cout << "DEBUG: [get_net_migration] Intervention scenario - attempting to receive migration data" << std::endl;
 
     // Create a default fallback table with zeros
     auto fallback_migration = create_age_gender_table<int>(context_.age_range());
@@ -821,8 +789,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
 
         // First large wait to give baseline time to generate data
         int initial_pause = static_cast<int>(5000 * size_factor);
-        std::cout << "DEBUG: [get_net_migration] Intervention waiting for " << initial_pause
-                  << "ms initially" << std::endl;
+        std::cout << "DEBUG: [get_net_migration] Intervention waiting for " << initial_pause << "ms initially" << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(initial_pause));
 
         for (int attempt = 0; attempt < max_attempts; attempt++) {
@@ -859,12 +826,10 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
 
             // Skip the sleep on first attempt after the initial pause
             if (attempt > 0) {
-                std::cout << "DEBUG: [get_net_migration] Intervention attempt " << attempt + 1
-                          << "/" << max_attempts << ", waiting " << wait_time << "ms" << std::endl;
+                std::cout << "DEBUG: [get_net_migration] Intervention attempt " << attempt + 1 << "/" << max_attempts << ", waiting " << wait_time << "ms" << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(wait_time));
             } else {
-                std::cout << "DEBUG: [get_net_migration] Intervention attempt " << attempt + 1
-                          << "/" << max_attempts << std::endl;
+                std::cout << "DEBUG: [get_net_migration] Intervention attempt " << attempt + 1 << "/" << max_attempts << std::endl;
             }
 
             try {
@@ -873,8 +838,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
                 double raw_timeout = wait_time * 3.0;
                 auto receive_timeout =
                     static_cast<int>(std::min(raw_timeout, 2.0 * 1000 * 1000)); // Max 2000 seconds
-                std::cout << "DEBUG: [get_net_migration] Attempting to receive with "
-                          << receive_timeout << "ms timeout" << std::endl;
+                std::cout << "DEBUG: [get_net_migration] Attempting to receive with " << receive_timeout << "ms timeout" << std::endl;
                 auto message = context_.scenario().channel().try_receive(receive_timeout);
 
                 if (message.has_value()) {
@@ -885,9 +849,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
 
                         if (messagePtr) {
                             try {
-                                std::cout << "DEBUG: [get_net_migration] Message is "
-                                             "NetImmigrationMessage type"
-                                          << std::endl;
+                                //std::cout << "DEBUG: [get_net_migration] Message is NetImmigrationMessage type" << std::endl;
                                 auto data = messagePtr->data();
 
                                 // Do a quick validation of the data
@@ -898,9 +860,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
                                 }
 
                                 if (valid) {
-                                    std::cout << "DEBUG: [get_net_migration] Successfully "
-                                                 "validated migration data"
-                                              << std::endl;
+                                    std::cout << "DEBUG: [get_net_migration] Successfully validated migration data" << std::endl;
                                     return data;
                                 } else {
                                     std::cerr << "WARNING: Received migration data is incomplete"
@@ -932,9 +892,6 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
             if (attempt == 5) {
                 try {
                     // Try to generate our own migration data as a backup approach
-                    std::cout << "DEBUG: [get_net_migration] Generating backup migration data "
-                                 "after 5 failed attempts"
-                              << std::endl;
                     auto backup_data = create_net_migration();
 
                     // Use this data if all further attempts fail
@@ -1004,7 +961,7 @@ IntegerAgeGenderTable Simulation::create_net_migration() {
         }
 
         // Get expected population only after verifying simulated is valid
-        std::cout << "DEBUG: [create_net_migration] Getting expected population" << std::endl;
+        //std::cout << "DEBUG: [create_net_migration] Getting expected population" << std::endl;
         IntegerAgeGenderTable expected_population;
         try {
             auto expected_future = std::async(
