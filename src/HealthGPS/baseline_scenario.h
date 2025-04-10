@@ -17,9 +17,9 @@ class BaselineScenario final : public Scenario {
     /// @param data_sync The data synchronisation channel instance to use.
     BaselineScenario(SyncChannel &data_sync);
 
-    ScenarioType type() const noexcept override;
+    ScenarioType type() const noexcept override { return ScenarioType::baseline; }
 
-    const std::string &name() const noexcept override;
+    std::string name() override { return name_; }
 
     SyncChannel &channel() override;
 

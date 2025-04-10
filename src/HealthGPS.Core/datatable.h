@@ -1,22 +1,73 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <mutex>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <ostream>
 #include <unordered_map>
 #include <vector>
 
 #include "column.h"
+#include "forward_type.h"
 
 namespace hgps::core {
 
-/// @brief Defines a Datatable for in memory data class
 class DataTable {
   public:
+    // Define the struct inside the class
+    struct DemographicCoefficients {
+        double age_coefficient{0.0};
+        std::unordered_map<Gender, double> gender_coefficients;
+        std::unordered_map<Region, double> region_coefficients;
+        std::unordered_map<Ethnicity, double> ethnicity_coefficients;
+    };
+
     /// @brief DataTable columns iterator type
     using IteratorType = std::vector<std::unique_ptr<DataTableColumn>>::const_iterator;
+
+    /// @brief Default constructor
+    DataTable() = default;
+
+    /// @brief Copy constructor - performs deep copy of all columns and state
+    /// @param other The DataTable to copy from
+    DataTable(const DataTable &other)
+        : demographic_coefficients_(other.demographic_coefficients_),
+          sync_mtx_(std::make_unique<std::mutex>()), names_(other.names_), index_(other.index_),
+          rows_count_(other.rows_count_) {
+        // Deep copy all columns
+        columns_.reserve(other.columns_.size());
+        for (const auto &col : other.columns_) {
+            columns_.push_back(col->clone());
+        }
+    }
+
+    /// @brief Copy assignment operator - performs deep copy of all columns and state
+    /// @param other The DataTable to copy from
+    /// @return Reference to this DataTable
+    DataTable &operator=(const DataTable &other) {
+        if (this != &other) {
+            DataTable temp(other); // Copy-and-swap idiom
+            std::swap(demographic_coefficients_, temp.demographic_coefficients_);
+            std::swap(sync_mtx_, temp.sync_mtx_);
+            std::swap(names_, temp.names_);
+            std::swap(index_, temp.index_);
+            std::swap(columns_, temp.columns_);
+            std::swap(rows_count_, temp.rows_count_);
+        }
+        return *this;
+    }
+
+    /// @brief Move constructor
+    /// @param other The DataTable to move from
+    DataTable(DataTable &&other) noexcept = default;
+
+    /// @brief Move assignment operator
+    /// @param other The DataTable to move from
+    /// @return Reference to this DataTable
+    DataTable &operator=(DataTable &&other) noexcept = default;
 
     /// @brief Gets the number of columns
     /// @return Number of columns
@@ -65,13 +116,58 @@ class DataTable {
     /// @return The structure string representation
     std::string to_string() const noexcept;
 
+    /// @brief Get demographic coefficients for a specific model type
+    /// @param model_type The model type to get coefficients for
+    /// @return The demographic coefficients for the model type
+    DemographicCoefficients get_demographic_coefficients(const std::string &model_type) const;
+
+    /// @brief Load demographic coefficients from a JSON configuration
+    /// @param config The JSON configuration containing the coefficients
+    void load_demographic_coefficients(const nlohmann::json &config);
+
+    /// @brief Set demographic coefficients for a specific model type
+    /// @param model_type The model type to set coefficients for
+    /// @param coeffs The demographic coefficients to set
+    void set_demographic_coefficients(const std::string &model_type,
+                                      const DemographicCoefficients &coeffs);
+
+    static double calculate_probability(const DemographicCoefficients &coeffs, int age,
+                                        Gender gender, Region region,
+                                        std::optional<Ethnicity> ethnicity = std::nullopt);
+    std::unordered_map<Region, double> get_region_distribution(int age, Gender gender) const;
+    std::unordered_map<Ethnicity, double> get_ethnicity_distribution(int age, Gender gender,
+                                                                     Region region) const;
+
+    /// @brief Load ethnicity coefficients from the demographic models config
+    /// @param demographic_models The demographic models configuration
+    void load_ethnicity_coefficients(const nlohmann::json &demographic_models);
+
   private:
+    // Add member variable to store the demographic coefficients
+    std::unordered_map<std::string, DemographicCoefficients> demographic_coefficients_;
+
+    /// @brief Load region coefficients from the demographic models config
+    /// @param demographic_models The demographic models configuration
+    void load_region_coefficients(const nlohmann::json &demographic_models);
+
     std::unique_ptr<std::mutex> sync_mtx_{std::make_unique<std::mutex>()};
     std::vector<std::string> names_{};
     std::unordered_map<std::string, std::size_t> index_{};
     std::vector<std::unique_ptr<DataTableColumn>> columns_{};
     size_t rows_count_ = 0;
-};
+
+    /// @brief Load ethnicity region coefficients from the configuration
+    /// @param ethnicity_coeffs Ethnicity coefficients to update
+    /// @param region_probs JSON containing region probability coefficients
+    static void load_ethnicity_region_coefficients(DemographicCoefficients &ethnicity_coeffs,
+                                                   const nlohmann::json &region_probs);
+
+    /// @brief Load ethnicity type coefficients from the configuration
+    /// @param ethnicity_coeffs Ethnicity coefficients to update
+    /// @param ethnicity_probs JSON containing ethnicity probability coefficients
+    static void load_ethnicity_type_coefficients(DemographicCoefficients &ethnicity_coeffs,
+                                                 const nlohmann::json &ethnicity_probs);
+}; // End of DataTable class
 
 } // namespace hgps::core
 

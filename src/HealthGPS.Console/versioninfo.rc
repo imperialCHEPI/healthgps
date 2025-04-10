@@ -1,6 +1,13 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "version.h"
+
+// Simple version definitions for RC compiler
+#define FILE_VERSION_MAJOR 1
+#define FILE_VERSION_MINOR 0
+#define FILE_VERSION_PATCH 0
+#define FILE_VERSION_BUILD 0
+#define FILE_VERSION_STRING "1.0.0"
+#define PRODUCT_VERSION_STRING "1.0.0"
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
     // MinGW-w64, MinGW
@@ -38,14 +45,12 @@ END
 
 2 TEXTINCLUDE
 BEGIN
-    "#include ""winres.h""\r\n"
-    "\0"
+    "#include ""winres.h""\r\n\0"
 END
 
 3 TEXTINCLUDE
 BEGIN
-    "\r\n"
-    "\0"
+    "\r\n\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -57,8 +62,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION RESOURCE_VERSION
- PRODUCTVERSION RESOURCE_VERSION
+ FILEVERSION FILE_VERSION_MAJOR,FILE_VERSION_MINOR,FILE_VERSION_PATCH,FILE_VERSION_BUILD
+ PRODUCTVERSION FILE_VERSION_MAJOR,FILE_VERSION_MINOR,FILE_VERSION_PATCH,FILE_VERSION_BUILD
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -75,12 +80,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Imperial College London"
             VALUE "FileDescription", "Health GPS Microsimulation for policy options"
-            VALUE "FileVersion", PROJECT_VERSION
+            VALUE "FileVersion", FILE_VERSION_STRING
             VALUE "InternalName", "HealthGPS.Console"
             VALUE "LegalCopyright", "Copyright (C) 2022"
             VALUE "OriginalFilename", "HealthGPS.Console"
-            VALUE "ProductName", PROJECT_NAME
-            VALUE "ProductVersion", PROJECT_VERSION
+            VALUE "ProductName", "HealthGPS"
+            VALUE "ProductVersion", PRODUCT_VERSION_STRING
         END
     END
     BLOCK "VarFileInfo"
@@ -88,7 +93,6 @@ BEGIN
         VALUE "Translation", 0x809, 1200
     END
 END
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -102,14 +106,11 @@ IDI_ICON1               ICON                    "healthgps.ico"
 #endif    // English (United Kingdom) resources
 /////////////////////////////////////////////////////////////////////////////
 
-
-
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

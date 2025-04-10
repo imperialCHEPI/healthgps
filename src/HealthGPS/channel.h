@@ -28,7 +28,7 @@ template <typename T> class Channel {
 
     /// @brief Initialises a new instance of the Channel class
     /// @param capacity The channel capacity, if fixed; otherwise, unlimited
-    explicit Channel(size_type capacity = 0) : capacity_{capacity}, is_closed_{false} {}
+    explicit Channel(size_type capacity = 500) : capacity_{capacity}, is_closed_{false} {}
 
     Channel(const Channel &) = delete;
     Channel &operator=(const Channel &) = delete;
