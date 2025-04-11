@@ -46,7 +46,7 @@ ResultFileWriter &ResultFileWriter::operator=(ResultFileWriter &&other) noexcept
 }
 
 ResultFileWriter::~ResultFileWriter() {
-    //std::cout << "DEBUG: [ResultFileWriter] Destructor called, closing files" << std::endl;
+    // std::cout << "DEBUG: [ResultFileWriter] Destructor called, closing files" << std::endl;
 
     if (stream_.is_open()) {
         std::cout << "DEBUG: [ResultFileWriter] Closing JSON file" << std::endl;
@@ -75,7 +75,8 @@ ResultFileWriter::~ResultFileWriter() {
 }
 
 void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
-    //std::cout << "DEBUG: [ResultFileWriter] Starting to write message for time " << message.model_time << std::endl;
+    // std::cout << "DEBUG: [ResultFileWriter] Starting to write message for time " <<
+    // message.model_time << std::endl;
 
     try {
         std::scoped_lock lock(lock_mutex_);
@@ -93,21 +94,19 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
             return;
         }
 
-        //std::cout << "DEBUG: [ResultFileWriter] Output streams are open and in good state" << std::endl;
+        // std::cout << "DEBUG: [ResultFileWriter] Output streams are open and in good state" <<
+        // std::endl;
 
         /*if (first_row_.load()) {
-            //std::cout << "DEBUG: [ResultFileWriter] Writing CSV header for first row" << std::endl;
-            first_row_ = false;
-            write_csv_header(message);
-        } else {
-            stream_ << ",";
-        }*/ 
+            //std::cout << "DEBUG: [ResultFileWriter] Writing CSV header for first row" <<
+        std::endl; first_row_ = false; write_csv_header(message); } else { stream_ << ",";
+        }*/
 
         std::string json = to_json_string(message);
-        //std::cout << "DEBUG: [ResultFileWriter] Writing JSON data of length " << json.size()  << std::endl;
-        //stream_ << json;
+        // std::cout << "DEBUG: [ResultFileWriter] Writing JSON data of length " << json.size()  <<
+        // std::endl; stream_ << json;
 
-        //std::cout << "DEBUG: [ResultFileWriter] Writing CSV channels" << std::endl;
+        // std::cout << "DEBUG: [ResultFileWriter] Writing CSV channels" << std::endl;
         write_csv_channels(message);
 
         // Explicitly flush after each write for safety
@@ -122,7 +121,8 @@ void ResultFileWriter::write(const hgps::ResultEventMessage &message) {
             std::cerr << "ERROR: [ResultFileWriter] CSV stream failed after write" << std::endl;
         }
 
-        //std::cout << "DEBUG: [ResultFileWriter] Successfully wrote and flushed data for time " << message.model_time << std::endl;
+        // std::cout << "DEBUG: [ResultFileWriter] Successfully wrote and flushed data for time " <<
+        // message.model_time << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR: [ResultFileWriter] Exception while writing results: " << e.what()
                   << std::endl;
@@ -217,13 +217,15 @@ void ResultFileWriter::write_csv_header(const hgps::ResultEventMessage &message)
 void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &message) {
     using namespace hgps::core;
 
-    //std::cout << "DEBUG: [ResultFileWriter] Writing CSV data for "<< message.content.series.sample_size() << " samples and " << message.content.series.channels().size() << " channels" << std::endl;
+    // std::cout << "DEBUG: [ResultFileWriter] Writing CSV data for "<<
+    // message.content.series.sample_size() << " samples and " <<
+    // message.content.series.channels().size() << " channels" << std::endl;
 
     // Debug: List all available channels
-    //std::cout << "DEBUG: [ResultFileWriter] Available channels: ";
+    // std::cout << "DEBUG: [ResultFileWriter] Available channels: ";
     /*for (const auto &chan : message.content.series.channels()) {
         std::cout << chan << ", ";
-    }*/ 
+    }*/
     std::cout << std::endl;
 
     if (message.content.series.channels().empty()) {
@@ -265,7 +267,8 @@ void ResultFileWriter::write_csv_channels(const hgps::ResultEventMessage &messag
 
             // Log if channels were added for the first few rows
             if (index < 3) {
-                //std::cout << "DEBUG: [ResultFileWriter] Added " << channels_added << " channel values to row " << index << std::endl;
+                // std::cout << "DEBUG: [ResultFileWriter] Added " << channels_added << " channel
+                // values to row " << index << std::endl;
             }
         } catch (const std::exception &e) {
             std::cerr << "ERROR: [ResultFileWriter] Exception in channel processing: " << e.what()

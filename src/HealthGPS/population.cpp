@@ -35,7 +35,8 @@ void Population::add(Person person, unsigned int time) noexcept {
 
 void Population::add_newborn_babies(std::size_t number, core::Gender gender,
                                     unsigned int time) noexcept {
-   // std::cout << "DEBUG: add_newborn_babies called with " << number << " babies, gender: " << (gender == core::Gender::male ? "Male" : "Female") << std::endl;
+    // std::cout << "DEBUG: add_newborn_babies called with " << number << " babies, gender: " <<
+    // (gender == core::Gender::male ? "Male" : "Female") << std::endl;
 
     auto recycle = find_index_of_recyclables(time, number);
     auto remaining = number;
@@ -55,7 +56,8 @@ void Population::add_newborn_babies(std::size_t number, core::Gender gender,
         people_.emplace_back(gender);
     }
 
-    //std::cout << "DEBUG: After add_newborn_babies, active population: " << current_active_size() << " of " << people_.size() << std::endl;
+    // std::cout << "DEBUG: After add_newborn_babies, active population: " << current_active_size()
+    // << " of " << people_.size() << std::endl;
 }
 
 std::vector<int> Population::find_index_of_recyclables(unsigned int time,

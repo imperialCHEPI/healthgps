@@ -8,10 +8,10 @@
 #include "risk_factor_adjustable_model.h"
 #include "static_linear_model.h"
 
+#include <fstream>
 #include <optional>
 #include <tuple>
 #include <vector>
-#include <fstream>
 
 namespace hgps {
 
@@ -311,7 +311,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
 
     // Carbohydrate tracking
     mutable std::ofstream carb_tracking_file_;
-    void track_carbohydrate_values(const Person& person, int year) const;
+    void track_carbohydrate_values(const Person &person, int year) const;
 };
 
 /// @brief Defines the energy balance model data type

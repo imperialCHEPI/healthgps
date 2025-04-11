@@ -90,7 +90,8 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 
     // std::cout << "DEBUG: [Simulation] About to call initialise_population()" << std::endl;
     initialise_population();
-    //std::cout << "DEBUG: [Simulation] Successfully returned from initialise_population()" << std::endl;
+    // std::cout << "DEBUG: [Simulation] Successfully returned from initialise_population()" <<
+    // std::endl;
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -138,7 +139,8 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         // std::cout << "DEBUG: [Simulation::update] About to call update_population()" <<
         // std::endl;
         update_population();
-        //std::cout << "DEBUG: [Simulation::update] Completed update_population() successfully" << std::endl;
+        // std::cout << "DEBUG: [Simulation::update] Completed update_population() successfully" <<
+        // std::endl;
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -156,7 +158,9 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         // CRITICAL FIX: Ensure we return a valid time for the next event
         // The simulation will stop if we don't return a valid time less than infinity
         if (world_time < end_time_) {
-            std::cout << "DEBUG: [Simulation::update] Next time (" << world_time.real << ") is less than end time (" << end_time_.real << "), scheduling next year" << std::endl;
+            std::cout << "DEBUG: [Simulation::update] Next time (" << world_time.real
+                      << ") is less than end time (" << end_time_.real << "), scheduling next year"
+                      << std::endl;
 
             // CRITICAL: Verify we are not returning the same time we started with
             if (world_time.real == starting_time.real) {
@@ -170,9 +174,11 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
                           << world_time.real << std::endl;
             }
 
-            //std::cout << "DEBUG: [Simulation::update] Scheduling next year: " << world_time.real << std::endl;
-            // std::cout << "DEBUG: [Simulation::update] Returning time real=" << world_time.real <<
-            // ", logical=" << world_time.logical << std::endl;
+            // std::cout << "DEBUG: [Simulation::update] Scheduling next year: " << world_time.real
+            // << std::endl;
+            //  std::cout << "DEBUG: [Simulation::update] Returning time real=" << world_time.real
+            //  <<
+            //  ", logical=" << world_time.logical << std::endl;
             return world_time;
         } else {
             std::cout << "DEBUG: [Simulation::update] Reached end year " << world_time.real << ""
@@ -188,7 +194,8 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
     }
 
     // We have reached the end, remove the model and return infinite time for next event.
-    //std::cout << "DEBUG: [Simulation::update] End time already reached at start of update" << std::endl;
+    // std::cout << "DEBUG: [Simulation::update] End time already reached at start of update" <<
+    // std::endl;
     std::cout << "===== SIMULATION END: Final year reached =====" << std::endl;
     std::cout << "DEBUG: [Simulation::update] End time reached, removing simulation model"
               << std::endl;
@@ -226,48 +233,51 @@ void Simulation::initialise_population() {
                   << std::endl;
 
         // Gender - Age, must be first, followed by region, ethnicity, income, physical activity
-        //std::cout << "DEBUG: Initializing demographic module..." << std::endl;
+        // std::cout << "DEBUG: Initializing demographic module..." << std::endl;
         demographic_->initialise_population(context_, context_.population(), context_.random());
-        //std::cout << "DEBUG: Demographic module initialization completed" << std::endl;
+        // std::cout << "DEBUG: Demographic module initialization completed" << std::endl;
 
         // Social economics status
-        //std::cout << "DEBUG: Initializing socio-economic status module..." << std::endl;
+        // std::cout << "DEBUG: Initializing socio-economic status module..." << std::endl;
         ses_->initialise_population(context_, context_.population(), context_.random());
-        //std::cout << "DEBUG: Socio-economic status module initialization completed" << std::endl;
+        // std::cout << "DEBUG: Socio-economic status module initialization completed" << std::endl;
 
         // Generate risk factors
-        //std::cout << "DEBUG: Initializing risk factor module..." << std::endl;
+        // std::cout << "DEBUG: Initializing risk factor module..." << std::endl;
         risk_factor_->initialise_population(context_, context_.population(), context_.random());
-        //std::cout << "DEBUG: Risk factor module initialization completed" << std::endl;
+        // std::cout << "DEBUG: Risk factor module initialization completed" << std::endl;
 
         // Ensure disease caches are fresh before initializing diseases
-        //std::cout << "DEBUG: Resetting disease caches..." << std::endl;
+        // std::cout << "DEBUG: Resetting disease caches..." << std::endl;
         reset_disease_caches();
-        //std::cout << "DEBUG: Disease caches reset completed" << std::endl;
+        // std::cout << "DEBUG: Disease caches reset completed" << std::endl;
 
         // Initialise diseases
-        //std::cout << "DEBUG: Initializing disease module..." << std::endl;
+        // std::cout << "DEBUG: Initializing disease module..." << std::endl;
         disease_->initialise_population(context_, context_.population(), context_.random());
-        //std::cout << "DEBUG: Disease module initialization completed" << std::endl;
+        // std::cout << "DEBUG: Disease module initialization completed" << std::endl;
 
         // Check active population after disease initialization
-        //std::cout << "DEBUG: Active population after disease initialization: " << context_.population().current_active_size() << std::endl;
+        // std::cout << "DEBUG: Active population after disease initialization: " <<
+        // context_.population().current_active_size() << std::endl;
 
         // Initialise analysis
-        //std::cout << "DEBUG: Initializing analysis module..." << std::endl;
+        // std::cout << "DEBUG: Initializing analysis module..." << std::endl;
         analysis_->initialise_population(context_, context_.population(), context_.random());
-        //std::cout << "DEBUG: Analysis module initialization completed" << std::endl;
+        // std::cout << "DEBUG: Analysis module initialization completed" << std::endl;
 
         print_initial_population_statistics();
 
         // Add more detailed logging at critical transition points
-        //std::cout << "\n====== TRANSITION FROM DISEASE TO ANALYSIS STAGE ======\n" << std::endl;
-        //std::cout << "DEBUG: Disease initialization and updates completed successfully" << std::endl;
-        //std::cout << "DEBUG: Current simulation time: " << context_.time_now() << std::endl;
-        //std::cout << "DEBUG: Active population size: " << context_.population().current_active_size() << std::endl;
-        //std::cout << "DEBUG: About to proceed to analysis stage" << std::endl;
+        // std::cout << "\n====== TRANSITION FROM DISEASE TO ANALYSIS STAGE ======\n" << std::endl;
+        // std::cout << "DEBUG: Disease initialization and updates completed successfully" <<
+        // std::endl; std::cout << "DEBUG: Current simulation time: " << context_.time_now() <<
+        // std::endl; std::cout << "DEBUG: Active population size: " <<
+        // context_.population().current_active_size() << std::endl; std::cout << "DEBUG: About to
+        // proceed to analysis stage" << std::endl;
 
-        //std::cout << "=== SIMULATION POPULATION INITIALIZATION COMPLETED SUCCESSFULLY ===" << std::endl;
+        // std::cout << "=== SIMULATION POPULATION INITIALIZATION COMPLETED SUCCESSFULLY ===" <<
+        // std::endl;
     } catch (const std::exception &) {
     } catch (...) {
         std::cerr << "UNKNOWN ERROR in Simulation::initialise_population" << std::endl;
@@ -278,28 +288,29 @@ void Simulation::update_population() {
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
-    //std::cout << "DEBUG: Starting demographic updates" << std::endl;
+    // std::cout << "DEBUG: Starting demographic updates" << std::endl;
     demographic_->update_population(context_, *disease_);
-    //std::cout << "DEBUG: Completed demographic updates" << std::endl;
+    // std::cout << "DEBUG: Completed demographic updates" << std::endl;
 
     // Calculate the net immigration by gender and age, update the population accordingly
-    //std::cout << "DEBUG: Starting net immigration updates" << std::endl;
+    // std::cout << "DEBUG: Starting net immigration updates" << std::endl;
     update_net_immigration();
-    //std::cout << "DEBUG: Completed net immigration updates" << std::endl;
+    // std::cout << "DEBUG: Completed net immigration updates" << std::endl;
 
     // update population socio-economic status
-    //std::cout << "DEBUG: Starting socio-economic updates" << std::endl;
+    // std::cout << "DEBUG: Starting socio-economic updates" << std::endl;
     ses_->update_population(context_);
-    //std::cout << "DEBUG: Completed socio-economic updates" << std::endl;
+    // std::cout << "DEBUG: Completed socio-economic updates" << std::endl;
 
     // Update population risk factors
-    //std::cout << "DEBUG: Starting risk factor updates" << std::endl;
+    // std::cout << "DEBUG: Starting risk factor updates" << std::endl;
     try {
         // Add more detailed logging within the risk factor update process
-        //std::cout << "DEBUG: [Risk Factor] Beginning update process..." << std::endl;
+        // std::cout << "DEBUG: [Risk Factor] Beginning update process..." << std::endl;
 
         // Additional safety check on population before updates
-        //std::cout << "DEBUG: [Risk Factor] Population active size before update: " << context_.population().current_active_size() << std::endl;
+        // std::cout << "DEBUG: [Risk Factor] Population active size before update: " <<
+        // context_.population().current_active_size() << std::endl;
 
         // Call the risk factor update with timeout protection
         auto risk_future = std::async(std::launch::async, [this]() {
@@ -323,7 +334,7 @@ void Simulation::update_population() {
         } else {
             bool success = risk_future.get();
             if (success) {
-                //std::cout << "DEBUG: [Risk Factor] Update completed successfully" << std::endl;
+                // std::cout << "DEBUG: [Risk Factor] Update completed successfully" << std::endl;
             } else {
                 std::cerr << "ERROR: Risk factor update returned failure" << std::endl;
             }
@@ -337,10 +348,10 @@ void Simulation::update_population() {
     } catch (...) {
         std::cerr << "CRITICAL ERROR: Unknown exception in risk factor update" << std::endl;
     }
-    //std::cout << "DEBUG: Completed risk factor updates" << std::endl;
+    // std::cout << "DEBUG: Completed risk factor updates" << std::endl;
 
     // Update diseases status: remission and incidence
-    //std::cout << "DEBUG: Starting disease status updates" << std::endl;
+    // std::cout << "DEBUG: Starting disease status updates" << std::endl;
     try {
         // Check if any people in the population have active disease status before updating
         bool has_active_diseases = false;
@@ -352,7 +363,8 @@ void Simulation::update_population() {
         }
 
         if (!has_active_diseases) {
-            std::cout << "WARNING: No active diseases found in population, skipping disease updates" << std::endl;
+            std::cout << "WARNING: No active diseases found in population, skipping disease updates"
+                      << std::endl;
         } else {
             // Call the disease update method with additional safeguards
             auto disease_future = std::async(std::launch::async, [this]() {
@@ -375,7 +387,7 @@ void Simulation::update_population() {
             } else {
                 bool success = disease_future.get();
                 if (success) {
-                    //std::cout << "DEBUG: Disease update completed successfully" << std::endl;
+                    // std::cout << "DEBUG: Disease update completed successfully" << std::endl;
                 } else {
                     std::cerr << "ERROR: Disease update returned failure" << std::endl;
                 }
@@ -386,10 +398,10 @@ void Simulation::update_population() {
     } catch (...) {
         std::cerr << "CRITICAL ERROR: Unknown exception in disease update" << std::endl;
     }
-    //std::cout << "DEBUG: Completed disease status updates" << std::endl;
+    // std::cout << "DEBUG: Completed disease status updates" << std::endl;
 
     // Publish results to data logger
-    //std::cout << "DEBUG: Starting analysis updates" << std::endl;
+    // std::cout << "DEBUG: Starting analysis updates" << std::endl;
     try {
         // Check for valid ethnicity values before analysis
         int skipped_count = 0;
@@ -433,7 +445,7 @@ void Simulation::update_population() {
         } else {
             bool success = analysis_future.get();
             if (success) {
-                //std::cout << "DEBUG: Analysis completed successfully" << std::endl;
+                // std::cout << "DEBUG: Analysis completed successfully" << std::endl;
             } else {
                 std::cerr << "ERROR: Analysis returned failure" << std::endl;
             }
@@ -443,17 +455,18 @@ void Simulation::update_population() {
     } catch (...) {
         std::cerr << "CRITICAL ERROR: Unknown exception in analysis update" << std::endl;
     }
-    //std::cout << "DEBUG: Completed analysis updates" << std::endl;
+    // std::cout << "DEBUG: Completed analysis updates" << std::endl;
 }
 
 void Simulation::update_net_immigration() {
     try {
-        //std::cout << "DEBUG: [Net Immigration] Starting get_net_migration" << std::endl;
+        // std::cout << "DEBUG: [Net Immigration] Starting get_net_migration" << std::endl;
 
         // Get net migration data, will generate fallback data if there's an error
         auto net_immigration = get_net_migration();
 
-        //std::cout << "DEBUG: [Net Immigration] Got migration data, beginning population updates"  << std::endl;
+        // std::cout << "DEBUG: [Net Immigration] Got migration data, beginning population updates"
+        // << std::endl;
 
         // Update population based on net immigration
         auto start_age = context_.age_range().lower();
@@ -487,7 +500,8 @@ void Simulation::update_net_immigration() {
             }
         }
 
-        //std::cout << "DEBUG: [Net Immigration] Finished applying migration to population" << std::endl;
+        // std::cout << "DEBUG: [Net Immigration] Finished applying migration to population" <<
+        // std::endl;
 
         // Basic check to ensure we still have active population
         if (context_.population().current_active_size() == 0) {
@@ -504,7 +518,8 @@ void Simulation::update_net_immigration() {
             context_.reset_population(target_size > 0 ? target_size : 100);
             initialise_population();
 
-            std::cout << "Population reset with " << context_.population().current_active_size() << " active members." << std::endl;
+            std::cout << "Population reset with " << context_.population().current_active_size()
+                      << " active members." << std::endl;
         }
 
         // Enhanced synchronization between baseline and intervention
@@ -537,7 +552,8 @@ void Simulation::update_net_immigration() {
                     auto future = std::async(std::launch::async, [&, net_migration_copy]() mutable {
                         try {
                             // Safe send with logging
-                            //std::cout << "DEBUG: [Baseline] Sending migration data to intervention..."  << std::endl;
+                            // std::cout << "DEBUG: [Baseline] Sending migration data to
+                            // intervention..."  << std::endl;
 
                             // Create a message and add verification info
                             auto message = std::make_unique<NetImmigrationMessage>(
@@ -547,7 +563,8 @@ void Simulation::update_net_immigration() {
                             // Send the message
                             context_.scenario().channel().send(std::move(message));
 
-                            //std::cout << "DEBUG: [Baseline] Migration data sent successfully" << std::endl;
+                            // std::cout << "DEBUG: [Baseline] Migration data sent successfully" <<
+                            // std::endl;
                             return true;
                         } catch (const std::exception &e) {
                             std::cerr << "ERROR during async send: " << e.what() << std::endl;
@@ -757,7 +774,8 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
             // std::cout << "DEBUG: [get_net_migration] Baseline scenario - creating migration data"
             // << std::endl;
             auto data = create_net_migration();
-            //std::cout << "DEBUG: [get_net_migration] Baseline scenario - created migration data successfully"<< std::endl;
+            // std::cout << "DEBUG: [get_net_migration] Baseline scenario - created migration data
+            // successfully"<< std::endl;
             return data;
         } catch (const std::exception &e) {
             std::cerr << "ERROR in baseline get_net_migration: " << e.what() << std::endl;
@@ -776,7 +794,8 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
     }
 
     // For intervention, try to receive the migration data with significantly more patience
-    //std::cout<< "DEBUG: [get_net_migration] Intervention scenario - attempting to receive migration data" << std::endl;
+    // std::cout<< "DEBUG: [get_net_migration] Intervention scenario - attempting to receive
+    // migration data" << std::endl;
 
     // Create a default fallback table with zeros
     auto fallback_migration = create_age_gender_table<int>(context_.age_range());
@@ -799,7 +818,8 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
 
         // First large wait to give baseline time to generate data
         int initial_pause = static_cast<int>(5000 * size_factor);
-        std::cout << "DEBUG: [get_net_migration] Intervention waiting for " << initial_pause << "ms initially" << std::endl;
+        std::cout << "DEBUG: [get_net_migration] Intervention waiting for " << initial_pause
+                  << "ms initially" << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(initial_pause));
 
         for (int attempt = 0; attempt < max_attempts; attempt++) {
@@ -850,7 +870,8 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
                 double raw_timeout = wait_time * 3.0;
                 auto receive_timeout =
                     static_cast<int>(std::min(raw_timeout, 2.0 * 1000 * 1000)); // Max 2000 seconds
-                std::cout << "DEBUG: [get_net_migration] Attempting to receive with " << receive_timeout << "ms timeout" << std::endl;
+                std::cout << "DEBUG: [get_net_migration] Attempting to receive with "
+                          << receive_timeout << "ms timeout" << std::endl;
                 auto message = context_.scenario().channel().try_receive(receive_timeout);
 
                 if (message.has_value()) {
@@ -875,7 +896,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
                                 if (valid) {
                                     /*std::cout << "DEBUG: [get_net_migration] Successfully "
                                                  "validated migration data"
-                                              << std::endl;*/ 
+                                              << std::endl;*/
                                     return data;
                                 } else {
                                     std::cerr << "WARNING: Received migration data is incomplete"
@@ -911,7 +932,8 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
 
                     // Use this data if all further attempts fail
                     fallback_migration = backup_data;
-                    std::cout << "DEBUG: [get_net_migration] Successfully generated backup data" << std::endl;
+                    std::cout << "DEBUG: [get_net_migration] Successfully generated backup data"
+                              << std::endl;
                 } catch (const std::exception &e) {
                     std::cerr << "ERROR generating backup migration data: " << e.what()
                               << std::endl;
@@ -930,7 +952,7 @@ IntegerAgeGenderTable Simulation::get_net_migration() {
 }
 
 IntegerAgeGenderTable Simulation::create_net_migration() {
-    //std::cout << "DEBUG: [create_net_migration] Starting" << std::endl;
+    // std::cout << "DEBUG: [create_net_migration] Starting" << std::endl;
 
     // Create an empty table with zeros for all age/gender combinations
     auto net_emigration = create_age_gender_table<int>(context_.age_range());
@@ -944,7 +966,7 @@ IntegerAgeGenderTable Simulation::create_net_migration() {
     }
 
     try {
-        //std::cout << "DEBUG: [create_net_migration] Getting simulated population" << std::endl;
+        // std::cout << "DEBUG: [create_net_migration] Getting simulated population" << std::endl;
 
         // Get simulated population with timeout protection
         IntegerAgeGenderTable simulated_population;
@@ -957,7 +979,8 @@ IntegerAgeGenderTable Simulation::create_net_migration() {
         }
 
         simulated_population = sim_pop_future.get();
-        //std::cout << "DEBUG: [create_net_migration] Successfully retrieved simulated population"<< std::endl;
+        // std::cout << "DEBUG: [create_net_migration] Successfully retrieved simulated
+        // population"<< std::endl;
 
         // Only proceed with expected population if simulated population is valid
         bool simulated_valid = true;
@@ -986,7 +1009,8 @@ IntegerAgeGenderTable Simulation::create_net_migration() {
             }
 
             expected_population = expected_future.get();
-            //std::cout << "DEBUG: [create_net_migration] Successfully retrieved expected population" << std::endl;
+            // std::cout << "DEBUG: [create_net_migration] Successfully retrieved expected
+            // population" << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "ERROR getting expected population: " << e.what() << std::endl;
             return net_emigration; // Return zeros on error
@@ -1006,7 +1030,8 @@ IntegerAgeGenderTable Simulation::create_net_migration() {
             return net_emigration; // Return zeros
         }
 
-        //std::cout << "DEBUG: [create_net_migration] Calculating migration differences" << std::endl;
+        // std::cout << "DEBUG: [create_net_migration] Calculating migration differences" <<
+        // std::endl;
 
         // Both populations are verified valid, now calculate migration
         for (int age = start_age; age <= end_age; age++) {
@@ -1046,7 +1071,7 @@ IntegerAgeGenderTable Simulation::create_net_migration() {
             }
         }
 
-        //std::cout << "DEBUG: [create_net_migration] Migration calculation complete" << std::endl;
+        // std::cout << "DEBUG: [create_net_migration] Migration calculation complete" << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "Error in create_net_migration: " << e.what() << std::endl;
     }

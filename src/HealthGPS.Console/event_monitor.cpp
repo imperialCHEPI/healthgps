@@ -57,26 +57,27 @@ void EventMonitor::visit(const hgps::ErrorEventMessage &message) {
 }
 
 void EventMonitor::visit(const hgps::ResultEventMessage &message) {
-    //std::cout << "DEBUG: [EventMonitor] Processing ResultEventMessage from " << message.source << " for time " << message.model_time << std::endl;
+    // std::cout << "DEBUG: [EventMonitor] Processing ResultEventMessage from " << message.source <<
+    // " for time " << message.model_time << std::endl;
 
     try {
         // Verify the message content has valid data
         /*std::cout << "DEBUG: [EventMonitor] Result data: population="
                   << message.content.population_size
                   << ", alive males=" << message.content.number_alive.males
-                  << ", alive females=" << message.content.number_alive.females << std::endl;*/ 
+                  << ", alive females=" << message.content.number_alive.females << std::endl;*/
 
         // Check if result series has channels before writing
         /*std::cout << "DEBUG: [EventMonitor] Series data: " << message.content.series.size()
                   << " channels, " << message.content.series.sample_size() << " samples"
-                  << std::endl;*/ 
+                  << std::endl;*/
 
         if (message.content.series.channels().empty()) {
             std::cerr << "ERROR: [EventMonitor] Result message has NO CHANNELS. Output will be "
                          "incomplete!"
                       << std::endl;
         } else {
-            //std::cout << "DEBUG: [EventMonitor] First few channels: ";
+            // std::cout << "DEBUG: [EventMonitor] First few channels: ";
             int count = 0;
             for (const auto &channel : message.content.series.channels()) {
                 if (count++ < 5) {
@@ -87,9 +88,9 @@ void EventMonitor::visit(const hgps::ResultEventMessage &message) {
         }
 
         // Write to the result writer using . operator (reference access)
-       // std::cout << "DEBUG: [EventMonitor] Writing result data to file..." << std::endl;
+        // std::cout << "DEBUG: [EventMonitor] Writing result data to file..." << std::endl;
         result_writer_.write(message);
-        //std::cout << "DEBUG: [EventMonitor] Successfully wrote result data to file" << std::endl;
+        // std::cout << "DEBUG: [EventMonitor] Successfully wrote result data to file" << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR: [EventMonitor] Exception while processing result message: " << e.what()
                   << std::endl;

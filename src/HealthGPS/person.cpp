@@ -47,13 +47,13 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
         // Static properties
         return current_dispatcher.at(key)(*this);
     }
-    
+
     // Check if the key matches any ethnicity name (case-insensitive)
     std::string key_str = key.to_string();
     std::string key_lower = key_str;
-    std::transform(key_lower.begin(), key_lower.end(), key_lower.begin(), 
-                  [](unsigned char c){ return std::tolower(c); });
-    
+    std::transform(key_lower.begin(), key_lower.end(), key_lower.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
     // Handle ethnicity lookups by name
     if (key_lower == "white" && ethnicity == core::Ethnicity::White) {
         return ethnicity_to_value();
@@ -64,34 +64,33 @@ double Person::get_risk_factor_value(const core::Identifier &key) const {
     } else if (key_lower == "others" && ethnicity == core::Ethnicity::Others) {
         return ethnicity_to_value();
     }
-    
+
     // Also check if key matches the person's current ethnicity (by name)
     std::string person_ethnicity = ethnicity_to_string();
     std::string person_ethnicity_lower = person_ethnicity;
-    std::transform(person_ethnicity_lower.begin(), person_ethnicity_lower.end(), 
-                  person_ethnicity_lower.begin(), 
-                  [](unsigned char c){ return std::tolower(c); });
-    
+    std::transform(person_ethnicity_lower.begin(), person_ethnicity_lower.end(),
+                   person_ethnicity_lower.begin(), [](unsigned char c) { return std::tolower(c); });
+
     if (key_lower == person_ethnicity_lower) {
         return ethnicity_to_value();
     }
-    
+
     if (risk_factors.contains(key)) {
         // Dynamic properties
         return risk_factors.at(key);
     }
-    
+
     // Try a case-insensitive search through risk factors
-    for (const auto& [factor_key, factor_value] : risk_factors) {
+    for (const auto &[factor_key, factor_value] : risk_factors) {
         std::string factor_key_str = factor_key.to_string();
         std::transform(factor_key_str.begin(), factor_key_str.end(), factor_key_str.begin(),
-                      [](unsigned char c){ return std::tolower(c); });
-                      
+                       [](unsigned char c) { return std::tolower(c); });
+
         if (factor_key_str == key_lower) {
             return factor_value;
         }
     }
-    
+
     throw std::out_of_range("Risk factor not found: " + key.to_string());
 }
 

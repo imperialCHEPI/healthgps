@@ -4,82 +4,130 @@
     "Nutrients": [
         {
             "Name": "Carbohydrate",
-            "Range": [ 0.018864257, 1781.290527 ],
+            "Range": [
+                0.018864257,
+                1781.290527
+            ],
             "Energy": 4.0
         },
         {
             "Name": "Protein",
-            "Range": [ 0.008585715, 359.7049561 ],
+            "Range": [
+                0.008585715,
+                359.7049561
+            ],
             "Energy": 4.0
         },
         {
             "Name": "Fat",
-            "Range": [ 0.0, 1232.129272 ],
+            "Range": [
+                0.0,
+                1232.129272
+            ],
             "Energy": 9.0
         },
         {
             "Name": "Sodium",
-            "Range": [ 0.000200005, 16.34803581 ],
+            "Range": [
+                0.000200005,
+                16.34803581
+            ],
             "Energy": 0.0
         },
         {
             "Name": "Alcohol",
-            "Range": [ 0, 306.9281311 ],
+            "Range": [
+                0,
+                306.9281311
+            ],
             "Energy": 7.0
         },
         {
             "Name": "ProcessedMeat",
-            "Range": [ 0.0, 932.5 ],
+            "Range": [
+                0.0,
+                932.5
+            ],
             "Energy": 0.0
         },
         {
             "Name": "RedMeat",
-            "Range": [ 0.0, 476.6325559 ],
+            "Range": [
+                0.0,
+                476.6325559
+            ],
             "Energy": 0.0
         },
         {
             "Name": "Legume",
-            "Range": [ 0.0, 433.6983613 ],
+            "Range": [
+                0.0,
+                433.6983613
+            ],
             "Energy": 0.0
         },
         {
             "Name": "Fruit",
-            "Range": [ 0.0, 1720.489525 ],
+            "Range": [
+                0.0,
+                1720.489525
+            ],
             "Energy": 0.0
         },
         {
             "Name": "Vegetable",
-            "Range": [ 0.0, 2046.825704 ],
+            "Range": [
+                0.0,
+                2046.825704
+            ],
             "Energy": 0.0
         },
         {
             "Name": "AddedSugar",
-            "Range": [ 0, 758.3163452 ],
+            "Range": [
+                0,
+                758.3163452
+            ],
             "Energy": 4.0
         },
         {
             "Name": "TotalSugar",
-            "Range": [ 0.019693965, 819.5865479 ],
+            "Range": [
+                0.019693965,
+                819.5865479
+            ],
             "Energy": 0.0
         },
         {
             "Name": "MonounsaturatedFat",
-            "Range": [ 0.0, 483.5317688 ],
+            "Range": [
+                0.0,
+                483.5317688
+            ],
             "Energy": 0.0
         },
         {
             "Name": "PolyunsaturatedFattyAcid",
-            "Range": [ 0.0, 473.1528015 ],
+            "Range": [
+                0.0,
+                473.1528015
+            ],
             "Energy": 0.0
         },
         {
             "Name": "SaturatedFat",
-            "Range": [ 0.0, 276.9013672 ],
+            "Range": [
+                0.0,
+                276.9013672
+            ],
             "Energy": 0.0
         },
         {
             "Name": "Fibre",
-            "Range": [ 0.0, 189.5542603 ],
+            "Range": [
+                0.0,
+                189.5542603
+            ],
             "Energy": 0.0
         }
     ],

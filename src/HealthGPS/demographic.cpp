@@ -267,7 +267,8 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
             value.females /= total_weight;
         }
 
-        std::cout << "WARNING: Created synthetic age distribution with realistic age curve" << std::endl;
+        std::cout << "WARNING: Created synthetic age distribution with realistic age curve"
+                  << std::endl;
     }
 
     auto pop_size = static_cast<int>(population.size());
@@ -276,7 +277,8 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
     // ONLY FOR TESTING WHEN USING A SMALL POPULATION
     // For small populations, ensure at least one person in each decade
     if (pop_size < 100) {
-        std::cout << "Small population detected, ensuring representation across age groups" << std::endl;
+        std::cout << "Small population detected, ensuring representation across age groups"
+                  << std::endl;
 
         // Create a distribution of ages to explicitly include
         std::vector<int> required_ages = {0, 10, 20, 30, 40, 50, 60, 70, 80, 90};
@@ -426,7 +428,7 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context, Populatio
 // income_continuous, income_category and physical activity
 void DemographicModule::initialise_population(RuntimeContext &context, Population &population,
                                               Random &random) {
-    //std::cout << "DEBUG: Initializing population of size " << population.size() << std::endl;
+    // std::cout << "DEBUG: Initializing population of size " << population.size() << std::endl;
 
     // First, ensure all persons in the population are active
     // This is critical to fix any issues from previous runs
@@ -503,7 +505,8 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
 
 void DemographicModule::update_population([[maybe_unused]] RuntimeContext &context,
                                           const DiseaseModule &disease_host) {
-    //std::cout << "DEBUG: Starting update_population, active size: " << context.population().current_active_size() << std::endl;
+    // std::cout << "DEBUG: Starting update_population, active size: " <<
+    // context.population().current_active_size() << std::endl;
 
     // Start the residual mortality calculation asynchronously with additional safety mechanisms
     std::future<void> residual_future;
@@ -546,7 +549,8 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
     auto expected_pop_size = get_total_population_size(context.time_now());
     auto expected_num_deaths = get_total_deaths(context.time_now());
 
-    //std::cout << "DEBUG: Before residual_future.get(), active size: " << context.population().current_active_size() << std::endl;
+    // std::cout << "DEBUG: Before residual_future.get(), active size: " <<
+    // context.population().current_active_size() << std::endl;
 
     // Wait for the residual mortality calculation with timeout
     bool residual_success = false;
@@ -560,7 +564,8 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
                 try {
                     residual_future.get(); // No need to store the result
                     residual_success = true;
-                    //std::cout << "DEBUG: Residual mortality calculation completed successfully" << std::endl;
+                    // std::cout << "DEBUG: Residual mortality calculation completed successfully"
+                    // << std::endl;
                 } catch (const std::exception &e) {
                     std::cerr << "ERROR: Exception during residual mortality calculation: "
                               << e.what() << std::endl;
@@ -623,7 +628,7 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
                     0.001 + (age / 1200.0); // Slightly lower for females
             }
 
-            //std::cout << "INFO: Created default residual mortality values" << std::endl;
+            // std::cout << "INFO: Created default residual mortality values" << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "ERROR: Failed to create default mortality rates: " << e.what()
                       << std::endl;
@@ -738,7 +743,7 @@ void DemographicModule::update_population([[maybe_unused]] RuntimeContext &conte
 void DemographicModule::update_residual_mortality(RuntimeContext &context,
                                                   const DiseaseModule &disease_host) {
     try {
-        //std::cout << "DEBUG: [update_residual_mortality] Starting calculation..." << std::endl;
+        // std::cout << "DEBUG: [update_residual_mortality] Starting calculation..." << std::endl;
 
         // Reset disease caches to prevent stale data from causing errors
         extern void reset_disease_caches();
@@ -829,7 +834,8 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
             throw; // Re-throw to trigger default values
         }
 
-        //std::cout << "DEBUG: [update_residual_mortality] Calculation completed successfully" << std::endl;
+        // std::cout << "DEBUG: [update_residual_mortality] Calculation completed successfully" <<
+        // std::endl;
     } catch (const std::exception &) {
 
         // Create default values
@@ -1043,7 +1049,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     auto max_supported_age = 110u;
     auto max_age =
         std::max(static_cast<unsigned int>(context.age_range().upper()), max_supported_age);
-    //std::cout << "DEBUG: Maximum age limit is " << max_age << std::endl;
+    // std::cout << "DEBUG: Maximum age limit is " << max_age << std::endl;
 
     auto number_of_deaths = 0;
     auto age_deaths = 0;
@@ -1466,7 +1472,7 @@ void DemographicModule::initialise_income_continuous(Person &person, Random &ran
             std::cout << "  Random effect: " << (income_with_random - income_base)
                       << " (increased stddev: " << increased_stddev << ", random value: " << rand
                       << ")" << std::endl;
-        }*/ 
+        }*/
 
         // Check if the value is at risk of being at the min or max extremes
         /* if (income_with_random < min_income + (income_range * 0.05) ||
@@ -1657,7 +1663,7 @@ void DemographicModule::initialise_physical_activity([[maybe_unused]] RuntimeCon
 
         /*if (log_for_this_person) {
             std::cout << "  Base intercept: " << intercept << std::endl;
-        }*/ 
+        }*/
 
         // Calculate base expected PA value for age and gender
         double expected = intercept;

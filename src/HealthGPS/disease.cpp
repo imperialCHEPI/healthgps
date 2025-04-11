@@ -36,7 +36,7 @@ void reset_disease_caches() {
         }
 
         // Log successful reset
-        //std::cout << "DEBUG: Disease caches have been reset successfully" << std::endl;
+        // std::cout << "DEBUG: Disease caches have been reset successfully" << std::endl;
     } catch (...) {
         // Last resort error handling - create brand new static maps
         std::cerr << "WARNING: Error during disease cache reset, creating new cache instances"
@@ -175,7 +175,8 @@ void DiseaseModule::update_population(RuntimeContext &context) {
             disease_update_failures[disease_name] = false;
 
             // Log successful update
-            //std::cout << "DEBUG: [DiseaseModule] Successfully updated " << disease_name << " disease status" << std::endl;
+            // std::cout << "DEBUG: [DiseaseModule] Successfully updated " << disease_name << "
+            // disease status" << std::endl;
 
         } catch (const std::out_of_range &e) {
             error_count++;
@@ -198,12 +199,13 @@ void DiseaseModule::update_population(RuntimeContext &context) {
     }
 
     // Log summary of disease updates
-    std::cout << "INFO: [DiseaseModule] Updated " << success_count << " disease models successfully, " << error_count << " failures" << std::endl;
+    std::cout << "INFO: [DiseaseModule] Updated " << success_count
+              << " disease models successfully, " << error_count << " failures" << std::endl;
 
     // Print summary for each disease
     if (success_count > 0) {
         int year = context.time_now();
-        //std::cout << "INFO: [Year " << year << "] Disease summary:" << std::endl;
+        // std::cout << "INFO: [Year " << year << "] Disease summary:" << std::endl;
         for (const auto &disease_id : disease_ids) {
             if (!disease_update_failures[disease_id.to_string()]) {
                 // Only print successful diseases
@@ -229,7 +231,7 @@ void DiseaseModule::update_population(RuntimeContext &context) {
     }
 
     // Add this line to indicate the function completed successfully
-    //std::cout << "DEBUG: Successfully completed initializing " << name() << std::endl;
+    // std::cout << "DEBUG: Successfully completed initializing " << name() << std::endl;
 }
 
 bool DiseaseModule::has_disease(const core::Identifier &disease_code,
@@ -515,7 +517,8 @@ std::unique_ptr<DiseaseModule> build_disease_module(Repository &repository,
         });
 
     // Log final statistics
-    //std::cout << "INFO: Disease initialization complete: " << successful_count << " successful, " << failed_count << " failed" << std::endl;
+    // std::cout << "INFO: Disease initialization complete: " << successful_count << " successful, "
+    // << failed_count << " failed" << std::endl;
 
     return std::make_unique<DiseaseModule>(std::move(models));
 }
