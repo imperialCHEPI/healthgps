@@ -11,6 +11,7 @@
 #include <optional>
 #include <tuple>
 #include <vector>
+#include <fstream>
 
 namespace hgps {
 
@@ -55,6 +56,8 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
         std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
         std::unordered_map<core::Income, LinearModelParams> income_models,
         double income_continuous_stddev);
+
+    ~KevinHallModel();
 
     RiskFactorModelType type() const noexcept override;
 
@@ -107,7 +110,7 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     /// @brief Initialise total nutrient intakes from food intakes
     /// @param person The person to initialise
     /// @param random The random number generator
-    void initialise_nutrient_intakes(Person &person, Random &random) const;
+    void initialise_nutrient_intakes(Person &person) const;
 
     /// @brief Update total nutrient intakes from food intakes
     /// @param person The person to update
@@ -305,6 +308,10 @@ class KevinHallModel final : public RiskFactorAdjustableModel {
     // Member variables in correct initialization order
     double income_continuous_stddev_;
     double physical_activity_stddev_ = 0.5;
+
+    // Carbohydrate tracking
+    mutable std::ofstream carb_tracking_file_;
+    void track_carbohydrate_values(const Person& person, int year) const;
 };
 
 /// @brief Defines the energy balance model data type

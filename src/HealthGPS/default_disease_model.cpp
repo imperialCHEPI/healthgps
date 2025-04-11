@@ -26,8 +26,7 @@ const core::Identifier &DefaultDiseaseModel::disease_type() const noexcept {
 void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
     try {
         // Log the start of disease initialization
-        std::cout << "INFO: Initializing disease status for " << disease_type().to_string()
-                  << std::endl;
+       // std::cout << "INFO: Initializing disease status for " << disease_type().to_string() << std::endl;
 
         // Track initialization statistics
         int total_people = 0;
@@ -62,8 +61,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
             return;
         }
 
-        std::cout << "INFO: Maximum age in disease table for " << disease_type().to_string()
-                  << " is " << max_table_age << std::endl;
+        //std::cout << "INFO: Maximum age in disease table for " << disease_type().to_string() << " is " << max_table_age << std::endl;
 
         auto relative_risk_table = calculate_average_relative_risk(context);
         for (auto &person : context.population()) {
@@ -151,10 +149,11 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
         }
 
         // Report initialization statistics
-        std::cout << "INFO: Initialized " << disease_type().to_string() << " for " << disease_count
+        /*std::cout << "INFO: Initialized " << disease_type().to_string() << " for "
+                       << disease_count
                   << " out of " << active_people << " active people ("
                   << (disease_count * 100.0 / std::max(1, active_people)) << "%), with "
-                  << error_count << " errors" << std::endl;
+                  << error_count << " errors" << std::endl;*/ 
 
         // Warn if no diseases were initialized
         if (disease_count == 0) {
@@ -192,8 +191,7 @@ void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &conte
                 return;
             }
 
-            std::cout << "INFO: Maximum age in disease table for " << disease_type().to_string()
-                      << " is " << max_table_age_ << std::endl;
+            //std::cout << "INFO: Maximum age in disease table for " << disease_type().to_string() << " is " << max_table_age_ << std::endl;
         }
 
         tbb::parallel_for_each(pop.cbegin(), pop.cend(), [&](const auto &person) {
@@ -240,33 +238,26 @@ void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &conte
             average_relative_risk_(age, core::Gender::female) = female_average;
         }
 
-        std::cout << "INFO: Successfully initialized average relative risk for "
-                  << disease_type().to_string() << std::endl;
+        //std::cout << "INFO: Successfully initialized average relative risk for " << disease_type().to_string() << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR in initialise_average_relative_risk: " << e.what() << std::endl;
     }
 }
 
 void DefaultDiseaseModel::update_disease_status(RuntimeContext &context) {
-    std::cout << "DEBUG: Starting disease status updates for " << disease_type().to_string()
-              << std::endl;
+    //std::cout << "DEBUG: Starting disease status updates for " << disease_type().to_string()<< std::endl;
 
     try {
         // Order is very important!
-        std::cout << "DEBUG: Starting remission updates for " << disease_type().to_string()
-                  << std::endl;
+        //std::cout << "DEBUG: Starting remission updates for " << disease_type().to_string() << std::endl;
         this->update_remission_cases(context);
-        std::cout << "DEBUG: Completed remission updates for " << disease_type().to_string()
-                  << std::endl;
+        //std::cout << "DEBUG: Completed remission updates for " << disease_type().to_string() << std::endl;
 
-        std::cout << "DEBUG: Starting incidence updates for " << disease_type().to_string()
-                  << std::endl;
+        //std::cout << "DEBUG: Starting incidence updates for " << disease_type().to_string() << std::endl;
         this->update_incidence_cases(context);
-        std::cout << "DEBUG: Completed incidence updates for " << disease_type().to_string()
-                  << std::endl;
+        //std::cout << "DEBUG: Completed incidence updates for " << disease_type().to_string() << std::endl;
 
-        std::cout << "DEBUG: Completed disease status updates for " << disease_type().to_string()
-                  << std::endl;
+       // std::cout << "DEBUG: Completed disease status updates for " << disease_type().to_string() << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR in update_disease_status for " << disease_type().to_string() << ": "
                   << e.what() << std::endl;
@@ -321,7 +312,6 @@ double DefaultDiseaseModel::get_excess_mortality(const Person &person) const noe
 
         return 0.0;
     } catch (...) {
-        // Silently handle any errors in this const noexcept method
         return 0.0;
     }
 }
@@ -401,6 +391,7 @@ double DefaultDiseaseModel::calculate_relative_risk_for_risk_factors(const Perso
         return relative_risk;
     } catch (const std::exception &) {
         // If there's any error, return default value
+        std::cout << "ERROR[default_disease_model]:Going default";
         return 1.0;
     }
 }
@@ -692,15 +683,12 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         // Simplified report - only print if there were errors or it's a year divisible by 5
         int year = context.time_now();
         if (error_count > 0 || year % 5 == 0) {
-            std::cout << "INFO: [Year " << year << "] " << disease_type().to_string()
-                      << " incidence: " << new_cases << " new cases ("
-                      << (new_cases * 100.0 / std::max(1, active_people)) << "%)" << std::endl;
+            //std::cout << "INFO: [Year " << year << "] " << disease_type().to_string() << " incidence: " << new_cases << " new cases (" << (new_cases * 100.0 / std::max(1, active_people)) << "%)" << std::endl;
         }
 
         // Only warn about zero cases if the year is divisible by 5 (to reduce noise)
         if (new_cases == 0 && active_people > 0 && year % 5 == 0) {
-            std::cerr << "WARNING: No new " << disease_type().to_string() << " cases in year "
-                      << year << std::endl;
+            std::cerr << "WARNING: No new " << disease_type().to_string() << " cases in year " << year << std::endl;
         }
     } catch (const std::exception &e) {
         // Handle any other exceptions
@@ -738,8 +726,7 @@ double DefaultDiseaseModel::calculate_disease_probability(const Person &person,
                 return 0.0;
             }
 
-            std::cout << "INFO: Maximum age in disease table for " << disease_type().to_string()
-                      << " is " << max_table_age_ << std::endl;
+            //std::cout << "INFO: Maximum age in disease table for " << disease_type().to_string() << " is " << max_table_age_ << std::endl;
         }
 
         // Handle people with ages above what's in the disease table

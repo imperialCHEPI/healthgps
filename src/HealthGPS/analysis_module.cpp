@@ -89,7 +89,7 @@ std::string AnalysisModule::name() const noexcept { return name_; }
 void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &context,
                                            [[maybe_unused]] Population &population,
                                            [[maybe_unused]] Random &random) {
-    std::cout << "DEBUG: Starting analysis module initialization..." << std::endl;
+    //std::cout << "DEBUG: Starting analysis module initialization..." << std::endl;
 
     try {
         const auto &age_range = context.age_range();
@@ -162,8 +162,7 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
 
             // Force initialization of some essential channels as fallback
             if (channels_.empty()) {
-                std::cout << "DEBUG: Forcing initialization of essential channels as fallback"
-                          << std::endl;
+                std::cout << "DEBUG: Forcing initialization of essential channels as fallback" << std::endl;
                 channels_.emplace_back("count");
                 channels_.emplace_back("deaths");
                 channels_.emplace_back("emigrations");
@@ -183,8 +182,7 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
                     channels_.emplace_back("std_" + factor.key().to_string());
                 }
 
-                std::cout << "DEBUG: Fallback initialization added " << channels_.size()
-                          << " channels" << std::endl;
+                std::cout << "DEBUG: Fallback initialization added " << channels_.size() << " channels" << std::endl;
             }
         } else if (channels_.size() < 10) {
             std::cerr << "WARNING: Very few channels initialized (" << channels_.size()
@@ -200,7 +198,7 @@ void AnalysisModule::initialise_population([[maybe_unused]] RuntimeContext &cont
 
         publish_result_message(context);
 
-        std::cout << "DEBUG: Successfully completed analysis module initialization" << std::endl;
+        //std::cout << "DEBUG: Successfully completed analysis module initialization" << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "ERROR in AnalysisModule::initialise_population: " << e.what() << std::endl;
     } catch (...) {
@@ -255,8 +253,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
                              "Output will be empty."
                           << std::endl;
             } else {
-                std::cout << "DEBUG: Successfully initialized " << channels_.size() << " channels"
-                          << std::endl;
+                //std::cout << "DEBUG: Successfully initialized " << channels_.size() << " channels" << std::endl;
             }
         }
 
@@ -287,9 +284,8 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
             // std::cout << "..." << std::endl;
         }
 
-        std::cout << "DEBUG: Created model result object with sample size " << sample_size
-                  << std::endl;
-        std::cout << "DEBUG: Starting historical statistics calculation..." << std::endl;
+        //std::cout << "DEBUG: Created model result object with sample size " << sample_size << std::endl;
+        //std::cout << "DEBUG: Starting historical statistics calculation..." << std::endl;
 
         // Store a flag to track if historical calculation succeeded
         bool historical_stats_success = true;
@@ -299,18 +295,18 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
             handle = core::run_async(&AnalysisModule::calculate_historical_statistics, this,
                                      std::ref(context), std::ref(result));
 
-            std::cout << "DEBUG: Started async calculation of historical statistics" << std::endl;
+            //std::cout << "DEBUG: Started async calculation of historical statistics" << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "ERROR starting historical statistics calculation: " << e.what()
                       << std::endl;
             historical_stats_success = false;
         }
 
-        std::cout << "DEBUG: Starting population statistics calculation..." << std::endl;
+        //std::cout << "DEBUG: Starting population statistics calculation..." << std::endl;
 
         try {
             calculate_population_statistics(context, result.series);
-            std::cout << "DEBUG: Completed population statistics calculation" << std::endl;
+            //std::cout << "DEBUG: Completed population statistics calculation" << std::endl;
 
             // Verify series has data
             // std::cout << "DEBUG: After calculation - series has " << result.series.size() << "
@@ -339,10 +335,9 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
 
         if (historical_stats_success) {
             try {
-                std::cout << "DEBUG: Waiting for historical statistics calculation to complete..."
-                          << std::endl;
+                //std::cout << "DEBUG: Waiting for historical statistics calculation to complete..." << std::endl;
                 handle.get();
-                std::cout << "DEBUG: Historical statistics calculation completed" << std::endl;
+                //std::cout << "DEBUG: Historical statistics calculation completed" << std::endl;
             } catch (const std::out_of_range &e) {
                 std::cerr << "ERROR in historical statistics calculation - map key error: "
                           << e.what() << std::endl;
@@ -379,7 +374,7 @@ void AnalysisModule::publish_result_message(RuntimeContext &context) const {
         try {
             context.publish(std::make_unique<ResultEventMessage>(
                 context.identifier(), context.current_run(), context.time_now(), result));
-            std::cout << "DEBUG: Successfully published result event message" << std::endl;
+            //std::cout << "DEBUG: Successfully published result event message" << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "ERROR publishing result message: " << e.what() << std::endl;
         }
@@ -555,7 +550,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
 void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                                                      DataSeries &series) const {
     try {
-        std::cout << "DEBUG: Starting calculate_population_statistics" << std::endl;
+        //std::cout << "DEBUG: Starting calculate_population_statistics" << std::endl;
 
         // Check for empty channels list
         if (channels_.empty()) {
@@ -766,15 +761,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // Calculate standard deviation
         try {
             calculate_standard_deviation(context, series);
-            std::cout << "DEBUG: Calculated standard deviations successfully" << std::endl;
+            //std::cout << "DEBUG: Calculated standard deviations successfully" << std::endl;
         } catch (const std::exception &e) {
             std::cerr << "ERROR calculating standard deviations: " << e.what() << std::endl;
         }
 
         // Add placeholder values for ages 101-110 if none were processed
         if (!has_high_ages) {
-            std::cout << "DEBUG: Adding placeholder values for ages 101-110" << std::endl;
-
+            
             // Get values from age 100 to use as reference
             for (int age = 101; age <= 110; age++) {
                 // For each channel, copy from age 100 but reduced by a small factor for each year
@@ -805,7 +799,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // std::cout << "DEBUG: Final data series contains " << series.size() << " channels" <<
         // std::endl;
         if (series.size() > 0) {
-            std::cout << "DEBUG: First few channels in final data: ";
+            //std::cout << "DEBUG: First few channels in final data: ";
             int channel_count = 0;
             for (const auto &channel : series.channels()) {
                 if (channel_count++ < 5) {

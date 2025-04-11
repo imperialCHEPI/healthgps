@@ -1,6 +1,16 @@
 #include "HealthGPS.Core/exception.h"
 #include <iostream>
 
+#include "kevin_hall_model.h"
+#include "runtime_context.h"
+#include "sync_message.h"
+#include "demographic.h"
+
+#include <algorithm>
+#include <iterator>
+#include <utility>
+#include <random>
+
 // Disable specific warnings from external dependencies
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -18,15 +28,6 @@
     disable : 6285) // Non-zero constant in bitwise-and operation (from core bit manipulation)
 #endif
 
-#include "demographic.h"
-#include "kevin_hall_model.h"
-#include "runtime_context.h"
-#include "sync_message.h"
-
-#include <algorithm>
-#include <iterator>
-#include <random>
-#include <utility>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -71,7 +72,21 @@ KevinHallModel::KevinHallModel(
       height_stddev_{height_stddev}, height_slope_{height_slope},
       region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
       income_models_{std::move(income_models)},
-      income_continuous_stddev_{income_continuous_stddev} {}
+      income_continuous_stddev_{income_continuous_stddev} {
+    
+    // Initialize carbohydrate tracking file
+    carb_tracking_file_.open("carbohydrate_over_years.csv");
+    if (carb_tracking_file_.is_open()) {
+        carb_tracking_file_ << "PersonID,Age,Year,Scenario,CI_0,CI" << std::endl;
+    }
+}
+
+KevinHallModel::~KevinHallModel() {
+    // Close the carbohydrate tracking file
+    if (carb_tracking_file_.is_open()) {
+        carb_tracking_file_.close();
+    }
+}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
@@ -99,7 +114,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Step 6: Initialize remaining risk factors
     for (auto &person : context.population()) {
-        initialise_nutrient_intakes(person, context.random());
+        initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
@@ -151,6 +166,11 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 
     // Adjust physical activity mean to match expected
     adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
+    
+    // Flush the tracking file after each time step
+    if (carb_tracking_file_.is_open()) {
+        carb_tracking_file_.flush();
+    }
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
@@ -162,7 +182,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
             continue;
         }
 
-        initialise_nutrient_intakes(person, context.random());
+        initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
@@ -419,20 +439,21 @@ double KevinHallModel::get_expected(RuntimeContext &context, core::Gender sex, i
     return RiskFactorAdjustableModel::get_expected(context, sex, age, factor, range, apply_trend);
 }
 
-void KevinHallModel::initialise_nutrient_intakes(Person &person,
-                                                 [[maybe_unused]] Random &random) const {
-    // Initialise base nutrient intakes
+void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
+
+    // Initialise nutrient intakes.
     compute_nutrient_intakes(person);
 
-    // Get current values
+    // Start with previous = current.
     double carbohydrate = person.risk_factors.at("Carbohydrate"_id);
-    double sodium = person.risk_factors.at("Sodium"_id);
-
-    // Store values with random variations
-    person.risk_factors.at("Carbohydrate"_id) = carbohydrate;
     person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
-    person.risk_factors.at("Sodium"_id) = sodium;
+    double sodium = person.risk_factors.at("Sodium"_id);
     person.risk_factors["Sodium_previous"_id] = sodium;
+    
+    // Track initial carbohydrate values
+    if (context_) {
+        track_carbohydrate_values(person, context_->time_now());
+    }
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
@@ -444,20 +465,85 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
 
     // Update nutrient intakes.
     compute_nutrient_intakes(person);
+    
+    // Track updated carbohydrate values
+    if (context_) {
+        track_carbohydrate_values(person, context_->time_now());
+    }
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-    // Reset nutrient intakes to zero.
+    // Reset nutrient intakes to zero for all nutrients in energy equation
     for (const auto &[nutrient_key, unused] : energy_equation_) {
         person.risk_factors[nutrient_key] = 0.0;
     }
 
-    // Compute nutrient intakes from food intakes.
+    // Create a list of missing food intakes to report once
+    std::vector<std::string> missing_foods;
+
+    // Compute nutrient intakes from food intakes with error handling
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
-        double food_intake = person.risk_factors.at(food_key);
-        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+        try {
+            // Try to access food intake with direct key
+            double food_intake = 0.0;
+            if (person.risk_factors.contains(food_key)) {
+                food_intake = person.risk_factors.at(food_key);
+            } else {
+                // Try case-insensitive lookup
+                std::string food_key_str = food_key.to_string();
+                std::string food_key_lower = food_key_str;
+                std::transform(food_key_lower.begin(), food_key_lower.end(), food_key_lower.begin(),
+                               [](unsigned char c){ return std::tolower(c); });
+                
+                bool found = false;
+                for (const auto& [factor_key, factor_value] : person.risk_factors) {
+                    std::string factor_key_str = factor_key.to_string();
+                    std::string factor_key_lower = factor_key_str;
+                    std::transform(factor_key_lower.begin(), factor_key_lower.end(), factor_key_lower.begin(),
+                                   [](unsigned char c){ return std::tolower(c); });
+                                   
+                    if (factor_key_lower == food_key_lower) {
+                        food_intake = factor_value;
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // If still not found, initialize it to 0
+                if (!found) {
+                    missing_foods.push_back(food_key.to_string());
+                    person.risk_factors[food_key] = 0.0;
+                    food_intake = 0.0;
+                }
+            }
+            
+            // Process each nutrient
+            for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
+                try {
+                    person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+                } catch (const std::exception &e) {
+                    // Initialize missing nutrient
+                    person.risk_factors[nutrient_key] = food_intake * nutrient_coefficient;
+                }
+            }
+        } catch (const std::exception &e) {
+            // Log error but continue with other foods
+            std::cerr << "Error processing food intake for " << food_key.to_string() 
+                      << ": " << e.what() << std::endl;
+            
+            // Initialize this food to 0 to prevent future errors
+            person.risk_factors[food_key] = 0.0;
         }
+    }
+    
+    // Report missing foods once
+    if (!missing_foods.empty() && context_) {
+        std::cerr << "WARNING: Initialized missing foods to 0 in person " << person.id() << ": ";
+        for (size_t i = 0; i < missing_foods.size(); ++i) {
+            if (i > 0) std::cerr << ", ";
+            std::cerr << missing_foods[i];
+        }
+        std::cerr << std::endl;
     }
 }
 
@@ -482,15 +568,53 @@ void KevinHallModel::update_energy_intake(Person &person) const {
 }
 
 void KevinHallModel::compute_energy_intake(Person &person) const {
-
     // Reset energy intake to zero.
     const auto energy_intake_key = "EnergyIntake"_id;
     person.risk_factors[energy_intake_key] = 0.0;
 
-    // Compute energy intake from nutrient intakes.
+    // Compute energy intake from nutrient intakes with error handling
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
-        double nutrient_intake = person.risk_factors.at(nutrient_key);
-        person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
+        try {
+            // Try to access nutrient with direct key
+            double nutrient_intake = 0.0;
+            if (person.risk_factors.contains(nutrient_key)) {
+                nutrient_intake = person.risk_factors.at(nutrient_key);
+            } else {
+                // Try case-insensitive lookup
+                std::string nutrient_key_str = nutrient_key.to_string();
+                std::string nutrient_key_lower = nutrient_key_str;
+                std::transform(nutrient_key_lower.begin(), nutrient_key_lower.end(), nutrient_key_lower.begin(),
+                               [](unsigned char c){ return std::tolower(c); });
+                
+                bool found = false;
+                for (const auto& [factor_key, factor_value] : person.risk_factors) {
+                    std::string factor_key_str = factor_key.to_string();
+                    std::string factor_key_lower = factor_key_str;
+                    std::transform(factor_key_lower.begin(), factor_key_lower.end(), factor_key_lower.begin(),
+                                   [](unsigned char c){ return std::tolower(c); });
+                                   
+                    if (factor_key_lower == nutrient_key_lower) {
+                        nutrient_intake = factor_value;
+                        found = true;
+                        break;
+                    }
+                }
+                
+                // If still not found, initialize it to 0
+                if (!found) {
+                    std::cerr << "WARNING: Missing nutrient " << nutrient_key.to_string() 
+                              << " for person " << person.id() << ", initializing to 0" << std::endl;
+                    person.risk_factors[nutrient_key] = 0.0;
+                    nutrient_intake = 0.0;
+                }
+            }
+            
+            person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
+        } catch (const std::exception &e) {
+            // Log error but continue with other nutrients
+            std::cerr << "Error processing nutrient " << nutrient_key.to_string() 
+                      << " for energy intake: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -964,7 +1088,7 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
                     fixed_count++;
 
                     // Debug specific cases for first few inconsistencies
-                    if (inconsistency_count <= 5) {
+                    /*if (inconsistency_count <= 5) {
                         std::cout << "FIXED: Person " << person.id() << " Income=" << income_value;
 
                         std::cout << ", Category changed from ";
@@ -1003,7 +1127,7 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
                             std::cout << "Unknown";
                         }
                         std::cout << std::endl;
-                    }
+                    }*/ 
                 } else {
                     // Already consistent, no action needed
                 }
@@ -1033,6 +1157,30 @@ void KevinHallModel::update_income_category(RuntimeContext &context) const {
 
         last_update_year = current_year;
     }
+}
+
+void KevinHallModel::track_carbohydrate_values(const Person& person, int year) const {
+    if (!carb_tracking_file_.is_open()) {
+        return;
+    }
+    
+    // Get carbohydrate values using string literals with _id suffix
+    double ci_0 = person.risk_factors.at("Carbohydrate_previous"_id);
+    double ci = person.risk_factors.at("Carbohydrate"_id);
+    
+    // Determine scenario type
+    std::string scenario_type = "unknown";
+    if (context_) {
+        scenario_type = (context_->scenario().type() == ScenarioType::baseline) ? "baseline" : "intervention";
+    }
+    
+    // Write to CSV file using std::to_string for the person ID
+    carb_tracking_file_ << std::to_string(person.id()) << ","
+                       << person.age << ","
+                       << year << ","
+                       << scenario_type << ","
+                       << ci_0 << ","
+                       << ci << std::endl;
 }
 
 KevinHallModelDefinition::KevinHallModelDefinition(
