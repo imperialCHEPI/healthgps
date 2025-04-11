@@ -31,5 +31,5 @@
         "running",
         "output"
     ],
-    "additionalProperties": false
+    "additionalProperties": true
 }

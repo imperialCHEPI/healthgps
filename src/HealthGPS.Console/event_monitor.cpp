@@ -6,6 +6,7 @@
 
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <iostream>
 
 namespace hgps {
 EventMonitor::EventMonitor(hgps::EventAggregator &event_bus, ResultWriter &result_writer)
@@ -55,7 +56,59 @@ void EventMonitor::visit(const hgps::ErrorEventMessage &message) {
     fmt::print(fg(fmt::color::red), "{}\n", message.to_string());
 }
 
-void EventMonitor::visit(const hgps::ResultEventMessage &message) { result_writer_.write(message); }
+void EventMonitor::visit(const hgps::ResultEventMessage &message) {
+    // std::cout << "DEBUG: [EventMonitor] Processing ResultEventMessage from " << message.source <<
+    // " for time " << message.model_time << std::endl;
+
+    try {
+        // Verify the message content has valid data
+        /*std::cout << "DEBUG: [EventMonitor] Result data: population="
+                  << message.content.population_size
+                  << ", alive males=" << message.content.number_alive.males
+                  << ", alive females=" << message.content.number_alive.females << std::endl;*/
+
+        // Check if result series has channels before writing
+        /*std::cout << "DEBUG: [EventMonitor] Series data: " << message.content.series.size()
+                  << " channels, " << message.content.series.sample_size() << " samples"
+                  << std::endl;*/
+
+        if (message.content.series.channels().empty()) {
+            std::cerr << "ERROR: [EventMonitor] Result message has NO CHANNELS. Output will be "
+                         "incomplete!"
+                      << std::endl;
+        } else {
+            // std::cout << "DEBUG: [EventMonitor] First few channels: ";
+            int count = 0;
+            for (const auto &channel : message.content.series.channels()) {
+                if (count++ < 5) {
+                    std::cout << channel << ", ";
+                }
+            }
+            std::cout << "..." << std::endl;
+        }
+
+        // Write to the result writer using . operator (reference access)
+        // std::cout << "DEBUG: [EventMonitor] Writing result data to file..." << std::endl;
+        result_writer_.write(message);
+        // std::cout << "DEBUG: [EventMonitor] Successfully wrote result data to file" << std::endl;
+    } catch (const std::exception &e) {
+        std::cerr << "ERROR: [EventMonitor] Exception while processing result message: " << e.what()
+                  << std::endl;
+
+        // Try to recover by attempting to write again with extra safety
+        try {
+            std::cerr << "ATTEMPTING RECOVERY: Trying to write result data again..." << std::endl;
+            result_writer_.write(message);
+            std::cerr << "RECOVERY SUCCESSFUL: Wrote result data in recovery attempt" << std::endl;
+        } catch (const std::exception &recovery_e) {
+            std::cerr << "RECOVERY FAILED: Could not write result data: " << recovery_e.what()
+                      << std::endl;
+        }
+    } catch (...) {
+        std::cerr << "ERROR: [EventMonitor] Unknown exception while processing result message"
+                  << std::endl;
+    }
+}
 
 void EventMonitor::info_event_handler(std::shared_ptr<hgps::EventMessage> message) {
     info_queue_.emplace(std::move(message));

@@ -108,7 +108,8 @@ int main(int argc, char *argv[]) { // NOLINT(bugprone-exception-escape)
     }
 
     // Load input data file into a datatable asynchronous
-    auto table_future = core::run_async(load_datatable_from_csv, config.file);
+    auto load_func = &load_datatable_from_csv;
+    auto table_future = core::run_async(load_func, config.file);
 
 #ifdef CATCH_EXCEPTIONS
     try {

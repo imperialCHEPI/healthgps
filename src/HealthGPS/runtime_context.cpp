@@ -1,12 +1,39 @@
 #include "runtime_context.h"
+#include "demographic.h"
+
+namespace {
+// Hash function for RegionKey tuple
+struct RegionKeyHash {
+    std::size_t operator()(const std::tuple<int, hgps::core::Gender> &key) const {
+        auto [age, gender] = key;
+        return std::hash<int>()(age) ^ std::hash<int>()(static_cast<int>(gender));
+    }
+};
+
+// Hash function for EthnicityKey tuple
+struct EthnicityKeyHash {
+    std::size_t
+    operator()(const std::tuple<int, hgps::core::Gender, hgps::core::Region> &key) const {
+        auto [age, gender, region] = key;
+        return std::hash<int>()(age) ^ std::hash<int>()(static_cast<int>(gender)) ^
+               std::hash<int>()(static_cast<int>(region));
+    }
+};
+} // namespace
 
 namespace hgps {
 
 RuntimeContext::RuntimeContext(std::shared_ptr<const EventAggregator> bus,
                                std::shared_ptr<const ModelInput> inputs,
                                std::unique_ptr<Scenario> scenario)
-    : event_bus_{std::move(bus)}, inputs_{std::move(inputs)}, scenario_{std::move(scenario)},
-      population_{0} {}
+    : event_bus_{std::const_pointer_cast<EventAggregator>(bus)}, inputs_{std::move(inputs)},
+      scenario_{std::move(scenario)}, population_{0}, random_{}, metrics_{},
+      // NOLINTNEXTLINE(cppcoreguidelines-use-default-member-init)
+      time_now_{},
+      // NOLINTNEXTLINE(cppcoreguidelines-use-default-member-init)
+      current_run_{},
+      // NOLINTNEXTLINE(cppcoreguidelines-use-default-member-init)
+      model_start_time_{}, age_range_{inputs_->settings().age_range()} {}
 
 int RuntimeContext::time_now() const noexcept { return time_now_; }
 
@@ -36,11 +63,9 @@ const std::vector<core::DiseaseInfo> &RuntimeContext::diseases() const noexcept 
     return inputs_->diseases();
 }
 
-const core::IntegerInterval &RuntimeContext::age_range() const noexcept {
-    return inputs_->settings().age_range();
-}
+const core::IntegerInterval &RuntimeContext::age_range() const noexcept { return age_range_; }
 
-const std::string &RuntimeContext::identifier() const noexcept { return scenario_->name(); }
+std::string RuntimeContext::identifier() const noexcept { return scenario_->name(); }
 
 void RuntimeContext::set_current_time(const int time_now) noexcept { time_now_ = time_now; }
 
@@ -54,11 +79,35 @@ void RuntimeContext::reset_population(const std::size_t initial_pop_size) {
 }
 
 void RuntimeContext::publish(std::unique_ptr<EventMessage> message) const noexcept {
-    event_bus_->publish(std::move(message));
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+    const_cast<EventAggregator *>(event_bus_.get())->publish(std::move(message));
 }
 
 void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const noexcept {
-    event_bus_->publish_async(std::move(message));
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+    const_cast<EventAggregator *>(event_bus_.get())->publish_async(std::move(message));
+}
+
+std::unordered_map<core::Region, double>
+RuntimeContext::get_region_probabilities(int age, core::Gender gender) const {
+    return inputs_->get_region_probabilities(age, gender);
+}
+
+std::unordered_map<core::Ethnicity, double>
+RuntimeContext::get_ethnicity_probabilities(int age, core::Gender gender,
+                                            core::Region region) const {
+    return inputs_->get_ethnicity_probabilities(age, gender, region);
+}
+
+void RuntimeContext::set_demographic_module(std::shared_ptr<DemographicModule> demographic_module) {
+    demographic_module_ = std::move(demographic_module);
+}
+
+DemographicModule &RuntimeContext::demographic_module() const {
+    if (!demographic_module_) {
+        throw core::HgpsException("Demographic module not set in RuntimeContext");
+    }
+    return *demographic_module_;
 }
 
 } // namespace hgps

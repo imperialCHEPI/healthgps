@@ -18,7 +18,7 @@ class RiskFactorModule final : public RiskFactorHostModule {
 
     SimulationModuleType type() const noexcept override;
 
-    const std::string &name() const noexcept override;
+    std::string name() const noexcept override;
 
     std::size_t size() const noexcept override;
 
@@ -26,9 +26,12 @@ class RiskFactorModule final : public RiskFactorHostModule {
 
     RiskFactorModel &at(const RiskFactorModelType &model_type) const;
 
-    void initialise_population(RuntimeContext &context) override;
+    void initialise_population(RuntimeContext &context);
 
-    void update_population(RuntimeContext &context) override;
+    void update_population(RuntimeContext &context);
+
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
   private:
     std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> models_;

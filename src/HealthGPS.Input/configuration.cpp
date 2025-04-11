@@ -93,10 +93,8 @@ Configuration get_configuration(const std::string &config_source,
     }
 
     const auto config_file = get_config_file_path(config_source);
-
     const auto opt = load_and_validate_json(config_file, ConfigSchemaFileName, ConfigSchemaVersion,
                                             /*require_schema_property=*/false);
-
     // Base dir for relative paths
     config.root_path = config_file.parent_path();
 
