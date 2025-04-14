@@ -59,7 +59,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context)
     int prevalence_id           = definition_.get().table().at(MeasureKey::prevalence);
     auto relative_risk_table    = calculate_average_relative_risk(context);
 
-    std::cout << "initialise_disease_status, disease = " << disease_type() << ", about to loop" << std::endl;
+    //std::cout << "initialise_disease_status, disease = " << disease_type() << ", about to loop" << std::endl;
     // for (auto &person : context.population())
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person)
@@ -75,14 +75,13 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context)
         double hazard                   = context.random().next_double();
         //double hazard                   = DrawStandardUniform_Threaded();
 
-        if (person.id() > 100 && person.id() < 105)
-            std::cout << "Person " << person.id() << " hazard " << hazard << std::endl; 
+        //if (person.id() > 100 && person.id() < 105)
+        //    std::cout << "Person " << person.id() << " hazard " << hazard << std::endl; 
         
         if (hazard < probability) 
             person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active, .start_time = 0}; // start_time = 0 means the disease existed before the simulation started.
     });
-    std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED"
-              << std::endl;
+    //std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" << std::endl;
 }
 
 void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &context) {
@@ -223,27 +222,37 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &p
     return relative_risk;
 }
 
-void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
+void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) 
+{
     int remission_id = definition_.get().table().at(MeasureKey::remission);
 
-    for (auto &person : context.population()) {
+    //for (auto &person : context.population()) 
+    //std::cout << "update_remission_cases, disease = " << disease_type() << ", about to loop"  << std::endl;
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Skip if person is inactive or newborn.
         if (!person.is_active() || person.age == 0) {
-            continue;
+            return;
         }
 
         // Skip if person does not have the disease.
         if (!person.diseases.contains(disease_type()) ||
             person.diseases.at(disease_type()).status != DiseaseStatus::active) {
-            continue;
+            return;
         }
 
         auto probability = definition_.get().table()(person.age, person.gender).at(remission_id);
         auto hazard = context.random().next_double();
+
+         //if (person.id() > 100 && person.id() < 105)
+            //std::cout << "Person " << person.id() << " hazard " << hazard << std::endl; 
+
         if (hazard < probability) {
             person.diseases.at(disease_type()).status = DiseaseStatus::free;
         }
-    }
+    });
+    //std::cout << "update_remission_cases, disease = " << disease_type() << " FINISHED"
+    //          << std::endl;
 }
 
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
