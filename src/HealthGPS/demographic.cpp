@@ -347,7 +347,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context, cons
     std::atomic<int> number_of_deaths = 0;
     //std::cout << "START update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
 
-    // for (auto &person : context.population())
+    // for (auto &entity : context.population())
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &entity) {
         if (!entity.is_active()) {

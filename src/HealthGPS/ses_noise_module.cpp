@@ -29,10 +29,13 @@ SimulationModuleType SESNoiseModule::type() const noexcept { return SimulationMo
 const std::string &SESNoiseModule::name() const noexcept { return name_; }
 
 void SESNoiseModule::initialise_population(RuntimeContext &context) {
-    for (auto &entity : context.population()) {
+    
+    //for (auto &entity : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &entity) {
         entity.ses = context.random().next_normal(parameters_[0], parameters_[1]);
+    });
     }
-}
 
 void SESNoiseModule::update_population(RuntimeContext &context) {
     auto newborn_age = 0u;
