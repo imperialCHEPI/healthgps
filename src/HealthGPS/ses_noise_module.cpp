@@ -44,9 +44,10 @@ void SESNoiseModule::update_population(RuntimeContext &context) {
         pop, [&](const Person &entity) { return entity.age == newborn_age; });
 
     std::sort(indices.begin(), indices.end());
-    for (auto &index : indices) {
+    //for (auto &index : indices) {
+    tbb::parallel_for_each(indices.begin(), indices.end(), [&](auto &index) {
         pop[index].ses = context.random().next_normal(parameters_[0], parameters_[1]);
-    }
+    });
 }
 
 std::unique_ptr<SESNoiseModule> build_ses_noise_module([[maybe_unused]] Repository &repository,
