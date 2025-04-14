@@ -25,9 +25,11 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
     int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 
     auto relative_risk_table = calculate_average_relative_risk(context);
-    for (auto &person : context.population()) {
+    //for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active() || !definition_.get().table().contains(person.age)) {
-            continue;
+            return;
         }
 
         double relative_risk = 1.0;
@@ -45,7 +47,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
                                                       .start_time = 0,
                                                       .time_since_onset = time_since_onset};
         }
-    }
+    });
 }
 
 void DefaultCancerModel::initialise_average_relative_risk(RuntimeContext &context) {
