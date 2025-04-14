@@ -168,7 +168,9 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
     auto age_count = age_range.upper() + 1;
 
     // Compute first moments.
-    auto moments = UnorderedMap2d<core::Gender, core::Identifier, std::vector<FirstMoment>>{}; // very wasteful - being created and destroyed at every time step
+    auto moments = UnorderedMap2d<core::Gender, core::Identifier,
+                                  std::vector<FirstMoment>>{}; // very wasteful - being created and
+                                                               // destroyed at every time step
     for (const auto &person : population) {
         if (!person.is_active()) {
             continue;

@@ -5,8 +5,8 @@
 #include <ranges>
 #include <utility>
 
-#include <oneapi/tbb/parallel_for_each.h>
 #include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
 
 namespace hgps {
 
@@ -61,8 +61,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
     // for (auto &person : context.population())
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
-    {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     });
@@ -102,7 +101,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise newborns and update others.
-    //for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;
@@ -121,7 +120,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
-    //for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
             return;

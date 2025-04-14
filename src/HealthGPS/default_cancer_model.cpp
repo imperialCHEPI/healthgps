@@ -25,7 +25,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
     int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 
     auto relative_risk_table = calculate_average_relative_risk(context);
-    //for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active() || !definition_.get().table().contains(person.age)) {
@@ -199,7 +199,7 @@ double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &pe
 void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
     int max_onset = definition_.get().parameters().max_time_since_onset;
 
-    //for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Skip if person is inactive or newborn.

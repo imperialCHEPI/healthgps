@@ -3,39 +3,39 @@
 #include "runtime_context.h"
 
 #include <oneapi/tbb/parallel_for_each.h>
-//#include <oneapi/tbb.h>
-//#include <tbb/tbb.h>
+// #include <oneapi/tbb.h>
+// #include <tbb/tbb.h>
 
 #include <iostream>
 #include <random>
-//#include <tbb/enumerable_thread_specific.h>
-//#include <tbb/parallel_for.h>
-//#include <vector>
-// #include <omp.h>
+// #include <tbb/enumerable_thread_specific.h>
+// #include <tbb/parallel_for.h>
+// #include <vector>
+//  #include <omp.h>
 
 //// Global seed generator
-//std::random_device rd;
-//std::mt19937 global_seed_generator(rd());
-//std::uniform_int_distribution<> seed_dist;
+// std::random_device rd;
+// std::mt19937 global_seed_generator(rd());
+// std::uniform_int_distribution<> seed_dist;
 //
 //// Thread-local storage for the Mersenne Twister
-//tbb::enumerable_thread_specific<std::mt19937> thread_local_rng([&]() 
+// tbb::enumerable_thread_specific<std::mt19937> thread_local_rng([&]()
 //{
-//    return std::mt19937(seed_dist(global_seed_generator));
-//});
+//     return std::mt19937(seed_dist(global_seed_generator));
+// });
 //
 //// Thread-local storage for the uniform real distribution
-//tbb::enumerable_thread_specific<std::uniform_real_distribution<>> thread_local_dist([]() 
+// tbb::enumerable_thread_specific<std::uniform_real_distribution<>> thread_local_dist([]()
 //{
-//    return std::uniform_real_distribution<>(0.0, 1.0);
-//});
+//     return std::uniform_real_distribution<>(0.0, 1.0);
+// });
 //
-//double DrawStandardUniform_Threaded() 
+// double DrawStandardUniform_Threaded()
 //{
-//    std::mt19937 &rng = thread_local_rng.local();
-//    std::uniform_real_distribution<> &dist = thread_local_dist.local();
-//    return dist(rng);
-//}
+//     std::mt19937 &rng = thread_local_rng.local();
+//     std::uniform_real_distribution<> &dist = thread_local_dist.local();
+//     return dist(rng);
+// }
 
 namespace hgps {
 
@@ -54,13 +54,13 @@ const core::Identifier &DefaultDiseaseModel::disease_type() const noexcept {
     return definition_.get().identifier().code;
 }
 
-void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) 
-{
-    int prevalence_id           = definition_.get().table().at(MeasureKey::prevalence);
-    auto relative_risk_table    = calculate_average_relative_risk(context);
+void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
+    int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
+    auto relative_risk_table = calculate_average_relative_risk(context);
 
-    //std::cout << "initialise_disease_status, disease = " << disease_type() << ", about to loop" << std::endl;
-    // for (auto &person : context.population())
+    // std::cout << "initialise_disease_status, disease = " << disease_type() << ", about to loop"
+    // << std::endl;
+    //  for (auto &person : context.population())
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active() || !definition_.get().table().contains(person.age))
@@ -84,7 +84,8 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context)
                 .start_time =
                     0}; // start_time = 0 means the disease existed before the simulation started.
     });
-    //std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" << std::endl;
+    // std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" <<
+    // std::endl;
 }
 
 void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &context) {
@@ -225,12 +226,12 @@ double DefaultDiseaseModel::calculate_relative_risk_for_diseases(const Person &p
     return relative_risk;
 }
 
-void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) 
-{
+void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
     int remission_id = definition_.get().table().at(MeasureKey::remission);
 
-    //for (auto &person : context.population()) 
-    //std::cout << "update_remission_cases, disease = " << disease_type() << ", about to loop"  << std::endl;
+    // for (auto &person : context.population())
+    // std::cout << "update_remission_cases, disease = " << disease_type() << ", about to loop"  <<
+    // std::endl;
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Skip if person is inactive or newborn.
@@ -261,8 +262,9 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context)
 void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
-    //std::cout << "update_incidence_cases, disease = " << disease_type() << ", about to loop"  << std::endl;
-    //  for (auto &person : context.population())
+    // std::cout << "update_incidence_cases, disease = " << disease_type() << ", about to loop"  <<
+    // std::endl;
+    //   for (auto &person : context.population())
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Skip if person is inactive.
@@ -297,7 +299,7 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
         }
     });
     // std::cout << "update_incidence_cases, disease = " << disease_type() << " FINISHED"
-     //         << std::endl;
+    //         << std::endl;
 }
 
 } // namespace hgps

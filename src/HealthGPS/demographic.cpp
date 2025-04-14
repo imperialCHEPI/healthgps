@@ -5,11 +5,10 @@
 #include <cassert>
 #include <mutex>
 
-#include <oneapi/tbb/parallel_for_each.h>
 #include <iostream>
-//#include <tbb/atomic.h> // Include only the header for tbb::atomic
+#include <oneapi/tbb/parallel_for_each.h>
+// #include <tbb/atomic.h> // Include only the header for tbb::atomic
 #include <algorithm>
-
 
 namespace { // anonymous namespace
 
@@ -341,11 +340,12 @@ double DemographicModule::calculate_excess_mortality_product(const Person &entit
     return std::max(std::min(product, 1.0), 0.0);
 }
 
-int DemographicModule::update_age_and_death_events(RuntimeContext &context, const DiseaseModule &disease_host) 
-{
+int DemographicModule::update_age_and_death_events(RuntimeContext &context,
+                                                   const DiseaseModule &disease_host) {
     auto max_age = static_cast<unsigned int>(context.age_range().upper());
     std::atomic<int> number_of_deaths = 0;
-    //std::cout << "START update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
+    // std::cout << "START update_age_and_death_events, number_of_deaths = " << number_of_deaths <<
+    // std::endl;
 
     // for (auto &entity : context.population())
     auto &pop = context.population();
@@ -382,7 +382,8 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context, cons
         }
     });
 
-    //std::cout << "END update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
+    // std::cout << "END update_age_and_death_events, number_of_deaths = " << number_of_deaths <<
+    // std::endl;
     return number_of_deaths;
 }
 

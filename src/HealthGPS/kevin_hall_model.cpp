@@ -169,7 +169,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
 
         update_nutrient_intakes(person);
         update_energy_intake(person);
-    }); 
+    });
 
     // Update weight for non-newborns.
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
@@ -183,14 +183,13 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         } else {
             kevin_hall_run(person);
         }
-    }); 
-
+    });
 
     // Compute (baseline) or receive (intervention) weight adjustments from baseline scenario.
     auto adjustments = receive_weight_adjustments(context);
 
     // Adjust weight and other Kevin Hall state for non-newborns.
-    //for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Ignore if inactive or newborn.
         if (!person.is_active() || (person.age == 0)) {
@@ -209,8 +208,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         } else {
             adjust_weight(person, adjustment);
         }
-    }); 
-    
+    });
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));
