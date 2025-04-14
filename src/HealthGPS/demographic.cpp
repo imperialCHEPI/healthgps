@@ -345,7 +345,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context, cons
 {
     auto max_age = static_cast<unsigned int>(context.age_range().upper());
     std::atomic<int> number_of_deaths = 0;
-    std::cout << "START update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
+    //std::cout << "START update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
 
     // for (auto &person : context.population())
     auto &pop = context.population();
@@ -382,7 +382,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context, cons
         }
     });
 
-    std::cout << "END update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
+    //std::cout << "END update_age_and_death_events, number_of_deaths = " << number_of_deaths << std::endl;
     return number_of_deaths;
 }
 
