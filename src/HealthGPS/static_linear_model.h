@@ -40,9 +40,12 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param trend_lambda The lambda values of the risk factor trends
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param region_prevalence Region prevalence for age groups and sex
+    /// @param ethnicity_prevalence Ethnicity prevalence for age groups and sex
     /// @param income_models The income models for each income category
-    /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @param region_models The region models for each region
+    /// @param phycical_activity_stddev The standard deviation of the physical activity
+    /// @param physical_activity_models The physical activity models for each region
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -60,9 +63,37 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
+        const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+            &region_prevalence,
+        const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+            &ethnicity_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
-        std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
-        double physical_activity_stddev); // added region as a shared pointer for FINCH
+        const std::unordered_map<core::Region, LinearModelParams> &region_models,
+        double physical_activity_stddev,
+        const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models)
+        : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend), 
+                                 std::move(trend_steps)},
+          expected_trend_boxcox_{std::move(expected_trend_boxcox)},
+          names_{names},
+          models_{models},
+          ranges_{ranges},
+          lambda_{lambda},
+          stddev_{stddev},
+          cholesky_{cholesky},
+          policy_models_{policy_models},
+          policy_ranges_{policy_ranges},
+          policy_cholesky_{policy_cholesky},
+          trend_models_{trend_models},
+          trend_ranges_{trend_ranges},
+          trend_lambda_{trend_lambda},
+          info_speed_{info_speed},
+          rural_prevalence_{rural_prevalence},
+          region_prevalence_{region_prevalence},
+          ethnicity_prevalence_{ethnicity_prevalence},
+          income_models_{income_models},
+          region_models_{region_models},
+          physical_activity_stddev_{physical_activity_stddev},
+          physical_activity_models_{physical_activity_models} {}
 
     RiskFactorModelType type() const noexcept override;
 
@@ -104,31 +135,45 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     void update_sector(Person &person, Random &random) const;
 
-    /// @brief Initialise the income category of a person
-    /// @param person The person to initialise sector for
+    /// @brief Initialise the region of a person
+    /// @param person The person to initialise region for
     /// @param random The random number generator from the runtime context
-    void initialise_income(Person &person, Random &random) const;
+    void initialise_region(Person &person, Random &random) const;
 
-    /// @brief Update the income category of a person
-    /// @param person The person to update sector for
+    /// @brief Update the region of a person
+    /// @param person The person to update region for
     /// @param random The random number generator from the runtime context
-    void update_income(Person &person, Random &random) const;
+    void update_region(Person &person, Random &random) const;
+
+    /// @brief Initialise the ethnicity of a person
+    /// @param person The person to initialise ethnicity for
+    /// @param random The random number generator from the runtime context
+    void initialise_ethnicity(Person &person, Random &random) const;
+
+    /// @brief Update the ethnicity of a person
+    /// @param person The person to update ethnicity for
+    /// @param random The random number generator from the runtime context
+    void update_ethnicity(Person &person, Random &random) const;
+
+    /// @brief Initialise the income_continuous of a person
+    /// @param person The person to initialise income_continuous for
+    /// @param random The random number generator from the runtime context
+    void initialise_income_continuous(Person &person, Random &random) const;
+
+    /// @brief Update the income_continuous of a person
+    /// @param person The person to update income_continuous for
+    /// @param random The random number generator from the runtime context
+    void update_income_continuous(Person &person, Random &random) const;
+
+    /// @brief Based on income_continuous, set the income category
+    /// @param person The person to update income category for
+    void update_income_category(Person &person) const;
 
     /// @brief Initialise the physical activity of a person
     /// @param person The person to initialise PAL for
     /// @param random The random number generator from the runtime context
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
-
-    // @brief Initialise the region of a person
-    /// @param person The person to initialise region for
-    /// @param random The random number generator from the runtime context
-    void initialise_region(Person &person, Random &random) const;
-
-    // @brief update the region of a person
-    /// @param person The person to update the region for
-    /// @param random The random number generator from the runtime context
-    void update_region(Person &person, Random &random) const;
 
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
@@ -146,10 +191,14 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        &region_prevalence_;
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        &ethnicity_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
-    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>>
-        region_models_; // made a shared pointer
+    const std::unordered_map<core::Region, LinearModelParams> &region_models_;
     const double physical_activity_stddev_;
+    const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models_;
 };
 
 /// @brief Defines the static linear model data type
@@ -174,9 +223,12 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param trend_lambda The lambda values of the risk factor trends
     /// @param info_speed The information speed of risk factor updates
     /// @param rural_prevalence Rural sector prevalence for age groups and sex
+    /// @param region_prevalence Region prevalence for age groups and sex
+    /// @param ethnicity_prevalence Ethnicity prevalence for age groups and sex
     /// @param income_models The income models for each income category
-    /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @param region_models The region models for each region
+    /// @param phycical_activity_stddev The standard deviation of the physical activity
+    /// @param physical_activity_models The physical activity models for each region
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -193,13 +245,37 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
+        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+            region_prevalence,
+        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+            ethnicity_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
         std::unordered_map<core::Region, LinearModelParams> region_models,
-        double physical_activity_stddev);
+        double physical_activity_stddev,
+        const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
     std::unique_ptr<RiskFactorModel> create_model() const override;
+
+    /// @brief Gets the physical activity standard deviation
+    /// @return The physical activity standard deviation
+    double get_physical_activity_stddev() const { return physical_activity_stddev_; }
+
+    /// @brief Gets the region prevalence data
+    /// @return The region prevalence data
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>&
+    get_region_prevalence() const { return region_prevalence_; }
+
+    /// @brief Gets the ethnicity prevalence data
+    /// @return The ethnicity prevalence data
+    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>&
+    get_ethnicity_prevalence() const { return ethnicity_prevalence_; }
+
+    /// @brief Gets the income models
+    /// @return The income models
+    const std::unordered_map<core::Income, LinearModelParams>&
+    get_income_models() const { return income_models_; }
 
   private:
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
@@ -218,9 +294,14 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     double info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        region_prevalence_;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        ethnicity_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     std::unordered_map<core::Region, LinearModelParams> region_models_;
     double physical_activity_stddev_;
+    const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models_;
 };
 
 } // namespace hgps

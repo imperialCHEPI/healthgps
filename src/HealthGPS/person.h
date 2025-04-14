@@ -5,6 +5,9 @@
 
 #include <atomic>
 #include <map>
+#include <functional>
+#include <unordered_map>
+#include <cmath>
 
 namespace hgps {
 
@@ -69,10 +72,15 @@ struct Person {
     core::Region region{core::Region::unknown};
 
     /// @brief Current risk factors values
-    std::map<core::Identifier, double> risk_factors;
+    std::unordered_map<core::Identifier, double> risk_factors{};
 
     /// @brief Diseases history and current status
     std::map<core::Identifier, Disease> diseases;
+
+    /// @brief Demographic attributes
+    core::Ethnicity ethnicity{core::Ethnicity::unknown};
+    double income_continuous{0.0};
+    double physical_activity{0.0};
 
     /// @brief Determine if a Person is current alive
     /// @return true for alive; otherwise, false
@@ -131,6 +139,20 @@ struct Person {
     /// @throws HgpsException if income is unknown
     float income_to_value() const;
 
+    /// @brief Gets region membership value as float
+    /// @returns The region membership value (1: England, 2: Wales, 3: Scotland, 4: Northern Ireland)
+    /// @throw HgpsException if region is unknown
+    float region_to_value() const;
+
+    /// @brief Gets ethnicity membership value as float
+    /// @returns The ethnicity membership value (1: White, 2: Black, 3: Asian, 4: Mixed, 5: Other)
+    /// @throw HgpsException if ethnicity is unknown
+    float ethnicity_to_value() const;
+
+    /// @brief Copies the data from another Person instance
+    /// @param other The source Person instance
+    void copy_from(const Person &other);
+
     /// @brief Emigrate this instance from the virtual population
     /// @param time Migration time
     /// @throws std::logic_error for attempting to set to non-active individuals.
@@ -144,11 +166,6 @@ struct Person {
     /// @brief Resets the unique identifier sequence to zero.
     static void reset_id();
 
-    /// @brief Gets the region enumeration as a number
-    /// @return The region value (England = 1, Wales = 2, Scotland = 3, NorthernIreland = 4)
-    /// @throws HgpsException if region is unknown
-    float region_to_value() const;
-
   private:
     std::size_t id_{};
     bool is_alive_{true};
@@ -157,6 +174,7 @@ struct Person {
     unsigned int time_of_migration_{};
 
     static std::atomic<std::size_t> newUID;
-    static std::map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
+    static std::unordered_map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
 };
+
 } // namespace hgps

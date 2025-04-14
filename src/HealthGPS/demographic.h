@@ -8,6 +8,7 @@
 #include "modelinput.h"
 #include "repository.h"
 #include "runtime_context.h"
+#include "static_linear_model.h"
 
 namespace hgps {
 
@@ -19,8 +20,14 @@ class DemographicModule final : public SimulationModule {
     /// @brief Initialise a new instance of the DemographicModule class.
     /// @param pop_data Population demographic trends table with year and age lookup
     /// @param life_table Population life trends table with births and deaths
+    /// @param region_prevalence Region prevalence by age group and gender
+    /// @param ethnicity_prevalence Ethnicity prevalence by age group and gender
+    /// @param income_models Income models for different income classifications
     DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
-                      LifeTable &&life_table);
+                      LifeTable &&life_table,
+                      std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence,
+                      std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence,
+                      std::unordered_map<core::Income, LinearModelParams> income_models);
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier
@@ -40,7 +47,11 @@ class DemographicModule final : public SimulationModule {
     /// @return The respective population age distribution
     const std::map<int, PopulationRecord> &get_population_distribution(int time_year) const;
 
-    /// @brief Initialises the virtual population status
+    /// @brief Initialises the virtual population with age and gender
+    /// @param context The simulation run-time context
+    void initialise_age_gender(RuntimeContext &context);
+
+    /// @brief Initialises the virtual population status with all the varaibles of age, gender, region, ethnicity, income and physical activity
     /// @param context The simulation run-time context
     void initialise_population(RuntimeContext &context) override;
 
@@ -55,8 +66,30 @@ class DemographicModule final : public SimulationModule {
     GenderTable<int, double> birth_rates_;
     GenderTable<int, double> residual_death_rates_;
     std::string name_{"Demographic"};
+    std::vector<double> income_quartile_thresholds_;
+    
+    // Demographic configuration data from JSON
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence_;
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence_;
+    std::unordered_map<core::Income, LinearModelParams> income_models_;
 
     void initialise_birth_rates();
+
+    // Population-level initialization functions
+    void initialise_region(RuntimeContext &context, Person &person, Random &random);
+    void initialise_ethnicity(RuntimeContext &context, Person &person, Random &random);
+    void initialise_income_continuous(RuntimeContext &context, Person &person, Random &random);
+    void initialise_income_category(Person &person, const Population &population);
+    void calculate_income_quartiles(const Population &population);
+    
+    // Population-level update function
+    void update_demographic_variables(RuntimeContext &context);
+    
+    // Person-level update functions
+    void update_region(RuntimeContext &context, Person &person, Random &random);
+    void update_ethnicity(RuntimeContext &context, Person &person, Random &random);
+    void update_income_continuous(RuntimeContext &context, Person &person, Random &random);
+    void update_income_category(RuntimeContext &context);
 
     double get_total_deaths(int time_year) const noexcept;
     std::map<int, DoubleGenderValue> get_age_gender_distribution(int time_year) const noexcept;

@@ -6,17 +6,22 @@ namespace hgps {
 
 std::atomic<std::size_t> Person::newUID{0};
 
-std::map<core::Identifier, std::function<double(const Person &)>> Person::current_dispatcher{
-    {"Intercept"_id, [](const Person &) { return 1.0; }},
-    {"Gender"_id, [](const Person &p) { return p.gender_to_value(); }},
-    {"Age"_id, [](const Person &p) { return static_cast<double>(p.age); }},
-    {"Age2"_id, [](const Person &p) { return pow(p.age, 2); }},
-    {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
-    {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
-    {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
-    {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
-    {"SES"_id, [](const Person &p) { return p.ses; }},
-};
+std::unordered_map<core::Identifier, std::function<double(const Person &)>>
+    Person::current_dispatcher{
+        {"Intercept"_id, [](const Person &) { return 1.0; }},
+        {"Gender"_id, [](const Person &p) { return p.gender_to_value(); }},
+        {"Age"_id, [](const Person &p) { return static_cast<double>(p.age); }},
+        {"Age2"_id, [](const Person &p) { return pow(p.age, 2); }},
+        {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
+        {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
+        {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
+        {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
+        {"SES"_id, [](const Person &p) { return p.ses; }},
+        {"Region"_id, [](const Person &p) { return p.region_to_value(); }},
+        {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
+        {"PhysicalActivity"_id, [](const Person &p) { return p.physical_activity; }},
+        {"IncomeContinuous"_id, [](const Person &p) { return p.income_continuous; }},
+    };
 
 Person::Person() : id_{++Person::newUID} {}
 
@@ -108,6 +113,24 @@ float Person::region_to_value() const {
     }
 }
 
+float Person::ethnicity_to_value() const {
+    switch (ethnicity) {
+    case core::Ethnicity::White:
+        return 1.0f;
+    case core::Ethnicity::Black:
+        return 2.0f;
+    case core::Ethnicity::Asian:
+        return 3.0f;
+    case core::Ethnicity::Mixed:
+        return 4.0f;
+    case core::Ethnicity::Other:
+        return 5.0f;
+    case core::Ethnicity::unknown:
+    default:
+        throw core::HgpsException("Ethnicity is unknown.");
+    }
+}
+
 void Person::emigrate(const unsigned int time) {
     if (!is_active()) {
         throw std::logic_error("Entity must be active prior to emigrate.");
@@ -127,4 +150,24 @@ void Person::die(const unsigned int time) {
 }
 
 void Person::reset_id() { Person::newUID = 0; }
+
+// Copy demographics from another Person instance
+void Person::copy_from(const Person &other) {
+    // Copy demographic attributes
+    age = other.age;
+    gender = other.gender;
+    region = other.region;
+    ethnicity = other.ethnicity;
+    income_continuous = other.income_continuous;
+    income = other.income;
+    sector = other.sector;
+    ses = other.ses;
+    physical_activity = other.physical_activity;
+    
+    // Copy risk factors and diseases
+    risk_factors = other.risk_factors;
+    diseases = other.diseases;
+    
+    // Don't copy private members like is_alive_, has_emigrated_, etc.
+}
 } // namespace hgps

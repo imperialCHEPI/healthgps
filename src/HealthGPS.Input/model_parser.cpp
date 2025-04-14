@@ -365,38 +365,88 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                             {core::Gender::male, age_group["Male"]}};
     }
 
-    // Income models for different income classifications.
+    // Region prevalence for age groups, gender and region.
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence;
+    if (opt.contains("RegionPrevalence")) {
+        for (const auto &age_group : opt["RegionPrevalence"]) {
+            auto age_group_name = age_group["Name"].get<core::Identifier>();
+            
+            // Initialize empty maps for both genders
+            std::unordered_map<core::Region, double> female_region_prevalence;
+            std::unordered_map<core::Region, double> male_region_prevalence;
+            
+            // Parse region prevalence data for each region if available
+            if (age_group["Female"].contains("England")) {
+                female_region_prevalence[core::Region::England] = age_group["Female"]["England"].get<double>();
+                male_region_prevalence[core::Region::England] = age_group["Male"]["England"].get<double>();
+            }
+            
+            if (age_group["Female"].contains("Wales")) {
+                female_region_prevalence[core::Region::Wales] = age_group["Female"]["Wales"].get<double>();
+                male_region_prevalence[core::Region::Wales] = age_group["Male"]["Wales"].get<double>();
+            }
+            
+            if (age_group["Female"].contains("Scotland")) {
+                female_region_prevalence[core::Region::Scotland] = age_group["Female"]["Scotland"].get<double>();
+                male_region_prevalence[core::Region::Scotland] = age_group["Male"]["Scotland"].get<double>();
+            }
+            
+            if (age_group["Female"].contains("NorthernIreland")) {
+                female_region_prevalence[core::Region::NorthernIreland] = age_group["Female"]["NorthernIreland"].get<double>();
+                male_region_prevalence[core::Region::NorthernIreland] = age_group["Male"]["NorthernIreland"].get<double>();
+            }
+            
+            // Add to the main map
+            region_prevalence[age_group_name][core::Gender::female] = female_region_prevalence;
+            region_prevalence[age_group_name][core::Gender::male] = male_region_prevalence;
+        }
+    }
+
+    // Ethnicity prevalence for age groups, gender and ethnicity.
+    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence;
+    if (opt.contains("EthnicityPrevalence")) {
+        for (const auto &age_group : opt["EthnicityPrevalence"]) {
+            auto age_group_name = age_group["Name"].get<core::Identifier>();
+            
+            // Process female ethnicity prevalence
+            std::unordered_map<core::Ethnicity, double> female_ethnicity_prevalence;
+            female_ethnicity_prevalence[core::Ethnicity::White] = age_group["Female"]["White"].get<double>();
+            female_ethnicity_prevalence[core::Ethnicity::Asian] = age_group["Female"]["Asian"].get<double>();
+            female_ethnicity_prevalence[core::Ethnicity::Black] = age_group["Female"]["Black"].get<double>();
+            female_ethnicity_prevalence[core::Ethnicity::Other] = age_group["Female"]["Others"].get<double>();
+            
+            // Process male ethnicity prevalence
+            std::unordered_map<core::Ethnicity, double> male_ethnicity_prevalence;
+            male_ethnicity_prevalence[core::Ethnicity::White] = age_group["Male"]["White"].get<double>();
+            male_ethnicity_prevalence[core::Ethnicity::Asian] = age_group["Male"]["Asian"].get<double>();
+            male_ethnicity_prevalence[core::Ethnicity::Black] = age_group["Male"]["Black"].get<double>();
+            male_ethnicity_prevalence[core::Ethnicity::Other] = age_group["Male"]["Others"].get<double>();
+            
+            // Add to the main map
+            ethnicity_prevalence[age_group_name][core::Gender::female] = female_ethnicity_prevalence;
+            ethnicity_prevalence[age_group_name][core::Gender::male] = male_ethnicity_prevalence;
+        }
+    }
+
+    // Income models for income_continuous
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
-
-        // Get income category.
-        // Added New income category (Low, LowerMiddle, UpperMiddle & High)
-        core::Income category;
-        if (core::case_insensitive::equals(key, "Unknown")) {
-            category = core::Income::unknown;
-        } else if (core::case_insensitive::equals(key, "Low")) {
-            category = core::Income::low;
-        } else if (core::case_insensitive::equals(key, "LowerMiddle")) {
-            category = core::Income::lowermiddle;
-        } else if (core::case_insensitive::equals(key, "UpperMiddle")) {
-            category = core::Income::uppermiddle;
-        } else if (core::case_insensitive::equals(key, "High")) {
-            category = core::Income::high;
-        } else {
-            throw core::HgpsException(fmt::format("Income category {} is unrecognised.", key));
-        }
-
-        // Get income model parameters.
+        // Get income model parameters
         LinearModelParams model;
         model.intercept = json_params["Intercept"].get<double>();
         model.coefficients =
             json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
-        // Insert income model.
-        income_models.emplace(category, std::move(model));
+        // Convert the string key to core::Income enum
+        // For now, we don't distinguish among the key types - we just need one model to work with
+        core::Income income_key = core::Income::unknown;
+        
+        // Insert income model with the converted enum key
+        income_models.emplace(income_key, std::move(model));
     }
 
-    // Region models for different region classifications.
+    // Region models for different region classifications- Mahima
+    // Not being used right now as we are using RegionPrevelance
     std::unordered_map<core::Region, LinearModelParams> region_models;
     for (const auto &model : opt["RegionModels"]) {
         auto region = parse_region(model["Region"].get<std::string>());
@@ -411,8 +461,37 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         region_models.try_emplace(region, std::move(params));
     }
 
-    // Standard deviation of physical activity.
-    const double physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+    // Physical activity models
+    std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models;
+    if (opt.contains("PhysicalActivityModels")) {
+        for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {
+            // Create a model for this physical activity type (e.g., "continuous")
+            LinearModelParams model;
+            
+            // Get the intercept
+            model.intercept = json_params["Intercept"].get<double>();
+            
+            // Get the coefficients
+            if (json_params.contains("Coefficients")) {
+                model.coefficients = 
+                    json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+            }
+            
+            // Store the model
+            physical_activity_models.emplace(core::Identifier(key), std::move(model));
+        }
+    }
+
+    // Standard deviation of physical activity (now loaded directly from the model)
+    double physical_activity_stddev = 0.0;
+    if (opt.contains("PhysicalActivityModels") && 
+        opt["PhysicalActivityModels"].contains("continuous") && 
+        opt["PhysicalActivityModels"]["continuous"].contains("StandardDeviation")) {
+        physical_activity_stddev = opt["PhysicalActivityModels"]["continuous"]["StandardDeviation"].get<double>();
+    } else if (opt.contains("PhysicalActivityStdDev")) {
+        // Fallback to old format if present
+        physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+    }
 
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
@@ -420,7 +499,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(income_models), std::move(region_models), physical_activity_stddev);
+        std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models), 
+        std::move(region_models), physical_activity_stddev, std::move(physical_activity_models));
 }
 
 // Added to handle region parsing since income was made quartile, and region was added
