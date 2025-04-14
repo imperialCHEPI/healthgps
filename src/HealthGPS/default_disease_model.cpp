@@ -80,7 +80,7 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
         // if (person.id() > 100 && person.id() < 105)
         //     std::cout << "Person " << person.id() << " hazard " << hazard << std::endl;
 
-        if (hazard < probability)
+        if (hazard < probability) {
             person.diseases[disease_type()] = Disease{
                 .status = DiseaseStatus::active,
                 .start_time =
