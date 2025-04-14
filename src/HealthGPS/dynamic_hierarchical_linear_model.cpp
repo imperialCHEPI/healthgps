@@ -6,6 +6,9 @@
 #include <utility>
 #include <vector>
 
+#include <oneapi/tbb/parallel_for_each.h>
+
+
 namespace hgps {
 
 DynamicHierarchicalLinearModel::DynamicHierarchicalLinearModel(
@@ -38,10 +41,12 @@ void DynamicHierarchicalLinearModel::generate_risk_factors(RuntimeContext &conte
 
 void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context) {
     auto age_key = core::Identifier{"age"};
-    for (auto &entity : context.population()) {
+    // for (auto &person : context.population())
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &entity) {
         // Ignore if inactive, newborn risk factors must be generated, not updated!
         if (!entity.is_active() || entity.age == 0) {
-            continue;
+            return;
         }
 
         auto current_risk_factors = get_current_risk_factors(context.mapping(), entity);
@@ -58,7 +63,7 @@ void DynamicHierarchicalLinearModel::update_risk_factors(RuntimeContext &context
         } else {
             update_risk_factors_exposure(context, entity, current_risk_factors, equations.female);
         }
-    }
+    });
 
     // Adjust risk factors such that mean sim value matches expected value.
     std::vector<core::Identifier> factor_keys;
