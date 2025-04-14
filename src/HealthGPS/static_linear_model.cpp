@@ -48,8 +48,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Initialise everyone.
     // for (auto &person : context.population())
     auto &pop = context.population();
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
-    {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         initialise_sector(person, context.random());
         initialise_region(person, context.random()); // added region for FINCH
         initialise_income(person, context.random());
@@ -79,9 +78,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
                       (context.time_now() - context.start_time()) >= 2);
 
     // Initialise newborns and update others.
-    for (auto &person : context.population()) {
+    // for (auto &person : context.population())
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
-            continue;
+            return;
         }
 
         if (person.age == 0) {
@@ -95,15 +96,16 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_income(person, context.random());
             update_factors(context, person, context.random());
         }
-    }
+    });
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise newborns and update others.
-    for (auto &person : context.population()) {
+    //for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
-            continue;
+            return;
         }
 
         if (person.age == 0) {
@@ -113,19 +115,19 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_policies(person, intervene);
             update_trends(context, person);
         }
-    }
+    });
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
-    for (auto &person : context.population()) {
+    //for (auto &person : context.population()) {
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
-            continue;
+            return;
         }
-
         apply_policies(person, intervene);
-    }
+    });
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {

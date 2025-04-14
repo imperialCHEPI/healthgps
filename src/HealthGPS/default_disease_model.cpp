@@ -62,24 +62,27 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context)
     //std::cout << "initialise_disease_status, disease = " << disease_type() << ", about to loop" << std::endl;
     // for (auto &person : context.population())
     auto &pop = context.population();
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person)
-    {
-        if (!person.is_active() || !definition_.get().table().contains(person.age)) return;
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
+        if (!person.is_active() || !definition_.get().table().contains(person.age))
+            return;
 
-        double relative_risk            = 1.0;
-        relative_risk                   *= calculate_relative_risk_for_risk_factors(person);
-        double average_relative_risk    = relative_risk_table(person.age, person.gender);
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        double average_relative_risk = relative_risk_table(person.age, person.gender);
 
-        double prevalence               = definition_.get().table()(person.age, person.gender).at(prevalence_id);
-        double probability              = prevalence * relative_risk / average_relative_risk;
-        double hazard                   = context.random().next_double();
-        //double hazard                   = DrawStandardUniform_Threaded();
+        double prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
+        double probability = prevalence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
+        // double hazard                   = DrawStandardUniform_Threaded();
 
-        //if (person.id() > 100 && person.id() < 105)
-        //    std::cout << "Person " << person.id() << " hazard " << hazard << std::endl; 
-        
-        if (hazard < probability) 
-            person.diseases[disease_type()] = Disease{.status = DiseaseStatus::active, .start_time = 0}; // start_time = 0 means the disease existed before the simulation started.
+        // if (person.id() > 100 && person.id() < 105)
+        //     std::cout << "Person " << person.id() << " hazard " << hazard << std::endl;
+
+        if (hazard < probability)
+            person.diseases[disease_type()] = Disease{
+                .status = DiseaseStatus::active,
+                .start_time =
+                    0}; // start_time = 0 means the disease existed before the simulation started.
     });
     //std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" << std::endl;
 }
@@ -244,14 +247,14 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context)
         auto probability = definition_.get().table()(person.age, person.gender).at(remission_id);
         auto hazard = context.random().next_double();
 
-         //if (person.id() > 100 && person.id() < 105)
-            //std::cout << "Person " << person.id() << " hazard " << hazard << std::endl; 
+        // if (person.id() > 100 && person.id() < 105)
+        // std::cout << "Person " << person.id() << " hazard " << hazard << std::endl;
 
         if (hazard < probability) {
             person.diseases.at(disease_type()).status = DiseaseStatus::free;
         }
     });
-    //std::cout << "update_remission_cases, disease = " << disease_type() << " FINISHED"
+    // std::cout << "update_remission_cases, disease = " << disease_type() << " FINISHED"
     //          << std::endl;
 }
 
@@ -261,42 +264,39 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     //std::cout << "update_incidence_cases, disease = " << disease_type() << ", about to loop"  << std::endl;
     //  for (auto &person : context.population())
     auto &pop = context.population();
-    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
-    {
-        
-            // Skip if person is inactive.
-            if (!person.is_active()) {
-                return;
-            }
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
+        // Skip if person is inactive.
+        if (!person.is_active()) {
+            return;
+        }
 
-            // Clear newborn diseases.
-            if (person.age == 0) {
-                person.diseases.clear();
-                return;
-            }
+        // Clear newborn diseases.
+        if (person.age == 0) {
+            person.diseases.clear();
+            return;
+        }
 
-            // Skip if the person already has the disease.
-            if (person.diseases.contains(disease_type()) &&
-                person.diseases.at(disease_type()).status == DiseaseStatus::active) {
-                return;
-            }
+        // Skip if the person already has the disease.
+        if (person.diseases.contains(disease_type()) &&
+            person.diseases.at(disease_type()).status == DiseaseStatus::active) {
+            return;
+        }
 
-            double relative_risk = 1.0;
-            relative_risk *= calculate_relative_risk_for_risk_factors(person);
-            relative_risk *= calculate_relative_risk_for_diseases(person);
+        double relative_risk = 1.0;
+        relative_risk *= calculate_relative_risk_for_risk_factors(person);
+        relative_risk *= calculate_relative_risk_for_diseases(person);
 
-            double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
+        double average_relative_risk = average_relative_risk_.at(person.age, person.gender);
 
-            double incidence =
-                definition_.get().table()(person.age, person.gender).at(incidence_id);
-            double probability = incidence * relative_risk / average_relative_risk;
-            double hazard = context.random().next_double();
-            if (hazard < probability) {
-                person.diseases[disease_type()] =
-                    Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
-            }
+        double incidence = definition_.get().table()(person.age, person.gender).at(incidence_id);
+        double probability = incidence * relative_risk / average_relative_risk;
+        double hazard = context.random().next_double();
+        if (hazard < probability) {
+            person.diseases[disease_type()] =
+                Disease{.status = DiseaseStatus::active, .start_time = context.time_now()};
+        }
     });
-     //std::cout << "update_incidence_cases, disease = " << disease_type() << " FINISHED"
+    // std::cout << "update_incidence_cases, disease = " << disease_type() << " FINISHED"
      //         << std::endl;
 }
 
