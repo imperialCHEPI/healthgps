@@ -64,7 +64,9 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active() || !definition_.get().table().contains(person.age))
+        if (!person.is_active() || !definition_.get().table().contains(person.age)) {
             return;
+}
 
         double relative_risk = 1.0;
         relative_risk *= calculate_relative_risk_for_risk_factors(person);
