@@ -5,6 +5,9 @@
 #include <ranges>
 #include <utility>
 
+#include <oneapi/tbb/parallel_for_each.h>
+#include <iostream>
+
 namespace hgps {
 
 StaticLinearModel::StaticLinearModel(
@@ -43,22 +46,27 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Initialise everyone.
-    for (auto &person : context.population()) {
+    // for (auto &person : context.population())
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
+    {
         initialise_sector(person, context.random());
         initialise_region(person, context.random()); // added region for FINCH
         initialise_income(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
-    }
+    });
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Initialise everyone.
-    for (auto &person : context.population()) {
+    // for (auto &person : context.population())
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
+    {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
-    }
+    });
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
