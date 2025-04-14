@@ -259,10 +259,11 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
     //std::cout << "update_incidence_cases, disease = " << disease_type() << ", about to loop"  << std::endl;
+    //  for (auto &person : context.population())
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) 
     {
-        // for (auto &person : context.population())
+        
             // Skip if person is inactive.
             if (!person.is_active()) {
                 return;
