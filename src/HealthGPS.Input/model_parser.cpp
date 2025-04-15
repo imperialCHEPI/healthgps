@@ -15,12 +15,12 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
-#include <optional>
 #include <iostream>
+#include <optional>
 
 #if USE_TIMER
 #define MEASURE_FUNCTION()
-    hgps::core::ScopedTimer timer { __func__ }
+hgps::core::ScopedTimer timer { __func__ }
 #else
 #define MEASURE_FUNCTION()
 #endif
@@ -218,7 +218,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
-    //std::cout << "Finished loading RiskFactorCorrelationFile";
+    // std::cout << "Finished loading RiskFactorCorrelationFile";
 
     // Policy covariance matrix.
     const auto policy_covariance_file_info =
@@ -226,8 +226,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
     Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                       policy_covariance_table.num_columns()};
-    //std::cout << "Finished loading PolicyCovarianceFile";
-    
+    // std::cout << "Finished loading PolicyCovarianceFile";
+
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<core::Identifier> names;
     std::vector<LinearModelParams> models;

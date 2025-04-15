@@ -52,7 +52,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (person.age == 0) {
             // For newborns, initialize demographic variables
             initialise_sector(person, context.random());
-            // Demographic variables (region, ethnicity, income) are initialized by the DemographicModule
+            // Demographic variables (region, ethnicity, income) are initialized by the
+            // DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
