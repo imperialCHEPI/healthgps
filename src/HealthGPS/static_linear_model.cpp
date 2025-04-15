@@ -1,6 +1,5 @@
 #include "static_linear_model.h"
 #include "HealthGPS.Core/exception.h"
-#include "runtime_context.h"
 #include "HealthGPS.Input/model_parser.h"
 #include "demographic.h"
 
@@ -354,18 +353,19 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
         person.sector = core::Sector::urban;
     }
 }
-// Physical activity depends on age. gender, region, ethncity, income_continuous and random noise with std dev
-// Loaded from the static_model.json under the Physical Activity Models section
-void StaticLinearModel::initialise_physical_activity( [[maybe_unused]] RuntimeContext &context, Person &person, Random &random) const {
+// Physical activity depends on age. gender, region, ethncity, income_continuous and random noise
+// with std dev Loaded from the static_model.json under the Physical Activity Models section
+void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeContext &context,
+                                                     Person &person, Random &random) const {
     // Use the physical activity model we loaded from the JSON
     if (physical_activity_models_.contains("continuous")) {
-        const auto& model = physical_activity_models_.at("continuous");
-        
+        const auto &model = physical_activity_models_.at("continuous");
+
         // Start with the intercept
         double value = model.intercept;
-        
+
         // Add all coefficient effects
-        for (const auto& [factor_name, coefficient] : model.coefficients) {
+        for (const auto &[factor_name, coefficient] : model.coefficients) {
             // Apply each coefficient to the person's factor value
             value += coefficient * person.get_risk_factor_value(factor_name);
         }
@@ -377,7 +377,7 @@ void StaticLinearModel::initialise_physical_activity( [[maybe_unused]] RuntimeCo
         // Add random noise using the standard deviation
         double noise = random.next_normal(0.0, pa_stddev);
         double final_value = value * (1.0 + noise);
-        
+
         // Set the physical activity value
         person.risk_factors["PhysicalActivity"_id] = final_value;
     }
@@ -396,9 +396,12 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<std::vector<core::DoubleInterval>> trend_ranges,
     std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>> rural_prevalence,
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence,
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+    std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence,
     std::unordered_map<core::Income, LinearModelParams> income_models,
     std::unordered_map<core::Region, LinearModelParams> region_models,
@@ -413,7 +416,8 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
       policy_cholesky_{std::move(policy_cholesky)}, trend_models_{std::move(trend_models)},
       trend_ranges_{std::move(trend_ranges)}, trend_lambda_{std::move(trend_lambda)},
       info_speed_{info_speed}, rural_prevalence_{std::move(rural_prevalence)},
-      region_prevalence_{std::move(region_prevalence)}, ethnicity_prevalence_{std::move(ethnicity_prevalence)},
+      region_prevalence_{std::move(region_prevalence)},
+      ethnicity_prevalence_{std::move(ethnicity_prevalence)},
       income_models_{std::move(income_models)}, region_models_{std::move(region_models)},
       physical_activity_stddev_{physical_activity_stddev},
       physical_activity_models_{physical_activity_models} {

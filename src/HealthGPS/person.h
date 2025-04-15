@@ -4,10 +4,10 @@
 #include "HealthGPS.Core/identifier.h"
 
 #include <atomic>
-#include <map>
-#include <functional>
-#include <unordered_map>
 #include <cmath>
+#include <functional>
+#include <map>
+#include <unordered_map>
 
 namespace hgps {
 
@@ -140,7 +140,8 @@ struct Person {
     float income_to_value() const;
 
     /// @brief Gets region membership value as float
-    /// @returns The region membership value (1: England, 2: Wales, 3: Scotland, 4: Northern Ireland)
+    /// @returns The region membership value (1: England, 2: Wales, 3: Scotland, 4: Northern
+    /// Ireland)
     /// @throw HgpsException if region is unknown
     float region_to_value() const;
 
@@ -174,7 +175,8 @@ struct Person {
     unsigned int time_of_migration_{};
 
     static std::atomic<std::size_t> newUID;
-    static std::unordered_map<core::Identifier, std::function<double(const Person &)>> current_dispatcher;
+    static std::unordered_map<core::Identifier, std::function<double(const Person &)>>
+        current_dispatcher;
 };
 
 } // namespace hgps

@@ -63,36 +63,28 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         std::shared_ptr<std::vector<double>> trend_lambda, double info_speed,
         const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             &rural_prevalence,
-        const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        const std::unordered_map<
+            core::Identifier,
+            std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
             &region_prevalence,
-        const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        const std::unordered_map<
+            core::Identifier,
+            std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
             &ethnicity_prevalence,
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
         const std::unordered_map<core::Region, LinearModelParams> &region_models,
         double physical_activity_stddev,
         const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models)
-        : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend), 
-                                 std::move(trend_steps)},
-          expected_trend_boxcox_{std::move(expected_trend_boxcox)},
-          names_{names},
-          models_{models},
-          ranges_{ranges},
-          lambda_{lambda},
-          stddev_{stddev},
-          cholesky_{cholesky},
-          policy_models_{policy_models},
-          policy_ranges_{policy_ranges},
-          policy_cholesky_{policy_cholesky},
-          trend_models_{trend_models},
-          trend_ranges_{trend_ranges},
-          trend_lambda_{trend_lambda},
-          info_speed_{info_speed},
-          rural_prevalence_{rural_prevalence},
-          region_prevalence_{region_prevalence},
-          ethnicity_prevalence_{ethnicity_prevalence},
-          income_models_{income_models},
-          region_models_{region_models},
-          physical_activity_stddev_{physical_activity_stddev},
+        : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
+                                    std::move(trend_steps)},
+          expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
+          ranges_{ranges}, lambda_{lambda}, stddev_{stddev}, cholesky_{cholesky},
+          policy_models_{policy_models}, policy_ranges_{policy_ranges},
+          policy_cholesky_{policy_cholesky}, trend_models_{trend_models},
+          trend_ranges_{trend_ranges}, trend_lambda_{trend_lambda}, info_speed_{info_speed},
+          rural_prevalence_{rural_prevalence}, region_prevalence_{region_prevalence},
+          ethnicity_prevalence_{ethnicity_prevalence}, income_models_{income_models},
+          region_models_{region_models}, physical_activity_stddev_{physical_activity_stddev},
           physical_activity_models_{physical_activity_models} {}
 
     RiskFactorModelType type() const noexcept override;
@@ -157,9 +149,13 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const double info_speed_;
     const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         &rural_prevalence_;
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+    const std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         &region_prevalence_;
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+    const std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         &ethnicity_prevalence_;
     const std::unordered_map<core::Income, LinearModelParams> &income_models_;
     const std::unordered_map<core::Region, LinearModelParams> &region_models_;
@@ -211,9 +207,13 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unique_ptr<std::vector<double>> trend_lambda, double info_speed,
         std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
             rural_prevalence,
-        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        std::unordered_map<
+            core::Identifier,
+            std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
             region_prevalence,
-        std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        std::unordered_map<
+            core::Identifier,
+            std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
             ethnicity_prevalence,
         std::unordered_map<core::Income, LinearModelParams> income_models,
         std::unordered_map<core::Region, LinearModelParams> region_models,
@@ -230,18 +230,27 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
     /// @brief Gets the region prevalence data
     /// @return The region prevalence data
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>&
-    get_region_prevalence() const { return region_prevalence_; }
+    const std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> &
+    get_region_prevalence() const {
+        return region_prevalence_;
+    }
 
     /// @brief Gets the ethnicity prevalence data
     /// @return The ethnicity prevalence data
-    const std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>&
-    get_ethnicity_prevalence() const { return ethnicity_prevalence_; }
+    const std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> &
+    get_ethnicity_prevalence() const {
+        return ethnicity_prevalence_;
+    }
 
     /// @brief Gets the income models
     /// @return The income models
-    const std::unordered_map<core::Income, LinearModelParams>&
-    get_income_models() const { return income_models_; }
+    const std::unordered_map<core::Income, LinearModelParams> &get_income_models() const {
+        return income_models_;
+    }
 
   private:
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
@@ -260,9 +269,12 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     double info_speed_;
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, double>>
         rural_prevalence_;
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence_;
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+    std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     std::unordered_map<core::Region, LinearModelParams> region_models_;

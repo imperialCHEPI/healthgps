@@ -23,11 +23,17 @@ class DemographicModule final : public SimulationModule {
     /// @param region_prevalence Region prevalence by age group and gender
     /// @param ethnicity_prevalence Ethnicity prevalence by age group and gender
     /// @param income_models Income models for different income classifications
-    DemographicModule(std::map<int, std::map<int, PopulationRecord>> &&pop_data,
-                      LifeTable &&life_table,
-                      std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence,
-                      std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence,
-                      std::unordered_map<core::Income, LinearModelParams> income_models);
+    DemographicModule(
+        std::map<int, std::map<int, PopulationRecord>> &&pop_data, LifeTable &&life_table,
+        std::unordered_map<
+            core::Identifier,
+            std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+            region_prevalence,
+        std::unordered_map<
+            core::Identifier,
+            std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+            ethnicity_prevalence,
+        std::unordered_map<core::Income, LinearModelParams> income_models);
 
     /// @brief Gets the module type identifier
     /// @return The module type identifier
@@ -51,7 +57,8 @@ class DemographicModule final : public SimulationModule {
     /// @param context The simulation run-time context
     void initialise_age_gender(RuntimeContext &context);
 
-    /// @brief Initialises the virtual population status with all the varaibles of age, gender, region, ethnicity, income and physical activity
+    /// @brief Initialises the virtual population status with all the varaibles of age, gender,
+    /// region, ethnicity, income and physical activity
     /// @param context The simulation run-time context
     void initialise_population(RuntimeContext &context) override;
 
@@ -67,10 +74,15 @@ class DemographicModule final : public SimulationModule {
     GenderTable<int, double> residual_death_rates_;
     std::string name_{"Demographic"};
     std::vector<double> income_quartile_thresholds_;
-    
+
     // Demographic configuration data from JSON
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence_;
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence_;
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        region_prevalence_;
+    std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        ethnicity_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
 
     void initialise_birth_rates();

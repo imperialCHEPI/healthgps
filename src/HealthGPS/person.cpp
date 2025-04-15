@@ -163,11 +163,11 @@ void Person::copy_from(const Person &other) {
     sector = other.sector;
     ses = other.ses;
     physical_activity = other.physical_activity;
-    
+
     // Copy risk factors and diseases
     risk_factors = other.risk_factors;
     diseases = other.diseases;
-    
+
     // Don't copy private members like is_alive_, has_emigrated_, etc.
 }
 } // namespace hgps

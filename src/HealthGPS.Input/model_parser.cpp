@@ -369,36 +369,46 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
     std::cout << "\nFinished loading Rural Prevelance";
     // Region prevalence for age groups, gender and region.
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence;
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
+        region_prevalence;
     if (opt.contains("RegionPrevalence")) {
         for (const auto &age_group : opt["RegionPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
-            
+
             // Initialize empty maps for both genders
             std::unordered_map<core::Region, double> female_region_prevalence;
             std::unordered_map<core::Region, double> male_region_prevalence;
-            
+
             // Parse region prevalence data for each region if available
             if (age_group["Female"].contains("England")) {
-                female_region_prevalence[core::Region::England] = age_group["Female"]["England"].get<double>();
-                male_region_prevalence[core::Region::England] = age_group["Male"]["England"].get<double>();
+                female_region_prevalence[core::Region::England] =
+                    age_group["Female"]["England"].get<double>();
+                male_region_prevalence[core::Region::England] =
+                    age_group["Male"]["England"].get<double>();
             }
-            
+
             if (age_group["Female"].contains("Wales")) {
-                female_region_prevalence[core::Region::Wales] = age_group["Female"]["Wales"].get<double>();
-                male_region_prevalence[core::Region::Wales] = age_group["Male"]["Wales"].get<double>();
+                female_region_prevalence[core::Region::Wales] =
+                    age_group["Female"]["Wales"].get<double>();
+                male_region_prevalence[core::Region::Wales] =
+                    age_group["Male"]["Wales"].get<double>();
             }
-            
+
             if (age_group["Female"].contains("Scotland")) {
-                female_region_prevalence[core::Region::Scotland] = age_group["Female"]["Scotland"].get<double>();
-                male_region_prevalence[core::Region::Scotland] = age_group["Male"]["Scotland"].get<double>();
+                female_region_prevalence[core::Region::Scotland] =
+                    age_group["Female"]["Scotland"].get<double>();
+                male_region_prevalence[core::Region::Scotland] =
+                    age_group["Male"]["Scotland"].get<double>();
             }
-            
+
             if (age_group["Female"].contains("NorthernIreland")) {
-                female_region_prevalence[core::Region::NorthernIreland] = age_group["Female"]["NorthernIreland"].get<double>();
-                male_region_prevalence[core::Region::NorthernIreland] = age_group["Male"]["NorthernIreland"].get<double>();
+                female_region_prevalence[core::Region::NorthernIreland] =
+                    age_group["Female"]["NorthernIreland"].get<double>();
+                male_region_prevalence[core::Region::NorthernIreland] =
+                    age_group["Male"]["NorthernIreland"].get<double>();
             }
-            
+
             // Add to the main map
             region_prevalence[age_group_name][core::Gender::female] = female_region_prevalence;
             region_prevalence[age_group_name][core::Gender::male] = male_region_prevalence;
@@ -407,27 +417,39 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::cout << "\nFinished loading RegionPrevelance";
 
     // Ethnicity prevalence for age groups, gender and ethnicity.
-    std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence;
+    std::unordered_map<
+        core::Identifier,
+        std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        ethnicity_prevalence;
     if (opt.contains("EthnicityPrevalence")) {
         for (const auto &age_group : opt["EthnicityPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
-            
+
             // Process female ethnicity prevalence
             std::unordered_map<core::Ethnicity, double> female_ethnicity_prevalence;
-            female_ethnicity_prevalence[core::Ethnicity::White] = age_group["Female"]["White"].get<double>();
-            female_ethnicity_prevalence[core::Ethnicity::Asian] = age_group["Female"]["Asian"].get<double>();
-            female_ethnicity_prevalence[core::Ethnicity::Black] = age_group["Female"]["Black"].get<double>();
-            female_ethnicity_prevalence[core::Ethnicity::Other] = age_group["Female"]["Others"].get<double>();
-            
+            female_ethnicity_prevalence[core::Ethnicity::White] =
+                age_group["Female"]["White"].get<double>();
+            female_ethnicity_prevalence[core::Ethnicity::Asian] =
+                age_group["Female"]["Asian"].get<double>();
+            female_ethnicity_prevalence[core::Ethnicity::Black] =
+                age_group["Female"]["Black"].get<double>();
+            female_ethnicity_prevalence[core::Ethnicity::Other] =
+                age_group["Female"]["Others"].get<double>();
+
             // Process male ethnicity prevalence
             std::unordered_map<core::Ethnicity, double> male_ethnicity_prevalence;
-            male_ethnicity_prevalence[core::Ethnicity::White] = age_group["Male"]["White"].get<double>();
-            male_ethnicity_prevalence[core::Ethnicity::Asian] = age_group["Male"]["Asian"].get<double>();
-            male_ethnicity_prevalence[core::Ethnicity::Black] = age_group["Male"]["Black"].get<double>();
-            male_ethnicity_prevalence[core::Ethnicity::Other] = age_group["Male"]["Others"].get<double>();
-            
+            male_ethnicity_prevalence[core::Ethnicity::White] =
+                age_group["Male"]["White"].get<double>();
+            male_ethnicity_prevalence[core::Ethnicity::Asian] =
+                age_group["Male"]["Asian"].get<double>();
+            male_ethnicity_prevalence[core::Ethnicity::Black] =
+                age_group["Male"]["Black"].get<double>();
+            male_ethnicity_prevalence[core::Ethnicity::Other] =
+                age_group["Male"]["Others"].get<double>();
+
             // Add to the main map
-            ethnicity_prevalence[age_group_name][core::Gender::female] = female_ethnicity_prevalence;
+            ethnicity_prevalence[age_group_name][core::Gender::female] =
+                female_ethnicity_prevalence;
             ethnicity_prevalence[age_group_name][core::Gender::male] = male_ethnicity_prevalence;
         }
     }
@@ -444,7 +466,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Convert the string key to core::Income enum
         // For now, we don't distinguish among the key types - we just need one model to work with
         core::Income income_key = core::Income::unknown;
-        
+
         // Insert income model with the converted enum key
         income_models.emplace(income_key, std::move(model));
     }
@@ -471,16 +493,16 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {
             // Create a model for this physical activity type (e.g., "continuous")
             LinearModelParams model;
-            
+
             // Get the intercept
             model.intercept = json_params["Intercept"].get<double>();
-            
+
             // Get the coefficients
             if (json_params.contains("Coefficients")) {
-                model.coefficients = 
+                model.coefficients =
                     json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
             }
-            
+
             // Store the model
             physical_activity_models.emplace(core::Identifier(key), std::move(model));
         }
@@ -488,10 +510,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Standard deviation of physical activity (now loaded directly from the model)
     double physical_activity_stddev = 0.0;
-    if (opt.contains("PhysicalActivityModels") && 
-        opt["PhysicalActivityModels"].contains("continuous") && 
+    if (opt.contains("PhysicalActivityModels") &&
+        opt["PhysicalActivityModels"].contains("continuous") &&
         opt["PhysicalActivityModels"]["continuous"].contains("StandardDeviation")) {
-        physical_activity_stddev = opt["PhysicalActivityModels"]["continuous"]["StandardDeviation"].get<double>();
+        physical_activity_stddev =
+            opt["PhysicalActivityModels"]["continuous"]["StandardDeviation"].get<double>();
     } else if (opt.contains("PhysicalActivityStdDev")) {
         // Fallback to old format if present
         physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
@@ -503,7 +526,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models), 
+        std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models),
         std::move(region_models), physical_activity_stddev, std::move(physical_activity_models));
 }
 
