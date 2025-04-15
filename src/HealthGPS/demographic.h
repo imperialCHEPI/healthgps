@@ -81,15 +81,8 @@ class DemographicModule final : public SimulationModule {
     void initialise_income_continuous(RuntimeContext &context, Person &person, Random &random);
     void initialise_income_category(Person &person, const Population &population);
     void calculate_income_quartiles(const Population &population);
-    
-    // Population-level update function
-    void update_demographic_variables(RuntimeContext &context);
-    
-    // Person-level update functions
-    void update_region(RuntimeContext &context, Person &person, Random &random);
-    void update_ethnicity(RuntimeContext &context, Person &person, Random &random);
-    void update_income_continuous(RuntimeContext &context, Person &person, Random &random);
     void update_income_category(RuntimeContext &context);
+    void initialize_newborns(RuntimeContext &context);
 
     double get_total_deaths(int time_year) const noexcept;
     std::map<int, DoubleGenderValue> get_age_gender_distribution(int time_year) const noexcept;

@@ -2,6 +2,7 @@
 #include "HealthGPS.Core/exception.h"
 #include "runtime_context.h"
 #include "HealthGPS.Input/model_parser.h"
+#include "demographic.h"
 
 #include <ranges>
 #include <utility>
@@ -13,10 +14,11 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
+    // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
+    // initialized by the DemographicModule in initialise_population
 
-    // Initialise everyone.
+    // Initialise everyone with risk factors.
     for (auto &person : context.population()) {
-        initialise_sector(person, context.random());
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
@@ -24,7 +26,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
-    // Initialise everyone.
+    // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
@@ -35,22 +37,27 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
 
-    // Initialise newborns and update others.
+    // NOTE: Demographic variables are updated by the DemographicModule in update_population
+    // Here we only handle risk factor related updates
+
+    // Update risk factors for all people, initializing for newborns.
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
 
         if (person.age == 0) {
+            // For newborns, initialize demographic variables
             initialise_sector(person, context.random());
+            // Demographic variables (region, ethnicity, income) are initialized by the DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
+            // For existing people, only update sector and factors
             update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
@@ -59,7 +66,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
 
-    // Initialise newborns and update others.
+    // Update policies and trends for all people, initializing for newborns.
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;

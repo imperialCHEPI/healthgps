@@ -221,7 +221,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 }
 
 // Population-level initialization functions
-void DemographicModule::initialise_region(RuntimeContext &context, Person &person, Random &random) {
+void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person, Random &random) {
     // Determine the age group for this person
     core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
     
@@ -246,7 +246,7 @@ void DemographicModule::initialise_region(RuntimeContext &context, Person &perso
                               "or are incorrectly distributed");
 }
 
-void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &person,
+void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context, Person &person,
                                              Random &random) {
     // Determine the age group for this person
     core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
@@ -272,7 +272,7 @@ void DemographicModule::initialise_ethnicity(RuntimeContext &context, Person &pe
         "or are incorrectly distributed");
 }
 
-void DemographicModule::initialise_income_continuous(RuntimeContext &context, Person &person, Random &random) {
+void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeContext &context, Person &person, Random &random) {
     // income_continuous is considered as household income and assigned to every person
     // Find the income model to use (there should be only one)
     if (!income_models_.empty()) {
@@ -287,11 +287,8 @@ void DemographicModule::initialise_income_continuous(RuntimeContext &context, Pe
             // Skip the standard deviation entry as it's not a factor
             if (factor_name == "IncomeContinuousStdDev") continue;
             
-            // Add all coefficient effects
-            for (const auto &[factor_name, coefficient] : model.coefficients) {
-                // Apply each coefficient to the person's factor value
-                value += coefficient * person.get_risk_factor_value(factor_name);
-            }
+            // Apply each coefficient to the person's factor value
+            value += coefficient * person.get_risk_factor_value(factor_name);
         }
         
         // Get the standard deviation from the model if available
@@ -341,7 +338,7 @@ void DemographicModule::calculate_income_quartiles(const Population &population)
     
     if (sorted_incomes.empty()) {
         // Default thresholds if no valid incomes found
-        income_quartile_thresholds_ = {25000, 50000, 75000};
+        //income_quartile_thresholds_ = {25000, 50000, 75000};
         return;
     }
     
@@ -367,9 +364,9 @@ void DemographicModule::update_population(RuntimeContext &context,
     // apply death events and update basic information (age)
     residual_future.get();
     auto number_of_deaths = update_age_and_death_events(context, disease_host);
-    
-    // update demographic variables for those still alive
-    update_demographic_variables(context);
+
+    // Update demographic variables including income categories 
+    update_income_category(context);
 
     // apply births events
     auto last_year_births_rate = get_birth_rate(context.time_now() - 1);
@@ -378,6 +375,9 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.population().add_newborn_babies(number_of_boys, core::Gender::male, context.time_now());
     context.population().add_newborn_babies(number_of_girls, core::Gender::female,
                                             context.time_now());
+    
+    // Initialize demographic variables for newborns
+    initialize_newborns(context);
 
     // Calculate statistics.
     auto simulated_death_rate = number_of_deaths * 1000.0 / initial_pop_size;
@@ -386,55 +386,6 @@ void DemographicModule::update_population(RuntimeContext &context,
     context.metrics()["SimulatedDeathRate"] = simulated_death_rate;
     context.metrics()["ExpectedDeathRate"] = expected_death_rate;
     context.metrics()["DeathRateDeltaPercent"] = percent_difference;
-}
-
-void DemographicModule::update_demographic_variables(RuntimeContext &context) {
-    // Update the demographic variables for each person
-    for (auto &person : context.population()) {
-        if (person.is_active()) {
-            // For newborns, we initialize instead of update
-            if (person.age == 0) {
-                initialise_region(context, person, context.random());
-                initialise_ethnicity(context, person, context.random());
-                initialise_income_continuous(context, person, context.random());
-                const Population& population = context.population();
-                initialise_income_category(person, population);
-            } else {
-                // Update the region, ethnicity, and income_continuous
-                update_region(context, person, context.random());
-                update_ethnicity(context, person, context.random());
-                update_income_continuous(context, person, context.random());
-            }
-        }
-    }
-    
-    // Update income categories for all people (only once)
-    update_income_category(context);
-}
-
-// Person-level update functions
-void DemographicModule::update_region(RuntimeContext &context, Person &person, Random &random) {
-    // Only update for special cases like 18-year-olds transitioning from one age group to another
-    if (person.age == 18) {
-        // Re-initialize region when a person transitions from Under18 to Over18 group
-        initialise_region(context, person, random);
-    }
-    // Otherwise, region remains the same
-}
-
-void DemographicModule::update_ethnicity(RuntimeContext &context, Person &person, Random &random) {
-    // Only update for special cases like 18-year-olds transitioning from one age group to another
-    if (person.age == 18) {
-        // Re-initialize ethnicity when a person transitions from Under18 to Over18 group
-        initialise_ethnicity(context, person, random);
-    }
-    // Otherwise, ethnicity remains the same
-}
-
-void DemographicModule::update_income_continuous(RuntimeContext &context, Person &person,
-                                                 Random &random) {
-    // TODO: Write logic for continuous income update for this specific person
-    
 }
 
 void DemographicModule::update_income_category(RuntimeContext &context) {
@@ -618,6 +569,18 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
     }
 
     return number_of_deaths;
+}
+
+void DemographicModule::initialize_newborns(RuntimeContext &context) {
+    // Initialize demographic variables for newborns (age == 0)
+    for (auto &person : context.population()) {
+        if (person.is_active() && person.age == 0) {
+            initialise_region(context, person, context.random());
+            initialise_ethnicity(context, person, context.random());
+            initialise_income_continuous(context, person, context.random());
+            initialise_income_category(person, context.population());
+        }
+    }
 }
 
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,

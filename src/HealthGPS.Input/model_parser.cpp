@@ -16,9 +16,10 @@
 #include <filesystem>
 #include <fstream>
 #include <optional>
+#include <iostream>
 
 #if USE_TIMER
-#define MEASURE_FUNCTION()                                                                         \
+#define MEASURE_FUNCTION()
     hgps::core::ScopedTimer timer { __func__ }
 #else
 #define MEASURE_FUNCTION()
@@ -211,12 +212,13 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-
+    std::cout << "\nStarting to load Static_model.json";
     // Risk factor correlation matrix.
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
     const auto correlation_table = load_datatable_from_csv(correlation_file_info);
     Eigen::MatrixXd correlation{correlation_table.num_rows(), correlation_table.num_columns()};
+    //std::cout << "Finished loading RiskFactorCorrelationFile";
 
     // Policy covariance matrix.
     const auto policy_covariance_file_info =
@@ -224,7 +226,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     const auto policy_covariance_table = load_datatable_from_csv(policy_covariance_file_info);
     Eigen::MatrixXd policy_covariance{policy_covariance_table.num_rows(),
                                       policy_covariance_table.num_columns()};
-
+    //std::cout << "Finished loading PolicyCovarianceFile";
+    
     // Risk factor and intervention policy: names, models, parameters and correlation/covariance.
     std::vector<core::Identifier> names;
     std::vector<LinearModelParams> models;
@@ -364,7 +367,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
                                             {core::Gender::male, age_group["Male"]}};
     }
-
+    std::cout << "\nFinished loading Rural Prevelance";
     // Region prevalence for age groups, gender and region.
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>> region_prevalence;
     if (opt.contains("RegionPrevalence")) {
@@ -401,6 +404,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             region_prevalence[age_group_name][core::Gender::male] = male_region_prevalence;
         }
     }
+    std::cout << "\nFinished loading RegionPrevelance";
 
     // Ethnicity prevalence for age groups, gender and ethnicity.
     std::unordered_map<core::Identifier, std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>> ethnicity_prevalence;
@@ -427,7 +431,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             ethnicity_prevalence[age_group_name][core::Gender::male] = male_ethnicity_prevalence;
         }
     }
-
+    std::cout << "\nFinished loading EthnicityPrevelance";
     // Income models for income_continuous
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
@@ -611,11 +615,10 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
         std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
-
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-
+    std::cout << "\nStarted loading Kevin Hall risk values";
     // Risk factor expected values by sex and age.
     auto expected = load_risk_factor_expected(config);
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
@@ -631,7 +634,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
-
+    std::cout << "\nFinished loading Kevin Hall nutrients";
     // Food groups.
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
         nutrient_equations;
@@ -652,6 +655,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
             }
         }
     }
+    std::cout << "\nFinished loading KevinHall Foods";
 
     // Weight quantiles.
     const auto weight_quantiles_table_F = load_datatable_from_csv(
@@ -758,6 +762,6 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
+    std::cout << "Finished all the loading required cutie pie";
 }
-
 } // namespace hgps::input

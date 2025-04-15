@@ -135,40 +135,6 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param random The random number generator from the runtime context
     void update_sector(Person &person, Random &random) const;
 
-    /// @brief Initialise the region of a person
-    /// @param person The person to initialise region for
-    /// @param random The random number generator from the runtime context
-    void initialise_region(Person &person, Random &random) const;
-
-    /// @brief Update the region of a person
-    /// @param person The person to update region for
-    /// @param random The random number generator from the runtime context
-    void update_region(Person &person, Random &random) const;
-
-    /// @brief Initialise the ethnicity of a person
-    /// @param person The person to initialise ethnicity for
-    /// @param random The random number generator from the runtime context
-    void initialise_ethnicity(Person &person, Random &random) const;
-
-    /// @brief Update the ethnicity of a person
-    /// @param person The person to update ethnicity for
-    /// @param random The random number generator from the runtime context
-    void update_ethnicity(Person &person, Random &random) const;
-
-    /// @brief Initialise the income_continuous of a person
-    /// @param person The person to initialise income_continuous for
-    /// @param random The random number generator from the runtime context
-    void initialise_income_continuous(Person &person, Random &random) const;
-
-    /// @brief Update the income_continuous of a person
-    /// @param person The person to update income_continuous for
-    /// @param random The random number generator from the runtime context
-    void update_income_continuous(Person &person, Random &random) const;
-
-    /// @brief Based on income_continuous, set the income category
-    /// @param person The person to update income category for
-    void update_income_category(Person &person) const;
-
     /// @brief Initialise the physical activity of a person
     /// @param person The person to initialise PAL for
     /// @param random The random number generator from the runtime context
