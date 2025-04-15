@@ -79,11 +79,12 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
         // if (person.id() > 100 && person.id() < 105)
         //     std::cout << "Person " << person.id() << " hazard " << hazard << std::endl;
 
-        if (hazard < probability)
+        if (hazard < probability) {
             person.diseases[disease_type()] = Disease{
                 .status = DiseaseStatus::active,
                 .start_time =
                     0}; // start_time = 0 means the disease existed before the simulation started.
+        }
     });
     // std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" <<
     // std::endl;
