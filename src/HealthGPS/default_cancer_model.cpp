@@ -25,9 +25,11 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
     int prevalence_id = definition_.get().table().at(MeasureKey::prevalence);
 
     auto relative_risk_table = calculate_average_relative_risk(context);
-    for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active() || !definition_.get().table().contains(person.age)) {
-            continue;
+            return;
         }
 
         double relative_risk = 1.0;
@@ -45,7 +47,7 @@ void DefaultCancerModel::initialise_disease_status(RuntimeContext &context) {
                                                       .start_time = 0,
                                                       .time_since_onset = time_since_onset};
         }
-    }
+    });
 }
 
 void DefaultCancerModel::initialise_average_relative_risk(RuntimeContext &context) {
@@ -197,16 +199,18 @@ double DefaultCancerModel::calculate_relative_risk_for_diseases(const Person &pe
 void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
     int max_onset = definition_.get().parameters().max_time_since_onset;
 
-    for (auto &person : context.population()) {
+    // for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Skip if person is inactive or newborn.
         if (!person.is_active() || person.age == 0) {
-            continue;
+            return;
         }
 
         // Skip if person does not have the disease.
         if (!person.diseases.contains(disease_type()) ||
             person.diseases.at(disease_type()).status != DiseaseStatus::active) {
-            continue;
+            return;
         }
 
         // Increment duration by one year
@@ -216,28 +220,29 @@ void DefaultCancerModel::update_remission_cases(RuntimeContext &context) {
             disease.status = DiseaseStatus::free;
             disease.time_since_onset = -1;
         }
-    }
+    });
 }
 
 void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
     int incidence_id = definition_.get().table().at(MeasureKey::incidence);
 
-    for (auto &person : context.population()) {
+    auto &pop = context.population();
+    tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         // Skip if person is inactive.
         if (!person.is_active()) {
-            continue;
+            return;
         }
 
         // Clear newborn diseases.
         if (person.age == 0) {
             person.diseases.clear();
-            continue;
+            return;
         }
 
         // Skip if the person already has the disease.
         if (person.diseases.contains(disease_type()) &&
             person.diseases.at(disease_type()).status == DiseaseStatus::active) {
-            continue;
+            return;
         }
 
         double relative_risk = 1.0;
@@ -254,7 +259,7 @@ void DefaultCancerModel::update_incidence_cases(RuntimeContext &context) {
                                                       .start_time = context.time_now(),
                                                       .time_since_onset = 0};
         }
-    }
+    });
 }
 
 int DefaultCancerModel::calculate_time_since_onset(RuntimeContext &context,

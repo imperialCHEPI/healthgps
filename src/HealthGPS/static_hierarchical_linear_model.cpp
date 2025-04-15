@@ -3,6 +3,8 @@
 
 #include "HealthGPS.Core/exception.h"
 
+#include <oneapi/tbb/parallel_for_each.h>
+
 namespace hgps {
 
 StaticHierarchicalLinearModel::StaticHierarchicalLinearModel(
