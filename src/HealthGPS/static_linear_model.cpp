@@ -489,7 +489,7 @@ void StaticLinearModel::update_region(Person &person, Random &random) const {
     }
 }
 
-StaticLinearModelDefinition::StaticLinearModelDefinition( 
+StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
     std::unique_ptr<std::unordered_map<core::Identifier, int>> trend_steps,
