@@ -14,7 +14,6 @@
 #include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
 
-#include <oneapi/tbb/parallel_for_each.h>
 
 namespace { // anonymous namespace
 

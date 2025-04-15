@@ -63,31 +63,29 @@ void DefaultDiseaseModel::initialise_disease_status(RuntimeContext &context) {
     //  for (auto &person : context.population())
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
-        if (!person.is_active() || !definition_.get().table().contains(person.age))
-            if (!person.is_active() || !definition_.get().table().contains(person.age)) {
-                return;
-            }
+    if (!person.is_active() || !definition_.get().table().contains(person.age)) {
+        return;
+    }
 
-        double relative_risk = 1.0;
-        relative_risk *= calculate_relative_risk_for_risk_factors(person);
-        double average_relative_risk = relative_risk_table(person.age, person.gender);
+    double relative_risk = 1.0;
+    relative_risk *= calculate_relative_risk_for_risk_factors(person);
+    double average_relative_risk = relative_risk_table(person.age, person.gender);
 
-        double prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
-        double probability = prevalence * relative_risk / average_relative_risk;
-        double hazard = context.random().next_double();
-        // double hazard                   = DrawStandardUniform_Threaded();
+    double prevalence = definition_.get().table()(person.age, person.gender).at(prevalence_id);
+    double probability = prevalence * relative_risk / average_relative_risk;
+    double hazard = context.random().next_double();
+    // double hazard                   = DrawStandardUniform_Threaded();
 
-        // if (person.id() > 100 && person.id() < 105)
-        //     std::cout << "Person " << person.id() << " hazard " << hazard << std::endl;
+    // if (person.id() > 100 && person.id() < 105)
+    //     std::cout << "Person " << person.id() << " hazard " << hazard << std::endl;
 
-        if (hazard < probability) {
+        if (hazard < probability)
             person.diseases[disease_type()] = Disease{
                 .status = DiseaseStatus::active,
                 .start_time =
                     0}; // start_time = 0 means the disease existed before the simulation started.
-        });
-        // std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" <<
-        // std::endl;
+    });
+    //std::cout << "initialise_disease_status, disease = " << disease_type() << " FINISHED" << std::endl;
 }
 
 void DefaultDiseaseModel::initialise_average_relative_risk(RuntimeContext &context) {
