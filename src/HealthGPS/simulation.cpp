@@ -14,7 +14,6 @@
 #include <oneapi/tbb/parallel_for_each.h>
 #include <stdexcept>
 
-
 namespace { // anonymous namespace
 
 /// @brief Defines the net immigration synchronisation message
