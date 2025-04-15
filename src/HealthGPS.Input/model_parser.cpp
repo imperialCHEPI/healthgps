@@ -212,8 +212,8 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
 std::unique_ptr<hgps::StaticLinearModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-    //std::cout << "\nStarting to load Static_model.json";
-    
+    // std::cout << "\nStarting to load Static_model.json";
+
     // Risk factor correlation matrix.
     const auto correlation_file_info =
         input::get_file_info(opt["RiskFactorCorrelationFile"], config.root_path);
@@ -368,7 +368,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         rural_prevalence[age_group_name] = {{core::Gender::female, age_group["Female"]},
                                             {core::Gender::male, age_group["Male"]}};
     }
-    //std::cout << "\nFinished loading Rural Prevelance";
+    // std::cout << "\nFinished loading Rural Prevelance";
 
     // Region prevalence for age groups, gender and region.
     std::unordered_map<core::Identifier,
@@ -416,7 +416,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             region_prevalence[age_group_name][core::Gender::male] = male_region_prevalence;
         }
     }
-    //std::cout << "\nFinished loading RegionPrevelance";
+    // std::cout << "\nFinished loading RegionPrevelance";
 
     // Ethnicity prevalence for age groups, gender and ethnicity.
     std::unordered_map<
@@ -455,11 +455,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             ethnicity_prevalence[age_group_name][core::Gender::male] = male_ethnicity_prevalence;
         }
     }
-    //std::cout << "\nFinished loading EthnicityPrevelance";
-    
+    // std::cout << "\nFinished loading EthnicityPrevelance";
+
     // Add detailed debug prints to identify exactly where parsing fails
-    //std::cout << "\nDEBUG: About to process IncomeModels";
-    
+    // std::cout << "\nDEBUG: About to process IncomeModels";
+
     // Income models for income_continuous
     std::unordered_map<core::Income, LinearModelParams> income_models;
     for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
@@ -472,19 +472,19 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         // Convert the string key to core::Income enum
         // For now, we don't distinguish among the key types - we just need one model to work with
         core::Income income_key = core::Income::unknown;
-        
+
         // Insert income model with the converted enum key
         income_models.emplace(income_key, std::move(model));
     }
-    //std::cout << "\nDEBUG: Finished processing IncomeModels";
+    // std::cout << "\nDEBUG: Finished processing IncomeModels";
 
     // Region models for different region classifications- Mahima
     // Not being used right now as we are using RegionPrevelance
-    
-    //std::cout << "\nDEBUG: About to process RegionModels";
+
+    // std::cout << "\nDEBUG: About to process RegionModels";
     std::unordered_map<core::Region, LinearModelParams> region_models;
     if (opt.contains("RegionModels")) {
-        //std::cout << "\nDEBUG: RegionModels entry exists";
+        // std::cout << "\nDEBUG: RegionModels entry exists";
         for (const auto &model : opt["RegionModels"]) {
             std::cout << "\nDEBUG: Processing RegionModel";
             auto region = parse_region(model["Region"].get<std::string>());
@@ -499,54 +499,55 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             region_models.try_emplace(region, std::move(params));
         }
     } else {
-        //std::cout << "\nDEBUG: RegionModels section not found, skipping";
+        // std::cout << "\nDEBUG: RegionModels section not found, skipping";
     }
-    //std::cout << "\nDEBUG: Finished processing RegionModels";
+    // std::cout << "\nDEBUG: Finished processing RegionModels";
 
     // Physical activity models
-    //std::cout << "\nDEBUG: About to process PhysicalActivityModels";
+    // std::cout << "\nDEBUG: About to process PhysicalActivityModels";
     std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models;
     if (opt.contains("PhysicalActivityModels")) {
-       for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {
+        for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {
             // Create a model for this physical activity type (e.g., "continuous")
             LinearModelParams model;
-            
+
             // Get the intercept
             model.intercept = json_params["Intercept"].get<double>();
-            
+
             // Get the coefficients
             if (json_params.contains("Coefficients")) {
-                model.coefficients = 
+                model.coefficients =
                     json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
             }
-            
+
             // Store the model
             physical_activity_models.emplace(core::Identifier(key), std::move(model));
         }
     }
-    //std::cout << "\nDEBUG: Finished processing PhysicalActivityModels";
+    // std::cout << "\nDEBUG: Finished processing PhysicalActivityModels";
 
     // Standard deviation of physical activity (now loaded directly from the model)
-    //std::cout << "\nDEBUG: Processing PhysicalActivityStdDev";
+    // std::cout << "\nDEBUG: Processing PhysicalActivityStdDev";
     double physical_activity_stddev = 0.0;
-    if (opt.contains("PhysicalActivityModels") && 
-        opt["PhysicalActivityModels"].contains("continuous") && 
+    if (opt.contains("PhysicalActivityModels") &&
+        opt["PhysicalActivityModels"].contains("continuous") &&
         opt["PhysicalActivityModels"]["continuous"].contains("StandardDeviation")) {
-        physical_activity_stddev = opt["PhysicalActivityModels"]["continuous"]["StandardDeviation"].get<double>();
+        physical_activity_stddev =
+            opt["PhysicalActivityModels"]["continuous"]["StandardDeviation"].get<double>();
     } else if (opt.contains("PhysicalActivityStdDev")) {
         // Fallback to old format if present
         physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
     }
-    //std::cout << "\nDEBUG: Finished processing PhysicalActivityStdDev";
+    // std::cout << "\nDEBUG: Finished processing PhysicalActivityStdDev";
 
-    //std::cout << "\nDEBUG: About to create StaticLinearModelDefinition";
+    // std::cout << "\nDEBUG: About to create StaticLinearModelDefinition";
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
         std::move(lambda), std::move(stddev), std::move(cholesky), std::move(policy_models),
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
-        std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models), 
+        std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models),
         std::move(region_models), physical_activity_stddev, std::move(physical_activity_models));
 }
 
@@ -661,8 +662,8 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
-    //std::cout << "\nStarted loading Kevin Hall risk values";
-    
+    // std::cout << "\nStarted loading Kevin Hall risk values";
+
     // Risk factor expected values by sex and age.
     auto expected = load_risk_factor_expected(config);
     auto expected_trend = std::make_unique<std::unordered_map<core::Identifier, double>>();
@@ -678,7 +679,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
-    //std::cout << "\nFinished loading Kevin Hall nutrients";
+    // std::cout << "\nFinished loading Kevin Hall nutrients";
 
     // Food groups.
     std::unordered_map<hgps::core::Identifier, std::map<hgps::core::Identifier, double>>
@@ -700,7 +701,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
             }
         }
     }
-    //std::cout << "\nFinished loading KevinHall Foods";
+    // std::cout << "\nFinished loading KevinHall Foods";
 
     // Weight quantiles.
     const auto weight_quantiles_table_F = load_datatable_from_csv(
