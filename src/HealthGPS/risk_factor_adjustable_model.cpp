@@ -83,7 +83,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving adjustments for intervention";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving
+        // adjustments for intervention";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         if (!message.has_value()) {
             std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Timed "
@@ -141,7 +142,8 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         // sent";
     }
 
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Completed" << std::endl;
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Completed" <<
+    // std::endl;
 }
 
 int RiskFactorAdjustableModel::get_trend_steps(const core::Identifier &factor) const {
