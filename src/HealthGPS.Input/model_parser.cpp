@@ -415,7 +415,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Add to the main map
             region_prevalence[age_group_name][core::Gender::female] = female_region_prevalence;
             region_prevalence[age_group_name][core::Gender::male] = male_region_prevalence;
-            
+
             // Check sum of probabilities
             double female_sum = 0.0;
             double male_sum = 0.0;
@@ -425,7 +425,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             for (const auto &[region, prob] : male_region_prevalence) {
                 male_sum += prob;
             }
-            //std::cout << "\nDEBUG: Sum of probabilities - Female: " << female_sum << ", Male: " << male_sum << std::endl;
+            // std::cout << "\nDEBUG: Sum of probabilities - Female: " << female_sum << ", Male: "
+            // << male_sum << std::endl;
         }
         std::cout << "\nDEBUG: Finished loading RegionPrevalence" << std::endl;
     } else {
@@ -500,7 +501,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     if (opt.contains("RegionModels")) {
         // std::cout << "\nDEBUG: RegionModels entry exists";
         for (const auto &model : opt["RegionModels"]) {
-            //std::cout << "\nDEBUG: Processing RegionModel";
+            // std::cout << "\nDEBUG: Processing RegionModel";
             auto region = parse_region(model["Region"].get<std::string>());
             auto params = LinearModelParams{};
             params.intercept = model["Intercept"].get<double>();

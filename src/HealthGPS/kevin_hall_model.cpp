@@ -5,9 +5,9 @@
 #include "sync_message.h"
 
 #include <algorithm>
+#include <iostream>
 #include <iterator>
 #include <utility>
-#include <iostream>
 
 namespace { // anonymous namespace
 
@@ -421,7 +421,8 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
 
 void KevinHallModel::initialise_kevin_hall_state(Person &person,
                                                  std::optional<double> adjustment) const {
-    std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #" << person.id() << std::endl;
+    std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #"
+              << person.id() << std::endl;
     // Apply optional weight adjustment.
     if (adjustment.has_value()) {
         person.risk_factors.at("Weight"_id) += adjustment.value();
@@ -478,7 +479,8 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 }
 
 void KevinHallModel::kevin_hall_run(Person &person) const {
-    std::cout << "\nDEBUG: KevinHallModel::kevin_hall_run - Starting for person #" << person.id() << std::endl;
+    std::cout << "\nDEBUG: KevinHallModel::kevin_hall_run - Starting for person #" << person.id()
+              << std::endl;
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
 

@@ -2,12 +2,11 @@
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
 #include "converter.h"
+#include "finally.h"
 #include "info_message.h"
 #include "mtrandom.h"
 #include "sync_message.h"
 #include "univariate_visitor.h"
-#include "finally.h"
-
 
 #include <algorithm>
 #include <fmt/format.h>
@@ -44,14 +43,15 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
 }
 
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
-    //std::cout << "\nDEBUG: Simulation::setup_run - Starting for run #" << run_number << " with seed " << run_seed << std::endl;
+    // std::cout << "\nDEBUG: Simulation::setup_run - Starting for run #" << run_number << " with
+    // seed " << run_seed << std::endl;
     context_.set_current_run(run_number);
     context_.random().seed(run_seed);
-    //std::cout << "\nDEBUG: Simulation::setup_run - Completed" << std::endl;
+    // std::cout << "\nDEBUG: Simulation::setup_run - Completed" << std::endl;
 }
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
-    //std::cout << "\nDEBUG: Simulation::init - Starting" << std::endl;
+    // std::cout << "\nDEBUG: Simulation::init - Starting" << std::endl;
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -59,9 +59,9 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.scenario().clear();
     context_.set_current_time(world_time);
     end_time_ = adevs::Time(inputs.stop_time(), 0);
-    //std::cout << "\nDEBUG: Simulation::init - Initializing population" << std::endl;
+    // std::cout << "\nDEBUG: Simulation::init - Initializing population" << std::endl;
     initialise_population();
-    //std::cout << "\nDEBUG: Simulation::init - Population initialized" << std::endl;
+    // std::cout << "\nDEBUG: Simulation::init - Population initialized" << std::endl;
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -77,7 +77,8 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
-    //std::cout << "\nDEBUG: Simulation::update - Starting at time " << env->now().real << std::endl;
+    // std::cout << "\nDEBUG: Simulation::update - Starting at time " << env->now().real <<
+    // std::endl;
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -86,7 +87,8 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto world_time = env->now() + adevs::Time(1, 0);
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
-        std::cout << "\nDEBUG: Simulation::update - Updating population for time " << time_year << std::endl;
+        std::cout << "\nDEBUG: Simulation::update - Updating population for time " << time_year
+                  << std::endl;
         update_population();
         std::cout << "\nDEBUG: Simulation::update - Population updated" << std::endl;
 
@@ -99,7 +101,8 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
             name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
         // Schedule next event time
-        std::cout << "\nDEBUG: Simulation::update - Completed, next time: " << world_time.real << std::endl;
+        std::cout << "\nDEBUG: Simulation::update - Completed, next time: " << world_time.real
+                  << std::endl;
         return world_time;
     }
 
@@ -122,7 +125,7 @@ void Simulation::fini(adevs::Time clock) {
 }
 
 void Simulation::initialise_population() {
-    //std::cout << "\nDEBUG: Simulation::initialise_population - Starting" << std::endl;
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Starting" << std::endl;
     /* Note: order is very important */
 
     // Create virtual population
@@ -135,17 +138,19 @@ void Simulation::initialise_population() {
     std::cout << "\nDEBUG: population with size " << virtual_pop_size << std::endl;
 
     // Gender - Age, must be first
-    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic" << std::endl; 
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic"
+              << std::endl;
     demographic_->initialise_population(context_);
     std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed" << std::endl;
 
-    // Social economics status- NOT BEING USED FOR FINCH- Mahima 
+    // Social economics status- NOT BEING USED FOR FINCH- Mahima
     /*std::cout << "\nDEBUG: Simulation::initialise_population - Initializing SES" << std::endl;
     ses_->initialise_population(context_);
-    std::cout << "\nDEBUG: Simulation::initialise_population - SES completed" << std::endl;*/ 
+    std::cout << "\nDEBUG: Simulation::initialise_population - SES completed" << std::endl;*/
 
     // Generate risk factors
-    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing risk factors" << std::endl;
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing risk factors"
+              << std::endl;
     risk_factor_->initialise_population(context_);
     std::cout << "\nDEBUG: Simulation::initialise_population - Risk factors completed" << std::endl;
 
@@ -180,7 +185,7 @@ void Simulation::update_population() {
     // update population socio-economic status- Not using SES for FINCH- Mahima
     /*std::cout << "\nDEBUG: Simulation::update_population - Updating SES" << std::endl;
     ses_->update_population(context_);
-    std::cout << "\nDEBUG: Simulation::update_population - SES updated" << std::endl;*/ 
+    std::cout << "\nDEBUG: Simulation::update_population - SES updated" << std::endl;*/
 
     // Update population risk factors
     std::cout << "\nDEBUG: Simulation::update_population - Updating risk factors" << std::endl;
@@ -196,7 +201,7 @@ void Simulation::update_population() {
     std::cout << "\nDEBUG: Simulation::update_population - Updating analysis" << std::endl;
     analysis_->update_population(context_);
     std::cout << "\nDEBUG: Simulation::update_population - Analysis updated" << std::endl;
-    
+
     std::cout << "\nDEBUG: Simulation::update_population - Completed" << std::endl;
 }
 
