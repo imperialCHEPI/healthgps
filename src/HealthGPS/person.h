@@ -150,6 +150,16 @@ struct Person {
     /// @throw HgpsException if ethnicity is unknown
     float ethnicity_to_value() const;
 
+    /// @brief Gets the region enumeration as a string
+    /// @return The region name string
+    /// @throws HgpsException if region is unknown
+    std::string region_to_string() const;
+
+    /// @brief Gets the ethnicity enumeration as a string
+    /// @return The ethnicity name string
+    /// @throws HgpsException if ethnicity is unknown
+    std::string ethnicity_to_string() const;
+
     /// @brief Copies the data from another Person instance
     /// @param other The source Person instance
     void copy_from(const Person &other);

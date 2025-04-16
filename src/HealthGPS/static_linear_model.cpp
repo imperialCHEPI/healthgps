@@ -5,6 +5,7 @@
 
 #include <ranges>
 #include <utility>
+#include <iostream>
 
 namespace hgps {
 
@@ -13,6 +14,7 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting" << std::endl;
     // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
     // initialized by the DemographicModule in initialise_population
 
@@ -21,24 +23,31 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity initialized" << std::endl;
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted" << std::endl;
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized" << std::endl;
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted" << std::endl;
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed" << std::endl;
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting" << std::endl;
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Intervention status: " << (intervene ? "true" : "false") << std::endl;
 
     // NOTE: Demographic variables are updated by the DemographicModule in update_population
     // Here we only handle risk factor related updates
@@ -62,9 +71,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_factors(context, person, context.random());
         }
     }
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Factors and physical activity updated" << std::endl;
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Risk factors adjusted" << std::endl;
 
     // Update policies and trends for all people, initializing for newborns.
     for (auto &person : context.population()) {
@@ -80,9 +91,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies and trends updated" << std::endl;
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Trended risk factors adjusted" << std::endl;
 
     // Apply policies if intervening.
     for (auto &person : context.population()) {
@@ -92,6 +105,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         apply_policies(person, intervene);
     }
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies applied" << std::endl;
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed" << std::endl;
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {

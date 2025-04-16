@@ -375,6 +375,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence;
     if (opt.contains("RegionPrevalence")) {
+        std::cout << "\nDEBUG: Found RegionPrevalence section in JSON" << std::endl;
         for (const auto &age_group : opt["RegionPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
 
@@ -414,9 +415,22 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // Add to the main map
             region_prevalence[age_group_name][core::Gender::female] = female_region_prevalence;
             region_prevalence[age_group_name][core::Gender::male] = male_region_prevalence;
+            
+            // Check sum of probabilities
+            double female_sum = 0.0;
+            double male_sum = 0.0;
+            for (const auto &[region, prob] : female_region_prevalence) {
+                female_sum += prob;
+            }
+            for (const auto &[region, prob] : male_region_prevalence) {
+                male_sum += prob;
+            }
+            //std::cout << "\nDEBUG: Sum of probabilities - Female: " << female_sum << ", Male: " << male_sum << std::endl;
         }
+        std::cout << "\nDEBUG: Finished loading RegionPrevalence" << std::endl;
+    } else {
+        std::cout << "\nDEBUG: WARNING - RegionPrevalence section not found in JSON" << std::endl;
     }
-    // std::cout << "\nFinished loading RegionPrevelance";
 
     // Ethnicity prevalence for age groups, gender and ethnicity.
     std::unordered_map<
@@ -486,7 +500,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     if (opt.contains("RegionModels")) {
         // std::cout << "\nDEBUG: RegionModels entry exists";
         for (const auto &model : opt["RegionModels"]) {
-            std::cout << "\nDEBUG: Processing RegionModel";
+            //std::cout << "\nDEBUG: Processing RegionModel";
             auto region = parse_region(model["Region"].get<std::string>());
             auto params = LinearModelParams{};
             params.intercept = model["Intercept"].get<double>();
