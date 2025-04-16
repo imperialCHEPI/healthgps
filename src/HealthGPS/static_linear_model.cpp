@@ -14,7 +14,7 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
     // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
     // initialized by the DemographicModule in initialise_population
 
@@ -23,26 +23,23 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical "
-                 "activity completed";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted";
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-    std::cout
-        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
+    //std::cout<< "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    std::cout
-        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
-
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
+    
     // Print risk factor summary once at the end
     std::string risk_factor_list;
     for (size_t i = 0; i < names_.size(); i++) {
@@ -57,12 +54,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting" ;
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Intervention status: "
-              << (intervene ? "true" : "false");
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Intervention status: " << (intervene ? "true" : "false") ;
 
     // NOTE: Demographic variables are updated by the DemographicModule in update_population
     // Here we only handle risk factor related updates
@@ -86,12 +82,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_factors(context, person, context.random());
         }
     }
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Factors and physical activity "
-                 "updated";
+    //std::cout<< "\nDEBUG: StaticLinearModel::update_risk_factors - Factors and physical activity updated";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Risk factors adjusted";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Risk factors adjusted";
 
     // Update policies and trends for all people, initializing for newborns.
     for (auto &person : context.population()) {
@@ -107,11 +102,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies and trends updated";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies and trends updated";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Trended risk factors adjusted";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Trended risk factors adjusted";
 
     // Apply policies if intervening.
     for (auto &person : context.population()) {
@@ -121,7 +116,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         apply_policies(person, intervene);
     }
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies applied";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies applied";
     std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
 
@@ -620,13 +615,12 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     // Debug information about physical_activity_models_
-    std::cout << "\nDEBUG: In create_model - physical_activity_models_ size: "
-              << physical_activity_models_.size() << std::endl;
-
-    if (!physical_activity_models_.empty()) {
-        std::cout << "\nDEBUG: First model key: "
+    //std::cout << "\nDEBUG: In create_model - physical_activity_models_ size: " << physical_activity_models_.size() << std::endl;
+    
+    /*if (!physical_activity_models_.empty()) {
+        std::cout << "\nDEBUG: First model key: " 
                   << physical_activity_models_.begin()->first.to_string() << std::endl;
-    }
+    }*/ 
 
     return std::make_unique<StaticLinearModel>(
         expected_, expected_trend_, trend_steps_, expected_trend_boxcox_, names_, models_, ranges_,
