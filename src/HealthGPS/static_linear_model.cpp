@@ -23,7 +23,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity completed";
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical "
+                 "activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
@@ -39,27 +40,29 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
-    
+    std::cout
+        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
+
     // Print risk factor summary once at the end
     std::string risk_factor_list;
     for (size_t i = 0; i < names_.size(); i++) {
-        if (i > 0) risk_factor_list += ", ";
+        if (i > 0)
+            risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
     }
-    std::cout << "\nDEBUG: Successfully completed processing " << names_.size() 
+    std::cout << "\nDEBUG: Successfully completed processing " << names_.size()
               << " risk factors: " << risk_factor_list;
-              
+
     std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting" ;
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting";
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
     std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Intervention status: "
-              << (intervene ? "true" : "false") ;
+              << (intervene ? "true" : "false");
 
     // NOTE: Demographic variables are updated by the DemographicModule in update_population
     // Here we only handle risk factor related updates
@@ -83,8 +86,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_factors(context, person, context.random());
         }
     }
-    std::cout
-        << "\nDEBUG: StaticLinearModel::update_risk_factors - Factors and physical activity updated";
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Factors and physical activity "
+                 "updated";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
@@ -128,11 +131,11 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
-    //std::cout << "\nDEBUG: Inside initialise_factors";
+    // std::cout << "\nDEBUG: Inside initialise_factors";
 
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
-    //std::cout << "\nDEBUG: Finished computing residuals, size: " << residuals.size();
+    // std::cout << "\nDEBUG: Finished computing residuals, size: " << residuals.size();
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
@@ -150,7 +153,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Initialise risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        
+
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -158,7 +161,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Save risk factor.
         person.risk_factors[names_[i]] = factor;
     }
-    
+
     // Removed risk factor summary from here since it will be printed once in generate_risk_factors
 }
 
@@ -321,32 +324,33 @@ StaticLinearModel::compute_linear_models(Person &person,
     // Approximate risk factors with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
         if (i >= models.size()) {
-            std::cout << "\nDEBUG: ERROR - Index " << i << " is out of bounds for models vector of size " << models.size();
+            std::cout << "\nDEBUG: ERROR - Index " << i
+                      << " is out of bounds for models vector of size " << models.size();
             break; // Prevent out-of-bounds access
         }
-        
+
         auto name = names_[i];
         auto model = models[i];
         double factor = model.intercept;
-        
+
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             double value = person.get_risk_factor_value(coefficient_name);
             factor += coefficient_value * value;
         }
-        
+
         for (const auto &[coefficient_name, coefficient_value] : model.log_coefficients) {
             double value = person.get_risk_factor_value(coefficient_name);
-            
+
             if (value <= 0) {
                 value = 1e-10; // Avoid log of zero or negative
             }
-            
+
             factor += coefficient_value * log(value);
         }
-        
+
         linear.emplace_back(factor);
     }
-    
+
     return linear;
 }
 
@@ -406,53 +410,53 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 // with std dev Loaded from the static_model.json under the Physical Activity Models section
 void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeContext &context,
                                                      Person &person, Random &random) const {
-    //std::cout << "\nDEBUG: Inside physical activity initialization";
-    
+    // std::cout << "\nDEBUG: Inside physical activity initialization";
+
     // Check if we have any models before proceeding
     if (physical_activity_models_.empty()) {
-        std::cout << "\nERROR: physical_activity_models_ is empty! Cannot initialize physical activity.";
-        std::cout << "\nERROR: Please check that PhysicalActivityModels are properly defined in the configuration.";
+        std::cout
+            << "\nERROR: physical_activity_models_ is empty! Cannot initialize physical activity.";
+        std::cout << "\nERROR: Please check that PhysicalActivityModels are properly defined in "
+                     "the configuration.";
         // Don't set a default value - let the error surface so it can be diagnosed
         return;
     }
-    
+
     // Continue only if models are available
     double final_value = 0.0;
-    
+
     // Look for the continuous model first
     auto model_it = physical_activity_models_.find(core::Identifier("continuous"));
-    
+
     // If continuous model not found, use the first available model
     if (model_it == physical_activity_models_.end()) {
         std::cout << "\nDEBUG: No 'continuous' model found, using first available model";
         model_it = physical_activity_models_.begin();
     }
-    
+
     // Check again that we have a valid iterator
     if (model_it != physical_activity_models_.end()) {
         const auto &model = model_it->second;
-        
+
         // Start with the intercept
         double value = model.intercept;
-        //std::cout << "\nDEBUG: Using physical activity intercept value: " << value;
-        
+        // std::cout << "\nDEBUG: Using physical activity intercept value: " << value;
+
         // Process coefficients
         for (const auto &[factor_name, coefficient] : model.coefficients) {
             // Skip the standard deviation entry as it's not a factor
             if (factor_name == "StandardDeviation"_id)
                 continue;
-            
+
             // Apply coefficient based on its name
             double factor_value = 0.0;
-            
+
             // Age effects
             if (factor_name == "Age"_id) {
                 factor_value = static_cast<double>(person.age);
-            } 
-            else if (factor_name == "Age2"_id) {
+            } else if (factor_name == "Age2"_id) {
                 factor_value = std::pow(person.age, 2);
-            }
-            else if (factor_name == "Age3"_id) {
+            } else if (factor_name == "Age3"_id) {
                 factor_value = std::pow(person.age, 3);
             }
             // Gender effect
@@ -466,31 +470,25 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
             // Region effects
             else if (factor_name == "England"_id && person.region == core::Region::England) {
                 factor_value = 1.0;
-            }
-            else if (factor_name == "Wales"_id && person.region == core::Region::Wales) {
+            } else if (factor_name == "Wales"_id && person.region == core::Region::Wales) {
                 factor_value = 1.0;
-            }
-            else if (factor_name == "Scotland"_id && person.region == core::Region::Scotland) {
+            } else if (factor_name == "Scotland"_id && person.region == core::Region::Scotland) {
                 factor_value = 1.0;
-            }
-            else if (factor_name == "NorthernIreland"_id && person.region == core::Region::NorthernIreland) {
+            } else if (factor_name == "NorthernIreland"_id &&
+                       person.region == core::Region::NorthernIreland) {
                 factor_value = 1.0;
             }
             // Ethnicity effects
             else if (factor_name == "White"_id && person.ethnicity == core::Ethnicity::White) {
                 factor_value = 1.0;
-            }
-            else if (factor_name == "Black"_id && person.ethnicity == core::Ethnicity::Black) {
+            } else if (factor_name == "Black"_id && person.ethnicity == core::Ethnicity::Black) {
                 factor_value = 1.0;
-            }
-            else if (factor_name == "Asian"_id && person.ethnicity == core::Ethnicity::Asian) {
+            } else if (factor_name == "Asian"_id && person.ethnicity == core::Ethnicity::Asian) {
                 factor_value = 1.0;
-            }
-            else if (factor_name == "Mixed"_id && person.ethnicity == core::Ethnicity::Mixed) {
+            } else if (factor_name == "Mixed"_id && person.ethnicity == core::Ethnicity::Mixed) {
                 factor_value = 1.0;
-            }
-            else if ((factor_name == "Others"_id || factor_name == "Other"_id) && 
-                    person.ethnicity == core::Ethnicity::Other) {
+            } else if ((factor_name == "Others"_id || factor_name == "Other"_id) &&
+                       person.ethnicity == core::Ethnicity::Other) {
                 factor_value = 1.0;
             }
             // Income continuous value
@@ -501,35 +499,35 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
             else if (person.risk_factors.count(factor_name) > 0) {
                 factor_value = person.risk_factors.at(factor_name);
             }
-            
+
             // Add to our value
             value += coefficient * factor_value;
         }
-        
+
         // Get the standard deviation
         double pa_stddev = physical_activity_stddev_; // Default
         if (model.coefficients.count("StandardDeviation"_id) > 0) {
             pa_stddev = model.coefficients.at("StandardDeviation"_id);
         }
-        
+
         // Add random noise using the standard deviation
         double noise = random.next_normal(0.0, pa_stddev);
-        
+
         // Calculate final value with noise
         final_value = value * (1.0 + noise);
-        //std::cout << "\nDEBUG: Calculated final physical activity value: " << final_value;
-        
+        // std::cout << "\nDEBUG: Calculated final physical activity value: " << final_value;
+
         // Set the physical activity value
         person.risk_factors[core::Identifier("PhysicalActivity")] = final_value;
         person.physical_activity = final_value;
-    }
-    else {
+    } else {
         std::cout << "\nERROR: No valid physical activity models found!";
         // Don't set a default value - let the error surface
         return;
     }
-    
-    //std::cout << "\nDEBUG: Finished physical activity initialization for person ID " << person.id();
+
+    // std::cout << "\nDEBUG: Finished physical activity initialization for person ID " <<
+    // person.id();
 }
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
@@ -622,11 +620,11 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
 
 std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() const {
     // Debug information about physical_activity_models_
-    std::cout << "\nDEBUG: In create_model - physical_activity_models_ size: " 
+    std::cout << "\nDEBUG: In create_model - physical_activity_models_ size: "
               << physical_activity_models_.size() << std::endl;
-    
+
     if (!physical_activity_models_.empty()) {
-        std::cout << "\nDEBUG: First model key: " 
+        std::cout << "\nDEBUG: First model key: "
                   << physical_activity_models_.begin()->first.to_string() << std::endl;
     }
 

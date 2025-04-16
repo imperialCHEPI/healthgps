@@ -203,7 +203,7 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
-    //std::cout << "\nDEBUG: Finished assigning age and gender";
+    // std::cout << "\nDEBUG: Finished assigning age and gender";
 }
 
 // Made structural change- Mahima
@@ -227,7 +227,8 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
             initialise_income_category(person, population);
         }
     }
-    std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and income-category to everybody!";
+    std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and "
+                 "income-category to everybody!";
 }
 
 // Population-level initialization functions
@@ -363,10 +364,10 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
             // Age effects
             if (factor_name == "Age") {
                 value += coefficient * static_cast<double>(person.age);
-            } 
+            }
             if (factor_name == "Age2") {
                 value += coefficient * pow(person.age, 2);
-            } 
+            }
             if (factor_name == "Age3") {
                 value += coefficient * pow(person.age, 3);
             }

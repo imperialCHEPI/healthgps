@@ -68,22 +68,27 @@ double RiskFactorAdjustableModel::get_expected(RuntimeContext &context, core::Ge
 void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
                                                     const std::vector<core::Identifier> &factors,
                                                     OptionalRanges ranges, bool apply_trend) const {
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Starting (apply_trend=" << (apply_trend ? "true" : "false") << ")" << std::endl;
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Starting
+    // (apply_trend=" << (apply_trend ? "true" : "false") << ")" << std::endl;
     RiskFactorSexAgeTable adjustments;
 
     // Baseline scenario: compute adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
-        //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Calculating adjustments for baseline";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Calculating
+        // adjustments for baseline";
         adjustments = calculate_adjustments(context, factors, ranges, apply_trend);
-        //std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments calculated";
+        // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments
+        // calculated";
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
     else {
-        std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving adjustments for intervention";
+        std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving "
+                     "adjustments for intervention";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         if (!message.has_value()) {
-            std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Timed out waiting for adjustment message";
+            std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Timed "
+                         "out waiting for adjustment message";
             throw core::HgpsException(
                 "Simulation out of sync, receive baseline adjustments message has timed out");
         }
@@ -91,17 +96,20 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         auto &basePtr = message.value();
         auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
         if (!messagePrt) {
-            std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Failed to receive adjustment message";
+            std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Failed "
+                         "to receive adjustment message";
             throw core::HgpsException(
                 "Simulation out of sync, failed to receive a baseline adjustments message");
         }
 
         adjustments = messagePrt->data();
-        //std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments received";
+        // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments
+        // received";
     }
 
     // All scenarios: apply adjustments to population.
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Applying adjustments to population";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Applying adjustments
+    // to population";
     auto &pop = context.population();
     tbb::parallel_for_each(pop.begin(), pop.end(), [&](auto &person) {
         if (!person.is_active()) {
@@ -122,14 +130,16 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             person.risk_factors.at(factors[i]) = value;
         }
     });
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments applied";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments applied";
 
     // Baseline scenario: send adjustments to intervention scenario.
     if (context.scenario().type() == ScenarioType::baseline) {
-        //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Sending adjustments to intervention";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Sending
+        // adjustments to intervention";
         context.scenario().channel().send(std::make_unique<RiskFactorAdjustmentMessage>(
             context.current_run(), context.time_now(), std::move(adjustments)));
-        //std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments sent";
+        // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments
+        // sent";
     }
 
     std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Completed" << std::endl;
@@ -143,17 +153,20 @@ RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
                                                  const std::vector<core::Identifier> &factors,
                                                  OptionalRanges ranges, bool apply_trend) const {
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Starting";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Starting";
     auto age_range = context.age_range();
     auto age_count = age_range.upper() + 1;
 
     // Compute simulated means.
-    //std::cout<< "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Calculating simulated means";
+    // std::cout<< "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Calculating
+    // simulated means";
     auto simulated_means = calculate_simulated_mean(context.population(), age_range, factors);
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Simulated means calculated";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Simulated means
+    // calculated";
 
     // Compute adjustments.
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Computing adjustments";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Computing
+    // adjustments";
     auto adjustments = RiskFactorSexAgeTable{};
     for (const auto &[sex, simulated_means_by_sex] : simulated_means) {
         for (size_t i = 0; i < factors.size(); i++) {
@@ -181,8 +194,9 @@ RiskFactorAdjustableModel::calculate_adjustments(RuntimeContext &context,
             }
         }
     }
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Adjustments computed";
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Completed";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments - Adjustments
+    // computed"; std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_adjustments -
+    // Completed";
 
     return adjustments;
 }
@@ -191,7 +205,7 @@ RiskFactorSexAgeTable
 RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
                                                     const core::IntegerInterval age_range,
                                                     const std::vector<core::Identifier> &factors) {
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Starting";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Starting";
     auto age_count = age_range.upper() + 1;
 
     // Compute first moments.
@@ -222,11 +236,12 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
         /*if (processed_count % 1000 == 0) {
             std::cout << "\nDEBUG: Processed " << processed_count << " people for first moments"
                       << std::endl;
-        }*/ 
+        }*/
     }
 
     // Compute means.
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Computing means";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Computing
+    // means";
     auto means = RiskFactorSexAgeTable{};
     for (const auto &[sex, moments_by_sex] : moments) {
         for (const auto &factor : factors) {
@@ -237,8 +252,8 @@ RiskFactorAdjustableModel::calculate_simulated_mean(Population &population,
             }
         }
     }
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Means computed";
-    //std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Completed";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Means computed";
+    // std::cout << "\nDEBUG: RiskFactorAdjustableModel::calculate_simulated_mean - Completed";
 
     return means;
 }

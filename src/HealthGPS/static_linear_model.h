@@ -254,7 +254,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
 
     /// @brief Gets the physical activity models
     /// @return The physical activity models
-    const std::unordered_map<core::Identifier, LinearModelParams> &get_physical_activity_models() const {
+    const std::unordered_map<core::Identifier, LinearModelParams> &
+    get_physical_activity_models() const {
         return physical_activity_models_;
     }
 

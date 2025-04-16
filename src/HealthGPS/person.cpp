@@ -21,26 +21,41 @@ std::unordered_map<core::Identifier, std::function<double(const Person &)>>
         {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
         {"PhysicalActivity"_id, [](const Person &p) { return p.physical_activity; }},
         {"IncomeContinuous"_id, [](const Person &p) { return p.income_continuous; }},
-        
+
         // Add handlers for specific ethnicity coefficients
-        {"White"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::White ? 1.0 : 0.0; }},
-        {"white"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::White ? 1.0 : 0.0; }},
-        {"Black"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0; }},
-        {"black"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0; }},
-        {"Asian"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0; }},
-        {"asian"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0; }},
-        {"Mixed"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Mixed ? 1.0 : 0.0; }},
-        {"mixed"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Mixed ? 1.0 : 0.0; }},
-        {"Other"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
-        {"other"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
-        {"Others"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
-        {"others"_id, [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
-        
+        {"White"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::White ? 1.0 : 0.0; }},
+        {"white"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::White ? 1.0 : 0.0; }},
+        {"Black"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0; }},
+        {"black"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Black ? 1.0 : 0.0; }},
+        {"Asian"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0; }},
+        {"asian"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Asian ? 1.0 : 0.0; }},
+        {"Mixed"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Mixed ? 1.0 : 0.0; }},
+        {"mixed"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Mixed ? 1.0 : 0.0; }},
+        {"Other"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
+        {"other"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
+        {"Others"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
+        {"others"_id,
+         [](const Person &p) { return p.ethnicity == core::Ethnicity::Other ? 1.0 : 0.0; }},
+
         // Add handlers for specific region coefficients if needed
-        {"England"_id, [](const Person &p) { return p.region == core::Region::England ? 1.0 : 0.0; }},
+        {"England"_id,
+         [](const Person &p) { return p.region == core::Region::England ? 1.0 : 0.0; }},
         {"Wales"_id, [](const Person &p) { return p.region == core::Region::Wales ? 1.0 : 0.0; }},
-        {"Scotland"_id, [](const Person &p) { return p.region == core::Region::Scotland ? 1.0 : 0.0; }},
-        {"NorthernIreland"_id, [](const Person &p) { return p.region == core::Region::NorthernIreland ? 1.0 : 0.0; }},
+        {"Scotland"_id,
+         [](const Person &p) { return p.region == core::Region::Scotland ? 1.0 : 0.0; }},
+        {"NorthernIreland"_id,
+         [](const Person &p) { return p.region == core::Region::NorthernIreland ? 1.0 : 0.0; }},
     };
 
 Person::Person() : id_{++Person::newUID} {}
@@ -98,7 +113,7 @@ float Person::sector_to_value() const {
         return 1.0f;
     default:
         // Return default value (urban) instead of throwing an exception
-        return 0.0f;  // Default to urban (0.0) if sector is unknown
+        return 0.0f; // Default to urban (0.0) if sector is unknown
     }
 }
 
