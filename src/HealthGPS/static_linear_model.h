@@ -252,6 +252,12 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         return income_models_;
     }
 
+    /// @brief Gets the physical activity models
+    /// @return The physical activity models
+    const std::unordered_map<core::Identifier, LinearModelParams> &get_physical_activity_models() const {
+        return physical_activity_models_;
+    }
+
   private:
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     std::vector<core::Identifier> names_;
@@ -279,7 +285,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Income, LinearModelParams> income_models_;
     std::unordered_map<core::Region, LinearModelParams> region_models_;
     double physical_activity_stddev_;
-    const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models_;
+    std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models_;
 };
 
 } // namespace hgps

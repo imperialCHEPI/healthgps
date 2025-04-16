@@ -10,8 +10,8 @@
 #include <cmath>
 #include <iostream>
 #include <mutex>
-
 #include <oneapi/tbb/parallel_for_each.h>
+
 using namespace hgps;
 
 namespace { // anonymous namespace
@@ -203,7 +203,7 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context) {
     }
 
     assert(index == pop_size);
-    std::cout << "\nDEBUG: Finished assigning age and gender";
+    //std::cout << "\nDEBUG: Finished assigning age and gender";
 }
 
 // Made structural change- Mahima
@@ -218,7 +218,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
         // STEP-3 Initialize ethnicity
         // STEP-4 Initialize income continuous
         // STEP-5 Initialize income category
-        // STEP-6 Initialize physical activity
+        // STEP-6 Initialize physical activity- being done in the static_linear_model.cpp
         if (person.is_active()) {
             initialise_region(context, person, context.random());
             initialise_ethnicity(context, person, context.random());
@@ -227,6 +227,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
             initialise_income_category(person, population);
         }
     }
+    std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and income-category to everybody!";
 }
 
 // Population-level initialization functions
@@ -362,20 +363,22 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
             // Age effects
             if (factor_name == "Age") {
                 value += coefficient * static_cast<double>(person.age);
-            } else if (factor_name == "Age2") {
+            } 
+            if (factor_name == "Age2") {
                 value += coefficient * pow(person.age, 2);
-            } else if (factor_name == "Age3") {
+            } 
+            if (factor_name == "Age3") {
                 value += coefficient * pow(person.age, 3);
             }
             // Gender effect
-            else if (factor_name == "Gender") {
+            if (factor_name == "Gender") {
                 // Male = 1, Female = 0
                 if (person.gender == core::Gender::male) {
                     value += coefficient;
                 }
             }
             // Sector effect
-            else if (factor_name == "Sector") {
+            if (factor_name == "Sector") {
                 // Rural = 1, Urban = 0
                 if (person.sector == core::Sector::rural) {
                     value += coefficient;

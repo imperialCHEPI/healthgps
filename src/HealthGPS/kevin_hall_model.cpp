@@ -48,7 +48,7 @@ RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorMod
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: KevinHallModel::generate_risk_factors - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::generate_risk_factors - Starting" << std::endl;
 
     // Initialise everyone.
     for (auto &person : context.population()) {
@@ -73,7 +73,7 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: KevinHallModel::update_risk_factors - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::update_risk_factors - Starting" << std::endl;
 
     // Update (initialise) newborns.
     update_newborns(context);
@@ -93,7 +93,7 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_newborns(RuntimeContext &context) const {
-    std::cout << "\nDEBUG: KevinHallModel::update_newborns - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::update_newborns - Starting" << std::endl;
 
     // Initialise nutrient and energy intake and weight for newborns.
     for (auto &person : context.population()) {
@@ -150,7 +150,7 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
 }
 
 void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
-    std::cout << "\nDEBUG: KevinHallModel::update_non_newborns - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::update_non_newborns - Starting" << std::endl;
 
     // Update nutrient and energy intake for non-newborns.
     for (auto &person : context.population()) {
@@ -220,7 +220,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
 }
 
 KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
-    std::cout << "\nDEBUG: KevinHallModel::receive_weight_adjustments - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::receive_weight_adjustments - Starting" << std::endl;
     KevinHallAdjustmentTable adjustments;
 
     // Baseline scenatio: compute adjustments.
@@ -247,7 +247,7 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
 void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
                                              KevinHallAdjustmentTable &&adjustments) const {
-    std::cout << "\nDEBUG: KevinHallModel::send_weight_adjustments - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::send_weight_adjustments - Starting" << std::endl;
     // Baseline scenario: send adjustments.
     if (context.scenario().type() == ScenarioType::baseline) {
         context.scenario().channel().send(std::make_unique<KevinHallAdjustmentMessage>(
@@ -258,7 +258,7 @@ void KevinHallModel::send_weight_adjustments(RuntimeContext &context,
 KevinHallAdjustmentTable
 KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
                                            std::optional<unsigned> age) const {
-    std::cout << "\nDEBUG: KevinHallModel::compute_weight_adjustments - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::compute_weight_adjustments - Starting" << std::endl;
     auto W_means = compute_mean_weight(context.population(), std::nullopt, age);
 
     // Compute adjustments.
@@ -421,8 +421,7 @@ void KevinHallModel::compute_energy_intake(Person &person) const {
 
 void KevinHallModel::initialise_kevin_hall_state(Person &person,
                                                  std::optional<double> adjustment) const {
-    std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #"
-              << person.id() << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::initialise_kevin_hall_state - Starting for person #" << person.id() << std::endl;
     // Apply optional weight adjustment.
     if (adjustment.has_value()) {
         person.risk_factors.at("Weight"_id) += adjustment.value();
@@ -479,8 +478,7 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 }
 
 void KevinHallModel::kevin_hall_run(Person &person) const {
-    std::cout << "\nDEBUG: KevinHallModel::kevin_hall_run - Starting for person #" << person.id()
-              << std::endl;
+    std::cout << "\nDEBUG: KevinHallModel::kevin_hall_run - Starting";
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
 
@@ -684,7 +682,7 @@ KevinHallAdjustmentTable
 KevinHallModel::compute_mean_weight(Population &population,
                                     std::optional<std::unordered_map<core::Gender, double>> power,
                                     std::optional<unsigned> age) const {
-    std::cout << "\nDEBUG: KevinHallModel::compute_mean_weight - Starting" << std::endl;
+    //std::cout << "\nDEBUG: KevinHallModel::compute_mean_weight - Starting" << std::endl;
     // Local struct to hold count and sum of weight powers.
     struct SumCount {
       public:
