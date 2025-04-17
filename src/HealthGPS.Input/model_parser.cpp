@@ -375,7 +375,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence;
     if (opt.contains("RegionPrevalence")) {
-        //std::cout << "\nDEBUG: Found RegionPrevalence section in JSON" << std::endl;
+        // std::cout << "\nDEBUG: Found RegionPrevalence section in JSON" << std::endl;
         for (const auto &age_group : opt["RegionPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
 
@@ -428,7 +428,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // std::cout << "\nDEBUG: Sum of probabilities - Female: " << female_sum << ", Male: "
             // << male_sum << std::endl;
         }
-        //std::cout << "\nDEBUG: Finished loading RegionPrevalence" << std::endl;
+        // std::cout << "\nDEBUG: Finished loading RegionPrevalence" << std::endl;
     } else {
         std::cout << "\nDEBUG: WARNING - RegionPrevalence section not found in JSON" << std::endl;
     }
@@ -521,7 +521,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Physical activity models
     std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models;
     if (opt.contains("PhysicalActivityModels")) {
-        //std::cout << "\nDEBUG: Found PhysicalActivityModels in JSON";
+        // std::cout << "\nDEBUG: Found PhysicalActivityModels in JSON";
 
         // Validate the structure
         if (!opt["PhysicalActivityModels"].is_object()) {
@@ -533,7 +533,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Process each model
             for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {
-                //std::cout << "\nDEBUG: Processing physical activity model key: " << key;
+                // std::cout << "\nDEBUG: Processing physical activity model key: " << key;
 
                 // Create a model for this physical activity type (e.g., "continuous")
                 LinearModelParams model;
@@ -541,7 +541,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 // Get the intercept
                 if (json_params.contains("Intercept")) {
                     model.intercept = json_params["Intercept"].get<double>();
-                    //std::cout << "\nDEBUG: Loaded intercept: " << model.intercept;
+                    // std::cout << "\nDEBUG: Loaded intercept: " << model.intercept;
                 } else {
                     std::cout << "\nDEBUG: WARNING - Missing Intercept for model " << key;
                     model.intercept = 0.0;
@@ -549,7 +549,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
                 // Get the coefficients
                 if (json_params.contains("Coefficients")) {
-                    //std::cout << "\nDEBUG: Found Coefficients section";
+                    // std::cout << "\nDEBUG: Found Coefficients section";
 
                     // Load the coefficients manually to debug
                     auto coeffs = std::unordered_map<core::Identifier, double>();
@@ -561,7 +561,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                             if (coeff_value.is_number()) {
                                 double value = coeff_value.get<double>();
                                 coeffs[core::Identifier(coeff_key)] = value;
-                                //std::cout << "\nDEBUG: Loaded coefficient " << coeff_key << " = " << value;
+                                // std::cout << "\nDEBUG: Loaded coefficient " << coeff_key << " = "
+                                // << value;
                             } else {
                                 std::cout << "\nDEBUG: WARNING - Coefficient " << coeff_key
                                           << " is not a number, skipping";
@@ -573,7 +574,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     }
 
                     model.coefficients = std::move(coeffs);
-                    //std::cout << "\nDEBUG: Loaded " << model.coefficients.size() << " coefficients";
+                    // std::cout << "\nDEBUG: Loaded " << model.coefficients.size() << "
+                    // coefficients";
                 } else {
                     std::cout << "\nDEBUG: WARNING - No Coefficients section found for model "
                               << key;
@@ -583,16 +585,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 if (json_params.contains("StandardDeviation")) {
                     double pa_stddev = json_params["StandardDeviation"].get<double>();
                     model.coefficients[core::Identifier("StandardDeviation")] = pa_stddev;
-                    //std::cout << "\nDEBUG: Loaded StandardDeviation from model: " << pa_stddev;
+                    // std::cout << "\nDEBUG: Loaded StandardDeviation from model: " << pa_stddev;
                 }
 
                 // Store the model
                 core::Identifier model_key(key);
-                //std::cout << "\nDEBUG: Storing model with key: '" << model_key.to_string() << "'";
+                // std::cout << "\nDEBUG: Storing model with key: '" << model_key.to_string() <<
+                // "'";
 
                 // Store the model in the map
                 physical_activity_models.emplace(model_key, model);
-                //std::cout << "\nDEBUG: Added model with key: " << model_key.to_string() << ", current map size: " << physical_activity_models.size();
+                // std::cout << "\nDEBUG: Added model with key: " << model_key.to_string() << ",
+                // current map size: " << physical_activity_models.size();
             }
         }
     } else {
@@ -600,11 +604,13 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     }
 
     // Verify the final map
-    //std::cout << "\nDEBUG: Finished processing PhysicalActivityModels, final count: " << physical_activity_models.size();
+    // std::cout << "\nDEBUG: Finished processing PhysicalActivityModels, final count: " <<
+    // physical_activity_models.size();
 
     if (!physical_activity_models.empty()) {
         for (const auto &[key, model] : physical_activity_models) {
-            //std::cout << "\nDEBUG: Verified model key: " << key.to_string() << ", coefficients: " << model.coefficients.size();
+            // std::cout << "\nDEBUG: Verified model key: " << key.to_string() << ", coefficients: "
+            // << model.coefficients.size();
         }
     }
 

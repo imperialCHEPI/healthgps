@@ -50,9 +50,10 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
     }
-    //std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk factors: " << risk_factor_list;
+    // std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk
+    // factors: " << risk_factor_list;
 
-    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
@@ -122,7 +123,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         apply_policies(person, intervene);
     }
     // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies applied";
-    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
+    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
