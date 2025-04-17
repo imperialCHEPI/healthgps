@@ -87,6 +87,11 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
         if (!entity.is_active()) {
             return;
         }
+        
+        // Skip if age is out of bounds - fix signed/unsigned comparison
+        if (entity.age < static_cast<int>(age_range.lower()) || entity.age > static_cast<int>(age_range.upper())) {
+            return;
+        }
 
         auto sum = 1.0;
         for (const auto &disease : entity.diseases) {
@@ -191,6 +196,11 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
     auto population_dead = 0;
     auto population_migrated = 0;
     for (const auto &entity : context.population()) {
+        // Skip processing if age is invalid - fix signed/unsigned comparison
+        if (entity.age < 0 || entity.age > static_cast<int>(age_upper_bound)) {
+            continue;
+        }
+        
         if (!entity.is_active()) {
             if (entity.has_emigrated() && entity.time_of_migration() == analysis_time) {
                 population_migrated++;
@@ -293,6 +303,11 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
     auto yld_sum = 0.0;
     auto count = 0.0;
     for (const auto &entity : population) {
+        // Skip processing if age is invalid - fix signed/unsigned comparison
+        if (entity.age < 0 || entity.age > static_cast<int>(max_age)) {
+            continue;
+        }
+        
         if (entity.time_of_death() == death_year && entity.age <= max_age) {
             auto male_reference_age =
                 definition_.life_expectancy().at(death_year, core::Gender::male);
@@ -308,6 +323,13 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
             yld_sum += calculate_disability_weight(entity);
             count++;
         }
+    }
+
+    // Protect against division by zero
+    if (count < 0.0000001) {
+        return DALYsIndicator{.years_of_life_lost = 0.0,
+                              .years_lived_with_disability = 0.0,
+                              .disability_adjusted_life_years = 0.0};
     }
 
     auto yll = yll_sum * DALY_UNITS / count;
