@@ -87,9 +87,10 @@ void AnalysisModule::initialise_population(RuntimeContext &context) {
         if (!entity.is_active()) {
             return;
         }
-        
+
         // Skip if age is out of bounds - fix signed/unsigned comparison
-        if (entity.age < static_cast<int>(age_range.lower()) || entity.age > static_cast<int>(age_range.upper())) {
+        if (entity.age < static_cast<int>(age_range.lower()) ||
+            entity.age > static_cast<int>(age_range.upper())) {
             return;
         }
 
@@ -200,7 +201,7 @@ void AnalysisModule::calculate_historical_statistics(RuntimeContext &context,
         if (entity.age < 0 || entity.age > static_cast<int>(age_upper_bound)) {
             continue;
         }
-        
+
         if (!entity.is_active()) {
             if (entity.has_emigrated() && entity.time_of_migration() == analysis_time) {
                 population_migrated++;
@@ -307,7 +308,7 @@ DALYsIndicator AnalysisModule::calculate_dalys(Population &population, unsigned 
         if (entity.age < 0 || entity.age > static_cast<int>(max_age)) {
             continue;
         }
-        
+
         if (entity.time_of_death() == death_year && entity.age <= max_age) {
             auto male_reference_age =
                 definition_.life_expectancy().at(death_year, core::Gender::male);
