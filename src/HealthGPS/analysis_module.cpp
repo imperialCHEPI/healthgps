@@ -386,7 +386,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
-        
+
         // Skip processing if age is out of bounds
         if (age >= series.size()) {
             continue;
@@ -551,7 +551,7 @@ void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) c
     if (entity.age >= series.size()) {
         return; // Skip this entity if age is out of bounds
     }
-    
+
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
     case WeightCategory::normal:
