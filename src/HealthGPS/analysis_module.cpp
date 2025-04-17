@@ -1,4 +1,3 @@
-
 #include "HealthGPS.Core/thread_util.h"
 
 #include "analysis_module.h"
@@ -365,6 +364,11 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     for (const auto &person : context.population()) {
         auto age = person.age;
         auto gender = person.gender;
+        
+        // Skip processing if age is out of bounds
+        if (age >= series.size()) {
+            continue;
+        }
 
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
@@ -449,6 +453,10 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     // Accumulate squared deviations from mean.
     auto accumulate_squared_diffs = [&series](const std::string &chan, core::Gender sex, int age,
                                               double value) {
+        // Skip if age is out of bounds
+        if (age >= series.size()) {
+            return;
+        }
         const double mean = series(sex, "mean_" + chan).at(age);
         const double diff = value - mean;
         series(sex, "std_" + chan).at(age) += diff * diff;
@@ -458,6 +466,11 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     for (const auto &person : context.population()) {
         unsigned int age = person.age;
         core::Gender sex = person.gender;
+
+        // Skip if age is out of bounds
+        if (age >= series.size()) {
+            continue;
+        }
 
         if (!person.is_active()) {
             if (!person.is_alive() && person.time_of_death() == current_time) {
@@ -512,6 +525,11 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 }
 
 void AnalysisModule::classify_weight(DataSeries &series, const Person &entity) const {
+    // Check if the age is within the valid range before processing
+    if (entity.age >= series.size()) {
+        return; // Skip this entity if age is out of bounds
+    }
+    
     auto weight_class = weight_classifier_.classify_weight(entity);
     switch (weight_class) {
     case WeightCategory::normal:

@@ -227,8 +227,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
             initialise_income_category(person, population);
         }
     }
-    std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and "
-                 "income-category to everybody!";
+    //std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and income-category to everybody!";
 }
 
 // Population-level initialization functions

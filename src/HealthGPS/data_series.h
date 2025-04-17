@@ -67,6 +67,11 @@ class DataSeries {
     /// @return The channels sample size value
     std::size_t sample_size() const noexcept;
 
+    /// @brief Ensures that data structures exist for the specified age
+    /// @param age The age to ensure exists in the data structures
+    /// @return True if the age data was created, false if it already existed
+    bool ensure_age_exists(int age);
+
   private:
     std::size_t sample_size_;
     std::vector<std::string> channels_;
