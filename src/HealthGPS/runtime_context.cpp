@@ -14,7 +14,11 @@ int RuntimeContext::start_time() const noexcept { return model_start_time_; }
 
 unsigned int RuntimeContext::current_run() const noexcept { return current_run_; }
 
-int RuntimeContext::sync_timeout_millis() const noexcept { return inputs_->sync_timeout_ms(); }
+int RuntimeContext::sync_timeout_millis() const noexcept { 
+    int timeout = inputs_->sync_timeout_ms();
+    std::cout << "\nDEBUG: RuntimeContext::sync_timeout_millis - Value: " << timeout << "ms";
+    return timeout; 
+}
 
 Population &RuntimeContext::population() noexcept { return population_; }
 

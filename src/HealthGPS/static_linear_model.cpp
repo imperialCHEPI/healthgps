@@ -56,10 +56,27 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting";
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: " 
+              << context.population().size() << ", scenario: " 
+              << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
+              << ", current time: " << context.time_now();
+              
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
+    
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Model setup: Names size=" 
+              << names_.size() << ", Models size=" << models_.size() 
+              << ", Ranges size=" << ranges_.size();
+    
+    // Count active population members
+    int active_count = 0;
+    for (const auto &person : context.population()) {
+        if (person.is_active()) {
+            active_count++;
+        }
+    }
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Active population members: " << active_count;
     
     // Count statistics for summary
     int total_people = 0;
@@ -67,6 +84,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     int existing = 0;
 
     // Update risk factors for all people, initializing for newborns.
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Beginning to process people";
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
@@ -86,6 +104,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             existing++;
             update_sector(person, context.random());
             update_factors(context, person, context.random());
+        }
+        
+        // Print progress periodically
+        if (total_people % 10000 == 0) {
+            std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people so far";
         }
     }
     std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people (" 
