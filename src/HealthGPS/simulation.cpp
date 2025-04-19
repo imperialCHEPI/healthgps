@@ -2,6 +2,7 @@
 #include "HealthGPS.Core/thread_util.h"
 #include "HealthGPS.Core/univariate_summary.h"
 #include "converter.h"
+#include "finally.h"
 #include "info_message.h"
 #include "mtrandom.h"
 #include "sync_message.h"
@@ -42,11 +43,15 @@ Simulation::Simulation(SimulationModuleFactory &factory, std::shared_ptr<const E
 }
 
 void Simulation::setup_run(unsigned int run_number, unsigned int run_seed) noexcept {
+    // std::cout << "\nDEBUG: Simulation::setup_run - Starting for run #" << run_number << " with
+    // seed " << run_seed << std::endl;
     context_.set_current_run(run_number);
     context_.random().seed(run_seed);
+    // std::cout << "\nDEBUG: Simulation::setup_run - Completed" << std::endl;
 }
 
 adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
+    // std::cout << "\nDEBUG: Simulation::init - Starting" << std::endl;
     auto start = std::chrono::steady_clock::now();
     const auto &inputs = context_.inputs();
     auto world_time = inputs.start_time();
@@ -54,8 +59,9 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.scenario().clear();
     context_.set_current_time(world_time);
     end_time_ = adevs::Time(inputs.stop_time(), 0);
-
+    // std::cout << "\nDEBUG: Simulation::init - Initializing population" << std::endl;
     initialise_population();
+    // std::cout << "\nDEBUG: Simulation::init - Population initialized" << std::endl;
 
     auto stop = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -66,10 +72,13 @@ adevs::Time Simulation::init(adevs::SimEnv<int> *env) {
     context_.publish(std::make_unique<InfoEventMessage>(
         name(), ModelAction::start, context_.current_run(), context_.time_now(), message));
 
+    std::cout << "\nDEBUG: Simulation::init - Completed, next time: " << world_time << std::endl;
     return env->now() + adevs::Time(world_time, 0);
 }
 
 adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
+    // std::cout << "\nDEBUG: Simulation::update - Starting at time " << env->now().real <<
+    // std::endl;
     if (env->now() < end_time_) {
         auto start = std::chrono::steady_clock::now();
         context_.metrics().reset();
@@ -78,8 +87,10 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
         auto world_time = env->now() + adevs::Time(1, 0);
         auto time_year = world_time.real;
         context_.set_current_time(time_year);
-
+        std::cout << "\nDEBUG: Simulation::update - Updating population for time " << time_year
+                  << std::endl;
         update_population();
+        std::cout << "\nDEBUG: Simulation::update - Population updated" << std::endl;
 
         auto stop = std::chrono::steady_clock::now();
         auto elapsed = std::chrono::duration<double, std::milli>(stop - start);
@@ -90,10 +101,13 @@ adevs::Time Simulation::update(adevs::SimEnv<int> *env) {
             name(), ModelAction::update, context_.current_run(), context_.time_now(), message));
 
         // Schedule next event time
+        std::cout << "\nDEBUG: Simulation::update - Completed, next time: " << world_time.real
+                  << std::endl;
         return world_time;
     }
 
     // We have reached the end, remove the model and return infinite time for next event.
+    std::cout << "\nDEBUG: Simulation::update - End time reached, removing model" << std::endl;
     env->remove(this);
     return adevs_inf<adevs::Time>();
 }
@@ -111,6 +125,7 @@ void Simulation::fini(adevs::Time clock) {
 }
 
 void Simulation::initialise_population() {
+    // std::cout << "\nDEBUG: Simulation::initialise_population - Starting" << std::endl;
     /* Note: order is very important */
 
     // Create virtual population
@@ -120,65 +135,109 @@ void Simulation::initialise_population() {
     float size_fraction = inputs.settings().size_fraction();
     auto virtual_pop_size = static_cast<int>(size_fraction * total_year_pop_size);
     context_.reset_population(virtual_pop_size);
+    std::cout << "\nDEBUG: population with size " << virtual_pop_size << std::endl;
 
     // Gender - Age, must be first
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic";
     demographic_->initialise_population(context_);
+    std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed";
 
-    // Social economics status
+    // Social economics status- NOT BEING USED FOR FINCH- Mahima
+    /*std::cout << "\nDEBUG: Simulation::initialise_population - Initializing SES" << std::endl;
     ses_->initialise_population(context_);
+    std::cout << "\nDEBUG: Simulation::initialise_population - SES completed" << std::endl;*/
 
     // Generate risk factors
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing risk factors"
+              << std::endl;
     risk_factor_->initialise_population(context_);
+    std::cout << "\nDEBUG: Simulation::initialise_population - Risk factors completed";
 
     // Initialise diseases
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing diseases";
     disease_->initialise_population(context_);
+    std::cout << "\nDEBUG: Simulation::initialise_population - Diseases completed";
 
     // Initialise analysis
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing analysis";
     analysis_->initialise_population(context_);
+    std::cout << "\nDEBUG: Simulation::initialise_population - Analysis completed";
 
     print_initial_population_statistics();
+    std::cout << "\nDEBUG: Simulation::initialise_population - Completed";
 }
 
 void Simulation::update_population() {
+    std::cout << "\nDEBUG: Simulation::update_population - Starting";
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
+    std::cout << "\nDEBUG: Simulation::update_population - Updating demographic";
     demographic_->update_population(context_, *disease_);
+    std::cout << "\nDEBUG: Simulation::update_population - Demographic updated";
 
     // Calculate the net immigration by gender and age, update the population accordingly
+    std::cout << "\nDEBUG: Simulation::update_population - Updating net immigration";
     update_net_immigration();
+    std::cout << "\nDEBUG: Simulation::update_population - Net immigration updated";
 
-    // update population socio-economic status
+    // update population socio-economic status- Not using SES for FINCH- Mahima
+    /*std::cout << "\nDEBUG: Simulation::update_population - Updating SES" << std::endl;
     ses_->update_population(context_);
+    std::cout << "\nDEBUG: Simulation::update_population - SES updated" << std::endl;*/
 
     // Update population risk factors
+    std::cout
+        << "\nDEBUG: Simulation::update_population - About to call risk_factor_->update_population";
     risk_factor_->update_population(context_);
+    std::cout << "\nDEBUG: Simulation::update_population - Risk factors updated";
 
     // Update diseases status: remission and incidence
+    std::cout << "\nDEBUG: Simulation::update_population - Updating diseases";
     disease_->update_population(context_);
+    std::cout << "\nDEBUG: Simulation::update_population - Diseases updated";
 
     // Publish results to data logger
+    std::cout << "\nDEBUG: Simulation::update_population - Updating analysis";
     analysis_->update_population(context_);
+    std::cout << "\nDEBUG: Simulation::update_population - Analysis updated";
+
+    std::cout << "\nDEBUG: Simulation::update_population - Completed";
 }
 
 void Simulation::update_net_immigration() {
+    std::cout << "\nDEBUG: Simulation::update_net_immigration - Starting to get net migration";
     auto net_immigration = get_net_migration();
+    std::cout << "\nDEBUG: Simulation::update_net_immigration - Got net migration data";
 
     // Update population based on net immigration
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
+    std::cout << "\nDEBUG: Simulation::update_net_immigration - Processing ages from " << start_age
+              << " to " << end_age;
+
     for (int age = start_age; age <= end_age; age++) {
         auto male_net_value = net_immigration.at(age, core::Gender::male);
         apply_net_migration(male_net_value, age, core::Gender::male);
 
         auto female_net_value = net_immigration.at(age, core::Gender::female);
         apply_net_migration(female_net_value, age, core::Gender::female);
+
+        if (age % 20 == 0) {
+            std::cout << "\nDEBUG: Simulation::update_net_immigration - Processed up to age "
+                      << age;
+        }
     }
+    std::cout << "\nDEBUG: Simulation::update_net_immigration - Finished processing all ages";
 
     if (context_.scenario().type() == ScenarioType::baseline) {
+        std::cout
+            << "\nDEBUG: Simulation::update_net_immigration - Sending data to baseline channel";
         context_.scenario().channel().send(std::make_unique<NetImmigrationMessage>(
             context_.current_run(), context_.time_now(), std::move(net_immigration)));
+        std::cout << "\nDEBUG: Simulation::update_net_immigration - Data sent to baseline channel";
     }
+    std::cout << "\nDEBUG: Simulation::update_net_immigration - Completed";
 }
 
 IntegerAgeGenderTable Simulation::get_current_expected_population() const {
@@ -222,6 +281,10 @@ IntegerAgeGenderTable Simulation::get_current_simulated_population() {
 }
 
 void Simulation::apply_net_migration(int net_value, unsigned int age, const core::Gender &gender) {
+    std::cout << "\nDEBUG: apply_net_migration - Age: " << age
+              << ", Gender: " << (gender == core::Gender::male ? "male" : "female")
+              << ", Net value: " << net_value;
+
     if (net_value > 0) {
         auto &pop = context_.population();
         auto similar_indices = core::find_index_of_all(pop, [&](const Person &entity) {
@@ -231,6 +294,8 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
         if (!similar_indices.empty()) {
             // Needed for repeatability in random selection
             std::sort(similar_indices.begin(), similar_indices.end());
+            std::cout << "\nDEBUG: apply_net_migration - Found " << similar_indices.size()
+                      << " similar people for cloning";
 
             for (auto trial = 0; trial < net_value; trial++) {
                 auto index =
@@ -238,9 +303,15 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
                 const auto &source = pop.at(similar_indices.at(index));
                 context_.population().add(partial_clone_entity(source), context_.time_now());
             }
+            std::cout << "\nDEBUG: apply_net_migration - Added " << net_value << " cloned people";
+        } else {
+            std::cout << "\nDEBUG: apply_net_migration - No similar people found for cloning";
         }
     } else if (net_value < 0) {
+        std::cout << "\nDEBUG: apply_net_migration - Looking for " << -net_value
+                  << " people to emigrate";
         auto net_value_counter = net_value;
+        int found = 0;
         for (auto &entity : context_.population()) {
             if (!entity.is_active()) {
                 continue;
@@ -249,43 +320,78 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
             if (entity.age == age && entity.gender == gender) {
                 entity.emigrate(context_.time_now());
                 net_value_counter++;
+                found++;
                 if (net_value_counter == 0) {
                     break;
                 }
             }
         }
+        std::cout << "\nDEBUG: apply_net_migration - Made " << found << " people emigrate";
+    } else {
+        std::cout << "\nDEBUG: apply_net_migration - No migration needed (net value is 0)";
     }
 }
 
 hgps::IntegerAgeGenderTable Simulation::get_net_migration() {
+    std::cout << "\nDEBUG: Simulation::get_net_migration - Starting for scenario type: "
+              << (context_.scenario().type() == ScenarioType::baseline ? "baseline"
+                                                                       : "intervention");
+
     if (context_.scenario().type() == ScenarioType::baseline) {
-        return create_net_migration();
+        std::cout << "\nDEBUG: Simulation::get_net_migration - Creating net migration for baseline";
+        auto result = create_net_migration();
+        std::cout << "\nDEBUG: Simulation::get_net_migration - Created net migration for baseline";
+        return result;
     }
 
     // Receive message with timeout
+    std::cout << "\nDEBUG: Simulation::get_net_migration - Trying to receive message";
     auto message = context_.scenario().channel().try_receive(context_.sync_timeout_millis());
+    std::cout << "\nDEBUG: Simulation::get_net_migration - Message received: "
+              << (message.has_value() ? "yes" : "no");
+
     if (message.has_value()) {
         auto &basePtr = message.value();
+        std::cout << "\nDEBUG: Simulation::get_net_migration - Checking message type";
         auto *messagePrt = dynamic_cast<NetImmigrationMessage *>(basePtr.get());
         if (messagePrt) {
+            std::cout
+                << "\nDEBUG: Simulation::get_net_migration - Message is NetImmigrationMessage";
             return messagePrt->data();
         }
 
+        std::cout
+            << "\nERROR: Simulation::get_net_migration - Message is not NetImmigrationMessage";
         throw std::runtime_error(
             "Simulation out of sync, failed to receive a net immigration message");
     }
+    std::cout << "\nERROR: Simulation::get_net_migration - No message received within timeout";
     throw std::runtime_error(fmt::format(
         "Simulation out of sync, receive net immigration message has timed out after {} ms.",
         context_.sync_timeout_millis()));
 }
 
 hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
+    std::cout << "\nDEBUG: Simulation::create_net_migration - Starting";
+
     auto expected_future = core::run_async(&Simulation::get_current_expected_population, this);
+    std::cout
+        << "\nDEBUG: Simulation::create_net_migration - Started future for expected population";
+
     auto simulated_population = get_current_simulated_population();
+    std::cout << "\nDEBUG: Simulation::create_net_migration - Got simulated population";
+
     auto net_emigration = create_age_gender_table<int>(context_.age_range());
+    std::cout << "\nDEBUG: Simulation::create_net_migration - Created empty net emigration table";
+
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
+
+    std::cout
+        << "\nDEBUG: Simulation::create_net_migration - Waiting for expected population future";
     auto expected_population = expected_future.get();
+    std::cout << "\nDEBUG: Simulation::create_net_migration - Got expected population";
+
     auto net_value = 0;
     for (int age = start_age; age <= end_age; age++) {
         net_value = expected_population.at(age, core::Gender::male) -
@@ -296,6 +402,7 @@ hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
                     simulated_population.at(age, core::Gender::female);
         net_emigration.at(age, core::Gender::female) = net_value;
     }
+    std::cout << "\nDEBUG: Simulation::create_net_migration - Filled net emigration table";
 
     // Update statistics
     return net_emigration;
@@ -307,8 +414,12 @@ Person Simulation::partial_clone_entity(const Person &source) noexcept {
     clone.gender = source.gender;
     clone.ses = source.ses;
     clone.sector = source.sector;
-    clone.region = source.region; // added region for FINCH
+    clone.region = source.region; // added for FINCH
+    clone.ethnicity = source.ethnicity;
     clone.income = source.income;
+    clone.income_continuous = source.income_continuous;
+    clone.income_category = source.income_category;
+    clone.physical_activity = source.physical_activity;
     for (const auto &item : source.risk_factors) {
         clone.risk_factors.emplace(item.first, item.second);
     }

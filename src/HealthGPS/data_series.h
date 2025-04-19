@@ -1,6 +1,7 @@
 #pragma once
 #include "HealthGPS.Core/forward_type.h"
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -66,6 +67,18 @@ class DataSeries {
     /// @brief Gets the channels sample size, number of points per channel.
     /// @return The channels sample size value
     std::size_t sample_size() const noexcept;
+
+    /// @brief Ensures that data structures exist for the specified age
+    /// @param age The age to ensure exists in the data structures
+    /// @return True if the age data was created, false if it already existed
+    bool ensure_age_exists(int age);
+
+    /// @brief Checks if a channel exists in the data series
+    /// @param channel The channel name to check
+    /// @return True if the channel exists, false otherwise
+    bool has_channel(const std::string &channel) const noexcept {
+        return std::find(channels_.begin(), channels_.end(), channel) != channels_.end();
+    }
 
   private:
     std::size_t sample_size_;

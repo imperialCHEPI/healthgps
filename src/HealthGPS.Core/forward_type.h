@@ -83,6 +83,27 @@ enum class Region : uint8_t {
     NorthernIreland
 };
 
+/// @brief Enumerates ethnicity categories
+enum class Ethnicity : uint8_t {
+    /// @brief Unknown ethnicity
+    unknown,
+
+    /// @brief White
+    White,
+
+    /// @brief Black
+    Black,
+
+    /// @brief Asian
+    Asian,
+
+    /// @brief Mixed
+    Mixed,
+
+    /// @brief Other
+    Other
+};
+
 /// @brief C++20 concept for numeric columns types
 template <typename T>
 concept Numerical = std::is_arithmetic_v<T>;
