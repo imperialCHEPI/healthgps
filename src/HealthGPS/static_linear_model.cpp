@@ -50,55 +50,60 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
     }
-    // std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk
-    // factors: " << risk_factor_list;
+    std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk factors: " << risk_factor_list;
 
     // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting" ;
-    //  HACK: start intervening two years into the simulation.
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting";
+    // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Intervention status: " <<
-    // (intervene ? "true" : "false") ;
-
-    // NOTE: Demographic variables are updated by the DemographicModule in update_population
-    // Here we only handle risk factor related updates
+    
+    // Count statistics for summary
+    int total_people = 0;
+    int newborns = 0;
+    int existing = 0;
 
     // Update risk factors for all people, initializing for newborns.
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-
+        
+        total_people++;
+        
         if (person.age == 0) {
             // For newborns, initialize demographic variables
+            newborns++;
             initialise_sector(person, context.random());
-            // Demographic variables (region, ethnicity, income) are initialized by the
-            // DemographicModule
+            // Demographic variables (region, ethnicity, income) are initialized by the DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
             // For existing people, only update sector and factors
+            existing++;
             update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
     }
-    // std::cout<< "\nDEBUG: StaticLinearModel::update_risk_factors - Factors and physical activity
-    // updated";
+    std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people (" 
+              << newborns << " newborns, " << existing << " existing)";
 
     // Adjust such that risk factor means match expected values.
+    std::cout << "\nDEBUG: StaticLinearModel - Adjusting risk factors";
     adjust_risk_factors(context, names_, ranges_, false);
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Risk factors adjusted";
-
+    
     // Update policies and trends for all people, initializing for newborns.
+    int people_with_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-
+        
+        people_with_policies++;
+        
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
             initialise_trends(context, person);
@@ -107,23 +112,26 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies and trends updated";
+    std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for " << people_with_policies << " people";
 
     // Adjust such that trended risk factor means match trended expected values.
+    std::cout << "\nDEBUG: StaticLinearModel - Adjusting trended risk factors";
     adjust_risk_factors(context, names_, ranges_, true);
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Trended risk factors
-    // adjusted";
 
     // Apply policies if intervening.
+    int people_with_applied_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-
+        
+        people_with_applied_policies++;
         apply_policies(person, intervene);
     }
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Policies applied";
-    // std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
+    
+    std::cout << "\nDEBUG: StaticLinearModel - Applied policies for " << people_with_applied_policies 
+              << " people (intervention mode: " << (intervene ? "active" : "inactive") << ")";
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
@@ -132,18 +140,14 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
                                            Random &random) const {
-    // std::cout << "\nDEBUG: Inside initialise_factors";
-
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
-    // std::cout << "\nDEBUG: Finished computing residuals, size: " << residuals.size();
 
     // Approximate risk factors with linear models.
     auto linear = compute_linear_models(person, models_);
 
     // Initialise residuals and risk factors (do not exist yet).
     for (size_t i = 0; i < names_.size(); i++) {
-
         // Initialise residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
         double residual = residuals[i];
@@ -162,13 +166,10 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Save risk factor.
         person.risk_factors[names_[i]] = factor;
     }
-
-    // Removed risk factor summary from here since it will be printed once in generate_risk_factors
 }
 
 void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                                        Random &random) const {
-
     // Correlated residual sampling.
     auto residuals = compute_residuals(random, cholesky_);
 
@@ -177,9 +178,14 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
     // Update residuals and risk factors (should exist).
     for (size_t i = 0; i < names_.size(); i++) {
-
         // Update residual.
         auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        if (person.risk_factors.find(residual_name) == person.risk_factors.end()) {
+            // Initialize if missing
+            person.risk_factors[residual_name] = residuals[i];
+            continue;
+        }
+
         double residual_old = person.risk_factors.at(residual_name);
         double residual = residuals[i] * info_speed_;
         residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
@@ -188,8 +194,17 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        if (person.risk_factors.find(names_[i]) == person.risk_factors.end()) {
+            // Initialize if missing
+            double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+            double factor = linear[i] + residual * stddev_[i];
+            factor = expected * inverse_box_cox(factor, lambda_[i]);
+            factor = ranges_[i].clamp(factor);
+            person.risk_factors[names_[i]] = factor;
+            continue;
+        }
+
+        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -325,9 +340,10 @@ StaticLinearModel::compute_linear_models(Person &person,
     // Approximate risk factors with linear models.
     for (size_t i = 0; i < names_.size(); i++) {
         if (i >= models.size()) {
-            std::cout << "\nDEBUG: ERROR - Index " << i
+            std::cout << "\nERROR: compute_linear_models - Index " << i
                       << " is out of bounds for models vector of size " << models.size();
-            break; // Prevent out-of-bounds access
+            linear.push_back(0.0); // Default value
+            continue;
         }
 
         auto name = names_[i];
@@ -335,6 +351,10 @@ StaticLinearModel::compute_linear_models(Person &person,
         double factor = model.intercept;
 
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
+            // Skip the standard deviation entry as it's not a factor
+            if (coefficient_name == "StandardDeviation"_id)
+                continue;
+                
             double value = person.get_risk_factor_value(coefficient_name);
             factor += coefficient_value * value;
         }

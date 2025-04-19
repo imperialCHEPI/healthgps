@@ -439,15 +439,19 @@ void DemographicModule::initialise_income_category(Person &person, const Populat
 
     if (income_value <= income_quartile_thresholds_[0]) {
         person.income = core::Income::low;
+        person.income_category = 0;
         person.risk_factors[core::Identifier("income_category")] = 0.0; // Low = 0
     } else if (income_value <= income_quartile_thresholds_[1]) {
         person.income = core::Income::lowermiddle;
+        person.income_category = 1;
         person.risk_factors[core::Identifier("income_category")] = 1.0; // Lower middle = 1
     } else if (income_value <= income_quartile_thresholds_[2]) {
         person.income = core::Income::uppermiddle;
+        person.income_category = 2;
         person.risk_factors[core::Identifier("income_category")] = 2.0; // Upper middle = 2
     } else {
         person.income = core::Income::high;
+        person.income_category = 3;
         person.risk_factors[core::Identifier("income_category")] = 3.0; // High = 3
     }
     // std::cout << "\nDEBUG: Finished initialise_income_category";

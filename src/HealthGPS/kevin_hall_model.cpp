@@ -479,7 +479,6 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
 }
 
 void KevinHallModel::kevin_hall_run(Person &person) const {
-    std::cout << "\nDEBUG: KevinHallModel::kevin_hall_run - Starting";
     // Get initial body weight.
     double BW_0 = person.risk_factors.at("Weight"_id);
 

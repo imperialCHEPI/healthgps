@@ -75,18 +75,6 @@ unsigned int Person::time_of_migration() const noexcept { return time_of_migrati
 
 bool Person::is_active() const noexcept { return is_alive_ && !has_emigrated_; }
 
-double Person::get_risk_factor_value(const core::Identifier &key) const {
-    if (current_dispatcher.contains(key)) {
-        // Static properties
-        return current_dispatcher.at(key)(*this);
-    }
-    if (risk_factors.contains(key)) {
-        // Dynamic properties
-        return risk_factors.at(key);
-    }
-    throw std::out_of_range("Risk factor not found: " + key.to_string());
-}
-
 float Person::gender_to_value() const { return gender_to_value(gender); }
 
 float Person::gender_to_value(core::Gender gender) {
@@ -196,6 +184,7 @@ void Person::copy_from(const Person &other) {
     ethnicity = other.ethnicity;
     income_continuous = other.income_continuous;
     income = other.income;
+    income_category = other.income_category;
     sector = other.sector;
     ses = other.ses;
     physical_activity = other.physical_activity;

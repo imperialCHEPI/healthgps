@@ -62,8 +62,14 @@ struct Person {
     /// @brief Sector (region) assigned value
     core::Sector sector{core::Sector::unknown};
 
-    /// @brief Income category
+    /// @brief Income category (enum)
     core::Income income{core::Income::unknown};
+
+    /// @brief Income continuous value
+    double income_continuous{0.0};
+
+    /// @brief Income category (categorical version of income)
+    int income_category{0};
 
     /// @brief Social-economic status (SES) assigned value
     double ses{};
@@ -79,7 +85,6 @@ struct Person {
 
     /// @brief Demographic attributes
     core::Ethnicity ethnicity{core::Ethnicity::unknown};
-    double income_continuous{0.0};
     double physical_activity{0.0};
 
     /// @brief Determine if a Person is current alive
@@ -103,11 +108,22 @@ struct Person {
     /// @return true for active; otherwise, false.
     bool is_active() const noexcept;
 
-    /// @brief Gets a risk factor current value
-    /// @param key The risk factor identifier
-    /// @return Current risk factor value, if found
-    /// @throws std::out_of_range for unknown risk factor
-    double get_risk_factor_value(const core::Identifier &key) const;
+    /// @brief Gets the risk factor value for a specific key
+    /// @param key The risk factor identifier key
+    /// @return The value if found, 0.0 otherwise
+    double get_risk_factor_value(const core::Identifier &key) const {
+        if (current_dispatcher.contains(key)) {
+            // Static properties
+            return current_dispatcher.at(key)(*this);
+        }
+        if (risk_factors.contains(key)) {
+            // Dynamic properties
+            return risk_factors.at(key);
+        }
+        
+        // Instead of throwing, return 0.0 for missing risk factors
+        return 0.0;
+    }
 
     /// @brief Gets the gender enumeration as a number for analysis
     /// @return The gender associated value
