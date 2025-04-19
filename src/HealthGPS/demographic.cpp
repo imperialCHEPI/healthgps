@@ -439,12 +439,16 @@ void DemographicModule::initialise_income_category(Person &person, const Populat
 
     if (income_value <= income_quartile_thresholds_[0]) {
         person.income = core::Income::low;
+        person.risk_factors[core::Identifier("income_category")] = 0.0;  // Low = 0
     } else if (income_value <= income_quartile_thresholds_[1]) {
         person.income = core::Income::lowermiddle;
+        person.risk_factors[core::Identifier("income_category")] = 1.0;  // Lower middle = 1
     } else if (income_value <= income_quartile_thresholds_[2]) {
         person.income = core::Income::uppermiddle;
+        person.risk_factors[core::Identifier("income_category")] = 2.0;  // Upper middle = 2
     } else {
         person.income = core::Income::high;
+        person.risk_factors[core::Identifier("income_category")] = 3.0;  // High = 3
     }
     // std::cout << "\nDEBUG: Finished initialise_income_category";
 }
@@ -695,14 +699,39 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
 void DemographicModule::initialize_newborns(RuntimeContext &context) {
     // Initialize demographic variables for newborns (age == 0)
+    std::cout << "\nDEBUG: Initializing demographic variables for newborns" << std::endl;
+    
     for (auto &person : context.population()) {
         if (person.is_active() && person.age == 0) {
             initialise_region(context, person, context.random());
             initialise_ethnicity(context, person, context.random());
             initialise_income_continuous(context, person, context.random());
             initialise_income_category(person, context.population());
+            
+            // Double-check that income_category was properly added
+            if (!person.risk_factors.contains(core::Identifier("income_category"))) {
+                std::cout << "\nDEBUG: Adding missing income_category risk factor for newborn" << std::endl;
+                double income_value = 0.0;
+                switch (person.income) {
+                    case core::Income::low:
+                        income_value = 0.0;
+                        break;
+                    case core::Income::lowermiddle:
+                        income_value = 1.0;
+                        break;
+                    case core::Income::uppermiddle:
+                        income_value = 2.0;
+                        break;
+                    case core::Income::high:
+                        income_value = 3.0;
+                        break;
+                }
+                person.risk_factors[core::Identifier("income_category")] = income_value;
+            }
         }
     }
+    
+    std::cout << "\nDEBUG: Finished initializing demographic variables for newborns" << std::endl;
 }
 
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
