@@ -5,14 +5,14 @@
 #include "lms_model.h"
 #include "weight_model.h"
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <future>
-#include <oneapi/tbb/parallel_for_each.h>
 #include <iostream>
+#include <oneapi/tbb/parallel_for_each.h>
 #include <set>
 #include <string>
-#include <algorithm>
 
 namespace hgps {
 
@@ -366,18 +366,19 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
     series.add_channels(channels_);
 
     // Debug output: check what channels are initialized
-    //std::cout << "\nDebug: Total output channels: " << channels_.size();
-    
+    // std::cout << "\nDebug: Total output channels: " << channels_.size();
+
     // Create a std::set to store factor keys for debugging
     std::set<std::string> factor_keys;
     for (const auto &factor : context.mapping().entries()) {
         factor_keys.insert(factor.key().to_string());
     }
-    
+
     // Print the first 10 factor keys for debugging
     std::cout << "\nDebug: First risk factors: ";
     int count = 0;
-    for (auto iter = factor_keys.begin(); iter != factor_keys.end() && count < 10; ++iter, ++count) {
+    for (auto iter = factor_keys.begin(); iter != factor_keys.end() && count < 10;
+         ++iter, ++count) {
         std::cout << *iter << ", ";
     }
 
@@ -408,7 +409,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &factor : context.mapping().entries()) {
             std::string factor_key = factor.key().to_string();
             std::string mean_key = "mean_" + factor_key;
-            
+
             // First check if we can directly access this risk factor
             double value = 0.0;
             if (person.risk_factors.contains(factor.key())) {
@@ -417,7 +418,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 // Try to use the get_risk_factor_value method which includes static properties
                 value = person.get_risk_factor_value(factor.key());
             }
-            
+
             // Add the value to the appropriate channel if vector is large enough
             if (age < series(gender, mean_key).size()) {
                 series(gender, mean_key).at(age) += value;
@@ -452,20 +453,20 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         // Calculate in-place factor averages.
         for (const auto &factor : context.mapping().entries()) {
             std::string column = "mean_" + factor.key().to_string();
-            
+
             // Skip if the column doesn't exist
-            if (age >= series(core::Gender::female, column).size() || 
+            if (age >= series(core::Gender::female, column).size() ||
                 age >= series(core::Gender::male, column).size()) {
                 continue;
             }
-            
+
             // Avoid division by zero
             if (count_F > 0) {
                 series(core::Gender::female, column).at(age) /= count_F;
             } else {
                 series(core::Gender::female, column).at(age) = 0.0;
             }
-            
+
             if (count_M > 0) {
                 series(core::Gender::male, column).at(age) /= count_M;
             } else {
@@ -477,7 +478,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &disease : context.diseases()) {
             std::string column_prevalence = "prevalence_" + disease.code.to_string();
             std::string column_incidence = "incidence_" + disease.code.to_string();
-            
+
             // Avoid division by zero
             if (count_F > 0) {
                 series(core::Gender::female, column_prevalence).at(age) /= count_F;
@@ -486,7 +487,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
                 series(core::Gender::female, column_prevalence).at(age) = 0.0;
                 series(core::Gender::female, column_incidence).at(age) = 0.0;
             }
-            
+
             if (count_M > 0) {
                 series(core::Gender::male, column_prevalence).at(age) /= count_M;
                 series(core::Gender::male, column_incidence).at(age) /= count_M;
@@ -500,14 +501,14 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         for (const auto &column : {"mean_yll", "mean_yld", "mean_daly"}) {
             double female_divisor = count_F + deaths_F;
             double male_divisor = count_M + deaths_M;
-            
+
             // Avoid division by zero
             if (female_divisor > 0) {
                 series(core::Gender::female, column).at(age) /= female_divisor;
             } else {
                 series(core::Gender::female, column).at(age) = 0.0;
             }
-            
+
             if (male_divisor > 0) {
                 series(core::Gender::male, column).at(age) /= male_divisor;
             } else {
@@ -528,11 +529,10 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto accumulate_squared_diffs = [&series](const std::string &chan, core::Gender sex, int age,
                                               double value) {
         // Skip processing if the channel doesn't exist or age is out of bounds
-        if (age >= series(sex, "mean_" + chan).size() || 
-            age >= series(sex, "std_" + chan).size()) {
+        if (age >= series(sex, "mean_" + chan).size() || age >= series(sex, "std_" + chan).size()) {
             return;
         }
-        
+
         const double mean = series(sex, "mean_" + chan).at(age);
         const double diff = value - mean;
         series(sex, "std_" + chan).at(age) += diff * diff;
@@ -561,7 +561,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
 
         for (const auto &factor : context.mapping().entries()) {
             std::string factor_key = factor.key().to_string();
-            
+
             // Get the value in the same way as in calculate_population_statistics
             double value = 0.0;
             if (person.risk_factors.contains(factor.key())) {
@@ -570,7 +570,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
                 // Try to use the get_risk_factor_value method which includes static properties
                 value = person.get_risk_factor_value(factor.key());
             }
-            
+
             accumulate_squared_diffs(factor_key, sex, age, value);
         }
     }
@@ -582,16 +582,16 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
         if (age >= series(sex, "std_" + chan).size()) {
             return;
         }
-        
+
         // Check for division by zero
         if (count <= 0) {
             series(sex, "std_" + chan).at(age) = 0.0;
             return;
         }
-        
+
         const double sum = series(sex, "std_" + chan).at(age);
         const double std_dev = std::sqrt(sum / count);
-        
+
         // Avoid NaN results
         if (std::isnan(std_dev)) {
             series(sex, "std_" + chan).at(age) = 0.0;
@@ -659,11 +659,11 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         std::string key = factor.key().to_string();
         std::string mean_key = "mean_" + key;
         std::string std_key = "std_" + key;
-        
+
         // Always make keys lowercase for consistency
         mean_key = core::to_lower(mean_key);
         std_key = core::to_lower(std_key);
-        
+
         // Check to avoid duplicates
         if (std::find(channels_.begin(), channels_.end(), mean_key) == channels_.end()) {
             channels_.emplace_back(mean_key);
@@ -672,32 +672,49 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
                 count++;
             }
         }
-        
+
         if (std::find(channels_.begin(), channels_.end(), std_key) == channels_.end()) {
             channels_.emplace_back(std_key);
         }
     }
 
     // Add all the core food-related risk factors explicitly to ensure they're included
-    std::vector<std::string> food_factors = {
-        "carbohydrate", "protein", "fat", "sodium", "alcohol", 
-        "processedmeat", "redmeat", "fruit", "vegetable", "legume",
-        "polyunsaturatedfattyacid", "saturatedfat", "monounsaturatedfat", 
-        "fibre", "totalsugar", "addedsugar", "foodcarbohydrate", "foodfat",
-        "foodprotein", "foodsodium", "energyintake", "physicalactivity",
-        "bmi", "height", "weight"
-    };
+    std::vector<std::string> food_factors = {"carbohydrate",
+                                             "protein",
+                                             "fat",
+                                             "sodium",
+                                             "alcohol",
+                                             "processedmeat",
+                                             "redmeat",
+                                             "fruit",
+                                             "vegetable",
+                                             "legume",
+                                             "polyunsaturatedfattyacid",
+                                             "saturatedfat",
+                                             "monounsaturatedfat",
+                                             "fibre",
+                                             "totalsugar",
+                                             "addedsugar",
+                                             "foodcarbohydrate",
+                                             "foodfat",
+                                             "foodprotein",
+                                             "foodsodium",
+                                             "energyintake",
+                                             "physicalactivity",
+                                             "bmi",
+                                             "height",
+                                             "weight"};
 
     // Ensure all food factors are included
     for (const auto &factor : food_factors) {
         std::string mean_key = "mean_" + factor;
         std::string std_key = "std_" + factor;
-        
+
         if (std::find(channels_.begin(), channels_.end(), mean_key) == channels_.end()) {
             channels_.emplace_back(mean_key);
             std::cout << "\nAdded missing channel: " << mean_key;
         }
-        
+
         if (std::find(channels_.begin(), channels_.end(), std_key) == channels_.end()) {
             channels_.emplace_back(std_key);
             std::cout << "\nAdded missing channel: " << std_key;
@@ -722,7 +739,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("std_yld");
     channels_.emplace_back("mean_daly");
     channels_.emplace_back("std_daly");
-    
+
     // Debug output
     std::cout << "\nInitialized " << channels_.size() << " output channels";
 }

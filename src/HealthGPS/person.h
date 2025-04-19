@@ -120,7 +120,7 @@ struct Person {
             // Dynamic properties
             return risk_factors.at(key);
         }
-        
+
         // Instead of throwing, return 0.0 for missing risk factors
         return 0.0;
     }

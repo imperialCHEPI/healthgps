@@ -1,10 +1,10 @@
 #pragma once
 #include "HealthGPS.Core/forward_type.h"
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 namespace hgps {
 
