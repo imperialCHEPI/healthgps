@@ -50,7 +50,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
     }
-    std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk factors: " << risk_factor_list;
+    std::cout << "\nDEBUG: Successfully completed processing " << names_.size()
+              << " risk factors: " << risk_factor_list;
 
     // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
@@ -64,20 +65,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
-    
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Model setup: Names size=" 
-              << names_.size() << ", Models size=" << models_.size() 
-              << ", Ranges size=" << ranges_.size();
-    
-    // Count active population members
-    int active_count = 0;
-    for (const auto &person : context.population()) {
-        if (person.is_active()) {
-            active_count++;
-        }
-    }
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Active population members: " << active_count;
-    
+
     // Count statistics for summary
     int total_people = 0;
     int newborns = 0;
@@ -89,14 +77,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (!person.is_active()) {
             continue;
         }
-        
+
         total_people++;
-        
+
         if (person.age == 0) {
             // For newborns, initialize demographic variables
             newborns++;
             initialise_sector(person, context.random());
-            // Demographic variables (region, ethnicity, income) are initialized by the DemographicModule
+            // Demographic variables (region, ethnicity, income) are initialized by the
+            // DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
@@ -111,22 +100,22 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people so far";
         }
     }
-    std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people (" 
+    std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people ("
               << newborns << " newborns, " << existing << " existing)";
 
     // Adjust such that risk factor means match expected values.
     std::cout << "\nDEBUG: StaticLinearModel - Adjusting risk factors";
     adjust_risk_factors(context, names_, ranges_, false);
-    
+
     // Update policies and trends for all people, initializing for newborns.
     int people_with_policies = 0;
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
         }
-        
+
         people_with_policies++;
-        
+
         if (person.age == 0) {
             initialise_policies(person, context.random(), intervene);
             initialise_trends(context, person);
@@ -135,7 +124,8 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
-    std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for " << people_with_policies << " people";
+    std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for "
+              << people_with_policies << " people";
 
     // Adjust such that trended risk factor means match trended expected values.
     std::cout << "\nDEBUG: StaticLinearModel - Adjusting trended risk factors";
@@ -147,12 +137,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (!person.is_active()) {
             continue;
         }
-        
+
         people_with_applied_policies++;
         apply_policies(person, intervene);
     }
-    
-    std::cout << "\nDEBUG: StaticLinearModel - Applied policies for " << people_with_applied_policies 
+
+    std::cout << "\nDEBUG: StaticLinearModel - Applied policies for "
+              << people_with_applied_policies
               << " people (intervention mode: " << (intervene ? "active" : "inactive") << ")";
     std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
@@ -219,7 +210,8 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // Update risk factor.
         if (person.risk_factors.find(names_[i]) == person.risk_factors.end()) {
             // Initialize if missing
-            double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+            double expected =
+                get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
             double factor = linear[i] + residual * stddev_[i];
             factor = expected * inverse_box_cox(factor, lambda_[i]);
             factor = ranges_[i].clamp(factor);
@@ -227,7 +219,8 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
             continue;
         }
 
-        double expected = get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        double expected =
+            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
         double factor = linear[i] + residual * stddev_[i];
         factor = expected * inverse_box_cox(factor, lambda_[i]);
         factor = ranges_[i].clamp(factor);
@@ -377,7 +370,7 @@ StaticLinearModel::compute_linear_models(Person &person,
             // Skip the standard deviation entry as it's not a factor
             if (coefficient_name == "StandardDeviation"_id)
                 continue;
-                
+
             double value = person.get_risk_factor_value(coefficient_name);
             factor += coefficient_value * value;
         }
