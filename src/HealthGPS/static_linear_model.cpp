@@ -57,11 +57,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: " 
-              << context.population().size() << ", scenario: " 
+    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: "
+              << context.population().size() << ", scenario: "
               << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
               << ", current time: " << context.time_now();
-              
+
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
                       (context.time_now() - context.start_time()) >= 2);
@@ -94,10 +94,11 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
-        
+
         // Print progress periodically
         if (total_people % 10000 == 0) {
-            std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people so far";
+            std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people
+                      << " people so far";
         }
     }
     std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people ("
