@@ -15,10 +15,10 @@ std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
     std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
-    
+
     // Verify that all expected risk factors are included in the names_ vector
     verify_risk_factors();
-    
+
     // NOTE: Demographic variables (region, ethnicity, income, etc.) are already
     // initialized by the DemographicModule in initialise_population
 
@@ -27,7 +27,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity completed";
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical "
+                 "activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
@@ -38,11 +39,13 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
+    std::cout
+        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
+    std::cout
+        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -84,15 +87,15 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         if (person.age == 0) {
             // For newborns, initialize demographic variables
             newborns++;
-            //initialise_sector(person, context.random());
-            // Demographic variables (region, ethnicity, income) are initialized by the
-            // DemographicModule
+            // initialise_sector(person, context.random());
+            //  Demographic variables (region, ethnicity, income) are initialized by the
+            //  DemographicModule
             initialise_factors(context, person, context.random());
             initialise_physical_activity(context, person, context.random());
         } else {
             // For existing people, only update sector and factors
             existing++;
-            //update_sector(person, context.random());
+            // update_sector(person, context.random());
             update_factors(context, person, context.random());
         }
 
@@ -155,13 +158,13 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
     if (std::abs(lambda) < 1e-10) {
         return std::exp(factor);
     }
-    
+
     // For regular Box-Cox transform, protect against non-positive values
     double term = 1.0 + lambda * factor;
     if (term <= 0) {
         return 0.0; // Return zero for invalid inputs
     }
-    
+
     return std::pow(term, 1.0 / lambda);
 }
 
@@ -187,14 +190,14 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // Initialise risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        
+
         // Two-stage modeling approach- Mahima
         // Calculate the linear predictor
         double linear_term = linear[i] + residual * stddev_[i];
-        
+
         // Apply the Box-Cox transformation with protection against invalid values
         double factor;
-        
+
         // Make sure lambda_[i] is valid for Box-Cox
         if (std::abs(lambda_[i]) < 1e-10) {
             // For lambda near zero, use log transformation
@@ -202,7 +205,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         } else {
             // Regular inverse Box-Cox with protection
             double boxcox_term = 1.0 + lambda_[i] * linear_term;
-            
+
             // If the Box-Cox term would be non-positive, set factor to zero
             if (boxcox_term <= 0) {
                 factor = 0.0;
@@ -210,15 +213,15 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
                 factor = expected * std::pow(boxcox_term, 1.0 / lambda_[i]);
             }
         }
-        
+
         // If the result is not finite (NaN or Inf), set to zero
         if (!std::isfinite(factor)) {
             factor = 0.0;
         }
-        
+
         // Ensure it's within valid range
         factor = ranges_[i].clamp(factor);
-        
+
         // Save risk factor
         person.risk_factors[names_[i]] = factor;
     }
@@ -248,14 +251,14 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // Update risk factor.
         double expected =
             get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
-        
+
         // Two-stage modeling approach- Mahima
         // Calculate the linear predictor
         double linear_term = linear[i] + residual * stddev_[i];
-        
+
         // Apply the Box-Cox transformation with protection against invalid values
         double factor;
-        
+
         // Make sure lambda_[i] is valid for Box-Cox
         if (std::abs(lambda_[i]) < 1e-10) {
             // For lambda near zero, use log transformation
@@ -263,7 +266,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         } else {
             // Regular inverse Box-Cox with protection
             double boxcox_term = 1.0 + lambda_[i] * linear_term;
-            
+
             // If the Box-Cox term would be non-positive, set factor to zero
             if (boxcox_term <= 0) {
                 factor = 0.0;
@@ -271,15 +274,15 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
                 factor = expected * std::pow(boxcox_term, 1.0 / lambda_[i]);
             }
         }
-        
+
         // If the result is not finite (NaN or Inf), set to zero
         if (!std::isfinite(factor)) {
             factor = 0.0;
         }
-        
+
         // Ensure it's within valid range
         factor = ranges_[i].clamp(factor);
-        
+
         // Save risk factor
         person.risk_factors.at(names_[i]) = factor;
     }
@@ -341,10 +344,11 @@ void StaticLinearModel::initialise_policies(Person &person, Random &random, bool
     for (size_t i = 0; i < names_.size(); i++) {
         auto residual_name = core::Identifier{names_[i].to_string() + "_policy_residual"};
         person.risk_factors[residual_name] = residuals[i];
-        
+
         // Ensure the risk factor exists (might be zero from two-stage model)
         if (person.risk_factors.find(names_[i]) == person.risk_factors.end()) {
-            std::cout << "\nDEBUG: Risk factor " << names_[i].to_string() << " not found, initializing to zero";
+            std::cout << "\nDEBUG: Risk factor " << names_[i].to_string()
+                      << " not found, initializing to zero";
             person.risk_factors[names_[i]] = 0.0;
         }
     }
@@ -400,7 +404,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
 
         // Apply policy to risk factor.
         double factor_old = person.risk_factors.at(names_[i]);
-        
+
         // Special handling for zero values - policy can still make zero values non-zero
         double factor;
         if (factor_old == 0.0) {
@@ -409,7 +413,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
             if (policy > 10.0) { // Threshold for converting zero to non-zero
                 // Create a small non-zero value based on policy strength
                 factor = ranges_[i].lower() * (1.0 + policy / 100.0);
-                std::cout << "\nDEBUG: Policy converting zero risk factor " << names_[i].to_string() 
+                std::cout << "\nDEBUG: Policy converting zero risk factor " << names_[i].to_string()
                           << " to non-zero: " << factor;
             } else {
                 // Not strong enough to convert zero to non-zero
@@ -419,7 +423,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
             // Normal policy application for non-zero values
             factor = factor_old * (1.0 + policy / 100.0);
         }
-        
+
         // Ensure result is within valid range
         factor = ranges_[i].clamp(factor);
 
@@ -756,39 +760,40 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 
 // Add a new method to verify risk factors
 void StaticLinearModel::verify_risk_factors() const {
-    std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
-    
+    std::cout
+        << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
+
     // Check model configuration consistency - no hardcoded values
     if (names_.size() != models_.size()) {
-        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size() 
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
                   << ") and models_ size (" << models_.size() << ")";
     }
-    
+
     if (names_.size() != ranges_.size()) {
-        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size() 
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
                   << ") and ranges_ size (" << ranges_.size() << ")";
     }
-    
+
     if (names_.size() != lambda_.size()) {
-        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size() 
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
                   << ") and lambda_ size (" << lambda_.size() << ")";
     }
-    
+
     if (names_.size() != stddev_.size()) {
-        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size() 
+        std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
                   << ") and stddev_ size (" << stddev_.size() << ")";
     }
-    
+
     // Check RiskFactorModels from expected_trend_boxcox_ map against names_
     if (expected_trend_boxcox_) {
-        for (const auto& name : names_) {
+        for (const auto &name : names_) {
             if (!expected_trend_boxcox_->contains(name)) {
-                std::cout << "\nWARNING: Risk factor " << name.to_string() 
+                std::cout << "\nWARNING: Risk factor " << name.to_string()
                           << " not found in expected_trend_boxcox_ map";
             }
         }
     }
-    
+
     std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with "
               << names_.size() << " risk factors";
 }

@@ -652,7 +652,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     int count = 0;
     for (const auto &factor : context.mapping().entries()) {
         std::string key = factor.key().to_string();
-        
+
         // Convert to lowercase for normalization
         std::string normalized_key = core::to_lower(key);
         normalized_factors.insert(normalized_key);
