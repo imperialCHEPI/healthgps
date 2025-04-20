@@ -528,8 +528,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\nDEBUG: ERROR - PhysicalActivityModels is not an object, actual type: "
                       << opt["PhysicalActivityModels"].type_name() << std::endl;
         } else {
-            std::cout << "\nDEBUG: PhysicalActivityModels has "
-                      << opt["PhysicalActivityModels"].size() << " entries" << std::endl;
+            //std::cout << "\nDEBUG: PhysicalActivityModels has " << opt["PhysicalActivityModels"].size() << " entries" << std::endl;
 
             // Process each model
             for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {

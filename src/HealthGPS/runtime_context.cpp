@@ -16,7 +16,7 @@ unsigned int RuntimeContext::current_run() const noexcept { return current_run_;
 
 int RuntimeContext::sync_timeout_millis() const noexcept {
     int timeout = inputs_->sync_timeout_ms();
-    std::cout << "\nDEBUG: RuntimeContext::sync_timeout_millis - Value: " << timeout << "ms";
+    //std::cout << "\nDEBUG: RuntimeContext::sync_timeout_millis - Value: " << timeout << "ms";
     return timeout;
 }
 

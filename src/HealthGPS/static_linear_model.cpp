@@ -14,8 +14,8 @@ RiskFactorModelType StaticLinearModel::type() const noexcept { return RiskFactor
 std::string StaticLinearModel::name() const noexcept { return "Static"; }
 
 void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
-
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Starting";
+    
     // Verify that all expected risk factors are included in the names_ vector
     verify_risk_factors();
 
@@ -27,25 +27,22 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical "
-                 "activity completed";
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Risk factors adjusted";
 
     // Initialise everyone with policies and trends.
     for (auto &person : context.population()) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-    std::cout
-        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    std::cout
-        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
+    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -54,17 +51,17 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
             risk_factor_list += ", ";
         risk_factor_list += names_[i].to_string();
     }
-    std::cout << "\nDEBUG: Successfully completed processing " << names_.size()
-              << " risk factors: " << risk_factor_list;
+    //std::cout << "\nDEBUG: Successfully completed processing " << names_.size() << " risk factors: " << risk_factor_list;
 
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Completed";
 }
 
 void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: "
+    /*std::cout
+        << "\nDEBUG: StaticLinearModel::update_risk_factors - Starting with population size: "
               << context.population().size() << ", scenario: "
               << (context.scenario().type() == ScenarioType::baseline ? "baseline" : "intervention")
-              << ", current time: " << context.time_now();
+              << ", current time: " << context.time_now();*/ 
 
     // HACK: start intervening two years into the simulation.
     bool intervene = (context.scenario().type() == ScenarioType::intervention &&
@@ -76,7 +73,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
     int existing = 0;
 
     // Update risk factors for all people, initializing for newborns.
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Beginning to process people";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Beginning to process people";
     for (auto &person : context.population()) {
         if (!person.is_active()) {
             continue;
@@ -101,15 +98,13 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 
         // Print progress periodically
         if (total_people % 10000 == 0) {
-            std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people
-                      << " people so far";
+            //std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people so far";
         }
     }
-    std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people ("
-              << newborns << " newborns, " << existing << " existing)";
+    //std::cout << "\nDEBUG: StaticLinearModel - Processed " << total_people << " people (" << newborns << " newborns, " << existing << " existing)";
 
     // Adjust such that risk factor means match expected values.
-    std::cout << "\nDEBUG: StaticLinearModel - Adjusting risk factors";
+    //std::cout << "\nDEBUG: StaticLinearModel - Adjusting risk factors";
     adjust_risk_factors(context, names_, ranges_, false);
 
     // Update policies and trends for all people, initializing for newborns.
@@ -129,11 +124,10 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
             update_trends(context, person);
         }
     }
-    std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for "
-              << people_with_policies << " people";
+    //std::cout << "\nDEBUG: StaticLinearModel - Updated policies and trends for "<< people_with_policies << " people";
 
     // Adjust such that trended risk factor means match trended expected values.
-    std::cout << "\nDEBUG: StaticLinearModel - Adjusting trended risk factors";
+    //std::cout << "\nDEBUG: StaticLinearModel - Adjusting trended risk factors";
     adjust_risk_factors(context, names_, ranges_, true);
 
     // Apply policies if intervening.
@@ -146,11 +140,7 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
         people_with_applied_policies++;
         apply_policies(person, intervene);
     }
-
-    std::cout << "\nDEBUG: StaticLinearModel - Applied policies for "
-              << people_with_applied_policies
-              << " people (intervention mode: " << (intervene ? "active" : "inactive") << ")";
-    std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
+    //std::cout << "\nDEBUG: StaticLinearModel::update_risk_factors - Completed";
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
@@ -404,7 +394,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
 
         // Apply policy to risk factor.
         double factor_old = person.risk_factors.at(names_[i]);
-
+        
         // Special handling for zero values - policy can still make zero values non-zero
         double factor;
         if (factor_old == 0.0) {
@@ -413,7 +403,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
             if (policy > 10.0) { // Threshold for converting zero to non-zero
                 // Create a small non-zero value based on policy strength
                 factor = ranges_[i].lower() * (1.0 + policy / 100.0);
-                std::cout << "\nDEBUG: Policy converting zero risk factor " << names_[i].to_string()
+                std::cout << "\nDEBUG: Policy converting zero risk factor " << names_[i].to_string() 
                           << " to non-zero: " << factor;
             } else {
                 // Not strong enough to convert zero to non-zero
@@ -423,7 +413,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
             // Normal policy application for non-zero values
             factor = factor_old * (1.0 + policy / 100.0);
         }
-
+        
         // Ensure result is within valid range
         factor = ranges_[i].clamp(factor);
 
@@ -760,9 +750,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 
 // Add a new method to verify risk factors
 void StaticLinearModel::verify_risk_factors() const {
-    std::cout
-        << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
-
+    std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
+    
     // Check model configuration consistency - no hardcoded values
     if (names_.size() != models_.size()) {
         std::cout << "\nWARNING: Mismatch between names_ size (" << names_.size()
@@ -793,7 +782,7 @@ void StaticLinearModel::verify_risk_factors() const {
             }
         }
     }
-
+    
     std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with "
               << names_.size() << " risk factors";
 }
