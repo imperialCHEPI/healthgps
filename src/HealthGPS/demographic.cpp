@@ -300,12 +300,14 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
 
     // Check if the age_group exists in ethnicity_prevalence_
     if (!ethnicity_prevalence_.contains(age_group)) {
-        std::cout << "\nDEBUG: ERROR - Age group not found in ethnicity_prevalence_ map: " << age_group.to_string();
+        std::cout << "\nDEBUG: ERROR - Age group not found in ethnicity_prevalence_ map: "
+                  << age_group.to_string();
     }
 
     // Check if the gender exists for this age_group
     if (!ethnicity_prevalence_.at(age_group).contains(person.gender)) {
-        std::cout << "\nDEBUG: ERROR - Gender not found in ethnicity_prevalence_ for age group: " << age_group.to_string();
+        std::cout << "\nDEBUG: ERROR - Gender not found in ethnicity_prevalence_ for age group: "
+                  << age_group.to_string();
         // Assign a default ethnicity to prevent crash
         person.ethnicity = core::Ethnicity::White;
         return;
@@ -329,8 +331,8 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         }
     }
 
-    std::cout
-        << "\nDEBUG: WARNING - Reached end of ethnicity assignment loop without assigning ethnicity";
+    std::cout << "\nDEBUG: WARNING - Reached end of ethnicity assignment loop without assigning "
+                 "ethnicity";
 
     // If we reach here, no ethnicity was assigned - this indicates an error in probability
     // distribution
@@ -699,7 +701,7 @@ int DemographicModule::update_age_and_death_events(RuntimeContext &context,
 
 void DemographicModule::initialize_newborns(RuntimeContext &context) {
     // Initialize demographic variables for newborns (age == 0)
-    //std::cout << "\nDEBUG: Initializing demographic variables for newborns" << std::endl;
+    // std::cout << "\nDEBUG: Initializing demographic variables for newborns" << std::endl;
 
     for (auto &person : context.population()) {
         if (person.is_active() && person.age == 0) {
@@ -731,12 +733,13 @@ void DemographicModule::initialize_newborns(RuntimeContext &context) {
         }
     }
 
-    //std::cout << "\nDEBUG: Finished initializing demographic variables for newborns" << std::endl;
+    // std::cout << "\nDEBUG: Finished initializing demographic variables for newborns" <<
+    // std::endl;
 }
 
 std::unique_ptr<DemographicModule> build_population_module(Repository &repository,
                                                            const ModelInput &config) {
-    //std::cout << "\nDEBUG: Starting build_population_module" << std::endl;
+    // std::cout << "\nDEBUG: Starting build_population_module" << std::endl;
 
     // year => age [age, male, female]
     auto pop_data = std::map<int, std::map<int, PopulationRecord>>();
@@ -775,7 +778,7 @@ std::unique_ptr<DemographicModule> build_population_module(Repository &repositor
     std::unordered_map<std::string, double> physical_activity_params;
     physical_activity_params["StandardDeviation"] = static_model.get_physical_activity_stddev();
 
-    //std::cout << "\nDEBUG: Creating DemographicModule with extracted configuration" << std::endl;
+    // std::cout << "\nDEBUG: Creating DemographicModule with extracted configuration" << std::endl;
 
     // Create and return the demographic module with all the configuration data
     return std::make_unique<DemographicModule>(

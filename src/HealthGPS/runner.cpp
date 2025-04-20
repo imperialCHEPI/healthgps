@@ -130,12 +130,14 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     /* Run until the next event is at infinity */
     int event_count = 0;
     while (!token.stop_requested() && sim.next_event_time() < adevs_inf<adevs::Time>()) {
-        //std::cout << "\nDEBUG: Processing event #" << ++event_count << " at time real=" << sim.next_event_time().real << ", logical=" << sim.next_event_time().logical << std::endl;
+        // std::cout << "\nDEBUG: Processing event #" << ++event_count << " at time real=" <<
+        // sim.next_event_time().real << ", logical=" << sim.next_event_time().logical << std::endl;
         sim.exec_next_event();
-        //std::cout << "\nDEBUG: Event #" << event_count << " processed" << std::endl;
+        // std::cout << "\nDEBUG: Event #" << event_count << " processed" << std::endl;
     }
 
-    //std::cout << "\nDEBUG: Simulation loop completed after " << event_count << " events" << std::endl;
+    // std::cout << "\nDEBUG: Simulation loop completed after " << event_count << " events" <<
+    // std::endl;
 
     ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),

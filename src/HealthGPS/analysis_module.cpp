@@ -648,7 +648,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     std::set<std::string> normalized_factors;
 
     // Add all risk factors from the configuration
-    //std::cout << "\nInitializing risk factor channels:";
+    // std::cout << "\nInitializing risk factor channels:";
     int count = 0;
     for (const auto &factor : context.mapping().entries()) {
         std::string key = factor.key().to_string();
@@ -665,7 +665,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
         if (std::find(channels_.begin(), channels_.end(), mean_key) == channels_.end()) {
             channels_.emplace_back(mean_key);
             if (count < 20) {
-                //std::cout << " " << mean_key;
+                // std::cout << " " << mean_key;
                 count++;
             }
         }
@@ -695,7 +695,7 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("std_daly");
 
     // Debug output
-    //std::cout << "\nInitialized " << channels_.size() << " output channels";
+    // std::cout << "\nInitialized " << channels_.size() << " output channels";
 }
 
 std::unique_ptr<AnalysisModule> build_analysis_module(Repository &repository,
