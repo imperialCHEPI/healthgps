@@ -15,12 +15,13 @@ std::unordered_map<core::Identifier, std::function<double(const Person &)>>
         {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
         {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
         {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
-        {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
+        {"Income"_id, [](const Person &p) { return std::max(0.0, p.income_continuous); }},
         {"SES"_id, [](const Person &p) { return p.ses; }},
         {"Region"_id, [](const Person &p) { return p.region_to_value(); }},
         {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
         {"PhysicalActivity"_id, [](const Person &p) { return p.physical_activity; }},
-        {"IncomeContinuous"_id, [](const Person &p) { return p.income_continuous; }},
+        {"IncomeContinuous"_id, [](const Person &p) { return std::max(0.0, p.income_continuous); }},
+        {"IncomeCategory"_id, [](const Person &p) { return p.income_to_value(); }},
 
         // Add handlers for specific ethnicity coefficients
         {"White"_id,

@@ -374,14 +374,6 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
         factor_keys.insert(factor.key().to_string());
     }
 
-    // Print the first 10 factor keys for debugging
-    std::cout << "\nDebug: First risk factors: ";
-    int count = 0;
-    for (auto iter = factor_keys.begin(); iter != factor_keys.end() && count < 10;
-         ++iter, ++count) {
-        std::cout << *iter << ", ";
-    }
-
     auto current_time = static_cast<unsigned int>(context.time_now());
     for (const auto &person : context.population()) {
         auto age = person.age;
@@ -652,22 +644,27 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
     channels_.emplace_back("deaths");
     channels_.emplace_back("emigrations");
 
+    // Create a set of normalized factor names to avoid duplicates
+    std::set<std::string> normalized_factors;
+
     // Add all risk factors from the configuration
     std::cout << "\nInitializing risk factor channels:";
     int count = 0;
     for (const auto &factor : context.mapping().entries()) {
         std::string key = factor.key().to_string();
-        std::string mean_key = "mean_" + key;
-        std::string std_key = "std_" + key;
+        
+        // Convert to lowercase for normalization
+        std::string normalized_key = core::to_lower(key);
+        normalized_factors.insert(normalized_key);
 
-        // Always make keys lowercase for consistency
-        mean_key = core::to_lower(mean_key);
-        std_key = core::to_lower(std_key);
+        // Create mean and std keys
+        std::string mean_key = "mean_" + normalized_key;
+        std::string std_key = "std_" + normalized_key;
 
-        // Check to avoid duplicates
+        // Add to channels if not already present
         if (std::find(channels_.begin(), channels_.end(), mean_key) == channels_.end()) {
             channels_.emplace_back(mean_key);
-            if (count < 10) {
+            if (count < 20) {
                 std::cout << " " << mean_key;
                 count++;
             }
@@ -675,49 +672,6 @@ void AnalysisModule::initialise_output_channels(RuntimeContext &context) {
 
         if (std::find(channels_.begin(), channels_.end(), std_key) == channels_.end()) {
             channels_.emplace_back(std_key);
-        }
-    }
-
-    // Add all the core food-related risk factors explicitly to ensure they're included
-    std::vector<std::string> food_factors = {"carbohydrate",
-                                             "protein",
-                                             "fat",
-                                             "sodium",
-                                             "alcohol",
-                                             "processedmeat",
-                                             "redmeat",
-                                             "fruit",
-                                             "vegetable",
-                                             "legume",
-                                             "polyunsaturatedfattyacid",
-                                             "saturatedfat",
-                                             "monounsaturatedfat",
-                                             "fibre",
-                                             "totalsugar",
-                                             "addedsugar",
-                                             "foodcarbohydrate",
-                                             "foodfat",
-                                             "foodprotein",
-                                             "foodsodium",
-                                             "energyintake",
-                                             "physicalactivity",
-                                             "bmi",
-                                             "height",
-                                             "weight"};
-
-    // Ensure all food factors are included
-    for (const auto &factor : food_factors) {
-        std::string mean_key = "mean_" + factor;
-        std::string std_key = "std_" + factor;
-
-        if (std::find(channels_.begin(), channels_.end(), mean_key) == channels_.end()) {
-            channels_.emplace_back(mean_key);
-            std::cout << "\nAdded missing channel: " << mean_key;
-        }
-
-        if (std::find(channels_.begin(), channels_.end(), std_key) == channels_.end()) {
-            channels_.emplace_back(std_key);
-            std::cout << "\nAdded missing channel: " << std_key;
         }
     }
 

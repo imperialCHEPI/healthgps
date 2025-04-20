@@ -133,6 +133,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void initialise_physical_activity(RuntimeContext &context, Person &person,
                                       Random &random) const;
 
+    /// Verify that all risk factors from the configuration are properly included
+    void verify_risk_factors() const;
+
     std::shared_ptr<std::unordered_map<core::Identifier, double>> expected_trend_boxcox_;
     const std::vector<core::Identifier> &names_;
     const std::vector<LinearModelParams> &models_;
