@@ -65,7 +65,7 @@ template <typename T> class Channel {
             // "ms for message";
             // Simply wait, no need to store the return value
             (void)cond_var_.wait_for(lock, std::chrono::milliseconds(timeout_millis),
-                                    [this] { return buffer_.size() > 0 || closed(); });
+                                     [this] { return buffer_.size() > 0 || closed(); });
             // std::cout << "\nDEBUG: Channel::try_receive - Wait completed";
         }
 
