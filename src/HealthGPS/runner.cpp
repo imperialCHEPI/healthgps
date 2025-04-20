@@ -128,7 +128,7 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     sim.add(&model);
 
     /* Run until the next event is at infinity */
-    int event_count = 0;
+    //int event_count = 0;
     while (!token.stop_requested() && sim.next_event_time() < adevs_inf<adevs::Time>()) {
         // std::cout << "\nDEBUG: Processing event #" << ++event_count << " at time real=" <<
         // sim.next_event_time().real << ", logical=" << sim.next_event_time().logical << std::endl;

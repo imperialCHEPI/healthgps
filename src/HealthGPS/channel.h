@@ -63,10 +63,10 @@ template <typename T> class Channel {
         } else {
             // std::cout << "\nDEBUG: Channel::try_receive - Waiting up to " << timeout_millis <<
             // "ms for message";
-            bool result = cond_var_.wait_for(lock, std::chrono::milliseconds(timeout_millis),
-                                             [this] { return buffer_.size() > 0 || closed(); });
-            // std::cout << "\nDEBUG: Channel::try_receive - Wait completed, condition met: "<<
-            // (result ? "yes" : "no");
+            // Simply wait, no need to store the return value
+            (void)cond_var_.wait_for(lock, std::chrono::milliseconds(timeout_millis),
+                                    [this] { return buffer_.size() > 0 || closed(); });
+            // std::cout << "\nDEBUG: Channel::try_receive - Wait completed";
         }
 
         if (buffer_.empty()) {
