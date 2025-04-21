@@ -84,7 +84,7 @@ class DemographicModule final : public SimulationModule {
         std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence_;
     std::unordered_map<core::Income, LinearModelParams> income_models_;
-    RuntimeContext* context_{nullptr}; // Store reference to context for range validation
+    RuntimeContext *context_{nullptr}; // Store reference to context for range validation
 
     void initialise_birth_rates();
 

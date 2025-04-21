@@ -22,7 +22,8 @@ std::unordered_map<core::Identifier, std::function<double(const Person &)>>
         {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
         {"PhysicalActivity"_id, [](const Person &p) { return p.physical_activity; }},
         {"IncomeContinuous"_id, [](const Person &p) { return std::max(0.0, p.income_continuous); }},
-        {"IncomeCategory"_id, [](const Person &p) { return static_cast<double>(p.income_category); }},
+        {"IncomeCategory"_id,
+         [](const Person &p) { return static_cast<double>(p.income_category); }},
 
         // Add handlers for specific ethnicity coefficients
         {"White"_id,
@@ -157,7 +158,8 @@ float Person::ethnicity_to_value() const {
     }
 }
 
-void Person::set_risk_factor(const RuntimeContext &context, const core::Identifier &key, double value) {
+void Person::set_risk_factor(const RuntimeContext &context, const core::Identifier &key,
+                             double value) {
     // Apply range validation before setting the value
     risk_factors[key] = context.ensure_risk_factor_in_range(key, value);
 }

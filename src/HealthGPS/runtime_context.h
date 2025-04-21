@@ -109,7 +109,8 @@ class RuntimeContext {
     /// @param factor_key The risk factor identifier
     /// @param value The value to be clamped
     /// @return The value clamped to the factor's range if one exists, or the original value
-    double ensure_risk_factor_in_range(const core::Identifier &factor_key, double value) const noexcept;
+    double ensure_risk_factor_in_range(const core::Identifier &factor_key,
+                                       double value) const noexcept;
 
   private:
     std::shared_ptr<const EventAggregator> event_bus_;

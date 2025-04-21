@@ -450,7 +450,8 @@ void DemographicModule::initialise_income_category(Person &person, const Populat
         person.income = core::Income::lowermiddle;
         person.income_category = 1;
         if (context_) {
-            person.set_risk_factor(*context_, core::Identifier("income_category"), 1.0); // Lower middle = 1
+            person.set_risk_factor(*context_, core::Identifier("income_category"),
+                                   1.0); // Lower middle = 1
         } else {
             person.risk_factors[core::Identifier("income_category")] = 1.0; // Lower middle = 1
         }
@@ -458,7 +459,8 @@ void DemographicModule::initialise_income_category(Person &person, const Populat
         person.income = core::Income::uppermiddle;
         person.income_category = 2;
         if (context_) {
-            person.set_risk_factor(*context_, core::Identifier("income_category"), 2.0); // Upper middle = 2
+            person.set_risk_factor(*context_, core::Identifier("income_category"),
+                                   2.0); // Upper middle = 2
         } else {
             person.risk_factors[core::Identifier("income_category")] = 2.0; // Upper middle = 2
         }
