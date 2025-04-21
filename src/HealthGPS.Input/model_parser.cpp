@@ -896,6 +896,6 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
         // Register model in cache
         repository.register_risk_factor_model_definition(model_type, std::move(model_definition));
     }
-    std::cout << "\nFinished all the loading required cutie pie\n";
+    std::cout << "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n";
 }
 } // namespace hgps::input

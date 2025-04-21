@@ -27,8 +27,7 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical "
-                 "activity completed";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
@@ -39,13 +38,11 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-    std::cout
-        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    std::cout
-        << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
+    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -386,7 +383,6 @@ void StaticLinearModel::update_policies(Person &person, bool intervene) const {
 }
 
 void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
-
     // No-op if not intervening.
     if (!intervene) {
         return;
@@ -401,27 +397,7 @@ void StaticLinearModel::apply_policies(Person &person, bool intervene) const {
 
         // Apply policy to risk factor.
         double factor_old = person.risk_factors.at(names_[i]);
-
-        // Special handling for zero values - policy can still make zero values non-zero
-        double factor;
-        if (factor_old == 0.0) {
-            // For zero values, policy might make them non-zero based on policy strength
-            // Positive policy values can move a zero to non-zero if strong enough
-            if (policy > 10.0) { // Threshold for converting zero to non-zero
-                // Create a small non-zero value based on policy strength
-                factor = ranges_[i].lower() * (1.0 + policy / 100.0);
-                std::cout << "\nDEBUG: Policy converting zero risk factor " << names_[i].to_string()
-                          << " to non-zero: " << factor;
-            } else {
-                // Not strong enough to convert zero to non-zero
-                factor = 0.0;
-            }
-        } else {
-            // Normal policy application for non-zero values
-            factor = factor_old * (1.0 + policy / 100.0);
-        }
-
-        // Ensure result is within valid range
+        double factor = factor_old * (1.0 + policy / 100.0);
         factor = ranges_[i].clamp(factor);
 
         // Save risk factor.
@@ -757,8 +733,7 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 
 // Add a new method to verify risk factors
 void StaticLinearModel::verify_risk_factors() const {
-    std::cout
-        << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
+    //std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
 
     // Check model configuration consistency - no hardcoded values
     if (names_.size() != models_.size()) {
@@ -791,8 +766,7 @@ void StaticLinearModel::verify_risk_factors() const {
         }
     }
 
-    std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with "
-              << names_.size() << " risk factors";
+    //std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with " << names_.size() << " risk factors";
 }
 
 } // namespace hgps
