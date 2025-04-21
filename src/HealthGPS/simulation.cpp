@@ -291,7 +291,8 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
         if (!similar_indices.empty()) {
             // Needed for repeatability in random selection
             std::sort(similar_indices.begin(), similar_indices.end());
-            //std::cout << "\nDEBUG: apply_net_migration - Found " << similar_indices.size() << " similar people for cloning";
+            // std::cout << "\nDEBUG: apply_net_migration - Found " << similar_indices.size() << "
+            // similar people for cloning";
 
             for (auto trial = 0; trial < net_value; trial++) {
                 auto index =
@@ -301,7 +302,8 @@ void Simulation::apply_net_migration(int net_value, unsigned int age, const core
             }
         }
     } else if (net_value < 0) {
-        //std::cout << "\nDEBUG: apply_net_migration - Looking for " << -net_value  << " people to emigrate";
+        // std::cout << "\nDEBUG: apply_net_migration - Looking for " << -net_value  << " people to
+        // emigrate";
         auto net_value_counter = net_value;
         for (auto &entity : context_.population()) {
             if (!entity.is_active()) {
@@ -336,18 +338,21 @@ hgps::IntegerAgeGenderTable Simulation::get_net_migration() {
     // Receive message with timeout
     // std::cout << "\nDEBUG: Simulation::get_net_migration - Trying to receive message";
     auto message = context_.scenario().channel().try_receive(context_.sync_timeout_millis());
-    //std::cout << "\nDEBUG: Simulation::get_net_migration - Message received: " << (message.has_value() ? "yes" : "no");
+    // std::cout << "\nDEBUG: Simulation::get_net_migration - Message received: " <<
+    // (message.has_value() ? "yes" : "no");
 
     if (message.has_value()) {
         auto &basePtr = message.value();
         // std::cout << "\nDEBUG: Simulation::get_net_migration - Checking message type";
         auto *messagePrt = dynamic_cast<NetImmigrationMessage *>(basePtr.get());
         if (messagePrt) {
-            //std::cout << "\nDEBUG: Simulation::get_net_migration - Message is NetImmigrationMessage";
+            // std::cout << "\nDEBUG: Simulation::get_net_migration - Message is
+            // NetImmigrationMessage";
             return messagePrt->data();
         }
 
-        //std::cout << "\nERROR: Simulation::get_net_migration - Message is not NetImmigrationMessage";
+        // std::cout << "\nERROR: Simulation::get_net_migration - Message is not
+        // NetImmigrationMessage";
         throw std::runtime_error(
             "Simulation out of sync, failed to receive a net immigration message");
     }
@@ -364,7 +369,8 @@ hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
     // std::cout << "\nDEBUG: Simulation::create_net_migration - Starting";
 
     auto expected_future = core::run_async(&Simulation::get_current_expected_population, this);
-    //std::cout << "\nDEBUG: Simulation::create_net_migration - Started future for expected population";
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Started future for expected
+    // population";
 
     auto simulated_population = get_current_simulated_population();
     // std::cout << "\nDEBUG: Simulation::create_net_migration - Got simulated population";
@@ -376,9 +382,10 @@ hgps::IntegerAgeGenderTable Simulation::create_net_migration() {
     auto start_age = context_.age_range().lower();
     auto end_age = context_.age_range().upper();
 
-    //std::cout << "\nDEBUG: Simulation::create_net_migration - Waiting for expected population future";
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Waiting for expected population
+    // future";
     auto expected_population = expected_future.get();
-    //std::cout << "\nDEBUG: Simulation::create_net_migration - Got expected population";
+    // std::cout << "\nDEBUG: Simulation::create_net_migration - Got expected population";
 
     auto net_value = 0;
     for (int age = start_age; age <= end_age; age++) {

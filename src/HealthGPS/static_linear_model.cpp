@@ -27,7 +27,8 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_factors(context, person, context.random());
         initialise_physical_activity(context, person, context.random());
     }
-    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical activity completed";
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Factors and physical
+    // activity completed";
 
     // Adjust such that risk factor means match expected values.
     adjust_risk_factors(context, names_, ranges_, false);
@@ -38,11 +39,13 @@ void StaticLinearModel::generate_risk_factors(RuntimeContext &context) {
         initialise_policies(person, context.random(), false);
         initialise_trends(context, person);
     }
-    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends initialized";
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Policies and trends
+    // initialized";
 
     // Adjust such that trended risk factor means match trended expected values.
     adjust_risk_factors(context, names_, ranges_, true);
-    //std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors adjusted";
+    // std::cout << "\nDEBUG: StaticLinearModel::generate_risk_factors - Trended risk factors
+    // adjusted";
 
     // Print risk factor summary once at the end
     std::string risk_factor_list;
@@ -733,7 +736,8 @@ std::unique_ptr<RiskFactorModel> StaticLinearModelDefinition::create_model() con
 
 // Add a new method to verify risk factors
 void StaticLinearModel::verify_risk_factors() const {
-    //std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor configuration";
+    // std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verifying risk factor
+    // configuration";
 
     // Check model configuration consistency - no hardcoded values
     if (names_.size() != models_.size()) {
@@ -766,7 +770,8 @@ void StaticLinearModel::verify_risk_factors() const {
         }
     }
 
-    //std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with " << names_.size() << " risk factors";
+    // std::cout << "\nDEBUG: StaticLinearModel::verify_risk_factors - Verification completed with "
+    // << names_.size() << " risk factors";
 }
 
 } // namespace hgps
