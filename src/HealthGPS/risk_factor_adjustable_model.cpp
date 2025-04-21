@@ -120,14 +120,21 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
             double delta = adjustments.at(person.gender, factors[i]).at(person.age);
             double value = person.risk_factors.at(factors[i]) + delta;
 
-            // Clamp value to an optionally specified range.
-            if (ranges.has_value()) {
-                const auto &range = ranges.value().get()[i];
-                value = range.clamp(value);
-            }
-
-            // Set the adjusted value.
-            person.risk_factors.at(factors[i]) = value;
+            // Set the adjusted value with range validation
+            person.set_risk_factor(context, factors[i], value);
+        }
+        
+        // Special handling for demographic attributes
+        // Map income_continuous to Income
+        if (std::find(factors.begin(), factors.end(), "Income"_id) != factors.end()) {
+            double delta = adjustments.at(person.gender, "Income"_id).at(person.age);
+            person.income_continuous += delta;
+        }
+        
+        // Map physical_activity to PhysicalActivity
+        if (std::find(factors.begin(), factors.end(), "PhysicalActivity"_id) != factors.end()) {
+            double delta = adjustments.at(person.gender, "PhysicalActivity"_id).at(person.age);
+            person.physical_activity += delta;
         }
     });
     // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Adjustments applied";

@@ -65,4 +65,17 @@ void RuntimeContext::publish_async(std::unique_ptr<EventMessage> message) const 
     event_bus_->publish_async(std::move(message));
 }
 
+double RuntimeContext::ensure_risk_factor_in_range(const core::Identifier &factor_key, double value) const noexcept {
+    try {
+        // Look up the MappingEntry for this risk factor
+        const MappingEntry &entry = mapping().at(factor_key);
+        
+        // Use the MappingEntry's get_bounded_value method to clamp the value to its range
+        return entry.get_bounded_value(value);
+    } catch (const std::exception&) {
+        // If the factor is not found or any other error occurs, return the original value
+        return value;
+    }
+}
+
 } // namespace hgps

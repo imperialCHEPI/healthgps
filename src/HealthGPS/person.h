@@ -11,6 +11,9 @@
 
 namespace hgps {
 
+// Forward declarations
+class RuntimeContext;
+
 /// @brief Disease status enumeration
 enum struct DiseaseStatus : uint8_t {
     /// @brief Declared free from condition
@@ -125,6 +128,12 @@ struct Person {
         return 0.0;
     }
 
+    /// @brief Sets a risk factor value with range validation
+    /// @param context The runtime context for range validation
+    /// @param key The risk factor identifier key
+    /// @param value The value to set, which will be clamped to the valid range
+    void set_risk_factor(const RuntimeContext &context, const core::Identifier &key, double value);
+
     /// @brief Gets the gender enumeration as a number for analysis
     /// @return The gender associated value
     /// @throws HgpsException if gender is unknown
@@ -143,7 +152,7 @@ struct Person {
 
     /// @brief Check if person is an adult (18 or over)
     /// @return true if person is 18 or over; else false
-    bool over_18() const noexcept;
+    bool is_adult() const noexcept;
 
     /// @brief Gets the sector enumeration as a number
     /// @return The sector value (0 for urban, 1 for rural)

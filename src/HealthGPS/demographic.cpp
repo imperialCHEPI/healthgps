@@ -209,6 +209,9 @@ void DemographicModule::initialise_age_gender(RuntimeContext &context) {
 // Made structural change- Mahima
 // This function now is used to initialise population with age, gender, region, ethncicty, income
 void DemographicModule::initialise_population(RuntimeContext &context) {
+    // Store context reference for range validation
+    context_ = &context;
+
     // First initialize everyone's age and gender (ONCE)
     initialise_age_gender(context);
 
@@ -438,19 +441,35 @@ void DemographicModule::initialise_income_category(Person &person, const Populat
     if (income_value <= income_quartile_thresholds_[0]) {
         person.income = core::Income::low;
         person.income_category = 0;
-        person.risk_factors[core::Identifier("income_category")] = 0.0; // Low = 0
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"), 0.0); // Low = 0
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 0.0; // Low = 0
+        }
     } else if (income_value <= income_quartile_thresholds_[1]) {
         person.income = core::Income::lowermiddle;
         person.income_category = 1;
-        person.risk_factors[core::Identifier("income_category")] = 1.0; // Lower middle = 1
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"), 1.0); // Lower middle = 1
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 1.0; // Lower middle = 1
+        }
     } else if (income_value <= income_quartile_thresholds_[2]) {
         person.income = core::Income::uppermiddle;
         person.income_category = 2;
-        person.risk_factors[core::Identifier("income_category")] = 2.0; // Upper middle = 2
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"), 2.0); // Upper middle = 2
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 2.0; // Upper middle = 2
+        }
     } else {
         person.income = core::Income::high;
         person.income_category = 3;
-        person.risk_factors[core::Identifier("income_category")] = 3.0; // High = 3
+        if (context_) {
+            person.set_risk_factor(*context_, core::Identifier("income_category"), 3.0); // High = 3
+        } else {
+            person.risk_factors[core::Identifier("income_category")] = 3.0; // High = 3
+        }
     }
     // std::cout << "\nDEBUG: Finished initialise_income_category";
 }
@@ -482,6 +501,9 @@ void DemographicModule::calculate_income_quartiles(const Population &population)
 
 void DemographicModule::update_population(RuntimeContext &context,
                                           const DiseaseModule &disease_host) {
+    // Store context reference for range validation
+    context_ = &context;
+
     auto residual_future = core::run_async(&DemographicModule::update_residual_mortality, this,
                                            std::ref(context), std::ref(disease_host));
 

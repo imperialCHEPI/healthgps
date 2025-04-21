@@ -1,6 +1,7 @@
 #include "person.h"
 
 #include "HealthGPS.Core/exception.h"
+#include "runtime_context.h"
 
 namespace hgps {
 
@@ -13,7 +14,7 @@ std::unordered_map<core::Identifier, std::function<double(const Person &)>>
         {"Age"_id, [](const Person &p) { return static_cast<double>(p.age); }},
         {"Age2"_id, [](const Person &p) { return pow(p.age, 2); }},
         {"Age3"_id, [](const Person &p) { return pow(p.age, 3); }},
-        {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
+        {"Over18"_id, [](const Person &p) { return static_cast<double>(p.is_adult()); }},
         {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
         {"Income"_id, [](const Person &p) { return std::max(0.0, p.income_continuous); }},
         {"SES"_id, [](const Person &p) { return p.ses; }},
@@ -21,7 +22,7 @@ std::unordered_map<core::Identifier, std::function<double(const Person &)>>
         {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
         {"PhysicalActivity"_id, [](const Person &p) { return p.physical_activity; }},
         {"IncomeContinuous"_id, [](const Person &p) { return std::max(0.0, p.income_continuous); }},
-        {"IncomeCategory"_id, [](const Person &p) { return p.income_to_value(); }},
+        {"IncomeCategory"_id, [](const Person &p) { return static_cast<double>(p.income_category); }},
 
         // Add handlers for specific ethnicity coefficients
         {"White"_id,
@@ -76,6 +77,8 @@ unsigned int Person::time_of_migration() const noexcept { return time_of_migrati
 
 bool Person::is_active() const noexcept { return is_alive_ && !has_emigrated_; }
 
+bool Person::is_adult() const noexcept { return age >= 18; }
+
 float Person::gender_to_value() const { return gender_to_value(gender); }
 
 float Person::gender_to_value(core::Gender gender) {
@@ -91,8 +94,6 @@ std::string Person::gender_to_string() const {
     }
     return gender == core::Gender::male ? "male" : "female";
 }
-
-bool Person::over_18() const noexcept { return age >= 18; }
 
 float Person::sector_to_value() const {
     switch (sector) {
@@ -154,6 +155,11 @@ float Person::ethnicity_to_value() const {
     default:
         throw core::HgpsException("Ethnicity is unknown.");
     }
+}
+
+void Person::set_risk_factor(const RuntimeContext &context, const core::Identifier &key, double value) {
+    // Apply range validation before setting the value
+    risk_factors[key] = context.ensure_risk_factor_in_range(key, value);
 }
 
 void Person::emigrate(const unsigned int time) {
