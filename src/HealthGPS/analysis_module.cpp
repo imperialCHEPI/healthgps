@@ -412,7 +412,7 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             }
 
             // Add the value to the appropriate channel if vector is large enough
-            if (age < series(gender, mean_key).size()) {
+            if (static_cast<size_t>(age) < series(gender, mean_key).size()) {
                 series(gender, mean_key).at(age) += value;
             }
         }
@@ -447,8 +447,8 @@ void AnalysisModule::calculate_population_statistics(RuntimeContext &context,
             std::string column = "mean_" + factor.key().to_string();
 
             // Skip if the column doesn't exist
-            if (age >= series(core::Gender::female, column).size() ||
-                age >= series(core::Gender::male, column).size()) {
+            if (static_cast<size_t>(age) >= series(core::Gender::female, column).size() ||
+                static_cast<size_t>(age) >= series(core::Gender::male, column).size()) {
                 continue;
             }
 
@@ -521,7 +521,8 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto accumulate_squared_diffs = [&series](const std::string &chan, core::Gender sex, int age,
                                               double value) {
         // Skip processing if the channel doesn't exist or age is out of bounds
-        if (age >= series(sex, "mean_" + chan).size() || age >= series(sex, "std_" + chan).size()) {
+        if (static_cast<size_t>(age) >= series(sex, "mean_" + chan).size() || 
+            static_cast<size_t>(age) >= series(sex, "std_" + chan).size()) {
             return;
         }
 
@@ -571,7 +572,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto divide_by_count_sqrt = [&series](const std::string &chan, core::Gender sex, int age,
                                           double count) {
         // Skip if channel doesn't exist or age is out of bounds
-        if (age >= series(sex, "std_" + chan).size()) {
+        if (static_cast<size_t>(age) >= series(sex, "std_" + chan).size()) {
             return;
         }
 

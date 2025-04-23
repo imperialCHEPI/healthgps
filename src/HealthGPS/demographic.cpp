@@ -751,6 +751,10 @@ void DemographicModule::initialize_newborns(RuntimeContext &context) {
                 case core::Income::high:
                     income_value = 3.0;
                     break;
+                case core::Income::unknown:
+                default:
+                    income_value = 0.0; // Default to low income if unknown
+                    break;
                 }
                 person.risk_factors[core::Identifier("income_category")] = income_value;
             }
