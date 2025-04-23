@@ -610,7 +610,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     if (!physical_activity_models.empty()) {
         for (const auto &pair : physical_activity_models) {
             const auto &model = pair.second;
-            // std::cout << "\nDEBUG: Verified model key: " << pair.first.to_string() << ", coefficients: "
+            // std::cout << "\nDEBUG: Verified model key: " << pair.first.to_string() << ",
+            // coefficients: "
             // << model.coefficients.size();
         }
     }
