@@ -214,7 +214,7 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // If the result is not finite (NaN or Inf), set to zero
         /*if (!std::isfinite(factor)) {
             factor = 0.0;
-        }*/ 
+        }*/
 
         // Ensure it's within valid range
         factor = ranges_[i].clamp(factor);
