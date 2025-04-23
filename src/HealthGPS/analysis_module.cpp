@@ -521,7 +521,7 @@ void AnalysisModule::calculate_standard_deviation(RuntimeContext &context,
     auto accumulate_squared_diffs = [&series](const std::string &chan, core::Gender sex, int age,
                                               double value) {
         // Skip processing if the channel doesn't exist or age is out of bounds
-        if (static_cast<size_t>(age) >= series(sex, "mean_" + chan).size() || 
+        if (static_cast<size_t>(age) >= series(sex, "mean_" + chan).size() ||
             static_cast<size_t>(age) >= series(sex, "std_" + chan).size()) {
             return;
         }
