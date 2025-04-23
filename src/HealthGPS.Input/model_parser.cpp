@@ -6,7 +6,7 @@
 
 #include "HealthGPS.Core/exception.h"
 #include "HealthGPS.Core/scoped_timer.h"
-#include "HealthGPS/static_linear_model.h" 
+#include "HealthGPS/static_linear_model.h"
 
 #include <Eigen/Cholesky>
 #include <Eigen/Dense>
@@ -83,8 +83,8 @@ load_and_validate_model_json(const std::filesystem::path &model_path) {
 namespace hgps::input {
 
 // Forward declaration of new function to load risk factor coefficients from CSV
-std::unordered_map<std::string, hgps::LinearModelParams> 
-load_risk_factor_coefficients_from_csv(const std::filesystem::path& csv_path);
+std::unordered_map<std::string, hgps::LinearModelParams>
+load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path);
 
 nlohmann::json load_json(const std::filesystem::path &filepath) {
     std::ifstream file(filepath);
@@ -241,11 +241,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Check if boxcox_coefficients.csv exists in the same directory as the model JSON- Mahima
     std::filesystem::path model_dir = config.root_path;
     std::filesystem::path csv_path = model_dir / "boxcox_coefficients.csv";
-    
+
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
     if (std::filesystem::exists(csv_path)) {
-        std::cout << "\nFound CSV file for risk factor coefficients: " << csv_path.string() << std::endl;
+        std::cout << "\nFound CSV file for risk factor coefficients: " << csv_path.string()
+                  << std::endl;
         csv_coefficients = load_risk_factor_coefficients_from_csv(csv_path);
     }
 
@@ -270,18 +271,18 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Risk factor model parameters - check if we have it in CSV first
         LinearModelParams model;
-        
+
         if (csv_coefficients.find(key) != csv_coefficients.end()) {
             // Use coefficients from CSV file
             model = csv_coefficients[key];
             std::cout << "\nLoading risk factors using .csv YAY!!! For: " << key;
-            
+
             // Print a sample of the key coefficients for verification
             std::cout << "\n  Intercept: " << model.intercept;
             if (!model.coefficients.empty()) {
                 auto first_coef = model.coefficients.begin()->first;
-                std::cout << "\n  First coefficient (" << first_coef.to_string() << "): " 
-                          << model.coefficients[first_coef];
+                std::cout << "\n  First coefficient (" << first_coef.to_string()
+                          << "): " << model.coefficients[first_coef];
             }
         } else {
             // Fall back to JSON if not found in CSV
@@ -939,44 +940,43 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 }
 
 // Add this function to load risk factor coefficients from a CSV file- Mahima
-std::unordered_map<std::string, hgps::LinearModelParams> 
-load_risk_factor_coefficients_from_csv(const std::filesystem::path& csv_path) {
+std::unordered_map<std::string, hgps::LinearModelParams>
+load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path) {
     MEASURE_FUNCTION();
-    
+
     // Map to store the result of coefficient loading from CSV
     std::unordered_map<std::string, hgps::LinearModelParams> result;
-    
+
     // Check if the file exists
     if (!std::filesystem::exists(csv_path)) {
-        std::cout << "\nWARNING: CSV file for risk factor coefficients not found: " 
+        std::cout << "\nWARNING: CSV file for risk factor coefficients not found: "
                   << csv_path.string() << std::endl;
         return result;
     }
-    
+
     try {
         // Use rapidcsv to read the CSV file
         rapidcsv::Document doc(csv_path.string());
-        
+
         // Get column names from the header (risk factor names)
         auto risk_factor_names = doc.GetColumnNames();
-        
+
         // Skip the first column which contains row identifiers
         if (risk_factor_names.size() > 0) {
             risk_factor_names.erase(risk_factor_names.begin());
         }
-        
+
         // Mapping from CSV row names to internal coefficient names
         std::unordered_map<std::string, std::string> row_name_mapping = {
             {"Intercept", "Intercept"},
-            {"gender2", "Gender"},  // gender2 = Female (Male is reference category 0)
+            {"gender2", "Gender"}, // gender2 = Female (Male is reference category 0)
             {"age1", "Age"},
             {"age2", "Age2"},
             {"ethnicity2", "Asian"},
             {"ethnicity3", "Black"},
             {"ethnicity4", "Others"},
-            {"income", "income_continuous"}
-        };
-        
+            {"income", "income_continuous"}};
+
         // Get all row names (coefficient types)
         auto row_count = doc.GetRowCount();
         std::vector<std::string> row_names;
@@ -984,29 +984,30 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path& csv_path) {
             // Get the first column value which is the row name
             row_names.push_back(doc.GetCell<std::string>(0, i));
         }
-        
+
         // Initialize a LinearModelParams object for each risk factor
-        for (const auto& rf_name : risk_factor_names) {
+        for (const auto &rf_name : risk_factor_names) {
             result[rf_name] = hgps::LinearModelParams();
         }
-        
+
         // Read values for each risk factor and coefficient
         for (size_t row_idx = 0; row_idx < row_count; row_idx++) {
             std::string row_name = row_names[row_idx];
-            
+
             // Map the row name to the internal coefficient name
             std::string coef_name = row_name;
             if (row_name_mapping.find(row_name) != row_name_mapping.end()) {
                 coef_name = row_name_mapping[row_name];
             }
-            
+
             // For each risk factor column
             for (size_t col_idx = 0; col_idx < risk_factor_names.size(); col_idx++) {
                 std::string rf_name = risk_factor_names[col_idx];
-                
+
                 // Read the value from the CSV
-                double value = doc.GetCell<double>(col_idx + 1, row_idx); // +1 because first column is row names
-                
+                double value = doc.GetCell<double>(col_idx + 1,
+                                                   row_idx); // +1 because first column is row names
+
                 // Set the appropriate value based on the row type
                 if (coef_name == "Intercept") {
                     result[rf_name].intercept = value;
@@ -1016,31 +1017,32 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path& csv_path) {
                 }
             }
         }
-        
-        std::cout << "\nSuccessfully loaded risk factor coefficients from CSV: \n" << csv_path.string();
-        
+
+        std::cout << "\nSuccessfully loaded risk factor coefficients from CSV: \n"
+                  << csv_path.string();
+
         // Print a sample of the loaded coefficient values for verification
         if (!result.empty()) {
             // Take the first risk factor as an example
             auto first_rf = result.begin()->first;
             std::cout << "\n\nSample coefficient values for risk factor '" << first_rf << "':";
             std::cout << "\n  Intercept: " << result[first_rf].intercept;
-            
+
             // Print a few coefficients
-            for (const auto& coef_pair : result[first_rf].coefficients) {
+            for (const auto &coef_pair : result[first_rf].coefficients) {
                 std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
             }
-            
+
             // Print total number of risk factors and coefficients loaded
             std::cout << "\n\nTotal risk factors loaded: " << result.size();
-            std::cout << "\nAverage coefficients per risk factor: " 
+            std::cout << "\nAverage coefficients per risk factor: "
                       << (result.empty() ? 0 : result.begin()->second.coefficients.size());
             std::cout << "\n";
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to load risk factor coefficients from CSV: " << e.what();
     }
-    
+
     return result;
 }
 } // namespace hgps::input
