@@ -36,6 +36,9 @@ json resolve_uri(const uri &uri, const std::filesystem::path &program_directory)
 
 namespace hgps::input {
 void validate_json(std::istream &is, const std::string &schema_file_name, int schema_version) {
+    // SCHEMA VALIDATION DISABLED - Skip and return immediately
+    
+    
     const auto data = json::parse(is);
 
     // Load schema
@@ -52,6 +55,7 @@ void validate_json(std::istream &is, const std::string &schema_file_name, int sc
 
     // Perform validation
     schema.validate(data);
+    
 }
 
 nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
@@ -65,6 +69,7 @@ nlohmann::json load_and_validate_json(const std::filesystem::path &file_path,
     // Read in JSON file
     auto json = nlohmann::json::parse(ifs);
 
+   
     // Check that the file has a $schema property and that it matches the URL of the
     // schema version we support
     if (!json.contains("$schema")) {

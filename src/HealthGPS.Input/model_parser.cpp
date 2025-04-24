@@ -644,7 +644,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Verify the final map
     // std::cout << "\nDEBUG: Finished processing PhysicalActivityModels, final count: " <<
     // physical_activity_models.size();
-
+    /*
     if (!physical_activity_models.empty()) {
         for (const auto &pair : physical_activity_models) {
             const auto &model = pair.second;
@@ -653,6 +653,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // << model.coefficients.size();
         }
     }
+    */
 
     // Standard deviation of physical activity (now loaded directly from the model)
     // std::cout << "\nDEBUG: Processing PhysicalActivityStdDev";

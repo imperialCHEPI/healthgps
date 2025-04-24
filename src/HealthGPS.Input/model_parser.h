@@ -12,6 +12,7 @@
 
 #include <filesystem>
 #include <utility>
+#include <unordered_map>
 
 namespace hgps::input {
 
@@ -80,5 +81,11 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 /// @param value The string representation of the region
 /// @return The parsed region
 core::Region parse_region(const std::string &value);
+
+/// @brief Loads risk factor ranges from a CSV file
+/// @param csv_path The path to the CSV file containing the risk factor ranges
+/// @return A map of risk factor identifiers to range values
+std::unordered_map<hgps::core::Identifier, hgps::core::DoubleInterval>
+load_risk_factor_ranges_from_csv(const std::filesystem::path &csv_path);
 
 } // namespace hgps::input
