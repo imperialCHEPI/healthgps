@@ -84,7 +84,8 @@ namespace hgps::input {
 
 // Forward declaration of new function to load risk factor coefficients from CSV
 std::unordered_map<std::string, hgps::LinearModelParams>
-load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug = true);
+load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path,
+                                       bool print_debug = true);
 
 // Forward declaration of new function to load policy ranges from CSV
 std::unordered_map<std::string, hgps::core::DoubleInterval>
@@ -242,7 +243,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                       policy_covariance_table.num_columns()};
     // std::cout << "Finished loading PolicyCovarianceFile";
 
-    // Check if boxcox_coefficients.csv and policy files exists in the same directory as the model JSON- Mahima
+    // Check if boxcox_coefficients.csv and policy files exists in the same directory as the model
+    // JSON- Mahima
     std::filesystem::path model_dir = config.root_path;
     std::filesystem::path csv_path = model_dir / "boxcox_coefficients.csv";
     std::filesystem::path policy_csv_path = model_dir / "scenario2_food_policyeffect_model.csv";
@@ -263,26 +265,27 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                   << std::endl;
         policy_csv_coefficients = load_risk_factor_coefficients_from_csv(policy_csv_path, false);
         policy_ranges_map = load_policy_ranges_from_csv(policy_csv_path);
-        std::cout << "\nSuccessfully loaded policy coefficients from CSV for " 
+        std::cout << "\nSuccessfully loaded policy coefficients from CSV for "
                   << policy_csv_coefficients.size() << " risk factors";
-                  
+
         // Print a sample of the loaded policy coefficients for verification
         if (!policy_csv_coefficients.empty()) {
             auto first_rf = policy_csv_coefficients.begin()->first;
-            std::cout << "\n\nSample policy coefficient values for risk factor '" << first_rf << "':";
+            std::cout << "\n\nSample policy coefficient values for risk factor '" << first_rf
+                      << "':";
             std::cout << "\n  Policy Intercept: " << policy_csv_coefficients[first_rf].intercept;
-            
+
             // Print a few coefficients
             for (const auto &coef_pair : policy_csv_coefficients[first_rf].coefficients) {
                 std::cout << "\n  " << coef_pair.first.to_string() << ": " << coef_pair.second;
             }
-            
+
             // Print range if available
             if (policy_ranges_map.find(first_rf) != policy_ranges_map.end()) {
-                std::cout << "\n  Policy range: [" << policy_ranges_map[first_rf].lower() 
-                          << ", " << policy_ranges_map[first_rf].upper() << "]";
+                std::cout << "\n  Policy range: [" << policy_ranges_map[first_rf].lower() << ", "
+                          << policy_ranges_map[first_rf].upper() << "]";
             }
-            
+
             std::cout << "\n";
         }
     }
@@ -310,17 +313,17 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         LinearModelParams model;
 
         if (csv_coefficients.find(key) != csv_coefficients.end()) {
-            //std::cout << "\nLoading risk factors using .csv YAY!!!";
-            // Use coefficients from CSV file
+            // std::cout << "\nLoading risk factors using .csv YAY!!!";
+            //  Use coefficients from CSV file
             model = csv_coefficients[key];
 
             // Print a sample of the key coefficients for verification
-            //std::cout << "\n  Intercept: " << model.intercept;
+            // std::cout << "\n  Intercept: " << model.intercept;
             /*if (!model.coefficients.empty()) {
                 auto first_coef = model.coefficients.begin()->first;
                 std::cout << "\n  First coefficient (" << first_coef.to_string()
                           << "): " << model.coefficients[first_coef];
-            }*/ 
+            }*/
         } else {
             // Fall back to JSON if not found in CSV
             std::cout << "\nLoading risk factors using JSON NOOOOOOOOOOO!!!";
@@ -354,22 +357,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         if (policy_csv_coefficients.find(key) != policy_csv_coefficients.end()) {
             // Use coefficients from CSV file
             policy_model = policy_csv_coefficients[key];
-            //std::cout << "\nLoading policy coefficients using CSV for: " << key;
+            // std::cout << "\nLoading policy coefficients using CSV for: " << key;
 
             // Print a sample of the key coefficients for verification
-            //std::cout << "\n  Policy Intercept: " << policy_model.intercept;
+            // std::cout << "\n  Policy Intercept: " << policy_model.intercept;
             /*if (!policy_model.coefficients.empty()) {
                 auto first_coef = policy_model.coefficients.begin()->first;
-                std::cout << "\n  First policy coefficient (" << first_coef.to_string() << "): " << policy_model.coefficients[first_coef];
-            }*/ 
+                std::cout << "\n  First policy coefficient (" << first_coef.to_string() << "): " <<
+            policy_model.coefficients[first_coef];
+            }*/
         } else {
             // Fall back to JSON if not found in CSV- worst case
             std::cout << "\nLoading policy coefficients using JSON NOOOOOOO!!! for: " << key;
             policy_model.intercept = policy_json_params["Intercept"].get<double>();
-            policy_model.coefficients =
-                policy_json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
-            policy_model.log_coefficients = policy_json_params["LogCoefficients"]
+            policy_model.coefficients = policy_json_params["Coefficients"]
                                             .get<std::unordered_map<core::Identifier, double>>();
+            policy_model.log_coefficients =
+                policy_json_params["LogCoefficients"]
+                    .get<std::unordered_map<core::Identifier, double>>();
         }
 
         // Check intervention policy covariance matrix column name matches risk factor name.
@@ -383,11 +388,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
         // Write intervention policy data structures.
         policy_models.emplace_back(std::move(policy_model));
-        if (policy_csv_coefficients.find(key) != policy_csv_coefficients.end() && 
+        if (policy_csv_coefficients.find(key) != policy_csv_coefficients.end() &&
             policy_ranges_map.find(key) != policy_ranges_map.end()) {
             // Use ranges from CSV
             policy_ranges.emplace_back(policy_ranges_map[key]);
-            //std::cout << "\n  Using policy range from CSV: [" << policy_ranges_map[key].lower() << ", " << policy_ranges_map[key].upper() << "]";
+            // std::cout << "\n  Using policy range from CSV: [" << policy_ranges_map[key].lower()
+            // << ", " << policy_ranges_map[key].upper() << "]";
         } else {
             // Fall back to JSON ranges
             policy_ranges.emplace_back(policy_json_params["Range"].get<core::DoubleInterval>());
@@ -1042,8 +1048,7 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
             {"ethnicity3", "Black"},
             {"ethnicity4", "Others"},
             {"income", "income_continuous"},
-            {"EnergyIntake", "EnergyIntake"}
-        };
+            {"EnergyIntake", "EnergyIntake"}};
 
         // Get all row names (coefficient types)
         auto row_count = doc.GetRowCount();
@@ -1061,7 +1066,7 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
         // Read values for each risk factor and coefficient
         for (size_t row_idx = 0; row_idx < row_count; row_idx++) {
             std::string row_name = row_names[row_idx];
-            
+
             // Skip min/max rows as they're for ranges
             if (row_name == "min" || row_name == "max") {
                 continue;
@@ -1134,8 +1139,8 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 
     // Check if the file exists
     if (!std::filesystem::exists(csv_path)) {
-        std::cout << "\nWARNING: CSV file for policy ranges not found: "
-                  << csv_path.string() << std::endl;
+        std::cout << "\nWARNING: CSV file for policy ranges not found: " << csv_path.string()
+                  << std::endl;
         return result;
     }
 
@@ -1161,12 +1166,12 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
         // Read min/max values first
         for (size_t row_idx = 0; row_idx < row_count; row_idx++) {
             std::string row_name = row_names[row_idx];
-            
+
             if (row_name == "min" || row_name == "max") {
                 for (size_t col_idx = 0; col_idx < risk_factor_names.size(); col_idx++) {
                     std::string rf_name = risk_factor_names[col_idx];
                     double value = doc.GetCell<double>(col_idx + 1, row_idx);
-                    
+
                     if (row_name == "min") {
                         min_values[rf_name] = value;
                     } else {
@@ -1182,22 +1187,22 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
             // This ensures we take exactly what's in the CSV
             double min_val = 0.0;
             double max_val = 0.0;
-            
+
             if (min_values.find(rf_name) != min_values.end()) {
                 min_val = min_values[rf_name];
             }
-            
+
             if (max_values.find(rf_name) != max_values.end()) {
                 max_val = max_values[rf_name];
             }
-            
+
             // If min > max, swap them to prevent exceptions
             if (min_val > max_val) {
-                std::cout << "\nWARNING: For " << rf_name << ", min (" << min_val 
-                          << ") > max (" << max_val << "). Swapping values.";
+                std::cout << "\nWARNING: For " << rf_name << ", min (" << min_val << ") > max ("
+                          << max_val << "). Swapping values.";
                 std::swap(min_val, max_val);
             }
-            
+
             // Create interval with correct values
             result[rf_name] = hgps::core::DoubleInterval(min_val, max_val);
         }
@@ -1209,7 +1214,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
             // Take the first risk factor as an example
             auto first_rf = result.begin()->first;
             std::cout << "\n\nSample range values for policy risk factor '" << first_rf << "':";
-            std::cout << "\n  Range: [" << result[first_rf].lower() << ", " 
+            std::cout << "\n  Range: [" << result[first_rf].lower() << ", "
                       << result[first_rf].upper() << "]";
             std::cout << "\n\nTotal policy ranges loaded: " << result.size() << "\n";
         }
