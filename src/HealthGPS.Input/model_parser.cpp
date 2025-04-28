@@ -83,7 +83,8 @@ load_and_validate_model_json(const std::filesystem::path &model_path) {
 namespace hgps::input {
 
 // Forward declaration of new function to load risk factor coefficients from CSV- Mahima
-// This is better coz then I don't need to use the header file coz the only change is loading from CSV instead of JSON
+// This is better coz then I don't need to use the header file coz the only change is loading from
+// CSV instead of JSON
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path,
                                        bool print_debug = true);
@@ -244,9 +245,11 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                       policy_covariance_table.num_columns()};
     // std::cout << "Finished loading PolicyCovarianceFile";
 
-    // Check if boxcox_coefficients.csv for the risk factors boxcox data and the scenario2_food_policyeffect_model.csv for policy data exists in the same directory as the model
-    // JSON- Mahima
-    //Basically they have to be in the same folder as the JSON files- so in case of FINCH it is C://HealthGPS-examples/KevinHall_FINCH folder
+    // Check if boxcox_coefficients.csv for the risk factors boxcox data and the
+    // scenario2_food_policyeffect_model.csv for policy data exists in the same directory as the
+    // model JSON- Mahima
+    // Basically they have to be in the same folder as the JSON files- so in case of FINCH it is
+    // C://HealthGPS-examples/KevinHall_FINCH folder
     std::filesystem::path model_dir = config.root_path;
     std::filesystem::path csv_path = model_dir / "boxcox_coefficients.csv";
     std::filesystem::path policy_csv_path = model_dir / "scenario2_food_policyeffect_model.csv";
@@ -1128,8 +1131,9 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
     return result;
 }
 
-//Function to load policy ranges from CSV- Mahima
-//could have reused the boxcox loading code but anyways did sepearte function for safety and maybe future upgrades
+// Function to load policy ranges from CSV- Mahima
+// could have reused the boxcox loading code but anyways did sepearte function for safety and maybe
+// future upgrades
 std::unordered_map<std::string, hgps::core::DoubleInterval>
 load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
     MEASURE_FUNCTION();
@@ -1185,7 +1189,8 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
         }
 
         // Now create the intervals correctly- Mahima
-        //peviosuly I had an error where it was swapping the min and max coz of the interval.h functionality
+        // peviosuly I had an error where it was swapping the min and max coz of the interval.h
+        // functionality
         for (const auto &rf_name : risk_factor_names) {
             // Use the values directly without validation
             // This ensures we take exactly what's in the CSV
