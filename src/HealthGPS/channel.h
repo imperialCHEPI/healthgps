@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <iostream>
 #include <mutex>
 #include <optional>
 #include <queue>
@@ -52,22 +53,33 @@ template <typename T> class Channel {
     /// @param timeout_millis Max wait timeout, or zero for infinity
     /// @return The received message, if arrived; otherwise empty.
     std::optional<value_type> try_receive(int timeout_millis = 0) {
+        // std::cout << "\nDEBUG: Channel::try_receive - Starting with timeout: " << timeout_millis
+        // << "ms, buffer size: " << buffer_.size();
         std::unique_lock<std::mutex> lock{mtx_};
 
         if (timeout_millis <= 0) {
+            // std::cout << "\nDEBUG: Channel::try_receive - Waiting indefinitely for message";
             cond_var_.wait(lock, [this] { return buffer_.size() > 0 || closed(); });
         } else {
-            cond_var_.wait_for(lock, std::chrono::milliseconds(timeout_millis),
-                               [this] { return buffer_.size() > 0 || closed(); });
+            // std::cout << "\nDEBUG: Channel::try_receive - Waiting up to " << timeout_millis <<
+            // "ms for message";
+            // Simply wait, no need to store the return value
+            (void)cond_var_.wait_for(lock, std::chrono::milliseconds(timeout_millis),
+                                     [this] { return buffer_.size() > 0 || closed(); });
+            // std::cout << "\nDEBUG: Channel::try_receive - Wait completed";
         }
 
         if (buffer_.empty()) {
+            std::cout
+                << "\nWARNING: Channel::try_receive - Buffer is empty, returning empty result";
             return {};
         }
 
         auto entry = std::move(buffer_.front());
         buffer_.pop();
 
+        // std::cout << "\nDEBUG: Channel::try_receive - Message received, remaining buffer size: "
+        // << buffer_.size();
         cond_var_.notify_one();
         return entry;
     }
@@ -98,16 +110,23 @@ template <typename T> class Channel {
     std::mutex mtx_;
 
     bool do_send(auto &&payload) {
+        /*std::cout << "\nDEBUG: Channel::do_send - Starting, channel closed: "
+                  << (is_closed_.load() ? "yes" : "no");*/
         if (is_closed_.load()) {
+            std::cout << "\nWARNING: Channel::do_send - Channel is closed, cannot send";
             return false;
         }
 
         std::unique_lock<std::mutex> lock(mtx_);
         if (capacity_ > 0 && buffer_.size() >= capacity_) {
+            std::cout << "\nWARNING: Channel::do_send - Buffer is full (" << buffer_.size() << "/"
+                      << capacity_ << "), waiting for space";
             cond_var_.wait(lock, [this]() { return buffer_.size() < capacity_; });
         }
 
         buffer_.push(std::forward<decltype(payload)>(payload));
+        // std::cout << "\nDEBUG: Channel::do_send - Message sent, new buffer size: "<<
+        // buffer_.size();
         cond_var_.notify_one();
         return true;
     }

@@ -187,7 +187,32 @@ void load_modelling_info(const json &j, Configuration &config) {
     const auto modelling = get(j, "modelling");
 
     auto &info = config.modelling;
-    get_to(modelling, "risk_factors", info.risk_factors, success);
+
+    // Make risk_factors optional
+    if (modelling.contains("risk_factors")) {
+        // Store as JSON value instead of trying to convert to vector<string>
+        info.risk_factors = modelling["risk_factors"];
+    } else {
+        // Initialize with empty JSON array
+        info.risk_factors = json::array();
+        fmt::print("WARNING: 'risk_factors' field is missing, initializing with empty array\n");
+    }
+
+    // Handle risk_factor_ranges_file if it exists
+    if (modelling.contains("risk_factor_ranges_file")) {
+        std::filesystem::path ranges_file_path;
+        if (get_to(modelling, "risk_factor_ranges_file", ranges_file_path, success)) {
+            try {
+                rebase_valid_path(ranges_file_path, config.root_path);
+                info.risk_factor_ranges_file = ranges_file_path;
+                fmt::print("Risk factor ranges file: {}\n", ranges_file_path.string());
+            } catch (const ConfigurationError &) {
+                success = false;
+                fmt::print(fg(fmt::color::red), "Risk factor ranges file not found: {}\n",
+                           ranges_file_path.string());
+            }
+        }
+    }
 
     // Rebase paths and check for errors
     if (get_to(modelling, "risk_factor_models", info.risk_factor_models, success)) {

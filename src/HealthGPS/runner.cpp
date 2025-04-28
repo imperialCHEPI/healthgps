@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <fmt/format.h>
+#include <iostream>
 #include <thread>
 
 namespace hgps {
@@ -116,6 +117,8 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     auto run_start = std::chrono::steady_clock::now();
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_begin, run));
+    // std::cout << "\nDEBUG: Runner::run_model_thread - Starting for " << model.name() << " run #"
+    // << run << std::endl;
 
     /* Create the simulation engine */
     adevs::Simulator<int> sim;
@@ -125,13 +128,22 @@ void Runner::run_model_thread(const std::stop_token &token, Simulation &model, u
     sim.add(&model);
 
     /* Run until the next event is at infinity */
+    // int event_count = 0;
     while (!token.stop_requested() && sim.next_event_time() < adevs_inf<adevs::Time>()) {
+        // std::cout << "\nDEBUG: Processing event #" << ++event_count << " at time real=" <<
+        // sim.next_event_time().real << ", logical=" << sim.next_event_time().logical << std::endl;
         sim.exec_next_event();
+        // std::cout << "\nDEBUG: Event #" << event_count << " processed" << std::endl;
     }
+
+    // std::cout << "\nDEBUG: Simulation loop completed after " << event_count << " events" <<
+    // std::endl;
 
     ElapsedTime elapsed = std::chrono::steady_clock::now() - run_start;
     notify(std::make_unique<RunnerEventMessage>(fmt::format("{} - {}", runner_id_, model.name()),
                                                 RunnerAction::run_end, run, elapsed.count()));
+    // std::cout << "\nDEBUG: Runner::run_model_thread - Completed for " << model.name() << " run #"
+    // << run << std::endl;
 }
 
 void Runner::notify(std::unique_ptr<hgps::EventMessage> message) {

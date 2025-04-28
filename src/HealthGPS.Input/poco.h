@@ -66,6 +66,7 @@ struct ModellingInfo {
     std::vector<RiskFactorInfo> risk_factors;
     std::unordered_map<std::string, std::filesystem::path> risk_factor_models;
     BaselineInfo baseline_adjustment;
+    std::filesystem::path risk_factor_ranges_file; // Path to CSV file with risk factor ranges
 };
 
 //! Experiment output folder and file information
