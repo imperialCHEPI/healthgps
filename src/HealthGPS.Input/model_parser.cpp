@@ -770,36 +770,37 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             if (!logistic_coefficients.empty()) {
                 // Convert unordered_map to vector in the same order as names
                 std::vector<LinearModelParams> logistic_models_vec;
-                for (const auto& name : names) {
+                for (const auto &name : names) {
                     // Convert name to lowercase for case-insensitive comparison
                     std::string name_str = name.to_string();
                     std::string name_lower = core::to_lower(name_str);
-                    
+
                     // Look for either the original name or a case-insensitive match
                     bool found = false;
-                    for (const auto& [key, model] : logistic_coefficients) {
+                    for (const auto &[key, model] : logistic_coefficients) {
                         if (core::to_lower(key) == name_lower) {
                             logistic_models_vec.push_back(model);
                             found = true;
                             break;
                         }
                     }
-                    
+
                     if (!found) {
-                        // If no logistic coefficients for this risk factor, use the boxcox coefficients
-                        std::cout << "\nWARNING: No logistic regression coefficients found for " << name.to_string()
-                                  << ", using boxcox coefficients";
-                        
+                        // If no logistic coefficients for this risk factor, use the boxcox
+                        // coefficients
+                        std::cout << "\nWARNING: No logistic regression coefficients found for "
+                                  << name.to_string() << ", using boxcox coefficients";
+
                         // Look for boxcox coefficients (also case-insensitive)
                         bool boxcox_found = false;
-                        for (const auto& [key, model] : csv_coefficients) {
+                        for (const auto &[key, model] : csv_coefficients) {
                             if (core::to_lower(key) == name_lower) {
                                 logistic_models_vec.push_back(model);
                                 boxcox_found = true;
                                 break;
                             }
                         }
-                        
+
                         if (!boxcox_found) {
                             // If no boxcox coefficients either, create empty model
                             logistic_models_vec.push_back(LinearModelParams{});
@@ -808,7 +809,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 }
                 return logistic_models_vec;
             } else {
-                // If no logistic coefficients, return empty vector (StaticLinearModelDefinition will handle this)
+                // If no logistic coefficients, return empty vector (StaticLinearModelDefinition
+                // will handle this)
                 return std::vector<LinearModelParams>{};
             }
         }());

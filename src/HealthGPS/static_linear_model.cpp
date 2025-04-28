@@ -160,18 +160,19 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
 }
 
 // Calculate the probability of a risk factor being zero using logistic regression- Mahima
-double StaticLinearModel::calculate_zero_probability(Person &person, size_t risk_factor_index) const {
+double StaticLinearModel::calculate_zero_probability(Person &person,
+                                                     size_t risk_factor_index) const {
     // Get the logistic model for this risk factor
-    const auto& logistic_model = logistic_models_[risk_factor_index];
-    
+    const auto &logistic_model = logistic_models_[risk_factor_index];
+
     // Calculate the linear predictor using the logistic model
     double logistic_linear_term = logistic_model.intercept;
-    
+
     // Add the coefficients
-    for (const auto& [coef_name, coef_value] : logistic_model.coefficients) {
+    for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
         logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
     }
-    
+
     // logistic function: p = 1 / (1 + exp(-linear_term))
     return 1.0 / (1.0 + std::exp(-logistic_linear_term));
 }
@@ -202,21 +203,22 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
         // Previous approach: Use BoxCox transformation to calculate risk factor values
-        // New approach: First use logistic regression to determine if the risk factor value should be zero
+        // New approach: First use logistic regression to determine if the risk factor value should
+        // be zero
         //              If non-zero, then use BoxCox transformation to calculate the actual value
         // =======================================================================
-            
+
         // STAGE 1: Determine if risk factor should be zero using logistic regression
         double zero_probability = calculate_zero_probability(person, i);
-        
+
         // Sample from this probability to determine if risk factor should be zero
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
         if (random_sample < zero_probability) {
             // Risk factor should be zero
             person.risk_factors[names_[i]] = 0.0;
-            continue; 
+            continue;
         }
-        
+
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // Using the original model logic from before
         double factor = linear[i] + residual * stddev_[i];
@@ -256,13 +258,14 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
         // Previous approach: Use BoxCox transformation to calculate risk factor values
-        // New approach: First use logistic regression to determine if the risk factor value should be zero
+        // New approach: First use logistic regression to determine if the risk factor value should
+        // be zero
         //              If non-zero, then use BoxCox transformation to calculate the actual value
         // =======================================================================
-            
+
         // STAGE 1: Determine if risk factor should be zero using logistic regression
         double zero_probability = calculate_zero_probability(person, i);
-        
+
         // Sample from this probability to determine if risk factor should be zero
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
         if (random_sample < zero_probability) {
@@ -270,7 +273,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
             person.risk_factors.at(names_[i]) = 0.0;
             continue; // Skip to next risk factor
         }
-        
+
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // Using the original model logic from before
         double factor = linear[i] + residual * stddev_[i];
@@ -280,7 +283,7 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // If the result is not finite (NaN or Inf), set to zero
         /*if (!std::isfinite(factor)) {
             factor = 0.0;
-        }*/ 
+        }*/
 
         // Save risk factor
         person.risk_factors.at(names_[i]) = factor;
@@ -718,18 +721,20 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
             throw core::HgpsException("One or more expected trend BoxCox value is missing");
         }
     }
-    
+
     // If logistic models are empty, initialize them to be the same as the boxcox models
     // This is just a fallback in case logistic models were not provided
     if (logistic_models_.empty()) {
-        std::cout << "\nWARNING: No logistic regression models provided, using BoxCox models as fallback";
+        std::cout
+            << "\nWARNING: No logistic regression models provided, using BoxCox models as fallback";
         logistic_models_ = models_;
     }
-    
+
     // Check if the number of logistic models matches the number of risk factors
     if (logistic_models_.size() != names_.size()) {
-        throw core::HgpsException(fmt::format("Number of logistic models ({}) does not match number of risk factors ({})",
-                                             logistic_models_.size(), names_.size()));
+        throw core::HgpsException(
+            fmt::format("Number of logistic models ({}) does not match number of risk factors ({})",
+                        logistic_models_.size(), names_.size()));
     }
 }
 
