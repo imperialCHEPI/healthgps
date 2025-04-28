@@ -86,8 +86,7 @@ namespace hgps::input {
 // This is better coz then I don't need to use the header file coz the only change is loading from
 // CSV instead of JSON
 std::unordered_map<std::string, hgps::LinearModelParams>
-load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path,
-                                       bool print_debug);
+load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug);
 
 // Forward declaration of new function to load policy ranges from CSV
 std::unordered_map<std::string, hgps::core::DoubleInterval>
@@ -96,7 +95,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path);
 // Forward declaration of new function to load logistic regression coefficients from CSV
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
-                                              bool print_debug);
+                                               bool print_debug);
 
 nlohmann::json load_json(const std::filesystem::path &filepath) {
     std::ifstream file(filepath);
@@ -304,8 +303,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Load logistic regression coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> logistic_coefficients;
     if (std::filesystem::exists(logistic_csv_path)) {
-        std::cout << "\nFound CSV file for logistic regression coefficients: " << logistic_csv_path.string()
-                  << std::endl;
+        std::cout << "\nFound CSV file for logistic regression coefficients: "
+                  << logistic_csv_path.string() << std::endl;
         logistic_coefficients = load_logistic_regression_coefficients_from_csv(logistic_csv_path);
         std::cout << "\nSuccessfully loaded logistic regression coefficients from CSV for "
                   << logistic_coefficients.size() << " risk factors";
@@ -1251,9 +1250,11 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 }
 
 // Function for the implementation of load_logistic_regression_coefficients_from_csv- Mahima
-//I can reuse the boxcox laoding function but for safety, I wrote another. We can change this later. 
+// I can reuse the boxcox laoding function but for safety, I wrote another. We can change this
+// later.
 std::unordered_map<std::string, hgps::LinearModelParams>
-hgps::input::load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug) {
+hgps::input::load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
+                                                            bool print_debug) {
     MEASURE_FUNCTION();
 
     // Map to store the result of logistic regression coefficient loading from CSV
@@ -1347,7 +1348,8 @@ hgps::input::load_logistic_regression_coefficients_from_csv(const std::filesyste
             if (!result.empty()) {
                 // Take the first risk factor as an example
                 auto first_rf = result.begin()->first;
-                std::cout << "\n\nSample logistic regression coefficient values for risk factor '" << first_rf << "':";
+                std::cout << "\n\nSample logistic regression coefficient values for risk factor '"
+                          << first_rf << "':";
                 std::cout << "\n  Intercept: " << result[first_rf].intercept;
 
                 // Print a few coefficients
@@ -1356,14 +1358,16 @@ hgps::input::load_logistic_regression_coefficients_from_csv(const std::filesyste
                 }
 
                 // Print total number of risk factors and coefficients loaded
-                std::cout << "\n\nTotal risk factors with logistic regression coefficients loaded: " << result.size();
+                std::cout << "\n\nTotal risk factors with logistic regression coefficients loaded: "
+                          << result.size();
                 std::cout << "\nAverage coefficients per risk factor: "
                           << (result.empty() ? 0 : result.begin()->second.coefficients.size());
                 std::cout << "\n";
             }
         }
     } catch (const std::exception &e) {
-        std::cout << "\nERROR: Failed to load logistic regression coefficients from CSV: " << e.what();
+        std::cout << "\nERROR: Failed to load logistic regression coefficients from CSV: "
+                  << e.what();
     }
 
     return result;
