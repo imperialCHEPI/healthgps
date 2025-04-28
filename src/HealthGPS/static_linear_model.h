@@ -46,6 +46,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     /// @param region_models The region models for each region
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @param physical_activity_models The physical activity models for each region
+    /// @param logistic_models The logistic models for each risk factor
     /// @throws HgpsException for invalid arguments
     StaticLinearModel(
         std::shared_ptr<RiskFactorSexAgeTable> expected,
@@ -74,7 +75,8 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
         const std::unordered_map<core::Income, LinearModelParams> &income_models,
         const std::unordered_map<core::Region, LinearModelParams> &region_models,
         double physical_activity_stddev,
-        const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models)
+        const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models,
+        const std::vector<LinearModelParams> &logistic_models)
         : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                     std::move(trend_steps)},
           expected_trend_boxcox_{std::move(expected_trend_boxcox)}, names_{names}, models_{models},
@@ -85,7 +87,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
           rural_prevalence_{rural_prevalence}, region_prevalence_{region_prevalence},
           ethnicity_prevalence_{ethnicity_prevalence}, income_models_{income_models},
           region_models_{region_models}, physical_activity_stddev_{physical_activity_stddev},
-          physical_activity_models_{physical_activity_models} {}
+          physical_activity_models_{physical_activity_models}, logistic_models_{logistic_models} {}
 
     RiskFactorModelType type() const noexcept override;
 
@@ -94,6 +96,9 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     void generate_risk_factors(RuntimeContext &context) override;
 
     void update_risk_factors(RuntimeContext &context) override;
+
+    // Calculate the probability of a risk factor being zero using logistic regression
+    double calculate_zero_probability(Person &person, size_t risk_factor_index) const;
 
   private:
     static double inverse_box_cox(double factor, double lambda);
@@ -164,6 +169,7 @@ class StaticLinearModel final : public RiskFactorAdjustableModel {
     const std::unordered_map<core::Region, LinearModelParams> &region_models_;
     const double physical_activity_stddev_;
     const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models_;
+    const std::vector<LinearModelParams> &logistic_models_;
 };
 
 /// @brief Defines the static linear model data type
@@ -194,6 +200,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     /// @param region_models The region models for each region
     /// @param phycical_activity_stddev The standard deviation of the physical activity
     /// @param physical_activity_models The physical activity models for each region
+    /// @param logistic_models The logistic models for each risk factor
     /// @throws HgpsException for invalid arguments
     StaticLinearModelDefinition(
         std::unique_ptr<RiskFactorSexAgeTable> expected,
@@ -221,7 +228,8 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
         std::unordered_map<core::Income, LinearModelParams> income_models,
         std::unordered_map<core::Region, LinearModelParams> region_models,
         double physical_activity_stddev,
-        const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models);
+        const std::unordered_map<core::Identifier, LinearModelParams> &physical_activity_models,
+        std::vector<LinearModelParams> logistic_models);
 
     /// @brief Construct a new StaticLinearModel from this definition
     /// @return A unique pointer to the new StaticLinearModel instance
@@ -290,6 +298,7 @@ class StaticLinearModelDefinition : public RiskFactorAdjustableModelDefinition {
     std::unordered_map<core::Region, LinearModelParams> region_models_;
     double physical_activity_stddev_;
     std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models_;
+    std::vector<LinearModelParams> logistic_models_;
 };
 
 } // namespace hgps

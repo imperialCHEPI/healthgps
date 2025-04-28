@@ -39,7 +39,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt);
 /// @param opt The parsed model definition JSON file
 /// @param config The model configuration
 /// @return An instance of the hgps::StaticLinearModelDefinition type
-std::unique_ptr<hgps::StaticLinearModelDefinition>
+std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config);
 
 /// @brief Loads the old energy balance model definition from a JSON file

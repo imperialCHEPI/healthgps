@@ -229,7 +229,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
                                                                            std::move(levels));
 }
 
-std::unique_ptr<hgps::StaticLinearModelDefinition>
+std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
     // std::cout << "\nStarting to load Static_model.json";
@@ -765,7 +765,53 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         std::move(policy_ranges), std::move(policy_cholesky), std::move(trend_models),
         std::move(trend_ranges), std::move(trend_lambda), info_speed, std::move(rural_prevalence),
         std::move(region_prevalence), std::move(ethnicity_prevalence), std::move(income_models),
-        std::move(region_models), physical_activity_stddev, physical_activity_models);
+        std::move(region_models), physical_activity_stddev, physical_activity_models,
+        [&]() -> std::vector<LinearModelParams> {
+            if (!logistic_coefficients.empty()) {
+                // Convert unordered_map to vector in the same order as names
+                std::vector<LinearModelParams> logistic_models_vec;
+                for (const auto& name : names) {
+                    // Convert name to lowercase for case-insensitive comparison
+                    std::string name_str = name.to_string();
+                    std::string name_lower = core::to_lower(name_str);
+                    
+                    // Look for either the original name or a case-insensitive match
+                    bool found = false;
+                    for (const auto& [key, model] : logistic_coefficients) {
+                        if (core::to_lower(key) == name_lower) {
+                            logistic_models_vec.push_back(model);
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        // If no logistic coefficients for this risk factor, use the boxcox coefficients
+                        std::cout << "\nWARNING: No logistic regression coefficients found for " << name.to_string()
+                                  << ", using boxcox coefficients";
+                        
+                        // Look for boxcox coefficients (also case-insensitive)
+                        bool boxcox_found = false;
+                        for (const auto& [key, model] : csv_coefficients) {
+                            if (core::to_lower(key) == name_lower) {
+                                logistic_models_vec.push_back(model);
+                                boxcox_found = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!boxcox_found) {
+                            // If no boxcox coefficients either, create empty model
+                            logistic_models_vec.push_back(LinearModelParams{});
+                        }
+                    }
+                }
+                return logistic_models_vec;
+            } else {
+                // If no logistic coefficients, return empty vector (StaticLinearModelDefinition will handle this)
+                return std::vector<LinearModelParams>{};
+            }
+        }());
 }
 
 // Added to handle region parsing since income was made quartile, and region was added
@@ -1147,7 +1193,7 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
 }
 
 // Function to load policy ranges from CSV- Mahima
-// could have reused the boxcox loading code but anyways did sepearte function for safety and maybe
+// could have reused the boxcox loading code but anyways did separate function for safety and maybe
 // future upgrades
 std::unordered_map<std::string, hgps::core::DoubleInterval>
 load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
