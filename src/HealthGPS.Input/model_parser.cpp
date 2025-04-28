@@ -973,6 +973,9 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path) {
             {"gender2", "Gender"}, // gender2 = Female (Male is reference category 0)
             {"age1", "Age"},
             {"age2", "Age2"},
+            {"region2", "Wales"},
+            {"region3", "Scotland"},
+            {"region4", "NorthernIreland"},
             {"ethnicity2", "Asian"},
             {"ethnicity3", "Black"},
             {"ethnicity4", "Others"},
