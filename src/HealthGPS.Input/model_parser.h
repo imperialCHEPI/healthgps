@@ -70,6 +70,26 @@ load_risk_model_definition(hgps::RiskFactorModelType model_type,
 /// @throw std::invalid_argument if file is missing
 nlohmann::json load_json(const std::filesystem::path &filepath);
 
+/// @brief Loads risk factor coefficients from a CSV file
+/// @param csv_path The path to the CSV file containing the coefficients
+/// @param print_debug Whether to print debug information
+/// @return A map from risk factor names to their linear model parameters
+std::unordered_map<std::string, hgps::LinearModelParams>
+load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug = true);
+
+/// @brief Loads policy ranges from a CSV file
+/// @param csv_path The path to the CSV file containing the policy ranges
+/// @return A map from risk factor names to their policy ranges
+std::unordered_map<std::string, hgps::core::DoubleInterval>
+load_policy_ranges_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads logistic regression coefficients from a CSV file
+/// @param csv_path The path to the CSV file containing the logistic regression coefficients
+/// @param print_debug Whether to print debug information
+/// @return A map from risk factor names to their linear model parameters
+std::unordered_map<std::string, hgps::LinearModelParams>
+load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug = true);
+
 /// @brief Registers a risk factor model definition with the repository
 /// @param repository The repository instance to register
 /// @param config The model configuration
