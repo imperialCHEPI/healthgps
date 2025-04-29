@@ -270,16 +270,16 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
 
         // Save risk factor
         person.risk_factors[names_[i]] = factor;
-        
+
         // Print sample risk factor values for verification
         /*static int factor_sample_counter = 0;
         if (++factor_sample_counter % 2000 == 0) {  // Even less frequent to avoid flooding
-            std::cout << "\nRISK FACTOR VALUE IN INITIALISE FACTORS: " << names_[i].to_string() 
-                      << " = " << factor 
-                      << " (Person ID: " << person.id() 
-                      << ", Age: " << person.age 
+            std::cout << "\nRISK FACTOR VALUE IN INITIALISE FACTORS: " << names_[i].to_string()
+                      << " = " << factor
+                      << " (Person ID: " << person.id()
+                      << ", Age: " << person.age
                       << ", Gender: " << (person.gender == core::Gender::male ? "M" : "F") << ")";
-        }*/ 
+        }*/
     }
 }
 
@@ -335,14 +335,15 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
 
         // Save risk factor
         person.risk_factors.at(names_[RiskFactorIndex]) = factor;
-        
+
         // Occasionally print sample risk factor values for verification
         /* static int factor_sample_counter = 0;
         if (++factor_sample_counter % 2000 == 0) {  // Even less frequent to avoid flooding
-            std::cout << "\nRISK FACTOR VALUE IN UPDATE FACTORS: " << names_[RiskFactorIndex].to_string() 
-                      << " = " << factor 
-                      << " (Person ID: " << person.id() 
-                      << ", Age: " << person.age 
+            std::cout << "\nRISK FACTOR VALUE IN UPDATE FACTORS: " <<
+        names_[RiskFactorIndex].to_string()
+                      << " = " << factor
+                      << " (Person ID: " << person.id()
+                      << ", Age: " << person.age
                       << ", Gender: " << (person.gender == core::Gender::male ? "M" : "F") << ")";
         }*/
     }
@@ -741,15 +742,15 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     if (ranges_.empty()) {
         throw core::HgpsException("Risk factor ranges list is empty");
     }
-    
+
     // Print the loaded ranges for verification
     std::cout << "\n======= LOADED RISK FACTOR RANGES =======";
     for (size_t i = 0; i < names_.size() && i < ranges_.size(); ++i) {
-        std::cout << "\nRisk factor: " << names_[i].to_string() 
-                  << ", Range: [" << ranges_[i].lower() << " , " << ranges_[i].upper() << "]";
+        std::cout << "\nRisk factor: " << names_[i].to_string() << ", Range: ["
+                  << ranges_[i].lower() << " , " << ranges_[i].upper() << "]";
     }
     std::cout << "\n=========================================\n";
-    
+
     if (lambda_.empty()) {
         throw core::HgpsException("Risk factor lambda list is empty");
     }
