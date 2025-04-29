@@ -87,9 +87,8 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path);
 /// @brief Loads region prevalence data from a CSV file
 /// @param csv_path The path to the CSV file containing region prevalence data
 /// @return A map structure with region prevalence data by age, gender, and region
-std::unordered_map<core::Identifier, 
-                  std::unordered_map<core::Gender, 
-                                    std::unordered_map<core::Region, double>>>
+std::unordered_map<core::Identifier,
+                   std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
 load_region_prevalence_from_csv(const std::filesystem::path &csv_path);
 
 /// @brief Loads logistic regression coefficients from a CSV file

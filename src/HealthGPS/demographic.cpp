@@ -6,13 +6,12 @@
 #include "static_linear_model.h"
 #include "sync_message.h"
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <mutex>
 #include <oneapi/tbb/parallel_for_each.h>
-#include <atomic>
-
 
 using namespace hgps;
 
@@ -236,7 +235,8 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 }
 
 // Population-level initialization functions
-//after assigning age and gender to everybody, assign region where region is deoendent on age and gender probabilities
+// after assigning age and gender to everybody, assign region where region is deoendent on age and
+// gender probabilities
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
     // Create an age-specific identifier in the format used in the CSV loading
@@ -247,7 +247,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         // Check if the gender exists for this age
         if (!region_prevalence_.at(age_id).contains(person.gender)) {
             std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age: "
-                    << age_id.to_string() << std::endl;
+                      << age_id.to_string() << std::endl;
             return;
         }
 
@@ -256,17 +256,17 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
 
         // Debug prints for verification (only for first few people)
         static std::atomic<int> sample_count{0};
-        //int current_count = sample_count.fetch_add(1);
-        
+        // int current_count = sample_count.fetch_add(1);
+
         // Use CDF for assignment
-        double rand_value = random.next_double(); //next_double is always between 0 and 1
+        double rand_value = random.next_double(); // next_double is always between 0 and 1
         double cumulative_prob = 0.0;
 
         for (const auto &[region, prob] : region_probs) {
             cumulative_prob += prob;
-            if (rand_value < cumulative_prob) { 
+            if (rand_value < cumulative_prob) {
                 person.region = region;
-                
+
                 // Print the first 5 region assignments for verification
                 /* if (current_count < 5) {
                     std::string region_name;
@@ -277,32 +277,33 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
                         case core::Region::NorthernIreland: region_name = "N.Ireland"; break;
                         default: region_name = "Unknown"; break;
                     }
-                    //std::cout << "\n==== REGION ASSIGNMENT #" << (current_count + 1) << " ====" << std::endl;
-                    std::cout << "\nAge: " << person.age << ", Gender: " 
+                    //std::cout << "\n==== REGION ASSIGNMENT #" << (current_count + 1) << " ====" <<
+                std::endl; std::cout << "\nAge: " << person.age << ", Gender: "
                               << (person.gender == core::Gender::male ? "male" : "female");
-                    std::cout << "Assigned: " << region_name 
+                    std::cout << "Assigned: " << region_name
                               << " (random value: " << rand_value
                               << ", cumulative prob: " << cumulative_prob << ")";
                 }*/
-                
+
                 return;
             }
         }
 
         // If we get here, there was a problem with the probability distribution
-        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a region for age " 
+        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a "
+                     "region for age "
                   << person.age << std::endl;
-        //person.region = core::Region::England; // Default fallback
-    } 
-    else {
+        // person.region = core::Region::England; // Default fallback
+    } else {
         // Fall back to age groups if specific age not found
         std::cout << "Failed to assign region using CSV so using JSON- NOOOOOOO!!!";
         core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
 
         // Check if the age_group exists in region_prevalence_
         if (!region_prevalence_.contains(age_group)) {
-            std::cout << "\nDEBUG: ERROR - Neither specific age nor age group found in region_prevalence_: "
-                    << person.age << std::endl;
+            std::cout << "\nDEBUG: ERROR - Neither specific age nor age group found in "
+                         "region_prevalence_: "
+                      << person.age << std::endl;
             // Assign a default region to prevent crash
             person.region = core::Region::England;
             return;
@@ -311,7 +312,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         // Check if the gender exists for this age_group
         if (!region_prevalence_.at(age_group).contains(person.gender)) {
             std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age group: "
-                    << age_group.to_string() << std::endl;
+                      << age_group.to_string() << std::endl;
             // Assign a default region to prevent crash
             person.region = core::Region::England;
             return;
@@ -332,8 +333,10 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
             }
         }
 
-        // If we reach here, no region was assigned - this indicates an error in probability distribution
-        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a region";
+        // If we reach here, no region was assigned - this indicates an error in probability
+        // distribution
+        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a "
+                     "region";
         person.region = core::Region::England; // Default fallback
     }
 }
