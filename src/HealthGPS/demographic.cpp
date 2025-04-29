@@ -11,6 +11,8 @@
 #include <iostream>
 #include <mutex>
 #include <oneapi/tbb/parallel_for_each.h>
+#include <atomic>
+
 
 using namespace hgps;
 
@@ -234,63 +236,106 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 }
 
 // Population-level initialization functions
+//after assigning age and gender to everybody, assign region where region is deoendent on age and gender probabilities
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
-    // std::cout << "\nDEBUG: Inside initialise_region";
+    // Create an age-specific identifier in the format used in the CSV loading
+    core::Identifier age_id("age_" + std::to_string(person.age));
 
-    // Determine the age group for this person
-    core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
-
-    // Check if the age_group exists in region_prevalence_
-    if (!region_prevalence_.contains(age_group)) {
-        std::cout << "\nDEBUG: ERROR - Age group not found in region_prevalence_ map: "
-                  << age_group.to_string() << std::endl;
-        // Assign a default region to prevent crash
-        person.region = core::Region::England;
-        return;
-    }
-
-    // Check if the gender exists for this age_group
-    if (!region_prevalence_.at(age_group).contains(person.gender)) {
-        std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age group: "
-                  << age_group.to_string() << std::endl;
-        // Assign a default region to prevent crash
-        person.region = core::Region::England;
-        return;
-    }
-
-    // Get region probabilities directly from the stored data
-    const auto &region_probs = region_prevalence_.at(age_group).at(person.gender);
-    double sum_probs = 0.0;
-    for (const auto &[region, prob] : region_probs) {
-
-        sum_probs += prob;
-    }
-
-    // Use CDF for assignment
-    double rand_value = random.next_double(); // next_double is always between 0,1
-    // std::cout << "\nDEBUG: Random value for region assignment: " << rand_value << std::endl;
-
-    double cumulative_prob = 0.0;
-
-    for (const auto &[region, prob] : region_probs) {
-        cumulative_prob += prob;
-        // std::cout << "\nDEBUG: Region: " << static_cast<int>(region) << ", Prob: " << prob  << ",
-        // Cumulative: " << cumulative_prob << ", Random: " << rand_value << std::endl;
-
-        if (rand_value < cumulative_prob) { // Changed from <= to < for correct CDF sampling
-            person.region = region;
+    // Check if this specific age exists in region_prevalence_ map
+    if (region_prevalence_.contains(age_id)) {
+        // Check if the gender exists for this age
+        if (!region_prevalence_.at(age_id).contains(person.gender)) {
+            std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age: "
+                    << age_id.to_string() << std::endl;
             return;
         }
+
+        // Get region probabilities directly from the stored data for this specific age
+        const auto &region_probs = region_prevalence_.at(age_id).at(person.gender);
+
+        // Debug prints for verification (only for first few people)
+        static std::atomic<int> sample_count{0};
+        //int current_count = sample_count.fetch_add(1);
+        
+        // Use CDF for assignment
+        double rand_value = random.next_double(); //next_double is always between 0 and 1
+        double cumulative_prob = 0.0;
+
+        for (const auto &[region, prob] : region_probs) {
+            cumulative_prob += prob;
+            if (rand_value < cumulative_prob) { 
+                person.region = region;
+                
+                // Print the first 5 region assignments for verification
+                /* if (current_count < 5) {
+                    std::string region_name;
+                    switch (person.region) {
+                        case core::Region::England: region_name = "England"; break;
+                        case core::Region::Wales: region_name = "Wales"; break;
+                        case core::Region::Scotland: region_name = "Scotland"; break;
+                        case core::Region::NorthernIreland: region_name = "N.Ireland"; break;
+                        default: region_name = "Unknown"; break;
+                    }
+                    //std::cout << "\n==== REGION ASSIGNMENT #" << (current_count + 1) << " ====" << std::endl;
+                    std::cout << "\nAge: " << person.age << ", Gender: " 
+                              << (person.gender == core::Gender::male ? "male" : "female");
+                    std::cout << "Assigned: " << region_name 
+                              << " (random value: " << rand_value
+                              << ", cumulative prob: " << cumulative_prob << ")";
+                }*/
+                
+                return;
+            }
+        }
+
+        // If we get here, there was a problem with the probability distribution
+        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a region for age " 
+                  << person.age << std::endl;
+        //person.region = core::Region::England; // Default fallback
+    } 
+    else {
+        // Fall back to age groups if specific age not found
+        std::cout << "Failed to assign region using CSV so using JSON- NOOOOOOO!!!";
+        core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
+
+        // Check if the age_group exists in region_prevalence_
+        if (!region_prevalence_.contains(age_group)) {
+            std::cout << "\nDEBUG: ERROR - Neither specific age nor age group found in region_prevalence_: "
+                    << person.age << std::endl;
+            // Assign a default region to prevent crash
+            person.region = core::Region::England;
+            return;
+        }
+
+        // Check if the gender exists for this age_group
+        if (!region_prevalence_.at(age_group).contains(person.gender)) {
+            std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age group: "
+                    << age_group.to_string() << std::endl;
+            // Assign a default region to prevent crash
+            person.region = core::Region::England;
+            return;
+        }
+
+        // Get region probabilities from age group data
+        const auto &region_probs = region_prevalence_.at(age_group).at(person.gender);
+
+        // Use CDF for assignment
+        double rand_value = random.next_double(); // next_double is always between 0,1
+        double cumulative_prob = 0.0;
+
+        for (const auto &[region, prob] : region_probs) {
+            cumulative_prob += prob;
+            if (rand_value < cumulative_prob) { // Using < for correct CDF sampling
+                person.region = region;
+                return;
+            }
+        }
+
+        // If we reach here, no region was assigned - this indicates an error in probability distribution
+        std::cout << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a region";
+        person.region = core::Region::England; // Default fallback
     }
-
-    std::cout
-        << "\nDEBUG: WARNING - Reached end of region assignment loop without assigning a region";
-
-    // If we reach here, no region was assigned - this indicates an error in probability
-    // distribution
-    throw core::HgpsException("Failed to assign region: cumulative probabilities do not sum to "
-                              "1.0 or are incorrectly distributed");
 }
 
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,

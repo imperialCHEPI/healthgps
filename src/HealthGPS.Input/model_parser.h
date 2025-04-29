@@ -84,6 +84,14 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path,
 std::unordered_map<std::string, hgps::core::DoubleInterval>
 load_policy_ranges_from_csv(const std::filesystem::path &csv_path);
 
+/// @brief Loads region prevalence data from a CSV file
+/// @param csv_path The path to the CSV file containing region prevalence data
+/// @return A map structure with region prevalence data by age, gender, and region
+std::unordered_map<core::Identifier, 
+                  std::unordered_map<core::Gender, 
+                                    std::unordered_map<core::Region, double>>>
+load_region_prevalence_from_csv(const std::filesystem::path &csv_path);
+
 /// @brief Loads logistic regression coefficients from a CSV file
 /// @param csv_path The path to the CSV file containing the logistic regression coefficients
 /// @param print_debug Whether to print debug information

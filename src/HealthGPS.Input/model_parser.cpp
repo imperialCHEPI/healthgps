@@ -255,16 +255,17 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // Basically they have to be in the same folder as the JSON files- so in case of FINCH it is
     // C://HealthGPS-examples/KevinHall_FINCH folder
     std::filesystem::path model_dir = config.root_path;
-    std::filesystem::path csv_path = model_dir / "boxcox_coefficients.csv";
-    std::filesystem::path policy_csv_path = model_dir / "scenario2_food_policyeffect_model.csv";
-    std::filesystem::path logistic_csv_path = model_dir / "logistic_regression.csv";
+    std::filesystem::path csv_path = model_dir / "boxcox_coefficients.csv"; //loading of boxcox for RF
+    std::filesystem::path policy_csv_path = model_dir / "scenario2_food_policyeffect_model.csv"; //loading of policy for RF
+    std::filesystem::path logistic_csv_path = model_dir / "logistic_regression.csv"; //loading of logistic regression for 2 stage- risk factor modelling
+    std::filesystem::path region_csv_path = model_dir / "region.csv"; //loading of region for demographic factors
 
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
     if (std::filesystem::exists(csv_path)) {
         std::cout << "\nFound CSV file for risk factor coefficients: " << csv_path.string()
                   << std::endl;
-        csv_coefficients = load_risk_factor_coefficients_from_csv(csv_path);
+        csv_coefficients = load_risk_factor_coefficients_from_csv(csv_path, false);
     }
 
     // Load policy coefficients from CSV if the file exists- Mahima
@@ -500,8 +501,24 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     std::unordered_map<core::Identifier,
                        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence;
-    if (opt.contains("RegionPrevalence")) {
-        // std::cout << "\nDEBUG: Found RegionPrevalence section in JSON" << std::endl;
+    
+    // First load region prevalence from CSV file if it exists
+    if (std::filesystem::exists(region_csv_path)) {
+        std::cout << "\nLoading region prevalence from CSV file: " << region_csv_path.string() << std::endl;
+        region_prevalence = load_region_prevalence_from_csv(region_csv_path);
+        
+        // Validate that we loaded some data
+        if (region_prevalence.empty()) {
+            std::cout << "\nWARNING: Failed to load region prevalence from CSV, falling back to JSON. NOOOOOO!!!" << std::endl;
+        } else {
+            std::cout << "\nSuccessfully loaded region prevalence from CSV with " 
+                      << region_prevalence.size() << " age entries" << std::endl;
+        }
+    }
+    
+    // If region prevalence is still empty (CSV didn't exist or failed to load), load from JSON
+    if (region_prevalence.empty() && opt.contains("RegionPrevalence")) {
+        std::cout << "\nLoading region prevalence from JSON configuration" << std::endl;
         for (const auto &age_group : opt["RegionPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
 
@@ -554,9 +571,10 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             // std::cout << "\nDEBUG: Sum of probabilities - Female: " << female_sum << ", Male: "
             // << male_sum << std::endl;
         }
-        // std::cout << "\nDEBUG: Finished loading RegionPrevalence" << std::endl;
-    } else {
-        std::cout << "\nDEBUG: WARNING - RegionPrevalence section not found in JSON" << std::endl;
+        std::cout << "\nLoaded region prevalence from JSON with "
+                  << region_prevalence.size() << " age groups" << std::endl;
+    } else if (region_prevalence.empty()) {
+        std::cout << "\nWARNING: No region prevalence data found in CSV or JSON" << std::endl;
     }
 
     // Ethnicity prevalence for age groups, gender and ethnicity.
@@ -1076,7 +1094,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
     std::cout << "\nFINISHED ALL THE LOADING REQUIRED CUTIEPIE :)\n";
 }
 
-// Function to load risk factor coefficients from a CSV file- Mahima
+// Function to load risk factor coefficients for boxcox from a CSV file- Mahima
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug) {
     MEASURE_FUNCTION();
@@ -1416,6 +1434,97 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
     } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to load logistic regression coefficients from CSV: "
                   << e.what();
+    }
+
+    return result;
+}
+
+//Function to load the region data using csv- Mahima
+std::unordered_map<core::Identifier, 
+                  std::unordered_map<core::Gender, 
+                                    std::unordered_map<core::Region, double>>>
+load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
+    MEASURE_FUNCTION();
+
+    // Map to store the result of region prevalence loading from CSV
+    std::unordered_map<core::Identifier, 
+                      std::unordered_map<core::Gender, 
+                                        std::unordered_map<core::Region, double>>> result;
+
+    // Check if the file exists in the same directory as the JSON input files
+    if (!std::filesystem::exists(csv_path)) {
+        std::cout << "\nWARNING: CSV file for region prevalence not found: "
+                  << csv_path.string() << std::endl;
+        return result;
+    }
+
+    try {
+        // Use rapidcsv to read the CSV file
+        rapidcsv::Document doc(csv_path.string());
+        
+        // Process each row in the CSV file
+        int sample_count = 0;
+        std::cout << "\n--- SAMPLE OF REGION DATA LOADED FROM CSV ---" << std::endl;
+        std::cout << "Age | Gender | England | Wales | Scotland | N.Ireland" << std::endl;
+        
+        for (size_t i = 0; i < doc.GetRowCount(); i++) {
+            // Get all values for this row
+            auto row = doc.GetRow<std::string>(i);
+            
+            // Expected columns: Age, Gender, England, Wales, Scotland, Northern Ireland
+            if (row.size() < 6) {
+                std::cout << "\nWARNING: Invalid row format in region prevalence CSV, skipping row: " 
+                          << i << std::endl;
+                continue;
+            }
+            
+            // Parse age
+            int age = std::stoi(row[0]);
+            // Create an age identifier in the format "age_X" (not starting with a number)
+            core::Identifier age_id("age_" + std::to_string(age));
+            
+            // Parse gender (0 = male, 1 = female) and map to correct values
+            core::Gender gender = (std::stoi(row[1]) == 0) ? core::Gender::male : core::Gender::female;
+            
+            // Parse region probabilities
+            double england_prob = std::stod(row[2]);
+            double wales_prob = std::stod(row[3]);
+            double scotland_prob = std::stod(row[4]);
+            double ni_prob = std::stod(row[5]);
+            
+            // Print a sample of the first few rows
+            if (sample_count < 5) {
+                std::cout << age << " | " 
+                          << (gender == core::Gender::male ? "male" : "female") << " | "
+                          << england_prob << " | " 
+                          << wales_prob << " | " 
+                          << scotland_prob << " | " 
+                          << ni_prob << std::endl;
+                sample_count++;
+            }
+            
+            // Store in result map with same structure as the existing JSON-loaded data
+            result[age_id][gender][core::Region::England] = england_prob;
+            result[age_id][gender][core::Region::Wales] = wales_prob;
+            result[age_id][gender][core::Region::Scotland] = scotland_prob;
+            result[age_id][gender][core::Region::NorthernIreland] = ni_prob;
+            
+            // Validate probabilities sum to approximately 1.0
+            double sum = england_prob + wales_prob + scotland_prob + ni_prob;
+            if (std::abs(sum - 1.0) > 0.001) {
+                std::cout << "\nWARNING: Region probabilities for age " << age 
+                          << ", gender " << (gender == core::Gender::male ? "male" : "female")
+                          << " sum to " << sum << " (should be 1.0)" << std::endl;
+            }
+        }
+        
+        std::cout << "\n--- END OF SAMPLE ---" << std::endl;
+        std::cout << "\nLoaded region prevalence data for " << result.size() 
+                  << " age groups from CSV file" << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cout << "\nERROR: Failed to process region prevalence CSV: " 
+                  << e.what() << std::endl;
     }
 
     return result;
