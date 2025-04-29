@@ -145,18 +145,33 @@ void StaticLinearModel::update_risk_factors(RuntimeContext &context) {
 }
 
 double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
-    // Handle lambda near zero as a special case (log transform)
+    // Handle extreme lambda values
     if (std::abs(lambda) < 1e-10) {
-        return std::exp(factor);
+        // For lambda near zero, use exponential
+        double result = std::exp(factor);
+        // Check for Inf
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for Inf
+        }
+        return result;
+    } else {
+        // For non-zero lambda
+        double base = lambda * factor + 1.0;
+        // Check if base is valid for power
+        if (base <= 0.0) {
+            return 0.0; // Return safe value for negative/zero base
+        }
+        
+        // Compute power and check result
+        double result = std::pow(base, 1.0 / lambda);
+        // Validate the result is finite
+        if (!std::isfinite(result)) {
+            return 0.0; // Return safe value for NaN/Inf
+        }
+        
+        // Ensure result is non-negative (though power should already guarantee this)
+        return std::max(0.0, result);
     }
-
-    // For regular Box-Cox transform, protect against non-positive values
-    double term = 1.0 + lambda * factor;
-    if (term <= 0) {
-        return 0.0; // Return zero for invalid inputs
-    }
-
-    return std::pow(term, 1.0 / lambda);
 }
 
 // Calculate the probability of a risk factor being zero using logistic regression- Mahima
@@ -172,9 +187,27 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
     for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
         logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
     }
+    
+    // Add residual from the person's residual for this risk factor
+    auto residual_name = core::Identifier{names_[risk_factor_index].to_string() + "_residual"};
+    if (person.risk_factors.find(residual_name) != person.risk_factors.end()) {
+        // Use the existing residual stored for this risk factor
+        double residual = person.risk_factors.at(residual_name);
+        logistic_linear_term += residual * stddev_[risk_factor_index];
+    }
 
     // logistic function: p = 1 / (1 + exp(-linear_term))
-    return 1.0 / (1.0 + std::exp(-logistic_linear_term));
+    double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
+    
+    // Only print if probability is outside the valid range [0,1] coz logistic regression should be only within 0 and 1
+    // This should never happen with a proper logistic function, but check for numerical issues
+    if (probability < 0.0 || probability > 1.0) {
+        std::cout << "\nWARNING: Invalid logistic probability for " 
+                 << names_[risk_factor_index].to_string() 
+                 << ": " << probability << " (should be between 0 and 1)";
+    }
+    
+    return probability;
 }
 
 void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &person,
@@ -240,20 +273,20 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
     auto linear = compute_linear_models(person, models_);
 
     // Update residuals and risk factors (should exist).
-    for (size_t i = 0; i < names_.size(); i++) {
+    for (size_t RiskFactorIndex = 0; RiskFactorIndex < names_.size(); RiskFactorIndex++) {
 
         // Update residual.
-        auto residual_name = core::Identifier{names_[i].to_string() + "_residual"};
+        auto residual_name = core::Identifier{names_[RiskFactorIndex].to_string() + "_residual"};
         double residual_old = person.risk_factors.at(residual_name);
-        double residual = residuals[i] * info_speed_;
+        double residual = residuals[RiskFactorIndex] * info_speed_;
         residual += sqrt(1.0 - info_speed_ * info_speed_) * residual_old;
 
         // Save residual.
         person.risk_factors.at(residual_name) = residual;
 
         // Update risk factor.
-        double expected =
-            get_expected(context, person.gender, person.age, names_[i], ranges_[i], false);
+        double expected = get_expected(context, person.gender, person.age, names_[RiskFactorIndex],
+                                       ranges_[RiskFactorIndex], false);
 
         // TWO-STAGE RISK FACTOR MODELING APPROACH- Mahima
         // =======================================================================
@@ -264,29 +297,24 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         // =======================================================================
 
         // STAGE 1: Determine if risk factor should be zero using logistic regression
-        double zero_probability = calculate_zero_probability(person, i);
+        double zero_probability = calculate_zero_probability(person, RiskFactorIndex);
 
         // Sample from this probability to determine if risk factor should be zero
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
         if (random_sample < zero_probability) {
             // Risk factor should be zero
-            person.risk_factors.at(names_[i]) = 0.0;
+            person.risk_factors.at(names_[RiskFactorIndex]) = 0.0;
             continue; // Skip to next risk factor
         }
 
         // STAGE 2: Calculate non-zero risk factor value using BoxCox transformation
         // Using the original model logic from before
-        double factor = linear[i] + residual * stddev_[i];
-        factor = expected * inverse_box_cox(factor, lambda_[i]);
-        factor = ranges_[i].clamp(factor);
-
-        // If the result is not finite (NaN or Inf), set to zero
-        /*if (!std::isfinite(factor)) {
-            factor = 0.0;
-        }*/
+        double factor = linear[RiskFactorIndex] + residual * stddev_[RiskFactorIndex];
+        factor = expected * inverse_box_cox(factor, lambda_[RiskFactorIndex]);
+        factor = ranges_[RiskFactorIndex].clamp(factor);
 
         // Save risk factor
-        person.risk_factors.at(names_[i]) = factor;
+        person.risk_factors.at(names_[RiskFactorIndex]) = factor;
     }
 }
 

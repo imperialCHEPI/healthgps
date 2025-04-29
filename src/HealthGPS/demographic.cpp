@@ -226,8 +226,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
             initialise_region(context, person, context.random());
             initialise_ethnicity(context, person, context.random());
             initialise_income_continuous(context, person, context.random());
-            const Population &population = context.population();
-            initialise_income_category(person, population);
+            initialise_income_category(person, context.population());
         }
     }
     // std::cout << "Finished assigning age, gender, region, ethnicity, income-continuous and

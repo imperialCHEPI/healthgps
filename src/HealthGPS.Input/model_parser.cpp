@@ -1301,7 +1301,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 // I can reuse the boxcox laoding function but for safety, I wrote another. We can change this
 // later.
 std::unordered_map<std::string, hgps::LinearModelParams>
-hgps::input::load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
+load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
                                                             bool print_debug) {
     MEASURE_FUNCTION();
 

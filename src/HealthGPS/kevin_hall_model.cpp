@@ -269,7 +269,19 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
             // NOTE: we only have the ages we requested here.
             double W_expected =
                 get_expected(context, W_mean_sex, W_mean_age, "Weight"_id, std::nullopt, true);
-            adjustments.at(W_mean_sex)[W_mean_age] = W_expected - W_mean;
+            double adjustment = W_expected - W_mean;
+            
+            // Ensure adjustment won't push weight outside of valid range
+            if (nutrient_ranges_.contains("Weight"_id)) {
+                // Calculate the max possible adjustment to keep values in range
+                double max_adjustment = nutrient_ranges_.at("Weight"_id).upper() - W_mean;
+                double min_adjustment = nutrient_ranges_.at("Weight"_id).lower() - W_mean;
+                
+                // Clamp the adjustment so it keeps weight in range
+                adjustment = std::clamp(adjustment, min_adjustment, max_adjustment);
+            }
+            
+            adjustments.at(W_mean_sex)[W_mean_age] = adjustment;
         }
     }
 
@@ -425,7 +437,14 @@ void KevinHallModel::initialise_kevin_hall_state(Person &person,
     // << person.id() << std::endl;
     //  Apply optional weight adjustment.
     if (adjustment.has_value()) {
-        person.risk_factors.at("Weight"_id) += adjustment.value();
+        double adjusted_weight = person.risk_factors.at("Weight"_id) + adjustment.value();
+        
+        // Clamp weight within valid range if it exists in nutrient_ranges_
+        if (nutrient_ranges_.contains("Weight"_id)) {
+            adjusted_weight = nutrient_ranges_.at("Weight"_id).clamp(adjusted_weight);
+        }
+        
+        person.risk_factors.at("Weight"_id) = adjusted_weight;
     }
 
     // Get already computed values.
@@ -548,6 +567,11 @@ void KevinHallModel::kevin_hall_run(Person &person) const {
 
     // Compute body weight.
     double BW = F + L + G + W + ECF;
+    
+    // Clamp weight within valid range if it exists in nutrient_ranges_
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+    }
 
     // Set new state.
     person.risk_factors.at("Glycogen"_id) = G;
@@ -589,7 +613,10 @@ double KevinHallModel::compute_EE(double BW, double F, double L, double EI, doub
 void KevinHallModel::compute_bmi(Person &person) const {
     auto w = person.risk_factors.at("Weight"_id);
     auto h = person.risk_factors.at("Height"_id) / 100;
-    person.risk_factors["BMI"_id] = w / (h * h);
+    
+    // Calculate BMI
+    double bmi = w / (h * h);
+    person.risk_factors["BMI"_id] = bmi;
 }
 
 void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) const {
@@ -612,7 +639,14 @@ void KevinHallModel::initialise_weight(RuntimeContext &context, Person &person) 
     double w_expected =
         get_expected(context, person.gender, person.age, "Weight"_id, std::nullopt, true);
     double w_quantile = get_weight_quantile(epa_quantile, person.gender);
-    person.risk_factors["Weight"_id] = w_expected * w_quantile;
+    double weight = w_expected * w_quantile;
+    
+    // Clamp weight within valid range if it exists in nutrient_ranges_
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        weight = nutrient_ranges_.at("Weight"_id).clamp(weight);
+    }
+    
+    person.risk_factors["Weight"_id] = weight;
 }
 
 void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
@@ -637,6 +671,12 @@ void KevinHallModel::adjust_weight(Person &person, double adjustment) const {
 
     // Adjust weight and compute adjustment ratio for other factors.
     double BW = BW_0 + adjustment;
+    
+    // Clamp weight within valid range if it exists in nutrient_ranges_
+    if (nutrient_ranges_.contains("Weight"_id)) {
+        BW = nutrient_ranges_.at("Weight"_id).clamp(BW);
+    }
+    
     double ratio = (BW - G - W) / (BW_0 - G - W);
 
     // Adjust other factors to compensate.
