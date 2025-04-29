@@ -161,14 +161,14 @@ double StaticLinearModel::inverse_box_cox(double factor, double lambda) {
         if (base <= 0.0) {
             return 0.0; // Return safe value for negative/zero base
         }
-        
+
         // Compute power and check result
         double result = std::pow(base, 1.0 / lambda);
         // Validate the result is finite
         if (!std::isfinite(result)) {
             return 0.0; // Return safe value for NaN/Inf
         }
-        
+
         // Ensure result is non-negative (though power should already guarantee this)
         return std::max(0.0, result);
     }
@@ -187,7 +187,7 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
     for (const auto &[coef_name, coef_value] : logistic_model.coefficients) {
         logistic_linear_term += coef_value * person.get_risk_factor_value(coef_name);
     }
-    
+
     // Add residual from the person's residual for this risk factor
     auto residual_name = core::Identifier{names_[risk_factor_index].to_string() + "_residual"};
     if (person.risk_factors.find(residual_name) != person.risk_factors.end()) {
@@ -198,15 +198,16 @@ double StaticLinearModel::calculate_zero_probability(Person &person,
 
     // logistic function: p = 1 / (1 + exp(-linear_term))
     double probability = 1.0 / (1.0 + std::exp(-logistic_linear_term));
-    
-    // Only print if probability is outside the valid range [0,1] coz logistic regression should be only within 0 and 1
-    // This should never happen with a proper logistic function, but check for numerical issues
+
+    // Only print if probability is outside the valid range [0,1] coz logistic regression should be
+    // only within 0 and 1 This should never happen with a proper logistic function, but check for
+    // numerical issues
     if (probability < 0.0 || probability > 1.0) {
-        std::cout << "\nWARNING: Invalid logistic probability for " 
-                 << names_[risk_factor_index].to_string() 
-                 << ": " << probability << " (should be between 0 and 1)";
+        std::cout << "\nWARNING: Invalid logistic probability for "
+                  << names_[risk_factor_index].to_string() << ": " << probability
+                  << " (should be between 0 and 1)";
     }
-    
+
     return probability;
 }
 

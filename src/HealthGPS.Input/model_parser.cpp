@@ -1302,7 +1302,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 // later.
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
-                                                            bool print_debug) {
+                                               bool print_debug) {
     MEASURE_FUNCTION();
 
     // Map to store the result of logistic regression coefficient loading from CSV
