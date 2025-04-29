@@ -41,7 +41,16 @@ KevinHallModel::KevinHallModel(
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_stddev_{height_stddev}, height_slope_{height_slope} {
+          
+    // Print nutrient ranges to verify they're loaded correctly
+    std::cout << "\n======= LOADED NUTRIENT RANGES =======";
+    for (const auto& [key, range] : nutrient_ranges_) {
+        std::cout << "\nNutrient/Measurement: " << key.to_string() 
+                  << ", Range: [" << range.lower() << " , " << range.upper() << "]";
+    }
+    std::cout << "\n=====================================\n";
+}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
