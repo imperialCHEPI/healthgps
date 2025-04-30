@@ -376,7 +376,8 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         }
     }
 
-    // If we reach here, no ethnicity was assigned - this indicates an error in probability distribution
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability
+    // distribution
     std::cout << "\nDEBUG: WARNING - Reached end of ethnicity assignment loop without assigning "
                  "ethnicity";
 
