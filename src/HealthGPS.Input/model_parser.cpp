@@ -653,7 +653,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Income models for income_continuous
     std::unordered_map<core::Income, LinearModelParams> income_models;
-    
+
     // First check if we have a CSV file for income model
     if (std::filesystem::exists(income_csv_path)) {
         std::cout << "\nLoading income model from CSV file: " << income_csv_path.string();
@@ -662,7 +662,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             std::cout << "\nSuccessfully loaded income model from CSV";
         }
     }
-    
+
     // Fall back to JSON if CSV loading failed or didn't exist
     if (income_models.empty() && opt.contains("IncomeModels")) {
         std::cout << "\nLoading income model from JSON (DEPRECATED)";
@@ -674,7 +674,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
             // Convert the string key to core::Income enum
-            // For now, we don't distinguish among the key types - we just need one model to work with
+            // For now, we don't distinguish among the key types - we just need one model to work
+            // with
             core::Income income_key = core::Income::unknown;
 
             // Insert income model with the converted enum key
@@ -1715,29 +1716,29 @@ std::unordered_map<core::Income, hgps::LinearModelParams>
 load_income_model_from_csv(const std::filesystem::path &csv_path) {
     std::unordered_map<core::Income, hgps::LinearModelParams> income_models;
     LinearModelParams model;
-    
+
     // Open and read CSV file
     std::ifstream file(csv_path);
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open income model CSV: " + csv_path.string());
     }
-    
+
     try {
         std::string line;
         // Skip header line if it exists (but we don't need to for this file)
         // std::getline(file, line);
-        
+
         // Process each line
         while (std::getline(file, line)) {
             // Skip empty lines
             if (line.empty()) {
                 continue;
             }
-            
+
             // Check for separator - try tab first, then comma if tab not found
             char separator = '\t';
             size_t sep_pos = line.find(separator);
-            
+
             // If tab not found, try comma
             if (sep_pos == std::string::npos) {
                 separator = ',';
@@ -1747,15 +1748,15 @@ load_income_model_from_csv(const std::filesystem::path &csv_path) {
                     continue;
                 }
             }
-            
+
             // Extract key and value
             std::string key = line.substr(0, sep_pos);
             std::string value_str = line.substr(sep_pos + 1);
-            
+
             // Remove any surrounding whitespace and quotes
             key = core::trim(key);
             value_str = core::trim(value_str);
-            
+
             // Remove quotes if present
             if (key.size() >= 2 && key.front() == '"' && key.back() == '"') {
                 key = key.substr(1, key.size() - 2);
@@ -1763,23 +1764,24 @@ load_income_model_from_csv(const std::filesystem::path &csv_path) {
             if (value_str.size() >= 2 && value_str.front() == '"' && value_str.back() == '"') {
                 value_str = value_str.substr(1, value_str.size() - 2);
             }
-            
+
             if (key.empty() || value_str.empty()) {
                 std::cout << "\nWarning: Empty key or value in line: " << line;
                 continue;
             }
-            
+
             // Convert value to double
             double value;
             try {
                 value = std::stod(value_str);
-            } catch (const std::exception& e) {
-                std::cout << "\nWarning: Cannot convert '" << value_str << "' to double: " << e.what();
+            } catch (const std::exception &e) {
+                std::cout << "\nWarning: Cannot convert '" << value_str
+                          << "' to double: " << e.what();
                 continue;
             }
-            
+
             std::cout << "\nLoaded " << key << " = " << value;
-            
+
             // Apply value based on parameter name
             if (key == "Intercept") {
                 model.intercept = value;
@@ -1790,62 +1792,58 @@ load_income_model_from_csv(const std::filesystem::path &csv_path) {
             } else {
                 // Map CSV parameter names to the expected names in the code
                 std::string mapped_key = key;
-                
-                // For gender: gender2 = female (Gender coefficient represents male=0, female=1 effect)
+
+                // For gender: gender2 = female (Gender coefficient represents male=0, female=1
+                // effect)
                 if (key == "gender2") {
                     mapped_key = "Gender";
                 }
                 // For age: age1 = linear term, age2 = quadratic term
                 else if (key == "age1") {
                     mapped_key = "Age";
-                }
-                else if (key == "age2") {
+                } else if (key == "age2") {
                     mapped_key = "Age2";
                 }
-                // For ethnicity: ethnicity1=White, ethnicity2=Asian, ethnicity3=Black, ethnicity4=Other
+                // For ethnicity: ethnicity1=White, ethnicity2=Asian, ethnicity3=Black,
+                // ethnicity4=Other
                 else if (key == "ethnicity2") {
                     mapped_key = "Asian";
-                }
-                else if (key == "ethnicity3") {
+                } else if (key == "ethnicity3") {
                     mapped_key = "Black";
-                }
-                else if (key == "ethnicity4") {
+                } else if (key == "ethnicity4") {
                     mapped_key = "Others";
                 }
                 // For region: region1=England, region2=Wales, region3=Scotland, region4=N.Ireland
                 else if (key == "region2") {
                     mapped_key = "Wales";
-                }
-                else if (key == "region3") {
+                } else if (key == "region3") {
                     mapped_key = "Scotland";
-                }
-                else if (key == "region4") {
+                } else if (key == "region4") {
                     mapped_key = "NorthernIreland";
                 }
-                
+
                 model.coefficients[mapped_key] = value;
             }
         }
-        
+
         // Add default 0 values for any missing coefficients
         std::vector<std::string> expected_coeffs = {"England", "White", "Mixed", "Sector"};
-        for (const auto& coef : expected_coeffs) {
+        for (const auto &coef : expected_coeffs) {
             if (model.coefficients.find(coef) == model.coefficients.end()) {
                 model.coefficients[coef] = 0.0;
             }
         }
-        
+
         // Add the continuous income model
         income_models[core::Income::unknown] = model;
-        
-        std::cout << "\nSuccessfully loaded income model with intercept " << model.intercept 
+
+        std::cout << "\nSuccessfully loaded income model with intercept " << model.intercept
                   << " and " << model.coefficients.size() << " coefficients";
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cout << "\nFailed to load income model CSV: " << e.what();
         throw;
     }
-    
+
     return income_models;
 }
 } // namespace hgps::input

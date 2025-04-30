@@ -46,8 +46,8 @@ KevinHallModel::KevinHallModel(
     // Print nutrient ranges to verify they're loaded correctly
     std::cout << "\n======= LOADED NUTRIENT RANGES IN KEVIN HALL =======";
     for (const auto &[key, range] : nutrient_ranges_) {
-        std::cout << "\nNutrient: " << key.to_string() << ", Range: [" << range.lower()
-                  << " , " << range.upper() << "]";
+        std::cout << "\nNutrient: " << key.to_string() << ", Range: [" << range.lower() << " , "
+                  << range.upper() << "]";
     }
     std::cout << "\n=====================================\n";
 }
