@@ -237,6 +237,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 // Population-level initialization functions
 // after assigning age and gender to everybody, assign region where region is deoendent on age and
 // gender probabilities
+// NOLINTEND(readability-function-cognitive-complexity)
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
     // Create an age-specific identifier in the format used in the CSV loading
@@ -337,6 +338,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
     }
 }
 
+// NOLINTEND(readability-function-cognitive-complexity)
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
                                              Person &person, Random &random) {
     // std::cout << "\nDEBUG: Inside initialise_ethnicity";
@@ -387,6 +389,7 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
                               "1.0 or are incorrectly distributed");
 }
 
+// NOLINTEND(readability-function-cognitive-complexity)
 void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeContext &context,
                                                      Person &person, Random &random) {
     // income_continuous is considered as household income and assigned to every person
@@ -402,8 +405,8 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
 
         // Directly apply coefficients based on person's attributes
         for (const auto &[factor_name, coefficient] : model.coefficients) {
-            // Skip the standard deviation entry as it's not a factor
-            if (factor_name == "IncomeContinuousStdDev")
+            // Skip special entries that aren't factors
+            if (factor_name == "IncomeContinuousStdDev" || factor_name == "min" || factor_name == "max")
                 continue;
 
             // Age effects
@@ -465,6 +468,15 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
         // Add random noise
         double noise = random.next_normal(0.0, income_stddev);
         double final_value = value * (1.0 + noise);
+        
+        // Apply min/max bounds if they exist in the model
+        if (model.coefficients.count("min") > 0) {
+            final_value = std::max(final_value, model.coefficients.at("min"));
+        }
+        
+        if (model.coefficients.count("max") > 0) {
+            final_value = std::min(final_value, model.coefficients.at("max"));
+        }
 
         // Set the income_continuous value
         person.income_continuous = final_value;
@@ -472,6 +484,7 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
     // std::cout << "\nDEBUG: Finished initialise_income_continuous";
 }
 
+// NOLINTEND(readability-function-cognitive-complexity)
 void DemographicModule::initialise_income_category(Person &person, const Population &population) {
     // Apply the income category based on the person's income_continuous value and current
     // thresholds

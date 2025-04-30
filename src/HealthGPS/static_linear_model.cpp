@@ -744,7 +744,7 @@ StaticLinearModelDefinition::StaticLinearModelDefinition(
     }
 
     // Print the loaded ranges for verification
-    std::cout << "\n======= LOADED RISK FACTOR RANGES =======";
+    std::cout << "\n======= LOADED RISK FACTOR RANGES IN STATIC LINEAR MODEL =======";
     for (size_t i = 0; i < names_.size() && i < ranges_.size(); ++i) {
         std::cout << "\nRisk factor: " << names_[i].to_string() << ", Range: ["
                   << ranges_[i].lower() << " , " << ranges_[i].upper() << "]";

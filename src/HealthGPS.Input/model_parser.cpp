@@ -97,6 +97,10 @@ std::unordered_map<std::string, hgps::LinearModelParams>
 load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
                                                bool print_debug);
 
+// Forward declaration of function to load income model from CSV
+std::unordered_map<core::Income, hgps::LinearModelParams>
+load_income_model_from_csv(const std::filesystem::path &csv_path);
+
 nlohmann::json load_json(const std::filesystem::path &filepath) {
     std::ifstream file(filepath);
     if (!file.is_open()) {
@@ -228,7 +232,7 @@ load_hlm_risk_model_definition(const nlohmann::json &opt) {
     return std::make_unique<hgps::StaticHierarchicalLinearModelDefinition>(std::move(models),
                                                                            std::move(levels));
 }
-
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -266,6 +270,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         model_dir / "region.csv"; // loading of region for demographic factors
     std::filesystem::path ethnicity_csv_path =
         model_dir / "ethnicity.csv"; // loading of ethnicity for demographic factors
+    std::filesystem::path income_csv_path =
+        model_dir / "income_model.csv"; // loading of income model parameters
 
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
@@ -505,6 +511,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // std::cout << "\nFinished loading Rural Prevelance";
 
     // Region prevalence for age groups, gender and region.
+    // NOLINTEND(readability-function-cognitive-complexity)
     std::unordered_map<core::Identifier,
                        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence;
@@ -646,19 +653,33 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Income models for income_continuous
     std::unordered_map<core::Income, LinearModelParams> income_models;
-    for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
-        // Get income model parameters
-        LinearModelParams model;
-        model.intercept = json_params["Intercept"].get<double>();
-        model.coefficients =
-            json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
+    
+    // First check if we have a CSV file for income model
+    if (std::filesystem::exists(income_csv_path)) {
+        std::cout << "\nLoading income model from CSV file: " << income_csv_path.string();
+        income_models = load_income_model_from_csv(income_csv_path);
+        if (!income_models.empty()) {
+            std::cout << "\nSuccessfully loaded income model from CSV";
+        }
+    }
+    
+    // Fall back to JSON if CSV loading failed or didn't exist
+    if (income_models.empty() && opt.contains("IncomeModels")) {
+        std::cout << "\nLoading income model from JSON (DEPRECATED)";
+        for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
+            // Get income model parameters
+            LinearModelParams model;
+            model.intercept = json_params["Intercept"].get<double>();
+            model.coefficients =
+                json_params["Coefficients"].get<std::unordered_map<core::Identifier, double>>();
 
-        // Convert the string key to core::Income enum
-        // For now, we don't distinguish among the key types - we just need one model to work with
-        core::Income income_key = core::Income::unknown;
+            // Convert the string key to core::Income enum
+            // For now, we don't distinguish among the key types - we just need one model to work with
+            core::Income income_key = core::Income::unknown;
 
-        // Insert income model with the converted enum key
-        income_models.emplace(income_key, std::move(model));
+            // Insert income model with the converted enum key
+            income_models.emplace(income_key, std::move(model));
+        }
     }
     // std::cout << "\nDEBUG: Finished processing IncomeModels";
 
@@ -801,6 +822,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // std::cout << "\nDEBUG: Finished processing PhysicalActivityStdDev";
 
     // std::cout << "\nDEBUG: About to create StaticLinearModelDefinition";
+    // NOLINTEND(readability-function-cognitive-complexity)
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
@@ -1057,6 +1079,7 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         std::move(height_stddev), std::move(height_slope));
 }
 
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::RiskFactorModelDefinition>
 load_risk_model_definition(hgps::RiskFactorModelType model_type,
                            const std::filesystem::path &model_path, const Configuration &config) {
@@ -1120,6 +1143,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 }
 
 // Function to load risk factor coefficients for boxcox from a CSV file- Mahima
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug) {
     MEASURE_FUNCTION();
@@ -1240,6 +1264,7 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
 // Function to load policy ranges from CSV- Mahima
 // could have reused the boxcox loading code but anyways did separate function for safety and maybe
 // future upgrades
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unordered_map<std::string, hgps::core::DoubleInterval>
 load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
     MEASURE_FUNCTION();
@@ -1343,6 +1368,7 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 // Function for the implementation of load_logistic_regression_coefficients_from_csv- Mahima
 // I can reuse the boxcox laoding function but for safety, I wrote another. We can change this
 // later.
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
                                                bool print_debug) {
@@ -1465,6 +1491,7 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
 }
 
 // Function to load the region data using csv- Mahima
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unordered_map<core::Identifier,
                    std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
 load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
@@ -1555,6 +1582,7 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
 // For code maintainability, I'm using different functions for each as region, ethnicity, income and
 // physical acivity are being used to assign demographics to people and not like risk factors where
 // we don't have particularly verify what each column is
+// NOLINTEND(readability-function-cognitive-complexity)
 std::unordered_map<core::Identifier,
                    std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
 load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
@@ -1679,5 +1707,145 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
     }
 
     return result;
+}
+
+// Function to load income model using csv- Mahima
+// NOLINTEND(readability-function-cognitive-complexity)
+std::unordered_map<core::Income, hgps::LinearModelParams>
+load_income_model_from_csv(const std::filesystem::path &csv_path) {
+    std::unordered_map<core::Income, hgps::LinearModelParams> income_models;
+    LinearModelParams model;
+    
+    // Open and read CSV file
+    std::ifstream file(csv_path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open income model CSV: " + csv_path.string());
+    }
+    
+    try {
+        std::string line;
+        // Skip header line if it exists (but we don't need to for this file)
+        // std::getline(file, line);
+        
+        // Process each line
+        while (std::getline(file, line)) {
+            // Skip empty lines
+            if (line.empty()) {
+                continue;
+            }
+            
+            // Check for separator - try tab first, then comma if tab not found
+            char separator = '\t';
+            size_t sep_pos = line.find(separator);
+            
+            // If tab not found, try comma
+            if (sep_pos == std::string::npos) {
+                separator = ',';
+                sep_pos = line.find(separator);
+                if (sep_pos == std::string::npos) {
+                    std::cout << "\nWarning: Neither tab nor comma found in line: " << line;
+                    continue;
+                }
+            }
+            
+            // Extract key and value
+            std::string key = line.substr(0, sep_pos);
+            std::string value_str = line.substr(sep_pos + 1);
+            
+            // Remove any surrounding whitespace and quotes
+            key = core::trim(key);
+            value_str = core::trim(value_str);
+            
+            // Remove quotes if present
+            if (key.size() >= 2 && key.front() == '"' && key.back() == '"') {
+                key = key.substr(1, key.size() - 2);
+            }
+            if (value_str.size() >= 2 && value_str.front() == '"' && value_str.back() == '"') {
+                value_str = value_str.substr(1, value_str.size() - 2);
+            }
+            
+            if (key.empty() || value_str.empty()) {
+                std::cout << "\nWarning: Empty key or value in line: " << line;
+                continue;
+            }
+            
+            // Convert value to double
+            double value;
+            try {
+                value = std::stod(value_str);
+            } catch (const std::exception& e) {
+                std::cout << "\nWarning: Cannot convert '" << value_str << "' to double: " << e.what();
+                continue;
+            }
+            
+            std::cout << "\nLoaded " << key << " = " << value;
+            
+            // Apply value based on parameter name
+            if (key == "Intercept") {
+                model.intercept = value;
+            } else if (key == "stddev") {
+                model.coefficients["IncomeContinuousStdDev"] = value;
+            } else if (key == "min" || key == "max") {
+                model.coefficients[key] = value;
+            } else {
+                // Map CSV parameter names to the expected names in the code
+                std::string mapped_key = key;
+                
+                // For gender: gender2 = female (Gender coefficient represents male=0, female=1 effect)
+                if (key == "gender2") {
+                    mapped_key = "Gender";
+                }
+                // For age: age1 = linear term, age2 = quadratic term
+                else if (key == "age1") {
+                    mapped_key = "Age";
+                }
+                else if (key == "age2") {
+                    mapped_key = "Age2";
+                }
+                // For ethnicity: ethnicity1=White, ethnicity2=Asian, ethnicity3=Black, ethnicity4=Other
+                else if (key == "ethnicity2") {
+                    mapped_key = "Asian";
+                }
+                else if (key == "ethnicity3") {
+                    mapped_key = "Black";
+                }
+                else if (key == "ethnicity4") {
+                    mapped_key = "Others";
+                }
+                // For region: region1=England, region2=Wales, region3=Scotland, region4=N.Ireland
+                else if (key == "region2") {
+                    mapped_key = "Wales";
+                }
+                else if (key == "region3") {
+                    mapped_key = "Scotland";
+                }
+                else if (key == "region4") {
+                    mapped_key = "NorthernIreland";
+                }
+                
+                model.coefficients[mapped_key] = value;
+            }
+        }
+        
+        // Add default 0 values for any missing coefficients
+        std::vector<std::string> expected_coeffs = {"England", "White", "Mixed", "Sector"};
+        for (const auto& coef : expected_coeffs) {
+            if (model.coefficients.find(coef) == model.coefficients.end()) {
+                model.coefficients[coef] = 0.0;
+            }
+        }
+        
+        // Add the continuous income model
+        income_models[core::Income::unknown] = model;
+        
+        std::cout << "\nSuccessfully loaded income model with intercept " << model.intercept 
+                  << " and " << model.coefficients.size() << " coefficients";
+    }
+    catch (const std::exception& e) {
+        std::cout << "\nFailed to load income model CSV: " << e.what();
+        throw;
+    }
+    
+    return income_models;
 }
 } // namespace hgps::input
