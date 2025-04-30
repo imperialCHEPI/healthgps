@@ -568,7 +568,7 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
         person.sector = core::Sector::urban;
     }
 }
-// Physical activity depends on age. gender, region, ethncity, income_continuous and random noise
+// Physical activity depends on age. gender, region, ethnicity, income_continuous and random noise
 // with std dev Loaded from the static_model.json under the Physical Activity Models section
 void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeContext &context,
                                                      Person &person, Random &random) const {

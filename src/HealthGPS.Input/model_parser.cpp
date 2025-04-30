@@ -264,6 +264,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                                // factor modelling
     std::filesystem::path region_csv_path =
         model_dir / "region.csv"; // loading of region for demographic factors
+    std::filesystem::path ethnicity_csv_path = model_dir / "ethnicity.csv"; // loading of ethnicity for demographic factors
 
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
@@ -590,6 +591,20 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         core::Identifier,
         std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
         ethnicity_prevalence;
+    // First load region prevalence from CSV file if it exists
+    if (std::filesystem::exists(ethnicity_csv_path)) {
+        std::cout << "\nLoading ethnicity prevalence from CSV file: " << ethnicity_csv_path.string();
+        ethnicity_prevalence = load_ethnicity_prevalence_from_csv(ethnicity_csv_path);
+
+        // Validate that we loaded some data
+        if (ethnicity_prevalence.empty()) {
+            std::cout << "\nWARNING: Failed to load ethnicity prevalence from CSV, falling back to "
+                         "JSON. NOOOOOO!!!";
+        } else {
+            std::cout << "\nSuccessfully loaded ethnicity prevalence from CSV with "
+                      << ethnicity_prevalence.size() << " age entries" << std::endl;
+        }
+    }
     if (opt.contains("EthnicityPrevalence")) {
         for (const auto &age_group : opt["EthnicityPrevalence"]) {
             auto age_group_name = age_group["Name"].get<core::Identifier>();
@@ -1529,6 +1544,123 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
                   << " age groups from CSV file" << std::endl;
     } catch (const std::exception &e) {
         std::cout << "\nERROR: Failed to process region prevalence CSV: " << e.what() << std::endl;
+    }
+
+    return result;
+}
+
+// Function to load the region data using csv- Mahima
+// For code maintainability, I'm using different functions for each as region, ethnicity, income and physical acivity are being used to assign demographics to people and not like risk factors where we don't have particularly verify what each column is
+std::unordered_map<core::Identifier,
+                   std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
+    MEASURE_FUNCTION();
+
+    // Map to store the result of ethnicity prevalence loading from CSV
+    std::unordered_map<core::Identifier,
+                       std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
+        result;
+
+    // Check if the file exists in the same directory as the JSON input files
+    if (!std::filesystem::exists(csv_path)) {
+        std::cout << "\nWARNING: CSV file for ethnicity prevalence not found: " << csv_path.string()
+                  << std::endl;
+        return result;
+    }
+
+    try {
+        // Use rapidcsv to read the CSV file
+        rapidcsv::Document doc(csv_path.string());
+
+        // Process each row in the CSV file
+        int sample_count = 0;
+        std::cout << "\n--- SAMPLE OF ETHNICITY DATA LOADED FROM CSV ---" << std::endl;
+        std::cout << "Adult | Gender | Ethnicity | England | Wales | N.Ireland | Scotland" << std::endl;
+
+        for (size_t i = 0; i < doc.GetRowCount(); i++) {
+            // Get all values for this row
+            auto row = doc.GetRow<std::string>(i);
+
+            // Expected columns: adult, gender, ethnicity, England, Wales, Northern Ireland, Scotland
+            if (row.size() < 7) {
+                std::cout
+                    << "\nWARNING: Invalid row format in ethnicity prevalence CSV, skipping row: " << i
+                    << std::endl;
+                continue;
+            }
+
+            // Parse adult/age group (0 = Under18, 1 = Over18)
+            int adult = std::stoi(row[0]);
+            // Create an age group identifier (Under18/Over18)
+            core::Identifier age_id = (adult == 0) ? "Under18"_id : "Over18"_id;
+
+            // Parse gender (0 = male, 1 = female) and map to correct values
+            core::Gender gender =
+                (std::stoi(row[1]) == 0) ? core::Gender::male : core::Gender::female;
+
+            // Parse ethnicity type (1 = White, 2 = Asian, 3 = Black, 4 = Other)
+            int ethnicity_code = std::stoi(row[2]);
+            core::Ethnicity ethnicity;
+            switch (ethnicity_code) {
+                case 1: ethnicity = core::Ethnicity::White; break;
+                case 2: ethnicity = core::Ethnicity::Asian; break;
+                case 3: ethnicity = core::Ethnicity::Black; break;
+                case 4: ethnicity = core::Ethnicity::Other; break;
+                default:
+                    std::cout << "\nWARNING: Unknown ethnicity code: " << ethnicity_code
+                              << ", skipping row " << i << std::endl;
+                    continue;
+            }
+
+            // Get England probability for this specific ethnicity
+            // (we only use England probabilities as specified)
+            double england_prob = std::stod(row[3]);
+            double wales_prob = std::stod(row[4]);
+            double ni_prob = std::stod(row[5]);
+            double scotland_prob = std::stod(row[6]);
+
+            // Print a sample of the first few rows
+            if (sample_count < 5) {
+                std::cout << adult << " | " << (gender == core::Gender::male ? "male" : "female")
+                          << " | " << ethnicity_code << " | " << england_prob << " | " << wales_prob
+                          << " | " << ni_prob << " | " << scotland_prob << std::endl;
+                sample_count++;
+            }
+
+            // Store in result map with same structure as the existing JSON-loaded data
+            // Each row in the CSV represents one ethnicity for a specific age group and gender
+            result[age_id][gender][ethnicity] = england_prob;
+        }
+
+        // Check and normalize probabilities for each age group and gender
+        for (auto &[age_id, gender_map] : result) {
+            for (auto &[gender, ethnicity_map] : gender_map) {
+                // Calculate the sum of all probabilities
+                double sum = 0.0;
+                for (const auto &[ethnicity, prob] : ethnicity_map) {
+                    sum += prob;
+                }
+                
+                // Normalize if sum is not close to 1.0
+                if (std::abs(sum - 1.0) > 0.001) {
+                    std::cout << "\nNormalizing ethnicity probabilities for " 
+                              << age_id.to_string() << ", gender "
+                              << (gender == core::Gender::male ? "male" : "female") 
+                              << " (sum was " << sum << ")" << std::endl;
+                    
+                    // Normalize each probability
+                    for (auto &[ethnicity, prob] : ethnicity_map) {
+                        prob /= sum;
+                    }
+                }
+            }
+        }
+
+        std::cout << "\n--- END OF SAMPLE ---" << std::endl;
+        std::cout << "\nLoaded ethnicity prevalence data for " << result.size()
+                  << " age groups from CSV file" << std::endl;
+    } catch (const std::exception &e) {
+        std::cout << "\nERROR: Failed to process ethnicity prevalence CSV: " << e.what() << std::endl;
     }
 
     return result;

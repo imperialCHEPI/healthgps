@@ -278,7 +278,7 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
                         default: region_name = "Unknown"; break;
                     }
                     //std::cout << "\n==== REGION ASSIGNMENT #" << (current_count + 1) << " ====" <<
-                std::endl; std::cout << "\nAge: " << person.age << ", Gender: "
+                std::cout << "\nAge: " << person.age << ", Gender: "
                               << (person.gender == core::Gender::male ? "male" : "female");
                     std::cout << "Assigned: " << region_name
                               << " (random value: " << rand_value
@@ -304,8 +304,6 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
             std::cout << "\nDEBUG: ERROR - Neither specific age nor age group found in "
                          "region_prevalence_: "
                       << person.age << std::endl;
-            // Assign a default region to prevent crash
-            person.region = core::Region::England;
             return;
         }
 
@@ -313,8 +311,6 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         if (!region_prevalence_.at(age_group).contains(person.gender)) {
             std::cout << "\nDEBUG: ERROR - Gender not found in region_prevalence_ for age group: "
                       << age_group.to_string() << std::endl;
-            // Assign a default region to prevent crash
-            person.region = core::Region::England;
             return;
         }
 
@@ -346,20 +342,20 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     // std::cout << "\nDEBUG: Inside initialise_ethnicity";
 
     // Determine the age group for this person
+    // In the loading I'm assigning 0-under18 and 1-over18
     core::Identifier age_group = person.age < 18 ? "Under18"_id : "Over18"_id;
 
     // Check if the age_group exists in ethnicity_prevalence_
     if (!ethnicity_prevalence_.contains(age_group)) {
         std::cout << "\nDEBUG: ERROR - Age group not found in ethnicity_prevalence_ map: "
                   << age_group.to_string();
+        return;
     }
 
     // Check if the gender exists for this age_group
     if (!ethnicity_prevalence_.at(age_group).contains(person.gender)) {
         std::cout << "\nDEBUG: ERROR - Gender not found in ethnicity_prevalence_ for age group: "
                   << age_group.to_string();
-        // Assign a default ethnicity to prevent crash
-        person.ethnicity = core::Ethnicity::White;
         return;
     }
 
@@ -367,7 +363,6 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     const auto &ethnicity_probs = ethnicity_prevalence_.at(age_group).at(person.gender);
 
     double rand_value = random.next_double(); // next_double is between 0,1
-
     double cumulative_prob = 0.0;
 
     for (const auto &[ethnicity, prob] : ethnicity_probs) {
@@ -381,6 +376,7 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
         }
     }
 
+    // If we reach here, no ethnicity was assigned - this indicates an error in probability distribution
     std::cout << "\nDEBUG: WARNING - Reached end of ethnicity assignment loop without assigning "
                  "ethnicity";
 
