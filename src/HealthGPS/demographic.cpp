@@ -237,7 +237,7 @@ void DemographicModule::initialise_population(RuntimeContext &context) {
 // Population-level initialization functions
 // after assigning age and gender to everybody, assign region where region is deoendent on age and
 // gender probabilities
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &context, Person &person,
                                           Random &random) {
     // Create an age-specific identifier in the format used in the CSV loading
@@ -337,8 +337,9 @@ void DemographicModule::initialise_region([[maybe_unused]] RuntimeContext &conte
         person.region = core::Region::England; // Default fallback
     }
 }
-
 // NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &context,
                                              Person &person, Random &random) {
     // std::cout << "\nDEBUG: Inside initialise_ethnicity";
@@ -388,8 +389,9 @@ void DemographicModule::initialise_ethnicity([[maybe_unused]] RuntimeContext &co
     throw core::HgpsException("Failed to assign ethnicity: cumulative probabilities do not sum to "
                               "1.0 or are incorrectly distributed");
 }
-
 // NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeContext &context,
                                                      Person &person, Random &random) {
     // income_continuous is considered as household income and assigned to every person
@@ -483,9 +485,9 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
         person.income_continuous = final_value;
     }
     // std::cout << "\nDEBUG: Finished initialise_income_continuous";
-}
+}// NOLINTEND(readability-function-cognitive-complexity)
 
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::initialise_income_category(Person &person, const Population &population) {
     // Apply the income category based on the person's income_continuous value and current
     // thresholds
@@ -533,6 +535,7 @@ void DemographicModule::initialise_income_category(Person &person, const Populat
     }
     // std::cout << "\nDEBUG: Finished initialise_income_category";
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 void DemographicModule::calculate_income_quartiles(const Population &population) {
     // Collect all valid income values

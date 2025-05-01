@@ -272,6 +272,8 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
         model_dir / "ethnicity.csv"; // loading of ethnicity for demographic factors
     std::filesystem::path income_csv_path =
         model_dir / "income_model.csv"; // loading of income model parameters
+    std::filesystem::path physical_activity_csv_path =
+        model_dir / "physicalactivity_model.csv"; // loading of physical activity model parameters
 
     // Load risk factor coefficients from CSV if the file exists
     std::unordered_map<std::string, hgps::LinearModelParams> csv_coefficients;
@@ -511,7 +513,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     // std::cout << "\nFinished loading Rural Prevelance";
 
     // Region prevalence for age groups, gender and region.
-    // NOLINTEND(readability-function-cognitive-complexity)
+    // NOLINTBEGIN(readability-function-cognitive-complexity)
     std::unordered_map<core::Identifier,
                        std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
         region_prevalence;
@@ -593,6 +595,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
     } else if (region_prevalence.empty()) {
         std::cout << "\nWARNING: No region prevalence data found in CSV or JSON" << std::endl;
     }
+    // NOLINTEND(readability-function-cognitive-complexity)
 
     // Ethnicity prevalence for age groups, gender and ethnicity.
     std::unordered_map<
@@ -665,7 +668,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Fall back to JSON if CSV loading failed or didn't exist
     if (income_models.empty() && opt.contains("IncomeModels")) {
-        std::cout << "\nLoading income model from JSON (DEPRECATED)";
+        std::cout << "\nLoading income model from JSON NOOOOOOO!!!!";
         for (const auto &[key, json_params] : opt["IncomeModels"].items()) {
             // Get income model parameters
             LinearModelParams model;
@@ -711,8 +714,40 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // Physical activity models
     std::unordered_map<core::Identifier, LinearModelParams> physical_activity_models;
-    if (opt.contains("PhysicalActivityModels")) {
-        // std::cout << "\nDEBUG: Found PhysicalActivityModels in JSON";
+    double physical_activity_stddev = 0.0;
+
+    // First try to load physical activity models from CSV
+    if (std::filesystem::exists(physical_activity_csv_path)) {
+        std::cout << "\nFound CSV file for physical activity model: " 
+                  << physical_activity_csv_path.string();
+        try {
+            physical_activity_models = load_physical_activity_model_from_csv(physical_activity_csv_path);
+            
+            // Extract the standard deviation from the model
+            if (!physical_activity_models.empty()) {
+                auto it = physical_activity_models.begin();
+                if (it->second.coefficients.count("stddev") > 0) {
+                    physical_activity_stddev = it->second.coefficients.at("stddev");
+                    std::cout << "\nLoaded physical activity standard deviation from CSV: " 
+                              << physical_activity_stddev;
+                } else {
+                    std::cout << "\nWARNING: No stddev coefficient found in model";
+                }
+                
+                // Also verify intercept was loaded correctly
+                std::cout << "\nVerified model intercept: " << it->second.intercept;
+            }
+        } catch (const std::exception &e) {
+            std::cout << "\nError loading physical activity model from CSV: " << e.what();
+            physical_activity_models.clear(); // Clear any partial data
+        }
+    } else {
+        std::cout << "\nNo physical activity model CSV file found, checking JSON...";
+    }
+
+    // Fall back to JSON if needed
+    if (physical_activity_models.empty() && opt.contains("PhysicalActivityModels")) {
+        std::cout << "\nLoading physical activity models from JSON NOOOOOO!!!!";
 
         // Validate the structure
         if (!opt["PhysicalActivityModels"].is_object()) {
@@ -724,9 +759,6 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
             // Process each model
             for (const auto &[key, json_params] : opt["PhysicalActivityModels"].items()) {
-                // std::cout << "\nDEBUG: Processing physical activity model key: " << key;
-
-                // Create a model for this physical activity type (e.g., "continuous")
                 LinearModelParams model;
 
                 // Get the intercept
@@ -734,15 +766,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     model.intercept = json_params["Intercept"].get<double>();
                     // std::cout << "\nDEBUG: Loaded intercept: " << model.intercept;
                 } else {
-                    std::cout << "\nDEBUG: WARNING - Missing Intercept for model " << key;
+                    std::cout << "\nWARNING - Missing Intercept for model " << key;
                     model.intercept = 0.0;
                 }
 
                 // Get the coefficients
                 if (json_params.contains("Coefficients")) {
-                    // std::cout << "\nDEBUG: Found Coefficients section";
-
-                    // Load the coefficients manually to debug
                     auto coeffs = std::unordered_map<core::Identifier, double>();
 
                     // Check if Coefficients is an object
@@ -755,12 +784,12 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                                 // std::cout << "\nDEBUG: Loaded coefficient " << coeff_key << " = "
                                 // << value;
                             } else {
-                                std::cout << "\nDEBUG: WARNING - Coefficient " << coeff_key
+                                std::cout << "\nWARNING - Coefficient " << coeff_key
                                           << " is not a number, skipping";
                             }
                         }
                     } else {
-                        std::cout << "\nDEBUG: ERROR - Coefficients is not an object, actual type: "
+                        std::cout << "\nERROR - Coefficients is not an object, actual type: "
                                   << json_params["Coefficients"].type_name();
                     }
 
@@ -768,62 +797,40 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                     // std::cout << "\nDEBUG: Loaded " << model.coefficients.size() <<
                     // coefficients";
                 } else {
-                    std::cout << "\nDEBUG: WARNING - No Coefficients section found for model "
-                              << key;
+                    std::cout << "\nWARNING - No Coefficients section found for model " << key;
                 }
 
                 // Handle StandardDeviation if present at this level
                 if (json_params.contains("StandardDeviation")) {
                     double pa_stddev = json_params["StandardDeviation"].get<double>();
                     model.coefficients[core::Identifier("StandardDeviation")] = pa_stddev;
-                    // std::cout << "\nDEBUG: Loaded StandardDeviation from model: " << pa_stddev;
+                    physical_activity_stddev = pa_stddev;
                 }
 
                 // Store the model
                 core::Identifier model_key(key);
-                // std::cout << "\nDEBUG: Storing model with key: '" << model_key.to_string() <<
-                // "'";
-
-                // Store the model in the map
                 physical_activity_models.emplace(model_key, model);
-                // std::cout << "\nDEBUG: Added model with key: " << model_key.to_string() << ",
-                // current map size: " << physical_activity_models.size();
             }
         }
-    } else {
-        std::cout << "\nDEBUG: No PhysicalActivityModels found in JSON";
+    } 
+    
+    // If neither CSV nor JSON had physical activity models
+    if (physical_activity_models.empty()) {
+        std::cout << "\nNo physical activity models found in CSV or JSON";
     }
-
-    // Verify the final map
-    // std::cout << "\nDEBUG: Finished processing PhysicalActivityModels, final count: " <<
-    // physical_activity_models.size();
-    /*
-    if (!physical_activity_models.empty()) {
-        for (const auto &pair : physical_activity_models) {
-            const auto &model = pair.second;
-            // std::cout << "\nDEBUG: Verified model key: " << pair.first.to_string() << ",
-            // coefficients: "
-            // << model.coefficients.size();
+    
+    // Fallback for standard deviation if not found in models
+    if (physical_activity_stddev == 0.0 && physical_activity_models.empty()) {
+        if (opt.contains("PhysicalActivityStdDev")) {
+            physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
+            std::cout << "\nUsing PhysicalActivityStdDev from JSON: " << physical_activity_stddev;
+        } else {
+            std::cout << "\nWARNING: No physical activity standard deviation found in models or JSON";
         }
     }
-    */
-
-    // Standard deviation of physical activity (now loaded directly from the model)
-    // std::cout << "\nDEBUG: Processing PhysicalActivityStdDev";
-    double physical_activity_stddev = 0.0;
-    if (opt.contains("PhysicalActivityModels") &&
-        opt["PhysicalActivityModels"].contains("continuous") &&
-        opt["PhysicalActivityModels"]["continuous"].contains("StandardDeviation")) {
-        physical_activity_stddev =
-            opt["PhysicalActivityModels"]["continuous"]["StandardDeviation"].get<double>();
-    } else if (opt.contains("PhysicalActivityStdDev")) {
-        // Fallback to old format if present
-        physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
-    }
-    // std::cout << "\nDEBUG: Finished processing PhysicalActivityStdDev";
 
     // std::cout << "\nDEBUG: About to create StaticLinearModelDefinition";
-    // NOLINTEND(readability-function-cognitive-complexity)
+    // NOLINTBEGIN(readability-function-cognitive-complexity)
     return std::make_unique<StaticLinearModelDefinition>(
         std::move(expected), std::move(expected_trend), std::move(trend_steps),
         std::move(expected_trend_boxcox), std::move(names), std::move(models), std::move(ranges),
@@ -881,6 +888,7 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
             }
         }());
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // Added to handle region parsing since income was made quartile, and region was added
 core::Region parse_region(const std::string &value) {
@@ -1144,7 +1152,7 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 }
 
 // Function to load risk factor coefficients for boxcox from a CSV file- Mahima
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bool print_debug) {
     MEASURE_FUNCTION();
@@ -1261,11 +1269,12 @@ load_risk_factor_coefficients_from_csv(const std::filesystem::path &csv_path, bo
 
     return result;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // Function to load policy ranges from CSV- Mahima
 // could have reused the boxcox loading code but anyways did separate function for safety and maybe
 // future upgrades
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<std::string, hgps::core::DoubleInterval>
 load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
     MEASURE_FUNCTION();
@@ -1365,11 +1374,12 @@ load_policy_ranges_from_csv(const std::filesystem::path &csv_path) {
 
     return result;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // Function for the implementation of load_logistic_regression_coefficients_from_csv- Mahima
 // I can reuse the boxcox laoding function but for safety, I wrote another. We can change this
 // later.
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<std::string, hgps::LinearModelParams>
 load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_path,
                                                bool print_debug) {
@@ -1490,9 +1500,10 @@ load_logistic_regression_coefficients_from_csv(const std::filesystem::path &csv_
 
     return result;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // Function to load the region data using csv- Mahima
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<core::Identifier,
                    std::unordered_map<core::Gender, std::unordered_map<core::Region, double>>>
 load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
@@ -1578,12 +1589,13 @@ load_region_prevalence_from_csv(const std::filesystem::path &csv_path) {
 
     return result;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // Function to load the region data using csv- Mahima
 // For code maintainability, I'm using different functions for each as region, ethnicity, income and
 // physical acivity are being used to assign demographics to people and not like risk factors where
 // we don't have particularly verify what each column is
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<core::Identifier,
                    std::unordered_map<core::Gender, std::unordered_map<core::Ethnicity, double>>>
 load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
@@ -1709,9 +1721,10 @@ load_ethnicity_prevalence_from_csv(const std::filesystem::path &csv_path) {
 
     return result;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
 
 // Function to load income model using csv- Mahima
-// NOLINTEND(readability-function-cognitive-complexity)
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 std::unordered_map<core::Income, hgps::LinearModelParams>
 load_income_model_from_csv(const std::filesystem::path &csv_path) {
     std::unordered_map<core::Income, hgps::LinearModelParams> income_models;
@@ -1821,6 +1834,10 @@ load_income_model_from_csv(const std::filesystem::path &csv_path) {
                 } else if (key == "region4") {
                     mapped_key = "NorthernIreland";
                 }
+                // Income continuous value with "income" and not "Income"
+                else if (key == "income") {
+                    mapped_key = "income";
+                }
 
                 model.coefficients[mapped_key] = value;
             }
@@ -1846,4 +1863,138 @@ load_income_model_from_csv(const std::filesystem::path &csv_path) {
 
     return income_models;
 }
+// NOLINTEND(readability-function-cognitive-complexity)
+
+// NOLINTBEGIN(readability-function-cognitive-complexity)
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_physical_activity_model_from_csv(const std::filesystem::path &csv_path) {
+    std::unordered_map<core::Identifier, hgps::LinearModelParams> physical_activity_models;
+    LinearModelParams model;
+
+    // Open and read CSV file
+    std::ifstream file(csv_path);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open physical activity model CSV: " + csv_path.string());
+    }
+
+    try {
+        std::string line;
+        // Skip header line if it exists (but we don't need to for this file)
+        // std::getline(file, line);
+
+        // Process each line
+        while (std::getline(file, line)) {
+            // Skip empty lines
+            if (line.empty()) {
+                continue;
+            }
+
+            // Check for separator - try tab first, then comma if tab not found
+            char separator = '\t';
+            size_t sep_pos = line.find(separator);
+
+            // If tab not found, try comma
+            if (sep_pos == std::string::npos) {
+                separator = ',';
+                sep_pos = line.find(separator);
+                if (sep_pos == std::string::npos) {
+                    std::cout << "\nWarning: Neither tab nor comma found in line: " << line;
+                    continue;
+                }
+            }
+
+            // Extract key and value
+            std::string key = line.substr(0, sep_pos);
+            std::string value_str = line.substr(sep_pos + 1);
+
+            // Remove any surrounding whitespace and quotes
+            key = core::trim(key);
+            value_str = core::trim(value_str);
+
+            // Remove quotes if present
+            if (key.size() >= 2 && key.front() == '"' && key.back() == '"') {
+                key = key.substr(1, key.size() - 2);
+            }
+            if (value_str.size() >= 2 && value_str.front() == '"' && value_str.back() == '"') {
+                value_str = value_str.substr(1, value_str.size() - 2);
+            }
+
+            if (key.empty() || value_str.empty()) {
+                std::cout << "\nWarning: Empty key or value in line: " << line;
+                continue;
+            }
+
+            // Convert value to double
+            double value;
+            try {
+                value = std::stod(value_str);
+            } catch (const std::exception &e) {
+                std::cout << "\nWarning: Cannot convert '" << value_str
+                          << "' to double: " << e.what();
+                continue;
+            }
+
+            std::cout << "\nLoaded " << key << " = " << value;
+
+            // Apply value based on parameter name
+            if (key == "Intercept") {
+                model.intercept = value;
+            } else if (key == "stddev") {
+                model.coefficients["stddev"] = value;
+            } else if (key == "min" || key == "max") {
+                model.coefficients[key] = value;
+            } else {
+                // Map CSV parameter names to the expected names in the code
+                std::string mapped_key = key;
+
+                // For gender: gender2 = female (Gender coefficient represents male=0, female=1
+                // effect)
+                if (key == "gender2") {
+                    mapped_key = "Gender";
+                }
+                // For age: age1 = linear term, age2 = quadratic term
+                else if (key == "age1") {
+                    mapped_key = "Age";
+                } else if (key == "age2") {
+                    mapped_key = "Age2";
+                }
+                // For ethnicity: ethnicity1=White, ethnicity2=Asian, ethnicity3=Black,
+                // ethnicity4=Other
+                else if (key == "ethnicity2") {
+                    mapped_key = "Asian";
+                } else if (key == "ethnicity3") {
+                    mapped_key = "Black";
+                } else if (key == "ethnicity4") {
+                    mapped_key = "Others";
+                }
+                // For region: region1=England, region2=Wales, region3=Scotland, region4=N.Ireland
+                else if (key == "region2") {
+                    mapped_key = "Wales";
+                } else if (key == "region3") {
+                    mapped_key = "Scotland";
+                } else if (key == "region4") {
+                    mapped_key = "NorthernIreland";
+                }
+                // Income continuous value with "income" and not "Income"
+                else if (key == "income") {
+                    mapped_key = "income";
+                }
+
+                model.coefficients[mapped_key] = value;
+            }
+        }
+
+        std::cout << "\nSuccessfully loaded physical activity model with intercept " << model.intercept
+                  << " and " << model.coefficients.size() << " coefficients";
+    } catch (const std::exception &e) {
+        std::cout << "\nFailed to load physical activity model CSV: " << e.what();
+        throw;
+    }
+
+    // Add the model to the map with "continuous" as the key
+    physical_activity_models[core::Identifier("continuous")] = model;
+
+    return physical_activity_models;
+}
+// NOLINTEND(readability-function-cognitive-complexity)
 } // namespace hgps::input

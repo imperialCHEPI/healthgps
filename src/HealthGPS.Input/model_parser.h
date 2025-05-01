@@ -117,4 +117,18 @@ void register_risk_factor_model_definitions(hgps::CachedRepository &repository,
 /// @return The parsed region
 core::Region parse_region(const std::string &value);
 
+/// @brief Loads income model data from a CSV file
+/// @param csv_path The path to the CSV file containing income model data
+/// @param csv_path The path to the CSV file containing income model data
+/// @return A map structure with income data by age, gender, region and ethnicity
+std::unordered_map<core::Income, hgps::LinearModelParams>
+load_income_model_from_csv(const std::filesystem::path &csv_path);
+
+/// @brief Loads physical activity model data from a CSV file
+/// @param csv_path The path to the CSV file containing physical activity model data
+/// @param csv_path The path to the CSV file containing physical activity model data
+/// @return A map structure with physical activity data by age, gender, region, ethnicity and income_continous
+std::unordered_map<core::Identifier, hgps::LinearModelParams>
+load_physical_activity_model_from_csv(const std::filesystem::path &csv_path);
+
 } // namespace hgps::input

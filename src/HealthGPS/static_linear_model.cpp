@@ -493,7 +493,7 @@ StaticLinearModel::compute_linear_models(Person &person,
 
         for (const auto &[coefficient_name, coefficient_value] : model.coefficients) {
             // Skip the standard deviation entry as it's not a factor
-            if (coefficient_name == "StandardDeviation"_id)
+            if (coefficient_name == "stddev"_id)
                 continue;
 
             double value = person.get_risk_factor_value(coefficient_name);
@@ -607,54 +607,54 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
         // Process coefficients
         for (const auto &[factor_name, coefficient] : model.coefficients) {
             // Skip the standard deviation entry as it's not a factor
-            if (factor_name == "StandardDeviation"_id)
+            if (factor_name == "stddev"_id)
                 continue;
 
             // Apply coefficient based on its name
             double factor_value = 0.0;
 
             // Age effects
-            if (factor_name == "Age"_id) {
+            if (factor_name == "age"_id) {
                 factor_value = static_cast<double>(person.age);
-            } else if (factor_name == "Age2"_id) {
+            } else if (factor_name == "age2"_id) {
                 factor_value = std::pow(person.age, 2);
-            } else if (factor_name == "Age3"_id) {
+            } else if (factor_name == "age3"_id) {
                 factor_value = std::pow(person.age, 3);
             }
             // Gender effect
-            else if (factor_name == "Gender"_id) {
+            else if (factor_name == "gender"_id) {
                 factor_value = person.gender_to_value();
             }
             // Sector effect
-            else if (factor_name == "Sector"_id) {
+            else if (factor_name == "sector"_id) {
                 factor_value = person.sector_to_value();
             }
             // Region effects
-            else if (factor_name == "England"_id && person.region == core::Region::England) {
+            else if (factor_name == "england"_id && person.region == core::Region::England) {
                 factor_value = 1.0;
-            } else if (factor_name == "Wales"_id && person.region == core::Region::Wales) {
+            } else if (factor_name == "wales"_id && person.region == core::Region::Wales) {
                 factor_value = 1.0;
-            } else if (factor_name == "Scotland"_id && person.region == core::Region::Scotland) {
+            } else if (factor_name == "scotland"_id && person.region == core::Region::Scotland) {
                 factor_value = 1.0;
-            } else if (factor_name == "NorthernIreland"_id &&
+            } else if (factor_name == "northernireland"_id &&
                        person.region == core::Region::NorthernIreland) {
                 factor_value = 1.0;
             }
             // Ethnicity effects
-            else if (factor_name == "White"_id && person.ethnicity == core::Ethnicity::White) {
+            else if (factor_name == "white"_id && person.ethnicity == core::Ethnicity::White) {
                 factor_value = 1.0;
-            } else if (factor_name == "Black"_id && person.ethnicity == core::Ethnicity::Black) {
+            } else if (factor_name == "black"_id && person.ethnicity == core::Ethnicity::Black) {
                 factor_value = 1.0;
-            } else if (factor_name == "Asian"_id && person.ethnicity == core::Ethnicity::Asian) {
+            } else if (factor_name == "asian"_id && person.ethnicity == core::Ethnicity::Asian) {
                 factor_value = 1.0;
-            } else if (factor_name == "Mixed"_id && person.ethnicity == core::Ethnicity::Mixed) {
+            } else if (factor_name == "mixed"_id && person.ethnicity == core::Ethnicity::Mixed) {
                 factor_value = 1.0;
-            } else if ((factor_name == "Others"_id || factor_name == "Other"_id) &&
+            } else if ((factor_name == "others"_id || factor_name == "other"_id) &&
                        person.ethnicity == core::Ethnicity::Other) {
                 factor_value = 1.0;
             }
             // Income continuous value
-            else if (factor_name == "Income"_id) {
+            else if (factor_name == "income"_id) {
                 factor_value = person.income_continuous;
             }
             // If we already have this factor, use its value
@@ -667,9 +667,9 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
         }
 
         // Get the standard deviation
-        double pa_stddev = physical_activity_stddev_; // Default
-        if (model.coefficients.count("StandardDeviation"_id) > 0) {
-            pa_stddev = model.coefficients.at("StandardDeviation"_id);
+        double pa_stddev = physical_activity_stddev_;
+        if (model.coefficients.count("stddev"_id) > 0) {
+            pa_stddev = model.coefficients.at("stddev"_id);
         }
 
         // Add random noise using the standard deviation
