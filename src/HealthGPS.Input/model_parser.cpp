@@ -718,22 +718,23 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
 
     // First try to load physical activity models from CSV
     if (std::filesystem::exists(physical_activity_csv_path)) {
-        std::cout << "\nFound CSV file for physical activity model: " 
+        std::cout << "\nFound CSV file for physical activity model: "
                   << physical_activity_csv_path.string();
         try {
-            physical_activity_models = load_physical_activity_model_from_csv(physical_activity_csv_path);
-            
+            physical_activity_models =
+                load_physical_activity_model_from_csv(physical_activity_csv_path);
+
             // Extract the standard deviation from the model
             if (!physical_activity_models.empty()) {
                 auto it = physical_activity_models.begin();
                 if (it->second.coefficients.count("stddev") > 0) {
                     physical_activity_stddev = it->second.coefficients.at("stddev");
-                    std::cout << "\nLoaded physical activity standard deviation from CSV: " 
+                    std::cout << "\nLoaded physical activity standard deviation from CSV: "
                               << physical_activity_stddev;
                 } else {
                     std::cout << "\nWARNING: No stddev coefficient found in model";
                 }
-                
+
                 // Also verify intercept was loaded correctly
                 std::cout << "\nVerified model intercept: " << it->second.intercept;
             }
@@ -812,20 +813,21 @@ load_staticlinear_risk_model_definition(const nlohmann::json &opt, const Configu
                 physical_activity_models.emplace(model_key, model);
             }
         }
-    } 
-    
+    }
+
     // If neither CSV nor JSON had physical activity models
     if (physical_activity_models.empty()) {
         std::cout << "\nNo physical activity models found in CSV or JSON";
     }
-    
+
     // Fallback for standard deviation if not found in models
     if (physical_activity_stddev == 0.0 && physical_activity_models.empty()) {
         if (opt.contains("PhysicalActivityStdDev")) {
             physical_activity_stddev = opt["PhysicalActivityStdDev"].get<double>();
             std::cout << "\nUsing PhysicalActivityStdDev from JSON: " << physical_activity_stddev;
         } else {
-            std::cout << "\nWARNING: No physical activity standard deviation found in models or JSON";
+            std::cout
+                << "\nWARNING: No physical activity standard deviation found in models or JSON";
         }
     }
 
@@ -1874,7 +1876,8 @@ load_physical_activity_model_from_csv(const std::filesystem::path &csv_path) {
     // Open and read CSV file
     std::ifstream file(csv_path);
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open physical activity model CSV: " + csv_path.string());
+        throw std::runtime_error("Failed to open physical activity model CSV: " +
+                                 csv_path.string());
     }
 
     try {
@@ -1984,8 +1987,8 @@ load_physical_activity_model_from_csv(const std::filesystem::path &csv_path) {
             }
         }
 
-        std::cout << "\nSuccessfully loaded physical activity model with intercept " << model.intercept
-                  << " and " << model.coefficients.size() << " coefficients";
+        std::cout << "\nSuccessfully loaded physical activity model with intercept "
+                  << model.intercept << " and " << model.coefficients.size() << " coefficients";
     } catch (const std::exception &e) {
         std::cout << "\nFailed to load physical activity model CSV: " << e.what();
         throw;

@@ -127,7 +127,8 @@ load_income_model_from_csv(const std::filesystem::path &csv_path);
 /// @brief Loads physical activity model data from a CSV file
 /// @param csv_path The path to the CSV file containing physical activity model data
 /// @param csv_path The path to the CSV file containing physical activity model data
-/// @return A map structure with physical activity data by age, gender, region, ethnicity and income_continous
+/// @return A map structure with physical activity data by age, gender, region, ethnicity and
+/// income_continous
 std::unordered_map<core::Identifier, hgps::LinearModelParams>
 load_physical_activity_model_from_csv(const std::filesystem::path &csv_path);
 

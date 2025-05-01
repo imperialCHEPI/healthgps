@@ -485,7 +485,7 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
         person.income_continuous = final_value;
     }
     // std::cout << "\nDEBUG: Finished initialise_income_continuous";
-}// NOLINTEND(readability-function-cognitive-complexity)
+} // NOLINTEND(readability-function-cognitive-complexity)
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 void DemographicModule::initialise_income_category(Person &person, const Population &population) {
