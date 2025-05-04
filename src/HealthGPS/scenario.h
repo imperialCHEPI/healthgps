@@ -38,7 +38,7 @@ class Scenario {
 
     /// @brief Gets the scenario type name
     /// @return Scenario type name
-    virtual const std::string &name() const noexcept = 0;
+    virtual std::string name() = 0;
 
     /// @brief Gets the Scenario communication channel
     /// @return The communication channel

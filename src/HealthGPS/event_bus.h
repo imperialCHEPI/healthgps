@@ -16,9 +16,9 @@ class DefaultEventBus final : public EventAggregator {
     subscribe(EventType event_id,
               std::function<void(std::shared_ptr<EventMessage> message)> function) override;
 
-    void publish(std::unique_ptr<EventMessage> message) const override;
+    void publish(std::unique_ptr<EventMessage> message) override;
 
-    void publish_async(std::unique_ptr<EventMessage> message) const override;
+    void publish_async(std::unique_ptr<EventMessage> message) override;
 
     bool unsubscribe(const EventSubscriber &subscriber) override;
 

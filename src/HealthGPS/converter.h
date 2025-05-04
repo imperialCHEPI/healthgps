@@ -10,6 +10,7 @@
 
 #include "HealthGPS.Core/datastore.h"
 #include "HealthGPS.Core/poco.h"
+#include "interfaces.h"
 
 namespace hgps {
 /// @brief Internal details namespace for private data types and functions
@@ -50,6 +51,12 @@ class StoreConverter {
     static DiseaseParameter to_disease_parameter(const core::CancerParameterEntity &entity);
 
     static LmsDefinition to_lms_definition(const std::vector<core::LmsDataRow> &dataset);
+
+    /// @brief Converts population items to a map of population records
+    /// @param items The population items to convert
+    /// @return The population records map
+    static std::map<int, std::map<int, PopulationRecord>>
+    to_population_records(const std::vector<core::PopulationItem> &items);
 };
 
 /// @brief Creates the relative risk definition for a disease

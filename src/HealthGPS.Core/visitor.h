@@ -35,4 +35,5 @@ class DataTableColumnVisitor {
     /// @param column The column instance
     virtual void visit(const IntegerDataTableColumn &column) = 0;
 };
+
 } // namespace hgps::core

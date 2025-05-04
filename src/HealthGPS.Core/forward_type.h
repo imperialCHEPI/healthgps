@@ -62,7 +62,14 @@ enum class Income : uint8_t {
     uppermiddle,
 
     /// @brief High income
-    high
+    high,
+
+    /// @brief Continuous income value
+    /// @note This is a placeholder for continuous income values
+    /// @note This is not used in the current implementation
+    /// @note This is used in the static model to generate income values
+    /// @note JUST A HACK TO GET THE MODEL TO RUN
+    Continuous
 };
 
 /// @brief Enumerates region categories
@@ -81,6 +88,24 @@ enum class Region : uint8_t {
 
     /// @brief Northern Ireland
     NorthernIreland
+};
+
+/// @brief Enumerates ethnicity categories
+enum class Ethnicity : uint8_t {
+    /// @brief Unknown ethnicity
+    unknown,
+
+    /// @brief White ethnicity
+    White,
+
+    /// @brief Asian ethnicity
+    Asian,
+
+    /// @brief Black ethnicity
+    Black,
+
+    /// @brief Other ethnicities
+    Others
 };
 
 /// @brief C++20 concept for numeric columns types
@@ -102,11 +127,12 @@ struct LookupGenderValue {
 class DataTable;
 class DataTableColumn;
 
+class DataTableColumnVisitor;
+
+// Forward declarations for specialized column types
 class StringDataTableColumn;
 class FloatDataTableColumn;
 class DoubleDataTableColumn;
 class IntegerDataTableColumn;
-
-class DataTableColumnVisitor;
 
 } // namespace hgps::core

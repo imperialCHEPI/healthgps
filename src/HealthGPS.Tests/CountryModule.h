@@ -1,6 +1,7 @@
 #pragma once
 #include "HealthGPS.Input/api.h"
 #include "HealthGPS/api.h"
+#include "HealthGPS/population.h"
 
 #include <iostream>
 #include <memory>
@@ -15,11 +16,17 @@ class CountryModule : public hgps::SimulationModule {
         return hgps::SimulationModuleType::Analysis;
     };
 
-    const std::string &name() const noexcept override { return name_; }
+    std::string name() const noexcept override { return name_; }
 
-    void initialise_population(hgps::RuntimeContext &) override {
+    void initialise_population([[maybe_unused]] hgps::RuntimeContext &context,
+                               [[maybe_unused]] hgps::Population &population,
+                               [[maybe_unused]] hgps::Random &random) override {
         std::cout << "There are: " << countries_.size() << " countries, current: " << current_.name
                   << std::endl;
+    }
+
+    void update_population([[maybe_unused]] hgps::RuntimeContext &context) override {
+        // No-op for test module
     }
 
     void execute(std::string command) {
