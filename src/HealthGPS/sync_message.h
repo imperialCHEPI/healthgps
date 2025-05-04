@@ -49,6 +49,13 @@ template <typename PayloadType> class SyncDataMessage final : public SyncMessage
     explicit SyncDataMessage(const int run, const int time, PayloadType &&data)
         : SyncMessage(run, time), data_{std::move(data)} {}
 
+    /// @brief Creates a copy of a SyncDataMessage using a deep copy of the data
+    /// @param run Simulation run number
+    /// @param time Simulation time
+    /// @param data The payload data instance to copy
+    explicit SyncDataMessage(const int run, const int time, const PayloadType &data)
+        : SyncMessage(run, time), data_{data} {} // Makes a copy
+
     /// @brief Gets the message payload data
     /// @return The payload data
     const PayloadType &data() const noexcept { return data_; }

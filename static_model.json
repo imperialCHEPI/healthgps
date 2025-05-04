@@ -1,0 +1,1903 @@
+{
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v2/config/models/staticlinear.json",
+    "ModelName": "StaticLinear",
+    "InformationSpeed": 0.1,
+    "PhysicalActivityStdDev": 0.27510807,
+    "RuralPrevalence": [
+        {
+            "Name": "Under18",
+            "Female": 0.0,
+            "Male": 0.0
+        },
+        {
+            "Name": "Over18",
+            "Female": 0.0,
+            "Male": 0.0
+        }
+    ],
+    "RegionPrevalence": [
+        {
+            "Name": "Under18",
+            "Female": {
+                "England": 1.0,
+                "Wales": 0.0,
+                "Scotland": 0.0,
+                "NorthernIreland": 0.0
+            },
+            "Male": {
+                "England": 1.0,
+                "Wales": 0.0,
+                "Scotland": 0.0,
+                "NorthernIreland": 0.0
+            }
+        },
+        {
+            "Name": "Over18",
+            "Female": {
+                "England": 1.0,
+                "Wales": 0.0,
+                "Scotland": 0.0,
+                "NorthernIreland": 0.0
+            },
+            "Male": {
+                "England": 1.0,
+                "Wales": 0.0,
+                "Scotland": 0.0,
+                "NorthernIreland": 0.0
+            }
+        }
+    ],
+    "EthnicityPrevalence": [
+        {
+            "Name": "Under18",
+            "Female": {
+                "White": 0.749619681,
+                "Asian": 0.111977184,
+                "Black": 0.05100945,
+                "Others": 0.087393684
+            },
+            "Male": {
+                "White": 0.748859123,
+                "Asian": 0.112001554,
+                "Black": 0.051989487,
+                "Others": 0.087149836
+            }
+        },
+        {
+            "Name": "Over18",
+            "Female": {
+                "White": 0.852932903,
+                "Asian": 0.079101397,
+                "Black": 0.031788739,
+                "Others": 0.036176961
+            },
+            "Male": {
+                "White": 0.856113218,
+                "Asian": 0.076197005,
+                "Black": 0.033120629,
+                "Others": 0.034569148
+            }
+        }
+    ],
+    "IncomeModels": {
+        "continuous": {
+            "Intercept": 409.3604814,
+            "Coefficients": {
+                "Gender": -26.21445067,
+                "Age": 9.305314696,
+                "Age2": -0.112970896,
+                "England": 0.0,
+                "Wales": 0.0,
+                "Scotland": 0.0,
+                "NorthernIreland": 0.0,
+                "White": 0.0,
+                "Asian": -45.38331165,
+                "Black": -108.2015578,
+                "Others": -40.05884512,
+                "Sector": 0.0,
+                "IncomeContinuousStdDev": 293.752576754905
+            }
+        }
+    },
+    "PhysicalActivityModels": {
+        "continuous": {
+            "Intercept": 1.710451556,
+            "Coefficients": {
+                "Gender": -0.008142608,
+                "Age": 0.005314357,
+                "Age2": -5.71912099924485e-05,
+                "Age3": 0.0,
+                "Income": -3.06898468645247e-07,
+                "England": 0.0,
+                "Wales": 0.0,
+                "Scotland": 0.0,
+                "NorthernIreland": 0.0,
+                "White": 0.0,
+                "Asian": -0.0611276153979725,
+                "Black": -0.0477024750529409,
+                "Others": -0.0536908560817608,
+                "Sector": 0.0
+            },
+            "StandardDeviation": 0.27510807
+        }
+    },
+    "Nutrients": [
+        {
+            "Name": "Carbohydrate",
+            "Range": [
+                0.018864257,
+                1781.290527
+            ],
+            "Energy": 4.0
+        },
+        {
+            "Name": "Protein",
+            "Range": [
+                0.008585715,
+                359.7049561
+            ],
+            "Energy": 4.0
+        },
+        {
+            "Name": "Fat",
+            "Range": [
+                0,
+                1232.129272
+            ],
+            "Energy": 9.0
+        },
+        {
+            "Name": "Sodium",
+            "Range": [
+                0.000200005,
+                16.34803581
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "Alcohol",
+            "Range": [
+                0.0,
+                306.9281311
+            ],
+            "Energy": 7.0
+        },
+        {
+            "Name": "ProcessedMeat",
+            "Range": [
+                0.0,
+                932.5
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "RedMeat",
+            "Range": [
+                0.0,
+                476.6325559
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "Legume",
+            "Range": [
+                0.0,
+                433.6983613
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "Fruit",
+            "Range": [
+                0.0,
+                1720.489525
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "Vegetable",
+            "Range": [
+                0.0,
+                2046.825704
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "AddedSugar",
+            "Range": [
+                0.0,
+                758.3163452
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "TotalSugar",
+            "Range": [
+                0.019693965,
+                819.5865479
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "MonounsaturatedFat",
+            "Range": [
+                0.0,
+                483.5317688
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "PolyunsaturatedFattyAcid",
+            "Range": [
+                0.0,
+                473.1528015
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "SaturatedFat",
+            "Range": [
+                0.0,
+                276.9013672
+            ],
+            "Energy": 0.0
+        },
+        {
+            "Name": "Fibre",
+            "Range": [
+                0.0,
+                189.5542603
+            ],
+            "Energy": 0.0
+        }
+    ],
+    "RiskFactorModels": {
+        "FoodCarbohydrate": {
+            "Lambda": 0.424242424,
+            "StdDev": 0.498568327,
+            "Range": [
+                0.018864257,
+                1781.290527
+            ],
+            "Intercept": -0.0419600936445343,
+            "Coefficients": {
+                "Gender": -0.0116235127632443,
+                "Age": -0.000229764472053914,
+                "Age2": -7.1228845766885e-07,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": -1.23943375060876e-05,
+                "White": 0.0,
+                "Asian": 0.0253794826267235,
+                "Black": -0.192323962249784,
+                "Others": -0.120415050811932
+            },
+            "Policy": {
+                "Range": [
+                    -12.90322581,
+                    14.28571429
+                ],
+                "Intercept": -6.457052062,
+                "Coefficients": {
+                    "Gender": 0.047407582,
+                    "Age": -0.001665267,
+                    "Age2": 8.30167054935246e-05,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.002290836,
+                    "White": 0.0,
+                    "Asian": -0.013845305,
+                    "Black": 0.328349453,
+                    "Others": 0.228548933
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.267769606
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodFat": {
+            "Lambda": 0.343434343,
+            "StdDev": 0.560611733,
+            "Range": [
+                0,
+                1232.129272
+            ],
+            "Intercept": -0.090842877732224,
+            "Coefficients": {
+                "Gender": -0.017170039347447,
+                "Age": 0.000421969617209,
+                "Age2": -9.0358646826733e-06,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 1.90838009472965e-05,
+                "White": 0.0,
+                "Asian": -0.145881432920571,
+                "Black": -0.122736497221975,
+                "Others": -0.085354574162787
+            },
+            "Policy": {
+                "Range": [
+                    -14.28571429,
+                    8.571428571
+                ],
+                "Intercept": -7.26952653536811,
+                "Coefficients": {
+                    "Gender": 0.0905709355363324,
+                    "Age": 0.0056306381749435,
+                    "Age2": -3.95543939337e-05,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.0020259241132192,
+                    "White": 0.0,
+                    "Asian": -0.403543434737892,
+                    "Black": 0.0627658722000522,
+                    "Others": 0.267825469271057
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.418032197430311
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodProtein": {
+            "Lambda": 0.464646465,
+            "StdDev": 0.472232139,
+            "Range": [
+                0.008585715,
+                359.7049561
+            ],
+            "Intercept": -0.0623377587162805,
+            "Coefficients": {
+                "Gender": -0.0083747997584371,
+                "Age": -0.00034338204839,
+                "Age2": 1.6761036141e-06,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 5.76198044152e-05,
+                "White": 0.0,
+                "Asian": -0.103172577211995,
+                "Black": -0.250546989990864,
+                "Others": -0.112879534810166
+            },
+            "Policy": {
+                "Range": [
+                    -8.108108108,
+                    6.060606061
+                ],
+                "Intercept": -1.83142284657035,
+                "Coefficients": {
+                    "Gender": 0.0121938465994787,
+                    "Age": 0.00080712636060402,
+                    "Age2": 8.45501965095e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00084672641424808,
+                    "White": 0.0,
+                    "Asian": -0.253380651110988,
+                    "Black": -0.00107378315352039,
+                    "Others": -0.146370000407764
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.0735146225821622
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodSodium": {
+            "Lambda": 0.383838384,
+            "StdDev": 0.540985409,
+            "Range": [
+                0.000200005,
+                16.34803581
+            ],
+            "Intercept": -0.0657984387791329,
+            "Coefficients": {
+                "Gender": -0.016599548265756,
+                "Age": 0.000204637350872005,
+                "Age2": -7.855615035181e-06,
+                "Age3": -8.59404983799456,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 4.3672811082315e-05,
+                "White": 0.0,
+                "Asian": -0.37282466389182,
+                "Black": -0.435655390560753,
+                "Others": -0.227722766314412
+            },
+            "Policy": {
+                "Range": [
+                    -50,
+                    100
+                ],
+                "Intercept": 3.05673154547559,
+                "Coefficients": {
+                    "Gender": -0.191124905774412,
+                    "Age": 0.026542788086403,
+                    "Age2": -0.000266256003141,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.001800417743034,
+                    "White": 0.0,
+                    "Asian": -1.79977480952101,
+                    "Black": -0.939493835113804,
+                    "Others": 0.586076304990808
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": -0.685940886598897
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodAlcohol": {
+            "Lambda": -0.02020202,
+            "StdDev": 7.467862049,
+            "Range": [
+                0,
+                306.9281311
+            ],
+            "Intercept": -11.4290841448773,
+            "Coefficients": {
+                "Gender": -0.153927458398418,
+                "Age": 0.0886716617541963,
+                "Age2": -0.000714823411385858,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 0.00387344090687517,
+                "White": 0.0,
+                "Asian": -3.78636191657522,
+                "Black": -4.90350771678135,
+                "Others": -2.6010598423786
+            },
+            "Policy": {
+                "Range": [
+                    -100,
+                    100
+                ],
+                "Intercept": 2.06508455810482,
+                "Coefficients": {
+                    "Gender": 0.02466296521485,
+                    "Age": 0.02350019109491,
+                    "Age2": -0.00034953860406,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": -0.00306151066166,
+                    "White": 0,
+                    "Asian": -0.08140681033024,
+                    "Black": -0.28123955484046,
+                    "Others": 0.30591109468001
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": -0.05089874049511
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodProcessedMeat": {
+            "Lambda": 0.343434343,
+            "StdDev": 1.074757182,
+            "Range": [
+                0,
+                932.5
+            ],
+            "Intercept": -0.120132714489205,
+            "Coefficients": {
+                "Gender": -0.0455553596882143,
+                "Age": 0.00107539090071946,
+                "Age2": -3.687374047798e-05,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": -0.00016736840286599,
+                "White": 0.0,
+                "Asian": -1.3347423105476,
+                "Black": -0.985741434533394,
+                "Others": -0.949080723162365
+            },
+            "Policy": {
+                "Range": [
+                    -11.51964737,
+                    4.916288623
+                ],
+                "Intercept": -5.93480146038836,
+                "Coefficients": {
+                    "Gender": 0.053982155048173,
+                    "Age": 0.0040360437319402,
+                    "Age2": 4.8705226536e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00199885439934256,
+                    "White": 0.0,
+                    "Asian": -0.228197738830853,
+                    "Black": 0.176665466017896,
+                    "Others": 0.176859053566388
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.275970609454732
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodRedMeat": {
+            "Lambda": 0.101010101,
+            "StdDev": 3.865070448,
+            "Range": [
+                0,
+                476.6325559
+            ],
+            "Intercept": -2.56849855888157,
+            "Coefficients": {
+                "Gender": -0.0549622767963646,
+                "Age": -0.0086822437092163,
+                "Age2": -1.7078252148625e-05,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 0.000405025505676833,
+                "White": 0.0,
+                "Asian": -0.243933571558425,
+                "Black": -1.41980057949515,
+                "Others": -1.05781879472448
+            },
+            "Policy": {
+                "Range": [
+                    -11.51964737,
+                    4.916288623
+                ],
+                "Intercept": -5.93480146038836,
+                "Coefficients": {
+                    "Gender": 0.053982155048173,
+                    "Age": 0.0040360437319402,
+                    "Age2": 4.8705226536e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00199885439934256,
+                    "White": 0.0,
+                    "Asian": -0.228197738830853,
+                    "Black": 0.176665466017896,
+                    "Others": 0.176859053566388
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.275970609454732
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodFruit": {
+            "Lambda": 0.343434343,
+            "StdDev": 1.036519871,
+            "Range": [
+                0,
+                1720.489525
+            ],
+            "Intercept": -0.554338755082016,
+            "Coefficients": {
+                "Gender": 0.0333409278179031,
+                "Age": -0.00808526952148711,
+                "Age2": 0.00010384658296679,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 0.00052071534555467,
+                "White": 0.0,
+                "Asian": 0.483044377462357,
+                "Black": 0.0884473994577733,
+                "Others": 0.229892860032728
+            },
+            "Policy": {
+                "Range": [
+                    -11.51964737,
+                    4.916288623
+                ],
+                "Intercept": -5.93480146038836,
+                "Coefficients": {
+                    "Gender": 0.053982155048173,
+                    "Age": 0.0040360437319402,
+                    "Age2": 4.8705226536e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00199885439934256,
+                    "White": 0.0,
+                    "Asian": -0.228197738830853,
+                    "Black": 0.176665466017896,
+                    "Others": 0.176859053566388
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.275970609454732
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodVegetable": {
+            "Lambda": 0.383838384,
+            "StdDev": 0.87269244,
+            "Range": [
+                0,
+                2046.825704
+            ],
+            "Intercept": -0.339364481876657,
+            "Coefficients": {
+                "Gender": 0.00452706472958235,
+                "Age": -0.00290745175652572,
+                "Age2": 3.6283116346208e-05,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 0.000285550400661417,
+                "White": 0.0,
+                "Asian": 0.0472721879402074,
+                "Black": -0.127776755980955,
+                "Others": -0.0116242042800746
+            },
+            "Policy": {
+                "Range": [
+                    -11.51964737,
+                    4.916288623
+                ],
+                "Intercept": -5.93480146038836,
+                "Coefficients": {
+                    "Gender": 0.053982155048173,
+                    "Age": 0.0040360437319402,
+                    "Age2": 4.8705226536e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00199885439934256,
+                    "White": 0.0,
+                    "Asian": -0.228197738830853,
+                    "Black": 0.176665466017896,
+                    "Others": 0.176859053566388
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.275970609454732
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodLegume": {
+            "Lambda": 0.02020202,
+            "StdDev": 6.233710213,
+            "Range": [
+                0,
+                433.6983613
+            ],
+            "Intercept": -6.89228136171947,
+            "Coefficients": {
+                "Gender": 0.078596075021357,
+                "Age": -0.0161722303078087,
+                "Age2": 0.00030753899968319,
+                "Age3": 0.0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 0.00209014967319091,
+                "White": 0.0,
+                "Asian": 0.792635974056378,
+                "Black": -2.13654780279295,
+                "Others": 0.850015978765371
+            },
+            "Policy": {
+                "Range": [
+                    -11.51964737,
+                    4.916288623
+                ],
+                "Intercept": -5.93480146038836,
+                "Coefficients": {
+                    "Gender": 0.053982155048173,
+                    "Age": 0.0040360437319402,
+                    "Age2": 4.8705226536e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00199885439934256,
+                    "White": 0.0,
+                    "Asian": -0.228197738830853,
+                    "Black": 0.176665466017896,
+                    "Others": 0.176859053566388
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.275970609454732
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodFibre": {
+            "Lambda": 0.424242424,
+            "StdDev": 0.541884142,
+            "Range": [
+                0.0,
+                189.5542603
+            ],
+            "Intercept": -0.130310584351796,
+            "Coefficients": {
+                "Gender": -0.00166373278411658,
+                "Age": -0.00115314529496579,
+                "Age2": 1.2739577399078e-05,
+                "Age3": 0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 0.00013501214128139,
+                "White": 0.0,
+                "Asian": 0.00964417796428824,
+                "Black": -0.173602683734983,
+                "Others": -0.078573789190345
+            },
+            "Policy": {
+                "Range": [
+                    -25,
+                    20
+                ],
+                "Intercept": -1.08632797108439,
+                "Coefficients": {
+                    "Gender": -0.0322689117545994,
+                    "Age": -0.00245041218984313,
+                    "Age2": 6.82064664590482e-05,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00180689983603317,
+                    "White": 0.0,
+                    "Asian": -0.0157541826713097,
+                    "Black": 0.295559022006025,
+                    "Others": 0.268190323209484
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": -0.0748588806778521
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodTotalSugar": {
+            "Lambda": 0.343434343,
+            "StdDev": 0.603703671,
+            "Range": [
+                0.019693965,
+                819.5865479
+            ],
+            "Intercept": -0.0825604709308204,
+            "Coefficients": {
+                "Gender": -0.0143621955760441,
+                "Age": -0.00116795257604404,
+                "Age2": 9.030191357577e-06,
+                "Age3": 0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 2.6712751503485e-05,
+                "White": 0.0,
+                "Asian": -0.101783577718322,
+                "Black": -0.288824892055501,
+                "Others": -0.186006810654923
+            },
+            "Policy": {
+                "Range": [
+                    -13.33333333,
+                    5.454545455
+                ],
+                "Intercept": -7.86760560991245,
+                "Coefficients": {
+                    "Gender": 0.0064430488734569,
+                    "Age": -0.00766612761508818,
+                    "Age2": 0.000189598777677081,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00240996396991,
+                    "White": 0.0,
+                    "Asian": -0.0445989107639575,
+                    "Black": 0.651267041124199,
+                    "Others": 0.282040299368153
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.174551816362288
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodAddedSugar": {
+            "Lambda": 0.303030303,
+            "StdDev": 1.102951905,
+            "Range": [
+                0,
+                758.3163452
+            ],
+            "Intercept": -0.451073852652013,
+            "Coefficients": {
+                "Gender": -0.0114202851004926,
+                "Age": 0.0015114507246029,
+                "Age2": -7.03283691563e-06,
+                "Age3": 0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 7.122413346221e-05,
+                "White": 0.0,
+                "Asian": -0.216368797416288,
+                "Black": -0.416428231138938,
+                "Others": -0.268702109082518
+            },
+            "Policy": {
+                "Range": [
+                    -28.57142857,
+                    25
+                ],
+                "Intercept": -12.324046324442,
+                "Coefficients": {
+                    "Gender": 0.0159618176226169,
+                    "Age": -0.0210861104092868,
+                    "Age2": 0.0003339218378036,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.0023080803965928,
+                    "White": 0.0,
+                    "Asian": -0.242950653526926,
+                    "Black": 0.388268154312708,
+                    "Others": 0.299148667000672
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.492357808294526
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodSaturatedFat": {
+            "Lambda": 0.383838384,
+            "StdDev": 0.566456128,
+            "Range": [
+                0,
+                276.9013672
+            ],
+            "Intercept": -0.057748883341915,
+            "Coefficients": {
+                "Gender": -0.0161354736271517,
+                "Age": -0.000328725786071376,
+                "Age2": -3.384982902935e-06,
+                "Age3": 0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 1.4526124763305e-05,
+                "White": 0.0,
+                "Asian": -0.196015538379194,
+                "Black": -0.324488173036891,
+                "Others": -0.170319813143657
+            },
+            "Policy": {
+                "Range": [
+                    -13.33333333,
+                    12.5
+                ],
+                "Intercept": -5.44226633625449,
+                "Coefficients": {
+                    "Gender": 0.078853230990993,
+                    "Age": 0.001832188778927,
+                    "Age2": -1.5424094768e-05,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.001613664187046,
+                    "White": 0.0,
+                    "Asian": -0.453299686211861,
+                    "Black": 0.157923977193341,
+                    "Others": 0.45127293433337
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.173357788366882
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodPolyunsaturatedFattyAcid": {
+            "Lambda": 0.222222222,
+            "StdDev": 0.711409652,
+            "Range": [
+                0,
+                473.1528015
+            ],
+            "Intercept": -0.233380571055244,
+            "Coefficients": {
+                "Gender": -0.0253239378889377,
+                "Age": 0.00222975625521274,
+                "Age2": -2.4819570950611e-05,
+                "Age3": 0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 3.0303398868301e-05,
+                "White": 0.0,
+                "Asian": -0.0812921590028408,
+                "Black": 0.0183128677267572,
+                "Others": -0.0509044973057704
+            },
+            "Policy": {
+                "Range": [
+                    -33.33333333,
+                    20
+                ],
+                "Intercept": -5.45781836917733,
+                "Coefficients": {
+                    "Gender": 0.0911689357780177,
+                    "Age": 0.00394586798527399,
+                    "Age2": -4.072970919939e-05,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00290600982134709,
+                    "White": 0.0,
+                    "Asian": -0.343671530807197,
+                    "Black": 0.344908349256948,
+                    "Others": -0.114567862863229
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.285551804967712
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        },
+        "FoodMonounsaturatedFat": {
+            "Lambda": 0.303030303,
+            "StdDev": 0.591985418,
+            "Range": [
+                0,
+                483.5317688
+            ],
+            "Intercept": -0.119112912915191,
+            "Coefficients": {
+                "Gender": -0.0201754360695236,
+                "Age": 0.0007258429453743,
+                "Age2": -1.1641172969e-05,
+                "Age3": 0,
+                "Region": 0.0,
+                "Sector": 0.0,
+                "Income": 2.74648180454e-05,
+                "White": 0.0,
+                "Asian": -0.165531329123765,
+                "Black": -0.0880191335877045,
+                "Others": -0.0710366100287538
+            },
+            "Policy": {
+                "Range": [
+                    -16.66666667,
+                    16.66666667
+                ],
+                "Intercept": -8.12262227980284,
+                "Coefficients": {
+                    "Gender": 0.107543610392947,
+                    "Age": 0.0097179281323355,
+                    "Age2": -5.70884878408e-06,
+                    "Region": 0.0,
+                    "Sector": 0.0,
+                    "Income": 0.00214336070579451,
+                    "White": 0.0,
+                    "Asian": -0.456605872017531,
+                    "Black": 0.145940434067184,
+                    "Others": 0.251232767272312
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0,
+                    "EnergyIntake": 0.424655429802057
+                }
+            },
+            "Trend": {
+                "Intercept": 1.0,
+                "Range": [
+                    1,
+                    1
+                ],
+                "Lambda": 0,
+                "Coefficients": {
+                    "Gender": 0.0,
+                    "Age": 0.0,
+                    "Age2": 0.0,
+                    "Region": 0.0,
+                    "Income": 0.0,
+                    "White": 0.0,
+                    "Asian": 0.0,
+                    "Black": 0.0,
+                    "Others": 0.0
+                },
+                "LogCoefficients": {
+                    "FoodCarbohydrate": 0.0,
+                    "FoodFat": 0.0,
+                    "FoodProtein": 0.0,
+                    "FoodSodium": 0.0,
+                    "FoodAlcohol": 0.0,
+                    "FoodProcessedMeat": 0.0,
+                    "FoodRedMeat": 0.0,
+                    "FoodFruit": 0.0,
+                    "FoodVegetable": 0.0,
+                    "FoodLegume": 0.0,
+                    "FoodFibre": 0.0,
+                    "FoodTotalSugar": 0.0,
+                    "FoodAddedSugar": 0.0,
+                    "FoodSaturatedFat": 0.0,
+                    "FoodPolyunsaturatedFattyAcid": 0.0,
+                    "FoodMonounsaturatedFat": 0.0
+                }
+            },
+            "ExpectedTrend": 1,
+            "ExpectedTrendBoxCox": 1,
+            "TrendSteps": 0
+        }
+    },
+    "RiskFactorCorrelationFile": {
+        "name": "Finch_residual_risk_factor_correlation.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "ASCII",
+        "columns": {
+            "FoodCarbohydrate": "double",
+            "FoodFat": "double",
+            "FoodProtein": "double",
+            "FoodSodium": "double",
+            "FoodAlcohol": "double",
+            "FoodProcessedMeat": "double",
+            "FoodRedMeat": "double",
+            "FoodFruit": "double",
+            "FoodVegetable": "double",
+            "FoodLegume": "double",
+            "FoodFibre": "double",
+            "FoodTotalSugar": "double",
+            "FoodAddedSugar": "double",
+            "FoodSaturatedFat": "double",
+            "FoodPolyunsaturatedFattyAcid": "double",
+            "FoodMonounsaturatedFat": "double"
+        }
+    },
+    "PolicyCovarianceFile": {
+        "name": "Finch_residual_policy_covariance.csv",
+        "format": "csv",
+        "delimiter": ",",
+        "encoding": "ASCII",
+        "columns": {
+            "FoodCarbohydrate": "double",
+            "FoodFat": "double",
+            "FoodProtein": "double",
+            "FoodSodium": "double",
+            "FoodAlcohol": "double",
+            "FoodProcessedMeat": "double",
+            "FoodRedMeat": "double",
+            "FoodFruit": "double",
+            "FoodVegetable": "double",
+            "FoodLegume": "double",
+            "FoodFibre": "double",
+            "FoodTotalSugar": "double",
+            "FoodAddedSugar": "double",
+            "FoodSaturatedFat": "double",
+            "FoodPolyunsaturatedFattyAcid": "double",
+            "FoodMonounsaturatedFat": "double"
+        }
+    }
+}

@@ -1,4 +1,5 @@
 #include "riskfactor.h"
+#include <iostream>
 
 namespace hgps {
 
@@ -29,7 +30,7 @@ SimulationModuleType RiskFactorModule::type() const noexcept {
     return SimulationModuleType::RiskFactor;
 }
 
-const std::string &RiskFactorModule::name() const noexcept { return name_; }
+std::string RiskFactorModule::name() const noexcept { return name_; }
 
 std::size_t RiskFactorModule::size() const noexcept { return models_.size(); }
 
@@ -57,6 +58,13 @@ void RiskFactorModule::update_population(RuntimeContext &context) {
     // Update risk factors for population
     auto &dynamic_model = models_.at(RiskFactorModelType::Dynamic);
     dynamic_model->update_risk_factors(context);
+}
+
+void RiskFactorModule::initialise_population([[maybe_unused]] RuntimeContext &context,
+                                             [[maybe_unused]] Population &population,
+                                             [[maybe_unused]] Random &random) {
+    // Call the one-parameter version of initialise_population to avoid recursion
+    this->initialise_population(context);
 }
 
 std::unique_ptr<RiskFactorModule>

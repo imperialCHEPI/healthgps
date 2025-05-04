@@ -7,6 +7,11 @@
 
 namespace hgps {
 
+/// @brief Resets all static caches used to track disease failures
+/// @details This function should be called before each simulation run to ensure
+///          all diseases get a fresh chance to initialize
+void reset_disease_caches();
+
 /// @brief Defines the disease module container to hold disease models
 class DiseaseModule final : public UpdatableModule {
   public:
@@ -22,7 +27,7 @@ class DiseaseModule final : public UpdatableModule {
 
     /// @brief Gets the module name
     /// @return The human-readable module name
-    const std::string &name() const noexcept override;
+    std::string name() const noexcept override;
 
     /// @brief Gets the number of diseases models hosted
     /// @return Number of hosted diseases models
@@ -47,7 +52,8 @@ class DiseaseModule final : public UpdatableModule {
 
     /// @brief Initialises the virtual population status
     /// @param context The simulation run-time context
-    void initialise_population(RuntimeContext &context) override;
+    void initialise_population(RuntimeContext &context, Population &population,
+                               Random &random) override;
 
     /// @brief Updates the virtual population status
     /// @param context The simulation run-time context
@@ -59,6 +65,19 @@ class DiseaseModule final : public UpdatableModule {
     /// @return the mortality rate value, if found, otherwise zero.
     double get_excess_mortality(const core::Identifier &disease_code,
                                 const Person &entity) const noexcept;
+
+    /// @brief Checks if a person has a specific disease
+    /// @param disease_code The disease identifier
+    /// @param entity The person instance
+    /// @return True if the person has the disease, false otherwise
+    bool has_disease(const core::Identifier &disease_code, const Person &entity) const noexcept;
+
+    /// @brief Gets the disease status for a specific person
+    /// @param disease_code The disease identifier
+    /// @param entity The person instance
+    /// @return The disease status if found, or DiseaseStatus::inactive if not found
+    DiseaseStatus get_disease_status(const core::Identifier &disease_code,
+                                     const Person &entity) const noexcept;
 
   private:
     std::map<core::Identifier, std::shared_ptr<DiseaseModel>> models_;

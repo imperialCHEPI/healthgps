@@ -1,0 +1,388 @@
+{
+    "$schema": "https://raw.githubusercontent.com/imperialCHEPI/healthgps/main/schemas/v1/config.json",
+    "version": 2,
+    "data": {
+        "source": "https://github.com/imperialCHEPI/healthgps-data/releases/download/finch_disease_data/finch_disease_data.zip",
+        "checksum": "5618dd8d69e5c3c131a8407c7f7e9d686f299477e5f04e07c1fb00a4cc035d57"
+    },
+    "inputs": {
+        "dataset": {
+            "name": "Finch.DataFile.csv",
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "ASCII",
+            "columns": {
+                "Gender": "integer",
+                "Age": "integer",
+                "Age2": "integer",
+                "Age3": "integer",
+                "Region": "integer",
+                "Sector": "integer",
+                "Income": "integer",
+                "Ethnicity": "integer",
+                "Carbohydrate": "double",
+                "Protein": "double",
+                "Sodium": "double",
+                "Fat": "double",
+                "Alcohol": "double",
+                "ProcessedMeat": "double",
+                "RedMeat": "double",
+                "Fruit": "double",
+                "Vegetable": "double",
+                "Legume": "double",
+                "PolyunsaturatedFattyAcid": "double",
+                "SaturatedFat": "double",
+                "MonounsaturatedFat": "double",
+                "Fibre": "double",
+                "TotalSugar": "double",
+                "AddedSugar": "double",
+                "PhysicalActivity": "double",
+                "EnergyIntake": "double",
+                "Weight": "double",
+                "Height": "double"
+            }
+        },
+        "settings": {
+            "country_code": "GBR",
+            "size_fraction": 0.001,
+            "age_range": [
+                0,
+                110
+            ]
+        }
+    },
+    "modelling": {
+        "ses_model": {
+            "function_name": "normal",
+            "function_parameters": [
+                0.0,
+                1.0
+            ]
+        },
+        "risk_factors": [
+            {
+                "name": "Gender",
+                "level": 0,
+                "range": [
+                    0,
+                    1
+                ]
+            },
+            {
+                "name": "Age",
+                "level": 0,
+                "range": [
+                    0,
+                    110
+                ]
+            },
+            {
+                "name": "Age2",
+                "level": 0,
+                "range": [
+                    0,
+                    12100
+                ]
+            },
+            {
+                "name": "Age3",
+                "level": 0,
+                "range": [
+                    0,
+                    1331000
+                ]
+            },
+            {
+                "name": "Region",
+                "level": 0,
+                "range": [
+                    1,
+                    4
+                ]
+            },
+            {
+                "name": "Ethnicity",
+                "level": 0,
+                "range": [
+                    1,
+                    4
+                ]
+            },
+            {
+                "name": "Income",
+                "level": 0,
+                "range": [
+                    23,
+                    2375
+                ]
+            },
+            {
+                "name": "income_category",
+                "level": 0,
+                "range": [
+                    1,
+                    4
+                ]
+            },
+            {
+                "name": "FoodCarbohydrate",
+                "level": 1,
+                "range": [
+                    0.018864257,
+                    1781.290527
+                ]
+            },
+            {
+                "name": "FoodFat",
+                "level": 1,
+                "range": [
+                    0,
+                    1232.129272
+                ]
+            },
+            {
+                "name": "FoodProtein",
+                "level": 1,
+                "range": [
+                    0.008585715,
+                    359.7049561
+                ]
+            },
+            {
+                "name": "FoodSodium",
+                "level": 1,
+                "range": [
+                    0.000200005,
+                    16.34803581
+                ]
+            },
+            {
+                "name": "Carbohydrate",
+                "level": 1,
+                "range": [
+                    0.018864257,
+                    1781.290527
+                ]
+            },
+            {
+                "name": "Sodium",
+                "level": 1,
+                "range": [
+                    0.000200005,
+                    16.34803581
+                ]
+            },
+            {
+                "name": "Protein",
+                "level": 1,
+                "range": [
+                    0.008585715,
+                    359.7049561
+                ]
+            },
+            {
+                "name": "Fat",
+                "level": 1,
+                "range": [
+                    0,
+                    1232.129272
+                ]
+            },
+            {
+                "name": "Alcohol",
+                "level": 1,
+                "range": [
+                    0,
+                    306.9281311
+                ]
+            },
+            {
+                "name": "ProcessedMeat",
+                "level": 1,
+                "range": [
+                    0,
+                    932.5
+                ]
+            },
+            {
+                "name": "RedMeat",
+                "level": 1,
+                "range": [
+                    0,
+                    476.6325559
+                ]
+            },
+            {
+                "name": "Fruit",
+                "level": 1,
+                "range": [
+                    0,
+                    1720.489525
+                ]
+            },
+            {
+                "name": "Vegetable",
+                "level": 1,
+                "range": [
+                    0,
+                    2046.825704
+                ]
+            },
+            {
+                "name": "Legume",
+                "level": 1,
+                "range": [
+                    0,
+                    433.6983613
+                ]
+            },
+            {
+                "name": "PolyunsaturatedFattyAcid",
+                "level": 1,
+                "range": [
+                    0,
+                    473.1528015
+                ]
+            },
+            {
+                "name": "SaturatedFat",
+                "level": 1,
+                "range": [
+                    0,
+                    276.9013672
+                ]
+            },
+            {
+                "name": "MonounsaturatedFat",
+                "level": 1,
+                "range": [
+                    0,
+                    483.5317688
+                ]
+            },
+            {
+                "name": "Fibre",
+                "level": 1,
+                "range": [
+                    0,
+                    189.5542603
+                ]
+            },
+            {
+                "name": "TotalSugar",
+                "level": 1,
+                "range": [
+                    0.019693965,
+                    819.5865479
+                ]
+            },
+            {
+                "name": "AddedSugar",
+                "level": 1,
+                "range": [
+                    0,
+                    758.3163452
+                ]
+            },
+            {
+                "name": "PhysicalActivity",
+                "level": 2,
+                "range": [
+                    1.4,
+                    2.5
+                ]
+            },
+            {
+                "name": "EnergyIntake",
+                "level": 2,
+                "range": [
+                    0.3,
+                    19072.7793
+                ]
+            },
+            {
+                "name": "Weight",
+                "level": 3,
+                "range": [
+                    1,
+                    210
+                ]
+            },
+            {
+                "name": "Height",
+                "level": 3,
+                "range": [
+                    44,
+                    203.2
+                ]
+            },
+            {
+                "name": "BMI",
+                "level": 3,
+                "range": [
+                    14.26126,
+                    45.84575
+                ]
+            }
+        ],
+        "risk_factor_models": {
+            "static": "static_model.json",
+            "dynamic": "dynamic_model.json"
+        },
+        "baseline_adjustments": {
+            "format": "csv",
+            "delimiter": ",",
+            "encoding": "ASCII",
+            "file_names": {
+                "factorsmean_male": "Finch.FactorsMean.Male.csv",
+                "factorsmean_female": "Finch.FactorsMean.Female.csv"
+            }
+        }
+    },
+    "running": {
+        "seed": [
+            123456789
+        ],
+        "start_time": 2022,
+        "stop_time": 2030,
+        "trial_runs": 1,
+        "sync_timeout_ms": 15000,
+        "diseases": [
+            "alzheimer",
+            "asthma",
+            "colorectalcancer",
+            "diabetes",
+            "lowbackpain",
+            "osteoarthritisknee",
+            "osteoarthritiship",
+            "gallbladder",
+            "chronickidneydisease",
+            "ischemicheartdisease",
+            "stroke",
+            "ischemicstroke",
+            "intracerebralhemorrhage",
+            "subarachnoidhemorrhage",
+            "esophaguscancer",
+            "kidneycancer",
+            "breastcancer"
+        ],
+        "interventions": {
+            "active_type_id": "simple",
+            "types": {
+                "simple": {
+                    "active_period": {
+                        "start_time": 2025,
+                        "finish_time": null
+                    },
+                    "impact_type": "absolute",
+                    "impacts": []
+                }
+            }
+        }
+    },
+    "output": {
+        "comorbidities": 5,
+        "folder": "${HOME}/healthgps/results/finch",
+        "file_name": "HealthGPS_Result_{TIMESTAMP}.json"
+    }
+}

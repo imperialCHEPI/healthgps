@@ -18,7 +18,7 @@ struct RunInfo {
     unsigned int stop_time{};
 
     /// @brief Scenarios data synchronisation timeout in milliseconds
-    unsigned int sync_timeout_ms{};
+    unsigned int sync_timeout_ms{120000};
 
     /// @brief Custom seed to initialise the pseudo-number generator engine
     std::optional<unsigned int> seed{};
@@ -44,14 +44,14 @@ class ModelInput {
   public:
     ModelInput() = delete;
 
-    /// @brief Initialise a new instance of the ModelInput class.
-    /// @param data The risk factors fitted dataset
-    /// @param settings Experiment settings definition
-    /// @param run_info Simulation run information
-    /// @param ses_info Socio-economic status (SES) model information
-    /// @param risk_mapping Hierarchical risk factors model mappings
-    /// @param diseases Selected diseases to include in experiment
-    ModelInput(core::DataTable &data, Settings settings, const RunInfo &run_info,
+    /// @brief Constructs a new model input instance.
+    /// @param data The input data table
+    /// @param settings The model settings
+    /// @param run_info The run information
+    /// @param ses_info The socioeconomic status definition
+    /// @param risk_mapping The risk mapping
+    /// @param diseases The diseases information
+    ModelInput(core::DataTable data, Settings settings, const RunInfo &run_info,
                SESDefinition ses_info, HierarchicalMapping risk_mapping,
                std::vector<core::DiseaseInfo> diseases);
 
@@ -95,8 +95,23 @@ class ModelInput {
     /// @return Diseases to include in experiment
     const std::vector<core::DiseaseInfo> &diseases() const noexcept;
 
+    /// @brief Get region probabilities for specific age and gender stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @return Map of region to probability for this stratum
+    std::unordered_map<core::Region, double> get_region_probabilities(int age,
+                                                                      core::Gender gender) const;
+
+    /// @brief Get ethnicity probabilities for specific age, gender, and region stratum
+    /// @param age The age stratum
+    /// @param gender The gender stratum
+    /// @param region The region stratum
+    /// @return Map of ethnicity to probability for this stratum
+    std::unordered_map<core::Ethnicity, double>
+    get_ethnicity_probabilities(int age, core::Gender gender, core::Region region) const;
+
   private:
-    std::reference_wrapper<core::DataTable> input_data_;
+    core::DataTable input_data_;
     Settings settings_;
     RunInfo run_info_;
     SESDefinition ses_definition_;

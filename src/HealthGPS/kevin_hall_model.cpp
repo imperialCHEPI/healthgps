@@ -1,12 +1,36 @@
 #include "HealthGPS.Core/exception.h"
+#include <iostream>
 
+#include "demographic.h"
 #include "kevin_hall_model.h"
 #include "runtime_context.h"
 #include "sync_message.h"
 
 #include <algorithm>
 #include <iterator>
+#include <random>
 #include <utility>
+
+// Disable specific warnings from external dependencies
+#ifdef _MSC_VER
+#pragma warning(push)
+// Eigen warnings
+#pragma warning(disable : 26495) // Variable 'xxx' is uninitialized (from Eigen SIMD optimizations)
+
+// fmt library warnings
+#pragma warning(disable : 26498) // Variable 'xxx' is constexpr, mark variable constexpr (from fmt)
+
+// lexer warnings
+#pragma warning(disable : 26819) // Unannotated fallthrough between switch labels (from lexer)
+
+// Low-level bitwise operations
+#pragma warning(                                                                                   \
+    disable : 6285) // Non-zero constant in bitwise-and operation (from core bit manipulation)
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 namespace { // anonymous namespace
 
@@ -34,34 +58,78 @@ KevinHallModel::KevinHallModel(
     const std::unordered_map<core::Gender, std::vector<double>> &weight_quantiles,
     const std::vector<double> &epa_quantiles,
     const std::unordered_map<core::Gender, double> &height_stddev,
-    const std::unordered_map<core::Gender, double> &height_slope)
+    const std::unordered_map<core::Gender, double> &height_slope,
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double income_continuous_stddev)
     : RiskFactorAdjustableModel{std::move(expected), std::move(expected_trend),
                                 std::move(trend_steps)},
       energy_equation_{energy_equation}, nutrient_ranges_{nutrient_ranges},
       nutrient_equations_{nutrient_equations}, food_prices_{food_prices},
       weight_quantiles_{weight_quantiles}, epa_quantiles_{epa_quantiles},
-      height_stddev_{height_stddev}, height_slope_{height_slope} {}
+      height_stddev_{height_stddev}, height_slope_{height_slope},
+      region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {
+
+    // Initialize carbohydrate tracking file
+    carb_tracking_file_.open("carbohydrate_over_years.csv");
+    if (carb_tracking_file_.is_open()) {
+        carb_tracking_file_ << "PersonID,Age,Year,Scenario,CI_0,CI" << std::endl;
+    }
+}
+
+KevinHallModel::~KevinHallModel() {
+    // Close the carbohydrate tracking file
+    if (carb_tracking_file_.is_open()) {
+        carb_tracking_file_.close();
+    }
+}
 
 RiskFactorModelType KevinHallModel::type() const noexcept { return RiskFactorModelType::Dynamic; }
 
 std::string KevinHallModel::name() const noexcept { return "Dynamic"; }
 
+// Modified: Mahima 25/02/2025
+// Ensuring correct initialization order for population characteristics
 void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
+    context_ = &context; // Store reference to the context
 
-    // Initialise everyone.
+    // Step 1: Age and gender are already initialized by the population generator (demographic.cpp)
+    // also in person.cpp, the person class maintains a deep copy of it
+
+    // Step 2: Initialize fixed characteristics (region and ethnicity)
+    // These are now initialized in demographic.cpp
+
+    // Step 3: Initialize continuous income
+    // This is now initialized in demographic.cpp
+
+    // Step 4: Initialize income category
+    // This is now initialized in demographic.cpp
+
+    // Step 5: Initialize physical activity
+    // This is now initialized in demographic.cpp
+
+    // Step 6: Initialize remaining risk factors
     for (auto &person : context.population()) {
         initialise_nutrient_intakes(person);
         initialise_energy_intake(person);
         initialise_weight(context, person);
     }
 
-    // Adjust weight mean to match expected.
+    // Adjust weight mean to match expected
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
 
-    // Compute weight power means by sex and age.
+    // Added for FINCH- Mahima
+    //  Adjust physical activity mean to match expected
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
+
+    // Compute weight power means by sex and age
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
 
-    // Initialise everyone.
+    // Step 7: Initialize height (depends on weight)
+    // Step 8: Calculate BMI (depends on weight and height)
     for (auto &person : context.population()) {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         initialise_height(context, person, W_power_mean, context.random());
@@ -71,6 +139,10 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 }
 
 void KevinHallModel::update_risk_factors(RuntimeContext &context) {
+    context_ = &context; // Store reference to the context
+
+    // Update income categories every 5 years
+    update_income_category(context);
 
     // Update (initialise) newborns.
     update_newborns(context);
@@ -86,6 +158,17 @@ void KevinHallModel::update_risk_factors(RuntimeContext &context) {
         }
 
         compute_bmi(person);
+        if (person.age == 18) {
+            update_region(context, person, context.random());
+        }
+    }
+
+    // Adjust physical activity mean to match expected
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
+
+    // Flush the tracking file after each time step
+    if (carb_tracking_file_.is_open()) {
+        carb_tracking_file_.flush();
     }
 }
 
@@ -128,6 +211,22 @@ void KevinHallModel::update_newborns(RuntimeContext &context) const {
     }
 
     // NOTE: FOR REFACTORING: End of semi-redundant block.
+
+    // Adjust physical activity for newborns to match expected
+    for (auto &person : context.population()) {
+        // Ignore if inactive or not newborn.
+        if (!person.is_active() || (person.age != 0)) {
+            continue;
+        }
+
+        // Initialize physical activity if not already done
+        if (!person.risk_factors.contains("PhysicalActivity"_id)) {
+            initialise_physical_activity(context, person, context.random());
+        }
+    }
+
+    // Adjust physical activity mean to match expected for newborns
+    adjust_risk_factors(context, {"PhysicalActivity"_id}, std::nullopt, false);
 
     // Compute newborn weight power means by sex.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_, 0);
@@ -349,10 +448,14 @@ void KevinHallModel::initialise_nutrient_intakes(Person &person) const {
     person.risk_factors["Carbohydrate_previous"_id] = carbohydrate;
     double sodium = person.risk_factors.at("Sodium"_id);
     person.risk_factors["Sodium_previous"_id] = sodium;
+
+    // Track initial carbohydrate values
+    if (context_) {
+        track_carbohydrate_values(person, context_->time_now());
+    }
 }
 
 void KevinHallModel::update_nutrient_intakes(Person &person) const {
-
     // Set previous nutrient intakes.
     double previous_carbohydrate = person.risk_factors.at("Carbohydrate"_id);
     person.risk_factors.at("Carbohydrate_previous"_id) = previous_carbohydrate;
@@ -361,21 +464,87 @@ void KevinHallModel::update_nutrient_intakes(Person &person) const {
 
     // Update nutrient intakes.
     compute_nutrient_intakes(person);
+
+    // Track updated carbohydrate values
+    if (context_) {
+        track_carbohydrate_values(person, context_->time_now());
+    }
 }
 
 void KevinHallModel::compute_nutrient_intakes(Person &person) const {
-
-    // Reset nutrient intakes to zero.
+    // Reset nutrient intakes to zero for all nutrients in energy equation
     for (const auto &[nutrient_key, unused] : energy_equation_) {
         person.risk_factors[nutrient_key] = 0.0;
     }
 
-    // Compute nutrient intakes from food intakes.
+    // Create a list of missing food intakes to report once
+    std::vector<std::string> missing_foods;
+
+    // Compute nutrient intakes from food intakes with error handling
     for (const auto &[food_key, nutrient_coefficients] : nutrient_equations_) {
-        double food_intake = person.risk_factors.at(food_key);
-        for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
-            person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+        try {
+            // Try to access food intake with direct key
+            double food_intake = 0.0;
+            if (person.risk_factors.contains(food_key)) {
+                food_intake = person.risk_factors.at(food_key);
+            } else {
+                // Try case-insensitive lookup
+                std::string food_key_str = food_key.to_string();
+                std::string food_key_lower = food_key_str;
+                std::transform(food_key_lower.begin(), food_key_lower.end(), food_key_lower.begin(),
+                               [](unsigned char c) { return std::tolower(c); });
+
+                bool found = false;
+                for (const auto &[factor_key, factor_value] : person.risk_factors) {
+                    std::string factor_key_str = factor_key.to_string();
+                    std::string factor_key_lower = factor_key_str;
+                    std::transform(factor_key_lower.begin(), factor_key_lower.end(),
+                                   factor_key_lower.begin(),
+                                   [](unsigned char c) { return std::tolower(c); });
+
+                    if (factor_key_lower == food_key_lower) {
+                        food_intake = factor_value;
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If still not found, initialize it to 0
+                if (!found) {
+                    missing_foods.push_back(food_key.to_string());
+                    person.risk_factors[food_key] = 0.0;
+                    food_intake = 0.0;
+                }
+            }
+
+            // Process each nutrient
+            for (const auto &[nutrient_key, nutrient_coefficient] : nutrient_coefficients) {
+                try {
+                    person.risk_factors.at(nutrient_key) += food_intake * nutrient_coefficient;
+                } catch (const std::exception &e) {
+                    // Initialize missing nutrient
+                    person.risk_factors[nutrient_key] = food_intake * nutrient_coefficient;
+                }
+            }
+        } catch (const std::exception &e) {
+            // Log error but continue with other foods
+            std::cerr << "Error processing food intake for " << food_key.to_string() << ": "
+                      << e.what() << std::endl;
+
+            // Initialize this food to 0 to prevent future errors
+            person.risk_factors[food_key] = 0.0;
         }
+    }
+
+    // Report missing foods once
+    if (!missing_foods.empty() && context_) {
+        std::cerr << "WARNING: Initialized missing foods to 0 in person " << person.id() << ": ";
+        for (size_t i = 0; i < missing_foods.size(); ++i) {
+            if (i > 0)
+                std::cerr << ", ";
+            std::cerr << missing_foods[i];
+        }
+        std::cerr << std::endl;
     }
 }
 
@@ -400,15 +569,56 @@ void KevinHallModel::update_energy_intake(Person &person) const {
 }
 
 void KevinHallModel::compute_energy_intake(Person &person) const {
-
     // Reset energy intake to zero.
     const auto energy_intake_key = "EnergyIntake"_id;
     person.risk_factors[energy_intake_key] = 0.0;
 
-    // Compute energy intake from nutrient intakes.
+    // Compute energy intake from nutrient intakes with error handling
     for (const auto &[nutrient_key, energy_coefficient] : energy_equation_) {
-        double nutrient_intake = person.risk_factors.at(nutrient_key);
-        person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
+        try {
+            // Try to access nutrient with direct key
+            double nutrient_intake = 0.0;
+            if (person.risk_factors.contains(nutrient_key)) {
+                nutrient_intake = person.risk_factors.at(nutrient_key);
+            } else {
+                // Try case-insensitive lookup
+                std::string nutrient_key_str = nutrient_key.to_string();
+                std::string nutrient_key_lower = nutrient_key_str;
+                std::transform(nutrient_key_lower.begin(), nutrient_key_lower.end(),
+                               nutrient_key_lower.begin(),
+                               [](unsigned char c) { return std::tolower(c); });
+
+                bool found = false;
+                for (const auto &[factor_key, factor_value] : person.risk_factors) {
+                    std::string factor_key_str = factor_key.to_string();
+                    std::string factor_key_lower = factor_key_str;
+                    std::transform(factor_key_lower.begin(), factor_key_lower.end(),
+                                   factor_key_lower.begin(),
+                                   [](unsigned char c) { return std::tolower(c); });
+
+                    if (factor_key_lower == nutrient_key_lower) {
+                        nutrient_intake = factor_value;
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If still not found, initialize it to 0
+                if (!found) {
+                    std::cerr << "WARNING: Missing nutrient " << nutrient_key.to_string()
+                              << " for person " << person.id() << ", initializing to 0"
+                              << std::endl;
+                    person.risk_factors[nutrient_key] = 0.0;
+                    nutrient_intake = 0.0;
+                }
+            }
+
+            person.risk_factors.at(energy_intake_key) += nutrient_intake * energy_coefficient;
+        } catch (const std::exception &e) {
+            // Log error but continue with other nutrients
+            std::cerr << "Error processing nutrient " << nutrient_key.to_string()
+                      << " for energy intake: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -754,6 +964,226 @@ void KevinHallModel::update_height(RuntimeContext &context, Person &person,
     person.risk_factors["Height"_id] = H;
 }
 
+// Modified: Mahima 25/02/2025
+// Region is initialised using the CDF of the region probabilities along with age/gender strata
+void KevinHallModel::initialise_region(RuntimeContext &context, Person &person,
+                                       Random &random) const {
+    // Delegate to demographic module
+    context.demographic_module().initialise_region(context, person, random);
+}
+
+// NOTE: Might need to change this if region updates are happening differently
+void KevinHallModel::update_region([[maybe_unused]] RuntimeContext &context, Person &person,
+                                   Random &random) const {
+    if (person.age == 18) {
+        initialise_region(context, person, random);
+    }
+}
+
+// Modified: Mahima 25/02/2025
+// Ethnicity is initialised using the CDF of the ethnicity probabilities along with
+// age/gender/region strata
+void KevinHallModel::initialise_ethnicity(RuntimeContext &context, Person &person,
+                                          Random &random) const {
+    // Delegate to demographic module
+    context.demographic_module().initialise_ethnicity(context, person, random);
+}
+// NOTE: No update ethnicity as it is fixed throughout once assigned
+
+// Modified: Mahima 25/02/2025
+// Physical activity is initialised using the expected value of physical activity based on age,
+// gender, region, ethnicity and income
+void KevinHallModel::initialise_physical_activity(RuntimeContext &context, Person &person,
+                                                  Random &random) const {
+    // Delegate to demographic module
+    context.demographic_module().initialise_physical_activity(context, person, random);
+}
+
+// Modified: Mahima 25/02/2025
+// Income is initialised using the SoftMax of the income probabilities based on age, gender, region,
+// ethnicity
+// this uses a logistic regression model to predict the income category
+void KevinHallModel::initialise_income_continuous(Person &person, Random &random) const {
+    // Delegate to demographic module
+    context_->demographic_module().initialise_income_continuous(person, random);
+}
+
+void KevinHallModel::update_income_continuous(Person &person, Random &random) const {
+    // Removing age check to ensure income is updated for all individuals regardless of age
+    // This treats income as household income rather than individual income
+
+    // Call the income initialization function
+    initialise_income_continuous(person, random);
+}
+
+// Modified: Mahima 25/02/2025, Optimized for large populations
+// Helper function to calculate income thresholds once for the entire population
+std::tuple<double, double, double>
+KevinHallModel::calculate_income_thresholds(const Population &population) const {
+    return context_->demographic_module().calculate_income_thresholds(population);
+}
+
+// Modified: Mahima 25/02/2025, Optimized for large populations
+// Income category is initialised using the quartiles of the income_continuous values
+// This method now only assigns the category based on pre-calculated thresholds
+void KevinHallModel::initialise_income_category(Person &person, double q1_threshold,
+                                                double q2_threshold, double q3_threshold) const {
+    // Delegate to demographic module
+    context_->demographic_module().initialise_income_category(person, q1_threshold, q2_threshold,
+                                                              q3_threshold);
+}
+
+// Modified to calculate thresholds once for the entire population
+void KevinHallModel::update_income_category(RuntimeContext &context) const {
+    static int last_update_year = 0;
+    int current_year = context.time_now();
+
+    // Update quartiles every 5 years
+    if (current_year - last_update_year >= 5) {
+        // Calculate thresholds once for the entire population
+        auto [q1_threshold, q2_threshold, q3_threshold] =
+            calculate_income_thresholds(context.population());
+
+        // std::cout << "INFO: Updating income categories with thresholds Q1=" << q1_threshold << ",
+        // Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+
+        // Validate thresholds are properly ordered
+        if (q1_threshold > q2_threshold || q2_threshold > q3_threshold) {
+            std::cerr
+                << "ERROR: Income thresholds are incorrectly ordered in update_income_category"
+                << std::endl;
+            // Fix by using percentages of range
+            double min_income = 23.0;
+            double max_income = 2375.0;
+            double range = max_income - min_income;
+            q1_threshold = min_income + range * 0.25;
+            q2_threshold = min_income + range * 0.5;
+            q3_threshold = min_income + range * 0.75;
+            std::cerr << "Using fixed thresholds instead: Q1=" << q1_threshold
+                      << ", Q2=" << q2_threshold << ", Q3=" << q3_threshold << std::endl;
+        }
+
+        // Track inconsistencies during update
+        int inconsistency_count = 0;
+        int fixed_count = 0;
+
+        // Apply thresholds to each person
+        for (auto &person : context.population()) {
+            if (person.is_active()) {
+                // Store original category for comparison
+                auto original_category = person.income_category;
+
+                // Get income value and ensure it's within valid range
+                double income_value = std::max(23.0, std::min(2375.0, person.income_continuous));
+
+                // Check if income continuous and category are consistent
+                bool is_consistent = true;
+                if ((person.income_category == core::Income::low && income_value >= q1_threshold) ||
+                    (person.income_category == core::Income::lowermiddle &&
+                     (income_value < q1_threshold || income_value >= q2_threshold)) ||
+                    (person.income_category == core::Income::uppermiddle &&
+                     (income_value < q2_threshold || income_value >= q3_threshold)) ||
+                    (person.income_category == core::Income::high && income_value < q3_threshold)) {
+                    is_consistent = false;
+                    inconsistency_count++;
+
+                    // Resynchronize by updating the category based on income value
+                    initialise_income_category(person, q1_threshold, q2_threshold, q3_threshold);
+                    fixed_count++;
+
+                    // Debug specific cases for first few inconsistencies
+                    /*if (inconsistency_count <= 5) {
+                        std::cout << "FIXED: Person " << person.id() << " Income=" << income_value;
+
+                        std::cout << ", Category changed from ";
+                        switch (original_category) {
+                        case core::Income::low:
+                            std::cout << "Low";
+                            break;
+                        case core::Income::lowermiddle:
+                            std::cout << "Lower Middle";
+                            break;
+                        case core::Income::uppermiddle:
+                            std::cout << "Upper Middle";
+                            break;
+                        case core::Income::high:
+                            std::cout << "High";
+                            break;
+                        default:
+                            std::cout << "Unknown";
+                        }
+
+                        std::cout << " to ";
+                        switch (person.income_category) {
+                        case core::Income::low:
+                            std::cout << "Low";
+                            break;
+                        case core::Income::lowermiddle:
+                            std::cout << "Lower Middle";
+                            break;
+                        case core::Income::uppermiddle:
+                            std::cout << "Upper Middle";
+                            break;
+                        case core::Income::high:
+                            std::cout << "High";
+                            break;
+                        default:
+                            std::cout << "Unknown";
+                        }
+                        std::cout << std::endl;
+                    }*/
+                } else {
+                    // Already consistent, no action needed
+                }
+
+                // Special rule for edge cases - very low income should never be High
+                if (income_value <= 30.0 && person.income_category == core::Income::high) {
+                    person.income_category = core::Income::low;
+                    std::cout << "OVERRIDE: Forcing Low category for very low income ("
+                              << income_value << ") for person " << person.id() << std::endl;
+                }
+
+                // Special rule for edge cases - very high income should never be Low
+                if (income_value >= 2300.0 && person.income_category == core::Income::low) {
+                    person.income_category = core::Income::high;
+                    std::cout << "OVERRIDE: Forcing High category for very high income ("
+                              << income_value << ") for person " << person.id() << std::endl;
+                }
+            }
+        }
+
+        if (inconsistency_count > 0) {
+            /*std::cout << "INFO: Fixed " << fixed_count << " of " << inconsistency_count
+                      << " income category inconsistencies ("
+                      << (100.0 * inconsistency_count / context.population().current_active_size())
+                      << "% of active population)" << std::endl;*/
+        }
+
+        last_update_year = current_year;
+    }
+}
+
+void KevinHallModel::track_carbohydrate_values(const Person &person, int year) const {
+    if (!carb_tracking_file_.is_open()) {
+        return;
+    }
+
+    // Get carbohydrate values using string literals with _id suffix
+    double ci_0 = person.risk_factors.at("Carbohydrate_previous"_id);
+    double ci = person.risk_factors.at("Carbohydrate"_id);
+
+    // Determine scenario type
+    std::string scenario_type = "unknown";
+    if (context_) {
+        scenario_type =
+            (context_->scenario().type() == ScenarioType::baseline) ? "baseline" : "intervention";
+    }
+
+    // Write to CSV file using std::to_string for the person ID
+    carb_tracking_file_ << std::to_string(person.id()) << "," << person.age << "," << year << ","
+                        << scenario_type << "," << ci_0 << "," << ci << std::endl;
+}
+
 KevinHallModelDefinition::KevinHallModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
     std::unique_ptr<std::unordered_map<core::Identifier, double>> expected_trend,
@@ -764,13 +1194,20 @@ KevinHallModelDefinition::KevinHallModelDefinition(
     std::unordered_map<core::Identifier, std::optional<double>> food_prices,
     std::unordered_map<core::Gender, std::vector<double>> weight_quantiles,
     std::vector<double> epa_quantiles, std::unordered_map<core::Gender, double> height_stddev,
-    std::unordered_map<core::Gender, double> height_slope)
+    std::unordered_map<core::Gender, double> height_slope,
+    std::shared_ptr<std::unordered_map<core::Region, LinearModelParams>> region_models,
+    std::shared_ptr<std::unordered_map<core::Ethnicity, LinearModelParams>> ethnicity_models,
+    std::unordered_map<core::Income, LinearModelParams> income_models,
+    double income_continuous_stddev)
     : RiskFactorAdjustableModelDefinition{std::move(expected), std::move(expected_trend),
                                           std::move(trend_steps)},
       energy_equation_{std::move(energy_equation)}, nutrient_ranges_{std::move(nutrient_ranges)},
       nutrient_equations_{std::move(nutrient_equations)}, food_prices_{std::move(food_prices)},
       weight_quantiles_{std::move(weight_quantiles)}, epa_quantiles_{std::move(epa_quantiles)},
-      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)} {
+      height_stddev_{std::move(height_stddev)}, height_slope_{std::move(height_slope)},
+      region_models_{std::move(region_models)}, ethnicity_models_{std::move(ethnicity_models)},
+      income_models_{std::move(income_models)},
+      income_continuous_stddev_{income_continuous_stddev} {
 
     if (energy_equation_.empty()) {
         throw core::HgpsException("Energy equation mapping is empty");
@@ -799,10 +1236,13 @@ KevinHallModelDefinition::KevinHallModelDefinition(
 }
 
 std::unique_ptr<RiskFactorModel> KevinHallModelDefinition::create_model() const {
-    return std::make_unique<KevinHallModel>(expected_, expected_trend_, trend_steps_,
-                                            energy_equation_, nutrient_ranges_, nutrient_equations_,
-                                            food_prices_, weight_quantiles_, epa_quantiles_,
-                                            height_stddev_, height_slope_);
+    return std::make_unique<KevinHallModel>(
+        std::make_shared<RiskFactorSexAgeTable>(*expected_),
+        std::make_shared<std::unordered_map<core::Identifier, double>>(*expected_trend_),
+        std::make_shared<std::unordered_map<core::Identifier, int>>(*trend_steps_),
+        energy_equation_, nutrient_ranges_, nutrient_equations_, food_prices_, weight_quantiles_,
+        epa_quantiles_, height_stddev_, height_slope_, region_models_, ethnicity_models_,
+        income_models_, income_continuous_stddev_);
 }
 
 } // namespace hgps

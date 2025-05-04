@@ -85,6 +85,7 @@ class Simulation : public adevs::Model<int> {
     std::shared_ptr<DiseaseModule> disease_;
     std::shared_ptr<UpdatableModule> analysis_;
     adevs::Time end_time_;
+    bool is_intervention_{false}; // Flag to identify if this is an intervention simulation
 
     void initialise_population();
     void update_population();
@@ -100,6 +101,16 @@ class Simulation : public adevs::Model<int> {
     std::map<std::string, core::UnivariateSummary> create_input_data_summary() const;
 
     static Person partial_clone_entity(const Person &source) noexcept;
+
+    // Write person data to a stream
+    // This function writes the person data to a stream in a CSV format
+    // because the person data is stored in an unordered_map, we need to iterate through the map and
+    // write the data to the stream
+    void write_person_data(std::ostream &stream, const Person &person, unsigned int time) const;
+    void write_header(std::ostream &stream) const;
+
+    static constexpr char separator_ = ',';           // Add separator for CSV output
+    std::vector<core::Identifier> risk_factor_names_; // Add member variable for risk factor names
 };
 
 } // namespace hgps
