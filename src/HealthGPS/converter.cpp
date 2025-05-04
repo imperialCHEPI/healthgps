@@ -176,4 +176,20 @@ LmsDefinition StoreConverter::to_lms_definition(const std::vector<core::LmsDataR
 
     return {std::move(lms_dataset)};
 }
+
+std::map<int, std::map<int, PopulationRecord>>
+StoreConverter::to_population_records(const std::vector<core::PopulationItem> &items) {
+    auto result = std::map<int, std::map<int, PopulationRecord>>{};
+
+    for (const auto &item : items) {
+        if (!result.contains(item.at_time)) {
+            result.emplace(item.at_time, std::map<int, PopulationRecord>{});
+        }
+
+        result.at(item.at_time)
+            .emplace(item.with_age, PopulationRecord(item.with_age, item.males, item.females));
+    }
+
+    return result;
+}
 } // namespace hgps::detail

@@ -292,7 +292,7 @@ TEST(TestSimulation, CreateSESNoiseModule) {
     context.reset_population(10);
 
     auto ses_module = build_ses_noise_module(repository, *inputs);
-    ses_module->initialise_population(context);
+    ses_module->initialise_population(context, context.population(), context.random());
 
     ASSERT_EQ(SimulationModuleType::SES, ses_module->type());
     ASSERT_EQ("SES", ses_module->name());
@@ -358,7 +358,8 @@ std::make_unique<DynamicHierarchicalLinearModel>(dynamic_definion));
 
 TEST(TestSimulation, CreateRiskFactorModuleFailWithEmpty) {
     using namespace hgps;
-    ASSERT_THROW(RiskFactorModule{{}}, std::invalid_argument);
+    std::map<RiskFactorModelType, std::unique_ptr<RiskFactorModel>> empty_models;
+    ASSERT_THROW(RiskFactorModule{std::move(empty_models)}, std::invalid_argument);
 }
 
 /*
@@ -431,4 +432,24 @@ TEST(TestSimulation, CreateAnalysisModule) {
     auto analysis_module = build_analysis_module(repository, *inputs);
     ASSERT_EQ(SimulationModuleType::Analysis, analysis_module->type());
     ASSERT_EQ("Analysis", analysis_module->name());
+}
+
+TEST(SimulationTest, InitializationTest) {
+    using namespace hgps;
+    using namespace hgps::input;
+
+    DataTable data;
+    create_test_datatable(data);
+
+    auto inputs = create_test_configuration(data);
+    auto manager = DataManager(test_datastore_path);
+    auto repository = CachedRepository(manager);
+    auto bus = std::make_shared<DefaultEventBus>();
+    auto channel = SyncChannel{};
+    auto scenario = std::make_unique<BaselineScenario>(channel);
+    auto context = RuntimeContext(bus, inputs, std::move(scenario));
+    context.reset_population(10);
+
+    auto ses_module = build_ses_noise_module(repository, *inputs);
+    ses_module->initialise_population(context, context.population(), context.random());
 }
