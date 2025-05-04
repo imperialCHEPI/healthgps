@@ -18,7 +18,7 @@ DefaultEventBus::subscribe(EventType event_id,
     return std::make_unique<EventSubscriberHandler>(handle_id, this);
 }
 
-void DefaultEventBus::publish(std::unique_ptr<EventMessage> message) const {
+void DefaultEventBus::publish(std::unique_ptr<EventMessage> message) {
     shared_access([&]() {
         std::shared_ptr<EventMessage> shared_message = std::move(message);
 
@@ -30,7 +30,7 @@ void DefaultEventBus::publish(std::unique_ptr<EventMessage> message) const {
     });
 }
 
-void DefaultEventBus::publish_async(std::unique_ptr<EventMessage> message) const {
+void DefaultEventBus::publish_async(std::unique_ptr<EventMessage> message) {
     auto futptr = std::make_shared<std::future<void>>();
     *futptr = core::run_async(&DefaultEventBus::publish, this, std::move(message));
 }

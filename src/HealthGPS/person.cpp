@@ -15,13 +15,22 @@ std::map<core::Identifier, std::function<double(const Person &)>> Person::curren
     {"Over18"_id, [](const Person &p) { return static_cast<double>(p.over_18()); }},
     {"Sector"_id, [](const Person &p) { return p.sector_to_value(); }},
     {"Income"_id, [](const Person &p) { return p.income_to_value(); }},
+    {"Region"_id, [](const Person &p) { return p.region_to_value(); }},
+    {"Ethnicity"_id, [](const Person &p) { return p.ethnicity_to_value(); }},
     {"SES"_id, [](const Person &p) { return p.ses; }},
 };
+// Modified- Mahima
+// Creating default constructors (that don't require arguments)
+// Pointed out by Clang-Tidy hence removed
+Person::Person() : id_{++newUID} {} // Only initialize id_, other members use class defaults
 
-Person::Person() : id_{++Person::newUID} {}
-
+// Modified- Mahima
+// Creating parameterized constructor (that require arguments)
+// Removed the default constructor as it was not being used in the code
+// Pointed out by Clang-Tidy
 Person::Person(const core::Gender birth_gender) noexcept
-    : gender{birth_gender}, id_{++Person::newUID} {}
+    : id_{++newUID},          // Must be first
+      gender{birth_gender} {} // Only initialize id_ and gender
 
 std::size_t Person::id() const noexcept { return id_; }
 
@@ -77,7 +86,7 @@ float Person::sector_to_value() const {
 }
 
 float Person::income_to_value() const {
-    switch (income) {
+    switch (income_category) {
     case core::Income::low:
         return 1.0f;
     case core::Income::lowermiddle:
@@ -86,9 +95,8 @@ float Person::income_to_value() const {
         return 3.0f;
     case core::Income::high:
         return 4.0f;
-    case core::Income::unknown:
     default:
-        throw core::HgpsException("Unknown income category");
+        throw core::HgpsException("Income category is unknown");
     }
 }
 
@@ -105,6 +113,22 @@ float Person::region_to_value() const {
     case core::Region::unknown:
     default:
         throw core::HgpsException("Region is unknown.");
+    }
+}
+
+float Person::ethnicity_to_value() const {
+    switch (ethnicity) {
+    case core::Ethnicity::White:
+        return 1.0f;
+    case core::Ethnicity::Asian:
+        return 2.0f;
+    case core::Ethnicity::Black:
+        return 3.0f;
+    case core::Ethnicity::Others:
+        return 4.0f;
+    case core::Ethnicity::unknown:
+    default:
+        throw core::HgpsException("Ethnicity is unknown.");
     }
 }
 
@@ -127,4 +151,20 @@ void Person::die(const unsigned int time) {
 }
 
 void Person::reset_id() { Person::newUID = 0; }
+
+// Copy constructor because of unordered_map in Person class hence deep copy is needed
+void Person::copy_from(const Person &other) {
+    // Make sure all demographics are properly copied
+    age = other.age;
+    gender = other.gender;
+    region = other.region;
+    ethnicity = other.ethnicity;
+    income_continuous = other.income_continuous;
+    income_category = other.income_category;
+    sector = other.sector;
+    ses = other.ses;
+    risk_factors = other.risk_factors;
+    diseases = other.diseases;
+    // Don't copy private members like is_alive_, has_emigrated_, etc.
+}
 } // namespace hgps

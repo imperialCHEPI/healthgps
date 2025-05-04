@@ -83,6 +83,24 @@ enum class Region : uint8_t {
     NorthernIreland
 };
 
+/// @brief Enumerates ethnicity categories
+enum class Ethnicity : uint8_t {
+    /// @brief Unknown ethnicity
+    unknown,
+
+    /// @brief White ethnicity
+    White,
+
+    /// @brief Asian ethnicity
+    Asian,
+
+    /// @brief Black ethnicity
+    Black,
+
+    /// @brief Other ethnicities
+    Others
+};
+
 /// @brief C++20 concept for numeric columns types
 template <typename T>
 concept Numerical = std::is_arithmetic_v<T>;
@@ -102,11 +120,12 @@ struct LookupGenderValue {
 class DataTable;
 class DataTableColumn;
 
+class DataTableColumnVisitor;
+
+// Forward declarations for specialized column types
 class StringDataTableColumn;
 class FloatDataTableColumn;
 class DoubleDataTableColumn;
 class IntegerDataTableColumn;
-
-class DataTableColumnVisitor;
 
 } // namespace hgps::core
