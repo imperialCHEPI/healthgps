@@ -278,12 +278,11 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
             // NOTE: we only have the ages we requested here.
             double W_expected =
                 get_expected(context, W_mean_sex, W_mean_age, "Weight"_id, std::nullopt, true);
-            
+
             // NaN check for weight calculations
             if (std::isnan(W_expected) || std::isnan(W_mean)) {
                 std::cout << "\nWARNING: NaN detected in weight adjustment calculation for "
-                          << ", age=" << W_mean_age
-                          << ". Using 0 adjustment." << std::endl;
+                          << ", age=" << W_mean_age << ". Using 0 adjustment." << std::endl;
                 adjustments.at(W_mean_sex)[W_mean_age] = 0.0;
                 continue;
             }
