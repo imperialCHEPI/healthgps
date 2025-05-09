@@ -245,7 +245,7 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
     // Keep trying until we get a message of the correct type
     auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
-    
+
     while (!messagePrt) {
         message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         while (!message.has_value()) {

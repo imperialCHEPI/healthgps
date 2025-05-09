@@ -634,10 +634,10 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
         while (!message.has_value()) {
             message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         }
-        
+
         // Keep trying until we get a message of the correct type
         auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
-        
+
         while (!messagePrt) {
             message = context.scenario().channel().try_receive(context.sync_timeout_millis());
             while (!message.has_value()) {
@@ -645,7 +645,7 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
             }
             messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
         }
-        
+
         residual_death_rates_ = messagePrt->data();
     }
 }
