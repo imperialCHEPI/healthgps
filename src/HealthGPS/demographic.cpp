@@ -631,19 +631,22 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
             context.current_run(), context.time_now(), std::move(residual_mortality)));
     } else {
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (message.has_value()) {
-            auto &basePtr = message.value();
-            auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(basePtr.get());
-            if (messagePrt) {
-                residual_death_rates_ = messagePrt->data();
-            } else {
-                throw std::runtime_error(
-                    "Simulation out of sync, failed to receive a residual mortality message");
-            }
-        } else {
-            throw std::runtime_error(
-                "Simulation out of sync, receive residual mortality message has timed out");
+        while (!message.has_value()) {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         }
+        
+        // Keep trying until we get a message of the correct type
+        auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
+        
+        while (!messagePrt) {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            while (!message.has_value()) {
+                message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            }
+            messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
+        }
+        
+        residual_death_rates_ = messagePrt->data();
     }
 }
 

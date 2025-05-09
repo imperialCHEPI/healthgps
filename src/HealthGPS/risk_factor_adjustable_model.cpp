@@ -86,20 +86,18 @@ void RiskFactorAdjustableModel::adjust_risk_factors(RuntimeContext &context,
         // std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - Receiving
         // adjustments for intervention";
         auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        if (!message.has_value()) {
-            std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Timed "
-                         "out waiting for adjustment message";
-            throw core::HgpsException(
-                "Simulation out of sync, receive baseline adjustments message has timed out");
+        while (!message.has_value()) {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
         }
 
-        auto &basePtr = message.value();
-        auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(basePtr.get());
-        if (!messagePrt) {
-            std::cout << "\nDEBUG: RiskFactorAdjustableModel::adjust_risk_factors - ERROR: Failed "
-                         "to receive adjustment message";
-            throw core::HgpsException(
-                "Simulation out of sync, failed to receive a baseline adjustments message");
+        // Keep trying until we get a message of the correct type
+        auto *messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(message.value().get());
+        while (!messagePrt) {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            while (!message.has_value()) {
+                message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+            }
+            messagePrt = dynamic_cast<RiskFactorAdjustmentMessage *>(message.value().get());
         }
 
         adjustments = messagePrt->data();

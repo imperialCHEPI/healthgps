@@ -239,16 +239,19 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
 
     // Intervention scenario: receive adjustments from baseline scenario.
     auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-    if (!message.has_value()) {
-        throw core::HgpsException(
-            "Simulation out of sync, receive Kevin Hall adjustments message has timed out");
+    while (!message.has_value()) {
+        message = context.scenario().channel().try_receive(context.sync_timeout_millis());
     }
 
-    auto &basePtr = message.value();
-    auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(basePtr.get());
-    if (!messagePrt) {
-        throw core::HgpsException(
-            "Simulation out of sync, failed to receive a Kevin Hall adjustments message");
+    // Keep trying until we get a message of the correct type
+    auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
+    
+    while (!messagePrt) {
+        message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        while (!message.has_value()) {
+            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
+        }
+        messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
     }
 
     return messagePrt->data();
