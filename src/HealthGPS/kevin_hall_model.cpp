@@ -207,6 +207,16 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
             initialise_kevin_hall_state(person, adjustment);
         } else {
             adjust_weight(person, adjustment);
+
+            // Ensure adjustment won't push weight outside of valid range
+            if (nutrient_ranges_.contains("Weight"_id)) {
+                // Calculate the max possible adjustment to keep values in range
+                double max_adjustment = nutrient_ranges_.at("Weight"_id).upper();
+                double min_adjustment = nutrient_ranges_.at("Weight"_id).lower();
+
+                // Clamp the adjustment so it keeps weight in range
+                adjustment = std::clamp(adjustment, min_adjustment, max_adjustment);
+            }
         }
     }
 
@@ -290,16 +300,6 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
                 continue;
             }
             double adjustment = W_expected - W_mean;
-
-            // Ensure adjustment won't push weight outside of valid range
-            if (nutrient_ranges_.contains("Weight"_id)) {
-                // Calculate the max possible adjustment to keep values in range
-                double max_adjustment = nutrient_ranges_.at("Weight"_id).upper() - W_mean;
-                double min_adjustment = nutrient_ranges_.at("Weight"_id).lower() - W_mean;
-
-                // Clamp the adjustment so it keeps weight in range
-                adjustment = std::clamp(adjustment, min_adjustment, max_adjustment);
-            }
 
             adjustments.at(W_mean_sex)[W_mean_age] = adjustment;
         }
