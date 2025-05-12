@@ -236,7 +236,7 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         double W_power_mean = W_power_means.at(person.gender, person.age);
         update_height(context, person, W_power_mean);
     }
-}// NOLINTEND(readability-function-cognitive-complexity)
+} // NOLINTEND(readability-function-cognitive-complexity)
 
 KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeContext &context) const {
     // std::cout << "\nDEBUG: KevinHallModel::receive_weight_adjustments - Starting" << std::endl;

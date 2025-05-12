@@ -694,7 +694,7 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
 
     // std::cout << "\nDEBUG: Finished physical activity initialization for person ID " <<
     // person.id();
-}// NOLINTEND(readability-function-cognitive-complexity)
+} // NOLINTEND(readability-function-cognitive-complexity)
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
