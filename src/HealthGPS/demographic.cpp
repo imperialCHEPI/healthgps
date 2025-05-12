@@ -470,16 +470,11 @@ void DemographicModule::initialise_income_continuous([[maybe_unused]] RuntimeCon
 
         // Add random noise
         double noise = random.next_normal(0.0, income_stddev);
-        double final_value = value * (1.0 + noise);
+        double final_value = value + noise;  // Add noise instead of multiplying
 
         // Apply min/max bounds if they exist in the model
-        if (model.coefficients.count("min") > 0) {
-            final_value = std::max(final_value, model.coefficients.at("min"));
-        }
-
-        if (model.coefficients.count("max") > 0) {
-            final_value = std::min(final_value, model.coefficients.at("max"));
-        }
+        final_value = std::max(final_value, model.coefficients.at("min"));
+        final_value = std::min(final_value, model.coefficients.at("max"));
 
         // Set the income_continuous value
         person.income_continuous = final_value;

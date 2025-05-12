@@ -676,8 +676,11 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
         double noise = random.next_normal(0.0, pa_stddev);
 
         // Calculate final value with noise
-        final_value = value * (1.0 + noise);
-        // std::cout << "\nDEBUG: Calculated final physical activity value: " << final_value;
+        final_value = value + noise;  // Add noise instead of multiplying
+
+        // Apply min/max bounds if they exist in the model
+        final_value = std::max(final_value, model.coefficients.at("min"));
+        final_value = std::min(final_value, model.coefficients.at("max"));
 
         // Set the physical activity value
         person.risk_factors[core::Identifier("PhysicalActivity")] = final_value;
