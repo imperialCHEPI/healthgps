@@ -208,13 +208,13 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         } else {
             // Apply the adjustment
             adjust_weight(person, adjustment);
-            
+
             // Ensure the final weight is within valid range
             if (nutrient_ranges_.contains("Weight"_id)) {
                 double current_weight = person.risk_factors.at("Weight"_id);
-                double clamped_weight = std::clamp(current_weight, 
-                                                 nutrient_ranges_.at("Weight"_id).lower(),
-                                                 nutrient_ranges_.at("Weight"_id).upper());
+                double clamped_weight =
+                    std::clamp(current_weight, nutrient_ranges_.at("Weight"_id).lower(),
+                               nutrient_ranges_.at("Weight"_id).upper());
                 person.risk_factors.at("Weight"_id) = clamped_weight;
             }
         }
