@@ -570,6 +570,7 @@ void StaticLinearModel::update_sector(Person &person, Random &random) const {
 }
 // Physical activity depends on age. gender, region, ethnicity, income_continuous and random noise
 // with std dev Loaded from the static_model.json under the Physical Activity Models section
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeContext &context,
                                                      Person &person, Random &random) const {
     // std::cout << "\nDEBUG: Inside physical activity initialization";
@@ -693,7 +694,7 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
 
     // std::cout << "\nDEBUG: Finished physical activity initialization for person ID " <<
     // person.id();
-}
+}// NOLINTEND(readability-function-cognitive-complexity)
 
 StaticLinearModelDefinition::StaticLinearModelDefinition(
     std::unique_ptr<RiskFactorSexAgeTable> expected,
