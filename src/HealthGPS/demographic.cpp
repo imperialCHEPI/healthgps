@@ -627,7 +627,7 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
     } else {
         // Initialize message with a value that has_value() will return false for
         std::optional<std::unique_ptr<SyncMessage>> message;
-        
+
         // Keep trying until we get a message
         do {
             message = context.scenario().channel().try_receive(context.sync_timeout_millis());
@@ -641,7 +641,7 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
             do {
                 message = context.scenario().channel().try_receive(context.sync_timeout_millis());
             } while (!message.has_value());
-            
+
             messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
         }
 
