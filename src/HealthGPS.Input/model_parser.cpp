@@ -1000,6 +1000,8 @@ load_ebhlm_risk_model_definition(const nlohmann::json &opt, const Configuration 
         std::move(equations), std::move(variables), percentage);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
+
+//NONLINTBEGIN(readability-function-cognitive-complexity)
 std::unique_ptr<hgps::KevinHallModelDefinition>
 load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configuration &config) {
     MEASURE_FUNCTION();
@@ -1020,6 +1022,27 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
+    
+    // Add Weight range from config.json risk_factors section
+    try {
+        // Load config.json to get Weight range
+        auto config_json = load_json(config.root_path / "config.json");
+        if (config_json.contains("modelling") && config_json["modelling"].contains("risk_factors")) {
+            for (const auto &risk_factor : config_json["modelling"]["risk_factors"]) {
+                if (risk_factor["name"] == "Weight") {
+                    hgps::core::Identifier weight_key("Weight");
+                    nutrient_ranges[weight_key] = risk_factor["range"].get<hgps::core::DoubleInterval>();
+                    std::cout << "\nAdded Weight range from config.json: [" 
+                              << nutrient_ranges[weight_key].lower() << ", " 
+                              << nutrient_ranges[weight_key].upper() << "]";
+                    break;
+                }
+            }
+        }
+    } catch (const std::exception &e) {
+        std::cout << "\nWARNING: Failed to load Weight range from config.json: " << e.what();
+    }
+    
     // std::cout << "\nFinished loading Kevin Hall nutrients";
 
     // Food groups.
