@@ -608,9 +608,9 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
         // Process coefficients
         for (const auto &[factor_name, coefficient] : model.coefficients) {
             // Skip the standard deviation entry as it's not a factor
-            if (factor_name == "stddev"_id)
+            if (factor_name == "stddev"_id) {
                 continue;
-
+            }
             // Apply coefficient based on its name
             double factor_value = 0.0;
 
@@ -669,7 +669,7 @@ void StaticLinearModel::initialise_physical_activity([[maybe_unused]] RuntimeCon
 
         // Get the standard deviation
         double pa_stddev = physical_activity_stddev_;
-        if (model.coefficients.count("stddev"_id) > 0) {
+        if (model.coefficients.contains("stddev"_id)) {
             pa_stddev = model.coefficients.at("stddev"_id);
         }
 

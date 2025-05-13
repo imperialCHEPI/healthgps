@@ -625,19 +625,23 @@ void DemographicModule::update_residual_mortality(RuntimeContext &context,
         context.scenario().channel().send(std::make_unique<ResidualMortalityMessage>(
             context.current_run(), context.time_now(), std::move(residual_mortality)));
     } else {
-        auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        while (!message.has_value()) {
+        // Initialize message with a value that has_value() will return false for
+        std::optional<std::unique_ptr<SyncMessage>> message;
+        
+        // Keep trying until we get a message
+        do {
             message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        }
+        } while (!message.has_value());
 
         // Keep trying until we get a message of the correct type
         auto *messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
 
         while (!messagePrt) {
-            message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-            while (!message.has_value()) {
+            // Initialize message again to avoid uninitialized variable warning
+            do {
                 message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-            }
+            } while (!message.has_value());
+            
             messagePrt = dynamic_cast<ResidualMortalityMessage *>(message.value().get());
         }
 

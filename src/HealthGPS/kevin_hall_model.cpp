@@ -45,9 +45,20 @@ KevinHallModel::KevinHallModel(
 
     // Print nutrient ranges to verify they're loaded correctly
     std::cout << "\n======= LOADED NUTRIENT RANGES IN KEVIN HALL =======";
+    bool weight_range_found = false;
     for (const auto &[key, range] : nutrient_ranges_) {
         std::cout << "\nNutrient: " << key.to_string() << ", Range: [" << range.lower() << " , "
                   << range.upper() << "]";
+        if (key == "Weight"_id) {
+            weight_range_found = true;
+            std::cout << " <--- WEIGHT RANGE FOUND!";
+        }
+    }
+    
+    if (!weight_range_found) {
+        std::cout << "\n!!! WARNING: WEIGHT RANGE NOT FOUND IN NUTRIENT RANGES !!!";
+    } else {
+        std::cout << "\n*** Weight range is defined and will be used for clamping ***";
     }
     std::cout << "\n=====================================\n";
 }
@@ -68,6 +79,25 @@ void KevinHallModel::generate_risk_factors(RuntimeContext &context) {
 
     // Adjust weight mean to match expected.
     adjust_risk_factors(context, {"Weight"_id}, std::nullopt, true);
+    
+    // Print weight values for a sample of people after adjustment
+    std::cout << "\n===== WEIGHT ADJUSTMENT CHECK: SAMPLE OF 5 PEOPLE =====";
+    int sample_count = 0;
+    int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
+    for (const auto &person : context.population()) {
+        if (!person.is_active()) continue;
+        
+        if (person.id() % print_interval == 0 && sample_count < 5) {
+            std::cout << "\nPerson ID: " << person.id()
+                      << ", Age: " << person.age
+                      << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                      << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg";
+            sample_count++;
+        }
+        
+        if (sample_count >= 5) break;
+    }
+    std::cout << "\n================================================\n";
 
     // Compute weight power means by sex and age.
     auto W_power_means = compute_mean_weight(context.population(), height_slope_);
@@ -208,17 +238,43 @@ void KevinHallModel::update_non_newborns(RuntimeContext &context) const {
         } else {
             // Apply the adjustment
             adjust_weight(person, adjustment);
-
+            
             // Ensure the final weight is within valid range
             if (nutrient_ranges_.contains("Weight"_id)) {
                 double current_weight = person.risk_factors.at("Weight"_id);
                 double clamped_weight =
                     std::clamp(current_weight, nutrient_ranges_.at("Weight"_id).lower(),
-                               nutrient_ranges_.at("Weight"_id).upper());
+                                nutrient_ranges_.at("Weight"_id).upper());
                 person.risk_factors.at("Weight"_id) = clamped_weight;
             }
         }
     }
+    
+    // Print weight values for a sample of people after adjustment
+    std::cout << "\n===== WEIGHT ADJUSTMENT CHECK DURING UPDATE: SAMPLE OF 5 PEOPLE =====";
+    std::cout << "\nYear: " << context.time_now();
+    int sample_count = 0;
+    int print_interval = std::max(1, static_cast<int>(context.population().size() / 5));
+    for (const auto &person : context.population()) {
+        if (!person.is_active() || person.age == 0) continue;
+        
+        if (person.id() % print_interval == 0 && sample_count < 5) {
+            double adjustment_value = 0.0;
+            if (adjustments.contains(person.gender, person.age)) {
+                adjustment_value = adjustments.at(person.gender, person.age);
+            }
+            
+            std::cout << "\nPerson ID: " << person.id()
+                      << ", Age: " << person.age
+                      << ", Gender: " << (person.gender == core::Gender::male ? "Male" : "Female")
+                      << ", Weight: " << person.risk_factors.at("Weight"_id) << " kg"
+                      << ", Adjustment: " << adjustment_value;
+            sample_count++;
+        }
+        
+        if (sample_count >= 5) break;
+    }
+    std::cout << "\n=================================================================\n";
 
     // Send (baseline) weight adjustments to intervention scenario.
     send_weight_adjustments(context, std::move(adjustments));
@@ -295,7 +351,7 @@ KevinHallModel::compute_weight_adjustments(RuntimeContext &context,
             // NaN check for weight calculations
             if (std::isnan(W_expected) || std::isnan(W_mean)) {
                 std::cout << "\nWARNING: NaN detected in weight adjustment calculation for "
-                          << ", age=" << W_mean_age << ". Using 0 adjustment." << std::endl;
+                          << "age=" << W_mean_age << ". Using 0 adjustment." << std::endl;
                 adjustments.at(W_mean_sex)[W_mean_age] = 0.0;
                 continue;
             }
