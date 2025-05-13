@@ -306,19 +306,23 @@ KevinHallAdjustmentTable KevinHallModel::receive_weight_adjustments(RuntimeConte
     }
 
     // Intervention scenario: receive adjustments from baseline scenario.
-    auto message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-    while (!message.has_value()) {
+    // Initialize message with a value that has_value() will return false for
+    std::optional<std::unique_ptr<SyncMessage>> message;
+    
+    // Keep trying until we get a message
+    do {
         message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-    }
+    } while (!message.has_value());
 
     // Keep trying until we get a message of the correct type
     auto *messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
 
     while (!messagePrt) {
-        message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        while (!message.has_value()) {
+        // Initialize message again to avoid uninitialized variable warning
+        do {
             message = context.scenario().channel().try_receive(context.sync_timeout_millis());
-        }
+        } while (!message.has_value());
+        
         messagePrt = dynamic_cast<KevinHallAdjustmentMessage *>(message.value().get());
     }
 
