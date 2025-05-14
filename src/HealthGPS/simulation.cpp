@@ -136,9 +136,9 @@ void Simulation::initialise_population() {
     std::cout << "\nDEBUG: population with size " << virtual_pop_size;
 
     // Gender - Age, must be first
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic";
     demographic_->initialise_population(context_);
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed";
 
     // Social economics status- NOT BEING USED FOR FINCH- Mahima
     /*std::cout << "\nDEBUG: Simulation::initialise_population - Initializing SES" << std::endl;

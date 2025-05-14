@@ -255,8 +255,9 @@ void StaticLinearModel::initialise_factors(RuntimeContext &context, Person &pers
         double zero_probability = calculate_zero_probability(person, i);
 
         // Sample from this probability to determine if risk factor should be zero
+        // if logistic regression output = 1, risk factor value = 0
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
-        if (random_sample < zero_probability) {
+        if (random_sample > zero_probability) {
             // Risk factor should be zero
             person.risk_factors[names_[i]] = 0.0;
             continue;
@@ -320,8 +321,9 @@ void StaticLinearModel::update_factors(RuntimeContext &context, Person &person,
         double zero_probability = calculate_zero_probability(person, RiskFactorIndex);
 
         // Sample from this probability to determine if risk factor should be zero
+        // if logistic regression output = 1, risk factor value = 0
         double random_sample = random.next_double(); // Uniform random value between 0 and 1
-        if (random_sample < zero_probability) {
+        if (random_sample > zero_probability) {
             // Risk factor should be zero
             person.risk_factors.at(names_[RiskFactorIndex]) = 0.0;
             continue; // Skip to next risk factor

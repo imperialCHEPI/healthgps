@@ -1022,29 +1022,41 @@ load_kevinhall_risk_model_definition(const nlohmann::json &opt, const Configurat
         nutrient_ranges[nutrient_key] = nutrient["Range"].get<hgps::core::DoubleInterval>();
         energy_equation[nutrient_key] = nutrient["Energy"].get<double>();
     }
-
-    // Add Weight range from config.json risk_factors section
+    
+    // Add additional important ranges from config.json risk_factors section- Mahima
     try {
-        // Load config.json to get Weight range
+        // Load config.json to get additional ranges
         auto config_json = load_json(config.root_path / "config.json");
         if (config_json.contains("modelling") &&
             config_json["modelling"].contains("risk_factors")) {
+            
+            // List of important risk factors to load ranges for
+            const std::vector<std::string> important_factors = {
+                "Weight", "Height", "BMI", "EnergyIntake", "Age", "Age2", "Age3"
+            };
+            
+            int factors_added = 0;
             for (const auto &risk_factor : config_json["modelling"]["risk_factors"]) {
-                if (risk_factor["name"] == "Weight") {
-                    hgps::core::Identifier weight_key("Weight");
-                    nutrient_ranges[weight_key] =
-                        risk_factor["range"].get<hgps::core::DoubleInterval>();
-                    std::cout << "\nAdded Weight range from config.json: ["
-                              << nutrient_ranges[weight_key].lower() << ", "
-                              << nutrient_ranges[weight_key].upper() << "]";
-                    break;
+                const std::string rf_name = risk_factor["name"];
+                
+                // Check if this is one of our important factors
+                if (std::find(important_factors.begin(), important_factors.end(), rf_name) != important_factors.end()) {
+                    hgps::core::Identifier factor_key(rf_name);
+                    nutrient_ranges[factor_key] = risk_factor["range"].get<hgps::core::DoubleInterval>();
+                    factors_added++;
+                    
+                    std::cout << "\nAdded " << rf_name << " range from config.json: [" 
+                              << nutrient_ranges[factor_key].lower() << ", " 
+                              << nutrient_ranges[factor_key].upper() << "]";
                 }
             }
+            
+            std::cout << "\nLoaded " << factors_added << " additional factor ranges from config.json";
         }
     } catch (const std::exception &e) {
-        std::cout << "\nWARNING: Failed to load Weight range from config.json: " << e.what();
+        std::cout << "\nWARNING: Failed to load additional ranges from config.json: " << e.what();
     }
-
+    
     // std::cout << "\nFinished loading Kevin Hall nutrients";
 
     // Food groups.
