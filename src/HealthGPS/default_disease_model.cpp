@@ -198,6 +198,16 @@ void DefaultDiseaseModel::update_remission_cases(RuntimeContext &context) {
             person.diseases.at(disease_type()).status != DiseaseStatus::active) {
             continue;
         }
+        // Enhanced logging with more details
+        std::cout << "\nDEBUG MAP ACCESS: Person #" << person.id() << " Age=" << person.age
+                  << " Gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                  << " Disease=" << disease_type().to_string()
+                  << " Checking remission_id=" << remission_id;
+
+        // Check if the table contains this age
+        if (!definition_.get().table().contains(person.age)) {
+            std::cout << "\nMAP ERROR DETAIL: Age " << person.age << " not found in disease table";
+        }
 
         auto probability = definition_.get().table()(person.age, person.gender).at(remission_id);
         auto hazard = context.random().next_double();
@@ -227,6 +237,16 @@ void DefaultDiseaseModel::update_incidence_cases(RuntimeContext &context) {
             person.diseases.at(disease_type()).status == DiseaseStatus::active) {
             continue;
         }
+        // Enhanced logging with more details
+        std::cout << "\nDEBUG MAP ACCESS: Person #" << person.id() << " Age=" << person.age
+                  << " Gender=" << (person.gender == core::Gender::male ? "male" : "female")
+                  << " Disease=" << disease_type().to_string()
+                  << " Checking incidence_id=" << incidence_id;
+
+        // Check if the table contains this age
+        if (!definition_.get().table().contains(person.age)) {
+            std::cout << "\nMAP ERROR DETAIL: Age " << person.age << " not found in disease table";
+
 
         double relative_risk = 1.0;
         relative_risk *= calculate_relative_risk_for_risk_factors(person);

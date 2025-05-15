@@ -136,9 +136,9 @@ void Simulation::initialise_population() {
     std::cout << "\nDEBUG: population with size " << virtual_pop_size;
 
     // Gender - Age, must be first
-    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic";
+    //std::cout << "\nDEBUG: Simulation::initialise_population - Initializing demographic";
     demographic_->initialise_population(context_);
-    std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed";
+    //std::cout << "\nDEBUG: Simulation::initialise_population - Demographic completed";
 
     // Social economics status- NOT BEING USED FOR FINCH- Mahima
     /*std::cout << "\nDEBUG: Simulation::initialise_population - Initializing SES" << std::endl;
@@ -146,22 +146,22 @@ void Simulation::initialise_population() {
     std::cout << "\nDEBUG: Simulation::initialise_population - SES completed" << std::endl;*/
 
     // Generate risk factors
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing risk factors";
+    //std::cout << "\nDEBUG: Simulation::initialise_population - Initializing risk factors";
     risk_factor_->initialise_population(context_);
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Risk factors completed";
+    //std::cout << "\nDEBUG: Simulation::initialise_population - Risk factors completed";
 
     // Initialise diseases
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing diseases";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing diseases";
     disease_->initialise_population(context_);
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Diseases completed";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Diseases completed";
 
     // Initialise analysis
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Initializing analysis";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Initializing analysis";
     analysis_->initialise_population(context_);
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Analysis completed";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Analysis completed";
 
     print_initial_population_statistics();
-    // std::cout << "\nDEBUG: Simulation::initialise_population - Completed";
+    std::cout << "\nDEBUG: Simulation::initialise_population - Completed";
 }
 
 void Simulation::update_population() {
@@ -169,14 +169,14 @@ void Simulation::update_population() {
     /* Note: order is very important */
 
     // update basic information: demographics + diseases
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating demographic";
+    //std::cout << "\nDEBUG: Simulation::update_population - Updating demographic";
     demographic_->update_population(context_, *disease_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Demographic updated";
+    //std::cout << "\nDEBUG: Simulation::update_population - Demographic updated";
 
     // Calculate the net immigration by gender and age, update the population accordingly
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating net immigration";
+    //std::cout << "\nDEBUG: Simulation::update_population - Updating net immigration";
     update_net_immigration();
-    // std::cout << "\nDEBUG: Simulation::update_population - Net immigration updated";
+    //std::cout << "\nDEBUG: Simulation::update_population - Net immigration updated";
 
     // update population socio-economic status- Not using SES for FINCH- Mahima
     /*std::cout << "\nDEBUG: Simulation::update_population - Updating SES" << std::endl;
@@ -184,22 +184,21 @@ void Simulation::update_population() {
     std::cout << "\nDEBUG: Simulation::update_population - SES updated" << std::endl;*/
 
     // Update population risk factors
-    // std::cout << "\nDEBUG: Simulation::update_population - About to call
-    // risk_factor_->update_population";
+    //std::cout << "\nDEBUG: Simulation::update_population - About to call risk_factor_->update_population";
     risk_factor_->update_population(context_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Risk factors updated";
+    //std::cout << "\nDEBUG: Simulation::update_population - Risk factors updated";
 
     // Update diseases status: remission and incidence
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating diseases";
+    //std::cout << "\nDEBUG: Simulation::update_population - Updating diseases";
     disease_->update_population(context_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Diseases updated";
+    //std::cout << "\nDEBUG: Simulation::update_population - Diseases updated";
 
     // Publish results to data logger
-    // std::cout << "\nDEBUG: Simulation::update_population - Updating analysis";
+    //std::cout << "\nDEBUG: Simulation::update_population - Updating analysis";
     analysis_->update_population(context_);
-    // std::cout << "\nDEBUG: Simulation::update_population - Analysis updated";
+    //std::cout << "\nDEBUG: Simulation::update_population - Analysis updated";
 
-    // std::cout << "\nDEBUG: Simulation::update_population - Completed";
+    //std::cout << "\nDEBUG: Simulation::update_population - Completed";
 }
 
 void Simulation::update_net_immigration() {
